@@ -1,0 +1,10 @@
+E:\Github\CsharpCode\ConsoleApp\ConsoleApp\obj\Debug\ConsoleApp.csproj.CoreCompileInputs.cache
+E:\Github\CsharpCode\ConsoleApp\ConsoleApp\bin\Debug\ConsoleApp.exe.config
+E:\Github\CsharpCode\ConsoleApp\ConsoleApp\bin\Debug\ConsoleApp.exe
+E:\Github\CsharpCode\ConsoleApp\ConsoleApp\bin\Debug\ConsoleApp.pdb
+E:\Github\CsharpCode\ConsoleApp\ConsoleApp\bin\Debug\UnityEditor.dll
+E:\Github\CsharpCode\ConsoleApp\ConsoleApp\bin\Debug\UnityEngine.dll
+E:\Github\CsharpCode\ConsoleApp\ConsoleApp\obj\Debug\ConsoleApp.csproj.CopyComplete
+E:\Github\CsharpCode\ConsoleApp\ConsoleApp\obj\Debug\ConsoleApp.exe
+E:\Github\CsharpCode\ConsoleApp\ConsoleApp\obj\Debug\ConsoleApp.pdb
+E:\Github\CsharpCode\ConsoleApp\ConsoleApp\obj\Debug\ConsoleApp.csprojAssemblyReference.cache
