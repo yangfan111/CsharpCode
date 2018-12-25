@@ -1,0 +1,16 @@
+{
+  "SDList": [
+    {
+      "DS": "E:\\Github\\CsharpCode\\JobModules\\Wise_Unity\\API",
+      "SS": "F:\\voyager\\UnityPackages\\Wwise\\Deployment\\API\\"
+    },
+    {
+      "DS": "E:\\Github\\CsharpCode\\JobModules\\Wise_Unity\\Components",
+      "SS": "F:\\voyager\\UnityPackages\\Wwise\\Deployment\\Components"
+    },
+    {
+      "DS": "E:\\Github\\CsharpCode\\JobModules\\Wise_Imp\\",
+      "SS": "f:\\voyager\\UnityProjects\\App.Client.Unity\\App.Client.Unity-Windows\\Assets\\Core\\Audio\\"
+    }
+  ]
+}

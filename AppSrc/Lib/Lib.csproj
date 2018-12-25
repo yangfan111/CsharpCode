@@ -1,0 +1,85 @@
+﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{65031B6D-2C11-43DD-B160-24F4A626D044}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <NoStandardLibraries>false</NoStandardLibraries>
+    <AssemblyName>Lib</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>Lib</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="UnityEditor">
+      <HintPath>..\Dependent\UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\Dependent\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".vs\ConsoleApp\v15\.suo" />
+    <None Include=".vs\ConsoleApp\v15\Server\sqlite3\db.lock" />
+    <None Include=".vs\ConsoleApp\v15\Server\sqlite3\storage.ide" />
+    <None Include=".vs\ConsoleApp\v15\Server\sqlite3\storage.ide-shm" />
+    <None Include=".vs\ConsoleApp\v15\Server\sqlite3\storage.ide-wal" />
+    <None Include=".vs\YFApps\v15\.suo" />
+    <None Include=".vs\YFApps\v15\Server\sqlite3\db.lock" />
+    <None Include=".vs\YFApps\v15\Server\sqlite3\storage.ide" />
+    <None Include=".vs\YFLib\v15\.suo" />
+    <None Include=".vs\YFLib\v15\Server\sqlite3\db.lock" />
+    <None Include=".vs\YFLib\v15\Server\sqlite3\storage.ide" />
+    <None Include=".vs\YFLib\v15\Server\sqlite3\storage.ide-shm" />
+    <None Include=".vs\YFLib\v15\Server\sqlite3\storage.ide-wal" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="lib\EditorLib.cs" />
+    <Compile Include="lib\Mics.cs" />
+    <Compile Include="lib\TodoLib.cs" />
+    <Compile Include="lib\YF.FileUtil.FS.cs" />
+    <Compile Include="lib\YF.FileUtil.PS.cs" />
+    <Compile Include="lib\YF.FileUtil.Seri.cs" />
+    <Compile Include="lib\YF.Global.cs" />
+    <Compile Include="lib\YF.RunLib.cs" />
+    <Compile Include="lib\YF.Structure.cs" />
+    <Compile Include="practice\_Serializable.cs" />
+    <Compile Include="practice\_URI.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include=".vs\lib\v15\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
+  <ProjectExtensions>
+    <VisualStudio AllowExistingFolder="true" />
+  </ProjectExtensions>
+</Project>
