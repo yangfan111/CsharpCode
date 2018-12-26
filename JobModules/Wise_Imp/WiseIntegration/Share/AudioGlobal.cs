@@ -3,8 +3,10 @@ public class AudioComponent : UnityEngine.MonoBehaviour
 {
     protected bool flagInit = false;
 }
-namespace   Core.Audio
+namespace Core.Audio
 {
+ 
+
     public class AudioConst
     {
         //AKAudioEngineDriver
@@ -24,28 +26,28 @@ namespace   Core.Audio
         public AudioFrameworkException() : base()
         { }
         public AudioFrameworkException(string message)
-            : base("AudioFrame Exception=>"+message)
+            : base("AudioFrame Exception=>" + message)
         {
-            
+
         }
     }
 
 
-        //public class AudioRunTimePoolParams
-        //{
-        //    private static int CustomPoolSize = AkSoundEngineController.s_DefaultPoolSize;
-        //    private static int pooIterator = AudioConst.CustomPoolOriginCounter;
-        //    static readonly List<int> usedPoolList = new List<int>();
-        //    public static bool IsUsed(int poolId)
-        //    {
-        //        return usedPoolList.Contains(poolId);
-        //    }
+    //public class AudioRunTimePoolParams
+    //{
+    //    private static int CustomPoolSize = AkSoundEngineController.s_DefaultPoolSize;
+    //    private static int pooIterator = AudioConst.CustomPoolOriginCounter;
+    //    static readonly List<int> usedPoolList = new List<int>();
+    //    public static bool IsUsed(int poolId)
+    //    {
+    //        return usedPoolList.Contains(poolId);
+    //    }
 
-        //}
+    //}
 
 
 
-        public enum AudioAmbientEmitterType
+    public enum AudioAmbientEmitterType
     {
         ActionOnCustomEventType,
         UseCallback
@@ -83,8 +85,8 @@ namespace   Core.Audio
     }
     public enum AudioGroupType
     {
-        SwitchGroup=1,
-        StateGroup=2,
+        SwitchGroup = 1,
+        StateGroup = 2,
 
     }
 

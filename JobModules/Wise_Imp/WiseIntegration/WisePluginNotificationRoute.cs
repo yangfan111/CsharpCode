@@ -7,7 +7,9 @@ public class WisePluginNotificationRoute : MonoBehaviour
     [HideInInspector]
     public AkInitializer akInteractComponent;
     [HideInInspector]
-    AkAudioListener defaultSpatialListener;
+    public AkAudioListener defaultSpatialListener;
+    public Transform defaultListenerTrans;
+
     void Start()
     {
         
@@ -17,12 +19,29 @@ public class WisePluginNotificationRoute : MonoBehaviour
             GameObject listenerObj = new GameObject("DefaultAudioListenerObj");
             defaultSpatialListener = listenerObj.AddComponent<AkAudioListener>();
             defaultSpatialListener.SetIsDefaultListener(true);
-            var camGo = Camera.main.gameObject;
-            listenerObj.transform.SetParent(camGo.transform);
-            listenerObj.transform.localPosition = Vector3.zero;
+            defaultListenerTrans = defaultSpatialListener.transform;
+            if (Camera.main)
+            {
+                defaultListenerTrans.SetParent(Camera.main.transform);
+                defaultListenerTrans.localPosition = Vector3.zero;
+            }
+            else
+            {
+                defaultListenerTrans.position = Vector3.zero;
+            }
+         
         }
         //TODO:引擎状态判断
         Core.Audio.AKAudioEntry.LaunchAppAudio(this);
+    }
+    private void LateUpdate()
+    {
+        if (defaultListenerTrans.parent) return;
+        if (Camera.main)
+        {
+            defaultListenerTrans.SetParent(Camera.main.transform);
+            defaultListenerTrans.localPosition = Vector3.zero;
+        }
     }
     //void OnWiseEngineStartupReady(System.Object obj)
     //{

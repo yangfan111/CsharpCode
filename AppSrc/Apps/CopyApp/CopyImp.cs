@@ -70,7 +70,7 @@ public class CopyImp
         var imp = obj as ImplentConfig;
         foreach (var data in imp.SDList)
         {
-            FS.DirectoryCopy(data.SS, data.DS, true);
+            FS.FileOrDicretoryCopy(data.SS, data.DS, true);
         }
     }
 

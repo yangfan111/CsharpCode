@@ -7,7 +7,7 @@ namespace YF.FileUtil
     // 获取文件/文件夹信息 
     /// var dir = new DirectoryInfo(sourceDirName)
     /// var files[] = dir.GetFiles()
-    /// file.CopyTo(temppath, true)
+    /// fileInfo.CopyTo(temppath, true)
     // 获取路径的文件夹名
     ///Path.GetDirectoryName
     // 获取文件名:1.通过DirectoryInfo,FileInfo去取 2.静态去取
@@ -35,6 +35,18 @@ namespace YF.FileUtil
         ///         Directory.CreateDirectory(destDirName)
         ///*******dir.GetFiles()
         ///*******file.CopyTo(temppath, true);
+        public static void FileOrDicretoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            if(System.IO.Path.HasExtension(sourceDirName))
+            {
+                System.IO.FileInfo fi = new System.IO.FileInfo(sourceDirName);
+                fi.CopyTo(destDirName, true);
+            }
+            else
+            {
+                DirectoryCopy(sourceDirName, destDirName, copySubDirs);
+            }
+        }
         public static bool DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
         {
             // Get the subdirectories for the specified directory.
