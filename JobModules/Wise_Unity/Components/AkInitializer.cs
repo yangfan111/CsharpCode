@@ -8,7 +8,7 @@
 [UnityEngine.AddComponentMenu("Wwise/AkInitializer")]
 [UnityEngine.RequireComponent(typeof(AkTerminator))]
 [UnityEngine.DisallowMultipleComponent]
-[UnityEngine.ExecuteInEditMode]
+//[UnityEngine.ExecuteInEditMode]
 /// This script deals with initialization, and frame updates of the Wwise audio engine.  
 /// It is marked as \c DontDestroyOnLoad so it stays active for the life of the game, 
 /// not only one scene. You can, and probably should, modify this script to change the 
@@ -22,13 +22,13 @@
 /// - AkCallbackManager
 public class AkInitializer : UnityEngine.MonoBehaviour
 {
-	#region Public Data Members
+    #region Public Data Members
+    [UnityEngine.HideInInspector]
+    ///Path for the soundbanks. This must contain one sub folder per platform, with the same as in the Wwise project.
+   // public string basePath = AkSoundEngineController.s_DefaultBasePath;
 
-	///Path for the soundbanks. This must contain one sub folder per platform, with the same as in the Wwise project.
-	public string basePath = AkSoundEngineController.s_DefaultBasePath;
-
-	/// Language sub-folder.
-	public string language = AkSoundEngineController.s_Language;
+    /// Language sub-folder.
+    public string language = AkSoundEngineController.s_Language;
 
 	///Default Pool size.  This contains the meta data for your audio project.  Default size is 4 MB, but you should adjust for your needs.
 	public int defaultPoolSize = AkSoundEngineController.s_DefaultPoolSize;
@@ -74,12 +74,14 @@ public class AkInitializer : UnityEngine.MonoBehaviour
 
 	public static string GetBasePath()
 	{
-#if UNITY_EDITOR
-		return WwiseSettings.LoadSettings().SoundbankPath;
-#else
-		return AkSoundEngineController.Instance.basePath;
-#endif
-	}
+        return AudioCustomizeSettings.GetBankAssetFolder();
+        //        return WwiseSettings.LoadSettings().SoundbankPath;
+        //#if UNITY_EDITOR
+        //        return WwiseSettings.LoadSettings().SoundbankPath;
+        //#else
+        //		return AkSoundEngineController.Instance.basePath;
+        //#endif
+    }
 
 	public static string GetCurrentLanguage()
 	{
@@ -107,12 +109,12 @@ public class AkInitializer : UnityEngine.MonoBehaviour
 	private void OnEnable()
 	{
         UnityEngine.Debug.Log("Enable");
+        
         if (ms_Instance == this)
         {
             AkSoundEngineController.Instance.Init(this);
           //  gameObject.SendMessage("OnWiseEngineStartupReady", this, UnityEngine.SendMessageOptions.DontRequireReceiver);
         }
-		
 	}
     private void Start()
     {

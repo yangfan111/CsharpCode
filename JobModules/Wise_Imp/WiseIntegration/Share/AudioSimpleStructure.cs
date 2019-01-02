@@ -5,11 +5,15 @@ namespace Core.Audio
     public struct AudioSimpleProtoArgs
     {
         private int eventId;
+        public int EventId { get { return eventId; } }
         public bool EventVailed { get { return eventId == int.MaxValue; } }
         private int groupId;
+        public int GroupId { get { return groupId; } }
+
         public bool GroupIdVailed { get { return groupId == int.MaxValue; } }
         private string stateName;
-        public bool StateVailed { get { return string.IsNullOrEmpty(stateName); } }
+        public string StateName { get { return stateName; } }
+        public bool StateVailed { get { return !string.IsNullOrEmpty(stateName); } }
 
 
 

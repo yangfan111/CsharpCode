@@ -12,42 +12,61 @@ namespace Core.Audio
 {
     public class GameAudioMedium
     {
-
+        static int testWeaponEvent = 1;
+        static string testWeaponModel= "Gun_shot_mode_type_single";
         /// <summary>
         /// 枪械开火
         /// </summary>
         /// <param name="weaponState"></param>
-        public static void PerformAudioOnGunFire(WeaponLogic.IPlayerWeaponState weaponState)
+        public static void PerformOnGunFire(WeaponLogic.IPlayerWeaponState weaponState)
         {
-            NewWeaponConfigItem weaponCfg = NewWeaponConfigManager.Instance.GetConfigById(weaponState.CurrentWeapon);
+            if (AudioConst.IsForbidden) return;
+            NewWeaponConfigItem weaponCfg = WeaponConfigManager.Instance.GetConfigById(weaponState.CurrentWeapon);
             AKAudioEntry.AudioAssert(weaponCfg != null, string.Format("weapon config id [{0}] not find", weaponState.CurrentWeapon));
             //假装有event
-            int eventId = 1;
-            AKAudioEntry.Dispatcher.PostEvent(eventId, weaponState.CurrentWeaponGo);
+            AKAudioEntry.Dispatcher.PostEvent(testWeaponEvent, weaponState.CurrentWeaponGo);
         }
+    
         /// <summary>
         /// 枪械切换
         /// </summary>
         /// <param name="weaponState"></param>
-        public static void PeformAudioOnGunSwitch(WeaponLogic.IPlayerWeaponState weaponState)
+        public static void PerformOnGunSwitch(WeaponLogic.IPlayerWeaponState
+            weaponState)
         {
-            NewWeaponConfigItem weaponCfg = NewWeaponConfigManager.Instance.GetConfigById(weaponState.CurrentWeapon);
-            AKAudioEntry.AudioAssert(weaponCfg != null, string.Format("weapon config id [{0}] not find", weaponState.CurrentWeapon));
+            PerformOnGunSwitch(weaponState.CurrentWeapon);
+        }
+        public static void PerformOnGunSwitch(NewWeaponConfigItem weaponCfg)
+        {
+            if (AudioConst.IsForbidden) return;
+            AKAudioEntry.AudioAssert(weaponCfg != null, string.Format("weapon config id [{0}] not find", weaponCfg.Id));
             //假装有event
-            int eventId = 1;
-            //AKAudioEntry.Dispatcher.PostEvent(eventId, weaponState.CurrentWeaponGo);
+            int eventId = 2;
+            testWeaponEvent = testWeaponEvent == 1 ? 2 : 1;
+            AKAudioEntry.Dispatcher.PrepareEvent(testWeaponEvent);
+        }
+        public static void PerformOnGunSwitch(int weaponId)
+        {
+            if (AudioConst.IsForbidden) return;
+            NewWeaponConfigItem weaponCfg = WeaponConfigManager.Instance.GetConfigById(weaponId);
+            PerformOnGunSwitch(weaponCfg);
         }
         /// <summary>
         /// 枪械模式更换
         /// </summary>
         /// <param name="weaponState"></param>
-        public static void PerformAudioOnGunModelSwitch(WeaponLogic.IPlayerWeaponState weaponState)
+        public static void PerformOnGunModelSwitch(CommonFireConfig comCfg, WeaponLogic.IPlayerWeaponState weaponState)
         {
-            NewWeaponConfigItem weaponCfg = NewWeaponConfigManager.Instance.GetConfigById(weaponState.CurrentWeapon);
+            if (AudioConst.IsForbidden) return;
+           // NewWeaponConfigItem weaponCfg = WeaponConfigManager.Instance.GetConfigById(weaponState.CurrentWeapon);
             //   var fireModelCfg = WeaponConfigManager.Instance.GetFireModeCountById(weaponState.CurrentWeapon);
             AKEventCfg evtCfg = AudioConfigSimulator.SimAKEventCfg1();
-            string configedState = "Gun_shot_mode_type_continue";
-            AKAudioEntry.Dispatcher.VarySwitchState(evtCfg.switchGroup, configedState, weaponState.CurrentWeaponGo);
+            testWeaponModel = testWeaponModel == "Gun_shot_mode_type_single" ? "Gun_shot_mode_type_triple" : "Gun_shot_mode_type_single";
+            AKAudioEntry.Dispatcher.VarySwitchState(evtCfg.switchGroup, testWeaponModel, weaponState.CurrentWeaponGo);
+
+        }
+        public static void PostAutoRegisterGameObjAudio(Vector3 position,bool createObject)
+        {
 
         }
     }

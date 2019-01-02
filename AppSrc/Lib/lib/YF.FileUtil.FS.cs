@@ -47,7 +47,16 @@ namespace YF.FileUtil
                 DirectoryCopy(sourceDirName, destDirName, copySubDirs);
             }
         }
-        public static bool DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        public static bool DirectoryCopy(string sourceDir, string destDir, bool copySubDirs)
+        {
+            return DirectoryCopy(sourceDir, destDir, copySubDirs, "", false);
+        }
+        public static bool DirectoryCopy(string sourceDir, string destDir, bool copySubDirs, string filter)
+        {
+            return DirectoryCopy(sourceDir, destDir, copySubDirs, filter, false);
+        }
+
+        public static bool DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs, string filter, bool recoverEntirely)
         {
             // Get the subdirectories for the specified directory.
             var dir = new System.IO.DirectoryInfo(sourceDirName);
@@ -61,15 +70,24 @@ namespace YF.FileUtil
             var dirs = dir.GetDirectories();
 
             // If the destination directory doesn't exist, create it. 
+            if (System.IO.Directory.Exists(destDirName) && recoverEntirely)
+            {
+                System.IO.Directory.Delete(destDirName);
+
+            }
             if (!System.IO.Directory.Exists(destDirName))
                 System.IO.Directory.CreateDirectory(destDirName);
-
             // Get the files in the directory and copy them to the new location.
             var files = dir.GetFiles();
             foreach (var file in files)
             {
-                var temppath = System.IO.Path.Combine(destDirName, file.Name);
-                file.CopyTo(temppath, true);
+
+                if (filter == "" || System.IO.Path.GetExtension(file.Name) == filter)
+                {
+                    var temppath = System.IO.Path.Combine(destDirName, file.Name);
+                    file.CopyTo(temppath, true);
+                }
+
             }
 
             // If copying subdirectories, copy them and their contents to new location. 

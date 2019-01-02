@@ -23,7 +23,7 @@ public class AkEventTrack : UnityEngine.Timeline.TrackAsset
 	{
 #if UNITY_EDITOR
 		var Settings = WwiseSettings.LoadSettings();
-		var WprojPath = AkUtilities.GetFullPath(UnityEngine.Application.dataPath, Settings.WwiseProjectPath);
+		var WprojPath = Settings.DeveloperWwiseProjectPath;
 		AkUtilities.EnableBoolSoundbankSettingInWproj("SoundBankGenerateEstimatedDuration", WprojPath);
 #endif
 		var playable = UnityEngine.Playables.ScriptPlayable<AkEventPlayableBehavior>.Create(graph);

@@ -3,26 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Core.Utils;
+using UnityEngine;
 
 namespace Core.Audio
 {
-    //public class AudioSystem
-    //{
-    //        }
-    //public class AudioLaunchNotifycation
-    //{
-    //    public AudioLaunchNotifycation()
-    //    {
-    //       //  AkSoundEngineController.Instance.StarupReadyEvt += AKAudioEntry.LaunchAppAudio;
-    //    }
-    //}
+
     public class AKAudioEntry
     {
         private static AKAudioDispatcher dispatcher;
         private static AKAudioBankLoader bankResLoader;
         private static bool prepareReady = false;
         public static readonly LoggerAdapter AudioLogger = new LoggerAdapter(typeof(AKAudioDispatcher));
-    //   public static AudioLaunchNotifycation Notify = new AudioLaunchNotifycation();
+        //   public static AudioLaunchNotifycation Notify = new AudioLaunchNotifycation();
         static AKAudioEntry()
         {
             //      AkSoundEngineController.Instance.StarupReadyEvt += LaunchAppAudio;
@@ -31,6 +23,7 @@ namespace Core.Audio
         {
             get
             {
+                if (AudioConst.IsForbidden) return null;
                 if (dispatcher == null)
                 {
                     if (prepareReady)
@@ -48,27 +41,38 @@ namespace Core.Audio
         }
         public static void PostEvent(int eventId, UnityEngine.GameObject target)
         {
+            if (AudioConst.IsForbidden) return;
             Dispatcher.PostEvent(eventId, target);
         }
-        
+        public static void PostEvent(int eventId)
+        {
+            Dispatcher.PostEvent(eventId, WiseNotificationRoute.defaultSpatialListener.gameObject);
+        }
         public static WisePluginNotificationRoute WiseNotificationRoute { get; private set; }
         public static void LaunchAppAudio(WisePluginNotificationRoute wiseNotificationRoute)
         {
+            if (AudioConst.IsForbidden) return;
             AudioLogger.Info("[Audio=>Entry]engine audio preapared ready");
             WiseNotificationRoute = wiseNotificationRoute;
             bankResLoader = new AKAudioBankLoader();
+
+#if UNITY_EDITOR
+       //     TestCodeChunk_Interanl();
+
+# endif
             if (AudioConst.AudioLoadTypeWhenStarup == "Sync")
             {
-                //   AKRESULT result1 = AkBankManagerExt.LoadBankRes("Init", false, false);
-                //   AKRESULT result2 = AkBankManagerExt.LoadBankRes("Test", false, false);
+
                 AKRESULT result = bankResLoader.LoadInitialBnkRes();
                 AudioLogger.Info("[Audio=>Entry]App audio try to preapare");
-                if (result == AKRESULT.AK_Success)
+                if (result == AKRESULT.AK_Success || result == AKRESULT.AK_BankAlreadyLoaded)
                 {
                     prepareReady = true;
-                    Dispatcher.PostEvent(1, wiseNotificationRoute.gameObject);
-                   // uint playingId = AkSoundEngine.PostEvent("Gun_56_shot", wiseNotificationRoute.gameObject);
-             
+                    Debug.Log("prepareReady");
+#if UNITY_EDITOR
+                    // TestCodeChunk_External();
+                    //  TestCodeChunk_Interanl();
+#endif
                 }
             }
             else
@@ -77,6 +81,43 @@ namespace Core.Audio
             }
 
         }
+#if UNITY_EDITOR
+        static UnityEngine.GameObject testObj;
+        static UnityEngine.GameObject AudioTestObj
+        {
+            get
+            {
+                if (!testObj)
+                {
+                    testObj = GameObject.Find("Directional Light");
+                }
+                return testObj;
+            }
+        }
+
+        static void TestCodeChunk_Interanl()
+        {
+            UnityEngine.Debug.LogFormat("-------------internal test--------------");
+            uint m_BankID;
+            var result = AkSoundEngine.LoadBank("Weapon_Footstep", AkSoundEngine.AK_DEFAULT_POOL_ID, out m_BankID);
+
+            UnityEngine.Debug.LogFormat("Load Init bank :" + result);
+            uint playingId = AkSoundEngine.PostEvent("Gun_P1911_shot", WiseNotificationRoute.gameObject);
+      
+            UnityEngine.Debug.LogFormat("-----------------------------------------");
+        }
+
+
+        static void TestCodeChunk_External()
+        {
+            UnityEngine.Debug.LogFormat("-------------external test--------------");
+            AKRESULT result = bankResLoader.LoadInitialBnkRes();
+            UnityEngine.Debug.LogFormat("Load Init bank :" + result);
+            // Dispatcher.PostEvent(1,AudioTestObj);
+            Dispatcher.PostEvent(2, WiseNotificationRoute.gameObject);
+            UnityEngine.Debug.LogFormat("-----------------------------------------");
+        }
+#endif
         static void OnBnkAsyncFinish()
         {
             AudioLogger.Info("[Audio=>Entry]App audio preapared ready");

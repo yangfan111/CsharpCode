@@ -9,16 +9,16 @@ namespace   Core.Audio
     {
         private readonly Dictionary<string, AKBankAtom> bankAtomContenter = new Dictionary<string, AKBankAtom>();
         //完整加载的bank列表
-        private readonly HashSet<string> bankFinishLoadingIdList = new HashSet<string>();
+        private readonly HashSet<string> bankFinishLoadingIds = new HashSet<string>();
         //加载中的bank列表
-        private readonly HashSet<string> bankAyncLoadingIdList = new HashSet<string>();
+        private readonly HashSet<string> bankAyncLoadingIds= new HashSet<string>();
         //  private readonly HashSet<string> bankOnLoadIdList = new HashSet<string>();
         public System.Collections.IEnumerator GetBanksEnumerator() { return bankAtomContenter.Values.GetEnumerator(); }
         internal void Recycle()
         {
             bankAtomContenter.Clear();
-            bankFinishLoadingIdList.Clear();
-            bankAyncLoadingIdList.Clear();
+            bankFinishLoadingIds.Clear();
+            bankAyncLoadingIds.Clear();
 
         }
 
@@ -32,16 +32,16 @@ namespace   Core.Audio
         }
         internal void AddLoadingStateAtom(string bankName)
         {
-            bankFinishLoadingIdList.Add(bankName);
+            bankFinishLoadingIds.Add(bankName);
         }
 
         internal AKRESULT VertifyBankLoadLicense(string bankName)
         {
             if (!bankAtomContenter.ContainsKey(bankName))
                 return AKRESULT.AK_UnknownBankID;
-            if (bankFinishLoadingIdList.Contains(bankName))
+            if (bankFinishLoadingIds.Contains(bankName))
                 return AKRESULT.AK_BankAlreadyLoaded;
-            if (bankAyncLoadingIdList.Contains(bankName))
+            if (bankAyncLoadingIds.Contains(bankName))
                 return AKRESULT.AK_BankInAyncLoading;
             return AKRESULT.AK_Success;
         }
@@ -49,9 +49,9 @@ namespace   Core.Audio
         {
             if (!bankAtomContenter.ContainsKey(bankName))
                 return AKRESULT.AK_UnknownBankID;
-            if (!bankFinishLoadingIdList.Contains(bankName))
+            if (!bankFinishLoadingIds.Contains(bankName))
                 return AKRESULT.AK_BankNotLoadYet;
-            if (bankAyncLoadingIdList.Contains(bankName))
+            if (bankAyncLoadingIds.Contains(bankName))
                 return AKRESULT.AK_BankInAyncLoading;
             return AKRESULT.AK_Success;
         }
@@ -78,7 +78,7 @@ namespace   Core.Audio
         {
             AKRESULT result;
             List<AKAudioBankLoader.BankLoadInfo> failList= new List<AKAudioBankLoader.BankLoadInfo>();
-            foreach (var name in bankFinishLoadingIdList)
+            foreach (var name in bankFinishLoadingIds)
             {
                 result= Unload(name);
                 if(result != AKRESULT.AK_Success)
@@ -95,18 +95,18 @@ namespace   Core.Audio
             AKRESULT result = bankAtomContenter[bankName].LoadAsync(ayncLoadHandler, callbckCookie);
             if (result == AKRESULT.AK_WaitBankLoadingFinish)
             {
-                bankAyncLoadingIdList.Add(bankName);
+                bankAyncLoadingIds.Add(bankName);
             }
             return result;
         }
         private void OnLoadSucess(string bankName)
         {
-            bankAyncLoadingIdList.Remove(bankName);
-            bankFinishLoadingIdList.Add(bankName);
+            bankAyncLoadingIds.Remove(bankName);
+            bankFinishLoadingIds.Add(bankName);
         }
         private void OnLoadFailed(string bankName)
         {
-            bankAyncLoadingIdList.Remove(bankName);
+            bankAyncLoadingIds.Remove(bankName);
         }
         private void OnLoadRefUpdate(string bankName)
         {
@@ -114,7 +114,7 @@ namespace   Core.Audio
         }
         private void OnUnloadSucess(string bankName)
         {
-            bankFinishLoadingIdList.Remove(bankName);
+            bankFinishLoadingIds.Remove(bankName);
         }
         private void OnUnloadFail(string bankName)
         {

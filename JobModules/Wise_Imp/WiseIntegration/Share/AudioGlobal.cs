@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-public class AudioComponent : UnityEngine.MonoBehaviour
-{
-    protected bool flagInit = false;
-}
+
 namespace Core.Audio
 {
- 
 
+    public class AudioComponent : UnityEngine.MonoBehaviour
+    {
+
+    }
     public class AudioConst
     {
         //AKAudioEngineDriver
@@ -15,8 +15,42 @@ namespace Core.Audio
         public const uint PlayingId = AkSoundEngine.AK_INVALID_PLAYING_ID;
         public const uint EndEventFlag = (uint)AkCallbackType.AK_EndOfEvent;
         public const float DefualtVolumeRate = 1.0f;
-        public static readonly string PluginName = "Wise";//默认音频插件
-        public static readonly string AudioLoadTypeWhenStarup = "Sync"; //启动加载方式
+        public const string PluginName = "Wise";//默认音频插件
+        public static event System.Action<bool> onForbiddenOptionVary;
+        /// <summary>
+        /// 启动默认音频加载方式
+        /// </summary>
+        private static string audioLoadTypeWhenStarup = "Sync";
+
+        public static string AudioLoadTypeWhenStarup
+        {
+            get { return audioLoadTypeWhenStarup; }
+#if UNITY_EDITOR
+            set
+            {
+                audioLoadTypeWhenStarup = value;
+            }
+#endif
+        }
+
+        /// <summary>
+        /// 全局音频禁用常量
+        /// </summary>
+        public static bool IsForbidden
+        {
+            get { return isForbidden; }
+            set
+            {
+                if (isForbidden != value)
+                {
+                    IsForbidden = value;
+                    if (onForbiddenOptionVary != null)
+                        onForbiddenOptionVary(isForbidden);
+                }
+            }
+        }
+
+        private static bool isForbidden = false;
         //public const uint CustomPoolMaxNum = 1;
         //public const int CustomPoolOriginCounter = 1001;
 

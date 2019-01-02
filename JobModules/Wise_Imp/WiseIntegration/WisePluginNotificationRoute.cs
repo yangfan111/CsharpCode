@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class WisePluginNotificationRoute : MonoBehaviour
 {
@@ -8,13 +6,20 @@ public class WisePluginNotificationRoute : MonoBehaviour
     public AkInitializer akInteractComponent;
     [HideInInspector]
     public AkAudioListener defaultSpatialListener;
+    [HideInInspector]
     public Transform defaultListenerTrans;
 
     void Start()
     {
-        
+
         akInteractComponent = GetComponent<AkInitializer>();
-        if(!defaultSpatialListener)
+        InitWiseDefaultListener();
+        //TODO:引擎状态判断
+        Core.Audio.AKAudioEntry.LaunchAppAudio(this);
+    }
+    void InitWiseDefaultListener()
+    {
+        if (!defaultSpatialListener)
         {
             GameObject listenerObj = new GameObject("DefaultAudioListenerObj");
             defaultSpatialListener = listenerObj.AddComponent<AkAudioListener>();
@@ -29,13 +34,14 @@ public class WisePluginNotificationRoute : MonoBehaviour
             {
                 defaultListenerTrans.position = Vector3.zero;
             }
-         
         }
-        //TODO:引擎状态判断
-        Core.Audio.AKAudioEntry.LaunchAppAudio(this);
     }
-    private void LateUpdate()
+    void LateUpdate()
     {
+        if (!defaultListenerTrans)
+        {
+            InitWiseDefaultListener();
+        }
         if (defaultListenerTrans.parent) return;
         if (Camera.main)
         {

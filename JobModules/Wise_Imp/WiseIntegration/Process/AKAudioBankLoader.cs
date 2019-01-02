@@ -23,7 +23,7 @@ namespace Core.Audio
         }
         public AKRESULT LoadInitialBnkRes()
         {
-            return TryLoadBnk("Test");
+            return TryLoadBnk("Weapon_Footstep");
         }
         public void LoadInitialBnkResAsync(System.Action callback)
         {

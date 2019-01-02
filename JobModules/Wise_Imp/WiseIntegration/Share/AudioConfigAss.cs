@@ -55,16 +55,16 @@ namespace Core.Audio
     {
         public static AkBankRes SimAKBankCfg()
         {
-            var co = new AkBankRes("Test", AudioBankLoadType.Normal, new List<int>(), new List<int>());
+            var co = new AkBankRes("Weapon_Footstep", AudioBankLoadType.Normal, new List<int>(), new List<int>());
             return co;
 
         }
         public static AKEventCfg SimAKEventCfg1()
         {
             var co = new AKEventCfg();
-            co.id = 1;
+            co.id = 1; 
             co.name = "Gun_56_shot";
-            co.bankRef = "Test";
+            co.bankRef = "Weapon_Footstep";
             co.switchGroup = 11;
             return co;
         }
@@ -72,8 +72,9 @@ namespace Core.Audio
         {
             var co = new AKEventCfg();
             co.id = 2;
-            co.name = "Gun_56_shot_continue_stop";
-            co.bankRef = "Test";
+            co.name = "Gun_P1911_shot";
+            co.bankRef = "Weapon_Footstep";
+            co.switchGroup = 11;
             return co;
         }
         public static AKGroupCfg SimAKGroup1()
@@ -81,9 +82,9 @@ namespace Core.Audio
             var co = new AKGroupCfg();
             co.id = 11;
             co.type = AudioGroupType.SwitchGroup;
-            co.name = "Gun_shot_model_type";
-            co.states = new List<string>() { "Gun_shot_model_type_continue", "Gun_shot_model_type_single" };
-            co.defaultState = "Gun_shot_model_type_continue";
+            co.name = "Gun_shot_mode_type";
+            co.states = new List<string>() { "Gun_shot_mode_type_single", "Gun_shot_mode_type_triple" };
+            co.defaultState = "Gun_shot_mode_type_single";
             return co;
         }
         public static AKGroupCfg SimAKGroup2()

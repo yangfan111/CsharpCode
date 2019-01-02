@@ -65,8 +65,64 @@ namespace YF
                 return false;
             }
         }
-     
+        /// <summary>
+        /// 根据打包平台获取对应总平台名
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public static string GetPlatformName(UnityEditor.BuildTarget target)
+        {
+            var platformSubDir = string.Empty;
+    //        GetCustomPlatformName(ref platformSubDir, target);
+            if (!string.IsNullOrEmpty(platformSubDir))
+                return platformSubDir;
 
+            switch (target)
+            {
+                case UnityEditor.BuildTarget.Android:
+                    return "Android";
+
+                case UnityEditor.BuildTarget.iOS:
+                case UnityEditor.BuildTarget.tvOS:
+                    return "iOS";
+
+                case UnityEditor.BuildTarget.StandaloneLinux:
+                case UnityEditor.BuildTarget.StandaloneLinux64:
+                case UnityEditor.BuildTarget.StandaloneLinuxUniversal:
+                    return "Linux";
+
+#if UNITY_2017_3_OR_NEWER
+			case UnityEditor.BuildTarget.StandaloneOSX:
+#else
+                //case UnityEditor.BuildTarget.StandaloneOSXIntel:
+                //case UnityEditor.BuildTarget.StandaloneOSXIntel64:
+                //case UnityEditor.BuildTarget.StandaloneOSXUniversal:
+#endif
+                    return "Mac";
+
+                case (UnityEditor.BuildTarget)39: // UnityEditor.BuildTarget.Lumin
+                    return "Lumin";
+
+                case UnityEditor.BuildTarget.PS4:
+                    return "PS4";
+
+                case UnityEditor.BuildTarget.PSP2:
+                    return "Vita";
+
+                case UnityEditor.BuildTarget.StandaloneWindows:
+                case UnityEditor.BuildTarget.StandaloneWindows64:
+                case UnityEditor.BuildTarget.WSAPlayer:
+                    return "Windows";
+
+                case UnityEditor.BuildTarget.XboxOne:
+                    return "XboxOne";
+
+                case UnityEditor.BuildTarget.Switch:
+                    return "Switch";
+            }
+
+            return target.ToString();
+        }
     }
 }
 

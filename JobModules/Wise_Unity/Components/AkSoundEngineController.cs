@@ -1,9 +1,17 @@
 #if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.
 public class AkSoundEngineController
 {
-	#region Public Data Members
+    #region Public Data Members
 
-	public static readonly string s_DefaultBasePath = System.IO.Path.Combine("Audio", "GeneratedSoundBanks");
+    public static string s_DefaultBasePath {
+
+        get
+        {
+            return AudioCustomizeSettings.GetBankAssetFolder();
+        }
+    }
+
+    
 	public static string s_Language = "English(US)";
 	public static int s_DefaultPoolSize = 4096;
 	public static int s_LowerPoolSize = 2048;
@@ -16,7 +24,7 @@ public class AkSoundEngineController
 	public static bool s_EngineLogging = true;
 	public static int s_SpatialAudioPoolSize = 4096;
 
-	public string basePath = s_DefaultBasePath;
+	//public string basePath = s_DefaultBasePath;
 	public string language = s_Language;
 	public bool engineLogging = s_EngineLogging;
 
@@ -167,7 +175,7 @@ public class AkSoundEngineController
 #endif
 
 		UnityEngine.Debug.Log("WwiseUnity: Initialize sound engine ...");
-		basePath = akInitializer.basePath;
+		var basePath = s_DefaultBasePath;
 		language = akInitializer.language;
 
 		//Use default properties for most SoundEngine subsystem.  
@@ -270,7 +278,8 @@ public class AkSoundEngineController
 
 		//Load the init bank right away.  Errors will be logged automatically.
 		result = AkSoundEngine.LoadBank("Init.bnk", AkSoundEngine.AK_DEFAULT_POOL_ID, out BankID);
-		if (result != AKRESULT.AK_Success)
+   
+        if (result != AKRESULT.AK_Success)
 			UnityEngine.Debug.LogError("WwiseUnity: Failed load Init.bnk with result: " + result);
 
 #if UNITY_EDITOR
