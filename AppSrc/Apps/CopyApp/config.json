@@ -15,6 +15,18 @@
     {
       "DS": "E:\\Github\\Mics\\放置所有配置文件\\.gitconfig",
       "SS": "C:\\Users\\Administrator\\.gitconfig"
+    },
+     {
+      "DS": "E:\\Github\\Mics\\放置所有配置文件\\github说明.txt",
+      "SS": "E:\\Github\\tmp\\github说明.txt"
+    },
+     {    
+      "DS": "E:\\Github\\Mics\\放置所有配置文件\\push.bat",
+      "SS": "E:\\Github\\push.bat"
+    },
+      {    
+      "DS": "E:\\Github\\Mics\\放置所有配置文件\\syhub.bat",
+      "SS": "E:\\Github\\syhub.bat"
     }
   ]
 }

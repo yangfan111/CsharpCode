@@ -70,6 +70,7 @@ public class AudioCustomizeSettings
 
 #else
                 return Application.streamingAssetsPath;
+          //return Application.dataPath + "/StreamingAssets";
 #endif
     }
 

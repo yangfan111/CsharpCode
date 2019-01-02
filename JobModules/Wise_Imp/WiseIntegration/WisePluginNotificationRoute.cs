@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+[RequireComponent(typeof(AkInitializer))]
 public class WisePluginNotificationRoute : MonoBehaviour
 {
     [HideInInspector]
