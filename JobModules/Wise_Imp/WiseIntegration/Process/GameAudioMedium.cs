@@ -20,7 +20,7 @@ namespace Core.Audio
         /// <param name="weaponState"></param>
         public static void PerformOnGunFire(WeaponLogic.IPlayerWeaponState weaponState)
         {
-            if (AudioConst.IsForbidden) return;
+            if (AudioInfluence.IsForbidden) return;
             NewWeaponConfigItem weaponCfg = WeaponConfigManager.Instance.GetConfigById(weaponState.CurrentWeapon);
             AKAudioEntry.AudioAssert(weaponCfg != null, string.Format("weapon config id [{0}] not find", weaponState.CurrentWeapon));
             //假装有event
@@ -38,7 +38,7 @@ namespace Core.Audio
         }
         public static void PerformOnGunSwitch(NewWeaponConfigItem weaponCfg)
         {
-            if (AudioConst.IsForbidden) return;
+            if (AudioInfluence.IsForbidden) return;
             AKAudioEntry.AudioAssert(weaponCfg != null, string.Format("weapon config id [{0}] not find", weaponCfg.Id));
             //假装有event
             int eventId = 2;
@@ -47,7 +47,7 @@ namespace Core.Audio
         }
         public static void PerformOnGunSwitch(int weaponId)
         {
-            if (AudioConst.IsForbidden) return;
+            if (AudioInfluence.IsForbidden) return;
             NewWeaponConfigItem weaponCfg = WeaponConfigManager.Instance.GetConfigById(weaponId);
             PerformOnGunSwitch(weaponCfg);
         }
@@ -57,7 +57,7 @@ namespace Core.Audio
         /// <param name="weaponState"></param>
         public static void PerformOnGunModelSwitch(CommonFireConfig comCfg, WeaponLogic.IPlayerWeaponState weaponState)
         {
-            if (AudioConst.IsForbidden) return;
+            if (AudioInfluence.IsForbidden) return;
            // NewWeaponConfigItem weaponCfg = WeaponConfigManager.Instance.GetConfigById(weaponState.CurrentWeapon);
             //   var fireModelCfg = WeaponConfigManager.Instance.GetFireModeCountById(weaponState.CurrentWeapon);
             AKEventCfg evtCfg = AudioConfigSimulator.SimAKEventCfg1();

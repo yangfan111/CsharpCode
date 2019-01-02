@@ -7,7 +7,7 @@ namespace Core.Audio
     {
 
     }
-    public class AudioConst
+    public class AudioInfluence
     {
         //AKAudioEngineDriver
         public const AkCurveInterpolation DefualtCurveInterpolation = AkCurveInterpolation.AkCurveInterpolation_Linear;//默认插值函数
