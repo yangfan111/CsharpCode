@@ -37,44 +37,14 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="UnityEditor">
+      <HintPath>..\AppSrc\Dependent\UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\AppSrc\Dependent\UnityEngine.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client.Scripts\AudioComponentMaker.cs" />
-    <Compile Include="Client.Scripts\AudioCoreSettingsComponent.cs" />
-    <Compile Include="Client.Scripts\ClientDebugScript.cs" />
-    <Compile Include="Client.Scripts\ClientGameController.cs" />
-    <Compile Include="Client.Scripts\Console.cs" />
-    <Compile Include="Client.Scripts\DeveloperConsoleCommands.cs" />
-    <Compile Include="Client.Scripts\Editor\AudioComponentMakerInspector.cs" />
-    <Compile Include="Client.Scripts\Editor\AudioCoreSettingsComponentInspector.cs" />
-    <Compile Include="Client.Scripts\ExitGame.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\AudioCustomizeSettingsComponent.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\AudioInitMaker.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Editor\AudioCustomizeSettingsComponentInspector.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Editor\VoyagerSettingComponentInspector.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Process\AKAudioBankLoader.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Process\AKAudioBankLoader.HandlerAgent.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Process\AKAudioBankLoader.SupportAux.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Process\AKTypesController.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Process\AudioArgs.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Process\AudioDispatcher.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Process\AudioEntry.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Process\AudioRegulator.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Process\AudioTriggerList.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Process\GameAudioMedium.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Share\AKTypeStructure.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Share\AudioBankAtom.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Share\AudioConfigAss.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Share\AudioCustomizeSettingData.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Share\AudioGlobal.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Share\AudioSimpleStructure.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Share\Wwise_IDs.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Trigger\AudioTriggerBase.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Trigger\AudioTrigger_GunSimple.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Trigger\AudioTrigger_SceneLoad.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\Trigger\AudioTrigger_TrickTarget.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\VoyagerSettingsComponent.cs" />
-    <Compile Include="Wise_Imp\WiseIntegration\WisePluginNotificationRoute.cs" />
     <Compile Include="Wise_Unity\API\Generated\Common\Ak3DSpatializationMode.cs" />
     <Compile Include="Wise_Unity\API\Generated\Common\AkActionOnEventType.cs" />
     <Compile Include="Wise_Unity\API\Generated\Common\AkAudioDeviceState.cs" />
@@ -282,9 +252,7 @@
     <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\ResonanceAudioFX.dll" />
     <Content Include="Wise_Unity\Plugins\Windows\x86_64\Profile\AkSoundEngine.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include=".vs\JobModules\v15\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />
