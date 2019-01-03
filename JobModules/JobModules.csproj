@@ -1,0 +1,292 @@
+﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{811910A2-8A41-4AD2-9C9D-A222A9EA9961}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <NoStandardLibraries>false</NoStandardLibraries>
+    <AssemblyName>ClassLibrary</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>JobModules</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Client.Scripts\AudioComponentMaker.cs" />
+    <Compile Include="Client.Scripts\AudioCoreSettingsComponent.cs" />
+    <Compile Include="Client.Scripts\ClientDebugScript.cs" />
+    <Compile Include="Client.Scripts\ClientGameController.cs" />
+    <Compile Include="Client.Scripts\Console.cs" />
+    <Compile Include="Client.Scripts\DeveloperConsoleCommands.cs" />
+    <Compile Include="Client.Scripts\Editor\AudioComponentMakerInspector.cs" />
+    <Compile Include="Client.Scripts\Editor\AudioCoreSettingsComponentInspector.cs" />
+    <Compile Include="Client.Scripts\ExitGame.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\AudioCustomizeSettingsComponent.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\AudioInitMaker.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Editor\AudioCustomizeSettingsComponentInspector.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Editor\VoyagerSettingComponentInspector.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Process\AKAudioBankLoader.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Process\AKAudioBankLoader.HandlerAgent.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Process\AKAudioBankLoader.SupportAux.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Process\AKTypesController.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Process\AudioArgs.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Process\AudioDispatcher.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Process\AudioEntry.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Process\AudioRegulator.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Process\AudioTriggerList.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Process\GameAudioMedium.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Share\AKTypeStructure.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Share\AudioBankAtom.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Share\AudioConfigAss.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Share\AudioCustomizeSettingData.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Share\AudioGlobal.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Share\AudioSimpleStructure.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Share\Wwise_IDs.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Trigger\AudioTriggerBase.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Trigger\AudioTrigger_GunSimple.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Trigger\AudioTrigger_SceneLoad.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\Trigger\AudioTrigger_TrickTarget.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\VoyagerSettingsComponent.cs" />
+    <Compile Include="Wise_Imp\WiseIntegration\WisePluginNotificationRoute.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\Ak3DSpatializationMode.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkActionOnEventType.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkAudioDeviceState.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkAudioFormat.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkAudioInterruptionCallbackInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkAudioSettings.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkAudioSourceChangeCallbackInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkAuxSendValue.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkBankCallbackInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkBankContent.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkBusHierarchyFlags.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkCallbackInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkCallbackSerializer.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkCallbackType.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkChannelConfig.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkChannelConfigType.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkChannelEmitter.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkChannelOrdering.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkConnectionType.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkCurveInterpolation.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkDeviceSettings.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkDiffractionFlags.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkDurationCallbackInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkDynamicSequenceItemCallbackInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkDynamicSequenceType.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkEmitterSettings.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkEventCallbackInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkExternalSourceInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkGlobalCallbackLocation.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkGroupType.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkImageSourceParams.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkImageSourceSettings.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkInitSettings.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkIterator.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkMarkerCallbackInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkMemSettings.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkMeteringFlags.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkMIDICcTypes.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkMIDIEvent.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkMIDIEventCallbackInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkMIDIEventTypes.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkMIDIPost.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkMonitorErrorCode.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkMonitorErrorLevel.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkMonitoringCallbackInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkMultiPositionType.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkMusicPlaylistCallbackInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkMusicSettings.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkMusicSyncCallbackInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkObjectInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkObstructionOcclusionValues.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkOutputSettings.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkPannerType.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkPanningRule.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkPlaylist.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkPlaylistArray.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkPlaylistItem.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkPluginType.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkPositioningInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkPositionSourceType.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkPreparationType.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkPropagationPathInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkPropagationPathInfoProxy.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkQueryRTPCValue.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkRamp.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AKRESULT.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkRoomParams.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkSegmentInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkSerializedCallbackHeader.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkSoundPathInfo.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkSoundPathInfoProxy.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkSoundPropagationPathParams.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkSourceChannelOrdering.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkSourceSettings.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkSpatialAudioInitSettings.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkStreamMgrSettings.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkTransform.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkTriangle.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkTriangleProxy.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\AkVector.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\_ArrayPoolDefault.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\_ArrayPoolLEngineDefault.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Common\_ArrayPoolSpatialAudio.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Mac\AkMemPoolAttributes_Mac.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Mac\AkPlatformInitSettings_Mac.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Mac\AkSoundEnginePINVOKE_Mac.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Mac\AkSoundEngine_Mac.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Mac\AkThreadProperties_Mac.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Windows\AkAudioAPI_Windows.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Windows\AkMemPoolAttributes_Windows.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Windows\AkPlatformInitSettings_Windows.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Windows\AkSoundEnginePINVOKE_Windows.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Windows\AkSoundEngine_Windows.cs" />
+    <Compile Include="Wise_Unity\API\Generated\Windows\AkThreadProperties_Windows.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AkAudioInputManager.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AkAuxSendArray.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AkBankManager.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AkBasePathGetter.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AkBasePathGetterExt.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AkCallbackManager.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AkChannelEmitterArray.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AkLogger.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AkMIDIPostArray.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AkPositionArray.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AkPropagationPathInfoArray.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AkSoundEngine.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AkSoundPathInfoArray.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AkTriangleArray.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AkUtilities.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AudioCustomizeSettings.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\AudioPluginSettingAgent.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\VoyagerCustomizeSettings.cs" />
+    <Compile Include="Wise_Unity\API\Handwritten\WwiseTypes.cs" />
+    <Compile Include="Wise_Unity\Components\AkAmbient.cs" />
+    <Compile Include="Wise_Unity\Components\AkAudioListener.cs" />
+    <Compile Include="Wise_Unity\Components\AkBank.cs" />
+    <Compile Include="Wise_Unity\Components\AkDragDropHelper.cs" />
+    <Compile Include="Wise_Unity\Components\AkEmitterObstructionOcclusion.cs" />
+    <Compile Include="Wise_Unity\Components\AkEnvironment.cs" />
+    <Compile Include="Wise_Unity\Components\AkEnvironmentPortal.cs" />
+    <Compile Include="Wise_Unity\Components\AkEvent.cs" />
+    <Compile Include="Wise_Unity\Components\AkEventCallbackData.cs" />
+    <Compile Include="Wise_Unity\Components\AkEventPlayable.cs" />
+    <Compile Include="Wise_Unity\Components\AkEventTrack.cs" />
+    <Compile Include="Wise_Unity\Components\AkGameObj.cs" />
+    <Compile Include="Wise_Unity\Components\AkGameObjEnvironmentData.cs" />
+    <Compile Include="Wise_Unity\Components\AkGameObjListenerList.cs" />
+    <Compile Include="Wise_Unity\Components\AkGameObjPositionData.cs" />
+    <Compile Include="Wise_Unity\Components\AkGameObjPositionOffsetData.cs" />
+    <Compile Include="Wise_Unity\Components\AkGameObjPosOffsetData.cs" />
+    <Compile Include="Wise_Unity\Components\AkInitializer.cs" />
+    <Compile Include="Wise_Unity\Components\AkMemBankLoader.cs" />
+    <Compile Include="Wise_Unity\Components\AkObstructionOcclusion.cs" />
+    <Compile Include="Wise_Unity\Components\AkRoom.cs" />
+    <Compile Include="Wise_Unity\Components\AkRoomPortal.cs" />
+    <Compile Include="Wise_Unity\Components\AkRoomPortalObstruction.cs" />
+    <Compile Include="Wise_Unity\Components\AkRTPCPlayable.cs" />
+    <Compile Include="Wise_Unity\Components\AkRTPCTrack.cs" />
+    <Compile Include="Wise_Unity\Components\AkSoundEngineController.cs" />
+    <Compile Include="Wise_Unity\Components\AkSpatialAudioBase.cs" />
+    <Compile Include="Wise_Unity\Components\AkSpatialAudioEmitter.cs" />
+    <Compile Include="Wise_Unity\Components\AkSpatialAudioListener.cs" />
+    <Compile Include="Wise_Unity\Components\AkState.cs" />
+    <Compile Include="Wise_Unity\Components\AkSurfaceReflector.cs" />
+    <Compile Include="Wise_Unity\Components\AkSwitch.cs" />
+    <Compile Include="Wise_Unity\Components\AkTerminator.cs" />
+    <Compile Include="Wise_Unity\Components\AkTriggerBase.cs" />
+    <Compile Include="Wise_Unity\Components\AkTriggerCollisionEnter.cs" />
+    <Compile Include="Wise_Unity\Components\AkTriggerCollisionExit.cs" />
+    <Compile Include="Wise_Unity\Components\AkTriggerDisable.cs" />
+    <Compile Include="Wise_Unity\Components\AkTriggerEnable.cs" />
+    <Compile Include="Wise_Unity\Components\AkTriggerEnter.cs" />
+    <Compile Include="Wise_Unity\Components\AkTriggerExit.cs" />
+    <Compile Include="Wise_Unity\Components\AkTriggerMouseDown.cs" />
+    <Compile Include="Wise_Unity\Components\AkTriggerMouseEnter.cs" />
+    <Compile Include="Wise_Unity\Components\AkTriggerMouseExit.cs" />
+    <Compile Include="Wise_Unity\Components\AkTriggerMouseUp.cs" />
+    <Compile Include="Wise_Unity\Components\AkUnityEventHandler.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libAkConvolutionReverb.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libAkFlanger.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libAkGuitarDistortion.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libAkHarmonizer.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libAkMotion.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libAkPitchShifter.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libAkRecorder.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libAkReflect.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libAkRoomVerb.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libAkSoundSeedAir.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libAkSoundSeedImpact.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libAkStereoDelay.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libAkSynthOne.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libAkTimeStretch.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libAkTremolo.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libAuro.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libCrankcaseAudioREVModelPlayer.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libMcDSP.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\DSP\libResonanceAudioFX.bundle" />
+    <None Include="Wise_Unity\Plugins\Mac\Profile\AkSoundEngine.bundle\Contents\Info.plist" />
+    <None Include="Wise_Unity\Plugins\Mac\Profile\AkSoundEngine.bundle\Contents\MacOS\AkSoundEngine" />
+    <None Include="Wise_Unity\Plugins\Mac\Profile\AkSoundEngine.bundle\Contents\Resources\en.lproj\InfoPlist.strings" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Wise_Unity\Plugins\Mac\Profile\AkSoundEngine.bundle\Contents\Resources\readme.txt" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\AkConvolutionReverb.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\AkFlanger.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\AkGuitarDistortion.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\AkHarmonizer.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\AkMotion.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\AkPitchShifter.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\AkRecorder.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\AkReflect.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\AkSoundSeedAir.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\AkSoundSeedImpact.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\AkStereoDelay.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\AkSynthOne.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\AkTimeStretch.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\AkTremolo.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\Auro.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\CrankcaseAudioREVModelPlayer.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\iZotope.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\McDSP.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\MSSpatial.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\DSP\ResonanceAudioFX.dll" />
+    <Content Include="Wise_Unity\Plugins\Windows\x86_64\Profile\AkSoundEngine.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include=".vs\JobModules\v15\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
+  <ProjectExtensions>
+    <VisualStudio AllowExistingFolder="true" />
+  </ProjectExtensions>
+</Project>
