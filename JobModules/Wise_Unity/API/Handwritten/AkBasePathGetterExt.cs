@@ -8,7 +8,7 @@ public partial class AkBasePathGetter
     /// <returns></returns>
     public static string GetPlatformBasePath()
     {
-        return AudioPluginSettingAgent.GetBankAssetFolder();
+        return AudioCustomizeSettings.GetBankAssetFolder();
 
 //        var projSettingData = AKCustomizeSettings.ProjCustomizeSettings;
 //#if UNITY_EDITOR

@@ -27,6 +27,10 @@
       {    
       "DS": "E:\\Github\\Mics\\放置所有配置文件\\syHub.bat",
       "SS": "E:\\Github\\syHub.bat"
+    },
+    {    
+      "DS": "E:\\Github\\CsharpCode\\JobModules\\Client.Scripts",
+      "SS": "F:\\voyager\\UnityPackages\\App.Client.Scripts\\Scripts"
     }
   ]
 }

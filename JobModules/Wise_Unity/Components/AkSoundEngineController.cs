@@ -7,7 +7,7 @@ public class AkSoundEngineController
 
         get
         {
-            return AudioPluginSettingAgent.GetBankAssetFolder();
+            return AudioCustomizeSettings.GetBankAssetFolder();
         }
     }
 

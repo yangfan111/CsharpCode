@@ -30,8 +30,8 @@ namespace   Core.Audio
 
         public AudioRegulator()
         {
-            VolumeRate = AudioInfluence.DefualtVolumeRate;
-            TransitionSecond = AudioInfluence.DefaultTransitionDuration;
+            VolumeRate = AudioConst.DefualtVolumeRate;
+            TransitionSecond = AudioConst.DefaultTransitionDuration;
         }
         public void SetVolumeRate(float rate)
         {

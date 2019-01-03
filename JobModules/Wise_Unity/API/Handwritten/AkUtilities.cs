@@ -12,21 +12,21 @@ public class WwiseSettings
     {
         get
         {
-            return AudioPluginSettingAgent.GetCreatePacker();
+            return AudioCustomizeSettings.GetCreatePacker();
         }
     }
     public bool CreateWwiseGlobal
     {
         get
         {
-            return AudioPluginSettingAgent.GetCreateWwiseGlobal();
+            return AudioCustomizeSettings.GetCreateWwiseGlobal();
         }
     }
     public bool CreateWwiseListener
     {
         get
         {
-            return AudioPluginSettingAgent.GetCreateWwiseListener();
+            return AudioCustomizeSettings.GetCreateWwiseListener();
         }
     }
     public bool GenerateSoundBanksAsPreBuildStep { get { return false; } }
@@ -35,7 +35,7 @@ public class WwiseSettings
     {
         get
         {
-            return AudioPluginSettingAgent.GetBankAssetFolder();
+            return AudioCustomizeSettings.GetBankAssetFolder();
         }
     }
     public string WwiseInstallationPathMac
@@ -43,7 +43,7 @@ public class WwiseSettings
 
         get
         {
-            return AudioPluginSettingAgent.DeveloperWwiseInstallationPath;
+            return AudioCustomizeSettings.DeveloperWwiseInstallationPath;
         }
     }
     public string WwiseInstallationPathWindows
@@ -51,7 +51,7 @@ public class WwiseSettings
 
         get
         {
-            return AudioPluginSettingAgent.DeveloperWwiseInstallationPath;
+            return AudioCustomizeSettings.DeveloperWwiseInstallationPath;
         }
     }
     public string WwiseProjectPath
@@ -59,7 +59,7 @@ public class WwiseSettings
         get
         {
 
-            return AudioPluginSettingAgent.DeveloperWwiseProjectPath;
+            return AudioCustomizeSettings.DeveloperWwiseProjectPath;
         }
     }
 
@@ -202,12 +202,12 @@ public partial class AkUtilities
         var settings = WwiseSettings.LoadSettings();
 
 #if UNITY_EDITOR_WIN
-        if (!string.IsNullOrEmpty(AudioPluginSettingAgent.DeveloperWwiseInstallationPath))
+        if (!string.IsNullOrEmpty(AudioCustomizeSettings.DeveloperWwiseInstallationPath))
         {
-            result = System.IO.Path.Combine(AudioPluginSettingAgent.DeveloperWwiseInstallationPath, @"Authoring\x64\Release\bin\WwiseCLI.exe");
+            result = System.IO.Path.Combine(AudioCustomizeSettings.DeveloperWwiseInstallationPath, @"Authoring\x64\Release\bin\WwiseCLI.exe");
 
             if (!System.IO.File.Exists(result))
-                result = System.IO.Path.Combine(AudioPluginSettingAgent.DeveloperWwiseInstallationPath, @"Authoring\Win32\Release\bin\WwiseCLI.exe");
+                result = System.IO.Path.Combine(AudioCustomizeSettings.DeveloperWwiseInstallationPath, @"Authoring\Win32\Release\bin\WwiseCLI.exe");
         }
 #elif UNITY_EDITOR_OSX
 		if (!string.IsNullOrEmpty(settings.WwiseInstallationPathMac))
@@ -225,7 +225,7 @@ public partial class AkUtilities
     public static void GenerateSoundbanks(System.Collections.Generic.List<string> platforms = null)
     {
         var Settings = WwiseSettings.LoadSettings();
-        var wwiseProjectFullPath = AudioPluginSettingAgent.DeveloperWwiseProjectPath; // GetFullPath(UnityEngine.Application.dataPath, AKCustomizeSettings.DeveloperWwiseProjectPath);
+        var wwiseProjectFullPath = AudioCustomizeSettings.DeveloperWwiseProjectPath; // GetFullPath(UnityEngine.Application.dataPath, AKCustomizeSettings.DeveloperWwiseProjectPath);
 
         if (IsSoundbankOverrideEnabled(wwiseProjectFullPath))
         {
@@ -381,7 +381,7 @@ public partial class AkUtilities
     public static System.Collections.Generic.IDictionary<string, string> GetAllBankPaths()
     {
         var Settings = WwiseSettings.LoadSettings();
-        var WwiseProjectFullPath = AudioPluginSettingAgent.DeveloperWwiseProjectPath;
+        var WwiseProjectFullPath = AudioCustomizeSettings.DeveloperWwiseProjectPath;
 
         UpdateSoundbanksDestinationFolders(WwiseProjectFullPath);
         return s_ProjectBankPaths;
