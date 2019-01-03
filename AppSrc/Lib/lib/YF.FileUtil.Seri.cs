@@ -151,7 +151,7 @@ namespace YF.FileUtil
                 xmlStream.Position = 0;
                 //加载流 
                 xmlDoc.Load(xmlStream);
-                savePath = FS.GetPath_PlatormStream(savePath);
+                savePath = FS.GetPath_PlatformStream(savePath);
                 xmlDoc.Save(System.IO.Path.Combine(UnityEngine.Application.dataPath, savePath));
 
             }
@@ -167,7 +167,7 @@ namespace YF.FileUtil
                     System.Type T = s_object.GetType();
                     var xmlSerializer = new System.Xml.Serialization.XmlSerializer(T);
                     //创建文件流
-                    var xmlFileStream = new System.IO.FileStream(FS.GetPath_PlatormStream(tarFileName),
+                    var xmlFileStream = new System.IO.FileStream(FS.GetPath_PlatformStream(tarFileName),
                         System.IO.FileMode.Open, System.IO.FileAccess.Read);
                     //加载流
                     var Settings = (WwiseSettings)xmlSerializer.Deserialize(xmlFileStream);

@@ -13,6 +13,11 @@ namespace YF
             return ShortIDGenerator.Compute(inName);
         }
         ///反射获取全局类型索引值 [类名/类名截取->短id计算] ---> 类名
+        /// baseType.Assembly.GetTypes();
+        /// types[i].IsSubclassOf(baseType)
+        /// 非Eidotr环境下
+        /// var baseTypeInfo = System.Reflection.IntrospectionExtensions.GetTypeInfo(baseType);
+		/// var typeInfos = baseTypeInfo.Assembly.DefinedTypes;
         public static Dictionary<uint, string> GetAllDerivedTypes(System.Type T)
         {
             var derivedTypes = new Dictionary<uint, string>();

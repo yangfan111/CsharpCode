@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 #if UNITY_2017_1_OR_NEWER
+#endif
 //unity editor atrribute
 [UnityEngine.AddComponentMenu("Wwise/AkEnvironmentPortal")]
 [UnityEngine.RequireComponent(typeof(UnityEngine.BoxCollider))]
@@ -12,4 +13,3 @@ public class Mics : MonoBehaviour
     public float abc = 0f;
 
 }
-#endif

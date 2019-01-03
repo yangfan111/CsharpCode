@@ -7,15 +7,14 @@ namespace YF.FileUtil
     // 获取文件/文件夹信息 
     /// var dir = new DirectoryInfo(sourceDirName)
     /// var files[] = dir.GetFiles()
-    /// fileInfo.CopyTo(temppath, true)
+    /// ********fileInfo.CopyTo(temppath, true)********
     // 获取路径的文件夹名
     ///Path.GetDirectoryName
     // 获取文件名:1.通过DirectoryInfo,FileInfo去取 2.静态去取
     /// Directory.GetFiles(dirPath, filters, System.IO.SearchOption.AllDirectories)
     //分平台stream路径分类：
     ///Android/ios/switch/非Editor模式:Application.persistentDataPath + folder
-    ///Windows/Editor模式:【step1:streamPath+custom】+【step2:platormFolder】+【step3:finalFolderName】
-    ///
+    ///Windows/Editor模式:streamingAsset+对应路径
     //获取标准化的文件路径名
     ///path.Trim:移除空白字段
     ///addTrailingSlash:是否增加结尾"/"char分隔符
@@ -168,10 +167,10 @@ namespace YF.FileUtil
         }
         ///***************************step1:获取Application.streamingAssetsPath|""/custom///***************************
         ///**********************************************streamPath******************************************
-        ///获取当前平台steam Asset 文件夹路径 
+        ///1，获取指定平台目标路径：【streamPath】
         ///android非编译器平台：stream目录只写根目录
         ///其他平台：正常streamingAssetsPath目录
-        public static string GetPath_PlatormStream(string examplePath)
+        public static string GetPath_PlatformStream(string examplePath)
         {
             // Get full path of base path
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -188,12 +187,12 @@ namespace YF.FileUtil
             return fullBasePath;
         }
         ///**********************************************step2:获取../platformName******************************************
-        ///streamPath + custom + platformName 
-        public static string GetPath_PlatormStream_Custom_PlatormSubfolder()
+        ///【streamPath】 + 【custom】+ 【platformName】 
+        public static string GetPath_PlatformStream_Custom_PlatormSubfolder()
         {
             var platformName = GetUnityPlatformName();
             // Combine base path with platform sub-folder
-            var platformBasePath = System.IO.Path.Combine(GetPath_PlatormStream("Audio/Generator"), platformName);
+            var platformBasePath = System.IO.Path.Combine(GetPath_PlatformStream("Audio/Generator"), platformName);
             FixSlashes(ref platformBasePath);
             return platformBasePath;
         }
@@ -207,7 +206,7 @@ namespace YF.FileUtil
 // This is for platforms that only have a specific file location for persistent data.
 		return System.IO.Path.Combine(UnityEngine.Application.persistentDataPath,finalFolderName);
 #else
-            return System.IO.Path.Combine(GetPath_PlatormStream_Custom_PlatormSubfolder(), finalFolderName);
+            return System.IO.Path.Combine(GetPath_PlatformStream_Custom_PlatormSubfolder(), finalFolderName);
 #endif
         }
   

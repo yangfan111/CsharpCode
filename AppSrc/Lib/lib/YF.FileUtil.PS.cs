@@ -16,7 +16,7 @@ namespace YF.FileUtil
     {
         public static readonly char wrongSeparatorChar = System.IO.Path.DirectorySeparatorChar == '/' ? '\\' : '/';
 
-        ///Path.Replcace
+        ///-path的规范化：1.badChar.Replace 2.barChar.Replcace.Trim()/TrimStart()
         public static string NormalizePath(string in_path)
         {
             if (string.IsNullOrEmpty(in_path))
