@@ -65,12 +65,51 @@ namespace YF
                 return false;
             }
         }
+        ///**********************************************platformName******************************************
+        ///UNITY_STANDALONE_WIN,
+        ///UNITY_ANDROID
+        ///UNITY_IOS
+        ///UNITY_EDITOR_WIN
+        public static string GetPlatformNameByCompile()
+        {
+            string platformSubDir = string.Empty;
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_WSA
+		platformSubDir = "Windows";
+#elif UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
+		platformSubDir = "Mac";
+#elif UNITY_STANDALONE_LINUX
+		platformSubDir = "Linux";
+#elif UNITY_XBOXONE
+		platformSubDir = "XBoxOne";
+#elif UNITY_IOS || UNITY_TVOS
+		platformSubDir = "iOS";
+#elif UNITY_ANDROID
+		platformSubDir = "Android";
+#elif PLATFORM_LUMIN
+		platformSubDir = "Lumin";
+#elif UNITY_PS4
+		platformSubDir = "PS4";
+#elif UNITY_WP_8_1
+		platformSubDir = "WindowsPhone";
+#elif UNITY_SWITCH
+		platformSubDir = "Switch";
+#elif UNITY_PSP2
+#if AK_ARCH_VITA_SW || !AK_ARCH_VITA_HW
+		platformSubDir = "VitaSW";
+#else
+		platformSubDir = "VitaHW";
+#endif
+#else
+            platformSubDir = "Undefined platform sub-folder";
+#endif
+            return platformSubDir;
+        }
         /// <summary>
         /// 根据打包平台获取对应总平台名
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        public static string GetPlatformName(UnityEditor.BuildTarget target)
+        public static string GetPlatformNameByBuildTarget(UnityEditor.BuildTarget target)
         {
             var platformSubDir = string.Empty;
     //        GetCustomPlatformName(ref platformSubDir, target);

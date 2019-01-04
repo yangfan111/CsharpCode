@@ -48,7 +48,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="lib\EditorLib.cs" />
+    <Compile Include="lib\YF.EditorLib.cs" />
     <Compile Include="lib\Mics.cs" />
     <Compile Include="lib\TodoLib.cs" />
     <Compile Include="lib\YF.FileUtil.FS.cs" />

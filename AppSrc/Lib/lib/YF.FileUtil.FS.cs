@@ -126,45 +126,7 @@ namespace YF.FileUtil
         }
         public static string AppRootPath { get { return System.IO.Path.GetDirectoryName(UnityEngine.Application.dataPath); } }
 
-        ///**********************************************platformName******************************************
-        ///UNITY_STANDALONE_WIN,
-        ///UNITY_ANDROID
-        ///UNITY_IOS
-        ///UNITY_EDITOR_WIN
-        public static string GetUnityPlatformName()
-        {
-            string platformSubDir = string.Empty;
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_WSA
-		platformSubDir = "Windows";
-#elif UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
-		platformSubDir = "Mac";
-#elif UNITY_STANDALONE_LINUX
-		platformSubDir = "Linux";
-#elif UNITY_XBOXONE
-		platformSubDir = "XBoxOne";
-#elif UNITY_IOS || UNITY_TVOS
-		platformSubDir = "iOS";
-#elif UNITY_ANDROID
-		platformSubDir = "Android";
-#elif PLATFORM_LUMIN
-		platformSubDir = "Lumin";
-#elif UNITY_PS4
-		platformSubDir = "PS4";
-#elif UNITY_WP_8_1
-		platformSubDir = "WindowsPhone";
-#elif UNITY_SWITCH
-		platformSubDir = "Switch";
-#elif UNITY_PSP2
-#if AK_ARCH_VITA_SW || !AK_ARCH_VITA_HW
-		platformSubDir = "VitaSW";
-#else
-		platformSubDir = "VitaHW";
-#endif
-#else
-            platformSubDir = "Undefined platform sub-folder";
-#endif
-            return platformSubDir;
-        }
+
         ///***************************step1:获取Application.streamingAssetsPath|""/custom///***************************
         ///**********************************************streamPath******************************************
         ///1，获取指定平台目标路径：【streamPath】
@@ -190,7 +152,7 @@ namespace YF.FileUtil
         ///【streamPath】 + 【custom】+ 【platformName】 
         public static string GetPath_PlatformStream_Custom_PlatormSubfolder()
         {
-            var platformName = GetUnityPlatformName();
+            var platformName = EditorLib.GetPlatformNameByCompile();
             // Combine base path with platform sub-folder
             var platformBasePath = System.IO.Path.Combine(GetPath_PlatformStream("Audio/Generator"), platformName);
             FixSlashes(ref platformBasePath);

@@ -8,8 +8,8 @@ class Program
     static void Main(string[] args)
     {
         //Console.WriteLine("Sucess");
-     
-            CopyImp.CopyProjPackages();
+        Console.WriteLine(args);
+        CopyImp.CopyProjPackages();
             Console.Write("Copy Sucess");
             //  _URI.MakRelative();
     
