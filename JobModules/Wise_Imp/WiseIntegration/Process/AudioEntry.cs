@@ -23,7 +23,7 @@ namespace Core.Audio
         {
             get
             {
-                if (AudioConst.IsForbidden) return null;
+                if (AudioInfluence.IsForbidden) return null;
                 if (dispatcher == null)
                 {
                     if (prepareReady)
@@ -41,7 +41,7 @@ namespace Core.Audio
         }
         public static void PostEvent(int eventId, UnityEngine.GameObject target)
         {
-            if (AudioConst.IsForbidden) return;
+            if (AudioInfluence.IsForbidden) return;
             Dispatcher.PostEvent(eventId, target);
         }
         public static void PostEvent(int eventId)
@@ -51,7 +51,7 @@ namespace Core.Audio
         public static WisePluginNotificationRoute WiseNotificationRoute { get; private set; }
         public static void LaunchAppAudio(WisePluginNotificationRoute wiseNotificationRoute)
         {
-            if (AudioConst.IsForbidden) return;
+            if (AudioInfluence.IsForbidden) return;
             AudioLogger.Info("[Audio=>Entry]engine audio preapared ready");
             WiseNotificationRoute = wiseNotificationRoute;
             bankResLoader = new AKAudioBankLoader();
@@ -60,7 +60,7 @@ namespace Core.Audio
        //     TestCodeChunk_Interanl();
 
 # endif
-            if (AudioConst.AudioLoadTypeWhenStarup == "Sync")
+            if (AudioInfluence.AudioLoadTypeWhenStarup == "Sync")
             {
 
                 AKRESULT result = bankResLoader.LoadInitialBnkRes();

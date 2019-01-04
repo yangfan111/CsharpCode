@@ -1,0 +1,759 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e10308b4c39fdfd4dbe30d133536b6b4, type: 3}
+  m_Name: AkWwiseProjectData
+  m_EditorClassIdentifier: 
+  AcousticTextureWwu:
+  - Guid: '{B39AC1CF-19D6-491D-B9B4-EE9EDDFCFC13}'
+    m_lastTimePart2: -1999218300
+    m_lastTimePsrt1: 717790580
+    ParentPhysicalPath: 
+    PhysicalPath: Virtual Acoustics\Default Work Unit.wwu
+    List: []
+  - Guid: '{463D666B-3CA8-4FA5-8B4A-5FEF12B883F6}'
+    m_lastTimePart2: -1999218415
+    m_lastTimePsrt1: -1459374040
+    ParentPhysicalPath: 
+    PhysicalPath: Virtual Acoustics\Factory Reflect Acoustic Textures.wwu
+    List:
+    - Guid: f2532d2fccda8e408b8898b1b52a26d6
+      ID: -126323319
+      Name: Acoustic_Banner
+      Path: Factory Reflect Acoustic Textures\Textures\Acoustic_Banner
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Acoustic_Banner
+        ObjectType: 15
+    - Guid: 32c20a8be202de4ebeacfdd1a900e3ed
+      ID: 1873957695
+      Name: Anechoic
+      Path: Factory Reflect Acoustic Textures\Textures\Anechoic
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Anechoic
+        ObjectType: 15
+    - Guid: a9a586b004f2534ca838bdb18b18f6d6
+      ID: 504532776
+      Name: Brick
+      Path: Factory Reflect Acoustic Textures\Textures\Brick
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Brick
+        ObjectType: 15
+    - Guid: 8975223456dc604296c4b9f4b669092b
+      ID: -1882360988
+      Name: Carpet
+      Path: Factory Reflect Acoustic Textures\Textures\Carpet
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Carpet
+        ObjectType: 15
+    - Guid: 001cf85c9628e04aaf7c3080bdaba682
+      ID: 841620460
+      Name: Concrete
+      Path: Factory Reflect Acoustic Textures\Textures\Concrete
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Concrete
+        ObjectType: 15
+    - Guid: 19c9d2305f92434189063dbb3c4ae5e2
+      ID: -1099468548
+      Name: Cork_Tiles
+      Path: Factory Reflect Acoustic Textures\Textures\Cork_Tiles
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Cork_Tiles
+        ObjectType: 15
+    - Guid: 339ee6f8975c6849b508a1535f2d66e8
+      ID: -1366806192
+      Name: Curtains
+      Path: Factory Reflect Acoustic Textures\Textures\Curtains
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Curtains
+        ObjectType: 15
+    - Guid: f4e3a4680b4c8746a8b8a84db93dbc8f
+      ID: -624659732
+      Name: Drywall
+      Path: Factory Reflect Acoustic Textures\Textures\Drywall
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Drywall
+        ObjectType: 15
+    - Guid: 32d581836edbed4ea7a3bc7b0a0b8ba8
+      ID: 1970351858
+      Name: Fabric
+      Path: Factory Reflect Acoustic Textures\Textures\Fabric
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Fabric
+        ObjectType: 15
+    - Guid: 313793c51a00b44a98dd9b033a8c8eab
+      ID: 513139656
+      Name: Mountain
+      Path: Factory Reflect Acoustic Textures\Textures\Mountain
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Mountain
+        ObjectType: 15
+    - Guid: c4da82a82a13b747ba9db9907ba29cc0
+      ID: -1657378743
+      Name: Tile
+      Path: Factory Reflect Acoustic Textures\Textures\Tile
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Tile
+        ObjectType: 15
+    - Guid: 96bcff1fe76f9e48ba6c7c14a71391ae
+      ID: 2058049674
+      Name: Wood
+      Path: Factory Reflect Acoustic Textures\Textures\Wood
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Wood
+        ObjectType: 15
+    - Guid: e5d1857ba2c1634e9a13cec54b641adc
+      ID: -32444547
+      Name: Wood_Bright
+      Path: Factory Reflect Acoustic Textures\Textures\Wood_Bright
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Wood_Bright
+        ObjectType: 15
+    - Guid: 8e474652dac50c4ea0dec98d1479529a
+      ID: 1755085759
+      Name: Wood_Deep
+      Path: Factory Reflect Acoustic Textures\Textures\Wood_Deep
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Wood_Deep
+        ObjectType: 15
+  autoPopulateEnabled: 1
+  AuxBusWwu:
+  - Guid: '{C5101E62-536A-4803-831E-F756904FC519}'
+    m_lastTimePart2: -1999218086
+    m_lastTimePsrt1: -1163979133
+    ParentPhysicalPath: 
+    PhysicalPath: Master-Mixer Hierarchy\Default Work Unit.wwu
+    List:
+    - Guid: 4e62479138fc0644bad08ee0de2545c3
+      ID: -1849235421
+      Name: Underwater_FX
+      Path: Default Work Unit\Master Audio Bus\MasterBus\Underwater_FX
+      PathAndIcons:
+      - ElementName: Default Work Unit
+        ObjectType: 12
+      - ElementName: Master Audio Bus
+        ObjectType: 2
+      - ElementName: MasterBus
+        ObjectType: 2
+      - ElementName: Underwater_FX
+        ObjectType: 1
+  BankWwu:
+  - Guid: '{EB9EB3B2-5F56-47C8-ADFA-A15CE1B7E85D}'
+    m_lastTimePart2: -1999218046
+    m_lastTimePsrt1: 697601081
+    ParentPhysicalPath: 
+    PhysicalPath: SoundBanks\Default Work Unit.wwu
+    List:
+    - Guid: 499002e7f1ea7e438d7b88fb632892b9
+      ID: -1137964055
+      Name: Test
+      Path: Default Work Unit\Test
+      PathAndIcons:
+      - ElementName: Default Work Unit
+        ObjectType: 12
+      - ElementName: Test
+        ObjectType: 7
+  - Guid: '{3862FCF4-B121-471E-9B2B-36AFC84054CB}'
+    m_lastTimePart2: -1999213597
+    m_lastTimePsrt1: 254551905
+    ParentPhysicalPath: 
+    PhysicalPath: SoundBanks\New Work Unit.wwu
+    List: []
+  basePath: Audio\GeneratedSoundBanks
+  callbackManagerBufferSize: 4
+  CurrentPluginConfig: 
+  defaultPoolSize: 4096
+  EventWwu:
+  - Guid: '{B7AA9BB0-8B18-4D03-A9C3-501829B343AA}'
+    m_lastTimePart2: -1999218206
+    m_lastTimePsrt1: 1068921659
+    ParentPhysicalPath: 
+    PhysicalPath: Events\Act.wwu
+    List:
+    - Guid: 5a296e0e02331b4a949e62327aa08499
+      ID: -1039843431
+      Name: Act_aqutic_stay
+      Path: Act\Act_Aquatic\Act_aqutic_stay
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Act_Aquatic
+        ObjectType: 4
+      - ElementName: Act_aqutic_stay
+        ObjectType: 3
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - Guid: 00f3946f55f46f4f8c01ae309c5c5037
+      ID: -906063650
+      Name: Act_aqutic_swim
+      Path: Act\Act_Aquatic\Act_aqutic_swim
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Act_Aquatic
+        ObjectType: 4
+      - ElementName: Act_aqutic_swim
+        ObjectType: 3
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - Guid: e196be47a1219748a3939b60b8abea1b
+      ID: 1985650621
+      Name: Act_aqutic_swim_stop
+      Path: Act\Act_Aquatic\Act_aqutic_swim_stop
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Act_Aquatic
+        ObjectType: 4
+      - ElementName: Act_aqutic_swim_stop
+        ObjectType: 3
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - Guid: 595d18a646f60f4aaff292fb3838aaeb
+      ID: -335836708
+      Name: Act_footstep
+      Path: Act\Act_Footstep\Act_footstep
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Act_Footstep
+        ObjectType: 4
+      - ElementName: Act_footstep
+        ObjectType: 3
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+  - Guid: '{E8F90C71-1B2D-4793-AC2E-E898CD7F8556}'
+    m_lastTimePart2: -1999218300
+    m_lastTimePsrt1: 718076530
+    ParentPhysicalPath: 
+    PhysicalPath: Events\Default Work Unit.wwu
+    List: []
+  - Guid: '{FA1387C3-1A07-468A-A08C-55B59C3A440C}'
+    m_lastTimePart2: -1999218076
+    m_lastTimePsrt1: 93311165
+    ParentPhysicalPath: 
+    PhysicalPath: Events\Transport\Car.wwu
+    List:
+    - Guid: f287023718362c448089c628bf881a3f
+      ID: -1550661188
+      Name: Car_start
+      Path: Transport\Car\Car_01\Car_start
+      PathAndIcons:
+      - ElementName: Transport
+        ObjectType: 5
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: Car_01
+        ObjectType: 4
+      - ElementName: Car_start
+        ObjectType: 3
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - Guid: 076cd31303d4d941a8df6e9b8b787d9c
+      ID: 1465464336
+      Name: Car_stop
+      Path: Transport\Car\Car_01\Car_stop
+      PathAndIcons:
+      - ElementName: Transport
+        ObjectType: 5
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: Car_01
+        ObjectType: 4
+      - ElementName: Car_stop
+        ObjectType: 3
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+  - Guid: '{5D5BF796-5D42-4882-A562-F87FEF570D1B}'
+    m_lastTimePart2: -1999218049
+    m_lastTimePsrt1: 486966750
+    ParentPhysicalPath: 
+    PhysicalPath: Events\Weapon.wwu
+    List:
+    - Guid: 61e88e485d5c0c4588efb257375d44c5
+      ID: -1897580808
+      Name: Gun_56_shot
+      Path: Weapon\Gunshot\Gun_56_shot
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gunshot
+        ObjectType: 4
+      - ElementName: Gun_56_shot
+        ObjectType: 3
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - Guid: ab6ae83eb9708e46b5f9766f8b7c96ec
+      ID: -523321365
+      Name: Gun_56_shot_continue_stop
+      Path: Weapon\Gunshot\Gun_56_shot_continue_stop
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gunshot
+        ObjectType: 4
+      - ElementName: Gun_56_shot_continue_stop
+        ObjectType: 3
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - Guid: 33eaef75d13b6143a0cc0914090f36ab
+      ID: -266077089
+      Name: Gun_92FS_shot
+      Path: Weapon\Gunshot\Gun_92FS_shot
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gunshot
+        ObjectType: 4
+      - ElementName: Gun_92FS_shot
+        ObjectType: 3
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - Guid: 24f98c1bfd2da842ad0339ea56ecc5f4
+      ID: 1427590296
+      Name: Gun_92FS_shot_continue_stop
+      Path: Weapon\Gunshot\Gun_92FS_shot_continue_stop
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gunshot
+        ObjectType: 4
+      - ElementName: Gun_92FS_shot_continue_stop
+        ObjectType: 3
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - Guid: f0a41f96ac6be8498fa79bf2106d03c5
+      ID: -1184107724
+      Name: Gun_AKM_shot
+      Path: Weapon\Gunshot\Gun_AKM_shot
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gunshot
+        ObjectType: 4
+      - ElementName: Gun_AKM_shot
+        ObjectType: 3
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - Guid: 11e1dc7a1336114bb642f640a2f2a5a2
+      ID: 1415950951
+      Name: Gun_AKM_shot_continue_stop
+      Path: Weapon\Gunshot\Gun_AKM_shot_continue_stop
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gunshot
+        ObjectType: 4
+      - ElementName: Gun_AKM_shot_continue_stop
+        ObjectType: 3
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - Guid: 64ab6a673330334ea0d086defc34f6fc
+      ID: -1397057713
+      Name: Gun_DT22_shot
+      Path: Weapon\Gunshot\Gun_DT22_shot
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gunshot
+        ObjectType: 4
+      - ElementName: Gun_DT22_shot
+        ObjectType: 3
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - Guid: 5936240b2d951c4a9c2f7d20fc8686cb
+      ID: 1833881064
+      Name: Gun_DT22_shot_continue_stop
+      Path: Weapon\Gunshot\Gun_DT22_shot_continue_stop
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gunshot
+        ObjectType: 4
+      - ElementName: Gun_DT22_shot_continue_stop
+        ObjectType: 3
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - Guid: 53c56e56efa7144591cc7dafb68e8db6
+      ID: -1015337733
+      Name: Gun_M249_shot
+      Path: Weapon\Gunshot\Gun_M249_shot
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gunshot
+        ObjectType: 4
+      - ElementName: Gun_M249_shot
+        ObjectType: 3
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - Guid: 352c40fe6492a34996ef7579c4879e5d
+      ID: 2032076820
+      Name: Gun_M249_shot_continue_stop
+      Path: Weapon\Gunshot\Gun_M249_shot_continue_stop
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gunshot
+        ObjectType: 4
+      - ElementName: Gun_M249_shot_continue_stop
+        ObjectType: 3
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - Guid: 1e704d8badbb134b962302dcc9a3ad60
+      ID: -877318357
+      Name: Gun_MP5A3_shot
+      Path: Weapon\Gunshot\Gun_MP5A3_shot
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gunshot
+        ObjectType: 4
+      - ElementName: Gun_MP5A3_shot
+        ObjectType: 3
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - Guid: 6aab1bc96632c74ba9f3ff5f9087f854
+      ID: -1979619740
+      Name: Gun_MP5A3_shot_continue_stop
+      Path: Weapon\Gunshot\Gun_MP5A3_shot_continue_stop
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gunshot
+        ObjectType: 4
+      - ElementName: Gun_MP5A3_shot_continue_stop
+        ObjectType: 3
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+  ExpandedItems:
+  - /
+  - //Switches
+  - //Switches/Gun
+  - //Switches/Gun/Gun_shot_mode_type
+  language: English(US)
+  lowerPoolSize: 2048
+  m_lastPopulateTimePart2: 0
+  m_lastPopulateTimePsrt1: 0
+  memoryCutoffThreshold: 0.95
+  preparePoolSize: 0
+  RtpcWwu:
+  - Guid: '{E6956110-B5E1-4162-845A-6110BB9CCECD}'
+    m_lastTimePart2: -1999218296
+    m_lastTimePsrt1: -2136350976
+    ParentPhysicalPath: 
+    PhysicalPath: Game Parameters\Default Work Unit.wwu
+    List: []
+  - Guid: '{0EBEFF9B-64D5-4278-9F38-008363D3046C}'
+    m_lastTimePart2: -1999218296
+    m_lastTimePsrt1: -1066951454
+    ParentPhysicalPath: 
+    PhysicalPath: Game Parameters\Model.wwu
+    List:
+    - Guid: b8c3f6d0dafbd343912eefd047d86145
+      ID: 1909548668
+      Name: Model_car_engine
+      Path: Model\Model_car_engine
+      PathAndIcons:
+      - ElementName: Model
+        ObjectType: 12
+      - ElementName: Model_car_engine
+        ObjectType: 13
+  StateWwu:
+  - Guid: '{7291065F-6A5B-4C71-9145-A47E22AFD415}'
+    m_lastTimePart2: -1999218300
+    m_lastTimePsrt1: 718106929
+    ParentPhysicalPath: 
+    PhysicalPath: States\Default Work Unit.wwu
+    List: []
+  - Guid: '{4094C37F-C2C7-4842-BF1C-12FBF88D913A}'
+    m_lastTimePart2: -1999218282
+    m_lastTimePsrt1: 295421448
+    ParentPhysicalPath: 
+    PhysicalPath: States\Global.wwu
+    List:
+    - Guid: 80838506b0ec8b48af3e59658110874c
+      ID: -898860274
+      Name: Global_camera
+      Path: Global\Global_camera
+      PathAndIcons:
+      - ElementName: Global
+        ObjectType: 12
+      - ElementName: Global_camera
+        ObjectType: 9
+      ValueGuids:
+      - bytes: 92b4834d4e0fe344ac7bcfe2b0640ff1
+      - bytes: 541feb3947f4c444a824daa4704e6302
+      - bytes: c938ff2aa70ef541b8269e3702db85a0
+      ValueIcons:
+      - ElementName: Global_camera_overwater
+        ObjectType: 8
+      - ElementName: Global_camera_underwater
+        ObjectType: 8
+      - ElementName: None
+        ObjectType: 8
+      valueIDs: 20425d8bce43624edb3ba32c
+      values:
+      - Global_camera_overwater
+      - Global_camera_underwater
+      - None
+  streamingPoolSize: 1024
+  SwitchWwu:
+  - Guid: '{4AF26C22-9892-4F67-87DB-16ECE6447AD2}'
+    m_lastTimePart2: -1999218208
+    m_lastTimePsrt1: -1949213373
+    ParentPhysicalPath: 
+    PhysicalPath: Switches\Act.wwu
+    List:
+    - Guid: 1e4f9cb49304d14b90f703f316a34b4a
+      ID: 1284892144
+      Name: Aqutic
+      Path: Act\Aqutic
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Aqutic
+        ObjectType: 11
+      ValueGuids:
+      - bytes: 817def8871a9e74fadeaa8e6fb06623b
+      - bytes: a1711b184b209d42aacf538084993dd5
+      ValueIcons:
+      - ElementName: Aqutic_overwater
+        ObjectType: 10
+      - ElementName: Aqutic_underwater
+        ObjectType: 10
+      valueIDs: 92be69e830e2b5fa
+      values:
+      - Aqutic_overwater
+      - Aqutic_underwater
+    - Guid: 175f52dd96b92242b6b42f4bb9fa3adc
+      ID: -982339011
+      Name: Footstep_Act_type
+      Path: Act\Footstep_Act_type
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Footstep_Act_type
+        ObjectType: 11
+      ValueGuids:
+      - bytes: 09ce42ca516426469637bd06df4744be
+      - bytes: 30814f5ee6ba214dbd8b43b552c35716
+      - bytes: 4048d5469ebe8d42ab0a8e32679cf769
+      - bytes: cfdcd156ba9a3a4a81c578b4c01ba60d
+      ValueIcons:
+      - ElementName: crawl
+        ObjectType: 10
+      - ElementName: Jump
+        ObjectType: 10
+      - ElementName: squat
+        ObjectType: 10
+      - ElementName: walk
+        ObjectType: 10
+      valueIDs: 166faeb989e080e4a9af9f76be6db17d
+      values:
+      - crawl
+      - Jump
+      - squat
+      - walk
+    - Guid: 0a5e63a7d500d04b957ce29579adda84
+      ID: -1881522604
+      Name: Footstep_material_type
+      Path: Act\Footstep_material_type
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Footstep_material_type
+        ObjectType: 11
+      ValueGuids:
+      - bytes: e60cbcfd00e92f4484aa331767be87bc
+      - bytes: 8e8e7aa7ce8be3459789274ec014bebc
+      - bytes: 0a8692c812d8cf49b77db2d5fdb5cf6d
+      - bytes: ff93616e71423a40982e92d0a1889bb2
+      - bytes: 2ac8c52566ed094181b3abca43210446
+      - bytes: 9d4125392d37f247a8af956e0ead63ce
+      - bytes: c914349b2e9efa4b905497e2b46d230c
+      - bytes: da9660911f667b49bf6b0771af2463f8
+      ValueIcons:
+      - ElementName: Concrete
+        ObjectType: 10
+      - ElementName: Grass
+        ObjectType: 10
+      - ElementName: Metal
+        ObjectType: 10
+      - ElementName: Rock
+        ObjectType: 10
+      - ElementName: Rug
+        ObjectType: 10
+      - ElementName: Sand
+        ObjectType: 10
+      - ElementName: Wetland
+        ObjectType: 10
+      - ElementName: Wood
+        ObjectType: 10
+      valueIDs: ec1b2a32d92e3dfd5ec675933a65d07fa1b9722a2797e92ff89ce7038a58ab7a
+      values:
+      - Concrete
+      - Grass
+      - Metal
+      - Rock
+      - Rug
+      - Sand
+      - Wetland
+      - Wood
+  - Guid: '{49966347-64FF-4563-B304-4C952ECE15AB}'
+    m_lastTimePart2: -1999218300
+    m_lastTimePsrt1: 718091907
+    ParentPhysicalPath: 
+    PhysicalPath: Switches\Default Work Unit.wwu
+    List: []
+  - Guid: '{BEBF243C-6547-4C56-9252-E9C1DCB30499}'
+    m_lastTimePart2: -1999218297
+    m_lastTimePsrt1: -812939457
+    ParentPhysicalPath: 
+    PhysicalPath: Switches\Gun.wwu
+    List:
+    - Guid: 57e24ab31cbe7840a5e6ed79f9360f75
+      ID: 1650757475
+      Name: Gun_bullet_type
+      Path: Gun\Gun_bullet_type
+      PathAndIcons:
+      - ElementName: Gun
+        ObjectType: 12
+      - ElementName: Gun_bullet_type
+        ObjectType: 11
+      ValueGuids:
+      - bytes: 0645a7c8a2d0894fa79b67f0764ed33e
+      - bytes: 4c867546357fe94d8fa99db63838c78e
+      - bytes: 10a2b1e041c1c448b3bfe6e4cedc929b
+      - bytes: 35a42cd8a4459146887a5854a3fe9877
+      - bytes: ded691b14650ab4193563e7f7a9eb074
+      ValueIcons:
+      - ElementName: Gun_bullet_type_pistol
+        ObjectType: 10
+      - ElementName: Gun_bullet_type_rifle
+        ObjectType: 10
+      - ElementName: Gun_bullet_type_shotgun
+        ObjectType: 10
+      - ElementName: Gun_bullet_type_sniper
+        ObjectType: 10
+      - ElementName: Gun_bullet_type_submachine
+        ObjectType: 10
+      valueIDs: 2361efb784a76b6ad8a9f06823d54c1ed73e9409
+      values:
+      - Gun_bullet_type_pistol
+      - Gun_bullet_type_rifle
+      - Gun_bullet_type_shotgun
+      - Gun_bullet_type_sniper
+      - Gun_bullet_type_submachine
+    - Guid: 7b844b5297a50f41b623f8f137266d96
+      ID: -1321263551
+      Name: Gun_shot_mode_type
+      Path: Gun\Gun_shot_mode_type
+      PathAndIcons:
+      - ElementName: Gun
+        ObjectType: 12
+      - ElementName: Gun_shot_mode_type
+        ObjectType: 11
+      ValueGuids:
+      - bytes: aa918ebf575adc4e8e3a0dabc991c796
+      - bytes: 02fd7ddd9d61ec4f932ccb0ae2fe339e
+      - bytes: 17a6d6e2e105c1468b11a7ae69e9a308
+      ValueIcons:
+      - ElementName: Gun_shot_mode_type_continue
+        ObjectType: 10
+      - ElementName: Gun_shot_mode_type_single
+        ObjectType: 10
+      - ElementName: Gun_shot_mode_type_triple
+        ObjectType: 10
+      valueIDs: 071efbc9c0ef222cc4121814
+      values:
+      - Gun_shot_mode_type_continue
+      - Gun_shot_mode_type_single
+      - Gun_shot_mode_type_triple
+  TriggerWwu:
+  - Guid: '{ADABFB2C-2160-432E-B238-64386771EACA}'
+    m_lastTimePart2: -1999218300
+    m_lastTimePsrt1: 717901195
+    ParentPhysicalPath: 
+    PhysicalPath: Triggers\Default Work Unit.wwu
+    List: []

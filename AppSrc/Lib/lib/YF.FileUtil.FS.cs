@@ -4,6 +4,9 @@ using System;
 namespace YF.FileUtil
 {
     /// <summary>
+    // 读取目标文件数据
+    ///File.ReadAllText(outPath)
+    ///FileStream
     // 获取文件/文件夹信息 
     /// var dir = new DirectoryInfo(sourceDirName)
     /// var files[] = dir.GetFiles()
@@ -36,7 +39,8 @@ namespace YF.FileUtil
         ///*******file.CopyTo(temppath, true);
         public static void FileOrDicretoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
         {
-            if(System.IO.Path.HasExtension(sourceDirName))
+            var fileName = System.IO.Path.GetFileName(sourceDirName);
+            if(System.IO.Path.HasExtension(fileName))
             {
                 System.IO.FileInfo fi = new System.IO.FileInfo(sourceDirName);
                 fi.CopyTo(destDirName, true);

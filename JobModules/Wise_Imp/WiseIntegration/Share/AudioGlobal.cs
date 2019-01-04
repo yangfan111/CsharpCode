@@ -7,7 +7,7 @@ namespace Core.Audio
     {
 
     }
-    public class AudioConst
+    public class AudioInfluence
     {
         //AKAudioEngineDriver
         public const AkCurveInterpolation DefualtCurveInterpolation = AkCurveInterpolation.AkCurveInterpolation_Linear;//默认插值函数
@@ -20,18 +20,9 @@ namespace Core.Audio
         /// <summary>
         /// 启动默认音频加载方式
         /// </summary>
-        private static string audioLoadTypeWhenStarup = "Sync";
 
-        public static string AudioLoadTypeWhenStarup
-        {
-            get { return audioLoadTypeWhenStarup; }
-#if UNITY_EDITOR
-            set
-            {
-                audioLoadTypeWhenStarup = value;
-            }
-#endif
-        }
+        public static string AudioLoadTypeWhenStarup { get; set; }
+     
 
         /// <summary>
         /// 全局音频禁用常量

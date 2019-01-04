@@ -24,6 +24,7 @@ using Utils.Configuration;
 using Console = System.Console;
 using ArtPlugins;
 using Core.Event;
+using Utils.Singleton;
 
 namespace App.Shared.Scripts
 {
@@ -420,17 +421,17 @@ namespace App.Shared.Scripts
             
             ConsoleCommandsDatabase.RegisterCommand(DebugCommands.ForbidSystem,
                 ForbidSystem,
-                description: "temporary stop system ",
+                description: "禁止对应系统及子系统运行 ",
                 usage: "ForbidSystem");            
             
             ConsoleCommandsDatabase.RegisterCommand(DebugCommands.PermitSystem,
                 PermitSystem,
-                description: "let system go",
+                description: "允许对应系统及子系统运行",
                 usage: "PermitSystem");            
             
             ConsoleCommandsDatabase.RegisterCommand(DebugCommands.ShowSystem,
                 ShowSystem,
-                description: "list all controlled systems",
+                description: "显示所有受控系统",
                 usage: "ShowSystem");
 
             ConsoleCommandsDatabase.RegisterCommand(DebugCommands.WaterReflectUseCam,
@@ -532,7 +533,7 @@ namespace App.Shared.Scripts
 
         private string DebugTime(params string[] args)
         {
-            var r = DurationHelp.Instance.GetCmdTable();
+            var r = SingletonManager.Get<DurationHelp>().GetCmdTable();
             logger.Error(r);
             return r;
         }
@@ -784,7 +785,7 @@ namespace App.Shared.Scripts
             {
                 return "Argument Error! item id should be int";
             }
-            var weapon = WeaponDataConfigManager.Instance.GetConfigById(i);
+            var weapon = SingletonManager.Get<WeaponDataConfigManager>().GetConfigById(i);
             if (null == weapon)
             {
                 return string.Format("no weapon with id {0}", i);
@@ -834,7 +835,7 @@ namespace App.Shared.Scripts
             {
                 return "Argument Error! bulletCount should be int";
             }
-            var asset = AvatarAssetConfigManager.Instance.GetAssetInfoById(i);
+            var asset = SingletonManager.Get<AvatarAssetConfigManager>().GetAssetInfoById(i);
             if (string.IsNullOrEmpty(asset.AssetName))
             {
                 return "illegal equipment id ";
@@ -966,7 +967,7 @@ namespace App.Shared.Scripts
             {
                 return "Argument Error! bulletCount should be int";
             }
-            var infos = WeaponPartsConfigManager.Instance.GetModifyInfos(i);
+            var infos = SingletonManager.Get<WeaponPartsConfigManager>().GetModifyInfos(i);
             if (null == infos)
             {
                 return "illegal attachment id";
@@ -1403,10 +1404,10 @@ namespace App.Shared.Scripts
             switch (args[0])
             {
                 case "veg":
-                    DynamicScenesController.Instance.SetVegetationActive(args[1] == "on");
+                    SingletonManager.Get<DynamicScenesController>().SetVegetationActive(args[1] == "on");
                     break;
                 case "height":
-                    DynamicScenesController.Instance.SetHeightmapActive(args[1] == "on");
+                    SingletonManager.Get<DynamicScenesController>().SetHeightmapActive(args[1] == "on");
                     break;
                 case "lightprobe":
                     int count = SceneManager.sceneCount;
@@ -1669,7 +1670,7 @@ namespace App.Shared.Scripts
         {
             if (args.Length == 0)
             {
-                return MyProfilerManager.Instance.IsRecordOn ? "Profiler Enabled" : "Profiler Disabled";
+                return SingletonManager.Get<MyProfilerManager>().IsRecordOn ? "Profiler Enabled" : "Profiler Disabled";
             }
 
             if (args.Length > 2)

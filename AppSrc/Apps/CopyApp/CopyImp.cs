@@ -2,15 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using YF;
 using YF.FileUtil;
 class Program
 {
     static void Main(string[] args)
     {
         //Console.WriteLine("Sucess");
-        Console.WriteLine(args);
-        CopyImp.CopyProjPackages();
-            Console.Write("Copy Sucess");
+        //   Console.WriteLine(args[0]);
+        CopyCmdType cmd = (CopyCmdType)int.Parse(args[0]);
+        switch(cmd)
+        {
+            case CopyCmdType.CopyFile:
+                CopyImp.CopyProjPackages();
+                break;
+            case CopyCmdType.De_CopyFile:
+                CopyImp.DeCopyProjPackages();
+                break;
+        }
+      
+        Console.Write("Copy Sucess");
             //  _URI.MakRelative();
     
         if (Console.ReadKey() != null)
@@ -56,6 +67,7 @@ public class ImplentConfig
 public class CopyImp
 {
     public static readonly string configPath = @"e:\Github\CsharpCode\AppSrc\Apps\CopyApp\config.json";
+    public static readonly string d_configPath = @"e:\Github\CsharpCode\AppSrc\Apps\CopyApp\d_config.json";
     public static void ExportXML()
     {
         var obj = new ImplentConfig();
@@ -73,7 +85,16 @@ public class CopyImp
             FS.FileOrDicretoryCopy(data.SS, data.DS, true);
         }
     }
-
+    public static void DeCopyProjPackages()
+    {
+        Seri.myJsonDeSeriType = typeof(ImplentConfig);
+        var obj = Seri.DeSerializableObj(d_configPath, YF.SerializableType.Json);
+        var imp = obj as ImplentConfig;
+        foreach (var data in imp.SDList)
+        {
+            FS.FileOrDicretoryCopy(data.SS, data.DS, true);
+        }
+    }
     public static void CopyWise()
     {
 

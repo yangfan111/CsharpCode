@@ -1,0 +1,40 @@
+{
+  "SDList": [
+    {
+      "SS": "E:\\Github\\CsharpCode\\JobModules\\Wise_Unity\\API",
+      "DS": "F:\\voyager\\UnityPackages\\Wwise\\Deployment\\API\\"
+    },
+    {
+      "SS": "E:\\Github\\CsharpCode\\JobModules\\Wise_Unity\\Components",
+      "DS": "F:\\voyager\\UnityPackages\\Wwise\\Deployment\\Components"
+    },
+    {
+      "SS": "E:\\Github\\CsharpCode\\JobModules\\Wise_Imp\\",
+      "DS": "F:\\voyager\\UnityProjects\\App.Client.Unity\\App.Client.Unity-Windows\\Assets\\Core\\Audio\\"
+    },
+    {
+      "SS": "E:\\Github\\Mics\\放置所有配置文件\\.gitconfig",
+      "DS": "C:\\Users\\Administrator\\.gitconfig"
+    },
+     {
+      "SS": "E:\\Github\\Mics\\放置所有配置文件\\github说明.txt",
+      "DS": "E:\\Github\\tmp\\github说明.txt"
+    },
+     {    
+      "SS": "E:\\Github\\Mics\\放置所有配置文件\\psHub.bat",
+      "DS": "E:\\Github\\psHub.bat"
+    },
+      {    
+      "SS": "E:\\Github\\Mics\\放置所有配置文件\\syHub.bat",
+      "DS": "E:\\Github\\syHub.bat"
+    },
+    {    
+      "SS": "E:\\Github\\CsharpCode\\JobModules\\Client_Scripts",
+      "DS": "F:\\voyager\\UnityPackages\\App.Client.Scripts\\Scripts"
+    },
+    {    
+      "SS": "E:\\Github\\CsharpCode\\JobModules\\Wise_Unity\\Editor",
+      "DS": "f:\\voyager\\UnityPackages\\Wwise\\Editor"
+    }
+  ]
+}

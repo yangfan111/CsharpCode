@@ -72,8 +72,8 @@ public class ClientGameController : MonoBehaviour, ICoRoutineManager
 
         _logger.InfoFormat("StartGame...roomId:{0},ip:{1},port:{2},token:{3}", roomId, ip, port, token);
 
-        ClientFileSystemConfigManager.Instance.BootConfig.BattleServer.IP = ip;
-        ClientFileSystemConfigManager.Instance.BootConfig.BattleServer.TcpPort = port;
+        SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.BattleServer.IP = ip;
+        SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.BattleServer.TcpPort = port;
         TestUtility.TestToken = token;
        
         //start
@@ -139,7 +139,7 @@ public class ClientGameController : MonoBehaviour, ICoRoutineManager
         if (hallController == null)
         {
             _assetLoader = new AssetPool(this);
-            yield return StartCoroutine(_assetLoader.Init(ClientFileSystemConfigManager.Instance.BootConfig.Resource,
+            yield return StartCoroutine(_assetLoader.Init(SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.Resource,
                 SharedConfig.IsServer));
             DoStart();
         }
@@ -150,7 +150,7 @@ public class ClientGameController : MonoBehaviour, ICoRoutineManager
             _logger.InfoFormat("GetGameClientInfo...");
         }
 
-        MyHttpServer.Start(ClientFileSystemConfigManager.Instance.BootConfig.HttpPort, _clientRoom);
+        MyHttpServer.Start(SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.HttpPort, _clientRoom);
 #if UNITY_SOURCE_MODIFIED && !UNITY_EDITOR
         if (!SharedConfig.InSamplingMode && !SharedConfig.InLegacySampleingMode)
         {
@@ -191,15 +191,15 @@ public class ClientGameController : MonoBehaviour, ICoRoutineManager
         consoleCommands.RegisterOpenCallback(BlockAllInput);
         if (!SharedConfig.IsOffline)
         {
-            _loginClient = new LoginClient(ClientFileSystemConfigManager.Instance.BootConfig.BattleServer.IP,
-                new NetworkPortInfo(ClientFileSystemConfigManager.Instance.BootConfig.BattleServer.TcpPort,
-                    ClientFileSystemConfigManager.Instance.BootConfig.BattleServer.UdpPort),
+            _loginClient = new LoginClient(SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.BattleServer.IP,
+                new NetworkPortInfo(SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.BattleServer.TcpPort,
+                    SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.BattleServer.UdpPort),
                 _clientRoom);
            
         }
         _isInit = true;
-        GlobalProperties.Instance.Properties["serverIp"] = ClientFileSystemConfigManager.Instance.BootConfig.BattleServer.IP;
-        GlobalProperties.Instance.Properties["tcpPort"] = ClientFileSystemConfigManager.Instance.BootConfig.BattleServer.TcpPort;
+        GlobalProperties.Instance.Properties["serverIp"] = SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.BattleServer.IP;
+        GlobalProperties.Instance.Properties["tcpPort"] = SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.BattleServer.TcpPort;
         GlobalProperties.Instance.Properties["token"] = TestUtility.TestToken;
         GlobalProperties.Instance.Properties["CS"] = "Client";
         GlobalProperties.Instance.Properties["mutilThread"] = SharedConfig.MutilThread;
@@ -266,7 +266,7 @@ public class ClientGameController : MonoBehaviour, ICoRoutineManager
 
         try
         {
-            DurationHelp.Instance.ProfileStart(CustomProfilerStep.GameController);
+            SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.GameController);
             if (_isDestroy)
                 return;
 
@@ -287,8 +287,8 @@ public class ClientGameController : MonoBehaviour, ICoRoutineManager
         }
         finally
         {
-            DurationHelp.Instance.ProfileEnd(CustomProfilerStep.GameController);
-           // MyProfilerManager.Instance.RecordToLog(_seq);
+            SingletonManager.Get<DurationHelp>().ProfileEnd(CustomProfilerStep.GameController);
+           // SingletonManager.Get<MyProfilerManager>().RecordToLog(_seq);
         }
     }
 
@@ -323,9 +323,6 @@ public class ClientGameController : MonoBehaviour, ICoRoutineManager
 
         _clientRoom.Dispose();
         DefaultGo.Clear(GameRunningStage.BattleClient);
-        LevelController.Instance.Clear();
-        DynamicScenesController.Instance.Clear();
-        
         SingletonManager.Dispose();
 
 #if UNITY_SOURCE_MODIFIED && !UNITY_EDITOR
@@ -343,7 +340,7 @@ public class ClientGameController : MonoBehaviour, ICoRoutineManager
             sceneName = gameObject.scene.name;
         args.Add(sceneName);
 
-        args.AddRange(MapConfigManager.Instance().GetLoadedMapNames());
+        args.AddRange(SingletonManager.Get<MapConfigManager>().GetLoadedMapNames());
 
         _logger.InfoFormat("Hall OnGameOver ... unload count:{0}", args.Count);
         foreach (var arg in args)
@@ -376,7 +373,7 @@ public class ClientGameController : MonoBehaviour, ICoRoutineManager
 
     public void SendChatMessageToGame(object broadcastMessageData)
     {
-        var action = FreeUiManager.Instance.Contexts1.ui.chat.AddChatMessageDataAction;
+        var action = SingletonManager.Get<FreeUiManager>().Contexts1.ui.chat.AddChatMessageDataAction;
         if (action != null)
         {
             action.Invoke(broadcastMessageData);
@@ -385,7 +382,7 @@ public class ClientGameController : MonoBehaviour, ICoRoutineManager
 
     private void SendCheckPersonalOnlineStatusToGame(object list)
     {
-        var action = FreeUiManager.Instance.Contexts1.ui.chat.GetPersonalOnlineStatusCallback;
+        var action = SingletonManager.Get<FreeUiManager>().Contexts1.ui.chat.GetPersonalOnlineStatusCallback;
         if (action != null)
         {
             action.Invoke(list);

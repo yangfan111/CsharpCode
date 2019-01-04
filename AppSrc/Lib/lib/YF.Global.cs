@@ -2,7 +2,11 @@
 namespace YF
 {
 
-
+    public enum CopyCmdType
+    {
+        CopyFile =0,
+        De_CopyFile = 1,
+    }
 
 
     public enum SerializableType

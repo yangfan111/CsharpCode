@@ -29,16 +29,16 @@ public class AudioPluginSettingAgent
                     return false;
 #endif
     }
-#if UNITY_EDITOR
+
     public static void SetCreatePacker(bool usePicker)
     {
 
-
+#if UNITY_EDITOR
         AudioPluginSettingData.D_CreatedPicker = usePicker;
-
-    }
-    
 #endif
+    }
+
+
     public static bool GetCreateWwiseGlobal()
     {
 #if UNITY_EDITOR
