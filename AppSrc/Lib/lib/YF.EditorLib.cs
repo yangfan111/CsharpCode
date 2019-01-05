@@ -1,13 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using UnityEditor;
 namespace YF
 {
     public class EditorLib
     {
         /// <summary>
+        /// 开始python应用
         /// 需要配置全局变量
         /// ProcessStartInfo
+        ///  start.FileName = "python";
+        ///  start.Arguments = (string)arg
+        ///  start.UseShellExecute = false;
+        /// start.RedirectStandardOutput = true;;
+        /// ar process = System.Diagnostics.Process.Start(start))
+        ///   process.WaitForExit();
+        ///   (process.ExitCode == 0)
         /// </summary>
         /// <returns></returns>
         public static bool StartPythonProgram(string entryPath,object arg)
@@ -43,20 +52,20 @@ namespace YF
                     if (process.ExitCode == 0)
                     {
                         return true;
-                   //     UnityEditor.EditorUtility.DisplayProgressBar(s_progTitle, progMsg, 1.0f);
+                   //     EditorUtility.DisplayProgressBar(s_progTitle, progMsg, 1.0f);
                         //UnityEngine.Debug.Log(string.Format(
                         //    "WwiseUnity: SoundBank ID conversion succeeded. Find generated Unity script under {0}.", s_bankDir));
                     }
                     else
                         UnityEngine.Debug.LogError("WwiseUnity: Conversion failed.");
 
-                    //UnityEditor.AssetDatabase.Refresh();
+                    //AssetDatabase.Refresh();
                 }
                 catch (System.Exception ex)
                 {
-                   // UnityEditor.AssetDatabase.Refresh();
+                   // AssetDatabase.Refresh();
 
-                    //UnityEditor.EditorUtility.ClearProgressBar();
+                    //EditorUtility.ClearProgressBar();
                     //UnityEngine.Debug.LogError(string.Format(
                         //"WwiseUnity: SoundBank ID conversion process failed with exception: {}. Check detailed logs under the folder: Assets/Wwise/Logs.",
                    //    ex));
@@ -109,7 +118,7 @@ namespace YF
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        public static string GetPlatformNameByBuildTarget(UnityEditor.BuildTarget target)
+        public static string GetPlatformNameByBuildTarget(BuildTarget target)
         {
             var platformSubDir = string.Empty;
     //        GetCustomPlatformName(ref platformSubDir, target);
@@ -118,51 +127,103 @@ namespace YF
 
             switch (target)
             {
-                case UnityEditor.BuildTarget.Android:
+                case BuildTarget.Android:
                     return "Android";
 
-                case UnityEditor.BuildTarget.iOS:
-                case UnityEditor.BuildTarget.tvOS:
+                case BuildTarget.iOS:
+                case BuildTarget.tvOS:
                     return "iOS";
 
-                case UnityEditor.BuildTarget.StandaloneLinux:
-                case UnityEditor.BuildTarget.StandaloneLinux64:
-                case UnityEditor.BuildTarget.StandaloneLinuxUniversal:
+                case BuildTarget.StandaloneLinux:
+                case BuildTarget.StandaloneLinux64:
+                case BuildTarget.StandaloneLinuxUniversal:
                     return "Linux";
 
 #if UNITY_2017_3_OR_NEWER
-			case UnityEditor.BuildTarget.StandaloneOSX:
+			case BuildTarget.StandaloneOSX:
 #else
-                //case UnityEditor.BuildTarget.StandaloneOSXIntel:
-                //case UnityEditor.BuildTarget.StandaloneOSXIntel64:
-                //case UnityEditor.BuildTarget.StandaloneOSXUniversal:
+                //case BuildTarget.StandaloneOSXIntel:
+                //case BuildTarget.StandaloneOSXIntel64:
+                //case BuildTarget.StandaloneOSXUniversal:
 #endif
                     return "Mac";
 
-                case (UnityEditor.BuildTarget)39: // UnityEditor.BuildTarget.Lumin
+                case (BuildTarget)39: // BuildTarget.Lumin
                     return "Lumin";
 
-                case UnityEditor.BuildTarget.PS4:
+                case BuildTarget.PS4:
                     return "PS4";
 
-                case UnityEditor.BuildTarget.PSP2:
+                case BuildTarget.PSP2:
                     return "Vita";
 
-                case UnityEditor.BuildTarget.StandaloneWindows:
-                case UnityEditor.BuildTarget.StandaloneWindows64:
-                case UnityEditor.BuildTarget.WSAPlayer:
+                case BuildTarget.StandaloneWindows:
+                case BuildTarget.StandaloneWindows64:
+                case BuildTarget.WSAPlayer:
                     return "Windows";
 
-                case UnityEditor.BuildTarget.XboxOne:
+                case BuildTarget.XboxOne:
                     return "XboxOne";
 
-                case UnityEditor.BuildTarget.Switch:
+                case BuildTarget.Switch:
                     return "Switch";
             }
 
             return target.ToString();
         }
     }
+    #region//scene 
+    public class SceneLib
+    {
+        /// <summary>
+        /// editor下代码创建场景
+        /// UnityEditor.SceneManagement下
+        /// EditorSceneManager.NewScene 
+        /// 
+        /// Engine下代码访问场景
+        /// UnityEngine.SceneManagement
+        /// SceneManager.GetActiveScene();
+        /// </summary>
+        /// <returns> UnityEngine.SceneManagement.Scene</returns>
+        public static UnityEngine.SceneManagement.Scene CreateNewScene()
+        {
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.DefaultGameObjects);
+            return scene;
+        }
+        /// <summary>
+        /// 打开场景文件
+        /// </summary>
+        /// <param name="scene"></param>
+        /// <returns></returns>
+        public static UnityEngine.SceneManagement.Scene OpenExistingScene(string scene)
+        {
+            return UnityEditor.SceneManagement.EditorSceneManager.OpenScene(scene);
+        }
+        /// <summary>
+        /// 通用编译器，非编译器环境下
+        /// </summary>
+        /// <returns></returns>
+        public static UnityEngine.SceneManagement.Scene GetCurrentScene()
+        {
+            return UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        }
+        /// <summary>
+        /// 编译器环境下保存场景
+        /// </summary>
+        /// <param name="destSceneName">目标拷贝场景名</param>
+        /// <param name="saveAsCopy">作为备份使用</param>
+        /// <returns></returns>
+        public static bool SaveCurrentScene(string destSceneName,bool saveAsCopy = false)
+        {
+            bool ret;
+            if (destSceneName == null)
+                ret = UnityEditor.SceneManagement.EditorSceneManager.SaveScene(GetCurrentScene());
+            else
+                ret = UnityEditor.SceneManagement.EditorSceneManager.SaveScene(GetCurrentScene(), destSceneName, saveAsCopy);
+            return ret;
+        }
+    }
+    #endregion
 }
 
 //    #region//editor uses---------------------------------------------------------------------------
@@ -171,7 +232,7 @@ namespace YF
 //    ///刷新UnityEditor
 //    public static void RepaintInspector()
 //    {
-//        var windows = UnityEngine.Resources.FindObjectsOfTypeAll<UnityEditor.EditorWindow>();
+//        var windows = UnityEngine.Resources.FindObjectsOfTypeAll<EditorWindow>();
 //        foreach (var win in windows)
 //            if (win.titleContent.text == "Inspector")
 //                win.Repaint();
@@ -199,68 +260,3 @@ namespace YF
 //        process.Close();
 
 //        return output;
-//    }
-//    public static void SaveSettings(WwiseSettings Settings)
-//	{
-//		try
-//		{
-//			var xmlDoc = new System.Xml.XmlDocument();
-//			var xmlSerializer = new System.Xml.Serialization.XmlSerializer(Settings.GetType());
-//			using (var xmlStream = new System.IO.MemoryStream())
-//			{
-//				var streamWriter = new System.IO.StreamWriter(xmlStream, System.Text.Encoding.UTF8);
-//				xmlSerializer.Serialize(streamWriter, Settings);
-//				xmlStream.Position = 0;
-//				xmlDoc.Load(xmlStream);
-//				xmlDoc.Save(System.IO.Path.Combine(UnityEngine.Application.dataPath, WwiseSettingsFilename));
-//			}
-//		}
-//		catch (System.Exception)
-//		{
-//		}
-//	}
-
-//	// Load the WwiseSettings structure from a serialized XML file
-//	public static WwiseSettings LoadSettings(bool ForceLoad = false)
-//	{
-//		if (s_Instance != null && !ForceLoad)
-//			return s_Instance;
-
-//		var Settings = new WwiseSettings();
-//		try
-//		{
-//			if (System.IO.File.Exists(System.IO.Path.Combine(UnityEngine.Application.dataPath, WwiseSettingsFilename)))
-//			{
-//				var xmlSerializer = new System.Xml.Serialization.XmlSerializer(Settings.GetType());
-//				var xmlFileStream = new System.IO.FileStream(UnityEngine.Application.dataPath + "/" + WwiseSettingsFilename,
-//					System.IO.FileMode.Open, System.IO.FileAccess.Read);
-//				Settings = (WwiseSettings) xmlSerializer.Deserialize(xmlFileStream);
-//				xmlFileStream.Close();
-//			}
-//			else
-//			{
-//				var projectDir = System.IO.Path.GetDirectoryName(UnityEngine.Application.dataPath);
-//				var foundWwiseProjects = System.IO.Directory.GetFiles(projectDir, "*.wproj", System.IO.SearchOption.AllDirectories);
-
-//				if (foundWwiseProjects.Length == 0)
-//					Settings.WwiseProjectPath = "";
-//				else
-//				{
-//					Settings.WwiseProjectPath =
-//						AkUtilities.MakeRelativePath(UnityEngine.Application.dataPath, foundWwiseProjects[0]);
-//				}
-
-//				Settings.SoundbankPath = AkSoundEngineController.s_DefaultBasePath;
-//			}
-
-//			s_Instance = Settings;
-//		}
-//		catch (System.Exception)
-//		{
-//		}
-
-//		return Settings;
-//	}
-//}
-
-//    #endregion

@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+﻿
 [UnityEditor.InitializeOnLoad]
 public class AkPluginActivator
 {
@@ -840,4 +840,4 @@ void *_pluginName_##_fp = (void*)&_pluginName_##Registration;
 		VitaEQ = 0x00900003 //Vita EQ
 	}
 }
-#endif
+
