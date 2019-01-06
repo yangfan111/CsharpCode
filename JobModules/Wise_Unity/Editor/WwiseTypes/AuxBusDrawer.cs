@@ -10,7 +10,7 @@ namespace AK.Wwise.Editor
 			for (var i = 0; i < list.Count; i++)
 			{
 				var element = list[i].List.Find(x => new System.Guid(x.Guid).Equals(in_guid[0]));
-
+                
 				if (element != null)
 				{
 					m_IDProperty[0].intValue = element.ID;
