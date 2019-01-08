@@ -314,7 +314,7 @@ public class ClientGameController : MonoBehaviour, ICoRoutineManager
         Debug.Log("OnDestroy");
         _logger.InfoFormat("Start Destroy...");
         _isDestroy = true;
-
+        MyHttpServer.Stop();
         if (_loginClient != null)
             _loginClient.Dispose();
 
