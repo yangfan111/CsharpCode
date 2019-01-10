@@ -18,6 +18,9 @@
 /// - <a href="https://www.audiokinetic.com/library/edge/?source=SDK&id=soundengine__environments.html" target="_blank">Integration Details - Environments and Game-defined Auxiliary Sends</a> (Note: This is described in the Wwise SDK documentation.)
 public class AkGameObj : UnityEngine.MonoBehaviour
 {
+    /// <summary>
+    ///-每个AKGameObj包含一个AkGameObjListenerList
+    /// </summary>
 	[UnityEngine.SerializeField] private AkGameObjListenerList m_listeners = new AkGameObjListenerList();
 
 	/// Is this object affected by Environment changes?  Set to false if not affected in order to save some useless calls.  Default is true.
