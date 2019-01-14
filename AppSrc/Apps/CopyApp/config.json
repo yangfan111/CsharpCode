@@ -35,6 +35,10 @@
     {    
       "DS": "E:\\Github\\CsharpCode\\JobModules\\Wise_Unity\\Editor",
       "SS": "f:\\voyager\\UnityPackages\\Wwise\\Editor"
+    },
+     {    
+      "DS": "E:\\Github\\CsharpCode\\JobModules\\App.Shared",
+      "SS": "f:\\voyager\\UnityPackages\\App.Shared"
     }
   ]
 }

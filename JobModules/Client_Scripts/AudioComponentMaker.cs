@@ -69,7 +69,7 @@ public class AudioComponentMaker : MonoBehaviour
 #endif
         // wiseObject = new GameObject("WwiseGlobal");
         gameObject.AddComponent<AkInitializer>();
-        gameObject.AddComponent<WisePluginNotificationRoute>();
+        gameObject.AddComponent<AudioPluginsDriver>();
     }
     private void OnApplicationQuit()
     {

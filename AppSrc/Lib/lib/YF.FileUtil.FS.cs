@@ -43,6 +43,7 @@ namespace YF.FileUtil
             if(System.IO.Path.HasExtension(fileName))
             {
                 System.IO.FileInfo fi = new System.IO.FileInfo(sourceDirName);
+                fi.Attributes = System.IO.FileAttributes.Normal;
                 fi.CopyTo(destDirName, true);
             }
             else
@@ -61,9 +62,8 @@ namespace YF.FileUtil
 
         public static bool DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs, string filter, bool recoverEntirely)
         {
-            // Get the subdirectories for the specified directory.
-            var dir = new System.IO.DirectoryInfo(sourceDirName);
-
+            var dir = System.IO.Directory.CreateDirectory(sourceDirName);
+            dir.Attributes = System.IO.FileAttributes.System;
             if (!dir.Exists)
             {
                 Console.WriteLine("WwiseUnity: Source directory doesn't exist");

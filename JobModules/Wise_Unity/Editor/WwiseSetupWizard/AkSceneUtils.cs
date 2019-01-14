@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR Finished
+﻿#if UNITY_EDITOR 
 
 public class AkSceneUtils
 {

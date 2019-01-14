@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{10AD1B1D-B427-4832-AD59-90F11230FA45}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>App.Shared</RootNamespace>
+    <AssemblyName>App.Shared.EntitasCodeGen</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\build\bin\Debug\</OutputPath>
+    <IntermediateOutputPath>..\build\obj\Debug\</IntermediateOutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Entitas">
+      <HintPath>..\ThirdParty\Entitas\Libs\Entitas.dll</HintPath>
+    </Reference>
+    <Reference Include="Entitas.CodeGeneration.Attributes, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ThirdParty\Entitas\Libs\Entitas.CodeGeneration.Attributes.dll</HintPath>
+    </Reference>
+    <Reference Include="Entitas.Utils">
+      <HintPath>..\ThirdParty\Entitas\Libs\Entitas.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ThirdParty\Unity\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Asset\AssetInfo.cs" />
+    <Compile Include="Asset\IAssetPool.cs" />
+    <Compile Include="Asset\IGameObjectPool.cs" />
+    <Compile Include="Asset\ILoadRequestManagerComponent.cs" />
+    <Compile Include="Asset\IRecyclableComponent.cs" />
+    <Compile Include="Asset\IUnityObjectPool.cs" />
+    <Compile Include="Asset\LoadRequest.cs" />
+    <Compile Include="Asset\LoadResult.cs" />
+    <Compile Include="Components\ClientMap\FlagLoadingMapGameObjectComponent.cs" />
+    <Compile Include="Components\ClientMap\MapGameObjectComponent.cs" />
+    <Compile Include="Components\ClientSession\SessionObjectsComponent.cs" />
+    <Compile Include="Components\Common\FlagPlaybackComponent.cs" />
+    <Compile Include="Components\Common\FlagPredicationComponent.cs" />
+    <Compile Include="Components\Common\FlagDestroyComponent.cs" />
+    <Compile Include="Components\Common\LoadRequestManagerComponent.cs" />
+    <Compile Include="Components\Common\RotationComponent.cs" />
+    <Compile Include="Components\EComponentIds.cs" />
+    <Compile Include="Components\Player\CharacterContollerComponent.cs" />
+    <Compile Include="Components\Player\FlagSelfComponent.cs" />
+    <Compile Include="Components\Player\CharacterUnityObject.cs" />
+    <Compile Include="Components\Player\PlayerMoveComponent.cs" />
+    <Compile Include="Components\Player\UserCmdComponent.cs" />
+    <Compile Include="Components\Player\UserCmdOwnerComponent.cs" />
+    <Compile Include="Components\ServerMap\MapGameObjectComponent.cs" />
+    <Compile Include="Components\ServerSession\RoomStateComponent.cs" />
+    <Compile Include="Components\Vehicle\CameraComponent.cs" />
+    <Compile Include="Components\Vehicle\GameObjectComponent.cs" />
+    <Compile Include="Generated\Entitas\Generated\ClientMap\ClientMapAttribute.cs" />
+    <Compile Include="Generated\Entitas\Generated\ClientSession\ClientSessionAttribute.cs" />
+    <Compile Include="Generated\Entitas\Generated\Player\PlayerAttribute.cs" />
+    <Compile Include="Generated\Entitas\Generated\ServerMap\ServerMapAttribute.cs" />
+    <Compile Include="Generated\Entitas\Generated\ServerSession\ServerSessionAttribute.cs" />
+    <Compile Include="Generated\Entitas\Generated\Vehicle\VehicleAttribute.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Components\Common\EntityIdComponent.cs" />
+    <Compile Include="Components\Common\OrientationComponent.cs" />
+    <Compile Include="Components\Common\PositionComponent.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{01080bb5-eb3d-4311-b7bc-169176401d57}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Entitas.properties" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>$(ProjectDir)generate_components.bat</PostBuildEvent>
+  </PropertyGroup>
+</Project>
