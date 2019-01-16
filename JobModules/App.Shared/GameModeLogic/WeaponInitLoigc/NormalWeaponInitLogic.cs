@@ -170,11 +170,11 @@ namespace App.Shared.GameModeLogic.WeaponInitLoigc
             }
             if(firstSlot < EWeaponSlotType.Length)
             {
-                playerEntity.playerAction.Logic.TryMountWeapon(firstSlot);
+                playerEntity.playerAction.Logic.TryMountSlotWeapon(firstSlot);
             }
             foreach(var slot in _removeSlotList)
             {
-                playerEntity.playerAction.Logic.RemoveWeapon(slot);
+                playerEntity.playerAction.Logic.RemoveSlotWeapon(slot);
             }
         }
 

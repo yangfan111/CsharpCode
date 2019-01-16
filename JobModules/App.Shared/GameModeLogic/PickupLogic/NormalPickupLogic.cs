@@ -97,7 +97,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
                     DoDropGrenade(player);
                     return; 
             }
-            var curWeapon = player.GetBagLogicImp().GetWeaponInfo(slot);
+            var curWeapon = player.GetBagLogicImp().GetSlot_WeaponInfo(slot);
             if (curWeapon.Id > 0)
             {
                 var dropPos = player.GetHandWeaponPosition();
@@ -130,7 +130,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
                         sceneObjectEntity = _sceneObjectEntityFactory.CreateDropWeaponEntity(curWeapon, playerTrans.position, _sceneWeaponLifeTime) as SceneObjectEntity;
                     }
                 }
-                player.playerAction.Logic.DropWeapon(slot);
+                player.playerAction.Logic.DropSlotWeapon(slot);
             }
         }
 

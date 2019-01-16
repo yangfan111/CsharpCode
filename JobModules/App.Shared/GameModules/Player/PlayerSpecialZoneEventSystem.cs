@@ -157,7 +157,7 @@ namespace App.Shared.GameModules.Player
                                                     SingletonManager.Get<MapConfigManager>().WaterSurfaceHeight(player.position.Value) - (AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset),
                                                  player.position.Value.z);
             player.position.Value = syncTransform.position;
-            player.playerAction.Logic.ForceUnmountWeapon();
+            player.playerAction.Logic.ForceUnmountHeldWeapon();
             player.stateInterface.State.Swim();
         }
 
@@ -174,7 +174,7 @@ namespace App.Shared.GameModules.Player
 
         private void Dive(PlayerEntity player)
         {
-            player.playerAction.Logic.ForceUnmountWeapon();
+            player.playerAction.Logic.ForceUnmountHeldWeapon();
             player.stateInterface.State.Dive();
         }
     }

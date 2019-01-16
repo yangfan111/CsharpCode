@@ -29,7 +29,7 @@ namespace App.Shared.GameModules.Player.Robot.Conditions
                
                 if (mEntity != null )
                 {
-                    return !mEntity.GetBagLogicImp().GetWeaponInfo(SlotType.Value).Equals(new WeaponInfo())?TaskStatus.Success:TaskStatus.Failure;
+                    return !mEntity.GetBagLogicImp().GetSlot_WeaponInfo(SlotType.Value).Equals(new WeaponInfo())?TaskStatus.Success:TaskStatus.Failure;
                 }
             }
 

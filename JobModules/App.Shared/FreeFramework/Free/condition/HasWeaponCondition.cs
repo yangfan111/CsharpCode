@@ -22,11 +22,11 @@ namespace App.Shared.FreeFramework.Free.condition
             {
                 if (hand)
                 {
-                    return fd.Player.GetBagLogicImp().GetCurrentWeaponInfo().Id == id;
+                    return fd.Player.GetBagLogicImp().HeldSlotWeaponInfo().Id == id;
                 }
                 else
                 {
-                    return fd.Player.GetBagLogicImp().HasWeapon(id);
+                    return fd.Player.GetBagLogicImp().IsWeaponStuffedInSlot(id);
                 }   
             }
 

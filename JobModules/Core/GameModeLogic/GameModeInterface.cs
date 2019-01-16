@@ -35,13 +35,13 @@ namespace Core.GameModeLogic
         int GetReservedBullet(Entity playerEntity, EBulletCaliber caliber);
     }
 
-    public interface IWeaponSlotController
-    {
-        EWeaponSlotType GetWeaponSlotByIndex(int index);
-        bool IsSlotValid(EWeaponSlotType slot);
-        EWeaponSlotType[] AvaliableSlots { get; } 
-        void InitPlayerWeaponBySlotInfo(Entity playerEntity);
-    }
+    //public interface IWeaponSlotController
+    //{
+    //    EWeaponSlotType GetWeaponSlotByIndex(int index);
+    //    bool IsSlotValid(EWeaponSlotType slot);
+    //    EWeaponSlotType[] AvaliableSlots { get; } 
+    //    void InitPlayerWeaponBySlotInfo(Entity playerEntity);
+    //}
     
     public interface IWeaponActionListener
     {
@@ -50,7 +50,7 @@ namespace Core.GameModeLogic
         void OnDrop(Entity playerEntity, EWeaponSlotType slot);
     }
     
-     public interface IWeaponModeLogic : IWeaponInitLogic, IWeaponSlotController, IBagSlotLogic, IPickupLogic,
+     public interface IWeaponModeLogic : IWeaponInitLogic, IBagSlotLogic, IPickupLogic,
         IReservedBulletLogic, IWeaponActionListener
     {
     }
@@ -58,18 +58,17 @@ namespace Core.GameModeLogic
     public class ModeLogic : IWeaponModeLogic
     {
         private IWeaponInitLogic _weaponInitLogic;
-        private IWeaponSlotController _weaponSlotController;
+      //  private IWeaponSlotController _weaponSlotController;
         private IBagSlotLogic _bagSlotLogic;
         private IPickupLogic _pickupLogic;
         private IReservedBulletLogic _reservedBulletLogic;
         private IWeaponActionListener _weaponActionListener;
 
-        public ModeLogic(IWeaponInitLogic weaponInitLogic, IWeaponSlotController weaponSlotController,
+        public ModeLogic(IWeaponInitLogic weaponInitLogic, 
             IBagSlotLogic bagSlotLogic, IPickupLogic pickupLogic, IReservedBulletLogic reservedBulletLogic,
             IWeaponActionListener weaponActionListener)
         {
             _weaponInitLogic = weaponInitLogic;
-            _weaponSlotController = weaponSlotController;
             _bagSlotLogic = bagSlotLogic;
             _pickupLogic = pickupLogic;
             _reservedBulletLogic = reservedBulletLogic;
@@ -102,25 +101,25 @@ namespace Core.GameModeLogic
 
         #region IWeaponSlotController
 
-        public EWeaponSlotType GetWeaponSlotByIndex(int index)
-        {
-            return _weaponSlotController.GetWeaponSlotByIndex(index);
-        }
+        //public EWeaponSlotType GetWeaponSlotByIndex(int index)
+        //{
+        //    return _weaponSlotController.GetWeaponSlotByIndex(index);
+        //}
 
-        public bool IsSlotValid(EWeaponSlotType slot)
-        {
-            return _weaponSlotController.IsSlotValid(slot);
-        }
+        //public bool IsSlotValid(EWeaponSlotType slot)
+        //{
+        //    return _weaponSlotController.IsSlotValid(slot);
+        //}
 
-        public EWeaponSlotType[] AvaliableSlots
-        {
-            get { return _weaponSlotController.AvaliableSlots; }
-        }
+        //public EWeaponSlotType[] AvaliableSlots
+        //{
+        //    get { return _weaponSlotController.AvaliableSlots; }
+        //}
 
-        public void InitPlayerWeaponBySlotInfo(Entity playerEntity)
-        {
-            _weaponSlotController.InitPlayerWeaponBySlotInfo(playerEntity);
-        }
+        //public void InitPlayerWeaponBySlotInfo(Entity playerEntity)
+        //{
+        //    _weaponSlotController.InitPlayerWeaponBySlotInfo(playerEntity);
+        //}
 
         #endregion
 

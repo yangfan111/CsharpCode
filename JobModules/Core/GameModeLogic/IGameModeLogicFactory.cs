@@ -17,11 +17,11 @@
 
         protected abstract IWeaponInitLogic GetWeaponIniLogic();
 
-        protected abstract IWeaponSlotController GetWeaponSlotController();
+     //   protected abstract IWeaponSlotController GetWeaponSlotController();
 
         public IWeaponModeLogic CreateWeaponModeLogic()
         {
-            return new ModeLogic(GetWeaponIniLogic(),GetWeaponSlotController(),GetBagSlotLogic(),GetPickupLogic(),GetReservedBulletLogic(),GetWeaponActionListener());
+            return new ModeLogic(GetWeaponIniLogic(),GetBagSlotLogic(),GetPickupLogic(),GetReservedBulletLogic(),GetWeaponActionListener());
         }
     }
 }

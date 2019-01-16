@@ -211,7 +211,7 @@ namespace App.Shared.DebugHandle
         public static string ProcessPlayerCommands(DebugCommand message, PlayerEntity player, ICommonSessionObjects sessionObjects, ICurrentTime currentTime)
         {
             var result = "";
-            WeaponBagLogic bagLogicImp;
+            PlayerWeaponComponentAgent bagLogicImp;
             switch (message.Command)
             {
                 case DebugCommands.ClientMove:
@@ -283,7 +283,7 @@ namespace App.Shared.DebugHandle
                     player.gamePlay.CurHp = int.Parse(message.Args[0]);
                     break;
                 case DebugCommands.SetCurBullet:
-                    player.GetBagLogicImp().SetWeaponBullet(int.Parse(message.Args[0]));
+                    player.GetBagLogicImp().SetHeldWeaponBullet(int.Parse(message.Args[0]));
                     break;
                 case DebugCommands.SetReservedBullet:
                     if (message.Args.Length > 1)
@@ -296,7 +296,7 @@ namespace App.Shared.DebugHandle
                     else
                     {
                         int count = int.Parse(message.Args[0]);
-                        player.GetBagLogicImp().SetReservedBullet(player.GetBagLogicImp().GetCurrentWeaponSlot(), count);
+                        player.GetBagLogicImp().SetReservedBullet(player.GetBagLogicImp().HeldSlotType, count);
                     }
                     break;
                 case DebugCommands.SetWeapon:
@@ -334,7 +334,7 @@ namespace App.Shared.DebugHandle
                         break;
                 case DebugCommands.DropWeapon:
                     var dropSlot = int.Parse(message.Args[0]);
-                    player.playerAction.Logic.DropWeapon((EWeaponSlotType)dropSlot);
+                    player.playerAction.Logic.DropSlotWeapon((EWeaponSlotType)dropSlot);
                     break;
                 case DebugCommands.TestWeaponAssemble:
                     if (null == _twaRootGo)
@@ -379,12 +379,12 @@ namespace App.Shared.DebugHandle
                         id = int.Parse(message.Args[1]);
                       
 
-                        res = player.GetBagLogicImp().SetWeaponPart((EWeaponSlotType)slot, id);
+                        res = player.GetBagLogicImp().SetSlotWeaponPart((EWeaponSlotType)slot, id);
                     }
                     else
                     {
                         id = int.Parse(message.Args[0]);
-                        res = player.GetBagLogicImp().SetCurrentWeaponPart(id);
+                        res = player.GetBagLogicImp().SetHeldSlotWeaponPart(id);
                     }
 
                     switch (res)
@@ -403,7 +403,7 @@ namespace App.Shared.DebugHandle
                 case DebugCommands.ClearAttachment:
                     var weaponSlot = (EWeaponSlotType)int.Parse(message.Args[0]);
                     var part = (EWeaponPartType)int.Parse(message.Args[1]);
-                    player.GetBagLogicImp().DeleteWeaponPart(weaponSlot, part);
+                    player.GetBagLogicImp().DeleteSlotWeaponPart(weaponSlot, part);
                     break;
                 case DebugCommands.SwitchAttachment:
                     break;
@@ -411,7 +411,7 @@ namespace App.Shared.DebugHandle
                     player.appearanceInterface.Appearance.ChangeAvatar(int.Parse(message.Args[0]));
                     break;
                 case DebugCommands.ShowAvaliablePartType:
-                    var weapon = player.GetBagLogicImp().GetCurrentWeaponInfo();
+                    var weapon = player.GetBagLogicImp().HeldSlotWeaponInfo();
                     if (weapon.Id > 0)
                     {
                         var list = SingletonManager.Get<WeaponPartsConfigManager>().GetAvaliablePartTypes(weapon.Id);

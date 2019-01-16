@@ -55,11 +55,11 @@ namespace App.Server.GameModules.GamePlay.Free.player
             }
             else if ("currentWeaponKey" == field)
             {
-                return new IntPara(field, FreeWeaponUtil.GetWeaponKey(player.GetBagLogicImp().GetCurrentWeaponSlot()));
+                return new IntPara(field, FreeWeaponUtil.GetWeaponKey(player.GetBagLogicImp().HeldSlotType));
             }
             else if ("currentWeaponId" == field)
             {
-                return new IntPara(field, player.GetBagLogicImp().GetCurrentWeaponInfo().Id);
+                return new IntPara(field, player.GetBagLogicImp().HeldSlotWeaponInfo().Id);
             }
             else if ("inCar" == field)
             {

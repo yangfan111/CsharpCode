@@ -72,7 +72,7 @@ namespace App.Shared.GameModules.Player
 
         public int CurrentWeapon
         {
-            get { return _playerEntity.GetBagLogicImp().GetCurrentWeaponInfo().Id; }
+            get { return _playerEntity.GetBagLogicImp().HeldSlotWeaponInfo().Id; }
         }
 
         public float HorizontalVeocity
@@ -207,7 +207,7 @@ namespace App.Shared.GameModules.Player
                 {
                     return 0;
                 }
-                return _playerEntity.GetBagLogicImp().GetWeaponBullet();
+                return _playerEntity.GetBagLogicImp().HeldWeaponBullet;
             }
 
             set
@@ -217,7 +217,7 @@ namespace App.Shared.GameModules.Player
                 {
                     return;
                 }
-                _playerEntity.GetBagLogicImp().SetWeaponBullet(value);
+                _playerEntity.GetBagLogicImp().SetHeldWeaponBullet(value);
             }
         }
 
@@ -268,8 +268,8 @@ namespace App.Shared.GameModules.Player
 
         public EFireMode FireMode
         {
-            get { return (EFireMode)_playerEntity.GetBagLogicImp().CurFireMode; }
-            set { _playerEntity.GetBagLogicImp().CurFireMode = (int)value; }
+            get { return (EFireMode)_playerEntity.GetBagLogicImp().HeldFireMode; }
+            set { _playerEntity.GetBagLogicImp().HeldFireMode = (int)value; }
         }
 
         public void ShowFireModeChangeTip(EFireMode newFireMode)
@@ -323,8 +323,8 @@ namespace App.Shared.GameModules.Player
 
         bool IPlayerWeaponState.IsBolted
         {
-            get { return _playerEntity.GetBagLogicImp().CurBolted; }
-            set { _playerEntity.GetBagLogicImp().CurBolted = value; }
+            get { return _playerEntity.GetBagLogicImp().HeldBolted; }
+            set { _playerEntity.GetBagLogicImp().HeldBolted = value; }
         }
 
         public bool CanFire()
@@ -498,7 +498,7 @@ namespace App.Shared.GameModules.Player
 
         public void UnmountWeaponByAction()
         {
-            _playerEntity.playerAction.Logic.ForceUnmountWeapon();
+            _playerEntity.playerAction.Logic.ForceUnmountHeldWeapon();
         }
 
         public void EndSpecialFire()
@@ -641,7 +641,7 @@ namespace App.Shared.GameModules.Player
         {
             get
             {
-                var weapon = _playerEntity.GetBagLogicImp().GetCurrentWeaponInfo();
+                var weapon = _playerEntity.GetBagLogicImp().HeldSlotWeaponInfo();
                 if (weapon.Id < 1)
                 {
                     return EBulletCaliber.Length;

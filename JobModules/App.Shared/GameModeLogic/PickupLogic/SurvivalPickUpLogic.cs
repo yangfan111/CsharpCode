@@ -31,8 +31,8 @@ namespace App.Shared.GameModeLogic.PickupLogic
             //使用服务器操作
             return;
             var player = _playerContext.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(playerEntityId, (short)EEntityType.Player));
-            var bagImp = player.bag.Bag as WeaponBagLogic;
-           var curWeapon = bagImp.GetWeaponInfo(slot);
+            var bagImp = player.bag.Bag as PlayerWeaponComponentAgent;
+           var curWeapon = bagImp.GetSlot_WeaponInfo(slot);
             if (curWeapon.Id > 0)
             {
                 var dropPos = player.GetHandWeaponPosition();
@@ -65,7 +65,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
                         sceneObjectEntity = _sceneObjectEntityFactory.CreateWeaponEntity(curWeapon, playerTrans.position) as SceneObjectEntity;
                     }
                 }
-                player.playerAction.Logic.DropWeapon(slot);
+                player.playerAction.Logic.DropSlotWeapon(slot);
             }
         }
 

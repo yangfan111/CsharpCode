@@ -2,6 +2,8 @@
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using Core.Bag;
+using App.Shared.WeaponLogic;
+using App.Shared.Util;
 
 namespace App.Shared.GameModules.Player
 {
@@ -15,9 +17,12 @@ namespace App.Shared.GameModules.Player
                 return;
             }
             var player = owner.OwnerEntity as PlayerEntity;
-            if(cmd.IsForceUnmountWeapon)
+            var controller = player.GetWeaponController();
+
+            if (cmd.IsForceUnmountWeapon)
             {
-                player.playerAction.Logic.ForceUnmountWeapon();
+              
+                controller.ForceUnmountHeldWeapon();
                 return;
             }
 
@@ -33,14 +38,14 @@ namespace App.Shared.GameModules.Player
                 }
             }
             bool changeWeaponSucess= true;
-            var curSlot = player.GetBagLogicImp().GetCurrentWeaponSlot();
+            var curSlot = player.weaponAgent.Content.HeldSlotType;
             if (curSlot == EWeaponSlotType.None)
             {
-                var lastSlot = player.GetBagLogicImp().PopLastWeaponSlot();
+                var lastSlot = player.weaponAgent.Content.PopGetLastWeaponId();
                 if (lastSlot != EWeaponSlotType.None)
                 {
                     //player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.ChangeWeapon);
-                    player.playerAction.Logic.DrawWeapon(lastSlot);
+                    controller.DrawSlotWeapon(lastSlot);
                 }
                 else
                 {
@@ -53,8 +58,8 @@ namespace App.Shared.GameModules.Player
             }
             else
             {
-             //   player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.ChangeWeapon);
-                player.playerAction.Logic.UnmountWeapon();
+                //   player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.ChangeWeapon);
+                controller.UnmountHeldWeapon();
             }
             if (changeWeaponSucess)
                 player.weaponLogic.State.OnSwitchWeapon();

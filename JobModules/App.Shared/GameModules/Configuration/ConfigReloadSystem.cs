@@ -105,7 +105,7 @@ namespace App.Shared.GameModules.Configuration
             foreach(var player in _playerContext.GetEntities())
             {
                 player.weaponFactory.Factory.ClearCache();
-                player.playerAction.Logic.TryMountWeapon(player.GetBagLogicImp().GetCurrentWeaponSlot());
+                player.playerAction.Logic.TryMountSlotWeapon(player.GetBagLogicImp().HeldSlotType);
             }
         }
 

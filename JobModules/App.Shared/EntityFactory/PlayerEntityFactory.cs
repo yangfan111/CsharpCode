@@ -36,6 +36,7 @@ using App.Shared.WeaponLogic.HitCheck;
 using Core.GameModeLogic;
 using Utils.Singleton;
 using App.Shared.Sound;
+using App.Shared.Util;
 
 namespace App.Shared.EntityFactory
 {
@@ -56,14 +57,14 @@ namespace App.Shared.EntityFactory
         {
             var entityId = entityIdGenerator.GetNextEntityId();
             playerInfo.EntityId = entityId;
-            return CreateNewPlayerEntity(playerContext,  commonSessionObjects.WeaponModeLogic,  
+            return CreateNewPlayerEntity(playerContext, 
                 position, playerInfo, true, false);
         }
 
 
         public static PlayerEntity CreateNewPlayerEntity(
             PlayerContext playerContext,
-            IWeaponSlotController weaponSlotController,
+      
             Vector3 position,
             ICreatePlayerInfo playerInfo,
             bool prediction,
@@ -134,7 +135,7 @@ namespace App.Shared.EntityFactory
             playerEntity.AddRemoteEvents(new PlayerEvents());
 
             playerEntity.AddStatisticsData(false, new BattleData(), new StatisticsData());
-            weaponSlotController.InitPlayerWeaponBySlotInfo(playerEntity);
+            playerEntity.AttachWeaponComponents();
             playerEntity.AddPlayerMask((byte)(EPlayerMask.TeamA | EPlayerMask.TeamB), (byte)(EPlayerMask.TeamA | EPlayerMask.TeamB));
             playerEntity.AddOverrideBag(0);
             //Logger.Info(playerEntity.Dump());
@@ -244,13 +245,8 @@ namespace App.Shared.EntityFactory
                 player.AddNetworkWeaponAnimation(string.Empty, 0, string.Empty, 0);
 
             AddCameraStateNew(player);
-            var bagLogic = new WeaponBagLogic(
-                player,
-                SingletonManager.Get<WeaponConfigManager>());
+            player.AttachWeaponComponentAgent();
 
-            player.AddBag(bagLogic);
-            var grenadeInventory = new GrenadeBagCacheAgent(player.grenadeInventoryData);
-            player.AddGrenadeInventoryHolder(grenadeInventory);
             player.AddLocalEvents(new PlayerEvents());
             InitFiltedInput(player, sessionObjects.GameStateProcessorFactory); 
 /*
@@ -262,14 +258,14 @@ namespace App.Shared.EntityFactory
                 SingletonManager.Get<TerrainManager>(),
                 SingletonManager.Get<MapConfigManager>()));
 */
-            player.AddSoundManager(new DummyPlayerSoundManager());
-            player.AddPlayerAction(new PlayerWeaponActionLogic(player,
-                bagLogic,
-                sceneObjectFactory,
-                player.modeLogic.ModeLogic,
-                grenadeInventory,
-                player.modeLogic.ModeLogic,
-                player.modeLogic.ModeLogic));
+            //player.AddSoundManager(new DummyPlayerSoundManager());
+            //player.AddPlayerAction(new PlayerWeaponController(player,
+            //    bagLogic,
+            //    sceneObjectFactory,
+            //    player.modeLogic.ModeLogic,
+            //    grenadeInventory,
+            //    player.modeLogic.ModeLogic,
+            //    player.modeLogic.ModeLogic));
             
             if (!player.hasPingStatistics)
             {

@@ -46,7 +46,7 @@ namespace App.Shared.GameModules.Player
                     playerEntity.appearanceInterface.Appearance.SetThridPerson();
                     playerEntity.appearanceInterface.Appearance.UnmountWeaponFromHandAtOnce();
                     playerEntity.characterBoneInterface.CharacterBone.SetThridPerson();
-                    playerEntity.playerAction.Logic.ForceUnmountWeapon();
+                    playerEntity.playerAction.Logic.ForceUnmountHeldWeapon();
                     playerAppearance.PlayerDead();
                     characterControllerAppearance.PlayerDead();
                     playerEntity.genericActionInterface.GenericAction.PlayerDead(playerEntity);
@@ -75,7 +75,7 @@ namespace App.Shared.GameModules.Player
                 {
                     _logger.InfoFormat("{0} play dying", playerEntity.entityKey);
                     playerState.Dying();
-                    playerEntity.playerAction.Logic.ForceUnmountWeapon();
+                    playerEntity.playerAction.Logic.ForceUnmountHeldWeapon();
                 }
             }
 

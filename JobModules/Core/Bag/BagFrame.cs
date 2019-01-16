@@ -17,8 +17,13 @@ namespace Core.Bag
         GrenadeWeapon,
         TacticWeapon,
         Length,
+        /// <summary>
+        /// 做武器component统一获取适配
+        /// </summary>
+        WeaponState = 99,
     }
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true,Inherited =false)]
+  
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
     public sealed class WeaponSpeciesAttribute : Attribute
     {
         public readonly EWeaponSlotType slotType;
@@ -69,64 +74,158 @@ namespace Core.Bag
         public int Count;
     }
 
-    public interface IWeaponBagLogic
+    public interface IPlayerWeaponComponentArchive
     {
-    }
-        //WeaponInfo GetWeaponInfo(EWeaponSlotType slot);
-        //WeaponInfo GetCurrentWeaponInfo();
-        //EWeaponSlotType PopLastWeaponSlot();
-
-        //bool HasWeapon();
-        //bool HasWeaponInSlot(EWeaponSlotType slot);
-        //bool HasWeapon(int weaponId);
-
-        //bool CurBolted { get; set; }
-
-        //void SetWeaponBullet(EWeaponSlotType slot, int count);
-        //int GetWeaponBullet(EWeaponSlotType slot);
-        //int GetWeaponBullet();
-
-        //void SetWeaponBullet(int count);
-        //int GetWeaponAvatarId(int weaponId);
-
-        //EWeaponSlotType GetCurrentWeaponSlot();
-        //int CurrentWeaponId { get; }
-
-        //int GetReservedBullet(EWeaponSlotType slot);
-        //int GetReservedBullet(EBulletCaliber caliber);
-        //void SetReservedBullet(EWeaponSlotType slot, int count);
-        //int SetReservedBullet(EBulletCaliber caliber, int count);
-
-        //int GetReservedBullet();
-        //void SetReservedBullet(int count);
-
-        //int CurFireMode { get; set; }
-        //int GetFireMode(EWeaponSlotType slot);
-        //int GetFireModeCount(EWeaponSlotType slot);
         /// <summary>
-        /// 添加武器配件到当前武器
+        /// 获取武器控制器实例
         /// </summary>
-        /// <param name="id"></param>
         /// <returns></returns>
-        //EFuncResult SetCurrentWeaponPart(int id);
-        ///// <summary>
-        ///// 添加武器配件到指定位置
-        ///// </summary>
-        ///// <param name="slot"></param>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //EFuncResult SetWeaponPart(EWeaponSlotType slot, int id);
-        ///// <summary>
-        ///// 删除指定位置武器的指定部位的配件
-        ///// </summary>
-        ///// <param name="slot"></param>
-        ///// <param name="part"></param>
-        //void DeleteWeaponPart(EWeaponSlotType slot, EWeaponPartType part);
-        ///// <summary>
-        ///// 将武器Id转为AvatarId
-        ///// </summary>
-        ///// <param name="weaponId"></param>
-        //int GetAvatarById(int weaponId);
+        IPlayerWeaponController GetController();
+
+        int GetReservedBullet();
+        /// <summary>
+        /// 获取当前槽位信息
+        /// </summary>
+        /// <returns></returns>
+        EWeaponSlotType HeldSlotType { get; }
+
+
+        /// 获取当前槽位信息
+        /// </summary>
+        /// <returns></returns>
+        int HeldSlotWeaponId { get; }
+        /// <summary>
+        /// 获取当前槽位信息
+        /// </summary>
+        /// <returns></returns>
+        /// <summary>
+        WeaponInfo HeldSlotWeaponInfo { get; }
+        /// <summary>
+        /// 获取武器信息(槽位)
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <returns></returns>
+        WeaponInfo GetSlot__WeaponInfo(EWeaponSlotType slot);
+        /// <summary>
+        ///  获取武器信息(槽位)
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <param name="wpInfo"></param>
+        /// <returns></returns>
+        int GetSLot__WeaponId(EWeaponSlotType slot);
+
+
+        bool TryGetSlot__WeaponInfo(EWeaponSlotType slot, out WeaponInfo wpInfo);
+
+        /// <summary>
+        /// 获取上一次使用的武器槽位
+        /// </summary>
+        /// <returns></returns>
+        int GetLastWeaponSlot();
+
+        /// <summary>
+        /// 当前武器槽位是否有武器
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <returns></returns>
+        bool IsWeaponSlotStuffed(EWeaponSlotType slot);
+
+        /// <summary>
+        /// 判断当前武器是否在槽位内
+        /// </summary>
+        /// <param name="weaponId"></param>
+        /// <returns></returns>
+        bool IsWeaponStuffedInSlot(int weaponId);
+
+
+        /// <summary>
+        /// 获取最近一次使用的武器槽位
+        /// </summary>
+        /// <returns></returns>
+        EWeaponSlotType PopGetLastWeaponId();
+        /// <summary>
+        /// 当前开火模式
+        /// </summary>
+        int HeldFireMode { get; set; }
+
+        bool HeldBolted { get; set; }
+
+        int GetSlotFireModeCount(EWeaponSlotType slot);
+        /// <summary>
+        /// 当前武器子弹数
+        /// </summary>
+        /// <returns></returns>
+        int HeldWeaponBullet { get; }
+        /// <summary>
+        /// 武器子弹数(槽位)
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <returns></returns>
+        int GetSlotWeaponBullet(EWeaponSlotType slot);
+
+        bool GetSlotWeaponBolted(EWeaponSlotType slot);
+
+        /// <summary>
+        /// 开火模式(武器)
+        /// </summary>
+        int GetSlotFireMode(EWeaponSlotType slot);
+        bool IsHeldSlotType(EWeaponSlotType slot);
+    }
+    //WeaponInfo GetWeaponInfo(EWeaponSlotType slot);
+    //WeaponInfo GetHeldSlot__WeaponInfo();
+    //EWeaponSlotType PopLastWeaponSlot();
+
+    //bool HasWeapon();
+    //bool IsWeaponSlotStuffed(EWeaponSlotType slot);
+    //bool HasWeapon(int weaponId);
+
+    //bool CurBolted { get; set; }
+
+    //void SetWeaponBullet(EWeaponSlotType slot, int count);
+    //int GetWeaponBullet(EWeaponSlotType slot);
+    //int GetWeaponBullet();
+
+    //void SetWeaponBullet(int count);
+    //int GetWeaponAvatarId(int weaponId);
+
+    //EWeaponSlotType GetHeldSlot__Type();
+    //int CurrentWeaponId { get; }
+
+    //int GetReservedBullet(EWeaponSlotType slot);
+    //int GetReservedBullet(EBulletCaliber caliber);
+    //void SetReservedBullet(EWeaponSlotType slot, int count);
+    //int SetReservedBullet(EBulletCaliber caliber, int count);
+
+    //int GetReservedBullet();
+    //void SetReservedBullet(int count);
+
+    //int CurFireMode { get; set; }
+    //int GetFireMode(EWeaponSlotType slot);
+    //int GetFireModeCount(EWeaponSlotType slot);
+    /// <summary>
+    /// 添加武器配件到当前武器
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    //EFuncResult SetCurrentWeaponPart(int id);
+    ///// <summary>
+    ///// 添加武器配件到指定位置
+    ///// </summary>
+    ///// <param name="slot"></param>
+    ///// <param name="id"></param>
+    ///// <returns></returns>
+    //EFuncResult SetWeaponPart(EWeaponSlotType slot, int id);
+    ///// <summary>
+    ///// 删除指定位置武器的指定部位的配件
+    ///// </summary>
+    ///// <param name="slot"></param>
+    ///// <param name="part"></param>
+    //void DeleteWeaponPart(EWeaponSlotType slot, EWeaponPartType part);
+    ///// <summary>
+    ///// 将武器Id转为AvatarId
+    ///// </summary>
+    ///// <param name="weaponId"></param>
+    //int GetAvatarById(int weaponId);
 
     //public interface IBagWeaponController
     //{

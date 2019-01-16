@@ -19,6 +19,7 @@ using App.Shared.FreeFramework.framework.trigger;
 using App.Shared.FreeFramework.framework.@event;
 using Utils.Singleton;
 using App.Shared.WeaponLogic;
+using App.Shared.Util;
 
 namespace App.Shared.GameModules.GamePlay.SimpleTest
 {
@@ -68,22 +69,19 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                 {
                     return;
                 }
-                var bagImp = player.bag.Bag as WeaponBagLogic;
-                if (!bagImp.HasWeapon())
-                {
-                    return;
-                }
-                var weapon = bagImp.GetCurrentWeaponInfo();
-                var config = SingletonManager.Get<WeaponConfigManager>().GetConfigById(weapon.Id);
+                IPlayerWeaponComponentArchive weaponAgent = player.GetWeaponAchive();
+            
+                WeaponInfo heldWeapon = weaponAgent.HeldSlotWeaponInfo;
+                var config = SingletonManager.Get<WeaponConfigManager>().GetConfigById(heldWeapon.Id);
                 if (NoReloadAction(config))
                 {
                     return;
                 }
-                if (MagazineIsFull(player.weaponLogic.State, weapon.Bullet))
+                if (MagazineIsFull(player.weaponLogic.State, heldWeapon.Bullet))
                 {
                     return;
                 }
-                if (HasNoReservedBullet(bagImp, player))
+                if (HasNoReservedBullet(weaponAgent, player))
                 {
                     return;
                 }
@@ -120,7 +118,7 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                 {
                     if (weaponState.LoadedBulletCount > 0 && !weaponState.IsAlwaysEmptyReload)
                     {
-                        var needActionDeal = CheckNeedActionDeal(bagImp, ActionDealEnum.Reload);
+                        var needActionDeal = CheckNeedActionDeal(weaponAgent, ActionDealEnum.Reload);
                         if (needActionDeal)
                         {
                             player.appearanceInterface.Appearance.MountWeaponOnAlternativeLocator();
@@ -138,7 +136,7 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                     }
                     else
                     {
-                        var needActionDeal = CheckNeedActionDeal(bagImp, ActionDealEnum.ReloadEmpty);
+                        var needActionDeal = CheckNeedActionDeal(weaponAgent, ActionDealEnum.ReloadEmpty);
                         if (needActionDeal)
                         {
                             player.appearanceInterface.Appearance.MountWeaponOnAlternativeLocator();
@@ -172,9 +170,9 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
             return bulletCount >= weaponState.BulletCountLimit;
         }
 
-        private bool HasNoReservedBullet(WeaponBagLogic bag, PlayerEntity playerEntity)
+        private bool HasNoReservedBullet(IPlayerWeaponComponentArchive agent, PlayerEntity playerEntity)
         {
-            if (bag.GetReservedBullet() < 1)
+            if (agent.GetReservedBullet() < 1)
             {
                 _elapse = 0;
                 if (SharedConfig.CurrentGameMode == Components.GameMode.Normal)
@@ -233,10 +231,9 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
             }
         }
 
-        private bool CheckNeedActionDeal(WeaponBagLogic bag, ActionDealEnum action)
+        private bool CheckNeedActionDeal(IPlayerWeaponComponentArchive archive, ActionDealEnum action)
         {
-            var weaponId = bag.GetCurrentWeaponInfo().Id;
-            return SingletonManager.Get<WeaponConfigManager>().NeedActionDeal(weaponId, action);
+            return SingletonManager.Get<WeaponConfigManager>().NeedActionDeal(archive.HeldSlotWeaponId, action);
         }
 
         // 临时代码

@@ -65,7 +65,7 @@ namespace App.Shared.GameModules.Camera.Utils
 
         public static bool CanWeaponGunSight(this PlayerEntity player)
         {
-            return player.hasBag && player.GetBagLogicImp().GetCurrentWeaponInfo().Id > 0 &&
+            return player.hasBag && player.GetBagLogicImp().HeldSlotWeaponInfo().Id > 0 &&
                    player.weaponLogic.State.CanCameraFocus();
         }
 

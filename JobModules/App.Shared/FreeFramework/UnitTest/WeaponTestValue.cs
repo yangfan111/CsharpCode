@@ -21,14 +21,14 @@ namespace App.Shared.FreeFramework.UnitTest
             FreeData fd = (FreeData)args.GetUnit(UnitTestConstant.Tester);
             if (fd != null)
             {
-                EWeaponSlotType currentSlot = fd.Player.GetBagLogicImp().GetCurrentWeaponSlot();
+                EWeaponSlotType currentSlot = fd.Player.GetBagLogicImp().HeldSlotType;
 
                 if (args.GetInt(slot) > 0)
                 {
                     currentSlot = FreeWeaponUtil.GetSlotType(args.GetInt(slot));
                 }
 
-                WeaponInfo info = fd.Player.GetBagLogicImp().GetWeaponInfo(currentSlot);
+                WeaponInfo info = fd.Player.GetBagLogicImp().GetSlot__WeaponInfo(currentSlot);
                 tv.AddField("id", info.Id);
                 tv.AddField("clip", info.Bullet);
                 tv.AddField("carryClip", info.ReservedBullet);

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5821BE30-7FAC-30A9-9C03-AD7FAC770687}</ProjectGuid>
@@ -14,7 +14,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
   </PropertyGroup>
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"/>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' Or '$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
     <OutputPath>F:\voyager\UnityPackages\Dll.Export\</OutputPath>
     <PlatformTarget>anycpu</PlatformTarget>
@@ -65,21 +65,65 @@
     <None Include="F:\voyager\UnityPackages\App.Shared\CMakeLists.txt">
     </None>
   </ItemGroup>
-  <Target Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' Or '$(Configuration)|$(Platform)'=='Debug|x86'" Name="CustomCommand_Debug_8dd382befd7df28cf04e265cc96a7b22" Inputs="F:/voyager/UnityPackages/App.Shared/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt" Outputs="F:\voyager\UnityPackages\App.Shared\CMakeFiles\generate.stamp">
+  <Target Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' Or '$(Configuration)|$(Platform)'=='Debug|x86'"
+    Name="CustomCommand_Debug_8dd382befd7df28cf04e265cc96a7b22"
+    Inputs="F:/voyager/UnityPackages/App.Shared/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt"
+    Outputs="F:\voyager\UnityPackages\App.Shared\CMakeFiles\generate.stamp">
     <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/App.Shared/CMakeLists.txt" />
-    <Exec Command="setlocal&#xD;&#xA;&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared/CMakeFiles/generate.stamp&#xD;&#xA;if %errorlevel% neq 0 goto :cmEnd&#xD;&#xA;:cmEnd&#xD;&#xA;endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone&#xD;&#xA;:cmErrorLevel&#xD;&#xA;exit /b %1&#xD;&#xA;:cmDone&#xD;&#xA;if %errorlevel% neq 0 goto :VCEnd" />
+    <Exec Command="setlocal
+&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd" />
   </Target>
-  <Target Condition="'$(Configuration)|$(Platform)'=='Release|Win32' Or '$(Configuration)|$(Platform)'=='Release|x86'" Name="CustomCommand_Release_8dd382befd7df28cf04e265cc96a7b22" Inputs="F:/voyager/UnityPackages/App.Shared/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt" Outputs="F:\voyager\UnityPackages\App.Shared\CMakeFiles\generate.stamp">
+  <Target Condition="'$(Configuration)|$(Platform)'=='Release|Win32' Or '$(Configuration)|$(Platform)'=='Release|x86'"
+    Name="CustomCommand_Release_8dd382befd7df28cf04e265cc96a7b22"
+    Inputs="F:/voyager/UnityPackages/App.Shared/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt"
+    Outputs="F:\voyager\UnityPackages\App.Shared\CMakeFiles\generate.stamp">
     <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/App.Shared/CMakeLists.txt" />
-    <Exec Command="setlocal&#xD;&#xA;&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared/CMakeFiles/generate.stamp&#xD;&#xA;if %errorlevel% neq 0 goto :cmEnd&#xD;&#xA;:cmEnd&#xD;&#xA;endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone&#xD;&#xA;:cmErrorLevel&#xD;&#xA;exit /b %1&#xD;&#xA;:cmDone&#xD;&#xA;if %errorlevel% neq 0 goto :VCEnd" />
+    <Exec Command="setlocal
+&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd" />
   </Target>
-  <Target Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32' Or '$(Configuration)|$(Platform)'=='MinSizeRel|x86'" Name="CustomCommand_MinSizeRel_8dd382befd7df28cf04e265cc96a7b22" Inputs="F:/voyager/UnityPackages/App.Shared/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt" Outputs="F:\voyager\UnityPackages\App.Shared\CMakeFiles\generate.stamp">
+  <Target Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32' Or '$(Configuration)|$(Platform)'=='MinSizeRel|x86'"
+    Name="CustomCommand_MinSizeRel_8dd382befd7df28cf04e265cc96a7b22"
+    Inputs="F:/voyager/UnityPackages/App.Shared/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt"
+    Outputs="F:\voyager\UnityPackages\App.Shared\CMakeFiles\generate.stamp">
     <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/App.Shared/CMakeLists.txt" />
-    <Exec Command="setlocal&#xD;&#xA;&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared/CMakeFiles/generate.stamp&#xD;&#xA;if %errorlevel% neq 0 goto :cmEnd&#xD;&#xA;:cmEnd&#xD;&#xA;endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone&#xD;&#xA;:cmErrorLevel&#xD;&#xA;exit /b %1&#xD;&#xA;:cmDone&#xD;&#xA;if %errorlevel% neq 0 goto :VCEnd" />
+    <Exec Command="setlocal
+&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd" />
   </Target>
-  <Target Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32' Or '$(Configuration)|$(Platform)'=='RelWithDebInfo|x86'" Name="CustomCommand_RelWithDebInfo_8dd382befd7df28cf04e265cc96a7b22" Inputs="F:/voyager/UnityPackages/App.Shared/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt" Outputs="F:\voyager\UnityPackages\App.Shared\CMakeFiles\generate.stamp">
+  <Target Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32' Or '$(Configuration)|$(Platform)'=='RelWithDebInfo|x86'"
+    Name="CustomCommand_RelWithDebInfo_8dd382befd7df28cf04e265cc96a7b22"
+    Inputs="F:/voyager/UnityPackages/App.Shared/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt"
+    Outputs="F:\voyager\UnityPackages\App.Shared\CMakeFiles\generate.stamp">
     <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/App.Shared/CMakeLists.txt" />
-    <Exec Command="setlocal&#xD;&#xA;&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared/CMakeFiles/generate.stamp&#xD;&#xA;if %errorlevel% neq 0 goto :cmEnd&#xD;&#xA;:cmEnd&#xD;&#xA;endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone&#xD;&#xA;:cmErrorLevel&#xD;&#xA;exit /b %1&#xD;&#xA;:cmDone&#xD;&#xA;if %errorlevel% neq 0 goto :VCEnd" />
+    <Exec Command="setlocal
+&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd" />
   </Target>
   <ItemGroup>
     <Compile Include="F:\voyager\UnityPackages\App.Shared\AssetConfig.cs" />
@@ -981,10 +1025,6 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Network\SerializeInfo\VehicleCmdSerializeInfo.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Network\SerializeInfo\VehicleEventMessageConverter.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Network\SerializeInfo\VehicleEventSerializeInfo.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Patch\BagLogicPatch.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Patch\Patch.WeaponLogic.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Patch\PlayerWeaponActionLogicPatch.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Patch\WeaponLocationControllerPatch.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Player\Events\DefaultEvent.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Player\Events\FireEvent.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Player\Events\HitEnvironmentEvent.cs" />
@@ -995,7 +1035,6 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Player\PlayerEntityEx.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Player\PlayerInfoExtensions.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Player\PlayerStateUtil.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Player\PlayerWeaponActionLogic.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Room\RoomInfoEx.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\RpcMessageType.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\DynamicScenesController.cs" />
@@ -1036,9 +1075,13 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\AbstractUserCmdExecuteSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\AttachmentUtil.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\BagUtility.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\CommonUtil.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\MapObjectUtility.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\SceneObjectUtility.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\StatisticsDataEx.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\Weapon\PlayerEntity_WeaponExt.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\Weapon\WeaponInfoEx.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\Weapon\WeaponUtil.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VechilePrediction\AbstractVehicleCmdExecuteSystemHandler.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VechilePrediction\ClientVehicleCmdExecuteSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VechilePrediction\ClientVehicleCmdExecuteSystemHandler.cs" />
@@ -1073,17 +1116,21 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VehicleGameHandler\VehicleSyncEventSendHandler.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VehicleGameHandler\VehicleTypeMatcher.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VehicleGameHandler\VehicleUpdateHandler.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponBag\BagLogic.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponBag\IBag.cs" />
-    <Compile Include="WeaponBag\SlotHandler\GrenadeSlotHandler.cs" />
-    <Compile Include="WeaponBag\SlotHandler\MeleeSlotHandler.cs" />
-    <Compile Include="WeaponBag\SlotHandler\WeaponSlotHandlerBase.cs" />
-    <Compile Include="WeaponBag\SlotHandler\TacticSlotHandler.cs" />
-    <Compile Include="WeaponBag\SlotHandler\WeaponSlotAuxiliary.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponBag\PlayerEntityC4BagEx.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponBag\SlotController\DefaultWeaponSlotController.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponBag\SlotController\GroupWeaponSlotController.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponBag\WeaponInfoEx.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\Cache\GrenadeBagCacheHelper.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\IBag.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\PlayerEntityC4BagEx.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\PlayerWeaponComponentAgent.Getter.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\PlayerWeaponComponentAgent.Part.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\PlayerWeaponComponentAgent.Setter.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\PlayerWeaponComponentAgent.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\PlayerWeaponController.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\SlotHandler\GrenadeSlotHandler.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\SlotHandler\MeleeSlotHandler.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\SlotHandler\TacticSlotHandler.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\SlotHandler\WeaponBagSlotsAux.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\SlotHandler\WeaponSlotBaseHandler.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\WeaponEntityFacade.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\WeaponSharedStructs.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponLogic\Attachment\WeaponAttachmentFactory.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponLogic\Bullet\BulletFireInfoProvider.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponLogic\Bullet\DefaultBulletFireInfoProvider.cs" />
@@ -1096,7 +1143,6 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponLogic\Tactic\TacticWeaponLogic.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponLogic\WeaponFactory.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponLogic\WeaponLogicComponentsFactory.cs" />
-    <Compile Include="WeaponBag\Cache\GrenadeBagCacheAgent.cs" />
     <None Include="F:\voyager\UnityPackages\App.Shared\packages.config" />
   </ItemGroup>
   <ItemGroup>

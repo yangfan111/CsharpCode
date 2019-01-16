@@ -51,9 +51,9 @@ namespace App.Shared.GameModules.Player
             }
 
             var newSlot = playerEntity.modeLogic.ModeLogic.GetSlotByIndex(cmd.CurWeapon);
-            var curSlot = playerEntity.GetBagLogicImp().GetCurrentWeaponSlot();
+            var curSlot = playerEntity.GetBagLogicImp().HeldSlotType;
             
-            var newWeapon = playerEntity.GetBagLogicImp().GetWeaponInfo(newSlot);
+            var newWeapon = playerEntity.GetBagLogicImp().GetSlot_WeaponInfo(newSlot);
             if(newWeapon.Id < 1)
             {
                 playerEntity.tip.TipType = ETipType.NoWeaponInSlot;
