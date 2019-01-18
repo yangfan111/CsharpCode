@@ -106,11 +106,7 @@ namespace App.Shared.GameModules.Configuration
             foreach(var player in _playerContext.GetEntities())
             {
                 player.weaponFactory.Factory.ClearCache();
-<<<<<<< HEAD
                 player.GetController<PlayerWeaponController>().TryMountSlotWeapon(player.GetController<PlayerWeaponController>().CurrSlotType);
-=======
-                player.playerAction.Logic.TryMountSlotWeapon(player.GetBagLogicImp().HeldSlotType);
->>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
             }
         }
 

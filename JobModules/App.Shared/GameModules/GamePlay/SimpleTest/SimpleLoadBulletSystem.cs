@@ -18,11 +18,7 @@ using App.Server.GameModules.GamePlay.free.player;
 using App.Shared.FreeFramework.framework.trigger;
 using App.Shared.FreeFramework.framework.@event;
 using Utils.Singleton;
-<<<<<<< HEAD
 using App.Shared.GameModules.Weapon;
-=======
-using App.Shared.WeaponLogic;
->>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
 using App.Shared.Util;
 
 namespace App.Shared.GameModules.GamePlay.SimpleTest
@@ -71,35 +67,19 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                 }
                 if (!player.hasWeaponComponentAgent)
                     return;
-<<<<<<< HEAD
                 ISharedPlayerWeaponComponentGetter sharedAPI = player.GetController<PlayerWeaponController>();
             
                 WeaponInfo currWeapon = sharedAPI.CurrSlotWeaponInfo;
                 var config = SingletonManager.Get<WeaponConfigManager>().GetConfigById(currWeapon.Id);
-=======
-                }
-                IPlayerWeaponComponentArchive weaponAgent = player.GetWeaponAchive();
-            
-                WeaponInfo heldWeapon = weaponAgent.HeldSlotWeaponInfo;
-                var config = SingletonManager.Get<WeaponConfigManager>().GetConfigById(heldWeapon.Id);
->>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
                 if (NoReloadAction(config))
                 {
                     return;
                 }
-<<<<<<< HEAD
                 if (MagazineIsFull(player.weaponLogic.State, currWeapon.Bullet))
                 {
                     return;
                 }
                 if (HasNoReservedBullet(sharedAPI, player))
-=======
-                if (MagazineIsFull(player.weaponLogic.State, heldWeapon.Bullet))
-                {
-                    return;
-                }
-                if (HasNoReservedBullet(weaponAgent, player))
->>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
                 {
                     return;
                 }
@@ -136,11 +116,7 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                 {
                     if (weaponState.LoadedBulletCount > 0 && !weaponState.IsAlwaysEmptyReload)
                     {
-<<<<<<< HEAD
                         var needActionDeal = CheckNeedActionDeal(sharedAPI, ActionDealEnum.Reload);
-=======
-                        var needActionDeal = CheckNeedActionDeal(weaponAgent, ActionDealEnum.Reload);
->>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
                         if (needActionDeal)
                         {
                             player.appearanceInterface.Appearance.MountWeaponOnAlternativeLocator();
@@ -158,11 +134,7 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                     }
                     else
                     {
-<<<<<<< HEAD
                         var needActionDeal = CheckNeedActionDeal(sharedAPI, ActionDealEnum.ReloadEmpty);
-=======
-                        var needActionDeal = CheckNeedActionDeal(weaponAgent, ActionDealEnum.ReloadEmpty);
->>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
                         if (needActionDeal)
                         {
                             player.appearanceInterface.Appearance.MountWeaponOnAlternativeLocator();
@@ -196,11 +168,7 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
             return bulletCount >= weaponState.BulletCountLimit;
         }
 
-<<<<<<< HEAD
         private bool HasNoReservedBullet(ISharedPlayerWeaponComponentGetter agent, PlayerEntity playerEntity)
-=======
-        private bool HasNoReservedBullet(IPlayerWeaponComponentArchive agent, PlayerEntity playerEntity)
->>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
         {
             if (agent.GetReservedBullet() < 1)
             {
@@ -261,15 +229,9 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
             }
         }
 
-<<<<<<< HEAD
         private bool CheckNeedActionDeal(ISharedPlayerWeaponComponentGetter sharedApi, ActionDealEnum action)
         {
             return SingletonManager.Get<WeaponConfigManager>().NeedActionDeal(sharedApi.CurrSlotWeaponId, action);
-=======
-        private bool CheckNeedActionDeal(IPlayerWeaponComponentArchive archive, ActionDealEnum action)
-        {
-            return SingletonManager.Get<WeaponConfigManager>().NeedActionDeal(archive.HeldSlotWeaponId, action);
->>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
         }
 
         // 临时代码

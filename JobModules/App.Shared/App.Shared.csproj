@@ -1117,11 +1117,6 @@ if %errorlevel% neq 0 goto :VCEnd" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\MapObjectUtility.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\SceneObjectUtility.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\StatisticsDataEx.cs" />
-<<<<<<< HEAD
-=======
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\Weapon\PlayerEntity_WeaponExt.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\Weapon\WeaponInfoEx.cs" />
->>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\Weapon\WeaponUtil.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VechilePrediction\AbstractVehicleCmdExecuteSystemHandler.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VechilePrediction\ClientVehicleCmdExecuteSystem.cs" />
@@ -1157,24 +1152,6 @@ if %errorlevel% neq 0 goto :VCEnd" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VehicleGameHandler\VehicleSyncEventSendHandler.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VehicleGameHandler\VehicleTypeMatcher.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VehicleGameHandler\VehicleUpdateHandler.cs" />
-<<<<<<< HEAD
-=======
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\Cache\GrenadeBagCacheHelper.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\IBag.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\PlayerEntityC4BagEx.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\PlayerWeaponComponentAgent.Getter.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\PlayerWeaponComponentAgent.Part.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\PlayerWeaponComponentAgent.Setter.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\PlayerWeaponComponentAgent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\PlayerWeaponController.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\SlotHandler\GrenadeSlotHandler.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\SlotHandler\MeleeSlotHandler.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\SlotHandler\TacticSlotHandler.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\SlotHandler\WeaponBagSlotsAux.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\SlotHandler\WeaponSlotBaseHandler.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\WeaponEntityFacade.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Weapon\WeaponSharedStructs.cs" />
->>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
     <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponLogic\Attachment\WeaponAttachmentFactory.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponLogic\Bullet\BulletFireInfoProvider.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponLogic\Bullet\DefaultBulletFireInfoProvider.cs" />

@@ -235,11 +235,7 @@ namespace App.Shared.GameModules.Player
             playerEntity.stateInterface.State.DriveStart(actionSeatId, postureId);
             //if (playerEntity.IsVehicleDriver())    //主驾驶位置
             {
-<<<<<<< HEAD
                 playerEntity.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon();
-=======
-                playerEntity.playerAction.Logic.ForceUnmountHeldWeapon();
->>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
             }
         }
     }
