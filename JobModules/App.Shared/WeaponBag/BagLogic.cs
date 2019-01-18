@@ -1,9 +1,7 @@
 ﻿using Core.Utils;
-using Core.Bag;
 using XmlConfig;
 using WeaponConfigNs;
 using Core.Configuration;
-using Core.Enums;
 using Utils.Configuration;
 using Assets.Utils.Configuration;
 using App.Shared.Util;
@@ -15,7 +13,7 @@ using Assets.XmlConfig;
 using Utils.Appearance;
 using App.Shared.Player;
 using Utils.Singleton;
-using App.Shared.Util;
+using Core;
 
 namespace App.Shared.WeaponLogic
 {

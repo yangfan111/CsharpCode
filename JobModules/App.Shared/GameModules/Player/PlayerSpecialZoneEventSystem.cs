@@ -170,9 +170,13 @@ namespace App.Shared.GameModules.Player
                                                     SingletonManager.Get<MapConfigManager>().WaterSurfaceHeight(player.position.Value) - (AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset),
                                                  player.position.Value.z);
             player.position.Value = syncTransform.position;
+<<<<<<< HEAD
           
             PlayerMoveSystem.SyncUpdateComponentPos(player, syncTransform.position);
             player.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon();
+=======
+            player.playerAction.Logic.ForceUnmountHeldWeapon();
+>>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
             player.stateInterface.State.Swim();
             //_logger.InfoFormat("swim ashore pos:{0}",player.position.Value.ToStringExt());
         }
@@ -190,7 +194,11 @@ namespace App.Shared.GameModules.Player
 
         private void Dive(PlayerEntity player)
         {
+<<<<<<< HEAD
             player.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon();
+=======
+            player.playerAction.Logic.ForceUnmountHeldWeapon();
+>>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
             player.stateInterface.State.Dive();
         }
     }

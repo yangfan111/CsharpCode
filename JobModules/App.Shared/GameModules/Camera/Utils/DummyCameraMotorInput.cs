@@ -37,7 +37,11 @@ namespace App.Shared.GameModules.Camera
             ActionKeepState = player.stateInterface.State.GetActionKeepState();
             IsDriveCar =  player.IsOnVehicle();            
             IsDead = player.gamePlay.IsLifeState(EPlayerLifeState.Dead);
+<<<<<<< HEAD
             CanWeaponGunSight = player.hasWeaponComponentAgent && player.GetController<PlayerWeaponController>().CurrSlotWeaponId >= 1 & player.weaponLogic.State.CanCameraFocus();
+=======
+            CanWeaponGunSight = player.hasBag && player.GetBagLogicImp().HeldSlotWeaponInfo().Id >= 1 & player.weaponLogic.State.CanCameraFocus();
+>>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
             ArchorPitch = YawPitchUtility.Normalize(archorPitch);
             ArchorYaw = YawPitchUtility.Normalize(archorYaw);
             IsParachuteAttached = player.hasPlayerSkyMove && player.playerSkyMove.IsParachuteAttached;

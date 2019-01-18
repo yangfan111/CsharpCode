@@ -158,7 +158,11 @@ namespace App.Shared.GameModules.Player.CharacterState
                 // 更新Clip速率
                 animatorClipManager.Update(commandsContainer, _fsmOutputs.AddOutput, playerEntity.thirdPersonAnimator.UnityAnimator,
                     playerEntity.firstPersonAnimator.UnityAnimator,
+<<<<<<< HEAD
                     playerEntity.GetController<PlayerWeaponController>().CurrSlotWeaponId,
+=======
+                    playerEntity.GetBagLogicImp().HeldSlotWeaponInfo().Id,
+>>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
                     playerEntity.networkAnimator.NeedRewind);
 
                 // 更新Animator的Param

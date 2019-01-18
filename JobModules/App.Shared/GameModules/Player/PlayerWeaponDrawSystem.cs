@@ -1,8 +1,13 @@
 ﻿using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
+<<<<<<< HEAD
 using Core;
 using App.Shared.GameModules.Weapon;
+=======
+using Core.Bag;
+using App.Shared.WeaponLogic;
+>>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
 using App.Shared.Util;
 
 namespace App.Shared.GameModules.Player
@@ -17,12 +22,20 @@ namespace App.Shared.GameModules.Player
                 return;
             }
             var player = owner.OwnerEntity as PlayerEntity;
+<<<<<<< HEAD
             var controller = player.GetController<PlayerWeaponController>();
+=======
+            var controller = player.GetWeaponController();
+>>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
 
             if (cmd.IsForceUnmountWeapon)
             {
               
+<<<<<<< HEAD
                 controller.ForceUnmountCurrWeapon();
+=======
+                controller.ForceUnmountHeldWeapon();
+>>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
                 return;
             }
 
@@ -38,10 +51,17 @@ namespace App.Shared.GameModules.Player
                 }
             }
             bool changeWeaponSucess= true;
+<<<<<<< HEAD
             EWeaponSlotType curSlot = player.GetController<PlayerWeaponController>().CurrSlotType;
             if (curSlot == EWeaponSlotType.None)
             {
                 EWeaponSlotType lastSlot = player.GetController<PlayerWeaponController>().PopGetLastWeaponId();
+=======
+            var curSlot = player.weaponAgent.Content.HeldSlotType;
+            if (curSlot == EWeaponSlotType.None)
+            {
+                var lastSlot = player.weaponAgent.Content.PopGetLastWeaponId();
+>>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
                 if (lastSlot != EWeaponSlotType.None)
                 {
                     //player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.ChangeWeapon);
@@ -59,7 +79,11 @@ namespace App.Shared.GameModules.Player
             else
             {
                 //   player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.ChangeWeapon);
+<<<<<<< HEAD
                 controller.UnmountCurrWeapon();
+=======
+                controller.UnmountHeldWeapon();
+>>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
             }
             if (changeWeaponSucess)
                 player.weaponLogic.State.OnSwitchWeapon();

@@ -171,11 +171,19 @@ namespace App.Shared.GameModeLogic.WeaponInitLoigc
             }
             if(firstSlot < EWeaponSlotType.Length)
             {
+<<<<<<< HEAD
                 playerEntity.GetController<PlayerWeaponController>().TryMountSlotWeapon(firstSlot);
             }
             foreach(var slot in _removeSlotList)
             {
                 playerEntity.GetController<PlayerWeaponController>().RemoveSlotWeapon(slot);
+=======
+                playerEntity.playerAction.Logic.TryMountSlotWeapon(firstSlot);
+            }
+            foreach(var slot in _removeSlotList)
+            {
+                playerEntity.playerAction.Logic.RemoveSlotWeapon(slot);
+>>>>>>> 6213b9d866f8e5766fe02025e06c786a8fc53841
             }
         }
 
