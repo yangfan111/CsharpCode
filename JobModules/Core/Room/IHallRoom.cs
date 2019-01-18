@@ -23,9 +23,8 @@ namespace Core.Room
         int RoomDisplayId { get; set; }
         int RoomCapacity { get; set; }
 
-        long CreateTime { get; set; }
 
-        bool IsValid { get; set; }
+        bool IsValid { get; }
 
         void AddPlayer(IPlayerInfo player);
 
@@ -50,8 +49,6 @@ namespace Core.Room
         void GameOver();
 
         void Dispose();
-
-        bool CheckTimeOut();
     }
 
     public interface ITeamInfo

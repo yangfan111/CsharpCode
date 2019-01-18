@@ -57,6 +57,7 @@ namespace App.Shared.GameModules.Bullet
 
                 if (_logger.IsDebugEnabled)
                 {
+                    _logger.DebugFormat("client animator {0}", playerEntity.networkAnimator.ToStringExt());
                     StringBuilder s = new StringBuilder();
                     hitBoxComponent.HitBoxGameObject.transform.Recursively(t => s.Append("[n " + t.name + ", p " + t.position.ToStringExt() + ", r " + t.rotation.ToStringExt() + "]"));
                     _logger.DebugFormat("hitbox pos {0}, rot {1}, transforms {2}, ", position, rotation, s);

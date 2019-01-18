@@ -79,6 +79,8 @@ namespace App.Shared.GameModules.Player.CharacterState
             _animMonitor.MonitorBeforeFsmUpdate(commandsContainer,
                                                 playerEntity.thirdPersonAnimator.UnityAnimator,
                                                 playerEntity.playerMove.IsGround);
+            //_logger.InfoFormat("land:{2}:IsGround:{0},IsExceedSlopeLimit:{1}", playerEntity.playerMove.IsGround,
+            //     playerEntity.stateInterface.State.IsExceedSlopeLimit(),playerEntity.playerMove.IsGround && !playerEntity.stateInterface.State.IsExceedSlopeLimit() );
             
             // AnimationMonitor会产生Freefall并对Freefall进行处理，所以要在AnimationMonitor.MonitorBeforeFsmUpdate的后面
             AnimationTest(playerEntity, commandsContainer);
@@ -313,11 +315,48 @@ namespace App.Shared.GameModules.Player.CharacterState
                 FreeFallTest(playerEntity, commandsContainer);
                 WaterPostureDownDisableTest(playerEntity, commandsContainer);
                 JumpDisableTest(playerEntity, commandsContainer);
+                LandJumpDisableTest(playerEntity, commandsContainer);
+                
             }
             finally
             {
                 SingletonManager.Get<DurationHelp>().ProfileEnd(CustomProfilerStep.StateUpdateTest);
             }
+        }
+        
+        private void LandJumpDisableTest(PlayerEntity playerEntity, IAdaptiveContainer<IFsmInputCommand> commandsContainer)
+        {
+            var state = playerEntity.stateInterface.State.GetNextPostureState();
+            if (!((state == PostureInConfig.Land || state == PostureInConfig.Stand) && playerEntity.stateInterface.State.IsExceedSlopeLimit()))
+            {
+                return;
+            }
+            
+            testCommand.Clear();
+            
+            for (int i = 0; i < commandsContainer.Length; i++)
+            {
+                var v = commandsContainer[i];
+                if (v.Type == FsmInput.Jump)
+                {
+                    testCommand.Add(v);
+                }
+            }
+
+            if (testCommand.Count == 0)
+            {
+                return;
+            }
+            
+            foreach (IFsmInputCommand command in testCommand)
+            {
+                _logger.InfoFormat("chang command:{0} to none, because current state:{1} can not jump because the land is IsExceedSlopeLimit!",
+                    command.Type,
+                    state);
+                command.Type = FsmInput.None;
+            }
+            
+            testCommand.Clear();
         }
 
         private void JumpDisableTest(PlayerEntity playerEntity, IAdaptiveContainer<IFsmInputCommand> commandsContainer)
@@ -344,19 +383,9 @@ namespace App.Shared.GameModules.Player.CharacterState
                 return;
             }
             
-            var gameObject = playerEntity.RootGo();
-            var prevLayer = gameObject.layer;
-            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayers.TempPlayerLayer);
-            var startPoint = gameObject.transform.position;
-            //UnityLayers.
-            // a shift lift up
-            startPoint.y += CastRadius;
-            RaycastHit outHit;
-            
-//            DebugDraw.DebugWireSphere(startPoint, Color.red, CastRadius, 1f);
-//            DebugDraw.DebugWireSphere(startPoint + new Vector3(0,targetHeight - CastRadius - LiftUp,0), Color.magenta, CastRadius, 1f);
-            
-            if (!Physics.SphereCast(startPoint, CastRadius, Vector3.down, out outHit, CastRadius + CastRadius, UnityLayers.AllCollidableLayerMask))
+            var isHit = IsHitGround(playerEntity, ProbeDist);
+
+            if (!isHit)
             {
                 
                 foreach (IFsmInputCommand command in testCommand)
@@ -366,11 +395,28 @@ namespace App.Shared.GameModules.Player.CharacterState
                         state);
                     command.Type = FsmInput.None;
                 }
-
                 //Debug.DrawLine(outHit.point, outHit.normal, Color.red, 5000.0f);
             }
-            IntersectionDetectTool.SetColliderLayer(gameObject, prevLayer);
             testCommand.Clear();
+        }
+
+        private static bool IsHitGround(PlayerEntity playerEntity, float dist)
+        {
+            var gameObject = playerEntity.RootGo();
+            var prevLayer = gameObject.layer;
+            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayers.TempPlayerLayer);
+            var startPoint = gameObject.transform.position;
+            //UnityLayers.
+            // a shift lift up
+            startPoint.y += CastRadius;
+            RaycastHit outHit;
+
+//            DebugDraw.DebugWireSphere(startPoint, Color.red, CastRadius, 1f);
+//            DebugDraw.DebugWireSphere(startPoint + new Vector3(0,targetHeight - CastRadius - LiftUp,0), Color.magenta, CastRadius, 1f);
+            var isHit = Physics.SphereCast(startPoint, CastRadius, Vector3.down, out outHit, CastRadius + dist,
+                UnityLayers.AllCollidableLayerMask);
+            IntersectionDetectTool.SetColliderLayer(gameObject, prevLayer);
+            return isHit;
         }
 
         private void AnimatorChange(bool isChange, AbstractNetworkAnimator networkAnimator, IUserCmd cmd)
@@ -390,10 +436,13 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         private void FreeFallTest(PlayerEntity player, IAdaptiveContainer<IFsmInputCommand> commands)
         {
-            if ((!player.playerMove.IsGround &&
-                 !(player.stateInterface.State.GetActionState() == ActionInConfig.Gliding ||
-                   player.stateInterface.State.GetActionState() == ActionInConfig.Parachuting)) &&
-                player.playerMove.Velocity.y < -SpeedManager.Gravity)
+            var freeFallTest = (!player.playerMove.IsGround &&
+                     !(player.stateInterface.State.GetActionState() == ActionInConfig.Gliding ||
+                       player.stateInterface.State.GetActionState() == ActionInConfig.Parachuting)) &&
+                    player.playerMove.Velocity.y < -SpeedManager.Gravity;
+            
+            if (freeFallTest || (player.characterContoller.Value.collisionFlags == CollisionFlags.None &&
+                                 !IsHitGround(player, ProbeDist)))
             {
                 for (int i = 0; i < commands.Length; ++i)
                 {
@@ -474,6 +523,7 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         private static readonly float LiftUp = 0.1f;
         private static readonly float CastRadius = 0.3f;
+        private static readonly float ProbeDist = 1.4f;
         private List<IFsmInputCommand> testCommand = new List<IFsmInputCommand>();
         private List<FsmInput> testCondition = new List<FsmInput>();
 

@@ -49,20 +49,27 @@ namespace App.Shared.GameModules.Bullet
                 var playerEntity = GetPlayerEntity(gameEntity);
 				
                 playerEntity.thirdPersonAnimator.UnityAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
-                
+
+                Animator.ClearAnimatorJobContainer();
+
                 PlayerEntityUtility.UpdateTransform(playerEntity,
                         gameEntity.GetComponent<NetworkAnimatorComponent>(),
                         gameEntity.GetComponent<PredictedAppearanceComponent>(),
                         gameEntity.GetComponent<Orientation>());
+                //_logger.DebugFormat("server animator {0}", gameEntity.GetComponent<NetworkAnimatorComponent>().ToStringExt());
+                Animator.BatchUpdate();
 
+                Animator.ClearAnimatorJobContainer();
                 var provider = SingletonManager.Get<HitBoxTransformProviderCache>().GetProvider(playerEntity.thirdPersonModel.Value);
                 provider.Update(position, rotation);
                 HitBoxGameObjectUpdater.Update(hitBoxComponent.HitBoxGameObject.transform, provider);
+
                 
                 PlayerEntityUtility.UpdateTransform(playerEntity,
                                                     playerEntity.networkAnimator,
                                                     playerEntity.predictedAppearance,
                                                     playerEntity.orientation);
+                Animator.BatchUpdate();
                 
                 playerEntity.thirdPersonAnimator.UnityAnimator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
 

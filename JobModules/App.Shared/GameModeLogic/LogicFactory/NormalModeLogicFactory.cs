@@ -63,9 +63,8 @@ namespace App.Shared.GameModeLogic.LogicFactory
 
         protected override IWeaponInitLogic GetWeaponIniLogic()
         {
-            var bagLimitTime =
-                SingletonManager.Get<GameModeConfigManager>().GetBagLimitTime(_commonSessionObjects.RoomInfo.ModeId);
-            var weaponInitLogic = new NormalWeaponInitLogic(bagLimitTime,
+            var weaponInitLogic = new NormalWeaponInitLogic(_commonSessionObjects.RoomInfo.ModeId,
+                SingletonManager.Get<GameModeConfigManager>(),
                 SingletonManager.Get<WeaponConfigManager>(),
                 SingletonManager.Get<WeaponPropertyConfigManager>());
 

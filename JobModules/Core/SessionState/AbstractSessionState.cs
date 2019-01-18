@@ -71,8 +71,13 @@ namespace Core.SessionState
             _logger.InfoFormat("{0}  Leave",GetType());
             if (root is DebugSystems)
             {
-                _logger.InfoFormat("{0}  DestroyGameObject", ((DebugSystems)root).gameObject.name);
-                ((DebugSystems)root).gameObject.DestroyGameObject();
+                var go = ((DebugSystems) root).gameObject;
+                if (go != null)
+                {
+                    _logger.InfoFormat("{0}  DestroyGameObject", go.name);
+                    go.DestroyGameObject();
+                }
+                
             }
         }
 

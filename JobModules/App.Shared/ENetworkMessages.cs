@@ -23,6 +23,7 @@
         UpdateMsg,
         FireInfo,
         DebugScriptInfo,
+        GameOver,
         Max,
     }
 
@@ -41,6 +42,7 @@
         FireInfoAck,
         DebugMessage,
         ClearScene,
+        GameOver,
         Max
     }
 

@@ -12,7 +12,6 @@ namespace Core.Room
         void Update(int interval);
         void LateUpdate();
         void SetHallRoom(IHallRoom hallRoom);
-        void ResetContexts();
         void SendSnapshot();
         void CompensationSnapshot();
         void RunFreeGameRule();

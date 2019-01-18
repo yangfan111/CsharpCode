@@ -79,7 +79,8 @@ namespace App.Shared.GameModules.Player
                             Swim(player);
                             //_logger.InfoFormat("Dive to swim, inWaterDepth:{0}, thread:{1}, new In water depth:{2}", inWaterDepth, AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset, SingletonManager.Get<MapConfigManager>().WaterSurfaceHeight(player.position.Value) - player.position.Value.y);
                         }
-                        else if ((inWaterDepth < (AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset) || groundTest) && nextPostureInConfig != PostureInConfig.Stand)
+                        else if ((inWaterDepth < (AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset 
+                                                  - HeightStandSwimOffset) || groundTest) && nextPostureInConfig != PostureInConfig.Stand)
                         {
                             //Ashore(player, CompareUtility.IsApproximatelyEqual(0f, dist) ? 0 : waterSurfaceHeight - dist);
                             Ashore(player, groundTest ? inWaterDepth - dist:AshoreDepth);
@@ -98,7 +99,7 @@ namespace App.Shared.GameModules.Player
                     }
                     case PostureInConfig.Stand:
                     {
-                        if (inWaterDepth > (AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset - HeightStandSwimOffset) && nextPostureInConfig != PostureInConfig.Swim)
+                        if (inWaterDepth > (AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset) && nextPostureInConfig != PostureInConfig.Swim)
                         {
                             Swim(player);
                             //_logger.InfoFormat("stand to swim, inWaterDepth:{0}, thread:{1}, new In water depth:{2}", inWaterDepth, AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset, SingletonManager.Get<MapConfigManager>().WaterSurfaceHeight(player.position.Value) - player.position.Value.y);
@@ -137,7 +138,7 @@ namespace App.Shared.GameModules.Player
             return true;
         }
 
-        private static readonly float DisOffset = 0.0F;
+        private static readonly float DisOffset = 0.05F;
         
         private bool GroundTest(PlayerEntity playerEntity, out float dist)
         {

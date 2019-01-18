@@ -17,16 +17,12 @@ namespace App.Shared.GameModules.Player
     
     public class LandHandler
     {
+        private static readonly LoggerAdapter _logger = new LoggerAdapter(typeof(LandHandler));
         private static readonly float BeginSlowDownInWater = SingletonManager.Get<CharacterStateConfigManager>().BeginSlowDownInWater;
         private static readonly float StopSlowDownInWater = SingletonManager.Get<CharacterStateConfigManager>().StopSlowDownInWater;
         private static readonly float SteepLimitBegin = Mathf.Tan(Mathf.Deg2Rad * SingletonManager.Get<CharacterStateConfigManager>().SteepLimitBegin);
         private static readonly float SteepLimitStop = Mathf.Tan(Mathf.Deg2Rad * SingletonManager.Get<CharacterStateConfigManager>().SteepLimitStop);
         private static readonly float SteepAverRatio = SingletonManager.Get<CharacterStateConfigManager>().SteepAverRatio;
-        private static readonly float MaxEdgeAngle = 15.0f;
-        
-        public static float MaxStepHeight = 0.25f;
-        public static float SecondaryProbesVertical = 0.02f;
-        public static float SecondaryProbesHorizontal = 0.02f;
         
         public static void Move(Contexts contexts, PlayerEntity player, float deltaTime)
         {
@@ -198,7 +194,7 @@ namespace App.Shared.GameModules.Player
 
             //Debug.DrawRay(controller.GetLastGroundHitPoint(), lastNormal.normalized * 7,Color.yellow);
             
-            Vector3 slopeVec = SlopeSlide(velocity, lastNormal, deltaTime);
+            Vector3 slopeVec = SlopeSlide(velocity, lastNormal, deltaTime, controller.transform.forward);
 
             //Debug.DrawRay(controller.GetLastGroundHitPoint(), slopeVec.normalized * 7,Color.cyan);
             
@@ -209,17 +205,31 @@ namespace App.Shared.GameModules.Player
 
             var offsetSlope = Vector3.zero;
             
+            //_logger.InfoFormat("latestCollisionSlope:{0}", latestCollisionSlope);
+            
             //速度计算与下滑处理
             int ledgeDetect = -1;
+
+            if (latestCollisionSlope >= controller.slopeLimit)
+            {
+                player.stateInterface.State.SetExceedSlopeLimit(true);
+
+            }
+            else
+            {
+                player.stateInterface.State.SetExceedSlopeLimit(false);
+
+            }
+            
             if (latestCollisionSlope >= controller.slopeLimit && Vector3.Dot(lastNormal, Vector3.up) > 0.0f &&
                 (controller.collisionFlags & CollisionFlags.Below) != 0  &&
-                lastVel.y <= 0.0f && (ledgeDetect = LedgeDetect(controller.GetLastGroundHitPoint(), controller.GetLastGroundNormal(),
-                controller.slopeLimit, controller.gameObject)) == 0
+                lastVel.y <= 0.0f
                 )
             {
                 // 沿斜面下滑
-                velocity = slopeVec.ToVector4(); //SlopeSlide(player, -velocity.y, script.CollisionNormal, deltaTime);
-                player.stateInterface.State.SetExceedSlopeLimit(true);
+                velocity = new Vector4(velocity.x, slopeVec.y, velocity.z, 1f); //SlopeSlide(player, -velocity.y, script.CollisionNormal, deltaTime);
+                offsetSlope = new Vector3(-velocity.x + slopeVec.x, 0f, -velocity.z + slopeVec.z); //SlopeSlide(player, -velocity.y, script.CollisionNormal, deltaTime);
+                //player.stateInterface.State.Freefall();
                 //_logger.InfoFormat("slide slope!!!!!!, latestCollisionSlope:{0}", latestCollisionSlope);
             }
             else
@@ -235,125 +245,33 @@ namespace App.Shared.GameModules.Player
                 velocity = player.stateInterface.State.GetSpeed(lastVel, deltaTime, buff);
                 velocityOffset = player.stateInterface.State.GetSpeedOffset(buff);
                 velocity = player.orientation.RotationYaw * (velocity);
-
                 if (velocity.y < 0 &&
-                    (Mathf.Abs(collisionSlope) > Mathf.Tan(MaxEdgeAngle * Mathf.Deg2Rad)) &&
-                    (controller.collisionFlags & CollisionFlags.Below) != 0 && (ledgeDetect == -1 ? LedgeDetect(controller.GetLastGroundHitPoint(), controller.GetLastGroundNormal(),
-                        controller.slopeLimit, controller.gameObject):ledgeDetect) == 1)
-                {
-                    offsetSlope = slopeVec;
-                    offsetSlope.y = 0;
-                    velocity.y = slopeVec.y;
-                    //_logger.InfoFormat("can not stand no ledge");
-                    //_logger.InfoFormat("can not stand no ledge, ledgeDetect:{0}, collisionSlope:{1}, velocity:{2},offset:{3}, offsetSlope:{4},velocityOffset:{5}",
-                    //   ledgeDetect,collisionSlope,
-                    //  velocity.ToStringExt(),
-                    //  (player.orientation.RotationYaw * (velocityOffset) + offsetSlope).ToStringExt(),
-                    // offsetSlope.ToStringExt(),
-                    // velocityOffset.ToStringExt());
-
-                }
-                
-                else if (velocity.y < 0 &&
                     (Mathf.Abs(collisionSlope) <  Mathf.Tan(controller.slopeLimit * Mathf.Deg2Rad)) && //超出限制应正常滑落
                     (controller.collisionFlags & CollisionFlags.Below) != 0
                 ) //判断人物未浮空                                                           
                 {
                     velocity.y = 0;
                     velocity.y = collisionSlope * velocity.magnitude - 0.1f; //-0.1f 保证下坡时持续产生CollisionFlags.Below  
-                    //_logger.InfoFormat("velocity:{0}, collisionSLocp:{1}, {2}, slopeVec:{3}, xzcomp:{4}", velocity.ToStringExt(), collisionSlope,Mathf.Tan(controller.slopeLimit * Mathf.Deg2Rad), slopeVec.ToStringExt() , xzcomp);
+                    //_logger.InfoFormat("velocity:{0}, latestCollisionSlope:{1}, {2}, slopeVec:{3}, xzcomp:{4}", velocity.ToStringExt(), latestCollisionSlope,Mathf.Tan(controller.slopeLimit * Mathf.Deg2Rad), slopeVec.ToStringExt() , xzcomp);
                 }
-
-                velocityOffset = player.orientation.RotationYaw * (velocityOffset) + offsetSlope;
-                player.stateInterface.State.SetExceedSlopeLimit(false);
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="hitPoint"></param>
-        /// <param name="hitNormal"></param>
-        /// <param name="maxStableSlopeAngle"></param>
-        /// <param name="gameObject"></param>
-        /// <returns>0 not detect 1 detect</returns>
-        private static int LedgeDetect(Vector3 hitPoint, Vector3 hitNormal, float maxStableSlopeAngle, GameObject gameObject)
-        {
-            var prevLayer = gameObject.layer;
-            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayers.TempPlayerLayer);
-            var atCharacterUp = Vector3.up;
-            var LedgeHandling = true;
-            var InnerNormal = hitNormal;
-            var OuterNormal = hitNormal;
-            int LedgeDetected = 0;
-            Vector3 innerHitDirection = Vector3.ProjectOnPlane(hitNormal, atCharacterUp).normalized;
-            // Ledge handling
-            if (LedgeHandling)
-            {
-                float ledgeCheckHeight = MaxStepHeight;
-
-                bool isStableLedgeInner = false;
-                bool isStableLedgeOuter = false;
-
-                RaycastHit innerLedgeHit;
-                if (IntersectionDetectTool.CharacterCollisionsRaycast(
-                    hitPoint + (atCharacterUp * SecondaryProbesVertical) + (innerHitDirection * SecondaryProbesHorizontal), 
-                    -atCharacterUp,
-                    ledgeCheckHeight + SecondaryProbesVertical, 
-                    out innerLedgeHit, 
-                    IntersectionDetectTool._internalCharacterHits) > 0)
-                {
-                    InnerNormal = innerLedgeHit.normal;
-                    isStableLedgeInner = true;
-                    //Debug.DrawRay(hitPoint + (atCharacterUp * SecondaryProbesVertical) + (innerHitDirection * SecondaryProbesHorizontal), InnerNormal * 10, Color.magenta, 3f);
-                }
-
-                RaycastHit outerLedgeHit;
-                if (IntersectionDetectTool.CharacterCollisionsRaycast(
-                    hitPoint + (atCharacterUp * SecondaryProbesVertical) + (-innerHitDirection * SecondaryProbesHorizontal), 
-                    -atCharacterUp,
-                    ledgeCheckHeight + SecondaryProbesVertical, 
-                    out outerLedgeHit, 
-                    IntersectionDetectTool._internalCharacterHits) > 0)
-                {
-                    OuterNormal = outerLedgeHit.normal;
-                    isStableLedgeOuter = true;
-//                    Debug.DrawRay(
-//                        hitPoint + (atCharacterUp * SecondaryProbesVertical) +
-//                        (-innerHitDirection * SecondaryProbesHorizontal), OuterNormal * 10, Color.blue, 3f);
-                }
-                
-                LedgeDetected = (isStableLedgeInner != isStableLedgeOuter) ? 1 : LedgeDetected;
-                //if (LedgeDetected == 1)
-                //{
-                    //_logger.InfoFormat("ledge detected!!!,isStableLedgeInner:{0},isStableLedgeOuter:{1}",isStableLedgeInner,isStableLedgeOuter);
-                //}
-                //else
-                //{
-                    //_logger.InfoFormat("stable inner:{0}, outer:{1}", isStableLedgeInner, isStableLedgeOuter);
-                //}
-                //Debug.DrawRay(hitPoint, hitNormal * 8f, Color.green, 3.0f);
-            }
-
-            
-            
-            IntersectionDetectTool.SetColliderLayer(gameObject, prevLayer);
-            
-            return LedgeDetected;
+            velocityOffset = player.orientation.RotationYaw * (velocityOffset) + offsetSlope;
         }
         
-        private static bool IsStableOnNormal(Vector3 normal, float maxStableSlopeAngle)
-        {
-            return Vector3.Angle(Vector3.up, normal) <= maxStableSlopeAngle;
-        }
-        
-        private static Vector3 SlopeSlide(Vector3 prevSpeed, Vector3 collisionNormal, float deltaTime)
+        private static Vector3 SlopeSlide(Vector3 prevSpeed, Vector3 collisionNormal, float deltaTime, Vector3 forward)
         {
             if (CompareUtility.IsApproximatelyEqual(collisionNormal.normalized, Vector3.up))
             {
                 return Vector3.zero;
             }
-            prevSpeed.y = prevSpeed.y - SpeedManager.Gravity * deltaTime;
+
+            if (CompareUtility.IsApproximatelyEqual(prevSpeed.x, 0f, 0.001f) &&
+                CompareUtility.IsApproximatelyEqual(prevSpeed.z, 0f, 0.001f))
+            {
+                prevSpeed.x = forward.x;
+                prevSpeed.z = forward.z;
+            }
+            prevSpeed.y = prevSpeed.y - SpeedManager.SlideSlopeGravity * deltaTime;
 
             var slopeDir = new Vector3();
             slopeDir.y = -Mathf.Sqrt(1 - collisionNormal.y * collisionNormal.y);
@@ -366,7 +284,8 @@ namespace App.Shared.GameModules.Player
             slopeDir.z = xzComponent * collisionNormal.z / (x + z);
 
             //slopeDir *= Mathf.Abs(newSpeed / slopeDir.y);
-            slopeDir = slopeDir.normalized * prevSpeed.magnitude;
+            //slopeDir = slopeDir.normalized * prevSpeed.magnitude;
+            slopeDir *= Mathf.Abs(prevSpeed.y / slopeDir.y);
             return slopeDir;
         }
 

@@ -7,6 +7,7 @@ using Core.Room;
 using Core.Utils;
 using Entitas;
 using System.Collections.Generic;
+using Utils.Configuration;
 
 namespace App.Shared.GameModeLogic.WeaponInitLoigc
 {
@@ -15,18 +16,21 @@ namespace App.Shared.GameModeLogic.WeaponInitLoigc
         private const int DefaultBagIndex = 0;
         private LinkedList<EWeaponSlotType> _removeSlotList = new LinkedList<EWeaponSlotType>();
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(NormalWeaponInitLogic));
-        private readonly int _bagLimitTime = 0;
+        private readonly int _gameModeId;
         private INewWeaponConfigManager _weaponConfigManager;
         private IWeaponPropertyConfigManager _weaponPropertyConfigManager;
+        private IGameModeConfigManager _gameModeConfigManager;
         private OverrideWeaponController _overrideWeaponController = new OverrideWeaponController();
 
-        public NormalWeaponInitLogic(int baglimitTime, 
+        public NormalWeaponInitLogic(int modeId, 
+            IGameModeConfigManager gameModeConfigManager,
             INewWeaponConfigManager newWeaponConfigManager,
             IWeaponPropertyConfigManager weaponPropertyConfigManager)
         {
-            _bagLimitTime = baglimitTime;
+            _gameModeId = modeId;
             _weaponConfigManager = newWeaponConfigManager;
             _weaponPropertyConfigManager = weaponPropertyConfigManager;
+            _gameModeConfigManager = gameModeConfigManager;
         }
 
         public bool IsBagSwithEnabled(Entity playerEntity)
@@ -91,9 +95,8 @@ namespace App.Shared.GameModeLogic.WeaponInitLoigc
                 Logger.Error("PlayerEntity is null");
                 return;
             }
-            Logger.InfoFormat("{0} UnlockBag", player.entityKey.Value);
             player.weaponState.BagLocked = false;
-            player.weaponState.BagOpenLimitTime = player.time.ClientTime + _bagLimitTime;
+            player.weaponState.BagOpenLimitTime = player.time.ClientTime + _gameModeConfigManager.GetBagLimitTime(_gameModeId);
         }
 
         public void ResetWeaponWithBagIndex(int index, Entity playerEntity)

@@ -97,14 +97,14 @@ namespace App.Shared.Network
             _serializeInfo[(int)EClient2ServerMessage.DebugCommand] = new ProtoBufSerializeInfo<DebugCommandMessage>(Protobuf.DebugCommandMessage.Parser);
             _serializeInfo[(int) EClient2ServerMessage.UpdateMsg] = _replicatedUpdateEntitySerializeInfo=new ReplicatedUpdateEntitySerializeInfo(ComponentSerializerManager.Instance, new UpdateMessagePool());
             _serializeInfo[(int) EClient2ServerMessage.FireInfo] = new ProtoBufSerializeInfo<FireInfoMessage>(Protobuf.DebugCommandMessage.Parser);
-            _serializeInfo[(int) EClient2ServerMessage.DebugScriptInfo] =  new  ProtoBufSerializeInfo<DebugScriptInfo>(Protobuf.DebugScriptInfo.Parser); 
-
+            _serializeInfo[(int) EClient2ServerMessage.DebugScriptInfo] =  new  ProtoBufSerializeInfo<DebugScriptInfo>(Protobuf.DebugScriptInfo.Parser);
+            _serializeInfo[(int) EClient2ServerMessage.GameOver ] = new ProtoBufSerializeInfo<GameOverMesssage>(Protobuf.GameOverMesssage.Parser);
             _replicatedSnapshotSerializeInfo = new ReplicatedSnapshotSerializeInfo(new SnapshotReplicator(ComponentSerializerManager.Instance));
             _serializeInfo[(int) EServer2ClientMessage.Snapshot] = _replicatedSnapshotSerializeInfo;
-            
-//            _replicatedUserCmdSerializeInfo = new ReplicatedCmddSerializeInfo(new SnapshotReplicator(ComponentSerializerManager.Instance));
-       
-            
+
+            //            _replicatedUserCmdSerializeInfo = new ReplicatedCmddSerializeInfo(new SnapshotReplicator(ComponentSerializerManager.Instance));
+
+
             _serializeInfo[(int) EServer2ClientMessage.SimulationTimeSync] = new SimulationTimeMessageSerializeInfo();
             _serializeInfo[(int)EServer2ClientMessage.UdpId] = new ProtoBufSerializeInfo<UdpIdMessage>(Protobuf.UdpIdMessage.Parser);
             _serializeInfo[(int)EServer2ClientMessage.FreeData] = new ProtoBufSerializeInfo<SimpleProto>(SimpleProto.Parser);
@@ -118,9 +118,11 @@ namespace App.Shared.Network
             _serializeInfo[(int)EServer2ClientMessage.FireInfoAck] = new ProtoBufSerializeInfo<FireInfoAckMessage>(Protobuf.UpdateMessageAck.Parser);
             _serializeInfo[(int)EServer2ClientMessage.DebugMessage] = new ProtoBufSerializeInfo<ServerDebugMessage>(Protobuf.ServerDebugMessage.Parser);
             _serializeInfo[(int)EServer2ClientMessage.ClearScene] = new ProtoBufSerializeInfo<ClearSceneMessage>(Protobuf.ClearSceneMessage.Parser);
+            _serializeInfo[(int)EServer2ClientMessage.GameOver] = new ProtoBufSerializeInfo<GameOverMesssage>(Protobuf.GameOverMesssage.Parser);
+
         }
 
-   
+
 
         public ISerializeInfo this[int messageType]
         {

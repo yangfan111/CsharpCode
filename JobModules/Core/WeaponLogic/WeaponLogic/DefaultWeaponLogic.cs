@@ -32,7 +32,7 @@ namespace Core.WeaponLogic
         public override float GetBaseSpeed()
         {
             var moveConfig = _config.MoveSpeedLogic as DefaultMoveSpeedLogicConfig;
-            if(null == moveConfig)
+            if(null != moveConfig)
             {
                 return moveConfig.MaxSpeed;
             }

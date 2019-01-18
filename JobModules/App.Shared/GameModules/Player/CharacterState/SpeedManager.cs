@@ -24,6 +24,7 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         public const float Epsilon = 0.01f;
         public const float Gravity = 10.0f;
+        public const float SlideSlopeGravity = 8.0f;
 
         private readonly PlayerEntity _player;
         private readonly ICharacterPosture _posture;
@@ -278,9 +279,15 @@ namespace App.Shared.GameModules.Player.CharacterState
             var candidateId1 = CharacterStateConfigHelper.GenerateId(_postureInConfig.InTransition() ? _postureInConfig.NextPosture() : _postureInConfig.CurrentPosture(),
                  _movementInConfig.InTransition() ? _movementInConfig.NextMovement() : _movementInConfig.CurrentMovement());
             var candidateId2 = CharacterStateConfigHelper.GenerateId(_postureInConfig.NextPosture(), MovementInConfig.Null);
+            var candidateId3 = CharacterStateConfigHelper.GenerateId(_postureInConfig.CurrentPosture(), MovementInConfig.Null);
             //_logger.InfoFormat("posture in transition:{0}, next posture:{1}, cur posture:{2}, move in transition:{3}, next move:{4}, CURRENT MOVE:{5}",_postureInConfig.InTransition() , _postureInConfig.NextPosture() , _postureInConfig.CurrentPosture(),
              //   _movementInConfig.InTransition() , _movementInConfig.NextMovement() , _movementInConfig.CurrentMovement());
-            if (_speedConditionDictionary.ContainsKey(candidateId2))
+            if (_speedConditionDictionary.ContainsKey(candidateId3))
+            {
+                valid = true;
+                _speedConditionDictionary[candidateId3].Invoke();
+            }
+            else if (_speedConditionDictionary.ContainsKey(candidateId2))
             {
                 valid = true;
                 _speedConditionDictionary[candidateId2].Invoke();

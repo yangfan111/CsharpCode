@@ -207,7 +207,7 @@ namespace Core.CharacterState.Action
                                                  CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
                         
-                        TurnOnUpperBodyOverlay(addOutput);
+                        //TurnOnUpperBodyOverlay(addOutput);
 
                         command.Handled = true;
                         
@@ -215,8 +215,11 @@ namespace Core.CharacterState.Action
                     }
 
                     return false;
-                },
-                null, (int) ActionStateId.Unarm, null, 0, new[] { FsmInput.Unarm });
+                }, 
+                null,
+                (int) ActionStateId.Unarm,
+                (normalizedTime, addOutput) => { LerpOpenUpperBodyLayer(addOutput, normalizedTime); }, 
+                (int)SingletonManager.Get<CharacterStateConfigManager>().HolsterTransitionTime, new[] { FsmInput.Unarm });
             
             #endregion
 
@@ -283,7 +286,7 @@ namespace Core.CharacterState.Action
                                                  CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
                         
-                        TurnOnUpperBodyOverlay(addOutput);
+                        //TurnOnUpperBodyOverlay(addOutput);
 
                         command.Handled = true;
 
@@ -292,7 +295,7 @@ namespace Core.CharacterState.Action
 
                     return false;
                 },
-                null, (int)ActionStateId.SwitchWeapon, null, 0, new[] { FsmInput.SwitchWeapon });
+                null, (int)ActionStateId.SwitchWeapon, (normalizedTime, addOutput) => { LerpOpenUpperBodyLayer(addOutput, normalizedTime); }, (int)SingletonManager.Get<CharacterStateConfigManager>().HolsterTransitionTime, new[] { FsmInput.SwitchWeapon });
             
             #endregion
             
@@ -914,6 +917,16 @@ namespace Core.CharacterState.Action
                     CharacterView.ThirdPerson);
                 addOutput(FsmOutput.Cache);
             }
+        }
+
+        public static void LerpOpenUpperBodyLayer(Action<FsmOutput> addOutput, float ratio)
+        {
+            FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.UpperBodyLayer,
+                Mathf.Lerp(AnimatorParametersHash.Instance.UpperBodyDisableValue,
+                    AnimatorParametersHash.Instance.UpperBodyEnableValue,
+                    Mathf.Clamp01(ratio)),
+                CharacterView.ThirdPerson);
+            addOutput(FsmOutput.Cache);
         }
 
         private static void TurnOnUpperBodyOverlay(Action<FsmOutput> addOutput)
