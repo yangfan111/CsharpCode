@@ -28,6 +28,7 @@ namespace App.Shared.GameModules.Player.CharacterState
         };
 
         private static readonly int InitCommandLen = 5;
+        private static readonly float EPS = 0.0001f;
 
         private List<IFsmInputFilter> _filters = new List<IFsmInputFilter>
         {
@@ -124,9 +125,11 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         private void FromUserCmdToFsmInput(IUserCmd cmd, PlayerEntity player)
         {
+            //Logger.InfoFormat("horzontal val:{0}, vertical val:{1}", cmd.MoveHorizontal, cmd.MoveVertical);
+
             // 根据WSAD生成FsmInput
-            if (CompareUtility.IsApproximatelyEqual(cmd.MoveHorizontal, 0) 
-                && CompareUtility.IsApproximatelyEqual(cmd.MoveVertical, 0)
+            if (CompareUtility.IsApproximatelyEqual(cmd.MoveHorizontal, 0, EPS) 
+                && CompareUtility.IsApproximatelyEqual(cmd.MoveVertical, 0, EPS)
                 && !player.playerMove.IsAutoRun)
             {
                 // WSAD均未按下
@@ -134,11 +137,11 @@ namespace App.Shared.GameModules.Player.CharacterState
             }
             else
             {
-                if (!CompareUtility.IsApproximatelyEqual(cmd.MoveHorizontal, 0))
+                if (!CompareUtility.IsApproximatelyEqual(cmd.MoveHorizontal, 0, EPS))
                 {
                     SetCommand(cmd.MoveHorizontal > 0 ? FsmInput.Right : FsmInput.Left, cmd.MoveHorizontal);
                 }
-                if (!CompareUtility.IsApproximatelyEqual(cmd.MoveVertical, 0))
+                if (!CompareUtility.IsApproximatelyEqual(cmd.MoveVertical, 0, EPS))
                 {
                     SetCommand(cmd.MoveVertical > 0 ? FsmInput.Forth : FsmInput.Back, cmd.MoveVertical);
                 }
@@ -179,14 +182,14 @@ namespace App.Shared.GameModules.Player.CharacterState
                 }
             }
 
-            if (!CompareUtility.IsApproximatelyEqual(cmd.MoveUpDown, 0))
+            if (!CompareUtility.IsApproximatelyEqual(cmd.MoveUpDown, 0, EPS))
             {
                 SetCommand(cmd.MoveUpDown > 0 ? FsmInput.Up : FsmInput.Down, cmd.MoveUpDown);
             }
 
-            if (CompareUtility.IsApproximatelyEqual(cmd.MoveHorizontal, 0) &&
-                CompareUtility.IsApproximatelyEqual(cmd.MoveVertical, 0) &&
-                CompareUtility.IsApproximatelyEqual(cmd.MoveUpDown, 0))
+            if (CompareUtility.IsApproximatelyEqual(cmd.MoveHorizontal, 0, EPS) &&
+                CompareUtility.IsApproximatelyEqual(cmd.MoveVertical, 0, EPS) &&
+                CompareUtility.IsApproximatelyEqual(cmd.MoveUpDown, 0, EPS))
             {
                 SetCommand(FsmInput.DiveIdle);
             }

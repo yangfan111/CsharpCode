@@ -5,8 +5,6 @@ namespace Core.Room
     {
         long HallRoomId { get; set; }
 
-        IRoom ServerRoom { get; set; }
-
         ERoomGameStatus GameStatus { get; set; }
         int ModeId { get; set; }
         int TeamCapacity { get; set; }
@@ -53,7 +51,7 @@ namespace Core.Room
 
         void Dispose();
 
-        void CheckTimeOut();
+        bool CheckTimeOut();
     }
 
     public interface ITeamInfo

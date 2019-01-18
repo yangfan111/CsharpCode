@@ -64,6 +64,7 @@ namespace App.Shared.SceneManagement
 
         private void Clear()
         {
+            _loadingScene = _unloadingScene = 0;
             SceneManager.sceneLoaded -= SceneLoaded;
             SceneManager.sceneUnloaded -= SceneUnloaded;
         }

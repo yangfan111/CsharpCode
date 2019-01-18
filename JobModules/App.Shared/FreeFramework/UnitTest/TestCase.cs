@@ -15,6 +15,8 @@ namespace App.Shared.FreeFramework.UnitTest
         private OrderAiAction order;
         private bool started;
 
+        public IUnitTestData data;
+
         public TestCase()
         {
             this.order = new OrderAiAction();
@@ -30,7 +32,12 @@ namespace App.Shared.FreeFramework.UnitTest
                 {
                     foreach (IGameAction action in trigger)
                     {
-                        this.order.actions.Add(action);
+                        if (action is OneCaseAction)
+                        {
+                            OneCaseAction one = (OneCaseAction)action;
+                            one.trigger = trigger;
+                            this.order.actions.Add(one);
+                        }
                     }
                 }
             }

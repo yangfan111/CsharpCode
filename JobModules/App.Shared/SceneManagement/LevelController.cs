@@ -32,6 +32,8 @@ namespace App.Shared.SceneManagement
 
         private void Clear()
         {
+            Logger.InfoFormat("LevelController Clear");
+            lastScene = default(Scene);
             SceneManager.sceneLoaded -= SceneLoaded;
         }
 
@@ -55,11 +57,18 @@ namespace App.Shared.SceneManagement
 
         private void SceneLoaded(Scene scene, LoadSceneMode modee)
         {
-            if(lastScene != null && lastScene.name != null)
+            if(lastScene.isLoaded && lastScene.name != null)
             {
+                Logger.InfoFormat("The last scene {0} have been loaded, unload it first!", lastScene.name);
                 SceneManager.UnloadSceneAsync(lastScene);
             }
             lastScene = scene;
+
+            if (!scene.isLoaded)
+            {
+                throw new Exception("Scene is not loaded.");
+            }
+
             SceneManager.SetActiveScene(scene);
             Logger.DebugFormat("SET ACTIVE SCENE: {0}", scene.name);
             foreach (var go in scene.GetRootGameObjects())

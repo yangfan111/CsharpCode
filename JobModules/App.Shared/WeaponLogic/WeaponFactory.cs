@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using Core.CharacterState;
 using Core.Utils;
 using Core.WeaponLogic.Bullet;
-using App.Shared.WeaponLogic.Bullet;
+using App.Shared.GameModules.Weapon.Bullet;
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
-using App.Shared.WeaponLogic.Tactic;
+using App.Shared.GameModules.Weapon.Tactic;
 using Core.Free;
 using Utils.Singleton;
 
-namespace App.Shared.WeaponLogic
+namespace App.Shared.GameModules.Weapon
 {
     public class WeaponFactory : IWeaponFactory
     {

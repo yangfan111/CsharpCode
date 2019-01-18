@@ -139,7 +139,7 @@ namespace Core.Animation
                 }
             }
             
-            animator.Update(0);
+            animator.UpdateAndCacheDatas(0);
         }
 
         struct SortedLayer

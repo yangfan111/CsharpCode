@@ -1,4 +1,4 @@
-﻿using App.Shared.WeaponLogic;
+﻿using App.Shared.GameModules.Weapon;
 using App.Shared.Util;
 using Core;
 using Core.EntityComponent;
@@ -43,7 +43,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
             {
                 return;
             }
-            var pickupSuccess = player.playerAction.Logic.AutoPickUpWeapon(entity.weapon.ToWeaponInfo());
+            var pickupSuccess = player.GetController<PlayerWeaponController>().AutoPickUpWeapon(entity.weapon.ToWeaponInfo());
             if (pickupSuccess)
             {
                 _sceneObjectEntityFactory.DestroyEquipmentEntity(entity.entityKey.Value.EntityId);

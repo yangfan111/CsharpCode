@@ -13,7 +13,7 @@ using Core.WeaponLogic;
 using Core.EntityComponent;
 using App.Shared.Configuration;
 using Assets.XmlConfig;
-using Core.Bag;
+using Core;
 using Core.Enums;
 using Utils.Utils;
 using WeaponConfigNs;
@@ -28,6 +28,8 @@ using App.Shared.FreeFramework.framework.@event;
 using App.Shared.FreeFramework.framework.trigger;
 using UltimateFracturing;
 using Utils.Singleton;
+using App.Shared.Util;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Throwing
 {
@@ -179,7 +181,7 @@ namespace App.Shared.GameModules.Throwing
                 return;
             }
             playerEntity.throwingAction.ActionInfo.ClearState();
-            playerEntity.playerAction.Logic.OnCost(EWeaponSlotType.GrenadeWeapon);
+            playerEntity.GetController<PlayerWeaponController>().OnExpend(EWeaponSlotType.GrenadeWeapon);
         }
 
         private void OldRaycast()

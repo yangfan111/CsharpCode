@@ -111,7 +111,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
                             player.stateInterface.State.BuriedBomb(null);
                             break;
                         case DefuseBomb:
-                            if(!server)
+                            if (!server)
                             {
                                 player.DefuseBomb();
                             }

@@ -11,7 +11,7 @@ using XmlConfig;
 using App.Shared.GameModules.Player;
 using Core.Event;
 
-namespace App.Shared.WeaponLogic
+namespace App.Shared.GameModules.Weapon
 {
     public class DefaultWeaponEffectLogic : AbstractAttachableWeaponLogic<DefaultWeaponEffectConfig, int>, IWeaponEffectLogic
     {

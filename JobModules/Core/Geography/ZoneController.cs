@@ -51,15 +51,18 @@ namespace Core.Geography
         public float DistanceInsideUpperBorder(SpecialZone type, Vector3 position)
         {
             float ret = float.NaN;
-
-            var zones = _zones[type];
-            foreach (var zone in zones)
+            List<Zone> zones;
+            if(_zones.TryGetValue(type, out zones))
             {
-                if (InZone(zone, position))
+                foreach (var zone in zones)
                 {
-                    ret = zone.Center.y + zone.HalfSize.y;
-                    break;
+                    if (InZone(zone, position))
+                    {
+                        ret = zone.Center.y + zone.HalfSize.y;
+                        break;
+                    }
                 }
+
             }
 
             return ret;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Assets.XmlConfig;
-using Core.Bag;
+using Core;
 using Entitas;
 using UnityEngine;
 
@@ -9,13 +9,13 @@ namespace Core
 {
     public interface IMapObjectEntityFactory
     {
-        IEntity CreateDoor(int objectId,
+        IEntity CreateDoor(string objectId,
             GameObject gameObject, Action<object> detachCallback);
 
-        IEntity CreateDestructibleObject(int objectId,
+        IEntity CreateDestructibleObject(string objectId,
             GameObject gameObject, Action<object> detachCallback);
 
-        IEntity CreateGlassyObject(int objectId, GameObject gameObject, Action<object> brokenCallback);
+        IEntity CreateGlassyObject(string objectId, GameObject gameObject, Action<object> brokenCallback);
     }
     
     public interface ISceneObjectEntityFactory

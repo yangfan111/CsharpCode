@@ -1,9 +1,9 @@
-﻿using App.Shared.WeaponLogic.SlotController;
-using App.Shared.GameModeLogic.BagSlotLogic;
+﻿using App.Shared.GameModeLogic.BagSlotLogic;
 using App.Shared.GameModeLogic.PickupLogic;
 using App.Shared.GameModeLogic.ReservedBulletLogic;
 using App.Shared.GameModeLogic.WeaponActionListener;
 using App.Shared.GameModeLogic.WeaponInitLoigc;
+using App.Shared.GameModules.Weapon;
 using Assets.Utils.Configuration;
 using Core.GameModeLogic;
 using Core.GameModule.System;
@@ -53,7 +53,7 @@ namespace App.Shared.GameModeLogic.LogicFactory
             return reservedBulletLogic;
         }
 
-        protected override IWeaponActionListener GetWeaponActionListener()
+        protected override IWeaponProcessListener GetWeaponActionListener()
         {
             var weaponActionListener = new NormalWeaponActionListener();
 
@@ -73,12 +73,9 @@ namespace App.Shared.GameModeLogic.LogicFactory
             return weaponInitLogic;
         }
 
-        protected override IWeaponSlotController GetWeaponSlotController()
+        protected override IWeaponSlotsLibrary GetWeaponSlotLibary()
         {
-            var weaponSlotController = new GroupWeaponSlotController();
-
-
-            return weaponSlotController;
+            return WeaponSlotsLibrary.Allocate(Core.EWeaponSlotsGroupType.Group);
         }
     }
 }

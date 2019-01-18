@@ -14,36 +14,15 @@ namespace App.Shared.GameModules.Configuration
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(CharacterSpeedSubResourceHandler));
 
-        public CharacterSpeedSubResourceHandler(ILoadRequestManager loadRequestManager) : base(loadRequestManager)
+        public CharacterSpeedSubResourceHandler() : base()
         {
         }
 
-        protected override void LoadSubResourcesImpl(List<Tuple<AssetInfo, Object>> subResources)
+        protected override bool LoadSubResourcesImpl()
         {
-            var obj = subResources[0].Item2;
-            var assetInfos = GetAssetInfos(obj);
-            if (assetInfos != null)
-            {
-                foreach (AssetInfo assetInfo in assetInfos)
-                {
-                    AddLoadRequest(assetInfo);
-                }
-            }
-        }
-
-        private List<AssetInfo> GetAssetInfos(UnityEngine.Object obj)
-        {
-            var asset = obj as TextAsset;
-            if (null != asset)
-            {
-                var config = XmlConfigParser<CharacterStateConfig>.Load(asset.text);
-                HashSet<AssetInfo> assetInfos = new HashSet<AssetInfo>(AssetInfo.AssetInfoComparer.Instance);
-                assetInfos.Add(new AssetInfo(config.JumpCurveInfo.BundleName, config.JumpCurveInfo.AssetName));
-
-                return assetInfos.ToList();
-            }
-
-            return null;
+            var config = SingletonManager.Get<CharacterStateConfigManager>();
+            AddLoadRequest(config.AirMoveCurveAssetInfo);
+            return true;
         }
 
         protected override void OnLoadSuccImpl(AssetInfo assetInfo, Object obj)
@@ -54,8 +33,6 @@ namespace App.Shared.GameModules.Configuration
                 var config = XmlConfigParser<SerializableCurve>.Load(asset.text);
                 SingletonManager.Get<CharacterStateConfigManager>().AirMoveCurve = config.toCurve();
             }
-            
-            ForceExit();
         }
     }
 }

@@ -8,6 +8,7 @@ using Core.Geography;
 using System.Collections.Generic;
 using System.Collections;
 using App.Shared.SceneTriggerObject;
+using Utils.Configuration;
 using Utils.Singleton;
 
 namespace App.Shared.Configuration
@@ -31,16 +32,11 @@ namespace App.Shared.Configuration
         private HashSet<string> _loadedMapNames = new HashSet<string>();
 
         private static MapConfig _mapConfig;
-
+        
         public static void Generate(int mapId, Action callBack)
         {
             var instance = SingletonManager.Get<MapConfigManager>();
             instance.Init(mapId,  callBack);
-        }
-
-        public static MapConfig MapConfig
-        {
-            get { return _mapConfig; }
         }
 
         public MapConfigManager()
@@ -77,80 +73,13 @@ namespace App.Shared.Configuration
             return _zone.GetHeightOfUpperBorder(SpecialZone.Water, position);
         }
 
-        public void OnLoadSucc(object source, AssetInfo assetInfo, UnityEngine.Object obj)
+        public void SetMapInfo(AbstractMapConfig info)
         {
-            var asset = obj as TextAsset;
-            if (null == asset)
-            {
-                Logger.ErrorFormat("Asset {0}:{1} Load Fialed ", assetInfo.BundleName, assetInfo.AssetName);
-                return;
-            }
-            if (string.IsNullOrEmpty(asset.text))
-            {
-                Logger.ErrorFormat("MapConfig is Empty");
-                return;
-            }
-            
-            MapConfig cfg = null;
-            try
-            {
-                cfg = XmlConfigParser<MapConfig>.Load(asset.text);
-            }
-            catch (Exception e)
-            {
-                Logger.Error("Parse MapConfig Error", e);
-                return;
-            }
-            Logger.InfoFormat("OnLoadSucc mapInfo count:{0}",cfg.MapInfos.Count);
-            SceneParameters = null;
-            _mapConfig = cfg;
-            foreach (var v in cfg.MapInfos)
-            {
-                if (v.Id == _mapId)
-                {
-                    SceneParameters = v;
-
-                    _zone = new ZoneController();
-                    _zone.AddZone(SceneParameters.SpecialZones);
-
-                    IOperationAfterConfigLoaded op = null;
-                    if (SceneParameters is LevelConfig)
-                    {
-                        op = new LevelInit(SingletonManager.Get<TriggerObjectManager>());
-                    }
-                    else if (SceneParameters is SceneConfig)
-                    {
-                        op = new TerrainInit(SingletonManager.Get<TriggerObjectManager>());
-                    }
-
-                    if (op != null)
-                    {
-                        if (SharedConfig.IsServer)
-                        {
-                            op.ServerOperation(v, _callBack);
-                        }
-                        else
-                        {
-                            op.ClientOperation(v, _callBack);
-                        }
-
-                        foreach (var req in op.LoadInitialScene())
-                        {
-                            _loadedMapNames.Add(req.Address.AssetName);
-                            _loadSceneHandler.AddSceneRequest(req);
-                        }
-                    }
-
-                    break;
-                }
-            }
-
-            if (SceneParameters == null)
-            {
-                Logger.ErrorFormat("mapId:{0} is invalid", _mapId);
-            }
+            SceneParameters = info;
+            _zone = new ZoneController();
+            _zone.AddZone(SceneParameters.SpecialZones);
         }
-
+        
         public void AddLoadingMap(string mapName)
         {
             _loadedMapNames.Add(mapName);

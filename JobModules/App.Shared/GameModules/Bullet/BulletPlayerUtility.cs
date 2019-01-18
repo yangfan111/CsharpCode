@@ -339,30 +339,27 @@ namespace App.Shared.GameModules.Bullet
             if (null != srcPlayer)
             {
                 bool isTeammate = srcPlayer.playerInfo.TeamId == targetPlayer.playerInfo.TeamId;
-                if(isTeammate)
-                {
-                    return;
-                }
+                
                 bool isKill = isTargetDead;
                 bool isHitDown = targetPlayer.gamePlay.IsHitDown();
                 bool isCrit = damage.part == (int) EBodyPart.Head;
 
-                //总伤害量
-                srcPlayer.statisticsData.Statistics.TotalDamage += damage.damage;
+                targetPlayer.statisticsData.AddOtherInfo(srcPlayer.entityKey.Value, srcPlayer.weaponLogicInfo.WeaponId, isKill, isHitDown, (int) damage.damage,srcPlayer.playerInfo);
 
-                //添加自己对别人的伤害记录
-                srcPlayer.statisticsData.AddOpponentInfo(targetPlayer.entityKey.Value, srcPlayer.weaponLogicInfo.WeaponId, isKill, isHitDown, (int)damage.damage, targetPlayer.playerInfo);
                 //添加别人对自己的伤害记录（受伤不算）
-                if (targetPlayer.gamePlay.IsLastLifeState(EPlayerLifeState.Alive))
+                if (targetPlayer.gamePlay.IsLastLifeState(EPlayerLifeState.Alive) && !isTeammate)
                 {
-                    targetPlayer.statisticsData.AddOtherInfo(srcPlayer.entityKey.Value, srcPlayer.weaponLogicInfo.WeaponId, isKill, isHitDown, (int)damage.damage, srcPlayer.playerInfo);
+                    //添加自己对别人的伤害记录
+                    srcPlayer.statisticsData.AddOpponentInfo(targetPlayer.entityKey.Value, srcPlayer.weaponLogicInfo.WeaponId, isKill, isHitDown, (int) damage.damage, targetPlayer.playerInfo);
+                    //总伤害量
+                    srcPlayer.statisticsData.Statistics.TotalDamage += damage.damage;
                     //有效伤害
                     srcPlayer.statisticsData.Statistics.PlayerDamage += damage.damage;
                 }
 
                 if (isTargetDead)
                 {
-                    if (srcPlayer.playerInfo.TeamId != targetPlayer.playerInfo.TeamId)
+                    if (!isTeammate)
                     {
                         //击杀数
                         srcPlayer.statisticsData.Statistics.KillCount++;
@@ -373,32 +370,34 @@ namespace App.Shared.GameModules.Bullet
                         }
                         //连杀数（吃鸡模式）
                         srcPlayer.statisticsData.Statistics.EvenKillCount++;
+                        //最大击杀距离
+                        srcPlayer.statisticsData.Statistics.MaxKillDistance = Mathf.Max(srcPlayer.statisticsData.Statistics.MaxKillDistance,
+                            UnityEngine.Vector3.Distance(srcPlayer.position.Value, targetPlayer.position.Value));
+                        if (damage.WeaponType == EWeaponSubType.Pistol)
+                        {
+                            //手枪击杀
+                            srcPlayer.statisticsData.Statistics.PistolKillCount++;
+                        }
+                        else if (damage.WeaponType == EWeaponSubType.Grenade)
+                        {
+                            //手雷击杀
+                            srcPlayer.statisticsData.Statistics.GrenadeKillCount++;
+                        }
                     }
                     else
                     {
                         //击杀队友
                         srcPlayer.statisticsData.Statistics.KillTeamCount++;
                     }
-                    //最大击杀距离
-                    srcPlayer.statisticsData.Statistics.MaxKillDistance = Mathf.Max(srcPlayer.statisticsData.Statistics.MaxKillDistance,
-                        UnityEngine.Vector3.Distance(srcPlayer.position.Value, targetPlayer.position.Value));
-                    if (damage.WeaponType == EWeaponSubType.Pistol)
-                    {
-                        //手枪击杀
-                        srcPlayer.statisticsData.Statistics.PistolKillCount++;
-                    }
-                    else if (damage.WeaponType == EWeaponSubType.Grenade)
-                    {
-                        //手雷击杀
-                        srcPlayer.statisticsData.Statistics.GrenadeKillCount++;
-                    }
                 }
-                if (isHitDown)
+
+                if (isHitDown && !isTeammate)
                 {
                     //击倒数
                     srcPlayer.statisticsData.Statistics.HitDownCount++;
                 }
-                if (isCrit)
+
+                if (isCrit && !isTeammate)
                 {
                     //总爆头数
                     srcPlayer.statisticsData.Statistics.CritCount++;
@@ -423,9 +422,13 @@ namespace App.Shared.GameModules.Bullet
                 }
                 if (SharedConfig.IsServer && null != gameRule)
                 {
-                    //死亡顺序
-                    gameRule.Contexts.session.serverSessionObjects.DeathOrder ++;
-                    targetPlayer.statisticsData.Statistics.DeathOrder = gameRule.Contexts.session.serverSessionObjects.DeathOrder;
+                    //死亡顺序（非自杀与队友击杀）
+                    if (null != srcPlayer && srcPlayer.playerInfo.TeamId != targetPlayer.playerInfo.TeamId)
+                    {
+                        gameRule.Contexts.session.serverSessionObjects.DeathOrder++;
+                        targetPlayer.statisticsData.Statistics.DeathOrder = gameRule.Contexts.session.serverSessionObjects.DeathOrder;
+                    }
+
                     //存活时间
                     IEventArgs args = (IEventArgs)gameRule.Contexts.session.commonSession.FreeArgs;
                     int startTime = FreeUtil.ReplaceInt("{startWaitTime}", args);
@@ -446,7 +449,6 @@ namespace App.Shared.GameModules.Bullet
                             PlayerEntity otherEntity = gameRule.Contexts.player.GetEntityWithEntityKey(other.PlayerKey);
                             if (null != otherEntity && srcPlayer.playerInfo.TeamId == otherEntity.playerInfo.TeamId)
                             {
-                                //TODO 修改助攻的计算方式
                                 otherEntity.statisticsData.Statistics.AssistCount++;
                             }
                         }

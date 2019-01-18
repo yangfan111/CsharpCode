@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <ProjectGuid>{89347114-9496-3679-85F4-60D1E379C6B6}</ProjectGuid>
@@ -14,7 +14,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
   </PropertyGroup>
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"/>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' Or '$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
     <OutputPath>F:\voyager\UnityPackages\Dll.Export\</OutputPath>
     <PlatformTarget>anycpu</PlatformTarget>
@@ -65,24 +65,67 @@
     <None Include="F:\voyager\UnityPackages\Core\CMakeLists.txt">
     </None>
   </ItemGroup>
-  <Target Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' Or '$(Configuration)|$(Platform)'=='Debug|x86'" Name="CustomCommand_Debug_9907a41c0549bd7379194de140332d9b" Inputs="F:/voyager/UnityPackages/Core/CMakeLists.txt;F:\voyager\UnityPackages\Core\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\Core\CMakeLists.txt" Outputs="F:\voyager\UnityPackages\Core\CMakeFiles\generate.stamp">
+  <Target Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' Or '$(Configuration)|$(Platform)'=='Debug|x86'"
+    Name="CustomCommand_Debug_9907a41c0549bd7379194de140332d9b"
+    Inputs="F:/voyager/UnityPackages/Core/CMakeLists.txt;F:\voyager\UnityPackages\Core\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\Core\CMakeLists.txt"
+    Outputs="F:\voyager\UnityPackages\Core\CMakeFiles\generate.stamp">
     <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/Core/CMakeLists.txt" />
-    <Exec Command="setlocal&#xD;&#xA;&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/Core/CMakeFiles/generate.stamp&#xD;&#xA;if %errorlevel% neq 0 goto :cmEnd&#xD;&#xA;:cmEnd&#xD;&#xA;endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone&#xD;&#xA;:cmErrorLevel&#xD;&#xA;exit /b %1&#xD;&#xA;:cmDone&#xD;&#xA;if %errorlevel% neq 0 goto :VCEnd" />
+    <Exec Command="setlocal
+&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/Core/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd" />
   </Target>
-  <Target Condition="'$(Configuration)|$(Platform)'=='Release|Win32' Or '$(Configuration)|$(Platform)'=='Release|x86'" Name="CustomCommand_Release_9907a41c0549bd7379194de140332d9b" Inputs="F:/voyager/UnityPackages/Core/CMakeLists.txt;F:\voyager\UnityPackages\Core\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\Core\CMakeLists.txt" Outputs="F:\voyager\UnityPackages\Core\CMakeFiles\generate.stamp">
+  <Target Condition="'$(Configuration)|$(Platform)'=='Release|Win32' Or '$(Configuration)|$(Platform)'=='Release|x86'"
+    Name="CustomCommand_Release_9907a41c0549bd7379194de140332d9b"
+    Inputs="F:/voyager/UnityPackages/Core/CMakeLists.txt;F:\voyager\UnityPackages\Core\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\Core\CMakeLists.txt"
+    Outputs="F:\voyager\UnityPackages\Core\CMakeFiles\generate.stamp">
     <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/Core/CMakeLists.txt" />
-    <Exec Command="setlocal&#xD;&#xA;&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/Core/CMakeFiles/generate.stamp&#xD;&#xA;if %errorlevel% neq 0 goto :cmEnd&#xD;&#xA;:cmEnd&#xD;&#xA;endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone&#xD;&#xA;:cmErrorLevel&#xD;&#xA;exit /b %1&#xD;&#xA;:cmDone&#xD;&#xA;if %errorlevel% neq 0 goto :VCEnd" />
+    <Exec Command="setlocal
+&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/Core/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd" />
   </Target>
-  <Target Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32' Or '$(Configuration)|$(Platform)'=='MinSizeRel|x86'" Name="CustomCommand_MinSizeRel_9907a41c0549bd7379194de140332d9b" Inputs="F:/voyager/UnityPackages/Core/CMakeLists.txt;F:\voyager\UnityPackages\Core\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\Core\CMakeLists.txt" Outputs="F:\voyager\UnityPackages\Core\CMakeFiles\generate.stamp">
+  <Target Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32' Or '$(Configuration)|$(Platform)'=='MinSizeRel|x86'"
+    Name="CustomCommand_MinSizeRel_9907a41c0549bd7379194de140332d9b"
+    Inputs="F:/voyager/UnityPackages/Core/CMakeLists.txt;F:\voyager\UnityPackages\Core\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\Core\CMakeLists.txt"
+    Outputs="F:\voyager\UnityPackages\Core\CMakeFiles\generate.stamp">
     <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/Core/CMakeLists.txt" />
-    <Exec Command="setlocal&#xD;&#xA;&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/Core/CMakeFiles/generate.stamp&#xD;&#xA;if %errorlevel% neq 0 goto :cmEnd&#xD;&#xA;:cmEnd&#xD;&#xA;endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone&#xD;&#xA;:cmErrorLevel&#xD;&#xA;exit /b %1&#xD;&#xA;:cmDone&#xD;&#xA;if %errorlevel% neq 0 goto :VCEnd" />
+    <Exec Command="setlocal
+&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/Core/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd" />
   </Target>
-  <Target Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32' Or '$(Configuration)|$(Platform)'=='RelWithDebInfo|x86'" Name="CustomCommand_RelWithDebInfo_9907a41c0549bd7379194de140332d9b" Inputs="F:/voyager/UnityPackages/Core/CMakeLists.txt;F:\voyager\UnityPackages\Core\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\Core\CMakeLists.txt" Outputs="F:\voyager\UnityPackages\Core\CMakeFiles\generate.stamp">
+  <Target Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32' Or '$(Configuration)|$(Platform)'=='RelWithDebInfo|x86'"
+    Name="CustomCommand_RelWithDebInfo_9907a41c0549bd7379194de140332d9b"
+    Inputs="F:/voyager/UnityPackages/Core/CMakeLists.txt;F:\voyager\UnityPackages\Core\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\Core\CMakeLists.txt"
+    Outputs="F:\voyager\UnityPackages\Core\CMakeFiles\generate.stamp">
     <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/Core/CMakeLists.txt" />
-    <Exec Command="setlocal&#xD;&#xA;&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/Core/CMakeFiles/generate.stamp&#xD;&#xA;if %errorlevel% neq 0 goto :cmEnd&#xD;&#xA;:cmEnd&#xD;&#xA;endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone&#xD;&#xA;:cmErrorLevel&#xD;&#xA;exit /b %1&#xD;&#xA;:cmDone&#xD;&#xA;if %errorlevel% neq 0 goto :VCEnd" />
+    <Exec Command="setlocal
+&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/Core/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd" />
   </Target>
   <ItemGroup>
-    <Compile Include="Bag\BagFrame.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Animation\AnimatorPoseReplayer.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Animation\IPatchClass.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Animation\NetworkAnimatorLayer.cs" />
@@ -133,6 +176,7 @@
     <Compile Include="F:\voyager\UnityPackages\Core\Audio\WiseIntegration\Trigger\AudioTrigger_GunSimple.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Audio\WiseIntegration\Trigger\AudioTrigger_SceneLoad.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Audio\WiseIntegration\Trigger\AudioTrigger_TrickTarget.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\Bag\BagFrame.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\BulletSimulation\BulletHitSimulator.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\BulletSimulation\BulletLayers.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\BulletSimulation\BulletMoveSimulator.cs" />
@@ -439,7 +483,6 @@
     <Compile Include="F:\voyager\UnityPackages\Core\IFactory\IBulletEntityFactory.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\IFactory\ISceneObjectEntityFactory.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\IFactory\ISoundEntityFactory.cs" />
-    <Compile Include="F:\voyager\UnityPackages\Core\IPlayerWeaponActionLogic.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Interpolate\InterpolateUtility.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Playback\IInterpolatableComponent.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Playback\IInterpolationInfo.cs" />
@@ -523,11 +566,16 @@
     <Compile Include="F:\voyager\UnityPackages\Core\Room\ILoginMessage.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Room\IPlayerInfo.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Room\IRoom.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\Room\IRoomEventDispatchter.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Room\IRoomId.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Room\IRoomManager.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Room\PlayerInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\Room\PlayerInfoManager.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\Room\RoomEventDispatcher.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Room\RoomInfo.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Room\RoomManager.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\SceneManagement\ILevelManager.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\SceneManagement\OriginStatus.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\SceneTriggerObject\TriggerObjectSyncEvent.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\SessionState\AbstractSessionState.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\SessionState\AbstractStepExecuteSystem.cs" />

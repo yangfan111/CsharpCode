@@ -25,6 +25,7 @@ namespace Core.WeaponLogic
         /// 清理状态信息
         /// </summary>
         void Reset();
+     
     }
 
     public interface ISpeedProvider

@@ -284,37 +284,49 @@ namespace App.Shared.GameModules.Player
                 player.thirdPersonAnimator.UnityAnimator);
 
             // equipment(pan)
-            player.appearanceInterface.Appearance.SyncFrom(player.latestAppearance);
-            player.appearanceInterface.Appearance.SyncFrom(appearance);
-            player.appearanceInterface.Appearance.TryRewind();
-            player.characterBoneInterface.CharacterBone.Peek(player.thirdPersonAppearance.PeekDegree);
+            var appearanceInterface = player.appearanceInterface;
+            var characterBoneInterface = player.characterBoneInterface;
+            var thirdPersonAppearance = player.thirdPersonAppearance;
+            var characterBone = player.characterBone;
+            var characterControllerInterface = player.characterControllerInterface;
+            appearanceInterface.Appearance.SyncFrom(player.latestAppearance);
+            appearanceInterface.Appearance.SyncFrom(appearance);
+            appearanceInterface.Appearance.TryRewind();
+            characterBoneInterface.CharacterBone.Peek(thirdPersonAppearance.PeekDegree);
 
             CodeRigBoneParam param = new CodeRigBoneParam
             {
                 PitchAmplitude = orientation.Pitch,
                 OverlayAnimationWeight = networkAnimator.AnimatorLayers[NetworkAnimatorLayer.PlayerUpperBodyOverlayLayer].Weight,
-                PostureWhenOverlay = player.thirdPersonAppearance.Posture,
+                PostureWhenOverlay = thirdPersonAppearance.Posture,
                 // 预测时，IK不生效
-                IKActive = ActiveIK(player.thirdPersonAppearance.Action, player.thirdPersonAppearance.Posture),
-                HeadPitch = player.characterBone.PitchHeadAngle,
-                HeadYaw = player.characterBone.RotHeadAngle,
-                HandPitch = player.characterBone.PitchHandAngle,
-                HeadRotProcess = player.characterBone.HeadRotProcess,
-                IsHeadRotCW = player.characterBone.IsHeadRotCW
+                IKActive = ActiveIK(thirdPersonAppearance.Action, thirdPersonAppearance.Posture),
+                HeadPitch = characterBone.PitchHeadAngle,
+                HeadYaw = characterBone.RotHeadAngle,
+                HandPitch = characterBone.PitchHandAngle,
+                HeadRotProcess = characterBone.HeadRotProcess,
+                WeaponRot = characterBone.WeaponRot,
+                IsProne = thirdPersonAppearance.Posture == ThirdPersonPosture.Prone,
+                IsHeadRotCW = characterBone.IsHeadRotCW,
+                
+                FirstPersonPositionOffset = characterBone.FirstPersonPositionOffset,
+                FirstPersonRotationOffset = characterBone.FirstPersonRotationOffset,
+                FirstPersonSightOffset = characterBone.FirstPersonSightOffset
             };
             // code controlled pose
-            player.characterBoneInterface.CharacterBone.Update(param);
+            characterBoneInterface.CharacterBone.WeaponRotPlayback(param);
+            characterBoneInterface.CharacterBone.Update(param);
 
             // 更新包围盒
 
-            if (player.thirdPersonAppearance.NeedUpdateController)
+            if (thirdPersonAppearance.NeedUpdateController)
             {
-                player.characterControllerInterface.CharacterController.SetCharacterControllerHeight(player.thirdPersonAppearance.CharacterHeight);
-                player.characterControllerInterface.CharacterController.SetCharacterControllerCenter(player.thirdPersonAppearance.CharacterCenter);
-                player.characterControllerInterface.CharacterController.SetCharacterControllerRadius(player.thirdPersonAppearance.CharacterRadius);
+                characterControllerInterface.CharacterController.SetCharacterControllerHeight(thirdPersonAppearance.CharacterHeight);
+                characterControllerInterface.CharacterController.SetCharacterControllerCenter(thirdPersonAppearance.CharacterCenter);
+                characterControllerInterface.CharacterController.SetCharacterControllerRadius(thirdPersonAppearance.CharacterRadius);
             }
             
-            player.characterContoller.Value.SetCurrentControllerType(ThirdPersonPostureTool.ConvertToPostureInConfig(player.thirdPersonAppearance.Posture));
+            player.characterContoller.Value.SetCurrentControllerType(ThirdPersonPostureTool.ConvertToPostureInConfig(thirdPersonAppearance.Posture));
         }
         
         public static bool ActiveIK(ThirdPersonAction action, ThirdPersonPosture posture)

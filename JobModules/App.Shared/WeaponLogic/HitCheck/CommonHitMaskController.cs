@@ -2,7 +2,7 @@
 using Core.BulletSimulation;
 using System.Collections.Generic;
 
-namespace App.Shared.WeaponLogic.HitCheck
+namespace App.Shared.GameModules.Weapon.HitCheck
 {
     public class CommonHitMaskController : IHitMaskController
     {

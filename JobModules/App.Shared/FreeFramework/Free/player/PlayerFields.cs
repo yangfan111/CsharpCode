@@ -4,6 +4,7 @@ using App.Shared.Components.Player;
 using App.Server.GameModules.GamePlay.Free.weapon;
 using App.Shared.GameModules.Player;
 using App.Shared;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
@@ -55,11 +56,11 @@ namespace App.Server.GameModules.GamePlay.Free.player
             }
             else if ("currentWeaponKey" == field)
             {
-                return new IntPara(field, FreeWeaponUtil.GetWeaponKey(player.GetBagLogicImp().GetCurrentWeaponSlot()));
+                return new IntPara(field, FreeWeaponUtil.GetWeaponKey(player.GetController<PlayerWeaponController>().CurrSlotType));
             }
             else if ("currentWeaponId" == field)
             {
-                return new IntPara(field, player.GetBagLogicImp().GetCurrentWeaponInfo().Id);
+                return new IntPara(field, player.GetController<PlayerWeaponController>().CurrSlotWeaponId);
             }
             else if ("inCar" == field)
             {

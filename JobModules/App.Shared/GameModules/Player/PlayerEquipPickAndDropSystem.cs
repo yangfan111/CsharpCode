@@ -1,7 +1,7 @@
 ﻿using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using Core.Bag;
+using Core;
 
 namespace App.Shared.GameModules.Player
 {

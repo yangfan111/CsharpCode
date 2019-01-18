@@ -169,6 +169,9 @@ namespace Core.CharacterState.Posture
                 case MovementStateId.Sprint:
                     ret = MovementInConfig.Sprint;
                     break;
+                case MovementStateId.DiveMove:
+                    ret = MovementInConfig.DiveMove;
+                    break;
                 // 以下暂时没有用到
                 //case MovementStateId.Swim:
                 //    ret = MovementInConfig.Swim;

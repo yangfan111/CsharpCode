@@ -12,8 +12,11 @@ using App.Shared.Player;
 using Core.CharacterState;
 using XmlConfig;
 using App.Shared.GameModules.Vehicle;
+using Utils.Compare;
 using Utils.Utils;
 using Utils.Singleton;
+using App.Shared.Util;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Player
 {
@@ -32,6 +35,10 @@ namespace App.Shared.GameModules.Player
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
+            if (cmd.PredicatedOnce)
+            {
+                return;
+            }
             PlayerEntity player = (PlayerEntity)owner.OwnerEntity;
             if (player.IsOnVehicle() || player.gamePlay.IsLifeState(EPlayerLifeState.Dead))
             {
@@ -49,30 +56,34 @@ namespace App.Shared.GameModules.Player
 
             if (SingletonManager.Get<MapConfigManager>().InWater(player.position.Value))
             {
-                var inWaterDepth = SingletonManager.Get<MapConfigManager>().WaterSurfaceHeight(player.position.Value) - player.position.Value.y;
+                var waterSurfaceHeight = SingletonManager.Get<MapConfigManager>().WaterSurfaceHeight(player.position.Value);
+                var inWaterDepth = waterSurfaceHeight - player.position.Value.y;
+                //_logger.InfoFormat("inWaterDepth:{0}", inWaterDepth);
+                float dist = 0f;
                 switch (postureInConfig)
                 {
                     case PostureInConfig.Swim:
                     {
-                        if (inWaterDepth < (AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset - HeightStandSwimOffset))
+                        if (nextPostureInConfig != PostureInConfig.Stand && (inWaterDepth < (AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset - HeightStandSwimOffset) || GroundTest(player, out dist)))
                         {
                             Ashore(player, AshoreDepth);
-                            //_logger.InfoFormat("in water, swim to stand, inWaterDepth:{0}, thread:{1}, prevPos:{2}, " +
-                             //                  "seq:{3}", inWaterDepth, AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset, prevPos.ToStringExt(), cmd.Seq);
+                            //_logger.InfoFormat("in water, swim to stand, inWaterDepth:{0}, thread:{1}", inWaterDepth, AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset);
                         }
                         break;
                     }
                     case PostureInConfig.Dive:
                     {
-                        if (inWaterDepth < (AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset) && GroundTest(player))
-                        {
-                            Ashore(player, AshoreDepth);
-                            //_logger.InfoFormat("in Dive, Dive to stand, inWaterDepth:{0}, thread:{1}, prevPos:{2}, seq:{3}", inWaterDepth, AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset, prevPos.ToStringExt(), cmd.Seq);
-                        }
-                        else if (inWaterDepth < (AnimatorParametersHash.FirstPersonStandCameraHeight  + HeightOffset) && nextPostureInConfig != PostureInConfig.Swim)
+                        var groundTest = GroundTest(player, out dist);
+                        if (inWaterDepth < (AnimatorParametersHash.FirstPersonStandCameraHeight  + HeightOffset) && !groundTest && nextPostureInConfig != PostureInConfig.Stand && nextPostureInConfig != PostureInConfig.Swim)
                         {
                             Swim(player);
-                            //_logger.InfoFormat("Dive to swim, inWaterDepth:{0}, thread:{1}, new In water depth:{2}, seq:{3}", inWaterDepth, AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset, SingletonManager.Get<MapConfigManager>().WaterSurfaceHeight(player.position.Value) - player.position.Value.y, cmd.Seq);
+                            //_logger.InfoFormat("Dive to swim, inWaterDepth:{0}, thread:{1}, new In water depth:{2}", inWaterDepth, AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset, SingletonManager.Get<MapConfigManager>().WaterSurfaceHeight(player.position.Value) - player.position.Value.y);
+                        }
+                        else if ((inWaterDepth < (AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset) || groundTest) && nextPostureInConfig != PostureInConfig.Stand)
+                        {
+                            //Ashore(player, CompareUtility.IsApproximatelyEqual(0f, dist) ? 0 : waterSurfaceHeight - dist);
+                            Ashore(player, groundTest ? inWaterDepth - dist:AshoreDepth);
+                            //_logger.InfoFormat("in Dive, Dive to stand, inWaterDepth:{0}, thread:{1}", inWaterDepth, AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset);
                         }
                         break;
                     }
@@ -90,8 +101,8 @@ namespace App.Shared.GameModules.Player
                         if (inWaterDepth > (AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset - HeightStandSwimOffset) && nextPostureInConfig != PostureInConfig.Swim)
                         {
                             Swim(player);
-                            //_logger.InfoFormat("stand to swim, inWaterDepth:{0}, thread:{1}, new In water depth:{2}, prevPos:{3}, seq:{4}", inWaterDepth, AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset, SingletonManager.Get<MapConfigManager>().WaterSurfaceHeight(player.position.Value) - player.position.Value.y, prevPos.ToStringExt(), cmd.Seq);
-                            }
+                            //_logger.InfoFormat("stand to swim, inWaterDepth:{0}, thread:{1}, new In water depth:{2}", inWaterDepth, AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset, SingletonManager.Get<MapConfigManager>().WaterSurfaceHeight(player.position.Value) - player.position.Value.y);
+                        }
                         break;
                     }
                     case PostureInConfig.Crouch:
@@ -118,7 +129,7 @@ namespace App.Shared.GameModules.Player
                 if (postureInConfig == PostureInConfig.Swim || postureInConfig == PostureInConfig.Dive)
                 {
                     Ashore(player, SwimPositionUnderWater);
-                    //_logger.InfoFormat("out of  water, swim to stand, postureInConfig:{0}, seq:{1}", postureInConfig, cmd.Seq);
+                    //_logger.InfoFormat("out of  water, swim to stand, postureInConfig:{0}", postureInConfig);
 
                 }
             }
@@ -126,11 +137,12 @@ namespace App.Shared.GameModules.Player
             return true;
         }
 
-        private static readonly float DisOffset = 0.1f;
+        private static readonly float DisOffset = 0.0F;
         
-        private bool GroundTest(PlayerEntity playerEntity)
+        private bool GroundTest(PlayerEntity playerEntity, out float dist)
         {
             bool ret = false;
+            dist = 0f;
             var controller = playerEntity.characterContoller.Value;
             var radius = controller.radius;
             var gameObject = playerEntity.RootGo();
@@ -144,6 +156,7 @@ namespace App.Shared.GameModules.Player
             if (Physics.SphereCast(startPoint, radius, Vector3.down, out outHit, AnimatorParametersHash.FirstPersonStandCameraHeight - radius + DisOffset, UnityLayers.AllCollidableLayerMask))
             {
                 ret = true;
+                dist = outHit.distance + radius;
             }
             IntersectionDetectTool.SetColliderLayer(gameObject, prevLayer);
             //_logger.InfoFormat("GroundTest : {0}", ret);
@@ -157,8 +170,11 @@ namespace App.Shared.GameModules.Player
                                                     SingletonManager.Get<MapConfigManager>().WaterSurfaceHeight(player.position.Value) - (AnimatorParametersHash.FirstPersonStandCameraHeight + HeightOffset),
                                                  player.position.Value.z);
             player.position.Value = syncTransform.position;
-            player.playerAction.Logic.ForceUnmountWeapon();
+          
+            PlayerMoveSystem.SyncUpdateComponentPos(player, syncTransform.position);
+            player.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon();
             player.stateInterface.State.Swim();
+            //_logger.InfoFormat("swim ashore pos:{0}",player.position.Value.ToStringExt());
         }
 
         private void Ashore(PlayerEntity player, float inWaterDepth)
@@ -167,14 +183,14 @@ namespace App.Shared.GameModules.Player
             syncTransform.position = new Vector3(player.position.Value.x,
                                                  player.position.Value.y + inWaterDepth - SwimPositionUnderWater,
                                                  player.position.Value.z);
-            player.position.Value = syncTransform.position;
+            PlayerMoveSystem.SyncUpdateComponentPos(player, syncTransform.position);
             //_logger.InfoFormat("after ashore pos:{0}",player.position.Value.ToStringExt());
             player.stateInterface.State.Ashore();
         }
 
         private void Dive(PlayerEntity player)
         {
-            player.playerAction.Logic.ForceUnmountWeapon();
+            player.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon();
             player.stateInterface.State.Dive();
         }
     }

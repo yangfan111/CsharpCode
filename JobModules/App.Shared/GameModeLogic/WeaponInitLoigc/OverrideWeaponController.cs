@@ -22,7 +22,7 @@ namespace App.Shared.GameModeLogic.WeaponInitLoigc
                 foreach(var weapon in _playerWeaponBagData.weaponList)
                 {
                     var slot = PlayerWeaponBagData.Index2Slot(weapon.Index);
-                    if(slot == Core.Bag.EWeaponSlotType.TacticWeapon)
+                    if(slot == Core.EWeaponSlotType.TacticWeapon)
                     {
                         weapon.WeaponTplId = playerEntity.overrideBag.TacticWeapon;
                         replace = true;
@@ -32,7 +32,7 @@ namespace App.Shared.GameModeLogic.WeaponInitLoigc
                 {
                     _playerWeaponBagData.weaponList.Add(new PlayerWeaponData
                     {
-                        Index = PlayerWeaponBagData.Slot2Index(Core.Bag.EWeaponSlotType.TacticWeapon),
+                        Index = PlayerWeaponBagData.Slot2Index(Core.EWeaponSlotType.TacticWeapon),
                         WeaponTplId = playerEntity.overrideBag.TacticWeapon,
                     });
                 }

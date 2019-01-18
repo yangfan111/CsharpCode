@@ -1,5 +1,5 @@
 ﻿using Assets.XmlConfig;
-using Core.Bag;
+using Core;
 using Core.Utils;
 
 namespace App.Shared.GameModeLogic.BagSlotLogic

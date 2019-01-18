@@ -1,5 +1,5 @@
 ﻿using Assets.XmlConfig;
-using Core.Bag;
+using Core;
 using Entitas;
 using WeaponConfigNs;
 
@@ -35,41 +35,41 @@ namespace Core.GameModeLogic
         int GetReservedBullet(Entity playerEntity, EBulletCaliber caliber);
     }
 
-    public interface IWeaponSlotController
+    public interface IWeaponSlotsLibrary
     {
         EWeaponSlotType GetWeaponSlotByIndex(int index);
         bool IsSlotValid(EWeaponSlotType slot);
-        EWeaponSlotType[] AvaliableSlots { get; } 
-        void InitPlayerWeaponBySlotInfo(Entity playerEntity);
+        EWeaponSlotType[] AvaliableSlots { get; }
+        void AllocateWeaponComponents(Entity playerEntity);
     }
-    
-    public interface IWeaponActionListener
+
+    public interface IWeaponProcessListener
     {
         void OnPickup(Entity playerEntity, EWeaponSlotType slot);
-        void OnCost(Entity playerEntity, EWeaponSlotType slot);
+        void OnExpend(Entity playerEntity, EWeaponSlotType slot);
         void OnDrop(Entity playerEntity, EWeaponSlotType slot);
     }
     
-     public interface IWeaponModeLogic : IWeaponInitLogic, IWeaponSlotController, IBagSlotLogic, IPickupLogic,
-        IReservedBulletLogic, IWeaponActionListener
+     public interface IWeaponModeLogic : IWeaponInitLogic, IBagSlotLogic, IPickupLogic,
+        IReservedBulletLogic, IWeaponProcessListener,IWeaponSlotsLibrary
     {
     }
 
     public class ModeLogic : IWeaponModeLogic
     {
         private IWeaponInitLogic _weaponInitLogic;
-        private IWeaponSlotController _weaponSlotController;
+        private IWeaponSlotsLibrary _slotLibrary;
         private IBagSlotLogic _bagSlotLogic;
         private IPickupLogic _pickupLogic;
         private IReservedBulletLogic _reservedBulletLogic;
-        private IWeaponActionListener _weaponActionListener;
+        private IWeaponProcessListener _weaponActionListener;
 
-        public ModeLogic(IWeaponInitLogic weaponInitLogic, IWeaponSlotController weaponSlotController,
+        public ModeLogic(IWeaponInitLogic weaponInitLogic, IWeaponSlotsLibrary slotLibary,
             IBagSlotLogic bagSlotLogic, IPickupLogic pickupLogic, IReservedBulletLogic reservedBulletLogic,
-            IWeaponActionListener weaponActionListener)
+            IWeaponProcessListener weaponActionListener)
         {
             _weaponInitLogic = weaponInitLogic;
-            _weaponSlotController = weaponSlotController;
+            _slotLibrary = slotLibary;
             _bagSlotLogic = bagSlotLogic;
             _pickupLogic = pickupLogic;
             _reservedBulletLogic = reservedBulletLogic;
@@ -104,22 +104,22 @@ namespace Core.GameModeLogic
 
         public EWeaponSlotType GetWeaponSlotByIndex(int index)
         {
-            return _weaponSlotController.GetWeaponSlotByIndex(index);
+            return _slotLibrary.GetWeaponSlotByIndex(index);
         }
 
         public bool IsSlotValid(EWeaponSlotType slot)
         {
-            return _weaponSlotController.IsSlotValid(slot);
+            return _slotLibrary.IsSlotValid(slot);
         }
 
         public EWeaponSlotType[] AvaliableSlots
         {
-            get { return _weaponSlotController.AvaliableSlots; }
+            get { return _slotLibrary.AvaliableSlots; }
         }
-
-        public void InitPlayerWeaponBySlotInfo(Entity playerEntity)
+        
+        public  void AllocateWeaponComponents(Entity playerEntity)
         {
-            _weaponSlotController.InitPlayerWeaponBySlotInfo(playerEntity);
+            _slotLibrary.AllocateWeaponComponents(playerEntity);
         }
 
         #endregion
@@ -193,9 +193,9 @@ namespace Core.GameModeLogic
             _weaponActionListener.OnPickup(playerEntity, slot);
         }
 
-        public void OnCost(Entity playerEntity, EWeaponSlotType slot)
+        public void OnExpend(Entity playerEntity, EWeaponSlotType slot)
         {
-            _weaponActionListener.OnCost(playerEntity, slot);
+            _weaponActionListener.OnExpend(playerEntity, slot);
         }
 
         public void OnDrop(Entity playerEntity, EWeaponSlotType slot)

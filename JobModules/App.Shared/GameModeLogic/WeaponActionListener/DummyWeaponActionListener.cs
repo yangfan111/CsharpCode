@@ -1,12 +1,12 @@
-﻿using Core.Bag;
+﻿using Core;
 using Core.GameModeLogic;
 using Entitas;
 
 namespace App.Shared.GameModeLogic.WeaponActionListener
 {
-    public class DummyWeaponActionListener : IWeaponActionListener
+    public class DummyWeaponActionListener : IWeaponProcessListener
     {
-        public void OnCost(Entity playerEntity, EWeaponSlotType slot)
+        public void OnExpend(Entity playerEntity, EWeaponSlotType slot)
         {
             //DO NOTHING
         }

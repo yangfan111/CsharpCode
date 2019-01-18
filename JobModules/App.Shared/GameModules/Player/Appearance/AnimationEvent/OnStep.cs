@@ -48,45 +48,45 @@ namespace App.Shared.GameModules.Player.Appearance.AnimationEvent
             var curPosture = player.stateInterface.State.GetCurrentPostureState();
             var id = UniversalConsts.InvalidIntId;
             var inWater = SingletonManager.Get<MapConfigManager>().InWater(player.position.Value);
-            switch (curPosture)
-            {
-                case PostureInConfig.Crouch:
-                    if(inWater)
-                    {
-                        player.soundManager.Value.PlayOnce(EPlayerSoundType.SquatSwamp);
-                    }
-                    else
-                    {
-                        player.soundManager.Value.PlayOnce(EPlayerSoundType.Squat);
-                    }
-                    break;
-                case PostureInConfig.Prone:
-                    if(inWater)
-                    {
-                        player.soundManager.Value.PlayOnce(EPlayerSoundType.CrawlSwamp);
-                    }
-                    else
-                    {
-                        player.soundManager.Value.PlayOnce(EPlayerSoundType.Crawl);
-                    }
-                    break;
-                case PostureInConfig.Stand:
-                    if(inWater)
-                    {
-                        player.soundManager.Value.PlayOnce(EPlayerSoundType.WalkSwamp);
-                    }
-                    else
-                    {
-                        player.soundManager.Value.PlayOnce(EPlayerSoundType.Walk);
-                    }
-                    break;
-                case PostureInConfig.Swim:
-                    player.soundManager.Value.PlayOnce(EPlayerSoundType.Swim);
-                    break;
-                case PostureInConfig.Dive:
-                    player.soundManager.Value.PlayOnce(EPlayerSoundType.Dive);
-                    break;
-            }
+            //switch (curPosture)
+            //{
+            //    case PostureInConfig.Crouch:
+            //        if(inWater)
+            //        {
+            //            player.soundManager.Value.PlayOnce(EPlayerSoundType.SquatSwamp);
+            //        }
+            //        else
+            //        {
+            //            player.soundManager.Value.PlayOnce(EPlayerSoundType.Squat);
+            //        }
+            //        break;
+            //    case PostureInConfig.Prone:
+            //        if(inWater)
+            //        {
+            //            player.soundManager.Value.PlayOnce(EPlayerSoundType.CrawlSwamp);
+            //        }
+            //        else
+            //        {
+            //            player.soundManager.Value.PlayOnce(EPlayerSoundType.Crawl);
+            //        }
+            //        break;
+            //    case PostureInConfig.Stand:
+            //        if(inWater)
+            //        {
+            //            player.soundManager.Value.PlayOnce(EPlayerSoundType.WalkSwamp);
+            //        }
+            //        else
+            //        {
+            //            player.soundManager.Value.PlayOnce(EPlayerSoundType.Walk);
+            //        }
+            //        break;
+            //    case PostureInConfig.Swim:
+            //        player.soundManager.Value.PlayOnce(EPlayerSoundType.Swim);
+            //        break;
+            //    case PostureInConfig.Dive:
+            //        player.soundManager.Value.PlayOnce(EPlayerSoundType.Dive);
+            //        break;
+            //}
         }
     }
 }

@@ -145,8 +145,7 @@ namespace RpcNetwork.RpcNetwork
             }
             catch (Exception e)
             {
-                Debug.Log(e);
-                return;
+                _logger.Error("Rpc Error", e);
             }
 
             //Handle(networkChannel, messagName, obj);

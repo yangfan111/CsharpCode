@@ -109,7 +109,7 @@ namespace Core.Compensation
                         {
                             try
                             {
-                                _enableHitBox.BeginProfile();
+                                _enableHitBox.BeginProfileOnlyEnableProfile();
                                 _hitboxHandler.EnableHitBox(entity, true);
                                 _hitboxHandler.UpdateHitBox(entity);
                                 _hitboxHandler.DrawHitBoxOnBullet(entity);
@@ -117,7 +117,7 @@ namespace Core.Compensation
                             }
                             finally
                             {
-                                _enableHitBox.EndProfile();
+                                _enableHitBox.EndProfileOnlyEnableProfile();
                             }
                            
                         }
@@ -165,7 +165,7 @@ namespace Core.Compensation
                         {
                             try
                             {
-                                _enableHitBox.BeginProfile();
+                                _enableHitBox.BeginProfileOnlyEnableProfile();
                                 _hitboxHandler.EnableHitBox(entity, true);
                                 _hitboxHandler.UpdateHitBox(entity);
                                 _hitboxHandler.DrawHitBoxOnBullet(entity);
@@ -173,7 +173,7 @@ namespace Core.Compensation
                             }
                             finally
                             {
-                                _enableHitBox.EndProfile();
+                                _enableHitBox.EndProfileOnlyEnableProfile();
                             }
                         }
                     }

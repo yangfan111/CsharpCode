@@ -1,18 +1,13 @@
 ﻿using com.wd.free.action;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using com.wd.free.@event;
 using com.wd.free.unit;
 using App.Server.GameModules.GamePlay.free.player;
-using Core.Bag;
+using Core;
 using com.wd.free.util;
 using UnityEngine;
-using Utils.Appearance;
-using Free.framework;
-using Core.Free;
 using App.Shared;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Server.GameModules.GamePlay.Free.weapon
 {
@@ -33,7 +28,7 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
 
                 int index = FreeUtil.ReplaceInt(weaponKey, args);
 
-                EWeaponSlotType currentSlot = p.GetBagLogicImp().GetCurrentWeaponSlot();
+                EWeaponSlotType currentSlot = p.GetController<PlayerWeaponController>().CurrSlotType;
 
                 if (index > 0)
                 {
@@ -42,7 +37,7 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
 
                 Debug.LogFormat("remove weapon: " + index);
 
-                p.playerAction.Logic.DropWeapon(currentSlot);
+                p.GetController<PlayerWeaponController>().DropSlotWeapon(currentSlot);
 
                 //SimpleProto message = new SimpleProto();
                 //message.Key = FreeMessageConstant.ChangeAvatar;

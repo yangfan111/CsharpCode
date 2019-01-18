@@ -6,12 +6,15 @@ using System.Text;
 using com.wd.free.@event;
 using com.wd.free.para;
 using Core.Room;
+using Core.Utils;
 
 namespace App.Shared.FreeFramework.Free.Action
 {
     [Serializable]
     public class PreloadResourceAction : AbstractGameAction
     {
+        private static LoggerAdapter _logger = new LoggerAdapter(typeof(PreloadResourceAction));
+
         public string ui;
         public string weapon;
         public string car;
@@ -49,6 +52,8 @@ namespace App.Shared.FreeFramework.Free.Action
             }
 
             info.PreLoadUI = string.Join(",", set.ToArray());
+
+            _logger.Info("已预加载资源：" + ui);
         }
     }
 }

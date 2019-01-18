@@ -27,6 +27,18 @@ namespace App.Shared.FreeFramework.UnitTest
             dic = new Dictionary<string, object>();
         }
 
+        public static string ToRecords(TestValue[] tvs)
+        {
+            List<string> list = new List<string>();
+
+            foreach (TestValue tv in tvs)
+            {
+                list.Add(tv.ToRecord());
+            }
+
+            return string.Join(StringUtil.SPLITER_RECORD, list.ToArray());
+        }
+
         public string ToRecord()
         {
             List<string> list = new List<string>();
@@ -35,13 +47,37 @@ namespace App.Shared.FreeFramework.UnitTest
                 list.Add(key + ":" + GetType(dic[key]) + ":" + dic[key]);
             }
 
-            return string.Join(StringUtil.SPLITER_RECORD, list.ToArray());
+            return string.Join(StringUtil.SPLITER_FIELD, list.ToArray());
         }
 
-        public static TestValue FromRecord(string v)
+        public static TestValue[] RecordsFromString(string v)
+        {
+            List<TestValue> list = new List<TestValue>();
+            string[] tvs = StringUtil.Split(v, StringUtil.SPLITER_RECORD);
+
+            foreach (string t in tvs)
+            {
+                string[] rs = StringUtil.Split(t, StringUtil.SPLITER_FIELD);
+                TestValue tv = new TestValue();
+                foreach (string r in rs)
+                {
+                    string[] fs = r.Split(':');
+                    if (fs.Length == 3)
+                    {
+                        tv.AddField(fs[0], tv.GetValue(int.Parse(fs[1]), fs[2]));
+                    }
+                }
+
+                list.Add(tv);
+            }
+
+            return list.ToArray();
+        }
+
+        public static TestValue RecordFromString(string v)
         {
             TestValue tv = new TestValue();
-            string[] rs = StringUtil.Split(v, StringUtil.SPLITER_RECORD);
+            string[] rs = StringUtil.Split(v, StringUtil.SPLITER_FIELD);
 
             foreach (string r in rs)
             {
@@ -200,7 +236,7 @@ namespace App.Shared.FreeFramework.UnitTest
                     return false;
                 }
 
-                if (dic[key] != other.dic[key])
+                if (dic[key].ToString() != other.dic[key].ToString())
                 {
                     return false;
                 }

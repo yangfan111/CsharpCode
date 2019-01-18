@@ -1,6 +1,7 @@
 ﻿using System;
 using Core.EntitasAdpater;
 using Core.EntityComponent;
+using Core.ObjectPool;
 using Core.SpatialPartition;
 using Entitas;
 
@@ -21,6 +22,22 @@ namespace App.Shared.GameContexts
         public override short EntityType
         {
             get { return (int)EEntityType.MapObject; }
+        }
+        public class ObjcetFactory : CustomAbstractObjectFactory
+        {
+            public ObjcetFactory() : base(typeof( EntitasGameEntity<MapObjectEntity>))
+            {
+            }
+
+            public override object MakeObject()
+            {
+                return new  EntitasGameEntity<MapObjectEntity>();
+            }
+
+            public override int InitPoolSize
+            {
+                get { return 4096; }
+            }
         }
     }
 }

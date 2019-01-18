@@ -26,6 +26,7 @@ using Utils.AssetManager;
 using App.Shared.GameModules.Player.CharacterBone;
 using Utils.Configuration;
 using Utils.Singleton;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Player
 {
@@ -147,9 +148,9 @@ namespace App.Shared.GameModules.Player
 
                     var characterBone = new CharacterBoneManager();
                     characterBone.SetWardrobeController(player.appearanceInterface.Appearance.GetWardrobeController());
-                    characterBone.SetWeaponController(player.appearanceInterface.Appearance.GetWeaponController());
-                    player.appearanceInterface.Appearance.GetWeaponController().SetWeaponChangedCallBack(characterBone.CurrentWeaponChanged);
-                    player.appearanceInterface.Appearance.GetWeaponController().SetCacheChangeAction(characterBone.CacheChangeCacheAction);
+                    characterBone.SetWeaponController(player.appearanceInterface.Appearance.GetController<PlayerWeaponController>());
+                    player.appearanceInterface.Appearance.GetController<PlayerWeaponController>().SetWeaponChangedCallBack(characterBone.CurrentWeaponChanged);
+                    player.appearanceInterface.Appearance.GetController<PlayerWeaponController>().SetCacheChangeAction(characterBone.CacheChangeCacheAction);
                     player.AddCharacterBoneInterface(characterBone);
 
                     player.AddRecycleableAsset(character);

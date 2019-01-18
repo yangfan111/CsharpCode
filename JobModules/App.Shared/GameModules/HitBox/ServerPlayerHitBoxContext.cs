@@ -8,6 +8,7 @@ using Core.HitBox;
 using Core.Utils;
 using System.Text;
 using UnityEngine;
+using Utils.Singleton;
 
 namespace App.Shared.GameModules.Bullet
 {
@@ -54,7 +55,8 @@ namespace App.Shared.GameModules.Bullet
                         gameEntity.GetComponent<PredictedAppearanceComponent>(),
                         gameEntity.GetComponent<Orientation>());
 
-                var provider = new HitBoxTransformProvider(playerEntity.thirdPersonModel.Value, position, rotation);
+                var provider = SingletonManager.Get<HitBoxTransformProviderCache>().GetProvider(playerEntity.thirdPersonModel.Value);
+                provider.Update(position, rotation);
                 HitBoxGameObjectUpdater.Update(hitBoxComponent.HitBoxGameObject.transform, provider);
                 
                 PlayerEntityUtility.UpdateTransform(playerEntity,

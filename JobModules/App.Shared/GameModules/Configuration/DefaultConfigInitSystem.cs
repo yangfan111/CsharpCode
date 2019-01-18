@@ -3,6 +3,7 @@ using Core.GameModule.Interface;
 using Core.SessionState;
 using Core.Utils;
 using System.Threading;
+using Entitas;
 using UnityEngine;
 using Utils.AssetManager;
 using Utils.Configuration;
@@ -15,9 +16,9 @@ namespace App.Shared.GameModules.Configuration
         void ParseConfig();
     }
 
-    public class DefaultConfigInitSystem<T> : IResourceLoadSystem, IConfigInit
+    public class DefaultConfigInitSystem<T> : IResourceLoadSystem, IConfigInit where T : AbstractConfigManager<T>,  new()
     {
-        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(DefaultConfigInitSystem<T>));
+        private static readonly LoggerAdapter Logger = new LoggerAdapter("App.Shared.GameModules.Configuration." + typeof(T).Namespace);
         private bool _isLoding;
         private ISessionState _sessionState;
         private AssetInfo _assetInfo;
@@ -26,33 +27,34 @@ namespace App.Shared.GameModules.Configuration
         private volatile bool _isExit = false;
         private string _cfg;
 
-        private SubResourceLoadSystem _subSystem;
-
         private string GetConditionId()
         {
             return string.Format("DefaultConfigInitSystem-{0}-{1}", typeof(T).Name, _assetInfo);
         }
 
-        public DefaultConfigInitSystem(ISessionState sessionState, AssetInfo asset, IConfigParser parser, SubReousourcesHandler subResourceHandler)
+        public DefaultConfigInitSystem(ISessionState sessionState, AssetInfo asset, IConfigParser parser)
         {
             _sessionState = sessionState;
             _assetInfo = asset;
             _sessionState.CreateExitCondition(GetConditionId());
             _parser = parser;
 
-            _subSystem = new SubResourceLoadSystem(subResourceHandler);
             SingletonManager.Get<SubProgressBlackBoard>().Add();
         }
 
         public bool IsDone
         {
-            get { return _isDone && _subSystem.IsDone; }
+            get { return _isDone; }
             set { _isDone = value; }
         }
 
         public void OnLoadResources(ILoadRequestManager loadRequestManager)
         {
-            if (!_isLoding)
+            if (SingletonManager.Get<T>().IsInitialized)
+            {
+                IsDone = true;
+            }
+            else if (!_isLoding)
             {
                 _isLoding = true;
                 loadRequestManager.AppendLoadRequest(null, _assetInfo, OnLoadSucc);
@@ -86,14 +88,19 @@ namespace App.Shared.GameModules.Configuration
 
             ThreadPool.QueueUserWorkItem(ParseConfig, this);
 
-            _subSystem.OnLoadSucc(assetInfo, obj);
             SingletonManager.Get<SubProgressBlackBoard>().Step();
         }
 
         public void ParseConfig()
         {
             _parser.ParseConfig(_cfg);
+           
+            var config = SingletonManager.Get<T>();
+            config.IsInitialized = true;
+
+            _cfg = null;
             IsDone = true;
+           
             Logger.InfoFormat("ParseConfig {0}", GetConditionId());
         }
 

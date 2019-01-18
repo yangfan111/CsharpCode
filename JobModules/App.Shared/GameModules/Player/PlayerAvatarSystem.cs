@@ -1,5 +1,5 @@
 ﻿using App.Shared.Components.Player;
-using Core.Bag;
+using Core;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;

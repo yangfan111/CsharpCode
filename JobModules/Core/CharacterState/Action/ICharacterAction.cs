@@ -1,4 +1,4 @@
-﻿using Core.Bag;
+﻿using Core;
 using Core.Fsm;
 using System;
 using XmlConfig;

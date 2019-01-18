@@ -5,7 +5,8 @@ using System.Text;
 using com.wd.free.@event;
 using App.Server.GameModules.GamePlay.free.player;
 using App.Server.GameModules.GamePlay.Free.weapon;
-using Core.Bag;
+using Core;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.FreeFramework.UnitTest
 {
@@ -21,14 +22,14 @@ namespace App.Shared.FreeFramework.UnitTest
             FreeData fd = (FreeData)args.GetUnit(UnitTestConstant.Tester);
             if (fd != null)
             {
-                EWeaponSlotType currentSlot = fd.Player.GetBagLogicImp().GetCurrentWeaponSlot();
+                EWeaponSlotType currentSlot = fd.Player.GetController<PlayerWeaponController>().CurrSlotType;
 
                 if (args.GetInt(slot) > 0)
                 {
                     currentSlot = FreeWeaponUtil.GetSlotType(args.GetInt(slot));
                 }
 
-                WeaponInfo info = fd.Player.GetBagLogicImp().GetWeaponInfo(currentSlot);
+                WeaponInfo info = fd.Player.GetController<PlayerWeaponController>().GetSlotWeaponInfo(currentSlot);
                 tv.AddField("id", info.Id);
                 tv.AddField("clip", info.Bullet);
                 tv.AddField("carryClip", info.ReservedBullet);

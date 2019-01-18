@@ -15,7 +15,8 @@
         public static string RequestJoinRoom = "requestJoinRoom";
         public static string ResponseJoinRoom = "responseJoinRoom";
         public static string UpdateRoomGameState = "updateRoomGameState";
+        public static string MandateLogOut = "mandateLogout";
 
-        public static string BattleServerHeartBeat = "battleServerHeartBeat";
+        public static string ServerHeartBeat = "heartBeat";
     }
 }

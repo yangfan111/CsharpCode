@@ -228,6 +228,11 @@ namespace App.Shared.GameModules.Player.Appearance
             return _weaponController.GetWeaponIdInHand();
         }
 
+        public bool IsEmptyHand()
+        {
+            return _weaponController.IsEmptyHand();
+        }
+
         public void MountWeaponInPackage(WeaponInPackage pos, int id)
         {
             if ((int) pos < (int) WeaponInPackage.EndOfTheWorld)
@@ -476,7 +481,7 @@ namespace App.Shared.GameModules.Player.Appearance
             return _wardrobeController;
         }
 
-        public WeaponController GetWeaponController()
+        public WeaponController GetController<PlayerWeaponController>()
         {
             return _weaponController;
         }

@@ -24,7 +24,7 @@ namespace Assets.App.Shared.GameModules.Camera
         private float _far;
         private float _fov;
         private float _near;
-     
+
 
         public float Far
         {
@@ -35,12 +35,16 @@ namespace Assets.App.Shared.GameModules.Camera
                 _far = value;
             }
         }
-        public float Fov {  get { return _fov; }
+
+        public float Fov
+        {
+            get { return _fov; }
             set
             {
                 IsSetFov = true;
                 _fov = value;
-            } }
+            }
+        }
 
         public bool IsSetFov { get; set; }
         public bool IsSetFar { get; set; }
@@ -49,31 +53,30 @@ namespace Assets.App.Shared.GameModules.Camera
         public float Near
         {
             get { return _near; }
-            set {  IsSetNear = true;_near = value; }
+            set
+            {
+                IsSetNear = true;
+                _near = value;
+            }
         }
 
         public DummyCameraMotorOutput()
         {
-          Init();
+            Init();
         }
 
         public void Init()
         {
             _fov = 75;
-            ArchorPosition = Vector3.zero;
-            ArchorOffset = Vector3.zero;
-            ArchorPostOffset = Vector3.zero;
-            Offset = Vector3.zero;
-            PostOffset = Vector3.zero;
-            ArchorEulerAngle = Vector3.zero;
-            EulerAngle = Vector3.zero;
+            ArchorPosition = ArchorOffset =
+                ArchorPostOffset = Offset = PostOffset = ArchorEulerAngle = EulerAngle = Vector3.zero;
             _far = 8000;
             _near = 0.03f;
             IsSetFar = false;
             IsSetFov = false;
             IsSetNear = false;
-            
         }
+
         public DummyCameraMotorOutput Append(DummyCameraMotorOutput append)
         {
             ArchorOffset.x += append.ArchorOffset.x;

@@ -11,6 +11,7 @@ using UnityEngine;
 
 namespace Core.SessionState
 {
+
     public class SessionStateMachine:IDisposable
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(SessionStateMachine));
@@ -46,7 +47,15 @@ namespace Core.SessionState
 
         public void Update()
         {
-            GetUpdateSystems().Execute();
+            try
+            {
+                GetUpdateSystems().Execute();
+            }
+            catch (Exception e)
+            {
+                _logger.ErrorFormat("Update Error {0}", e);
+            }
+           
             ChangeState();
         }
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using App.Shared.Components;
 using Assets.XmlConfig;
-using Core.Bag;
+using Core;
 using Core.GameTime;
 using Entitas;
 using UnityEngine;

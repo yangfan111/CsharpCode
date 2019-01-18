@@ -13,15 +13,17 @@
 
         protected abstract IReservedBulletLogic GetReservedBulletLogic();
 
-        protected abstract IWeaponActionListener GetWeaponActionListener();
+        protected abstract IWeaponProcessListener GetWeaponActionListener();
 
         protected abstract IWeaponInitLogic GetWeaponIniLogic();
 
-        protected abstract IWeaponSlotController GetWeaponSlotController();
+       protected abstract IWeaponSlotsLibrary GetWeaponSlotLibary();
+
+        
 
         public IWeaponModeLogic CreateWeaponModeLogic()
         {
-            return new ModeLogic(GetWeaponIniLogic(),GetWeaponSlotController(),GetBagSlotLogic(),GetPickupLogic(),GetReservedBulletLogic(),GetWeaponActionListener());
+            return new ModeLogic(GetWeaponIniLogic(), GetWeaponSlotLibary(), GetBagSlotLogic(),GetPickupLogic(),GetReservedBulletLogic(),GetWeaponActionListener());
         }
     }
 }

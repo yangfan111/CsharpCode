@@ -1,4 +1,6 @@
-﻿using Core.GameModule.Interface;
+﻿using App.Shared.GameModules.Weapon;
+using App.Shared.Util;
+using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 
 namespace App.Shared.GameModules.Player
@@ -12,7 +14,7 @@ namespace App.Shared.GameModules.Player
                 return;
             }
             var playerEntity = owner.OwnerEntity as PlayerEntity;
-            playerEntity.playerAction.Logic.OnInterrupt();
+           playerEntity.GetController<PlayerWeaponController>().Interrupt();
         }
     }
 }

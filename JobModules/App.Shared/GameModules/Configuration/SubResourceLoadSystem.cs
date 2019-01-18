@@ -2,94 +2,54 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using App.Shared.SessionStates;
+using Core.SessionState;
 using Core.Utils;
 using Sharpen;
 using UnityEngine;
 using Utils.AssetManager;
+using Utils.Configuration;
+using Utils.Singleton;
 using Object = UnityEngine.Object;
 
 namespace App.Shared.GameModules.Configuration
 {
-    public delegate void OnSubResourcesHandled(List<Tuple<AssetInfo, UnityEngine.Object>> subResources);
+    public delegate void OnSubResourcesHandled();
 
-    public delegate void SubReousourcesHandler(List<Tuple<AssetInfo, UnityEngine.Object>> subResources, OnSubResourcesHandled handledCallback);
 
     public class SubResourceLoadSystem : ISubResourceLoadSystem
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(SubResourceLoadSystem));
 
-        private SubReousourcesHandler _resourceHandler;
-        private bool _isDone = false;
-        private ISubResourceLoadSystem _subSystem;
+        private AbstractSubResourceLoadHandler _resourceHandler;
+        private ISessionState _sessionState;
+        private ILoadRequestManager _loadRequestManager;
         
-        public SubResourceLoadSystem(SubReousourcesHandler resourceHandler)
+        public SubResourceLoadSystem(ISessionState sessionState, AbstractSubResourceLoadHandler resourceHandler)
         {
+            _sessionState = sessionState;
             _resourceHandler = resourceHandler;
-            _isDone = resourceHandler == null;
+
+           _sessionState.CreateExitCondition(ConditionString);
+
+            SingletonManager.Get<SubProgressBlackBoard>().Add();
         }
 
-
-        public bool IsDone
+        private string ConditionString
         {
-            get { return _isDone && (_subSystem == null || _subSystem.IsDone); }
+            get { return string.Format("SubResourceLoadSystem : {0}", _resourceHandler.GetType()); }
         }
 
-        public ISubResourceLoadSystem Chain(SubReousourcesHandler responseHandler)
+        public void OnLoadResources(ILoadRequestManager loadRequestManager)
         {
-            if (_subSystem != null)
-            {
-                throw new RuntimeException("The SubSystem Has Existed!");
-            }
-
-            _subSystem = new SubResourceLoadSystem(responseHandler);
-            return _subSystem;
+            _loadRequestManager = loadRequestManager;
+            _resourceHandler.LoadSubResources(_loadRequestManager, Done);
         }
 
-        public void OnLoadSucc(AssetInfo assetInfo, UnityEngine.Object obj)
+        private void Done()
         {
-            if (_resourceHandler != null)
-            {
-                var subResource =
-                    new List<Tuple<AssetInfo, UnityEngine.Object>>() {new Tuple<AssetInfo, Object>(assetInfo, obj)};
-                OnLoadSucc(subResource);
-            }
-        }
-
-        public void OnLoadSucc(List<Tuple<AssetInfo, UnityEngine.Object>> subResources)
-        {
-            if (_resourceHandler != null)
-            {
-                var resources = new List<Tuple<AssetInfo, UnityEngine.Object>>();
-
-                foreach (var resource in subResources)
-                {
-                    if (resource.Item2 == null)
-                    {
-                        _logger.WarnFormat("Loaded Object SubResource {0} is NULL", resource.Item1);
-                        continue;
-                    }
-
-                    _logger.InfoFormat("SubResource {0} Loaded", resource.Item1);
-                    resources.Add(resource);
-                }
-
-                if (resources.Count > 0)
-                    _resourceHandler(resources, Done);
-                else
-                    _isDone = true;
-            }
-            else
-            {
-                _isDone = true;
-            }
-
-        }
-
-        private void Done(List<Tuple<AssetInfo, UnityEngine.Object>> subResources)
-        {
-            _isDone = true;
-            if(_subSystem  != null)
-                _subSystem.OnLoadSucc(subResources);
+            _sessionState.FullfillExitCondition(ConditionString);
+            SingletonManager.Get<SubProgressBlackBoard>().Step();
         }
     }
 }

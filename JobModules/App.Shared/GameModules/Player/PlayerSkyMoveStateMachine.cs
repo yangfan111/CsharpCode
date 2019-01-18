@@ -79,7 +79,7 @@ namespace App.Shared.GameModules.Player
                                         "back-----------------------------------------------------------------");
                     PlayerSkyMoveUtility.AttachParachute(contexts, player, false);
                 });
-                player.soundManager.Value.PlayOnce(EPlayerSoundType.OpenParachute);
+               // player.soundManager.Value.PlayOnce(EPlayerSoundType.OpenParachute);
                 playerSkyMove.IsWaitForAttach = true;
             }
             else if (!playerSkyMove.IsParachuteLoading && playerSkyMove.Parachute == null)

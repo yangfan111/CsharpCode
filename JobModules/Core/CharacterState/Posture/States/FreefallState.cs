@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Core.Fsm;
+using UnityEngine;
 using Utils.CharacterState;
 using Utils.Configuration;
 using Utils.Singleton;
@@ -39,11 +40,6 @@ namespace Core.CharacterState.Posture.States
 
                     if (ret)
                     {
-                        FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.SwimLayer,
-                                                       AnimatorParametersHash.Instance.SwimEnableValue,
-                                                       CharacterView.ThirdPerson);
-                        addOutput(FsmOutput.Cache);
-
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.SwimStateHash,
                                                  AnimatorParametersHash.Instance.SwimStateName,
                                                  AnimatorParametersHash.Instance.SwimStateSwimValue,
@@ -55,7 +51,20 @@ namespace Core.CharacterState.Posture.States
 
                     return ret;
                 },
-                null, (int)PostureStateId.Swim, null, 0, new[] { FsmInput.Swim });
+                null, 
+                (int)PostureStateId.Swim, 
+                (normalizedTime, addOutput) =>
+                {
+                    FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.SwimLayer,
+                        Mathf.Lerp(AnimatorParametersHash.Instance.SwimDisableValue,
+                            AnimatorParametersHash.Instance.SwimEnableValue,
+                            Mathf.Clamp01(normalizedTime)),
+                        CharacterView.ThirdPerson);
+                    addOutput(FsmOutput.Cache);
+                    
+                },
+                SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Jump, PostureInConfig.Swim),
+                new[] { FsmInput.Swim });
 
             #endregion
 

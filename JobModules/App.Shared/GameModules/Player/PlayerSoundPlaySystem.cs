@@ -50,7 +50,7 @@ namespace App.Shared.GameModules.Player
                     || (curPosture == PostureInConfig.Dive &&
                         _lastPosture[player.entityKey.Value] != PostureInConfig.Swim))
                 {
-                    player.soundManager.Value.PlayOnce(EPlayerSoundType.DropWater);
+                  //  player.soundManager.Value.PlayOnce(EPlayerSoundType.DropWater);
                 }
 
                 _lastPosture[player.entityKey.Value] = curPosture;
@@ -67,37 +67,37 @@ namespace App.Shared.GameModules.Player
                 return;
             }
 
-            switch (curPosture)
-            {
-                case PostureInConfig.Prone:
-                    switch (nextPosture)
-                    {
-                        case PostureInConfig.ProneToStand:
-                        case PostureInConfig.ProneToCrouch:
-                            player.soundManager.Value.PlayOnce(EPlayerSoundType.GetUp);
-                            _inTransition[player.entityKey.Value] = true;
-                            break;
-                    }
+            //switch (curPosture)
+            //{
+            //    case PostureInConfig.Prone:
+            //        switch (nextPosture)
+            //        {
+            //            case PostureInConfig.ProneToStand:
+            //            case PostureInConfig.ProneToCrouch:
+            //                player.soundManager.Value.PlayOnce(EPlayerSoundType.GetUp);
+            //                _inTransition[player.entityKey.Value] = true;
+            //                break;
+            //        }
 
-                    break;
-                case PostureInConfig.Stand:
-                case PostureInConfig.Crouch:
-                    if (nextPosture == PostureInConfig.ProneTransit)
-                    {
-                        player.soundManager.Value.PlayOnce(EPlayerSoundType.GetDown);
-                        _inTransition[player.entityKey.Value] = true;
-                    }
+            //        break;
+            //    case PostureInConfig.Stand:
+            //    case PostureInConfig.Crouch:
+            //        if (nextPosture == PostureInConfig.ProneTransit)
+            //        {
+            //            player.soundManager.Value.PlayOnce(EPlayerSoundType.GetDown);
+            //            _inTransition[player.entityKey.Value] = true;
+            //        }
 
-                    break;
-                case PostureInConfig.Land:
-                    if (nextPosture == PostureInConfig.Stand)
-                    {
-                        player.soundManager.Value.PlayOnce(EPlayerSoundType.Land);
-                        _inTransition[player.entityKey.Value] = true;
-                    }
+            //        break;
+            //    case PostureInConfig.Land:
+            //        if (nextPosture == PostureInConfig.Stand)
+            //        {
+            //            player.soundManager.Value.PlayOnce(EPlayerSoundType.Land);
+            //            _inTransition[player.entityKey.Value] = true;
+            //        }
 
-                    break;
-            }
+            //        break;
+            //}
         }
     }
 }

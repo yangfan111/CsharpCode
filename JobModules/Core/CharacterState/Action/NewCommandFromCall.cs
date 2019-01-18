@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Utils.CharacterState;
 using System.Linq;
 using System.Text;
-using Core.Bag;
+using Core;
 using Core.CharacterState.Action.States;
 using Core.Utils;
 using UnityEngine;

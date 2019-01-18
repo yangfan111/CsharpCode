@@ -10,7 +10,7 @@ using Core.WeaponLogic.Attachment;
 using Utils.Singleton;
 using WeaponConfigNs;
 
-namespace App.Shared.WeaponLogic.Tactic
+namespace App.Shared.GameModules.Weapon.Tactic
 {
     public class TacticWeaponLogic : IWeaponLogic
     {

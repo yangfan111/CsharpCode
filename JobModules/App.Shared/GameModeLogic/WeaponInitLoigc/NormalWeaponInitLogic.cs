@@ -1,7 +1,7 @@
-﻿using App.Shared.WeaponLogic;
+﻿using App.Shared.GameModules.Weapon;
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
-using Core.Bag;
+using Core;
 using Core.GameModeLogic;
 using Core.Room;
 using Core.Utils;
@@ -129,7 +129,8 @@ namespace App.Shared.GameModeLogic.WeaponInitLoigc
             {
                 _removeSlotList.AddLast(slot);
             }
-            playerEntity.grenadeInventoryHolder.Inventory.Recycle();
+            var helper = playerEntity.GetController<PlayerWeaponController>().GetBagCacheHelper(EWeaponSlotType.GrenadeWeapon);
+            helper.ClearCache();
             var firstSlot = EWeaponSlotType.Length;
             bool grenadeMounted = false;
             if(null != bagData)
@@ -153,28 +154,28 @@ namespace App.Shared.GameModeLogic.WeaponInitLoigc
                     {
                         if (!grenadeMounted)
                         {
-                            playerEntity.playerAction.Logic.ReplaceWeaponToSlot(slot, weaponInfo);
+                            playerEntity.GetController<PlayerWeaponController>().ReplaceWeaponToSlot(slot, weaponInfo);
                             grenadeMounted = true;
                         }
                         else
                         {
-                            playerEntity.grenadeInventoryHolder.Inventory.AddCache(weaponInfo.Id);
+                            helper.AddCache(weaponInfo.Id);
                         }
                     }
                     else
                     {
-                        playerEntity.playerAction.Logic.ReplaceWeaponToSlot(slot, weaponInfo);
+                        playerEntity.GetController<PlayerWeaponController>().ReplaceWeaponToSlot(slot, weaponInfo);
                     }
                 }
                 playerEntity.weaponState.BagIndex = bagData.BagIndex;
             }
             if(firstSlot < EWeaponSlotType.Length)
             {
-                playerEntity.playerAction.Logic.TryMountWeapon(firstSlot);
+                playerEntity.GetController<PlayerWeaponController>().TryMountSlotWeapon(firstSlot);
             }
             foreach(var slot in _removeSlotList)
             {
-                playerEntity.playerAction.Logic.RemoveWeapon(slot);
+                playerEntity.GetController<PlayerWeaponController>().RemoveSlotWeapon(slot);
             }
         }
 

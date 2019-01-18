@@ -2,7 +2,7 @@
 using Core.WeaponLogic;
 using UnityEngine;
 
-namespace App.Shared.WeaponLogic.Bullet
+namespace App.Shared.GameModules.Weapon.Bullet
 {
     public class SightBulletFireInfoProvider : DefaultBulletFireInfoProvider
     {

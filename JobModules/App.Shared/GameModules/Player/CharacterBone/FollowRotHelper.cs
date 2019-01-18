@@ -1,4 +1,4 @@
-﻿using Core.Bag;
+﻿using Core;
 using Core.CameraControl.NewMotor;
 using System;
 using System.Collections.Generic;
@@ -125,7 +125,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
         public static float PitchHeadAngle()
         {
-            return CanPitchHead() ? Player.cameraFinalOutputNew.EulerAngle.x : 0.0f;
+            return CanPitchHead() ? Player.orientation.Pitch : 0.0f;
         }
 
         public static float YawHeadAngle()
@@ -136,12 +136,8 @@ namespace App.Shared.GameModules.Player.CharacterBone
         public static float PitchHandAngle()
         {
             if (!CanPitchHand()) return 0;
-
-            bool fixAngle = Player.cameraStateNew.FreeNowMode == (int)ECameraFreeMode.On;
-
-            var handPitch = fixAngle
-                ? Player.cameraStateNew.CameraMotorInput.ArchorPitch
-                : Player.cameraFinalOutputNew.EulerAngle.x;
+            var handPitch = Player.orientation.Pitch;
+            
 
             float pitchAngle = (handPitch > HandRotMax) ? HandRotMax : handPitch;
             pitchAngle = (pitchAngle < HandRotMin) ? HandRotMin : pitchAngle;

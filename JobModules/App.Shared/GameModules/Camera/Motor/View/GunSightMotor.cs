@@ -55,7 +55,7 @@ namespace Core.CameraControl.NewMotor.View
             if (state.IsFree()) return false;
             if (!state.GetMainConfig().CanSwitchView) return false;
 
-            if (state.ViewMode == (ECameraViewMode.GunSight) &&
+            if (state.ViewMode == ECameraViewMode.GunSight &&
                 (input.FilteredCameraFocus || input.ForceChangeGunSight || input.ForceInterruptGunSight))
             {
                 if(input.ForceInterruptGunSight)
@@ -69,13 +69,13 @@ namespace Core.CameraControl.NewMotor.View
             }
 
             //if (state.ViewMode.Equals(ECameraViewMode.ThirdPerson) &&  input.IsCameraFocus)
-            if (state.ViewMode.Equals(ECameraViewMode.ThirdPerson) && !input.ForceInterruptGunSight &&  (input.FilteredCameraFocus || input.ForceChangeGunSight))
+            if (state.ViewMode==ECameraViewMode.ThirdPerson && !input.ForceInterruptGunSight &&  (input.FilteredCameraFocus || input.ForceChangeGunSight))
             {
                 return true;
             }
 
             //if (state.ViewMode.Equals(ECameraViewMode.FirstPerson) && input.IsCameraFocus)
-            if (state.ViewMode.Equals(ECameraViewMode.FirstPerson) && !input.ForceInterruptGunSight && (input.FilteredCameraFocus || input.ForceChangeGunSight))
+            if (state.ViewMode==ECameraViewMode.FirstPerson && !input.ForceInterruptGunSight && (input.FilteredCameraFocus || input.ForceChangeGunSight))
             {
                 return true;
             }

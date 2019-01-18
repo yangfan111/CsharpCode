@@ -9,6 +9,7 @@ using Core.Utils;
 using Utils.CharacterState;
 using Assets.Utils.Configuration;
 using Utils.Singleton;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Camera.Utils
 {
@@ -65,7 +66,7 @@ namespace App.Shared.GameModules.Camera.Utils
 
         public static bool CanWeaponGunSight(this PlayerEntity player)
         {
-            return player.hasBag && player.GetBagLogicImp().GetCurrentWeaponInfo().Id > 0 &&
+            return player.hasWeaponComponentAgent && player.GetController<PlayerWeaponController>().CurrSlotWeaponId > 0 &&
                    player.weaponLogic.State.CanCameraFocus();
         }
 

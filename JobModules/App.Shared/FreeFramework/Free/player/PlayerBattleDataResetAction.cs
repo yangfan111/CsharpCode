@@ -20,7 +20,7 @@ namespace App.Shared.FreeFramework.Free.player
             if (null != playerEntity)
             {
                 playerEntity.statisticsData.Battle.Reset();
-                SimpleProto sp = new SimpleProto();
+                SimpleProto sp = FreePool.Allocate();
                 sp.Key = FreeMessageConstant.ResetBattleData;
                 FreeMessageSender.SendMessage(playerEntity, sp);
             }

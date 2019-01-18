@@ -11,5 +11,6 @@ namespace Core.CharacterBone
     {
         void SetWeaponPitch(Action<FsmOutput> addOutput, float pitch);
         void WeaponRotUpdate(CodeRigBoneParam param);
+        void WeaponRotPlayback(CodeRigBoneParam param);
     }
 }

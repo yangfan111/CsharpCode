@@ -73,16 +73,17 @@ namespace App.Shared.GameModules.Player
 
             if (myEntity.gamePlay.IsSave)
             {
+                PlayerEntity teamEntity = _contexts.player.GetEntityWithEntityKey(myEntity.gamePlay.SavePlayerKey);
                 if (myEntity.time.ClientTime - myEntity.gamePlay.SaveTime >= SharedConfig.SaveNeedTime)
                 {
                     //正常结束
                     StopSave(myEntity);
                     //统计救援人数
                     myEntity.statisticsData.Statistics.SaveCount++;
+                    teamEntity.statisticsData.Statistics.BeSaveCount++;
                     return;
                 }
                 //打断救援（被救援者已不在）
-                PlayerEntity teamEntity = _contexts.player.GetEntityWithEntityKey(myEntity.gamePlay.SavePlayerKey);
                 if (null == teamEntity)
                 {
                     StopSave(myEntity, true);
@@ -101,6 +102,7 @@ namespace App.Shared.GameModules.Player
             }
             else if (myEntity.gamePlay.IsBeSave)
             {
+                PlayerEntity teamEntity = _contexts.player.GetEntityWithEntityKey(myEntity.gamePlay.SavePlayerKey);
                 if (myEntity.time.ClientTime - myEntity.gamePlay.SaveTime >= SharedConfig.SaveNeedTime)
                 {
                     //正常结束
@@ -110,10 +112,11 @@ namespace App.Shared.GameModules.Player
                     myEntity.gamePlay.ChangeLifeState(EPlayerLifeState.Alive, myEntity.time.ClientTime);
                     //蹲下状态
 //                    myEntity.stateInterface.State.Crouch();
+                    teamEntity.statisticsData.Statistics.SaveCount++;
+                    myEntity.statisticsData.Statistics.BeSaveCount++;
                     return;
                 }
                 //打断救援（救援者已不在）
-                PlayerEntity teamEntity = _contexts.player.GetEntityWithEntityKey(myEntity.gamePlay.SavePlayerKey);
                 if (null == teamEntity)
                 {
                     StopBeSave(myEntity, true);
@@ -136,7 +139,6 @@ namespace App.Shared.GameModules.Player
                 //趴下不能救援
                 if (myEntity.stateInterface.State.GetCurrentPostureState() == PostureInConfig.Prone)
                 {
-                    //TODO 弹出提示
                     if (SharedConfig.IsServer)
                     {
                         IEventArgs args = (IEventArgs) _contexts.session.commonSession.FreeArgs;

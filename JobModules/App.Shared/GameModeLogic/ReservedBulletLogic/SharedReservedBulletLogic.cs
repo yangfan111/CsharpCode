@@ -1,9 +1,10 @@
 ﻿using Assets.Utils.Configuration;
-using Core.Bag;
+using Core;
 using Core.GameModeLogic;
 using Core.Utils;
 using Entitas;
 using WeaponConfigNs;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModeLogic.ReservedBulletLogic
 {
@@ -102,7 +103,7 @@ namespace App.Shared.GameModeLogic.ReservedBulletLogic
         private EBulletCaliber GetCaliber(Entity entity, EWeaponSlotType slot)
         {
             var playerEntity = entity as PlayerEntity;
-            var weapon = playerEntity.GetBagLogicImp().GetWeaponInfo(slot);
+            var weapon = playerEntity.GetController<PlayerWeaponController>().GetSlotWeaponInfo(slot);
             var weaponId = weapon.Id;
             if (weaponId > 0)
             {

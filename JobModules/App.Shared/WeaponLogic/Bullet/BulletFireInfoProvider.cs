@@ -2,7 +2,7 @@
 using Core.WeaponLogic.Bullet;
 using UnityEngine;
 
-namespace App.Shared.WeaponLogic.Bullet
+namespace App.Shared.GameModules.Weapon.Bullet
 {
     public class BulletFireInfoProviderDispatcher : IBulletFireInfoProviderDispatcher
     {

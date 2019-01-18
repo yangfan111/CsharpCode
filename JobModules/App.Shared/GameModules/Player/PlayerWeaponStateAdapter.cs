@@ -10,7 +10,7 @@ using UnityEngine;
 using WeaponConfigNs;
 using XmlConfig;
 using Core.Attack;
-using Core.Bag;
+using Core;
 using Core.WeaponLogic.Throwing;
 using Assets.Utils.Configuration;
 using Core.CameraControl.NewMotor;
@@ -19,6 +19,7 @@ using Core.Common;
 using Core.Free;
 using Core.Utils;
 using Utils.Singleton;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Player
 {
@@ -72,7 +73,7 @@ namespace App.Shared.GameModules.Player
 
         public int CurrentWeapon
         {
-            get { return _playerEntity.GetBagLogicImp().GetCurrentWeaponInfo().Id; }
+            get { return _playerEntity.GetController<PlayerWeaponController>().CurrSlotWeaponId; }
         }
 
         public float HorizontalVeocity
@@ -180,21 +181,18 @@ namespace App.Shared.GameModules.Player
         {
             get
             {
-                var bag = _playerEntity.bag.Bag;
-                if (null == bag)
-                {
+                var achive = _playerEntity.GetController<PlayerWeaponController>();
+                if (null == achive)
                     return 0;
-                }
-                return _playerEntity.GetBagLogicImp().GetReservedBullet();
+                return achive.GetReservedBullet();
             }
             set
             {
-                var bag = _playerEntity.bag.Bag;
-                if (null == bag)
-                {
+                var achive = _playerEntity.GetController<PlayerWeaponController>();
+                if (null == achive)
                     return;
-                }
-                _playerEntity.GetBagLogicImp().SetReservedBullet(value);
+                var controller = _playerEntity.GetController<PlayerWeaponController>();
+                controller.SetReservedBullet(value);
             }
         }
 
@@ -202,22 +200,22 @@ namespace App.Shared.GameModules.Player
         {
             get
             {
-                var bag = _playerEntity.bag.Bag;
-                if (null == bag)
+                var achive = _playerEntity.GetController<PlayerWeaponController>();
+                if (null == achive)
                 {
                     return 0;
                 }
-                return _playerEntity.GetBagLogicImp().GetWeaponBullet();
+                return achive.CurrWeaponBullet;
             }
 
             set
             {
-                var bag = _playerEntity.bag.Bag;
-                if (null == bag)
-                {
+                var achive = _playerEntity.GetController<PlayerWeaponController>();
+           
+                if (null == achive)
                     return;
-                }
-                _playerEntity.GetBagLogicImp().SetWeaponBullet(value);
+                var controller = _playerEntity.GetController<PlayerWeaponController>();
+                controller.SetSlotWeaponBullet(value);
             }
         }
 
@@ -268,8 +266,8 @@ namespace App.Shared.GameModules.Player
 
         public EFireMode FireMode
         {
-            get { return (EFireMode)_playerEntity.GetBagLogicImp().CurFireMode; }
-            set { _playerEntity.GetBagLogicImp().CurFireMode = (int)value; }
+            get { return (EFireMode)_playerEntity.GetController<PlayerWeaponController>().CurrFireMode; }
+            set { _playerEntity.GetController<PlayerWeaponController>().CurrFireMode = (int)value; }
         }
 
         public void ShowFireModeChangeTip(EFireMode newFireMode)
@@ -323,8 +321,9 @@ namespace App.Shared.GameModules.Player
 
         bool IPlayerWeaponState.IsBolted
         {
-            get { return _playerEntity.GetBagLogicImp().CurBolted; }
-            set { _playerEntity.GetBagLogicImp().CurBolted = value; }
+            
+            get { return _playerEntity.GetController<PlayerWeaponController>().CurrBolted; }
+            set { _playerEntity.GetController<PlayerWeaponController>().CurrBolted = value; }
         }
 
         public bool CanFire()
@@ -493,12 +492,12 @@ namespace App.Shared.GameModules.Player
         public void OnWeaponCost()
         {
             var slot = _playerEntity.weaponState.CurrentWeaponSlot;
-            _playerEntity.playerAction.Logic.OnCost((EWeaponSlotType)slot);
+            _playerEntity.GetController<PlayerWeaponController>().OnExpend((EWeaponSlotType)slot);
         }
 
         public void UnmountWeaponByAction()
         {
-            _playerEntity.playerAction.Logic.ForceUnmountWeapon();
+            _playerEntity.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon();
         }
 
         public void EndSpecialFire()
@@ -508,7 +507,8 @@ namespace App.Shared.GameModules.Player
 
         public int PlaySoundOnce(int id)
         {
-            return _playerEntity.soundManager.Value.PlayOnce(id);
+            return 0;
+        //    return _playerEntity.soundManager.Value.PlayOnce(id);
         }
 
         private int _lastGrenadeId;
@@ -641,7 +641,7 @@ namespace App.Shared.GameModules.Player
         {
             get
             {
-                var weapon = _playerEntity.GetBagLogicImp().GetCurrentWeaponInfo();
+                var weapon = _playerEntity.GetController<PlayerWeaponController>().CurrSlotWeaponInfo;
                 if (weapon.Id < 1)
                 {
                     return EBulletCaliber.Length;

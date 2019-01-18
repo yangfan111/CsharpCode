@@ -7,19 +7,29 @@ namespace App.Shared
 {
     public static class Log4ConfigManager
     {
-        public static void InitLog4net()
+        private static bool _isInitLog = false;
+        private static object _lock = new object();
+        public static  void InitLog4net()
         {
+            lock (_lock)
+            {
+                if (!_isInitLog)
+                {
+                    _isInitLog = true;
 #if UNITY_2017
        var configFile = Application.dataPath + "\\Config\\log4net.xml";
         log4net.GlobalContext.Properties["LogDir"] = Application.dataPath;
 #else
-            var configFile = Application.dataPath + "/Config/log4net_56.xml";
-            var logDir = (Application.dataPath + "/../log/");
-            logDir = logDir.Replace("/", Path.DirectorySeparatorChar+"");
-            logDir = Path.GetFullPath(logDir);
-            log4net.GlobalContext.Properties["LogDir"] = logDir;
+                    var configFile = Application.dataPath + "/Config/log4net_56.xml";
+                    var logDir = (Application.dataPath + "/../log/");
+                    logDir = logDir.Replace("/", Path.DirectorySeparatorChar + "");
+                    logDir = Path.GetFullPath(logDir);
+                    log4net.GlobalContext.Properties["LogDir"] = logDir;
 #endif
-            LoggerAdapter.Init(configFile);
+                    LoggerAdapter.Init(configFile);
+                }
+            }
+           
         }
     }
 }

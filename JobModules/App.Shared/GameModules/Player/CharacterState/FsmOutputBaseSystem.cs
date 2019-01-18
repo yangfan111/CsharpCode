@@ -207,6 +207,9 @@ namespace App.Shared.GameModules.Player.CharacterState
         private static bool _animatorP1Changed;
         private static bool _animatorP3Changed;
         
+        private static bool _animatorP1NeedUpdate = false;
+        private static bool _animatorP3NeedUpdate = false;
+        
         public FsmOutputBaseSystem()
         {
             for (int i = 0; i < 10; i++)
@@ -223,8 +226,8 @@ namespace App.Shared.GameModules.Player.CharacterState
                 v.Valid = false;
             }
 
-//            _animatorP1Changed = false;
-//            _animatorP3Changed = false;
+            _animatorP1NeedUpdate = false;
+            _animatorP3NeedUpdate = false;
         }
 
         public void AddOutput(FsmOutput output)
@@ -265,13 +268,17 @@ namespace App.Shared.GameModules.Player.CharacterState
             {
                 SetLayerWeight(player.firstPersonAnimator.UnityAnimator, output);
                 _animatorP1Changed = true;
+                // next frame update
+                //_animatorP1NeedUpdate = true;
             }
 
             if ((output.View & CharacterView.ThirdPerson) != 0)
             {
                 SetLayerWeight(player.thirdPersonAnimator.UnityAnimator, output);
                 _animatorP3Changed = true;
-                                //Logger.InfoFormat("change due to SetLayerWeight");
+                //// next frame update
+                //_animatorP3NeedUpdate = true;
+               //Logger.InfoFormat("change due to SetLayerWeight");
             }
         }
 
@@ -296,21 +303,35 @@ namespace App.Shared.GameModules.Player.CharacterState
             _animatorP3Changed = false;
             return ret;
         }
+        
+        public bool NeedUpdateP1()
+        {
+            return _animatorP1NeedUpdate;
+        }
+
+        public bool NeedUpdateP3()
+        {
+            return _animatorP3NeedUpdate;
+        }
 
         private static void SetAnimatorParameterP1(Animator animator, FsmOutput output, FpAnimStatusComponent latestValue)
         {
             var index = latestValue.AnimatorParameterIndex[output.TargetHash];
             var latestParam = latestValue.AnimatorParameters[index];
-            
-            _animatorP1Changed = SetAnimatorParameter(animator, output, latestParam) || _animatorP1Changed;
+
+            var isChange = SetAnimatorParameter(animator, output, latestParam);
+            _animatorP1Changed = isChange || _animatorP1Changed;
+            _animatorP1NeedUpdate |= (isChange && output.UpdateImmediate);
         }
 
         private static void SetAnimatorParameterP3(Animator animator, FsmOutput output, NetworkAnimatorComponent latestValue)
         {
             var index = latestValue.AnimatorParameterIndex[output.TargetHash];
             var latestParam = latestValue.AnimatorParameters[index];
-            
-            _animatorP3Changed = SetAnimatorParameter(animator, output, latestParam) || _animatorP3Changed;
+
+            var isChange = SetAnimatorParameter(animator, output, latestParam);
+            _animatorP3Changed = isChange || _animatorP3Changed;
+            _animatorP3NeedUpdate |= (isChange && output.UpdateImmediate);
         }
 
         private static bool SetAnimatorParameter(Animator animator, FsmOutput output, NetworkAnimatorParameter latestValue)
@@ -387,7 +408,10 @@ namespace App.Shared.GameModules.Player.CharacterState
             if (CompareParamHistory(output, latetstParam))
             {
                 animator.SetBool(output.TargetHash, output.BoolValue);
-                if (output.UpdateImmediate) animator.Update(0);
+                if (output.UpdateImmediate)
+                {
+                    animator.Update(0, false);
+                }
                 return true;
             }
 

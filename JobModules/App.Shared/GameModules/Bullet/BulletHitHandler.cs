@@ -194,7 +194,7 @@ namespace App.Shared.GameModules.Bullet
                 try
                 {
 
-                    _OnHitPlayer.BeginProfile();
+                    _OnHitPlayer.BeginProfileOnlyEnableProfile();
                     Vector3 pos;
                     if(compensationWorld.TryGetEntityPosition(targetPlayer.entityKey.Value, out pos))
                     {
@@ -209,20 +209,20 @@ namespace App.Shared.GameModules.Bullet
                     }
                 finally
                 {
-                    _OnHitPlayer.EndProfile();
+                    _OnHitPlayer.EndProfileOnlyEnableProfile();
                 }
             }
             else if (targetVehicle != null)
             {
                 try
                 {
-                    _OnHitVehicle.BeginProfile();
+                    _OnHitVehicle.BeginProfileOnlyEnableProfile();
                     OnHitVehicle(srcPlayer, targetVehicle, bulletEntity, hit);
                     bulletEntity.HitType = EHitType.Vehicle;
                 }
                 finally
                 {
-                    _OnHitVehicle.EndProfile();
+                    _OnHitVehicle.EndProfileOnlyEnableProfile();
                 }
                 
             }
@@ -230,13 +230,13 @@ namespace App.Shared.GameModules.Bullet
             {
                 try
                 {
-                    _OnHitEnvironment.BeginProfile();
+                    _OnHitEnvironment.BeginProfileOnlyEnableProfile();
                     OnHitEnvironment(srcPlayer, bulletEntity, hit);
                     bulletEntity.HitType = EHitType.Environment;
                 }
                 finally
                 {
-                    _OnHitEnvironment.EndProfile();
+                    _OnHitEnvironment.EndProfileOnlyEnableProfile();
                 }
                 
             }

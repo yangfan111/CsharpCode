@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Core.Replicaton
 {
-    public interface ISnapshotPool
+    public interface ISnapshotPool:IDisposable
     {
         ISnapshot LatestSnapshot { get; }
         ISnapshot GetSnapshot(int snapshotSeq);

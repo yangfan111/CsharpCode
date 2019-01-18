@@ -48,15 +48,17 @@ namespace App.Client.StartUp
         private PlayerEntity _cacheOwner;
         private PlayerEntity _owner
         {
-            get{
-                if (_self.Equals(LatestSnapshot.Self))
+            get
+            {
+                var s = LatestSnapshot.Self;
+                if (_self.EntityId == s.EntityId && _self.EntityType == s.EntityType)
                 {
                     return _cacheOwner;
                 }
                 else
                 {
-                    _cacheOwner = _playerContext.GetEntityWithEntityKey(LatestSnapshot.Self);
-                    _self = LatestSnapshot.Self;
+                    _cacheOwner = _playerContext.GetEntityWithEntityKey(s);
+                    _self = s;
                     return _cacheOwner;
                 }
             }

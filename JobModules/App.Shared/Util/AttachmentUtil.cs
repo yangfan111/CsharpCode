@@ -1,9 +1,9 @@
-﻿using App.Shared.WeaponLogic;
+﻿using App.Shared.GameModules.Weapon;
 using App.Shared.Components.Bag;
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using Core.Appearance;
-using Core.Bag;
+using Core;
 using Core.Configuration;
 using Core.Utils;
 using Core.WeaponLogic.Attachment;

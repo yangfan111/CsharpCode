@@ -138,6 +138,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
         {
             _characterP1 = obj;
             _boneRigging.SetFirstPersonCharacter(obj);
+            _weaponRot.SetFirstPersonCharacter(obj);
             if (null != obj)
                 _firstPlayerIk = obj.GetComponent<PlayerIK>();
         }
@@ -214,9 +215,18 @@ namespace App.Shared.GameModules.Player.CharacterBone
                     param.MuzzleLocationP3 = muzzleTransform.position;
                 else
                     param.IsEmptyHand = true;
+                
+                muzzleTransform = GetLocation(SpecialLocation.MuzzleEffectPosition, CharacterView.FirstPerson);
+                if (muzzleTransform)
+                    param.MuzzleLocationP1 = muzzleTransform.position;
             }
 
             _weaponRot.WeaponRotUpdate(param);
+        }
+        
+        public void WeaponRotPlayback(CodeRigBoneParam param)
+        {
+            _weaponRot.WeaponRotPlayback(param);
         }
 
         public void Update(CodeRigBoneParam param)
@@ -295,40 +305,17 @@ namespace App.Shared.GameModules.Player.CharacterBone
         {
             var isEmptyInHand = _weaponController.IsEmptyHand();
             var weaponIdInHand = _weaponController.GetWeaponIdInHand();
-            var realWeaponIdInHand = weaponIdInHand;
             // 当前枪瞄准镜ID
             var scopeIdInCurrentWeapon = _weaponController.GetCurrentScopeId();
             var needIk = false;
             if (!isEmptyInHand)
             {
-                param.SightOffset = SingletonManager.Get<WeaponAvatarConfigManager>().GetSightDistance(weaponIdInHand);
-                needIk = _attachmentNeedIK ||
-                         SingletonManager.Get<WeaponAvatarConfigManager>().GetLeftHandIK(weaponIdInHand);
-                var avatarConfig = SingletonManager.Get<WeaponAvatarConfigManager>().GetConfigById(weaponIdInHand);
-                if (null != avatarConfig)
-                {
-                    //当前武器为皮肤武器
-                    if (avatarConfig.ApplyWeaponsId > 0 && avatarConfig.ApplyWeaponsId != weaponIdInHand)
-                    {
-                        realWeaponIdInHand = avatarConfig.ApplyWeaponsId;
-                    }
-                }
+                needIk = _attachmentNeedIK/* ||
+                         SingletonManager.Get<WeaponAvatarConfigManager>().GetLeftHandIK(weaponIdInHand)*/;
 
-                /**
-                 * 后面改为分辨率模糊匹配
-                 */
-                // 一人称人物腰位置射偏移
-                param.FirstPersonPositionOffset = SingletonManager.Get<FirstPersonOffsetConfigManager>()
-                    .GetFirstPersonOffsetByScreenRatio(realWeaponIdInHand,
-                        Screen.width / (float) Screen.height);
-                // 一人称腰射旋转偏移
-                param.FirstPersonRotationOffset = SingletonManager.Get<FirstPersonOffsetConfigManager>()
-                    .GetFirstPersonRotationOffsetByScreenRatio(realWeaponIdInHand,
-                        Screen.width / (float) Screen.height);
-                // 一人称人物肩射位置偏移
-                param.FirstPersonSightOffset = SingletonManager.Get<FirstPersonOffsetConfigManager>()
-                    .GetSightOffsetByScreenRatio(realWeaponIdInHand,
-                        Screen.width / (float) Screen.height);
+                if (_characterP1 == null) return needIk;
+                
+                param.SightOffset = SingletonManager.Get<WeaponAvatarConfigManager>().GetSightDistance(weaponIdInHand);
 
                 if (scopeIdInCurrentWeapon > 0)
                 {

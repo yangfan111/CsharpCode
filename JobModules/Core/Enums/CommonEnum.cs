@@ -12,7 +12,8 @@
     {
         None,
         Win,
-        Lose
+        Lose,
+        Tie//平局
     }
 
     public enum EUIGameTitleType

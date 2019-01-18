@@ -14,16 +14,15 @@ namespace App.Shared.GameModules.Configuration
 {
     public class BaseConfigurationInitModule : GameModule
     {
-        public bool _isServer;
+      
 
-        public BaseConfigurationInitModule(Contexts context, ISessionState sessionState, bool IsServer)
+        public BaseConfigurationInitModule(Contexts context, ISessionState sessionState)
         {
-            _isServer = IsServer;
+            
 
 
             AddConfigSystem<AssetConfigManager>(sessionState, "svn.version");
-            AddConfigSystem<CharacterStateConfigManager>(sessionState, "SpeedConfig", new CharacterSpeedSubResourceHandler(context.session.commonSession.LoadRequestManager)
-                .LoadSubResources);
+            AddConfigSystem<CharacterStateConfigManager>(sessionState, "SpeedConfig");
             AddConfigSystem<AvatarAssetConfigManager>(sessionState, "role_avator_res");
 
             AddConfigSystem<FirstPersonOffsetConfigManager>(sessionState, "FirstPersonOffset");
@@ -67,19 +66,19 @@ namespace App.Shared.GameModules.Configuration
             AddConfigSystem<ClientEffectConfigManager>(sessionState, "ClientEffect");
             AddConfigSystem<GameModeConfigManager>(sessionState, "gamemode");
 
-            AddConfigSystem<WeaponAvatarConfigManager>(sessionState, "weapon_avator",
-                new WeaponAvatarAnimSubResourceHandler(context.session.commonSession.LoadRequestManager)
-                    .LoadSubResources);
-            //AddConfigSystem<StreamingLevelStructure>(sessionState, "streaminglevel");
+            AddConfigSystem<WeaponAvatarConfigManager>(sessionState, "weapon_avator");
+            AddConfigSystem<StreamingLevelStructure>(sessionState, "streaminglevel", "tablesfrombuilding");
             AddConfigSystem<MapsDescription>(sessionState, "mapConfig");
         }
 
         private void AddConfigSystem<T>(ISessionState sessionState, string asset,
-            SubReousourcesHandler subResourceHandler = null) where T : AbstractConfigManager<T>, IConfigParser, new()
+            string bundleName = "tables")
+            where T : AbstractConfigManager<T>, IConfigParser, new()
         {
-            SingletonManager.Get<T>().IsServer = _isServer;
-            AddSystem(new DefaultConfigInitSystem<T>(sessionState, new AssetInfo("tables", asset),
-                SingletonManager.Get<T>(), subResourceHandler));
+           
+            AddSystem(new DefaultConfigInitSystem<T>(sessionState, new AssetInfo(bundleName, asset),
+                SingletonManager.Get<T>()));
         }
+        
     }
 }

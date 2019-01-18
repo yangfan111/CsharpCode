@@ -39,7 +39,7 @@ namespace Core.GameModule.System
             {
                 try
                 {
-                    _info.BeginProfile();
+                    _info.BeginProfileOnlyEnableProfile();
                     SingleExecute(entities[i]);
                 }
                 catch (Exception e)
@@ -49,7 +49,7 @@ namespace Core.GameModule.System
                 }
                 finally
                 {
-                    _info.EndProfile();
+                    _info.EndProfileOnlyEnableProfile();
                 }
             }
         }

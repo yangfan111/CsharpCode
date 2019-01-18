@@ -12,6 +12,10 @@ using XmlConfig;
 using App.Shared.Player;
 using Core.CharacterBone;
 using App.Shared.GameModules.Player.Appearance;
+using Core.Compare;
+using Shared.Scripts;
+using Utils.Configuration;
+using Utils.Singleton;
 
 namespace App.Shared.GameModules.Player.CharacterBone
 {
@@ -29,7 +33,21 @@ namespace App.Shared.GameModules.Player.CharacterBone
             }
 
             SightUpdate(player, cmd.FrameInterval);
+            SyncSightComponent(player);
             BoneUpdate(player);
+        }
+
+        private void SyncSightComponent(PlayerEntity player)
+        {
+            var toComponent = player.firstPersonAppearanceUpdate;
+            var fromComponent = player.firstPersonAppearance;
+            toComponent.SightVerticalShift = fromComponent.SightVerticalShift;
+            toComponent.SightHorizontalShift = fromComponent.SightHorizontalShift;
+            toComponent.SightVerticalShiftRange = fromComponent.SightVerticalShiftRange;
+            toComponent.SightHorizontalShiftDirection = fromComponent.SightHorizontalShiftDirection;
+            toComponent.SightVerticalShiftDirection = fromComponent.SightVerticalShiftDirection;
+            toComponent.SightRemainVerticalPeriodTime = fromComponent.SightRemainVerticalPeriodTime;
+            toComponent.RandomSeed = fromComponent.RandomSeed;
         }
 
         private static void SightUpdate(PlayerEntity player, int deltaTime)
@@ -77,7 +95,9 @@ namespace App.Shared.GameModules.Player.CharacterBone
             var keepAction = player.stateInterface.State.GetActionKeepState();
             var posture = player.stateInterface.State.GetCurrentPostureState();
 
-            CodeRigBoneParam param = new CodeRigBoneParam
+            UpdateOffsetData(player);
+
+            var param = new CodeRigBoneParam
             {
                 PitchAmplitude = player.orientation.Pitch - player.orientation.WeaponPunchPitch * 2,
                 OverlayAnimationWeight = animator.GetLayerWeight(NetworkAnimatorLayer.PlayerUpperBodyOverlayLayer),
@@ -92,13 +112,73 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 HandPitch = player.characterBone.PitchHandAngle,
                 HeadRotProcess = player.characterBone.HeadRotProcess,
                 IsHeadRotCW = player.characterBone.IsHeadRotCW,
-                WeaponPitch = player.characterBone.WeaponPitch,
-                IsServer = SharedConfig.IsServer
+                WeaponRot = player.characterBone.WeaponRot,
+                IsProne = posture == PostureInConfig.Prone,
+                IsServer = SharedConfig.IsServer,
+                
+                FirstPersonPositionOffset = player.characterBone.FirstPersonPositionOffset,
+                FirstPersonRotationOffset = player.characterBone.FirstPersonRotationOffset,
+                FirstPersonSightOffset = player.characterBone.FirstPersonSightOffset
             };
-
-            characterBone.Update(param);
+            
             if (!SharedConfig.IsServer)
                 characterBone.WeaponRotUpdate(param);
+            else
+                characterBone.WeaponRotPlayback(param);
+            characterBone.Update(param);
+        }
+
+        private static void UpdateOffsetData(PlayerEntity player)
+        {
+            if (SharedConfig.IsServer || player.appearanceInterface.Appearance.IsEmptyHand()) return;
+            if(!GetNeedChangeOffset(player)) return;
+
+            var realWeaponIdInHand = player.characterBone.RealWeaponId;
+            var screenRatio = player.characterBone.ScreenRatio;
+            
+            player.characterBone.FirstPersonPositionOffset = SingletonManager.Get<FirstPersonOffsetConfigManager>()
+                .GetFirstPersonOffsetByScreenRatio(realWeaponIdInHand,
+                    screenRatio);
+            // 一人称腰射旋转偏移
+            player.characterBone.FirstPersonRotationOffset = SingletonManager.Get<FirstPersonOffsetConfigManager>()
+                .GetFirstPersonRotationOffsetByScreenRatio(realWeaponIdInHand,
+                    screenRatio);
+            // 一人称人物肩射位置偏移
+            player.characterBone.FirstPersonSightOffset = SingletonManager.Get<FirstPersonOffsetConfigManager>()
+                .GetSightOffsetByScreenRatio(realWeaponIdInHand,
+                    screenRatio);
+        }
+
+        private static bool GetNeedChangeOffset(PlayerEntity player)
+        {
+            var screenRatio = Screen.width / (float) Screen.height;
+            var realWeaponId = GetRealWeaponId(player);
+            var needChanged = !CompareUtility.IsApproximatelyEqual(screenRatio, player.characterBone.ScreenRatio) ||
+                              !CompareUtility.IsApproximatelyEqual(realWeaponId, player.characterBone.RealWeaponId) ||
+                              FirstPersonOffsetScript.UpdateOffset;
+            
+            player.characterBone.ScreenRatio = screenRatio;
+            player.characterBone.RealWeaponId = realWeaponId;
+            player.characterBone.NeedChangeOffset = needChanged;
+
+            return needChanged;
+        }
+        
+        private static int GetRealWeaponId(PlayerEntity player)
+        {
+            var weaponIdInHand =  player.appearanceInterface.Appearance.GetWeaponIdInHand();
+            var realWeaponIdInHand = weaponIdInHand;
+            var avatarConfig = SingletonManager.Get<WeaponAvatarConfigManager>().GetConfigById(weaponIdInHand);
+            if (null != avatarConfig)
+            {
+                //当前武器为皮肤武器
+                if (avatarConfig.ApplyWeaponsId > 0 && avatarConfig.ApplyWeaponsId != weaponIdInHand)
+                {
+                    realWeaponIdInHand = avatarConfig.ApplyWeaponsId;
+                }
+            }
+
+            return realWeaponIdInHand;
         }
     }
 }

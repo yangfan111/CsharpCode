@@ -4,7 +4,8 @@ namespace Core.HitBox
 {
     public interface IHitBoxTransformProvider
     {
-        Transform GetTransform(string boneName);
+        void Update(Vector3 rootPosition, Quaternion rotation);
+        Transform GetTransform(Transform bone);
         Vector3 RootPosition { get; }
 
         Quaternion RootRotation { get; }

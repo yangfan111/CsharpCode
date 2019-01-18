@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Core.Replicaton
 {
@@ -81,6 +82,14 @@ namespace Core.Replicaton
 
         }
 
-       
+
+        public void Dispose()
+        {
+            foreach (var snapshot in _list)
+            {
+                RefCounterRecycler.Instance.ReleaseReference(snapshot);
+            }
+            _list.Clear();
+        }
     }
 }

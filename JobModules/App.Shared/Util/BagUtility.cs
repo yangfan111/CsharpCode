@@ -1,12 +1,12 @@
 ﻿using Core.Utils;
 using App.Shared.Components.Bag;
-using Core.Bag;
+using Core;
 using XmlConfig;
 using Utils.Configuration;
 using Utils.Appearance;
 using Assets.XmlConfig;
 using Utils.Singleton;
-using App.Shared.WeaponLogic;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared
 {
@@ -150,57 +150,8 @@ namespace App.Shared
             }
         }
 
-        public static WeaponBagLogic GetBagLogicImp(this PlayerEntity enity)
-        {
-            return enity.bag.Bag as WeaponBagLogic;
-        }
-        public static WeaponComponent GetWeaponComponentBySlot(this PlayerEntity player, EWeaponSlotType slot)
-        {
-            switch (slot)
-            {
-                case EWeaponSlotType.PrimeWeapon1:
-                    if(player.hasPrimeWeapon)
-                    {
-                        return player.primeWeapon;
-                    }
-                    break;
-                case EWeaponSlotType.PrimeWeapon2:
-                    if(player.hasSubWeapon)
-                    {
-                        return player.subWeapon;
-                    }
-                    break;
-                case EWeaponSlotType.SubWeapon:
-                    if(player.hasPistol)
-                    {
-                        return player.pistol;
-                    }
-                    break;
-                case EWeaponSlotType.MeleeWeapon:
-                    if(player.hasMelee)
-                    {
-                        return player.melee;
-                    }
-                    break;
-                case EWeaponSlotType.GrenadeWeapon:
-                    if(player.hasGrenade)
-                    {
-                        return player.grenade;
-                    }
-                    break;
-                case EWeaponSlotType.TacticWeapon:
-                    if(player.hasTacticWeapon)
-                    {
-                        return player.tacticWeapon;
-                    }
-                    break;
-                case EWeaponSlotType.None:
-                    return null;
-                default:
-                    Logger.WarnFormat("Illegal slot type {0} for weapon ", slot);
-                    return null;
-            }
-            return null;
-        }
+       
+         
+ 
     }
 }

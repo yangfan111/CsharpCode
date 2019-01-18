@@ -8,23 +8,19 @@ namespace Core.Configuration
     public class ClientEffectCommonConfigManager : AbstractConfigManager<ClientEffectCommonConfigManager>
     {
         private Dictionary<EClientEffectType, ClientEffectCommonConfigItem> _configs = new Dictionary<EClientEffectType, ClientEffectCommonConfigItem>(CommonEnumEqualityComparer<EClientEffectType>.Instance);
-        public override bool IsServer { get; set; }
+        
         public int BulletDropLifeTime { get; private set; }
         public int DecayLifeTime { get; private set; }
 
-        public int BulletDropMaxCount
-        {
-            get { return IsServer ? _bulletDropServerMaxCount : _bulletDropClientMaxCount; }
-        }
 
-        private int _bulletDropClientMaxCount;
-        private int _bulletDropServerMaxCount;
+        public int BulletDropClientMaxCount { get; private set; }
+        public int BulletDropServerMaxCount { get; private set; }
 
         public ClientEffectCommonConfigManager()
         {
             // 默认值，测试或者配置出错时使用
-            _bulletDropClientMaxCount = 30;
-            _bulletDropServerMaxCount = 100;
+            BulletDropClientMaxCount = 30;
+            BulletDropServerMaxCount = 100;
             BulletDropLifeTime = 30000;
         }
 
@@ -43,8 +39,8 @@ namespace Core.Configuration
                 switch (item.Type)
                 {
                     case EClientEffectType.BulletDrop:
-                        _bulletDropServerMaxCount = item.ServerLimit;
-                        _bulletDropClientMaxCount = item.ClientLimit;
+                        BulletDropServerMaxCount = item.ServerLimit;
+                        BulletDropClientMaxCount = item.ClientLimit;
                         BulletDropLifeTime = item.LifeTime;
                         break;
                    case EClientEffectType.DefaultHit:
@@ -65,6 +61,11 @@ namespace Core.Configuration
                 Logger.ErrorFormat("{0} does not exist in config" , type);
                 return null;
             }
+        }
+
+        public int GetBulletDropMaxCount(bool isServer)
+        {
+            return isServer ? BulletDropServerMaxCount : BulletDropClientMaxCount;
         }
     }
 }

@@ -72,8 +72,11 @@ namespace App.Shared.GameModules
             {
                 AddSystem(new ServerMoveSystem(contexts));
             }
-			
-            AddSystem(new PlayerSpecialZoneEventSystem());
+
+            if (!SharedConfig.IsServer)
+            {
+                AddSystem(new PlayerSpecialZoneEventSystem());
+            }
             AddSystem(new PlayerControlledVehicleUserCmdExecuteSystem());
             AddSystem(new UpdatePlayerPositionOnVehicle(contexts));
             //AddSystem(new PlayerCameraInputSystem(contexts.player));
@@ -100,7 +103,12 @@ namespace App.Shared.GameModules
             }
             AddSystem(new PlayerFirstAppearanceUpdateSystem());
             AddSystem(new PlayerAppearanceUpdateSystem());
-            AddSystem(new PlayerCharacterBoneUpdateSystem());
+            if(!SharedConfig.IsServer)
+                AddSystem(new PlayerCharacterBoneUpdateSystem());
+            else
+            {
+                AddSystem(new ServerCharacterBoneUpdateSystem());
+            }
             AddSystem(new PlayerHoldBreathSystem());
             AddSystem(new PlayerAvatarSystem());
             if (!SharedConfig.IsServer)

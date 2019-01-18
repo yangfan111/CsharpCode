@@ -8,7 +8,7 @@ using Core.EntityComponent;
 using Core.IFactory;
 using Utils.Singleton;
 
-namespace App.Shared.WeaponLogic
+namespace App.Shared.GameModules.Weapon
 {
     public class DefaultWeaponSoundLogic : AbstractAttachableWeaponLogic<DefaultWeaponSoundConfig,  int>, IWeaponSoundLogic
     {

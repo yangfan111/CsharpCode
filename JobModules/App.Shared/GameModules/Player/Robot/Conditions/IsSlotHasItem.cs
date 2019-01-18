@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using App.Shared.GameModules.Common;
 using App.Shared.GameModules.Player.Robot.SharedVariables;
+using App.Shared.GameModules.Weapon;
 using BehaviorDesigner.Runtime.Tasks;
-using Core.Bag;
+using Core;
 
 namespace App.Shared.GameModules.Player.Robot.Conditions
 {
@@ -29,7 +30,7 @@ namespace App.Shared.GameModules.Player.Robot.Conditions
                
                 if (mEntity != null )
                 {
-                    return !mEntity.GetBagLogicImp().GetWeaponInfo(SlotType.Value).Equals(new WeaponInfo())?TaskStatus.Success:TaskStatus.Failure;
+                    return !mEntity.GetController<PlayerWeaponController>().GetSlotWeaponInfo(SlotType.Value).Equals(new WeaponInfo())?TaskStatus.Success:TaskStatus.Failure;
                 }
             }
 

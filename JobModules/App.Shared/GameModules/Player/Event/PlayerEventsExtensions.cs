@@ -29,7 +29,7 @@ namespace App.Shared.GameModules.Player.Event
 
                 try
                 {
-                    _infos[(int) v.EventType].BeginProfile();
+                    _infos[(int) v.EventType].BeginProfileOnlyEnableProfile();
                     if (isServer)
                     {
                         if (handler.ServerFilter(entity, v))
@@ -59,7 +59,7 @@ namespace App.Shared.GameModules.Player.Event
                 }
                 finally
                 {
-                    _infos[(int) v.EventType].EndProfile();
+                    _infos[(int) v.EventType].EndProfileOnlyEnableProfile();
                 }
             }
         }

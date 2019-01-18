@@ -1,4 +1,4 @@
-﻿using App.Shared.WeaponLogic;
+﻿using App.Shared.GameModules.Weapon;
 using Core.Configuration.Sound;
 using Core.IFactory;
 using Core.Utils;
@@ -7,7 +7,7 @@ using Utils.Singleton;
 using WeaponConfigNs;
 using XmlConfig;
 
-namespace Assets.App.Shared.WeaponLogic
+namespace Assets.App.Shared.GameModules.Weapon
 {
     public class MeleeWeaponSoundLogic : AbstractWeaponSoundLogic<MeleeWeaponSoundConfig, int>
     {

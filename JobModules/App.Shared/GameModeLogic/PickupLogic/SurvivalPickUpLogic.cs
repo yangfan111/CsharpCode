@@ -1,7 +1,7 @@
 ﻿using App.Shared.GameModules.Player;
-using App.Shared.WeaponLogic;
+using App.Shared.GameModules.Weapon;
 using Core;
-using Core.Bag;
+using Core;
 using Core.Configuration;
 using Core.Utils;
 using UnityEngine;
@@ -31,8 +31,8 @@ namespace App.Shared.GameModeLogic.PickupLogic
             //使用服务器操作
             return;
             var player = _playerContext.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(playerEntityId, (short)EEntityType.Player));
-            var bagImp = player.bag.Bag as WeaponBagLogic;
-           var curWeapon = bagImp.GetWeaponInfo(slot);
+            var weaponAchive = player.GetController<PlayerWeaponController>();
+           var curWeapon = weaponAchive.GetSlotWeaponInfo(slot);
             if (curWeapon.Id > 0)
             {
                 var dropPos = player.GetHandWeaponPosition();
@@ -65,7 +65,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
                         sceneObjectEntity = _sceneObjectEntityFactory.CreateWeaponEntity(curWeapon, playerTrans.position) as SceneObjectEntity;
                     }
                 }
-                player.playerAction.Logic.DropWeapon(slot);
+                player.GetController<PlayerWeaponController>().DropSlotWeapon(slot);
             }
         }
 

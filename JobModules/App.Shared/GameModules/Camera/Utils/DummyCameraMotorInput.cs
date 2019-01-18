@@ -1,6 +1,7 @@
 ﻿using App.Shared.Components;
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Player;
+using App.Shared.GameModules.Weapon;
 using Core.CameraControl;
 using Core.Prediction.UserPrediction.Cmd;
 using XmlConfig;
@@ -36,7 +37,7 @@ namespace App.Shared.GameModules.Camera
             ActionKeepState = player.stateInterface.State.GetActionKeepState();
             IsDriveCar =  player.IsOnVehicle();            
             IsDead = player.gamePlay.IsLifeState(EPlayerLifeState.Dead);
-            CanWeaponGunSight = player.hasBag && player.GetBagLogicImp().GetCurrentWeaponInfo().Id >= 1 & player.weaponLogic.State.CanCameraFocus();
+            CanWeaponGunSight = player.hasWeaponComponentAgent && player.GetController<PlayerWeaponController>().CurrSlotWeaponId >= 1 & player.weaponLogic.State.CanCameraFocus();
             ArchorPitch = YawPitchUtility.Normalize(archorPitch);
             ArchorYaw = YawPitchUtility.Normalize(archorYaw);
             IsParachuteAttached = player.hasPlayerSkyMove && player.playerSkyMove.IsParachuteAttached;

@@ -14,6 +14,8 @@ namespace com.wd.free.ai
     {
         public int repeat;
         public List<IGameAction> actions;
+        // 每帧都做的动作，如收集数据
+        public IGameAction frame;
 
         public IParaCondition condition;
 
@@ -32,6 +34,11 @@ namespace com.wd.free.ai
                 args.FreeContext.AiSuccess = false;
 
                 action.Act(args);
+
+                if(frame != null)
+                {
+                    frame.Act(args);
+                }
 
                 if (args.FreeContext.AiSuccess)
                 {

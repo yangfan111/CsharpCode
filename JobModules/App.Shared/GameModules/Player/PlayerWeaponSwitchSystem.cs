@@ -1,9 +1,10 @@
 ﻿using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using Core.Bag;
+using App.Shared.Util;
+using Core;
 using Core.Common;
-using App.Shared.WeaponLogic;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Player
 {
@@ -44,22 +45,25 @@ namespace App.Shared.GameModules.Player
                     Logger.Error("FilteredInput in cmd should never be null !");
                 }
             }
-            if (!playerEntity.hasBag)
-            {
-                Logger.Error("No bag attached to player");
-                return;
-            }
-
             var newSlot = playerEntity.modeLogic.ModeLogic.GetSlotByIndex(cmd.CurWeapon);
-            var curSlot = playerEntity.GetBagLogicImp().GetCurrentWeaponSlot();
-            
-            var newWeapon = playerEntity.GetBagLogicImp().GetWeaponInfo(newSlot);
-            if(newWeapon.Id < 1)
-            {
-                playerEntity.tip.TipType = ETipType.NoWeaponInSlot;
-                return;
-            }
-            playerEntity.playerAction.Logic.SwitchIn(newSlot);
+            playerEntity.GetController<PlayerWeaponController>().SwitchIn(newSlot);
+            //if (!playerEntity.hasWeaponComponentAgent)
+            //{
+            //    Logger.Error("No bag attached to player");
+            //    return;
+            //}
+            //
+
+            //    var weaponAchive = playerEntity.GetController<PlayerWeaponController>();
+            //   var curSlot = playerEntity.GetController<PlayerWeaponController>().CurrSlotType;
+
+            //   var newWeapon = weaponAchive.GetSlotWeaponInfo(newSlot);
+            //if(newWeapon.Id < 1)
+            //{
+            //    playerEntity.tip.TipType = ETipType.NoWeaponInSlot;
+            //    return;
+            //}
+
         }
     }
 }

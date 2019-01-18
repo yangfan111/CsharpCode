@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using App.Shared.WeaponLogic;
+using App.Shared.GameModules.Weapon;
 using App.Shared.Components;
 using App.Shared.GameModules.Common;
 using App.Shared.Player;
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using Core;
-using Core.Bag;
+using Core;
 using Core.EntityComponent;
 using Core.GameTime;
 using Core.SceneTriggerObject;

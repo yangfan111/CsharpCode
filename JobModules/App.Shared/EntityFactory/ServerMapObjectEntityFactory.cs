@@ -4,7 +4,7 @@ using App.Shared.Components;
 using App.Shared.GameModules.Common;
 using Assets.XmlConfig;
 using Core;
-using Core.Bag;
+using Core;
 using Core.EntityComponent;
 using Core.GameTime;
 using Core.IFactory;
@@ -29,12 +29,12 @@ namespace App.Shared.EntityFactory
             _idGenerator = entityIdGenerator;
         }
 
-        public virtual IEntity CreateDoor(int objectId, GameObject gameObject, Action<object> detachCallback)
+        public virtual IEntity CreateDoor(string objectId, GameObject gameObject, Action<object> detachCallback)
         {
             return CreateDoorInternal(objectId, gameObject, detachCallback, ResetDoor);
         }
         
-        protected IEntity CreateDoorInternal(int objectId,
+        protected IEntity CreateDoorInternal(string objectId,
             GameObject gameObject, Action<object> detachCallback, Action<Entity> resetAction)
         {
             var door = (MapObjectEntity)CreateDestructibleObjectInternal(objectId, gameObject, detachCallback, resetAction, false);
@@ -44,7 +44,7 @@ namespace App.Shared.EntityFactory
         }
         
         
-        protected IEntity CreateDestructibleObjectInternal(int objectId,
+        protected IEntity CreateDestructibleObjectInternal(string objectId,
             GameObject gameObject, Action<object> detachCallback, Action<Entity> resetAction,
             bool isDestructibleObject,bool isMapObject = false)
         {
@@ -74,7 +74,7 @@ namespace App.Shared.EntityFactory
             return destructibleObject;
         }
 
-        protected MapObjectEntity CreateMapObject(int entityId, int objectId,
+        protected MapObjectEntity CreateMapObject(int entityId, string objectId,
             GameObject gameObject, Action<Entity> resetAction)
         {
             var obj = _mapObjectContext.CreateEntity();
@@ -155,13 +155,13 @@ namespace App.Shared.EntityFactory
             }
         }
  
-        public virtual IEntity CreateDestructibleObject(int objectId,
+        public virtual IEntity CreateDestructibleObject(string objectId,
             GameObject gameObject, Action<object> detachCallback)
         {
             return CreateDestructibleObjectInternal(objectId, gameObject.gameObject, detachCallback, ResetDestructibleObject, true);
         }
 
-        protected IEntity CreateDestructibleObjectInternal(int objectId,
+        protected IEntity CreateDestructibleObjectInternal(string objectId,
             GameObject gameObject, Action<object> detachCallback, Action<Entity> resetAction,
             bool isDestructibleObject)
         {
@@ -192,7 +192,7 @@ namespace App.Shared.EntityFactory
         }
 
 
-        public IEntity CreateGlassyObject(int objectId, GameObject gameObject, Action<object> brokenCallback)
+        public IEntity CreateGlassyObject(string objectId, GameObject gameObject, Action<object> brokenCallback)
         {
             var glassyObject = CreateSceneObject(_idGenerator.GetNextEntityId(), objectId, gameObject, ResetGlassyObject);
             AddEntityReference(glassyObject, gameObject);
@@ -207,7 +207,7 @@ namespace App.Shared.EntityFactory
             return glassyObject;
         }
 
-        private MapObjectEntity CreateSceneObject(int entityId, int objectId,
+        private MapObjectEntity CreateSceneObject(int entityId, string objectId,
             GameObject gameObject, Action<Entity> resetAction)
         {
             var obj = _mapObjectContext.CreateEntity();

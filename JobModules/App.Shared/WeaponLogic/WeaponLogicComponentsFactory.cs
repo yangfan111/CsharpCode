@@ -6,13 +6,13 @@ using Core.WeaponLogic.Attachment;
 using UnityEngine;
 using WeaponConfigNs;
 using Core.GameTime;
-using Assets.App.Shared.WeaponLogic;
+using Assets.App.Shared.GameModules.Weapon;
 using Core.WeaponLogic.Common;
 using Core.EntityComponent;
 using Core.IFactory;
 using Core.WeaponLogic.Bullet;
 
-namespace App.Shared.WeaponLogic
+namespace App.Shared.GameModules.Weapon
 {
     public class WeaponLogicComponentsFactory : AbstractWeaponLogicComponentsFactory
     {

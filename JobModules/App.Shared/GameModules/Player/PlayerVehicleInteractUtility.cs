@@ -2,7 +2,9 @@
 using App.Shared.Configuration;
 using App.Shared.GameModules.Common;
 using App.Shared.GameModules.Vehicle;
+using App.Shared.GameModules.Weapon;
 using App.Shared.Player;
+using App.Shared.Util;
 using Core.Utils;
 using UnityEngine;
 using Utils.Appearance;
@@ -233,7 +235,7 @@ namespace App.Shared.GameModules.Player
             playerEntity.stateInterface.State.DriveStart(actionSeatId, postureId);
             //if (playerEntity.IsVehicleDriver())    //主驾驶位置
             {
-                playerEntity.playerAction.Logic.ForceUnmountWeapon();
+                playerEntity.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon();
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5821BE30-7FAC-30A9-9C03-AD7FAC770687}</ProjectGuid>
@@ -14,7 +14,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
   </PropertyGroup>
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"/>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' Or '$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
     <OutputPath>F:\voyager\UnityPackages\Dll.Export\</OutputPath>
     <PlatformTarget>anycpu</PlatformTarget>
@@ -65,21 +65,65 @@
     <None Include="F:\voyager\UnityPackages\App.Shared\CMakeLists.txt">
     </None>
   </ItemGroup>
-  <Target Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' Or '$(Configuration)|$(Platform)'=='Debug|x86'" Name="CustomCommand_Debug_8dd382befd7df28cf04e265cc96a7b22" Inputs="F:/voyager/UnityPackages/App.Shared/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt" Outputs="F:\voyager\UnityPackages\App.Shared\CMakeFiles\generate.stamp">
+  <Target Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' Or '$(Configuration)|$(Platform)'=='Debug|x86'"
+    Name="CustomCommand_Debug_8dd382befd7df28cf04e265cc96a7b22"
+    Inputs="F:/voyager/UnityPackages/App.Shared/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt"
+    Outputs="F:\voyager\UnityPackages\App.Shared\CMakeFiles\generate.stamp">
     <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/App.Shared/CMakeLists.txt" />
-    <Exec Command="setlocal&#xD;&#xA;&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared/CMakeFiles/generate.stamp&#xD;&#xA;if %errorlevel% neq 0 goto :cmEnd&#xD;&#xA;:cmEnd&#xD;&#xA;endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone&#xD;&#xA;:cmErrorLevel&#xD;&#xA;exit /b %1&#xD;&#xA;:cmDone&#xD;&#xA;if %errorlevel% neq 0 goto :VCEnd" />
+    <Exec Command="setlocal
+&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd" />
   </Target>
-  <Target Condition="'$(Configuration)|$(Platform)'=='Release|Win32' Or '$(Configuration)|$(Platform)'=='Release|x86'" Name="CustomCommand_Release_8dd382befd7df28cf04e265cc96a7b22" Inputs="F:/voyager/UnityPackages/App.Shared/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt" Outputs="F:\voyager\UnityPackages\App.Shared\CMakeFiles\generate.stamp">
+  <Target Condition="'$(Configuration)|$(Platform)'=='Release|Win32' Or '$(Configuration)|$(Platform)'=='Release|x86'"
+    Name="CustomCommand_Release_8dd382befd7df28cf04e265cc96a7b22"
+    Inputs="F:/voyager/UnityPackages/App.Shared/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt"
+    Outputs="F:\voyager\UnityPackages\App.Shared\CMakeFiles\generate.stamp">
     <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/App.Shared/CMakeLists.txt" />
-    <Exec Command="setlocal&#xD;&#xA;&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared/CMakeFiles/generate.stamp&#xD;&#xA;if %errorlevel% neq 0 goto :cmEnd&#xD;&#xA;:cmEnd&#xD;&#xA;endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone&#xD;&#xA;:cmErrorLevel&#xD;&#xA;exit /b %1&#xD;&#xA;:cmDone&#xD;&#xA;if %errorlevel% neq 0 goto :VCEnd" />
+    <Exec Command="setlocal
+&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd" />
   </Target>
-  <Target Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32' Or '$(Configuration)|$(Platform)'=='MinSizeRel|x86'" Name="CustomCommand_MinSizeRel_8dd382befd7df28cf04e265cc96a7b22" Inputs="F:/voyager/UnityPackages/App.Shared/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt" Outputs="F:\voyager\UnityPackages\App.Shared\CMakeFiles\generate.stamp">
+  <Target Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32' Or '$(Configuration)|$(Platform)'=='MinSizeRel|x86'"
+    Name="CustomCommand_MinSizeRel_8dd382befd7df28cf04e265cc96a7b22"
+    Inputs="F:/voyager/UnityPackages/App.Shared/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt"
+    Outputs="F:\voyager\UnityPackages\App.Shared\CMakeFiles\generate.stamp">
     <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/App.Shared/CMakeLists.txt" />
-    <Exec Command="setlocal&#xD;&#xA;&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared/CMakeFiles/generate.stamp&#xD;&#xA;if %errorlevel% neq 0 goto :cmEnd&#xD;&#xA;:cmEnd&#xD;&#xA;endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone&#xD;&#xA;:cmErrorLevel&#xD;&#xA;exit /b %1&#xD;&#xA;:cmDone&#xD;&#xA;if %errorlevel% neq 0 goto :VCEnd" />
+    <Exec Command="setlocal
+&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd" />
   </Target>
-  <Target Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32' Or '$(Configuration)|$(Platform)'=='RelWithDebInfo|x86'" Name="CustomCommand_RelWithDebInfo_8dd382befd7df28cf04e265cc96a7b22" Inputs="F:/voyager/UnityPackages/App.Shared/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt" Outputs="F:\voyager\UnityPackages\App.Shared\CMakeFiles\generate.stamp">
+  <Target Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32' Or '$(Configuration)|$(Platform)'=='RelWithDebInfo|x86'"
+    Name="CustomCommand_RelWithDebInfo_8dd382befd7df28cf04e265cc96a7b22"
+    Inputs="F:/voyager/UnityPackages/App.Shared/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared\CMakeLists.txt"
+    Outputs="F:\voyager\UnityPackages\App.Shared\CMakeFiles\generate.stamp">
     <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/App.Shared/CMakeLists.txt" />
-    <Exec Command="setlocal&#xD;&#xA;&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared/CMakeFiles/generate.stamp&#xD;&#xA;if %errorlevel% neq 0 goto :cmEnd&#xD;&#xA;:cmEnd&#xD;&#xA;endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone&#xD;&#xA;:cmErrorLevel&#xD;&#xA;exit /b %1&#xD;&#xA;:cmDone&#xD;&#xA;if %errorlevel% neq 0 goto :VCEnd" />
+    <Exec Command="setlocal
+&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd" />
   </Target>
   <ItemGroup>
     <Compile Include="F:\voyager\UnityPackages\App.Shared\AssetConfig.cs" />
@@ -111,8 +155,14 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\EntityFactory\ServerSoundEntityFactory.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\EntityFactory\SoundEntityFactory.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\EntityFactory\ThrowingEntityFactory.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Extend\PlayerAgentManagent.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Extend\PlayerEntityC4BagEx.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Extend\PlayerEntityWeaponExt.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Extend\WeaponInfoEx.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\Entitas\FreePredictCmdSystem.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\Free\Action\HallRoomEvent.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\Free\Action\PreloadResourceAction.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\Free\Action\SetRoomStatusAction.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\Free\Chicken\PlayerStateInterrupter.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\Free\FreeEntityConstant.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\Free\FreeMessageSender.cs" />
@@ -263,13 +313,18 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\Sharpen\WrappedSystemStream.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\Sharpen\X509Certificate.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\Sharpen\X509TrustManager.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\UnitTest\AbstractTestCaseAction.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\UnitTest\AbstractTestValue.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\UnitTest\AnimationTestValue.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\UnitTest\DefineTestCaseAction.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\UnitTest\ITestValue.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\UnitTest\IUnitTestData.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\UnitTest\OneCaseAction.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\UnitTest\PlayerTestValue.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\UnitTest\StartUnitTestAction.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\UnitTest\TestCase.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\UnitTest\TestCaseAction.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\UnitTest\TestCaseMultiAction.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\UnitTest\TestRecord.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\UnitTest\TestValue.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\FreeFramework\UnitTest\TestValues.cs" />
@@ -770,9 +825,8 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Configuration\ConfigurationRefreshModule.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Configuration\DefaultConfigInitSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Configuration\ISubResourceLoadSystem.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Configuration\SceneConfigInitSystem.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Configuration\SceneConfigLoadModule.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Configuration\SceneConfigManager.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Configuration\SubResourceConfigurationInitModule.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Configuration\SubResourceLoadSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Configuration\WeaponAvatarAnimSubResourceHandler.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\GamePlay\AbstractPlayerBackSystem.cs" />
@@ -823,6 +877,7 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\CharacterBone\FollowRotHelper.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\CharacterBone\IKFilter.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\CharacterBone\PlayerCharacterBoneUpdateSystem.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\CharacterBone\ServerCharacterBoneUpdateSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\CharacterBone\WeaponRot.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\CharacterState\ComponentSynchronizer.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\CharacterState\FsmInputCommand.cs" />
@@ -839,6 +894,12 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\Event\PlayerEventsExtensions.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\Event\RemoteEventPlaySystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\FsmInputContainer.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\Move\DiveHandler.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\Move\FlyHandler.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\Move\LandHandler.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\Move\PlayerMoveSystem.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\Move\ServerMoveSystem.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\Move\SwimHandler.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\Oxygen\BaseEnergy.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\Oxygen\DivingEnergy.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\Oxygen\OxygenEnergy.cs" />
@@ -863,7 +924,6 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\PlayerFallDamageSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\PlayerGrenadeInventorySyncSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\PlayerHoldBreathSystem.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\PlayerMoveSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\PlayerMoveUtility.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\PlayerResourceLoadSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\PlayerSaveSystem.cs" />
@@ -905,8 +965,8 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\Robot\SharedVariables\SharedGameObjectSet.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\Robot\SharedVariables\SharedVariables.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\Robot\Utility\RobotUtility.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\ServerMoveSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Player\ServerPlayerSkyMoveStateUpdateSystem.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Preparation\InitMapIdSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Preparation\InitialSceneLoadingSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\SceneObject\DoorRotateSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\SceneObject\DoorTriggerSystem.cs" />
@@ -959,6 +1019,21 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Vehicle\WheelCarrier\WheelEntityMoveUtility.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Vehicle\WheelCarrier\WheelEntityStateUtility.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Vehicle\WheelCarrier\WheelEntityUtility.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Weapon\Cache\GrenadeBagCacheHelper.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Weapon\PlayerEntityWeaponMedium.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Weapon\PlayerWeaponComponentAgent.Getter.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Weapon\PlayerWeaponComponentAgent.Part.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Weapon\PlayerWeaponComponentAgent.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Weapon\PlayerWeaponController.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Weapon\Shared\IBagDataCacheHelper.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Weapon\Shared\IPlayerWeaponComponentGetterShared.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Weapon\Shared\WeaponSharedStructs.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Weapon\Shared\WeaponSlotsLibrary.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Weapon\SlotHandler\GrenadeSlotHandler.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Weapon\SlotHandler\MeleeSlotHandler.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Weapon\SlotHandler\TacticSlotHandler.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Weapon\SlotHandler\WeaponBagSlotsAux.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\GameModules\Weapon\SlotHandler\WeaponSlotHandlerBase.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Log4ConfigManager.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\MyHttpServer.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Network\AppMessageTypeInfo.cs" />
@@ -981,10 +1056,6 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Network\SerializeInfo\VehicleCmdSerializeInfo.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Network\SerializeInfo\VehicleEventMessageConverter.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Network\SerializeInfo\VehicleEventSerializeInfo.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Patch\BagLogicPatch.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Patch\Patch.WeaponLogic.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Patch\PlayerWeaponActionLogicPatch.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Patch\WeaponLocationControllerPatch.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Player\Events\DefaultEvent.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Player\Events\FireEvent.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Player\Events\HitEnvironmentEvent.cs" />
@@ -995,21 +1066,27 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Player\PlayerEntityEx.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Player\PlayerInfoExtensions.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Player\PlayerStateUtil.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\Player\PlayerWeaponActionLogic.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Room\RoomInfoEx.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\RpcMessageType.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\Basic\FixedScenesManager.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\Basic\OnceForAllParam.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\DynamicScenesController.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\ISceneManagementEvent.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\ISceneResourceManager.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\ISceneResourceRequestHandler.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\IUpdatePositionRelatedEffect.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\LevelController.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\LevelInit.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\LevelManager.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\PositionRelatedEffectUpdater.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\SceneAbstractController.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\Streaming\ResourceRequestCache.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\SceneDebugger.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\Streaming\IStreamingGoManager.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\Streaming\IStreamingResourceHandler.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\Streaming\LoadedScene.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\Streaming\StreamingGoByScene.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\Streaming\StreamingManager.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\Streaming\StreamingScene.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\Streaming\StreamingSceneGoInstantiation.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\TerrainInit.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\Streaming\WorldCompositionManager.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneManagement\Streaming\WorldCompositionParam.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\SceneTriggerObject\TriggerObjectManager.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\SessionStates\IAssetInfoProvider.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\SessionStates\PreLoadAssetProvider.cs" />
@@ -1036,9 +1113,11 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\AbstractUserCmdExecuteSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\AttachmentUtil.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\BagUtility.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\CommonUtil.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\MapObjectUtility.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\SceneObjectUtility.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\StatisticsDataEx.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\Util\Weapon\WeaponUtil.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VechilePrediction\AbstractVehicleCmdExecuteSystemHandler.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VechilePrediction\ClientVehicleCmdExecuteSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VechilePrediction\ClientVehicleCmdExecuteSystemHandler.cs" />
@@ -1073,17 +1152,6 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VehicleGameHandler\VehicleSyncEventSendHandler.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VehicleGameHandler\VehicleTypeMatcher.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\VehicleGameHandler\VehicleUpdateHandler.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponBag\BagLogic.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponBag\IBag.cs" />
-    <Compile Include="WeaponBag\SlotHandler\GrenadeSlotHandler.cs" />
-    <Compile Include="WeaponBag\SlotHandler\MeleeSlotHandler.cs" />
-    <Compile Include="WeaponBag\SlotHandler\WeaponSlotHandlerBase.cs" />
-    <Compile Include="WeaponBag\SlotHandler\TacticSlotHandler.cs" />
-    <Compile Include="WeaponBag\SlotHandler\WeaponSlotAuxiliary.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponBag\PlayerEntityC4BagEx.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponBag\SlotController\DefaultWeaponSlotController.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponBag\SlotController\GroupWeaponSlotController.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponBag\WeaponInfoEx.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponLogic\Attachment\WeaponAttachmentFactory.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponLogic\Bullet\BulletFireInfoProvider.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponLogic\Bullet\DefaultBulletFireInfoProvider.cs" />
@@ -1096,7 +1164,6 @@
     <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponLogic\Tactic\TacticWeaponLogic.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponLogic\WeaponFactory.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\WeaponLogic\WeaponLogicComponentsFactory.cs" />
-    <Compile Include="WeaponBag\Cache\GrenadeBagCacheAgent.cs" />
     <None Include="F:\voyager\UnityPackages\App.Shared\packages.config" />
   </ItemGroup>
   <ItemGroup>

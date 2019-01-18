@@ -18,6 +18,7 @@ namespace App.Shared.GameModules.Player
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerSkyMoveUtility));
         public static void DelayLoadParachute(PlayerEntity player, Contexts contexts)
         {
+            _logger.Info("Delay Load Parachute...");
             var parachuteAssetInfo = new AssetInfo("equipment/parachute", "I002");
             var loadRequestManager = contexts.session.commonSession.LoadRequestManager;
             loadRequestManager.AppendLoadRequest(player, parachuteAssetInfo,

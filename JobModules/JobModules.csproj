@@ -1056,6 +1056,21 @@
     <Compile Include="App.Shared\GameModules\Vehicle\WheelCarrier\WheelEntityMoveUtility.cs" />
     <Compile Include="App.Shared\GameModules\Vehicle\WheelCarrier\WheelEntityStateUtility.cs" />
     <Compile Include="App.Shared\GameModules\Vehicle\WheelCarrier\WheelEntityUtility.cs" />
+    <Compile Include="App.Shared\GameModules\Weapon\Cache\GrenadeBagCacheHelper.cs" />
+    <Compile Include="App.Shared\GameModules\Weapon\PlayerEntityWeaponMedium.cs" />
+    <Compile Include="App.Shared\GameModules\Weapon\PlayerWeaponComponentAgent.cs" />
+    <Compile Include="App.Shared\GameModules\Weapon\PlayerWeaponComponentAgent.Getter.cs" />
+    <Compile Include="App.Shared\GameModules\Weapon\PlayerWeaponComponentAgent.Part.cs" />
+    <Compile Include="App.Shared\GameModules\Weapon\PlayerWeaponController.cs" />
+    <Compile Include="App.Shared\GameModules\Weapon\Shared\IBagDataCacheHelper.cs" />
+    <Compile Include="App.Shared\GameModules\Weapon\Shared\IPlayerWeaponComponentGetterShared.cs" />
+    <Compile Include="App.Shared\GameModules\Weapon\Shared\WeaponSharedStructs.cs" />
+    <Compile Include="App.Shared\GameModules\Weapon\Shared\WeaponSlotsLibrary.cs" />
+    <Compile Include="App.Shared\GameModules\Weapon\SlotHandler\GrenadeSlotHandler.cs" />
+    <Compile Include="App.Shared\GameModules\Weapon\SlotHandler\MeleeSlotHandler.cs" />
+    <Compile Include="App.Shared\GameModules\Weapon\SlotHandler\TacticSlotHandler.cs" />
+    <Compile Include="App.Shared\GameModules\Weapon\SlotHandler\WeaponBagSlotsAux.cs" />
+    <Compile Include="App.Shared\GameModules\Weapon\SlotHandler\WeaponSlotHandlerBase.cs" />
     <Compile Include="App.Shared\Log4ConfigManager.cs" />
     <Compile Include="App.Shared\MyHttpServer.cs" />
     <Compile Include="App.Shared\Network\AppMessageTypeInfo.cs" />
@@ -2058,7 +2073,26 @@
     <Folder Include="App.Shared\Bag\SlotController\" />
     <Folder Include="App.Shared\bin\Release\" />
   </ItemGroup>
-  
+  <ItemGroup>
+    <None Include="App.Shared\GameModules\Weapon\Cache.meta" />
+    <None Include="App.Shared\GameModules\Weapon\Cache\GrenadeBagCacheHelper.cs.meta" />
+    <None Include="App.Shared\GameModules\Weapon\PlayerEntityWeaponMedium.cs.meta" />
+    <None Include="App.Shared\GameModules\Weapon\PlayerWeaponComponentAgent.cs.meta" />
+    <None Include="App.Shared\GameModules\Weapon\PlayerWeaponComponentAgent.Getter.cs.meta" />
+    <None Include="App.Shared\GameModules\Weapon\PlayerWeaponComponentAgent.Part.cs.meta" />
+    <None Include="App.Shared\GameModules\Weapon\PlayerWeaponController.cs.meta" />
+    <None Include="App.Shared\GameModules\Weapon\Shared.meta" />
+    <None Include="App.Shared\GameModules\Weapon\Shared\IBagDataCacheHelper.cs.meta" />
+    <None Include="App.Shared\GameModules\Weapon\Shared\IPlayerWeaponComponentGetterShared.cs.meta" />
+    <None Include="App.Shared\GameModules\Weapon\Shared\WeaponSharedStructs.cs.meta" />
+    <None Include="App.Shared\GameModules\Weapon\Shared\WeaponSlotsLibrary.cs.meta" />
+    <None Include="App.Shared\GameModules\Weapon\SlotHandler.meta" />
+    <None Include="App.Shared\GameModules\Weapon\SlotHandler\GrenadeSlotHandler.cs.meta" />
+    <None Include="App.Shared\GameModules\Weapon\SlotHandler\MeleeSlotHandler.cs.meta" />
+    <None Include="App.Shared\GameModules\Weapon\SlotHandler\TacticSlotHandler.cs.meta" />
+    <None Include="App.Shared\GameModules\Weapon\SlotHandler\WeaponBagSlotsAux.cs.meta" />
+    <None Include="App.Shared\GameModules\Weapon\SlotHandler\WeaponSlotHandlerBase.cs.meta" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />

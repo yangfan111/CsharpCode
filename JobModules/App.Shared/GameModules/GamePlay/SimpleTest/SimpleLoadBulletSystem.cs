@@ -6,7 +6,7 @@ using Entitas;
 using XmlConfig;
 using Core.WeaponLogic;
 using UnityEngine;
-using Core.Bag;
+using Core;
 using WeaponConfigNs;
 using Assets.Utils.Configuration;
 using Core.GameInputFilter;
@@ -18,7 +18,8 @@ using App.Server.GameModules.GamePlay.free.player;
 using App.Shared.FreeFramework.framework.trigger;
 using App.Shared.FreeFramework.framework.@event;
 using Utils.Singleton;
-using App.Shared.WeaponLogic;
+using App.Shared.GameModules.Weapon;
+using App.Shared.Util;
 
 namespace App.Shared.GameModules.GamePlay.SimpleTest
 {
@@ -64,26 +65,21 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                 {
                     return;
                 }
-                if (!player.hasBag)
-                {
+                if (!player.hasWeaponComponentAgent)
                     return;
-                }
-                var bagImp = player.bag.Bag as WeaponBagLogic;
-                if (!bagImp.HasWeapon())
-                {
-                    return;
-                }
-                var weapon = bagImp.GetCurrentWeaponInfo();
-                var config = SingletonManager.Get<WeaponConfigManager>().GetConfigById(weapon.Id);
+                ISharedPlayerWeaponComponentGetter sharedAPI = player.GetController<PlayerWeaponController>();
+            
+                WeaponInfo currWeapon = sharedAPI.CurrSlotWeaponInfo;
+                var config = SingletonManager.Get<WeaponConfigManager>().GetConfigById(currWeapon.Id);
                 if (NoReloadAction(config))
                 {
                     return;
                 }
-                if (MagazineIsFull(player.weaponLogic.State, weapon.Bullet))
+                if (MagazineIsFull(player.weaponLogic.State, currWeapon.Bullet))
                 {
                     return;
                 }
-                if (HasNoReservedBullet(bagImp, player))
+                if (HasNoReservedBullet(sharedAPI, player))
                 {
                     return;
                 }
@@ -120,7 +116,7 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                 {
                     if (weaponState.LoadedBulletCount > 0 && !weaponState.IsAlwaysEmptyReload)
                     {
-                        var needActionDeal = CheckNeedActionDeal(bagImp, ActionDealEnum.Reload);
+                        var needActionDeal = CheckNeedActionDeal(sharedAPI, ActionDealEnum.Reload);
                         if (needActionDeal)
                         {
                             player.appearanceInterface.Appearance.MountWeaponOnAlternativeLocator();
@@ -138,7 +134,7 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                     }
                     else
                     {
-                        var needActionDeal = CheckNeedActionDeal(bagImp, ActionDealEnum.ReloadEmpty);
+                        var needActionDeal = CheckNeedActionDeal(sharedAPI, ActionDealEnum.ReloadEmpty);
                         if (needActionDeal)
                         {
                             player.appearanceInterface.Appearance.MountWeaponOnAlternativeLocator();
@@ -172,9 +168,9 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
             return bulletCount >= weaponState.BulletCountLimit;
         }
 
-        private bool HasNoReservedBullet(WeaponBagLogic bag, PlayerEntity playerEntity)
+        private bool HasNoReservedBullet(ISharedPlayerWeaponComponentGetter agent, PlayerEntity playerEntity)
         {
-            if (bag.GetReservedBullet() < 1)
+            if (agent.GetReservedBullet() < 1)
             {
                 _elapse = 0;
                 if (SharedConfig.CurrentGameMode == Components.GameMode.Normal)
@@ -233,10 +229,9 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
             }
         }
 
-        private bool CheckNeedActionDeal(WeaponBagLogic bag, ActionDealEnum action)
+        private bool CheckNeedActionDeal(ISharedPlayerWeaponComponentGetter sharedApi, ActionDealEnum action)
         {
-            var weaponId = bag.GetCurrentWeaponInfo().Id;
-            return SingletonManager.Get<WeaponConfigManager>().NeedActionDeal(weaponId, action);
+            return SingletonManager.Get<WeaponConfigManager>().NeedActionDeal(sharedApi.CurrSlotWeaponId, action);
         }
 
         // 临时代码

@@ -95,16 +95,16 @@ namespace App.Shared.GameModules.SceneObject
                             door.AddDoorRotate(from, from, to, endState);
                             _logger.DebugFormat("Trigger Door From {0} {1} To {2} {3}",
                                 state, from, endState, to);
-                            switch((DoorState)endState)
-                            {
-                                case DoorState.Closed:
-                                    player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.CloseDoor);
-                                    break;
-                                case DoorState.OpenMax:
-                                case DoorState.OpenMin:
-                                    player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.OpenDoor);
-                                    break;
-                            }
+                            //switch((DoorState)endState)
+                            //{
+                            //    case DoorState.Closed:
+                            //        player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.CloseDoor);
+                            //        break;
+                            //    case DoorState.OpenMax:
+                            //    case DoorState.OpenMin:
+                            //        player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.OpenDoor);
+                            //        break;
+                            //}
                         }
                     }
                 }

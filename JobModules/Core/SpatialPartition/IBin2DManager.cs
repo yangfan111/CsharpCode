@@ -33,7 +33,7 @@ namespace Core.SpatialPartition
         }
     }
 
-    public interface IBin2DManager
+    public interface IBin2DManager:IDisposable
     {
         Bin2dState AddBin2D(int type, Bin2D<IGameEntity> bin2D, int visibleRadius,
             Func<Vector3, bool> bin2DFilter = null);
@@ -62,6 +62,14 @@ namespace Core.SpatialPartition
         public ICollection<Bin2dState> GetBin2Ds()
         {
             return Bin2DStates.Values;
+        }
+
+        public void Dispose()
+        {
+            foreach (var bin2DState in Bin2DStates.Values)
+            {
+                bin2DState.Bin2D.Dispose();
+            }
         }
     }
 }

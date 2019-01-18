@@ -150,10 +150,6 @@ namespace Core.CharacterState.Posture
 
                     if (ret)
                     {
-                        FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.SwimLayer,
-                                                       AnimatorParametersHash.Instance.SwimEnableValue,
-                                                       CharacterView.ThirdPerson);
-                        addOutput(FsmOutput.Cache);
 
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.SwimStateHash,
                                                  AnimatorParametersHash.Instance.SwimStateName,
@@ -167,7 +163,19 @@ namespace Core.CharacterState.Posture
                     return ret;
                 },
                 (command, addOutput) => FsmTransitionResponseType.NoResponse,
-                (int)PostureStateId.Swim, null, 0, new[] { FsmInput.Swim });
+                (int)PostureStateId.Swim,
+                (normalizedTime, addOutput) =>
+                {
+                    FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.SwimLayer,
+                        Mathf.Lerp(AnimatorParametersHash.Instance.SwimDisableValue,
+                            AnimatorParametersHash.Instance.SwimEnableValue,
+                            Mathf.Clamp01(normalizedTime)),
+                        CharacterView.ThirdPerson);
+                    addOutput(FsmOutput.Cache);
+                    
+                },
+                SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Stand, PostureInConfig.Swim), 
+                new[] { FsmInput.Swim });
 
             #endregion
 
@@ -454,7 +462,7 @@ namespace Core.CharacterState.Posture
 
             #region swim to stand
 
-            AddTransitionFromWaterToStand(state);
+            AddTransitionFromWaterToStand(state, SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Swim, PostureInConfig.Stand));
 
             #endregion
 
@@ -494,7 +502,7 @@ namespace Core.CharacterState.Posture
 
             #region dive to stand
 
-            AddTransitionFromWaterToStand(state);
+            AddTransitionFromWaterToStand(state, SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Dive, PostureInConfig.Stand));
 
             #endregion
 
@@ -642,7 +650,7 @@ namespace Core.CharacterState.Posture
                 null, (int)PostureStateId.Dying, null, 0, new[] { FsmInput.Dying });
         }
 
-        private static void AddTransitionFromWaterToStand(PostureState state)
+        private static void AddTransitionFromWaterToStand(PostureState state, int duration)
         {
             state.AddTransition(
                 (command, addOutput) =>
@@ -651,11 +659,6 @@ namespace Core.CharacterState.Posture
 
                     if (ret)
                     {
-                        FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.SwimLayer,
-                                                       AnimatorParametersHash.Instance.SwimDisableValue,
-                                                       CharacterView.ThirdPerson);
-                        addOutput(FsmOutput.Cache);
-
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
                                                  AnimatorParametersHash.Instance.PostureName,
                                                  AnimatorParametersHash.Instance.StandValue,
@@ -676,7 +679,18 @@ namespace Core.CharacterState.Posture
                     return ret;
                 },
                 (command, addOutput) => FsmTransitionResponseType.NoResponse,
-                (int)PostureStateId.Stand, null, 0, new[] { FsmInput.Ashore });
+                (int)PostureStateId.Stand, 
+                (normalizedTime, addOutput) =>
+                {
+                    FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.SwimLayer,
+                        Mathf.Lerp(AnimatorParametersHash.Instance.SwimEnableValue,
+                            AnimatorParametersHash.Instance.SwimDisableValue,
+                            Mathf.Clamp01(normalizedTime)),
+                        CharacterView.ThirdPerson);
+                    addOutput(FsmOutput.Cache);
+                    
+                },
+                duration, new[] { FsmInput.Ashore });
         }
 
         protected static void AddTransitionFromJumpToDying(PostureState state)

@@ -1,4 +1,4 @@
-﻿using App.Shared.WeaponLogic;
+﻿using App.Shared.GameModules.Weapon;
 using Core.WeaponLogic.Accuracy;
 using Core.WeaponLogic.Bullet;
 using Core.WeaponLogic.Kickback;

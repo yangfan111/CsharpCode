@@ -117,7 +117,7 @@ namespace App.Shared.GameModules.Player.CharacterState
             vel.y = 0;
             var lastSpeed = vel.magnitude;
 
-            if (_posture.GetCurrentPostureState() == PostureInConfig.Jump)
+            if (_posture.GetNextPostureState() == PostureInConfig.Jump)
             {
                 SetDefaultSpeeedRatio(buff);
                 CalcMoveSpeedReduce(deltaTime, true);
@@ -134,7 +134,8 @@ namespace App.Shared.GameModules.Player.CharacterState
                 vel.Normalize();
                 
                 var maxSpeed = GetMaxSpeed(buff);
-                //_logger.InfoFormat("maxspeed:{0}, buff:{1}", maxSpeed, buff);
+                
+                //_logger.InfoFormat("maxspeed:{0}, buff:{1}, next pos:{2}, next move:{3}", maxSpeed, buff,_postureInConfig.NextPosture(), _movementInConfig.NextMovement());
                 if (CompareUtility.IsApproximatelyEqual(maxSpeed, lastSpeed))
                 {
                     vel *= maxSpeed;
@@ -168,16 +169,14 @@ namespace App.Shared.GameModules.Player.CharacterState
             {
                 vel.y = 3.4f;
             }
-            else if (_posture.GetCurrentPostureState() == PostureInConfig.Swim)
+            else if (_posture.GetNextPostureState() == PostureInConfig.Swim)
             {
                 vel.y = 0;
             }
-            else if (_posture.GetCurrentPostureState() != PostureInConfig.Dive)
+            else if (_posture.GetNextPostureState() != PostureInConfig.Dive)
             {
                 vel.y = lastVel.y - deltaTime * Gravity;
             }
-
-            
 
             return vel;
         }
@@ -278,7 +277,7 @@ namespace App.Shared.GameModules.Player.CharacterState
             bool valid = false;
             var candidateId1 = CharacterStateConfigHelper.GenerateId(_postureInConfig.InTransition() ? _postureInConfig.NextPosture() : _postureInConfig.CurrentPosture(),
                  _movementInConfig.InTransition() ? _movementInConfig.NextMovement() : _movementInConfig.CurrentMovement());
-            var candidateId2 = CharacterStateConfigHelper.GenerateId(_postureInConfig.CurrentPosture(), MovementInConfig.Null);
+            var candidateId2 = CharacterStateConfigHelper.GenerateId(_postureInConfig.NextPosture(), MovementInConfig.Null);
             //_logger.InfoFormat("posture in transition:{0}, next posture:{1}, cur posture:{2}, move in transition:{3}, next move:{4}, CURRENT MOVE:{5}",_postureInConfig.InTransition() , _postureInConfig.NextPosture() , _postureInConfig.CurrentPosture(),
              //   _movementInConfig.InTransition() , _movementInConfig.NextMovement() , _movementInConfig.CurrentMovement());
             if (_speedConditionDictionary.ContainsKey(candidateId2))

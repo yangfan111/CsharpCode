@@ -10,7 +10,7 @@ namespace Core.Prediction
 {
     public class PredictionInitManager<TPredictionComponent> : IPredictionInitManager where TPredictionComponent:IPredictionComponent
     {
-        private LoggerAdapter _logger = new LoggerAdapter(typeof(PredictionInitManager<TPredictionComponent>));
+        private LoggerAdapter _logger = new LoggerAdapter("Core.Prediction.PredictionInitManager");
        
 
         public class CloneFilter : IEntityMapFilter
@@ -76,7 +76,6 @@ namespace Core.Prediction
 
             if (shouldRewind)
             {
-                //remoteEntityMap = _handler.RemoteEntityMap;
                 RewindTo(remoteEntityMap);
                 _handler.OnRewind();
                 

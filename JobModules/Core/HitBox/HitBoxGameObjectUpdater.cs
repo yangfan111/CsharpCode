@@ -18,7 +18,8 @@ namespace Core.HitBox
             for (int i = 0; i < hitbox.childCount; i++)
             {
                 var child = hitbox.GetChild(i);
-                Transform modelTransform = transformProvider.GetTransform(child.name);
+                
+                Transform modelTransform = transformProvider.GetTransform(child);
                 if (modelTransform != null)
                 {
                     child.localPosition = modelTransform.transform.localPosition;
@@ -26,7 +27,7 @@ namespace Core.HitBox
                 }
                 else
                 {
-                    _logger.DebugFormat("can't find hitbox node [{0}] in model {1}", child.name, transformProvider);
+                    _logger.DebugFormat("can't find hitbox node [{0}] in model {1}", child, transformProvider);
                 }
 
                 UpdateBones(child, transformProvider);

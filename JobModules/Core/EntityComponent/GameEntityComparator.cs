@@ -114,11 +114,10 @@ namespace Core.EntityComponent
             _componentComparator.RightEntity = rightEntity;
             _handler.OnDiffEntityStart(leftEntity, rightEntity);
             int count = 0;
-#if UNITY_EDITOR
+
             try
             {
-                _infos[leftEntity.EntityKey.EntityType].BeginProfile();
-#endif
+                _infos[leftEntity.EntityKey.EntityType].BeginProfileOnlyEnableProfile();
                 var left = leftEntity.PlayBackComponentDictionary;
                 var right = rightEntity.PlayBackComponentDictionary;
                 var handler = _componentComparator;
@@ -149,13 +148,13 @@ namespace Core.EntityComponent
                         handler.OnLeftItemMissing(rv);
                     }
                 }
-#if UNITY_EDITOR
+
             }
             finally
             {
-                _infos[leftEntity.EntityKey.EntityType].EndProfile();
+                _infos[leftEntity.EntityKey.EntityType].EndProfileOnlyEnableProfile();
             }
-#endif
+
 
             _handler.OnDiffEntityFinish(leftEntity, rightEntity);
             return count;
@@ -217,11 +216,11 @@ namespace Core.EntityComponent
 
              
                 int count = 0;
-#if UNITY_EDITOR
+
                 try
                 {
-                    _infos[leftEntity.EntityKey.EntityType].BeginProfile();
-#endif                    
+                    _infos[leftEntity.EntityKey.EntityType].BeginProfileOnlyEnableProfile();
+                   
                     var left = leftEntity.PlayBackComponentDictionary;
                     var right = rightEntity.PlayBackComponentDictionary;
                     foreach (var kv in left)
@@ -236,13 +235,12 @@ namespace Core.EntityComponent
                             _componentComparator.OnItemSame(lv, rv);
                         }
                     }
-#if UNITY_EDITOR                  
+               
                 }
                 finally
                 {
-                    _infos[leftEntity.EntityKey.EntityType].EndProfile();
-                }
-#endif  
+                    _infos[leftEntity.EntityKey.EntityType].EndProfileOnlyEnableProfile();
+                } 
                 _handler.OnDiffEntityFinish(leftEntity, rightEntity);
                 return count;
             }

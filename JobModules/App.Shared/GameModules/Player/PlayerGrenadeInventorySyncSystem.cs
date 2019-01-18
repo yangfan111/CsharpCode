@@ -1,4 +1,6 @@
-﻿using Core.GameModule.Interface;
+﻿using App.Shared.GameModules.Weapon;
+using Core;
+using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 
@@ -15,12 +17,8 @@ namespace App.Shared.GameModules.Player
                 Logger.Error("player entity is null");
                 return;
             }
-            if(!player.hasGrenadeInventoryHolder)
-            {
-                Logger.Error("palyer has no GrenadeInventoryHolder");
-                return;
-            }
-            player.grenadeInventoryHolder.Inventory.Rewind();
+            Weapon.IBagDataCacheHelper helper = player.GetController<PlayerWeaponController>().GetBagCacheHelper(EWeaponSlotType.GrenadeWeapon);
+            helper.Rewind();
         }
     }
 }

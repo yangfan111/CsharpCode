@@ -47,13 +47,13 @@ namespace Core.Playback
                     _playBackInfos.Add(new PlayBackInfo(localComponent, leftComponent, rightComponent));
                     try
                     {
-                        _info.BeginProfile();
+                        _info.BeginProfileOnlyEnableProfile();
                         local.Interpolate(leftComponent, rightComponent,
                             _interpolationInfo);
                     }
                     finally
                     {
-                        _info.EndProfile();
+                        _info.EndProfileOnlyEnableProfile();
                     }
                     
 

@@ -44,7 +44,7 @@ namespace App.Shared.EntityFactory
         public static void CreateBulletDrop(ClientEffectContext context, IEntityIdGenerator idGenerator,
             EntityKey owner, Vector3 position, float Yaw, float pitch, int effectId)
         {
-            while (_bulletDropEntities.Count >= SingletonManager.Get<ClientEffectCommonConfigManager>().BulletDropMaxCount)
+            while (_bulletDropEntities.Count >= SingletonManager.Get<ClientEffectCommonConfigManager>().GetBulletDropMaxCount(SharedConfig.IsServer))
             {
                 var val = _bulletDropEntities.First.Value;
                 if (val.isEnabled)

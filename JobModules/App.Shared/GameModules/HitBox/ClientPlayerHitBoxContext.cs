@@ -1,4 +1,5 @@
-﻿using App.Shared.Components.Common;
+﻿using System.Collections.Generic;
+using App.Shared.Components.Common;
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Player;
 using Core.Animation;
@@ -8,6 +9,7 @@ using Core.HitBox;
 using Core.Utils;
 using System.Text;
 using UnityEngine;
+using Utils.Singleton;
 
 namespace App.Shared.GameModules.Bullet
 {
@@ -16,7 +18,7 @@ namespace App.Shared.GameModules.Bullet
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(ClientPlayerHitBoxContext));
         private PlayerContext _playerContext;
         private AnimatorPoseReplayer _poseReplayer;
-
+      
         public ClientPlayerHitBoxContext(PlayerContext playerContext)
         {
             _playerContext = playerContext;
@@ -48,7 +50,8 @@ namespace App.Shared.GameModules.Bullet
                 var playerEntity = GetPlayerEntity(gameEntity);
 				
                 playerEntity.thirdPersonAnimator.UnityAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
-                var provider = new HitBoxTransformProvider(playerEntity.thirdPersonModel.Value, position, rotation);
+                var provider = SingletonManager.Get<HitBoxTransformProviderCache>().GetProvider(playerEntity.thirdPersonModel.Value);
+                provider.Update(position, rotation);
                 HitBoxGameObjectUpdater.Update(hitBoxComponent.HitBoxGameObject.transform, provider);
                 playerEntity.thirdPersonAnimator.UnityAnimator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
 
@@ -61,6 +64,7 @@ namespace App.Shared.GameModules.Bullet
             }
         }
 
+      
       
         private PlayerEntity GetPlayerEntity(IGameEntity gameEntity)
         {

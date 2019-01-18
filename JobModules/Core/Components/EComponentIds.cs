@@ -50,6 +50,7 @@
         VehicleSeat,
         SendUserCmd,
         Random,
+        LatestAdjustCmd,
         
         CameraState,
         CameraStateNew,
@@ -85,6 +86,7 @@
         PlayerFsmOutBefore,
         PlayerFirePos,
         PlayerFirstPersonAppearance,
+        PlayerFirstPersonAppearanceUpdate,
         PlayerThirdPersonAppearance,
         PlayerLatestAppearance,
         PlayerPredictedAppearance,

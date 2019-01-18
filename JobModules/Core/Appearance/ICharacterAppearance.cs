@@ -48,6 +48,7 @@ namespace Core.Appearance
         int GetScopeIdInCurrentWeapon();
         // 获取当前武器ID
         int GetWeaponIdInHand();
+        bool IsEmptyHand();
         //将武器挂载到替代绑点上
         void MountWeaponOnAlternativeLocator();
         //武器重新绑到右手绑点上
@@ -62,7 +63,7 @@ namespace Core.Appearance
         void EndReload();
 
         WardrobeController GetWardrobeController();
-        WeaponController GetWeaponController();
+        WeaponController GetController<PlayerWeaponController>();
 
         void Execute();
 

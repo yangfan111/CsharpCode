@@ -1,5 +1,5 @@
 ﻿using Core.Attack;
-using Core.Bag;
+using Core;
 using Core.EntityComponent;
 using Core.Free;
 using Core.Statistics;

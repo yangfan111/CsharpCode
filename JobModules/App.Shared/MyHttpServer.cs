@@ -41,7 +41,7 @@ namespace App.Shared
                    
             }
         }
-        public static void Start(int port, IEcsDebugHelper debugHelper)
+        public static void Start(int port)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace App.Shared
                 webserver.AddPageHandler("/BandWidthMonitor", new BandWidthMonitorHandler());
                 webserver.AddPageHandler("/SanpShotData", new SnapSHotHandler());
                 webserver.AddPageHandler("/fps", new FpsHandler());
-                webserver.AddPageHandler("/debug", new DebugHandler(debugHelper));
+                webserver.AddPageHandler("/debug", new DebugHandler());
                 webserver.AddPageHandler("/rigidbody", new RigidbodyInfoHandler());
                 webserver.AddPageHandler("/res", new LoadResHandler(true));
                 webserver.AddPageHandler("/resall", new LoadResHandler(false));
@@ -241,13 +241,16 @@ namespace App.Shared
             }
 
             StringBuilder sb = new StringBuilder();
+            sb.Append(
+                "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><script src=\"https://code.jquery.com/jquery-1.10.2.js\"></script><link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css\"><script type=\"text/javascript\" charset=\"utf8\" src=\"https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js\"></script><script>$(document).ready( function () {$('#table_id').DataTable({paging: false});});</script></head><body>");
+
             sb.Append("<p>").Append("Summary ").Append("Total: ").Append(infoCount).Append("  ").
                 Append("ActiveCount: ").Append(activeCount).Append("  ").
                 Append("KinematicCount: ").Append(kinematicCount).Append("  ").
                 Append("ActiveKinematicCount: ").Append(activeKinematicCount).Append("  ").
                 Append("SleepingCount: ").Append(sleepingCount).Append("  ").
                 Append("</p>");
-            sb.Append("<table width='1000px' border='1' align='center' cellpadding='2' cellspacing='1'>");
+            sb.Append ("<table id=\"table_id\" class=\"display\" width='400px' border='1' align='center' cellpadding='2' cellspacing='1'>");
             sb.Append("<thead>");
             sb.Append("<td width='10%'>Name</td>");
             sb.Append("<td>EntityKey</td>");
@@ -286,10 +289,9 @@ namespace App.Shared
 
     public class DebugHandler : IHttpRequestHandler
     {
-        private IEcsDebugHelper _debugHelper;
-        public DebugHandler(IEcsDebugHelper debugHelper)
+        public DebugHandler()
         {
-            _debugHelper = debugHelper;
+            
         }
 
         public string GetResponse()

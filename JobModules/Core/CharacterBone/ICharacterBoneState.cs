@@ -14,10 +14,14 @@ namespace Core.CharacterBone
         float HeadRotProcess { get; set; }
         bool IsHeadRotCW { get; set; }
         float WeaponPitch { get; set; }
-
-        //Quaternion NeckP3Pitch { get; set; }
-        //Quaternion HeadP3Pitch { get; set; }
-        //Quaternion NeckP3Yaw { get; set; }
-        //Quaternion HeadP3Yaw { get; set; }
+        float WeaponRot { get; set; }
+        
+        Vector3 FirstPersonPositionOffset { get; set; }
+        Vector3 FirstPersonRotationOffset { get; set; }
+        Vector3 FirstPersonSightOffset { get; set; }
+        
+        float ScreenRatio { get; set; }
+        int RealWeaponId { get; set; }
+        bool NeedChangeOffset { get; set; }
     }
 }

@@ -7,6 +7,7 @@ using Utils.Configuration;
 using Core.Configuration.Sound;
 using System.Collections.Generic;
 using Utils.Singleton;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Configuration
 {
@@ -105,7 +106,7 @@ namespace App.Shared.GameModules.Configuration
             foreach(var player in _playerContext.GetEntities())
             {
                 player.weaponFactory.Factory.ClearCache();
-                player.playerAction.Logic.TryMountWeapon(player.GetBagLogicImp().GetCurrentWeaponSlot());
+                player.GetController<PlayerWeaponController>().TryMountSlotWeapon(player.GetController<PlayerWeaponController>().CurrSlotType);
             }
         }
 

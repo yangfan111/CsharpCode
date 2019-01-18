@@ -419,8 +419,7 @@ namespace Core.CharacterState.Movement
                 state.AvailableTransitionId(),
                 (command, addOutput) =>
                 {
-                    if (command.IsMatch(FsmInput.Sprint) || command.IsMatch(FsmInput.Run) ||
-                        command.IsMatch(FsmInput.Walk))
+                    if (command.IsMatch(FsmInput.Walk))
                     {
                         command.Handled = true;
                         return true;
@@ -431,7 +430,41 @@ namespace Core.CharacterState.Movement
                 null,
                 (int)MovementStateId.Walk,
                 null,
-                0), new[] { FsmInput.Sprint, FsmInput.Run, FsmInput.Walk });
+                0), new[] {FsmInput.Walk });
+            
+            state.AddTransition(new DiveTransition(
+                state.AvailableTransitionId(),
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.Run))
+                    {
+                        command.Handled = true;
+                        return true;
+                    }
+
+                    return false;
+                },
+                null,
+                (int)MovementStateId.Run,
+                null,
+                0), new[] {FsmInput.Run});
+            
+            state.AddTransition(new DiveTransition(
+                state.AvailableTransitionId(),
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.Sprint))
+                    {
+                        command.Handled = true;
+                        return true;
+                    }
+
+                    return false;
+                },
+                null,
+                (int)MovementStateId.Sprint,
+                null,
+                0), new[] { FsmInput.Sprint });
 
             #endregion
             return state;

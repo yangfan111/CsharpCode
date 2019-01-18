@@ -10,6 +10,8 @@ using Core.Room;
 using Core.Configuration;
 using Core.Free;
 using Core.BulletSimulation;
+using Core.SceneManagement;
+using UnityEngine;
 
 namespace Core.GameModule.System
 {
@@ -37,5 +39,7 @@ namespace Core.GameModule.System
         IEntityIdGenerator EquipmentEntityIdGenerator { get; set; }
         IFreeArgs FreeArgs{ get; set; }
         IBulletInfoCollector BulletInfoCollector { get; set; }
+        ILevelManager LevelManager { get; set; }
+        Vector3 InitPosition { get; set; }
     }
 }

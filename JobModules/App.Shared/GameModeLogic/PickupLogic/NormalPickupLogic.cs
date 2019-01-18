@@ -1,11 +1,11 @@
-﻿using App.Shared.WeaponLogic;
+﻿using App.Shared.GameModules.Weapon;
 using App.Shared.GameModules.Player;
 using App.Shared.Player;
 using App.Shared.Util;
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using Core;
-using Core.Bag;
+using Core;
 using Core.Configuration;
 using Core.EntityComponent;
 using Core.GameModeLogic;
@@ -66,7 +66,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
                 return;
             }
             _sceneObjectEntityFactory.DestroyEquipmentEntity(entity.entityKey.Value.EntityId);
-            var last = player.playerAction.Logic.PickUpWeapon(entity.weapon.ToWeaponInfo());
+            var last = player.GetController<PlayerWeaponController>().PickUpWeapon(entity.weapon.ToWeaponInfo());
             if (last.Id > 0)
             {
                 _sceneObjectEntityFactory.CreateDropWeaponEntity(last, player.position.Value, _sceneWeaponLifeTime);
@@ -97,7 +97,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
                     DoDropGrenade(player);
                     return; 
             }
-            var curWeapon = player.GetBagLogicImp().GetWeaponInfo(slot);
+            var curWeapon = player.GetController<PlayerWeaponController>().GetSlotWeaponInfo(slot);
             if (curWeapon.Id > 0)
             {
                 var dropPos = player.GetHandWeaponPosition();
@@ -130,7 +130,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
                         sceneObjectEntity = _sceneObjectEntityFactory.CreateDropWeaponEntity(curWeapon, playerTrans.position, _sceneWeaponLifeTime) as SceneObjectEntity;
                     }
                 }
-                player.playerAction.Logic.DropWeapon(slot);
+                player.GetController<PlayerWeaponController>().DropSlotWeapon(slot);
             }
         }
 

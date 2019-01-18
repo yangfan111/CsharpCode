@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Core.GameTime;
@@ -8,8 +9,7 @@ using UnityEngine;
 
 namespace Core.Room
 {
-    
-
+    [Obsolete("Class deprecated - Use SingleRoomManager")]
     public class RoomManager : IRoomManager
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(RoomManager));
@@ -31,6 +31,10 @@ namespace Core.Room
         }
 
 
+        public void CreateRoomIfNotExist()
+        {
+            throw new NotImplementedException();
+        }
      
 
         public void AddRoom(IRoom room)
@@ -41,6 +45,12 @@ namespace Core.Room
         public IRoom GetNewRoom()
         {
             return _roomId2Room.Values.First();
+        }
+
+
+        public IRoom GetRoom(int roomId)
+        {
+            throw new NotImplementedException();
         }
 
         public void AddPlayerInfo(string token, IPlayerInfo room)

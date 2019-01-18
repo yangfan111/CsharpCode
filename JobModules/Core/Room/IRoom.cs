@@ -1,22 +1,27 @@
-﻿using Core.Network;
+﻿using System;
+using Core.Network;
 
 namespace Core.Room
 {
-    public interface IRoom
+
+    public interface IRoom : IDisposable
     {
         IRoomId RoomId { get; }
         bool LoginPlayer(IPlayerInfo playerInfo, INetworkChannel channel);
+        void Start();
         void Update(int interval);
         void LateUpdate();
         void SetHallRoom(IHallRoom hallRoom);
-        void Reset();
+        void ResetContexts();
         void SendSnapshot();
         void CompensationSnapshot();
         void RunFreeGameRule();
         void GameOver();
         void SetGameMode(int mode);
-        void SetTeamCapacity(int capacity);
         bool SendLoginSucc(IPlayerInfo playerInfo, INetworkChannel channel);
         void SetPlayerStageRunning(IPlayerInfo playerInfo, INetworkChannel channel);
+        PlayerInfo PlayerJoin(long hallRoomId, object roomPlayerInfo, out int errorCode);
+        bool IsDiposed { get; }
+        bool IsGameOver { get; }
     }
 }

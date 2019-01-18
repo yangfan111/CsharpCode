@@ -65,10 +65,13 @@ namespace Core.SessionState
 
         public virtual void Leave()
         {
+            GC.Collect();
             var root = GetUpdateSystems();
             root.ClearReactiveSystems();
+            _logger.InfoFormat("{0}  Leave",GetType());
             if (root is DebugSystems)
             {
+                _logger.InfoFormat("{0}  DestroyGameObject", ((DebugSystems)root).gameObject.name);
                 ((DebugSystems)root).gameObject.DestroyGameObject();
             }
         }

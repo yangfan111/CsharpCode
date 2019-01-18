@@ -1,6 +1,6 @@
 ﻿using App.Client.GameModules.Player;
 using App.Shared.EntityFactory;
-using Core.Bag;
+using Core;
 using Core.GameModule.Interface;
 using Entitas;
 

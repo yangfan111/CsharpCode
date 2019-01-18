@@ -48,7 +48,7 @@ namespace Core.BulletSimulation
 
             try
             {
-                _moveBullet.BeginProfile();
+                _moveBullet.BeginProfileOnlyEnableProfile();
                 foreach (IBulletEntity bullet in _bulletEntityCollector.GetAllBulletEntities())
                 {
                     if (bullet.IsValid)
@@ -59,7 +59,7 @@ namespace Core.BulletSimulation
             }
             finally
             {
-                _moveBullet.EndProfile();
+                _moveBullet.EndProfileOnlyEnableProfile();
             }
            
 
@@ -82,12 +82,12 @@ namespace Core.BulletSimulation
                     ICompensationWorld world;
                     try
                     {
-                        _createWorld.BeginProfile();
+                        _createWorld.BeginProfileOnlyEnableProfile();
                         world = CreateWorld(segment);
                     }
                     finally
                     {
-                        _createWorld.EndProfile();
+                        _createWorld.EndProfileOnlyEnableProfile();
                     }
                    
                     if(world==null) continue;
@@ -98,12 +98,12 @@ namespace Core.BulletSimulation
                     {
                         try
                         {
-                            _newBulletHit.BeginProfile();
+                            _newBulletHit.BeginProfileOnlyEnableProfile();
                             NewBulletHit(cmdSeq, segment, world);
                         }
                         finally
                         {
-                            _newBulletHit.EndProfile();
+                            _newBulletHit.EndProfileOnlyEnableProfile();
                         }
                         
                     }
@@ -111,12 +111,12 @@ namespace Core.BulletSimulation
                     {
                         try
                         {
-                            _oldBulletHit.BeginProfile();
+                            _oldBulletHit.BeginProfileOnlyEnableProfile();
                             OldBulletHit(cmdSeq, segment, world);
                         }
                         finally
                         {
-                            _oldBulletHit.EndProfile();
+                            _oldBulletHit.EndProfileOnlyEnableProfile();
                         }
                        
                     }

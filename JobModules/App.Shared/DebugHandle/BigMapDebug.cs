@@ -297,7 +297,7 @@ namespace App.Shared.DebugHandle
         private static string HandleNear(PlayerEntity player, string cmd)
         {
             Scene scene = GetScene(player);
-            if (scene != null)
+            if (scene != null && scene.isLoaded)
             {
                 List<Transform> buds = new List<Transform>();
                 List<TreeInstance> trees = new List<TreeInstance>();
@@ -422,6 +422,7 @@ namespace App.Shared.DebugHandle
             {
                 return ls;
             }
+
             ls = HandleNear(player, args[0]);
             if (ls != null)
             {
@@ -478,14 +479,14 @@ namespace App.Shared.DebugHandle
                         case "te":
                             if (string.IsNullOrEmpty(name))
                             {
-                                if (t != null && scene != SceneManager.GetActiveScene() && scene.name != "ClientScene")
+                                if (t != null && scene.name != "ClientScene")
                                 {
                                     t.enabled = open;
                                 }
                             }
                             else if ("b" == name)
                             {
-                                if (t != null && scene != SceneManager.GetActiveScene() && scene.name != "ClientScene")
+                                if (t != null && scene.name != "ClientScene")
                                 {
                                     t.drawHeightmap = open;
                                 }
@@ -493,14 +494,14 @@ namespace App.Shared.DebugHandle
 
                             break;
                         case "tr":
-                            if (t != null && scene != SceneManager.GetActiveScene() && scene.name != "ClientScene")
+                            if (t != null && scene.name != "ClientScene")
                             {
                                 HandleTree(scene, t, name, !open);
                                 count += t.terrainData.treeInstances.Length;
                             }
                             break;
                         case "de":
-                            if (t != null && scene != SceneManager.GetActiveScene() && scene.name != "ClientScene")
+                            if (t != null && scene.name != "ClientScene")
                             {
                                 foreach (DetailPrototype ti in grassDic[scene.name])
                                 {
@@ -573,7 +574,7 @@ namespace App.Shared.DebugHandle
                             }
                             break;
                         case "effect":
-                            if (scene.name == "AdditiveScene")
+                            if (scene == SceneManager.GetActiveScene())
                             {
                                 if (obj.name == "Main Camera")
                                 {

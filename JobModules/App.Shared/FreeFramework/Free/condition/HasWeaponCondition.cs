@@ -1,10 +1,8 @@
 ﻿using com.wd.free.para.exp;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using com.wd.free.@event;
 using App.Server.GameModules.GamePlay.free.player;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.FreeFramework.Free.condition
 {
@@ -22,11 +20,11 @@ namespace App.Shared.FreeFramework.Free.condition
             {
                 if (hand)
                 {
-                    return fd.Player.GetBagLogicImp().GetCurrentWeaponInfo().Id == id;
+                    return fd.Player.GetController<PlayerWeaponController>().CurrSlotWeaponId == id;
                 }
                 else
                 {
-                    return fd.Player.GetBagLogicImp().HasWeapon(id);
+                    return fd.Player.GetController<PlayerWeaponController>().IsWeaponStuffedInSlot(id);
                 }   
             }
 

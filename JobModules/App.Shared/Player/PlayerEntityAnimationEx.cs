@@ -1,4 +1,6 @@
-﻿using Core.Utils;
+﻿using App.Shared.GameModules.Weapon;
+using App.Shared.Util;
+using Core.Utils;
 
 namespace App.Shared.Player
 {
@@ -46,7 +48,7 @@ namespace App.Shared.Player
 
         private static void UndrawWeaponThenPlayAnim(PlayerEntity playerEntity)
         {
-            if(playerEntity.GetBagLogicImp().HasWeapon())
+            if(playerEntity.GetController<PlayerWeaponController>().IsWeaponCurrSlotStuffed())
             {
                 playerEntity.animationExData.ActionAfterAllAnimation = () =>
                 {

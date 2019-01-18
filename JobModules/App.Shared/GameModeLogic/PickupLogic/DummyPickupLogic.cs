@@ -1,4 +1,4 @@
-﻿using Core.Bag;
+﻿using Core;
 using Core.GameModeLogic;
 
 namespace App.Shared.GameModeLogic.PickupLogic

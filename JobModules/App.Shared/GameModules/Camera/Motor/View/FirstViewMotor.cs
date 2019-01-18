@@ -47,7 +47,7 @@ namespace Core.CameraControl.NewMotor.View
             }
 
             //if (state.ViewMode.Equals(ECameraViewMode.GunSight) && input.IsCameraFocus && state.LastViewMode.Equals(ECameraViewMode.FirstPerson))
-            if (state.ViewMode.Equals(ECameraViewMode.GunSight) && (input.FilteredCameraFocus || input.ForceChangeGunSight || input.ForceInterruptGunSight) && state.LastViewMode.Equals(ECameraViewMode.FirstPerson))
+            if (state.ViewMode == ECameraViewMode.GunSight && (input.FilteredCameraFocus || input.ForceChangeGunSight || input.ForceInterruptGunSight) && state.LastViewMode == ECameraViewMode.FirstPerson)
             {
                 return true;
             }

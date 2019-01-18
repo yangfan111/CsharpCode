@@ -193,6 +193,7 @@ namespace Core.GameModule.System
 
         public void Clear()
         {
+           
             for (int i = 0; i < Systems.Count; i++)
             {
                 var module = Systems[i];
@@ -200,6 +201,7 @@ namespace Core.GameModule.System
                 if (module is IReactiveSystem)
                 {
                     _logger.InfoFormat("Clear System :{0}",module.GetType());
+                    ((IReactiveSystem)module).Deactivate();
                     ((IReactiveSystem)module).Clear();
                  
                 }
@@ -336,6 +338,8 @@ namespace Core.GameModule.System
 
                 if (module is IReactiveSystem)
                 {
+                    _logger.InfoFormat("Clear System :{0}",module.GetType());
+                    ((IReactiveSystem)module).Deactivate();
                     ((IReactiveSystem)module).Clear();
                 }
             }

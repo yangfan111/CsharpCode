@@ -1,21 +1,21 @@
-﻿using Core.Bag;
+﻿using Core;
 using Core.GameModeLogic;
 using Core.Utils;
 using Entitas;
 
 namespace App.Shared.GameModeLogic.WeaponActionListener
 {
-    public class NormalWeaponActionListener : IWeaponActionListener
+    public class NormalWeaponActionListener : IWeaponProcessListener
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(NormalWeaponActionListener));
-        public void OnCost(Entity playerEntity, EWeaponSlotType slot)
+        public void OnExpend(Entity playerEntity, EWeaponSlotType slot)
         {
             if(!slot.IsSlotChangeByCost())
             {
                 return;
             }
             var player = playerEntity as PlayerEntity;
-            Logger.DebugFormat("{0} OnCost", player.entityKey.Value);
+            Logger.DebugFormat("{0} OnExpend", player.entityKey.Value);
             LockPlayerBag(player);
         }
 

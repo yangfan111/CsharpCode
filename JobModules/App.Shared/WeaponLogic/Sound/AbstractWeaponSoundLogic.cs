@@ -8,7 +8,7 @@ using Core.WeaponLogic.Attachment;
 using Core.EntityComponent;
 using Core.IFactory;
 
-namespace App.Shared.WeaponLogic
+namespace App.Shared.GameModules.Weapon
 {
     public abstract class AbstractWeaponSoundLogic<T1, T3> : AbstractAttachableWeaponLogic<T1, T3>, IWeaponSoundLogic where T1 : ICopyableConfig<T1>, new() 
     {

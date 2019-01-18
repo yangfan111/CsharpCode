@@ -22,6 +22,7 @@ using Utils.Configuration;
 using Utils.Singleton;
 using Utils.Utils;
 using XmlConfig;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Player.CharacterState
 {
@@ -98,6 +99,17 @@ namespace App.Shared.GameModules.Player.CharacterState
 
             UpdateStateResponseToAnimation(stateManager, commandsContainer, animatorClipManager, playerEntity);
 
+            if (_fsmOutputs.NeedUpdateP1())
+            {
+                playerEntity.firstPersonAnimator.UnityAnimator.Update(0f);
+            }
+
+            if (_fsmOutputs.NeedUpdateP3())
+            {
+                playerEntity.thirdPersonAnimator.UnityAnimator.Update(0f);
+                //_logger.InfoFormat("update p3!!!!!!!!");
+            }
+            
             WriteNetworkAnimation(cmd, playerEntity);
 
             SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.StateCallBackInvoke);
@@ -146,7 +158,7 @@ namespace App.Shared.GameModules.Player.CharacterState
                 // 更新Clip速率
                 animatorClipManager.Update(commandsContainer, _fsmOutputs.AddOutput, playerEntity.thirdPersonAnimator.UnityAnimator,
                     playerEntity.firstPersonAnimator.UnityAnimator,
-                    playerEntity.GetBagLogicImp().GetCurrentWeaponInfo().Id,
+                    playerEntity.GetController<PlayerWeaponController>().CurrSlotWeaponId,
                     playerEntity.networkAnimator.NeedRewind);
 
                 // 更新Animator的Param

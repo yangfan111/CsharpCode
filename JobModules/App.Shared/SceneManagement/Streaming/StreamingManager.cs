@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.SceneManagement;
 using Core.Utils;
 using Shared.Scripts.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Utils.AssetManager;
+using Object = UnityEngine.Object;
 
 namespace App.Shared.SceneManagement.Streaming
 {
-    public class StreamingManager : StreamingSceneGoInstantiation
+    class StreamingManager : ISceneResourceManager, IStreamingResourceHandler
     {
         struct LoadingGo
         {
@@ -17,75 +19,136 @@ namespace App.Shared.SceneManagement.Streaming
             public int GoIndex;
         }
         
-        private static LoggerAdapter Logger = new LoggerAdapter(typeof(StreamingManager));
+        private static LoggerAdapter _logger = new LoggerAdapter(typeof(StreamingManager));
         
-        private readonly ResourceRequestCache _requestHandler;
+        private readonly ISceneResourceRequestHandler _requestHandler;
         private readonly StreamingData _sceneDescription;
 
         private readonly Dictionary<string, int> _sceneIndex = new Dictionary<string, int>();
-        private readonly Dictionary<string, StreamingScene> _scenes = new Dictionary<string, StreamingScene>();
+        private readonly Dictionary<int, LoadedScene> _scenes = new Dictionary<int, LoadedScene>();
 
-        private bool _asap;
-        private int _concurrentLimit = 2;
-        private int _currentConcurrentCount;
+        private readonly WorldCompositionManager _worldComposition;
+        private readonly IStreamingGoManager _streamingGo;
+        // compromise for deadline
+        private readonly IStreamingGoManager _culling;
+
+        private int _concurrentLimit = ConcurrentLimit;
+        private const int AsapLimit = 500;
+        private const int ConcurrentLimit = 5;
+        private int _concurrentCount;
+
+        private int _destroyingCount;
+        private const int DestroyLimit = 10;
         
-        private Queue<LoadingGo> _goRequestQueue = new Queue<LoadingGo>();
-        private Queue<AssetInfo> _sceneRequestQueue = new Queue<AssetInfo>();
-        private List<LoadingGo> _loadingGoes = new List<LoadingGo>();
+        private readonly Queue<LoadingGo> _goRequestQueue = new Queue<LoadingGo>();
+        private readonly Queue<AssetInfo> _sceneRequestQueue = new Queue<AssetInfo>();
+        private readonly List<LoadingGo> _loadingGoes = new List<LoadingGo>();
 
-        public event Action<GameObject> GoInstantiated;
+        private readonly Queue<UnityObjectWrapper<GameObject>> _toBeDestroyedGo = new Queue<UnityObjectWrapper<GameObject>>();
+        private readonly Dictionary<int, Queue<int>> _unloadingScene = new Dictionary<int, Queue<int>>();
 
-        public StreamingManager(ResourceRequestCache requestHandler, StreamingData sceneDescription)
+        public StreamingManager(ISceneResourceRequestHandler requestHandler,
+                                IStreamingGoManager streamingGo,
+                                IStreamingGoManager culling,
+                                StreamingData sceneDescription,
+                                WorldCompositionParam param)
         {
             _requestHandler = requestHandler;
             _sceneDescription = sceneDescription;
             
-            var count = _sceneDescription.Scenes.Count;
-            for (int i = 0; i < count; i++)
-                _sceneIndex.Add(_sceneDescription.Scenes[i].SceneName, i);
+            _worldComposition = new WorldCompositionManager(this, param);
+            _streamingGo = streamingGo ?? new StreamingGoByScene();
+            _culling = culling;
+
+            _streamingGo.SetResourceHandler(this);
+
+            if (_sceneDescription != null)
+            {
+                var count = _sceneDescription.Scenes.Count;
+                for (int i = 0; i < count; i++)
+                    _sceneIndex.Add(_sceneDescription.Scenes[i].SceneName, i);
+            }
 
             _requestHandler.SceneLoaded += SceneLoaded;
             _requestHandler.SceneUnloaded += SceneUnloaded;
+            _requestHandler.GoLoaded += GoLoaded;
+            _requestHandler.GoUnloaded += GoUnloaded;
         }
 
-        public void Reset()
-        {
-            _requestHandler.SceneLoaded -= SceneLoaded;
-            _requestHandler.SceneUnloaded -= SceneUnloaded;
-        }
+        #region ISceneResourceManager
 
-        public void SetConcurrentLimit(int value)
+        public void UpdateOrigin(Vector3 value, OriginStatus status)
         {
-            _concurrentLimit = value;
+            _worldComposition.UpdateOrigin(value);
+            _streamingGo.UpdateOrigin(value, status);
+            if (_culling != null)
+                _culling.UpdateOrigin(value, status);
         }
 
         public void SetAsapMode(bool value)
         {
-            _asap = value;
+            _concurrentLimit = value ? AsapLimit : ConcurrentLimit;
         }
+
+        #endregion
         
+        #region IStreamingResourceHandler
+
         public void LoadScene(AssetInfo addr)
         {
-            if (!_scenes.ContainsKey(addr.AssetName))
-                _sceneRequestQueue.Enqueue(addr);
+            if (_sceneIndex.ContainsKey(addr.AssetName))
+            {
+                var sceneIndex = _sceneIndex[addr.AssetName];
+
+                if (!_scenes.ContainsKey(sceneIndex))
+                {
+                    _sceneRequestQueue.Enqueue(addr);
+                    RequestForScene();
+                }
+                else
+                    _logger.WarnFormat("load loaded scene: {0}", addr.AssetName);
+            }
             else
-                Logger.WarnFormat("load loaded scene: {0}", addr.AssetName);
+            {
+                _sceneRequestQueue.Enqueue(addr);
+                RequestForScene();
+                _logger.WarnFormat("not recognized scene: {0}", addr.AssetName);
+            }
         }
 
         public void UnloadScene(string sceneName)
         {
-            if (_scenes.ContainsKey(sceneName))
-                _requestHandler.AddUnloadSceneRequest(_scenes[sceneName].Scene);
+            if (_sceneIndex.ContainsKey(sceneName))
+            {
+                var sceneIndex = _sceneIndex[sceneName];
+
+                if (_scenes.ContainsKey(sceneIndex))
+                {
+                    _unloadingScene.Add(sceneIndex, new Queue<int>());
+                    _streamingGo.SceneUnloaded(sceneName);
+                    if (_culling != null)
+                        _culling.SceneUnloaded(sceneName);
+                    
+                    RequestForUnload();
+                }
+                else
+                    _logger.WarnFormat("unload not loaded scene: {0}", sceneName);
+            }
             else
-                Logger.WarnFormat("unload not loaded scene: {0}", sceneName);
+            {
+                _streamingGo.SceneUnloaded(sceneName);
+                if (_culling != null)
+                    _culling.SceneUnloaded(sceneName);
+                _requestHandler.AddUnloadSceneRequest(sceneName);
+                _logger.WarnFormat("not recognized scene: {0}", sceneName);
+            }
         }
 
-        public bool LoadGo(string sceneName, int goIndex)
+        public bool LoadGo(int sceneIndex, int goIndex)
         {
-            if (!_scenes.ContainsKey(sceneName))
+            if (sceneIndex >= _sceneDescription.Scenes.Count)
                 return false;
 
-            var sceneIndex = _sceneIndex[sceneName];
             var streamingObject = _sceneDescription.Scenes[sceneIndex].Objects[goIndex];
             _goRequestQueue.Enqueue(new LoadingGo
             {
@@ -98,69 +161,29 @@ namespace App.Shared.SceneManagement.Streaming
                 GoIndex = goIndex
             });
 
+            RequestForGo();
+
             return true;
         }
 
-        public void UnloadGo(string sceneName, int goIndex)
+        public void UnloadGo(int sceneIndex, int goIndex)
         {
-            if (_scenes.ContainsKey(sceneName))
-                _scenes[sceneName].RemoveGo(goIndex);
-        }
-
-        public void Update()
-        {
-            RequestForScene();
-            RequestForGo();
-        }
-
-        public void GoLoaded(GameObject go, AssetInfo addr)
-        {
-            var count = _loadingGoes.Count;
-            for (int i = 0; i < count; i++)
+            if (_unloadingScene.ContainsKey(sceneIndex))
+                _unloadingScene[sceneIndex].Enqueue(goIndex);
+            else if (_scenes.ContainsKey(sceneIndex))
             {
-                if (_loadingGoes[i].Addr.Equals(addr))
-                {
-                    var sceneName = _sceneDescription.Scenes[_loadingGoes[i].SceneIndex].SceneName;
-                    if (_scenes.ContainsKey(sceneName))
-                    {
-                        _scenes[sceneName].AddGo(go, _loadingGoes[i].GoIndex);
-                        if (GoInstantiated != null)
-                            GoInstantiated.Invoke(go);
-                    }
-
-                    _currentConcurrentCount--;
-                    _loadingGoes.RemoveAt(i);
-                    break;
-                }
+                _toBeDestroyedGo.Enqueue(_scenes[sceneIndex].RemoveGo(goIndex));
+                RequestForUnload();
             }
+            else
+                _logger.WarnFormat("unload go from not loaded scene, scene index: {0} go index: {1}", sceneIndex, goIndex);
         }
         
+        #endregion
+       
         private bool EnoughRoom()
         {
-            return _asap || _currentConcurrentCount < _concurrentLimit;
-        }
-
-        private void SceneLoaded(Scene scene, LoadSceneMode mode)
-        {
-            if (!_scenes.ContainsKey(scene.name))
-            {
-                _scenes.Add(scene.name, new StreamingScene(scene));
-                _currentConcurrentCount--;
-            }
-            else
-                Logger.WarnFormat("load registered scene: {0}", scene.name);
-        }
-
-        private void SceneUnloaded(Scene scene)
-        {
-            if (_scenes.ContainsKey(scene.name))
-            {
-                var streamingScene = _scenes[scene.name];
-                streamingScene.Clear();
-                _scenes.Remove(scene.name);
-            }
-            else
-                Logger.WarnFormat("unload not registered scene: {0}", scene.name);
+            return _concurrentCount < _concurrentLimit;
         }
 
         private void RequestForScene()
@@ -168,7 +191,7 @@ namespace App.Shared.SceneManagement.Streaming
             while (EnoughRoom() && _sceneRequestQueue.Count > 0)
             {
                 _requestHandler.AddLoadSceneRequest(_sceneRequestQueue.Dequeue());
-                _currentConcurrentCount++;
+                _concurrentCount++;
             }
         }
         
@@ -178,11 +201,129 @@ namespace App.Shared.SceneManagement.Streaming
             {
                 var loadingGo = _goRequestQueue.Dequeue();
                 _requestHandler.AddLoadGoRequest(loadingGo.Addr);
-                _currentConcurrentCount++;
+                _concurrentCount++;
 
-                if (!_asap)
-                    _loadingGoes.Add(loadingGo);
+                _loadingGoes.Add(loadingGo);
             }
+        }
+
+        private void RequestForUnload()
+        {
+            while (_destroyingCount < DestroyLimit && _toBeDestroyedGo.Count > 0)
+            {
+                var go = _toBeDestroyedGo.Dequeue();
+                _requestHandler.AddUnloadGoRequest(go);
+                ++_destroyingCount;
+            }
+
+            int emptySceneIndex = -1;
+
+            foreach (var pair in _unloadingScene)
+            {
+                var sceneIndex = pair.Key;
+                while (_destroyingCount < DestroyLimit && pair.Value.Count > 0)
+                {
+                    var goIndex = pair.Value.Dequeue();
+                    var go = _scenes[sceneIndex].RemoveGo(goIndex);
+                    
+                    _requestHandler.AddUnloadGoRequest(go);
+                    ++_destroyingCount;
+                }
+
+                if (pair.Value.Count <= 0)
+                {
+                    emptySceneIndex = pair.Key;
+                    break;
+                }
+            }
+
+            if (emptySceneIndex != -1)
+            {
+                _unloadingScene.Remove(emptySceneIndex);
+                _requestHandler.AddUnloadSceneRequest(_scenes[emptySceneIndex].Scene.name);
+            }
+        }
+    
+        private void SceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            var sceneIndex = -1;
+            if (_sceneIndex.ContainsKey(scene.name))
+            {
+                sceneIndex = _sceneIndex[scene.name];
+                _scenes.Add(sceneIndex, new LoadedScene(scene, _sceneDescription.Scenes[sceneIndex]));
+
+                _concurrentCount--;
+                
+                RequestForScene();
+            }
+            
+            _worldComposition.SceneLoaded(scene);
+            _streamingGo.SceneLoaded(scene.name,
+                                     sceneIndex,
+                                     scene,
+                                     sceneIndex == -1 ? null : _sceneDescription.Scenes[sceneIndex],
+                                     _worldComposition.GetDimensionOfScene(scene.name));
+            if (_culling != null)
+                _culling.SceneLoaded(scene.name,
+                                     sceneIndex,
+                                     scene,
+                                     sceneIndex == -1 ? null : _sceneDescription.Scenes[sceneIndex],
+                                     _worldComposition.GetDimensionOfScene(scene.name));
+                
+        }
+        
+        private void SceneUnloaded(Scene scene)
+        {
+            if (_sceneIndex.ContainsKey(scene.name))
+            {
+                var sceneIndex = _sceneIndex[scene.name];
+                var loadedScene = _scenes[sceneIndex];
+
+                loadedScene.Clear();
+                _scenes.Remove(sceneIndex);
+            }
+            else
+                _logger.WarnFormat("unload not registered scene: {0}", scene.name);
+            
+            _worldComposition.SceneUnloaded(scene);
+        }
+
+        private void GoLoaded(UnityObjectWrapper<GameObject> go)
+        {
+            var count = _loadingGoes.Count;
+            for (int i = 0; i < count; i++)
+            {
+                if (_loadingGoes[i].Addr.Equals(go.Address))
+                {
+                    var sceneIndex = _loadingGoes[i].SceneIndex;
+                    if (_scenes.ContainsKey(sceneIndex) && !_unloadingScene.ContainsKey(sceneIndex))
+                    {
+                        _scenes[sceneIndex].AddGo(go, _loadingGoes[i].GoIndex);
+                        _streamingGo.GoLoaded(sceneIndex, _loadingGoes[i].GoIndex, go);
+                        if (_culling != null)
+                            _culling.GoLoaded(sceneIndex, _loadingGoes[i].GoIndex, go);
+                    }
+                    else
+                    {
+                        _toBeDestroyedGo.Enqueue(go);
+                        RequestForUnload();
+                    }
+
+                    _concurrentCount--;
+                    _loadingGoes.RemoveAt(i);
+                    
+                    RequestForGo();
+
+                    return;
+                }
+            }
+        }
+
+        private void GoUnloaded(UnityObjectWrapper<GameObject> go)
+        {
+            --_destroyingCount;
+
+            RequestForUnload();
         }
     }
 }
