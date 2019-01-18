@@ -12,7 +12,8 @@ namespace Core.Audio
     {
         private static AKAudioDispatcher dispatcher;
         private static AKAudioBankLoader bankResLoader;
-        private static bool prepareReady = false;
+        public static bool PrepareReady { get; private set; }
+
         public static readonly LoggerAdapter AudioLogger = new LoggerAdapter(typeof(AKAudioDispatcher));
         //   public static AudioLaunchNotifycation Notify = new AudioLaunchNotifycation();
         static AKAudioEntry()
@@ -26,7 +27,7 @@ namespace Core.Audio
                 if (AudioInfluence.IsForbidden) return null;
                 if (dispatcher == null)
                 {
-                    if (prepareReady)
+                    if (PrepareReady)
                     {
                         dispatcher = new AKAudioDispatcher(bankResLoader);
                     }
@@ -68,7 +69,7 @@ namespace Core.Audio
                 AudioLogger.Info("[Audio=>Entry]App audio try to preapare");
                 if (result == AKRESULT.AK_Success || result == AKRESULT.AK_BankAlreadyLoaded)
                 {
-                    prepareReady = true;
+                    PrepareReady = true;
                     Debug.Log("prepareReady");
 #if UNITY_EDITOR
                     // TestCodeChunk_External();
@@ -122,7 +123,7 @@ namespace Core.Audio
         static void OnBnkAsyncFinish()
         {
             AudioLogger.Info("[Audio=>Entry]App audio preapared ready");
-            prepareReady = true;
+            PrepareReady = true;
         }
         public static void AudioAssert(bool comparison, string errMsg)
         {

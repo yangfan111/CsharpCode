@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using App.Client.SceneManagement;
+using App.Client.SceneManagement.DistanceCulling;
 using App.Protobuf;
 
 using App.Shared.DebugHandle;
@@ -1368,12 +1369,6 @@ namespace App.Shared.Scripts
 
             switch (args[0])
             {
-                case "on":
-                    SceneCulling.Enable = true;
-                    break;
-                case "off":
-                    SceneCulling.Enable = false;
-                    break;
                 case "log":
                     SceneCulling.Log = true;
                     break;
@@ -1384,9 +1379,50 @@ namespace App.Shared.Scripts
                     SceneCulling.SetCullingDistance(args[0], float.Parse(args[1]));
                     break;
                 case "camera":
-                    SceneCulling.EnableCameraOC = args[1].Equals("on");
+                    SharedConfig.EnableOC = args[1].Equals("on");
                     Camera.main.useOcclusionCulling = args[1].Equals("on");
                     break;
+                case "go":
+                {
+                    var sceneName = args[1].Replace("_", " ");
+                    var all = sceneName == "all";
+                    HashSet<string> excludeName = new HashSet<string> { "ClientScene", SceneManager.GetActiveScene().name};
+                    for (int i = 0; i < SceneManager.sceneCount; i++)
+                    {
+                        var scene = SceneManager.GetSceneAt(i);
+                        if (scene.name == sceneName || (all && !excludeName.Contains(scene.name)))
+                        {
+                            foreach (var go in scene.GetRootGameObjects())
+                            {
+                                if (go.GetComponent<Terrain>() == null)
+                                    go.SetActive(args[2] == "on");
+                            }
+                        }
+                    }
+                    break;
+                }
+                case "stat":
+                    switch (args[1])
+                    {
+                        case "on":
+                            RuntimeStats.enabled = true;
+                            break;
+                        case "off":
+                            RuntimeStats.enabled = false;
+                            break;
+                        case "log":
+                            logger.InfoFormat("main: {0}, render: {1}, batches: {2}, setPass: {3}, tri: {4}, verts: {5}",
+                                RuntimeStats.frameTime, RuntimeStats.renderTime, RuntimeStats.batches, RuntimeStats.setPassCalls,
+                                RuntimeStats.triangles, RuntimeStats.vertices);
+                            break;
+                    }
+                    break;
+                case "logic":
+                {
+                    var go = GameObject.Find("GameController");
+                    go.GetComponent<ClientGameController>().enabled = args[1] == "on";
+                    break;
+                }
                 default:
                     return "wrong input";
             }

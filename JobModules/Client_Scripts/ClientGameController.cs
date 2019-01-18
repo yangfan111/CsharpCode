@@ -150,7 +150,7 @@ public class ClientGameController : MonoBehaviour, ICoRoutineManager
             _logger.InfoFormat("GetGameClientInfo...");
         }
 
-        MyHttpServer.Start(SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.HttpPort, _clientRoom);
+        MyHttpServer.Start(SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.HttpPort);
 #if UNITY_SOURCE_MODIFIED && !UNITY_EDITOR
         if (!SharedConfig.InSamplingMode && !SharedConfig.InLegacySampleingMode)
         {
@@ -355,6 +355,9 @@ public class ClientGameController : MonoBehaviour, ICoRoutineManager
                 _logger.ErrorFormat("Hall OnGameOver Error ... {0}", e.Message);
             }
         }
+
+        _assetLoader.Dispose();
+        Resources.UnloadUnusedAssets();
     }
 
     public void OnGameOver()
