@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 #if UNITY_2017_1_OR_NEWER
 #endif
 //unity editor atrribute

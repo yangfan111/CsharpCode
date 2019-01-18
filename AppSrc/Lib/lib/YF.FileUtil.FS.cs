@@ -7,7 +7,7 @@ namespace YF.FileUtil
     // 读取目标文件数据
     ///File.ReadAllText(outPath)
     ///FileStream
-    // 获取文件/文件夹信息 
+    // 获取文件/文件夹信息 静态/构造DirectoryInfo数据结构
     /// var dir = new DirectoryInfo(sourceDirName)
     /// var files[] = dir.GetFiles()
     /// ********fileInfo.CopyTo(temppath, true)********

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System;
+﻿using System;
 using System.IO;
 ///序列化namespace
 using System.Runtime.Serialization;
@@ -64,7 +62,7 @@ namespace YF.FileUtil
             return null;
         }
         ///new Stream,new IFormatter
-        ///IFormatter.Serialize(Stream)
+        ///IFormatter.Serialize(Stream) IFormatter.Serialize===>Stream
         /// stream.Close()
         private static void Serializable_BinHandler(System.Object s_object, string outPath)
         {
@@ -128,7 +126,7 @@ namespace YF.FileUtil
             return obj;
         }
         ///stage1:
-        ///new XMLDoc() 
+        ///new XMLDoc() ,new MemStream
         ///XMLDoc.load(xmlStream)
         ///XMLDoc.Save(path)
         ///******************************
