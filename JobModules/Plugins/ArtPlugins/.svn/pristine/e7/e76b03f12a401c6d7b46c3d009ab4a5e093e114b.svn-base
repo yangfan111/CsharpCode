@@ -1,0 +1,5 @@
+[SampleProjects]
+sampleNames = {Car Sample Desert,WebGL Sample 2017_2f3+,Realtime ArchViz Sample,Lighting Box 2.5.3 f1 for 2017.2,Tutorials Playlist for 2.6+ in Orginal Quality,Lighting Box Grass Patch for Update 2.6,Enviro Compatible Lighting Box 2.6,Tree Creator Tutorials}
+sampleLinks = {http://89.163.206.23/CarSampleLink.zip,http://89.163.206.23/WebGL_Lighting_Box_Sample.zip,https://drive.google.com/file/d/0B2WDRR3zNNn8V1Q1SUUtUmE0dVE/view?usp=sharing,https://drive.google.com/file/d/1OPUqPZMmD9MeE7T5ISRgamMVgELh9Xwo/view?usp=sharing,https://drive.google.com/file/d/1aBrUaP6Mpv3WRuPouLWzmxEN2v9KNNWt/view?usp=sharing,https://drive.google.com/file/d/1tzfiAyXiBHqmHephiHYy-xPuapgdj9oG/view?usp=sharing,https://drive.google.com/file/d/17ciOGk2xNEjAqgQ0RDovsEbkBNg6Nwoe/view?usp=sharing,http://89.163.206.23/Tree_Creator.rar}
+version = 2.7
+sampleVersions = {2.32,2.5,2.5,2.5,2.6,2.6,2.6,2.7}

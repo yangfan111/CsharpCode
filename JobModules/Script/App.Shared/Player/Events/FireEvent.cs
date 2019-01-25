@@ -1,0 +1,70 @@
+using Core.EntityComponent;
+using Core.Event;
+using Core.ObjectPool;
+using Entitas;
+using UnityEngine;
+using App.Shared.GameModules.Weapon;
+using App.Shared.Audio;
+
+namespace App.Shared.Player.Events
+{
+    public class FireEvent : DefaultEvent
+    {
+       
+        public class ObjcetFactory :CustomAbstractObjectFactory
+        {
+            public ObjcetFactory() : base(typeof(FireEvent)){}
+            public override object MakeObject()
+            {
+                return new FireEvent();
+            }
+
+        }
+       public FireEvent()
+        {
+        }
+
+        public override EEventType EventType
+        {
+            get { return EEventType.Fire; }
+        }
+
+       
+    }
+    
+    public class FireEventHandler:DefaultEventHandler
+    {
+        public override EEventType EventType
+        {
+            get { return EEventType.Fire; }
+        }
+
+      
+        public override void DoEventClient( Entitas.IContexts contexts, IEntity entity, IEvent e)
+        {
+            var playerEntity = entity as PlayerEntity;
+            var allContexts = contexts as Contexts;
+            if (playerEntity != null)
+            {
+                playerEntity.weaponEffect.PlayList.Add(XmlConfig.EClientEffectType.MuzzleSpark);
+                if (playerEntity.appearanceInterface.Appearance.IsFirstPerson)
+                {
+                    GameAudioMedium.PerformOnGunFire();
+                }
+                else
+                {
+                    GameAudioMedium.PerformOnGunFire();
+                }
+            }
+        }
+
+      
+
+        public override bool ClientFilter(IEntity entity, IEvent e)
+        {
+            var playerEntity = entity as PlayerEntity;
+            return playerEntity != null && playerEntity.hasWeaponState;
+        }
+     
+    }
+}

@@ -1,0 +1,5 @@
+[SampleProjects]
+sampleNames = {Car Sample Desert,WebGL Sample 2017_2f3+,Realtime ArchViz Sample,Lighting Box 2.5.3 f1 for 2017.2,Tutorials Playlist for 2.6+ in Orginal Quality}
+sampleLinks = {n,n,n,n,n}
+version = 2.61
+sampleVersions = {2.32,2.5,2.5,2.5,2.6}

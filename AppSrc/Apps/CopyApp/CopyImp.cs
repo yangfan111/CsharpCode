@@ -4,12 +4,17 @@ using System.Linq;
 using System.Text;
 using YF;
 using YF.FileUtil;
+
+using System.Xml.Serialization;
+using YF.FileUtil.Serialize;
+
 class Program
 {
     static void Main(string[] args)
     {
         //Console.WriteLine("Sucess");
         //   Console.WriteLine(args[0]);
+
         CopyCmdType cmd = (CopyCmdType)int.Parse(args[0]);
         switch(cmd)
         {
@@ -28,6 +33,24 @@ class Program
         {
             return;
         }
+    }
+
+    static void Copy()
+    {
+        string spath = @"F:\voyager\UnityPackages\Assets\Configuration\Sound.xml";
+        var sconfig = new SoundConfig();
+        XmlSerializer xmlSerializer = new XmlSerializer(sconfig.GetType());
+    }
+
+    [XmlRoot("SoundConfig")]
+    public class SoundConfig
+    {
+        [XmlArray("Items")]
+        public SoundItem[] Items;
+    }
+    public class SoundItem
+    {
+        public int Id = 1;
     }
 
 }
@@ -71,14 +94,14 @@ public class CopyImp
     public static void ExportXML()
     {
         var obj = new ImplentConfig();
-        Seri.SerializableObj(obj, configPath, YF.SerializableType.Json);
+        NormalSerialize.SerializableObj(obj, configPath, YF.SerializableType.Json);
         //   Seri.SerializeXML(obj, @"e:\Github\CsharpCode\AppSrc\Apps\CopyApp\config.xml");
 
     }
     public static void CopyProjPackages()
     {
-        Seri.myJsonDeSeriType = typeof(ImplentConfig);
-        var obj = Seri.DeSerializableObj(configPath,YF.SerializableType.Json);
+        NormalSerialize.myJsonDeSeriType = typeof(ImplentConfig);
+        var obj = NormalSerialize.DeSerializableObj(configPath,YF.SerializableType.Json);
         var imp = obj as ImplentConfig;
         foreach (var data in imp.SDList)
         {
@@ -87,8 +110,8 @@ public class CopyImp
     }
     public static void DeCopyProjPackages()
     {
-        Seri.myJsonDeSeriType = typeof(ImplentConfig);
-        var obj = Seri.DeSerializableObj(d_configPath, YF.SerializableType.Json);
+        NormalSerialize.myJsonDeSeriType = typeof(ImplentConfig);
+        var obj = NormalSerialize.DeSerializableObj(d_configPath, YF.SerializableType.Json);
         var imp = obj as ImplentConfig;
         foreach (var data in imp.SDList)
         {

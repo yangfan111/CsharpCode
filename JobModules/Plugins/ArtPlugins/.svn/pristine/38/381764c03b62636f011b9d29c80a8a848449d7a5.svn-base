@@ -1,0 +1,578 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1590936089974950}
+  m_IsPrefabParent: 1
+--- !u!1 &1590936089974950
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4428722646224052}
+  - component: {fileID: 114103295359411196}
+  - component: {fileID: 33000829587875180}
+  - component: {fileID: 23070207843713668}
+  - component: {fileID: 64003281481592420}
+  m_Layer: 0
+  m_Name: 16_16T(1)_ER
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4428722646224052
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1590936089974950}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &23070207843713668
+MeshRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1590936089974950}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_Materials:
+  - {fileID: 2100000, guid: 5a6292264aee9964ab758a276c8c5e92, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &33000829587875180
+MeshFilter:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1590936089974950}
+  m_Mesh: {fileID: 4300000, guid: e970c0a10ba914845830b7739ceb5311, type: 2}
+--- !u!64 &64003281481592420
+MeshCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1590936089974950}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Convex: 0
+  m_InflateMesh: 0
+  m_SkinWidth: 0.01
+  m_Mesh: {fileID: 4300000, guid: e970c0a10ba914845830b7739ceb5311, type: 2}
+--- !u!114 &114103295359411196
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1590936089974950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -2039104457, guid: f56d46228aee4734f9114056c53bb57e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  crossingElements:
+  - centerPoint: {x: 0.4503541, y: 0, z: -12.121351}
+    tmpCenterPoint: {x: 0.4503541, y: 0, z: -12.121351}
+    stageCenterPoint: {x: 0.4503541, y: -12.121351, z: 0}
+    tmpStageCenterPoint: {x: 0.4503541, y: -12.121351, z: 0}
+    blendData: []
+    controlPointV3: {x: 0.4503541, y: 0, z: -4.1213512}
+    controlPoint: {x: 0.4503541, y: -4.1213512}
+    blendDistance: 0
+    extendBounds: 0
+    blendCornerPoints:
+    - {x: -8.347175, y: -12.121351, z: 0}
+    - {x: -8.347175, y: -12.121351, z: 0}
+    - {x: 9.247883, y: -12.121351, z: 0}
+    - {x: 9.247883, y: -12.121351, z: 0}
+    blendCornerPointInts: 050000000600000011000000
+    blendCornerPointWeights:
+    - 0
+    - 0
+    - 0
+    blendCornerPointsTransformed:
+    - {x: 137.03703, y: 565.46704, z: 0}
+    - {x: 137.03703, y: 565.46704, z: 0}
+    - {x: 496.97992, y: 565.46704, z: 0}
+    - {x: 496.97992, y: 565.46704, z: 0}
+    blendRatio: 1
+    curveStrength: 0
+    roadShapeVecs:
+    - {x: -8.797529, y: -0.00000012}
+    - {x: -0.0000009536743, y: -0.00000012}
+    - {x: 8.797529, y: -0.00000012}
+    roadShapeVecsString: -8.8, 0;0, 0;8.8, 0;
+    roadShapeMatchCount: 3
+    roadShapeUVY:
+    - 0
+    - 0.5
+    - 1
+    roadShapeUVY2:
+    - 0
+    - 0.5
+    - 1
+    hardEdge: 000000
+    roadShapeMaterialInts: 000000000000000000000000
+    sidewalkLeftVecs: []
+    sidewalkLeftUVY: []
+    sidewalkLeftMaterialInts: 
+    sidewalkRightVecs: []
+    sidewalkRightUVY: []
+    sidewalkRightMaterialInts: 
+    connectionVecs: []
+    connectionVecInts: 050000000600000011000000
+    fullConnectionVecInts: 050000000600000011000000
+    sidewalkLeftConnectionVecInts: 
+    sidewalkRightConnectionVecInts: 
+    doConnectionTri: 010101
+    outerVecInts: 
+    rotationPriority: 0
+    centerPointAngle: 1000
+    connectedRoad: {fileID: 0}
+    connectedMarker: -1
+    connectedRoadGO: {fileID: 0}
+    includeLeftSidewalk: 1
+    includeRightSidewalk: 1
+    roadMaterial: {fileID: 2100000, guid: cde14e4e7566d6242a68e870929703a6, type: 2}
+    roadMaterials:
+    - {fileID: 0}
+    centerPointPercentage: 0.5
+    leftIndent: -1
+    rightIndent: -1
+    leftSurrounding: -1
+    rightSurrounding: -1
+    leftIndentV3: {x: 0, y: 0, z: 0}
+    leftSurroundingV3: {x: 0, y: 0, z: 0}
+    rightIndentV3: {x: 0, y: 0, z: 0}
+    rightSurroundingV3: {x: 0, y: 0, z: 0}
+    leftCornerInt: -1
+    rightCornerInt: -1
+    leftIndentInt: 0
+    rightIndentInt: 0
+    leftInt: 0
+    rightInt: 2
+    leftIntFull: 0
+    rightIntFull: 2
+    alignmentHandleVec: {x: 0.4503541, y: 0, z: -11.121351}
+    additionalIndentDistance: 0
+    connectionAngle: 0
+    alignmentHandleVecRotationGizmo: {x: 0, y: 0, z: 0}
+    roadType: 1530955955.3422
+    roadTypeTimestamp: 0
+  - centerPoint: {x: -11.646971, y: 0, z: -0.0000009536743}
+    tmpCenterPoint: {x: -11.646971, y: 0, z: -0.0000009536743}
+    stageCenterPoint: {x: -11.646971, y: -0.0000009536743, z: 0}
+    tmpStageCenterPoint: {x: -11.646971, y: -0.0000009536743, z: 0}
+    blendData: []
+    controlPointV3: {x: -3.6469707, y: 0, z: -0.0000009536743}
+    controlPoint: {x: -3.6469707, y: -0.0000009536743}
+    blendDistance: 0
+    extendBounds: 0
+    blendCornerPoints:
+    - {x: -11.646971, y: 8.815001, z: 0}
+    - {x: -11.646971, y: 8.815001, z: 0}
+    - {x: -11.646971, y: -8.815002, z: 0}
+    - {x: -11.646971, y: -8.815002, z: 0}
+    blendCornerPointInts: 180000001700000019000000
+    blendCornerPointWeights:
+    - 0
+    - 0
+    - 0
+    blendCornerPointsTransformed:
+    - {x: 69.53296, y: 137.17114, z: 0}
+    - {x: 69.53296, y: 137.17114, z: 0}
+    - {x: 69.53296, y: 497.8289, z: 0}
+    - {x: 69.53296, y: 497.8289, z: 0}
+    blendRatio: 1
+    curveStrength: 0
+    roadShapeVecs:
+    - {x: -8.8150015, y: -0.0000010399999}
+    - {x: -0.0000009536743, y: -0.00000065}
+    - {x: 8.8150015, y: -0.00000027}
+    roadShapeVecsString: -8.8, 0;0, 0;8.8, 0;
+    roadShapeMatchCount: 3
+    roadShapeUVY:
+    - 0
+    - 0.5
+    - 1
+    roadShapeUVY2:
+    - 0
+    - 0.5
+    - 1
+    hardEdge: 000000
+    roadShapeMaterialInts: 000000000000000000000000
+    sidewalkLeftVecs: []
+    sidewalkLeftUVY: []
+    sidewalkLeftMaterialInts: 
+    sidewalkRightVecs: []
+    sidewalkRightUVY: []
+    sidewalkRightMaterialInts: 
+    connectionVecs: []
+    connectionVecInts: 180000001700000019000000
+    fullConnectionVecInts: 180000001700000019000000
+    sidewalkLeftConnectionVecInts: 
+    sidewalkRightConnectionVecInts: 
+    doConnectionTri: 010101
+    outerVecInts: 
+    rotationPriority: 0
+    centerPointAngle: 1000
+    connectedRoad: {fileID: 0}
+    connectedMarker: -1
+    connectedRoadGO: {fileID: 0}
+    includeLeftSidewalk: 1
+    includeRightSidewalk: 1
+    roadMaterial: {fileID: 2100000, guid: cde14e4e7566d6242a68e870929703a6, type: 2}
+    roadMaterials:
+    - {fileID: 0}
+    centerPointPercentage: 0.5
+    leftIndent: -1
+    rightIndent: -1
+    leftSurrounding: -1
+    rightSurrounding: -1
+    leftIndentV3: {x: 0, y: 0, z: 0}
+    leftSurroundingV3: {x: 0, y: 0, z: 0}
+    rightIndentV3: {x: 0, y: 0, z: 0}
+    rightSurroundingV3: {x: 0, y: 0, z: 0}
+    leftCornerInt: -1
+    rightCornerInt: -1
+    leftIndentInt: 0
+    rightIndentInt: 0
+    leftInt: 0
+    rightInt: 2
+    leftIntFull: 0
+    rightIntFull: 2
+    alignmentHandleVec: {x: 0, y: 0, z: 0}
+    additionalIndentDistance: 0
+    connectionAngle: 0
+    alignmentHandleVecRotationGizmo: {x: 0, y: 0, z: 0}
+    roadType: 1530955955.3422
+    roadTypeTimestamp: 0
+  - centerPoint: {x: 0.45035315, y: 0, z: 12.121351}
+    tmpCenterPoint: {x: 0.45035315, y: 0, z: 12.121351}
+    stageCenterPoint: {x: 0.45035315, y: 12.121351, z: 0}
+    tmpStageCenterPoint: {x: 0.45035315, y: 12.121351, z: 0}
+    blendData: []
+    controlPointV3: {x: 0.45035315, y: 0, z: 4.1213512}
+    controlPoint: {x: 0.45035315, y: 4.1213512}
+    blendDistance: 0
+    extendBounds: 0
+    blendCornerPoints:
+    - {x: 9.247883, y: 12.121351, z: 0}
+    - {x: 9.247883, y: 12.121351, z: 0}
+    - {x: -8.347177, y: 12.121351, z: 0}
+    - {x: -8.347177, y: 12.121351, z: 0}
+    blendCornerPointInts: 0d0000000e00000010000000
+    blendCornerPointWeights:
+    - 0
+    - 0
+    - 0
+    blendCornerPointsTransformed:
+    - {x: 496.97992, y: 69.532974, z: 0}
+    - {x: 496.97992, y: 69.532974, z: 0}
+    - {x: 137.037, y: 69.532974, z: 0}
+    - {x: 137.037, y: 69.532974, z: 0}
+    blendRatio: 1
+    curveStrength: 0
+    roadShapeVecs:
+    - {x: -8.797529, y: -0.00000118}
+    - {x: 0, y: -0.00000118}
+    - {x: 8.797529, y: -0.00000118}
+    roadShapeVecsString: -8.8, 0;0, 0;8.8, 0;
+    roadShapeMatchCount: 3
+    roadShapeUVY:
+    - 0
+    - 0.5
+    - 1
+    roadShapeUVY2:
+    - 0
+    - 0.5
+    - 1
+    hardEdge: 000000
+    roadShapeMaterialInts: 000000000000000000000000
+    sidewalkLeftVecs: []
+    sidewalkLeftUVY: []
+    sidewalkLeftMaterialInts: 
+    sidewalkRightVecs: []
+    sidewalkRightUVY: []
+    sidewalkRightMaterialInts: 
+    connectionVecs: []
+    connectionVecInts: 0d0000000e00000010000000
+    fullConnectionVecInts: 0d0000000e00000010000000
+    sidewalkLeftConnectionVecInts: 
+    sidewalkRightConnectionVecInts: 
+    doConnectionTri: 010101
+    outerVecInts: 
+    rotationPriority: 0
+    centerPointAngle: 1000
+    connectedRoad: {fileID: 0}
+    connectedMarker: -1
+    connectedRoadGO: {fileID: 0}
+    includeLeftSidewalk: 1
+    includeRightSidewalk: 1
+    roadMaterial: {fileID: 2100000, guid: cde14e4e7566d6242a68e870929703a6, type: 2}
+    roadMaterials:
+    - {fileID: 0}
+    centerPointPercentage: 0.5
+    leftIndent: -1
+    rightIndent: -1
+    leftSurrounding: -1
+    rightSurrounding: -1
+    leftIndentV3: {x: 0, y: 0, z: 0}
+    leftSurroundingV3: {x: 0, y: 0, z: 0}
+    rightIndentV3: {x: 0, y: 0, z: 0}
+    rightSurroundingV3: {x: 0, y: 0, z: 0}
+    leftCornerInt: -1
+    rightCornerInt: -1
+    leftIndentInt: 0
+    rightIndentInt: 0
+    leftInt: 0
+    rightInt: 2
+    leftIntFull: 0
+    rightIntFull: 2
+    alignmentHandleVec: {x: 0, y: 0, z: 0}
+    additionalIndentDistance: 0
+    connectionAngle: 0
+    alignmentHandleVecRotationGizmo: {x: 0, y: 0, z: 0}
+    roadType: 1530955955.3422
+    roadTypeTimestamp: 0
+  sidewalkControlElements: []
+  meshVecs:
+  - {x: 0.45035374, y: 0.00000028, z: -9.476273}
+  - {x: 0.4503532, y: 0.00000091, z: -7.7103105}
+  - {x: 7.517719, y: 0.00000101, z: -8.567012}
+  - {x: -8.347175, y: -0.00000027, z: -8.815002}
+  - {x: -8.099678, y: 0.00000101, z: -8.567012}
+  - {x: -8.347175, y: -0.00000012, z: -12.121351}
+  - {x: 0.4503532, y: -0.00000012, z: -12.121351}
+  - {x: 9.247883, y: 0.0000010399999, z: -8.815002}
+  - {x: 7.517719, y: 0, z: 0}
+  - {x: 9.247883, y: 0, z: 0}
+  - {x: 7.517719, y: -0.00000101, z: 8.567012}
+  - {x: 9.247883, y: -0.0000010399999, z: 8.815002}
+  - {x: 0.4503532, y: -0.0000010699999, z: 9.476273}
+  - {x: 9.247883, y: -0.00000118, z: 12.121351}
+  - {x: 0.4503532, y: -0.00000118, z: 12.121351}
+  - {x: -8.347177, y: -0.0000010399999, z: 8.815001}
+  - {x: -8.347177, y: -0.00000118, z: 12.121351}
+  - {x: 9.247883, y: -0.00000012, z: -12.121351}
+  - {x: -8.099678, y: -0.00000101, z: 8.56701}
+  - {x: 0.4503532, y: -0.00000091, z: 7.7103105}
+  - {x: -7.2446747, y: -0.00000057, z: -0.00000059}
+  - {x: 0.4503532, y: 0, z: 0}
+  - {x: -9.007136, y: -0.00000065, z: -0.00000054}
+  - {x: -11.646971, y: -0.00000065, z: 0}
+  - {x: -11.646971, y: -0.0000010399999, z: 8.815001}
+  - {x: -11.646971, y: -0.00000027, z: -8.815002}
+  fullMeshVecs:
+  - {x: 0.45035374, y: 0.00000028, z: -9.476273}
+  - {x: 0.4503532, y: 0.00000091, z: -7.7103105}
+  - {x: 7.517719, y: 0.00000101, z: -8.567012}
+  - {x: -8.347175, y: -0.00000027, z: -8.815002}
+  - {x: -8.099678, y: 0.00000101, z: -8.567012}
+  - {x: -8.347175, y: -0.00000012, z: -12.121351}
+  - {x: 0.4503532, y: -0.00000012, z: -12.121351}
+  - {x: 9.247883, y: 0.0000010399999, z: -8.815002}
+  - {x: 7.517719, y: 0, z: 0}
+  - {x: 9.247883, y: 0, z: 0}
+  - {x: 7.517719, y: -0.00000101, z: 8.567012}
+  - {x: 9.247883, y: -0.0000010399999, z: 8.815002}
+  - {x: 0.4503532, y: -0.0000010699999, z: 9.476273}
+  - {x: 9.247883, y: -0.00000118, z: 12.121351}
+  - {x: 0.4503532, y: -0.00000118, z: 12.121351}
+  - {x: -8.347177, y: -0.0000010399999, z: 8.815001}
+  - {x: -8.347177, y: -0.00000118, z: 12.121351}
+  - {x: 9.247883, y: -0.00000012, z: -12.121351}
+  - {x: -8.099678, y: -0.00000101, z: 8.56701}
+  - {x: 0.4503532, y: -0.00000091, z: 7.7103105}
+  - {x: -7.2446747, y: -0.00000057, z: -0.00000059}
+  - {x: 0.4503532, y: 0, z: 0}
+  - {x: -9.007136, y: -0.00000065, z: -0.00000054}
+  - {x: -11.646971, y: -0.00000065, z: 0}
+  - {x: -11.646971, y: -0.0000010399999, z: 8.815001}
+  - {x: -11.646971, y: -0.00000027, z: -8.815002}
+  tmpMeshVecs:
+  - {x: 0.45035374, y: 0.00000028, z: -9.476273}
+  - {x: 0.4503532, y: 0.00000091, z: -7.7103105}
+  - {x: 7.517719, y: 0.00000101, z: -8.567012}
+  - {x: -8.347175, y: -0.00000027, z: -8.815002}
+  - {x: -8.099678, y: 0.00000101, z: -8.567012}
+  - {x: -8.347175, y: -0.00000012, z: -12.121351}
+  - {x: 0.4503532, y: -0.00000012, z: -12.121351}
+  - {x: 9.247883, y: 0.0000010399999, z: -8.815002}
+  - {x: 7.517719, y: 0, z: 0}
+  - {x: 9.247883, y: 0, z: 0}
+  - {x: 7.517719, y: -0.00000101, z: 8.567012}
+  - {x: 9.247883, y: -0.0000010399999, z: 8.815002}
+  - {x: 0.4503532, y: -0.0000010699999, z: 9.476273}
+  - {x: 9.247883, y: -0.00000118, z: 12.121351}
+  - {x: 0.4503532, y: -0.00000118, z: 12.121351}
+  - {x: -8.347177, y: -0.0000010399999, z: 8.815001}
+  - {x: -8.347177, y: -0.00000118, z: 12.121351}
+  - {x: 9.247883, y: -0.00000012, z: -12.121351}
+  - {x: -8.099678, y: -0.00000101, z: 8.56701}
+  - {x: 0.4503532, y: -0.00000091, z: 7.7103105}
+  - {x: -7.2446747, y: -0.00000057, z: -0.00000059}
+  - {x: 0.4503532, y: 0, z: 0}
+  - {x: -9.007136, y: -0.00000065, z: -0.00000054}
+  - {x: -11.646971, y: -0.00000065, z: 0}
+  - {x: -11.646971, y: -0.0000010399999, z: 8.815001}
+  - {x: -11.646971, y: -0.00000027, z: -8.815002}
+  tmpFullMeshVecs:
+  - {x: 0.45035374, y: 0.00000028, z: -9.476273}
+  - {x: 0.4503532, y: 0.00000091, z: -7.7103105}
+  - {x: 7.517719, y: 0.00000101, z: -8.567012}
+  - {x: -8.347175, y: -0.00000027, z: -8.815002}
+  - {x: -8.099678, y: 0.00000101, z: -8.567012}
+  - {x: -8.347175, y: -0.00000012, z: -12.121351}
+  - {x: 0.4503532, y: -0.00000012, z: -12.121351}
+  - {x: 9.247883, y: 0.0000010399999, z: -8.815002}
+  - {x: 7.517719, y: 0, z: 0}
+  - {x: 9.247883, y: 0, z: 0}
+  - {x: 7.517719, y: -0.00000101, z: 8.567012}
+  - {x: 9.247883, y: -0.0000010399999, z: 8.815002}
+  - {x: 0.4503532, y: -0.0000010699999, z: 9.476273}
+  - {x: 9.247883, y: -0.00000118, z: 12.121351}
+  - {x: 0.4503532, y: -0.00000118, z: 12.121351}
+  - {x: -8.347177, y: -0.0000010399999, z: 8.815001}
+  - {x: -8.347177, y: -0.00000118, z: 12.121351}
+  - {x: 9.247883, y: -0.00000012, z: -12.121351}
+  - {x: -8.099678, y: -0.00000101, z: 8.56701}
+  - {x: 0.4503532, y: -0.00000091, z: 7.7103105}
+  - {x: -7.2446747, y: -0.00000057, z: -0.00000059}
+  - {x: 0.4503532, y: 0, z: 0}
+  - {x: -9.007136, y: -0.00000065, z: -0.00000054}
+  - {x: -11.646971, y: -0.00000065, z: 0}
+  - {x: -11.646971, y: -0.0000010399999, z: 8.815001}
+  - {x: -11.646971, y: -0.00000027, z: -8.815002}
+  tCrossingTmpFullMeshVecs: []
+  outerVecInts: 
+  surfaceVecs:
+  - {x: -8.347175, y: 0, z: -12.121351}
+  - {x: -11.646971, y: 0, z: -8.815002}
+  - {x: -11.646971, y: 0, z: 8.815001}
+  - {x: -8.347177, y: 0, z: 12.121351}
+  - {x: 9.247883, y: 0, z: 12.121351}
+  - {x: 9.247883, y: 0, z: -12.121351}
+  surfaceVecType: 010000000200000001000000020000000100000002000000
+  surfaceConnectionInt: 000000000100000001000000020000000200000000000000
+  tCrossingBlendData: []
+  indentVecs: []
+  sourcePrefab: {fileID: 0}
+  prefabId: 962494069
+  prioritySegments: 
+  minNodeDistance: 3
+  nodeWithinRange: -1
+  sourceObject: {fileID: 100000, guid: 69686ec09bf5f1b47b059e96ff74952b, type: 3}
+  meshInstance: 0
+  selectedConnection: -1
+  QDOOOQOOQQQQD: []
+  deformTerrain: 1
+  isRoundabout: 0
+  isERCrossing: 0
+  isIConnector: 0
+  roundaboutScript: {fileID: 0}
+  crossingsScript: {fileID: 0}
+  iConnectorScript: {fileID: 0}
+  isCustomPrefab: 1
+  customPrefabVersion: 1
+  recalculateNormals: 0
+  planarUVs: 0
+  planarTiling: 1
+  lastVecRoadIndex: 0
+  isSceneObject: 0
+  surfaceObject: {fileID: 0}
+  surfaceMeshVecs: []
+  tmpSurfaceMeshVecs: []
+  tmpSurfaceVecsTCrossings: []
+  surfaceInts: 
+  leftBottomCorner: {x: 0, y: 0, z: 0}
+  leftTopCorner: {x: 0, y: 0, z: 0}
+  rightBottomCorner: {x: 0, y: 0, z: 0}
+  rightTopCorner: {x: 0, y: 0, z: 0}
+  tCrossing: 0
+  tStraightBending: 1
+  tCrossingLeftRight: 1
+  tMainRoadWidth: 0
+  tConnectionRoadWidth: 0
+  bottomLeftSidewalkWidth: 0
+  bottomLeftSidewalkOuterOffset: 0
+  bottomLeftSidewalkCurbDepth: 0
+  bottomRightSidewalkWidth: 0
+  bottomRightSidewalkOuterOffset: 0
+  bottomRightSidewalkCurbDepth: 0
+  topLeftSidewalkWidth: 0
+  topLeftSidewalkOuterOffset: 0
+  topLeftSidewalkCurbDepth: 0
+  topRightSidewalkWidth: 0
+  topRightSidewalkOuterOffset: 0
+  topRightSidewalkCurbDepth: 0
+  testVec: {x: 0, y: 0, z: 0}
+  surfaceSurroundingInts: 
+  rotationPriorityElement: -1
+  cornerPos: {x: 0, y: 0, z: 0}
+  mainCorner: {x: 0, y: 0, z: 0}
+  connectedCorner: {x: 0, y: 0, z: 0}
+  mainVecOuter: {x: 0, y: 0, z: 0}
+  connectionVecOuter: {x: 0, y: 0, z: 0}
+  indentTopVec: {x: 0, y: 0, z: 0}
+  indentRightVec: {x: 0, y: 0, z: 0}
+  mainIndent: {x: 0, y: 0, z: 0}
+  connectionIndent: {x: 0, y: 0, z: 0}
+  selectedRotationConnection: 0
+  bottomVec: {x: 0, y: 0, z: 0}
+  rightVec: {x: 0, y: 0, z: 0}
+  bottomIndent: {x: 0, y: 0, z: 0}
+  rightIndent: {x: 0, y: 0, z: 0}
+  sAngle: 90
+  baseScript: {fileID: 0}
+  QDQDQOOQQDQOQQ: 0
+  tp1: {x: 0, y: 0, z: 0}
+  tp2: {x: 0, y: 0, z: 0}
+  doTerrainDeformation: 1
+  includeOuterVertices: 1
+  surroundingDistance: 0
+  surfaceMesh: {fileID: 0}
+  debugVecs1: []
+  debugVecs2: []
+  lightmapAdjusted: 0
+  lockScale: 1
+  extraIndentMargin: 0
+  indent: 0
+  surrounding: 0

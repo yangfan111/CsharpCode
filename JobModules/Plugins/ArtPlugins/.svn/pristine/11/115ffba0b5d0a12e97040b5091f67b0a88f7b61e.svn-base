@@ -1,0 +1,2 @@
+In order to have a reference of the prefab type, please store unused dynamic prefabs 
+that you want to remove from the connections tab in this folder

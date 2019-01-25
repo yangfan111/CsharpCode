@@ -1,0 +1,10 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+namespace ArtPlugins.MapConfig
+{
+    public class MapPointISO : MonoBehaviour
+    {
+         public int PointID = 0;
+    }
+}

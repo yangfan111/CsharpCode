@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: ef40284ec4b685245be2f6665f3af909
+timeCreated: 1510497393
+licenseType: Store
+ShaderImporter:
+  defaultTextures:
+  - _SplatMap1: {fileID: 2822908, guid: 763a0d75d35f56d478223f7c30ddd07d, type: 2}
+  - _AlbedoMaps: {fileID: 18700000, guid: 2a1e45aec61cb9b41830e680aef0d4bf, type: 2}
+  - _SplatMap2: {fileID: 2822908, guid: 763a0d75d35f56d478223f7c30ddd07d, type: 2}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

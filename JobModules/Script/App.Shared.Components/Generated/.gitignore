@@ -1,0 +1,3 @@
+*.cs
+!/**/*Attribute.cs
+!/**/*Entity.cs

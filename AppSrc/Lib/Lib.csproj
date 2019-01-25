@@ -48,12 +48,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="lib\YF.EditorLib.cs" />
+    <Compile Include="lib\UnityEditorLib.cs" />
     <Compile Include="lib\Mics.cs" />
     <Compile Include="lib\TodoLib.cs" />
-    <Compile Include="lib\YF.FileUtil.FS.cs" />
+    <Compile Include="lib\FS.cs" />
+    <Compile Include="lib\XMLSerialize.cs" />
     <Compile Include="lib\YF.FileUtil.PS.cs" />
-    <Compile Include="lib\YF.FileUtil.Seri.cs" />
+    <Compile Include="lib\NormalSerialize.cs" />
     <Compile Include="lib\YF.Global.cs" />
     <Compile Include="lib\YF.RunLib.cs" />
     <Compile Include="lib\YF.Structure.cs" />

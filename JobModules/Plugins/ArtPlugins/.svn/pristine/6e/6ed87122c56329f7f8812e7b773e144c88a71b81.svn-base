@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: df9b97ff031abc34ba8927309be3e0e6
+timeCreated: 1537840434
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+  - role: {instanceID: 0}
+  - grassMateral: {fileID: 2100000, guid: e7af9923de9a22c4b91de549d59679d1, type: 2}
+  - printer2D: {instanceID: 0}
+  - shader: {fileID: 7200000, guid: ea7fff13b2ae56541a8992308b8366ad, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

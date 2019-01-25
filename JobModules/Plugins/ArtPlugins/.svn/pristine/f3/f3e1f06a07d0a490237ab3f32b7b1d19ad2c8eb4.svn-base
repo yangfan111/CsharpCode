@@ -1,0 +1,52 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Shared.Scripts.SceneManagement;
+using UnityEngine;
+
+public class HierarchyRecorder
+{
+    public bool NeedLevelStreaming { get; private set; }
+
+    private const int MaxGoDepth = 20;
+    private readonly int[] _pathId = new int[MaxGoDepth];
+    private int _goTop;
+
+    private readonly StreamingScene _streamingScene = new StreamingScene();
+
+    public StreamingScene StreamingScene
+    {
+        get { return _streamingScene; }
+    }
+
+    public void PushGo(string name)
+    {
+        _pathId[_goTop] = _streamingScene.NodeNames.Count;
+        _goTop++;
+        _streamingScene.NodeNames.Add(name);
+    }
+
+    public void PopGo()
+    {
+        _goTop--;
+    }
+
+    public void Record(string bundleName, string assetName, StreamingObjectCategory cat, Bounds extent)
+    {
+        NeedLevelStreaming = true;
+        var obj = new StreamingObject
+        {
+            BundleName = bundleName,
+            AssetName = assetName,
+            Category = cat,
+            Extent = extent,
+            Path = new int[_goTop]
+        };
+
+        for (int i = 0; i < _goTop; i++)
+            obj.Path[i] = _pathId[i];
+
+        _streamingScene.Objects.Add(obj);
+    }
+}

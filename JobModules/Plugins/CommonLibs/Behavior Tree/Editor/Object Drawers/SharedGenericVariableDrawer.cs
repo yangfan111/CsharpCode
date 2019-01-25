@@ -1,0 +1,1 @@
+﻿// Intentionally left blank. This file will be removed with the next Behavior Designer release.

@@ -1,0 +1,131 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+namespace ArtPlugins
+{
+    public class SceneObjectCollectionEditor : Editor
+    {
+        private enum ObjectType
+        {
+            Door,
+            DestructibleObject,
+        }
+
+        private static readonly string DoorCollectionName = "DoorCollection";
+        private static readonly string DestructibleCollectionName = "DesctructibleCollection";
+        private static HashSet<string> _objectPathSet = new HashSet<string>();
+
+        private static bool needSave = true;
+
+        [InitializeOnLoadMethod]
+        public static void Init()
+        {
+            EditorSceneManager.sceneSaved -= OnSceneSaved;
+            EditorSceneManager.sceneSaved += OnSceneSaved;
+        }
+
+        [MenuItem("场景物件/收集所有门")]
+        public static void getAllDoor()
+        {
+            GetCollection(ObjectType.Door);
+        }
+
+        [MenuItem("场景物件/收集所有可破坏物件")]
+        public static void getAllDesructibleObject()
+        {
+            GetCollection(ObjectType.DestructibleObject);
+        }
+
+        private static void GetCollection(ObjectType tp)
+        {
+            for (int i = 0; i < EditorSceneManager.sceneCount; i++)
+            {
+                Scene scene = EditorSceneManager.GetSceneAt(i);
+                if (tp == ObjectType.Door)
+                    CollectSceneObject<DoorCollection, Door>(scene, DoorCollectionName);
+                else if (tp == ObjectType.DestructibleObject)
+                    CollectSceneObject<DestructibleCollection, DestructibleObject>(scene, DestructibleCollectionName);
+            }
+        }
+
+        private static void OnSceneSaved(Scene scene)
+        {
+            if (string.IsNullOrEmpty(scene.path) || !scene.path.StartsWith("Assets/Maps/maps/0001/Scenes/002 ")) return;
+            if (!needSave)                                      // 防止保存的不间断回调
+            {
+                needSave = true;
+                return;
+            }
+            needSave = false;
+            CollectSceneObject<DoorCollection, Door>(scene, DoorCollectionName);
+            CollectSceneObject<DestructibleCollection, DestructibleObject>(scene, DestructibleCollectionName);
+            EditorSceneManager.SaveScene(scene);
+        }
+
+        private static void CollectSceneObject<TCollection, TObject>(Scene scene, string collectionName)
+            where TCollection : SceneObjectCollection<TObject>
+            where TObject : SceneObjectId
+        {
+            TCollection collection = null;
+
+            foreach (var item in scene.GetRootGameObjects())
+            {
+                collection = item.GetComponent<TCollection>();
+                if (collection != null) break;
+            }
+
+            if (collection == null)
+            {
+                collection = new GameObject(collectionName).AddComponent<TCollection>();
+                SceneManager.MoveGameObjectToScene(collection.gameObject, scene);
+            }
+
+            List<TObject> objList = new List<TObject>();
+            foreach (var obj in GameObject.FindObjectsOfType<TObject>())
+            {
+                if (obj.gameObject.scene != scene) continue;
+                obj.ID = objList.Count + 1;
+                if (obj.ID >= (1 << 20))
+                {
+                    EditorUtility.DisplayDialog("错误", String.Format("物件个数大于 {0}", 1 << 20), "确定");
+                }
+                EditorUtility.SetDirty(obj);
+                objList.Add(obj);
+            }
+
+            var objPathList = new List<string>();
+            _objectPathSet.Clear();
+            foreach (var obj in objList)
+            {
+                var transform = obj.transform;
+                var path = transform.name;
+
+                while (transform.parent != null)
+                {
+                    transform = transform.parent;
+                    path = transform.name + "/" + path;
+                }
+
+                if (_objectPathSet.Contains(path))
+                {
+                    EditorUtility.DisplayDialog("命名重复错误", String.Format("场景中含有相同命名的对象: {0}", path), "确定");
+                    continue;
+                }
+
+                objPathList.Add(path);
+                _objectPathSet.Add(path);
+
+            }
+
+            EditorSceneManager.MarkSceneDirty(scene);
+            collection.ObjectPathArray = objPathList.ToArray();
+        }
+    }
+
+}

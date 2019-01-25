@@ -1,0 +1,134 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1562300138661404}
+  m_IsPrefabParent: 1
+--- !u!1 &1562300138661404
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4760785985338222}
+  - component: {fileID: 218407292804454512}
+  - component: {fileID: 154362650720952108}
+  - component: {fileID: 114146845228280714}
+  m_Layer: 0
+  m_Name: Terrain
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 4294967295
+  m_IsActive: 1
+--- !u!4 &4760785985338222
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1562300138661404}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114146845228280714
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1562300138661404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15d4b3ca5b0912743b88dd4974ef1366, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tMaterial: {fileID: 2100000, guid: 82b2e736351dca444bccb5cff4cfc2c8, type: 2}
+  layer0: {fileID: 2800000, guid: 7360b3647bb62a8459cac9d86d4ab8c9, type: 3}
+  layer1: {fileID: 2800000, guid: 25b7d427d0c5656418acd5d684bb6cc6, type: 3}
+  layer2: {fileID: 2800000, guid: 4caa05daeebd5bd438dd86101677259b, type: 3}
+  layer3: {fileID: 2800000, guid: bcf30aa1b9011214bbc779df24e4a54c, type: 3}
+  layer4: {fileID: 2800000, guid: de0e24a4af5b8c648b781f5626d43457, type: 3}
+  layer_Normal_0: {fileID: 2800000, guid: ebf368bca65b0314c9ca24c9952e060a, type: 3}
+  layer_Normal_1: {fileID: 2800000, guid: 2930a489336fbdb4b8629866405583e4, type: 3}
+  layer_Normal_2: {fileID: 2800000, guid: 05ea2e2d9fe12b141bc67c26d8877726, type: 3}
+  layer_Normal_3: {fileID: 2800000, guid: c8f93cce4a7d49c438cda709d3af5312, type: 3}
+  layer_Normal_4: {fileID: 2800000, guid: 2794481815bcc1e4ba555ccab944fbd1, type: 3}
+  autoUpdate: 1
+  splatMap1: {fileID: 28481135961884048, guid: 693160a2c14579c4594923db8850d679, type: 2}
+  splatMap2: {fileID: 28864714185642090, guid: 693160a2c14579c4594923db8850d679, type: 2}
+  sUV0: 30
+  sUV1: 30
+  sUV2: 30
+  sUV3: 30
+  sUV4: 30
+  sSmoothness0: 0
+  sSmoothness1: 0
+  sSmoothness2: 0
+  sSmoothness3: 0
+  sSmoothness4: 0
+  sDisplacement0: 0
+  sDisplacement1: 0
+  sDisplacement2: 0
+  sDisplacement3: 0
+  sDisplacement4: 0
+  sNormal0: 0
+  sNormal1: 0
+  sNormal2: 0
+  sNormal3: 0
+  sNormal4: 0
+  initialized: 1
+  tesValue: 4
+  tesMin: 100
+  tesMax: 100
+--- !u!154 &154362650720952108
+TerrainCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1562300138661404}
+  m_Material: {fileID: 0}
+  m_Enabled: 1
+  m_TerrainData: {fileID: 15600000, guid: 693160a2c14579c4594923db8850d679, type: 2}
+  m_EnableTreeColliders: 1
+--- !u!218 &218407292804454512
+Terrain:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1562300138661404}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_TerrainData: {fileID: 15600000, guid: 693160a2c14579c4594923db8850d679, type: 2}
+  m_TreeDistance: 2000
+  m_TreeBillboardDistance: 50
+  m_TreeCrossFadeLength: 5
+  m_TreeMaximumFullLODCount: 50
+  m_DetailObjectDistance: 80
+  m_DetailObjectDensity: 1
+  m_HeightmapPixelError: 5
+  m_SplatMapDistance: 1000
+  m_HeightmapMaximumLOD: 0
+  m_CastShadows: 1
+  m_DrawHeightmap: 1
+  m_DrawTreesAndFoliage: 1
+  m_ReflectionProbeUsage: 1
+  m_MaterialType: 3
+  m_LegacySpecular:
+    serializedVersion: 2
+    rgba: 4286545791
+  m_LegacyShininess: 0.078125
+  m_MaterialTemplate: {fileID: 2100000, guid: 82b2e736351dca444bccb5cff4cfc2c8, type: 2}
+  m_BakeLightProbesForTrees: 1
+  m_ScaleInLightmap: 0.0512
+  m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
