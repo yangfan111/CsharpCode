@@ -70,7 +70,7 @@ namespace App.Shared.SceneManagement
                 _cachedLoadGoRequest.Clear();
             }
 
-            ProcessUnloadRequests();
+            DestroyGo();
         }
 
         public int NotFinishedRequests { get; private set; }
@@ -81,7 +81,6 @@ namespace App.Shared.SceneManagement
 
         private List<AssetInfo> _cachedLoadSceneRequest = new List<AssetInfo>();
         private List<AssetInfo> _cachedLoadGoRequest = new List<AssetInfo>();
-        private List<string> _cachedUnloadSceneRequest = new List<string>();
         private Queue<UnityObjectWrapper<GameObject>> _cachedUnloadGoRequest = new Queue<UnityObjectWrapper<GameObject>>();
 
         private List<string> _fixedSceneNames;
@@ -89,7 +88,7 @@ namespace App.Shared.SceneManagement
         public void SetToWorldCompositionLevel(WorldCompositionParam param, IStreamingGoManager streamingGo)
         {
             // compromise for deadline
-            _sceneManager = new StreamingManager(this, streamingGo, SingletonManager.Get<StreamingLevelStructure>().Data, param);
+            _sceneManager = new StreamingManager(this, null, streamingGo, SingletonManager.Get<StreamingLevelStructure>().Data, param);
 
             _fixedSceneNames = param.FixedScenes;
             RequestForFixedScenes(param.AssetBundleName);
@@ -112,7 +111,7 @@ namespace App.Shared.SceneManagement
     
         public void AddUnloadSceneRequest(string sceneName)
         {
-            _cachedUnloadSceneRequest.Add(sceneName);
+            SceneManager.UnloadSceneAsync(sceneName);
             ++NotFinishedRequests;
         }
         
@@ -155,33 +154,25 @@ namespace App.Shared.SceneManagement
             --NotFinishedRequests;
         }
 
-        private void ProcessUnloadRequests()
+        private void DestroyGo()
         {
             var count = _cachedUnloadGoRequest.Count;
             for (int i = 0; i < count; i++)
             {
                 var go = _cachedUnloadGoRequest.Dequeue();
 
-                if (GoUnloaded != null)
-                    GoUnloaded.Invoke(go);
+                if (go.Value != null)
+                {
+                    if (GoUnloaded != null)
+                        GoUnloaded.Invoke(go);
 
-                UnityEngine.Object.Destroy(go.Value);
+                    UnityEngine.Object.Destroy(go.Value);
+                }
 
                 --NotFinishedRequests;
-            }
-
-            if (_cachedUnloadSceneRequest.Count != 0)
-            {
-                count = _cachedUnloadSceneRequest.Count;
-                for (int i = 0; i < count; i++)
-                {
-                    SceneManager.UnloadSceneAsync(_cachedUnloadSceneRequest[i]);
-                }
-                
-                _cachedUnloadSceneRequest.Clear();
-            }
+            }           
         }
-
+        
         private void RequestForFixedScenes(string bundleName)
         {
             foreach (var sceneName in _fixedSceneNames)

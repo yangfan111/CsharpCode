@@ -19,7 +19,6 @@ namespace App.Shared.GameModeLogic.LogicFactory
 
         public SurvivalModeLogicFactory(Contexts contexts, ICommonSessionObjects commonSessionObjects)
         {
-            UnityEngine.Debug.Log("survival mode ");
             _contexts = contexts;
             _commonSessionObjects = commonSessionObjects;
         }
@@ -33,14 +32,14 @@ namespace App.Shared.GameModeLogic.LogicFactory
 
         protected override IPickupLogic GetPickupLogic()
         {
-            var _pickupLogic = new SurvivalPickupLogic(_contexts, _contexts.session.entityFactoryObject.SceneObjectEntityFactory, _commonSessionObjects.RuntimeGameConfig);
+            var _pickupLogic = new SurvivalPickupLogic(_contexts.player, _contexts.sceneObject, _contexts.session.entityFactoryObject.SceneObjectEntityFactory, _commonSessionObjects.RuntimeGameConfig);
 
             return _pickupLogic;
         }
 
         protected override IReservedBulletLogic GetReservedBulletLogic()
         {
-            var _reservedBulletLogic = new SharedReservedBulletLogic(_contexts, SingletonManager.Get<WeaponConfigManager>());
+            var _reservedBulletLogic = new SharedReservedBulletLogic(SingletonManager.Get<WeaponConfigManager>());
 
             return _reservedBulletLogic;
         }

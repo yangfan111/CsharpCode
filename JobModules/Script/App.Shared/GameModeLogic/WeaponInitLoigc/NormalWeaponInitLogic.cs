@@ -1,5 +1,4 @@
 ﻿using App.Shared.GameModules.Weapon;
-using App.Shared.WeaponLogic;
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using Core;
@@ -18,28 +17,20 @@ namespace App.Shared.GameModeLogic.WeaponInitLoigc
         private LinkedList<EWeaponSlotType> _removeSlotList = new LinkedList<EWeaponSlotType>();
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(NormalWeaponInitLogic));
         private readonly int _gameModeId;
-        private IWeaponConfigManager _weaponConfigManager;
+        private INewWeaponConfigManager _weaponConfigManager;
         private IWeaponPropertyConfigManager _weaponPropertyConfigManager;
         private IGameModeConfigManager _gameModeConfigManager;
-        private IWeaponPartsConfigManager _weaponPartsConfigManager;
         private OverrideWeaponController _overrideWeaponController = new OverrideWeaponController();
-        private Contexts _contexts;
 
-        public NormalWeaponInitLogic(
-            Contexts contexts,
-            int modeId, 
+        public NormalWeaponInitLogic(int modeId, 
             IGameModeConfigManager gameModeConfigManager,
-            IWeaponConfigManager newWeaponConfigManager,
-            IWeaponPropertyConfigManager weaponPropertyConfigManager,
-            IWeaponPartsConfigManager weaponPartsConfigManager)
+            INewWeaponConfigManager newWeaponConfigManager,
+            IWeaponPropertyConfigManager weaponPropertyConfigManager)
         {
-            Logger.Info("init NormalWeaponInitLogic ");
-            _contexts = contexts;
             _gameModeId = modeId;
             _weaponConfigManager = newWeaponConfigManager;
             _weaponPropertyConfigManager = weaponPropertyConfigManager;
             _gameModeConfigManager = gameModeConfigManager;
-            _weaponPartsConfigManager = weaponPartsConfigManager;
         }
 
         public bool IsBagSwithEnabled(Entity playerEntity)
@@ -55,7 +46,6 @@ namespace App.Shared.GameModeLogic.WeaponInitLoigc
 
         public void InitDefaultWeapon(Entity playerEntity)
         {
-            Logger.Info("InitDefaultWeapon");
             var player = playerEntity as PlayerEntity;
             if(null == player)
             {
@@ -142,7 +132,7 @@ namespace App.Shared.GameModeLogic.WeaponInitLoigc
             {
                 _removeSlotList.AddLast(slot);
             }
-            var helper = playerEntity.GetController<PlayerWeaponController>().GetBagCacheHelper(EWeaponSlotType.ThrowingWeapon);
+            var helper = playerEntity.GetController<PlayerWeaponController>().GetBagCacheHelper(EWeaponSlotType.GrenadeWeapon);
             helper.ClearCache();
             var firstSlot = EWeaponSlotType.Length;
             bool grenadeMounted = false;
@@ -160,11 +150,14 @@ namespace App.Shared.GameModeLogic.WeaponInitLoigc
                     var weaponId = weapon.WeaponTplId;
                     var weaponInfo = weapon.ToWeaponInfo();
 
+                    weaponInfo.Bullet = _weaponPropertyConfigManager.GetBullet(weaponId);
+                    weaponInfo.ReservedBullet = _weaponPropertyConfigManager.GetBulletMax(weaponId);
+
                     if (weaponType == EWeaponType.ThrowWeapon)
                     {
                         if (!grenadeMounted)
                         {
-                            playerEntity.GetController<PlayerWeaponController>().ReplaceWeaponToSlot(_contexts, slot, weaponInfo);
+                            playerEntity.GetController<PlayerWeaponController>().ReplaceWeaponToSlot(slot, weaponInfo);
                             grenadeMounted = true;
                         }
                         else
@@ -174,28 +167,18 @@ namespace App.Shared.GameModeLogic.WeaponInitLoigc
                     }
                     else
                     {
-                        weaponInfo.Bullet = _weaponPropertyConfigManager.GetBullet(weaponId);
-                        weaponInfo.ReservedBullet = _weaponPropertyConfigManager.GetBulletMax(weaponId);
-                        if(weaponInfo.Magazine > 0)
-                        {
-                            var magazineCfg = _weaponPartsConfigManager.GetConfigById(weaponInfo.Magazine);
-                            weaponInfo.Bullet += magazineCfg.Bullet;
-                        }
-                        playerEntity.GetController<PlayerWeaponController>().ReplaceWeaponToSlot(_contexts, slot, weaponInfo);
+                        playerEntity.GetController<PlayerWeaponController>().ReplaceWeaponToSlot(slot, weaponInfo);
                     }
                 }
                 playerEntity.weaponState.BagIndex = bagData.BagIndex;
             }
             if(firstSlot < EWeaponSlotType.Length)
             {
-                playerEntity.GetController<PlayerWeaponController>().TryMountSlotWeapon(_contexts, firstSlot);
+                playerEntity.GetController<PlayerWeaponController>().TryMountSlotWeapon(firstSlot);
             }
             foreach(var slot in _removeSlotList)
             {
-                if(playerEntity.HasWeaponInSlot(_contexts, slot))
-                {
-                    playerEntity.GetController<PlayerWeaponController>().RemoveSlotWeapon(_contexts, slot);
-                }
+                playerEntity.GetController<PlayerWeaponController>().RemoveSlotWeapon(slot);
             }
         }
 

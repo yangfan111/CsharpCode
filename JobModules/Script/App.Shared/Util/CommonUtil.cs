@@ -14,17 +14,19 @@ namespace App.Shared.Util
         {
             return Attribute.GetCustomAttribute(t, typeof(T)) as T;
         }
-        [System.Diagnostics.Conditional("UNITY_EDITOR")]
         public static void WeakAssert(bool condition)
         {
+#if UNITY_EDITOR
             UnityEngine.Debug.Assert(condition);
+#endif
         }
-        [System.Diagnostics.Conditional("UNITY_EDITOR")]
         public static void WeakAssert(bool condition, string message, params object[] args)
         {
 
+#if UNITY_EDITOR
             var text = string.Format(message, args);
             UnityEngine.Debug.Assert(condition, text);
+#endif
         }
 
         public static void ProcessDerivedTypes(Type baseType, bool includeSelf, Action<Type> process)

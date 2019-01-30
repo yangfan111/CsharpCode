@@ -30,11 +30,6 @@ namespace Core.CharacterController.ConcreteController
             _motor.OnValidate();
         }
 
-        public override void DrawBoundingBox()
-        {
-            KinematicCharacterSystem.DebugShowFlyBoundingBox = true;
-        }
-
         public override void SetCharacterPosition(Vector3 targetPos)
         {
             if (!CompareUtility.IsApproximatelyEqual(_motor.TransientPosition, targetPos, EPS))

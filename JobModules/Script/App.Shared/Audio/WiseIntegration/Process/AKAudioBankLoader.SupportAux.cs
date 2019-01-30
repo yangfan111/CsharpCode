@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -7,6 +8,32 @@ namespace   App.Shared.Audio
 {
     public partial class AKAudioBankLoader
     {
+        abstract class BankLoadModelHandler
+        {
+            public abstract void Init();
+            public BankLoadModelHandler(bool saveDecode,bool decodeLoad,bool loadAsync)
+            {
+
+            }
+        }
+        class ExplicitLoadHandler : BankLoadModelHandler
+        {
+            private uint m_BankID;
+
+            public ExplicitLoadHandler(bool saveDecode, bool decodeLoad, bool loadAsync) : base(saveDecode, decodeLoad, loadAsync)
+            {
+            }
+
+            public override void Init()
+            {
+                string[] allBanks = null;
+                foreach(string bank in allBanks)
+                {
+                    AkSoundEngine.LoadBank(bank, AkSoundEngine.AK_DEFAULT_POOL_ID, out m_BankID);
+                    AkBankManager.LoadBank(bank, false, false);
+                }
+            }
+        }
         
         public delegate void LoadResultStackDelegate(AKRESULT result, string bankName, System.Object customData);
         public delegate void LoadResultBroadcastDelegate(string bankName);

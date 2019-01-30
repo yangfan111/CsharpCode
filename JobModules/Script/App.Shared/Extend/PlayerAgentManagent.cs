@@ -2,8 +2,9 @@
 
 namespace App.Shared
 {
-    public class GameModuleLogicManagement
+    public class GameModuleLogicManagent
     {
+
         private static readonly HashSet<object> entireInstances = new HashSet<object>();
 
         internal static void Submit<T>(T instance) where T : ModuleLogicActivator<T>, new()

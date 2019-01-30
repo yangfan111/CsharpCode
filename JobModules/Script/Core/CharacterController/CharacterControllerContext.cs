@@ -144,16 +144,6 @@ namespace Core.CharacterController
             return _currentState.GetRotateBound(prevRot, prevPos, frameInterval);
         }
 
-        public void DrawBoundingBox()
-        {
-            _currentState.DrawBoundingBox();
-        }
-
-        public void DrawLastGroundHit()
-        {
-            _currentState.DrawLastGroundHit();
-        }
-
         public CharacterControllerType controllerType { get; set; }
 
         public CharacterControllerType GetCurrentControllerType()

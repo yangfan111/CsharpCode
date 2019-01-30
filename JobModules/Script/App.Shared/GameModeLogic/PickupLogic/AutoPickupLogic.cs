@@ -11,14 +11,12 @@ namespace App.Shared.GameModeLogic.PickupLogic
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(AutoPickupLogic));
         private SceneObjectContext _sceneObjectContext;
         private PlayerContext _playerContext;
-        private Contexts _contexts;
         private ISceneObjectEntityFactory _sceneObjectEntityFactory;
 
-        public AutoPickupLogic(Contexts contexts, ISceneObjectEntityFactory sceneObjectEntityFactory)
+        public AutoPickupLogic(SceneObjectContext sceneObjectContext, PlayerContext playerContext, ISceneObjectEntityFactory sceneObjectEntityFactory)
         {
-            _contexts = contexts;
-            _sceneObjectContext = contexts.sceneObject;
-            _playerContext = contexts.player;
+            _sceneObjectContext = sceneObjectContext;
+            _playerContext = playerContext;
             _sceneObjectEntityFactory = sceneObjectEntityFactory;
         }
 
@@ -45,7 +43,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
             {
                 return;
             }
-            var pickupSuccess = player.GetController<PlayerWeaponController>().AutoPickUpWeapon(_contexts, entity.weapon.ToWeaponInfo());
+            var pickupSuccess = player.GetController<PlayerWeaponController>().AutoPickUpWeapon(entity.weapon.ToWeaponInfo());
             if (pickupSuccess)
             {
                 _sceneObjectEntityFactory.DestroyEquipmentEntity(entity.entityKey.Value.EntityId);

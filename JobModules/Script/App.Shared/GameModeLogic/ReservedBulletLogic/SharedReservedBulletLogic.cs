@@ -11,12 +11,10 @@ namespace App.Shared.GameModeLogic.ReservedBulletLogic
     public class SharedReservedBulletLogic : IReservedBulletLogic
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(SharedReservedBulletLogic));
-        private IWeaponConfigManager _weaponConfigManager;
+        private INewWeaponConfigManager _weaponConfigManager;
         private const int BulletLimit = int.MaxValue;
-        private Contexts _contexts;
-        public SharedReservedBulletLogic(Contexts contexts, IWeaponConfigManager weaponConfigManager)
+        public SharedReservedBulletLogic(INewWeaponConfigManager weaponConfigManager)
         {
-            _contexts = contexts;
             _weaponConfigManager = weaponConfigManager;
         }
 
@@ -105,7 +103,7 @@ namespace App.Shared.GameModeLogic.ReservedBulletLogic
         private EBulletCaliber GetCaliber(Entity entity, EWeaponSlotType slot)
         {
             var playerEntity = entity as PlayerEntity;
-            var weapon = playerEntity.GetController<PlayerWeaponController>().GetSlotWeaponInfo(_contexts, slot);
+            var weapon = playerEntity.GetController<PlayerWeaponController>().GetSlotWeaponInfo(slot);
             var weaponId = weapon.Id;
             if (weaponId > 0)
             {

@@ -80,11 +80,6 @@ namespace Core.CharacterState
             MotionNullValue = 0.1f;
             MotionValue = 1;
 
-
-            JumpStateName = "JumpState";
-            JumpStateNormal = 0.0f;
-            JumpStateMove = 1.0f;
-            
             MovementName = "MoveState";
             WalkValue = 0;
             RunValue = 1;
@@ -349,18 +344,6 @@ namespace Core.CharacterState
         public int ForceEndProneHash { get; private set; }
         public bool ForceEndProneEnable { get; private set; }
         public bool ForceEndProneDisable { get; private set; }
-        #endregion
-
-        #region JumpState
-        private string _jumpStateName = string.Empty;
-        public string JumpStateName
-        {
-            get { return _jumpStateName; }
-            set { _jumpStateName = value; JumpStateHash = StringToHash(value); }
-        }
-        public int JumpStateHash { get; private set; }
-        public float JumpStateNormal { get; private set; }
-        public float JumpStateMove { get; private set; }
         #endregion
 
         #region Jump

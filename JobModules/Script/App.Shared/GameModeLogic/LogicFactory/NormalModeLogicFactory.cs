@@ -21,7 +21,6 @@ namespace App.Shared.GameModeLogic.LogicFactory
 
         public NormalModeLogicFactory(Contexts contexts, ICommonSessionObjects commonSessionObjects, int modeId)
         {
-            UnityEngine.Debug.Log("normal mode ");
             _contexts = contexts;
             _commonSessionObjects = commonSessionObjects;
             _modeId = modeId;
@@ -36,16 +35,21 @@ namespace App.Shared.GameModeLogic.LogicFactory
 
         protected override IPickupLogic GetPickupLogic()
         {
-            var pickupLogic = new NormalPickupLogic(_contexts,
+            var pickupLogic = new NormalPickupLogic(_contexts.sceneObject,
+                _contexts.player,
                 _contexts.session.entityFactoryObject.SceneObjectEntityFactory,
                 _commonSessionObjects.RuntimeGameConfig,
                 SingletonManager.Get<GameModeConfigManager>().GetWepaonStayTime(_modeId));
+
+
             return pickupLogic;
         }
 
         protected override IReservedBulletLogic GetReservedBulletLogic()
         {
-            var reservedBulletLogic = new LocalReservedBulletLogic(_contexts);
+            var reservedBulletLogic = new LocalReservedBulletLogic();
+
+
             return reservedBulletLogic;
         }
 
@@ -59,13 +63,10 @@ namespace App.Shared.GameModeLogic.LogicFactory
 
         protected override IWeaponInitLogic GetWeaponIniLogic()
         {
-            var weaponInitLogic = new NormalWeaponInitLogic(
-                _contexts,
-                _commonSessionObjects.RoomInfo.ModeId,
+            var weaponInitLogic = new NormalWeaponInitLogic(_commonSessionObjects.RoomInfo.ModeId,
                 SingletonManager.Get<GameModeConfigManager>(),
                 SingletonManager.Get<WeaponConfigManager>(),
-                SingletonManager.Get<WeaponPropertyConfigManager>(),
-                SingletonManager.Get<WeaponPartsConfigManager>());
+                SingletonManager.Get<WeaponPropertyConfigManager>());
 
 
             return weaponInitLogic;

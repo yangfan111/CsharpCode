@@ -4,7 +4,6 @@ using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using System;
-using XmlConfig;
 
 namespace Assets.App.Shared.GameModules.Player
 {
@@ -18,7 +17,7 @@ namespace Assets.App.Shared.GameModules.Player
             {
                 return;
             }
-            if(cmd.IsHoldBreath && player.IsAiming()) 
+            if(cmd.IsHoldBreath && player.IsCameraGunSight()) 
             {
                 if(null == player)
                 {

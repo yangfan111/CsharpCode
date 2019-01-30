@@ -32,9 +32,9 @@ namespace App.Shared.VehicleGameHandler
             RegisterEventHandler(GameEvent.CarSecondWheelHpChange, new CarWheelHpChangeHandler(isOffline, false));
             RegisterEventHandler(GameEvent.CarThirdWheelHpChange, new CarWheelHpChangeHandler(isOffline, false));
             RegisterEventHandler(GameEvent.CarFourthWheelHpChange, new CarWheelHpChangeHandler(isOffline, false));
-            RegisterEventHandler(GameEvent.VehicleBrokenFlagChange, new CarBrokenFlagChangeHandler(contexts, isOffline, false));
+            RegisterEventHandler(GameEvent.VehicleBrokenFlagChange, new CarBrokenFlagChangeHandler(contexts.player, isOffline, false));
             RegisterEventHandler(GameEvent.VehicleHpChange, new ShipHpChangeHandler(isOffline, false));
-            RegisterEventHandler(GameEvent.VehicleBrokenFlagChange, new ShipBrokenFlagChangeHandler(contexts));   
+            RegisterEventHandler(GameEvent.VehicleBrokenFlagChange, new ShipBrokenFlagChangeHandler(contexts.player));   
         }
     }
 }

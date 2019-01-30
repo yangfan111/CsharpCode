@@ -12,11 +12,9 @@ namespace App.Shared.GameModules.Player
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerBuffUpdateSystem));
 
         private static float HPLossRate = 0.01f;
-        private Contexts _contexts;
 
-        public PlayerBuffUpdateSystem(Contexts contexts)
+        public PlayerBuffUpdateSystem()
         {
-            _contexts = contexts;
         }
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
@@ -33,7 +31,7 @@ namespace App.Shared.GameModules.Player
                 {
                     player.gamePlay.BuffRemainTime %= 1000;
                     float damage = player.gamePlay.InHurtedCount * player.gamePlay.MaxHp * HPLossRate * secs;
-                    VehicleDamageUtility.DoPlayerDamage(_contexts, null, player, damage, EUIDeadType.NoHelp);
+                    VehicleDamageUtility.DoPlayerDamage(null, player, damage, EUIDeadType.NoHelp);
                 }
             }
         }

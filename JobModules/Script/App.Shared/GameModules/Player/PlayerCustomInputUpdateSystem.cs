@@ -42,13 +42,12 @@ namespace App.Shared.GameModules.Player
                 }
                 else if ((state.IsForth || state.IsBack)  && !cmd.IsSpaceDown && !cmd.IsCDown)
                 {
-                    upDownValue = _controller.UpdateToTarget(cmd.FrameInterval * 0.001f,
-                        Mathf.Clamp((state.IsForth ? -1.0f : -1.0f)
-                                    * orientationPitch /
-                                    SingletonManager.Get<CameraConfigManager>().Config
-                                        .PoseConfigs[(int) ECameraPoseMode.Stand].PitchLimit.Max *
-                                    state.VerticalValue
-                            , -1, 1), upDownValue);
+                    //_logger.InfoFormat("orientationPitch:{0}, max:{1}, min:{2}", orientationPitch, SingletonManager.Get<CameraConfigManager>().GetConfigByType(ECameraConfigType.ThirdPerson).PitchLimit.Max, SingletonManager.Get<CameraConfigManager>().GetConfigByType(ECameraConfigType.ThirdPerson).PitchLimit.Min);
+                    upDownValue = _controller.UpdateToTarget(cmd.FrameInterval * 0.001f, 
+                        Mathf.Clamp((state.IsForth ? -1.0f:-1.0f) 
+                                     * orientationPitch / SingletonManager.Get<CameraConfigManager>().GetConfigByType(ECameraConfigType.ThirdPerson).PitchLimit.Max * state.VerticalValue,-1,1),
+                        upDownValue
+                    );
                 }
                 else
                 {

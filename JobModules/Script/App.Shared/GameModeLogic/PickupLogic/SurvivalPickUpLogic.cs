@@ -1,6 +1,5 @@
 ﻿using App.Shared.GameModules.Player;
 using App.Shared.GameModules.Weapon;
-using App.Shared.WeaponLogic;
 using Core;
 using Core;
 using Core.Configuration;
@@ -15,31 +14,25 @@ namespace App.Shared.GameModeLogic.PickupLogic
         private ISceneObjectEntityFactory _sceneObjectEntityFactory;
         private RuntimeGameConfig _runtimeGameConfig;
         private AutoPickupLogic _autoPickupLogic;
-        private Contexts _contexts;
 
-        public SurvivalPickupLogic(Contexts contexts,
+        public SurvivalPickupLogic(PlayerContext playerContext, 
+            SceneObjectContext sceneObjectContext,
             ISceneObjectEntityFactory sceneObjectEntityFactory,
             RuntimeGameConfig runtimeGameConfig)
         {
-            _contexts = contexts;
-            _playerContext = contexts.player;
+            _playerContext = playerContext;
             _runtimeGameConfig = runtimeGameConfig;
             _sceneObjectEntityFactory = sceneObjectEntityFactory;
-            _autoPickupLogic = new AutoPickupLogic(contexts, sceneObjectEntityFactory);
+            _autoPickupLogic = new AutoPickupLogic(sceneObjectContext, playerContext, sceneObjectEntityFactory);
         }
 
         public override void Dorp(int playerEntityId, EWeaponSlotType slot)
         {
             //使用服务器操作
-            var player = _playerContext.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(playerEntityId, (short)EEntityType.Player));
-            var weapon = player.GetWeaponEntity(_contexts, slot);
-            if(null != weapon)
-            {
-                weapon.isFlagDestroy = true;
-            }
             return;
+            var player = _playerContext.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(playerEntityId, (short)EEntityType.Player));
             var weaponAchive = player.GetController<PlayerWeaponController>();
-           var curWeapon = weaponAchive.GetSlotWeaponInfo(_contexts, slot);
+           var curWeapon = weaponAchive.GetSlotWeaponInfo(slot);
             if (curWeapon.Id > 0)
             {
                 var dropPos = player.GetHandWeaponPosition();
@@ -72,7 +65,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
                         sceneObjectEntity = _sceneObjectEntityFactory.CreateWeaponEntity(curWeapon, playerTrans.position) as SceneObjectEntity;
                     }
                 }
-                player.GetController<PlayerWeaponController>().DropSlotWeapon(_contexts, slot);
+                player.GetController<PlayerWeaponController>().DropSlotWeapon(slot);
             }
         }
 

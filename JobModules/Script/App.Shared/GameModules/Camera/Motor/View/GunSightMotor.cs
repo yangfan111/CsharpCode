@@ -1,21 +1,17 @@
 ﻿using System.Collections.Generic;
 using App.Shared.GameModules.Camera.Utils;
-using App.Shared.WeaponLogic;
 using Assets.App.Shared.GameModules.Camera;
 using Core.Utils;
 using UnityEngine;
-using XmlConfig;
 
 namespace Core.CameraControl.NewMotor.View
 {
     public class GunSightMotor:AbstractCameraMotor
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(GunSightMotor));
-        private Contexts _contexts;
-
-        public GunSightMotor(Contexts contexts)
+        public GunSightMotor()
         {
-            _contexts = contexts;
+
             CameraActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.View, (int)ModeId, (player, state) =>
             {
 
@@ -26,7 +22,7 @@ namespace Core.CameraControl.NewMotor.View
                         player.appearanceInterface.Appearance.SetFirstPerson();
                         player.characterBoneInterface.CharacterBone.SetFirstPerson();
                     }
-                    var speed = player.GetFocusSpeed(contexts);
+                    var speed = player.weaponLogic.Weapon.GetFocusSpeed();
                     player.stateInterface.State.SetSight(speed);
                 }
 
@@ -35,7 +31,7 @@ namespace Core.CameraControl.NewMotor.View
             CameraActionManager.AddAction(CameraActionType.Leave, SubCameraMotorType.View, (int)ModeId,
                 (player, state) =>
                 {
-                    var speed = player.GetFocusSpeed(contexts);
+                    var speed = player.weaponLogic.Weapon.GetFocusSpeed();
                     player.stateInterface.State.CancelSight(speed);
                 });
         }
@@ -98,7 +94,7 @@ namespace Core.CameraControl.NewMotor.View
                     ? ECameraViewMode.ThirdPerson
                     : ECameraViewMode.FirstPerson);
             }
-            var fov = player.GetFov(_contexts);
+            var fov = player.GetWeaponFov();
             if(fov <= 0)
             {
                 Logger.ErrorFormat("Illegal fov value {0}", fov);

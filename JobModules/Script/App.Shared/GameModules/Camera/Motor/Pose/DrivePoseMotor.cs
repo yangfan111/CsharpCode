@@ -22,10 +22,11 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Pose
      
 
         public DrivePoseMotor(ECameraPoseMode modeId,
-            CameraConfig config,
+            CameraConfigItem config,
             HashSet<ECameraPoseMode> excludes,
             VehicleContext vehicleContext,
-            FreeMoveContext freeMoveContext     
+            FreeMoveContext freeMoveContext
+                
         )
         {
             _modeId = (short) modeId;
@@ -36,7 +37,7 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Pose
                 this.excludes.Add((short) e);
             }
 
-            _config = config.GetCameraConfigItem(modeId);
+            _config = config;
 
             CameraActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.Pose, (int)modeId, 
                 (player, state) =>

@@ -2,181 +2,143 @@
 using App.Shared.EntityFactory;
 using Core.Utils;
 using Core.WeaponLogic;
+using Core.WeaponLogic.Attachment;
 using UnityEngine;
 using WeaponConfigNs;
-using Core.EntityComponent;
-using Core.WeaponLogic.WeaponLogicInterface;
-using Core.WeaponLogic.Attachment;
-using Core.WeaponLogic.FireAciton;
-using Utils.Singleton;
-using Core.WeaponLogic.Accuracy;
-using Assets.Utils.Configuration;
+using Core.GameTime;
+using Assets.App.Shared.GameModules.Weapon;
 using Core.WeaponLogic.Common;
-using Core.WeaponLogic.Kickback;
-using App.Shared.WeaponLogic.Common;
-using App.Shared.WeaponLogic.FireLogic;
-using App.Shared.GameModules.Weapon;
+using Core.EntityComponent;
+using Core.IFactory;
+using Core.WeaponLogic.Bullet;
 
-namespace App.Shared.WeaponLogic
+namespace App.Shared.GameModules.Weapon
 {
-    public class WeaponLogicComponentsFactory : IWeaponLogicComponentsFactory
+    public class WeaponLogicComponentsFactory : AbstractWeaponLogicComponentsFactory
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(WeaponLogicComponentsFactory));
+        private BulletContext _bulletContext;
+        private ThrowingContext _throwingContext;
+        private ClientEffectContext _clientEffectContext;
         private IEntityIdGenerator _entityIdGenerator;
-        private Contexts _contexts;
+        private SoundContext _soundContext;
+        private ICurrentTime _currentTime;
+        private ISoundEntityFactory _soundEntityFactory;
+        private IBulletEntityFactory _bulletEntityFactory;
 
         public WeaponLogicComponentsFactory(
             Contexts contexts,
-            IEntityIdGenerator entityIdGenerator)
+            IEntityIdGenerator entityIdGenerator,
+            ICurrentTime currentTime,
+            IAttachmentManager attachmentManager,
+            ISoundEntityFactory soundEntityFactory,
+            IBulletEntityFactory bulletEntityFactory):base(attachmentManager)
         {
-            _contexts = contexts;
+            _bulletContext = contexts.bullet;
+            _throwingContext = contexts.throwing;
+            _clientEffectContext = contexts.clientEffect;
+            _soundContext = contexts.sound;
             _entityIdGenerator = entityIdGenerator;
+            _currentTime = currentTime;
+            _attachmentManager = attachmentManager;
+            _soundEntityFactory = soundEntityFactory;
+            _bulletEntityFactory = bulletEntityFactory;
         }
 
-        public IWeaponLogic CreateWeaponLogic(NewWeaponConfigItem newCfg,
-        WeaponConfig config,
-        IWeaponSoundLogic soundLogic,
-        IWeaponEffectLogic effectLogic)
-        {
-            IWeaponLogic rc = null;
-            var weaponLogicConfig = config.WeaponLogic;
-            if (weaponLogicConfig is DefaultWeaponLogicConfig)
-            {
-                rc = new DefaultWeaponLogic(null);
-            }
-            else if (weaponLogicConfig is DoubleWeaponLogicConfig)
-            {
-                rc = new DoubleWeaponLogic(null, null);
-            }
-            return rc;
-        }
-
-        public IAccuracyLogic CreateAccuracyLogic(AccuracyLogicConfig config)
-        {
-            if (config is BaseAccuracyLogicConfig)
-            {
-                return new BaseAccuracyLogic(_contexts);
-            }
-            else if (config is PistolAccuracyLogicConfig)
-            {
-                return new PistolAccuracyLogic(_contexts);
-            }
-
-            return null;
-        }
-
-        public ISpreadLogic CreateSpreadLogic(SpreadLogicConfig config)
-        {
-            if (config is FixedSpreadLogicConfig)
-            {
-                return new FixedSpreadLogic(_contexts);
-            }
-            else if (config is PistolSpreadLogicConfig)
-            {
-                return new PistolSpreadLogic(_contexts);
-            }
-            else if (config is SniperSpreadLogicConfig)
-            {
-                return new SniperSpreadLogic(_contexts);
-            }
-            else if (config is RifleSpreadLogicConfig)
-            {
-                return new RifleSpreadLogic(_contexts);
-            }
-
-            return null;
-        }
-
-        public IFireCheck CreateSpecialReloadCheckLogic(CommonFireConfig commonFireConfig)
-        {
-            if (null != commonFireConfig && commonFireConfig.SpecialReloadCount > 0)
-            {
-                return new SpecialReloadCheckLogic(_contexts);
-            }
-            return null;
-        }
-
-        public IBulletFire CreateShowFireInMap(FireLogicConfig config)
-        {
-            var defaultFireConfig = config as DefaultFireLogicConfig;
-            if(null != defaultFireConfig)
-            {
-                return new ShowFireInMap(_contexts.ui);
-            }
-            return null;
-        }
-
-        public IAfterFire CreateAutoFireLogic(FireModeLogicConfig config)
-        {
-            var modeConfig = config as DefaultFireModeLogicConfig;
-            if (null != modeConfig)
-            {
-                foreach (var mode in modeConfig.AvaiableModes)
-                {
-                    if (mode == EFireMode.Burst)
-                    {
-                        return new AutoFireLogic(_contexts);
-                    }
-                }
-            }
-            return null;
-        }
-
-        public IKickbackLogic CreateKickbackLogic(KickbackLogicConfig config)
-        {
-            if (config is RifleKickbackLogicConfig)
-            {
-                return new RifleKickbackLogic(_contexts);
-            }
-            else if (config is FixedKickbackLogicConfig)
-            {
-                return new FixedKickbackLogic(_contexts);
-            }
-
-
-            return null;
-        }
-
-        public IFireCheck CreateFireCheckLogic(FireModeLogicConfig config)
-        {
-            if (config is DefaultFireModeLogicConfig)
-                return new FireBulletModeLogic(_contexts);
-            return null;
-        }
-
-        public IFireBulletCounter CreateFireBulletCounterLogic(FireCounterConfig config)
-        {
-            if (config is RifleFireCounterConfig)
-            {
-                return new RifleFireBulletCounter(_contexts);
-            }
-
-            return null;
-        }
-
-        public IFireActionLogic CreateFireActionLogic(NewWeaponConfigItem config)
-        {
-            if (SingletonManager.Get<WeaponConfigManager>().IsSpecialType(config.Id, ESpecialWeaponType.SniperFrie))
-            {
-                return new SpecialFireActionLogic(_contexts);
-            }
-            else
-            {
-                return new DefaultFireActionLogic(_contexts);
-            }
-        }
-
-        public IWeaponEffectLogic CreateEffectLogic(DefaultWeaponEffectConfig config)
+        public override IWeaponEffectLogic CreateEffectLogic(DefaultWeaponEffectConfig config)
         {
             //TODO 近战特效
-            return new DefaultWeaponEffectLogic(_contexts.clientEffect, _entityIdGenerator, config);
+            return new DefaultWeaponEffectLogic(_clientEffectContext, _entityIdGenerator, config);
         }
 
-        public IFireEffectFactory CreateFireEffectFactory(BulletConfig config)
+        public override IWeaponSoundLogic CreateSoundLogic(IPlayerWeaponState weaponState, WeaponLogicConfig config)
         {
-            return new FireEffectFactory(_contexts.clientEffect, _entityIdGenerator, config);
+            if(null == config)
+            {
+                return null;
+            }
+            var soundCfg = config.SoundConfig;
+            var defaultCfg = soundCfg as DefaultWeaponSoundConfig;
+            if(null != defaultCfg)
+            {
+                return new DefaultWeaponSoundLogic(_soundEntityFactory, weaponState, defaultCfg);
+            }
+            var meleeCfg = soundCfg as MeleeWeaponSoundConfig;
+            if(null != meleeCfg)
+            {
+                return new MeleeWeaponSoundLogic(weaponState, _soundEntityFactory, meleeCfg);
+            }
+            return null;
         }
 
+        public override IBulletFactory CreateBulletFactory(BulletConfig config, CommonFireConfig common)
+        {
+            return new BulletFactory(_bulletContext, _entityIdGenerator, _soundEntityFactory, _bulletEntityFactory, config);
+        }
+
+        public class BulletFactory : AbstractAttachableWeaponLogic<BulletConfig, float>, IBulletFactory
+        {
+            public BulletFactory(BulletContext bulletContext, 
+                IEntityIdGenerator entityIdGenerator, 
+                ISoundEntityFactory soundEntityFactory,
+                IBulletEntityFactory bulletEntityFactory,
+                BulletConfig bulletConfig) : base(bulletConfig)
+            {
+                _bulletContext = bulletContext;
+                _entityIdGenerator = entityIdGenerator;
+                _soundEntityFacotry = soundEntityFactory;
+                _bulletEntityFactory = bulletEntityFactory;
+            }
+
+            public override void Apply(BulletConfig baseConfig, BulletConfig output, float arg)
+            {
+                output.EmitVelocity = baseConfig.EmitVelocity * (arg> 0 ? arg : 1);
+            }
+            private BulletContext _bulletContext;
+            private IEntityIdGenerator _entityIdGenerator;
+            private ISoundEntityFactory _soundEntityFacotry;
+            private IBulletEntityFactory _bulletEntityFactory;
+            public int BulletHitCount
+            {
+                get
+                {
+                    return _config.HitCount;
+                }
+            }
+
+            public void CreateBullet(IPlayerWeaponState playerWeapon, 
+                Vector3 direction, 
+                IBulletFireInfoProviderDispatcher bulletFireInfoProviderDispatcher,
+                int cmdSeq, 
+                int renderTime)
+            {
+                PlayerEntity playerEntity = (PlayerEntity)playerWeapon.Owner;
+                var bulletEntity = _bulletEntityFactory.CreateBulletEntity(
+                    cmdSeq,
+                    playerEntity.weaponLogicInfo.WeaponId,
+                    playerEntity.entityKey.Value,
+                    renderTime,
+                    direction, 
+                    bulletFireInfoProviderDispatcher,
+                    _config,
+                    playerWeapon.Caliber) as BulletEntity;
+
+                if(null != bulletEntity)
+                {
+                    _logger.DebugFormat("Fire from {0} with velocity {1}, entity key {2}, cmd {3}",
+                        bulletEntity.position.Value,
+                        bulletEntity.bulletData.Velocity,
+                        bulletEntity.entityKey,
+                        cmdSeq);
+                }
+            }
+        }
+
+        public override IFireEffectFactory CreateFireEffectFactory(BulletConfig config)
+        {
+           return new FireEffectFactory(_clientEffectContext, _entityIdGenerator, config); 
+        }
+        
         public class FireEffectFactory : IFireEffectFactory
         {
             private ClientEffectContext _clientEffectContext;
@@ -190,64 +152,37 @@ namespace App.Shared.WeaponLogic
                 _bulletConfig = config;
             }
 
-            public void CreateBulletDropEffect(PlayerEntity playerEntity)
+            public void CreateBulletDropEffect(IPlayerWeaponState playerWeapon)
             {
-                playerEntity.weaponEffect.PlayList.Add(XmlConfig.EClientEffectType.BulletDrop);
+                 var player = playerWeapon.Owner as PlayerEntity;
+                player.weaponLogic.WeaponEffect.PlayBulletDropEffect(playerWeapon);
             }
 
-            public void CreateSparkEffect(PlayerEntity playerEntity)
+            public void CreateSparkEffect(IPlayerWeaponState playerWeapon)
             {
-                playerEntity.weaponEffect.PlayList.Add(XmlConfig.EClientEffectType.MuzzleSpark);
+                 var player = playerWeapon.Owner as PlayerEntity;
+                player.weaponLogic.WeaponEffect.PlayMuzzleSparkEffect(playerWeapon);
             }
         }
 
-        public IThrowingFactory CreateThrowingFactory(NewWeaponConfigItem newWeaponConfig, ThrowingConfig config)
+        public override IThrowingFactory CreateThrowingFactory(NewWeaponConfigItem newWeaponConfig, ThrowingConfig config)
         {
-            return new ThrowingFactory(_contexts.throwing, _entityIdGenerator, newWeaponConfig, config);
+            return new ThrowingFactory(_throwingContext, _entityIdGenerator, newWeaponConfig, config);
         }
 
-        public IBulletFire CreateBulletFireLogic(BulletConfig config)
+        public class ThrowingFactory : AbstractAttachableWeaponLogic<ThrowingConfig, ThrowingModifierArg>, IThrowingFactory
         {
-            if(null != config)
-            {
-                return new DefaultBulletFireLogic(_contexts);
-            }
-            return null;
-        }
-
-        public IFireTriggger CreateFireCommandLogic(FireLogicConfig config)
-        {
-            var defaultFireLogicConfig = config as DefaultFireLogicConfig;
-            if(null != defaultFireLogicConfig)
-            {
-                return new DefaultFireCmdLogic();
-            }
-            var meleeFireLogicConfig =  config as MeleeFireLogicConfig;
-            if(null != meleeFireLogicConfig)
-            {
-                //TODO 近战武器实现
-                return null;
-            }
-            var throwingFireLogicConfig = config as ThrowingFireLogicConfig;
-            if(null != throwingFireLogicConfig)
-            {
-                //TODO 投掷武器实现
-                return null;
-            }
-            return null;
-        }
-
-        public class ThrowingFactory : IThrowingFactory
-        {
-            private ThrowingConfig _config;
-            public ThrowingFactory(ThrowingContext throwingContext, IEntityIdGenerator entityIdGenerator, NewWeaponConfigItem newWeaponConfig, ThrowingConfig throwingConfig)
+            public ThrowingFactory(ThrowingContext throwingContext, IEntityIdGenerator entityIdGenerator, NewWeaponConfigItem newWeaponConfig, ThrowingConfig throwingConfig) : base(throwingConfig)
             {
                 _throwingContext = throwingContext;
                 _entityIdGenerator = entityIdGenerator;
                 _newWeaponConfig = newWeaponConfig;
-                _config = throwingConfig;
             }
 
+            public override void Apply(ThrowingConfig baseConfig, ThrowingConfig output, ThrowingModifierArg arg)
+            {
+            
+            }
             private ThrowingContext _throwingContext;
             private IEntityIdGenerator _entityIdGenerator;
             private NewWeaponConfigItem _newWeaponConfig;
@@ -282,8 +217,9 @@ namespace App.Shared.WeaponLogic
                 get { return _config; }
             }
 
-            public EntityKey CreateThrowing(PlayerEntity playerEntity, Vector3 direction, int renderTime, float initVel)
+            public EntityKey CreateThrowing(IPlayerWeaponState playerWeapon, Vector3 direction, int renderTime, float initVel)
             {
+                PlayerEntity playerEntity = (PlayerEntity)playerWeapon.Owner;
                 var throwingEntity = ThrowingEntityFactory.CreateThrowingEntity(
                     _throwingContext,
                     _entityIdGenerator,
@@ -321,5 +257,6 @@ namespace App.Shared.WeaponLogic
                 }
             }
         }
+
     }
 }

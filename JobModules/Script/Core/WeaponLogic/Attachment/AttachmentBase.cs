@@ -1,44 +1,100 @@
-﻿using Core.Configuration;
+﻿using Core.Utils;
 using System.Collections.Generic;
+using XmlConfig;
 
 namespace Core.WeaponLogic.Attachment
 {
-    public interface IPlayerWeaponConfigManager
+    public struct BulletModifierArg
     {
-        ExpandDefaultWeaponLogicConfig GetWeaponLogicConfig(int id, WeaponPartsStruct weaponParts);
+        public float Velocity;
+
+        public static BulletModifierArg Default()
+        {
+            return new BulletModifierArg
+            {
+                Velocity = 1
+            };
+        }
+    }
+    public struct EffectArg
+    {
+        public int Spark;
+    }
+    public struct DefaultFireModifierArg
+    {
+        public float Fov;
+        public float FocusSpeed;
+        public float ReloadSpeed;
+        public float BreathFactor;
+    }
+    public struct RifleKickbackModifierArg
+    {
+        public float BasicWidth;
+        public float ContinusWidth;
+        public float MaxWidth;
+        public float BasicHeight;
+        public float ContinusHeight;
+        public float MaxHeight;
+        public float Turnback;
+
+        public void CopyTo(ref RifleKickbackModifierArg arg)
+        {
+            arg.BasicWidth = BasicWidth;
+            arg.ContinusWidth = ContinusWidth;
+            arg.MaxWidth = MaxWidth;
+            arg.BasicHeight = BasicHeight;
+            arg.ContinusHeight = ContinusHeight;
+            arg.MaxHeight = MaxHeight;
+            arg.Turnback = Turnback;
+        }
+
+        public static RifleKickbackModifierArg Default()
+        {
+            return new RifleKickbackModifierArg {
+                BasicHeight = 1,
+                ContinusWidth = 1,
+                MaxHeight = 1,
+                MaxWidth = 1,
+                BasicWidth = 1,
+                ContinusHeight = 1,
+                Turnback = 1,
+            };
+        }
+    }
+    
+    public struct DefaultSoundArg
+    {
+        public int Fire;
+    }
+    
+    public struct ThrowingModifierArg
+    {
+        public float Velocity;
+
+        public static ThrowingModifierArg Default()
+        {
+            return new ThrowingModifierArg
+            {
+                Velocity = 1
+            };
+        }
     }
 
-    public class WeaponPartsStructComparer : IEqualityComparer<WeaponPartsStruct>
+
+
+    public interface IAttachmentManager
     {
-        public bool Equals(WeaponPartsStruct x, WeaponPartsStruct y)
-        {
-            return x.LowerRail == y.LowerRail
-                && x.UpperRail == y.UpperRail
-                && x.Stock == y.Stock
-                && x.Muzzle == y.Muzzle
-                && x.Magazine == y.Magazine;
-        }
+        void Prepare(WeaponPartsStruct attachments);
 
-        public int GetHashCode(WeaponPartsStruct obj)
-        {
-            int hash = 17;
-            // Maybe nullity checks, if these are objects not primitives!
-            hash = hash * 23 + obj.LowerRail.GetHashCode();
-            hash = hash * 23 + obj.UpperRail.GetHashCode();
-            hash = hash * 23 + obj.Magazine.GetHashCode();
-            hash = hash * 23 + obj.Muzzle.GetHashCode();
-            hash = hash * 23 + obj.Stock.GetHashCode();
-            return hash;
-        }
-
-        private static readonly WeaponPartsStructComparer _instance = new WeaponPartsStructComparer();
-        public static WeaponPartsStructComparer Instance
-        {
-            get
-            {
-                return _instance;
-            }
-        }
+        void ApplyAttachment(ISpreadLogic logic);
+        void ApplyAttachment(IKickbackLogic logic);
+        void ApplyAttachment(IAccuracyLogic logic);
+        void ApplyAttachment(IBulletContainer logic);
+        void ApplyAttachment(IWeaponSoundLogic logic);
+        void ApplyAttachment(IWeaponEffectLogic logic);
+        void ApplyAttachment(IWeaponLogic logic);
+        void ApplyAttachment(IBulletFactory logic);
+        void ApplyAttachment(IFireLogic logic);
     }
 
     public struct WeaponPartsStruct
@@ -82,4 +138,6 @@ namespace Core.WeaponLogic.Attachment
                 Muzzle);
         }
     }
+
+    
 }

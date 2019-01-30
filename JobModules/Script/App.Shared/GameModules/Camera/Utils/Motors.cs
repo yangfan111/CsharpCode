@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.CameraControl.NewMotor;
-using XmlConfig;
 
 namespace Assets.App.Shared.GameModules.Camera
 {

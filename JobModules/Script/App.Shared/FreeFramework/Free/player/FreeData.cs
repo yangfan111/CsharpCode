@@ -13,7 +13,6 @@ namespace App.Server.GameModules.GamePlay.free.player
     public class FreeData : BaseGameUnit, IFreeData, IGameUnit
     {
         public PlayerEntity Player;
-        public Contexts AllContexts;
 
         public FreeInventory freeInventory;
 
@@ -21,9 +20,8 @@ namespace App.Server.GameModules.GamePlay.free.player
 
         public PlayerStateTimer StateTimer;
 
-        public FreeData(Contexts context, PlayerEntity player)
+        public FreeData(PlayerEntity player)
         {
-            AllContexts = context;
             this.Player = player;
             this.key = "player";
             this.id = player.entityKey.Value.EntityId;
@@ -42,7 +40,7 @@ namespace App.Server.GameModules.GamePlay.free.player
             AddFields(new ObjectFields(player.gamePlay));
             AddFields(new ObjectFields(player.orientation));
             AddFields(new ObjectFields(player.weaponState));
-            AddFields(new PlayerFields(AllContexts, player));
+            AddFields(new PlayerFields(player));
             if (player.hasPlayerMask)
             {
                 AddFields(new ObjectFields(player.playerMask));

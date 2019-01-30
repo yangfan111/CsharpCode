@@ -46,7 +46,7 @@ public class AkWwiseComponentPicker : UnityEditor.EditorWindow
 
 			s_componentPicker.m_treeView.AssignDefaults();
 			s_componentPicker.m_treeView.SetRootItem(
-				System.IO.Path.GetFileNameWithoutExtension(AudioPluginManagement.DeveloperWwiseProjectPath),
+				System.IO.Path.GetFileNameWithoutExtension(AudioPluginSettingAgent.DeveloperWwiseProjectPath),
 				AkWwiseProjectData.WwiseObjectType.PROJECT);
 
 			//Populate the tree with the correct type 

@@ -17,7 +17,7 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Pose
             return input.IsAirPlane;
         }
 
-        public AirplanePoseMotor(ECameraPoseMode modeId, CameraConfig config, HashSet<ECameraPoseMode> excludes, VehicleContext vehicleContext, FreeMoveContext freeMoveContext) :
+        public AirplanePoseMotor(ECameraPoseMode modeId, CameraConfigItem config, HashSet<ECameraPoseMode> excludes, VehicleContext vehicleContext, FreeMoveContext freeMoveContext) :
             base(modeId, config, excludes, vehicleContext, freeMoveContext)
         {
         }

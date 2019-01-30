@@ -36,8 +36,12 @@ namespace App.Shared.GameModules.Player.CharacterState
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             PlayerEntity playerEntity = (PlayerEntity)owner.OwnerEntity;
-
-            CheckPlayerLifeState(playerEntity);
+  
+            if (playerEntity.gamePlay.IsLifeState(EPlayerLifeState.Dead) || playerEntity.gamePlay.IsLastLifeState(EPlayerLifeState.Dead))
+            {
+                // gamePlay有对应的处理，这里不需要
+                return;
+            }
 
             var stateManager = playerEntity.stateInterface.State;
             ComponentSynchronizer.SyncFromStateInterVarComponent(playerEntity.stateInterVar, stateManager );
@@ -94,70 +98,11 @@ namespace App.Shared.GameModules.Player.CharacterState
         {
             player.thirdPersonAppearance.Posture = ThirdPersonAppearanceUtils.GetPosture(player.stateInterface.State);
             player.thirdPersonAppearance.Action = ThirdPersonAppearanceUtils.GetAction(player.stateInterface.State);
-            player.thirdPersonAppearance.Movement = ThirdPersonAppearanceUtils.GetMovement(player.stateInterface.State);
             player.thirdPersonAppearance.PeekDegree = player.characterBoneInterface.CharacterBone.PeekDegree;
             player.thirdPersonAppearance.NeedUpdateController = true;
             player.thirdPersonAppearance.CharacterHeight = player.characterControllerInterface.CharacterController.GetCharacterControllerHeight;
             player.thirdPersonAppearance.CharacterCenter = player.characterControllerInterface.CharacterController.GetCharacterControllerCenter;
             player.thirdPersonAppearance.CharacterRadius = player.characterControllerInterface.CharacterController.GetCharacterControllerRadius;
         }
-        
-        #region LifeState
-
-        private void CheckPlayerLifeState(PlayerEntity player)
-        {
-            if (null == player || null == player.gamePlay) return;
-
-            var gamePlay = player.gamePlay;
-            if (!gamePlay.HasLifeStateChangedFlag()) return;
-
-            if (gamePlay.IsLifeState(EPlayerLifeState.Alive) &&
-                gamePlay.IsLastLifeState(EPlayerLifeState.Dead))
-                Reborn(player);
-            
-            if (gamePlay.IsLifeState(EPlayerLifeState.Alive) &&
-                gamePlay.IsLastLifeState(EPlayerLifeState.Dying))
-                Revive(player);
-            
-            if(gamePlay.IsLifeState(EPlayerLifeState.Dying))
-                Dying(player);
-
-            if (gamePlay.IsLifeState(EPlayerLifeState.Dead))
-                Dead(player);
-        }
-
-        private void Reborn(PlayerEntity player)
-        {
-            if (null == player) return;
-            var stateManager = player.stateInterface.State;
-            if (null == stateManager) return;
-            stateManager.PlayerReborn();
-        }
-        
-        private void Revive(PlayerEntity player)
-        {
-            if (null == player) return;
-            var stateManager = player.stateInterface.State;
-            if (null == stateManager) return;
-            stateManager.Revive();
-        }
-
-        private void Dying(PlayerEntity player)
-        {
-            if (null == player) return;
-            var stateManager = player.stateInterface.State;
-            if (null == stateManager) return;
-            stateManager.Dying();
-        }
-
-        private void Dead(PlayerEntity player)
-        {
-            if (null == player) return;
-            var stateManager = player.stateInterface.State;
-            if (null == stateManager) return;
-            stateManager.PlayerReborn();
-        }
-
-        #endregion
     }
 }

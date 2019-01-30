@@ -4,20 +4,12 @@ using Core.Utils;
 using Core;
 using App.Shared.GameModules.Weapon;
 using App.Shared.Util;
-using App.Shared.WeaponLogic;
 
 namespace App.Shared.GameModules.Player
 {
     public class PlayerWeaponDrawSystem : IUserCmdExecuteSystem
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerWeaponDrawSystem));
-        private Contexts _contexts;
-             
-        public PlayerWeaponDrawSystem(Contexts contexts)
-        {
-            _contexts = contexts; 
-        }
-
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             if(!cmd.IsDrawWeapon && !cmd.IsForceUnmountWeapon)
@@ -30,7 +22,7 @@ namespace App.Shared.GameModules.Player
             if (cmd.IsForceUnmountWeapon)
             {
               
-                controller.ForceUnmountCurrWeapon(_contexts);
+                controller.ForceUnmountCurrWeapon();
                 return;
             }
 
@@ -49,11 +41,11 @@ namespace App.Shared.GameModules.Player
             EWeaponSlotType curSlot = player.GetController<PlayerWeaponController>().CurrSlotType;
             if (curSlot == EWeaponSlotType.None)
             {
-                EWeaponSlotType lastSlot = player.GetController<PlayerWeaponController>().PopGetLastWeaponId(_contexts);
+                EWeaponSlotType lastSlot = player.GetController<PlayerWeaponController>().PopGetLastWeaponId();
                 if (lastSlot != EWeaponSlotType.None)
                 {
                     //player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.ChangeWeapon);
-                    controller.DrawSlotWeapon(_contexts, lastSlot);
+                    controller.DrawSlotWeapon(lastSlot);
                 }
                 else
                 {
@@ -67,12 +59,12 @@ namespace App.Shared.GameModules.Player
             else
             {
                 //   player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.ChangeWeapon);
-                controller.UnmountCurrWeapon(_contexts, null); 
+                controller.UnmountCurrWeapon();
             }
             if (changeWeaponSucess)
-            {
-                player.PlayWeaponSound(XmlConfig.EWeaponSoundType.SwitchIn);
-            }
+                player.weaponLogic.State.OnSwitchWeapon();
+   
+           
         }
     }
 }

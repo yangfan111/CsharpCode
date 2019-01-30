@@ -79,7 +79,6 @@
         public const string CountEntity = "countEntity";
         
         public const string ShowAniInfo = "ShowAniInfo";
-        public const string ShowBox = "ShowBox";
 
 
         public const string ClientMove = "m";

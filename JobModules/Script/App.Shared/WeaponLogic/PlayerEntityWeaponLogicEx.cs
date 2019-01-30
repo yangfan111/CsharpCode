@@ -56,25 +56,17 @@ namespace App.Shared.WeaponLogic
         /// <param name="contexts"></param>
         /// <param name="slot"></param>
         /// <returns></returns>
-        public static WeaponDataComponent GetWeaponData(this PlayerEntity playerEntity, Contexts contexts, EWeaponSlotType slot)
+        public static WeaponDataComponent GetWeaponSlotComponentData(this PlayerEntity playerEntity, Contexts contexts, EWeaponSlotType slot)
         {
-            var weaponEntity = playerEntity.GetWeaponEntityByHandDefault(contexts, slot);
-            if(null != weaponEntity)
-            {
-                return weaponEntity.weaponData;
-            }
-            return null;
+            return playerEntity.ToSlotWeaponEntity(contexts, slot).weaponData;
         }
 
-        public static BagStateComponent GetBagState(this PlayerEntity playerEntity)
+        public static WeaponBagStateComponent GetBagState(this PlayerEntity playerEntity)
         {
             return playerEntity.bagState;
         }
 
-        public static WeaponDataComponent GetCurrentWeaponData(this PlayerEntity playerEntity, Contexts contexts)
-        {
-            return GetWeaponData(playerEntity, contexts, (EWeaponSlotType)playerEntity.bagState.CurSlot);
-        }
+     
 
         public static WeaponInfo GetWeaponInfo(this PlayerEntity playerEntity, Contexts contexts, EWeaponSlotType slot)
         {
@@ -110,7 +102,6 @@ namespace App.Shared.WeaponLogic
 
         public static WeaponEntity GetWeaponEntity(this PlayerEntity playerEntity, Contexts contexts, EWeaponSlotType slot)
         {
-            var weaponContext = contexts.weapon;
             if(slot == EWeaponSlotType.None)
             {
                 return null;
@@ -120,23 +111,10 @@ namespace App.Shared.WeaponLogic
             {
                 return null;
             }
-            return weaponContext.GetEntityWithEntityKey(new EntityKey(weaponKey.Value, (short)EEntityType.Weapon));
+            return contexts.weapon.GetEntityWithEntityKey(new EntityKey(weaponKey.Value, (short)EEntityType.Weapon));
         }
 
-        public static WeaponEntity GetWeaponEntityByHandDefault(this PlayerEntity playerEntity, Contexts contexts)
-        {
-            return playerEntity.GetWeaponEntityByHandDefault(contexts, (EWeaponSlotType)playerEntity.bagState.CurSlot);
-        }
-
-        public static WeaponEntity GetWeaponEntityByHandDefault(this PlayerEntity playerEntity, Contexts contexts, EWeaponSlotType slot)
-        {
-            var weaponEntity = playerEntity.GetWeaponEntity(contexts, slot);
-            if(null != weaponEntity)
-            {
-                return weaponEntity;
-            }
-            return contexts.weapon.flagEmptyHandEntity;
-        }
+      
 
         public static WeaponInfo GetCurrentWeaponInfo(this PlayerEntity playerEntity, Contexts contexts)
         {

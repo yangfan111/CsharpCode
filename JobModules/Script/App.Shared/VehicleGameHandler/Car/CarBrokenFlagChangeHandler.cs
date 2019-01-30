@@ -18,7 +18,7 @@ namespace App.Shared.VehicleGameHandler
     {
         private bool _isOffline;
         private bool _isServer;
-        public CarBrokenFlagChangeHandler(Contexts contexts, bool isOffline, bool isServer) : base(contexts, new VehicleTypeMatcher(EVehicleType.Car))
+        public CarBrokenFlagChangeHandler(PlayerContext context, bool isOffline, bool isServer) : base(context, new VehicleTypeMatcher(EVehicleType.Car))
         {
             _isOffline = isOffline;
             _isServer = isServer;

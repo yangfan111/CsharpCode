@@ -36,7 +36,7 @@ namespace Core.Prediction.UserPrediction.Cmd
         public const int IsHoldBreath = 1 << (int)UserCmdEnum.IsHoldBreath;
         public const int IsSwitchAutoRun = 1 << (int)UserCmdEnum.IsSwitchAutoRun;
         public const int IsPickUp = 1 << (int)UserCmdEnum.IsPickUp;
-        public const int IsUseAction = 1 << (int)UserCmdEnum.IsHoldF;
+        public const int IsUseAction= 1 << (int)UserCmdEnum.IsHoldF;
         public const int IsForceUnmountWeapon = 1 << (int)UserCmdEnum.IsForceUnmountWeapon;
         /// <summary>
         /// 客户端发起的打断状态，比如打开某些界面时需要终止当前动作

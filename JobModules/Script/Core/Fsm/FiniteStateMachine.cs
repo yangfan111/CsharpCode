@@ -139,14 +139,5 @@ namespace Core.Fsm
                 return 0;
             }
         }
-
-        public float TransitionTime()
-        {
-            if (InTransition())
-            {
-                return _currentState.ActiveTransition.Duration;
-            }
-            return 0;
-        }
     }
 }

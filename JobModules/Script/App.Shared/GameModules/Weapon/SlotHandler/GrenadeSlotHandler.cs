@@ -3,7 +3,7 @@ using Core.Utils;
 
 namespace App.Shared.GameModules.Weapon
 {
-    [WeaponSpecies(EWeaponSlotType.ThrowingWeapon)]
+    [WeaponSpecies(EWeaponSlotType.GrenadeWeapon)]
     internal class GrenadeSlotHandler : WeaponSlotHandlerBase
     {
         private static LoggerAdapter Logger = new LoggerAdapter(typeof(GrenadeSlotHandler));
@@ -30,14 +30,14 @@ namespace App.Shared.GameModules.Weapon
             base.SetHelper(in_helper);
             bagCacheHelper = (GrenadeBagCacheHelper)in_helper;
         }
-        internal override void OnExpend(Contexts contexts, PlayerWeaponComponentAgent agent, WeaponSlotExpendCallback slotExpendCb)
+        internal override void OnExpend(PlayerWeaponComponentAgent agent, WeaponSlotExpendCallback slotExpendCb)
         {
 
-            bagCacheHelper.RemoveCache(agent.CurrSlotWeaponId(contexts).Value);
+            bagCacheHelper.RemoveCache(agent.CurrSlotWeaponId);
             if (slotExpendCb != null)
             {
                 var paramsData = new WeaponSlotExpendData(handledSlot, true, true);
-                slotExpendCb(contexts, paramsData);
+                slotExpendCb(paramsData);
             }
 
         }

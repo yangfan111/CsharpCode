@@ -112,11 +112,6 @@ namespace Core.CharacterState.Posture
             return _commonFsm.TransitionRemainTime();
         }
 
-        public float TransitionTime()
-        {
-            return _commonFsm.TransitionTime();
-        }
-
         public PostureInConfig CurrentPosture()
         {
             return GetCurrentOrNextState(true);

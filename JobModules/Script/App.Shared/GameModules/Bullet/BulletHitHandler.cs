@@ -88,8 +88,8 @@ namespace App.Shared.GameModules.Bullet
                 hit.normal);
         }
 
-        public void OnHitPlayer(Contexts contexts, PlayerEntity srcPlayer, PlayerEntity targetPlayer, IBulletEntity bulletEntity,
-            RaycastHit hit, Vector3 targetPlayerPostion)
+        public void OnHitPlayer(PlayerEntity srcPlayer, PlayerEntity targetPlayer, IBulletEntity bulletEntity,
+            RaycastHit hit, UnityEngine.Vector3 targetPlayerPostion)
         {
             Collider collider = hit.collider;
 
@@ -128,7 +128,6 @@ namespace App.Shared.GameModules.Bullet
             }
 
             BulletPlayerUtility.ProcessPlayerHealthDamage(
-                contexts,
                 _damager,
                 srcPlayer, 
                 targetPlayer, 
@@ -194,19 +193,20 @@ namespace App.Shared.GameModules.Bullet
             {
                 try
                 {
+
                     _OnHitPlayer.BeginProfileOnlyEnableProfile();
                     Vector3 pos;
-                    if (compensationWorld.TryGetEntityPosition(targetPlayer.entityKey.Value, out pos))
+                    if(compensationWorld.TryGetEntityPosition(targetPlayer.entityKey.Value, out pos))
                     {
-                        OnHitPlayer(_contexts, srcPlayer, targetPlayer, bulletEntity, hit, pos);
+                        OnHitPlayer(srcPlayer, targetPlayer, bulletEntity, hit, pos);
                     }
                     else
                     {
                         _logger.ErrorFormat("cant get player compensation position with key {0}", targetPlayer.entityKey.Value);
-                        OnHitPlayer(_contexts, srcPlayer, targetPlayer, bulletEntity, hit, targetPlayer.position.Value);
+                        OnHitPlayer(srcPlayer, targetPlayer, bulletEntity, hit, targetPlayer.position.Value);
                     }
                     bulletEntity.HitType = EHitType.Player;
-                }
+                    }
                 finally
                 {
                     _OnHitPlayer.EndProfileOnlyEnableProfile();
@@ -338,6 +338,8 @@ namespace App.Shared.GameModules.Bullet
                 oldThickNess, bulletEntity.PenetrableThickness,
                 info,
                 bulletEntity.PenetrableLayerCount);
+            
+            DamageInfoDebuger.OnEnvironmentHit(_contexts.player, _damager, _damageInfoCollector);
         }
     }
 }

@@ -12,7 +12,6 @@ using XmlConfig;
 using App.Shared.Player;
 using App.Shared.GameModules.Player.CharacterBone;
 using Core.CharacterBone;
-using Core.EntityComponent;
 
 namespace App.Shared.GameModules.Player.Appearance
 {
@@ -23,57 +22,26 @@ namespace App.Shared.GameModules.Player.Appearance
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             PlayerEntity player = owner.OwnerEntity as PlayerEntity;
-            CheckPlayerLifeState(player);
+            if (player.gamePlay.IsLifeState(EPlayerLifeState.Dead))
+            {
+                return;
+            }
             AppearanceUpdate(player);
         }
 
         private void AppearanceUpdate(PlayerEntity player)
         {
             var appearance = player.appearanceInterface.Appearance;
-            
-            appearance.SyncLatestFrom(player.latestAppearance);
-            appearance.SyncPredictedFrom(player.predictedAppearance);
-            
+
+            appearance.SyncFrom(player.predictedAppearance);
+            appearance.SyncFrom(player.latestAppearance);
             appearance.TryRewind();
+
             appearance.Execute();
-            
-            appearance.SyncLatestTo(player.latestAppearance);
-            appearance.SyncPredictedTo(player.predictedAppearance);
+
+            // first person only
+            appearance.SyncTo(player.predictedAppearance);
+            appearance.SyncTo(player.latestAppearance);
         }
-
-        #region LifeState
-
-        private void CheckPlayerLifeState(PlayerEntity player)
-        {
-            if (null == player || null == player.gamePlay) return;
-
-            var gamePlay = player.gamePlay;
-            if (!gamePlay.HasLifeStateChangedFlag()) return;
-
-            if (gamePlay.IsLifeState(EPlayerLifeState.Alive) &&
-                gamePlay.IsLastLifeState(EPlayerLifeState.Dead))
-                Reborn(player);
-
-            if (gamePlay.IsLifeState(EPlayerLifeState.Dead))
-                Dead(player);
-        }
-
-        private void Reborn(PlayerEntity player)
-        {
-            if (null == player) return;
-            var appearance = player.appearanceInterface.Appearance;
-            if (null == appearance) return;
-            appearance.PlayerReborn();
-        }
-        
-        private void Dead(PlayerEntity player)
-        {
-            if (null == player) return;
-            var appearance = player.appearanceInterface.Appearance;
-            if (null == appearance) return;
-            appearance.PlayerDead();
-        }
-
-        #endregion
     }
 }

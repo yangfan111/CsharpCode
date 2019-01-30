@@ -27,7 +27,7 @@ namespace App.Shared.Player
             }
         }
 
-        public static void DefuseBomb(this PlayerEntity playerEntity, Contexts contexts)
+        public static void DefuseBomb(this PlayerEntity playerEntity)
         {
             if(!playerEntity.hasAnimationExData)
             {
@@ -37,7 +37,7 @@ namespace App.Shared.Player
             }
             ResetAnimData(playerEntity);
             playerEntity.animationExData.AnimationWaitToBePlayed = () => playerEntity.stateInterface.State.DismantleBomb(playerEntity.animationExData.ActionAfterAllAnimation);
-            UndrawWeaponThenPlayAnim(playerEntity, contexts);
+            UndrawWeaponThenPlayAnim(playerEntity);
         }
 
         private static void ResetAnimData(PlayerEntity playerEntity)
@@ -46,9 +46,9 @@ namespace App.Shared.Player
             playerEntity.animationExData.ActionAfterAllAnimation = null;
         }
 
-        private static void UndrawWeaponThenPlayAnim(this PlayerEntity playerEntity, Contexts contexts)
+        private static void UndrawWeaponThenPlayAnim(PlayerEntity playerEntity)
         {
-            if(playerEntity.GetController<PlayerWeaponController>().IsWeaponCurrSlotStuffed(contexts))
+            if(playerEntity.GetController<PlayerWeaponController>().IsWeaponCurrSlotStuffed())
             {
                 playerEntity.animationExData.ActionAfterAllAnimation = () =>
                 {

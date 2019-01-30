@@ -12,8 +12,8 @@ namespace App.Shared.VehicleGameHandler
 {
     public class ShipBrokenFlagChangeHandler : VehicleBrokenFlagChangeHandler
     {
-        public ShipBrokenFlagChangeHandler(Contexts contexts) : 
-            base(contexts, new VehicleTypeMatcher(EVehicleType.Ship))
+        public ShipBrokenFlagChangeHandler(PlayerContext context) : 
+            base(context, new VehicleTypeMatcher(EVehicleType.Ship))
         {
 
         }

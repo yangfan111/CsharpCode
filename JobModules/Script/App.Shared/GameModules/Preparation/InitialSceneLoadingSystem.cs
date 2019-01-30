@@ -74,6 +74,7 @@ namespace App.Shared.GameModules.Preparation
                             allMaps.SmallMapParameters.AssetName
                         }
                     });
+                    RegistLoader();
                     break;
                 case LevelType.Exception:
                     throw new InvalidEnumArgumentException("map id not set");
@@ -119,6 +120,13 @@ namespace App.Shared.GameModules.Preparation
             
             _sceneRequests.Clear();
             _goRequests.Clear();
+        }
+        
+        private void RegistLoader()
+        {
+            SceneObjManager sm = new SceneObjManager();
+            _contexts.session.commonSession.LevelManager.SceneLoaded += (scene,type) => sm.OnSceneLoaded(scene);
+            _contexts.session.commonSession.LevelManager.SceneUnloaded += scene => sm.OnSceneUnloaded(scene);
         }
     }
 }

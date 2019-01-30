@@ -591,9 +591,9 @@ public class AkPluginActivator
 		var allPaths = AkUtilities.GetAllBankPaths();
 		var bNeedRefresh = false;
         //-寻找引擎的xml文件
-        if (!string.IsNullOrEmpty(AudioPluginManagement.DeveloperWwiseProjectPath))
+        if (!string.IsNullOrEmpty(AudioPluginSettingAgent.DeveloperWwiseProjectPath))
         {
-            var projectPath = System.IO.Path.GetDirectoryName(AudioPluginManagement.DeveloperWwiseProjectPath);
+            var projectPath = System.IO.Path.GetDirectoryName(AudioPluginSettingAgent.DeveloperWwiseProjectPath);
 
             var pfMap = AkUtilities.GetPlatformMapping();
 

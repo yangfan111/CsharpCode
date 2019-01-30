@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using Utils.AssetManager;
+﻿using Utils.AssetManager;
 
 namespace App.Shared.SceneManagement.Streaming
 {
@@ -7,7 +6,7 @@ namespace App.Shared.SceneManagement.Streaming
     {
         void LoadScene(AssetInfo addr);
         void UnloadScene(string sceneName);
-        void LoadGo(int sceneIndex, int goIndex);
-        void UnloadGo(UnityObjectWrapper<GameObject> go, int sceneIndex);
+        bool LoadGo(int sceneIndex, int goIndex);
+        void UnloadGo(int sceneIndex, int goIndex);
     }
 }

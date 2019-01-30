@@ -105,8 +105,8 @@ namespace Core.CharacterState.Action
 
         class CallBackRegister
         {
-            private Dictionary<FsmInput, System.Action> _inputCallBack = new Dictionary<FsmInput, System.Action>(CommonIntEnumEqualityComparer<FsmInput>.Instance);
-            private Dictionary<FsmInput, System.Action> _callBackRemove = new Dictionary<FsmInput, System.Action>(CommonIntEnumEqualityComparer<FsmInput>.Instance);
+            private Dictionary<FsmInput, System.Action> _inputCallBack = new Dictionary<FsmInput, System.Action>(CommonEnumEqualityComparer<FsmInput>.Instance);
+            private Dictionary<FsmInput, System.Action> _callBackRemove = new Dictionary<FsmInput, System.Action>(CommonEnumEqualityComparer<FsmInput>.Instance);
 
             public void AddNewCallBack(FsmInput trigger, FsmInput removeCondition, System.Action callBack)
             {
@@ -252,21 +252,6 @@ namespace Core.CharacterState.Action
             SetNewCommandFromFunctionCall(FsmInput.RescueEnd);
         }
 
-        public void SetPostureStand()
-        {
-            SetNewCommandFromFunctionCall(FsmInput.PostureStand);
-        }
-
-        public void SetPostureCrouch()
-        {
-            SetNewCommandFromFunctionCall(FsmInput.PostureCrouch);
-        }
-
-        public void SetPostureProne()
-        {
-            SetNewCommandFromFunctionCall(FsmInput.PostureProne);
-        }
-
         public void Stand()
         {
             SetNewCommandFromFunctionCall(FsmInput.Jump);
@@ -391,14 +376,12 @@ namespace Core.CharacterState.Action
         {
             SetNewCommandFromFunctionCall(FsmInput.BuriedBomb);
             SetNewCallbackFromFunctionCall(FsmInput.BuriedBombFinished, FsmInput.BuriedBombFinished, callBack);
-            SetPostureStand();
         }
 
         public void DismantleBomb(System.Action callBack)
         {
             SetNewCommandFromFunctionCall(FsmInput.DismantleBomb);
             SetNewCallbackFromFunctionCall(FsmInput.DismantleBombFinished, FsmInput.DismantleBombFinished, callBack);
-            SetPostureCrouch();
         }
 
         //投掷动作

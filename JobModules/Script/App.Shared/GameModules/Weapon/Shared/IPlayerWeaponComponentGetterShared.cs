@@ -22,29 +22,29 @@ namespace App.Shared.GameModules.Weapon
         /// 获取当前槽位信息
         /// </summary>
         /// <returns></returns>
-        int? CurrSlotWeaponId(Contexts contexts);
+        int CurrSlotWeaponId { get; }
         /// <summary>
         /// 获取当前槽位信息
         /// </summary>
         /// <returns></returns>
         /// <summary>
-        WeaponInfo CurrSlotWeaponInfo(Contexts contexts);
+        WeaponInfo CurrSlotWeaponInfo { get; }
         /// <summary>
         /// 获取武器信息(槽位)
         /// </summary>
         /// <param name="slot"></param>
         /// <returns></returns>
-        WeaponInfo GetSlotWeaponInfo(Contexts contexts, EWeaponSlotType slot);
+        WeaponInfo GetSlotWeaponInfo(EWeaponSlotType slot);
         /// <summary>
         ///  获取武器信息(槽位)
         /// </summary>
         /// <param name="slot"></param>
         /// <param name="wpInfo"></param>
         /// <returns></returns>
-        int? GetSlotWeaponId(Contexts contexts, EWeaponSlotType slot);
+        int GetSlotWeaponId(EWeaponSlotType slot);
 
 
-        bool TryGetSlotWeaponInfo(Contexts contexts, EWeaponSlotType slot, out WeaponInfo wpInfo);
+        bool TryGetSlotWeaponInfo(EWeaponSlotType slot, out WeaponInfo wpInfo);
 
         /// <summary>
         /// 获取上一次使用的武器槽位
@@ -57,26 +57,49 @@ namespace App.Shared.GameModules.Weapon
         /// </summary>
         /// <param name="slot"></param>
         /// <returns></returns>
-        bool IsWeaponSlotStuffed(Contexts contexts, EWeaponSlotType slot);
+        bool IsWeaponSlotStuffed(EWeaponSlotType slot);
+
+        bool IsWeaponCurrSlotStuffed();
 
         /// <summary>
         /// 判断当前武器是否在槽位内
         /// </summary>
         /// <param name="weaponId"></param>
         /// <returns></returns>
-        bool IsWeaponStuffedInSlot(Contexts contexts, int weaponId);
+        bool IsWeaponStuffedInSlot(int weaponId);
 
 
         /// <summary>
         /// 获取最近一次使用的武器槽位
         /// </summary>
         /// <returns></returns>
-        EWeaponSlotType PopGetLastWeaponId(Contexts contexts);
+        EWeaponSlotType PopGetLastWeaponId();
+        /// <summary>
+        /// 当前开火模式
+        /// </summary>
+        int CurrFireMode { get; set; }
+
+        bool CurrBolted { get; set; }
+
+        int GetSlotFireModeCount(EWeaponSlotType slot);
+        /// <summary>
+        /// 当前武器子弹数
+        /// </summary>
+        /// <returns></returns>
+        int CurrWeaponBullet { get; }
+        /// <summary>
+        /// 武器子弹数(槽位)
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <returns></returns>
+        int GetSlotWeaponBullet(EWeaponSlotType slot);
+
+        bool GetSlotWeaponBolted(EWeaponSlotType slot);
 
         /// <summary>
         /// 开火模式(武器)
         /// </summary>
-        int GetSlotFireMode(Contexts contexts, EWeaponSlotType slot);
+        int GetSlotFireMode(EWeaponSlotType slot);
         bool IsCurrSlotType(EWeaponSlotType slot);
         int GetReservedBullet();
         int GetReservedBullet(EWeaponSlotType slot);

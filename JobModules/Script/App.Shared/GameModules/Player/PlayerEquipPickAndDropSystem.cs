@@ -33,7 +33,7 @@ namespace App.Shared.GameModules.Player
                     player.modeLogic.ModeLogic.AutoPickupWeapon(player.entityKey.Value.EntityId, cmd.PickUpEquip);
                 }
             }
-            //投掷时会判断是否已经准备，手雷的对象为Playback，不存在预测回滚的问题
+            //TODO 暂时没有考虑回滚，后续需对回滚的情况做处理
             if (player.hasWeaponAutoState && player.weaponAutoState.AutoThrowing)
             {
                 if(null != _userCmdGenerator)
@@ -46,7 +46,7 @@ namespace App.Shared.GameModules.Player
             }
             if(cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsDropWeapon))
             { 
-                var slot = (EWeaponSlotType)player.bagState.CurSlot;
+                var slot = (EWeaponSlotType)player.weaponState.CurrentWeaponSlot;
                 player.modeLogic.ModeLogic.Dorp(player.entityKey.Value.EntityId, slot);
             }
         }

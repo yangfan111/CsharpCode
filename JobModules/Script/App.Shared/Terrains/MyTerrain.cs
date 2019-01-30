@@ -48,6 +48,8 @@ namespace App.Shared.Terrains
         private HashSet<string> setLoadedAssets = new HashSet<string>();
 
         private Vector3 _terrainInitPos = new Vector3();
+        private Vector3 _terrainOriginPos = new Vector3();
+        private Vector3 _size = new Vector3();
         private float _defaultFrictionGrip = 2.3f;
         private float _defaultFrictionDrag = 0.1f;
         private int _defaultId = 0;
@@ -71,7 +73,8 @@ namespace App.Shared.Terrains
             {
                 _mapId = sceneConfig.Id;
                 _mapName = sceneConfig.MapName;
-               
+                _terrainOriginPos.Set(sceneConfig.OriginPosition.x, sceneConfig.OriginPosition.y, sceneConfig.OriginPosition.z);
+                _size.Set(sceneConfig.Size.x, sceneConfig.Size.y, sceneConfig.Size.z);
                 if (sceneConfig is SceneConfig)
                 {
                     SceneConfig config = sceneConfig as SceneConfig;
@@ -236,6 +239,20 @@ namespace App.Shared.Terrains
             get
             {
                 return _terrainInitPos;
+            }
+        }
+        public Vector3 OriginPosition
+        {
+            get
+            {
+                return _terrainOriginPos;
+            }
+        }
+        public Vector3 Size
+        {
+            get
+            {
+                return _size;
             }
         }
 

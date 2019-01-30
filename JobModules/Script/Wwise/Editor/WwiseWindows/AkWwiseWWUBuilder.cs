@@ -12,7 +12,7 @@ public class AkWwiseWWUBuilder
 	private const string s_progTitle = "Populating Wwise Picker";
 	private const int s_SecondsBetweenChecks = 3;
 
-	private static string s_wwiseProjectPath = !string.IsNullOrEmpty(AudioPluginManagement.DeveloperWwiseProjectPath)? System.IO.Path.GetDirectoryName(AudioPluginManagement.DeveloperWwiseProjectPath):"";
+	private static string s_wwiseProjectPath = !string.IsNullOrEmpty(AudioPluginSettingAgent.DeveloperWwiseProjectPath)? System.IO.Path.GetDirectoryName(AudioPluginSettingAgent.DeveloperWwiseProjectPath):"";
 
 	private static readonly string[] FoldersOfInterest =
 	{
@@ -53,7 +53,7 @@ public class AkWwiseWWUBuilder
 
 	public static bool AutoPopulate()
 	{
-		if (!System.IO.File.Exists(AudioPluginManagement.DeveloperWwiseProjectPath))
+		if (!System.IO.File.Exists(AudioPluginSettingAgent.DeveloperWwiseProjectPath))
 		{
 			AkWwisePicker.WwiseProjectFound = false;
 			return false;
@@ -79,20 +79,20 @@ public class AkWwiseWWUBuilder
 	{
 		try
 		{
-			if (AudioPluginManagement.DeveloperWwiseProjectPath == null)
+			if (AudioPluginSettingAgent.DeveloperWwiseProjectPath == null)
 				WwiseSettings.LoadSettings();
 
-			if (string.IsNullOrEmpty(AudioPluginManagement.DeveloperWwiseProjectPath))
+			if (string.IsNullOrEmpty(AudioPluginSettingAgent.DeveloperWwiseProjectPath))
 			{
 				//UnityEngine.Debug.LogError("WwiseUnity: Wwise project needed to populate from Work Units. Aborting.");
 				return false;
 			}
 
 			s_wwiseProjectPath = System.IO.Path.GetDirectoryName(
-                AudioPluginManagement.DeveloperWwiseProjectPath);
+                AudioPluginSettingAgent.DeveloperWwiseProjectPath);
 
 			if (!System.IO.File.Exists(
-                AudioPluginManagement.DeveloperWwiseProjectPath))
+                AudioPluginSettingAgent.DeveloperWwiseProjectPath))
 			{
 				AkWwisePicker.WwiseProjectFound = false;
 				return false;

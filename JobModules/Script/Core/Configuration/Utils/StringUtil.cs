@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Core.Utils;
 using UnityEngine;
 
@@ -52,11 +51,5 @@ namespace Core.Configuration.Utils
 
             return ret;
         }
-
-
     }
-
-    
-
-  
 }

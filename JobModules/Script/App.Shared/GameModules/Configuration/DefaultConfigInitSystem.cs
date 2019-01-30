@@ -70,14 +70,13 @@ namespace App.Shared.GameModules.Configuration
 
         public void OnLoadSucc(object source, AssetInfo assetInfo, UnityEngine.Object obj)
         {
-           
             var asset = obj as TextAsset;
             if (null == asset)
             {
                 Logger.ErrorFormat("Asset {0}:{1} Load Fialed ", assetInfo.BundleName, assetInfo.AssetName);
                 return;
             }
-            
+
             _cfg = asset.text;
             if (null == _parser)
             {

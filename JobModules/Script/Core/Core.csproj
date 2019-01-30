@@ -140,7 +140,7 @@ if %errorlevel% neq 0 goto :VCEnd" />
     <Compile Include="F:\voyager\UnityPackages\Core\Appearance\ICharacterControllerAppearance.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Appearance\ICharacterFirstPersonAppearance.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Appearance\IInputScheme.cs" />
-    <Compile Include="F:\voyager\UnityPackages\Core\AssetManager\LoadRequestManagerSystem.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\AssetManager\UnityAssetManangerSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Attack\IHitMaskController.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Attack\MeleeAttack.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Bag\BagFrame.cs" />
@@ -169,6 +169,11 @@ if %errorlevel% neq 0 goto :VCEnd" />
     <Compile Include="F:\voyager\UnityPackages\Core\CharacterController\ConcreteController\DiveCharacterController.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\CharacterController\ConcreteController\ProneCharacterController.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\CharacterController\ConcreteController\SwimCharacterController.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\CharacterController\GroundDetection\BaseGroundDetection.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\CharacterController\GroundDetection\CharacterControllerAdapter.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\CharacterController\GroundDetection\GroundDetection.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\CharacterController\GroundDetection\GroundDetectionCollider.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\CharacterController\GroundDetection\GroundHit.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\CharacterController\ICharacterController.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\CharacterController\KinematicCharacterController.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\CharacterController\KinematicCharacterController\BaseCharacterController.cs" />
@@ -251,6 +256,7 @@ if %errorlevel% neq 0 goto :VCEnd" />
     <Compile Include="F:\voyager\UnityPackages\Core\CharacterState\Posture\Transitions\PeekLeftToNoPeekTransition.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\CharacterState\Posture\Transitions\PeekRightToNoPeekTransition.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\CharacterState\Posture\Transitions\PostureTransition.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\CharacterState\Posture\UnityAnimationEventCommands.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\CharacterState\StateInterCommands.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Common\ITipManager.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Compare\CompareUtility.cs" />
@@ -446,6 +452,8 @@ if %errorlevel% neq 0 goto :VCEnd" />
     <Compile Include="F:\voyager\UnityPackages\Core\HitBox\HitBoxOwnerComponent.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\HitBox\HitBoxTransformProvider.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\HitBox\IHitBoxTransformProvider.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\Http\HttpRequestParser.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\Http\HttpUtility.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Http\SimpleHttpServer.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\IFactory\ISceneObjectEntityFactory.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\IFactory\ISoundEntityFactory.cs" />

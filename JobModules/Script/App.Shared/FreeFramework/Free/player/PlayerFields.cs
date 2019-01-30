@@ -14,7 +14,6 @@ namespace App.Server.GameModules.GamePlay.Free.player
         private static HashSet<string> fieldSet;
 
         private PlayerEntity player;
-        private Contexts _contexts;
 
         static PlayerFields()
         {
@@ -24,10 +23,9 @@ namespace App.Server.GameModules.GamePlay.Free.player
             fieldSet.UnionWith(fields);
         }
 
-        public PlayerFields(Contexts contexts, PlayerEntity player)
+        public PlayerFields(PlayerEntity player)
         {
             this.player = player;
-            _contexts = contexts;
         }
 
         public IPara Get(string field)
@@ -62,7 +60,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
             }
             else if ("currentWeaponId" == field)
             {
-                return new IntPara(field, player.GetController<PlayerWeaponController>().CurrSlotWeaponId(_contexts).Value);
+                return new IntPara(field, player.GetController<PlayerWeaponController>().CurrSlotWeaponId);
             }
             else if ("inCar" == field)
             {

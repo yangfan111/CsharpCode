@@ -62,9 +62,9 @@ namespace App.Shared.Components.Player
     [Player]
     public class LatestAdjustCmdComponent : IGameComponent
     {
-        [DontInitilize] public Vector3 AdjustPos;
-        [DontInitilize] public int Seq;
-        [DontInitilize] public bool HasNewValue;
+        [DontInitilize] private Vector3 AdjustPos;
+        [DontInitilize] private int Seq;
+        [DontInitilize] private bool hasNewValue;
         
         public int GetComponentId()
         {
@@ -73,9 +73,9 @@ namespace App.Shared.Components.Player
 
         public Vector3? GetPos(int seq)
         {
-            if (HasNewValue)
+            if (hasNewValue)
             {
-                HasNewValue = false;
+                hasNewValue = false;
                 Seq = seq;
             }
             if (seq == Seq)
@@ -86,7 +86,7 @@ namespace App.Shared.Components.Player
         public void SetPos(Vector3 pos)
         {
             AdjustPos = pos;
-            HasNewValue = true;
+            hasNewValue = true;
         }   
     }
     

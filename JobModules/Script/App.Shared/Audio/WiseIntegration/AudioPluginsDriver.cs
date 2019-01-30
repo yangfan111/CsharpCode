@@ -14,7 +14,6 @@ public class AudioPluginsDriver: MonoBehaviour
 
         akInteractComponent = GetComponent<AkInitializer>();
         InitWiseDefaultListener();
-        //TODO:引擎状态判断
         App.Shared.Audio.AKAudioEntry.LaunchAppAudio(this);
     }
     void InitWiseDefaultListener()

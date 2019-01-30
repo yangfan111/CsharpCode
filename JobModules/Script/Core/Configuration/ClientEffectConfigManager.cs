@@ -8,7 +8,7 @@ namespace Core.Configuration
     public class ClientEffectConfigManager :AbstractConfigManager<ClientEffectConfigManager>
     {
         //方便拿一些对应类型只有一个对象的配置
-        private Dictionary<EClientEffectType, ClientEffectConfigItem> _typeDic = new Dictionary<EClientEffectType, ClientEffectConfigItem>(CommonIntEnumEqualityComparer<EClientEffectType>.Instance);
+        private Dictionary<EClientEffectType, ClientEffectConfigItem> _typeDic = new Dictionary<EClientEffectType, ClientEffectConfigItem>(CommonEnumEqualityComparer<EClientEffectType>.Instance);
         private Dictionary<int, ClientEffectConfigItem> _configs = new Dictionary<int, ClientEffectConfigItem>();
 
         public override void ParseConfig(string xml)

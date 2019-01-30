@@ -8,6 +8,7 @@ using Core.Event;
 using Core.Utils;
 using UnityEngine;
 using Utils.Singleton;
+using WeaponConfigNs;
 using XmlConfig;
 
 namespace App.Shared.EntityFactory

@@ -11,10 +11,6 @@ using Core;
 using Assets.Utils.Configuration;
 using App.Shared.Components.Bag;
 using Core.WeaponLogic.Attachment;
-using App.Shared.Audio;
-using App.Shared.WeaponLogic;
-using Core.EntityComponent;
-using App.Shared.Components.Weapon;
 
 namespace App.Shared.GameModules.Weapon
 {
@@ -28,95 +24,108 @@ namespace App.Shared.GameModules.Weapon
         /// <summary>
         /// WeaponStateComponent
         /// </summary>
-        private readonly BagStateComponentExtractor stateExtractor;
+        private readonly WeaponStateComponentExtractor stateExtractor;
         /// <summary>
         /// weaponController，正常状态下不应对Controlller持有
         /// </summary>
         private  PlayerWeaponController controller;
-
-        private PlayerEntity _playerEntity;
-
         public PlayerWeaponComponentAgent(
-            PlayerEntity playerEntity,
-            WeaponSlotComponenExtractor in_slotExtractor, BagStateComponentExtractor in_stateExtractor)
+            WeaponSlotComponenExtractor in_slotExtractor, WeaponStateComponentExtractor in_stateExtractor)
         {
-            _playerEntity = playerEntity; 
+            
             slotExtractor = in_slotExtractor;
             stateExtractor = in_stateExtractor;
           //  controller = new PlayerWeaponController(this);
         }
     
-        internal bool RemoveSlotWeapon(Contexts contexts, EWeaponSlotType slot,System.Action<Contexts> onSetProcess)
+        internal bool RemoveSlotWeapon(EWeaponSlotType slot,System.Action onSetProcess)
         {
-            var weaponEntityId = _playerEntity.GetWeaponInSlot(slot);
-            if(!weaponEntityId.HasValue)
-            {
-                return false;
-            }
-            var weaponEntity = contexts.weapon.GetEntityWithEntityKey(new EntityKey(weaponEntityId.Value, (short)EEntityType.Weapon));
-            if(null != weaponEntity)
-            {
-                if(SharedConfig.IsServer)
-                {
-                    weaponEntity.isFlagSyncSelf = false;
-                }
-                _playerEntity.SetWeaponInSlot(slot, 0);
-            }
-            else
-            {
-                Logger.ErrorFormat("weaponEntity with id {0} in slot {1} doesn't exist ", weaponEntityId.Value, slot);
-            }
             if (slot == CurrSlotType)
             {
-                SetCurrSlotTypeProcess(contexts, EWeaponSlotType.None, onSetProcess);
+                SetCurrSlotTypeProcess(EWeaponSlotType.None, onSetProcess);
             }
+            var comp = slotExtractor(slot);
+            CommonUtil.WeakAssert(comp != null);
+            comp.Clear();
             WeaponInPackage pos = slot.ToWeaponInPackage();
             return true;
         }
+
+      
+
      
-        internal void SetSlotWeaponBullet(Contexts contexts, int bullet)
+        internal void SetSlotWeaponBullet(int bullet)
         {
-            SetSlotWeaponBullet(contexts, CurrSlotType,bullet);
+            SetSlotWeaponBullet(CurrSlotType,bullet);
         }
-        internal void SetSlotWeaponBullet(Contexts contexts, EWeaponSlotType slot, int bullet)
+        internal void SetSlotWeaponBullet(EWeaponSlotType slot, int bullet)
         {
-            var weaponComp = slotExtractor(contexts, slot);
-            if(null != weaponComp)
-            {
+            var weaponComp = slotExtractor(slot);
+            if (WeaponUtil.VertifyWeaponComponent(weaponComp) == EFuncResult.Success)
                 weaponComp.Bullet = bullet;
-            }
-            else
-            {
-                Logger.ErrorFormat("weapon data in slot {0} doesn't exist", slot);
-            }
-            //if (WeaponUtil.VertifyWeaponComponent(weaponComp) == EFuncResult.Success)
-        }
 
-        internal void SetSlotFireMode(Contexts contexts, EWeaponSlotType slot, EFireMode mode)
+        }
+        /// <summary>
+        /// 重置weaponComponent数据
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <param name="weaponId"></param>
+        internal void ResetSlotWeaponComponent(EWeaponSlotType slot, int weaponId)
         {
-            var weapon = slotExtractor(contexts, slot);
-            NewWeaponConfigItem cfg;
-            if (WeaponUtil.VertifyWeaponComponent(weapon,out cfg) == EFuncResult.Success)
+            var weaponComp = slotExtractor(slot);
+
+            if (WeaponUtil.VertifyWeaponComponent(weaponComp) == EFuncResult.Success)
             {
-                weapon.FireMode = (int)mode;
-                //GameAudioMedium.PerformOnFireModelSwitch(cfg);
+                weaponComp.Clear();
+                weaponComp.Id = weaponId;
             }
+
+
+        }
+        internal void ClearSlotWeaponAttachments(EWeaponSlotType slot)
+        {
+            var weaponComp = slotExtractor(slot);
+
+            if (WeaponUtil.VertifyWeaponComponent(weaponComp) == EFuncResult.Success)
+                weaponComp.ResetAttachments();
+
         }
 
+        internal void SetSlotWeaponBolted(EWeaponSlotType slot, bool bolted)
+        {
+            var weapon = slotExtractor(slot);
+            if (WeaponUtil.VertifyWeaponComponent(weapon) == EFuncResult.Success)
+                weapon.IsBoltPulled = bolted;
+
+        }
+      
+
+        internal void SetSlotFireMode(EWeaponSlotType slot, EFireMode mode)
+        {
+            var weapon = slotExtractor(slot);
+
+            if (WeaponUtil.VertifyWeaponComponent(weapon) == EFuncResult.Success)
+                weapon.FireMode = (int)mode;
+            else
+                Logger.ErrorFormat("get weapon bolted failed : no weapon in slot {0} ", slot);
+        }
         internal void SetCurrSlotType(EWeaponSlotType slot)
         {
-            _playerEntity.bagState.CurSlot = (int)slot;
+            var stateCmp = stateExtractor(false);
+            CommonUtil.WeakAssert(stateCmp != null);
+            stateCmp.CurrentWeaponSlot = (int)slot;
+            
         }
         internal void SetLastWeaponSlot(int slot)
         {
-            var comp = stateExtractor();
+            var comp = stateExtractor(false);
             CommonUtil.WeakAssert(comp != null);
-            comp.LastSlot = slot;
+            comp.LastWeapon = slot;
         }
-        internal void SetCurrSlotTypeProcess(Contexts contexts, EWeaponSlotType slot, System.Action<Contexts> onSetProcess)
+        internal void SetCurrSlotTypeProcess(EWeaponSlotType slot, System.Action onSetProcess)
         {
             SetCurrSlotType(slot);
-            onSetProcess(contexts);
+            onSetProcess();
           
             if (slot != EWeaponSlotType.None)
             {
@@ -127,7 +136,7 @@ namespace App.Shared.GameModules.Weapon
         /// 自动查找当前可用手雷,no vertify
         /// </summary>
         /// <param name="grenadeComp"></param>
-        private void TryStuffEmptyGrenadeSlot()
+        private void TryStuffEmptyGrenadeSlot(WeaponComponent grenadeComp)
         {
             //=>TODO:
             ////var grenadeBagAgent = _playerEntity.grenadeInventoryHolder.Inventory;
@@ -159,7 +168,7 @@ namespace App.Shared.GameModules.Weapon
         /// <param name="slot"></param>
         /// <param name="autoStuffSlot"></param>
         /// <returns></returns>
-        private WeaponDataComponent TryStuffEmptyGrenadeSlot(EWeaponSlotType slot, bool autoStuffSlot = false)
+        private WeaponComponent TryStuffEmptyGrenadeSlot(EWeaponSlotType slot, bool autoStuffSlot = false)
         {
             return null; 
             //var comp = slotExtractor(slot);
@@ -168,91 +177,39 @@ namespace App.Shared.GameModules.Weapon
             //return comp;
         }
 
-        internal Err_WeaponLogicErrCode AddWeaponToSlot(Contexts contexts, EWeaponSlotType slot, WeaponInfo weapon, WeaponPartsModelRefresh onModelWeaponPartsRefresh, out WeaponInfo lastWeapon)
+        internal Err_WeaponLogicErrCode AddWeaponToSlot(EWeaponSlotType slot, WeaponInfo weapon, WeaponPartsModelRefresh onModelWeaponPartsRefresh)
         {
-            lastWeapon = new WeaponInfo();
             if (slot == EWeaponSlotType.None)
                 return Err_WeaponLogicErrCode.Err_SlotNone;
-            int? lastWeaponId = null;
-            if (_playerEntity.HasWeaponInSlot(contexts, slot))
-            {
-                lastWeapon = GetSlotWeaponInfo(contexts, slot);
-                lastWeaponId = lastWeapon.Id;
-            }
-            WeaponPartsStruct parts = weapon.GetParts();
-            ProcessWeaponEntityForPickUp(contexts, weapon, slot, lastWeaponId);
+            WeaponComponent weaponComp = slotExtractor(slot);
+            if (null == weaponComp)
+                return Err_WeaponLogicErrCode.Err_SlotNone;
+            var attachments = weapon.GetParts();
+            weapon.CopyToWeaponComponentWithDefaultParts(weaponComp);
+            weaponComp.FireMode = 0;
             var avatarId = weapon.AvatarId;
             if (avatarId < 1)
-            {
-                avatarId = SingletonManager.Get<WeaponConfigManager>().GetConfigById(weapon.Id).AvatorId;
-            }
-            WeaponPartsRefreshData refreshData = new WeaponPartsRefreshData();
-            refreshData.weaponInfo = weapon;
-            refreshData.slot = slot;
-            refreshData.oldParts = new WeaponPartsStruct();
-            refreshData.newParts = parts;
-            refreshData.mountInPackage = true;
-            if(lastWeaponId.HasValue)
-            {
-                refreshData.SetRefreshLogic(lastWeaponId.Value);
-            }
-            onModelWeaponPartsRefresh(contexts, refreshData);
+                avatarId = SingletonManager.Get<WeaponConfigManager>().GetConfigById(weaponComp.Id).AvatorId;
+            onModelWeaponPartsRefresh(weapon, slot, new WeaponPartsStruct(), attachments, true);
             return Err_WeaponLogicErrCode.Sucess;
         }
-
-        private void ProcessWeaponEntityForPickUp(Contexts contexts, WeaponInfo weapon, EWeaponSlotType slot, int? lastWeaponId)
-        {
-            if(weapon.weaponKey == 0)
-            {
-                var weaponEntity = _playerEntity.AddWeaponEntity(contexts, weapon);
-                _playerEntity.SetWeaponInSlot(slot, weaponEntity.entityKey.Value.EntityId);
-
-                weapon.CopyToWeaponComponentWithDefaultParts(weaponEntity.weaponData);
-            }
-            else
-            {
-                _playerEntity.SetWeaponInSlot(slot, weapon.weaponKey);
-                var weaponEntity = contexts.weapon.GetEntityWithEntityKey(new EntityKey(weapon.weaponKey, (short)EEntityType.Weapon));
-                if(null != weaponEntity)
-                {
-                    weaponEntity.isFlagSyncSelf = true;
-                }
-            }
-            if(lastWeaponId.HasValue)
-            {
-                var lastWeaponEntity = contexts.weapon.GetEntityWithEntityKey(new EntityKey(lastWeaponId.Value, (short)EEntityType.Weapon));
-                if(null != lastWeaponEntity)
-                {
-                    //TODO 客户端和服务器逻辑分离
-                    if(SharedConfig.IsServer)
-                    {
-                        lastWeaponEntity.isFlagSyncSelf = false;
-                    }
-                }
-                else
-                {
-                    Logger.ErrorFormat("GetLastWeaponEntity {0} Failed", lastWeaponId.Value);
-                }
-            }
-        }
-
         /// <summary>
         /// 重置开火模式
         /// </summary>
         /// <param name="slot"></param>
-        internal void ResetSlotFireModel(Contexts contexts, EWeaponSlotType slot)
+        internal void ResetSlotFireModel(EWeaponSlotType slot)
         {
-            var weaponComp = slotExtractor(contexts, slot);
+            var weaponComp = slotExtractor(slot);
             // 重置开火模式
             if (WeaponUtil.VertifyWeaponComponent(weaponComp) == EFuncResult.Success)
             {
                 if (weaponComp.FireMode == 0)
                 {
-                    bool hasAutoFireModel = SingletonManager.Get<WeaponDataConfigManager>().HasAutoFireMode(weaponComp.WeaponId);
+                    bool hasAutoFireModel = SingletonManager.Get<WeaponDataConfigManager>().HasAutoFireMode(weaponComp.Id);
                     if (hasAutoFireModel)
-                        SetSlotFireMode(contexts, slot, EFireMode.Auto);
+                        SetSlotFireMode(slot, EFireMode.Auto);
                     else
-                        SetSlotFireMode(contexts, slot, SingletonManager.Get<WeaponDataConfigManager>().GetFirstAvaliableFireMode(weaponComp.WeaponId));
+                        SetSlotFireMode(slot, SingletonManager.Get<WeaponDataConfigManager>().GetFirstAvaliableFireMode(weaponComp.Id));
                 }
             }
         }

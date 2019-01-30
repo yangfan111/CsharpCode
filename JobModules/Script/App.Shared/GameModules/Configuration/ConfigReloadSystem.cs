@@ -7,7 +7,6 @@ using Utils.Configuration;
 using Core.Configuration.Sound;
 using System.Collections.Generic;
 using Utils.Singleton;
-using App.Shared.WeaponLogic;
 using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Configuration
@@ -34,7 +33,7 @@ namespace App.Shared.GameModules.Configuration
             var weaponData= new ConfigReloadItem
             {
                 Asset = "WeaponData",
-                OnReload = (text) => WeaponReload(contexts, text),
+                OnReload = (text) => WeaponReload(text),
             };
             _configs.Add(weaponData);
             var weaponPart = new ConfigReloadItem
@@ -101,12 +100,13 @@ namespace App.Shared.GameModules.Configuration
             parser.ParseConfig(xmlContent);
         }
 
-        public void WeaponReload(Contexts contexts, TextAsset textAsset)
+        public void WeaponReload(TextAsset textAsset)
         {
             SingletonManager.Get<WeaponDataConfigManager>().ParseConfig(textAsset.text);
             foreach(var player in _playerContext.GetEntities())
             {
-                player.GetController<PlayerWeaponController>().TryMountSlotWeapon(contexts, player.GetController<PlayerWeaponController>().CurrSlotType);
+                player.weaponFactory.Factory.ClearCache();
+                player.GetController<PlayerWeaponController>().TryMountSlotWeapon(player.GetController<PlayerWeaponController>().CurrSlotType);
             }
         }
 

@@ -67,8 +67,8 @@ namespace App.Shared.Terrains
             IMyTerrain myTerrain = GetCurrentTerrain();
             if (null != myTerrain)
             {
-//                TerrainCommonData.leftMinPos = new Vector3(myTerrain.OriginPosition.x, myTerrain.OriginPosition.y,myTerrain.OriginPosition.z);
-//                TerrainCommonData.size = new Vector2(myTerrain.Size.x, myTerrain.Size.y);
+                TerrainCommonData.leftMinPos = new Vector3(myTerrain.OriginPosition.x, myTerrain.OriginPosition.y,myTerrain.OriginPosition.z);
+                TerrainCommonData.size = new Vector2(myTerrain.Size.x, myTerrain.Size.y);
             }
         }
     }

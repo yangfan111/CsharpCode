@@ -107,15 +107,15 @@ namespace App.Shared.GameModules.Attack
 
                 if (targetPlayer != null)
                 {
-                    _meleeHitHandler.OnHitPlayer(_contexts, player, targetPlayer, hit, attackInfo, config);
+                    _meleeHitHandler.OnHitPlayer(player, targetPlayer, hit, attackInfo, config);
                 }
                 else if (targetVehicle != null)
                 {
-                    _meleeHitHandler.OnHitVehicle(_contexts, player, targetVehicle, hit, attackInfo, config);
+                    _meleeHitHandler.OnHitVehicle(player, targetVehicle, hit, attackInfo, config);
                 }
                 else
                 {
-                    _meleeHitHandler.OnHitEnvrionment(_contexts, player, hit, attackInfo, config);
+                    _meleeHitHandler.OnHitEnvrionment(player, hit, attackInfo, config);
                 }
             }
 

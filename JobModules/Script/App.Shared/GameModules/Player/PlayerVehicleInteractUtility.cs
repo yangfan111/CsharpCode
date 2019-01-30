@@ -22,7 +22,7 @@ namespace App.Shared.GameModules.Player
             return playerEntity.hasControlledVehicle && playerEntity.controlledVehicle.IsOnVehicle;
         }
 
-        public static void SetCharacterStateWithVehicle(this PlayerEntity playerEntity, Contexts contexts, VehicleContext context)
+        public static void SetCharacterStateWithVehicle(this PlayerEntity playerEntity, VehicleContext context)
         {
             if(playerEntity.hasCharacterContoller)
             {
@@ -51,7 +51,7 @@ namespace App.Shared.GameModules.Player
                             if (!enabled && !isStateDrive)
                             {
                                 var vehicle = context.GetEntityWithEntityKey(playerEntity.controlledVehicle.EntityKey);
-                                playerEntity.DriveStart(contexts, playerEntity.controlledVehicle.Role, vehicle.vehicleAssetInfo.PostureId);
+                                playerEntity.DriveStart(playerEntity.controlledVehicle.Role, vehicle.vehicleAssetInfo.PostureId);
 
                             }
                             else if (enabled && isStateDrive)
@@ -226,7 +226,7 @@ namespace App.Shared.GameModules.Player
             return true;
         }
 
-        public static void DriveStart(this PlayerEntity playerEntity, Contexts contexts, int seatId, int postureId)
+        public static void DriveStart(this PlayerEntity playerEntity, int seatId, int postureId)
         {
             //seatId 1~4,  actionSeatId 0~3
             var actionSeatId = seatId - 1 < 0 ? 0 : seatId - 1;
@@ -235,7 +235,7 @@ namespace App.Shared.GameModules.Player
             playerEntity.stateInterface.State.DriveStart(actionSeatId, postureId);
             //if (playerEntity.IsVehicleDriver())    //主驾驶位置
             {
-                playerEntity.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon(contexts);
+                playerEntity.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon();
             }
         }
     }

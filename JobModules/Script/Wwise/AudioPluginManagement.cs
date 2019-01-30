@@ -5,94 +5,42 @@ using System.IO;
 using UnityEngine;
 public class AudioPluginManagement
 {
-    
-
-    [System.Serializable]
-    public class CustomizeSettingData
+    private static AudioPluginManagement instance;
+    public static AudioPluginManagement Instance
     {
-
-        //  public const string WwiseSettingsFilename = "WwiseSettings.xml";
-
-        //  private static WwiseSettings instance;
-
-        public bool CopySoundBanksAsPreBuildStep = false;
-
-        public static bool D_CreatedPicker = false;
-        //default is true
-        public bool CreateWwiseGlobal = true;
-        public const bool D_CreateWwiseGlobal = true;
-        //default is false
-        public bool CreateWwiseListener = false;
-        public static bool D_CreateWwiseListener = false;
-
-        public bool GenerateSoundBanksAsPreBuildStep = false;
-        public bool ShowMissingRigidBodyWarning = false;
-        public static string BankEditorAssetRelativePath = "Assets/Sound/WiseBank";
-
-        /// <summary>
-        ///非 WAV 数据的存储位置(KB)
-        /// </summary>
-        public uint defaultPoolSizeKB = 4 * 1024;
-
-        /// <summary>
-        /// 底层播放缓存内存池.
-        ///This contains the audio processing buffers and DSP data.  
-        /// </summary>
-        public uint lowerPoolSizeKB = 2048;
-
-        /// <summary>
-        /// uLEngineDefaultPoolSize 内存池阀值
-        /// </summary>
-        public float memoryCutoffThreshold = 0.95f;
-
-        /// <summary>
-        /// 空间相关音频尺寸
-        /// </summary>
-        public uint spatialAudioPoolSizeKB = 4 * 1024;
-
-
-        /// <summary>
-        /// streaming pool
-        /// </summary>
-        public uint streamingPoolSizeKB = 2 * 1024;
-        /// <summary>
-        /// preparePool
-        /// </summary>
-        public uint preparePoolSizeKB = 0;
-        /// <summary>
-        /// mem max Pool length
-        /// </summary>
-        public uint maxPoolNum = 20;
-
-        
-        /// <summary>
-        /// 回调内存分配
-        /// </summary>
-        public int callbackManagerBufferSize = 4 * 1024;
-
-        //optional 
-        //  public string language = AkSoundEngineController.s_Language;
-
-
-        public string BankFolder_UnityEditor;
-        // public string WwiseInstallationPathMac = @"E:\Wwise 2017.2.8.6698\";
-        public CustomizeSettingData()
+        get
         {
-            Init();
+            if (instance == null)
+                instance = new AudioPluginManagement();
+            return instance;
         }
-
-        [System.Diagnostics.Conditional("UNITY_EDITOR")]
-        public void Init()
+    }
+    public readonly AKSettingsManager SettingMgr = new AKSettingsManager();
+    private AudioPluginSettingData settingData;
+    public AudioPluginSettingData SettingData
+    {
+        get
         {
-            BankFolder_UnityEditor = System.IO.Path.Combine(Application.dataPath, BankEditorAssetRelativePath);
-            AkBasePathGetter.FixSlashes(ref BankFolder_UnityEditor);
+            if (settingData == null)
+            {
+#if UNITY_EDITOR
+                settingData = TryLoadSettingFile();
+#else
+
+ customizeSettings = new AudioPluginSettingData();
+#endif
+            }
+            return settingData;
         }
     }
 
 
+
+
+
     public class AKSettingsManager
     {
-        private AkInitSettings akInitSetting;
+        private AkInitSettings initSettings;
         private AkSpatialAudioInitSettings spatialSetting;
         private AkPlatformInitSettings platformSetting;
         private AkMusicSettings musicSetting;
@@ -115,10 +63,10 @@ public class AudioPluginManagement
                 isInitialized = true;
             }
 
-            return Submit();
+            return RegisterSettings();
         }
 
-        bool Submit()
+        bool RegisterSettings()
         {
 #if UNITY_EDITOR
             AkSoundEngine.SetGameName(UnityEngine.Application.productName + " (Editor)");
@@ -126,8 +74,8 @@ public class AudioPluginManagement
 		AkSoundEngine.SetGameName(UnityEngine.Application.productName);
 #endif
 
-            AKRESULT result = AkSoundEngine.Init(memSetting, streamingSetting, deviceSetting, akInitSetting, platformSetting,
-                musicSetting, spatialSetting, SettingData.preparePoolSizeKB * 1024);
+            AKRESULT result = AkSoundEngine.Init(memSetting, streamingSetting, deviceSetting, initSettings, platformSetting,
+                musicSetting, spatialSetting, instance.SettingData.preparePoolSizeKB * 1024);
 
             if (result != AKRESULT.AK_Success)
             {
@@ -170,40 +118,41 @@ public class AudioPluginManagement
         void CreateInitSetting()
         {
             //自定义
-            akInitSetting = new AkInitSettings();
-            akInitSetting.uDefaultPoolSize = SettingData.defaultPoolSizeKB * 1024;
+            initSettings = new AkInitSettings();
+            AkSoundEngine.GetDefaultInitSettings(initSettings);
+            initSettings.uDefaultPoolSize = instance.SettingData.defaultPoolSizeKB * 1024;
             //可选
-            ///// Use a separate thread for loading sound banks. Allows asynchronous operations.
-            //akInitSetting.bUseSoundBankMgrThread = false;
+            // /// Use a separate thread for loading sound banks. Allows asynchronous operations.
+            // akInitSetting.bUseSoundBankMgrThread = false;
 
 
-            ////Memory pool where data allocated by AK::SoundEngine::PrepareEvent() and AK::SoundEngine::PrepareGameSyncs() will be done.
-            ///*source code
-            // * if (in_preparePoolSizeByte > 0)
-            //{
-            //    g_PrepareEventPoolId = AK::MemoryMgr::CreatePool(NULL, in_preparePoolSizeByte, AK_UNITY_DEFAULT_POOL_SIZE, AkMalloc);
-            //    AK::MemoryMgr::SetPoolName(g_PrepareEventPoolId, AKTEXT("PreparePool"));
-            //    in_pSettings->uPrepareEventMemoryPoolID = g_PrepareEventPoolId;
-            //}
-            //else
-            //{
-            //    g_PrepareEventPoolId = AK_INVALID_POOL_ID;
-            //}*/
-            //akInitSetting.uPrepareEventMemoryPoolID = 0;
-            ////0.0f to 1.0f value: The percentage of occupied memory where the sound engine should enter in Low memory Mode. 定义内存阈值
-            //akInitSetting.fDefaultPoolRatioThreshold = 1.0f;//无需更改,手动更改会造成加载失败问题
-            ////Use a separate thread for processing audio. If set to false, audio processing will occur in RenderAudio()
-            akInitSetting.bUseLEngineThread = false;
-            ////Sets to true to enable AK::SoundEngine::PrepareGameSync usage.
-            akInitSetting.bEnableGameSyncPreparation = false;
+            // //Memory pool where data allocated by AK::SoundEngine::PrepareEvent() and AK::SoundEngine::PrepareGameSyncs() will be done.
+            // /*source code
+            //  * if (in_preparePoolSizeByte > 0)
+            // {
+            //     g_PrepareEventPoolId = AK::MemoryMgr::CreatePool(NULL, in_preparePoolSizeByte, AK_UNITY_DEFAULT_POOL_SIZE, AkMalloc);
+            //     AK::MemoryMgr::SetPoolName(g_PrepareEventPoolId, AKTEXT("PreparePool"));
+            //     in_pSettings->uPrepareEventMemoryPoolID = g_PrepareEventPoolId;
+            // }
+            // else
+            // {
+            //     g_PrepareEventPoolId = AK_INVALID_POOL_ID;
+            // }*/
+            // akInitSetting.uPrepareEventMemoryPoolID = 0;
+            // //0.0f to 1.0f value: The percentage of occupied memory where the sound engine should enter in Low memory Mode. 定义内存阈值
+            // akInitSetting.fDefaultPoolRatioThreshold = 1.0f;//无需更改,手动更改会造成加载失败问题
+            // //Use a separate thread for processing audio. If set to false, audio processing will occur in RenderAudio()
+            // //Sets to true to enable AK::SoundEngine::PrepareGameSync usage.
+            //// akInitSetting.bUseLEngineThread = false;
+            //// akInitSetting.bEnableGameSyncPreparation = false;
 
 
 
-            akInitSetting.uMonitorPoolSize = (uint)AkSoundEngineController.s_MonitorPoolSize * 1024;
-            akInitSetting.uMonitorQueuePoolSize = (uint)AkSoundEngineController.s_MonitorQueuePoolSize * 1024;
+            initSettings.uMonitorPoolSize = (uint)AkSoundEngineController.s_MonitorPoolSize * 1024;
+            initSettings.uMonitorQueuePoolSize = (uint)AkSoundEngineController.s_MonitorQueuePoolSize * 1024;
             ///设置dll的路径
 #if (!UNITY_ANDROID && !PLATFORM_LUMIN && !UNITY_WSA) || UNITY_EDITOR // Exclude WSA. It only needs the name of the DLL, and no path.
-            akInitSetting.szPluginDLLPath = System.IO.Path.Combine(UnityEngine.Application.dataPath,
+            initSettings.szPluginDLLPath = System.IO.Path.Combine(UnityEngine.Application.dataPath,
                 "Plugins" + System.IO.Path.DirectorySeparatorChar);
 #elif PLATFORM_LUMIN && !UNITY_EDITOR
         akInitSetting.szPluginDLLPath = UnityEngine.Application.dataPath.Replace("Data", "bin") + System.IO.Path.DirectorySeparatorChar;
@@ -213,8 +162,8 @@ public class AudioPluginManagement
         {
             platformSetting = new AkPlatformInitSettings();
             AkSoundEngine.GetDefaultPlatformInitSettings(platformSetting);
-            platformSetting.uLEngineDefaultPoolSize = SettingData.lowerPoolSizeKB * 1024;
-            platformSetting.fLEngineDefaultPoolRatioThreshold = SettingData.memoryCutoffThreshold;
+            platformSetting.uLEngineDefaultPoolSize = instance.SettingData.lowerPoolSizeKB * 1024;
+            platformSetting.fLEngineDefaultPoolRatioThreshold = instance.SettingData.memoryCutoffThreshold;
             ////采样率设置:Sampling Rate. Set to 0 to get the native sample rate. Default value is 0. 
             //platformSettings.uSampleRate = 0;
             //// Lower engine threading properties. 
@@ -227,16 +176,16 @@ public class AudioPluginManagement
         {
             spatialSetting = new AkSpatialAudioInitSettings();
             /// Desired memory pool size if a new pool should be created. A pool will be created if uPoolID is not set (AK_INVALID_POOL_ID).
-            spatialSetting.uPoolSize = SettingData.spatialAudioPoolSizeKB * 1024;
+            spatialSetting.uPoolSize = instance.SettingData.spatialAudioPoolSizeKB * 1024;
             //Maximum number of portals that sound can propagate through; must be less than or equal to AK_MAX_SOUND_PROPAGATION_DEPTH.
             spatialSetting.uMaxSoundPropagationDepth = AkSoundEngine.AK_MAX_SOUND_PROPAGATION_DEPTH;
-            
+
             ////多普勒效应参数相关 Diffraction occurs when a sound wave strikes a small obstacle
-            //spatialSetting.uDiffractionFlags = AkDiffractionFlags.DefaultDiffractionFlags;
+            spatialSetting.uDiffractionFlags = (uint)AkDiffractionFlags.DefaultDiffractionFlags;
             //// Multiplier that is applied to the distance attenuation of diffracted sounds (sounds that are in the 'shadow region') to simulate the phenomenon where by diffracted sound waves decay faster than incident sound waves. 
             //spatialSetting.fDiffractionShadowAttenFactor = 1.0f;
             //// Interpolation angle, in degrees, over which the fDiffractionShadowAttenFactor is applied.  
-            //spatialSetting.fDiffractionShadowDegrees =0f;
+            //spatialSetting.fDiffractionShadowDegrees = 0f;
         }
 
         public void CreateMicsSettings()
@@ -244,7 +193,7 @@ public class AudioPluginManagement
             musicSetting = new AkMusicSettings();
             AkSoundEngine.GetDefaultMusicSettings(musicSetting);
             memSetting = new AkMemSettings();
-            memSetting.uMaxNumPools = SettingData.maxPoolNum;
+            memSetting.uMaxNumPools = instance.SettingData.maxPoolNum;
 
             deviceSetting = new AkDeviceSettings();
             //带回默认设置
@@ -252,39 +201,49 @@ public class AudioPluginManagement
 
             streamingSetting = new AkStreamMgrSettings();
             // Size of memory pool for small objects of Stream Manager.
-            streamingSetting.uMemorySize = SettingData.streamingPoolSizeKB * 1024;
+            streamingSetting.uMemorySize = instance.SettingData.streamingPoolSizeKB * 1024;
+
+
+        }
+    }
+    [System.Diagnostics.Conditional("UNITY_EDITOR")]
+    public static void SaveSettingFile()
+    {
+        var path = Path.Combine(Application.dataPath, "Wwise/config.xml");
+
+        if (!File.Exists(path))
+        {
+            var xmlDoc = new System.Xml.XmlDocument();
+            var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(AudioPluginSettingData));
+            using (var xmlStream = new System.IO.MemoryStream())
+            {
+                var streamWriter = new System.IO.StreamWriter(xmlStream, System.Text.Encoding.UTF8);
+                xmlSerializer.Serialize(streamWriter, Instance.SettingData);
+                xmlStream.Position = 0;
+                xmlDoc.Load(xmlStream);
+                xmlDoc.Save(path);
+            }
 
 
         }
     }
 
-
-    static CustomizeSettingData TryLoadSettingFile()
+    AudioPluginSettingData TryLoadSettingFile()
     {
-        CustomizeSettingData localConfigData;
+        AudioPluginSettingData localConfigData;
         try
         {
             var path = Path.Combine(Application.dataPath, "Wwise/config.xml");
             if (File.Exists(path))
             {
-                var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(CustomizeSettingData));
+                var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(AudioPluginSettingData));
                 var xmlFileStream = new System.IO.FileStream(path, System.IO.FileMode.Open, System.IO.FileAccess.Read);
-                localConfigData = xmlSerializer.Deserialize(xmlFileStream) as CustomizeSettingData;
+                localConfigData = xmlSerializer.Deserialize(xmlFileStream) as AudioPluginSettingData;
                 xmlFileStream.Close();
             }
             else
             {
-                localConfigData = new CustomizeSettingData();
-                var xmlDoc = new System.Xml.XmlDocument();
-                var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(CustomizeSettingData));
-                using (var xmlStream = new System.IO.MemoryStream())
-                {
-                    var streamWriter = new System.IO.StreamWriter(xmlStream, System.Text.Encoding.UTF8);
-                    xmlSerializer.Serialize(streamWriter, localConfigData);
-                    xmlStream.Position = 0;
-                    xmlDoc.Load(xmlStream);
-                    xmlDoc.Save(path);
-                }
+                localConfigData = new AudioPluginSettingData();
 
             }
             return localConfigData;
@@ -299,35 +258,10 @@ public class AudioPluginManagement
 
 
 
-    public static CustomizeSettingData SettingData
-    {
-        get
-        {
-            if (settingData == null)
-            {
-#if UNITY_EDITOR
-                settingData = TryLoadSettingFile();
-#else
-
- customizeSettings = new AudioPluginSettingData();
-#endif
-            }
-            return settingData;
-        }
-    }
-    private static CustomizeSettingData settingData;
 
 
 
-    private static AKSettingsManager settingMgr;
-    public static AKSettingsManager SettingMgr
-    {
-        get
-        {
-            if (settingMgr == null) settingMgr = new AKSettingsManager();
-            return settingMgr;
-        }
-    }
+
 
 
 
@@ -341,7 +275,7 @@ public class AudioPluginManagement
     {
 #if UNITY_EDITOR
 
-        return CustomizeSettingData.D_CreatedPicker;
+        return AudioPluginSettingData.D_CreatedPicker;
 
 #else
                     return false;
@@ -352,7 +286,7 @@ public class AudioPluginManagement
     {
 
 #if UNITY_EDITOR
-        CustomizeSettingData.D_CreatedPicker = usePicker;
+        AudioPluginSettingData.D_CreatedPicker = usePicker;
 #endif
     }
 
@@ -362,7 +296,7 @@ public class AudioPluginManagement
 #if UNITY_EDITOR
 
 
-        return CustomizeSettingData.D_CreateWwiseGlobal;
+        return AudioPluginSettingData.D_CreateWwiseGlobal;
 
 #else
           return ProjCustomizeSettings.CreateWwiseGlobal;
@@ -372,24 +306,46 @@ public class AudioPluginManagement
     {
 #if UNITY_EDITOR
 
-        return CustomizeSettingData.D_CreateWwiseListener;
+        return AudioPluginSettingData.D_CreateWwiseListener;
 #else
           return ProjCustomizeSettings.CreateWwiseListener;
 #endif
     }
+    /// <summary>
+    /// bank的最终目录
+    /// </summary>
+    /// <returns></returns>
     public static string GetBankAssetFolder()
     {
 #if UNITY_EDITOR
 
-        string path_unityEditor = System.IO.Path.Combine(Application.dataPath, CustomizeSettingData.BankEditorAssetRelativePath);
+        string path_unityEditor = System.IO.Path.Combine(Application.dataPath, AudioPluginSettingData.BankEditorAssetRelativePath);
         AkBasePathGetter.FixSlashes(ref path_unityEditor);
         return path_unityEditor;
-
-
 #else
                 return Application.streamingAssetsPath;
           //return Application.dataPath + "/StreamingAssets";
 #endif
+    }
+    public static string[] GetBankAssetNamesByFolder(string folder)
+    {
+        try
+        {
+            string assetFolder = GetBankAssetFolder();
+            if (string.IsNullOrEmpty(folder))
+            {
+                var paths = Directory.GetFiles(assetFolder, "*.bnk", SearchOption.TopDirectoryOnly);
+                for (int i = 0; i < paths.Length; i++)
+                    paths[i] = Path.GetFileName(paths[i]);
+                return paths;
+            }
+        }
+        catch (System.Exception e)
+        {
+
+        }
+        return null;
+
     }
 
 

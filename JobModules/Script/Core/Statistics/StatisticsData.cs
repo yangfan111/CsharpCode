@@ -16,7 +16,6 @@ namespace Core.Statistics
 
     public class StatisticsData
     {
-        public bool DataCollectSwitch;
         /// <summary>
         /// 击杀人数
         /// </summary>
@@ -241,17 +240,13 @@ namespace Core.Statistics
         /// 上次击杀的时间
         /// </summary>
         public int LastKillTime;
-
         /// <summary>
         /// 死亡的持续时间
         /// </summary>
         public int DeadTime;
-  
         /// <summary>
         /// 上次死亡的时间
         /// </summary>
         public int LastDeadTime;
-
-        public int Rank;
     }
 }

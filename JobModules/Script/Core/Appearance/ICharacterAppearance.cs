@@ -6,7 +6,6 @@ using System;
 using Core.Fsm;
 using System.Collections.Generic;
 using Core.CharacterController;
-using Core.EntityComponent;
 
 namespace Core.Appearance
 {
@@ -63,16 +62,16 @@ namespace Core.Appearance
         void AddMagazine();
         void EndReload();
 
-        WardrobeControllerBase GetWardrobeController();
-        WeaponControllerBase GetController<PlayerWeaponController>();
+        WardrobeController GetWardrobeController();
+        WeaponController GetController<PlayerWeaponController>();
 
         void Execute();
 
         // 同步用
-        void SyncLatestFrom(IGameComponent playerLatestAppearance);
-        void SyncPredictedFrom(IGameComponent playerPredictedAppearance);
-        void SyncLatestTo(IGameComponent playerLatestAppearance);
-        void SyncPredictedTo(IGameComponent playerPredictedAppearance);
+        void SyncFrom(ILatestAppearanceState state);
+        void SyncTo(ILatestAppearanceState state);
+        void SyncFrom(IPredictedPlaybackAppearanceState state);
+        void SyncTo(IPredictedPlaybackAppearanceState state);
         void TryRewind();
     }
 }

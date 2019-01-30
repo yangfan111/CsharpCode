@@ -41,7 +41,7 @@ namespace App.Shared.VehicleGameHandler
                     var player = _contexts.player.GetEntityWithEntityKey(e.TargetObject);
                     if (player != null)
                     {
-                        DoProcessDamageToPlayer(_contexts, player, e.Damage);
+                        DoProcessDamageToPlayer(player, e.Damage);
                     }
                     break;
                 case (int) EEntityType.Vehicle:
@@ -55,9 +55,9 @@ namespace App.Shared.VehicleGameHandler
             
         }
 
-        private void DoProcessDamageToPlayer(Contexts contexts, PlayerEntity player, float damage)
+        private void DoProcessDamageToPlayer(PlayerEntity player, float damage)
         {
-            VehicleDamageUtility.DoPlayerDamage(contexts, null, player, damage);
+            VehicleDamageUtility.DoPlayerDamage(null, player, damage);
         }
 
         private void DoProcessDamageToVehicle(VehicleEntity vehicle, float damage)

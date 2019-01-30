@@ -43,7 +43,6 @@
         DebugMessage,
         ClearScene,
         GameOver,
-        HeartBeat,
         Max
     }
 

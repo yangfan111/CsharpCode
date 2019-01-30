@@ -21,10 +21,49 @@ namespace App.Shared.Audio
             bankAtomSet = new AKBankAtomSet(handlerAgent);
             bankAtomSet.Add(AudioConfigSimulator.SimAKBankCfg(),handlerAgent);
         }
-        public AKRESULT LoadInitialBnkRes()
+        public AKRESULT Initialize()
         {
-            return TryLoadBnk("Weapon_Footstep");
+            if (IsInitialized) return AKRESULT.AK_Success;
+            if (!AkSoundEngine.IsInitialized())
+                return AKRESULT.AK_Fail;
+            string initAssetFold = null;
+            switch (AudioInfluence.LoadTactics)
+            {
+                case BankLoadTactics.LoadEntirely:
+                    break;
+                default:
+                    break;
+            }
+            string []assetNames = AudioPluginManagement.GetBankAssetNamesByFolder(initAssetFold);
+            foreach(string asset in assetNames)
+            {
+                AKBankAtom atom = bankAtomSet.Register(asset);
+                AKRESULT result = atom.LoadSync();
+                AudioUtil.AssertInProcess(result, "bank:{0}", atom.BankData.Name);
+            }
+            IsInitialized = true;
+            return AKRESULT.AK_Success;
+
         }
+        public AKRESULT RegisterBank(string bankName)
+        {
+            //var result = bankAtomSet.VertifyBankLoadLicense(bankName);
+            AKBankAtom atom = bankAtomSet.Register(bankName);
+            AKRESULT result = atom.LoadSync();
+            AudioUtil.AssertInProcess(result, "bank:{0}", bankName);
+            return result;
+
+        }
+        public AKRESULT TryLoadBnk(string bankName)
+        {
+            //var result = bankAtomSet.VertifyBankLoadLicense(bankName);
+            AKBankAtom atom = bankAtomSet.Register(bankName);
+            AKRESULT result = atom.LoadSync();
+            AudioUtil.AssertInProcess(result, "bank:{0}", bankName);
+            return result;
+
+        }
+
         public void LoadInitialBnkResAsync(System.Action callback)
         {
 
@@ -33,16 +72,7 @@ namespace App.Shared.Audio
         {
             return TryLoadBnk(serialId);
         }
-        public AKRESULT TryLoadBnk(string bankName)
-        {
-            var result = bankAtomSet.VertifyBankLoadLicense(bankName);
-            if (result != AKRESULT.AK_Success)
-                return result;
-            result = bankAtomSet.LoadSync(bankName);
-          //  handlerAgent.BroadcastBankLoadResult(bankName, result);
-            return result;
-
-        }
+      
         //public AKRESULT TryUnloadBnk(int cfgId)
         //{
         //    return TryUnloadBnk(GetBankName(cfgId));

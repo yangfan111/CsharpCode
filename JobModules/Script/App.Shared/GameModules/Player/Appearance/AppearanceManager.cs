@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using App.Shared.Components.Player;
-using App.Shared.GameModules.Player.Appearance.PropControllerPackage;
-using App.Shared.GameModules.Player.Appearance.WardrobeControllerPackage;
-using App.Shared.GameModules.Player.Appearance.WeaponControllerPackage;
 using Core.Appearance;
 using Core.CharacterState;
 using Core.Compare;
@@ -18,7 +14,6 @@ using Core.Fsm;
 using Assets.Utils.Configuration;
 using Core.CameraControl;
 using Core.CharacterController;
-using Core.EntityComponent;
 using Sharpen;
 using Utils.AssetManager;
 using Utils.Singleton;
@@ -27,7 +22,6 @@ namespace App.Shared.GameModules.Player.Appearance
 {
     public class AppearanceManager : ICharacterAppearance
     {
-       
         private LoggerAdapter _logger = new LoggerAdapter(typeof(AppearanceManager));
 
         private WeaponController _weaponController;
@@ -152,8 +146,6 @@ namespace App.Shared.GameModules.Player.Appearance
         public void PlayerDead()
         {
             ControlRagdoll(true);
-            UnmountWeaponFromHand();
-            SetThridPerson();
             _logger.DebugFormat("Player Dead");
         }
 
@@ -347,28 +339,28 @@ namespace App.Shared.GameModules.Player.Appearance
 
         #region Sync
 
-        public void SyncLatestFrom(IGameComponent playerLatestAppearance)
+        public void SyncFrom(ILatestAppearanceState state)
         {
-            _weaponController.SyncFromLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
-            _wardrobeController.SyncFromLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
-            _propController.SyncFromLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
+            _weaponController.SyncFromLatestWeaponState(state);
+            _wardrobeController.SyncFromLatestWardrobeState(state);
+            _propController.SyncFromLatestPropState(state);
         }
 
-        public void SyncPredictedFrom(IGameComponent playerPredictedAppearance)
+        public void SyncTo(ILatestAppearanceState state)
         {
-            _weaponController.SyncFromPredictedComponent((PredictedAppearanceComponent)playerPredictedAppearance);
+            _weaponController.SyncToLatestWeaponState(state);
+            _wardrobeController.SyncToLatestWardrobeState(state);
+            _propController.SyncToLatestPropState(state);
         }
 
-        public void SyncLatestTo(IGameComponent playerLatestAppearance)
+        public void SyncFrom(IPredictedPlaybackAppearanceState state)
         {
-            _weaponController.SyncToLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
-            _wardrobeController.SyncToLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
-            _propController.SyncToLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
+            _weaponController.SyncFromPredictedWeaponState(state);
         }
 
-        public void SyncPredictedTo(IGameComponent playerPredictedAppearance)
+        public void SyncTo(IPredictedPlaybackAppearanceState state)
         {
-            _weaponController.SyncToPredictedComponent((PredictedAppearanceComponent)playerPredictedAppearance);
+            _weaponController.SyncToPredictedWeaponState(state);
         }
 
         public void TryRewind()
@@ -484,12 +476,12 @@ namespace App.Shared.GameModules.Player.Appearance
             return _needUpdateActionField;
         }
 
-        public WardrobeControllerBase GetWardrobeController()
+        public WardrobeController GetWardrobeController()
         {
             return _wardrobeController;
         }
-        
-        public WeaponControllerBase GetController<PlayerWeaponController>()
+
+        public WeaponController GetController<PlayerWeaponController>()
         {
             return _weaponController;
         }

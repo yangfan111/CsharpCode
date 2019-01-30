@@ -1,50 +1,48 @@
-﻿using App.Shared.GameModules.Camera.Utils;
-using App.Shared.WeaponLogic.Bullet;
+﻿using Core.WeaponLogic;
 using Core.WeaponLogic.Bullet;
 using UnityEngine;
 
 namespace App.Shared.GameModules.Weapon.Bullet
 {
-    public class BulletFireInfoProvider
+    public class BulletFireInfoProviderDispatcher : IBulletFireInfoProviderDispatcher
     {
-        private IBulletFireInfo _sightBulletFireInfo;
-        private IBulletFireInfo _defaultBulletFireInfo;
-        private IBulletFireInfo _currentBulletFireInfo;
-        private Contexts _contexts;
-
-        public BulletFireInfoProvider(Contexts contexts)
+        private IPlayerWeaponState _playerWeaponState;
+        private IBulletFireInfoProvider _sightBulletFireInfoProvider;
+        private IBulletFireInfoProvider _defaultBulletFireInfoProvider;
+        private IBulletFireInfoProvider _currentBulletFireInfoProvider;
+        public BulletFireInfoProviderDispatcher(IPlayerWeaponState playerWeaponState)
         {
-            _sightBulletFireInfo = new SightBulletFireInfo();
-            _defaultBulletFireInfo = new DefaultBulletFireInfo();
-            _currentBulletFireInfo = _defaultBulletFireInfo;
-            _contexts = contexts;
+            _playerWeaponState = playerWeaponState;
+            _sightBulletFireInfoProvider = new SightBulletFireInfoProvider(playerWeaponState);
+            _defaultBulletFireInfoProvider = new DefaultBulletFireInfoProvider(playerWeaponState);
+            _currentBulletFireInfoProvider = _defaultBulletFireInfoProvider;
         }
 
-        public void Prepare(PlayerEntity playerEntity)
+        public void Prepare()
         {
-            if(playerEntity.IsAiming())
+            if(_playerWeaponState.IsAiming)
             {
-                _currentBulletFireInfo = _sightBulletFireInfo; 
+                _currentBulletFireInfoProvider = _sightBulletFireInfoProvider; 
             }
             else
             {
-                _currentBulletFireInfo = _defaultBulletFireInfo;
+                _currentBulletFireInfoProvider = _defaultBulletFireInfoProvider;
             }
         }
 
-        public Vector3 GetFireDir(int seed, PlayerEntity playerEntity, WeaponEntity weaponEntity)
+        public Vector3 GetFireDir(int seed)
         {
-            return _currentBulletFireInfo.GetFireDir(seed, playerEntity, weaponEntity, _contexts);
+            return _currentBulletFireInfoProvider.GetFireDir(seed);
         }
 
-        public Vector3 GetFireEmitPosition(PlayerEntity playerEntity)
+        public Vector3 GetFireEmitPosition()
         {
-            return _currentBulletFireInfo.GetFireEmitPosition(playerEntity, _contexts);
+            return _currentBulletFireInfoProvider.GetFireEmitPosition();
         }
 
-        public Vector3 GetFireViewPosition(PlayerEntity playerEntity)
+        public Vector3 GetFireViewPosition()
         {
-            return _currentBulletFireInfo.GetFireViewPosition(playerEntity, _contexts);
+            return _currentBulletFireInfoProvider.GetFireViewPosition();
         }
     }
 }

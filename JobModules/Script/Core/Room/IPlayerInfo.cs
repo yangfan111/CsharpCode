@@ -1,6 +1,5 @@
 ﻿using Core.Statistics;
 using System.Collections.Generic;
-using Entitas;
 
 namespace Core.Room
 {
@@ -34,6 +33,5 @@ namespace Core.Room
         long CreateTime { get; set; }
         int GameStartTime { get; set; }
         bool IsLogin { get; set; }
-        Entity PlayerEntity { get; set; }
     }
 }

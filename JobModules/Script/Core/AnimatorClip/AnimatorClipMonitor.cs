@@ -24,11 +24,11 @@ namespace Core.Animation
             _animationCleanEventCallback = action;
         }
 
-        public void SetAnimatorClipsTime(int? weaponId)
+        public void SetAnimatorClipsTime(int weaponId)
         {
-            if (weaponId.HasValue)   //有枪
+            if (weaponId > 0)   //有枪
             {
-                var config = SingletonManager.Get<WeaponDataConfigManager>().GetConfigById(weaponId.Value);
+                var config = SingletonManager.Get<WeaponDataConfigManager>().GetConfigById(weaponId);
                 if(null != config)
                     _animatorClips = config.AnimatorStateTimes;
             }

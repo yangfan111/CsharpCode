@@ -74,7 +74,7 @@ public class AkInitializer : UnityEngine.MonoBehaviour
 
 	public static string GetBasePath()
 	{
-        return AudioPluginManagement.GetBankAssetFolder();
+        return AudioPluginSettingAgent.GetBankAssetFolder();
         //        return WwiseSettings.LoadSettings().SoundbankPath;
         //#if UNITY_EDITOR
         //        return WwiseSettings.LoadSettings().SoundbankPath;

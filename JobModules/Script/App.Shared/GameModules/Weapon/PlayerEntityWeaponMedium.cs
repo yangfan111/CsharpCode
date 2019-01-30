@@ -1,7 +1,6 @@
 ﻿using App.Shared.EntityFactory;
 using App.Shared.Player;
 using App.Shared.Util;
-using App.Shared.WeaponLogic;
 using Assets.Utils.Configuration;
 using Core;
 using Core.Common;
@@ -153,18 +152,21 @@ namespace App.Shared.GameModules.Weapon
         {
             ProcessListener.OnExpend(entity, slot);
         }
-        public void Player_ClearPlayerWeaponState(Contexts contexts)
+        public void Player_ClearPlayerWeaponState()
         {
-            entity.ClearPlayerWeaponState(contexts);
+            entity.ClearPlayerWeaponState();
         }
-        public void Player_RefreshPlayerWeaponLogic(Contexts contexts, int id)
+        public void Player_RefreshPlayerWeaponLogic(int id )
         {
-            entity.RefreshPlayerWeaponLogic(contexts, id);
+            entity.RefreshPlayerWeaponLogic(id);
         }
-        public void Apperance_RefreshABreath(Contexts contexts)
+        public void Weapon_SetAttachment(WeaponPartsStruct attachments)
         {
-            //TODO 动态获取
-            var breath = entity.GetWeaponConfig(contexts).GetBreathFactor();
+            entity.weaponLogic.Weapon.SetAttachment(attachments);
+        }
+        public void Apperance_RefreshABreath()
+        {
+            var breath = entity.weaponLogic.Weapon.GetBreathFactor();
             entity.appearanceInterface.FirstPersonAppearance.SightShift.SetAttachmentFactor(breath);
         }
         public void Model_RefreshWeaponModel(int weaponId,EWeaponSlotType slot,WeaponPartsStruct attachments)

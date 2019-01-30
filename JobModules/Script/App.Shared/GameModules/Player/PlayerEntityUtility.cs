@@ -280,33 +280,27 @@ namespace App.Shared.GameModules.Player
             //Logger.InfoFormat("replay pose, networkAnimatior:BaseClientTime{0}, server Time:{1}", networkAnimator.BaseClientTime, networkAnimator.BaseServerTime);
             
             // Animation
-            Animator.ClearAnimatorJobContainer();
-            
             PoseReplayer.ReplayPose(networkAnimator.AnimatorLayers, networkAnimator.AnimatorParameters,
                 player.thirdPersonAnimator.UnityAnimator);
-            
-            Animator.BatchUpdate();
-            Animator.ClearAnimatorJobContainer();
 
             // equipment(pan)
             var appearanceInterface = player.appearanceInterface;
-            appearanceInterface.Appearance.SyncLatestFrom(player.latestAppearance);
-            appearanceInterface.Appearance.SyncPredictedFrom(appearance);
-            appearanceInterface.Appearance.TryRewind();
-            
             var characterBoneInterface = player.characterBoneInterface;
             var thirdPersonAppearance = player.thirdPersonAppearance;
             var characterBone = player.characterBone;
             var characterControllerInterface = player.characterControllerInterface;
-            
+            appearanceInterface.Appearance.SyncFrom(player.latestAppearance);
+            appearanceInterface.Appearance.SyncFrom(appearance);
+            appearanceInterface.Appearance.TryRewind();
             characterBoneInterface.CharacterBone.Peek(thirdPersonAppearance.PeekDegree);
-            var param = new CodeRigBoneParam
+
+            CodeRigBoneParam param = new CodeRigBoneParam
             {
                 PitchAmplitude = orientation.Pitch,
                 OverlayAnimationWeight = networkAnimator.AnimatorLayers[NetworkAnimatorLayer.PlayerUpperBodyOverlayLayer].Weight,
                 PostureWhenOverlay = thirdPersonAppearance.Posture,
                 // 预测时，IK不生效
-                IKActive = ActiveIK(thirdPersonAppearance.Action, thirdPersonAppearance.Posture, thirdPersonAppearance.Movement),
+                IKActive = ActiveIK(thirdPersonAppearance.Action, thirdPersonAppearance.Posture),
                 HeadPitch = characterBone.PitchHeadAngle,
                 HeadYaw = characterBone.RotHeadAngle,
                 HandPitch = characterBone.PitchHandAngle,
@@ -335,11 +329,10 @@ namespace App.Shared.GameModules.Player
             player.characterContoller.Value.SetCurrentControllerType(ThirdPersonPostureTool.ConvertToPostureInConfig(thirdPersonAppearance.Posture));
         }
         
-        public static bool ActiveIK(ThirdPersonAction action, ThirdPersonPosture posture, ThirdPersonMovement movement)
+        public static bool ActiveIK(ThirdPersonAction action, ThirdPersonPosture posture)
         {
-            return action == ThirdPersonAction.EndOfTheWorld &&
-                   !IKFilter.IsInThirdPersonPostureFilters(posture) &&
-                   movement != ThirdPersonMovement.Sprint;
+            return (action == ThirdPersonAction.EndOfTheWorld) &&
+                   !IKFilter.IsInThirdPersonPostureFilters(posture);
         }
 
         public static void GetCapsule(PlayerEntity player, Vector3 position, out Vector3 pBottom, out Vector3 pUp, out float radius)

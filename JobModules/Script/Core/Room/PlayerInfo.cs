@@ -1,7 +1,6 @@
 ﻿using Core;
 using Core.Statistics;
 using Core.Utils;
-using Entitas;
 using System.Collections.Generic;
 
 namespace Core.Room
@@ -90,7 +89,6 @@ namespace Core.Room
         public int Camp { get; set; }
         public PlayerWeaponBagData[] WeaponBags { get; set; }
         public StatisticsData StatisticsData { get; set; }
-        public Entity PlayerEntity { get; set; }
     }
 
     public class PlayerWeaponData
@@ -160,14 +158,14 @@ namespace Core.Room
             {
                 case EWeaponSlotType.None:
                     return 0;
-                case EWeaponSlotType.PrimeWeapon:
-                case EWeaponSlotType.SecondaryWeapon:
+                case EWeaponSlotType.PrimeWeapon1:
+                case EWeaponSlotType.PrimeWeapon2:
                     return 1;
-                case EWeaponSlotType.PistolWeapon:
+                case EWeaponSlotType.SubWeapon:
                     return 2;
                 case EWeaponSlotType.MeleeWeapon:
                     return 3;
-                case EWeaponSlotType.ThrowingWeapon:
+                case EWeaponSlotType.GrenadeWeapon:
                     return 4;
                 case EWeaponSlotType.TacticWeapon:
                     return 7;
@@ -184,15 +182,15 @@ namespace Core.Room
                 case 0:
                     return EWeaponSlotType.None;
                 case 1:
-                    return EWeaponSlotType.PrimeWeapon;
+                    return EWeaponSlotType.PrimeWeapon1;
                 case 2:
-                    return EWeaponSlotType.PistolWeapon;
+                    return EWeaponSlotType.SubWeapon;
                 case 3:
                     return EWeaponSlotType.MeleeWeapon;
                 case 4:
                 case 5:
                 case 6:
-                    return EWeaponSlotType.ThrowingWeapon;
+                    return EWeaponSlotType.GrenadeWeapon;
                 case 7:
                     return EWeaponSlotType.TacticWeapon;
                 default:

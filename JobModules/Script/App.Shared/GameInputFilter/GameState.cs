@@ -9,14 +9,14 @@ namespace App.Shared.GameInputFilter
     {
         private EPlayerState _playerStae;
         private HashSet<EPlayerInput> _avaliableInputs;
-        private HashSet<EPlayerInput> _unavaliableInputs = new HashSet<EPlayerInput>(CommonIntEnumEqualityComparer<EPlayerInput>.Instance);
+        private HashSet<EPlayerInput> _unavaliableInputs = new HashSet<EPlayerInput>(CommonEnumEqualityComparer<EPlayerInput>.Instance);
         public GameState(EPlayerState state, HashSet<EPlayerInput> inputList)
         {
             _playerStae = state;
             _avaliableInputs = inputList;
             if(null == _avaliableInputs)
             {
-                _avaliableInputs = new HashSet<EPlayerInput>(CommonIntEnumEqualityComparer<EPlayerInput>.Instance); 
+                _avaliableInputs = new HashSet<EPlayerInput>(CommonEnumEqualityComparer<EPlayerInput>.Instance); 
             }
             for(var e = EPlayerInput.None + 1; e < EPlayerInput.Length; e++)
             {

@@ -1,11 +1,16 @@
 ﻿using App.Shared.GameModules.Weapon;
 using App.Shared.GameModules.Player;
+using App.Shared.Player;
 using App.Shared.Util;
+using Assets.Utils.Configuration;
+using Assets.XmlConfig;
+using Core;
 using Core;
 using Core.Configuration;
 using Core.EntityComponent;
 using Core.GameModeLogic;
 using Core.Utils;
+using System;
 using UnityEngine;
 
 namespace App.Shared.GameModeLogic.PickupLogic
@@ -15,24 +20,22 @@ namespace App.Shared.GameModeLogic.PickupLogic
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(NormalPickupLogic));
         protected SceneObjectContext _sceneObjectContext;
         protected PlayerContext _playerContext;
-        protected Contexts _contexts;
         private ISceneObjectEntityFactory _sceneObjectEntityFactory;
         private int _sceneWeaponLifeTime;
         private RuntimeGameConfig _runtimeGameConfig;
         private AutoPickupLogic _autoPickupLogic;
-        public NormalPickupLogic(
-            Contexts contexts,
+        public NormalPickupLogic(SceneObjectContext sceneObjectContext,
+            PlayerContext playerContext,
             ISceneObjectEntityFactory sceneObjectEntityFactory,
             RuntimeGameConfig runtimeGameConfig,
             int sceneWeaponLifetime)
         {
-            _contexts = contexts;
-            _sceneObjectContext = contexts.sceneObject;
-            _playerContext = contexts.player;
+            _sceneObjectContext = sceneObjectContext;
+            _playerContext = playerContext;
             _sceneObjectEntityFactory = sceneObjectEntityFactory;
             _sceneWeaponLifeTime = sceneWeaponLifetime;
             _runtimeGameConfig = runtimeGameConfig;
-            _autoPickupLogic = new AutoPickupLogic(contexts, sceneObjectEntityFactory);
+            _autoPickupLogic = new AutoPickupLogic(sceneObjectContext, playerContext, sceneObjectEntityFactory);
         }
 
         public virtual void DoPickup(int playerEntityId, int weaponEntityId)
@@ -63,7 +66,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
                 return;
             }
             _sceneObjectEntityFactory.DestroyEquipmentEntity(entity.entityKey.Value.EntityId);
-            var last = player.GetController<PlayerWeaponController>().PickUpWeapon(_contexts, entity.weapon.ToWeaponInfo());
+            var last = player.GetController<PlayerWeaponController>().PickUpWeapon(entity.weapon.ToWeaponInfo());
             if (last.Id > 0)
             {
                 _sceneObjectEntityFactory.CreateDropWeaponEntity(last, player.position.Value, _sceneWeaponLifeTime);
@@ -90,11 +93,11 @@ namespace App.Shared.GameModeLogic.PickupLogic
             }
             switch (slot)
             {
-                case EWeaponSlotType.ThrowingWeapon:
+                case EWeaponSlotType.GrenadeWeapon:
                     DoDropGrenade(player);
                     return; 
             }
-            var curWeapon = player.GetController<PlayerWeaponController>().GetSlotWeaponInfo(_contexts, slot);
+            var curWeapon = player.GetController<PlayerWeaponController>().GetSlotWeaponInfo(slot);
             if (curWeapon.Id > 0)
             {
                 var dropPos = player.GetHandWeaponPosition();
@@ -127,7 +130,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
                         sceneObjectEntity = _sceneObjectEntityFactory.CreateDropWeaponEntity(curWeapon, playerTrans.position, _sceneWeaponLifeTime) as SceneObjectEntity;
                     }
                 }
-                player.GetController<PlayerWeaponController>().DropSlotWeapon(_contexts, slot);
+                player.GetController<PlayerWeaponController>().DropSlotWeapon(slot);
             }
         }
 

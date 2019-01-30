@@ -13,13 +13,13 @@ namespace App.Shared.GameInputFilter
 
     public class PlayerStateMatrix
     {
-        Dictionary<EPlayerState, HashSet<EPlayerInput>> _conditions = new Dictionary<EPlayerState, HashSet<EPlayerInput>>(CommonIntEnumEqualityComparer<EPlayerState>.Instance);
+        Dictionary<EPlayerState, HashSet<EPlayerInput>> _conditions = new Dictionary<EPlayerState, HashSet<EPlayerInput>>(CommonEnumEqualityComparer<EPlayerState>.Instance);
 
         public void AddCondition(EPlayerState state, EPlayerInput input)
         {
             if (!_conditions.ContainsKey(state))
             {
-                _conditions[state] = new HashSet<EPlayerInput>(CommonIntEnumEqualityComparer<EPlayerInput>.Instance);
+                _conditions[state] = new HashSet<EPlayerInput>(CommonEnumEqualityComparer<EPlayerInput>.Instance);
             }
             _conditions[state].Add(input);
         }

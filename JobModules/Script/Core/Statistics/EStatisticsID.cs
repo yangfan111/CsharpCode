@@ -38,6 +38,7 @@
         /// 总开枪数 
         /// </summary>
         public const int ShootingCount = 9;
+        //public const int AliveCircle = 7;
         /// <summary>
         /// 总命中数
         /// </summary>
@@ -99,7 +100,7 @@
         /// </summary>
         public const int UseThrowingCount = 24;
         /// <summary>
-        /// 单局存活时间
+        /// 单据存活时间
         /// </summary>
         public const int SurvivalTime = 25;
         /// <summary>
@@ -154,121 +155,6 @@
         /// 死亡时长
         /// </summary>
         public const int DeadTime = 38;
-        /// <summary>
-        /// C4成功放置次数
-        /// </summary>
-        public const int C4SetCount = 39;
-        /// <summary>
-        /// C4成功引爆次数
-        /// </summary>
-        public const int C4DetonationCount = 40;
-        /// <summary>
-        /// C4成功拆除次数
-        /// </summary>
-        public const int C4DefuseCount = 41;
-        /// <summary>
-        /// 回合数
-        /// </summary>
-        public const int RoundCount = 42;
-        /// <summary>
-        /// 胜利
-        /// </summary>
-        public const int GameWin = 43;
-        /// <summary>
-        /// 失败
-        /// </summary>
-        public const int GameLose = 44;
-        /// <summary>
-        /// 感染人类次数
-        /// </summary>
-        public const int InfectCount = 45;
-        /// <summary>
-        /// 变成英雄次数
-        /// </summary>
-        public const int HeroCount = 46;
-        /// <summary>
-        /// 释放技能次数
-        /// </summary>
-        public const int SkillUseCount = 47;
-        /// <summary>
-        /// 捡补给箱次数
-        /// </summary>
-        public const int PickupBackupCount = 48;
-        /// <summary>
-        /// 被感染次数
-        /// </summary>
-        public const int InfectedCount = 49;
-        /// <summary>
-        /// 击杀英雄次数
-        /// </summary>
-        public const int HeroKill = 50;
-        /// <summary>
-        /// 击杀母体次数
-        /// </summary>
-        public const int BroodKill = 51;
-        /// <summary>
-        /// 成为变异体时长
-        /// </summary>
-        public const int InfectedTime = 52;
-        /// <summary>
-        /// 成为英雄时长
-        /// </summary>
-        public const int HeroTime = 53;
-        /// <summary>
-        /// 解锁等级
-        /// </summary>
-        public const int UnlockInfectLvl = 54;
-        /// <summary>
-        /// 生存（人类获胜）
-        /// </summary>
-        public const int InfectSurvivalWin = 55;
-        /// <summary>
-        /// 近战攻击数
-        /// </summary>
-        public const int MeleeAttackCount = 56;
-        /// <summary>
-        /// 近战命中数
-        /// </summary>
-        public const int MeleeHitCount = 57;
-        /// <summary>
-        /// 有效近战命中数
-        /// </summary>
-        public const int MeleeHit = 58;
-        /// <summary>
-        /// 近战爆头数
-        /// </summary>
-        public const int MeleeCrit = 59;
-        
-        /// <summary>
-        /// 首杀
-        /// </summary>
-        public const int GetFirstBlood = 61;
-        
-        /// <summary>
-        /// 治疗队友
-        /// </summary>
-        public const int HealVolume = 65;
-        /// <summary>
-        /// 守护C4时击杀敌人人数
-        /// </summary>
-        public const int C4ProtectKill = 66;
-
-        /// <summary>
-        /// 存活毒圈数
-        /// </summary>
-        public const int AliveCircle = 116;
-        /// <summary>
-        /// 单局参加人数
-        /// </summary>
-        public const int SectionPlayerCount = 117;
-        /// <summary>
-        /// 模式队伍人数
-        /// </summary>
-        public const int ModePlayerCount = 118;
-        /// <summary>
-        /// 普通击杀数
-        /// </summary>
-        public const int NormalKills = 119;
 
         /// <summary>
         /// 被步枪类武器击杀

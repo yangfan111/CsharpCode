@@ -71,6 +71,7 @@ namespace App.Shared.Audio
                 return triggerTypeBehaviors;
             }
         }
+        
         public void PrepareEvent(int eventId,GameObject target)
         {
             //typesController.VarySwitchState()
@@ -111,7 +112,7 @@ namespace App.Shared.Audio
             }
             else
             {
-                AKAudioEntry.AudioLogger.ErrorFormat("[Audio=>Dispather]Perform bank Load Sync fail,result:{0},bankName:{1},target:{2}", ret, evtCfg.bankRef,target);
+                AudioUtil.AssertInProcess(ret,"Perform bank Load Sync fail,result:{0},bankName:{1},target:{2}", ret, evtCfg.bankRef, target);
             }
         }
         public void PrepareEvent(int eventId)
@@ -137,14 +138,14 @@ namespace App.Shared.Audio
         }
         void HandleAKGroupResult(AKRESULT result,int group,string state,GameObject target )
         {
-            if(result!=AKRESULT.AK_Success)
-            {
-                AKAudioEntry.AudioLogger.ErrorFormat("[Audio=>Dispather]Perform AKGroup fail,result:{0},errgroup:{1},errState:{2},target:{3}", result, group, string.IsNullOrEmpty(state) ?"default": state, target);
-            }
-            else
-            {
-                AKAudioEntry.AudioLogger.Info("[Audio=>Dispather]Perform AKGroup sucess");
-            }
+            //if(result!=AKRESULT.AK_Success)
+            //{
+            //    AKAudioEntry.AudioLogger.ErrorFormat("[Audio=>Dispather]Perform AKGroup fail,result:{0},errgroup:{1},errState:{2},target:{3}", result, group, string.IsNullOrEmpty(state) ?"default": state, target);
+            //}
+            //else
+            //{
+            //    AKAudioEntry.AudioLogger.Info("[Audio=>Dispather]Perform AKGroup sucess");
+            //}
         }
     }
 }

@@ -1,6 +1,7 @@
-﻿using Core.CameraControl.NewMotor;
+﻿using App.Shared.Components;
+using Core.CameraControl.NewMotor;
+using Core.CharacterState.Movement;
 using System.Collections.Generic;
-using App.Shared.Components.Player;
 using XmlConfig;
 
 namespace App.Shared.GameInputFilter
@@ -27,18 +28,6 @@ namespace App.Shared.GameInputFilter
             {
                 return _playerStates;
             }
-
-            var gamePlay = _playerEntity.gamePlay;
-            switch ((EPlayerLifeState)gamePlay.LifeState)
-            {
-                case EPlayerLifeState.Dead:
-                    _playerStates.Add(EPlayerState.Dead);
-                    break;
-                case EPlayerLifeState.Dying:
-                    _playerStates.Add(EPlayerState.Dying);
-                    break;
-            }
-            
             var actionState = _playerEntity.stateInterface.State.GetActionState();
             switch (actionState)
             {
@@ -108,6 +97,9 @@ namespace App.Shared.GameInputFilter
                     break;
                 case PostureInConfig.Dive:
                     _playerStates.Add(EPlayerState.Dive);
+                    break;
+                case PostureInConfig.Dying:
+                    _playerStates.Add(EPlayerState.Dying);
                     break;
                 case PostureInConfig.Jump:
                     _playerStates.Add(EPlayerState.Jump);

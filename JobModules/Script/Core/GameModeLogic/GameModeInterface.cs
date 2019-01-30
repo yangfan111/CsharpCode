@@ -40,6 +40,7 @@ namespace Core.GameModeLogic
         EWeaponSlotType GetWeaponSlotByIndex(int index);
         bool IsSlotValid(EWeaponSlotType slot);
         EWeaponSlotType[] AvaliableSlots { get; }
+        void AllocateWeaponComponents(Entity playerEntity);
     }
 
     public interface IWeaponProcessListener
@@ -114,6 +115,11 @@ namespace Core.GameModeLogic
         public EWeaponSlotType[] AvaliableSlots
         {
             get { return _slotLibrary.AvaliableSlots; }
+        }
+        
+        public  void AllocateWeaponComponents(Entity playerEntity)
+        {
+            _slotLibrary.AllocateWeaponComponents(playerEntity);
         }
 
         #endregion

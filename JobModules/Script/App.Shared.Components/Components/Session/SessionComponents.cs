@@ -27,7 +27,6 @@ using Core.SyncLatest;
 using Core.UpdateLatest;
 using Core.Utils;
 using Core.WeaponLogic;
-using Core.WeaponLogic.Attachment;
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
 using UnityEngine;
@@ -44,6 +43,9 @@ namespace App.Shared.Components
         [DontInitilize] public ISceneObjectEntityFactory SceneObjectEntityFactory { get; set; }
         [DontInitilize] public IMapObjectEntityFactory MapObjectEntityFactory { get; set; }
         [DontInitilize] public ISoundEntityFactory SoundEntityFactory { get; set; }
+        [DontInitilize] public IBulletEntityFactory BulletEntityFactory { get; set; }
+        [DontInitilize]public IWeaponLogicFactory WeaponLogicFactory { get; set; }
+        [DontInitilize]public IWeaponLogicComponentsFactory WeaponLogicComponentsFactory { get; set; }
     }
 
     /// <summary>
@@ -78,11 +80,9 @@ namespace App.Shared.Components
         [DontInitilize]public IBulletInfoCollector BulletInfoCollector { get; set; }
         [DontInitilize]public ILevelManager LevelManager { get; set; }
         [DontInitilize]public Vector3 InitPosition { get; set; }
-        [DontInitilize] public IWeaponLogicManager WeaponLogicManager { get; set; }
-        [DontInitilize] public IPlayerWeaponConfigManager PlayerWeaponConfigManager { get; set; }
     }
     
-    public enum EClientSessionStates
+     public enum EClientSessionStates
     {
         LoadConfig,
         LoadSubResourceConfig,

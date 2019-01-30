@@ -13,7 +13,7 @@ namespace Core.Configuration
 
     public class PlayerSoundConfigManager : AbstractConfigManager<PlayerSoundConfigManager>, IPlayerSoundConfigManager
     {
-        Dictionary<EPlayerSoundType, List<int>> _soundTypeDic = new Dictionary<EPlayerSoundType, List<int>>(CommonIntEnumEqualityComparer<EPlayerSoundType>.Instance);
+        Dictionary<EPlayerSoundType, List<int>> _soundTypeDic = new Dictionary<EPlayerSoundType, List<int>>(CommonEnumEqualityComparer<EPlayerSoundType>.Instance);
         public override void ParseConfig(string xml)
         {
             var config = XmlConfigParser<PlayerSoundConfig>.Load(xml);

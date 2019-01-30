@@ -37,7 +37,7 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
 
                 Debug.LogFormat("remove weapon: " + index);
 
-                p.GetController<PlayerWeaponController>().DropSlotWeapon(args.GameContext, currentSlot);
+                p.GetController<PlayerWeaponController>().DropSlotWeapon(currentSlot);
 
                 //SimpleProto message = new SimpleProto();
                 //message.Key = FreeMessageConstant.ChangeAvatar;

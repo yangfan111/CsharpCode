@@ -202,19 +202,5 @@ namespace Core.CharacterController
         {
             return new KeyValuePair<float, float>(-180f,180f);
         }
-
-        public virtual void DrawBoundingBox()
-        {
-            var characterTransformToCapsuleBottom = _motor.CharacterTransformToCapsuleBottom;
-            var characterTransformToCapsuleTop = _motor.CharacterTransformToCapsuleTop;
-            //DebugDraw.EditorDrawCapsule(transform.position + transform.rotation * characterTransformToCapsuleBottom, transform.position + transform.rotation * characterTransformToCapsuleTop, radius, Color.magenta);
-            DebugDraw.DebugCapsule(transform.position + transform.rotation * characterTransformToCapsuleBottom, transform.position + transform.rotation * characterTransformToCapsuleTop, Color.magenta, radius);
-        }
-
-        public void DrawLastGroundHit()
-        {
-            //DebugDraw.EditorDrawArrow(GetLastGroundHitPoint(), GetLastGroundNormal(), Color.red);
-            DebugDraw.DebugArrow(GetLastGroundHitPoint(), GetLastGroundNormal(), Color.red);
-        }
     }
 }

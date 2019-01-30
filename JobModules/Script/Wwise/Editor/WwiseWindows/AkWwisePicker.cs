@@ -21,7 +21,7 @@ public class AkWwisePicker : UnityEditor.EditorWindow
 
 	private void OnEnable()
 	{
-		if (string.IsNullOrEmpty(AudioPluginManagement.DeveloperWwiseProjectPath))
+		if (string.IsNullOrEmpty(AudioPluginSettingAgent.DeveloperWwiseProjectPath))
 			return;
 
 		treeView.SaveExpansionStatus();
@@ -83,7 +83,7 @@ public class AkWwisePicker : UnityEditor.EditorWindow
 	public static void PopulateTreeview()
 	{
 		treeView.AssignDefaults();
-		treeView.SetRootItem(System.IO.Path.GetFileNameWithoutExtension(AudioPluginManagement.DeveloperWwiseProjectPath),
+		treeView.SetRootItem(System.IO.Path.GetFileNameWithoutExtension(AudioPluginSettingAgent.DeveloperWwiseProjectPath),
 			AkWwiseProjectData.WwiseObjectType.PROJECT);
 		treeView.PopulateItem(treeView.RootItem, "Events", AkWwiseProjectInfo.GetData().EventWwu);
 		treeView.PopulateItem(treeView.RootItem, "Switches", AkWwiseProjectInfo.GetData().SwitchWwu);

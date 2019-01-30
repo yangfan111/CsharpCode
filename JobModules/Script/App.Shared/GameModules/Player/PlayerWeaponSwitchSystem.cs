@@ -1,19 +1,19 @@
 ﻿using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
+using App.Shared.Util;
 using Core;
+using Core.Common;
 using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Player
 {
     public class PlayerWeaponSwitchSystem : IUserCmdExecuteSystem
     {
-        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerWeaponSwitchSystem));
-        private Contexts _contexts;
-        public PlayerWeaponSwitchSystem(Contexts contexts)
+        public PlayerWeaponSwitchSystem()
         {
-            _contexts = contexts;
         } 
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerWeaponSwitchSystem));
        /// <summary>
        /// 切换槽位
        /// </summary>
@@ -46,8 +46,7 @@ namespace App.Shared.GameModules.Player
                 }
             }
             var newSlot = playerEntity.modeLogic.ModeLogic.GetSlotByIndex(cmd.CurWeapon);
-            playerEntity.GetController<PlayerWeaponController>().SwitchIn(_contexts, newSlot);
-            //playerEntity.GetController<PlayerWeaponController>().PureSwitchIn(newSlot);
+            playerEntity.GetController<PlayerWeaponController>().SwitchIn(newSlot);
             //if (!playerEntity.hasWeaponComponentAgent)
             //{
             //    Logger.Error("No bag attached to player");

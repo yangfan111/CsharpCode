@@ -10,7 +10,7 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
     class DeadPoseMotor:NormalPoseMotor
     {
         private DeadCameraConfig _config;
-        public DeadPoseMotor(ECameraPoseMode modeId, CameraConfig config, HashSet<ECameraPoseMode> excludes, IMotorActive active,DeadCameraConfig deadConfig) : base(modeId, config, excludes, active)
+        public DeadPoseMotor(ECameraPoseMode modeId, CameraConfigItem config, HashSet<ECameraPoseMode> excludes, IMotorActive active,DeadCameraConfig deadConfig) : base(modeId, config, excludes, active)
         {
             _config = deadConfig;
 

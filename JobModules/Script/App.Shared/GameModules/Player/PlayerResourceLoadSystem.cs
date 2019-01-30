@@ -17,7 +17,6 @@ using Core.HitBox;
 using Utils.Appearance;
 using Core.WeaponAnimation;
 using App.Shared.GameModules.Player.Appearance.AnimationEvent;
-using App.Shared.GameModules.Player.Appearance.WeaponControllerPackage;
 using App.Shared.GameModules.Player.ConcreteCharacterController;
 using App.Shared.Player;
 using Core.CharacterController;
@@ -39,9 +38,9 @@ namespace App.Shared.GameModules.Player
         private readonly ThirdPersonModelLoadHandler _p3Handler;
         private readonly InterceptPool _interceptPool = new InterceptPool();
         
-        public PlayerResourceLoadSystem(Contexts contexts) : base(contexts.player)
+        public PlayerResourceLoadSystem(PlayerContext contexts) : base(contexts)
         {
-            _player = contexts.player;
+            _player = contexts;
             _p1Handler = new FirstPersonModelLoadHandler(contexts);
             _p3Handler = new ThirdPersonModelLoadHandler(contexts);
         }
@@ -104,12 +103,10 @@ namespace App.Shared.GameModules.Player
         public class ModelLoadHandler
         {
             private PlayerContext _playerContext;
-            private Contexts _contexts;
 
-            public ModelLoadHandler(Contexts contexts)
+            public ModelLoadHandler(PlayerContext playerContext)
             {
-                _playerContext = contexts.player;
-                _contexts = contexts;
+                _playerContext = playerContext;
             }
 
             protected void HandleLoadedModel(PlayerEntity player, GameObject obj)
@@ -140,7 +137,7 @@ namespace App.Shared.GameModules.Player
                     character.AddComponent<EntityReference>();
                     character.GetComponent<EntityReference>().Init(player.entityAdapter);
                     var comp = character.AddComponent<PlayerVehicleCollision>();
-                    comp.AllContext = _contexts;
+                    comp.Context = _playerContext;
 
                     var appearanceManager = new AppearanceManager();
                     player.AddAppearanceInterface(appearanceManager);
@@ -152,13 +149,8 @@ namespace App.Shared.GameModules.Player
                     var characterBone = new CharacterBoneManager();
                     characterBone.SetWardrobeController(player.appearanceInterface.Appearance.GetWardrobeController());
                     characterBone.SetWeaponController(player.appearanceInterface.Appearance.GetController<PlayerWeaponController>());
-                    var weaponController = player.appearanceInterface.Appearance.GetController<PlayerWeaponController>() as WeaponController;
-                    if (null != weaponController)
-                    {
-                        weaponController.SetWeaponChangedCallBack(characterBone.CurrentWeaponChanged);
-                        weaponController.SetCacheChangeAction(characterBone.CacheChangeCacheAction);
-                    }
-                    
+                    player.appearanceInterface.Appearance.GetController<PlayerWeaponController>().SetWeaponChangedCallBack(characterBone.CurrentWeaponChanged);
+                    player.appearanceInterface.Appearance.GetController<PlayerWeaponController>().SetCacheChangeAction(characterBone.CacheChangeCacheAction);
                     player.AddCharacterBoneInterface(characterBone);
 
                     player.AddRecycleableAsset(character);
@@ -168,7 +160,7 @@ namespace App.Shared.GameModules.Player
 
         public class FirstPersonModelLoadHandler : ModelLoadHandler
         {
-            public FirstPersonModelLoadHandler(Contexts contexts): base(contexts)
+            public FirstPersonModelLoadHandler(PlayerContext playerContext): base(playerContext)
             {
                 
             }
@@ -240,7 +232,7 @@ namespace App.Shared.GameModules.Player
 
         public class ThirdPersonModelLoadHandler : ModelLoadHandler
         {
-            public ThirdPersonModelLoadHandler(Contexts contexts) : base(contexts)
+            public ThirdPersonModelLoadHandler(PlayerContext playerContext) : base(playerContext)
             {
                 
             }

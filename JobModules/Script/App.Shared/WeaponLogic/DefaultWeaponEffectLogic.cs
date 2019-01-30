@@ -1,8 +1,11 @@
-﻿using App.Shared.Components;
+﻿using System.Reflection;
+using App.Shared.Components;
 using App.Shared.EntityFactory;
 using Core.Utils;
 using Core.WeaponLogic;
+using UnityEngine;
 using WeaponConfigNs;
+using Core.WeaponLogic.Common;
 using Utils.CharacterState;
 using XmlConfig;
 using App.Shared.GameModules.Player;
@@ -10,71 +13,73 @@ using Core.Event;
 
 namespace App.Shared.GameModules.Weapon
 {
-    public class DefaultWeaponEffectLogic : IWeaponEffectLogic
+    public class DefaultWeaponEffectLogic : AbstractAttachableWeaponLogic<DefaultWeaponEffectConfig, int>, IWeaponEffectLogic
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(DefaultWeaponEffectLogic));
         private ClientEffectContext _context;
         private IEntityIdGenerator _idGenerator;
-        private DefaultWeaponEffectConfig _config;
+        private DefaultWeaponLogicConfig _defaultWeaponLogicConfig;
+        private DoubleWeaponLogicConfig _doubleweapnLogicConfig;
 
-        public DefaultWeaponEffectLogic(ClientEffectContext context, IEntityIdGenerator idGenerator, DefaultWeaponEffectConfig config)
+        public DefaultWeaponEffectLogic(ClientEffectContext context, IEntityIdGenerator idGenerator, DefaultWeaponEffectConfig config): base(config)
         {
-            _config = config;
             _context = context;
             _idGenerator = idGenerator;
         }
-
-        public void OnAfterFire(PlayerEntity playerEntity, WeaponEntity weaponEntity, IWeaponCmd cmd)
+        public override void Apply(DefaultWeaponEffectConfig baseConfig, DefaultWeaponEffectConfig output, int arg)
         {
-            CreateFireEvent(playerEntity);
+            output.Spark = arg != 0 ? arg : baseConfig.Spark;
         }
 
-        public void CreateFireEvent(PlayerEntity playerEntity)
+        public void CreateFireEvent(IPlayerWeaponState playerState)
         {
-            if (null == playerEntity)
+            var player = playerState.Owner as PlayerEntity;
+            if (null == player)
             {
                 Logger.Error("player state owner is not player or null !");
                 return;
             }
-            if (playerEntity.hasLocalEvents)
+            if (player.hasLocalEvents)
             {
                 var e = EventInfos.Instance.Allocate(EEventType.Fire, false);
-                playerEntity.localEvents.Events.AddEvent(e);
+                player.localEvents.Events.AddEvent(e);
             }
         }
 
-        public void CreatePullBoltEffect(PlayerEntity playerEntity)
+        public void CreatePullBoltEffect(IPlayerWeaponState playerState)
         {
-            if (null == playerEntity)
+            var player = playerState.Owner as PlayerEntity;
+            if (null == player)
             {
                 Logger.Error("player state owner is not player or null !");
                 return;
             }
 
          
-            if (playerEntity.hasLocalEvents)
+            if (player.hasLocalEvents)
             {
                 var e = EventInfos.Instance.Allocate(EEventType.PullBolt, false);
-                playerEntity.localEvents.Events.AddEvent(e);
+                player.localEvents.Events.AddEvent(e);
             }
         }
 
-        public void PlayBulletDropEffect(PlayerEntity playerEntity)
+        public void PlayBulletDropEffect(IPlayerWeaponState playerState)
         {
-            if (null == playerEntity)
+            var player = playerState.Owner as PlayerEntity;
+            if (null == player)
             {
                 Logger.Error("player state owner is not player or null !");
                 return;
             }
 
-            var appearance = playerEntity.appearanceInterface.Appearance;
-            var characterBone = playerEntity.characterBoneInterface.CharacterBone;
-            var owner = playerEntity.entityKey.Value;
+            var appearance = player.appearanceInterface.Appearance;
+            var characterBone = player.characterBoneInterface.CharacterBone;
+            var owner = player.entityKey.Value;
 
             var ejectTrans = characterBone.GetLocation(SpecialLocation.EjectionLocation, appearance.IsFirstPerson ? CharacterView.FirstPerson : CharacterView.ThirdPerson);
             if (null != ejectTrans)
             {
-                ClientEffectFactory.CreateBulletDrop(_context, _idGenerator, owner, ejectTrans.position, playerEntity.orientation.Yaw, playerEntity.orientation.Pitch, _config.BulletDrop);
+                ClientEffectFactory.CreateBulletDrop(_context, _idGenerator, owner, ejectTrans.position, playerState.ViewYaw, playerState.ViewPitch, _config.BulletDrop);
             }
             else
             {
@@ -82,21 +87,22 @@ namespace App.Shared.GameModules.Weapon
             }
         }
 
-        public void PlayMuzzleSparkEffect(PlayerEntity playerEntity)
+        public void PlayMuzzleSparkEffect(IPlayerWeaponState playerState)
         {
-            if (null == playerEntity)
+            var player = playerState.Owner as PlayerEntity;
+            if (null == player)
             {
                 Logger.Error("player state owner is not player or null !");
                 return;
             }
 
-            var appearance = playerEntity.appearanceInterface.Appearance;
-            var characterBone = playerEntity.characterBoneInterface.CharacterBone;
-            var owner = playerEntity.entityKey.Value;
+            var appearance = player.appearanceInterface.Appearance;
+            var characterBone = player.characterBoneInterface.CharacterBone;
+            var owner = player.entityKey.Value;
             var muzzleTrans = characterBone.GetLocation(SpecialLocation.MuzzleEffectPosition, appearance.IsFirstPerson ? CharacterView.FirstPerson : CharacterView.ThirdPerson);
             if (null != muzzleTrans)
             {
-                ClientEffectFactory.CreateMuzzleSparkEffct(_context, _idGenerator, owner, muzzleTrans, playerEntity.orientation.Pitch, playerEntity.orientation.Yaw, _config.Spark);
+                ClientEffectFactory.CreateMuzzleSparkEffct(_context, _idGenerator, owner, muzzleTrans, playerState.ViewPitch, playerState.ViewYaw, _config.Spark);
             }
             else
             {
@@ -104,18 +110,19 @@ namespace App.Shared.GameModules.Weapon
             }
         }
 
-        public void PlayPullBoltEffect(PlayerEntity playerEntity)
+        public void PlayPullBoltEffect(IPlayerWeaponState playerState)
         {
-            if (null == playerEntity)
+            var player = playerState.Owner as PlayerEntity;
+            if (null == player)
             {
                 Logger.Error("player state owner is not player or null !");
                 return;
             }
 
-            var owner = playerEntity.entityKey.Value;
-            var effectPos = PlayerEntityUtility.GetThrowingEmitPosition(playerEntity);
-            float effectYaw = (playerEntity.orientation.Yaw + 90)%360;
-            float effectPitch = playerEntity.orientation.Pitch;
+            var owner = player.entityKey.Value;
+            var effectPos = PlayerEntityUtility.GetThrowingEmitPosition(player);
+            float effectYaw = (playerState.ViewYaw + 90)%360;
+            float effectPitch = playerState.ViewPitch;
             int effectId = 32;
             int effectTime = 3000;
 

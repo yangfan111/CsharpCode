@@ -1,4 +1,5 @@
-﻿using System;
+﻿using App.Shared.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,7 +32,7 @@ namespace   App.Shared.Audio
        
         public bool IsGameObjectGroupVailed(int groupId,UnityEngine.GameObject target)
         {
-            AKAudioEntry.AudioAssert(target != null);
+            CommonUtil.WeakAssert(target != null);
             int instanceId = target.GetInstanceID();
             return typeSwitch_GameObjHash_Datas.ContainsKey(instanceId);
         }
@@ -39,7 +40,7 @@ namespace   App.Shared.Audio
 
         public AKRESULT VarySwitchState(int groupId, UnityEngine.GameObject target, string state = "")
         {
-            AKAudioEntry.AudioAssert(target != null);
+            CommonUtil.WeakAssert(target != null);
             int instanceId = target.GetInstanceID();
             AKSwitchGroup group;
             AKRESULT ret;

@@ -1,5 +1,4 @@
 ﻿using Assets.XmlConfig;
-using Core.EntityComponent;
 using Core.Enums;
 using System;
 using System.Collections.Generic;
@@ -11,26 +10,14 @@ namespace Core
     public enum EWeaponSlotType
     {
         None = 0,
-        PrimeWeapon,
-        SecondaryWeapon,
-        PistolWeapon,
+        PrimeWeapon1,
+        PrimeWeapon2,
+        SubWeapon,
         MeleeWeapon,
-        ThrowingWeapon,
+        GrenadeWeapon,
         TacticWeapon,
         Length,
     }
-
-    public enum EWeaponBagIndex
-    {
-        None = 0,
-        First,
-        Second,
-        Third,
-        Forth,
-        Fifth,
-        Length,
-    } 
-
     public enum EWeaponSlotsGroupType
     {
         Default,
@@ -58,7 +45,6 @@ namespace Core
         public int LowerRail;
         public int Bullet;
         public int ReservedBullet;
-        public int weaponKey;
         public readonly static WeaponInfo Empty = new WeaponInfo();
         public override string ToString()
         {

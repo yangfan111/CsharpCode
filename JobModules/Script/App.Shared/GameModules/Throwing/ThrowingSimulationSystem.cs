@@ -30,8 +30,6 @@ using UltimateFracturing;
 using Utils.Singleton;
 using App.Shared.Util;
 using App.Shared.GameModules.Weapon;
-using App.Shared.WeaponLogic;
-using Assets.Utils.Configuration;
 
 namespace App.Shared.GameModules.Throwing
 {
@@ -84,6 +82,7 @@ namespace App.Shared.GameModules.Throwing
 
         private List<IThrowingSegment> _allThrowingSegments = new List<IThrowingSegment>();
         private ThrowingSegmentComparator _comparator = new ThrowingSegmentComparator();
+        private object weaponState;
 
         public void Update(EntityKey ownerKey, int frameTime)
         {
@@ -125,7 +124,7 @@ namespace App.Shared.GameModules.Throwing
                     if(!throwing.throwingData.IsFly)
                     {
                         player.stateInterface.State.FinishGrenadeThrow();
-                        CastGrenade(_contexts, player);
+                        CastGrenade(player);
                     }
                     continue;
                 }
@@ -175,14 +174,14 @@ namespace App.Shared.GameModules.Throwing
             }
         }
 
-        private void CastGrenade(Contexts contexts, PlayerEntity playerEntity)
+        private void CastGrenade(PlayerEntity playerEntity)
         {
             if(!playerEntity.throwingAction.ActionInfo.IsReady)
             {
                 return;
             }
             playerEntity.throwingAction.ActionInfo.ClearState();
-            playerEntity.GetController<PlayerWeaponController>().OnExpend(contexts, EWeaponSlotType.ThrowingWeapon);
+            playerEntity.GetController<PlayerWeaponController>().OnExpend(EWeaponSlotType.GrenadeWeapon);
         }
 
         private void OldRaycast()
@@ -256,12 +255,15 @@ namespace App.Shared.GameModules.Throwing
 
         private void StartFlying(PlayerEntity playerEntity, ThrowingEntity throwingEntity)
         {
-            var dir = BulletDirUtility.GetThrowingDir(playerEntity);
+            IPlayerWeaponState playerWeapon = playerEntity.weaponLogic.State;
+            var dir = BulletDirUtility.GetThrowingDir(playerWeapon);
             Vector3 vel = dir * throwingEntity.throwingData.InitVelocity;
             Vector3 pos = PlayerEntityUtility.GetThrowingEmitPosition(playerEntity);
             throwingEntity.position.Value = pos;
             throwingEntity.throwingData.Velocity = vel;
             throwingEntity.throwingData.IsFly = true;
+            //扔掉手雷
+            playerWeapon.LastGrenadeId = playerEntity.grenade.Id;
 
             if (SharedConfig.IsServer)
             {
@@ -270,22 +272,20 @@ namespace App.Shared.GameModules.Throwing
                 if (!args.Triggers.IsEmpty((int)EGameEvent.WeaponState))
                 {
                     SimpleParaList dama = new SimpleParaList();
-                    //TODO 确认逻辑
-                    dama.AddFields(new ObjectFields(playerEntity));
-                    var weaponData = playerEntity.GetCurrentWeaponData(_contexts);
-                    dama.AddPara(new IntPara("CarryClip", playerEntity.GetController<PlayerWeaponController>().GetReservedBullet()));
-                    dama.AddPara(new IntPara("Clip", weaponData.Bullet));
-                    var config = SingletonManager.Get<WeaponConfigManager>().GetConfigById(weaponData.WeaponId);
-                    dama.AddPara(new IntPara("ClipType", null == config ? 0 : config.Caliber));
-                    dama.AddPara(new IntPara("id", weaponData.WeaponId));
+                    dama.AddFields(new ObjectFields(playerWeapon));
+                    dama.AddPara(new IntPara("CarryClip", playerWeapon.ReservedBulletCount));
+                    dama.AddPara(new IntPara("Clip", playerWeapon.LoadedBulletCount));
+                    dama.AddPara(new IntPara("ClipType", (int)playerWeapon.Caliber));
+                    dama.AddPara(new IntPara("id", (int)playerWeapon.CurrentWeapon));
                     SimpleParable sp = new SimpleParable(dama);
 
-                    args.Trigger((int)EGameEvent.WeaponState, new TempUnit[] { new TempUnit("state", sp), new TempUnit("current", (FreeData)(playerEntity).freeData.FreeData) });
+                    args.Trigger((int)EGameEvent.WeaponState, new TempUnit[] { new TempUnit("state", sp), new TempUnit("current", (FreeData)((PlayerEntity)playerWeapon.Owner).freeData.FreeData) });
                 }
             }
-
+            playerWeapon.LastGrenadeId = 0;
+            playerWeapon.IsThrowingStartFly = false;
             //清理状态
-            CastGrenade(_contexts, playerEntity);
+            CastGrenade(playerEntity);
         }
 
         private void ExplosionEffect(ThrowingEntity throwing)

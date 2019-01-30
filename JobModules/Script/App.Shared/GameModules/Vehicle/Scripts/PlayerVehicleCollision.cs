@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Common;
 using Core.Utils;
@@ -10,7 +13,7 @@ namespace App.Shared.GameModules.Vehicle
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerVehicleCollision));
 
-        public Contexts AllContext;
+        public PlayerContext Context;
 
         private PlayerEntity _playerEntity;
         private float _lastCollisionTime;
@@ -40,8 +43,8 @@ namespace App.Shared.GameModules.Vehicle
                         var damage = CalcPlayerCollisionDamage(vehicle);
                         if (DamageEnabled && damage > 0.0f)
                         {
-                            var sourcePlayer = vehicle.hasOwnerId ? AllContext.player.GetEntityWithEntityKey(vehicle.ownerId.Value) : null;
-                            VehicleDamageUtility.DoPlayerDamage(AllContext, sourcePlayer, _playerEntity, damage);
+                            var sourcePlayer = vehicle.hasOwnerId ? Context.GetEntityWithEntityKey(vehicle.ownerId.Value) : null;
+                            VehicleDamageUtility.DoPlayerDamage(sourcePlayer, _playerEntity, damage);
                         }
                         _lastCollisionTime = collisionTime;
                     }

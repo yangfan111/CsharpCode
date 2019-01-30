@@ -13,6 +13,9 @@ namespace App.Shared.Terrains
         //Terrain width/height
         float TerrainSize { get; }
 
+        Vector3 OriginPosition { get; }
+        Vector3 Size { get; }
+
         //Friction
         STFriction GetFriction(Vector3 worldPos);
         float GetGripFriction(Vector3 worldPos);

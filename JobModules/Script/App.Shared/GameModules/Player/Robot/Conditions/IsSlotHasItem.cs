@@ -5,7 +5,6 @@ using System.Text;
 using App.Shared.GameModules.Common;
 using App.Shared.GameModules.Player.Robot.SharedVariables;
 using App.Shared.GameModules.Weapon;
-using App.Shared.WeaponLogic;
 using BehaviorDesigner.Runtime.Tasks;
 using Core;
 
@@ -31,8 +30,7 @@ namespace App.Shared.GameModules.Player.Robot.Conditions
                
                 if (mEntity != null )
                 {
-                    //return !mEntity.GetController<PlayerWeaponController>().GetSlotWeaponInfo(SlotType.Value).Equals(new WeaponInfo())?TaskStatus.Success:TaskStatus.Failure;
-                    return mEntity.HasWeapon(SlotType.Value)?TaskStatus.Success:TaskStatus.Failure;
+                    return !mEntity.GetController<PlayerWeaponController>().GetSlotWeaponInfo(SlotType.Value).Equals(new WeaponInfo())?TaskStatus.Success:TaskStatus.Failure;
                 }
             }
 

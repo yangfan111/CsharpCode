@@ -22,7 +22,6 @@ namespace App.Shared.GameModules.Player.Actions
                 player.thirdPersonAnimator.UnityAnimator.applyRootMotion = false;
             if(player.hasThirdPersonModel)
                 player.thirdPersonModel.Value.transform.localPosition.Set(0, 0, 0);
-            ResetConcretAction();
         }
 
         public void PlayerDead(PlayerEntity player)
@@ -31,7 +30,6 @@ namespace App.Shared.GameModules.Player.Actions
                 player.thirdPersonAnimator.UnityAnimator.applyRootMotion = false;
             if(player.hasThirdPersonModel)
                 player.thirdPersonModel.Value.transform.localPosition.Set(0, 0, 0);
-            ResetConcretAction();
         }
 
         public void Update(PlayerEntity player)

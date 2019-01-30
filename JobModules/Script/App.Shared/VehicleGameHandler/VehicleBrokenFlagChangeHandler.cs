@@ -17,14 +17,12 @@ namespace App.Shared.VehicleGameHandler
         private const float MaxOverlapRadius = 20.0f;
 
         private PlayerContext _playerContext;
-        private Contexts _contexts;
 
         private HashSet<Entity> _processedEntities;
 
-        public VehicleBrokenFlagChangeHandler(Contexts contexts, VehicleTypeMatcher matcher) : base(matcher)
+        public VehicleBrokenFlagChangeHandler(PlayerContext context, VehicleTypeMatcher matcher) : base(matcher)
         {
-            _contexts = contexts;
-            _playerContext = contexts.player;
+            _playerContext = context;
             _processedEntities = new HashSet<Entity>();
         }
 
@@ -56,7 +54,7 @@ namespace App.Shared.VehicleGameHandler
         {
             PlayerEntity sourcePlayer = null;
             var damageType = GetDamageType(vehicle, out sourcePlayer);
-            VehicleDamageUtility.DoDamageToAllPassgers(_contexts, vehicle, float.MaxValue, damageType, sourcePlayer);
+            VehicleDamageUtility.DoDamageToAllPassgers(_playerContext, vehicle, float.MaxValue, damageType, sourcePlayer);
         }
 
         private void DoExlopsionDamageToNeighboringObjects(VehicleEntity vehicle)
@@ -139,7 +137,7 @@ namespace App.Shared.VehicleGameHandler
             PlayerEntity sourcePlayer;
             var damageType = GetDamageType(explodedVehicle, out sourcePlayer);
 
-            VehicleDamageUtility.DoPlayerDamage(_contexts, sourcePlayer, player, damage, damageType);
+            VehicleDamageUtility.DoPlayerDamage(sourcePlayer, player, damage, damageType);
         }
 
         private EUIDeadType GetDamageType(VehicleEntity explodedVehicle, out PlayerEntity sourcePlayer)

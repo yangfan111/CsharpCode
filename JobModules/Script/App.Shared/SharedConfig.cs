@@ -91,11 +91,6 @@ namespace App.Shared
         public static bool InSamplingMode = false;
         public static bool InLegacySampleingMode = false;
         public static int ModeId = 1002;
-
-        /// <summary>
-        /// 是否显示self角色包围盒
-        /// </summary>
-        public static bool ShowCharacterBoundingBox = false;
         // Disable Occlusion Culling
         public static bool EnableOC = true;
         // Disable Distance Culling

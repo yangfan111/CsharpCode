@@ -15,11 +15,11 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
         static FreeWeaponUtil()
         {
             types = new EWeaponSlotType[7];
-            types[1] = EWeaponSlotType.PrimeWeapon;
-            types[2] = EWeaponSlotType.SecondaryWeapon;
-            types[3] = EWeaponSlotType.PistolWeapon;
+            types[1] = EWeaponSlotType.PrimeWeapon1;
+            types[2] = EWeaponSlotType.PrimeWeapon2;
+            types[3] = EWeaponSlotType.SubWeapon;
             types[4] = EWeaponSlotType.MeleeWeapon;
-            types[5] = EWeaponSlotType.ThrowingWeapon;
+            types[5] = EWeaponSlotType.GrenadeWeapon;
             types[6] = EWeaponSlotType.TacticWeapon;
 
             partTypes = new EWeaponPartType[6];
@@ -73,7 +73,7 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
                 return types[index];
             }
 
-            return EWeaponSlotType.PrimeWeapon;
+            return EWeaponSlotType.PrimeWeapon1;
         }
     }
 }

@@ -3,8 +3,7 @@ using Core.Event;
 using Core.ObjectPool;
 using Entitas;
 using UnityEngine;
-using App.Shared.GameModules.Weapon;
-using App.Shared.Audio;
+using Core.Audio;
 
 namespace App.Shared.Player.Events
 {
@@ -43,18 +42,11 @@ namespace App.Shared.Player.Events
         public override void DoEventClient( Entitas.IContexts contexts, IEntity entity, IEvent e)
         {
             var playerEntity = entity as PlayerEntity;
-            var allContexts = contexts as Contexts;
             if (playerEntity != null)
             {
-                playerEntity.weaponEffect.PlayList.Add(XmlConfig.EClientEffectType.MuzzleSpark);
-                if (playerEntity.appearanceInterface.Appearance.IsFirstPerson)
-                {
-                    GameAudioMedium.PerformOnGunFire();
-                }
-                else
-                {
-                    GameAudioMedium.PerformOnGunFire();
-                }
+               
+                playerEntity.weaponLogic.WeaponEffect.PlayMuzzleSparkEffect(playerEntity.weaponLogic.State);
+                GameAudioMedium.PerformOnGunFire(playerEntity.weaponLogic.State);
             }
         }
 
@@ -63,7 +55,7 @@ namespace App.Shared.Player.Events
         public override bool ClientFilter(IEntity entity, IEvent e)
         {
             var playerEntity = entity as PlayerEntity;
-            return playerEntity != null && playerEntity.hasWeaponState;
+            return playerEntity != null && playerEntity.hasWeaponLogic&&playerEntity.hasWeaponState;
         }
      
     }

@@ -19,6 +19,7 @@ namespace Core.GameModule.System
     {
         ISceneObjectEntityFactory SceneObjectEntityFactory { get; set; }
         ISoundEntityFactory SoundEntityFactory{ get; set; }
+        IBulletEntityFactory BulletEntityFactory{ get; set; }
     }
 
     public interface ICommonSessionObjects

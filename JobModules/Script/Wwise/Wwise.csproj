@@ -125,7 +125,10 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd" />
   </Target>
   <ItemGroup>
+    <Compile Include="F:\voyager\UnityPackages\Wwise\AKMemManager.cs" />
     <Compile Include="F:\voyager\UnityPackages\Wwise\AkBankManagerExt.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\AudioPluginManagement.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\AudioPluginSettingData.cs" />
     <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AKRESULT.cs" />
     <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\Ak3DSpatializationMode.cs" />
     <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkActionOnEventType.cs" />

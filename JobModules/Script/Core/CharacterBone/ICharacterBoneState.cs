@@ -8,7 +8,6 @@ namespace Core.CharacterBone
 {
     public interface ICharacterBoneState
     {
-        bool EnableIK { get; set; }
         float PitchHeadAngle { get; set; }
         float RotHeadAngle { get; set; }
         float PitchHandAngle { get; set; }

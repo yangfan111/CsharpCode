@@ -1,7 +1,5 @@
 ﻿using Assets.Utils.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using Core.Utils;
 using UnityEngine;
 using WeaponConfigNs;
@@ -9,6 +7,8 @@ using Utils.Singleton;
 using Utils.Configuration;
 using XmlConfig;
 using App.Shared.Util;
+using App.Shared.GameModules.Weapon;
+using Entitas;
 
 namespace App.Shared.Audio
 {
@@ -17,7 +17,17 @@ namespace App.Shared.Audio
 
         private static readonly LoggerAdapter audioLogger = new LoggerAdapter(typeof(AKAudioDispatcher));
 
+        public static void ProcessWeaponAudio(PlayerEntity entity,Contexts contexts, Func<AudioWeaponItem, int> propertyFilter)
+        {
+            var weaponController = entity.GetController<PlayerWeaponController>();
+            int? weaponId = weaponController.CurrSlotWeaponId(contexts);
+            if (!weaponId.HasValue)
+                return;
+            AudioEventItem evtConfig = SingletonManager.Get<AudioWeaponManager>().FindById(weaponId.Value, propertyFilter);
+            CommonUtil.WeakAssert(evtConfig != null, "Event Config err:{0}", weaponId.Value);
+       //     AKAudioEntry.Dispatcher.PostEvent(evtConfig,weaponController.CurrSlotWeaponId)
 
+        }
         /// <summary>
         /// 枪械开火
         /// </summary>
@@ -30,11 +40,12 @@ namespace App.Shared.Audio
             AudioEventItem evtConfig = SingletonManager.Get<AudioWeaponManager>().FindById(weaponId, propertyFilter);
             CommonUtil.WeakAssert(evtConfig != null, "AudioEventItem not find");
             AKRESULT ret = AKAudioEntry.Dispatcher.PostEvent(evtConfig, target);
-            if (ret != AKRESULT.AK_Success)
-            {
-                ReportException(ret, () => throw new AudioFrameworkException(string.Format("result:{0},source:{1}", ret, evtConfig)));
-            }
+            AudioUtil.AssertInProcess(ret, "result:{0},source:{1}", ret, evtConfig);
+            
         }
+
+    
+
         private static void ReportException(AKRESULT ret, Action onExcepProcess)
         {
             if (onExcepProcess == null)
@@ -70,7 +81,7 @@ namespace App.Shared.Audio
 #endif
             if (!AKAudioEntry.PrepareReady) return;
             NewWeaponConfigItem weaponCfg = SingletonManager.Get<WeaponConfigManager>().GetConfigById(weaponId);
-            ProcessWeaponSwitch(weaponCfg);
+        //    ProcessWeaponSwitch(weaponCfg);
         }
         /// <summary>
         /// 枪械模式更换
@@ -86,8 +97,8 @@ namespace App.Shared.Audio
             // NewWeaponConfigItem weaponCfg = WeaponConfigManager.Instance.GetConfigById(weaponState.CurrentWeapon);
             //   var fireModelCfg = WeaponConfigManager.Instance.GetFireModeCountById(weaponState.CurrentWeapon);
             AKEventCfg evtCfg = AudioConfigSimulator.SimAKEventCfg1();
-            testWeaponModel = testWeaponModel == "Gun_shot_mode_type_single" ? "Gun_shot_mode_type_triple" : "Gun_shot_mode_type_single";
-            AKAudioEntry.Dispatcher.VarySwitchState(evtCfg.switchGroup, testWeaponModel, weaponGo);
+            //testWeaponModel = testWeaponModel == "Gun_shot_mode_type_single" ? "Gun_shot_mode_type_triple" : "Gun_shot_mode_type_single";
+            //AKAudioEntry.Dispatcher.VarySwitchState(evtCfg.switchGroup, testWeaponModel, weaponGo);
 
         }
         public static void PostAutoRegisterGameObjAudio(Vector3 position, bool createObject)

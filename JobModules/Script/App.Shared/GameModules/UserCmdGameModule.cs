@@ -11,12 +11,12 @@ using App.Shared.GameModules.Throwing;
 using App.Shared.GameModules.Vehicle;
 using Assets.App.Shared.GameModules.Camera;
 using Assets.App.Shared.GameModules.Player;
-using Assets.Utils.Configuration;
+using Core;
 using Core.BulletSimulation;
 using Core.Compensation;
 using Core.GameModule.Module;
 using Core.GameModule.System;
-using Utils.Singleton;
+using Core.IFactory;
 
 namespace App.Shared.GameModules
 {
@@ -46,15 +46,14 @@ namespace App.Shared.GameModules
             AddSystem(new PlayerGrenadeInventorySyncSystem());
             //AddSystem(new CameraUpdateArchorSystem(contexts));
             AddSystem(new PlayerRotateLimitSystem());
-            AddSystem(new CameraPreUpdateSystem(contexts, motors));
+            AddSystem(new CameraPreUpdateSystem(contexts.vehicle,contexts.freeMove,motors));
             AddSystem(new BulletSimulationSystem(contexts, compensationWorldFactory, bulletHitHandler));
-            AddSystem(new PlayerAttackSystem(contexts));
+            AddSystem(new PlayerAttackSystem());
             AddSystem(new MeleeAttackSystem(contexts, compensationWorldFactory, meleeHitHandler));
             AddSystem(new ThrowingSimulationSystem(contexts, compensationWorldFactory, throwingHitHandler, contexts.session.entityFactoryObject.SoundEntityFactory));
-            AddSystem(new PlayerBulletGenerateSystem(contexts, SingletonManager.Get<WeaponConfigManager>()));
-
-            AddSystem(new PlayerWeaponSwitchSystem(contexts));
-            AddSystem(new PlayerWeaponDrawSystem(contexts));
+            
+            AddSystem(new PlayerWeaponSwitchSystem());
+            AddSystem(new PlayerWeaponDrawSystem());
             if (!SharedConfig.IsServer)
             {
                 AddSystem(new PlayerSkyMoveStateUpdateSystem(contexts));
@@ -76,7 +75,7 @@ namespace App.Shared.GameModules
 
             if (!SharedConfig.IsServer)
             {
-                AddSystem(new PlayerSpecialZoneEventSystem(contexts));
+                AddSystem(new PlayerSpecialZoneEventSystem());
             }
             AddSystem(new PlayerControlledVehicleUserCmdExecuteSystem());
             AddSystem(new UpdatePlayerPositionOnVehicle(contexts));
@@ -86,7 +85,7 @@ namespace App.Shared.GameModules
                 AddSystem(new VehicleCameraUpdateSystem(contexts));
             AddSystem(new PlayerOxygenEnergySystem(contexts.vehicle));
             AddSystem(new PlayerCustomInputUpdateSystem());
-            AddSystem(new PlayerClimbActionSystem());
+            AddSystem(new GenericActionSystem());
             if(!SharedConfig.IsServer)
                 AddSystem(new PlayerStateUpdateSystem(contexts));
             else
@@ -118,8 +117,8 @@ namespace App.Shared.GameModules
             }
             
             
-            AddSystem(new PlayerBuffUpdateSystem(contexts));
-            AddSystem(new PlayerFallDamageSystem(contexts));
+            AddSystem(new PlayerBuffUpdateSystem());
+            AddSystem(new PlayerFallDamageSystem());
             AddSystem(new PlayerSaveSystem(contexts));
             AddSystem(new PlayerStatisticsSystem());
             AddSystem(new CameraUpdateArchorSystem(contexts));
@@ -135,12 +134,12 @@ namespace App.Shared.GameModules
             }
             AddSystem(new PlayerStateTipSystem(contexts));
            
+            AddSystem(new PlayerWeaponLogicRefreshSystem(contexts));
             AddSystem(new PlayerActionInterruptSystem());
             AddSystem(new PlayerBagSwitchSystem(commonSessionObjects));
             if (!SharedConfig.IsServer)
                 AddSystem(new CameraPostUpdateSystem(contexts.player, contexts.vehicle, contexts.freeMove));
             else AddSystem(new ServerPostCameraUpdateSystem(contexts));
-            AddSystem(new PlayerSoundPlaySystem(contexts));
             
         }
     }

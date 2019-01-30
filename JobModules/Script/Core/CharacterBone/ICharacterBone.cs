@@ -16,17 +16,14 @@ namespace Core.CharacterBone
 
         void Execute(Action<FsmOutput> addOutput);
 
-        void Reborn();
-        void Dead();
-
         void SetStablePelvisRotation();
         void SetThirdPersonCharacter(GameObject obj);
         void SetFirstPersonCharacter(GameObject obj);
         void SetFirstPerson();
         void SetThridPerson();
         void SetCharacterRoot(GameObject characterRoot);
-        void SetWardrobeController(WardrobeControllerBase value);
-        void SetWeaponController(WeaponControllerBase value);
+        void SetWardrobeController(WardrobeController value);
+        void SetWeaponController(WeaponController value);
 
         Transform FastGetBoneTransform(string boneName, CharacterView view);
 

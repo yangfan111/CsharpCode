@@ -4,7 +4,6 @@ using Assets.App.Shared.GameModules.Camera;
 using Core.CameraControl.NewMotor;
 using Core.Utils;
 using UnityEngine;
-using XmlConfig;
 
 namespace App.Shared.GameModules.Camera.Motor.Peek
 {

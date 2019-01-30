@@ -8,7 +8,7 @@ using XmlConfig;
 
 namespace Core.CharacterController
 {
-    public interface ICharacterController:ICharacterDebugDraw
+    public interface ICharacterController
     {
         object RealValue { get; }
         /// <summary>
@@ -54,12 +54,6 @@ namespace Core.CharacterController
         Vector3 GetLastGroundNormal();
         Vector3 GetLastGroundHitPoint();
         KeyValuePair<float, float> GetRotateBound(Quaternion prevRot, Vector3 prevPos, int frameInterval);
-    }
-
-    public interface ICharacterDebugDraw
-    {
-        void DrawBoundingBox();
-        void DrawLastGroundHit();
     }
 
     public enum CharacterControllerType

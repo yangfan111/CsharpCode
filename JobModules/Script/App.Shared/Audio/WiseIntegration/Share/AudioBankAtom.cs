@@ -21,6 +21,16 @@ namespace   App.Shared.Audio
             bankAyncLoadingIds.Clear();
 
         }
+        public AKBankAtom Register(string bnk)
+        {
+            AKBankAtom atom;
+            if(!bankAtomContenter.TryGetValue(bnk, out atom)){
+                atom = new AKBankAtom(bnk);
+                bankAtomContenter.Add(bnk, atom);
+            }
+            return atom;
+
+        }
 
         public AKBankAtomSet(AKAudioBankLoader.BankLoadHandlerAgent loader)
         {
@@ -68,8 +78,10 @@ namespace   App.Shared.Audio
         }
         internal AKRESULT LoadSync(string bankName)
         {
-            return bankAtomContenter[bankName].LoadSync();
+          
+          return bankAtomContenter[bankName].LoadSync();
         }
+      
         internal AKRESULT Unload(string bankName)
         {
             return bankAtomContenter[bankName].Unload();
@@ -134,6 +146,10 @@ namespace   App.Shared.Audio
             loadHanlder = handlerAgent.InternalLoadHandler;
             unloadHandler = handlerAgent.InternalUnloadHandler;
         }
+        public AKBankAtom(string bnkName)
+        {
+            BankData = new AkBankRes(bnkName, AudioBankLoadType.Normal, new List<int>(), new List<int>());
+        }
         public string GetName() { return BankData.Name; }
         public List<int> GetTriggerList() { return BankData.TriggerList; }
         public List<int> GetUnLoadTriggerList() { return BankData.UnLoadTriggerList; }
@@ -158,6 +174,7 @@ namespace   App.Shared.Audio
         //AK的机制只支持加载名字
         internal AKRESULT LoadSync()
         {
+            AudioUtil.NLog("load bank:{0}", BankData.Name);
             return AkBankManager.LoadBankRes(BankData.Name, IsDecode, IsSaveDeCode);
         }
         internal AKRESULT Unload()

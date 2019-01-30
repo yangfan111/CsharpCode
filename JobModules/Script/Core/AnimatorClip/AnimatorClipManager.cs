@@ -29,7 +29,7 @@ namespace Core.Animation
         }
 
         public void Update(IAdaptiveContainer<IFsmInputCommand> commands, Action<FsmOutput> addOutput, Animator thirdAnimator, Animator firstAnimator, 
-            int? weaponId, bool needRewind)
+            int weaponId, bool needRewind)
         {
             _thirdClipMonitor.UpdateClipBehavior(thirdAnimator);
             _thirdClipMonitor.Update(addOutput, CharacterView.ThirdPerson, _reloadSpeedBuff);
@@ -50,7 +50,7 @@ namespace Core.Animation
             _reloadSpeedBuff = AnimatorParametersHash.DefaultAnimationSpeed;
         }
 
-        private void GetAnimatorClipTimesByWeaponId(IAdaptiveContainer<IFsmInputCommand> commands, bool needRewind, int? weaponId)
+        private void GetAnimatorClipTimesByWeaponId(IAdaptiveContainer<IFsmInputCommand> commands, bool needRewind, int weaponId)
         {
             int lenght = commands.Length;
             for (int i = 0; i < lenght; ++i)

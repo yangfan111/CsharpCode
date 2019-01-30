@@ -7,6 +7,45 @@ using XmlConfig;
 
 namespace Core.CameraControl.NewMotor
 {
+    public enum ECameraPoseMode
+    {
+        Stand,
+        DriveCar,
+        Prone,
+        Crouch,
+        Swim,
+        Rescue,
+        Dying,
+        AirPlane,
+        Dead,
+        Parachuting,
+        ParachutingOpen,
+        Gliding,
+        End
+    }
+
+    public enum ECameraFreeMode
+    {
+        Off,
+        On,
+        End
+    }
+
+    public enum ECameraViewMode
+    {
+        ThirdPerson,
+        FirstPerson,
+        GunSight,
+        End
+    }
+
+    public enum ECameraPeekMode
+    {
+        Off,
+        Right,
+        Left,
+        End
+    }
 
 
     public interface ICameraMotorInput : IVariableCameraInput
@@ -53,7 +92,13 @@ namespace Core.CameraControl.NewMotor
         }
     }
 
-
+    public enum SubCameraMotorType
+    {
+        Pose,
+        Free,
+        Peek,
+        View
+    }
 
     public interface ICameraMotorState
     {

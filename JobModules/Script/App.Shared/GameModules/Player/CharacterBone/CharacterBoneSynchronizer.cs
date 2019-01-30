@@ -1,5 +1,4 @@
 using App.Shared.Components.Player;
-using App.Shared.GameModules.Camera.Utils;
 using UnityEngine;
 using Utils.Appearance;
 
@@ -46,7 +45,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
         private static Transform GetMuzzleP3Pos(PlayerEntity playerEntity)
         {
             Transform ret = null;
-            if (!playerEntity.hasCharacterBoneInterface || !playerEntity.stateInterface.State.CanFire() || !playerEntity.IsCameraCanFire())
+            if (!playerEntity.hasCharacterBoneInterface || !playerEntity.weaponLogic.State.CanFire())
             {
                 return ret;
             }
@@ -57,7 +56,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
         private static Transform GetSightFirePos(PlayerEntity playerEntity)
         {
             Transform ret = null;
-            if (!playerEntity.hasFirstPersonModel || !playerEntity.IsCameraCanFire() || !playerEntity.stateInterface.State.CanFire())
+            if (!playerEntity.hasFirstPersonModel || !playerEntity.hasWeaponLogic || !playerEntity.weaponLogic.State.CanFire())
             {
                 return ret;
             }

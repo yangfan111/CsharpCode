@@ -17,7 +17,7 @@ namespace Core.Geography
             public Quaternion InverseRotation;
         }
 
-        private Dictionary<SpecialZone, List<Zone>> _zones = new Dictionary<SpecialZone, List<Zone>>(CommonIntEnumEqualityComparer<SpecialZone>.Instance);
+        private Dictionary<SpecialZone, List<Zone>> _zones = new Dictionary<SpecialZone, List<Zone>>(CommonEnumEqualityComparer<SpecialZone>.Instance);
 
         public void AddZone(IList<SpecialZoneScope> zones)
         {

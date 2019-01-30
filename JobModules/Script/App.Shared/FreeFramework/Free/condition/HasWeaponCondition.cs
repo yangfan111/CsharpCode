@@ -20,11 +20,11 @@ namespace App.Shared.FreeFramework.Free.condition
             {
                 if (hand)
                 {
-                    return fd.Player.GetController<PlayerWeaponController>().CurrSlotWeaponId(args.GameContext) == id;
+                    return fd.Player.GetController<PlayerWeaponController>().CurrSlotWeaponId == id;
                 }
                 else
                 {
-                    return fd.Player.GetController<PlayerWeaponController>().IsWeaponStuffedInSlot(args.GameContext, id);
+                    return fd.Player.GetController<PlayerWeaponController>().IsWeaponStuffedInSlot(id);
                 }   
             }
 

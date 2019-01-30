@@ -64,7 +64,7 @@ namespace App.Shared.GameModules.Player.CharacterState
         {
             for (int i = 0; i < CommandsContainer.Length; ++i)
             {
-                if (FilterFsmInputByStateDict.ContainsKey(CommandsContainer[i].Type) && !FilterFsmInputByStateDict[CommandsContainer[i].Type].Contains(state.Posture, CommonIntEnumEqualityComparer<PostureInConfig>.Instance))
+                if (FilterFsmInputByStateDict.ContainsKey(CommandsContainer[i].Type) && !FilterFsmInputByStateDict[CommandsContainer[i].Type].Contains(state.Posture, CommonEnumEqualityComparer<PostureInConfig>.Instance))
                 {
                     CommandsContainer[i].Reset();
                 }
