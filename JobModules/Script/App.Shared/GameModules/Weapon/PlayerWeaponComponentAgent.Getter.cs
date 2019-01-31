@@ -10,6 +10,7 @@ using Core.Configuration;
 using Core.Enums;
 using Assets.XmlConfig;
 using XmlConfig;
+using App.Shared.WeaponLogic;
 
 namespace App.Shared.GameModules.Weapon
 {
@@ -20,18 +21,19 @@ namespace App.Shared.GameModules.Weapon
         {
             get
             {
-                var stateCmp = stateExtractor(false);
-                CommonUtil.WeakAssert(stateCmp != null);
-                return WeaponUtil.GetSlotByStateComponent(stateCmp);
+                return (EWeaponSlotType)_playerEntity.bagState.CurSlot;
+                //var stateCmp = stateExtractor(false);
+                //CommonUtil.WeakAssert(stateCmp != null);
+                //return WeaponUtil.GetSlotByStateComponent(stateCmp);
             }
         }
-        public int CurrSlotWeaponId
+        public int? CurrSlotWeaponId(Contexts contexts)
         {
-            get { return GetSlotWeaponId(CurrSlotType); }
+            return GetSlotWeaponId(contexts, CurrSlotType);
         }
-        public WeaponInfo CurrSlotWeaponInfo
+        public WeaponInfo CurrSlotWeaponInfo(Contexts contexts)
         {
-            get { return GetSlotWeaponInfo(CurrSlotType); }
+            return GetSlotWeaponInfo(contexts, CurrSlotType);
         }
         public int GetReservedBullet()
         {
@@ -39,53 +41,62 @@ namespace App.Shared.GameModules.Weapon
         }
         public int GetLastWeaponSlot()
         {
-            var comp = stateExtractor(false);
+            var comp = stateExtractor();
             CommonUtil.WeakAssert(comp != null);
-            return comp.LastWeapon;
+            return comp.LastSlot;
         }
 
-        public WeaponInfo GetSlotWeaponInfo(EWeaponSlotType slot)
+        public WeaponInfo GetSlotWeaponInfo(Contexts contexts, EWeaponSlotType slot)
         {
-            WeaponComponent weapon = slotExtractor(slot);
-            return WeaponUtil.ToWeaponInfo(weapon);
+            WeaponEntity weaponEntity;
+            if(_playerEntity.TryGetWeapon(contexts, slot, out weaponEntity))
+            {
+                return weaponEntity.ToWeaponInfo();
+            }
+            return new WeaponInfo();
+        }
 
-        }
-        public int GetSlotWeaponId(EWeaponSlotType slot)
+        public int? GetSlotWeaponId(Contexts contexts, EWeaponSlotType slot)
         {
-            WeaponComponent weapon = slotExtractor(slot);
-            return weapon != null ? weapon.Id : 0;
+            var weapon = slotExtractor(contexts, slot);
+            if(weapon == null)
+            {
+                return null;
+            }
+            return weapon.WeaponId;
         }
+
         public bool IsCurrSlotType(EWeaponSlotType slot)
         {
             return CurrSlotType == slot;
         }
-        public bool IsWeaponSlotStuffed(EWeaponSlotType slot)
+
+        public bool IsWeaponSlotStuffed(Contexts contexts, EWeaponSlotType slot)
         {
-            WeaponComponent weapon = slotExtractor(slot);
-            return WeaponUtil.VertifyWeaponComponentStuffed(weapon);
+            return _playerEntity.HasWeaponInSlot(contexts, slot);
         }
-        public bool IsWeaponStuffedInSlot(int weaponId)
+
+        public bool IsWeaponStuffedInSlot(Contexts contexts, int weaponId)
         {
             NewWeaponConfigItem config;
             var ret = WeaponUtil.VertifyWeaponId(weaponId, out config);
             if (!ret) return false;
             var slot = ((EWeaponType)config.Type).ToWeaponSlot();
-            var weaponComp = slotExtractor(slot);
+            var weaponComp = slotExtractor(contexts, slot);
             if (WeaponUtil.VertifyWeaponComponent(weaponComp) == EFuncResult.Success)
-                return weaponComp.Id == weaponId;
+                return weaponComp.WeaponId == weaponId;
             return false;
 
         }
-        public bool TryGetSlotWeaponInfo(EWeaponSlotType slot, out WeaponInfo wpInfo)
+        public bool TryGetSlotWeaponInfo(Contexts contexts, EWeaponSlotType slot, out WeaponInfo wpInfo)
         {
-            wpInfo = GetSlotWeaponInfo(slot);
+            wpInfo = GetSlotWeaponInfo(contexts, slot);
             return (wpInfo.Id > 0);
-
         }
-        public EWeaponSlotType PopGetLastWeaponId()
+        public EWeaponSlotType PopGetLastWeaponId(Contexts contexts)
         {
             var last = (EWeaponSlotType)GetLastWeaponSlot();
-            if (last != EWeaponSlotType.None && GetSlotWeaponId(last) > 0)
+            if (last != EWeaponSlotType.None && GetSlotWeaponId(contexts, last) > 0)
             {
                 return last;
             }
@@ -93,7 +104,7 @@ namespace App.Shared.GameModules.Weapon
             {
                 for (var s = EWeaponSlotType.None + 1; s < EWeaponSlotType.Length; s++)
                 {
-                    if (GetSlotWeaponId(s) > 0)
+                    if (GetSlotWeaponId(contexts, s) > 0)
                     {
                         return s;
                     }
@@ -101,54 +112,35 @@ namespace App.Shared.GameModules.Weapon
                 return EWeaponSlotType.None;
             }
         }
-        public int CurrFireMode
-        {
-            get { return (int)GetSlotFireMode(CurrSlotType); }
-            set { SetSlotFireMode(CurrSlotType, (EFireMode)value); }
-        }
 
-        public bool CurrBolted
+        public int GetSlotFireModeCount(Contexts contexts, EWeaponSlotType slot)
         {
-            get { return GetSlotWeaponBolted(CurrSlotType); }
-            set { SetSlotWeaponBolted(CurrSlotType, value); }
-        }
-        public int GetSlotFireModeCount(EWeaponSlotType slot)
-        {
-            var weapon = GetSlotWeaponInfo(slot);
+            var weapon = GetSlotWeaponInfo(contexts, slot);
             if (!WeaponUtil.VertifyWeaponId(weapon.Id))
                 return 1;
             return SingletonManager.Get<WeaponDataConfigManager>().GetFireModeCountById(weapon.Id);
         }
-        public int CurrWeaponBullet
-        {
-            get { return GetSlotWeaponBullet(CurrSlotType); }
-        }
-        public int GetSlotWeaponBullet(EWeaponSlotType slot)
-        {
-            var weaponComp = slotExtractor(slot);
-            if (WeaponUtil.VertifyWeaponComponent(weaponComp) == EFuncResult.Success)
-                return weaponComp.Bullet;
-            return 0;
-        }
-        public bool GetSlotWeaponBolted(EWeaponSlotType slot)
-        {
-            var weapon = slotExtractor(slot);
 
-            if (WeaponUtil.VertifyWeaponComponent(weapon) == EFuncResult.Success)
-                return weapon.IsBoltPulled;
-            return false;
-        }
-        public int GetSlotFireMode(EWeaponSlotType slot)
+        public int CurrWeaponBullet(Contexts contexts)
         {
-            var weapon = slotExtractor(slot);
-
-            if (WeaponUtil.VertifyWeaponComponent(weapon) == EFuncResult.Success)
-                return weapon.FireMode;
-
-            Logger.ErrorFormat("get weapon bolted failed : no weapon in slot {0} ", slot);
-            return (int)EFireMode.Manual;
+            return GetSlotWeaponBullet(contexts, CurrSlotType);
+        }
+        public int GetSlotWeaponBullet(Contexts contexts, EWeaponSlotType slot)
+        {
+            var weaponData = _playerEntity.GetWeaponData(contexts, slot);
+            return null == weaponData ? 0 : weaponData.Bullet;
         }
 
+        public bool GetSlotWeaponBolted(Contexts contexts, EWeaponSlotType slot)
+        {
+            var weaponData = _playerEntity.GetWeaponData(contexts, slot);
+            return null == weaponData ? false : weaponData.PullBolt;
+        }
+        public int GetSlotFireMode(Contexts contexts, EWeaponSlotType slot)
+        {
+            var weaponData = _playerEntity.GetWeaponData(contexts, slot);
+            return null == weaponData ? (int)EFireMode.Manual : weaponData.FireMode;
+        }
 
         /// <summary>
         /// 属于特殊处理，正常情况下不需要持有controller
@@ -159,9 +151,9 @@ namespace App.Shared.GameModules.Weapon
             controller = in_controller;
         }
 
-        public bool IsWeaponCurrSlotStuffed()
+        public bool IsWeaponCurrSlotStuffed(Contexts contexts)
         {
-            return IsWeaponSlotStuffed(CurrSlotType);
+            return IsWeaponSlotStuffed(contexts, CurrSlotType);
         }
 
         public int GetReservedBullet(EWeaponSlotType slot)

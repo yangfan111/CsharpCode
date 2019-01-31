@@ -23,6 +23,7 @@ namespace Core.Event
 
         public void AddEvent(IEvent e)
         {
+            //TODO ö±µ¯Ç¹£¬¶à·¢×Óµ¯
             if (_events.ContainsKey(e.EventType))
             {
             }

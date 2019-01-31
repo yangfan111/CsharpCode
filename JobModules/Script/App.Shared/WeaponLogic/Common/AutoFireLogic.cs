@@ -17,28 +17,29 @@ namespace Core.WeaponLogic.Common
         public void OnAfterFire(PlayerEntity playerEntity, WeaponEntity weaponEntity, IWeaponCmd cmd)
         {
             var config = GetConfig(playerEntity);
-            var weaponState = weaponEntity.weaponData;
-            if(weaponState.FireMode != (int)EFireMode.Burst)
+            var runtimeInfo = weaponEntity.weaponRuntimeInfo;
+            var basicInfo = weaponEntity.weaponBasicInfo;
+            if(basicInfo.FireMode != (int)EFireMode.Burst)
             {
-                weaponState.BurstShootCount = 0;
+                runtimeInfo.BurstShootCount = 0;
                 EnableAutoFire(playerEntity, false);
                 return;
             }
-            weaponState.BurstShootCount += 1;
-            if(weaponState.BurstShootCount < config.BurstCount)
+            runtimeInfo.BurstShootCount += 1;
+            if(runtimeInfo.BurstShootCount < config.BurstCount)
             {
-                weaponState.NextAttackTimer = (cmd.RenderTime + config.BurstAttackInnerInterval);
+                runtimeInfo.NextAttackTimer = (cmd.RenderTime + config.BurstAttackInnerInterval);
                 EnableAutoFire(playerEntity, true);
             }
             else
             {
-                weaponState.NextAttackTimer = (cmd.RenderTime + config.BurstAttackInterval);
-                weaponState.BurstShootCount = 0;
+                runtimeInfo.NextAttackTimer = (cmd.RenderTime + config.BurstAttackInterval);
+                runtimeInfo.BurstShootCount = 0;
                 EnableAutoFire(playerEntity, false);
             }
             if(IsTheLastBullet(playerEntity))
             {
-                weaponState.BurstShootCount = 0;
+                runtimeInfo.BurstShootCount = 0;
                 EnableAutoFire(playerEntity, false);
             }
         }

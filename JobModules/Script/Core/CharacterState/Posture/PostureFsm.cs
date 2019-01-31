@@ -113,6 +113,12 @@ namespace Core.CharacterState.Posture
                 AnimatorParametersHash.Instance.StandValue,
                 CharacterView.FirstPerson | CharacterView.ThirdPerson);
             addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FrontPostureHash,
+                AnimatorParametersHash.Instance.FrontPostureName,
+                AnimatorParametersHash.Instance.FrontStand,
+                CharacterView.ThirdPerson);
+            addOutput(FsmOutput.Cache);
 
             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ProneHash,
                 AnimatorParametersHash.Instance.ProneName,
@@ -141,13 +147,13 @@ namespace Core.CharacterState.Posture
             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ClimbHash,
                 AnimatorParametersHash.Instance.ClimbName,
                 AnimatorParametersHash.Instance.ClimbDisableValue,
-                CharacterView.ThirdPerson, false);
+                CharacterView.ThirdPerson | CharacterView.FirstPerson, false);
             addOutput(FsmOutput.Cache);
 
             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ClimbStateHash,
                 AnimatorParametersHash.Instance.ClimbStateName,
                 0.0f,
-                CharacterView.ThirdPerson);
+                CharacterView.ThirdPerson | CharacterView.FirstPerson);
             addOutput(FsmOutput.Cache);
 
             FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.SwimLayer,

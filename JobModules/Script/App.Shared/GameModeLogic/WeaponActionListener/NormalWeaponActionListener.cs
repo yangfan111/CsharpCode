@@ -15,7 +15,10 @@ namespace App.Shared.GameModeLogic.WeaponActionListener
                 return;
             }
             var player = playerEntity as PlayerEntity;
-            Logger.DebugFormat("{0} OnExpend", player.entityKey.Value);
+            if(Logger.IsDebugEnabled)
+            {
+                Logger.DebugFormat("{0} OnExpend", player.entityKey.Value);
+            }
             LockPlayerBag(player);
         }
 

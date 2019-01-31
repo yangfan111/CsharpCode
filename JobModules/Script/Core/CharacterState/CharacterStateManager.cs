@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Core.CharacterState.Action;
 using Core.CharacterState.Movement;
 using Core.CharacterState.Posture;
@@ -122,7 +120,7 @@ namespace Core.CharacterState
         {
             return _exceedSlopeLimit;
         }
-
+        
         #endregion
 
         #region IFsmUpdate
@@ -182,6 +180,11 @@ namespace Core.CharacterState
         public ActionInConfig GetActionState()
         {
             return _action.GetActionState();
+        }
+
+        public ActionInConfig GetNextActionState()
+        {
+            return _action.GetNextActionState();
         }
 
         public ActionKeepInConfig GetActionKeepState()

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using App.Shared.GameModules.Camera.Utils;
 using Core.CameraControl.NewMotor;
 using Core.Interpolate;
 using UnityEngine;
@@ -9,14 +10,15 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Free
     class FreeOffMotor : AbstractCameraMotor
     {
       
-        private float _transitionTime = 300;
-     
+        private float _transitionTime ;
+        private SubCameraMotorType _motorType;
 
 
         public FreeOffMotor(float transitionTime
         )
         {
             _transitionTime = transitionTime;
+            _motorType = SubCameraMotorType.View;
         }
 
         public override int Order
@@ -45,7 +47,7 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Free
             output.ArchorEulerAngle = Vector3.zero;
             if (last.ModeId == (short)ECameraFreeMode.On)
             {
-               
+                _transitionTime = CameraUtility.GetPostureTransitionTime(_motorType, subState);
                 var elapsedPercent = ElapsedPercent( clientTime,subState.ModeTime,_transitionTime );
 
                 if (elapsedPercent < 1)

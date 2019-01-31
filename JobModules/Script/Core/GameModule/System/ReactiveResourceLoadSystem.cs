@@ -22,12 +22,12 @@ namespace Core.GameModule.System
         {
         }
 
-        public ILoadRequestManager LoadRequestManager { get; private set; }
+        public IUnityAssetManager AssetManager { get; private set; }
 
        
-        public virtual void OnLoadResources(ILoadRequestManager coRoutineManager)
+        public virtual void OnLoadResources(IUnityAssetManager assetManager)
         {
-            LoadRequestManager = coRoutineManager;
+            AssetManager = assetManager;
             
             Execute();
         }

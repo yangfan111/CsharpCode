@@ -2,6 +2,7 @@
 using App.Shared.Components.Player;
 using Core.Animation;
 using Core.CharacterState;
+using Core.CharacterState.Posture;
 using Core.EntityComponent;
 using Core.Event;
 using Core.UpdateLatest;
@@ -110,6 +111,13 @@ namespace App.Shared.Components.Serializer
         }
 
         public static StateInterCommands Merge(StateInterCommands basevalue, StateInterCommands patchvalue)
+        {
+            basevalue.Reset();
+            basevalue.CopyFrom(patchvalue);
+            return basevalue;
+        }
+        
+        public static UnityAnimationEventCommands Merge(UnityAnimationEventCommands basevalue, UnityAnimationEventCommands patchvalue)
         {
             basevalue.Reset();
             basevalue.CopyFrom(patchvalue);

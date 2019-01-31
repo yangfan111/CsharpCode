@@ -15,6 +15,7 @@ using XmlConfig;
 using com.wd.free.@event;
 using System;
 using Utils.Singleton;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Bullet
 {
@@ -53,59 +54,57 @@ namespace App.Shared.GameModules.Bullet
             return EBodyPart.Length;
         }
 
-        public static void ProcessPlayerHealthDamage(IPlayerDamager damager, PlayerEntity srcPlayer, PlayerEntity playerEntity, PlayerDamageInfo damage)
+        public static void ProcessPlayerHealthDamage(Contexts contexts, IPlayerDamager damager, PlayerEntity srcPlayer, PlayerEntity playerEntity, PlayerDamageInfo damage)
         {
-            DoProcessPlayerHealthDamage(damager, srcPlayer, playerEntity, damage, null);
+            DoProcessPlayerHealthDamage(contexts, damager, srcPlayer, playerEntity, damage, null);
         }
 
-        public static void ProcessPlayerHealthDamage(IPlayerDamager damager, PlayerEntity srcPlayer, PlayerEntity playerEntity, PlayerDamageInfo damage, IDamageInfoCollector damageInfoCollector)
+        public static void ProcessPlayerHealthDamage(Contexts contexts, IPlayerDamager damager, PlayerEntity srcPlayer, PlayerEntity playerEntity, PlayerDamageInfo damage, IDamageInfoCollector damageInfoCollector)
         {
             if(null == damageInfoCollector)
             {
                 _logger.Error("damageInfoCollector is null");
             }
-            DoProcessPlayerHealthDamage(damager, srcPlayer, playerEntity, damage, damageInfoCollector);
+            DoProcessPlayerHealthDamage(contexts, damager, srcPlayer, playerEntity, damage, damageInfoCollector);
         }
 
-        public static void DoProcessPlayerHealthDamage(IPlayerDamager damager, PlayerEntity srcPlayer, PlayerEntity playerEntity, PlayerDamageInfo damage, IDamageInfoCollector damageInfoCollector)
+        public static void DoProcessPlayerHealthDamage(Contexts contexts, IPlayerDamager damager, PlayerEntity srcPlayer, PlayerEntity playerEntity, PlayerDamageInfo damage, IDamageInfoCollector damageInfoCollector)
         {
             IGameRule gameRule = null != damager ? damager.GameRule : null;
-            DoProcessPlayerHealthDamage(gameRule, srcPlayer, playerEntity, damage, damageInfoCollector);
+            DoProcessPlayerHealthDamage(contexts, gameRule, srcPlayer, playerEntity, damage, damageInfoCollector);
         }
 
-        public static void DoProcessPlayerHealthDamage(IGameRule gameRule, PlayerEntity srcPlayer,
+        public static void DoProcessPlayerHealthDamage(Contexts contexts, IGameRule gameRule, PlayerEntity srcPlayer,
             PlayerEntity playerEntity, PlayerDamageInfo damage, IDamageInfoCollector damageInfoCollector)
         {
-            List<PlayerEntity> teamList = OnePlayerHealthDamage(gameRule, srcPlayer, playerEntity, damage, damageInfoCollector, false);
+            List<PlayerEntity> teamList = OnePlayerHealthDamage(contexts, gameRule, srcPlayer, playerEntity, damage, damageInfoCollector, false);
             if (null != teamList)
             {
                 //队友
                 foreach (PlayerEntity other in teamList)
                 {
                     PlayerDamageInfo damageInfo = new PlayerDamageInfo(other.gamePlay.InHurtedHp, (int)EUIDeadType.NoHelp, (int)EBodyPart.Chest, 0);
-                    OnePlayerHealthDamage(gameRule, null, other, damageInfo, damageInfoCollector, true);
+                    OnePlayerHealthDamage(contexts, gameRule, null, other, damageInfo, damageInfoCollector, true);
                 }
             }
         }
 
-        private static List<PlayerEntity> OnePlayerHealthDamage(IGameRule gameRule, PlayerEntity srcPlayer, PlayerEntity playerEntity, PlayerDamageInfo damage, IDamageInfoCollector damageInfoCollector, bool isTeam)
+        private static List<PlayerEntity> OnePlayerHealthDamage(Contexts contexts, IGameRule gameRule, PlayerEntity srcPlayer, PlayerEntity playerEntity, PlayerDamageInfo damage, IDamageInfoCollector damageInfoCollector, bool isTeam)
         {
             if (playerEntity.gamePlay.IsDead())
                 return null;
 
             float curHp = playerEntity.gamePlay.CurHp;
-
             float realDamage = damage.damage;
+
             if(gameRule != null)
             {
                 realDamage = gameRule.HandleDamage(srcPlayer, playerEntity, damage);
             }
-
             if(null != damageInfoCollector)
             {
                 damageInfoCollector.SetPlayerDamageInfo(srcPlayer, playerEntity, realDamage, (EBodyPart)damage.part);
             }
-
             if (!SharedConfig.IsOffline && !SharedConfig.IsServer)
             {
                 return null;
@@ -119,105 +118,105 @@ namespace App.Shared.GameModules.Bullet
 
             //保存最后伤害来源
             StatisticsData statisticsData = playerEntity.statisticsData.Statistics;
-            if (playerEntity.gamePlay.IsLastLifeState(EPlayerLifeState.Alive))
+            if (statisticsData.DataCollectSwitch)
             {
-                statisticsData.IsHited = true;
-                if (null != srcPlayer)
+                if (playerEntity.gamePlay.IsLastLifeState(EPlayerLifeState.Alive))
                 {
-                    statisticsData.LastHurtKey = srcPlayer.entityKey.Value;
+                    statisticsData.IsHited = true;
+                    if (null != srcPlayer)
+                    {
+                        statisticsData.LastHurtKey = srcPlayer.entityKey.Value;
+                    }
+                    else
+                    {
+                        statisticsData.LastHurtKey = EntityKey.Default;
+                    }
+                    statisticsData.LastHurtType = damage.type;
+                    statisticsData.LastHurtPart = damage.part;
+                    statisticsData.LastHurtWeaponId = damage.weaponId;
                 }
-                else
+
+                //谁击倒算谁的人头
+                if (statisticsData.IsHited)
                 {
-                    statisticsData.LastHurtKey = EntityKey.Default;
+                    if (gameRule != null)
+                    {
+                        PlayerEntity lastEntity = gameRule.Contexts.player.GetEntityWithEntityKey(statisticsData.LastHurtKey);
+                        if (null != lastEntity) srcPlayer = lastEntity;
+                    }
+                    damage.type = statisticsData.LastHurtType;
+                    damage.part = statisticsData.LastHurtPart;
+                    damage.weaponId = statisticsData.LastHurtWeaponId;
                 }
-                statisticsData.LastHurtType = damage.type;
-                statisticsData.LastHurtPart = damage.part;
-                statisticsData.LastHurtWeaponId = damage.weaponId;
+
+                if (playerEntity.gamePlay.IsDead())
+                {
+                    //UI击杀信息
+                    int killType = 0;
+                    if (damage.part == (int) EBodyPart.Head)
+                    {
+                        killType |= (int) EUIKillType.Crit;
+                    }
+                    if (playerEntity.gamePlay.IsHitDown())
+                    {
+                        killType |= (int) EUIKillType.Hit;
+                    }
+                    damage.KillType = killType;
+                    //UI击杀反馈
+                    if (null != srcPlayer)
+                    {
+                        int feedbackType = 0;
+                        if (damage.part == (int) EBodyPart.Head)
+                        {
+                            //爆头
+                            feedbackType |= 1 << (int) EUIKillFeedbackType.CritKill;
+                        }
+                        if (damage.IsOverWall)
+                        {
+                            //穿墙击杀
+                            feedbackType |= 1 << (int) EUIKillFeedbackType.ThroughWall;
+                        }
+                        if (SharedConfig.IsServer && null != gameRule && gameRule.Contexts.session.serverSessionObjects.DeathOrder == 0 && srcPlayer.playerInfo.TeamId != playerEntity.playerInfo.TeamId)
+                        {
+                            //一血
+                            feedbackType |= 1 << (int) EUIKillFeedbackType.FirstBlood;
+                        }
+                        if (srcPlayer.statisticsData.BeKilledOrHitDown(playerEntity.entityKey.Value))
+                        {
+                            //复仇
+                            feedbackType |= 1 << (int) EUIKillFeedbackType.Revenge;
+                        }
+                        /*if (false)
+                        {
+                            //合作击杀（助攻）
+                            feedbackType |= 1 << (int) EUIKillFeedbackType.Cooperate;
+                        }*/
+                        //武器
+                        NewWeaponConfigItem newConfig = SingletonManager.Get<WeaponConfigManager>().GetConfigById(damage.weaponId);
+                        if (null != newConfig)
+                        {
+                            if (newConfig.SubType == (int) EWeaponSubType.Melee)
+                                feedbackType |= 1 << (int) EUIKillFeedbackType.MeleeWeapon;
+                            else if (newConfig.SubType == (int) EWeaponSubType.BurnBomb)
+                                feedbackType |= 1 << (int) EUIKillFeedbackType.Burning;
+                            else if (newConfig.SubType == (int) EWeaponSubType.Grenade)
+                                feedbackType |= 1 << (int) EUIKillFeedbackType.Grenade;
+                        }
+                        if (feedbackType == 0)
+                        {
+                            //普通击杀
+                            feedbackType = 1 << (int) EUIKillFeedbackType.Normal;
+                        }
+                        damage.KillFeedbackType = feedbackType;
+                    }
+                }
+
+                //数据统计
+                ProcessDamageStatistics(contexts, gameRule, srcPlayer, playerEntity, damage);
             }
-
-            //谁击倒算谁的人头
-            if (statisticsData.IsHited)
-            {
-                if (gameRule != null)
-                {
-                    PlayerEntity lastEntity = gameRule.Contexts.player.GetEntityWithEntityKey(statisticsData.LastHurtKey);
-                    if (null != lastEntity)
-                        srcPlayer = lastEntity;
-                }
-                damage.type = statisticsData.LastHurtType;
-                damage.part = statisticsData.LastHurtPart;
-                damage.weaponId = statisticsData.LastHurtWeaponId;
-            }
-
-
-            if (playerEntity.gamePlay.IsDead())
-            {
-                //UI击杀信息
-                int killType = 0;
-                if (damage.part == (int)EBodyPart.Head)
-                {
-                    killType |= (int)EUIKillType.Crit;
-                }
-                if (playerEntity.gamePlay.IsHitDown())
-                {
-                    killType |= (int)EUIKillType.Hit;
-                }
-                damage.KillType = killType;
-                //UI击杀反馈
-                if (null != srcPlayer)
-                {
-                    int feedbackType = 0;
-                    if (damage.part == (int)EBodyPart.Head)
-                    {
-                        //爆头
-                        feedbackType |= 1 << (int)EUIKillFeedbackType.CritKill;
-                    }
-                    if (damage.IsOverWall)
-                    {
-                        //穿墙击杀
-                        feedbackType |= 1 << (int)EUIKillFeedbackType.ThroughWall;
-                    }
-                    if (SharedConfig.IsServer && null != gameRule && gameRule.Contexts.session.serverSessionObjects.DeathOrder == 0)
-                    {
-                        //一血
-                        feedbackType |= 1 << (int)EUIKillFeedbackType.FirstBlood;
-                    }
-                    if (srcPlayer.statisticsData.BeKilledOrHitDown(playerEntity.entityKey.Value))
-                    {
-                        //复仇
-                        feedbackType |= 1 << (int)EUIKillFeedbackType.Revenge;
-                    }
-                    if (false)
-                    {
-                        //合作击杀（助攻）
-                        feedbackType |= 1 << (int)EUIKillFeedbackType.Cooperate;
-                    }
-                    //武器
-                    NewWeaponConfigItem newConfig = SingletonManager.Get<WeaponConfigManager>().GetConfigById(damage.weaponId);
-                    if (null != newConfig)
-                    {
-                        if (newConfig.SubType == (int)EWeaponSubType.Melee)
-                            feedbackType |= 1 << (int)EUIKillFeedbackType.MeleeWeapon;
-                        else if (newConfig.SubType == (int)EWeaponSubType.BurnBomb)
-                            feedbackType |= 1 << (int)EUIKillFeedbackType.Burning;
-                        else if (newConfig.SubType == (int)EWeaponSubType.Grenade)
-                            feedbackType |= 1 << (int)EUIKillFeedbackType.Grenade;
-                    }
-                    if (feedbackType == 0)
-                    {
-                        //普通击杀
-                        feedbackType = 1 << (int)EUIKillFeedbackType.Normal;
-                    }
-                    damage.KillFeedbackType = feedbackType;
-                }
-            }
-
-
-            //数据统计
-            ProcessDamageStatistics(gameRule, srcPlayer, playerEntity, damage);
 
             //击杀|击倒
-            if (null != gameRule && (playerEntity.gamePlay.IsDead()))
+            if (null != gameRule && playerEntity.gamePlay.IsDead())
             {
                 gameRule.KillPlayer(srcPlayer, playerEntity, damage);
             }
@@ -323,7 +322,7 @@ namespace App.Shared.GameModules.Bullet
             return null;
         }
 
-        public static void ProcessDamageStatistics(IGameRule gameRule, PlayerEntity srcPlayer, PlayerEntity targetPlayer, PlayerDamageInfo damage)
+        public static void ProcessDamageStatistics(Contexts contexts, IGameRule gameRule, PlayerEntity srcPlayer, PlayerEntity targetPlayer, PlayerDamageInfo damage)
         {
             if (null == targetPlayer)
                 return;
@@ -344,13 +343,13 @@ namespace App.Shared.GameModules.Bullet
                 bool isHitDown = targetPlayer.gamePlay.IsHitDown();
                 bool isCrit = damage.part == (int) EBodyPart.Head;
 
-                targetPlayer.statisticsData.AddOtherInfo(srcPlayer.entityKey.Value, srcPlayer.weaponLogicInfo.WeaponId, isKill, isHitDown, (int) damage.damage,srcPlayer.playerInfo);
+                targetPlayer.statisticsData.AddOtherInfo(srcPlayer.entityKey.Value, srcPlayer.GetController<PlayerWeaponController>().CurrSlotWeaponId(contexts).Value, isKill, isHitDown, (int) damage.damage,srcPlayer.playerInfo);
 
                 //添加别人对自己的伤害记录（受伤不算）
                 if (targetPlayer.gamePlay.IsLastLifeState(EPlayerLifeState.Alive) && !isTeammate)
                 {
                     //添加自己对别人的伤害记录
-                    srcPlayer.statisticsData.AddOpponentInfo(targetPlayer.entityKey.Value, srcPlayer.weaponLogicInfo.WeaponId, isKill, isHitDown, (int) damage.damage, targetPlayer.playerInfo);
+                    srcPlayer.statisticsData.AddOpponentInfo(targetPlayer.entityKey.Value, srcPlayer.GetController<PlayerWeaponController>().CurrSlotWeaponId(contexts).Value, isKill, isHitDown, (int) damage.damage, targetPlayer.playerInfo);
                     //总伤害量
                     srcPlayer.statisticsData.Statistics.TotalDamage += damage.damage;
                     //有效伤害
@@ -364,7 +363,8 @@ namespace App.Shared.GameModules.Bullet
                         //击杀数
                         srcPlayer.statisticsData.Statistics.KillCount++;
                         srcPlayer.statisticsData.Statistics.LastKillTime = DateTime.Now.Millisecond;
-                        if (isCrit)
+                        //爆头击杀（不包括近战）
+                        if (isCrit && !damage.IsKnife)
                         {
                             srcPlayer.statisticsData.Statistics.CritKillCount++;
                         }
@@ -397,9 +397,9 @@ namespace App.Shared.GameModules.Bullet
                     srcPlayer.statisticsData.Statistics.HitDownCount++;
                 }
 
-                if (isCrit && !isTeammate)
+                //总爆头数（不包括近战）
+                if (isCrit && !damage.IsKnife && !isTeammate)
                 {
-                    //总爆头数
                     srcPlayer.statisticsData.Statistics.CritCount++;
                 }
             }
@@ -418,7 +418,7 @@ namespace App.Shared.GameModules.Bullet
                 }
                 else
                 {
-                    targetPlayer.statisticsData.AddKillerInfo(srcPlayer.entityKey.Value, srcPlayer.weaponLogicInfo.WeaponId, damage.type, srcPlayer.playerInfo);
+                    targetPlayer.statisticsData.AddKillerInfo(srcPlayer.entityKey.Value, srcPlayer.GetController<PlayerWeaponController>().CurrSlotWeaponId(contexts).Value, damage.type, srcPlayer.playerInfo);
                 }
                 if (SharedConfig.IsServer && null != gameRule)
                 {
@@ -427,6 +427,10 @@ namespace App.Shared.GameModules.Bullet
                     {
                         gameRule.Contexts.session.serverSessionObjects.DeathOrder++;
                         targetPlayer.statisticsData.Statistics.DeathOrder = gameRule.Contexts.session.serverSessionObjects.DeathOrder;
+                    }
+                    else
+                    {
+                        targetPlayer.statisticsData.Statistics.DeathOrder = -1;
                     }
 
                     //存活时间

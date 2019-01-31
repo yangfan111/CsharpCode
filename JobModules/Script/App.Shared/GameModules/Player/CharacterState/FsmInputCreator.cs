@@ -13,6 +13,7 @@ using Utils.Utils;
 using XmlConfig;
 using App.Shared.Player;
 using Core.CharacterState.Posture;
+using App.Shared.WeaponLogic;
 
 namespace App.Shared.GameModules.Player.CharacterState
 {
@@ -44,10 +45,10 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         public IAdaptiveContainer<IFsmInputCommand> CommandsContainer { get { return _commandsContainer; } }
 
-        public void CreateCommands(IUserCmd cmd, FilterState state, PlayerEntity player) //,int curLeanState,int leanTimeCount)
+        public void CreateCommands(IUserCmd cmd, FilterState state, PlayerEntity player, Contexts contexts) //,int curLeanState,int leanTimeCount)
         {
             PretreatCmd(player, cmd);
-            FromUserCmdToFsmInput(cmd, player);
+            FromUserCmdToFsmInput(cmd, player, contexts);
             foreach (var v in _filters)
             {
                 TryFilter(v, state);
@@ -64,7 +65,7 @@ namespace App.Shared.GameModules.Player.CharacterState
         {
             for (int i = 0; i < CommandsContainer.Length; ++i)
             {
-                if (FilterFsmInputByStateDict.ContainsKey(CommandsContainer[i].Type) && !FilterFsmInputByStateDict[CommandsContainer[i].Type].Contains(state.Posture, CommonEnumEqualityComparer<PostureInConfig>.Instance))
+                if (FilterFsmInputByStateDict.ContainsKey(CommandsContainer[i].Type) && !FilterFsmInputByStateDict[CommandsContainer[i].Type].Contains(state.Posture, CommonIntEnumEqualityComparer<PostureInConfig>.Instance))
                 {
                     CommandsContainer[i].Reset();
                 }
@@ -123,7 +124,7 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         }
 
-        private void FromUserCmdToFsmInput(IUserCmd cmd, PlayerEntity player)
+        private void FromUserCmdToFsmInput(IUserCmd cmd, PlayerEntity player, Contexts contexts)
         {
             //Logger.InfoFormat("horzontal val:{0}, vertical val:{1}", cmd.MoveHorizontal, cmd.MoveVertical);
 
@@ -150,7 +151,7 @@ namespace App.Shared.GameModules.Player.CharacterState
                     SetCommand(FsmInput.Forth, InputValueLimit.MaxAxisValue);
                 }
                 // 冲刺
-                if ((cmd.IsRun || player.playerMove.IsAutoRun) && IsCanSprint(cmd))
+                if ((cmd.IsRun || player.playerMove.IsAutoRun) && IsCanSprint(cmd, player,contexts))
                 {
                     if(player.playerMove.IsAutoRun)
                     {
@@ -228,9 +229,11 @@ namespace App.Shared.GameModules.Player.CharacterState
             }
         }
 
-        private bool IsCanSprint(IUserCmd cmd)
+        private bool IsCanSprint(IUserCmd cmd, PlayerEntity playerEntity, Contexts contexts)
         {
-            return !cmd.FilteredInput.IsInputBlocked(EPlayerInput.IsSprint);
+            var stateBlock = cmd.FilteredInput.IsInputBlocked(EPlayerInput.IsSprint);
+            var weaponBlock = playerEntity.HasWeapon(contexts) && !playerEntity.GetWeaponConfig(contexts).GetRunable();
+            return !stateBlock && !weaponBlock;
         }
 
         private bool IsCanRun(IUserCmd cmd)

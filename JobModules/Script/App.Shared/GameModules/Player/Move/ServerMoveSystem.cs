@@ -1,4 +1,5 @@
 ﻿using App.Shared.Components.Player;
+using App.Shared.GameModules.Weapon;
 using App.Shared.Player;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
@@ -69,7 +70,10 @@ namespace App.Shared.GameModules.Player
             localMoveComponent.IsCollided = moveUpdateData.IsCollided;
 
             UpdatePosition(player, moveUpdateData);
-            // _logger.ErrorFormat(" IsCollided:{1},IsGround:{2}", moveUpdateData.IsCollided,moveUpdateData.IsGround);
+            
+            if(moveUpdateData.NeedUmountWeapon)
+                player.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon(_contexts);
+            // _logger.ErrorFormat(" IsC ollided:{1},IsGround:{2}", moveUpdateData.IsCollided,moveUpdateData.IsGround);
         }
 
         private void UpdatePosition(PlayerEntity player, MoveUpdateComponent moveUpdateData)

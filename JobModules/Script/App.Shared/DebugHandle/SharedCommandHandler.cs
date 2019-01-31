@@ -1,6 +1,5 @@
 ﻿using System;
 using Core;
-using Core;
 using Core.Configuration;
 using Core.GameModule.System;
 using Core.Utils;
@@ -16,9 +15,7 @@ using System.Reflection;
 using Utils.Appearance;
 using System.Text;
 using App.Shared.Util;
-using com.wd.free.action.function;
 using Core.GameTime;
-using Core.IFactory;
 using Core.MyProfiler;
 using Core.SessionState;
 using Entitas;
@@ -208,7 +205,7 @@ namespace App.Shared.DebugHandle
         private static IWeaponModelController _weaponModelController;
         private static GameObject _twaRootGo;
         private static LoggerAdapter Logger = new LoggerAdapter(typeof(SharedCommandHandler));
-        public static string ProcessPlayerCommands(DebugCommand message, PlayerEntity player, ICommonSessionObjects sessionObjects, ICurrentTime currentTime)
+        public static string ProcessPlayerCommands(DebugCommand message, Contexts contexts, PlayerEntity player, ICommonSessionObjects sessionObjects, ICurrentTime currentTime)
         {
             var result = "";
             PlayerWeaponComponentAgent bagLogicImp;
@@ -284,7 +281,7 @@ namespace App.Shared.DebugHandle
                     player.gamePlay.CurHp = int.Parse(message.Args[0]);
                     break;
                 case DebugCommands.SetCurBullet:
-                    player.GetController<PlayerWeaponController>().SetSlotWeaponBullet(int.Parse(message.Args[0]));
+                    player.GetController<PlayerWeaponController>().SetSlotWeaponBullet(contexts, int.Parse(message.Args[0]));
                     break;
                 case DebugCommands.SetReservedBullet:
                     if (message.Args.Length > 1)
@@ -325,17 +322,17 @@ namespace App.Shared.DebugHandle
                         };
                         if (weaponSlotToSet != 0)
                         {
-                            player.GetController<PlayerWeaponController>().ReplaceWeaponToSlot((EWeaponSlotType)weaponSlotToSet, weaponInfo);
+                            player.GetController<PlayerWeaponController>().ReplaceWeaponToSlot(contexts, (EWeaponSlotType)weaponSlotToSet, weaponInfo);
                         }
                         else
                         {
-                            player.GetController<PlayerWeaponController>().PickUpWeapon(weaponInfo);
+                            player.GetController<PlayerWeaponController>().PickUpWeapon(contexts, weaponInfo);
                         }
                     }
                         break;
                 case DebugCommands.DropWeapon:
                     var dropSlot = int.Parse(message.Args[0]);
-                    player.GetController<PlayerWeaponController>().DropSlotWeapon((EWeaponSlotType)dropSlot);
+                    player.GetController<PlayerWeaponController>().DropSlotWeapon(contexts, (EWeaponSlotType)dropSlot);
                     break;
                 case DebugCommands.TestWeaponAssemble:
                     if (null == _twaRootGo)
@@ -352,7 +349,7 @@ namespace App.Shared.DebugHandle
                         SingletonManager.Get<WeaponPartsConfigManager>(),
                         SingletonManager.Get<WeaponAvatarConfigManager>(),
                         new WeaponModelLoadController<object>(
-                            new WeaponModelLoader(sessionObjects.LoadRequestManager),
+                            new WeaponModelLoader(sessionObjects.AssetManager),
                             new WeaponModelAssemblyController(_twaRootGo))
                         );
                     }
@@ -380,12 +377,12 @@ namespace App.Shared.DebugHandle
                         id = int.Parse(message.Args[1]);
                       
 
-                        res = player.GetController<PlayerWeaponController>().SetSlotWeaponPart((EWeaponSlotType)slot, id);
+                        res = player.GetController<PlayerWeaponController>().SetSlotWeaponPart(contexts, (EWeaponSlotType)slot, id);
                     }
                     else
                     {
                         id = int.Parse(message.Args[0]);
-                        res = player.GetController<PlayerWeaponController>().SetSlotWeaponPart(id);
+                        res = player.GetController<PlayerWeaponController>().SetSlotWeaponPart(contexts, id);
                     }
 
                     switch (res)
@@ -404,7 +401,7 @@ namespace App.Shared.DebugHandle
                 case DebugCommands.ClearAttachment:
                     var weaponSlot = (EWeaponSlotType)int.Parse(message.Args[0]);
                     var part = (EWeaponPartType)int.Parse(message.Args[1]);
-                    player.GetController<PlayerWeaponController>().DeleteSlotWeaponPart(weaponSlot, part);
+                    player.GetController<PlayerWeaponController>().DeleteSlotWeaponPart(contexts, weaponSlot, part);
                     break;
                 case DebugCommands.SwitchAttachment:
                     break;
@@ -412,7 +409,7 @@ namespace App.Shared.DebugHandle
                     player.appearanceInterface.Appearance.ChangeAvatar(int.Parse(message.Args[0]));
                     break;
                 case DebugCommands.ShowAvaliablePartType:
-                    int weaponId = player.GetController<PlayerWeaponController>().CurrSlotWeaponId;
+                    int weaponId = player.GetController<PlayerWeaponController>().CurrSlotWeaponId(contexts).Value;
                     if (weaponId > 0)
                     {
                         var list = SingletonManager.Get<WeaponPartsConfigManager>().GetAvaliablePartTypes(weaponId);
@@ -683,7 +680,7 @@ namespace App.Shared.DebugHandle
                 var abstractDebugCommand = instance as AbstractDebugCommand;
                 return abstractDebugCommand.Process(contexts, player, cmd.Args, fieldInfos);
             }
-            return "command not found";
+            return "";
         }
 
         private static List<AbstractDebugCommand> _debugCommands = new List<AbstractDebugCommand>
@@ -878,7 +875,7 @@ namespace App.Shared.DebugHandle
 
         protected override string OnProcess(Contexts contexts, PlayerEntity player, string[] args)
         {
-            var helper = player.GetController<PlayerWeaponController>().GetBagCacheHelper(EWeaponSlotType.GrenadeWeapon);
+            var helper = player.GetController<PlayerWeaponController>().GetBagCacheHelper(EWeaponSlotType.ThrowingWeapon);
             helper.AddCache(arg1);
             return "ok";
         }

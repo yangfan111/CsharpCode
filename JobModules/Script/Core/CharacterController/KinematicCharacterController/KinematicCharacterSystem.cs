@@ -41,6 +41,9 @@ namespace KinematicCharacterController
         /// </summary>
         public static bool AutoSimulation = false;
 
+        public static bool DebugShowFlyBoundingBox = false;
+
+
         private static float _lastCustomInterpolationStartTime = -1f;
         private static float _lastCustomInterpolationDeltaTime = -1f;
 
@@ -352,6 +355,11 @@ namespace KinematicCharacterController
             motor.UpdatePhase1(deltaTime);
             motor.UpdatePhase2(deltaTime);
 
+            if (DebugShowFlyBoundingBox)
+            {
+                DrawBoundingBox(motor);
+                DebugShowFlyBoundingBox = false;
+            }
 //            if (!CompareUtility.IsApproximatelyEqual(newCharacterMatrix.ExtractRotation().eulerAngles,
 //                motor.TransientRotation.eulerAngles))
 //            {
@@ -395,6 +403,18 @@ namespace KinematicCharacterController
 //                    YawPitchUtility.Normalize(prevRot.eulerAngles).ToStringExt()
 //                    );
 //            }
+        }
+
+        private static void DrawBoundingBox(KinematicCharacterMotor motor)
+        {
+            var characterTransformToCapsuleBottom = motor.CharacterTransformToCapsuleBottom;
+            var characterTransformToCapsuleTop = motor.CharacterTransformToCapsuleTop;
+//            DebugDraw.EditorDrawCapsule(motor.TransientPosition + motor.TransientRotation * characterTransformToCapsuleBottom,
+//                motor.TransientPosition + motor.TransientRotation * characterTransformToCapsuleTop, motor.CapsuleRadius,
+//                Color.magenta);
+            DebugDraw.DebugCapsule(motor.TransientPosition + motor.TransientRotation * characterTransformToCapsuleBottom,
+                motor.TransientPosition + motor.TransientRotation * characterTransformToCapsuleTop,
+                Color.magenta, motor.CapsuleRadius);
         }
 
         public static KeyValuePair<float, float> MyCalcRotateBound(KinematicCharacterMotor motor, int frameInterval)

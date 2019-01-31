@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Core.CharacterState;
+using Core.CharacterState.Posture;
 using Core.Compare;
 using Core.Components;
 using Core.EntityComponent;
@@ -173,8 +174,8 @@ namespace App.Shared.Components.Player
 
         [NetworkProperty] public StateInterCommands StateInterCommands;
         [NetworkProperty] public StateInterCommands AnimationCallbackCommands;
-        [NetworkProperty] public StateInterCommands FirstPersonAnimationEventCallBack;
-        [NetworkProperty] public StateInterCommands ThirdPersonAnimationEventCallBack;
+        [NetworkProperty] public UnityAnimationEventCommands FirstPersonAnimationEventCallBack;
+        [NetworkProperty] public UnityAnimationEventCommands ThirdPersonAnimationEventCallBack;
         [NetworkProperty, DontInitilize] public bool IsJumpForSync;
         
      
@@ -215,12 +216,12 @@ namespace App.Shared.Components.Player
             
             if (FirstPersonAnimationEventCallBack == null)
             {
-                FirstPersonAnimationEventCallBack = new StateInterCommands();
+                FirstPersonAnimationEventCallBack = new UnityAnimationEventCommands();
             }
             
             if (ThirdPersonAnimationEventCallBack == null)
             {
-                ThirdPersonAnimationEventCallBack = new StateInterCommands();
+                ThirdPersonAnimationEventCallBack = new UnityAnimationEventCommands();
             }
             
         }

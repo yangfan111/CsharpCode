@@ -20,7 +20,7 @@ namespace Core.WeaponLogic.Accuracy
             {
                 return;
             }
-            var weaponState = weaponEntity.weaponData;
+            var weaponState = weaponEntity.weaponRuntimeInfo;
             int accuracyDivisor = config.AccuracyDivisor;
             if (accuracyDivisor != -1)
             {

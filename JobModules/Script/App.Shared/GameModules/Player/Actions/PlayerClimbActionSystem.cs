@@ -35,13 +35,19 @@ namespace App.Shared.GameModules.Player.Actions
             _genericAction = player.genericActionInterface.GenericAction;
             _genericAction.Update(player);
             
-            if (cmd.IsJump)
+            if (cmd.IsJump && CanClimb(player))
                 TriggerActionInput(player);
         }
 
         private void TriggerActionInput(PlayerEntity player)
         {
             _genericAction.ActionInput(player);
+        }
+
+        private static bool CanClimb(PlayerEntity player)
+        {
+            var postureState = player.stateInterface.State.GetCurrentPostureState();
+            return PostureInConfig.Jump != postureState && PostureInConfig.Climb != postureState;
         }
         
         #region LifeState
@@ -52,6 +58,7 @@ namespace App.Shared.GameModules.Player.Actions
 
             var gamePlay = player.gamePlay;
             if (!gamePlay.HasLifeStateChangedFlag()) return;
+            if(CreatePlayerGameStateData(player)) return;
 
             if (gamePlay.IsLifeState(EPlayerLifeState.Alive) &&
                 gamePlay.IsLastLifeState(EPlayerLifeState.Dead))
@@ -59,6 +66,26 @@ namespace App.Shared.GameModules.Player.Actions
 
             if (gamePlay.IsLifeState(EPlayerLifeState.Dead))
                 Dead(player);
+        }
+        
+        private static bool CreatePlayerGameStateData(PlayerEntity player)
+        {
+            var gamePlay = player.gamePlay;
+            var playerGameState = player.playerGameState;
+            if(null == playerGameState || null == gamePlay) return true;
+            
+            if (PlayerSystemEnum.PlayerClimbUpdate == playerGameState.CurrentPlayerSystemState)
+            {
+                _logger.InfoFormat("ChangeClearInSystem:  {0}", playerGameState.CurrentPlayerSystemState);
+                gamePlay.ClearLifeStateChangedFlag();
+                playerGameState.CurrentPlayerSystemState = PlayerSystemEnum.NullState;
+                return true;
+            }
+            
+            if (PlayerSystemEnum.NullState == playerGameState.CurrentPlayerSystemState)
+                playerGameState.CurrentPlayerSystemState = PlayerSystemEnum.PlayerClimbUpdate;
+
+            return false;
         }
 
         private void Reborn(PlayerEntity player)
@@ -75,6 +102,7 @@ namespace App.Shared.GameModules.Player.Actions
             var genericAction = player.genericActionInterface.GenericAction;
             if (null == genericAction) return;
             genericAction.PlayerDead(player);
+            _logger.InfoFormat("PlayerClimbDead");
         }
 
         #endregion

@@ -12,8 +12,11 @@ namespace App.Shared.GameModules.Weapon
     public class GrenadeBagCacheHelper : IBagDataCacheHelper
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(GrenadeBagCacheHelper));
-        private readonly Dictionary<int, int> acquiredGrenades;
+        private readonly Dictionary<int, int> heldGrenades;
         private GrenadeCacheComponentExtractor componentExtractor;
+        /// <summary>
+        /// 手雷config id集合
+        /// </summary>
         private readonly List<int> grenadeConfigIds;
         private readonly List<int> grenadeValuedIds;
 
@@ -23,7 +26,7 @@ namespace App.Shared.GameModules.Weapon
             var configs = SingletonManager.Get<WeaponConfigManager>().GetConfigs();
             grenadeConfigIds = new List<int>();
             grenadeValuedIds = new List<int>();
-            acquiredGrenades = new Dictionary<int, int>();
+            heldGrenades = new Dictionary<int, int>();
             foreach (var config in configs)
             {
                 switch ((EWeaponType)config.Value.Type)
@@ -51,13 +54,13 @@ namespace App.Shared.GameModules.Weapon
         {
             if (!grenadeConfigIds.Contains(id)) return false;
             int value;
-            if (acquiredGrenades.TryGetValue(id, out value))
+            if (heldGrenades.TryGetValue(id, out value))
             {
-                acquiredGrenades[id] += 1;
+                heldGrenades[id] += 1;
             }
             else
             {
-                acquiredGrenades.Add(id, 1);
+                heldGrenades.Add(id, 1);
             }
             Sync();
             return true;
@@ -67,11 +70,11 @@ namespace App.Shared.GameModules.Weapon
         {
             if (!grenadeConfigIds.Contains(id)) return false;
             int value;
-            if (acquiredGrenades.TryGetValue(id, out value))
+            if (heldGrenades.TryGetValue(id, out value))
             {
                 value -= 1;
-                if (value < 1) acquiredGrenades.Remove(id);
-                else acquiredGrenades[id] = value;
+                if (value < 1) heldGrenades.Remove(id);
+                else heldGrenades[id] = value;
                 Sync();
                 return true;
             }
@@ -81,18 +84,18 @@ namespace App.Shared.GameModules.Weapon
         public void ClearCache()
         {
             lastGrenadeId = 0;
-            acquiredGrenades.Clear();
+            heldGrenades.Clear();
             Sync();
         }
         public int GetCount(int id)
         {
-            return acquiredGrenades.ContainsKey(id) ?
-                acquiredGrenades[id] : 0;
+            return heldGrenades.ContainsKey(id) ?
+                heldGrenades[id] : 0;
         }
         public List<int> GetOwnedIds()
         {
             grenadeValuedIds.Clear();
-            foreach (KeyValuePair<int, int> pair in acquiredGrenades)
+            foreach (KeyValuePair<int, int> pair in heldGrenades)
             {
                 if (pair.Value > 0)
                     grenadeValuedIds.Add(pair.Key);
@@ -106,7 +109,7 @@ namespace App.Shared.GameModules.Weapon
         /// <returns></returns>
         public int PickupNextAutomatic(int lastId)
         {
-            if (acquiredGrenades.Count < 1)
+            //TODO:if (heldGrenades.Count < 1)
                 return -1;
             var list = GetOwnedIds();
             if (lastId < 1)
@@ -119,7 +122,7 @@ namespace App.Shared.GameModules.Weapon
         /// </summary>
         public int PickupNextManually(int lastId)
         {
-            if (acquiredGrenades.Count < 1)
+            if (heldGrenades.Count < 1)
                 return -1;
             int finalIndx = 0;
             var list = GetOwnedIds();
@@ -142,11 +145,11 @@ namespace App.Shared.GameModules.Weapon
         }
         private int lastGrenadeId = 0;
 
-        public void SetCache(int id, int count)
+        private void SetCache(int id, int count)
         {
             if (!grenadeConfigIds.Contains(id)) return;
-            acquiredGrenades[id] = count;
-            Sync();
+            heldGrenades[id] = count;
+           // Sync();
 
         }
         private void Sync()

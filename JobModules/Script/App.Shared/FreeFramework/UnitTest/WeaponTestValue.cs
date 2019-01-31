@@ -29,7 +29,7 @@ namespace App.Shared.FreeFramework.UnitTest
                     currentSlot = FreeWeaponUtil.GetSlotType(args.GetInt(slot));
                 }
 
-                WeaponInfo info = fd.Player.GetController<PlayerWeaponController>().GetSlotWeaponInfo(currentSlot);
+                WeaponInfo info = fd.Player.GetController<PlayerWeaponController>().GetSlotWeaponInfo(args.GameContext, currentSlot);
                 tv.AddField("id", info.Id);
                 tv.AddField("clip", info.Bullet);
                 tv.AddField("carryClip", info.ReservedBullet);

@@ -11,7 +11,7 @@ namespace App.Shared.WeaponLogic.Bullet
         public override Vector3 GetFireDir(int seed, PlayerEntity playerEntity, WeaponEntity weaponEntity, Contexts contexts)
         {
             var delta = GetFireViewPosition(playerEntity, contexts) - playerEntity.cameraFinalOutputNew.Position;
-            var weaponData = weaponEntity.weaponData;
+            var weaponData = weaponEntity.weaponRuntimeInfo;
             return CalculateShotingDir(seed, 
                 delta.GetYaw(), 
                 delta.GetPitch(), 

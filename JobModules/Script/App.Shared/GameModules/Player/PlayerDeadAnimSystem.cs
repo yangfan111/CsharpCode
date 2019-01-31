@@ -11,11 +11,12 @@ namespace App.Shared.GameModules.Player
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerDeadAnimSystem));
         private IGroup<PlayerEntity> _players;
+        private Contexts _contexts;
 
         public PlayerDeadAnimSystem(Contexts context) : base(context)
         {
+            _contexts = context;
         }
-
 
         protected override IGroup<PlayerEntity> GetIGroup(Contexts contexts)
         {
@@ -30,53 +31,77 @@ namespace App.Shared.GameModules.Player
 
         protected override void OnGamePlay(PlayerEntity playerEntity)
         {
+            if(null == playerEntity || null == playerEntity.gamePlay ||
+               null == playerEntity.characterControllerInterface) 
+                return;
+            return;
             var gamePlay = playerEntity.gamePlay;
-            var playerState = playerEntity.stateInterface.State;
-            var playerAppearance = playerEntity.appearanceInterface.Appearance;
-            var characterControllerAppearance = playerEntity.characterControllerInterface.CharacterController;
+            
+            if (!gamePlay.HasLifeStateChangedFlag()) return;
+            if(CreatePlayerGameStateData(playerEntity)) return;
 
-            if (gamePlay.HasLifeStateChangedFlag())
+            if (gamePlay.IsLifeState(EPlayerLifeState.Alive) &&
+                gamePlay.IsLastLifeState(EPlayerLifeState.Dead))
+                Reborn(playerEntity);
+            
+            if (gamePlay.IsLifeState(EPlayerLifeState.Alive) &&
+                gamePlay.IsLastLifeState(EPlayerLifeState.Dying))
+                Revive(playerEntity);
+            
+            if(gamePlay.IsLifeState(EPlayerLifeState.Dying))
+                Dying(playerEntity);
+
+            if (gamePlay.IsLifeState(EPlayerLifeState.Dead))
+                Dead(playerEntity);
+        }
+        
+        private static bool CreatePlayerGameStateData(PlayerEntity player)
+        {
+            var gamePlay = player.gamePlay;
+            var playerGameState = player.playerGameState;
+            if(null == playerGameState || null == gamePlay) return true;
+            
+            if (PlayerSystemEnum.PlayerDeadAnim == playerGameState.CurrentPlayerSystemState)
             {
-                if (gamePlay.IsLifeState(EPlayerLifeState.Dead))
-                {
-                    _logger.InfoFormat("{0} play die", playerEntity.entityKey);
-                    playerEntity.appearanceInterface.Appearance.SetThridPerson();
-                    playerEntity.appearanceInterface.Appearance.UnmountWeaponFromHandAtOnce();
-                    playerEntity.characterBoneInterface.CharacterBone.SetThridPerson();
-                    playerEntity.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon();
-                    playerAppearance.PlayerDead();
-                    characterControllerAppearance.PlayerDead();
-                    playerEntity.genericActionInterface.GenericAction.PlayerDead(playerEntity);
-                    //playerEntity.RootGo().SendMessage("PlayerDead");
-                    playerEntity.RootGo().BroadcastMessage("PlayerDead");
-                    //playerState.Die();
-                }
-                else if (gamePlay.IsLifeState(EPlayerLifeState.Alive))
-                {
-                    if (gamePlay.IsLastLifeState(EPlayerLifeState.Dying))
-                    {
-                        _logger.InfoFormat("{0} play revive", playerEntity.entityKey);
-                        playerState.Revive();
-                    }
-                    else if (gamePlay.IsLastLifeState(EPlayerLifeState.Dead))
-                    {
-                        _logger.InfoFormat("{0} play rebirth", playerEntity.entityKey);
-                        playerState.PlayerReborn();
-                        playerEntity.genericActionInterface.GenericAction.PlayerReborn(playerEntity);
-                        playerAppearance.PlayerReborn();
-                        characterControllerAppearance.PlayerReborn();
-                        playerEntity.RootGo().BroadcastMessage("PlayerRelive");
-                    }
-                }
-                else if (gamePlay.IsLifeState(EPlayerLifeState.Dying))
-                {
-                    _logger.InfoFormat("{0} play dying", playerEntity.entityKey);
-                    playerState.Dying();
-                    playerEntity.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon();
-                }
+                _logger.InfoFormat("ChangeClearInSystem:  {0}", playerGameState.CurrentPlayerSystemState);
+                gamePlay.ClearLifeStateChangedFlag();
+                playerGameState.CurrentPlayerSystemState = PlayerSystemEnum.NullState;
+                return true;
             }
+            
+            if (PlayerSystemEnum.NullState == playerGameState.CurrentPlayerSystemState)
+                playerGameState.CurrentPlayerSystemState = PlayerSystemEnum.PlayerDeadAnim;
 
-            gamePlay.ClearLifeStateChangedFlag();
+            return false;
+        }
+        
+        private void Reborn(PlayerEntity player)
+        {
+            _logger.InfoFormat("{0} play rebirth", player.entityKey);
+                        
+            player.characterControllerInterface.CharacterController.PlayerReborn();
+            player.RootGo().BroadcastMessage("PlayerRelive");
+        }
+
+        private void Dead(PlayerEntity player)
+        {
+            _logger.InfoFormat("{0} play die", player.entityKey);
+                    
+            player.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon(_contexts);
+            player.characterControllerInterface.CharacterController.PlayerDead();
+            player.RootGo().BroadcastMessage("PlayerDead");
+            _logger.InfoFormat("PlayerDeadAnimDead");
+        }
+
+        private void Dying(PlayerEntity player)
+        {
+            _logger.InfoFormat("{0} play dying", player.entityKey);
+            player.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon(_contexts);
+        }
+
+        private void Revive(PlayerEntity player)
+        {
+            _logger.InfoFormat("{0} play revive", player.entityKey);
         }
     }
 }

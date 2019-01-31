@@ -24,7 +24,7 @@ namespace Core.WeaponLogic.Common
         {
             if(null != cmd.FilteredInput && cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.MeleeAttack)) 
             {
-                var weaponState = weaponEntity.weaponData;
+                var weaponState = weaponEntity.weaponRuntimeInfo;
                 if(weaponState.MeleeAttacking)
                 {
                     if(playerEntity.time.ClientTime > weaponState.NextAttackingTimeLimit)
@@ -78,7 +78,7 @@ namespace Core.WeaponLogic.Common
 
         public void AfterAttack(PlayerEntity playerEntity, IWeaponCmd cmd)
         {
-            var weaponState = playerEntity.GetCurrentWeaponData(_contexts);
+            var weaponState = playerEntity.GetWeaponRunTimeInfo(_contexts);
             weaponState.MeleeAttacking = true;
             weaponState.NextAttackingTimeLimit = playerEntity.time.ClientTime + _maxCD;
             //TODO 声音和特效添加 

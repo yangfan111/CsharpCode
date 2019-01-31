@@ -14,13 +14,13 @@ namespace App.Shared.Cam
     {
         public virtual Camera CreateFpCamera(Camera mainCamera)
         {
-            mainCamera.cullingMask ^= UnityLayers.HandLayerMask;
+          
             var fpCamera = new GameObject("FPCamera").AddComponent<Camera>();
             fpCamera.transform.SetParent(mainCamera.transform);
             fpCamera.transform.localPosition = Vector3.zero;
             fpCamera.transform.localRotation = Quaternion.identity;
             fpCamera.transform.localScale = Vector3.one;
-            fpCamera.cullingMask = UnityLayers.HandLayerMask;
+          
             fpCamera.nearClipPlane = 0.01f;
 
             fpCamera.depth = mainCamera.depth + 1;
@@ -30,13 +30,13 @@ namespace App.Shared.Cam
 
         public virtual Camera CreateFxCamera(Camera mainCamera)
         {
-            mainCamera.cullingMask ^= UnityLayers.CamFxLayerMask;
+            mainCamera.cullingMask ^= UnityLayerManager.GetLayerMask(EUnityLayerName.CameraFx);
             var fxCamera = new GameObject("FxCamera").AddComponent<Camera>();
             fxCamera.transform.SetParent(mainCamera.transform);
             fxCamera.transform.localPosition = Vector3.zero;
             fxCamera.transform.localRotation = Quaternion.identity;
             fxCamera.transform.localScale = Vector3.one;
-            fxCamera.cullingMask = UnityLayers.CamFxLayerMask;
+            fxCamera.cullingMask = UnityLayerManager.GetLayerMask(EUnityLayerName.CameraFx);
             fxCamera.nearClipPlane = 0.01f;
 
             fxCamera.depth = mainCamera.depth + 2;

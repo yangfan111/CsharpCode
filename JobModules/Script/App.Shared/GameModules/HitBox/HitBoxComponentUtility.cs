@@ -25,7 +25,7 @@ namespace App.Shared.GameModules.HitBox
                     pc = go.AddComponent<HitBoxOwnerComponent>();
                 }
                 pc.OwnerEntityKey = entityKey;
-                pc.gameObject.layer = UnityLayers.HitBoxLayer;
+                pc.gameObject.layer = UnityLayerManager.GetLayerIndex(EUnityLayerName.Hitbox);
             });
             playerEntity.AddHitBox(new BoundingSphere(sc.center, sc.radius), hitboxGo);
             hitboxGo.SetActive(false);

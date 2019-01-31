@@ -25,9 +25,9 @@ namespace App.Shared.GameModules.Configuration
             return true;
         }
 
-        protected override void OnLoadSuccImpl(AssetInfo assetInfo, Object obj)
+        protected override void OnLoadSuccImpl(UnityObject unityObj)
         {
-            var asset = obj as TextAsset;
+            var asset = unityObj.As<TextAsset>();
             if (null != asset)
             {
                 var config = XmlConfigParser<SerializableCurve>.Load(asset.text);

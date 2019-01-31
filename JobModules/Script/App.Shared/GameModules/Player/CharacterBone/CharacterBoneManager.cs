@@ -8,6 +8,11 @@ using Core.Fsm;
 using Core.Utils;
 using System;
 using System.Collections.Generic;
+using App.Shared.Components.Player;
+using App.Shared.GameModules.Player.Appearance.WardrobeControllerPackage;
+using App.Shared.GameModules.Player.Appearance.WeaponControllerPackage;
+using App.Shared.GameModules.Player.CharacterBone.IkControllerPackage;
+using Core.EntityComponent;
 using UnityEngine;
 using Utils.Appearance;
 using Utils.CharacterState;
@@ -40,6 +45,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
         private float _sightMoveVerticalShift;
 
         private bool _attachmentNeedIK = false;
+        private bool _weaponHasIK = false;
 
         private GameObject _characterRoot;
         private CharacterView _view = CharacterView.ThirdPerson;
@@ -83,14 +89,14 @@ namespace App.Shared.GameModules.Player.CharacterBone
             };
         }
 
-        public void SetWardrobeController(WardrobeController value)
+        public void SetWardrobeController(WardrobeControllerBase value)
         {
-            _wardrobeController = value;
+            _wardrobeController = value as WardrobeController;
         }
 
-        public void SetWeaponController(WeaponController value)
+        public void SetWeaponController(WeaponControllerBase value)
         {
-            _weaponController = value;
+            _weaponController = value as WeaponController;
         }
 
         public Transform FastGetBoneTransform(string boneName, CharacterView view)
@@ -156,6 +162,18 @@ namespace App.Shared.GameModules.Player.CharacterBone
         public void SetThridPerson()
         {
             _view = CharacterView.ThirdPerson;
+        }
+
+        public void Reborn()
+        {
+        }
+
+        public void Dead()
+        {
+            EndIK();
+            SetThridPerson();
+            _weaponHasIK = false;
+            _attachmentNeedIK = false;
         }
 
         public void SetStablePelvisRotation()
@@ -256,8 +274,9 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 param.FastMoveHorizontalShift = 0;
                 param.FastMoveVerticalShift = 0;
                 _attachmentNeedIK = false;
+                _weaponHasIK = false;
             }
-
+            
             param.SightModelOffset = YawPitchUtility.Normalize(_characterRoot.transform.rotation).x;
 
             _boneRigging.Update(param);
@@ -265,16 +284,18 @@ namespace App.Shared.GameModules.Player.CharacterBone
             UpdateIk();
         }
 
-        public void SyncTo(ICharacterBoneState state)
+        public void SyncTo(IGameComponent characterBoneComponent)
         {
-            _followRot.SyncTo(state);
-            _weaponRot.SyncTo(state);
+            var boneComponent = characterBoneComponent as CharacterBoneComponent;
+            _followRot.SyncTo(boneComponent);
+            _weaponRot.SyncTo(boneComponent);
+            _playerIkController.SyncTo(boneComponent);
         }
 
         // 包括枪配件的改变
         public void CurrentWeaponChanged(GameObject objP1, GameObject objP3)
         {
-            if (_boneRigging.SetIKTarget(objP1, objP3))
+            if (_boneRigging.SetIKTarget(objP1, objP3, ref _weaponHasIK))
             {
                 var lowRailInCurrentWeapon = _weaponController.GetCurrentLowRailId();
                 var gripHandPoseState =
@@ -310,9 +331,8 @@ namespace App.Shared.GameModules.Player.CharacterBone
             var needIk = false;
             if (!isEmptyInHand)
             {
-                needIk = _attachmentNeedIK/* ||
-                         SingletonManager.Get<WeaponAvatarConfigManager>().GetLeftHandIK(weaponIdInHand)*/;
-
+                needIk = _weaponHasIK;
+                
                 if (_characterP1 == null) return needIk;
                 
                 param.SightOffset = SingletonManager.Get<WeaponAvatarConfigManager>().GetSightDistance(weaponIdInHand);

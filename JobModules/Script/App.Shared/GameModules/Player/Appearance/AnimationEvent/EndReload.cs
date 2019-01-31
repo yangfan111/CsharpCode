@@ -1,4 +1,5 @@
-﻿using XmlConfig;
+﻿using App.Shared.WeaponLogic;
+using XmlConfig;
 
 namespace App.Shared.GameModules.Player.Appearance.AnimationEvent
 {
@@ -7,7 +8,7 @@ namespace App.Shared.GameModules.Player.Appearance.AnimationEvent
         public void AnimationEventCallback(PlayerEntity player, string param, UnityEngine.AnimationEvent eventParam)
         {
             player.appearanceInterface.Appearance.EndReload();
-            player.weaponLogic.WeaponSound.PlaySound(EWeaponSoundType.ReloadEnd);
+            player.PlayWeaponSound(EWeaponSoundType.ReloadEnd);
         }
     }
 }

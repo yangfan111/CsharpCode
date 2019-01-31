@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Assets.App.Shared.GameModules.Camera;
 using UnityEngine;
+using XmlConfig;
 
 namespace Core.CameraControl.NewMotor.View
 {

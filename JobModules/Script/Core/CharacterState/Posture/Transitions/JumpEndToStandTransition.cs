@@ -14,7 +14,11 @@ namespace Core.CharacterState.Posture.Transitions
     {
         public JumpEndToStandTransition(short id, short target, int duration) : base(id, target, duration)
         {
-            _simpleTransferCondition = (command, addOutput) => SimpleCommandHandler(command, FsmInput.Land);
+            _simpleTransferCondition = (command, addOutput) =>
+            {
+                var ret = SimpleCommandHandler(command, FsmInput.Land);
+                return ret;
+            };
             _interruptCondition = (command, addOutput) =>
             {
                 // 每帧根据动画剩余时间更新NormalizedTime
@@ -29,6 +33,18 @@ namespace Core.CharacterState.Posture.Transitions
                                              AnimatorParametersHash.Instance.StandValue,
                                              CharacterView.FirstPerson | CharacterView.ThirdPerson);
                     addOutput(FsmOutput.Cache);
+                    
+//                    FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.JumpStateHash,
+//                        AnimatorParametersHash.Instance.JumpStateName,
+//                        AnimatorParametersHash.Instance.JumpStateNormal,
+//                       CharacterView.ThirdPerson);
+//                    addOutput(FsmOutput.Cache);
+//                    
+//                    FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MoveJumpStateHash,
+//                        AnimatorParametersHash.Instance.MoveJumpStateName,
+//                        AnimatorParametersHash.Instance.MoveJumpStateNormal,
+//                        CharacterView.ThirdPerson);
+//                    addOutput(FsmOutput.Cache);
 
                     return FsmTransitionResponseType.ExternalEnd;
                 }

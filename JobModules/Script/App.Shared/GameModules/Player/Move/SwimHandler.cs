@@ -61,9 +61,10 @@ namespace App.Shared.GameModules.Player
             return velocityOffset.magnitude > 0 ||
                    (player.stateInterface.State.IsForth &&
                     dist.sqrMagnitude > 0 &&
-                    player.orientation.Pitch >= SingletonManager.Get<CameraConfigManager>()
-                        .GetConfigByType(ECameraConfigType.ThirdPerson).PitchLimit.Max -
-                    1);
+                    player.orientation
+                        .Pitch >= //SingletonManager.Get<CameraConfigManager>().GetConfigByType(ECameraViewMode.ThirdPerson).PitchLimit.Max - 1);
+                    SingletonManager.Get<CameraConfigManager>().Config.PoseConfigs[(int)ECameraPoseMode.Stand]
+                        .PitchLimit.Max - 1);
         }
 
         private static float CalcSwimXAngle(float vertical, float horizontal, float updown)

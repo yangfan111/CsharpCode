@@ -1,44 +1,33 @@
-﻿using System;
-using App.Shared.Components;
-using App.Shared.Components.Player;
-using App.Shared.EntityFactory;
-using Core.EntityComponent;
+﻿using App.Shared.GameModules.Weapon;
+using App.Shared.WeaponLogic;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using Core.WeaponLogic;
-using UnityEngine;
-using XmlConfig;
-using Random = System.Random;
+
 namespace App.Shared.GameModules.Player
 {
     public class PlayerAttackSystem : IUserCmdExecuteSystem
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerAttackSystem));
+        private WeaponLogicManager _weaponLogicManager;
+        private Contexts _contexts;
 
-       
-        public PlayerAttackSystem()
+        public PlayerAttackSystem(Contexts contexts)
         {
-            
-        }     
-
+            _contexts = contexts;
+            _weaponLogicManager = contexts.session.commonSession.WeaponLogicManager as WeaponLogicManager;
+        }
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             PlayerEntity playerEntity = (PlayerEntity)owner.OwnerEntity;
-            if (playerEntity.hasWeaponLogic)
+            var weaponId = playerEntity.GetController<PlayerWeaponController>().CurrSlotWeaponId(_contexts);
+            var weaponLogic = _weaponLogicManager.GetWeaponLogic(weaponId);
+            var weaponEntity = playerEntity.GetWeaponEntityByHandDefault(_contexts);
+            if(null != weaponLogic)
             {
-                PrepareAttackState(playerEntity);
-                var comp = playerEntity.weaponLogic;
-                comp.Weapon.Update(comp.State, cmd);
+                weaponLogic.Update(playerEntity, weaponEntity, cmd);
             }
-        }
-
-        private void PrepareAttackState(PlayerEntity player)
-        {
-            player.playerWeaponState.Reloading = 
-                player.stateInterface.State.GetActionState() == ActionInConfig.Reload ||
-                player.stateInterface.State.GetActionState() == ActionInConfig.SpecialReload;
         }
     }
 }

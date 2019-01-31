@@ -27,7 +27,7 @@ namespace Core.CharacterState.Posture.States
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ClimbHash,
                                                  AnimatorParametersHash.Instance.ClimbName,
                                                  AnimatorParametersHash.Instance.ClimbDisableValue,
-                                                 CharacterView.ThirdPerson, false);
+                                                 CharacterView.ThirdPerson | CharacterView.FirstPerson, false);
                         addOutput(FsmOutput.Cache);
 
                         return FsmStateResponseType.Reenter;

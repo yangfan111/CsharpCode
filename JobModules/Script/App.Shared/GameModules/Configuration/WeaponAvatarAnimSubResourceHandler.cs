@@ -35,15 +35,15 @@ namespace App.Shared.GameModules.Configuration
             return hasAsset;
         }
 
-        protected override void OnLoadSuccImpl(AssetInfo assetInfo, UnityEngine.Object obj)
+        protected override void OnLoadSuccImpl(UnityObject unityObj)
         {
-            if (obj == null)
+            if (unityObj.AsObject == null)
             {
-                _logger.ErrorFormat("preload animator controller asset:{0} is loaded failed, the asset is not preload, please check the weapon_avator.xml is correctly config and asset:{0} is exist in assetbundle", assetInfo);
+                _logger.ErrorFormat("preload animator controller asset:{0} is loaded failed, the asset is not preload, please check the weapon_avator.xml is correctly config and asset:{0} is exist in assetbundle", unityObj.Address);
             }
             else
             {
-                SingletonManager.Get<WeaponAvatarConfigManager>().AddToAssetPool(assetInfo, obj);
+                SingletonManager.Get<WeaponAvatarConfigManager>().AddToAssetPool(unityObj.Address, unityObj);
             }
         }
     }

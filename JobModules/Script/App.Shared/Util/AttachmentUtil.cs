@@ -1,27 +1,24 @@
-﻿using App.Shared.GameModules.Weapon;
-using App.Shared.Components.Bag;
+﻿using App.Shared.Components.Bag;
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using Core.Appearance;
 using Core;
-using Core.Configuration;
 using Core.Utils;
 using Core.WeaponLogic.Attachment;
-using System;
 using System.Collections.Generic;
-using Utils.Appearance;
 using Utils.Configuration;
 using Utils.Singleton;
 using Utils.Utils;
 using XmlConfig;
+using App.Shared.Components.Weapon;
 
 namespace App.Shared.Util
 {
     public static class WeaponPartsUtil
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(WeaponPartsUtil));
-        private static Dictionary<WeaponPartLocation, int> _attachmentsDic = new Dictionary<WeaponPartLocation, int>(CommonEnumEqualityComparer<WeaponPartLocation>.Instance);
-        private static Dictionary<WeaponPartLocation, int> _oldAttachmentsDic = new Dictionary<WeaponPartLocation, int>(CommonEnumEqualityComparer<WeaponPartLocation>.Instance);
+        private static Dictionary<WeaponPartLocation, int> _attachmentsDic = new Dictionary<WeaponPartLocation, int>(CommonIntEnumEqualityComparer<WeaponPartLocation>.Instance);
+        private static Dictionary<WeaponPartLocation, int> _oldAttachmentsDic = new Dictionary<WeaponPartLocation, int>(CommonIntEnumEqualityComparer<WeaponPartLocation>.Instance);
 
         /// <summary>
         /// 刷新武器的配件显示
@@ -165,28 +162,6 @@ namespace App.Shared.Util
             return attach;
         }
 
-        public static void SetWeaponCompAttachment(WeaponComponent weaponComp, EWeaponPartType type, int id)
-        {
-            switch (type)
-            {
-                case EWeaponPartType.LowerRail:
-                    weaponComp.LowerRail = id;
-                    break;
-                case EWeaponPartType.UpperRail:
-                    weaponComp.UpperRail = id;
-                    break;
-                case EWeaponPartType.Muzzle:
-                    weaponComp.Muzzle = id;
-                    break;
-                case EWeaponPartType.Magazine:
-                    weaponComp.Magazine = id;
-                    break;
-                case EWeaponPartType.Stock:
-                    weaponComp.Stock = id;
-                    break;
-            }
-        }
-
         public static WeaponInfo SetWeaponInfoAttachment(WeaponInfo weaponInfo, EWeaponPartType type, int id)
         {
             switch(type)
@@ -226,7 +201,7 @@ namespace App.Shared.Util
             return result;
         }
 
-        public static WeaponPartsStruct GetParts(this WeaponComponent comp)
+        public static WeaponPartsStruct GetParts(this WeaponBasicInfoComponent comp)
         {
             var result = new WeaponPartsStruct
             {
@@ -237,11 +212,11 @@ namespace App.Shared.Util
                 Magazine = comp.Magazine,
             };
 
-            result = result.ApplyDefaultParts(comp.Id);
+            result = result.ApplyDefaultParts(comp.WeaponId);
             return result;
         }
 
-        public static void ApplyParts(this WeaponComponent comp, WeaponPartsStruct attach)
+        public static void ApplyParts(this WeaponBasicInfoComponent comp, WeaponPartsStruct attach)
         {
             comp.LowerRail = attach.LowerRail;
             comp.UpperRail = attach.UpperRail;
@@ -250,11 +225,11 @@ namespace App.Shared.Util
             comp.Stock = attach.Stock;
         }
 
-        public static void CopyToWeaponComponentWithDefaultParts(this WeaponInfo weaponInfo, WeaponComponent weaponComponnet)
+        public static void CopyToWeaponComponentWithDefaultParts(this WeaponInfo weaponInfo, WeaponBasicInfoComponent weaponComponnet)
         {
             if (weaponComponnet != null)
             {
-                weaponInfo.ToPlayerWeaponComponent(weaponComponnet);
+                weaponInfo.ToWeaponComponent(weaponComponnet);
                 var attach = GetParts(weaponInfo);
                 attach = attach.ApplyDefaultParts(weaponInfo.Id);
                 weaponComponnet.ApplyParts(attach);

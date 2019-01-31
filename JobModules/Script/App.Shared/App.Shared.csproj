@@ -167,7 +167,10 @@ if %errorlevel% neq 0 goto :VCEnd" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\DebugHandle\GameSettingUtility.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\DebugHandle\SharedCommandHandler.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\DebugHandle\VehicleDebugUtility.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared\DebugSystem\RigidbodyDebugSystem.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\DebugSystem\AbstractDebugInfoSystem.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\DebugSystem\RigidbodyDebugInfoSystem.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\DebugSystem\ServerDebugInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared\DebugSystem\ServerDebugInfoSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\EEntityType.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\ENetworkMessages.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared\Editor\ExitPlayModeOnScriptCompile.cs" />

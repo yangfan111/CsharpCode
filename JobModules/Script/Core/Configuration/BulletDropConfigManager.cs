@@ -10,7 +10,7 @@ namespace Core.Configuration
 {
     public class BulletDropConfigManager : AbstractConfigManager<BulletDropConfigManager>
     {
-        private Dictionary<EBulletCaliber, BulletDropConfigItem> _itemDic = new Dictionary<EBulletCaliber, BulletDropConfigItem>(CommonEnumEqualityComparer<EBulletCaliber>.Instance);
+        private Dictionary<EBulletCaliber, BulletDropConfigItem> _itemDic = new Dictionary<EBulletCaliber, BulletDropConfigItem>(CommonIntEnumEqualityComparer<EBulletCaliber>.Instance);
 
         public override void ParseConfig(string xml)
         {

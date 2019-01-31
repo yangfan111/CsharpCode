@@ -104,7 +104,8 @@ namespace App.Shared.GameModules.Camera
         private void UpdateCollisionLayerMask(PlayerEntity playerEntity)
         {
             bool needCollisionWithCar =
-                playerEntity.stateInterface.State.GetActionKeepState() != ActionKeepInConfig.Drive;
+                playerEntity.stateInterface.State.GetActionKeepState() != ActionKeepInConfig.Drive &&
+                playerEntity.gamePlay.GameState != Components.GameState.AirPlane;
             _collisionLayers = needCollisionWithCar
                 ? _baseCollisionLayers
                 : _baseCollisionLayers & ~UnityLayers.VehicleLayerMask;

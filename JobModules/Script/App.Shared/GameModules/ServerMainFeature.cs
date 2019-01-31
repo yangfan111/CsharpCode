@@ -28,7 +28,7 @@ namespace App.Shared.GameModules
             IRoom room) : base(name)
         {
             topLevelGameModule.Init();
-            Add(new ModuleInitSystem(topLevelGameModule, sessionObjects.LoadRequestManager));
+            Add(new ModuleInitSystem(topLevelGameModule, sessionObjects.AssetManager));
             Add(new EntityCreateSystem(topLevelGameModule));
 
             Add(new GameStateUpdateSystem(topLevelGameModule));
@@ -50,8 +50,8 @@ namespace App.Shared.GameModules
                 sessionObjects.GameStateProcessorFactory, 4));
 #endif
 
-            Add(new LoadRequestManagerSystem(sessionObjects));
-            Add(new ResourceLoadSystem(topLevelGameModule, sessionObjects.LoadRequestManager));
+            Add(new UnityAssetManangerSystem(sessionObjects));
+            Add(new ResourceLoadSystem(topLevelGameModule, sessionObjects.AssetManager));
 
             Add(new GamePlaySystem(topLevelGameModule));
 

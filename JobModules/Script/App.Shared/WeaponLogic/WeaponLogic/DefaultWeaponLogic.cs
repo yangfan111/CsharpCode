@@ -7,7 +7,7 @@ namespace Core.WeaponLogic
         private IFireLogic _fireLogic;
         private LeftWeaponCmd _cmd = new LeftWeaponCmd();
 
-        public DefaultWeaponLogic(IFireLogic fireLogic)
+        public void SetFireLogic(IFireLogic fireLogic)
         {
             _fireLogic = fireLogic;
         }
@@ -15,7 +15,10 @@ namespace Core.WeaponLogic
         public void Update(PlayerEntity playerEntity, WeaponEntity weaponEntity, IUserCmd cmd)
         {
             _cmd.SetCurrentCmd(cmd);
-            _fireLogic.OnFrame(playerEntity, weaponEntity, _cmd);
+            if(null != _fireLogic)
+            {
+                _fireLogic.OnFrame(playerEntity, weaponEntity, _cmd);
+            }
         }
     }
 }

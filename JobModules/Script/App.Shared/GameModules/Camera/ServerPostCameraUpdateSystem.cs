@@ -8,6 +8,7 @@ using Core.CameraControl.NewMotor;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
+using XmlConfig;
 
 namespace App.Shared.GameModules.Camera
 {

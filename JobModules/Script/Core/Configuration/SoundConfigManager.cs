@@ -45,7 +45,6 @@ namespace Core.Configuration.Sound
             {
                 _weaponSoundDic[item.Id] = item;
             }
-            //TODO 检查必要的类型是否存在
         }
 
         public SoundConfigItem GetSoundById(int id)

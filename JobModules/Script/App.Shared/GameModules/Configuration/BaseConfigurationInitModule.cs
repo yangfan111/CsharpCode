@@ -18,9 +18,6 @@ namespace App.Shared.GameModules.Configuration
 
         public BaseConfigurationInitModule(Contexts context, ISessionState sessionState)
         {
-            
-
-
             AddConfigSystem<AssetConfigManager>(sessionState, "svn.version");
             AddConfigSystem<CharacterStateConfigManager>(sessionState, "SpeedConfig");
             AddConfigSystem<AvatarAssetConfigManager>(sessionState, "role_avator_res");
@@ -28,7 +25,9 @@ namespace App.Shared.GameModules.Configuration
             AddConfigSystem<FirstPersonOffsetConfigManager>(sessionState, "FirstPersonOffset");
             AddConfigSystem<RoleConfigManager>(sessionState, "role");
             AddConfigSystem<KillFeedBackConfigManager>(sessionState, "killfeedback");
-            AddConfigSystem<CameraConfigManager>(sessionState, "NewCamera");
+            
+            AddConfigSystem<CameraConfigManager>(sessionState, "Camera");
+            
             AddConfigSystem<SoundConfigManager>(sessionState, "Sound");
             AddConfigSystem<PlayerSoundConfigManager>(sessionState, "PlayerSound");
             AddConfigSystem<BulletDropConfigManager>(sessionState, "BulletDrop");
@@ -69,6 +68,12 @@ namespace App.Shared.GameModules.Configuration
             AddConfigSystem<WeaponAvatarConfigManager>(sessionState, "weapon_avator");
             AddConfigSystem<StreamingLevelStructure>(sessionState, "streaminglevel", "tablesfrombuilding");
             AddConfigSystem<MapsDescription>(sessionState, "mapConfig");
+            AddConfigSystem<AudioWeaponManager>(sessionState, "WeaponAudio");
+            AddConfigSystem<AudioEventManager>(sessionState, "AudioEvent");
+            AddConfigSystem<AudioGroupManager>(sessionState, "AudioGroup");
+
+
+
         }
 
         private void AddConfigSystem<T>(ISessionState sessionState, string asset,

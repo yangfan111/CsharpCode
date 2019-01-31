@@ -21,11 +21,11 @@ namespace App.Shared.Terrains
             
         }
 
-        public void LoadTerrain(ILoadRequestManager manager, AbstractMapConfig sceneConfig)
+        public void LoadTerrain(IUnityAssetManager assetManager, AbstractMapConfig sceneConfig)
         {
             if (!_dictTerrains.ContainsKey(sceneConfig.Id))
             {
-                MyTerrain terrain = new MyTerrain(manager, sceneConfig);
+                MyTerrain terrain = new MyTerrain(assetManager, sceneConfig);
                 terrain.LoadAll();
                 AddTerrain(terrain);
             }
@@ -67,8 +67,8 @@ namespace App.Shared.Terrains
             IMyTerrain myTerrain = GetCurrentTerrain();
             if (null != myTerrain)
             {
-                TerrainCommonData.leftMinPos = new Vector3(myTerrain.OriginPosition.x, myTerrain.OriginPosition.y,myTerrain.OriginPosition.z);
-                TerrainCommonData.size = new Vector2(myTerrain.Size.x, myTerrain.Size.y);
+//                TerrainCommonData.leftMinPos = new Vector3(myTerrain.OriginPosition.x, myTerrain.OriginPosition.y,myTerrain.OriginPosition.z);
+//                TerrainCommonData.size = new Vector2(myTerrain.Size.x, myTerrain.Size.y);
             }
         }
     }

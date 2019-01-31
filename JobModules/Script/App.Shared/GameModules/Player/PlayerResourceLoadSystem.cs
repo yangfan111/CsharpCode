@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using App.Shared.Components.Player;
 using App.Shared.GameModules.Common;
 using App.Shared.GameModules.HitBox;
 using App.Shared.GameModules.Player.Appearance;
@@ -17,6 +18,7 @@ using Core.HitBox;
 using Utils.Appearance;
 using Core.WeaponAnimation;
 using App.Shared.GameModules.Player.Appearance.AnimationEvent;
+using App.Shared.GameModules.Player.Appearance.WeaponControllerPackage;
 using App.Shared.GameModules.Player.ConcreteCharacterController;
 using App.Shared.Player;
 using Core.CharacterController;
@@ -38,9 +40,9 @@ namespace App.Shared.GameModules.Player
         private readonly ThirdPersonModelLoadHandler _p3Handler;
         private readonly InterceptPool _interceptPool = new InterceptPool();
         
-        public PlayerResourceLoadSystem(PlayerContext contexts) : base(contexts)
+        public PlayerResourceLoadSystem(Contexts contexts) : base(contexts.player)
         {
-            _player = contexts;
+            _player = contexts.player;
             _p1Handler = new FirstPersonModelLoadHandler(contexts);
             _p3Handler = new ThirdPersonModelLoadHandler(contexts);
         }
@@ -57,14 +59,14 @@ namespace App.Shared.GameModules.Player
 
         public override void SingleExecute(PlayerEntity player)
         {
-            LoadRequestManager.AppendLoadRequest(
+            AssetManager.LoadAssetAsync(
                 player,
                 AssetConfig.GetCharacterModelAssetInfo(player.playerInfo.ModelName),
                 _p3Handler.OnLoadSucc);
-            LoadRequestManager.AppendLoadRequest(player, AssetConfig.GetCharacterHitboxAssetInfo(player.playerInfo.ModelName), new HitboxLoadResponseHandler().OnLoadSucc);
+            AssetManager.LoadAssetAsync(player, AssetConfig.GetCharacterHitboxAssetInfo(player.playerInfo.ModelName), new HitboxLoadResponseHandler().OnLoadSucc);
             if (player.isFlagSelf)
             {
-                LoadRequestManager.AppendLoadRequest(
+                AssetManager.LoadAssetAsync(
                     player,
                     AssetConfig.GetCharacterHandAssetInfo(player.playerInfo.ModelName),
                     _p1Handler.OnLoadSucc);
@@ -73,9 +75,9 @@ namespace App.Shared.GameModules.Player
             _logger.InfoFormat("created client player entity {0}", player.entityKey);               
         }
 
-        public override void OnLoadResources(ILoadRequestManager coRoutineManager)
+        public override void OnLoadResources(IUnityAssetManager assetManager)
         {
-            base.OnLoadResources(coRoutineManager);
+            base.OnLoadResources(assetManager);
             foreach (var entity in _player.GetEntities())
             {
                 if (entity.hasAppearanceInterface)
@@ -84,15 +86,15 @@ namespace App.Shared.GameModules.Player
                     foreach (var request in loadRequests)
                     {
                         var intercept = _interceptPool.Get();
-                        intercept.SetParam(entity, request.Handler);
-                        coRoutineManager.AppendLoadRequest(entity, request.AssetInfo, intercept.Call);
+                        intercept.SetParam(entity, request.GetHandler<PlayerEntity>());
+                        assetManager.LoadAssetAsync(entity, request.AssetInfo, intercept.Call);
                     }
 
                     var recycleRequests = entity.appearanceInterface.Appearance.GetRecycleRequests();
                     foreach (var request in recycleRequests)
                     {
                         entity.RemoveAsset(request);
-                        coRoutineManager.AddRecycleRequest(request);
+                        assetManager.Recycle(request);
                     } 
 
                     entity.appearanceInterface.Appearance.ClearRequests();
@@ -103,21 +105,23 @@ namespace App.Shared.GameModules.Player
         public class ModelLoadHandler
         {
             private PlayerContext _playerContext;
+            private Contexts _contexts;
 
-            public ModelLoadHandler(PlayerContext playerContext)
+            public ModelLoadHandler(Contexts contexts)
             {
-                _playerContext = playerContext;
+                _playerContext = contexts.player;
+                _contexts = contexts;
             }
 
             protected void HandleLoadedModel(PlayerEntity player, GameObject obj)
             {
-                obj.layer = UnityLayers.PlayerLayer;
+                obj.layer = UnityLayerManager.GetLayerIndex(EUnityLayerName.Player);
                 PlayerEntityUtility.DisableCollider(obj.transform);
 
                 if (!player.hasCharacterContoller)
                 {
                     var character = DefaultGo.CreateGameObject(player.entityKey.ToString());
-                    character.layer = UnityLayers.PlayerLayer;
+                    character.layer = UnityLayerManager.GetLayerIndex(EUnityLayerName.Player);
                     CharacterController cc = PlayerEntityUtility.InitCharacterController(character);
                     KinematicCharacterMotor kcc = PlayerEntityUtility.InitKinematicCharacterMotor(character);
                     CharacterControllerContext characterControllerContext = new CharacterControllerContext(
@@ -137,7 +141,7 @@ namespace App.Shared.GameModules.Player
                     character.AddComponent<EntityReference>();
                     character.GetComponent<EntityReference>().Init(player.entityAdapter);
                     var comp = character.AddComponent<PlayerVehicleCollision>();
-                    comp.Context = _playerContext;
+                    comp.AllContext = _contexts;
 
                     var appearanceManager = new AppearanceManager();
                     player.AddAppearanceInterface(appearanceManager);
@@ -149,30 +153,34 @@ namespace App.Shared.GameModules.Player
                     var characterBone = new CharacterBoneManager();
                     characterBone.SetWardrobeController(player.appearanceInterface.Appearance.GetWardrobeController());
                     characterBone.SetWeaponController(player.appearanceInterface.Appearance.GetController<PlayerWeaponController>());
-                    player.appearanceInterface.Appearance.GetController<PlayerWeaponController>().SetWeaponChangedCallBack(characterBone.CurrentWeaponChanged);
-                    player.appearanceInterface.Appearance.GetController<PlayerWeaponController>().SetCacheChangeAction(characterBone.CacheChangeCacheAction);
+                    var weaponController = player.appearanceInterface.Appearance.GetController<PlayerWeaponController>() as WeaponController;
+                    if (null != weaponController)
+                    {
+                        weaponController.SetWeaponChangedCallBack(characterBone.CurrentWeaponChanged);
+                        weaponController.SetCacheChangeAction(characterBone.CacheChangeCacheAction);
+                    }
+                    
                     player.AddCharacterBoneInterface(characterBone);
-
                     player.AddRecycleableAsset(character);
+                    player.AddPlayerGameState(PlayerSystemEnum.NullState);
                 }
             }
         }
 
         public class FirstPersonModelLoadHandler : ModelLoadHandler
         {
-            public FirstPersonModelLoadHandler(PlayerContext playerContext): base(playerContext)
+            public FirstPersonModelLoadHandler(Contexts contexts): base(contexts)
             {
                 
             }
 
-            public void OnLoadSucc(object source, UnityObjectWrapper<GameObject> obj)
+            public void OnLoadSucc(PlayerEntity player, UnityObject unityObj)
             {
-                PlayerEntity player = (PlayerEntity)source;
-                GameObject go = obj;
+                GameObject go = unityObj;
 
                 HandleLoadedModel(player, go);
                 
-                player.AddAsset(obj);
+                player.AddAsset(unityObj);
 
                 player.AddFirstPersonModel(go);
 
@@ -232,21 +240,20 @@ namespace App.Shared.GameModules.Player
 
         public class ThirdPersonModelLoadHandler : ModelLoadHandler
         {
-            public ThirdPersonModelLoadHandler(PlayerContext playerContext) : base(playerContext)
+            public ThirdPersonModelLoadHandler(Contexts contexts) : base(contexts)
             {
                 
             }
 
-            public void OnLoadSucc(object source, UnityObjectWrapper<GameObject> obj)
+            public void OnLoadSucc(PlayerEntity player, UnityObject unityObj)
             {
-                PlayerEntity player = (PlayerEntity)source;
-                GameObject go = obj;
+                GameObject go = unityObj;
 
                 RemoveRagdollOnServerSide(go);
                 
                 HandleLoadedModel(player, go);
                 
-                player.AddAsset(obj);
+                player.AddAsset(unityObj);
 
                 player.AddThirdPersonModel(go);
 
@@ -357,25 +364,23 @@ namespace App.Shared.GameModules.Player
 
         public class HitboxLoadResponseHandler
         {
-            public void OnLoadSucc(object source, UnityObjectWrapper<GameObject> obj)
+            public void OnLoadSucc(PlayerEntity playerEntity, UnityObject unityObject)
             {
-                PlayerEntity playerEntity = (PlayerEntity)source;
-                var hitboxConfig = (GameObject)obj;
+                var hitboxConfig = unityObject;
                 HitBoxComponentUtility.InitHitBoxComponent(playerEntity.entityKey.Value, playerEntity, hitboxConfig);
             }
         }
 
         public class ParachuteLoadResponseHandler
         {
-            public void OnLoadSucc(object source, UnityObjectWrapper<GameObject> obj)
+            public void OnLoadSucc(PlayerEntity player, UnityObject unityObj)
             {
-                PlayerEntity player = (PlayerEntity)source;
                 if (player.isFlagDestroy)
                 {
                     return;
                 }
 
-                var transform =  obj.Value.transform;
+                var transform =  unityObj.AsGameObject.transform;
                 const string anchorName = "Driver_Seat";
                 var anchor = transform.FindChildRecursively(anchorName);
                 if (anchor == null)
@@ -394,23 +399,23 @@ namespace App.Shared.GameModules.Player
             private readonly InterceptPool _pool;
 
             private PlayerEntity _player;
-            private Action<object, UnityObjectWrapper<GameObject>> _handler;
+            private Action<PlayerEntity, UnityObject> _handler;
 
             public LoadResourceIntercept(InterceptPool pool)
             {
                 _pool = pool;
             }
 
-            public void SetParam(PlayerEntity player, Action<object, UnityObjectWrapper<GameObject>> handler)
+            public void SetParam(PlayerEntity player, Action<PlayerEntity, UnityObject> handler)
             {
                 _player = player;
                 _handler = handler;
             }
 
-            public void Call(object source, UnityObjectWrapper<GameObject> obj)
+            public void Call(PlayerEntity player, UnityObject unityObj)
             {
-                _player.AddAsset(obj);
-                _handler(source, obj);
+                _player.AddAsset(unityObj);
+                _handler(player, unityObj);
                 _pool.Free(this);
             }
         }

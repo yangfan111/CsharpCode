@@ -14,24 +14,25 @@ namespace Core.Components
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(MultiAssetComponent));
 
-        public Dictionary<AssetInfo, UnityObjectWrapper<GameObject>> LoadedAssets { get; private set; }
+        public Dictionary<AssetInfo, UnityObject> LoadedAssets { get; private set; }
 
         protected MultiAssetComponent()
         {
-            LoadedAssets = new Dictionary<AssetInfo, UnityObjectWrapper<GameObject>>(AssetInfo.AssetInfoComparer.Instance);
+            LoadedAssets = new Dictionary<AssetInfo, UnityObject>(AssetInfo.AssetInfoComparer.Instance);
         }
 
-        public virtual void Recycle(IGameObjectPool gameObjectPool)
+        public virtual void Recycle(IUnityAssetManager assetManager)
         {
             foreach (var asset in LoadedAssets)
             {
-                gameObjectPool.Add(asset.Value);
+                if(asset.Value != null)
+                    assetManager.Recycle(asset.Value);
             }
         }
 
         public GameObject FirstAsset
         {
-            get { return LoadedAssets.Count > 0 ? LoadedAssets.First().Value : null; }
+            get { return LoadedAssets.Count > 0 ? LoadedAssets.First().Value.AsGameObject : null; }
         }
 
         public abstract int GetComponentId();
@@ -41,7 +42,7 @@ namespace Core.Components
         {
             if (LoadedAssets == null)
                 LoadedAssets =
-                    new Dictionary<AssetInfo, UnityObjectWrapper<GameObject>>(AssetInfo.AssetInfoComparer.Instance);
+                    new Dictionary<AssetInfo, UnityObject>(AssetInfo.AssetInfoComparer.Instance);
             else
             {
                 LoadedAssets.Clear();

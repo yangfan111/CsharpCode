@@ -22,9 +22,6 @@ namespace App.Shared.Configuration
     public class MapConfigManager : Singleton<MapConfigManager>, IMapConfigManager
     {
         private static LoggerAdapter Logger = new LoggerAdapter(typeof(MapConfigManager));
-        private int _mapId;
-        private Action _callBack;
-        private ILoadRequestManager _loadSceneHandler;
 
         public AbstractMapConfig SceneParameters { get; private set; }
         public ZoneController _zone;
@@ -33,25 +30,10 @@ namespace App.Shared.Configuration
 
         private static MapConfig _mapConfig;
         
-        public static void Generate(int mapId, Action callBack)
-        {
-            var instance = SingletonManager.Get<MapConfigManager>();
-            instance.Init(mapId,  callBack);
-        }
 
         public MapConfigManager()
         { }
 
-        private void Init(int mapId, Action callBack)
-        {
-            _mapId = mapId;
-            _callBack = callBack;
-        }
-
-        public void SetLoadSceneHandler(ILoadRequestManager loadSceneHandler)
-        {
-            _loadSceneHandler = loadSceneHandler;
-        }
 
         public bool InWater(Vector3 position)
         {
@@ -96,7 +78,7 @@ namespace App.Shared.Configuration
 
         public void LoadSpecialZoneTriggers()
         {
-            _zone.CreateZoneTriggers(SpecialZone.Water, UnityLayers.WaterTriggerLayer);
+            _zone.CreateZoneTriggers(SpecialZone.Water, UnityLayerManager.GetLayerIndex(EUnityLayerName.WaterTrigger));
         }
     }
 }

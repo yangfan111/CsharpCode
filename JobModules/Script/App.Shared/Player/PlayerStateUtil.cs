@@ -68,7 +68,14 @@ namespace App.Shared.Player
         HasHelmet = 4,
         DivingChok = 5,
         NotMove = 6,
-        InterruptItem=7
+        InterruptItem=7,
+        
+        PlayerReborn,
+        PlayerRevive,
+        PlayerDead,
+        PlayerDying,
+        TurnOver,
+        TurnStart
     }
 
     public enum EPlayerCastState

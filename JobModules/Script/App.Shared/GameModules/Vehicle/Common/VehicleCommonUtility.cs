@@ -19,16 +19,16 @@ namespace App.Shared.GameModules.Vehicle
                 return;
             }
 
-            var go = vehicle.gameObject.UnityObjWrapper.Value;
+            var go = vehicle.gameObject.UnityObject.AsGameObject;
             SetLayer(go.transform, layer);
         }
 
         private static void SetLayer(Transform transform, int layer)
         {
-            if (transform.gameObject.layer != UnityLayers.HitBoxLayer &&
-                transform.gameObject.layer != UnityLayers.VehicleTriggerLayer &&
-                transform.gameObject.layer != UnityLayers.PlayerLayer &&
-                transform.gameObject.layer != UnityLayers.VehicleTireLayer)
+            if (transform.gameObject.layer != UnityLayerManager.GetLayerIndex(EUnityLayerName.Hitbox) &&
+                transform.gameObject.layer != UnityLayerManager.GetLayerIndex(EUnityLayerName.VehicleTrigger) &&
+                transform.gameObject.layer != UnityLayerManager.GetLayerIndex(EUnityLayerName.Player) &&
+                transform.gameObject.layer != UnityLayerManager.GetLayerIndex(EUnityLayerName.VehicleTire))
             {
                 transform.gameObject.layer = layer;
             }

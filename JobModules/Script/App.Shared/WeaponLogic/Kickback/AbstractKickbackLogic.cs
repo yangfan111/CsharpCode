@@ -1,6 +1,8 @@
-﻿using App.Shared.WeaponLogic;
+﻿using App.Shared;
+using App.Shared.WeaponLogic;
 using Core.WeaponLogic.WeaponLogicInterface;
 using UnityEngine;
+using WeaponConfigNs;
 
 namespace Core.WeaponLogic.Kickback
 {
@@ -26,14 +28,24 @@ namespace Core.WeaponLogic.Kickback
 
         public void OnFrame(PlayerEntity playerEntity, WeaponEntity weaponEntity, IWeaponCmd cmd)
         {
-            var weaponState = weaponEntity.weaponData;
+            var weaponState = weaponEntity.weaponRuntimeInfo;
             int frameInterval = cmd.FrameInterval;
             if (weaponState.PunchDecayCdTime > 0)
             {
                 weaponState.PunchDecayCdTime -= frameInterval;
+                var duration = GetDecayCdTime(playerEntity);
+                var deltaTime = cmd.RenderTime - weaponState.LastRenderTime;
+                weaponState.LastRenderTime = cmd.RenderTime;
+                playerEntity.orientation.NegPunchPitch += weaponState.PunchPitchSpeed * deltaTime;
+                playerEntity.orientation.WeaponPunchPitch = 
+                    playerEntity.orientation.NegPunchPitch  * GetKickbackConfig(playerEntity).Default.VPunchOffsetFactor;
+                playerEntity.orientation.NegPunchYaw += weaponState.PunchYawSpeed * deltaTime;
+                playerEntity.orientation.WeaponPunchYaw = 
+                    playerEntity.orientation.NegPunchYaw * GetKickbackConfig(playerEntity).Default.HPunchOffsetFactor;
             }
             else
             {
+                weaponState.LastRenderTime = cmd.RenderTime;
                 var punchYaw = playerEntity.orientation.NegPunchYaw;
                 var punchPitch = playerEntity.orientation.NegPunchPitch;
                 var frameTime = frameInterval / 1000f;
@@ -51,6 +63,33 @@ namespace Core.WeaponLogic.Kickback
                     playerEntity.orientation.WeaponPunchPitch = playerEntity.orientation.NegPunchPitch * factor;
                 }
             }
+        }
+
+        protected int GetDecayCdTime(PlayerEntity playerEntity)
+        {
+            var commonFireConfig = GetCommonFireConfig(playerEntity);
+            var kickbackConfig = GetKickbackConfig(playerEntity);
+            return (int)(commonFireConfig.AttackInterval * kickbackConfig.DecaytimeFactor);
+        }
+
+        protected RifleKickbackLogicConfig GetKickbackConfig(PlayerEntity playerEntity)
+        {
+            var config = playerEntity.GetWeaponConfig(_contexts);
+            if(null != config)
+            {
+                return config.RifleKickbackLogicCfg;
+            }
+            return null;
+        }
+
+        protected CommonFireConfig GetCommonFireConfig(PlayerEntity playerEntity)
+        {
+            var config = playerEntity.GetWeaponConfig(_contexts);
+            if(null != config)
+            {
+                return config.CommonFireCfg;
+            }
+            return null;
         }
     }
 }

@@ -11,7 +11,7 @@ namespace App.Shared.GameModules.Weapon.Bullet
 
         public virtual Vector3 GetFireDir(int seed, PlayerEntity playerEntity, WeaponEntity weaponEntity, Contexts contexts)
         {
-            var weaponState = weaponEntity.weaponData;
+            var weaponState = weaponEntity.weaponRuntimeInfo;
             if(!playerEntity.hasOrientation)
             {
                 LogError("playerEntity has no orientation");

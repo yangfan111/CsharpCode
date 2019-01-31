@@ -22,7 +22,7 @@ namespace Core.Prediction.UserPrediction.Parallel
         private ITaskDisparcher _disparcher;
         private float _rate;
 
-        public WorkThread(string name, List<IUserCmdExecuteSystem> systems)
+        public WorkThread(string name, List<IUserCmdExecuteSystem> systems): base(name)
         {
             _systems = systems;
             foreach (var userCmdExecuteSystem in _systems)

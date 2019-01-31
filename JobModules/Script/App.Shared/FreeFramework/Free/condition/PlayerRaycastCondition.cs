@@ -19,7 +19,7 @@ namespace App.Shared.FreeFramework.Free.condition
             FreeData fd = (FreeData)args.GetUnit(player);
             if (fd != null)
             {
-                return fd.Player.raycastTarget.Key == key;
+                return fd.Player.hasRaycastTarget && fd.Player.raycastTarget.Key == key;
             }
 
             return false;

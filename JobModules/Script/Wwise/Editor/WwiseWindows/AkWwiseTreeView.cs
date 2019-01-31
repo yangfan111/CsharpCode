@@ -410,7 +410,7 @@ public class AkWwiseTreeView : AK.Wwise.TreeView.TreeViewControl
 		else
 		{
 			UnityEngine.GUILayout.Label("Wwise Project not found at path:");
-			UnityEngine.GUILayout.Label(AudioPluginSettingAgent.DeveloperWwiseProjectPath);
+			UnityEngine.GUILayout.Label(AudioPluginManagement.DeveloperWwiseProjectPath);
 			UnityEngine.GUILayout.Label("Wwise Picker will not be usable.");
 		}
 	}

@@ -1,134 +1,104 @@
 ﻿using App.Shared.Util;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using UnityEngine;
+using XmlConfig;
 
-namespace   App.Shared.Audio
+namespace App.Shared.Audio
 {
     public class AKTypesController
     {
+        /// <summary>
+        /// eventId ==>event
+        /// </summary>
+        private readonly Dictionary<int, AKEventAtom> events = new Dictionary<int, AKEventAtom>();
+        /// <summary>
+        /// gameobject=>switchStates
+        /// </summary>
+        private readonly Dictionary<GameObject, HashSet<AKSwitchAtom>> gameobjectSwitchGrps = new Dictionary<GameObject, HashSet<AKSwitchAtom>>();
 
-        private readonly Dictionary<int, AKSwitchGroup> typeSwitch_GameObjHash_Datas = new Dictionary<int, AKSwitchGroup>();
-        private readonly Dictionary<int, AKStateGroup> typeState_ConfigId_Datas = new Dictionary<int, AKStateGroup>();
-
-        public delegate AKGroupCfg GroupCfgFinder(int groupId);
         public AKTypesController()
         {
-            var groupList = AKGroupCfg.Gather();
-            IEnumerator<AKGroupCfg> enumerator = groupList.GetEnumerator();
-            AKGroupCfg cfg;
-            while (enumerator.MoveNext())
+            AKEventAtom.onImplentment += PostEventHandler;
+            AKSwitchAtom.onImplentment += SwitchStateHandler;
+        }
+
+
+        private void SwitchStateHandler(AKSwitchAtom atom, GameObject target)
+        {
+            AKRESULT result = AkSoundEngine.SetSwitch(atom.config.Group, atom.currState, target);
+            AudioUtil.AssertProcessResult(result, "set switch {1} {0}", atom.currState,target.name);
+        }
+        private void PostEventHandler(AKEventAtom atom, GameObject target, bool firstPlayInObject)
+        {
+            if (firstPlayInObject && atom.attachedGrps.Count > 0)
             {
-                cfg = enumerator.Current;
-                if (cfg.type == AudioGroupType.StateGroup)
+                foreach (int grp in atom.attachedGrps)
                 {
-                    typeState_ConfigId_Datas.Add(cfg.id, new AKStateGroup(cfg));
+                    RegisterGetSwitch(target, grp);
                 }
             }
-            AKSwitchGroup.CfgFinder = AKGroupCfg.FindById;
-
+            AkSoundEngine.PostEvent(atom.evtName, target);
         }
-       
-        public bool IsGameObjectGroupVailed(int groupId,UnityEngine.GameObject target)
+        /// <summary>
+        /// switch获取
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="grpId"></param>
+        /// <returns></returns>
+        public AKSwitchAtom GetSwitch(GameObject target, int grpId)
         {
-            CommonUtil.WeakAssert(target != null);
-            int instanceId = target.GetInstanceID();
-            return typeSwitch_GameObjHash_Datas.ContainsKey(instanceId);
-        }
-
-
-        public AKRESULT VarySwitchState(int groupId, UnityEngine.GameObject target, string state = "")
-        {
-            CommonUtil.WeakAssert(target != null);
-            int instanceId = target.GetInstanceID();
-            AKSwitchGroup group;
-            AKRESULT ret;
-            if (typeSwitch_GameObjHash_Datas.TryGetValue(instanceId, out group))
+            HashSet<AKSwitchAtom> switchAtoms;
+            if (gameobjectSwitchGrps.TryGetValue(target, out switchAtoms))
             {
-                if (string.IsNullOrEmpty(state))
+                foreach (var atom in switchAtoms)
                 {
-                    ret = AkSoundEngine.SetSwitch(group.GetGroupName(), group.GetDefaultState(), target);
+                    if (atom.config.Id == grpId)
+                        return atom;
                 }
-                else if (!group.CanVaryState(state))
+            }
+            return null;
+        }
+        /// <summary>
+        /// 新switch注册获取
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="grpId"></param>
+        /// <param name="stateIndex"></param>
+        /// <returns></returns>
+        public AKSwitchAtom RegisterGetSwitch(GameObject target, int grpId, int stateIndex = -1)
+        {
+            CommonUtil.WeakAssert(target != null);
+            HashSet<AKSwitchAtom> switchAtoms;
+            AKSwitchAtom ret;
+            if (gameobjectSwitchGrps.TryGetValue(target, out switchAtoms))
+            {
+                foreach (var atom in switchAtoms)
                 {
-                    return AKRESULT.AK_InvalidStateGroupElement;
+                    if (atom.config.Id == grpId)
+                        return atom;
                 }
-                else
-                {
-                    ret = AkSoundEngine.SetSwitch(group.GetGroupName(), state, target);
-
-                }
+                ret = new AKSwitchAtom(grpId, stateIndex, target);
+                switchAtoms.Add(ret);
             }
             else
             {
-                group = AKSwitchGroup.Allocate(groupId, target);
-                if (group.CanVaryState(state))
-                {
-                    ret = AkSoundEngine.SetSwitch(group.GetGroupName(), state, target);
-                }
-                else
-                {
-                    ret = AkSoundEngine.SetSwitch(group.GetGroupName(), group.GetDefaultState(), target);
-                }
-                typeSwitch_GameObjHash_Datas.Add(instanceId, group);
+                ret = new AKSwitchAtom(grpId, stateIndex, target);
+                switchAtoms = new HashSet<AKSwitchAtom>() { ret };
+                gameobjectSwitchGrps.Add(target, switchAtoms);
             }
-            VaryGroupIfSucess(group, ret, state);
-            return ret;
-
-        }
-        private void VaryGroupIfSucess(AKStateGroup group, AKRESULT result, string state)
-        {
-            if (result == AKRESULT.AK_Success)
-            {
-                group.Change(state);
-            }
-        }
-        public AKRESULT VaryGlobalState(int groupId, string state)
-        {
-            AKStateGroup group;
-            if (!typeState_ConfigId_Datas.TryGetValue(groupId, out group))
-            {
-                return AKRESULT.AK_InvalidStateGroup;
-            }
-            if (!group.CanVaryState(state))
-            {
-                return AKRESULT.AK_InvalidStateGroupElement;
-            }
-            AKRESULT ret = AkSoundEngine.SetState(group.GetGroupName(), state);
-            VaryGroupIfSucess(group, ret, state);
             return ret;
         }
-        public void Recycle()
+        public AKEventAtom RegisterGetEvt(AudioEventItem config)
         {
-            foreach (var current in typeState_ConfigId_Datas.Values)
+            AKEventAtom evt;
+            if (!events.TryGetValue(config.Id, out evt))
             {
-                if (!current.IsDefault)
-                {
-                    AKRESULT result = AkSoundEngine.SetState
-                        (current.GetGroupName(), current.GetDefaultState());
-                    VaryGroupIfSucess(current, result, current.GetDefaultState());
-
-                }
+                evt = new AKEventAtom(config);
+                events.Add(config.Id, evt);
             }
-            foreach (KeyValuePair<int, AKSwitchGroup> pairs in typeSwitch_GameObjHash_Datas)
-            {
-                if (pairs.Value.Dismiss())
-                {
-                    typeSwitch_GameObjHash_Datas.Remove(pairs.Key);
-                }
-                else
-                {
-                    if (!pairs.Value.IsDefault)
-                    {
-                        AKRESULT result = AkSoundEngine.SetState
-                            (pairs.Value.GetGroupName(), pairs.Value.GetDefaultState());
-                        VaryGroupIfSucess(pairs.Value, result, pairs.Value.GetDefaultState());
-
-                    }
-                }
-            }
+            return evt;
         }
+
 
     }
 }

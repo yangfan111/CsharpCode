@@ -7,6 +7,8 @@ using Core.Free;
 using com.wd.free.util;
 using Assets.App.Server.GameModules.GamePlay.Free;
 using App.Shared.Player;
+using App.Shared;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
@@ -42,11 +44,11 @@ namespace App.Server.GameModules.GamePlay.Free.player
 
             if (fd != null)
             {
-                DoAnimation(realState, fd.Player);
+                DoAnimation(args.GameContext, realState, fd.Player);
             }
         }
 
-        public static void DoAnimation(int ani, PlayerEntity player, bool server = true)
+        public static void DoAnimation(Contexts contexts, int ani, PlayerEntity player, bool server = true)
         {
             if (player != null)
             {
@@ -113,7 +115,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
                         case DefuseBomb:
                             if (!server)
                             {
-                                player.DefuseBomb();
+                                player.DefuseBomb(contexts);
                             }
                             break;
                         case InterPlantBomb:
@@ -127,7 +129,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 else
                 {
                     player.stateInterface.State.UseProps(ani);
-                    player.weaponLogic.State.UnmountWeaponByAction();
+                    player.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon(contexts);
                     player.playerMove.InterruptAutoRun();
                 }
 

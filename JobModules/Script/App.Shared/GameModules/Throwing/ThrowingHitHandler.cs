@@ -15,15 +15,17 @@ namespace App.Shared.GameModules.Throwing
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(ThrowingHitHandler));
         private IPlayerDamager _damager;
+        private Contexts _contexts;
 
-        public ThrowingHitHandler(IPlayerDamager damager)
+        public ThrowingHitHandler(Contexts contexts, IPlayerDamager damager)
         {
             _damager = damager;
+            _contexts = contexts;
         }
 
         public void OnPlayerDamage(PlayerEntity sourcePlayer, PlayerEntity targetPlayer, PlayerDamageInfo damage)
         {
-            BulletPlayerUtility.ProcessPlayerHealthDamage(_damager, sourcePlayer, targetPlayer, damage);
+            BulletPlayerUtility.ProcessPlayerHealthDamage(_contexts, _damager, sourcePlayer, targetPlayer, damage);
         }
 
         public void OnVehicleDamage(VehicleEntity vehicle, float damage)

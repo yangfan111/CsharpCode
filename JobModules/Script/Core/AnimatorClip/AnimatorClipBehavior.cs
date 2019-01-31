@@ -114,7 +114,7 @@ namespace Core.Animation
             }
         }
 
-        virtual public void ChangeSpeedMultiplier(float speed)
+        virtual public void ChangeSpeedMultiplier(float speed, bool reset = false)
         {
 
         }

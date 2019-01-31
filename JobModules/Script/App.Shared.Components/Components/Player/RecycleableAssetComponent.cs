@@ -13,17 +13,17 @@ namespace App.Shared.Components.Player
         private static readonly LoggerAdapter ResLogger = new LoggerAdapter(EventLoggerConstant.Res);
         public GameObject PlayerRoot;
         
-        private Dictionary<int, UnityObjectWrapper<GameObject>> _goCollection = new Dictionary<int, UnityObjectWrapper<GameObject>>();
+        private Dictionary<int, UnityObject> _goCollection = new Dictionary<int, UnityObject>();
         public int GetComponentId()
         {
             return (int) EComponentIds.PlayerRecycleableAsset;
         }
 
-        public void Recycle(IGameObjectPool gameObjectPool)
+        public void Recycle(IUnityAssetManager assetManager)
         {
             foreach (var go in _goCollection)
             {
-                gameObjectPool.Add(go.Value);
+                assetManager.Recycle(go.Value);
             }
             _goCollection.Clear();
 
@@ -31,7 +31,7 @@ namespace App.Shared.Components.Player
             Object.DestroyImmediate(PlayerRoot);
         }
 
-        public void Add(UnityObjectWrapper<GameObject> asset)
+        public void Add(UnityObject asset)
         {
             if (_goCollection.ContainsKey(asset.Id))
             {
@@ -41,7 +41,7 @@ namespace App.Shared.Components.Player
             _goCollection.Add(asset.Id, asset);
         }
 
-        public void Remove(UnityObjectWrapper<GameObject> asset)
+        public void Remove(UnityObject asset)
         {
             _goCollection.Remove(asset.Id);
         }

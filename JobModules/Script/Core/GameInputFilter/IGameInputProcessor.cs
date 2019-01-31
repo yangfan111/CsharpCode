@@ -8,6 +8,7 @@ namespace Core.GameInputFilter
         void SetUserCmd(IUserCmd cmd);
         void AddState(IGameState gameState);
         IFilteredInput Filter();
+        IFilteredInput DummyInput();
         IFilteredInput GetFilteredInput();
     }
 }

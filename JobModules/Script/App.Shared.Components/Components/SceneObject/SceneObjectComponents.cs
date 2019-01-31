@@ -13,6 +13,7 @@ using Entitas.CodeGeneration.Attributes;
 using Core.SceneTriggerObject;
 using Core.Utils;
 using Core.UpdateLatest;
+using Core.EntityComponent;
 
 namespace App.Shared.Components.SceneObject
 {
@@ -68,6 +69,7 @@ namespace App.Shared.Components.SceneObject
         [DontInitilize, NetworkProperty] public int Stock;
         [DontInitilize, NetworkProperty] public int Bullet;
         [DontInitilize, NetworkProperty] public int ReservedBullet;
+        [DontInitilize, NetworkProperty] public int WeaponKey;
         public int GetComponentId()
         {
             return (int)EComponentIds.SceneObjectWeapon;
@@ -114,6 +116,7 @@ namespace App.Shared.Components.SceneObject
             Stock = remoteWeapon.Stock;
             Bullet = remoteWeapon.Bullet;
             ReservedBullet = remoteWeapon.ReservedBullet;
+            WeaponKey = remoteWeapon.WeaponKey;
         }
         public bool IsInterpolateEveryFrame(){ return false; }
         public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)

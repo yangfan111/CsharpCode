@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Core.CharacterState;
 using App.Shared.Components.Player;
+using Core.CharacterState.Posture;
 using Core.Compare;
 using Core.EntityComponent;
 using Core.Event;
@@ -62,7 +63,13 @@ namespace App.Shared.Components.Serializer
         {
             return EntityKeyComparer.Instance.Compare(a, b)==0;
         }
+        
         public static bool Equals(StateInterCommands a, StateInterCommands b)
+        {
+            return false;
+        }
+        
+        public static bool Equals(UnityAnimationEventCommands a, UnityAnimationEventCommands b)
         {
             return false;
         }

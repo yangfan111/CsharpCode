@@ -31,11 +31,12 @@ namespace App.Shared.GameModules.Player
             playerEntity.gamePlay.IsSave = false;
             playerEntity.gamePlay.SaveTime = 0;
             playerEntity.stateInterface.State.RescueEnd();
-            if (playerEntity.gamePlay.SaveEnterState == (int) playerEntity.stateInterface.State.GetCurrentPostureState()
+            /*if (playerEntity.gamePlay.SaveEnterState == (int) playerEntity.stateInterface.State.GetCurrentPostureState()
                 && playerEntity.gamePlay.SaveEnterState != (int)PostureInConfig.Crouch)
             {
                 playerEntity.stateInterface.State.Crouch();
-            }
+            }*/
+            playerEntity.stateInterface.State.Crouch();
 
             if (isInteruptSave)
             {
@@ -80,7 +81,6 @@ namespace App.Shared.GameModules.Player
                     StopSave(myEntity);
                     //统计救援人数
                     myEntity.statisticsData.Statistics.SaveCount++;
-                    teamEntity.statisticsData.Statistics.BeSaveCount++;
                     return;
                 }
                 //打断救援（被救援者已不在）
@@ -96,8 +96,15 @@ namespace App.Shared.GameModules.Player
                     StopSave(myEntity, true);
                     if (teamEntity.gamePlay.IsBeSave)
                     {
-                        StopBeSave(teamEntity, true);
+                       StopBeSave(teamEntity, true);
                     }
+                }
+                //打断救援（超出距离角度 或 被救援者已死亡）
+                if (teamEntity.gamePlay.IsDead() || GetAngle(myEntity, teamEntity) > SharedConfig.MaxSaveAngle
+                    || Vector3.Distance(myEntity.position.Value, teamEntity.position.Value) > SharedConfig.MaxSaveDistance)
+                {
+                    StopSave(myEntity, true);
+                    StopBeSave(teamEntity, true);
                 }
             }
             else if (myEntity.gamePlay.IsBeSave)
@@ -111,8 +118,7 @@ namespace App.Shared.GameModules.Player
                     myEntity.gamePlay.CurHp = (int)(myEntity.gamePlay.MaxHp * 0.1f);
                     myEntity.gamePlay.ChangeLifeState(EPlayerLifeState.Alive, myEntity.time.ClientTime);
                     //蹲下状态
-//                    myEntity.stateInterface.State.Crouch();
-                    teamEntity.statisticsData.Statistics.SaveCount++;
+                    //myEntity.stateInterface.State.Crouch();
                     myEntity.statisticsData.Statistics.BeSaveCount++;
                     return;
                 }
@@ -123,7 +129,7 @@ namespace App.Shared.GameModules.Player
                     return;
                 }
                 //打断救援（超出距离角度 或 自己已死亡）
-                if (myEntity.gamePlay.IsDead()
+                /*if (myEntity.gamePlay.IsDead()
                     || Vector3.Distance(myEntity.position.Value, teamEntity.position.Value) > SharedConfig.MaxSaveDistance
                     || GetAngle(teamEntity ,myEntity) > SharedConfig.MaxSaveAngle)
                 {
@@ -132,12 +138,12 @@ namespace App.Shared.GameModules.Player
                     {
                         StopSave(teamEntity, true);
                     }
-                }
+                }*/
             }
             else if (cmd.IsUseAction && cmd.UseType == (int) EUseActionType.Player)
             {
                 //趴下不能救援
-                if (myEntity.stateInterface.State.GetCurrentPostureState() == PostureInConfig.Prone)
+                /*if (myEntity.stateInterface.State.GetCurrentPostureState() == PostureInConfig.Prone)
                 {
                     if (SharedConfig.IsServer)
                     {
@@ -151,7 +157,7 @@ namespace App.Shared.GameModules.Player
                         myEntity.tip.TipType = ETipType.CanNotRescure;
                     }
                     return;
-                }
+                }*/
                 //实施救援
                 PlayerEntity teamEntity = _contexts.player.GetEntityWithEntityKey(new EntityKey(cmd.UseEntityId, (int)EEntityType.Player));
                 if (null != teamEntity)

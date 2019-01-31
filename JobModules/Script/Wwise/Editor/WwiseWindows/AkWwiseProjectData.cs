@@ -226,7 +226,7 @@ public class AkWwiseProjectData : UnityEngine.ScriptableObject
 		{
 			UnityEditor.Undo.RecordObject(this, "Save Init Settings");
 
-            basePath = AudioPluginSettingAgent.GetBankAssetFolder();
+            basePath = AudioPluginManagement.GetBankAssetFolder();
 			language = in_AkInit.language;
 			defaultPoolSize = in_AkInit.defaultPoolSize;
 			lowerPoolSize = in_AkInit.lowerPoolSize;

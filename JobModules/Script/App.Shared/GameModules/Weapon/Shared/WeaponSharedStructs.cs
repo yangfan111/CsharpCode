@@ -1,5 +1,6 @@
 ﻿
 using App.Shared.Components.Bag;
+using App.Shared.Components.Weapon;
 using Core;
 using Core.WeaponLogic.Attachment;
 
@@ -21,11 +22,11 @@ namespace App.Shared.GameModules.Weapon
 
     }
     public delegate Err_WeaponLogicErrCode WeaponBag_SlotProcessCallback(WeaponSlotHandlerBase contrller);
-    public delegate void WeaponPartsModelRefresh(WeaponInfo weaponInfo, EWeaponSlotType slot, WeaponPartsStruct oldParts, WeaponPartsStruct newParts,bool mountInPackage);
+    public delegate void WeaponPartsModelRefresh(Contexts contexts, WeaponPartsRefreshData data);
     public delegate void WeaponSlotSwitchCallback(EWeaponSlotType slotType, int nextId);
-    public delegate void WeaponSlotExpendCallback(WeaponSlotExpendData data);
-    public delegate WeaponComponent WeaponSlotComponenExtractor(EWeaponSlotType slot);
-    public delegate WeaponStateComponent WeaponStateComponentExtractor(bool autoState);
+    public delegate void WeaponSlotExpendCallback(Contexts contexts, WeaponSlotExpendData data);
+    public delegate WeaponBasicInfoComponent WeaponSlotComponenExtractor(Contexts contexts, EWeaponSlotType slot);
+    public delegate BagStateComponent BagStateComponentExtractor();
     public delegate GrenadeCacheDataComponent GrenadeCacheComponentExtractor();
     public struct WeaponSlotExpendData
     {
@@ -38,5 +39,22 @@ namespace App.Shared.GameModules.Weapon
             needRemoveCurrent = in_needRemoveCurrent;
             needAutoRestuff = in_needAutoRestuff;
         }
+    }
+    public struct WeaponPartsRefreshData
+    {
+        public WeaponInfo weaponInfo;
+        public EWeaponSlotType slot;
+        public WeaponPartsStruct oldParts;
+        public WeaponPartsStruct newParts;
+        public bool mountInPackage;
+        public bool refreshWeaponLogic;
+        public int lastWeaponId;
+        public void SetRefreshLogic(int in_lastWeaponId)
+        {
+            lastWeaponId = in_lastWeaponId;
+            refreshWeaponLogic = true;
+        }
+        
+       
     }
 }

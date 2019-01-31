@@ -19,16 +19,12 @@ namespace Core.GameModule.System
     {
         ISceneObjectEntityFactory SceneObjectEntityFactory { get; set; }
         ISoundEntityFactory SoundEntityFactory{ get; set; }
-        IBulletEntityFactory BulletEntityFactory{ get; set; }
     }
 
     public interface ICommonSessionObjects
     {
-      
-        IGameObjectPool GameObjectPool { get; set; }
-        ILoadRequestManager LoadRequestManager { get; set; }
+        IUnityAssetManager AssetManager { get; set; }
         ICoRoutineManager CoRoutineManager { get; set; }
-        IAssetPool AssetPool { get; set; }
         IGameContexts GameContexts { get; set; }
        
         IWeaponModeLogic WeaponModeLogic { get; set; }

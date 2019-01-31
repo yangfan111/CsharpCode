@@ -22,6 +22,7 @@ namespace App.Shared.GameModules.Player.Actions
                 player.thirdPersonAnimator.UnityAnimator.applyRootMotion = false;
             if(player.hasThirdPersonModel)
                 player.thirdPersonModel.Value.transform.localPosition.Set(0, 0, 0);
+            ResetConcretAction();
         }
 
         public void PlayerDead(PlayerEntity player)
@@ -30,6 +31,7 @@ namespace App.Shared.GameModules.Player.Actions
                 player.thirdPersonAnimator.UnityAnimator.applyRootMotion = false;
             if(player.hasThirdPersonModel)
                 player.thirdPersonModel.Value.transform.localPosition.Set(0, 0, 0);
+            ResetConcretAction();
         }
 
         public void Update(PlayerEntity player)
@@ -64,7 +66,7 @@ namespace App.Shared.GameModules.Player.Actions
             var overlapPos = playerTransform.position;
             
             PlayerEntityUtility.GetCapsule(player, overlapPos, out _capsuleBottom, out _capsuleUp, out _capsuleRadius);
-            var capsuleHight = _capsuleUp.y - _capsuleBottom.y;
+            var capsuleHeight = _capsuleUp.y - _capsuleBottom.y;
             _capsuleBottom.y = (playerTransform.position + playerTransform.up * 0.5f).y;
             if ((null == _concretAction || !_concretAction.PlayingAnimation) &&
                 Physics.CapsuleCast(_capsuleBottom, _capsuleUp, 0.001f, playerTransform.forward, out hit, 1,
@@ -74,8 +76,7 @@ namespace App.Shared.GameModules.Player.Actions
                 if (hit.distance < 0.5)
                 {
                     //得到碰撞点
-                    Vector3 point = hit.point;
-                    Vector3 sphereCenter = new Vector3(hit.point.x, hit.collider.bounds.center.y + hit.collider.bounds.extents.y + capsuleHight, hit.point.z);
+                    var sphereCenter = new Vector3(hit.point.x, hit.collider.bounds.center.y + hit.collider.bounds.extents.y + capsuleHeight, hit.point.z);
 
                     // 检测发射源是否处于碰撞体中
                     if (Physics.OverlapSphere(sphereCenter, 0.3f, UnityLayers.SceneCollidableLayerMask).Length >
@@ -83,29 +84,35 @@ namespace App.Shared.GameModules.Player.Actions
                     
                     RaycastHit sphereHit;
                     Physics.SphereCast(sphereCenter, 0.3f, Vector3.down, out sphereHit,
-                        hit.collider.bounds.center.y + hit.collider.bounds.extents.y + capsuleHight,
+                        hit.collider.bounds.center.y + hit.collider.bounds.extents.y + capsuleHeight,
                         UnityLayers.SceneCollidableLayerMask);
-                    point = sphereHit.point;
+                    var point = sphereHit.point;
                     
                     var distance = point.y - playerTransform.position.y;
                     if (distance > 1.5 && distance < 2.3)
                     {
                         //一定高度内为climb
                         ResetConcretAction();
-
                         _concretAction = _climbAction;
-                        _concretAction.MatchTarget = point;
+                        _concretAction.MatchTarget = point - playerTransform.right * 0.2f;
+                        
                         _concretAction.CanTriggerAction = true;
                     }else if (distance > 0.5 && distance <= 1.5)
                     {
                         ResetConcretAction();
+
+                        // 检测翻越过程中障碍
+                        _capsuleBottom.y = (point + playerTransform.up * 0.3f).y;
+                        _capsuleUp.y = _capsuleBottom.y + capsuleHeight;
+                        var canVault = !Physics.CapsuleCast(_capsuleBottom, _capsuleUp, 0.1f, playerTransform.forward,
+                            out hit, 1, UnityLayers.SceneCollidableLayerMask);
 
                         //
                         overlapPos = playerTransform.position + playerTransform.forward * (1.0f + _capsuleRadius) + playerTransform.up * 0.2f;
                         PlayerEntityUtility.GetCapsule(player, overlapPos, out _capsuleBottom, out _capsuleUp, out _capsuleRadius);
                         var casts = Physics.OverlapCapsule(_capsuleBottom, _capsuleUp, _capsuleRadius, UnityLayers.SceneCollidableLayerMask);
                         //
-                        if (casts.Length <= 0 && distance > 0.8f)
+                        if (casts.Length <= 0 && distance > 0.8f && canVault)
                         {
                             _concretAction = _vaultAction;
                         }

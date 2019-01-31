@@ -21,7 +21,7 @@ namespace App.Shared.Player
             return (Sex)sex;
         }
 
-        public static void AddAsset(this PlayerEntity player, UnityObjectWrapper<GameObject> asset)
+        public static void AddAsset(this PlayerEntity player, UnityObject asset)
         {
             if (asset != null)
             {
@@ -34,7 +34,7 @@ namespace App.Shared.Player
                 logger.InfoFormat("null asset in {0}", player.entityKey);
         }
 
-        public static void RemoveAsset(this PlayerEntity player, UnityObjectWrapper<GameObject> asset)
+        public static void RemoveAsset(this PlayerEntity player, UnityObject asset)
         {
             player.recycleableAsset.Remove(asset);
         }

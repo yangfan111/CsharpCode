@@ -36,7 +36,7 @@ namespace App.Shared.GameModules
         
             topLevelGameModule.Init();
             
-            Add(new ModuleInitSystem(topLevelGameModule, commonSessionObjects.LoadRequestManager));
+            Add(new ModuleInitSystem(topLevelGameModule, commonSessionObjects.AssetManager));
             Add(new EntityCreateSystem(topLevelGameModule).WithExecFrameStep(EEcecuteStep.NormalFrameStep)); 
 
 
@@ -67,8 +67,8 @@ namespace App.Shared.GameModules
                 userPredictionInitManager, 
                 commonSessionObjects.GameStateProcessorFactory).WithExecFrameStep(EEcecuteStep.CmdFrameStep));
             
-            Add(new LoadRequestManagerSystem(commonSessionObjects).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
-            Add(new ResourceLoadSystem(topLevelGameModule, commonSessionObjects.LoadRequestManager).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
+            Add(new UnityAssetManangerSystem(commonSessionObjects).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
+            Add(new ResourceLoadSystem(topLevelGameModule, commonSessionObjects.AssetManager).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
 
             Add(new GamePlaySystem(topLevelGameModule).WithExecFrameStep(EEcecuteStep.CmdFrameStep));
 

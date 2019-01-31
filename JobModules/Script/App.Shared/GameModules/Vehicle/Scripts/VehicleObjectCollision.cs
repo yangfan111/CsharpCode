@@ -25,10 +25,10 @@ namespace App.Shared.GameModules.Vehicle
             }
 
             //Debug.Log("Collision Enter ....");
-            if (collision.collider.gameObject.layer == UnityLayers.DefaultLayer ||
-                collision.collider.gameObject.layer == UnityLayers.TerrainLayer ||
-                collision.collider.gameObject.layer == UnityLayers.VehicleBodyLayer ||
-                collision.collider.gameObject.layer == UnityLayers.NoCollisionWithBulletLayer)
+            if (collision.collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.Default) ||
+                collision.collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.Terrain) ||
+                collision.collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.Vehicle) ||
+                collision.collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.NoCollisionWithBullet))
             {
                 DebugCollision(collision);
                 var entityRef = GetComponent<EntityReference>();

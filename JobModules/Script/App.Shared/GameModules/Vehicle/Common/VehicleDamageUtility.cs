@@ -13,7 +13,7 @@ namespace App.Shared.GameModules.Vehicle
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(VehicleDamageUtility));
         public static IPlayerDamager _damager;
 
-        public static void DoDamageToAllPassgers(PlayerContext context, VehicleEntity vehicle, float damage, EUIDeadType deadType, PlayerEntity sourcePlayer = null, bool isDamagePercent = false, bool sendToServer = false)
+        public static void DoDamageToAllPassgers(Contexts contexts, VehicleEntity vehicle, float damage, EUIDeadType deadType, PlayerEntity sourcePlayer = null, bool isDamagePercent = false, bool sendToServer = false)
         {
             var seats = vehicle.vehicleSeat;
             var orignalDamge = damage;
@@ -22,13 +22,13 @@ namespace App.Shared.GameModules.Vehicle
                 EntityKey entityKey;
                 if (seats.GetEntityKey(seatId, out entityKey))
                 {
-                    var player = context.GetEntityWithEntityKey(entityKey);
+                    var player = contexts.player.GetEntityWithEntityKey(entityKey);
                     if (player != null)
                     {
                         if(sourcePlayer == null && deadType == EUIDeadType.VehicleHit)
                         {
                             var lastDriveEntityKey = seats.LastDriverEntityKey;
-                            sourcePlayer = context.GetEntityWithEntityKey(lastDriveEntityKey);
+                            sourcePlayer = contexts.player.GetEntityWithEntityKey(lastDriveEntityKey);
                         }
 
                         //the case in which the damage is from self
@@ -43,7 +43,7 @@ namespace App.Shared.GameModules.Vehicle
                             damage = orignalDamge * gamePlay.MaxHp;
                         }
 
-                        BulletPlayerUtility.ProcessPlayerHealthDamage(_damager, sourcePlayer, player, new PlayerDamageInfo(damage, (int)deadType, (int)EBodyPart.Chest, vehicle.vehicleAssetInfo.Id));
+                        BulletPlayerUtility.ProcessPlayerHealthDamage(contexts, _damager, sourcePlayer, player, new PlayerDamageInfo(damage, (int)deadType, (int)EBodyPart.Chest, vehicle.vehicleAssetInfo.Id));
                         if (sendToServer)
                         {
                             SendDamageToServer(vehicle, player.entityKey.Value, damage);
@@ -53,9 +53,9 @@ namespace App.Shared.GameModules.Vehicle
             }
         }
 
-        public static void DoPlayerDamage(PlayerEntity sourcePlayer, PlayerEntity targetPlayer, float damage, EUIDeadType hitType = EUIDeadType.VehicleHit, EBodyPart hitPart = EBodyPart.Chest, int weaponId = 0)
+        public static void DoPlayerDamage(Contexts contexts, PlayerEntity sourcePlayer, PlayerEntity targetPlayer, float damage, EUIDeadType hitType = EUIDeadType.VehicleHit, EBodyPart hitPart = EBodyPart.Chest, int weaponId = 0)
         {
-            BulletPlayerUtility.ProcessPlayerHealthDamage(_damager, sourcePlayer, targetPlayer, new PlayerDamageInfo(damage, (int)hitType, (int)hitPart, weaponId));
+            BulletPlayerUtility.ProcessPlayerHealthDamage(contexts, _damager, sourcePlayer, targetPlayer, new PlayerDamageInfo(damage, (int)hitType, (int)hitPart, weaponId));
         }
 
         public static void SendDamageToServer(VehicleEntity vehicle, EntityKey entityKey, float damage)

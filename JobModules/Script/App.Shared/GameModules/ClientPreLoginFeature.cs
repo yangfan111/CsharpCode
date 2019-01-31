@@ -20,12 +20,12 @@ namespace App.Shared.GameModules
             ICommonSessionObjects sessionObjects) : base(name)
         {
             topLevelGameModule.Init();
-            Add(new ModuleInitSystem(topLevelGameModule, sessionObjects.LoadRequestManager));
+            Add(new ModuleInitSystem(topLevelGameModule, sessionObjects.AssetManager));
             Add(new EntityCreateSystem(topLevelGameModule));
            
 
-            Add(new LoadRequestManagerSystem(sessionObjects));
-            Add(new ResourceLoadSystem(topLevelGameModule, sessionObjects.LoadRequestManager));
+            Add(new UnityAssetManangerSystem(sessionObjects));
+            Add(new ResourceLoadSystem(topLevelGameModule, sessionObjects.AssetManager));
             
             Add(new RenderSystem(topLevelGameModule));
 

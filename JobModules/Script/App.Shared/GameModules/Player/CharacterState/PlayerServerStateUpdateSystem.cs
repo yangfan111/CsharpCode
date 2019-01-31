@@ -7,6 +7,7 @@ using App.Shared.GameModules.Player.Appearance.AnimationEvent;
 using App.Shared.Player;
 using Core.Animation;
 using Core.CharacterState;
+using Core.CharacterState.Posture;
 using Core.Common;
 using Core.Fsm;
 using Core.GameModule.Interface;
@@ -36,12 +37,8 @@ namespace App.Shared.GameModules.Player.CharacterState
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             PlayerEntity playerEntity = (PlayerEntity)owner.OwnerEntity;
-  
-            if (playerEntity.gamePlay.IsLifeState(EPlayerLifeState.Dead) || playerEntity.gamePlay.IsLastLifeState(EPlayerLifeState.Dead))
-            {
-                // gamePlay有对应的处理，这里不需要
-                return;
-            }
+
+            CheckPlayerLifeState(playerEntity);
 
             var stateManager = playerEntity.stateInterface.State;
             ComponentSynchronizer.SyncFromStateInterVarComponent(playerEntity.stateInterVar, stateManager );
@@ -63,20 +60,20 @@ namespace App.Shared.GameModules.Player.CharacterState
             var firstPersonEvent = playerEntity.firstPersonModel.Value.GetComponent<AnimationClipEvent>();
             if (firstPersonEvent != null)
             {
-                foreach (KeyValuePair<short, float> keyValuePair in playerEntity.stateInterVar.FirstPersonAnimationEventCallBack
+                foreach (KeyValuePair<short, AnimationEventParam> keyValuePair in playerEntity.stateInterVar.FirstPersonAnimationEventCallBack
                     .Commands)
                 {
-                    firstPersonEvent.ServerFunc(keyValuePair.Key);
+                    firstPersonEvent.ServerFunc(keyValuePair.Key, keyValuePair.Value);
                 }
             }
 
             var thirdPersonEvent = playerEntity.thirdPersonModel.Value.GetComponent<AnimationClipEvent>();
             if (thirdPersonEvent != null)
             {
-                foreach (KeyValuePair<short, float> keyValuePair in playerEntity.stateInterVar.ThirdPersonAnimationEventCallBack
+                foreach (KeyValuePair<short, AnimationEventParam> keyValuePair in playerEntity.stateInterVar.ThirdPersonAnimationEventCallBack
                     .Commands)
                 {
-                    thirdPersonEvent.ServerFunc(keyValuePair.Key);
+                    thirdPersonEvent.ServerFunc(keyValuePair.Key, keyValuePair.Value);
                 }
             }
         }
@@ -98,11 +95,92 @@ namespace App.Shared.GameModules.Player.CharacterState
         {
             player.thirdPersonAppearance.Posture = ThirdPersonAppearanceUtils.GetPosture(player.stateInterface.State);
             player.thirdPersonAppearance.Action = ThirdPersonAppearanceUtils.GetAction(player.stateInterface.State);
+            player.thirdPersonAppearance.Movement = ThirdPersonAppearanceUtils.GetMovement(player.stateInterface.State);
             player.thirdPersonAppearance.PeekDegree = player.characterBoneInterface.CharacterBone.PeekDegree;
             player.thirdPersonAppearance.NeedUpdateController = true;
             player.thirdPersonAppearance.CharacterHeight = player.characterControllerInterface.CharacterController.GetCharacterControllerHeight;
             player.thirdPersonAppearance.CharacterCenter = player.characterControllerInterface.CharacterController.GetCharacterControllerCenter;
             player.thirdPersonAppearance.CharacterRadius = player.characterControllerInterface.CharacterController.GetCharacterControllerRadius;
         }
+        
+        #region LifeState
+
+        private void CheckPlayerLifeState(PlayerEntity player)
+        {
+            if (null == player || null == player.gamePlay) return;
+
+            var gamePlay = player.gamePlay;
+            if (!gamePlay.HasLifeStateChangedFlag()) return;
+            if(CreatePlayerGameStateData(player)) return;
+
+            if (gamePlay.IsLifeState(EPlayerLifeState.Alive) &&
+                gamePlay.IsLastLifeState(EPlayerLifeState.Dead))
+                Reborn(player);
+            
+            if (gamePlay.IsLifeState(EPlayerLifeState.Alive) &&
+                gamePlay.IsLastLifeState(EPlayerLifeState.Dying))
+                Revive(player);
+            
+            if(gamePlay.IsLifeState(EPlayerLifeState.Dying))
+                Dying(player);
+
+            if (gamePlay.IsLifeState(EPlayerLifeState.Dead))
+                Dead(player);
+        }
+        
+        private static bool CreatePlayerGameStateData(PlayerEntity player)
+        {
+            var gamePlay = player.gamePlay;
+            var playerGameState = player.playerGameState;
+            if(null == playerGameState || null == gamePlay) return true;
+            
+            if (PlayerSystemEnum.PlayerServerStateUpdate == playerGameState.CurrentPlayerSystemState)
+            {
+                _logger.InfoFormat("ChangeClearInSystem:  {0}", playerGameState.CurrentPlayerSystemState);
+                gamePlay.ClearLifeStateChangedFlag();
+                playerGameState.CurrentPlayerSystemState = PlayerSystemEnum.NullState;
+                return true;
+            }
+            
+            if (PlayerSystemEnum.NullState == playerGameState.CurrentPlayerSystemState)
+                playerGameState.CurrentPlayerSystemState = PlayerSystemEnum.PlayerServerStateUpdate;
+
+            return false;
+        }
+
+        private void Reborn(PlayerEntity player)
+        {
+            if (null == player) return;
+            var stateManager = player.stateInterface.State;
+            if (null == stateManager) return;
+            stateManager.PlayerReborn();
+        }
+        
+        private void Revive(PlayerEntity player)
+        {
+            if (null == player) return;
+            var stateManager = player.stateInterface.State;
+            if (null == stateManager) return;
+            stateManager.Revive();
+        }
+
+        private void Dying(PlayerEntity player)
+        {
+            if (null == player) return;
+            var stateManager = player.stateInterface.State;
+            if (null == stateManager) return;
+            stateManager.Dying();
+        }
+
+        private void Dead(PlayerEntity player)
+        {
+            if (null == player) return;
+            var stateManager = player.stateInterface.State;
+            if (null == stateManager) return;
+            stateManager.PlayerReborn();
+            _logger.InfoFormat("ServerPlayerStateUpdateDead");
+        }
+
+        #endregion
     }
 }

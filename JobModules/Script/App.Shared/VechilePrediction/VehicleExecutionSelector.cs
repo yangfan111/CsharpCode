@@ -122,7 +122,7 @@ namespace App.Shared.VechilePrediction
 
         private void IgnorePlayerVehicleCollision(bool ignore)
         {
-            var layer = ignore ? UnityLayers.PlayerIgnoreVehicleLayer : UnityLayers.PlayerLayer;
+            var layer = ignore ? UnityLayerManager.GetLayerIndex(EUnityLayerName.PlayerIgnoreVehicle) : UnityLayerManager.GetLayerIndex(EUnityLayerName.Player);
             var players = _players.GetEntities();
             int playerCount = players.Length;
             for (int i = 0; i < playerCount; ++i)

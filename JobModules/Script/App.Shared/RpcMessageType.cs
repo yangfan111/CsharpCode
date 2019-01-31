@@ -3,6 +3,7 @@
     public class RpcMessageType
     {
         public static string RegisterBattleServer = "registerBattleServer";
+        public static string ResponseRegisterBattleServer = "responseRegisterBattleServer";
         public static string UpdateBattleServerStatus = "updateBattleServerStatus";
         public static string RegisterRoomServer = "registerRoomServer";
         public static string RequestCreateRoom = "requestCreateRoom";
@@ -14,6 +15,8 @@
 
         public static string RequestJoinRoom = "requestJoinRoom";
         public static string ResponseJoinRoom = "responseJoinRoom";
+        public static string RequestJoinRoomList = "requestJoinRoomList";
+        public static string ResponseJoinRoomList = "responseJoinRoomList";
         public static string UpdateRoomGameState = "updateRoomGameState";
         public static string MandateLogOut = "mandateLogout";
 

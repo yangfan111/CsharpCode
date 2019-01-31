@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Core.EntityComponent;
 using Core.GameInputFilter;
 using Core.Prediction.UserPrediction.Cmd;
@@ -84,12 +83,16 @@ namespace App.Shared.GameModules.Player
 
         public IFilteredInput Filter(IUserCmd userCmd)
         {
-            if(_playerEntity.isFlagDestroy || !_playerEntity.isEnabled)
+            var inputProcessor = _playerEntity.userCmdFilter.GameInputProcessor;
+            if(!_playerEntity.isEnabled)
             {
                 Logger.Error("player is destroyed");
-                return null;
+                return inputProcessor.DummyInput(); 
             }
-            var inputProcessor = _playerEntity.userCmdFilter.GameInputProcessor;
+            if(_playerEntity.isFlagDestroy)
+            {
+                return inputProcessor.DummyInput(); 
+            }
             if(null != inputProcessor)
             {
                 inputProcessor.Init();
@@ -99,7 +102,7 @@ namespace App.Shared.GameModules.Player
             else
             {
                 Logger.Error("no GameInputProcessor attached to player ");
-                return null;
+                return inputProcessor.DummyInput(); 
             }
         }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Core.Enums;
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
+using UnityEngine;
 
 namespace App.Shared.Components.Ui
 {
@@ -81,5 +82,9 @@ namespace App.Shared.Components.Ui
 
         [DontInitilize] public float LoadingRate;   //预加载 当前比例
         [DontInitilize] public string LoadingText;  //预加载 当前加载文本提示
+        [DontInitilize] public string KillerName;//击杀当前玩家的杀手名称
+        [DontInitilize] public Vector3 KillerTopPos;//击杀当前玩家的杀手头顶位置
+        [DontInitilize] public bool DeadButtonShow;//死亡界面上的按钮是否显示
+        [DontInitilize] public bool HaveAliveTeammate;//当前玩家是否有存活队友
     }
 }

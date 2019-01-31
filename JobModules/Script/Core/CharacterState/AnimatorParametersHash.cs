@@ -62,6 +62,10 @@ namespace Core.CharacterState
             StandValue = 2;
             StableValue = 3;
 
+            FrontPostureName = "FrontPosture";
+            FrontStand = 0f;
+            FrontCrouch = 1f;
+
             HandStateName = "UpDown";
             HandDownValue = -1;
             HandIdleValue = 0;
@@ -80,6 +84,16 @@ namespace Core.CharacterState
             MotionNullValue = 0.1f;
             MotionValue = 1;
 
+
+            JumpStateName = "JumpState";
+            JumpStateNormal = 0.0f;
+            JumpStateMove = 1.0f;
+            
+            MoveJumpStateName = "MoveJumpState";
+            MoveJumpStateNormal = 0.0f;
+            MoveJumpStateLF = -1.0f;
+            MoveJumpStateRF = 1.0f;
+            
             MovementName = "MoveState";
             WalkValue = 0;
             RunValue = 1;
@@ -309,6 +323,22 @@ namespace Core.CharacterState
         public float StableValue { get; private set; }
         #endregion
 
+        #region FrontPosture
+
+        private string _frontPostureName = String.Empty;
+        public string FrontPostureName
+        {
+            get { return _frontPostureName; }
+            set { _frontPostureName = value;
+                FrontPostureHash = StringToHash(value);
+            }
+        }
+        public int FrontPostureHash { get; private set; }
+        public float FrontStand { get; private set; }
+        public float FrontCrouch { get; private set; }
+
+        #endregion
+
         #region Prone
         private string _proneName = string.Empty;
         public string ProneName
@@ -346,6 +376,38 @@ namespace Core.CharacterState
         public bool ForceEndProneDisable { get; private set; }
         #endregion
 
+        #region JumpState
+        private string _jumpStateName = string.Empty;
+        public string JumpStateName
+        {
+            get { return _jumpStateName; }
+            set { _jumpStateName = value; JumpStateHash = StringToHash(value); }
+        }
+        public int JumpStateHash { get; private set; }
+        public float JumpStateNormal { get; private set; }
+        public float JumpStateMove { get; private set; }
+        #endregion
+
+        #region MoveJumpState
+
+        private string _moveJumpStateName = string.Empty;
+
+        public string MoveJumpStateName
+        {
+            get { return _moveJumpStateName; }
+            set
+            {
+                _moveJumpStateName = value;
+                MoveJumpStateHash = StringToHash(value);
+            }
+        }
+        public int MoveJumpStateHash { get; private set; }
+        public float MoveJumpStateLF { get; private set; }
+        public float MoveJumpStateRF { get; private set; }
+        public float MoveJumpStateNormal { get; private set; }
+
+        #endregion
+        
         #region Jump
         private string _jumpStartName = string.Empty;
         public string JumpStartName

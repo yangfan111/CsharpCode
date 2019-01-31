@@ -35,13 +35,13 @@ namespace App.Shared.GameModules.Player
                 var vehicle = context.GetEntityWithEntityKey(gamePlay.CollidedVehicleKey);
                 if (vehicle != null && vehicle.hasGameObject)
                 {
-                    var transform = vehicle.gameObject.UnityObjWrapper.Value.transform;
+                    var transform = vehicle.gameObject.UnityObject.AsGameObject.transform;
                     var forward = transform.forward;
                     var right = transform.right;
 
                     var rootTransform = player.characterContoller.Value.transform;
                     var playerPosition = rootTransform.position;
-                    var vehiclePosition = vehicle.gameObject.UnityObjWrapper.Value.transform.position;
+                    var vehiclePosition = vehicle.gameObject.UnityObject.AsGameObject.transform.position;
                     var deltaPosition = playerPosition - vehiclePosition;
                     deltaPosition.y = 0;
                     deltaPosition = deltaPosition.normalized;

@@ -9,8 +9,8 @@ public static class AkWwiseProjectInfo
 {
 	private const string WwiseEditorProjectDataDirectory = "Wwise/Editor/ProjectData";
 
-	private const string AssetsWwiseProjectDataPath =
-		"Assets/" + WwiseEditorProjectDataDirectory + "/AkWwiseProjectData.asset";
+	private const string AssetsWwiseProjectDataPath = "Assets/"+
+		 WwiseEditorProjectDataDirectory + "/AkWwiseProjectData.asset";
 
 	public static AkWwiseProjectData m_Data;
 

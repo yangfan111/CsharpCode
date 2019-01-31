@@ -6,9 +6,9 @@ namespace App.Shared.GameModules.Weapon
     /// <summary>
     /// 4 location : ground body hand pacakge
     /// </summary>
-    [WeaponSpecies(EWeaponSlotType.PrimeWeapon1)]
-    [WeaponSpecies(EWeaponSlotType.PrimeWeapon2)]
-    [WeaponSpecies(EWeaponSlotType.SubWeapon)]
+    [WeaponSpecies(EWeaponSlotType.PrimeWeapon)]
+    [WeaponSpecies(EWeaponSlotType.SecondaryWeapon)]
+    [WeaponSpecies(EWeaponSlotType.PistolWeapon)]
 
     public class WeaponSlotHandlerBase
     {
@@ -25,14 +25,14 @@ namespace App.Shared.GameModules.Weapon
             Helper = in_helper;
         }
         public virtual bool HasBagData { get { return false; } }
-        internal virtual void OnExpend(PlayerWeaponComponentAgent agent, WeaponSlotExpendCallback expendCb)
+        internal virtual void OnExpend(Contexts contexts, PlayerWeaponComponentAgent agent, WeaponSlotExpendCallback expendCb)
         {
-            var bullet = agent.CurrWeaponBullet;
-            agent.SetSlotWeaponBullet(bullet - 1);
+            var bullet = agent.CurrWeaponBullet(contexts);
+            agent.SetSlotWeaponBullet(contexts, bullet - 1);
             if (expendCb != null)
             {
                 var paramsData = new WeaponSlotExpendData(handledSlot,false, false);
-                expendCb(paramsData);
+                expendCb(contexts, paramsData);
             }
 
         }

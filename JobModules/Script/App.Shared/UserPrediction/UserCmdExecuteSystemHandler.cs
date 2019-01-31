@@ -17,7 +17,7 @@ namespace App.Server
         {
             _serverContexts = serverContexts;
             _players = serverContexts.player.GetGroup(PlayerMatcher.AllOf(PlayerMatcher.FirstPersonModel, PlayerMatcher.ThirdPersonModel,
-                PlayerMatcher.State, PlayerMatcher.HitBox, PlayerMatcher.PlayerWeaponState));
+                PlayerMatcher.State, PlayerMatcher.HitBox));
         }
 
 

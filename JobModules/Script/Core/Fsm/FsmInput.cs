@@ -33,6 +33,11 @@ namespace Core.Fsm
         PeekRight,
         // 不侧身
         NoPeek,
+        
+        // force set posture
+        PostureStand,
+        PostureCrouch,
+        PostureProne,
 
         // 蹲
         Crouch,

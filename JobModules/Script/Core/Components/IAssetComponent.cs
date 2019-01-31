@@ -6,18 +6,17 @@ namespace Core.Components
 {
     public interface IAssetComponent: IGameComponent
     {
-        void Recycle(IGameObjectPool gameObjectPool);
+        void Recycle(IUnityAssetManager assetManager);
     }
 
     public abstract class SingleAssetComponent : IAssetComponent, IGameComponent
     {
-        public AssetInfo AssetInfo { get; set; }
-        public UnityObjectWrapper<GameObject> UnityObjWrapper { get; set; }
-        public virtual void Recycle(IGameObjectPool gameObjectPool)
+        public UnityObject UnityObject { get; set; }
+        public virtual void Recycle(IUnityAssetManager assetManager)
         {
-            if (UnityObjWrapper != null)
+            if (UnityObject != null)
             {
-                gameObjectPool.Add(UnityObjWrapper);
+                assetManager.Recycle(UnityObject);
             }
         }
 

@@ -89,7 +89,7 @@ namespace Assets.App.Shared.GameModules.Player.Robot.Adapter
             }
             else
             {
-                Physics.Linecast(position + offset, bonePosition.position, out hit, UnityLayers.PlayerLayerMask);
+                Physics.Linecast(position + offset, bonePosition.position, out hit, UnityLayerManager.GetLayerMask(EUnityLayerName.Player));
             }
 
 

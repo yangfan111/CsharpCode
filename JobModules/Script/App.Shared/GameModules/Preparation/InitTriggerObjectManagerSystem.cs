@@ -27,7 +27,7 @@ namespace App.Shared.GameModules.Preparation
             }
         }
 
-        public void OnInitModule(ILoadRequestManager manager)
+        public void OnInitModule(IUnityAssetManager assetManager)
         {
             
         }

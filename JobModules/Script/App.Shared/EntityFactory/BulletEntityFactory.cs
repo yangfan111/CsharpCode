@@ -1,16 +1,15 @@
 ﻿using System;
 using App.Shared.Components;
+using App.Shared.WeaponLogic.Bullet;
 using Core.EntityComponent;
-using Core.IFactory;
 using Core.Utils;
-using Core.WeaponLogic.Bullet;
 using Entitas;
 using UnityEngine;
 using WeaponConfigNs;
 
 namespace App.Shared.EntityFactory
 {
-    public class BulletEntityFactory : IBulletEntityFactory
+    public class BulletEntityFactory
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(BulletEntityFactory));
         private BulletContext _bulletContext;
@@ -23,16 +22,17 @@ namespace App.Shared.EntityFactory
 
         public Entity CreateBulletEntity(
             int cmdSeq,
-            int weaponId,
             EntityKey entityKey,
-            int serverTime, Vector3 dir,
-            IBulletFireInfoProviderDispatcher bulletFireInfoProviderDispatcher,
+            int serverTime,
+            Vector3 dir,
+            int weaponId,
+            EBulletCaliber caliber,
             BulletConfig bulletConfig,
-            EBulletCaliber caliber)
+            Vector3 viewPosition,
+            Vector3 emitPosition)
         {
             int bulletEntityId = _entityIdGenerator.GetNextEntityId();
         
-            //var emitPost = PlayerEntityUtility.GetCameraBulletEmitPosition(playerEntity);
             Vector3 velocity = dir * bulletConfig.EmitVelocity;
             var bulletEntity = _bulletContext.CreateEntity();
             float maxDistance = bulletConfig.MaxDistance;
@@ -52,8 +52,6 @@ namespace App.Shared.EntityFactory
                 bulletConfig.VelocityDecay,
                 caliber,
                 weaponId);
-            var viewPosition = bulletFireInfoProviderDispatcher.GetFireViewPosition();
-            var emitPosition = bulletFireInfoProviderDispatcher.GetFireEmitPosition();
             bulletEntity.AddPosition(viewPosition);
             bulletEntity.AddOwnerId(entityKey);
             bulletEntity.bulletData.CmdSeq = cmdSeq;

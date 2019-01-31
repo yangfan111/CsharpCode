@@ -29,17 +29,13 @@ namespace App.Shared.GameInputFilter
                 EPlayerInput.IsCrouch,
                 EPlayerInput.IsProne,
                 EPlayerInput.IsSwitchWeapon,
-                //TODO 爬墙
                 EPlayerInput.IsReload,
                 EPlayerInput.IsSwitchFireMode,
-                //TODO 拉栓
-                //EPlayerInput.IsThrowing,
                 EPlayerInput.IsLeftAttack,
                 EPlayerInput.IsRightAttack,
             });
             _groups.Add(new List<EPlayerInput>
             {
-                //TODO 爬墙
                 EPlayerInput.IsJump,
                 EPlayerInput.IsSprint,
             });
@@ -49,7 +45,6 @@ namespace App.Shared.GameInputFilter
                 EPlayerInput.IsCrouch,
                 EPlayerInput.IsProne,
                 EPlayerInput.IsSwitchWeapon,
-                //TODO 爬墙
                 EPlayerInput.IsSprint,
             });
 

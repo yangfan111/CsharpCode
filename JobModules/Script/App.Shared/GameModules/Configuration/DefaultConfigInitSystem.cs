@@ -48,7 +48,7 @@ namespace App.Shared.GameModules.Configuration
             set { _isDone = value; }
         }
 
-        public void OnLoadResources(ILoadRequestManager loadRequestManager)
+        public void OnLoadResources(IUnityAssetManager assetManager)
         {
             if (SingletonManager.Get<T>().IsInitialized)
             {
@@ -57,7 +57,7 @@ namespace App.Shared.GameModules.Configuration
             else if (!_isLoding)
             {
                 _isLoding = true;
-                loadRequestManager.AppendLoadRequest(null, _assetInfo, OnLoadSucc);
+                assetManager.LoadAssetAsync(typeof(T).ToString(), _assetInfo, OnLoadSucc);
             }
 
             if (IsDone && !_isExit)
@@ -68,15 +68,17 @@ namespace App.Shared.GameModules.Configuration
             }
         }
 
-        public void OnLoadSucc(object source, AssetInfo assetInfo, UnityEngine.Object obj)
+        public void OnLoadSucc(string source, UnityObject unityObj)
         {
-            var asset = obj as TextAsset;
+
+            var assetInfo = unityObj.Address;
+            var asset = unityObj.As<TextAsset>();
             if (null == asset)
             {
                 Logger.ErrorFormat("Asset {0}:{1} Load Fialed ", assetInfo.BundleName, assetInfo.AssetName);
                 return;
             }
-
+            
             _cfg = asset.text;
             if (null == _parser)
             {

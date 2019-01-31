@@ -15,6 +15,7 @@ using Core.Configuration;
 using Core.Compare;
 using Utils.Configuration;
 using Utils.Singleton;
+using App.Shared.WeaponLogic;
 
 namespace App.Shared.GameModules.Player.CharacterState
 {
@@ -31,25 +32,25 @@ namespace App.Shared.GameModules.Player.CharacterState
         private readonly ICharacterMovement _movement;
         private readonly ICharacterPostureInConfig _postureInConfig;
         private readonly ICharacterMovementInConfig _movementInConfig;
-        private readonly ISpeedProvider _speedProvider;
 
         private Dictionary<int, Action> _speedConditionDictionary;
         private PostureInConfig _currentPosture;
         private MovementInConfig _currentMovement;
+        private Contexts _contexts;
 
         public SpeedManager(PlayerEntity player,
+                            Contexts contexts,
                             ICharacterPosture posture,
                             ICharacterMovement movement,
                             ICharacterPostureInConfig postureInConfig,
-                            ICharacterMovementInConfig movementInConfig,
-                            ISpeedProvider speedProvider)
+                            ICharacterMovementInConfig movementInConfig)
         {
+            _contexts = contexts;
             _player = player;
             _posture = posture;
             _movement = movement;
             _postureInConfig = postureInConfig;
             _movementInConfig = movementInConfig;
-            _speedProvider = speedProvider;
             _speedConditionDictionary = new Dictionary<int, Action>()
             {
                 // 落地
@@ -216,7 +217,7 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         private void SetDefaultSpeeedRatio(float buff)
         {
-            float weaponSpeed =_speedProvider.GetBaseSpeed();
+            float weaponSpeed = _player.GetBaseSpeed(_contexts);
             var newSpeedRatio =  weaponSpeed * (1.0f + buff) / SingletonManager.Get<CharacterStateConfigManager>().GetStandardAnimationSpeed();
             _player.playerMove.SpeedRatio = newSpeedRatio;
         }
@@ -301,8 +302,8 @@ namespace App.Shared.GameModules.Player.CharacterState
 
             if (valid)
             {
-                float weaponSpeed = GetWeaponSpeed(_currentPosture, _currentMovement, _speedProvider.GetBaseSpeed(),
-                    _speedProvider.GetDefaultSpeed());
+                float weaponSpeed = GetWeaponSpeed(_currentPosture, _currentMovement, _player.GetBaseSpeed(_contexts),
+                    _player.GetDefaultSpeed(_contexts));
                 maxSpeed = SingletonManager.Get<CharacterStateConfigManager>().GetSpeed(_currentPosture,
                     _currentMovement,
                     _movement.IsForth,
@@ -334,8 +335,8 @@ namespace App.Shared.GameModules.Player.CharacterState
         private void CalcSpeedRatio(float maxSpeed, float curSpeed, float buff)
         {
             var scale = Math.Max(0.01f, maxSpeed != 0 ? curSpeed / maxSpeed : 1);
-            float weaponSpeed = GetWeaponSpeed(_currentPosture, _currentMovement, _speedProvider.GetBaseSpeed(),
-                _speedProvider.GetDefaultSpeed());
+            float weaponSpeed = GetWeaponSpeed(_currentPosture, _currentMovement, _player.GetBaseSpeed(_contexts),
+                _player.GetDefaultSpeed(_contexts));
             var newSpeedRatio = scale * weaponSpeed * (1.0f + buff) / SingletonManager.Get<CharacterStateConfigManager>().GetStandardAnimationSpeed();
             _player.playerMove.SpeedRatio = newSpeedRatio;
             if (float.IsNaN(newSpeedRatio) || float.IsInfinity(newSpeedRatio))

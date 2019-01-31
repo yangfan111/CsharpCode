@@ -32,17 +32,16 @@ namespace App.Shared.GameModules.Vehicle
         public override void SingleExecute(VehicleEntity vehicle)
         {
             var name = vehicle.vehicleAssetInfo.AssetBundleName;
-            LoadRequestManager.AppendLoadRequest(vehicle, AssetConfig.GetVehicleHitboxAssetInfo(name), OnLoadSucc);
+            AssetManager.LoadAssetAsync(vehicle, AssetConfig.GetVehicleHitboxAssetInfo(name), OnLoadSucc);
                 
             _logger.DebugFormat("created client vehicle hitbox {0}", vehicle.entityKey.Value);
         }
 
       
        
-            public static void OnLoadSucc(object source, UnityObjectWrapper<GameObject> obj)
+            public static void OnLoadSucc(VehicleEntity vehicle, UnityObject unityObj)
             {
-                VehicleEntity vehicle = (VehicleEntity)source;
-                var hitboxConfig = (GameObject)obj;
+                var hitboxConfig = unityObj.AsGameObject;
                 var hitboxImposter = HitBoxComponentUtility.InitHitBoxComponent(vehicle.entityKey.Value, vehicle, hitboxConfig);
                 vehicle.ConfigHitBoxImposter(hitboxImposter);
             }

@@ -19,8 +19,8 @@ namespace App.Shared.SceneTriggerObject
 {
     public interface IGameObjectListener
     {
-        void OnMapObjLoaded(UnityObjectWrapper<GameObject> gameObject);
-        void OnMapObjUnloaded(UnityObjectWrapper<GameObject> gameObject);
+        void OnMapObjLoaded(UnityObject unityObj);
+        void OnMapObjUnloaded(UnityObject unityObj);
     }
 
     public interface ITriggerObjectListener
@@ -103,7 +103,7 @@ namespace App.Shared.SceneTriggerObject
             return _managers[(int)type].Get(id);
         }
 
-        public void OnMapObjLoaded(UnityObjectWrapper<GameObject> gameObject)
+        public void OnMapObjLoaded(UnityObject gameObject)
         {
             foreach (var manager in _managers)
             {
@@ -119,11 +119,11 @@ namespace App.Shared.SceneTriggerObject
             }
         }
 
-        public void OnMapObjUnloaded(UnityObjectWrapper<GameObject> gameObject)
+        public void OnMapObjUnloaded(UnityObject unityObj)
         {
             foreach (var manager in _managers)
             {
-                manager.OnMapObjUnloaded(gameObject);
+                manager.OnMapObjUnloaded(unityObj);
             }
         }
 
@@ -459,19 +459,19 @@ namespace App.Shared.SceneTriggerObject
             get { return _pool.LastUnloadedIdSet; }
         }
 
-        public void OnMapObjLoaded(UnityObjectWrapper<GameObject> gameObject)
+        public void OnMapObjLoaded(UnityObject unityObj)
         {
-            TriggerObjectLoadProfiler.Start(gameObject.Value);
-            FillTempGameObjectList(gameObject.Value);
+            TriggerObjectLoadProfiler.Start(unityObj);
+            FillTempGameObjectList(unityObj);
             AddTempGameObjectToPool();
             ClearTempGameObjectList();
             var elapsedTime = TriggerObjectLoadProfiler.Stop();
-            _logger.DebugFormat("Load Scene Trigger Object Type {0} from scene{1}, cost {2}", _typeValue, gameObject, elapsedTime);
+            _logger.DebugFormat("Load Scene Trigger Object Type {0} from scene{1}, cost {2}", _typeValue, unityObj.AsGameObject.name, elapsedTime);
         }
 
-        public void OnMapObjUnloaded(UnityObjectWrapper<GameObject> gameObject)
+        public void OnMapObjUnloaded(UnityObject unityObj)
         {
-            FillTempGameObjectIdList(gameObject.Value);
+            FillTempGameObjectIdList(unityObj);
             RemoveTempGameObjectFromPool();
             ClearTempGameObjectList();
         }
@@ -529,7 +529,7 @@ namespace App.Shared.SceneTriggerObject
             var rootObjects = scene.GetRootGameObjects();
             foreach (var rootObject in rootObjects)
             {
-                var obj = new UnityObjectWrapper<GameObject>(rootObject, AssetInfo.EmptyInstance, 0);
+                var obj = new UnityObject(rootObject, AssetInfo.EmptyInstance);
                 _triggerObjectManager.OnMapObjLoaded(obj);
             }
         }

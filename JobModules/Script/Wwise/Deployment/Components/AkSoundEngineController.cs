@@ -7,7 +7,7 @@ public class AkSoundEngineController
 
         get
         {
-            return AudioPluginSettingAgent.GetBankAssetFolder();
+            return AudioPluginManagement.GetBankAssetFolder();
         }
     }
 
@@ -178,79 +178,12 @@ public class AkSoundEngineController
 		var basePath = s_DefaultBasePath;
 		language = akInitializer.language;
 
-		//Use default properties for most SoundEngine subsystem.  
-		//The game programmer should modify these when needed.  See the Wwise SDK documentation for the initialization.
-		//These settings may very well change for each target platform.
-		var memSettings = new AkMemSettings();
-		memSettings.uMaxNumPools = 20;
-
-		var deviceSettings = new AkDeviceSettings();
-		AkSoundEngine.GetDefaultDeviceSettings(deviceSettings);
-
-		var streamingSettings = new AkStreamMgrSettings();
-		streamingSettings.uMemorySize = (uint) akInitializer.streamingPoolSize * 1024;
-
-		var initSettings = new AkInitSettings();
-		AkSoundEngine.GetDefaultInitSettings(initSettings);
-		initSettings.uDefaultPoolSize = (uint) akInitializer.defaultPoolSize * 1024;
-		initSettings.uMonitorPoolSize = (uint) akInitializer.monitorPoolSize * 1024;
-		initSettings.uMonitorQueuePoolSize = (uint) akInitializer.monitorQueuePoolSize * 1024;
-#if (!UNITY_ANDROID && !PLATFORM_LUMIN && !UNITY_WSA) || UNITY_EDITOR // Exclude WSA. It only needs the name of the DLL, and no path.
-        initSettings.szPluginDLLPath = System.IO.Path.Combine(UnityEngine.Application.dataPath,
-			"Plugins" + System.IO.Path.DirectorySeparatorChar);
-#elif PLATFORM_LUMIN && !UNITY_EDITOR
-        initSettings.szPluginDLLPath = UnityEngine.Application.dataPath.Replace("Data", "bin") + System.IO.Path.DirectorySeparatorChar;
-#endif
-
-		var platformSettings = new AkPlatformInitSettings();
-		AkSoundEngine.GetDefaultPlatformInitSettings(platformSettings);
-		platformSettings.uLEngineDefaultPoolSize = (uint) akInitializer.lowerPoolSize * 1024;
-		platformSettings.fLEngineDefaultPoolRatioThreshold = akInitializer.memoryCutoffThreshold;
-
-		var musicSettings = new AkMusicSettings();
-		AkSoundEngine.GetDefaultMusicSettings(musicSettings);
-
-		var spatialAudioSettings = new AkSpatialAudioInitSettings();
-		spatialAudioSettings.uPoolSize = (uint) akInitializer.spatialAudioPoolSize * 1024;
-		spatialAudioSettings.uMaxSoundPropagationDepth = akInitializer.maxSoundPropagationDepth;
-		spatialAudioSettings.uDiffractionFlags = (uint) akInitializer.diffractionFlags;
-
-#if UNITY_EDITOR
-		AkSoundEngine.SetGameName(UnityEngine.Application.productName + " (Editor)");
-#else
-		AkSoundEngine.SetGameName(UnityEngine.Application.productName);
-#endif
-
-		result = AkSoundEngine.Init(memSettings, streamingSettings, deviceSettings, initSettings, platformSettings,
-			musicSettings, spatialAudioSettings, (uint) akInitializer.preparePoolSize * 1024);
-
-		if (result != AKRESULT.AK_Success)
-		{
-			UnityEngine.Debug.LogError("WwiseUnity: Failed to initialize the sound engine. Abort.");
-			AkSoundEngine.Term();
-			return; //AkSoundEngine.Init should have logged more details.
-		}
-
-		var basePathToSet = AkBasePathGetter.GetSoundbankBasePath();
-		if (string.IsNullOrEmpty(basePathToSet))
-		{
-			UnityEngine.Debug.LogError("WwiseUnity: Couldn't find soundbanks base path. Terminate sound engine.");
-			AkSoundEngine.Term();
-			return;
-		}
-
-		result = AkSoundEngine.SetBasePath(basePathToSet);
-		if (result != AKRESULT.AK_Success)
-		{
-			UnityEngine.Debug.LogError("WwiseUnity: Failed to set soundbanks base path. Terminate sound engine.");
-			AkSoundEngine.Term();
-			return;
-		}
-
+        if (!AudioPluginManagement.Instance.SettingMgr.Initialize()) return;
 #if !UNITY_SWITCH
 		// Calling Application.persistentDataPath crashes Switch
 		var decodedBankFullPath = GetDecodedBankFullPath();
 		// AkSoundEngine.SetDecodedBankPath creates the folders for writing to (if they don't exist)
+        ///设定解码路径：
 		AkSoundEngine.SetDecodedBankPath(decodedBankFullPath);
 #endif
 
@@ -258,13 +191,13 @@ public class AkSoundEngineController
 
 #if !UNITY_SWITCH
 		// Calling Application.persistentDataPath crashes Switch
-		// AkSoundEngine.AddBasePath is currently only implemented for iOS and Android; No-op for all other platforms.
+		///设定基础路径：对windows不生效：AkSoundEngine.AddBasePath is currently only implemented for iOS and Android; No-op for all other platforms.
 		AkSoundEngine.AddBasePath(UnityEngine.Application.persistentDataPath + System.IO.Path.DirectorySeparatorChar);
 		// Adding decoded bank path last to ensure that it is the first one used when writing decoded banks.
 		AkSoundEngine.AddBasePath(decodedBankFullPath);
 #endif
 
-		result = AkCallbackManager.Init(akInitializer.callbackManagerBufferSize * 1024);
+		result = AkCallbackManager.Init(AudioPluginManagement.Instance.SettingData.callbackManagerBufferSize * 1024);
 		if (result != AKRESULT.AK_Success)
 		{
 			UnityEngine.Debug.LogError("WwiseUnity: Failed to initialize Callback Manager. Terminate sound engine.");
@@ -303,11 +236,11 @@ public class AkSoundEngineController
 	{
 #if UNITY_EDITOR
 		ClearInitializeState();
-
-		if (!IsSoundEngineLoaded)
+        AudioPluginManagement.SaveSettingFile();
+        if (!IsSoundEngineLoaded)
 			return;
 #endif
-
+        
 		if (!AkSoundEngine.IsInitialized())
 			return;
 

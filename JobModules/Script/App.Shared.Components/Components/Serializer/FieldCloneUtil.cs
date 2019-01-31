@@ -4,6 +4,7 @@ using App.Shared.Components.Bag;
 using Core.Animation;
 using Core.CameraControl;
 using Core.CharacterState;
+using Core.CharacterState.Posture;
 using Core.EntityComponent;
 using UnityEngine;
 
@@ -69,6 +70,11 @@ namespace App.Shared.Components.Serializer
         
 
         public static StateInterCommands Clone(StateInterCommands data)
+        {
+            return data != null ? data.Clone():null;
+        }
+        
+        public static UnityAnimationEventCommands Clone(UnityAnimationEventCommands data)
         {
             return data != null ? data.Clone():null;
         }

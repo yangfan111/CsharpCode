@@ -41,9 +41,10 @@ namespace App.Shared.Components.Ui
 
     public enum MapLevel
     {
-        Min = 0,
-        Medium = 1,
-        Max = 2,
+        None = 0,
+        Min = 1,
+        Medium = 2,
+        Max = 3,
     }
 
     public enum MiniMapPlayStatue
@@ -112,6 +113,7 @@ namespace App.Shared.Components.Ui
         {
             get { return Statue == MiniMapPlayStatue.DEAD; }
         }
+
     }
 
     public class BombAreaInfo   //轰炸区数据

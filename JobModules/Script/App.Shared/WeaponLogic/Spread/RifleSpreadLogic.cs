@@ -17,7 +17,7 @@ namespace Core.WeaponLogic
         public void BeforeFireBullet(PlayerEntity playerEntity, WeaponEntity weaponEntity, IWeaponCmd cmd)
         {
             var config = GetConfig(playerEntity);
-            var weaponState = weaponEntity.weaponData;
+            var weaponState = weaponEntity.weaponRuntimeInfo;
             float spread = UpdateSpread(playerEntity, weaponEntity, weaponState.Accuracy);
             weaponState.LastSpreadX = spread * config.SpreadScale.ScaleX;
             weaponState.LastSpreadY = spread * config.SpreadScale.ScaleY;

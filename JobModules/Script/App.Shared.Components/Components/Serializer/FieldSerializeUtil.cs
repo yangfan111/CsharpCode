@@ -10,6 +10,7 @@ using App.Shared.Components.Serializer.FieldSerializer;
 using Core.Animation;
 using Core.CameraControl;
 using Core.CharacterState;
+using Core.CharacterState.Posture;
 using Core.EntityComponent;
 using Core.Event;
 using Core.SnapshotReplication.Serialization.Serializer;
@@ -40,6 +41,7 @@ namespace App.Shared.Components.Serializer
         private static StringSerializer _stringSerializer = new StringSerializer();
 
         private static StateInterCommandsSerializer _stateInterCommandsSerializer = new StateInterCommandsSerializer();
+        private static UnityAnimationEventCommandsSerializer _unityAnimationEventCommandsSerializer = new UnityAnimationEventCommandsSerializer();
         private static EventsSerializer _eventsSerializer = new EventsSerializer();
 
         private static void SendCompressedData(int sendTime, uint toSend, Core.Utils.MyBinaryWriter writer)
@@ -341,6 +343,12 @@ namespace App.Shared.Components.Serializer
         {
             _stateInterCommandsSerializer.Write(data, writer);
         }
+        
+        public static void Serialize(UnityAnimationEventCommands data, Core.Utils.MyBinaryWriter writer,
+            UnityAnimationEventCommands last = default(UnityAnimationEventCommands), bool weiteAll = false)
+        {
+            _unityAnimationEventCommandsSerializer.Write(data, writer);
+        }
 
         public static void Serialize(EntityKey data, Core.Utils.MyBinaryWriter writer,
             EntityKey last = default(EntityKey), bool weiteAll = false)
@@ -630,6 +638,11 @@ namespace App.Shared.Components.Serializer
         public static StateInterCommands Deserialize(StateInterCommands typeTag, BinaryReader reader)
         {
             return _stateInterCommandsSerializer.Read(reader);
+        }
+        
+        public static UnityAnimationEventCommands Deserialize(UnityAnimationEventCommands typeTag, BinaryReader reader)
+        {
+            return _unityAnimationEventCommandsSerializer.Read(reader);
         }
 
         public static EntityKey Deserialize(EntityKey typeTag, BinaryReader reader)

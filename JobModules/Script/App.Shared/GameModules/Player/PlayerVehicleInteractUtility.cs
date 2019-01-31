@@ -22,7 +22,7 @@ namespace App.Shared.GameModules.Player
             return playerEntity.hasControlledVehicle && playerEntity.controlledVehicle.IsOnVehicle;
         }
 
-        public static void SetCharacterStateWithVehicle(this PlayerEntity playerEntity, VehicleContext context)
+        public static void SetCharacterStateWithVehicle(this PlayerEntity playerEntity, Contexts contexts, VehicleContext context)
         {
             if(playerEntity.hasCharacterContoller)
             {
@@ -51,7 +51,7 @@ namespace App.Shared.GameModules.Player
                             if (!enabled && !isStateDrive)
                             {
                                 var vehicle = context.GetEntityWithEntityKey(playerEntity.controlledVehicle.EntityKey);
-                                playerEntity.DriveStart(playerEntity.controlledVehicle.Role, vehicle.vehicleAssetInfo.PostureId);
+                                playerEntity.DriveStart(contexts, playerEntity.controlledVehicle.Role, vehicle.vehicleAssetInfo.PostureId);
 
                             }
                             else if (enabled && isStateDrive)
@@ -89,19 +89,19 @@ namespace App.Shared.GameModules.Player
             return null;
         }
 
+        private static BoneMount _mount = new BoneMount();
         private static bool SetCharacterPositionOnVehicle(this PlayerEntity playerEntity, VehicleContext context)
         {
             var characterTransform = playerEntity.RootGo().transform;
+            var character = playerEntity.RootGo();
             if (null == characterTransform) return false;
             bool on = playerEntity.IsOnVehicle();
             if (on)
             {
-                Transform seat = playerEntity.GetVehicleSeatTransform(context);
+                var seat = playerEntity.GetVehicleSeatTransform(context);
                 if (seat != null)
                 {
-                    characterTransform.parent = seat;
-                    characterTransform.localPosition = Vector3.zero;
-                    characterTransform.localRotation = Quaternion.identity;
+                    _mount.MountCharacterToVehicleSeat(character, seat);
                     playerEntity.orientation.Pitch = 0;
                     playerEntity.orientation.Yaw = 0;
 
@@ -113,7 +113,7 @@ namespace App.Shared.GameModules.Player
             }
 
             EnablePassagerCollider(playerEntity, context);
-            characterTransform.parent = null;
+            characterTransform.SetParent(null, false);
             return true;
         }
 
@@ -150,7 +150,7 @@ namespace App.Shared.GameModules.Player
                         break;
                     }
 
-                    transform = transform.parent;
+                    transform.SetParent(transform.parent, false);
                 }
             }
 
@@ -169,7 +169,7 @@ namespace App.Shared.GameModules.Player
                 ikControllerP3.SetIKGoal(AvatarIKGoal.LeftHand);
                 ikControllerP3.SetIKGoal(AvatarIKGoal.RightHand);
 
-                var vehicleObj = vehicleEntity.gameObject.UnityObjWrapper;
+                var vehicleObj = vehicleEntity.gameObject.UnityObject;
                 var leftIKP3 = BoneMount.FindChildBone(vehicleObj, BoneName.SteeringWheelLeftIK, true);
                 ikControllerP3.SetSource(AvatarIKGoal.LeftHand, leftIKP3);
                 var rightIKP3 = BoneMount.FindChildBone(vehicleObj, BoneName.SteeringWheelRightIK, true);
@@ -226,7 +226,7 @@ namespace App.Shared.GameModules.Player
             return true;
         }
 
-        public static void DriveStart(this PlayerEntity playerEntity, int seatId, int postureId)
+        public static void DriveStart(this PlayerEntity playerEntity, Contexts contexts, int seatId, int postureId)
         {
             //seatId 1~4,  actionSeatId 0~3
             var actionSeatId = seatId - 1 < 0 ? 0 : seatId - 1;
@@ -235,7 +235,7 @@ namespace App.Shared.GameModules.Player
             playerEntity.stateInterface.State.DriveStart(actionSeatId, postureId);
             //if (playerEntity.IsVehicleDriver())    //主驾驶位置
             {
-                playerEntity.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon();
+                playerEntity.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon(contexts);
             }
         }
     }

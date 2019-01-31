@@ -25,13 +25,13 @@ namespace App.Shared.GameModules.Player.Appearance
         
         public void PlayerDead()
         {
-            SetLayer(_characterRoot, UnityLayers.NoCollisionWithEntityLayer);
+            SetLayer(_characterRoot, UnityLayerManager.GetLayerIndex(EUnityLayerName.NoCollisionWithEntity));
             _controller.enabled = false;
         }
 
         public void PlayerReborn()
         {
-            SetLayer(_characterRoot, UnityLayers.PlayerLayer);
+            SetLayer(_characterRoot, UnityLayerManager.GetLayerIndex(EUnityLayerName.Player));
             _controller.enabled = true;
         }
         

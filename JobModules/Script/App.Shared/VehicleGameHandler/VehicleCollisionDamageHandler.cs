@@ -18,10 +18,12 @@ namespace App.Shared.VehicleGameHandler
 
         private PlayerContext _playerContext;
         private VehicleContext _vehicleContext;
+        private Contexts _contexts;
         public VehicleCollisionDamageHandler(Contexts contexts)
         {
             _playerContext = contexts.player;
             _vehicleContext = contexts.vehicle;
+            _contexts = contexts;
         }
 
         protected override void DoUpdate(VehicleEntity vehicle)
@@ -103,7 +105,7 @@ namespace App.Shared.VehicleGameHandler
         {
             if (damage > 0)
             {
-                VehicleDamageUtility.DoDamageToAllPassgers(_playerContext, vehicle, damage, EUIDeadType.VehicleHit, null, true, sendToServer);
+                VehicleDamageUtility.DoDamageToAllPassgers(_contexts, vehicle, damage, EUIDeadType.VehicleHit, null, true, sendToServer);
 
                 _logger.InfoFormat("Vehicle {0} AVERAGE collision damage {1} to all passagers", vehicle.entityKey.Value.EntityId, damage);
             }

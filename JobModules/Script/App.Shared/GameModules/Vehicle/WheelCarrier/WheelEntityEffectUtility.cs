@@ -29,12 +29,12 @@ namespace App.Shared.GameModules.Vehicle.WheelCarrier
         public void SetEngineEffectPercent(VehicleEntity vehicle, float percent)
         {
             var go = vehicle.gameObject;
-            var effect = go.UnityObjWrapper.Value.GetComponent<VehicleEngineEffect>();
+            var effect = go.UnityObject.AsGameObject.GetComponent<VehicleEngineEffect>();
             effect.Percent = percent;
 
             if (percent > 0)
             {
-                var eventEffect = go.UnityObjWrapper.Value.GetComponent<VehicleEventEffect>();
+                var eventEffect = go.UnityObject.AsGameObject.GetComponent<VehicleEventEffect>();
                 eventEffect.SetBrokenMaterial<VehicleMaterialLoader>(false);
             }
         }
@@ -42,14 +42,14 @@ namespace App.Shared.GameModules.Vehicle.WheelCarrier
         public void EnableEngineAudio(VehicleEntity vehicle, bool enabled)
         {
             var go = vehicle.gameObject;
-            var audio = go.UnityObjWrapper.Value.GetComponent<VehicleAudioPack>();
+            var audio = go.UnityObject.AsGameObject.GetComponent<VehicleAudioPack>();
             audio.EnableEngineRunning = enabled;
         }
 
         public void PlayExplosionInLandEffect(VehicleEntity vehicle)
         {
             var go = vehicle.gameObject;
-            var effect = go.UnityObjWrapper.Value.GetComponent<VehicleEventEffect>();
+            var effect = go.UnityObject.AsGameObject.GetComponent<VehicleEventEffect>();
             effect.Explosion<VehicleMaterialLoader>();
         }
 
@@ -57,7 +57,7 @@ namespace App.Shared.GameModules.Vehicle.WheelCarrier
         public static void PlayExplosionInWaterEffect(VehicleEntity vehicle)
         {
             var go = vehicle.gameObject;
-            var effect = go.UnityObjWrapper.Value.GetComponent<VehicleEventEffect>();
+            var effect = go.UnityObject.AsGameObject.GetComponent<VehicleEventEffect>();
             effect.ExplosionInWater<VehicleMaterialLoader>();
         }
 
@@ -65,7 +65,7 @@ namespace App.Shared.GameModules.Vehicle.WheelCarrier
         {
             var go = vehicle.gameObject;
             var controllerIndex = VehicleIndexHelper.ToVehicleControllerWheelIndex(index);
-            var controller = go.UnityObjWrapper.Value.GetComponent<VehicleAbstractController>();
+            var controller = go.UnityObject.AsGameObject.GetComponent<VehicleAbstractController>();
             var rendererRoot = controller.GetTireMeshRenderRoot(controllerIndex);
             if (rendererRoot == null)
             {
@@ -88,7 +88,7 @@ namespace App.Shared.GameModules.Vehicle.WheelCarrier
             //play explosion effect
             var go = vehicle.gameObject;
             var controllerIndex = VehicleIndexHelper.ToVehicleControllerWheelIndex(index);
-            var effect = go.UnityObjWrapper.Value.GetComponent<VehicleEventEffect>();
+            var effect = go.UnityObject.AsGameObject.GetComponent<VehicleEventEffect>();
             effect.WheelExplosion(controllerIndex);
         }
     }

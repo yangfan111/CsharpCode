@@ -41,6 +41,8 @@ namespace App.Shared.ContextInfos
                 GetBin2D(bin, (int) EEntityType.FreeMove)));
             entitasContextInfos.AddContextInfo(new SoundGameContext(contexts.sound,
                 GetBin2D(bin, (int) EEntityType.Sound)));
+            entitasContextInfos.AddContextInfo(new WeaponGameContext(contexts.weapon,
+                GetBin2D(bin, (int)EEntityType.Weapon)));
             if (IsIncludeSceneObject)
             {
                 entitasContextInfos.AddContextInfo(new SceneObjectGameContext(contexts.sceneObject,

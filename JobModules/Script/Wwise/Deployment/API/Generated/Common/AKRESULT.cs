@@ -99,7 +99,7 @@ public enum AKRESULT {
   AK_InitBankNotLoaded = 92,
   AK_InvalidStateGroupElement =101,
     AK_BankNotLoadYet =102,
-    AK_BankInAyncLoading =103,
+    AK_BankInLoadingQueue =103,
     AK_WaitBankLoadingFinish =104,
 }
 #endif // #if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.

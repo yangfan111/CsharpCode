@@ -40,12 +40,12 @@ namespace Core.GameModule.Common
                         foreach (var comp in entity.AssetComponents)
                         {
                            
-                            comp.Recycle(_sessionObjects.GameObjectPool);
+                            comp.Recycle(_sessionObjects.AssetManager);
                             
                         }
 
-                        if (_sessionObjects.LoadRequestManager != null)
-                            _sessionObjects.LoadRequestManager.CancelSource((Entity) entity.RealEntity);
+                        if (_sessionObjects.AssetManager != null)
+                            _sessionObjects.AssetManager.LoadCancel(entity.RealEntity);
                         entity.Destroy();
                     }
                 }

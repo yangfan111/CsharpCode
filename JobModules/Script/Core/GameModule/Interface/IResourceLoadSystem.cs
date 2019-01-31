@@ -4,6 +4,6 @@ namespace Core.GameModule.Interface
 {
     public interface IResourceLoadSystem
     {
-        void OnLoadResources(ILoadRequestManager loadRequestManager);
+        void OnLoadResources(IUnityAssetManager assetManager);
     }
 }

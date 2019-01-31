@@ -10,11 +10,11 @@ namespace Core.GameModule.System
     public class ResourceLoadSystem : AbstractFrameworkSystem<IResourceLoadSystem>
     {
         private IList<IResourceLoadSystem> _systems;
-        private ILoadRequestManager _loadRequestManager;
-        public ResourceLoadSystem(IGameModule module, ILoadRequestManager loadRequestManager)
+        private IUnityAssetManager _assetManager;
+        public ResourceLoadSystem(IGameModule module, IUnityAssetManager assetManager)
         {
             _systems = module.ResourceLoadSystems;
-            _loadRequestManager = loadRequestManager;
+            _assetManager = assetManager;
             Init();
         }
 
@@ -26,7 +26,7 @@ namespace Core.GameModule.System
 
         public override void SingleExecute(IResourceLoadSystem system)
         {
-            system.OnLoadResources(_loadRequestManager);
+            system.OnLoadResources(_assetManager);
         }
 
         public override void Execute()

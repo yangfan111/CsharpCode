@@ -59,10 +59,11 @@ namespace Core.Free
 		public const int PlayerCmd = 105;
         public const int PlayerAnimation = 106;
 		public const int BlastScoreUI = 107;
-
+        public const int ChangeWeapon = 108;
         public const int CommonRoundOverUI = 109;
         public const int CountDownTipUI = 110;
         public const int ResetBattleData = 111;
+        public const int BombAreaMarkUI = 112;
 
         private static Dictionary<int, string> MessageDesc = new Dictionary<int, string>();
 

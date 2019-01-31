@@ -16,23 +16,24 @@ using Vector3 = UnityEngine.Vector3;
 namespace App.Shared.Components.Player
 {
     [Player]
-    public class CharacterBoneComponent : IPlaybackComponent, ICharacterBoneState, IUpdateComponent
+    public class CharacterBoneComponent : IPlaybackComponent, IUpdateComponent
     {
-        [DontInitilize] [NetworkProperty] public float PitchHeadAngle { get; set; }
-        [DontInitilize] [NetworkProperty] public float RotHeadAngle { get; set; }
-        [DontInitilize] [NetworkProperty] public float PitchHandAngle { get; set; }
-        [DontInitilize] [NetworkProperty] public float HeadRotProcess { get; set; }
-        [DontInitilize] [NetworkProperty] public bool IsHeadRotCW { get; set; }
-        [NetworkProperty] public float WeaponPitch { get; set; }
-        [NetworkProperty] public float WeaponRot { get; set; }
+        [DontInitilize] [NetworkProperty] public bool EnableIK;
+        [DontInitilize] [NetworkProperty] public float PitchHeadAngle;
+        [DontInitilize] [NetworkProperty] public float RotHeadAngle;
+        [DontInitilize] [NetworkProperty] public float PitchHandAngle;
+        [DontInitilize] [NetworkProperty] public float HeadRotProcess;
+        [DontInitilize] [NetworkProperty] public bool IsHeadRotCW;
+        [NetworkProperty] public float WeaponPitch;
+        [NetworkProperty] public float WeaponRot;
 
-        [DontInitilize] [NetworkProperty] public Vector3 FirstPersonPositionOffset { get; set; }
-        [DontInitilize] [NetworkProperty] public Vector3 FirstPersonRotationOffset { get; set; }
-        [DontInitilize] [NetworkProperty] public Vector3 FirstPersonSightOffset { get; set; }
+        [DontInitilize] [NetworkProperty] public Vector3 FirstPersonPositionOffset;
+        [DontInitilize] [NetworkProperty] public Vector3 FirstPersonRotationOffset;
+        [DontInitilize] [NetworkProperty] public Vector3 FirstPersonSightOffset;
 
-        public float ScreenRatio { get; set; }
-        public int RealWeaponId { get; set; }
-        public bool NeedChangeOffset { get; set; }
+        public float ScreenRatio;
+        public int RealWeaponId;
+        public bool NeedChangeOffset;
 
         public int GetComponentId()
         {
@@ -75,6 +76,8 @@ namespace App.Shared.Components.Player
             IsHeadRotCW = leftComponent.IsHeadRotCW;
             NeedChangeOffset = leftComponent.NeedChangeOffset;
             RealWeaponId = leftComponent.RealWeaponId;
+
+            EnableIK = leftComponent.EnableIK;
         }
 
         public void CopyFrom(object rightComponent)
@@ -95,6 +98,8 @@ namespace App.Shared.Components.Player
             ScreenRatio = right.ScreenRatio;
             RealWeaponId = right.RealWeaponId;
             NeedChangeOffset = right.NeedChangeOffset;
+
+            EnableIK = right.EnableIK;
         }
     }
 

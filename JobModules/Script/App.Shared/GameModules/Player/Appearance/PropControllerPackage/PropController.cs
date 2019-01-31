@@ -5,6 +5,7 @@ using System.Text;
 using App.Shared.Components.Player;
 using Utils.Appearance;
 using Utils.Appearance.PropItem;
+using Utils.AssetManager;
 
 namespace App.Shared.GameModules.Player.Appearance.PropControllerPackage
 {
@@ -18,6 +19,11 @@ namespace App.Shared.GameModules.Player.Appearance.PropControllerPackage
         public void SyncToLatestComponent(LatestAppearanceComponent value)
         {
             CopyToLatestWardrobeComponent(value);
+        }
+
+        protected override AbstractLoadRequest CreateLoadRequest(AssetInfo assetInfo, ILoadedHandler mountHandler)
+        {
+            return LoadRequestFactory.Create<PlayerEntity>(assetInfo, mountHandler.OnLoadSucc);
         }
 
         #region Helper
@@ -35,5 +41,7 @@ namespace App.Shared.GameModules.Player.Appearance.PropControllerPackage
         }
 
         #endregion
+
+
     }
 }

@@ -15,7 +15,7 @@ namespace Core.WeaponLogic
         public void OnIdle(PlayerEntity playerEntity, WeaponEntity weaponEntity, IWeaponCmd cmd)
         {
             var config = GetConfig(playerEntity);
-            var weaponState = weaponEntity.weaponData;
+            var weaponState = weaponEntity.weaponRuntimeInfo;
             if (weaponState.ContinuesShootDecreaseNeeded)
             {
                 weaponState.ContinuesShootDecreaseNeeded = false;
@@ -38,7 +38,7 @@ namespace Core.WeaponLogic
 
         public void BeforeFireBullet(PlayerEntity playerEntity, WeaponEntity weaponEntity, IWeaponCmd cmd)
         {
-            var weaponState = weaponEntity.weaponData;
+            var weaponState = weaponEntity.weaponRuntimeInfo;
             weaponState.ContinuesShootDecreaseNeeded = true;
             weaponState.ContinuesShootCount++;
         }

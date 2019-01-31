@@ -20,8 +20,8 @@ namespace App.Shared.GameModules.Player
         {
             _logger.Info("Delay Load Parachute...");
             var parachuteAssetInfo = new AssetInfo("equipment/parachute", "I002");
-            var loadRequestManager = contexts.session.commonSession.LoadRequestManager;
-            loadRequestManager.AppendLoadRequest(player, parachuteAssetInfo,
+            var assetManager = contexts.session.commonSession.AssetManager;
+            assetManager.LoadAssetAsync(player, parachuteAssetInfo,
                 new PlayerResourceLoadSystem.ParachuteLoadResponseHandler().OnLoadSucc);
         }
 

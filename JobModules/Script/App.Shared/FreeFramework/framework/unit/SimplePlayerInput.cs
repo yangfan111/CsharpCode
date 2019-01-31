@@ -37,6 +37,7 @@ namespace App.Server.GameModules.GamePlay.free.player
         public const int X = 23;
         public const int PageDown = 24;
         public const int PageUp = 25;
+        public const int Z = 26;
 
         private const int NumberDelta = 1000;
 
@@ -116,6 +117,9 @@ namespace App.Server.GameModules.GamePlay.free.player
                     cmd.IsRightAttack = value;
                     break;
                 case X:
+                    cmd.IsDrawWeapon = value;
+                    break;
+                case Z:
                     cmd.IsProne = value;
                     break;
                 default:
@@ -164,6 +168,8 @@ namespace App.Server.GameModules.GamePlay.free.player
                 case RIGHT:
                     return _cmd.MoveHorizontal < 0;
                 case X:
+                    return _cmd.IsDrawWeapon;
+                case Z:
                     return _cmd.IsProne;
                 default:
                     return false;

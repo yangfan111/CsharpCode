@@ -1,14 +1,9 @@
 ﻿using Utils.AssetManager;
-using Core.Compensation;
 using Core.Components;
 using Core.EntityComponent;
-using Core.HitBox;
-using Core.Playback;
-using Core.SnapshotReplication.Serialization.NetworkObject;
 using Entitas.CodeGeneration.Attributes;
 using Entitas.VisualDebugging.Unity;
 using UnityEngine;
-using Object = System.Object;
 
 namespace App.Shared.Components.Common
 {
@@ -23,6 +18,7 @@ namespace App.Shared.Components.Common
     [FreeMove]
     [Throwing]
     [MapObject]
+    [Weapon]
     public class FakeEntityAdapterComponent : EntityAdapterComponent,FakeComponent
     {
         
@@ -52,6 +48,7 @@ namespace App.Shared.Components.Common
     [FreeMove]
     [Throwing]
     [MapObject]
+    [Weapon]
     public class FakeOwnerIdComponent : OwnerIdComponent,FakeComponent
     {
         
@@ -79,6 +76,7 @@ namespace App.Shared.Components.Common
     [UseBaseComponentType]
     [SceneObject]
     [MapObject]
+    [Weapon]
     public class FakeFlagSyncSelfComponent : FlagSyncSelfComponent,FakeComponent
     {
 
@@ -93,6 +91,7 @@ namespace App.Shared.Components.Common
     [FreeMove]
     [Throwing]
     [MapObject]
+    [Weapon]
     public class FakeEntityIdComponent : EntityKeyComponent,FakeComponent
     {
 
@@ -109,6 +108,7 @@ namespace App.Shared.Components.Common
     [FreeMove]
     [Throwing]
     [MapObject]
+    [Weapon]
     public class FakeFlagDestroyComponent : FlagDestroyComponent,FakeComponent
     {
 
@@ -206,7 +206,7 @@ namespace App.Shared.Components.Common
     {
         public BoundingSphere HitPreliminaryGeo;
         public GameObject HitBoxGameObject;
-        public void Recycle(IGameObjectPool gameObjectPool)
+        public void Recycle(IUnityAssetManager assetManager)
         {
             UnityEngine.Object.Destroy(HitBoxGameObject);
         }

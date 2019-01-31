@@ -17,22 +17,24 @@ namespace Core.CharacterState.Posture
 {
     class PostureState : FsmState
     {
-        
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PostureState));
-        
+
         public static PostureState CreateStandState()
         {
             PostureState state = new CustomPostureState(PostureStateId.Stand,
                 AnimatorParametersHash.FirstPersonStandCameraHeight,
                 AnimatorParametersHash.FirstPersonStandCameraForwardOffset,
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand).Height,
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand).Radius);
+                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand)
+                    .Height,
+                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand)
+                    .Radius);
 
             #region stand to crouch
 
             state.AddTransition(new PostureTransition(
                     state.AvailableTransitionId(),
-                    (command, addOutput) => FsmTransition.SimpleCommandHandler(command, FsmInput.Crouch),
+                    (command, addOutput) => FsmTransition.SimpleCommandHandler(command, FsmInput.Crouch) ||
+                                            FsmTransition.SimpleCommandHandler(command, FsmInput.PostureCrouch),
                     (command, addOutput) => FsmTransitionResponseType.NoResponse,
                     PostureStateId.Crouch,
                     SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Stand,
@@ -43,52 +45,63 @@ namespace Core.CharacterState.Posture
                     AnimatorParametersHash.FirstPersonCrouchCameraForwardOffset,
                     AnimatorParametersHash.Instance.StandValue,
                     AnimatorParametersHash.Instance.CrouchValue,
-                    SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand),
-                    SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Crouch)),
-                new[] {FsmInput.Crouch});
+                    SingletonManager.Get<CharacterStateConfigManager>()
+                        .GetCharacterControllerCapsule(PostureInConfig.Stand),
+                    SingletonManager.Get<CharacterStateConfigManager>()
+                        .GetCharacterControllerCapsule(PostureInConfig.Crouch)),
+                new[] {FsmInput.Crouch, FsmInput.PostureCrouch});
 
             #endregion
 
             #region stand to prone
 
             state.AddTransition(new PostureTransition(
-                state.AvailableTransitionId(),
-                (command, addOutput) =>
-                {
-                    var ret = command.IsMatch(FsmInput.Prone);
-
-                    if (ret)
+                    state.AvailableTransitionId(),
+                    (command, addOutput) =>
                     {
-                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ProneHash,
-                                     AnimatorParametersHash.Instance.ProneName,
-                                     AnimatorParametersHash.Instance.ProneEnable,
-                                     CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
-                        addOutput(FsmOutput.Cache);
+                        var ret = command.IsMatch(FsmInput.Prone) ||
+                                  command.IsMatch(FsmInput.PostureProne);
 
-                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
-                                                 AnimatorParametersHash.Instance.PostureName,
-                                                 AnimatorParametersHash.Instance.ProneValue,
-                                                 CharacterView.ThirdPerson);
-                        addOutput(FsmOutput.Cache);
+                        if (ret)
+                        {
+                            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ProneHash,
+                                AnimatorParametersHash.Instance.ProneName,
+                                AnimatorParametersHash.Instance.ProneEnable,
+                                CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                            addOutput(FsmOutput.Cache);
 
-                        command.Handled = true;
-                    }
+                            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
+                                AnimatorParametersHash.Instance.PostureName,
+                                AnimatorParametersHash.Instance.ProneValue,
+                                CharacterView.ThirdPerson);
+                            addOutput(FsmOutput.Cache);
+                            
+                            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FrontPostureHash,
+                                AnimatorParametersHash.Instance.FrontPostureName,
+                                AnimatorParametersHash.Instance.FrontStand,
+                                CharacterView.ThirdPerson);
+                            addOutput(FsmOutput.Cache);
 
-                    return ret;
-                },
-                (command, addOutput) => FsmTransitionResponseType.NoResponse,
-                PostureStateId.ProneTransit,
-                SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Stand,
-                        PostureInConfig.Prone)/*0*/,
-                AnimatorParametersHash.FirstPersonStandCameraHeight,
-                AnimatorParametersHash.FirstPersonProneCameraHeight,
-                AnimatorParametersHash.FirstPersonStandCameraForwardOffset,
-                AnimatorParametersHash.FirstPersonProneCameraForwardOffset,
-                AnimatorParametersHash.Instance.StandValue,
-                AnimatorParametersHash.Instance.ProneValue,
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand),
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Prone), false),
-                new[] { FsmInput.Prone });
+                            command.Handled = true;
+                        }
+
+                        return ret;
+                    },
+                    (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                    PostureStateId.ProneTransit,
+                    SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Stand,
+                        PostureInConfig.Prone) /*0*/,
+                    AnimatorParametersHash.FirstPersonStandCameraHeight,
+                    AnimatorParametersHash.FirstPersonProneCameraHeight,
+                    AnimatorParametersHash.FirstPersonStandCameraForwardOffset,
+                    AnimatorParametersHash.FirstPersonProneCameraForwardOffset,
+                    AnimatorParametersHash.Instance.StandValue,
+                    AnimatorParametersHash.Instance.ProneValue,
+                    SingletonManager.Get<CharacterStateConfigManager>()
+                        .GetCharacterControllerCapsule(PostureInConfig.Stand),
+                    SingletonManager.Get<CharacterStateConfigManager>()
+                        .GetCharacterControllerCapsule(PostureInConfig.Prone), false),
+                new[] {FsmInput.Prone, FsmInput.PostureProne});
 
             #endregion
 
@@ -102,9 +115,21 @@ namespace Core.CharacterState.Posture
                     if (ret)
                     {
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.JumpStartHash,
-                                                 AnimatorParametersHash.Instance.JumpStartName,
-                                                 AnimatorParametersHash.Instance.JumpStartEnable,
-                                                 CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                            AnimatorParametersHash.Instance.JumpStartName,
+                            AnimatorParametersHash.Instance.JumpStartEnable,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.JumpStateHash,
+                            AnimatorParametersHash.Instance.JumpStateName,
+                            command.AdditioanlValue,
+                            CharacterView.ThirdPerson);
+                        addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MoveJumpStateHash,
+                            AnimatorParametersHash.Instance.MoveJumpStateName,
+                            command.AlternativeAdditionalValue,
+                            CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
 
                         command.Handled = true;
@@ -113,7 +138,7 @@ namespace Core.CharacterState.Posture
                     return ret;
                 },
                 (command, addOutput) => FsmTransitionResponseType.NoResponse,
-                (int) PostureStateId.JumpStart, null, 0, new[] { FsmInput.Jump });
+                (int) PostureStateId.JumpStart, null, 0, new[] {FsmInput.Jump});
 
             #endregion
 
@@ -127,17 +152,30 @@ namespace Core.CharacterState.Posture
                     if (ret)
                     {
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FreeFallHash,
-                                                 AnimatorParametersHash.Instance.FreeFallName,
-                                                 AnimatorParametersHash.Instance.FreeFallEnable,
-                                                 CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                            AnimatorParametersHash.Instance.FreeFallName,
+                            AnimatorParametersHash.Instance.FreeFallEnable,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.JumpStateHash,
+                            AnimatorParametersHash.Instance.JumpStateName,
+                            AnimatorParametersHash.Instance.JumpStateNormal,
+                            CharacterView.ThirdPerson);
+                        addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MoveJumpStateHash,
+                            AnimatorParametersHash.Instance.MoveJumpStateName,
+                            AnimatorParametersHash.Instance.MoveJumpStateNormal,
+                            CharacterView.ThirdPerson);
+                        addOutput(FsmOutput.Cache);
+                        
                         Logger.InfoFormat("stand to freefall transition, set jumploop to true!");
                         command.Handled = true;
                     }
 
                     return ret;
                 },
-                null, (int)PostureStateId.Freefall, null, 0, new[] { FsmInput.Freefall });
+                null, (int) PostureStateId.Freefall, null, 0, new[] {FsmInput.Freefall});
 
             #endregion
 
@@ -150,11 +188,10 @@ namespace Core.CharacterState.Posture
 
                     if (ret)
                     {
-
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.SwimStateHash,
-                                                 AnimatorParametersHash.Instance.SwimStateName,
-                                                 AnimatorParametersHash.Instance.SwimStateSwimValue,
-                                                 CharacterView.ThirdPerson);
+                            AnimatorParametersHash.Instance.SwimStateName,
+                            AnimatorParametersHash.Instance.SwimStateSwimValue,
+                            CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
 
                         command.Handled = true;
@@ -163,7 +200,7 @@ namespace Core.CharacterState.Posture
                     return ret;
                 },
                 (command, addOutput) => FsmTransitionResponseType.NoResponse,
-                (int)PostureStateId.Swim,
+                (int) PostureStateId.Swim,
                 (normalizedTime, addOutput) =>
                 {
                     FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.SwimLayer,
@@ -172,10 +209,10 @@ namespace Core.CharacterState.Posture
                             Mathf.Clamp01(normalizedTime)),
                         CharacterView.ThirdPerson);
                     addOutput(FsmOutput.Cache);
-                    
                 },
-                SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Stand, PostureInConfig.Swim), 
-                new[] { FsmInput.Swim });
+                SingletonManager.Get<CharacterStateConfigManager>()
+                    .GetPostureTransitionTime(PostureInConfig.Stand, PostureInConfig.Swim),
+                new[] {FsmInput.Swim});
 
             #endregion
 
@@ -193,15 +230,15 @@ namespace Core.CharacterState.Posture
                     if (command.IsMatch(FsmInput.Climb))
                     {
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ClimbHash,
-                                                 AnimatorParametersHash.Instance.ClimbName,
-                                                 AnimatorParametersHash.Instance.ClimbEnableValue,
-                                                 CharacterView.ThirdPerson, false);
+                            AnimatorParametersHash.Instance.ClimbName,
+                            AnimatorParametersHash.Instance.ClimbEnableValue,
+                            CharacterView.ThirdPerson | CharacterView.FirstPerson, false);
                         addOutput(FsmOutput.Cache);
 
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ClimbStateHash,
-                                                 AnimatorParametersHash.Instance.ClimbStateName,
-                                                 command.AdditioanlValue,
-                                                 CharacterView.ThirdPerson);
+                            AnimatorParametersHash.Instance.ClimbStateName,
+                            command.AdditioanlValue,
+                            CharacterView.ThirdPerson | CharacterView.FirstPerson);
                         addOutput(FsmOutput.Cache);
                         command.Handled = true;
                         return true;
@@ -210,7 +247,7 @@ namespace Core.CharacterState.Posture
                     return false;
                 },
                 (command, addOutput) => FsmTransitionResponseType.NoResponse,
-                (int)PostureStateId.Climb, null, 0, new[] { FsmInput.Climb });
+                (int) PostureStateId.Climb, null, 0, new[] {FsmInput.Climb});
 
             #endregion
 
@@ -222,69 +259,85 @@ namespace Core.CharacterState.Posture
             PostureState state = new CustomPostureState(PostureStateId.Crouch,
                 AnimatorParametersHash.FirstPersonCrouchCameraHeight,
                 AnimatorParametersHash.FirstPersonCrouchCameraForwardOffset,
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Crouch).Height,
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Crouch).Radius);
-            
+                SingletonManager.Get<CharacterStateConfigManager>()
+                    .GetCharacterControllerCapsule(PostureInConfig.Crouch).Height,
+                SingletonManager.Get<CharacterStateConfigManager>()
+                    .GetCharacterControllerCapsule(PostureInConfig.Crouch).Radius);
+
             #region crouch to stand
 
             state.AddTransition(new PostureTransition(
-                state.AvailableTransitionId(),
-                (command, addOutput) => FsmTransition.SimpleCommandHandler(command, FsmInput.Crouch) || FsmTransition.SimpleCommandHandler(command, FsmInput.Jump),
-                (command, addOutput) => FsmTransitionResponseType.NoResponse,
-                PostureStateId.Stand,
-                SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Crouch, PostureInConfig.Stand),
-                AnimatorParametersHash.FirstPersonCrouchCameraHeight,
-                AnimatorParametersHash.FirstPersonStandCameraHeight,
-                AnimatorParametersHash.FirstPersonCrouchCameraForwardOffset,
-                AnimatorParametersHash.FirstPersonStandCameraForwardOffset,
-                AnimatorParametersHash.Instance.CrouchValue,
-                AnimatorParametersHash.Instance.StandValue,
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Crouch),
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand)),
-                new[] { FsmInput.Crouch, FsmInput.Jump });
+                    state.AvailableTransitionId(),
+                    (command, addOutput) => FsmTransition.SimpleCommandHandler(command, FsmInput.Crouch) ||
+                                            FsmTransition.SimpleCommandHandler(command, FsmInput.Jump) ||
+                                            FsmTransition.SimpleCommandHandler(command, FsmInput.PostureStand),
+                    (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                    PostureStateId.Stand,
+                    SingletonManager.Get<CharacterStateConfigManager>()
+                        .GetPostureTransitionTime(PostureInConfig.Crouch, PostureInConfig.Stand),
+                    AnimatorParametersHash.FirstPersonCrouchCameraHeight,
+                    AnimatorParametersHash.FirstPersonStandCameraHeight,
+                    AnimatorParametersHash.FirstPersonCrouchCameraForwardOffset,
+                    AnimatorParametersHash.FirstPersonStandCameraForwardOffset,
+                    AnimatorParametersHash.Instance.CrouchValue,
+                    AnimatorParametersHash.Instance.StandValue,
+                    SingletonManager.Get<CharacterStateConfigManager>()
+                        .GetCharacterControllerCapsule(PostureInConfig.Crouch),
+                    SingletonManager.Get<CharacterStateConfigManager>()
+                        .GetCharacterControllerCapsule(PostureInConfig.Stand)),
+                new[] {FsmInput.Crouch, FsmInput.Jump, FsmInput.PostureStand});
 
             #endregion
 
             #region crouch to prone
 
             state.AddTransition(new PostureTransition(
-                state.AvailableTransitionId(),
-                (command, addOutput) =>
-                {
-                    var ret = command.IsMatch(FsmInput.Prone);
-
-                    if (ret)
+                    state.AvailableTransitionId(),
+                    (command, addOutput) =>
                     {
-                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ProneHash,
-                                     AnimatorParametersHash.Instance.ProneName,
-                                     AnimatorParametersHash.Instance.ProneEnable,
-                                     CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
-                        addOutput(FsmOutput.Cache);
+                        var ret = command.IsMatch(FsmInput.Prone) ||
+                            command.IsMatch(FsmInput.PostureProne);
 
-                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
-                                                 AnimatorParametersHash.Instance.PostureName,
-                                                 AnimatorParametersHash.Instance.ProneValue,
-                                                 CharacterView.ThirdPerson);
-                        addOutput(FsmOutput.Cache);
+                        if (ret)
+                        {
+                            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ProneHash,
+                                AnimatorParametersHash.Instance.ProneName,
+                                AnimatorParametersHash.Instance.ProneEnable,
+                                CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                            addOutput(FsmOutput.Cache);
 
-                        command.Handled = true;
-                    }
+                            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
+                                AnimatorParametersHash.Instance.PostureName,
+                                AnimatorParametersHash.Instance.ProneValue,
+                                CharacterView.ThirdPerson);
+                            addOutput(FsmOutput.Cache);
+                            
+                            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FrontPostureHash,
+                                AnimatorParametersHash.Instance.FrontPostureName,
+                                AnimatorParametersHash.Instance.FrontCrouch,
+                                CharacterView.ThirdPerson);
+                            addOutput(FsmOutput.Cache);
 
-                    return ret;
-                },
-                (command, addOutput) => FsmTransitionResponseType.NoResponse,
-                PostureStateId.ProneTransit,
-                SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Crouch,
-                        PostureInConfig.Prone)/*0*/,
-                AnimatorParametersHash.FirstPersonCrouchCameraHeight,
-                AnimatorParametersHash.FirstPersonProneCameraHeight,
-                AnimatorParametersHash.FirstPersonCrouchCameraForwardOffset,
-                AnimatorParametersHash.FirstPersonProneCameraForwardOffset,
-                AnimatorParametersHash.Instance.CrouchValue,
-                AnimatorParametersHash.Instance.ProneValue,
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Crouch),
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Prone), false),
-                new[] { FsmInput.Prone });
+                            command.Handled = true;
+                        }
+
+                        return ret;
+                    },
+                    (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                    PostureStateId.ProneTransit,
+                    SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Crouch,
+                        PostureInConfig.Prone) /*0*/,
+                    AnimatorParametersHash.FirstPersonCrouchCameraHeight,
+                    AnimatorParametersHash.FirstPersonProneCameraHeight,
+                    AnimatorParametersHash.FirstPersonCrouchCameraForwardOffset,
+                    AnimatorParametersHash.FirstPersonProneCameraForwardOffset,
+                    AnimatorParametersHash.Instance.CrouchValue,
+                    AnimatorParametersHash.Instance.ProneValue,
+                    SingletonManager.Get<CharacterStateConfigManager>()
+                        .GetCharacterControllerCapsule(PostureInConfig.Crouch),
+                    SingletonManager.Get<CharacterStateConfigManager>()
+                        .GetCharacterControllerCapsule(PostureInConfig.Prone), false),
+                new[] {FsmInput.Prone, FsmInput.PostureProne});
 
             #endregion
 
@@ -298,9 +351,9 @@ namespace Core.CharacterState.Posture
                     if (ret)
                     {
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FreeFallHash,
-                                                 AnimatorParametersHash.Instance.FreeFallName,
-                                                 AnimatorParametersHash.Instance.FreeFallEnable,
-                                                 CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                            AnimatorParametersHash.Instance.FreeFallName,
+                            AnimatorParametersHash.Instance.FreeFallEnable,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
 
                         command.Handled = true;
@@ -308,7 +361,7 @@ namespace Core.CharacterState.Posture
 
                     return ret;
                 },
-                null, (int)PostureStateId.Freefall, null, 0, new[] { FsmInput.Freefall });
+                null, (int) PostureStateId.Freefall, null, 0, new[] {FsmInput.Freefall});
 
             #endregion
 
@@ -326,94 +379,114 @@ namespace Core.CharacterState.Posture
             PostureState state = new CustomPostureState(PostureStateId.Prone,
                 AnimatorParametersHash.FirstPersonProneCameraHeight,
                 AnimatorParametersHash.FirstPersonProneCameraForwardOffset,
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Prone).Height,
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Prone).Radius);
-            
+                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Prone)
+                    .Height,
+                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Prone)
+                    .Radius);
+
             #region prone to crouch
 
             state.AddTransition(new PostureTransition(
-                state.AvailableTransitionId(),
-                (command, addOutput) =>
-                {
-                    var ret = command.IsMatch(FsmInput.Crouch);
-
-                    if (ret)
+                    state.AvailableTransitionId(),
+                    (command, addOutput) =>
                     {
-                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ProneHash,
-                                     AnimatorParametersHash.Instance.ProneName,
-                                     AnimatorParametersHash.Instance.ProneDisable,
-                                     CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
-                        addOutput(FsmOutput.Cache);
+                        var ret = command.IsMatch(FsmInput.Crouch) ||
+                            command.IsMatch(FsmInput.PostureCrouch);
 
-                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
-                                                 AnimatorParametersHash.Instance.PostureName,
-                                                 AnimatorParametersHash.Instance.CrouchValue,
-                                                 CharacterView.ThirdPerson);
-                        addOutput(FsmOutput.Cache);
+                        if (ret)
+                        {
+                            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ProneHash,
+                                AnimatorParametersHash.Instance.ProneName,
+                                AnimatorParametersHash.Instance.ProneDisable,
+                                CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                            addOutput(FsmOutput.Cache);
 
-                        command.Handled = true;
-                    }
+                            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
+                                AnimatorParametersHash.Instance.PostureName,
+                                AnimatorParametersHash.Instance.CrouchValue,
+                                CharacterView.ThirdPerson);
+                            addOutput(FsmOutput.Cache);
+                            
+                            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FrontPostureHash,
+                                AnimatorParametersHash.Instance.FrontPostureName,
+                                AnimatorParametersHash.Instance.FrontCrouch,
+                                CharacterView.ThirdPerson);
+                            addOutput(FsmOutput.Cache);
 
-                    return ret;
-                },
-                (command, addOutput) => FsmTransitionResponseType.NoResponse,
-                PostureStateId.ProneToCrouch,
-                SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Prone,
-                        PostureInConfig.Crouch)/*0*/,
-                AnimatorParametersHash.FirstPersonProneCameraHeight,
-                AnimatorParametersHash.FirstPersonCrouchCameraHeight,
-                AnimatorParametersHash.FirstPersonProneCameraForwardOffset,
-                AnimatorParametersHash.FirstPersonCrouchCameraForwardOffset,
-                AnimatorParametersHash.Instance.ProneValue,
-                AnimatorParametersHash.Instance.CrouchValue,
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Prone),
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Crouch), false),
-                new[] { FsmInput.Crouch });
+                            command.Handled = true;
+                        }
+
+                        return ret;
+                    },
+                    (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                    PostureStateId.ProneToCrouch,
+                    SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Prone,
+                        PostureInConfig.Crouch) /*0*/,
+                    AnimatorParametersHash.FirstPersonProneCameraHeight,
+                    AnimatorParametersHash.FirstPersonCrouchCameraHeight,
+                    AnimatorParametersHash.FirstPersonProneCameraForwardOffset,
+                    AnimatorParametersHash.FirstPersonCrouchCameraForwardOffset,
+                    AnimatorParametersHash.Instance.ProneValue,
+                    AnimatorParametersHash.Instance.CrouchValue,
+                    SingletonManager.Get<CharacterStateConfigManager>()
+                        .GetCharacterControllerCapsule(PostureInConfig.Prone),
+                    SingletonManager.Get<CharacterStateConfigManager>()
+                        .GetCharacterControllerCapsule(PostureInConfig.Crouch), false),
+                new[] {FsmInput.Crouch, FsmInput.PostureCrouch});
 
             #endregion
 
             #region prone to stand
 
             state.AddTransition(new PostureTransition(
-                state.AvailableTransitionId(),
-                (command, addOutput) =>
-                {
-                    var ret = command.IsMatch(FsmInput.Jump) || command.IsMatch(FsmInput.Prone);
-
-                    if (ret)
+                    state.AvailableTransitionId(),
+                    (command, addOutput) =>
                     {
-                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ProneHash,
-                                     AnimatorParametersHash.Instance.ProneName,
-                                     AnimatorParametersHash.Instance.ProneDisable,
-                                     CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
-                        addOutput(FsmOutput.Cache);
+                        var ret = command.IsMatch(FsmInput.Jump) || command.IsMatch(FsmInput.Prone) ||
+                            command.IsMatch(FsmInput.PostureStand);
 
-                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
-                                                 AnimatorParametersHash.Instance.PostureName,
-                                                 AnimatorParametersHash.Instance.StandValue,
-                                                 CharacterView.ThirdPerson);
-                        addOutput(FsmOutput.Cache);
+                        if (ret)
+                        {
+                            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ProneHash,
+                                AnimatorParametersHash.Instance.ProneName,
+                                AnimatorParametersHash.Instance.ProneDisable,
+                                CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                            addOutput(FsmOutput.Cache);
 
-                        command.Handled = true;
-                        
-                        Logger.InfoFormat("prone to stand!!!! handle");
-                    }
+                            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
+                                AnimatorParametersHash.Instance.PostureName,
+                                AnimatorParametersHash.Instance.StandValue,
+                                CharacterView.ThirdPerson);
+                            addOutput(FsmOutput.Cache);
+                            
+                            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FrontPostureHash,
+                                AnimatorParametersHash.Instance.FrontPostureName,
+                                AnimatorParametersHash.Instance.FrontStand,
+                                CharacterView.ThirdPerson);
+                            addOutput(FsmOutput.Cache);
 
-                    return ret;
-                },
-                (command, addOutput) => FsmTransitionResponseType.NoResponse,
-                PostureStateId.ProneToStand,
-                SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Prone,
-                        PostureInConfig.Stand)/*0*/,
-                AnimatorParametersHash.FirstPersonProneCameraHeight,
-                AnimatorParametersHash.FirstPersonStandCameraHeight,
-                AnimatorParametersHash.FirstPersonProneCameraForwardOffset,
-                AnimatorParametersHash.FirstPersonStandCameraForwardOffset,
-                AnimatorParametersHash.Instance.ProneValue,
-                AnimatorParametersHash.Instance.StandValue,
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Prone),
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand), false),
-                new[] { FsmInput.Jump, FsmInput.Prone });
+                            command.Handled = true;
+
+                            Logger.InfoFormat("prone to stand!!!! handle");
+                        }
+
+                        return ret;
+                    },
+                    (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                    PostureStateId.ProneToStand,
+                    SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Prone,
+                        PostureInConfig.Stand) /*0*/,
+                    AnimatorParametersHash.FirstPersonProneCameraHeight,
+                    AnimatorParametersHash.FirstPersonStandCameraHeight,
+                    AnimatorParametersHash.FirstPersonProneCameraForwardOffset,
+                    AnimatorParametersHash.FirstPersonStandCameraForwardOffset,
+                    AnimatorParametersHash.Instance.ProneValue,
+                    AnimatorParametersHash.Instance.StandValue,
+                    SingletonManager.Get<CharacterStateConfigManager>()
+                        .GetCharacterControllerCapsule(PostureInConfig.Prone),
+                    SingletonManager.Get<CharacterStateConfigManager>()
+                        .GetCharacterControllerCapsule(PostureInConfig.Stand), false),
+                new[] {FsmInput.Jump, FsmInput.Prone, FsmInput.PostureStand});
 
             #endregion
 
@@ -427,15 +500,15 @@ namespace Core.CharacterState.Posture
                     if (ret)
                     {
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FreeFallHash,
-                                                 AnimatorParametersHash.Instance.FreeFallName,
-                                                 AnimatorParametersHash.Instance.FreeFallEnable,
-                                                 CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                            AnimatorParametersHash.Instance.FreeFallName,
+                            AnimatorParametersHash.Instance.FreeFallEnable,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
 
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ProneHash,
-                                                 AnimatorParametersHash.Instance.ProneName,
-                                                 AnimatorParametersHash.Instance.ProneDisable,
-                                                 CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                            AnimatorParametersHash.Instance.ProneName,
+                            AnimatorParametersHash.Instance.ProneDisable,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
 
                         command.Handled = true;
@@ -443,7 +516,7 @@ namespace Core.CharacterState.Posture
 
                     return ret;
                 },
-                null, (int) PostureStateId.Freefall, null, 0, new[] { FsmInput.Freefall });
+                null, (int) PostureStateId.Freefall, null, 0, new[] {FsmInput.Freefall});
 
             #endregion
 
@@ -462,20 +535,23 @@ namespace Core.CharacterState.Posture
 
             #region swim to stand
 
-            AddTransitionFromWaterToStand(state, SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Swim, PostureInConfig.Stand));
+            AddTransitionFromWaterToStand(state,
+                SingletonManager.Get<CharacterStateConfigManager>()
+                    .GetPostureTransitionTime(PostureInConfig.Swim, PostureInConfig.Stand));
 
             #endregion
 
             #region swim to dive
 
             state.AddTransition(new DiveTransition(
-                state.AvailableTransitionId(), 
-                (int)PostureStateId.Dive,
-                SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Swim, PostureInConfig.Dive), 
-                AnimatorParametersHash.Instance.SwimStateSwimValue, 
-                AnimatorParametersHash.Instance.SwimStateDiveValue,
-                FsmInput.Dive), 
-                new[] { FsmInput.Dive });
+                    state.AvailableTransitionId(),
+                    (int) PostureStateId.Dive,
+                    SingletonManager.Get<CharacterStateConfigManager>()
+                        .GetPostureTransitionTime(PostureInConfig.Swim, PostureInConfig.Dive),
+                    AnimatorParametersHash.Instance.SwimStateSwimValue,
+                    AnimatorParametersHash.Instance.SwimStateDiveValue,
+                    FsmInput.Dive),
+                new[] {FsmInput.Dive});
 
             #endregion
 
@@ -488,21 +564,23 @@ namespace Core.CharacterState.Posture
 
             #region dive to swim
 
-
             state.AddTransition(new DiveTransition(
-                state.AvailableTransitionId(),
-                (int)PostureStateId.Swim,
-                SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Dive, PostureInConfig.Swim),
-                AnimatorParametersHash.Instance.SwimStateDiveValue, 
-                AnimatorParametersHash.Instance.SwimStateSwimValue,
-                FsmInput.Swim),
-                new[] { FsmInput.Swim });
+                    state.AvailableTransitionId(),
+                    (int) PostureStateId.Swim,
+                    SingletonManager.Get<CharacterStateConfigManager>()
+                        .GetPostureTransitionTime(PostureInConfig.Dive, PostureInConfig.Swim),
+                    AnimatorParametersHash.Instance.SwimStateDiveValue,
+                    AnimatorParametersHash.Instance.SwimStateSwimValue,
+                    FsmInput.Swim),
+                new[] {FsmInput.Swim});
 
             #endregion
 
             #region dive to stand
 
-            AddTransitionFromWaterToStand(state, SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Dive, PostureInConfig.Stand));
+            AddTransitionFromWaterToStand(state,
+                SingletonManager.Get<CharacterStateConfigManager>()
+                    .GetPostureTransitionTime(PostureInConfig.Dive, PostureInConfig.Stand));
 
             #endregion
 
@@ -523,14 +601,14 @@ namespace Core.CharacterState.Posture
                     if (ret)
                     {
                         FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.DyingLayer,
-                                                       AnimatorParametersHash.Instance.DyingDisableValue,
-                                                       CharacterView.ThirdPerson);
+                            AnimatorParametersHash.Instance.DyingDisableValue,
+                            CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
 
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
-                                                 AnimatorParametersHash.Instance.PostureName,
-                                                 AnimatorParametersHash.Instance.CrouchValue,
-                                                 CharacterView.FirstPerson | CharacterView.ThirdPerson);
+                            AnimatorParametersHash.Instance.PostureName,
+                            AnimatorParametersHash.Instance.CrouchValue,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
 
                         command.Handled = true;
@@ -539,7 +617,7 @@ namespace Core.CharacterState.Posture
                     return ret;
                 },
                 (command, addOutput) => FsmTransitionResponseType.NoResponse,
-                (int) PostureStateId.Crouch, null, 0, new[] { FsmInput.Revive });
+                (int) PostureStateId.Crouch, null, 0, new[] {FsmInput.Revive});
 
             #endregion
 
@@ -590,18 +668,18 @@ namespace Core.CharacterState.Posture
             #region NoPeek to PeekLeft
 
             state.AddTransition(new NoPeekToPeekLeftTransition(state.AvailableTransitionId(),
-                                                               (int)PostureStateId.PeekLeft,
-                                                               AnimatorParametersHash.PeekTime),
-                                new[] { FsmInput.PeekLeft });
+                    (int) PostureStateId.PeekLeft,
+                    AnimatorParametersHash.PeekTime),
+                new[] {FsmInput.PeekLeft});
 
             #endregion
 
             #region NoPeek to PeekRight
 
             state.AddTransition(new NoPeekToPeekRightTransition(state.AvailableTransitionId(),
-                                                                (int) PostureStateId.PeekRight,
-                                                                AnimatorParametersHash.PeekTime),
-                                new[] { FsmInput.PeekRight });
+                    (int) PostureStateId.PeekRight,
+                    AnimatorParametersHash.PeekTime),
+                new[] {FsmInput.PeekRight});
 
             #endregion
 
@@ -632,14 +710,14 @@ namespace Core.CharacterState.Posture
                     if (ret)
                     {
                         FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.DyingLayer,
-                                                       AnimatorParametersHash.Instance.DyingEnableValue,
-                                                       CharacterView.ThirdPerson);
+                            AnimatorParametersHash.Instance.DyingEnableValue,
+                            CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
 
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ProneHash,
-                                                 AnimatorParametersHash.Instance.ProneName,
-                                                 AnimatorParametersHash.Instance.ProneDisable,
-                                                 CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                            AnimatorParametersHash.Instance.ProneName,
+                            AnimatorParametersHash.Instance.ProneDisable,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
 
                         command.Handled = true;
@@ -647,7 +725,7 @@ namespace Core.CharacterState.Posture
 
                     return ret;
                 },
-                null, (int)PostureStateId.Dying, null, 0, new[] { FsmInput.Dying });
+                null, (int) PostureStateId.Dying, null, 0, new[] {FsmInput.Dying});
         }
 
         private static void AddTransitionFromWaterToStand(PostureState state, int duration)
@@ -660,13 +738,13 @@ namespace Core.CharacterState.Posture
                     if (ret)
                     {
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
-                                                 AnimatorParametersHash.Instance.PostureName,
-                                                 AnimatorParametersHash.Instance.StandValue,
-                                                 CharacterView.FirstPerson | CharacterView.ThirdPerson);
+                            AnimatorParametersHash.Instance.PostureName,
+                            AnimatorParametersHash.Instance.StandValue,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
 
                         FsmOutput.Cache.SetValue(FsmOutputType.FirstPersonHeight,
-                                                 AnimatorParametersHash.FirstPersonStandCameraHeight);
+                            AnimatorParametersHash.FirstPersonStandCameraHeight);
                         addOutput(FsmOutput.Cache);
 
                         FsmOutput.Cache.SetValue(FsmOutputType.FirstPersonForwardOffset,
@@ -679,7 +757,7 @@ namespace Core.CharacterState.Posture
                     return ret;
                 },
                 (command, addOutput) => FsmTransitionResponseType.NoResponse,
-                (int)PostureStateId.Stand, 
+                (int) PostureStateId.Stand,
                 (normalizedTime, addOutput) =>
                 {
                     FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.SwimLayer,
@@ -688,9 +766,8 @@ namespace Core.CharacterState.Posture
                             Mathf.Clamp01(normalizedTime)),
                         CharacterView.ThirdPerson);
                     addOutput(FsmOutput.Cache);
-                    
                 },
-                duration, new[] { FsmInput.Ashore });
+                duration, new[] {FsmInput.Ashore});
         }
 
         protected static void AddTransitionFromJumpToDying(PostureState state)
@@ -705,29 +782,41 @@ namespace Core.CharacterState.Posture
                         command.Handled = true;
 
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FreeFallHash,
-                                                 AnimatorParametersHash.Instance.FreeFallName,
-                                                 AnimatorParametersHash.Instance.FreeFallDisable,
-                                                 CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                            AnimatorParametersHash.Instance.FreeFallName,
+                            AnimatorParametersHash.Instance.FreeFallDisable,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
 
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.JumpStartHash,
-                                                 AnimatorParametersHash.Instance.JumpStartName,
-                                                 AnimatorParametersHash.Instance.JumpStartDisable,
-                                                 CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                            AnimatorParametersHash.Instance.JumpStartName,
+                            AnimatorParametersHash.Instance.JumpStartDisable,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.JumpStateHash,
+                            AnimatorParametersHash.Instance.JumpStateName,
+                            AnimatorParametersHash.Instance.JumpStateNormal,
+                            CharacterView.ThirdPerson);
+                        addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MoveJumpStateHash,
+                            AnimatorParametersHash.Instance.MoveJumpStateName,
+                            AnimatorParametersHash.Instance.MoveJumpStateNormal,
+                            CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
 
                         FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.DyingLayer,
-                                                       AnimatorParametersHash.Instance.DyingEnableValue,
-                                                       CharacterView.ThirdPerson);
+                            AnimatorParametersHash.Instance.DyingEnableValue,
+                            CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
                     }
 
                     return ret;
                 },
-                null, (int)PostureStateId.Dying, null, 0, new[] { FsmInput.Dying });
+                null, (int) PostureStateId.Dying, null, 0, new[] {FsmInput.Dying});
         }
 
-        public PostureState(PostureStateId id) : base((short)id)
+        public PostureState(PostureStateId id) : base((short) id)
         {
         }
     }

@@ -437,7 +437,7 @@ namespace App.Shared.GameModules.Vehicle.WheelCarrier
 
         public static VehicleConfig GetCarConfig(VehicleEntity vehicle)
         {
-            var go = vehicle.gameObject.UnityObjWrapper.Value;
+            var go = vehicle.gameObject.UnityObject.AsGameObject;
             return go.GetComponent<VehicleConfig>();
         }
 

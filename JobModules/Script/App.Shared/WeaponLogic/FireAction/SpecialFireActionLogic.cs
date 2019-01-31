@@ -19,7 +19,7 @@ namespace Core.WeaponLogic.FireAciton
             {
                 return;
             }
-            var weaponState = weaponEntity.weaponData;
+            var weaponState = weaponEntity.weaponRuntimeInfo;
             if(weaponState.PullBolting && !IsFireEnd(playerEntity) && !IsFireHold(playerEntity))
             {
                 SetPullBolting(playerEntity, weaponEntity, false);
@@ -33,7 +33,7 @@ namespace Core.WeaponLogic.FireAciton
 
         protected override void OnAfterFire(PlayerEntity playerEntity, WeaponEntity weaponEntity, bool needActionDeal)
         {
-            var weaponData = weaponEntity.weaponData;
+            var weaponData = weaponEntity.weaponBasicInfo;
             if(weaponData.Bullet > 0)
             {
                 SpecialFire(playerEntity, needActionDeal);
@@ -46,7 +46,7 @@ namespace Core.WeaponLogic.FireAciton
 
         private void SetPullBolting(PlayerEntity playerEntity, WeaponEntity weaponEntity, bool value)
         {
-            var weaponData = weaponEntity.weaponData;
+            var weaponData = weaponEntity.weaponRuntimeInfo;
             if (value)
             {
                 var gunSight = playerEntity.cameraStateNew.ViewNowMode == (int)ECameraViewMode.GunSight;

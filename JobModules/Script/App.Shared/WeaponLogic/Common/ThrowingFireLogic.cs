@@ -119,11 +119,14 @@ namespace Core.WeaponLogic.Common
                 int renderTime = cmd.RenderTime;
                 var dir = BulletDirUtility.GetThrowingDir(playerEntity);
                 actionInfo.ThrowingEntityKey = _throwingFactory.CreateThrowing(playerEntity, dir, renderTime, GetInitVel(playerEntity));
-                playerEntity.GetCurrentWeaponData(_contexts).LastBulletDir = dir;
+                playerEntity.GetWeaponRunTimeInfo(_contexts).LastBulletDir = dir;
                 //弹片特效
                 if (cmd.IsReload)
                 {
-                    playerEntity.weaponEffect.PlayList.Add(EClientEffectType.PullBolt);
+                    if(playerEntity.hasWeaponEffect)
+                    {
+                        playerEntity.weaponEffect.PlayList.Add(EClientEffectType.PullBolt);
+                    }
                 }
                 playerEntity.weaponState.BagLocked = true;
             }

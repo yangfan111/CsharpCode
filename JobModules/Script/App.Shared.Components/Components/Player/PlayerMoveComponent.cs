@@ -137,6 +137,7 @@ namespace App.Shared.Components.Player
         [NetworkProperty] [DontInitilize] public bool MoveInWater; //涉水状态
         [NetworkProperty] [DontInitilize] public bool BeginDive; //由游泳状态转为潜水状态
         [NetworkProperty] [DontInitilize] public bool NeedUpdate;
+        [NetworkProperty] [DontInitilize] public bool NeedUmountWeapon;
 
         [NetworkProperty] [DontInitilize] public float SpeedRatio;
         [NetworkProperty] [DontInitilize] public float MoveSpeedRatio;
@@ -159,6 +160,7 @@ namespace App.Shared.Components.Player
                    BeginDive == r.BeginDive &&
                    NeedUpdate == r.NeedUpdate &&
                    MoveType == r.MoveType &&
+                   NeedUmountWeapon == r.NeedUmountWeapon &&
                    CompareUtility.IsApproximatelyEqual(SpeedRatio, r.SpeedRatio) &&
                    CompareUtility.IsApproximatelyEqual(MoveSpeedRatio, r.MoveSpeedRatio) &&
                    CompareUtility.IsApproximatelyEqual(ModelPitch, r.ModelPitch) &&
@@ -184,6 +186,7 @@ namespace App.Shared.Components.Player
             ModelYaw = r.ModelYaw;
             MoveType = r.MoveType;
             Dist = r.Dist;
+            NeedUmountWeapon = r.NeedUmountWeapon;
             VehicleRideOffOffset = r.VehicleRideOffOffset;
         }
 
@@ -191,6 +194,7 @@ namespace App.Shared.Components.Player
         {
             BeginDive = false;
             NeedUpdate = false;
+            NeedUmountWeapon = false;
         }
 
         public int GetComponentId()
@@ -226,7 +230,6 @@ namespace App.Shared.Components.Player
         [NetworkProperty] [DontInitilize] public float UpDownValue;
         [NetworkProperty] [DontInitilize] public float MoveSpeedRatio;
         [DontInitilize] public float AirTime;
-        [DontInitilize] public float DefaultSpeed;
         [DontInitilize] public float Steep;
         [DontInitilize] public float SteepAverage;
         [DontInitilize] public bool IsCollided;

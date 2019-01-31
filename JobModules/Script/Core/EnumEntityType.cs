@@ -13,6 +13,7 @@
         FreeMove,
         Throwing,
         MapObject,
+        Weapon,
         End
     }
 }

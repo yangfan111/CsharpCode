@@ -1,6 +1,8 @@
-﻿using App.Shared.WeaponLogic.Common;
+﻿using App.Shared.GameModules.Weapon.Tactic;
+using App.Shared.WeaponLogic.Common;
 using Assets.Utils.Configuration;
 using Core.Configuration;
+using Core.Free;
 using Core.Utils;
 using Core.WeaponLogic;
 using WeaponConfigNs;
@@ -10,17 +12,22 @@ namespace App.Shared.WeaponLogic
     public class WeaponLogicManager : IWeaponLogicManager
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(WeaponLogicManager));
-        private IFireLogicCreator _fireLogicCreator;
+        private IFireLogicProvider _fireLogicCreator;
         private IWeaponDataConfigManager _weaponDataConfigManager;
         private IWeaponConfigManager _weaponConfigManager;
+        private IFreeArgs _freeArgs;
+        private DefaultWeaponLogic _defaultWeaponLogic;
 
         public WeaponLogicManager(IWeaponDataConfigManager weaponDataConfigManager,
             IWeaponConfigManager weaponConfigManager,
-            IFireLogicCreator fireLogicCreator)
+            IFireLogicProvider fireLogicCreator,
+            IFreeArgs freeArgs)
         {
             _fireLogicCreator = fireLogicCreator;
             _weaponDataConfigManager = weaponDataConfigManager;
             _weaponConfigManager = weaponConfigManager;
+            _defaultWeaponLogic = new DefaultWeaponLogic();
+            _freeArgs = freeArgs;
         }
 
         public IWeaponLogic GetWeaponLogic(int? weaponId)
@@ -42,12 +49,14 @@ namespace App.Shared.WeaponLogic
             }
             if(!realWeaponId.HasValue)
             {
+                Logger.Error("weaponId is illegal and no hand in config");
                 return null;
             }
             var defaultConfig = weaponDataConfig.WeaponLogic as DefaultWeaponLogicConfig;
             if(null != defaultConfig)
             {
-                return new DefaultWeaponLogic(_fireLogicCreator.GetFireLogic(weaponConfig, defaultConfig.FireLogic));
+                _defaultWeaponLogic.SetFireLogic(_fireLogicCreator.GetFireLogic(weaponConfig, defaultConfig.FireLogic));
+                return _defaultWeaponLogic;
             }
             var doubleConfig = weaponDataConfig.WeaponLogic as DoubleWeaponLogicConfig;
             if(null != doubleConfig)
@@ -55,7 +64,12 @@ namespace App.Shared.WeaponLogic
                 return new DoubleWeaponLogic(_fireLogicCreator.GetFireLogic(weaponConfig, doubleConfig.LeftFireLogic),
                     _fireLogicCreator.GetFireLogic(weaponConfig, doubleConfig.RightFireLogic));
             }
-
+            var tacticConfig = weaponDataConfig.WeaponLogic as TacticWeaponLogicConfig;
+            if(null != tacticConfig)
+            {
+                return new TacticWeaponLogic(realWeaponId.Value, _freeArgs);
+            }
+            Logger.ErrorFormat("illegal weaponLogic for id {0}", realWeaponId);
             return null;
         }
 

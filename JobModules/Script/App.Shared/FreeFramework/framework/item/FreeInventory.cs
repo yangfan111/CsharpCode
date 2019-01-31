@@ -249,7 +249,7 @@ namespace com.wd.free.item
                     use.Act(args);
                     args.Resume("current");
                     args.Resume("item");
-                    PlayerAnimationAction.DoAnimation(PlayerAnimationAction.Stop, fd.Player);
+                    PlayerAnimationAction.DoAnimation(args.GameContext, PlayerAnimationAction.Stop, fd.Player);
                     FreeSoundUtil.Stop("use", args, fd);
 
                     PlayerStateUtil.RemoveGameState(EPlayerGameState.InterruptItem, fd.Player.gamePlay);

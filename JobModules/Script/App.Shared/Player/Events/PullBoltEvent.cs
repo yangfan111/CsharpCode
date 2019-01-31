@@ -39,7 +39,10 @@ namespace App.Shared.Player.Events
         {
             var playerEntity = entity as PlayerEntity;
            
-            playerEntity.weaponLogic.WeaponEffect.PlayPullBoltEffect(playerEntity.weaponLogic.State);
+            if(playerEntity.hasWeaponEffect)
+            {
+                playerEntity.weaponEffect.PlayList.Add(XmlConfig.EClientEffectType.PullBolt);
+            }
         }
 
      
@@ -47,9 +50,7 @@ namespace App.Shared.Player.Events
         public override bool ClientFilter(IEntity entity, IEvent e)
         {
             var playerEntity = entity as PlayerEntity;
-            return playerEntity != null && playerEntity.hasWeaponLogic && playerEntity.hasWeaponState;
+            return playerEntity != null && playerEntity.hasWeaponEffect && playerEntity.hasWeaponState;
         }
-        
-       
     }
 }

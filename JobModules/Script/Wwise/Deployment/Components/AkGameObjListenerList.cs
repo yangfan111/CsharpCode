@@ -11,7 +11,7 @@ public class AkGameObjListenerList : AkAudioListener.BaseListenerList
 	[System.NonSerialized] private AkGameObj akGameObj;
 
     /// <summary>
-    ///-默认的初始化listener
+    ///-要发送到监听的listener
     /// </summary>
 	[UnityEngine.SerializeField]
 	public System.Collections.Generic.List<AkAudioListener> initialListenerList =

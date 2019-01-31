@@ -20,14 +20,14 @@ namespace App.Shared.Components.Vehicle
             
         }
 
-        public override void Recycle(IGameObjectPool objectPool)
+        public override void Recycle(IUnityAssetManager assetManager)
         {
             if (Controller != null)
             {
                 Controller.ResetGameObject(typeof(VehicleMaterialLoader), false);
             }
             
-            base.Recycle(objectPool);
+            base.Recycle(assetManager);
         }
     }
 

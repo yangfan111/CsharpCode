@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using App.Shared.Components.Player;
+using App.Shared.GameModules.Player.Appearance.PropControllerPackage;
+using App.Shared.GameModules.Player.Appearance.WardrobeControllerPackage;
+using App.Shared.GameModules.Player.Appearance.WeaponControllerPackage;
 using Core.Appearance;
 using Core.CharacterState;
 using Core.Compare;
@@ -14,6 +18,7 @@ using Core.Fsm;
 using Assets.Utils.Configuration;
 using Core.CameraControl;
 using Core.CharacterController;
+using Core.EntityComponent;
 using Sharpen;
 using Utils.AssetManager;
 using Utils.Singleton;
@@ -22,6 +27,7 @@ namespace App.Shared.GameModules.Player.Appearance
 {
     public class AppearanceManager : ICharacterAppearance
     {
+       
         private LoggerAdapter _logger = new LoggerAdapter(typeof(AppearanceManager));
 
         private WeaponController _weaponController;
@@ -33,8 +39,8 @@ namespace App.Shared.GameModules.Player.Appearance
 
         private CharacterView _view = CharacterView.ThirdPerson;
 
-        private List<UnityObjectWrapper<GameObject>> _recycleRequestBatch = new List<UnityObjectWrapper<GameObject>>();
-        private List<LoadRequest> _loadRequestBatch = new List<LoadRequest>();
+        private List<UnityObject> _recycleRequestBatch = new List<UnityObject>();
+        private List<AbstractLoadRequest> _loadRequestBatch = new List<AbstractLoadRequest>();
 
         public AppearanceManager()
         {
@@ -146,6 +152,8 @@ namespace App.Shared.GameModules.Player.Appearance
         public void PlayerDead()
         {
             ControlRagdoll(true);
+            UnmountWeaponFromHand();
+            SetThridPerson();
             _logger.DebugFormat("Player Dead");
         }
 
@@ -339,28 +347,28 @@ namespace App.Shared.GameModules.Player.Appearance
 
         #region Sync
 
-        public void SyncFrom(ILatestAppearanceState state)
+        public void SyncLatestFrom(IGameComponent playerLatestAppearance)
         {
-            _weaponController.SyncFromLatestWeaponState(state);
-            _wardrobeController.SyncFromLatestWardrobeState(state);
-            _propController.SyncFromLatestPropState(state);
+            _weaponController.SyncFromLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
+            _wardrobeController.SyncFromLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
+            _propController.SyncFromLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
         }
 
-        public void SyncTo(ILatestAppearanceState state)
+        public void SyncPredictedFrom(IGameComponent playerPredictedAppearance)
         {
-            _weaponController.SyncToLatestWeaponState(state);
-            _wardrobeController.SyncToLatestWardrobeState(state);
-            _propController.SyncToLatestPropState(state);
+            _weaponController.SyncFromPredictedComponent((PredictedAppearanceComponent)playerPredictedAppearance);
         }
 
-        public void SyncFrom(IPredictedPlaybackAppearanceState state)
+        public void SyncLatestTo(IGameComponent playerLatestAppearance)
         {
-            _weaponController.SyncFromPredictedWeaponState(state);
+            _weaponController.SyncToLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
+            _wardrobeController.SyncToLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
+            _propController.SyncToLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
         }
 
-        public void SyncTo(IPredictedPlaybackAppearanceState state)
+        public void SyncPredictedTo(IGameComponent playerPredictedAppearance)
         {
-            _weaponController.SyncToPredictedWeaponState(state);
+            _weaponController.SyncToPredictedComponent((PredictedAppearanceComponent)playerPredictedAppearance);
         }
 
         public void TryRewind()
@@ -379,7 +387,7 @@ namespace App.Shared.GameModules.Player.Appearance
 
         #region ICharacterLoadResource
 
-        public List<LoadRequest> GetLoadRequests()
+        public List<AbstractLoadRequest> GetLoadRequests()
         {
             _loadRequestBatch.AddRange(_weaponController.GetLoadRequests());
             _loadRequestBatch.AddRange(_wardrobeController.GetLoadRequests());
@@ -387,7 +395,7 @@ namespace App.Shared.GameModules.Player.Appearance
             return _loadRequestBatch;
         }
 
-        public List<UnityObjectWrapper<GameObject>> GetRecycleRequests()
+        public List<UnityObject> GetRecycleRequests()
         {
             var weaponRecycle = _weaponController.GetRecycleRequests();
             foreach (var v in weaponRecycle)
@@ -476,12 +484,12 @@ namespace App.Shared.GameModules.Player.Appearance
             return _needUpdateActionField;
         }
 
-        public WardrobeController GetWardrobeController()
+        public WardrobeControllerBase GetWardrobeController()
         {
             return _wardrobeController;
         }
-
-        public WeaponController GetController<PlayerWeaponController>()
+        
+        public WeaponControllerBase GetController<TPlayerWeaponController>()
         {
             return _weaponController;
         }

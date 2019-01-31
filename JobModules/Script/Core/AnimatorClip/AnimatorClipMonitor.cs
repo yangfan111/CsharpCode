@@ -24,11 +24,11 @@ namespace Core.Animation
             _animationCleanEventCallback = action;
         }
 
-        public void SetAnimatorClipsTime(int weaponId)
+        public void SetAnimatorClipsTime(int? weaponId)
         {
-            if (weaponId > 0)   //有枪
+            if (weaponId.HasValue)   //有枪
             {
-                var config = SingletonManager.Get<WeaponDataConfigManager>().GetConfigById(weaponId);
+                var config = SingletonManager.Get<WeaponDataConfigManager>().GetConfigById(weaponId.Value);
                 if(null != config)
                     _animatorClips = config.AnimatorStateTimes;
             }
@@ -62,10 +62,10 @@ namespace Core.Animation
             ResetSpeedMultiplier(clipInfo);
         }
 
-        public override void ChangeSpeedMultiplier(float speed)
+        public override void ChangeSpeedMultiplier(float speed, bool reset = false)
         {
             var cmd = GetAvailableCommand();
-            cmd.SetCommand(SetCommand, speed);
+            cmd.SetCommand(SetCommand, speed, reset);
         }
 
         private void CalcSpeedMultiplier(AnimatorClipInfo clipInfo)
@@ -93,7 +93,7 @@ namespace Core.Animation
             {
                 if (item.StateName.Equals(cilpName))
                 {
-                    ChangeSpeedMultiplier(AnimatorParametersHash.DefaultAnimationSpeed);
+                    ChangeSpeedMultiplier(AnimatorParametersHash.DefaultAnimationSpeed, true);
                     break;
                 }
             }
@@ -124,19 +124,22 @@ namespace Core.Animation
         class Command
         {
             private float _additionalValue;
+            private bool _reset;
             private Action<Action<FsmOutput>, float, CharacterView> _action;
 
-            public void SetCommand(Action<Action<FsmOutput>, float, CharacterView> action, float additionValue = float.NaN)
+            public void SetCommand(Action<Action<FsmOutput>, float, CharacterView> action, float additionValue = float.NaN, bool reset = false)
             {
                 _action = action;
                 _additionalValue = additionValue;
+                _reset = reset;
             }
 
             public void Execute(Action<FsmOutput> addOutput, CharacterView view, float stateSpeedBuff)
             {
                 if (null != _action)
                 {
-                    _action.Invoke(addOutput, _additionalValue * stateSpeedBuff, view);
+                    var speed = _reset ? _additionalValue : _additionalValue * stateSpeedBuff;
+                    _action.Invoke(addOutput, speed, view);
                     _action = null;
                 }
             }

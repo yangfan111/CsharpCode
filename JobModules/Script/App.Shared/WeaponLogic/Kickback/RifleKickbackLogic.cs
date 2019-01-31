@@ -57,7 +57,6 @@ namespace Core.WeaponLogic.Kickback
                 kickBackParams = kickbackGroup.Base;
             }
 
-
             BaseKickBack(playerEntity, weaponEntity, cmd.CmdSeq,
                 kickBackParams,
                 hOffsetFactor,
@@ -70,7 +69,7 @@ namespace Core.WeaponLogic.Kickback
         {
             var commonFireConfig = GetCommonFireConfig(playerEntity);
             var kickbackConfig = GetKickbackConfig(playerEntity);
-            var weaponState = weaponEntity.weaponData;
+            var weaponState = weaponEntity.weaponRuntimeInfo;
             float kickUp;
             float kickLateral;
             if (weaponState.ContinuesShootCount == 1)
@@ -111,16 +110,17 @@ namespace Core.WeaponLogic.Kickback
                 weaponState.PunchYawLeftSide = !weaponState.PunchYawLeftSide;
 
             //if (isMaxUp)
-                weaponState.PunchDecayCdTime = (int)(commonFireConfig.AttackInterval * kickbackConfig.DecaytimeFactor);
-
-            playerEntity.orientation.NegPunchYaw = punchYaw;
-            playerEntity.orientation.NegPunchPitch = punchPitch;
-            playerEntity.orientation.WeaponPunchPitch = punchPitch * vOffsetFactor;
-            playerEntity.orientation.WeaponPunchYaw = punchYaw * hOffsetFactor;
-            Logger.DebugFormat("yaw src {0} new {1} pithc src {2} new {3}", playerEntity.orientation.NegPunchYaw,
-                playerEntity.orientation.WeaponPunchYaw,
-                playerEntity.orientation.NegPunchPitch,
-                playerEntity.orientation.WeaponPunchPitch);
+            weaponState.PunchDecayCdTime = GetDecayCdTime(playerEntity);
+            weaponState.PunchPitchSpeed = (punchPitch - playerEntity.orientation.NegPunchPitch) / weaponState.PunchDecayCdTime;
+            weaponState.PunchYawSpeed = (punchYaw - playerEntity.orientation.NegPunchYaw) / weaponState.PunchDecayCdTime;
+            //playerEntity.orientation.NegPunchYaw = punchYaw;
+            //playerEntity.orientation.NegPunchPitch = punchPitch;
+            //playerEntity.orientation.WeaponPunchPitch = punchPitch * vOffsetFactor;
+            //playerEntity.orientation.WeaponPunchYaw = punchYaw * hOffsetFactor;
+            //Logger.DebugFormat("yaw src {0} new {1} pithc src {2} new {3}", playerEntity.orientation.NegPunchYaw,
+            //    playerEntity.orientation.WeaponPunchYaw,
+            //    playerEntity.orientation.NegPunchPitch,
+            //    playerEntity.orientation.WeaponPunchPitch);
         }
 
         public override float UpdateLen(PlayerEntity playerEntity, float len, float frameTime)
@@ -143,26 +143,6 @@ namespace Core.WeaponLogic.Kickback
             {
                 return kickbackConfig.Default.WeaponFallbackFactor;
             }
-        }
-
-        private RifleKickbackLogicConfig GetKickbackConfig(PlayerEntity playerEntity)
-        {
-            var config = playerEntity.GetWeaponConfig(_contexts);
-            if(null != config)
-            {
-                return config.RifleKickbackLogicCfg;
-            }
-            return null;
-        }
-
-        private CommonFireConfig GetCommonFireConfig(PlayerEntity playerEntity)
-        {
-            var config = playerEntity.GetWeaponConfig(_contexts);
-            if(null != config)
-            {
-                return config.CommonFireCfg;
-            }
-            return null;
         }
     }
 }

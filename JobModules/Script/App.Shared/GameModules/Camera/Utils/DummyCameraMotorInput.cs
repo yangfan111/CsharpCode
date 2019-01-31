@@ -1,7 +1,7 @@
 ﻿using App.Shared.Components;
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Player;
-using App.Shared.GameModules.Weapon;
+using App.Shared.WeaponLogic;
 using Core.CameraControl;
 using Core.Prediction.UserPrediction.Cmd;
 using XmlConfig;
@@ -11,7 +11,7 @@ namespace App.Shared.GameModules.Camera
 {
     class DummyCameraMotorInput : ICameraMotorInput
     {
-        public void Generate(PlayerEntity player, IUserCmd usercmd,float archorYaw,float archorPitch)
+        public void Generate(Contexts contexts, PlayerEntity player, IUserCmd usercmd,float archorYaw,float archorPitch)
         {
             DeltaYaw = usercmd.DeltaYaw;
             DeltaPitch = usercmd.DeltaPitch;
@@ -37,14 +37,20 @@ namespace App.Shared.GameModules.Camera
             ActionKeepState = player.stateInterface.State.GetActionKeepState();
             IsDriveCar =  player.IsOnVehicle();            
             IsDead = player.gamePlay.IsLifeState(EPlayerLifeState.Dead);
-            CanWeaponGunSight = player.hasWeaponComponentAgent && player.GetController<PlayerWeaponController>().CurrSlotWeaponId >= 1 & player.weaponLogic.State.CanCameraFocus();
+            CanWeaponGunSight = player.IsCanGunSight(contexts);
             ArchorPitch = YawPitchUtility.Normalize(archorPitch);
             ArchorYaw = YawPitchUtility.Normalize(archorYaw);
             IsParachuteAttached = player.hasPlayerSkyMove && player.playerSkyMove.IsParachuteAttached;
-
-            ForceChangeGunSight = player.playerWeaponState.ForceChangeGunSight;
+            if(player.HasWeapon(contexts))
+            {
+                var weaponData = player.GetWeaponRunTimeInfo(contexts);
+                if(null != weaponData)
+                {
+                    ForceChangeGunSight = weaponData.ForceChangeGunSight;
+                    weaponData.ForceChangeGunSight = false;
+                }
+            }
             ForceInterruptGunSight = UseActionOrIsStateNoGunSight(usercmd, player);
-            player.playerWeaponState.ForceChangeGunSight = false;
         }
 
         private bool UseActionOrIsStateNoGunSight(IUserCmd userCmd, PlayerEntity playerEntity)

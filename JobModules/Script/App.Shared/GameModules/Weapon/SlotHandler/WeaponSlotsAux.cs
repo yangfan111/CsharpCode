@@ -3,6 +3,7 @@ using Core;
 using Core.Utils;
 using System;
 using System.Collections.Generic;
+using Utils.Utils;
 
 namespace App.Shared.GameModules.Weapon
 {
@@ -11,8 +12,7 @@ namespace App.Shared.GameModules.Weapon
      
        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(WeaponSlotsAux));
         private Dictionary<EWeaponSlotType, WeaponSlotHandlerBase> handlers= 
-            new Dictionary<EWeaponSlotType, WeaponSlotHandlerBase>();
-
+            new Dictionary<EWeaponSlotType, WeaponSlotHandlerBase>(CommonIntEnumEqualityComparer<EWeaponSlotType>.Instance);
 
         void OnDerivedTypeInstanceProcess(System.Type t)
         {

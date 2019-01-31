@@ -35,7 +35,7 @@ namespace Core.GameModule.System
                 catch (Exception e)
                 {
                     _logger.ErrorFormat("Exception :{0}",e);
-                    throw;
+                   
                 }
             }
         }

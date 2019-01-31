@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Core.CameraControl;
 using Core.Utils;
+using ECM.Components;
 using KinematicCharacterController;
 using UnityEngine;
 using Utils.Compare;
@@ -198,9 +199,47 @@ namespace Core.CharacterController
             return _motor.GroundingStatus.GroundPoint;
         }
 
+        public Vector3 GetLastHitNormal()
+        {
+            return _motor.GroundingStatus.GroundNormal;
+        }
+
+        public Vector3 GetLastHitPoint()
+        {
+            return _motor.GroundingStatus.GroundPoint;
+        }
+
         public virtual KeyValuePair<float, float> GetRotateBound(Quaternion prevRot, Vector3 prevPos, int frameInterval)
         {
             return new KeyValuePair<float, float>(-180f,180f);
+        }
+
+        public GroundHit GetGroundHit
+        {
+            get
+            {
+                //throw new Exception("not implement!!!");
+                return _motor.GroundingStatus.ToGroundHit();
+            }
+        }
+
+        public virtual void DrawBoundingBox()
+        {
+            var characterTransformToCapsuleBottom = _motor.CharacterTransformToCapsuleBottom;
+            var characterTransformToCapsuleTop = _motor.CharacterTransformToCapsuleTop;
+            //DebugDraw.EditorDrawCapsule(transform.position + transform.rotation * characterTransformToCapsuleBottom, transform.position + transform.rotation * characterTransformToCapsuleTop, radius, Color.magenta);
+            DebugDraw.DebugCapsule(transform.position + transform.rotation * characterTransformToCapsuleBottom, transform.position + transform.rotation * characterTransformToCapsuleTop, Color.magenta, radius);
+        }
+
+        public void DrawLastGroundHit()
+        {
+            //DebugDraw.EditorDrawArrow(GetLastGroundHitPoint(), GetLastGroundNormal(), Color.red);
+            DebugDraw.DebugArrow(GetLastGroundHitPoint(), GetLastGroundNormal(), Color.red);
+        }
+
+        public void DrawGround()
+        {
+            
         }
     }
 }

@@ -13,6 +13,7 @@ namespace Core.CharacterState.Posture
         /// </summary>
         /// <returns></returns>
         ActionInConfig GetActionState();
+        ActionInConfig GetNextActionState();
         ActionKeepInConfig GetActionKeepState();
         ActionKeepInConfig GetNextActionKeepState();
     }

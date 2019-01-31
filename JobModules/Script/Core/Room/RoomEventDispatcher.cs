@@ -17,6 +17,8 @@ namespace Core.Room
         CreateRoomResponse,
         JoinRoom,
         JoinRoomResponse,
+        JointRoomList,
+        JoinRoomListResponse,
         MandatoryLogOut,
         UpdateRoomStatus,
         UpdatePlayerStatus,
@@ -31,10 +33,13 @@ namespace Core.Room
     {
         public ERoomEventType EventType;
 
+        public bool IsDisposed;
+
         private IObjectAllocator _allocator;
 
         public virtual void Reset()
         {
+            IsDisposed = false;
             _allocator = null;
         }
 
@@ -50,7 +55,7 @@ namespace Core.Room
             var allocator = e._allocator;
             if (allocator == null)
             {
-                throw new Exception("The room event is not allocated from RoomEvent.Allocate<T>!");
+                throw new Exception(String.Format("The room event {0} {1} is not allocated from RoomEvent.Allocate<T>!",  e.EventType,  e.GetType()));
             }
 
             e.Reset();
@@ -73,6 +78,32 @@ namespace Core.Room
 
             return newValue;
         }
+
+
+        protected static T[] ChangeReferenceValue<T>(T[] originVal, T[] newValue) where T : BaseRefCounter
+        {
+
+            if (newValue != null)
+            {
+                foreach (var newRef in newValue)
+                {
+                    if(newRef !=  null)
+                        newRef.AcquireReference();
+                }
+                
+            }
+
+            if (originVal != null)
+            {
+                foreach (var orgRef in originVal)
+                {
+                    if(orgRef != null)
+                        orgRef.ReleaseReference();
+                }
+            }
+
+            return newValue;
+        }
 #pragma warning restore RefCounter001, RefCounter002 
 
     }
@@ -85,6 +116,7 @@ namespace Core.Room
         private List<RoomEvent> _execList = new List<RoomEvent>();
 
         public event Action<RoomEvent> OnRoomEvent;
+        public event Func<RoomEvent, bool> Filter; 
 
         public void Update()
         {
@@ -96,14 +128,29 @@ namespace Core.Room
                 {
                     try
                     {
-                        OnRoomEvent(e);
+                        if (!Filter(e))
+                        {
+                            if(!e.IsDisposed)
+                                OnRoomEvent(e);
+
+                            RoomEvent.FreeEvent(e);
+                        }
+                        else
+                        {
+                            if (!e.IsDisposed)
+                            {
+                                _eventList.Add(e);
+                            }
+                            else
+                            {
+                                RoomEvent.FreeEvent(e);
+                            }                  
+                        }
                     }
                     catch (Exception exception)
                     {
                        _logger.ErrorFormat("Room Event {0}", exception);
                     }
-
-                    RoomEvent.FreeEvent(e);
                 }
 
                 _execList.Clear();
