@@ -1,4 +1,4 @@
-﻿using App.Shared.Components.Bag;
+﻿using App.Shared.Components.Player;
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using Core.Appearance;
@@ -11,6 +11,7 @@ using Utils.Singleton;
 using Utils.Utils;
 using XmlConfig;
 using App.Shared.Components.Weapon;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.Util
 {
@@ -39,27 +40,27 @@ namespace App.Shared.Util
             {
                 return;
             }
-            if(!((EWeaponType)weaponConfig.Type).MayHasPart())
+            if (!((EWeaponType)weaponConfig.Type).MayHasPart())
             {
                 Logger.WarnFormat("weapon type {0} has no attachment by default ", weaponConfig.Type);
                 return;
             }
             PrepareDicsForAttach(oldAttachment, attachments);
 
-            var pos = slot.ToWeaponInPackage(); 
+            var pos = slot.ToWeaponInPackage();
 
-            foreach(var pair in _attachmentsDic)
+            foreach (var pair in _attachmentsDic)
             {
-                if(pair.Value > 0)
+                if (pair.Value > 0)
                 {
-                    if(!_oldAttachmentsDic.ContainsKey(pair.Key) || _oldAttachmentsDic[pair.Key] != pair.Value)
+                    if (!_oldAttachmentsDic.ContainsKey(pair.Key) || _oldAttachmentsDic[pair.Key] != pair.Value)
                     {
                         appearance.MountAttachment(pos, pair.Key, pair.Value);
                     }
                 }
                 else
                 {
-                    if(_oldAttachmentsDic.ContainsKey(pair.Key) && _oldAttachmentsDic[pair.Key] > 0)
+                    if (_oldAttachmentsDic.ContainsKey(pair.Key) && _oldAttachmentsDic[pair.Key] > 0)
                     {
                         appearance.UnmountAttachment(pos, pair.Key);
                     }
@@ -83,7 +84,7 @@ namespace App.Shared.Util
             MapAttachmentsToAttachmentDic(attachments, _oldAttachmentsDic);
         }
 
-        private static void MapAttachmentsToAttachmentDic(WeaponPartsStruct attachments, Dictionary<WeaponPartLocation,int> attachmentDic)
+        private static void MapAttachmentsToAttachmentDic(WeaponPartsStruct attachments, Dictionary<WeaponPartLocation, int> attachmentDic)
         {
             attachmentDic.Clear();
             attachmentDic[WeaponPartLocation.LowRail] = attachments.LowerRail;
@@ -102,9 +103,9 @@ namespace App.Shared.Util
         {
             var result = attachments.Clone();
             var defaultParts = SingletonManager.Get<WeaponConfigManager>().GetDefaultWeaponAttachments(weaponId);
-            foreach(var part in defaultParts)
+            foreach (var part in defaultParts)
             {
-                if(part < 1)
+                if (part < 1)
                 {
                     continue;
                 }
@@ -124,7 +125,7 @@ namespace App.Shared.Util
                         result.Magazine = result.Magazine > 0 ? result.Magazine : part;
                         break;
                     case EWeaponPartType.Stock:
-                        result.Stock = result.Stock> 0 ? result.Stock: part;
+                        result.Stock = result.Stock > 0 ? result.Stock : part;
                         break;
                 }
             }
@@ -162,9 +163,9 @@ namespace App.Shared.Util
             return attach;
         }
 
-        public static WeaponInfo SetWeaponInfoAttachment(WeaponInfo weaponInfo, EWeaponPartType type, int id)
+        public static WeaponScanStruct SetWeaponInfoAttachment(WeaponScanStruct weaponInfo, EWeaponPartType type, int id)
         {
-            switch(type)
+            switch (type)
             {
                 case EWeaponPartType.LowerRail:
                     weaponInfo.LowerRail = id;
@@ -186,7 +187,7 @@ namespace App.Shared.Util
             return weaponInfo;
         }
 
-        public static WeaponPartsStruct GetParts(this WeaponInfo info)
+        public static WeaponPartsStruct GetParts(this WeaponScanStruct info)
         {
             var result = new WeaponPartsStruct
             {
@@ -197,11 +198,11 @@ namespace App.Shared.Util
                 Stock = info.Stock,
             };
 
-            result = result.ApplyDefaultParts(info.Id);
+            result = result.ApplyDefaultParts(info.ConfigId);
             return result;
         }
 
-        public static WeaponPartsStruct GetParts(this WeaponBasicInfoComponent comp)
+        public static WeaponPartsStruct GetParts(this WeaponBasicDataComponent comp)
         {
             var result = new WeaponPartsStruct
             {
@@ -212,11 +213,11 @@ namespace App.Shared.Util
                 Magazine = comp.Magazine,
             };
 
-            result = result.ApplyDefaultParts(comp.WeaponId);
+            result = result.ApplyDefaultParts(comp.ConfigId);
             return result;
         }
 
-        public static void ApplyParts(this WeaponBasicInfoComponent comp, WeaponPartsStruct attach)
+        public static void ApplyParts(this WeaponBasicDataComponent comp, WeaponPartsStruct attach)
         {
             comp.LowerRail = attach.LowerRail;
             comp.UpperRail = attach.UpperRail;
@@ -225,19 +226,12 @@ namespace App.Shared.Util
             comp.Stock = attach.Stock;
         }
 
-        public static void CopyToWeaponComponentWithDefaultParts(this WeaponInfo weaponInfo, WeaponBasicInfoComponent weaponComponnet)
+        public static void CopyToWeaponComponentWithDefaultParts(this WeaponScanStruct weaponInfo, WeaponEntity weapon)
         {
-            if (weaponComponnet != null)
-            {
-                weaponInfo.ToWeaponComponent(weaponComponnet);
-                var attach = GetParts(weaponInfo);
-                attach = attach.ApplyDefaultParts(weaponInfo.Id);
-                weaponComponnet.ApplyParts(attach);
-            }
-            else
-            {
-                Logger.Error("weaponComponent to copy to is null");
-            }
+            weaponInfo.SyncSelf(weapon);
+            var attach = GetParts(weaponInfo);
+            attach = attach.ApplyDefaultParts(weaponInfo.ConfigId);
+            weapon.weaponBasicData.ApplyParts(attach);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using App.Shared.Components;
-using App.Shared.WeaponLogic.Bullet;
 using Core.EntityComponent;
 using Core.Utils;
 using Entitas;

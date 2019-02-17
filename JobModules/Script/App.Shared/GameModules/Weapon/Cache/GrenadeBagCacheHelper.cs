@@ -1,55 +1,41 @@
-﻿using Assets.Utils.Configuration;
-using Assets.XmlConfig;
-using Core;
+﻿using App.Shared.Components.Player;
+using Assets.Utils.Configuration;
 using Core.Utils;
+using System;
 using System.Collections.Generic;
 using Utils.Singleton;
-using App.Shared.Components.Bag;
-using System;
 
 namespace App.Shared.GameModules.Weapon
 {
+    /// <summary>
+    /// Defines the <see cref="GrenadeBagCacheHelper" />
+    /// </summary>
     public class GrenadeBagCacheHelper : IBagDataCacheHelper
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(GrenadeBagCacheHelper));
+
         private readonly Dictionary<int, int> heldGrenades;
-        private GrenadeCacheComponentExtractor componentExtractor;
+
+        private Func<GrenadeCacheDataComponent> componentExtractor;
+
+        private GrenadeCacheDataComponent grandeCache;
+
         /// <summary>
         /// 手雷config id集合
         /// </summary>
         private readonly List<int> grenadeConfigIds;
+
         private readonly List<int> grenadeValuedIds;
 
-        public GrenadeBagCacheHelper(GrenadeCacheComponentExtractor extractor)
+        public GrenadeBagCacheHelper(Func<GrenadeCacheDataComponent> extractor, List<int> grenadeIds)
         {
             componentExtractor = extractor;
             var configs = SingletonManager.Get<WeaponConfigManager>().GetConfigs();
-            grenadeConfigIds = new List<int>();
+            grenadeConfigIds = grenadeIds;
             grenadeValuedIds = new List<int>();
             heldGrenades = new Dictionary<int, int>();
-            foreach (var config in configs)
-            {
-                switch ((EWeaponType)config.Value.Type)
-                {
-                    case EWeaponType.ThrowWeapon:
-                        var subType = (EWeaponSubType)config.Value.SubType;
-                        switch (subType)
-                        {
-                            case EWeaponSubType.BurnBomb:
-                            case EWeaponSubType.FlashBomb:
-                            case EWeaponSubType.FogBomb:
-                            case EWeaponSubType.Grenade:
-                                break;
-                            default:
-                                Logger.ErrorFormat("new subtype {0} in tactic weapon", subType);
-                                break;
-                        }
-                        grenadeConfigIds.Add(config.Value.Id);
-                        break;
-                }
-            }
-
         }
+
         public bool AddCache(int id)
         {
             if (!grenadeConfigIds.Contains(id)) return false;
@@ -87,11 +73,13 @@ namespace App.Shared.GameModules.Weapon
             heldGrenades.Clear();
             Sync();
         }
+
         public int GetCount(int id)
         {
             return heldGrenades.ContainsKey(id) ?
                 heldGrenades[id] : 0;
         }
+
         public List<int> GetOwnedIds()
         {
             grenadeValuedIds.Clear();
@@ -103,6 +91,7 @@ namespace App.Shared.GameModules.Weapon
             grenadeValuedIds.Sort();
             return grenadeValuedIds;
         }
+
         /// <summary>
         /// 扔出手雷实现自动填充
         /// </summary>
@@ -110,13 +99,14 @@ namespace App.Shared.GameModules.Weapon
         public int PickupNextAutomatic(int lastId)
         {
             //TODO:if (heldGrenades.Count < 1)
-                return -1;
+            return -1;
             var list = GetOwnedIds();
             if (lastId < 1)
                 return list[0];
             int finalIndx = list.FindIndex((data) => lastId <= data);
             return Math.Max(finalIndx, 0);
         }
+
         /// <summary>
         /// 手动切换手雷
         /// </summary>
@@ -134,48 +124,41 @@ namespace App.Shared.GameModules.Weapon
             return list[finalIndx];
         }
 
-
         public void CacheLastGrenade(int lastId)
         {
             lastGrenadeId = lastId;
         }
+
         public void ClearLastCache()
         {
             lastGrenadeId = 0;
         }
+
         private int lastGrenadeId = 0;
 
         private void SetCache(int id, int count)
         {
             if (!grenadeConfigIds.Contains(id)) return;
             heldGrenades[id] = count;
-           // Sync();
-
         }
+
         private void Sync()
         {
-            var cacheData = componentExtractor();
-            cacheData.GrenadeCount1 = GetCount(grenadeConfigIds[0]);
-            cacheData.GrenadeCount2 = GetCount(grenadeConfigIds[1]);
-            cacheData.GrenadeCount3 = GetCount(grenadeConfigIds[2]);
-            cacheData.GrenadeCount4 = GetCount(grenadeConfigIds[3]);
-
-
+            grandeCache = componentExtractor();
+            for (int i = 0; i < grenadeConfigIds.Count; i++)
+                grandeCache.GrenadeArr[i].grenadeCount = GetCount(grenadeConfigIds[i]);
         }
 
         public void Rewind()
         {
-            var cacheData = componentExtractor();
-            SetCache(grenadeConfigIds[0], cacheData.GrenadeCount1);
-            SetCache(grenadeConfigIds[1], cacheData.GrenadeCount2);
-            SetCache(grenadeConfigIds[2], cacheData.GrenadeCount3);
-            SetCache(grenadeConfigIds[3], cacheData.GrenadeCount4);
+            grandeCache = componentExtractor();
+            for (int i = 0; i < grenadeConfigIds.Count; i++)
+                SetCache(grenadeConfigIds[i], grandeCache.GrenadeArr[i].grenadeCount);
         }
 
         public int ShowCount(int id)
         {
             return GetCount(id);
         }
-
     }
 }

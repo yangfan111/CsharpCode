@@ -58,7 +58,7 @@ namespace Core.Animation
             RewindTo(right);
         }
 
-        public bool NeedPatch(NetworkAnimatorLayer right)
+        public bool IsSimilar(NetworkAnimatorLayer right)
         {
             return IsApproximatelyEqual(right);
         }

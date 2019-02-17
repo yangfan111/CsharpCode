@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using App.Shared.Components.Bag;
 using Core.Animation;
 using Core.CameraControl;
 using Core.CharacterState;

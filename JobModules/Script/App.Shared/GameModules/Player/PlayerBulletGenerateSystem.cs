@@ -1,7 +1,6 @@
 ﻿using App.Shared.Components;
 using App.Shared.GameModules.Weapon;
 using App.Shared.Util;
-using App.Shared.WeaponLogic;
 using Assets.Utils.Configuration;
 using Core.EntityComponent;
 using Core.Prediction.UserPrediction.Cmd;
@@ -31,27 +30,18 @@ namespace App.Shared.GameModules.Player
 
         protected override void ExecuteUserCmd(PlayerEntity playerEntity, IUserCmd cmd)
         {
-            var dataList = playerEntity.playerBulletData.DataList;
-            if(dataList.Count > 0)
+            var controller = playerEntity.WeaponController();
+            var dataList = controller.BulletList;
+            if(dataList != null && dataList.Count > 0)
             {
-                var weaponDataConfig = playerEntity.GetWeaponConfig(_contexts);
-                if(null == weaponDataConfig)
-                {
-                    Logger.Error("weapon config is null ");
-                    return;
-                }
-                var bulletConfig = weaponDataConfig.BulletCfg;
-                var weaponId = playerEntity.GetController<PlayerWeaponController>().CurrSlotWeaponId(_contexts);
-                if(!weaponId.HasValue)
+                BulletConfig bulletConfig = controller.HeldWeaponAgent.BulletCfg;
+                if (null == bulletConfig)
                 {
                     return;
                 }
-                var config = _weaponConfigManager.GetConfigById(weaponId.Value);
-                if(null == config)
-                {
-                    return;
-                }
-                var caliber = (EBulletCaliber)config.Caliber;
+                int weaponConfigId = controller.HeldWeaponAgent.ConfigId.Value;
+                NewWeaponConfigItem weaponConfig = _weaponConfigManager.GetConfigById(weaponConfigId);
+                var caliber = (EBulletCaliber)weaponConfig.Caliber;
 
                 foreach (var bulletData in dataList)
                 {
@@ -75,7 +65,7 @@ namespace App.Shared.GameModules.Player
                         bulletConfig,
                         bulletConfig.VelocityDecay,
                         caliber,
-                        weaponId.Value);
+                        weaponConfigId);
                     bulletEntity.AddPosition(bulletData.ViewPosition);
                     bulletEntity.AddOwnerId(playerEntity.entityKey.Value);
                     bulletEntity.bulletData.CmdSeq = cmd.Seq;
@@ -92,9 +82,9 @@ namespace App.Shared.GameModules.Player
             }
         }
 
-        protected override bool filter(PlayerEntity playerEntity)
+        protected override bool filter(PlayerEntity entity)
         {
-            return playerEntity.hasPlayerBulletData;
+            return entity.WeaponController().BulletList != null;
         }
     }
 }

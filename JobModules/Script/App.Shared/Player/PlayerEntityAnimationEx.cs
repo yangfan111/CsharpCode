@@ -48,7 +48,7 @@ namespace App.Shared.Player
 
         private static void UndrawWeaponThenPlayAnim(this PlayerEntity playerEntity, Contexts contexts)
         {
-            if(playerEntity.GetController<PlayerWeaponController>().IsWeaponCurrSlotStuffed(contexts))
+            if(playerEntity.WeaponController().IsWeaponCurrSlotStuffed(contexts))
             {
                 playerEntity.animationExData.ActionAfterAllAnimation = () =>
                 {

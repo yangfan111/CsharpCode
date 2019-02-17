@@ -17,30 +17,30 @@ namespace Core.Room
         {
             WeaponBags = new PlayerWeaponBagData[PlayerWeaponBagCount];
             AvatarIds = new List<int>();
-            WeaponAvatarIds =new List<int>();
+            WeaponAvatarIds = new List<int>();
         }
 
-        public PlayerInfo(string token, IRoomId roomId, long playerId, string playerName, int roleModelId, long teamId, int num, int level, int backId, int titleId, int badgeId, int[] avatarIds, int[] weaponAvatarIds, bool hasTestWeapon): this()
+        public PlayerInfo(string token, IRoomId roomId, long playerId, string playerName, int roleModelId, long teamId, int num, int level, int backId, int titleId, int badgeId, int[] avatarIds, int[] weaponAvatarIds, bool hasTestWeapon) : this()
         {
-           
-           Token = token;
-           RoomId = roomId;
-           PlayerId = playerId;
-           PlayerName = playerName;
-           RoleModelId = roleModelId;
-           TeamId = teamId;
-           Num = num;
-           Level = level;
-           BackId = backId;
-           TitleId = titleId;
-           BadgeId = badgeId;
-         
+
+            Token = token;
+            RoomId = roomId;
+            PlayerId = playerId;
+            PlayerName = playerName;
+            RoleModelId = roleModelId;
+            TeamId = teamId;
+            Num = num;
+            Level = level;
+            BackId = backId;
+            TitleId = titleId;
+            BadgeId = badgeId;
+
             if (avatarIds != null)
             {
                 AvatarIds.AddRange(avatarIds);
             }
-            
-           
+
+
             if (weaponAvatarIds != null)
             {
                 WeaponAvatarIds.AddRange(weaponAvatarIds);
@@ -64,7 +64,7 @@ namespace Core.Room
             }
         }
 
-      
+
 
         public int EntityId { get; set; }
         public string Token { get; set; }
@@ -109,6 +109,21 @@ namespace Core.Room
             return string.Format("index {0}, weaponId {1}, avatarId {2}, lowerRail {3}, upRail {4}, stock {5}, muzzle {6} magazine {7}",
                 Index, WeaponTplId, WeaponAvatarTplId, LowerRail, UpperRail, Stock, Muzzle, Magazine);
         }
+
+        public static WeaponScanStruct Explicit(PlayerWeaponData weaponData)
+        {
+            WeaponScanStruct scan = new WeaponScanStruct();
+            scan.Assign(weaponData.WeaponTplId);
+
+            scan.AvatarId = weaponData.WeaponAvatarTplId;
+            scan.Muzzle = weaponData.Muzzle;
+            scan.Stock = weaponData.Stock;
+            scan.Magazine = weaponData.Magazine;
+            scan.UpperRail = weaponData.UpperRail;
+            scan.LowerRail = weaponData.LowerRail;
+            return scan;
+        }
+
     }
 
     public class PlayerWeaponBagData
@@ -123,7 +138,7 @@ namespace Core.Room
             OuputStringBuilder.Length = 0;
             OuputStringBuilder.Append(BagIndex);
             OuputStringBuilder.Append(":\n");
-            for(int i = 0; i < weaponList.Count; i++)
+            for (int i = 0; i < weaponList.Count; i++)
             {
                 OuputStringBuilder.Append(weaponList[i].Index);
                 OuputStringBuilder.Append(":");
@@ -132,23 +147,23 @@ namespace Core.Room
                 OuputStringBuilder.Append(weaponList[i].WeaponAvatarTplId);
                 OuputStringBuilder.AppendLine();
             }
-            return OuputStringBuilder.ToString(); 
+            return OuputStringBuilder.ToString();
         }
 
         public void CopyTo(PlayerWeaponBagData playerWeaponBagData)
         {
-            if(null == playerWeaponBagData)
+            if (null == playerWeaponBagData)
             {
                 Logger.Error("Target to copy is null");
                 return;
             }
             playerWeaponBagData.BagIndex = BagIndex;
-            if(playerWeaponBagData.weaponList == null)
+            if (playerWeaponBagData.weaponList == null)
             {
                 playerWeaponBagData.weaponList = new List<PlayerWeaponData>();
             }
             playerWeaponBagData.weaponList.Clear();
-            foreach(var weapon in weaponList)
+            foreach (var weapon in weaponList)
             {
                 playerWeaponBagData.weaponList.Add(weapon);
             }
@@ -156,7 +171,7 @@ namespace Core.Room
 
         public static int Slot2Index(EWeaponSlotType slotType)
         {
-            switch(slotType)
+            switch (slotType)
             {
                 case EWeaponSlotType.None:
                     return 0;
@@ -179,7 +194,7 @@ namespace Core.Room
 
         public static EWeaponSlotType Index2Slot(int index)
         {
-            switch(index)
+            switch (index)
             {
                 case 0:
                     return EWeaponSlotType.None;

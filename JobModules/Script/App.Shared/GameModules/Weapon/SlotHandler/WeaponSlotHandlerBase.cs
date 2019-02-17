@@ -25,14 +25,13 @@ namespace App.Shared.GameModules.Weapon
             Helper = in_helper;
         }
         public virtual bool HasBagData { get { return false; } }
-        internal virtual void OnExpend(Contexts contexts, PlayerWeaponComponentAgent agent, WeaponSlotExpendCallback expendCb)
+        internal virtual void OnExpend(WeaponComponentsAgent agent, System.Action<WeaponSlotExpendStruct> expendCb)
         {
-            var bullet = agent.CurrWeaponBullet(contexts);
-            agent.SetSlotWeaponBullet(contexts, bullet - 1);
+             agent.BaseComponent.Bullet-=1;
             if (expendCb != null)
             {
-                var paramsData = new WeaponSlotExpendData(handledSlot,false, false);
-                expendCb(contexts, paramsData);
+                var paramsData = new WeaponSlotExpendStruct(handledSlot,false, false);
+                expendCb(paramsData);
             }
 
         }

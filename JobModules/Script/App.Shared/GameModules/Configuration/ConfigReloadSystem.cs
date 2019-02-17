@@ -7,7 +7,7 @@ using Utils.Configuration;
 using Core.Configuration.Sound;
 using System.Collections.Generic;
 using Utils.Singleton;
-using App.Shared.WeaponLogic;
+using App.Shared.GameModules.Weapon;
 using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Configuration
@@ -109,7 +109,7 @@ namespace App.Shared.GameModules.Configuration
             SingletonManager.Get<WeaponDataConfigManager>().ParseConfig(textAsset.text);
             foreach(var player in _playerContext.GetEntities())
             {
-                player.GetController<PlayerWeaponController>().TryMountSlotWeapon(contexts, player.GetController<PlayerWeaponController>().CurrSlotType);
+                player.WeaponController().TryArmSlotWeapon(contexts, player.WeaponController().HeldSlotType);
             }
         }
 

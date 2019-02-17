@@ -1,5 +1,4 @@
-﻿using Assets.XmlConfig;
-using Core;
+﻿using Core;
 using Entitas;
 using WeaponConfigNs;
 
@@ -15,7 +14,7 @@ namespace Core.GameModeLogic
         void InitDefaultWeapon(Entity playerEntity);
         void InitDefaultWeapon(Entity playerEntity, int index);
         void ResetWeaponWithBagIndex(int index, Entity playerEntity);
-        bool IsBagSwithEnabled(Entity playerEntity); 
+        bool IsBagSwithEnabled(IPlayerWeaponControllerFrameWork controller); 
     }
 
     public interface IPickupLogic
@@ -92,9 +91,9 @@ namespace Core.GameModeLogic
             _weaponInitLogic.ResetWeaponWithBagIndex(index, playerEntity);
         }
 
-        public bool IsBagSwithEnabled(Entity playerEntity)
+        public bool IsBagSwithEnabled(IPlayerWeaponControllerFrameWork controller )
         {
-            return _weaponInitLogic.IsBagSwithEnabled(playerEntity);
+            return _weaponInitLogic.IsBagSwithEnabled(controller);
         }
 
         #endregion

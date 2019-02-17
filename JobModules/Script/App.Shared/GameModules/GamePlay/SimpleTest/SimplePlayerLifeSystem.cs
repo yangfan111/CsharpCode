@@ -10,7 +10,6 @@ using Random = System.Random;
 using Core.Configuration.Equipment;
 using Core.GameTime;
 using Utils.Singleton;
-using App.Shared.WeaponLogic;
 using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.GamePlay.SimpleTest
@@ -99,12 +98,12 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
             playerEntity.gamePlay.ChangeLifeState(EPlayerLifeState.Alive, time);
             playerEntity.gamePlay.CurHp = 100;
             playerEntity.position.Value = pos;
-            var weaponData = playerEntity.GetCurrentWeaponData(contexts);
-            var weaponConfig = playerEntity.GetWeaponConfig(contexts).CommonFireCfg;
-            if(null != weaponData && null != weaponConfig)
-            {
-                weaponData.Bullet = weaponConfig.MagazineCapacity;
-            }
+            PlayerWeaponController controller = playerEntity.WeaponController();
+            var configAssy = controller.HeldWeaponLogicConfigAssy;
+            if (configAssy == null)
+                return;
+            controller.ModifyBullet(configAssy.CommonFireCfg.MagazineCapacity);
+
         }
     }
 }

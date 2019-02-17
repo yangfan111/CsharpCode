@@ -46,10 +46,7 @@ namespace App.Shared.Player.Events
             var allContexts = contexts as Contexts;
             if (playerEntity != null)
             {
-                if(playerEntity.hasWeaponEffect)
-                {
-                    playerEntity.weaponEffect.PlayList.Add(XmlConfig.EClientEffectType.MuzzleSpark);
-                }
+                playerEntity.WeaponController().EffectList.Add(XmlConfig.EClientEffectType.MuzzleSpark);
                // GameAudioMedium.ProcessWeaponAudio(playerEntity,allContexts,(item)=>item.Fire);
                 // if (playerEntity.appearanceInterface.Appearance.IsFirstPerson)
                 // {
@@ -67,7 +64,7 @@ namespace App.Shared.Player.Events
         public override bool ClientFilter(IEntity entity, IEvent e)
         {
             var playerEntity = entity as PlayerEntity;
-            return playerEntity != null && playerEntity.hasWeaponState;
+            return playerEntity != null && playerEntity.WeaponController().EffectList != null;
         }
      
     }

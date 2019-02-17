@@ -2,6 +2,7 @@
 using App.Shared.Components;
 using Assets.XmlConfig;
 using Core;
+using Core.EntityComponent;
 using Core.GameTime;
 using Entitas;
 using UnityEngine;
@@ -22,16 +23,16 @@ namespace App.Shared.EntityFactory
             return null;
         }
 
-        public override void DestroyEquipmentEntity(int key)
+        public override void DestroySceneWeaponObjectEntity(int key)
         {
         }
 
-        public override IEntity CreateWeaponEntity(WeaponInfo weaponInfo, Vector3 position)
+        public override IEntity CreateSceneWeaponObjectEntity(WeaponScanStruct weaponInfo, Vector3 position)
         {
             return null;
         }
 
-        public override IEntity CreateDropWeaponEntity(WeaponInfo weaponInfo, Vector3 position, int lifeTime)
+        public override IEntity CreateDropSceneWeaponObjectEntity(WeaponScanStruct weaponKey, Vector3 position, int lifeTime)
         {
             return null;
         }

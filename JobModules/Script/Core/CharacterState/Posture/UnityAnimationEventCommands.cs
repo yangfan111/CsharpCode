@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Core.Prediction;
+using Core.Prediction.UserPrediction;
 using Core.Utils;
 using UnityEngine;
 
@@ -29,7 +30,7 @@ namespace Core.CharacterState.Posture
         }
     }
     
-    public class UnityAnimationEventCommands:ICloneableComponent
+    public class UnityAnimationEventCommands: ICloneableComponent
     {
         public List<KeyValuePair<short, AnimationEventParam>> Commands = new List<KeyValuePair<short, AnimationEventParam>>();
 

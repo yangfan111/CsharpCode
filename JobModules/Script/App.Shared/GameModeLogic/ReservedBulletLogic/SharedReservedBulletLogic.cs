@@ -105,8 +105,8 @@ namespace App.Shared.GameModeLogic.ReservedBulletLogic
         private EBulletCaliber GetCaliber(Entity entity, EWeaponSlotType slot)
         {
             var playerEntity = entity as PlayerEntity;
-            var weapon = playerEntity.GetController<PlayerWeaponController>().GetSlotWeaponInfo(_contexts, slot);
-            var weaponId = weapon.Id;
+            var weapon = playerEntity.WeaponController().GetSlotWeaponInfo(_contexts, slot);
+            var weaponId = weapon.ConfigId;
             if (weaponId > 0)
             {
                 var cfg = _weaponConfigManager.GetConfigById(weaponId);

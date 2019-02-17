@@ -36,7 +36,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
                 Logger.ErrorFormat("{0} doesn't exist in player context ", playerEntityId);
                 return;
             }
-            if (!entity.hasWeapon)
+            if (!entity.hasWeaponObject)
             {
                 Logger.ErrorFormat("only weapon is supported in normal mode");
                 return;
@@ -45,10 +45,10 @@ namespace App.Shared.GameModeLogic.PickupLogic
             {
                 return;
             }
-            var pickupSuccess = player.GetController<PlayerWeaponController>().AutoPickUpWeapon(_contexts, entity.weapon.ToWeaponInfo());
+            var pickupSuccess = player.WeaponController().AutoPickUpWeapon(_contexts, entity.weapon.ToWeaponInfo());
             if (pickupSuccess)
             {
-                _sceneObjectEntityFactory.DestroyEquipmentEntity(entity.entityKey.Value.EntityId);
+                _sceneObjectEntityFactory.DestroySceneWeaponObjectEntity(entity.entityKey.Value.EntityId);
             }
         }   
     }

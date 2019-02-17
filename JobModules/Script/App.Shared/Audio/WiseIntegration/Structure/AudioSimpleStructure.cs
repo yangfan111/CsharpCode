@@ -15,7 +15,7 @@ namespace App.Shared.Audio
         public string StateName { get { return stateName; } }
         public bool StateVailed { get { return !string.IsNullOrEmpty(stateName); } }
 
-
+        
 
         public AudioSimpleProtoArgs(int evt,int grp,string sts )
         {

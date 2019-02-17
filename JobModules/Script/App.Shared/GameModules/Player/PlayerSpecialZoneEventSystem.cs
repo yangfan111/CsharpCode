@@ -172,7 +172,7 @@ namespace App.Shared.GameModules.Player
             player.position.Value = syncTransform.position;
           
             PlayerMoveSystem.SyncUpdateComponentPos(player, syncTransform.position);
-            player.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon(_contexts);
+            player.WeaponController().ForceUnmountCurrWeapon(_contexts);
             player.moveUpdate.NeedUmountWeapon = true;
             player.stateInterface.State.Swim();
             //_logger.InfoFormat("swim ashore pos:{0}",player.position.Value.ToStringExt());
@@ -191,7 +191,7 @@ namespace App.Shared.GameModules.Player
 
         private void Dive(PlayerEntity player)
         {
-            player.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon(_contexts);
+            player.WeaponController().ForceUnmountCurrWeapon(_contexts);
             player.stateInterface.State.Dive();
         }
     }

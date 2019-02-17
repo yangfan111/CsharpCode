@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Assets.XmlConfig;
 using Core;
+using Core.EntityComponent;
 using Entitas;
 using UnityEngine;
 
@@ -28,12 +29,12 @@ namespace Core
             int count,
             Vector3 position);
 
-        IEntity CreateWeaponEntity(WeaponInfo weaponInfo, Vector3 position);
+        IEntity CreateSceneWeaponObjectEntity(WeaponScanStruct weaponInfo, Vector3 position);
 
         IEntity CreateCastEntity(Vector3 position, float size, int key, string tip);
 
-        void DestroyEquipmentEntity(int entityKey);
+        void DestroySceneWeaponObjectEntity(int entityKey);
 
-        IEntity CreateDropWeaponEntity(WeaponInfo weaponInfo, Vector3 position, int lifeTime);
+        IEntity CreateDropSceneWeaponObjectEntity(WeaponScanStruct weaponInfo, Vector3 position, int lifeTime);
     }
 }

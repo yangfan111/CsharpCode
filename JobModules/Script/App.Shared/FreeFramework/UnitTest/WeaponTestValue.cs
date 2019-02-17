@@ -22,15 +22,15 @@ namespace App.Shared.FreeFramework.UnitTest
             FreeData fd = (FreeData)args.GetUnit(UnitTestConstant.Tester);
             if (fd != null)
             {
-                EWeaponSlotType currentSlot = fd.Player.GetController<PlayerWeaponController>().CurrSlotType;
+                EWeaponSlotType currentSlot = fd.Player.WeaponController().HeldSlotType;
 
                 if (args.GetInt(slot) > 0)
                 {
                     currentSlot = FreeWeaponUtil.GetSlotType(args.GetInt(slot));
                 }
 
-                WeaponInfo info = fd.Player.GetController<PlayerWeaponController>().GetSlotWeaponInfo(args.GameContext, currentSlot);
-                tv.AddField("id", info.Id);
+                WeaponScanStruct info = fd.Player.WeaponController().GetSlotWeaponInfo(args.GameContext, currentSlot);
+                tv.AddField("id", info.ConfigId);
                 tv.AddField("clip", info.Bullet);
                 tv.AddField("carryClip", info.ReservedBullet);
             }

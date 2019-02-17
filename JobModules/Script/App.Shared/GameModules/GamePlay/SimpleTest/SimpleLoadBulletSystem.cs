@@ -16,7 +16,6 @@ using com.wd.free.@event;
 using App.Shared.FreeFramework.framework.@event;
 using Utils.Singleton;
 using App.Shared.GameModules.Weapon;
-using App.Shared.WeaponLogic;
 
 namespace App.Shared.GameModules.GamePlay.SimpleTest
 {
@@ -30,7 +29,7 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
         private Contexts _contexts;
         private ICommonSessionObjects _sessonObjects;
 
-        public SimpleLoadBulletSystem(Contexts contexts, ICommonSessionObjects sessionObjects) 
+        public SimpleLoadBulletSystem(Contexts contexts, ICommonSessionObjects sessionObjects)
         {
             this._contexts = contexts;
             this._sessonObjects = sessionObjects;
@@ -40,25 +39,33 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             PlayerEntity player = (PlayerEntity)owner.OwnerEntity;
+            ISharedPlayerWeaponComponentGetter sharedWeaponAPI = player.WeaponController();
             if (cmd.IsReload)// && cmd.FilteredInput.IsInput(EPlayerInput.IsReload))
             {
                 if (!cmd.FilteredInput.IsInput(EPlayerInput.IsReload) && !player.playerMove.IsAutoRun)
                 {
                     return;
                 }
-                ISharedPlayerWeaponComponentGetter sharedAPI = player.GetController<PlayerWeaponController>();
-            
-                WeaponInfo currWeapon = sharedAPI.CurrSlotWeaponInfo(_contexts);
-                var config = SingletonManager.Get<WeaponConfigManager>().GetConfigById(currWeapon.Id);
+
+
+                WeaponScanStruct? currWeapon = sharedWeaponAPI.HeldWeaponScan;
+                if (!currWeapon.HasValue) return;
+                var config = SingletonManager.Get<WeaponConfigManager>().GetConfigById(currWeapon.Value.ConfigId);
                 if (NoReloadAction(config))
                 {
                     return;
                 }
-                if (MagazineIsFull(player, currWeapon.Bullet))
+                PlayerWeaponController controller = player.WeaponController();
+                var configAssy = controller.HeldWeaponLogicConfigAssy;
+                if (null == configAssy)
                 {
                     return;
                 }
-                if (HasNoReservedBullet(sharedAPI, player))
+                if (currWeapon.Value.Bullet >= configAssy.CommonFireCfg.MagazineCapacity)
+                {
+                    return;
+                }
+                if (HasNoReservedBullet(sharedWeaponAPI, player))
                 {
                     return;
                 }
@@ -67,14 +74,10 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                     player.PlayWeaponSound(EWeaponSoundType.ClipDrop);
                     _reloading = true;
                 }
-                var weaponConfig = player.GetWeaponConfig(_contexts);
-                if(null == weaponConfig)
-                {
-                    return;
-                }
-                var weaponData = player.GetCurrentWeaponData(_contexts);
-                var commonfireConfig = weaponConfig.CommonFireCfg;
-                var reloadSpeed = weaponConfig.GetReloadSpeed();
+
+                var weaponData = sharedWeaponAPI.HeldWeaponScan.Value;
+                var commonfireConfig = configAssy.CommonFireCfg;
+                var reloadSpeed = configAssy.GetReloadSpeed();
                 reloadSpeed = Mathf.Max(0.1f, reloadSpeed);
 
                 player.playerMove.InterruptAutoRun();
@@ -83,7 +86,7 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                 if (commonfireConfig.SpecialReloadCount > 0)
                 {
                     var target = commonfireConfig.MagazineCapacity - weaponData.Bullet;
-                    target = Mathf.Min(target, player.GetController<PlayerWeaponController>().GetReservedBullet());
+                    target = Mathf.Min(target, player.WeaponController().GetReservedBullet());
                     var count = Mathf.CeilToInt((float)target / commonfireConfig.SpecialReloadCount);
                     count = Mathf.Max(1, count);
                     player.stateInterface.State.SpecialReload(
@@ -99,9 +102,9 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                 }
                 else
                 {
-                    if (weaponData.Bullet > 0 && !player.IsAlwaysEmptyReload(_contexts))
+                    if (weaponData.Bullet > 0 && !sharedWeaponAPI.IsHeldWeaponEmptyReload())
                     {
-                        var needActionDeal = CheckNeedActionDeal(sharedAPI, ActionDealEnum.Reload);
+                        var needActionDeal = CheckNeedActionDeal(sharedWeaponAPI, ActionDealEnum.Reload);
                         if (needActionDeal)
                         {
                             player.appearanceInterface.Appearance.MountWeaponOnAlternativeLocator();
@@ -119,7 +122,7 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                     }
                     else
                     {
-                        var needActionDeal = CheckNeedActionDeal(sharedAPI, ActionDealEnum.ReloadEmpty);
+                        var needActionDeal = CheckNeedActionDeal(sharedWeaponAPI, ActionDealEnum.ReloadEmpty);
                         if (needActionDeal)
                         {
                             player.appearanceInterface.Appearance.MountWeaponOnAlternativeLocator();
@@ -148,10 +151,6 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
             return config.Type == (int)EWeaponType.ThrowWeapon || config.Type == (int)EWeaponType.MeleeWeapon;
         }
 
-        private bool MagazineIsFull(PlayerEntity playerEntity, int bulletCount)
-        {
-            return bulletCount >= playerEntity.GetWeaponConfig(_contexts).CommonFireCfg.MagazineCapacity;
-        }
 
         private bool HasNoReservedBullet(ISharedPlayerWeaponComponentGetter agent, PlayerEntity playerEntity)
         {
@@ -172,21 +171,25 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
 
         private void SpecialReload(Contexts contexts, PlayerEntity playerEntity)
         {
-            var weaponConfig = playerEntity.GetWeaponConfig(contexts);
-            var weaponData = playerEntity.GetCurrentWeaponData(contexts);
-            var commonFireConfig = weaponConfig.CommonFireCfg;
+            PlayerWeaponController controller = playerEntity.WeaponController();
+            var configAssy = controller.HeldWeaponLogicConfigAssy;
+            if (configAssy == null) return;
+            WeaponScanStruct weaponScan = controller.HeldWeaponScan.Value;
+            var commonFireConfig = configAssy.CommonFireCfg;
             var loadCount = commonFireConfig.SpecialReloadCount;
-            var target = commonFireConfig.MagazineCapacity - weaponData.Bullet;
+            var target = commonFireConfig.MagazineCapacity - weaponScan.Bullet;
             loadCount = Mathf.Min(loadCount, target);
             DoRealod(contexts, playerEntity, loadCount);
         }
 
         private void Reload(Contexts contexts, PlayerEntity playerEntity)
         {
-            var weaponConfig = playerEntity.GetWeaponConfig(contexts);
-            var weaponData = playerEntity.GetCurrentWeaponData(contexts);
+            PlayerWeaponController controller = playerEntity.WeaponController();
+            var configAssy = controller.HeldWeaponLogicConfigAssy;
+            if (configAssy == null) return;
+            var weaponData = controller.HeldWeaponScan.Value;
 
-            var commonFireConfig = weaponConfig.CommonFireCfg;
+            var commonFireConfig = configAssy.CommonFireCfg;
             var target = commonFireConfig.MagazineCapacity - weaponData.Bullet;
             target = Mathf.Max(0, target);
             DoRealod(contexts, playerEntity, target);
@@ -194,14 +197,15 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
 
         private void DoRealod(Contexts contexts, PlayerEntity playerEntity, int target)
         {
-            var weaponConfig = playerEntity.GetWeaponConfig(contexts);
-            var weaponData = playerEntity.GetCurrentWeaponData(contexts);
+            //PlayerWeaponController controller = playerEntity.WeaponController();
+            //var configAssy = controller.HeldWeaponLogicConfigAssy;
+            var weaponData = playerEntity.WeaponController().HeldWeaponScan;
+            if (!weaponData.HasValue) return;
+            var lastReservedBullet = playerEntity.WeaponController().GetReservedBullet();
+            target = Mathf.Min(target, lastReservedBullet);
+            //  weaponData.Value.Bullet += target;
+            playerEntity.WeaponController().SetReservedBullet(lastReservedBullet - target);
 
-            var lastReservedBullet = playerEntity.GetController<PlayerWeaponController>().GetReservedBullet();
-            target = Mathf.Min(target, lastReservedBullet); 
-            weaponData.Bullet += target;
-            playerEntity.GetController<PlayerWeaponController>().SetReservedBullet(lastReservedBullet - target);
-           
             IEventArgs args = (IEventArgs)(_sessonObjects).FreeArgs;
 
             if (!args.Triggers.IsEmpty((int)EGameEvent.WeaponState))
@@ -221,7 +225,7 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
 
         private bool CheckNeedActionDeal(ISharedPlayerWeaponComponentGetter sharedApi, ActionDealEnum action)
         {
-            return SingletonManager.Get<WeaponConfigManager>().NeedActionDeal(sharedApi.CurrSlotWeaponId(_contexts).Value, action);
+            return SingletonManager.Get<WeaponConfigManager>().NeedActionDeal(sharedApi.HeldWeaponConfigId.Value, action);
         }
     }
 }

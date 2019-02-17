@@ -1,5 +1,5 @@
 ﻿using Core.Utils;
-using App.Shared.Components.Bag;
+using App.Shared.Components.Player;
 using Core;
 using XmlConfig;
 using Utils.Configuration;

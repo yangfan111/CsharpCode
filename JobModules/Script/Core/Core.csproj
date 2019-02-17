@@ -143,7 +143,6 @@ if %errorlevel% neq 0 goto :VCEnd" />
     <Compile Include="F:\voyager\UnityPackages\Core\AssetManager\UnityAssetManangerSystem.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Attack\IHitMaskController.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Attack\MeleeAttack.cs" />
-    <Compile Include="F:\voyager\UnityPackages\Core\Bag\BagFrame.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\BulletSimulation\BulletHitSimulator.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\BulletSimulation\BulletLayers.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\BulletSimulation\BulletMoveSimulator.cs" />
@@ -616,6 +615,12 @@ if %errorlevel% neq 0 goto :VCEnd" />
     <Compile Include="F:\voyager\UnityPackages\Core\Utils\QuaternionToEuler.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Utils\Version.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\Utils\VersionDisplay.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\Weapon\GrenadeCacheData.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\Weapon\WeaponBagContainer.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\Weapon\WeaponBagSlotData.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\Weapon\WeaponException.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\Weapon\WeaponFramework.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Core\Weapon\WeaponScanStruct.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\WeaponAnimation\IWeaponAnimProgress.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\WeaponAnimation\WeaponAnimationController.cs" />
     <Compile Include="F:\voyager\UnityPackages\Core\WeaponLogic\Attachment\AttachmentBase.cs" />

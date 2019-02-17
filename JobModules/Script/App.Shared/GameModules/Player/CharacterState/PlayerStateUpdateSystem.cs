@@ -161,7 +161,7 @@ namespace App.Shared.GameModules.Player.CharacterState
                 animatorClipManager.Update(commandsContainer, _fsmOutputs.AddOutput,
                     playerEntity.thirdPersonAnimator.UnityAnimator,
                     playerEntity.firstPersonAnimator.UnityAnimator,
-                    playerEntity.GetController<PlayerWeaponController>().CurrSlotWeaponId(_contexts),
+                    playerEntity.WeaponController().HeldWeaponAgent.ConfigId.Value,
                     playerEntity.networkAnimator.NeedRewind);
 
                 // 更新Animator的Param

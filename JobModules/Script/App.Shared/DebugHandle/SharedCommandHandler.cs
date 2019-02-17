@@ -208,7 +208,7 @@ namespace App.Shared.DebugHandle
         public static string ProcessPlayerCommands(DebugCommand message, Contexts contexts, PlayerEntity player, ICommonSessionObjects sessionObjects, ICurrentTime currentTime)
         {
             var result = "";
-            PlayerWeaponComponentAgent bagLogicImp;
+            PlayerWeaponComponentsAgent bagLogicImp;
             switch (message.Command)
             {
                 case DebugCommands.ClientMove:
@@ -281,7 +281,7 @@ namespace App.Shared.DebugHandle
                     player.gamePlay.CurHp = int.Parse(message.Args[0]);
                     break;
                 case DebugCommands.SetCurBullet:
-                    player.GetController<PlayerWeaponController>().SetSlotWeaponBullet(contexts, int.Parse(message.Args[0]));
+                    player.WeaponController().ModifyWeaponComponent_Bullet(contexts, int.Parse(message.Args[0]));
                     break;
                 case DebugCommands.SetReservedBullet:
                     if (message.Args.Length > 1)
@@ -289,12 +289,12 @@ namespace App.Shared.DebugHandle
                         int slot = int.Parse(message.Args[0]);
                         int count = int.Parse(message.Args[1]);
 
-                        player.GetController<PlayerWeaponController>().SetReservedBullet((EWeaponSlotType)slot, count);
+                        player.WeaponController().SetReservedBullet((EWeaponSlotType)slot, count);
                     }
                     else
                     {
                         int count = int.Parse(message.Args[0]);
-                        player.GetController<PlayerWeaponController>().SetReservedBullet( count);
+                        player.WeaponController().SetReservedBullet( count);
                     }
                     break;
                 case DebugCommands.SetWeapon:
@@ -315,24 +315,20 @@ namespace App.Shared.DebugHandle
                         {
                             weaponSlotToSet = int.Parse(message.Args[2].Trim());
                         }
-                        var weaponInfo = new WeaponInfo
-                        {
-                            Id = weaponIdToSet,
-                            AvatarId = avatarId > 0 ? avatarId : 0,
-                        };
+                        var weaponInfo = WeaponScanStruct.CreateWeaponOrientWithConfig(weaponIdToSet,(val)=> val.AvatarId = avatarId > 0 ? avatarId : 0);
                         if (weaponSlotToSet != 0)
                         {
-                            player.GetController<PlayerWeaponController>().ReplaceWeaponToSlot(contexts, (EWeaponSlotType)weaponSlotToSet, weaponInfo);
+                            player.WeaponController().ReplaceWeaponToSlot(contexts, (EWeaponSlotType)weaponSlotToSet, weaponInfo);
                         }
                         else
                         {
-                            player.GetController<PlayerWeaponController>().PickUpWeapon(contexts, weaponInfo);
+                            player.WeaponController().PickUpWeapon(contexts, weaponInfo);
                         }
                     }
                         break;
                 case DebugCommands.DropWeapon:
                     var dropSlot = int.Parse(message.Args[0]);
-                    player.GetController<PlayerWeaponController>().DropSlotWeapon(contexts, (EWeaponSlotType)dropSlot);
+                    player.WeaponController().DropSlotWeapon(contexts, (EWeaponSlotType)dropSlot);
                     break;
                 case DebugCommands.TestWeaponAssemble:
                     if (null == _twaRootGo)
@@ -377,12 +373,12 @@ namespace App.Shared.DebugHandle
                         id = int.Parse(message.Args[1]);
                       
 
-                        res = player.GetController<PlayerWeaponController>().SetSlotWeaponPart(contexts, (EWeaponSlotType)slot, id);
+                        res = player.WeaponController().SetSlotWeaponPart(contexts, (EWeaponSlotType)slot, id);
                     }
                     else
                     {
                         id = int.Parse(message.Args[0]);
-                        res = player.GetController<PlayerWeaponController>().SetSlotWeaponPart(contexts, id);
+                        res = player.WeaponController().SetSlotWeaponPart(contexts, id);
                     }
 
                     switch (res)
@@ -401,7 +397,7 @@ namespace App.Shared.DebugHandle
                 case DebugCommands.ClearAttachment:
                     var weaponSlot = (EWeaponSlotType)int.Parse(message.Args[0]);
                     var part = (EWeaponPartType)int.Parse(message.Args[1]);
-                    player.GetController<PlayerWeaponController>().DeleteSlotWeaponPart(contexts, weaponSlot, part);
+                    player.WeaponController().DeleteSlotWeaponPart(contexts, weaponSlot, part);
                     break;
                 case DebugCommands.SwitchAttachment:
                     break;
@@ -409,7 +405,7 @@ namespace App.Shared.DebugHandle
                     player.appearanceInterface.Appearance.ChangeAvatar(int.Parse(message.Args[0]));
                     break;
                 case DebugCommands.ShowAvaliablePartType:
-                    int weaponId = player.GetController<PlayerWeaponController>().CurrSlotWeaponId(contexts).Value;
+                    int weaponId = player.WeaponController().HeldWeaponAgent.ConfigId.Value;
                     if (weaponId > 0)
                     {
                         var list = SingletonManager.Get<WeaponPartsConfigManager>().GetAvaliablePartTypes(weaponId);
@@ -875,7 +871,7 @@ namespace App.Shared.DebugHandle
 
         protected override string OnProcess(Contexts contexts, PlayerEntity player, string[] args)
         {
-            var helper = player.GetController<PlayerWeaponController>().GetBagCacheHelper(EWeaponSlotType.ThrowingWeapon);
+            var helper = player.WeaponController().GetBagCacheHelper(EWeaponSlotType.ThrowingWeapon);
             helper.AddCache(arg1);
             return "ok";
         }

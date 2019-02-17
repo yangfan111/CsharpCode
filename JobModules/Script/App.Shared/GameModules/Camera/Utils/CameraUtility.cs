@@ -2,18 +2,12 @@
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Weapon;
 using App.Shared.Components.Player;
-using App.Shared.WeaponLogic;
+using App.Shared.GameModules.Weapon;
 using Core.CameraControl.NewMotor;
 using Core.Utils;
-using Utils.CharacterState;
-using Assets.Utils.Configuration;
 using Core.Configuration;
-using Core.EntityComponent;
-using Utils.Configuration;
 using Utils.Singleton;
 using XmlConfig;
-using Assets.Utils.Configuration;
-using Utils.Singleton;
 
 namespace App.Shared.GameModules.Camera.Utils
 {

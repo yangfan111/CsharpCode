@@ -1,4 +1,6 @@
-﻿using System;
+﻿using App.Shared;
+using App.Shared.Components;
+using System;
 using System.Collections.Generic;
 
 namespace Core.EntityComponent
@@ -34,7 +36,9 @@ namespace Core.EntityComponent
     [Serializable]
     public struct EntityKey
     {
-        public static EntityKey Default =new EntityKey(0,-1);
+        public static readonly EntityKey Default =new EntityKey(0,-1);
+
+        public static readonly EntityKey EmptyWeapon = new EntityKey(EntityIdGenerator.LocalBaseId - 1, GameGlobalConst.WeaponEntityType);
         public EntityKey(int entityId, short entityType)
         {
             

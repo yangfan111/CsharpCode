@@ -30,16 +30,18 @@ namespace App.Shared.GameModules.Weapon
             base.SetHelper(in_helper);
             bagCacheHelper = (GrenadeBagCacheHelper)in_helper;
         }
-        internal override void OnExpend(Contexts contexts, PlayerWeaponComponentAgent agent, WeaponSlotExpendCallback slotExpendCb)
+        internal override void OnExpend(WeaponComponentsAgent agent, System.Action<WeaponSlotExpendStruct> expendCb)
         {
-
-            bagCacheHelper.RemoveCache(agent.CurrSlotWeaponId(contexts).Value);
-            if (slotExpendCb != null)
+            bagCacheHelper.RemoveCache(agent.ConfigId.Value);
+            if (expendCb != null)
             {
-                var paramsData = new WeaponSlotExpendData(handledSlot, true, true);
-                slotExpendCb(contexts, paramsData);
+                var paramsData = new WeaponSlotExpendStruct(handledSlot, true, true);
+                expendCb(paramsData);
             }
-
         }
+
+
+          
+
     }
 }

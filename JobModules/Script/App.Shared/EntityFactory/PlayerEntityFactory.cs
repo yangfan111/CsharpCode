@@ -25,13 +25,14 @@ using App.Shared.GameModules.Player.Actions;
 using App.Server.GameModules.GamePlay.free.player;
 using com.wd.free.para;
 using Core.BulletSimulation;
-using App.Shared.GameModules.Weapon.HitCheck;
 using Core.GameModeLogic;
 using Utils.Singleton;
 using Core.WeaponLogic.Throwing;
-using App.Shared.WeaponLogic;
+using App.Shared.GameModules.Weapon;
 using Core;
 using Core.CharacterState.Posture;
+using Assets.App.Shared.EntityFactory;
+using App.Shared.GameModules.Weapon.Behavior;
 
 namespace App.Shared.EntityFactory
 {
@@ -47,12 +48,12 @@ namespace App.Shared.EntityFactory
 
         public static PlayerEntity CreateNewServerPlayerEntity(PlayerContext playerContext,
             ICommonSessionObjects commonSessionObjects,
-            IEntityIdGenerator entityIdGenerator,  Vector3 position,
+            IEntityIdGenerator entityIdGenerator, Vector3 position,
             IPlayerInfo playerInfo)
         {
             var entityId = entityIdGenerator.GetNextEntityId();
             playerInfo.EntityId = entityId;
-            return CreateNewPlayerEntity(playerContext,commonSessionObjects.WeaponModeLogic,
+            return CreateNewPlayerEntity(playerContext, commonSessionObjects.WeaponModeLogic,
                 position, playerInfo, true, false);
         }
 
@@ -68,9 +69,9 @@ namespace App.Shared.EntityFactory
             var sex = SingletonManager.Get<RoleConfigManager>().GetRoleItemById(playerInfo.RoleModelId).Sex;
             var modelName = sex == 1 ? SharedConfig.maleModelName : SharedConfig.femaleModelName;
 
-            playerEntity.AddPlayerInfo(playerInfo.EntityId, playerInfo.PlayerId, playerInfo.PlayerName, playerInfo.RoleModelId,modelName,
-                playerInfo.TeamId, playerInfo.Num, playerInfo.Level, playerInfo.BackId, playerInfo.TitleId, playerInfo.BadgeId, playerInfo.AvatarIds, playerInfo.WeaponAvatarIds,playerInfo.Camp);
-          
+            playerEntity.AddPlayerInfo(playerInfo.EntityId, playerInfo.PlayerId, playerInfo.PlayerName, playerInfo.RoleModelId, modelName,
+                playerInfo.TeamId, playerInfo.Num, playerInfo.Level, playerInfo.BackId, playerInfo.TitleId, playerInfo.BadgeId, playerInfo.AvatarIds, playerInfo.WeaponAvatarIds, playerInfo.Camp);
+
             playerEntity.playerInfo.WeaponBags = playerInfo.WeaponBags;
             playerEntity.AddUserCmd();
             playerEntity.AddUserCmdSeq(0);
@@ -93,14 +94,14 @@ namespace App.Shared.EntityFactory
             playerEntity.AddTime(0);
             playerEntity.AddGamePlay(100, 100);
 
-            playerEntity.AddWeaponState();
+            //            playerEntity.AddWeaponState();
 
-#if UNITY_EDITOR
-            if (SharedConfig.IsOffline)
-            {
-                playerEntity.weaponState.BagOpenLimitTime = 50000;
-            }
-#endif
+            //#if UNITY_EDITOR
+            //            if (SharedConfig.IsOffline)
+            //            {
+            //                playerEntity.weaponState.BagOpenLimitTime = 50000;
+            //            }
+            //#endif
 
             AddCameraStateNew(playerEntity);
             playerEntity.AddState();
@@ -131,7 +132,7 @@ namespace App.Shared.EntityFactory
             playerEntity.AddStatisticsData(false, new BattleData(), new StatisticsData());
             playerEntity.AddPlayerMask((byte)(EPlayerMask.TeamA | EPlayerMask.TeamB), (byte)(EPlayerMask.TeamA | EPlayerMask.TeamB));
             playerEntity.AddOverrideBag(0);
-            playerEntity.AddPlayerBulletData(new System.Collections.Generic.List<PlayerBulletData>());
+            playerEntity.AttachPlayerAux();
             //Logger.Info(playerEntity.Dump());
             return playerEntity;
         }
@@ -166,7 +167,7 @@ namespace App.Shared.EntityFactory
         {
             Logger.Info("PostCreateNewPlayerEntity");
             var sessionObjects = contexts.session.commonSession;
-            
+
             var sceneObjectFactory = contexts.session.entityFactoryObject.SceneObjectEntityFactory;
 
             player.AddModeLogic();
@@ -174,7 +175,7 @@ namespace App.Shared.EntityFactory
 
             var stateManager = new CharacterStateManager();
 
-            if(!player.hasStatisticsData)
+            if (!player.hasStatisticsData)
             {
                 player.AddStatisticsData(false, new BattleData(), new StatisticsData());
             }
@@ -202,7 +203,7 @@ namespace App.Shared.EntityFactory
             {
                 player.AddFirePosition();
             }
-            
+
             if (!player.hasState)
                 player.AddState();
             if (!player.hasStateInterVar)
@@ -217,13 +218,13 @@ namespace App.Shared.EntityFactory
                 player.AddVehicleCmdSeq(0);
             if (!player.hasUserCmd)
                 player.AddUserCmd();
-          
+
             if (!player.hasControlledVehicle)
                 player.AddControlledVehicle();
-            
+
             if (!player.hasPlayerSkyMove)
-                player.AddPlayerSkyMove(true,-1);
-            
+                player.AddPlayerSkyMove(true, -1);
+
             if (!player.hasPlayerSkyMoveInterVar)
                 player.AddPlayerSkyMoveInterVar();
 
@@ -234,10 +235,10 @@ namespace App.Shared.EntityFactory
                 player.AddNetworkWeaponAnimation(string.Empty, 0, string.Empty, 0);
 
             AddCameraStateNew(player);
-            player.AttachWeaponComponentLogic();
+
 
             player.AddLocalEvents(new PlayerEvents());
-            InitFiltedInput(player, sessionObjects.GameStateProcessorFactory); 
+            InitFiltedInput(player, sessionObjects.GameStateProcessorFactory);
 
             if (!player.hasPingStatistics)
             {
@@ -248,7 +249,7 @@ namespace App.Shared.EntityFactory
             {
                 FreeData fd = new FreeData(contexts, player);
                 if (player.hasStatisticsData)
-                {   
+                {
                     fd.AddFields(new ObjectFields(player.statisticsData.Statistics));
                 }
                 player.AddFreeData(fd);
@@ -258,27 +259,27 @@ namespace App.Shared.EntityFactory
             player.AddThrowingUpdate(false);
             player.AddThrowingAction();
             player.throwingAction.ActionInfo = new ThrowingActionInfo();
-            InitWeaponLogic(contexts, player);
+            AttachWeaponComponents(contexts, player);
         }
 
-        public static void InitWeaponLogic(Contexts contexts, PlayerEntity playerEntity)
+        public static void AttachWeaponComponents(Contexts contexts, PlayerEntity playerEntity)
         {
+            var emptyScan = WeaponUtil.CreateScan(WeaponUtil.EmptyHandId);
+            WeaponEntityFactory.GetOrCreateWeaponEntity(contexts.weapon, EntityKey.EmptyWeapon,
+             ref emptyScan);
+            // playerEntity.RemoveWeaponComponents();
+            var greandeIds = WeaponUtil.ForeachFilterGreandeIds();
+            playerEntity.AttachPlayerWeaponBags(contexts);
+            playerEntity.AttachPlayerAux();
+            playerEntity.AttachGrenadeCacheData(greandeIds);
+            playerEntity.AttachWeaponComponentBehavior(contexts, greandeIds);
             var entityId = contexts.session.commonSession.EntityIdGenerator.GetNextEntityId();
-            var emptyHandEntity = playerEntity.AddWeaponEntity(contexts, new WeaponInfo
-            {
-                Id = SingletonManager.Get<WeaponConfigManager>().EmptyHandId.Value,
-            });
-            playerEntity.AddEmptyHand();
-            playerEntity.emptyHand.EntityId = emptyHandEntity.entityKey.Value.EntityId;
-            playerEntity.RefreshPlayerWeaponLogic(contexts, null);
-            playerEntity.AddBagState((int)EWeaponSlotType.None, (int)EWeaponBagIndex.First);
-            playerEntity.AddFirstWeaponBag();
-            playerEntity.AddSecondaryWeaponBag();
-            playerEntity.AddThirdWeaponBag();
-            playerEntity.AddForthWeaponBag();
-            playerEntity.AddFifthWeaponBag();
-            playerEntity.AddGrenadeCacheData(0, 0, 0, 0);
-            playerEntity.AddWeaponAutoState();
+
+            //       playerEntity.AddEmptyHand();
+            //playerEntity.emptyHand.EntityId = emptyHandEntity.entityKey.Value.EntityId;
+            //playerEntity.RefreshOrientComponent(null);
+
+            //playerEntity.AddWeaponAutoState();
         }
 
         public static PlayerWeaponBagData[] MakeFakeWeaponBag()
@@ -287,7 +288,7 @@ namespace App.Shared.EntityFactory
             {
                 new PlayerWeaponBagData
                 {
-                    BagIndex = 0, 
+                    BagIndex = 0,
                     weaponList = new System.Collections.Generic.List<PlayerWeaponData>
                     {
                         new PlayerWeaponData
@@ -361,22 +362,22 @@ namespace App.Shared.EntityFactory
             };
         }
 
-      
+
 
         public static void InitFiltedInput(PlayerEntity player, IGameStateProcessorFactory gameStateProcessorFactory)
         {
             var stateProviderPool = gameStateProcessorFactory.GetProviderPool() as StateProviderPool;
             var statePool = gameStateProcessorFactory.GetStatePool();
-            if(null != stateProviderPool)
+            if (null != stateProviderPool)
             {
-                stateProviderPool.AddStateProvider(player, statePool); 
+                stateProviderPool.AddStateProvider(player, statePool);
             }
             else
             {
                 Logger.Error("state provider pool is null !!");
             }
-            var gameInputProcessor = new GameInputProcessor(new UserCommandMapper(), 
-                new StateProvider(new PlayerStateAdapter(player), statePool),  
+            var gameInputProcessor = new GameInputProcessor(new UserCommandMapper(),
+                new StateProvider(new PlayerStateAdapter(player), statePool),
                 new FilteredInput(),
                 new DummyFilteredInput());
             player.AddUserCmdFilter(gameInputProcessor);
@@ -387,12 +388,12 @@ namespace App.Shared.EntityFactory
             if (!playerEntity.hasCameraStateNew)
             {
                 playerEntity.AddCameraStateNew();
-               
+
             }
 
             if (!playerEntity.hasCameraFinalOutputNew)
             {
-               
+
                 playerEntity.AddCameraFinalOutputNew();
             }
 
@@ -415,10 +416,10 @@ namespace App.Shared.EntityFactory
             {
                 playerEntity.AddCameraStateUpload();
             }
-            
+
         }
 
-   
+
 
         public static void AddStateComponent(PlayerEntity playerEntity)
         {

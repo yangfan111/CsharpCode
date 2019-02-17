@@ -1,11 +1,12 @@
-﻿using Core.GameModeLogic;
+﻿using App.Shared.GameModules.Weapon;
+using Core.GameModeLogic;
 using Entitas;
 
 namespace App.Shared.GameModeLogic.WeaponInitLoigc
 {
     public class DummyWeaponInitLogic : IWeaponInitLogic
     {
-        public bool IsBagSwithEnabled(Entity playerEntity)
+        public bool IsBagSwithEnabled(PlayerWeaponController controller)
         {
             return false;
         }

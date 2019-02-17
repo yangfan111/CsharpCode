@@ -7,6 +7,7 @@ using Core.EntityComponent;
 using Core.GameModeLogic;
 using Core.Utils;
 using UnityEngine;
+using Assets.App.Shared.EntityFactory;
 
 namespace App.Shared.GameModeLogic.PickupLogic
 {
@@ -43,7 +44,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
                 Logger.ErrorFormat("{0} doesn't exist in scene object context ", weaponEntityId);
                 return;
             }
-            if(entity.hasThrowing)
+            if (entity.hasThrowing)
             {
                 return;
             }
@@ -53,7 +54,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
                 Logger.ErrorFormat("{0} doesn't exist in player context ", playerEntityId);
                 return;
             }
-            if (!entity.hasWeapon)
+            if (!entity.hasWeaponObject)
             {
                 Logger.ErrorFormat("only weapon is supported in normal mode");
                 return;
@@ -62,11 +63,20 @@ namespace App.Shared.GameModeLogic.PickupLogic
             {
                 return;
             }
-            _sceneObjectEntityFactory.DestroyEquipmentEntity(entity.entityKey.Value.EntityId);
-            var last = player.GetController<PlayerWeaponController>().PickUpWeapon(_contexts, entity.weapon.ToWeaponInfo());
-            if (last.Id > 0)
+            var controller = player.WeaponController();
+            //销毁场景武实体
+            _sceneObjectEntityFactory.DestroySceneWeaponObjectEntity(entity.entityKey.Value.EntityId);
+            //创建武器物体
+            var weaponScan = WeaponUtil.CreateScan(entity.weaponObject);
+            EntityKey lastKey = controller.PickUpWeapon(weaponScan);
+            //创建场景掉落实体
+            if (WeaponUtil.IsWeaponKeyVaild(lastKey))
             {
-                _sceneObjectEntityFactory.CreateDropWeaponEntity(last, player.position.Value, _sceneWeaponLifeTime);
+
+                WeaponEntity lastEntity = WeaponEntityFactory.GetWeaponEntity(_contexts.weapon, lastKey);
+                lastEntity.SetFlagNoOwner();
+                weaponScan = WeaponUtil.CreateScan(lastEntity);
+                _sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScan, player.position.Value, _sceneWeaponLifeTime);
             }
         }
 
@@ -82,7 +92,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
 
         public virtual void Dorp(int playerEntityId, EWeaponSlotType slot)
         {
-           var player = _playerContext.GetEntityWithEntityKey(new EntityKey(playerEntityId, (short)EEntityType.Player));
+            var player = _playerContext.GetEntityWithEntityKey(new EntityKey(playerEntityId, (short)EEntityType.Player));
             if (null == player)
             {
                 Logger.ErrorFormat("{0} doesn't exist in player context ", playerEntityId);
@@ -92,42 +102,44 @@ namespace App.Shared.GameModeLogic.PickupLogic
             {
                 case EWeaponSlotType.ThrowingWeapon:
                     DoDropGrenade(player);
-                    return; 
+                    return;
             }
-            var curWeapon = player.GetController<PlayerWeaponController>().GetSlotWeaponInfo(_contexts, slot);
-            if (curWeapon.Id > 0)
+            var weaponController = player.WeaponController();
+            var heldAgent = player.WeaponController().HeldWeaponAgent;
+            if (heldAgent.IsVailed())
             {
                 var dropPos = player.GetHandWeaponPosition();
                 var playerTrans = player.characterContoller.Value.transform;
                 var forward = playerTrans.forward;
                 var pos = dropPos + forward * _runtimeGameConfig.WeaponDropOffset;
+                var weaponScacn = heldAgent.BaseComponentScan.Value;
                 RaycastHit hhit;
                 SceneObjectEntity sceneObjectEntity;
                 if (Physics.Raycast(dropPos, forward, out hhit, _runtimeGameConfig.WeaponDropOffset, UnityLayers.SceneCollidableLayerMask))
                 {
                     RaycastHit vhit;
-                    if(Physics.Raycast(hhit.point, Vector3.down, out vhit, 100, UnityLayers.SceneCollidableLayerMask))
+                    if (Physics.Raycast(hhit.point, Vector3.down, out vhit, 100, UnityLayers.SceneCollidableLayerMask))
                     {
-                        sceneObjectEntity = _sceneObjectEntityFactory.CreateDropWeaponEntity(curWeapon, vhit.point, _sceneWeaponLifeTime) as SceneObjectEntity;
+                        sceneObjectEntity = _sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScacn, vhit.point, _sceneWeaponLifeTime) as SceneObjectEntity;
                     }
                     else
                     {
-                        sceneObjectEntity = _sceneObjectEntityFactory.CreateDropWeaponEntity(curWeapon, playerTrans.position, _sceneWeaponLifeTime) as SceneObjectEntity;
+                        sceneObjectEntity = _sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScacn, playerTrans.position, _sceneWeaponLifeTime) as SceneObjectEntity;
                     }
                 }
                 else
                 {
                     RaycastHit vhit;
-                    if(Physics.Raycast(pos, Vector3.down, out vhit, 100, UnityLayers.SceneCollidableLayerMask))
+                    if (Physics.Raycast(pos, Vector3.down, out vhit, 100, UnityLayers.SceneCollidableLayerMask))
                     {
-                        sceneObjectEntity = _sceneObjectEntityFactory.CreateDropWeaponEntity(curWeapon, vhit.point, _sceneWeaponLifeTime) as SceneObjectEntity;
+                        sceneObjectEntity = _sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScacn, vhit.point, _sceneWeaponLifeTime) as SceneObjectEntity;
                     }
                     else
                     {
-                        sceneObjectEntity = _sceneObjectEntityFactory.CreateDropWeaponEntity(curWeapon, playerTrans.position, _sceneWeaponLifeTime) as SceneObjectEntity;
+                        sceneObjectEntity = _sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScacn, playerTrans.position, _sceneWeaponLifeTime) as SceneObjectEntity;
                     }
                 }
-                player.GetController<PlayerWeaponController>().DropSlotWeapon(_contexts, slot);
+                weaponController.DropSlotWeapon(slot);
             }
         }
 

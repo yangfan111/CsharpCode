@@ -67,21 +67,22 @@ namespace App.Shared.EntityFactory
             return entity;
         }
 
-        public virtual IEntity CreateWeaponEntity(WeaponInfo weaponInfo, Vector3 position)
+        public virtual IEntity CreateSceneWeaponObjectEntity(WeaponScanStruct weaponScan, Vector3 position)
         {
             var entity = _sceneObjectContext.CreateEntity();
             entity.AddEntityKey(new EntityKey(_equipGenerator.GetNextEntityId(), (short) EEntityType.SceneObject));
             entity.isFlagSyncNonSelf = true;
             entity.AddPosition(position);
-            entity.AddWeapon();
-            weaponInfo.ToSceneWeaponComponent(entity.weapon);
+            entity.AddWeaponObject();
+            entity.weaponObject.SyncSelf(weaponScan); 
             entity.AddFlagImmutability(_currentTime.CurrentTime);
             return entity;
         }
 
-        public virtual IEntity CreateDropWeaponEntity(WeaponInfo weaponInfo, Vector3 position, int lifeTime)
+   
+        public virtual IEntity CreateDropSceneWeaponObjectEntity(WeaponScanStruct weaponScan, Vector3 position, int lifeTime)
         {
-            var entity = CreateWeaponEntity(weaponInfo, position);
+            var entity = CreateSceneWeaponObjectEntity(weaponScan, position);
             if(null == entity)
             {
                 return null;
@@ -94,7 +95,7 @@ namespace App.Shared.EntityFactory
                     sceneObjectEntity.AddLifeTime(DateTime.Now, lifeTime);
                 }
             }
-            if(SingletonManager.Get<WeaponConfigManager>().IsC4(weaponInfo.Id))
+            if(SingletonManager.Get<WeaponConfigManager>().IsC4(weaponScan.ConfigId))
             {
                 var sceneObjectEntity = entity as SceneObjectEntity;
                 if(null != sceneObjectEntity)
@@ -105,7 +106,7 @@ namespace App.Shared.EntityFactory
             return entity;
         }
 
-        public virtual void DestroyEquipmentEntity(int entityKey)
+        public virtual void DestroySceneWeaponObjectEntity(int entityKey)
         {
             var entity =
                 _sceneObjectContext.GetEntityWithEntityKey(new EntityKey(entityKey, (short) EEntityType.SceneObject));
@@ -122,5 +123,6 @@ namespace App.Shared.EntityFactory
             entity.AddFlagImmutability(_currentTime.CurrentTime);
             return entity;
         }
+
     }
 }

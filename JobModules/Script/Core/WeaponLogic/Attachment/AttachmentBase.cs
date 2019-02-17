@@ -71,7 +71,15 @@ namespace Core.WeaponLogic.Attachment
             result.Muzzle = Muzzle;
             return result;
         }
-
+        public WeaponPartsStruct Sync (WeaponScanStruct scanData)
+        {
+            LowerRail = scanData.LowerRail;
+            UpperRail = scanData.UpperRail;
+            Magazine = scanData.Magazine;
+            Stock = scanData.Stock;
+            Muzzle = scanData.Muzzle;
+            return this;
+        }
         public override string ToString()
         {
             return string.Format("Upper {0}, Lower {1}, Magazine {2}, Stock {3}, Muzzle {4}",

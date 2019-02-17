@@ -28,6 +28,8 @@ namespace App.Shared
                     return contexts.clientEffect.GetEntityWithEntityKey(key);
                 case (int)EEntityType.MapObject:
                     return contexts.mapObject.GetEntityWithEntityKey(key);
+                case (int)EEntityType.Weapon:
+                    return contexts.weapon.GetEntityWithEntityKey(key);
                 default:
                     return null;
             }

@@ -4,6 +4,11 @@ using Core.SnapshotReplication.Serialization.NetworkProperty;
 using Entitas.CodeGeneration.Attributes;
 using UnityEngine;
 
+
+
+using Core;
+using Entitas;
+
 namespace App.Shared.Components.Weapon
 {
 
@@ -28,11 +33,19 @@ namespace App.Shared.Components.Weapon
         {
         }
     }
-
     [Weapon]
-    public class WeaponBasicInfoComponent : IUserPredictionComponent
+    public class WeaponScanComponent:IComponent
     {
-        [DontInitilize, NetworkProperty] public int WeaponId;
+        [DontInitilize]
+        public WeaponScanStruct Value;
+
+
+        
+    }
+    [Weapon]
+    public class WeaponBasicDataComponent : IUserPredictionComponent
+    {
+        [DontInitilize, NetworkProperty] public int ConfigId;
         [DontInitilize, NetworkProperty] public int WeaponAvatarId;
         [DontInitilize, NetworkProperty] public int UpperRail;
         [DontInitilize, NetworkProperty] public int LowerRail;
@@ -49,8 +62,8 @@ namespace App.Shared.Components.Weapon
 
         public void CopyFrom(object rightComponent)
         {
-            var remote = rightComponent as WeaponBasicInfoComponent;
-            WeaponId = remote.WeaponId;
+            var remote = rightComponent as WeaponBasicDataComponent;
+            ConfigId = remote.ConfigId;
             WeaponAvatarId = remote.WeaponAvatarId;
             UpperRail = remote.UpperRail;
             LowerRail = remote.LowerRail;
@@ -70,8 +83,8 @@ namespace App.Shared.Components.Weapon
 
         public bool IsApproximatelyEqual(object right)
         {
-            var remote = right as WeaponBasicInfoComponent;
-            return WeaponId == remote.WeaponId &&
+            var remote = right as WeaponBasicDataComponent;
+            return ConfigId == remote.ConfigId &&
             WeaponAvatarId == remote.WeaponAvatarId &&
             UpperRail == remote.UpperRail &&
             LowerRail == remote.LowerRail &&
@@ -89,9 +102,10 @@ namespace App.Shared.Components.Weapon
             CopyFrom(rightComponent);
         }
     }
+  
 
     [Weapon]
-    public class WeaponRuntimeInfoComponent : IUserPredictionComponent
+    public class WeaponRuntimeDataComponent : IUserPredictionComponent
     {
         [DontInitilize, NetworkProperty] public int PunchDecayCdTime; // 开火后坐力效果时间, 在这个时间内，不回落
         [DontInitilize, NetworkProperty] public bool PunchYawLeftSide; // PunchYaw随机的方向
@@ -119,7 +133,7 @@ namespace App.Shared.Components.Weapon
 
         public void CopyFrom(object rightComponent)
         {
-            var remote = rightComponent as WeaponRuntimeInfoComponent;
+            var remote = rightComponent as WeaponRuntimeDataComponent;
             PunchDecayCdTime = remote.PunchDecayCdTime;
             PunchYawLeftSide = remote.PunchYawLeftSide;
             Accuracy = remote.Accuracy;
@@ -141,7 +155,7 @@ namespace App.Shared.Components.Weapon
             MeleeAttacking = remote.MeleeAttacking;
             IsPrevCmdFire = remote.IsPrevCmdFire;
         }
-
+        
         public int GetComponentId()
         {
             return (int)EComponentIds.WeaponData;
@@ -149,7 +163,7 @@ namespace App.Shared.Components.Weapon
 
         public bool IsApproximatelyEqual(object right)
         {
-            var remote = right as WeaponRuntimeInfoComponent;
+            var remote = right as WeaponRuntimeDataComponent;
             return PunchDecayCdTime == remote.PunchDecayCdTime
                 && PunchYawLeftSide == remote.PunchYawLeftSide
                 && Accuracy == remote.Accuracy
@@ -177,8 +191,8 @@ namespace App.Shared.Components.Weapon
             CopyFrom(rightComponent);
         }
 
-        public static WeaponRuntimeInfoComponent _empty = new WeaponRuntimeInfoComponent();
-        public WeaponRuntimeInfoComponent Empty()
+        public static WeaponRuntimeDataComponent _empty = new WeaponRuntimeDataComponent();
+        public WeaponRuntimeDataComponent Empty()
         {
             return _empty;
         }

@@ -6,7 +6,7 @@
     public interface IInterpolatableComponent
     {
         /// <summary>
-        /// 差值接口，提供差值的前后两针的数据，和当前的时间
+        /// 差值接口，提供差值的前后两帧的数据，和当前的时间
         /// </summary>
         /// <param name="left">差值的左值</param>
         /// <param name="right">差值的右值</param>

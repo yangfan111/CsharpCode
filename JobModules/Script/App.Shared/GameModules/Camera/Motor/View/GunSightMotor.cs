@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using App.Shared.GameModules.Camera.Utils;
-using App.Shared.WeaponLogic;
+using App.Shared.GameModules.Weapon;
 using Assets.App.Shared.GameModules.Camera;
 using Core.Utils;
 using UnityEngine;

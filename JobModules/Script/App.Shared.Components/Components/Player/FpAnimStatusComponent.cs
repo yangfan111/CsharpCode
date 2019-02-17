@@ -50,7 +50,7 @@ namespace App.Shared.Components.Player
 
                 for (int i = 0; i < AnimatorParameters.Count; i++)
                 {
-                    var equal = AnimatorParameters[i].NeedPatch(rightComp.AnimatorParameters[i]);
+                    var equal = AnimatorParameters[i].IsSimilar(rightComp.AnimatorParameters[i]);
                     if (!equal)
                     {
                         _logger.Debug(AnimatorParameters[i].ToString());

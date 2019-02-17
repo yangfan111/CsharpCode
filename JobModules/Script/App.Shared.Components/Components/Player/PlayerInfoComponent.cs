@@ -47,6 +47,7 @@ namespace App.Shared.Components.Player
 
         public void CopyFrom(object rightComponent)
         {
+            
             var right = (rightComponent as PlayerInfoComponent);
             if (right == null)
             {

@@ -36,8 +36,30 @@ namespace App.Shared.Components.Serializer
             to.AddRange(patch);
             return to;
         }
+        /// <summary>
+        /// size是不会变的，否则重新生成
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dest"></param>
+        /// <param name="origin"></param>
+        /// <returns></returns>
+        public static T[] Merge<T>(T[] dest,
+        T[] origin) where T : class, IPatchClass<T>, new()
+        {
+            var oc = origin.Length;
+            var dc = dest.Length;
+            dest = FieldSerializeUtil.Resize(dest, oc);
+            for (int i = 0; i < oc; i++)
+            {
+                if (origin[i].HasValue)
+                {
+                    dest[i].MergeFromPatch(origin[i]);
+                }
+            }
 
-
+            return dest;
+        }
+       
         public static int Merge(int basevalue, int patchvalue)
         {
             return patchvalue;

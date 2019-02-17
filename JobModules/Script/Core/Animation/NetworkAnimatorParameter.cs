@@ -77,7 +77,7 @@ namespace Core.Animation
             return IsApproximatelyEqual(right, 0.001f);
         }
 
-        public bool NeedPatch(NetworkAnimatorParameter right)
+        public bool IsSimilar(NetworkAnimatorParameter right)
         {
             return IsApproximatelyEqual(right, 0.0001f);
         }

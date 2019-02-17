@@ -15,7 +15,7 @@ using App.Shared.Components.Player;
 using App.Shared.GameModules.Player;
 using Core.BulletSimulation;
 using Utils.Singleton;
-using App.Shared.WeaponLogic;
+using App.Shared.GameModules.Weapon;
 using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Attack
@@ -125,16 +125,15 @@ namespace App.Shared.GameModules.Attack
                 src.statisticsData.Statistics.ShootingPlayerCount++;
             }*/
 
-            NewWeaponConfigItem newConfig = SingletonManager.Get<WeaponConfigManager>().GetConfigById(src.GetController<PlayerWeaponController>().CurrSlotWeaponId(contexts).Value);
+            NewWeaponConfigItem newConfig = SingletonManager.Get<WeaponConfigManager>().GetConfigById(src.WeaponController().HeldWeaponAgent.ConfigId.Value);
             if (null != newConfig && newConfig.SubType == (int)EWeaponSubType.Hand)
             {
-                BulletPlayerUtility.ProcessPlayerHealthDamage(contexts, _damager, src, target, new PlayerDamageInfo(Mathf.CeilToInt(baseDamage), (int) EUIDeadType.Unarmed, (int) part, 0), _damageInfoCollector);
+                BulletPlayerUtility.ProcessPlayerHealthDamage(contexts, _damager, src, target, new PlayerDamageInfo(Mathf.CeilToInt(baseDamage), (int)EUIDeadType.Unarmed, (int)part, 0), _damageInfoCollector);
             }
             else
             {
-                BulletPlayerUtility.ProcessPlayerHealthDamage(contexts, _damager, src, target, new PlayerDamageInfo(Mathf.CeilToInt(baseDamage), (int)EUIDeadType.Weapon, (int)part, src.GetController<PlayerWeaponController>().CurrSlotWeaponId(contexts).Value), _damageInfoCollector);
+                BulletPlayerUtility.ProcessPlayerHealthDamage(contexts, _damager, src, target, new PlayerDamageInfo(Mathf.CeilToInt(baseDamage), (int)EUIDeadType.Weapon, (int)part, src.WeaponController().HeldWeaponAgent.ConfigId.Value), _damageInfoCollector);
             }
-
             if (target.hasStateInterface && target.stateInterface.State.CanBeenHit())
                 target.stateInterface.State.BeenHit();
             ClientEffectFactory.AddHitPlayerEffectEvent(src, target.entityKey.Value, hit.point, hit.point - target.position.Value);
@@ -146,7 +145,7 @@ namespace App.Shared.GameModules.Attack
             var baseDamage = GetVehicleFactor(hit, target, out partIndex) * GetBaseDamage(attackInfo, config);
             var gameData = target.GetGameData();
             gameData.DecreaseHp(partIndex, baseDamage);
-            if(!src.IsEmptyHand(contexts))
+            if(!src.WeaponController().IsHeldSlotEmpty)
             {
                 RaycastHit effectHit;
                 if(TryGetEffectShowHit(src, out effectHit, config.Range))
@@ -159,7 +158,7 @@ namespace App.Shared.GameModules.Attack
 
         public void OnHitEnvrionment(Contexts contexts, PlayerEntity src, RaycastHit hit, MeleeAttackInfo attackInfo, MeleeFireLogicConfig config)
         {
-            if(!src.IsEmptyHand(contexts))
+        if (!src.WeaponController().IsHeldSlotEmpty)
             {
                 RaycastHit effectHit;
                 if (TryGetEffectShowHit(src, out effectHit, config.Range))

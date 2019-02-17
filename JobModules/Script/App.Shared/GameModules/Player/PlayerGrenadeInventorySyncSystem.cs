@@ -17,7 +17,7 @@ namespace App.Shared.GameModules.Player
                 Logger.Error("player entity is null");
                 return;
             }
-            Weapon.IBagDataCacheHelper helper = player.GetController<PlayerWeaponController>().GetBagCacheHelper(EWeaponSlotType.ThrowingWeapon);
+            Weapon.IBagDataCacheHelper helper = player.WeaponController().GetBagCacheHelper(EWeaponSlotType.ThrowingWeapon);
             helper.Rewind();
         }
     }

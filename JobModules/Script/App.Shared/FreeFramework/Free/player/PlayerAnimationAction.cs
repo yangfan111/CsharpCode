@@ -129,7 +129,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 else
                 {
                     player.stateInterface.State.UseProps(ani);
-                    player.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon(contexts);
+                    player.WeaponController().ForceUnmountCurrWeapon(contexts);
                     player.playerMove.InterruptAutoRun();
                 }
 

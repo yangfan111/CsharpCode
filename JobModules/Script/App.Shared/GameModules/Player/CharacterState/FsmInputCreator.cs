@@ -13,7 +13,7 @@ using Utils.Utils;
 using XmlConfig;
 using App.Shared.Player;
 using Core.CharacterState.Posture;
-using App.Shared.WeaponLogic;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Player.CharacterState
 {
@@ -232,7 +232,8 @@ namespace App.Shared.GameModules.Player.CharacterState
         private bool IsCanSprint(IUserCmd cmd, PlayerEntity playerEntity, Contexts contexts)
         {
             var stateBlock = cmd.FilteredInput.IsInputBlocked(EPlayerInput.IsSprint);
-            var weaponBlock = playerEntity.HasWeapon(contexts) && !playerEntity.GetWeaponConfig(contexts).GetRunable();
+            var configAssy = playerEntity.WeaponController().HeldWeaponLogicConfigAssy;
+            var weaponBlock = configAssy != null && !configAssy.GetRunable();
             return !stateBlock && !weaponBlock;
         }
 

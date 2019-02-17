@@ -28,7 +28,7 @@ call F:/voyager/UnityPackages/App.Shared.Components/generate_serializer.bat
     <PlatformTarget>anycpu</PlatformTarget>
     <PlatformToolset>v141</PlatformToolset>
     <AssemblyName>App.Shared.Components.EntitasCodeGen</AssemblyName>
-    <DefineConstants>TRACE;TRACE%3BDEBUG%3BUNITY_SOURCE_MODIFIED%3BUNITY_5%3BUNITY_53_OR_GREATER%3BUNITY_52_OR_GREATER</DefineConstants>
+    <DefineConstants>TRACE;TRACE%3BDEBUG%3BUNITY_EDITOR%3BUNITY_5_6%3BUNITY_5_6_1_OR_NEWER%3BUNITY_SOURCE_MODIFIED%3BUNITY_5%3BUNITY_53_OR_GREATER%3BUNITY_52_OR_GREATER</DefineConstants>
     <LangVersion>default</LangVersion>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -37,7 +37,7 @@ call F:/voyager/UnityPackages/App.Shared.Components/generate_serializer.bat
     <PlatformTarget>anycpu</PlatformTarget>
     <PlatformToolset>v141</PlatformToolset>
     <AssemblyName>App.Shared.Components.EntitasCodeGen</AssemblyName>
-    <DefineConstants>TRACE;TRACE%3BDEBUG%3BUNITY_SOURCE_MODIFIED%3BUNITY_5%3BUNITY_53_OR_GREATER%3BUNITY_52_OR_GREATER</DefineConstants>
+    <DefineConstants>TRACE;TRACE%3BDEBUG%3BUNITY_EDITOR%3BUNITY_5_6%3BUNITY_5_6_1_OR_NEWER%3BUNITY_SOURCE_MODIFIED%3BUNITY_5%3BUNITY_53_OR_GREATER%3BUNITY_52_OR_GREATER</DefineConstants>
     <LangVersion>default</LangVersion>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -135,7 +135,6 @@ if %errorlevel% neq 0 goto :VCEnd" />
   </Target>
   <ItemGroup>
     <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Adapter\IPlayerEntity.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Bag\BagComponents.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Bullet\BulletComponents.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\ClientEffect\ClientEffectComponents.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Common\CommonComponents.cs" />
@@ -185,7 +184,6 @@ if %errorlevel% neq 0 goto :VCEnd" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\PlayerSkyMoveComponent.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\PlayerSoundComponent.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\PlayerStateAdapterComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\PlayerWeaponComponent.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\RaycastComponent.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\RecycleableAssetComponent.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\RobotComponent.cs" />
@@ -280,6 +278,7 @@ if %errorlevel% neq 0 goto :VCEnd" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\VehicleSeatComponent.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\VehicleSyncEventComponent.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\VehicleTypeComponent.cs" />
+    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Weapon\PlayerWeaponComponents.cs" />
     <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Weapon\WeaponComponents.cs" />
     <None Include="F:\voyager\UnityPackages\App.Shared.Components\packages.config" />
   </ItemGroup>

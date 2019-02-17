@@ -1,4 +1,4 @@
-﻿using App.Shared.Components.Bag;
+﻿using App.Shared.Components.Player;
 using App.Shared.Util;
 using Core;
 using Core.GameModeLogic;

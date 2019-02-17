@@ -78,5 +78,6 @@ namespace App.Shared.Components.Serializer
         {
             return false;
         }
+        
     }
 }

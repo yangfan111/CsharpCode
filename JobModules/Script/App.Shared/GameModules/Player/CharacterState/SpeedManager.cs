@@ -15,7 +15,7 @@ using Core.Configuration;
 using Core.Compare;
 using Utils.Configuration;
 using Utils.Singleton;
-using App.Shared.WeaponLogic;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Player.CharacterState
 {

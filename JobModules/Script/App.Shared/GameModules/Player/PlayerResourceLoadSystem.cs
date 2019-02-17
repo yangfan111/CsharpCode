@@ -5,14 +5,10 @@ using App.Shared.GameModules.Common;
 using App.Shared.GameModules.HitBox;
 using App.Shared.GameModules.Player.Appearance;
 using App.Shared.GameModules.Vehicle;
-using Core.GameModule.System;
 using Core.Utils;
-using Core.CharacterState;
 using Entitas;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using App.Shared.GameModules.Player.CharacterState;
-using BehaviorDesigner.Runtime;
 using Core.Animation;
 using Core.HitBox;
 using Utils.Appearance;
@@ -29,6 +25,7 @@ using App.Shared.GameModules.Player.CharacterBone;
 using Utils.Configuration;
 using Utils.Singleton;
 using App.Shared.GameModules.Weapon;
+using Core.GameModule.System;
 
 namespace App.Shared.GameModules.Player
 {
@@ -152,8 +149,8 @@ namespace App.Shared.GameModules.Player
 
                     var characterBone = new CharacterBoneManager();
                     characterBone.SetWardrobeController(player.appearanceInterface.Appearance.GetWardrobeController());
-                    characterBone.SetWeaponController(player.appearanceInterface.Appearance.GetController<PlayerWeaponController>());
-                    var weaponController = player.appearanceInterface.Appearance.GetController<PlayerWeaponController>() as WeaponController;
+                    characterBone.SetWeaponController(player.appearanceInterface.Appearance.WeaponController());
+                    var weaponController = player.appearanceInterface.Appearance.WeaponController() as WeaponController;
                     if (null != weaponController)
                     {
                         weaponController.SetWeaponChangedCallBack(characterBone.CurrentWeaponChanged);

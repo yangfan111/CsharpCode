@@ -343,13 +343,13 @@ namespace App.Shared.GameModules.Bullet
                 bool isHitDown = targetPlayer.gamePlay.IsHitDown();
                 bool isCrit = damage.part == (int) EBodyPart.Head;
 
-                targetPlayer.statisticsData.AddOtherInfo(srcPlayer.entityKey.Value, srcPlayer.GetController<PlayerWeaponController>().CurrSlotWeaponId(contexts).Value, isKill, isHitDown, (int) damage.damage,srcPlayer.playerInfo);
+                targetPlayer.statisticsData.AddOtherInfo(srcPlayer.entityKey.Value, srcPlayer.WeaponController().HeldWeaponAgent.ConfigId.Value, isKill, isHitDown, (int)damage.damage, srcPlayer.playerInfo);
 
                 //添加别人对自己的伤害记录（受伤不算）
                 if (targetPlayer.gamePlay.IsLastLifeState(EPlayerLifeState.Alive) && !isTeammate)
                 {
                     //添加自己对别人的伤害记录
-                    srcPlayer.statisticsData.AddOpponentInfo(targetPlayer.entityKey.Value, srcPlayer.GetController<PlayerWeaponController>().CurrSlotWeaponId(contexts).Value, isKill, isHitDown, (int) damage.damage, targetPlayer.playerInfo);
+                    srcPlayer.statisticsData.AddOpponentInfo(targetPlayer.entityKey.Value, srcPlayer.WeaponController().HeldWeaponAgent.ConfigId.Value, isKill, isHitDown, (int)damage.damage, targetPlayer.playerInfo);
                     //总伤害量
                     srcPlayer.statisticsData.Statistics.TotalDamage += damage.damage;
                     //有效伤害
@@ -418,7 +418,7 @@ namespace App.Shared.GameModules.Bullet
                 }
                 else
                 {
-                    targetPlayer.statisticsData.AddKillerInfo(srcPlayer.entityKey.Value, srcPlayer.GetController<PlayerWeaponController>().CurrSlotWeaponId(contexts).Value, damage.type, srcPlayer.playerInfo);
+                    targetPlayer.statisticsData.AddKillerInfo(srcPlayer.entityKey.Value, srcPlayer.WeaponController().HeldWeaponAgent.ConfigId.Value, damage.type, srcPlayer.playerInfo);
                 }
                 if (SharedConfig.IsServer && null != gameRule)
                 {

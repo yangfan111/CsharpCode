@@ -72,7 +72,7 @@ namespace App.Shared.GameModules.Player
             UpdatePosition(player, moveUpdateData);
             
             if(moveUpdateData.NeedUmountWeapon)
-                player.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon(_contexts);
+                player.WeaponController().ForceUnmountCurrWeapon(_contexts);
             // _logger.ErrorFormat(" IsC ollided:{1},IsGround:{2}", moveUpdateData.IsCollided,moveUpdateData.IsGround);
         }
 

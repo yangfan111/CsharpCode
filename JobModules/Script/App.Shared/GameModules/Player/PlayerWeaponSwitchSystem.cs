@@ -46,17 +46,17 @@ namespace App.Shared.GameModules.Player
                 }
             }
             var newSlot = playerEntity.modeLogic.ModeLogic.GetSlotByIndex(cmd.CurWeapon);
-            playerEntity.GetController<PlayerWeaponController>().SwitchIn(_contexts, newSlot);
-            //playerEntity.GetController<PlayerWeaponController>().PureSwitchIn(newSlot);
-            //if (!playerEntity.hasWeaponComponentAgent)
+            playerEntity.WeaponController().SwitchIn(_contexts, newSlot);
+            //playerEntity.WeaponController().PureSwitchIn(newSlot);
+orientationComponentAgent)
             //{
             //    Logger.Error("No bag attached to player");
             //    return;
             //}
             //
 
-            //    var weaponAchive = playerEntity.GetController<PlayerWeaponController>();
-            //   var curSlot = playerEntity.GetController<PlayerWeaponController>().CurrSlotType;
+            //    var weaponAchive = playerEntity.WeaponController();
+            //   var curSlot = playerEntity.WeaponController().CurrSlotType;
 
             //   var newWeapon = weaponAchive.GetSlotWeaponInfo(newSlot);
             //if(newWeapon.Id < 1)

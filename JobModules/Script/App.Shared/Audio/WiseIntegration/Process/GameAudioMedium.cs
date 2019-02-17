@@ -1,10 +1,14 @@
-﻿using System;
+﻿using Assets.Utils.Configuration;
+using System;
 using Core.Utils;
 using UnityEngine;
 using WeaponConfigNs;
 using Utils.Singleton;
 using Utils.Configuration;
 using XmlConfig;
+using App.Shared.Util;
+using App.Shared.GameModules.Weapon;
+using Entitas;
 
 namespace App.Shared.Audio
 {
@@ -16,7 +20,7 @@ namespace App.Shared.Audio
         public static void PlayWeaponAudio(int weaponId,GameObject target, Func<AudioWeaponItem, int> propertyFilter)
         {
             AudioEventItem evtConfig = SingletonManager.Get<AudioWeaponManager>().FindById(weaponId, propertyFilter);
-            if (AKAudioEntry.Dispatcher != null)
+            if(evtConfig != null && AKAudioEntry.Dispatcher != null)
                 AKAudioEntry.Dispatcher.PostEvent(evtConfig, target);
 
         }

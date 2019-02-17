@@ -87,7 +87,7 @@ namespace App.Shared.GameModules.Player
         {
             _logger.InfoFormat("{0} play die", player.entityKey);
                     
-            player.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon(_contexts);
+            player.WeaponController().ForceUnmountCurrWeapon(_contexts);
             player.characterControllerInterface.CharacterController.PlayerDead();
             player.RootGo().BroadcastMessage("PlayerDead");
             _logger.InfoFormat("PlayerDeadAnimDead");
@@ -96,7 +96,7 @@ namespace App.Shared.GameModules.Player
         private void Dying(PlayerEntity player)
         {
             _logger.InfoFormat("{0} play dying", player.entityKey);
-            player.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon(_contexts);
+            player.WeaponController().ForceUnmountCurrWeapon(_contexts);
         }
 
         private void Revive(PlayerEntity player)

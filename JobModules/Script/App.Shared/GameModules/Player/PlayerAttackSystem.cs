@@ -1,5 +1,5 @@
 ﻿using App.Shared.GameModules.Weapon;
-using App.Shared.WeaponLogic;
+using App.Shared.GameModules.Weapon.Behavior;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
@@ -20,13 +20,13 @@ namespace App.Shared.GameModules.Player
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
-            PlayerEntity playerEntity = (PlayerEntity)owner.OwnerEntity;
-            var weaponId = playerEntity.GetController<PlayerWeaponController>().CurrSlotWeaponId(_contexts);
+            var controller =  GameModuleManagement.Get<PlayerWeaponController>(owner.OwnerEntityKey.GetHashCode());
+            var weaponId = controller.HeldWeaponAgent.ConfigId;
+            if (!weaponId.HasValue) return;
             var weaponLogic = _weaponLogicManager.GetWeaponLogic(weaponId);
-            var weaponEntity = playerEntity.GetWeaponEntityByHandDefault(_contexts);
             if(null != weaponLogic)
             {
-                weaponLogic.Update(playerEntity, weaponEntity, cmd);
+                weaponLogic.Update(controller, cmd);
             }
         }
     }

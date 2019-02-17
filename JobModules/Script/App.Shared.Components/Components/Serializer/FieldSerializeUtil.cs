@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using App.Shared.Components.Bag;
 using App.Shared.Components.Player;
 using App.Shared.Components.Serializer.FieldSerializer;
 using Core.Animation;
@@ -48,7 +47,7 @@ namespace App.Shared.Components.Serializer
         {
             while (sendTime > 0)
             {
-                _byteSerializer.Write((Byte) (toSend >> ((sendTime - 1) * 8)), writer);
+                _byteSerializer.Write((Byte)(toSend >> ((sendTime - 1) * 8)), writer);
                 sendTime--;
             }
         }
@@ -87,7 +86,7 @@ namespace App.Shared.Components.Serializer
                     min);
             }
 
-            uint toSend = (uint) (data - min);
+            uint toSend = (uint)(data - min);
             SendCompressedData(sendTimes, toSend, writer);
         }
 
@@ -112,7 +111,7 @@ namespace App.Shared.Components.Serializer
                     min);
             }
 
-            uint toSend = (uint) (data - min);
+            uint toSend = (uint)(data - min);
             SendCompressedData(sendTimes, toSend, writer);
         }
 
@@ -143,7 +142,7 @@ namespace App.Shared.Components.Serializer
                     min);
             }
 
-            uint toSend = (uint) (data - min);
+            uint toSend = (uint)(data - min);
             SendCompressedData(sendTimes, toSend, writer);
         }
 
@@ -168,7 +167,7 @@ namespace App.Shared.Components.Serializer
                     min);
             }
 
-            uint toSend = (uint) (data - min);
+            uint toSend = (uint)(data - min);
             SendCompressedData(sendTimes, toSend, writer);
         }
 
@@ -193,7 +192,7 @@ namespace App.Shared.Components.Serializer
                     min);
             }
 
-            uint toSend = (uint) ((data - min) * ratio);
+            uint toSend = (uint)((data - min) * ratio);
             SendCompressedData(sendTimes, toSend, writer);
         }
 
@@ -219,7 +218,7 @@ namespace App.Shared.Components.Serializer
                     min);
             }
 
-            uint toSend = (uint) ((data - min) * ratio);
+            uint toSend = (uint)((data - min) * ratio);
             SendCompressedData(sendTimes, toSend, writer);
         }
 
@@ -250,7 +249,7 @@ namespace App.Shared.Components.Serializer
                     min);
             }
 
-            uint toSend = (uint) ((data - min) * ratio);
+            uint toSend = (uint)((data - min) * ratio);
             SendCompressedData(sendTimes, toSend, writer);
         }
 
@@ -315,8 +314,8 @@ namespace App.Shared.Components.Serializer
                 return;
             }
 
-            float[] list = {data.x, data.y, data.z, data.w};
-            float[] lastlist = {last.x, last.y, last.z, last.w};
+            float[] list = { data.x, data.y, data.z, data.w };
+            float[] lastlist = { last.x, last.y, last.z, last.w };
             float biggest = data.x;
             int Site = 0;
             for (int i = 1; i < list.Length; i++)
@@ -329,7 +328,7 @@ namespace App.Shared.Components.Serializer
             }
 
             float sign = list[Site] > 0 ? 1 : -1;
-            _byteSerializer.Write((Byte) Site, writer);
+            _byteSerializer.Write((Byte)Site, writer);
             for (int i = 0; i < list.Length; i++)
             {
                 if (i != Site)
@@ -343,7 +342,7 @@ namespace App.Shared.Components.Serializer
         {
             _stateInterCommandsSerializer.Write(data, writer);
         }
-        
+
         public static void Serialize(UnityAnimationEventCommands data, Core.Utils.MyBinaryWriter writer,
             UnityAnimationEventCommands last = default(UnityAnimationEventCommands), bool weiteAll = false)
         {
@@ -372,7 +371,7 @@ namespace App.Shared.Components.Serializer
 
             for (int i = 0; i < count; i++)
             {
-                ret[i] = i >= lastCount || !data[i].NeedPatch(
+                ret[i] = i >= lastCount || !data[i].IsSimilar(
                              last[i]);
             }
 
@@ -384,11 +383,11 @@ namespace App.Shared.Components.Serializer
         {
             if (list == null || list.Count == 0)
             {
-                writer.Write((short) 0);
+                writer.Write((short)0);
             }
             else
             {
-                writer.Write((short) list.Count);
+                writer.Write((short)list.Count);
                 foreach (var i in list)
                 {
                     writer.Write(i);
@@ -452,7 +451,85 @@ namespace App.Shared.Components.Serializer
 
             return list;
         }
+        #region// 静态数组版本
+        public static void Serialize<T>(T[] currArr, Core.Utils.MyBinaryWriter writer, T[] lastArr = null,
+    bool writeAll = false) where T : class, IPatchClass<T>, new()
+        {
+            BitArrayWrapper bitArray = GetDiffBitArray(lastArr, currArr, writeAll);
+            var count = currArr == null ? 0 : currArr.Length;
+            var lastCount = lastArr == null ? 0 : lastArr.Length;
+            writer.Write(bitArray);
 
+            for (int i = 0; i < count; i++)
+            {
+                if (bitArray[i] == false) continue;
+                var last = i >= lastCount || writeAll ? default(T) : lastArr[i];
+                Serialize(currArr[i], last, writer);
+            }
+            bitArray.ReleaseReference();
+        }
+        private static BitArrayWrapper GetDiffBitArray<T>(T[] last, T[] data, bool writeAll)
+    where T : IPatchClass<T>, new()
+        {
+            var count = data == null ? 0 : data.Length;
+            var lastCount = last == null ? 0 : last.Length;
+            if (writeAll) return BitArrayWrapper.Allocate(count, true);
+            BitArrayWrapper ret = BitArrayWrapper.Allocate(count, false);
+
+            for (int i = 0; i < count; i++)
+            {
+                ret[i] = i >= lastCount || !data[i].IsSimilar(
+                             last[i]);
+            }
+
+            return ret;
+        }
+        /// <summary>
+        ///Shared.Components\Generated\Serializer\xxComponentSerializer.Deserialize
+        ///差异值反序列化
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="arr"></param>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static T[] Deserialize<T>(T[] arr, BinaryReader reader) where T : class, IPatchClass<T>, new()
+        {
+            BitArrayWrapper bitArray = reader.ReadBitArray();
+            int length = bitArray.Length;
+            arr = Resize(arr, length);
+
+            for (int i = 0; i < bitArray.Length; i++)
+            {
+                if (bitArray[i])
+                {
+                    Deserialize(arr[i], reader);
+                    arr[i].HasValue = true;
+                }
+                else
+                {
+                    arr[i].HasValue = false;
+                }
+            }
+            bitArray.ReleaseReference();
+            return arr;
+        }
+        ///resize from  >> FieldMergeUtil >> xxComponentSerializer.Merge
+        public static T[] Resize<T>(T[] arr, int length) where T : class, IPatchClass<T>, new()
+        {
+            AssertUtility.Assert(arr == null || arr.Length == 0 || arr.Length == length, "resize a diff length static array");
+            if (arr == null || arr.Length != length)
+            {
+                arr = new T[length];
+            }
+            for (int i = 0; i < arr.Length; i++)
+            {
+                if (arr[i] == null) arr[i] = new T();
+            }
+
+            return arr;
+        }
+
+        #endregion
         public static List<T> Deserialize<T>(List<T> list, BinaryReader reader) where T : class, IPatchClass<T>, new()
         {
             BitArrayWrapper bitArray = reader.ReadBitArray();
@@ -476,11 +553,11 @@ namespace App.Shared.Components.Serializer
             return list;
         }
 
-        private static T CloneObject<T>(T p) where T : class, IPatchClass<T>, new()
+   
+        private static void Serialize<T>(T curr, T last, MyBinaryWriter writer) where T : class, IPatchClass<T>, new()
         {
-            return p.Clone();
+            curr.Write(last, writer);
         }
-
         private static T Deserialize<T>(T last, BinaryReader reader) where T : class, IPatchClass<T>, new()
         {
             last.Read(reader);
@@ -497,7 +574,7 @@ namespace App.Shared.Components.Serializer
         {
             if (!DoCompress) return Deserialize(typeTag, reader);
             uint result = GetCompressData(receiveTimes, reader);
-            return (int) (result + min);
+            return (int)(result + min);
         }
 
         public static uint Deserialize(uint typeTag, BinaryReader reader)
@@ -510,7 +587,7 @@ namespace App.Shared.Components.Serializer
         {
             if (!DoCompress) return Deserialize(typeTag, reader);
             uint result = GetCompressData(receiveTimes, reader);
-            return (uint) (result + min);
+            return (uint)(result + min);
         }
 
         public static byte Deserialize(byte typeTag, BinaryReader reader)
@@ -528,7 +605,7 @@ namespace App.Shared.Components.Serializer
         {
             if (!DoCompress) return Deserialize(typeTag, reader);
             uint result = GetCompressData(receiveTimes, reader);
-            return (short) (result + min);
+            return (short)(result + min);
         }
 
         public static long Deserialize(long typeTag, BinaryReader reader)
@@ -541,7 +618,7 @@ namespace App.Shared.Components.Serializer
         {
             if (!DoCompress) return Deserialize(typeTag, reader);
             uint result = GetCompressData(receiveTimes, reader);
-            return (long) (result / ratio + min);
+            return (long)(result / ratio + min);
         }
 
         public static string Deserialize(string typeTag, BinaryReader reader)
@@ -558,8 +635,8 @@ namespace App.Shared.Components.Serializer
             bool DoCompress, BinaryReader reader)
         {
             if (!DoCompress) return Deserialize(typeTag, reader);
-            uint result = (uint) GetCompressData(receiveTimes, reader);
-            return (float) (result / ratio + min);
+            uint result = (uint)GetCompressData(receiveTimes, reader);
+            return (float)(result / ratio + min);
         }
 
         public static double Deserialize(double typeTag, BinaryReader reader)
@@ -572,7 +649,7 @@ namespace App.Shared.Components.Serializer
         {
             if (!DoCompress) return Deserialize(typeTag, reader);
             uint result = GetCompressData(receiveTimes, reader);
-            return (double) (result / ratio + min);
+            return (double)(result / ratio + min);
         }
 
         public static bool Deserialize(bool typeTag, BinaryReader reader)
@@ -619,7 +696,7 @@ namespace App.Shared.Components.Serializer
             BinaryReader reader)
         {
             if (!DoCompress) return Deserialize(typeTag, reader);
-            float[] list = {0f, 0f, 0f, 0f};
+            float[] list = { 0f, 0f, 0f, 0f };
             int Site = _byteSerializer.Read(reader);
             list[Site] = 1f;
             for (int i = 0; i < list.Length; i++)
@@ -639,17 +716,17 @@ namespace App.Shared.Components.Serializer
         {
             return _stateInterCommandsSerializer.Read(reader);
         }
-        
+
         public static UnityAnimationEventCommands Deserialize(UnityAnimationEventCommands typeTag, BinaryReader reader)
         {
             return _unityAnimationEventCommandsSerializer.Read(reader);
         }
 
+
         public static EntityKey Deserialize(EntityKey typeTag, BinaryReader reader)
         {
             return _entityKeySerializer.Read(reader);
         }
-
         public static PlayerEvents Deserialize(PlayerEvents typeTag, BinaryReader reader)
         {
             return _eventsSerializer.Read(reader, typeTag);

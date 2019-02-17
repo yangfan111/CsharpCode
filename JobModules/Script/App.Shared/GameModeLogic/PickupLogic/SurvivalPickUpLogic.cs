@@ -1,6 +1,5 @@
 ﻿using App.Shared.GameModules.Player;
 using App.Shared.GameModules.Weapon;
-using App.Shared.WeaponLogic;
 using Core;
 using Core;
 using Core.Configuration;
@@ -32,15 +31,12 @@ namespace App.Shared.GameModeLogic.PickupLogic
         {
             //使用服务器操作
             var player = _playerContext.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(playerEntityId, (short)EEntityType.Player));
-            var weapon = player.GetWeaponEntity(_contexts, slot);
-            if(null != weapon)
-            {
-                weapon.isFlagDestroy = true;
-            }
+            player.WeaponController().SetWeaponFlagDestory();
+           
             return;
-            var weaponAchive = player.GetController<PlayerWeaponController>();
+            var weaponAchive = player.WeaponController();
            var curWeapon = weaponAchive.GetSlotWeaponInfo(_contexts, slot);
-            if (curWeapon.Id > 0)
+            if (curWeapon.ConfigId > 0)
             {
                 var dropPos = player.GetHandWeaponPosition();
                 var playerTrans = player.characterContoller.Value.transform;
@@ -72,7 +68,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
                         sceneObjectEntity = _sceneObjectEntityFactory.CreateWeaponEntity(curWeapon, playerTrans.position) as SceneObjectEntity;
                     }
                 }
-                player.GetController<PlayerWeaponController>().DropSlotWeapon(_contexts, slot);
+                player.WeaponController().DropSlotWeapon(_contexts, slot);
             }
         }
 

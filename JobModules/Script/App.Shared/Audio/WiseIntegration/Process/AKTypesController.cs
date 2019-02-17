@@ -14,7 +14,7 @@ namespace App.Shared.Audio
         /// <summary>
         /// gameobject=>switchStates
         /// </summary>
-        private readonly Dictionary<GameObject, HashSet<AKSwitchAtom>> gameobjectSwitchGrps = new Dictionary<GameObject, HashSet<AKSwitchAtom>>();
+        private readonly Dictionary<GameObject, List<AKSwitchAtom>> gameobjectSwitchGrps = new Dictionary<GameObject, List<AKSwitchAtom>>();
 
         public AKTypesController()
         {
@@ -47,7 +47,7 @@ namespace App.Shared.Audio
         /// <returns></returns>
         public AKSwitchAtom GetSwitch(GameObject target, int grpId)
         {
-            HashSet<AKSwitchAtom> switchAtoms;
+            List<AKSwitchAtom> switchAtoms;
             if (gameobjectSwitchGrps.TryGetValue(target, out switchAtoms))
             {
                 foreach (var atom in switchAtoms)
@@ -68,7 +68,7 @@ namespace App.Shared.Audio
         public AKSwitchAtom RegisterGetSwitch(GameObject target, int grpId, int stateIndex = -1)
         {
             CommonUtil.WeakAssert(target != null);
-            HashSet<AKSwitchAtom> switchAtoms;
+            List<AKSwitchAtom> switchAtoms;
             AKSwitchAtom ret;
             if (gameobjectSwitchGrps.TryGetValue(target, out switchAtoms))
             {
@@ -83,7 +83,7 @@ namespace App.Shared.Audio
             else
             {
                 ret = new AKSwitchAtom(grpId, stateIndex, target);
-                switchAtoms = new HashSet<AKSwitchAtom>() { ret };
+                switchAtoms = new List<AKSwitchAtom>() { ret };
                 gameobjectSwitchGrps.Add(target, switchAtoms);
             }
             return ret;

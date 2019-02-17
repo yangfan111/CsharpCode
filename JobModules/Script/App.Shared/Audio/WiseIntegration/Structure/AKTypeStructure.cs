@@ -18,6 +18,12 @@ namespace App.Shared.Audio
 
     public class AudioRefCounter : IRef<GameObject>
     {
+        private Action onCleanUp;
+        protected AudioRefCounter(Action in_onCleaup)
+        {
+            onCleanUp = in_onCleaup;
+        }
+        protected AudioRefCounter() { }
         private readonly HashSet<GameObject> refs = new HashSet<GameObject>();
 
         public bool Has(GameObject target)
@@ -28,11 +34,15 @@ namespace App.Shared.Audio
         public virtual bool Register(GameObject target)
         {
             return refs.Add(target);
+           
         }
 
         public virtual bool UnRegister(GameObject target)
         {
-            return refs.Remove(target);
+            var ret = refs.Remove(target);
+            if (ret && onCleanUp != null)
+                onCleanUp();
+            return ret;
         }
     }
     public class AKBankAtom : AudioRefCounter
@@ -62,7 +72,7 @@ namespace App.Shared.Audio
         {
             onLoadPrepare(this);
             AKRESULT result = AkBankManager.LoadBankRes(BankName, false, false);
-            BankLoadResponseData callbackData = new BankLoadResponseData();
+            var callbackData = new BankLoadResponseData();
             callbackData.loadResult = result;
             callbackData.callback = callback;
             callbackData.userData = userData;

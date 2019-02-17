@@ -71,7 +71,7 @@ namespace YF.FileUtil
                 return false;
             }
 
-            var dirs = dir.GetDirectories();
+            var dirs             = dir.GetDirectories();
 
             // If the destination directory doesn't exist, create it. 
             if (System.IO.Directory.Exists(destDirName) && recoverEntirely)
@@ -82,11 +82,11 @@ namespace YF.FileUtil
             if (!System.IO.Directory.Exists(destDirName))
                 System.IO.Directory.CreateDirectory(destDirName);
             // Get the files in the directory and copy them to the new location.
-            var files = dir.GetFiles();
+            var files            = dir.GetFiles();
             foreach (var file in files)
             {
 
-                if (filter == "" || System.IO.Path.GetExtension(file.Name) == filter)
+                if (filter       == "" || System.IO.Path.GetExtension(file.Name) == filter)
                 {
                     var temppath = System.IO.Path.Combine(destDirName, file.Name);
                     file.CopyTo(temppath, true);

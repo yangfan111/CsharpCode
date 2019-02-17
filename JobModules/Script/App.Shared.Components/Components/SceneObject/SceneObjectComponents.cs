@@ -58,64 +58,18 @@ namespace App.Shared.Components.SceneObject
     }
 
     [SceneObject, ]
-    public class WeaponComponent : IPlaybackComponent 
+    public class WeaponObjectComponent : IPlaybackComponent 
     {
-        [DontInitilize, NetworkProperty] public int Id;
-        [DontInitilize, NetworkProperty] public int AvatarId;
-        [DontInitilize, NetworkProperty] public int UpperRail;
-        [DontInitilize, NetworkProperty] public int LowerRail;
-        [DontInitilize, NetworkProperty] public int Magazine;
-        [DontInitilize, NetworkProperty] public int Muzzle;
-        [DontInitilize, NetworkProperty] public int Stock;
-        [DontInitilize, NetworkProperty] public int Bullet;
-        [DontInitilize, NetworkProperty] public int ReservedBullet;
-        [DontInitilize, NetworkProperty] public int WeaponKey;
+        [DontInitilize, NetworkProperty] public EntityKey WeaponKey;
+        [DontInitilize, NetworkProperty] public int ConfigId;
         public int GetComponentId()
         {
             return (int)EComponentIds.SceneObjectWeapon;
         }
-
-        public void FillPartList(List<int> partList)
-        {
-            if(null == partList)
-            {
-                return;
-            }
-            partList.Clear();
-            if(UpperRail > 0)
-            {
-                partList.Add(UpperRail);
-            }
-            if(LowerRail> 0)
-            {
-                partList.Add(LowerRail);
-            }
-            if(Magazine > 0)
-            {
-                partList.Add(Magazine);
-            }
-            if(Stock > 0)
-            {
-                partList.Add(Stock);
-            }
-            if(Muzzle > 0)
-            {
-                partList.Add(Muzzle);
-            }
-        }
-
         public void CopyFrom(object rightComponent)
         {
-            var remoteWeapon = rightComponent as WeaponComponent;
-            Id = remoteWeapon.Id;
-            AvatarId = remoteWeapon.AvatarId;
-            UpperRail = remoteWeapon.UpperRail;
-            LowerRail = remoteWeapon.LowerRail;
-            Magazine = remoteWeapon.Magazine;
-            Muzzle = remoteWeapon.Muzzle;
-            Stock = remoteWeapon.Stock;
-            Bullet = remoteWeapon.Bullet;
-            ReservedBullet = remoteWeapon.ReservedBullet;
+            var remoteWeapon = rightComponent as WeaponObjectComponent;
+            ConfigId = remoteWeapon.ConfigId;
             WeaponKey = remoteWeapon.WeaponKey;
         }
         public bool IsInterpolateEveryFrame(){ return false; }

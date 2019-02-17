@@ -30,7 +30,7 @@ using UltimateFracturing;
 using Utils.Singleton;
 using App.Shared.Util;
 using App.Shared.GameModules.Weapon;
-using App.Shared.WeaponLogic;
+using App.Shared.GameModules.Weapon;
 using Assets.Utils.Configuration;
 
 namespace App.Shared.GameModules.Throwing
@@ -182,7 +182,7 @@ namespace App.Shared.GameModules.Throwing
                 return;
             }
             playerEntity.throwingAction.ActionInfo.ClearState();
-            playerEntity.GetController<PlayerWeaponController>().OnExpend(contexts, EWeaponSlotType.ThrowingWeapon);
+            playerEntity.WeaponController().OnExpend(contexts, EWeaponSlotType.ThrowingWeapon);
         }
 
         private void OldRaycast()
@@ -272,12 +272,14 @@ namespace App.Shared.GameModules.Throwing
                     SimpleParaList dama = new SimpleParaList();
                     //TODO 确认逻辑
                     dama.AddFields(new ObjectFields(playerEntity));
-                    var weaponData = playerEntity.GetCurrentWeaponData(_contexts);
-                    dama.AddPara(new IntPara("CarryClip", playerEntity.GetController<PlayerWeaponController>().GetReservedBullet()));
-                    dama.AddPara(new IntPara("Clip", weaponData.Bullet));
-                    var config = SingletonManager.Get<WeaponConfigManager>().GetConfigById(weaponData.WeaponId);
+                    var weaponData = playerEntity.WeaponController().HeldWeaponScan;
+                    if (!weaponData.HasValue)
+                        return;
+                    dama.AddPara(new IntPara("CarryClip", playerEntity.WeaponController().GetReservedBullet()));
+                    dama.AddPara(new IntPara("Clip", weaponData.Value.Bullet));
+                    var config = SingletonManager.Get<WeaponConfigManager>().GetConfigById(weaponData.Value.ConfigId);
                     dama.AddPara(new IntPara("ClipType", null == config ? 0 : config.Caliber));
-                    dama.AddPara(new IntPara("id", weaponData.WeaponId));
+                    dama.AddPara(new IntPara("id", weaponData.Value.ConfigId));
                     SimpleParable sp = new SimpleParable(dama);
 
                     args.Trigger((int)EGameEvent.WeaponState, new TempUnit[] { new TempUnit("state", sp), new TempUnit("current", (FreeData)(playerEntity).freeData.FreeData) });

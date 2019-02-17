@@ -18,6 +18,7 @@ using App.Shared.GameModules.Player.CharacterBone;
 using System.Collections.Generic;
 using Utils.Compare;
 using Utils.Singleton;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Player
 {
@@ -153,13 +154,13 @@ namespace App.Shared.GameModules.Player
                 return false;
             }
         }
-
-        public static Vector3 GetThrowingEmitPosition(PlayerEntity playerEntity)
+        //TODO:controller util
+        public static Vector3 GetThrowingEmitPosition(PlayerWeaponController controller)
         {
-            go.transform.rotation = Quaternion.Euler(playerEntity.cameraFinalOutputNew.EulerAngle);
-            go.transform.position = playerEntity.cameraFinalOutputNew.Position;
+            go.transform.rotation = Quaternion.Euler(controller.RelatedCameraFinal.EulerAngle);
+            go.transform.position = controller.RelatedCameraFinal.Position;
             Vector3 rc;
-            if (playerEntity.appearanceInterface.Appearance.IsFirstPerson)
+            if (controller.RelatedAppearence.IsFirstPerson)
             {
                 rc = go.transform.TransformPoint(ThrowingEmittorFirstOffset);
             }
@@ -270,7 +271,7 @@ namespace App.Shared.GameModules.Player
         }
 
         private static readonly AnimatorPoseReplayer PoseReplayer = new AnimatorPoseReplayer();
-        public static void UpdateTransform(PlayerEntity player, NetworkAnimatorComponent networkAnimator, PredictedAppearanceComponent appearance, Orientation orientation)
+        public static void UpdateTransform(PlayerEntity player, NetworkAnimatorComponent networkAnimator, PredictedAppearanceComponent appearance, OrientationComponent orientation)
         {
             if (!player.hasAppearanceInterface)
             {

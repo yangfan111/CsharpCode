@@ -10,7 +10,6 @@ namespace App.Shared.GameModules.Weapon
     public partial class WeaponSlotsAux
     {
      
-       private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(WeaponSlotsAux));
         private Dictionary<EWeaponSlotType, WeaponSlotHandlerBase> handlers= 
             new Dictionary<EWeaponSlotType, WeaponSlotHandlerBase>(CommonIntEnumEqualityComparer<EWeaponSlotType>.Instance);
 

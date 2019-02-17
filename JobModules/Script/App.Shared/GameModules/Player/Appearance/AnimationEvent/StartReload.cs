@@ -1,4 +1,4 @@
-﻿using App.Shared.WeaponLogic;
+﻿using App.Shared.GameModules.Weapon;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Player.Appearance.AnimationEvent

@@ -4,7 +4,7 @@ using Core.Utils;
 using Core;
 using App.Shared.GameModules.Weapon;
 using App.Shared.Util;
-using App.Shared.WeaponLogic;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Player
 {
@@ -25,12 +25,12 @@ namespace App.Shared.GameModules.Player
                 return;
             }
             var player = owner.OwnerEntity as PlayerEntity;
-            var controller = player.GetController<PlayerWeaponController>();
+            var controller = player.WeaponController();
 
             if (cmd.IsForceUnmountWeapon)
             {
               
-                controller.ForceUnmountCurrWeapon(_contexts);
+                controller.ForceUnarmCurrWeapon();
                 return;
             }
 
@@ -46,14 +46,14 @@ namespace App.Shared.GameModules.Player
                 }
             }
             bool changeWeaponSucess= true;
-            EWeaponSlotType curSlot = player.GetController<PlayerWeaponController>().CurrSlotType;
+            EWeaponSlotType curSlot = player.WeaponController().HeldSlotType;
             if (curSlot == EWeaponSlotType.None)
             {
-                EWeaponSlotType lastSlot = player.GetController<PlayerWeaponController>().PopGetLastWeaponId(_contexts);
+                EWeaponSlotType lastSlot = player.WeaponController().PollGetLastSlotType();
                 if (lastSlot != EWeaponSlotType.None)
                 {
                     //player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.ChangeWeapon);
-                    controller.DrawSlotWeapon(_contexts, lastSlot);
+                    controller.DrawSlotWeapon(lastSlot);
                 }
                 else
                 {
@@ -67,7 +67,7 @@ namespace App.Shared.GameModules.Player
             else
             {
                 //   player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.ChangeWeapon);
-                controller.UnmountCurrWeapon(_contexts, null); 
+                controller.UnArmHeldWeapon(null); 
             }
             if (changeWeaponSucess)
             {

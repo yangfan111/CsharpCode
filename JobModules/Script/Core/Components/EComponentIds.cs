@@ -58,13 +58,14 @@
         CameraStateUpload,
 
         BagState,
+        WeaponBagSet,
         WeaponBag1,
         WeaponBag2,
         WeaponBag3,
         WeaponBag4,
         WeaponBag5,
-        BagCurrentWeapon,
-        BagGrenadeInventory,
+        WeaponAmmunition,
+        PlayerGrenadeCache,
         BagEmptyHand,
 
         BulletData,

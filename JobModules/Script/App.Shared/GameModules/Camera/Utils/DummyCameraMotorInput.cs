@@ -1,7 +1,7 @@
 ﻿using App.Shared.Components;
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Player;
-using App.Shared.WeaponLogic;
+using App.Shared.GameModules.Weapon;
 using Core.CameraControl;
 using Core.Prediction.UserPrediction.Cmd;
 using XmlConfig;
@@ -21,7 +21,7 @@ namespace App.Shared.GameModules.Camera
                 FilteredChangeCamera = usercmd.FilteredInput.IsInput(EPlayerInput.ChangeCamera);
                 FilteredCameraFocus = usercmd.FilteredInput.IsInput(EPlayerInput.IsCameraFocus);
             }
-
+            var controller = player.WeaponController();
             FrameInterval = usercmd.FrameInterval;
             ChangeCamera = usercmd.ChangeCamera;
           
@@ -41,14 +41,10 @@ namespace App.Shared.GameModules.Camera
             ArchorPitch = YawPitchUtility.Normalize(archorPitch);
             ArchorYaw = YawPitchUtility.Normalize(archorYaw);
             IsParachuteAttached = player.hasPlayerSkyMove && player.playerSkyMove.IsParachuteAttached;
-            if(player.HasWeapon(contexts))
+            if(!controller.IsHeldSlotEmpty)
             {
-                var weaponData = player.GetWeaponRunTimeInfo(contexts);
-                if(null != weaponData)
-                {
-                    ForceChangeGunSight = weaponData.ForceChangeGunSight;
-                    weaponData.ForceChangeGunSight = false;
-                }
+                var runTImeScan = controller.HeldWeaponRunTimeScan.Value;
+                ForceChangeGunSight = controller.ModifyRunTimeForceChangeSight(false);
             }
             ForceInterruptGunSight = UseActionOrIsStateNoGunSight(usercmd, player);
         }
