@@ -8,7 +8,7 @@ namespace Core.Room
 {
     public interface IPlayerTokenGenerator
     {
-        string GenerateToken();
+        string GenerateToken(long playerId);
     }
 
     public class PlayerInfoManager : IPlayerTokenGenerator
@@ -33,6 +33,11 @@ namespace Core.Room
 
         public void RemovePlayerInfo(string token)
         {
+            if(null == token)
+            {
+                _logger.Error("token to remove is null");
+                return;
+            }
             if (_token2UserInfo.ContainsKey(token))
             {
                 _token2UserInfo.Remove(token);
@@ -100,14 +105,14 @@ namespace Core.Room
             return playerInfo;
         }
 
-        public string GenerateToken()
+        public string GenerateToken(long playerId)
         {
             string token = "";
             int cnt = 0;
             while (cnt < 5)
             {
                 cnt++;
-                token = RandomString(20);
+                token = String.Format("{0}{1}{2}", RandomString(10), playerId, DateTime.Now.ToString("hhmmss"));
                 if (!HasPlayerInfo(token))
                     break;
             }

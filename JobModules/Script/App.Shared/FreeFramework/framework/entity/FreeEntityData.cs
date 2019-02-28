@@ -146,6 +146,10 @@ namespace App.Server.GameModules.GamePlay.Free.entity
 
         public void Frame(IEventArgs args, int interval)
         {
+            if (_entity.isFlagDestroy)
+            {
+                return;
+            }
             args.TempUse("entity", this);
             args.TempUse(name, this);
 

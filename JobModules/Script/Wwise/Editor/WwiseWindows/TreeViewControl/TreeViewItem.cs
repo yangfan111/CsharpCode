@@ -120,8 +120,10 @@ namespace AK.Wwise.TreeView
 		public TreeViewItem FindItemByName(string name)
 		{
 			foreach (var item in Items)
+			{
 				if (item.Header == name)
 					return item;
+			}
 
 			return null;
 		}
@@ -133,7 +135,9 @@ namespace AK.Wwise.TreeView
 
 		private float CalculateHoverTime(UnityEngine.Rect rect, UnityEngine.Vector3 mousePos)
 		{
-			if (rect.Contains(mousePos)) return 0f;
+			if (rect.Contains(mousePos))
+				return 0f;
+
 			var midPoint = (rect.yMin + rect.yMax) * 0.5f;
 			var pointA = mousePos.y;
 			return UnityEngine.Mathf.Abs(midPoint - pointA) / 50f;
@@ -141,7 +145,7 @@ namespace AK.Wwise.TreeView
 
 		private void SetIconExpansion(SiblingOrder siblingOrder, TextureIcons middle, TextureIcons last)
 		{
-			bool result;
+			var result = false;
 			switch (siblingOrder)
 			{
 				case SiblingOrder.FIRST_CHILD:
@@ -150,9 +154,6 @@ namespace AK.Wwise.TreeView
 					break;
 				case SiblingOrder.LAST_CHILD:
 					result = ParentControl.Button(last);
-					break;
-				default:
-					result = false;
 					break;
 			}
 
@@ -165,133 +166,121 @@ namespace AK.Wwise.TreeView
 			if (null == ParentControl || IsHidden)
 				return;
 
-			UnityEngine.GUILayout.BeginHorizontal();
-
-			for (var index = 0; index < levels; ++index)
-				ParentControl.Button(TextureIcons.GUIDE);
-
-			if (!HasChildItems())
-				SetIconExpansion(siblingOrder, TextureIcons.MIDDLE_SIBLING_NO_CHILD, TextureIcons.LAST_SIBLING_NO_CHILD);
-			else if (IsExpanded)
-				SetIconExpansion(siblingOrder, TextureIcons.MIDDLE_SIBLING_EXPANDED, TextureIcons.LAST_SIBLING_EXPANDED);
-			else
-				SetIconExpansion(siblingOrder, TextureIcons.MIDDLE_SIBLING_COLLAPSED, TextureIcons.LAST_SIBLING_COLLAPSED);
-
 			var clicked = false;
 
-			// display the text for the tree view
-			if (!string.IsNullOrEmpty(Header))
+			using (new UnityEngine.GUILayout.HorizontalScope())
 			{
-				bool isSelected;
-				if (ParentControl.SelectedItem == this && !ParentControl.m_forceDefaultSkin)
-				{
-					//use selected skin
-					UnityEngine.GUI.skin = ParentControl.m_skinSelected;
-					isSelected = true;
-				}
+				for (var index = 0; index < levels; ++index)
+					ParentControl.Button(TextureIcons.GUIDE);
+
+				if (!HasChildItems())
+					SetIconExpansion(siblingOrder, TextureIcons.MIDDLE_SIBLING_NO_CHILD, TextureIcons.LAST_SIBLING_NO_CHILD);
+				else if (IsExpanded)
+					SetIconExpansion(siblingOrder, TextureIcons.MIDDLE_SIBLING_EXPANDED, TextureIcons.LAST_SIBLING_EXPANDED);
 				else
-					isSelected = false;
+					SetIconExpansion(siblingOrder, TextureIcons.MIDDLE_SIBLING_COLLAPSED, TextureIcons.LAST_SIBLING_COLLAPSED);
 
-				if (IsCheckBox)
+				// display the text for the tree view
+				if (!string.IsNullOrEmpty(Header))
 				{
-					if (IsChecked && ParentControl.Button(TextureIcons.NORMAL_CHECKED))
-					{
-						IsChecked = false;
-						if (ParentControl.SelectedItem != this)
-						{
-							ParentControl.SelectedItem = this;
-							IsSelected = true;
-							if (null != Selected)
-								Selected.Invoke(this, new SelectedEventArgs());
-						}
-
-						if (null != Unchecked)
-							Unchecked.Invoke(this, new UncheckedEventArgs());
-					}
-					else if (!IsChecked && ParentControl.Button(TextureIcons.NORMAL_UNCHECKED))
-					{
-						IsChecked = true;
-						if (ParentControl.SelectedItem != this)
-						{
-							ParentControl.SelectedItem = this;
-							IsSelected = true;
-							if (null != Selected)
-								Selected.Invoke(this, new SelectedEventArgs());
-						}
-
-						if (null != Checked)
-							Checked.Invoke(this, new CheckedEventArgs());
-					}
-
-					ParentControl.Button(TextureIcons.BLANK);
-				}
-
-				// Add a custom icon, if any
-				if (null != CustomIconBuilder)
-				{
-					CustomIconBuilder.Invoke(this, new CustomIconEventArgs());
-					ParentControl.Button(TextureIcons.BLANK);
-				}
-
-				if (UnityEngine.Event.current.isMouse)
-					s_clickCount = UnityEngine.Event.current.clickCount;
-
-				if (ParentControl.IsHoverEnabled)
-				{
-					var oldSkin = UnityEngine.GUI.skin;
+					var isSelected = ParentControl.SelectedItem == this && !ParentControl.m_forceDefaultSkin;
 					if (isSelected)
 						UnityEngine.GUI.skin = ParentControl.m_skinSelected;
-					else if (IsHover)
-						UnityEngine.GUI.skin = ParentControl.m_skinHover;
+
+					if (IsCheckBox)
+					{
+						if (IsChecked && ParentControl.Button(TextureIcons.NORMAL_CHECKED))
+						{
+							IsChecked = false;
+							if (ParentControl.SelectedItem != this)
+							{
+								ParentControl.SelectedItem = this;
+								IsSelected = true;
+								if (null != Selected)
+									Selected.Invoke(this, new SelectedEventArgs());
+							}
+
+							if (null != Unchecked)
+								Unchecked.Invoke(this, new UncheckedEventArgs());
+						}
+						else if (!IsChecked && ParentControl.Button(TextureIcons.NORMAL_UNCHECKED))
+						{
+							IsChecked = true;
+							if (ParentControl.SelectedItem != this)
+							{
+								ParentControl.SelectedItem = this;
+								IsSelected = true;
+								if (null != Selected)
+									Selected.Invoke(this, new SelectedEventArgs());
+							}
+
+							if (null != Checked)
+								Checked.Invoke(this, new CheckedEventArgs());
+						}
+
+						ParentControl.Button(TextureIcons.BLANK);
+					}
+
+					// Add a custom icon, if any
+					if (null != CustomIconBuilder)
+					{
+						CustomIconBuilder.Invoke(this, new CustomIconEventArgs());
+						ParentControl.Button(TextureIcons.BLANK);
+					}
+
+					if (UnityEngine.Event.current.isMouse)
+						s_clickCount = UnityEngine.Event.current.clickCount;
+
+					if (ParentControl.IsHoverEnabled)
+					{
+						var oldSkin = UnityEngine.GUI.skin;
+						UnityEngine.GUI.skin = isSelected ? ParentControl.m_skinSelected :
+							IsHover ? ParentControl.m_skinHover : ParentControl.m_skinUnselected;
+
+						if (ParentControl.IsHoverAnimationEnabled)
+							UnityEngine.GUI.skin.button.fontSize = (int) UnityEngine.Mathf.Lerp(20f, 12f, m_hoverTime);
+
+						UnityEngine.GUI.SetNextControlName("toggleButton"); //workaround to dirty GUI
+						if (UnityEngine.GUILayout.Button(Header))
+						{
+							UnityEngine.GUI.FocusControl("toggleButton"); //workaround to dirty GUI
+							if (ParentControl.SelectedItem != this)
+							{
+								ParentControl.SelectedItem = this;
+								IsSelected = true;
+								if (null != Selected)
+									Selected.Invoke(this, new SelectedEventArgs());
+							}
+
+							if (null != Click && (uint) s_clickCount <= 2)
+								clicked = true;
+						}
+
+						UnityEngine.GUI.skin = oldSkin;
+					}
 					else
+					{
+						UnityEngine.GUI.SetNextControlName("toggleButton"); //workaround to dirty GUI
+						if (UnityEngine.GUILayout.RepeatButton(Header))
+						{
+							UnityEngine.GUI.FocusControl("toggleButton"); //workaround to dirty GUI
+							if (ParentControl.SelectedItem != this)
+							{
+								ParentControl.SelectedItem = this;
+								IsSelected = true;
+								if (null != Selected)
+									Selected.Invoke(this, new SelectedEventArgs());
+							}
+
+							if (null != Click && (uint) s_clickCount <= 2)
+								clicked = true;
+						}
+					}
+
+					if (isSelected && !ParentControl.m_forceDefaultSkin)
 						UnityEngine.GUI.skin = ParentControl.m_skinUnselected;
-					if (ParentControl.IsHoverAnimationEnabled)
-						UnityEngine.GUI.skin.button.fontSize = (int) UnityEngine.Mathf.Lerp(20f, 12f, m_hoverTime);
-					UnityEngine.GUI.SetNextControlName("toggleButton"); //workaround to dirty GUI
-					if (UnityEngine.GUILayout.Button(Header))
-					{
-						UnityEngine.GUI.FocusControl("toggleButton"); //workaround to dirty GUI
-						if (ParentControl.SelectedItem != this)
-						{
-							ParentControl.SelectedItem = this;
-							IsSelected = true;
-							if (null != Selected)
-								Selected.Invoke(this, new SelectedEventArgs());
-						}
-
-						if (null != Click && (uint) s_clickCount <= 2)
-							clicked = true;
-					}
-
-					UnityEngine.GUI.skin = oldSkin;
-				}
-				else
-				{
-					UnityEngine.GUI.SetNextControlName("toggleButton"); //workaround to dirty GUI
-					if (UnityEngine.GUILayout.RepeatButton(Header))
-					{
-						UnityEngine.GUI.FocusControl("toggleButton"); //workaround to dirty GUI
-						if (ParentControl.SelectedItem != this)
-						{
-							ParentControl.SelectedItem = this;
-							IsSelected = true;
-							if (null != Selected)
-								Selected.Invoke(this, new SelectedEventArgs());
-						}
-
-						if (null != Click && (uint) s_clickCount <= 2)
-							clicked = true;
-					}
-				}
-
-				if (isSelected && !ParentControl.m_forceDefaultSkin)
-				{
-					//return to default skin
-					UnityEngine.GUI.skin = ParentControl.m_skinUnselected;
 				}
 			}
-
-			UnityEngine.GUILayout.EndHorizontal();
 
 			if (ParentControl.IsHoverEnabled)
 			{
@@ -301,13 +290,9 @@ namespace AK.Wwise.TreeView
 					if (ParentControl.HasFocus(mousePos))
 					{
 						var lastRect = UnityEngine.GUILayoutUtility.GetLastRect();
-						if (lastRect.Contains(mousePos))
-						{
-							IsHover = true;
+						IsHover = lastRect.Contains(mousePos);
+						if (IsHover)
 							ParentControl.HoverItem = this;
-						}
-						else
-							IsHover = false;
 
 						if (ParentControl.IsHoverEnabled && ParentControl.IsHoverAnimationEnabled)
 							m_hoverTime = CalculateHoverTime(lastRect, UnityEngine.Event.current.mousePosition);
@@ -321,22 +306,22 @@ namespace AK.Wwise.TreeView
 				{
 					var child = Items[index];
 					child.Parent = this;
-					if (index + 1 == Items.Count)
-						child.DisplayItem(levels + 1, SiblingOrder.LAST_CHILD);
-					else if (index == 0)
-						child.DisplayItem(levels + 1, SiblingOrder.FIRST_CHILD);
-					else
-						child.DisplayItem(levels + 1, SiblingOrder.MIDDLE_CHILD);
+					child.DisplayItem(levels + 1,
+						index + 1 == Items.Count ? SiblingOrder.LAST_CHILD :
+						index == 0 ? SiblingOrder.FIRST_CHILD : SiblingOrder.MIDDLE_CHILD);
 				}
 			}
 
-			if (clicked) Click.Invoke(this, new ClickEventArgs((uint) s_clickCount));
+			if (clicked)
+				Click.Invoke(this, new ClickEventArgs((uint) s_clickCount));
 
 			if (IsSelected && ParentControl.SelectedItem != this && null != Unselected)
 				Unselected.Invoke(this, new UnselectedEventArgs());
+
 			IsSelected = ParentControl.SelectedItem == this;
 
-			if (IsDraggable) HandleGUIEvents();
+			if (IsDraggable)
+				HandleGUIEvents();
 		}
 
 		private void HandleGUIEvents()
@@ -372,7 +357,6 @@ namespace AK.Wwise.TreeView
 				m_clickCount = in_clickCount;
 			}
 		}
-
 
 		public class CheckedEventArgs : System.EventArgs
 		{

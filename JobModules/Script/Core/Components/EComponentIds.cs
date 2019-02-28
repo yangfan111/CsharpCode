@@ -56,16 +56,18 @@
         CameraStateNew,
         CameraOutput,
         CameraStateUpload,
+        ObserveCamera,
 
-        BagPrimeWeapon,
-        BagSubWeapon,
-        BagMelee,
-        BagPistol,
-        BagGrenade,
-        BagCurrentWeapon,
-        BagBullet,
-        BagTactic,
-        BagGrenadeInventory,
+        BagState,
+        WeaponBagSet,
+        WeaponBag1,
+        WeaponBag2,
+        WeaponBag3,
+        WeaponBag4,
+        WeaponBag5,
+        WeaponAmmunition,
+        PlayerGrenadeCache,
+        BagEmptyHand,
 
         BulletData,
         PlayerTime,
@@ -93,8 +95,6 @@
         PlayerFsmMotor,
         PlayerHitbox,
         PlayerGamePlay,
-        PlayerWeapon,
-        PlayerWeaponLogicInfo,
         PlayerInfo,
         PlayerMeleeAttacker,
         PlayerThrowing,
@@ -108,6 +108,8 @@
         PlayerHitDiagnosis,
         PlayerCast,
         PlayerOverrideBag,
+        PlayerWeaponCustomize,
+
         GenericActionComponent,
         CharacterBone,
 
@@ -177,7 +179,16 @@
         LocalEvents,
         RemoteEvents,
         Statistics,
+        WeaponBasicInfo,
+        WeaponActiveFlag,
+        WeaponData,
+        
+        TriggerEvent,
+        PlayerResource,
+        RaycastTest,
+        Effects,
         End,
+
        
     }
 }

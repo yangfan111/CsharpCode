@@ -66,6 +66,15 @@ public class AkEmitterSettings : global::System.IDisposable {
   public float roomReverbAuxBusGain { set { AkSoundEnginePINVOKE.CSharp_AkEmitterSettings_roomReverbAuxBusGain_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkEmitterSettings_roomReverbAuxBusGain_get(swigCPtr); } 
   }
 
+  public uint diffractionMaxEdges { set { AkSoundEnginePINVOKE.CSharp_AkEmitterSettings_diffractionMaxEdges_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkEmitterSettings_diffractionMaxEdges_get(swigCPtr); } 
+  }
+
+  public uint diffractionMaxPaths { set { AkSoundEnginePINVOKE.CSharp_AkEmitterSettings_diffractionMaxPaths_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkEmitterSettings_diffractionMaxPaths_get(swigCPtr); } 
+  }
+
+  public float diffractionMaxPathLength { set { AkSoundEnginePINVOKE.CSharp_AkEmitterSettings_diffractionMaxPathLength_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkEmitterSettings_diffractionMaxPathLength_get(swigCPtr); } 
+  }
+
   public byte useImageSources { set { AkSoundEnginePINVOKE.CSharp_AkEmitterSettings_useImageSources_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkEmitterSettings_useImageSources_get(swigCPtr); } 
   }
 

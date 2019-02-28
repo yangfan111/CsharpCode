@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Core.CameraControl.NewMotor;
+using UnityEngine;
 using Utils.Configuration;
 using Utils.Utils;
 using XmlConfig;
@@ -8,9 +11,9 @@ namespace Core.Configuration
 {
     public class CameraConfigManager : AbstractConfigManager<CameraConfigManager>
     {
-        private Dictionary<ECameraConfigType, CameraConfigItem> _cameraConfigItems =
-            new Dictionary<ECameraConfigType, CameraConfigItem>(CommonEnumEqualityComparer<ECameraConfigType>.Instance);
-
+        private Dictionary<ECameraPoseMode, CameraConfigItem> _cameraConfigItems =
+            new Dictionary<ECameraPoseMode, CameraConfigItem>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance);
+        
         private CameraConfig _config;
         public string XMLContent { get; private set; }
 
@@ -19,13 +22,17 @@ namespace Core.Configuration
             get { return _config; }
         }
 
-        public int DeadTranstiionTime { get; private set; }
+        public int DeadTranstionTime { get; private set; }
         public int DefaultTranstionTime { get; private set; }
+        
+        public int PostTransitionTime { get; private set; }
 
         public override void ParseConfig(string xml)
         {
             XMLContent = xml;
             _config = XmlConfigParser<CameraConfig>.Load(xml);
+            _config.PoseConfigs = _config.PoseConfigs.OrderBy(var => var.CameraType).ToArray();
+    
             foreach (var cameraConfigItem in _config.PoseConfigs)
             {
                 _cameraConfigItems[cameraConfigItem.CameraType] = cameraConfigItem;
@@ -33,21 +40,20 @@ namespace Core.Configuration
                 {
                     switch (cameraConfigItem.CameraType)
                     {
-                        case ECameraConfigType.ThirdPerson:
-                        case ECameraConfigType.FirstPerson:
-                        case ECameraConfigType.DriveCar:
-                        case ECameraConfigType.Prone:
-                        case ECameraConfigType.Crouch:
-                        case ECameraConfigType.Swim:
-                        case ECameraConfigType.Rescue:
-                        case ECameraConfigType.Dying:
-                        case ECameraConfigType.Dead:
+                        case ECameraPoseMode.Stand:
+                        case ECameraPoseMode.DriveCar:
+                        case ECameraPoseMode.Prone:
+                        case ECameraPoseMode.Crouch:
+                        case ECameraPoseMode.Swim:
+                        case ECameraPoseMode.Rescue:
+                        case ECameraPoseMode.Dying:
+                        case ECameraPoseMode.Dead:
                             cameraConfigItem.Far = 1500;
                             break;
-                        case ECameraConfigType.AirPlane:
-                        case ECameraConfigType.Parachuting:
-                        case ECameraConfigType.ParachutingOpen:
-                        case ECameraConfigType.Gliding:
+                        case ECameraPoseMode.AirPlane:
+                        case ECameraPoseMode.Parachuting:
+                        case ECameraPoseMode.ParachutingOpen:
+                        case ECameraPoseMode.Gliding:
                             cameraConfigItem.Far = 8000;
                             break;
                         default:
@@ -61,30 +67,29 @@ namespace Core.Configuration
             }
 
             DefaultTranstionTime = _config.DefaultTransitionTime;
+            PostTransitionTime = _config.PostTransitionTime;
         }
 
-        public CameraConfigItem GetConfigByType(ECameraConfigType type)
+        public int GetTransitionTime(SubCameraMotorType type, SubCameraMotorState state)
         {
-            if (_cameraConfigItems.ContainsKey(type))
-            {
-                return _cameraConfigItems[type];
-            }
-
-            Logger.WarnFormat("Config does not exsit for {0}", type);
-            return null;
+            if (type == SubCameraMotorType.Pose)
+                return PoseTransitionTime((ECameraPoseMode) state.LastMode, (ECameraPoseMode) state.NowMode);
+            if (type == SubCameraMotorType.Free)
+                return _config.FreeConfig.TransitionTime;
+            return DefaultTranstionTime;
         }
-
-        public CameraConfigItem[] GetConfigItems()
+        
+        private int PoseTransitionTime(ECameraPoseMode lastMode,ECameraPoseMode curMode)
         {
-            if (null != _config)
+            var config = _config.PoseConfigs[(int) curMode];
+            if (config.PoseTransitionItems == null) return config.DefaultTime;
+            foreach (var item in config.PoseTransitionItems)
             {
-                return _config.PoseConfigs;
+                if (item.LastState == lastMode)
+                    return item.BaseTime;
             }
-            else
-            {
-                Logger.Error("camera config is null !");
-                return null;
-            }
+            return config.DefaultTime;
         }
+
     }
 }

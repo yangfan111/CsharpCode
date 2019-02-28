@@ -9,6 +9,8 @@ using Core.Utils;
 using UnityEngine;
 using XmlConfig;
 using System.Collections.Specialized;
+using Utils.Configuration;
+using Utils.Singleton;
 
 namespace Core.CameraControl.NewMotor
 {
@@ -68,6 +70,7 @@ namespace Core.CameraControl.NewMotor
     {
         protected CameraConfigItem _config;
 
+        
         public CameraConfigItem Config
         {
             get { return _config; }
@@ -79,9 +82,8 @@ namespace Core.CameraControl.NewMotor
         protected static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(AbstractCameraMotor));
         protected Action<PlayerEntity, ICameraMotorState> EnterActions;
         protected Action<PlayerEntity, ICameraMotorState> LeaveActions;
-
+        
         public abstract short ModeId { get; }
-
 
         protected static HashSet<short> EmptyHashSet = new HashSet<short>();
         public abstract bool IsActive(ICameraMotorInput input, ICameraMotorState state);
@@ -124,9 +126,10 @@ namespace Core.CameraControl.NewMotor
 
         protected AbstractCameraMotor()
         {
+
         }
 
-
+        
         public abstract void CalcOutput(PlayerEntity player, ICameraMotorInput input, ICameraMotorState state,
             SubCameraMotorState subState,
             DummyCameraMotorOutput output, ICameraNewMotor last, int clientTime);

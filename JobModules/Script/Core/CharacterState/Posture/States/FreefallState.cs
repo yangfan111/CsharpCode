@@ -13,7 +13,14 @@ namespace Core.CharacterState.Posture.States
 {
     class FreefallState : PostureState
     {
+        
         public FreefallState(PostureStateId id) : base(id)
+        {
+			InitSpecial();
+            InitCommon();
+        }
+
+        private void InitSpecial()
         {
             #region freefall to jumpend
 
@@ -30,9 +37,14 @@ namespace Core.CharacterState.Posture.States
                 null, (int)PostureStateId.JumpEnd, null, 0, new[] { FsmInput.Land });
 
             #endregion
+        }
 
+        protected void InitCommon()
+        {
+            
             #region freefall to swim
 
+            
             AddTransition(
                 (command, addOutput) =>
                 {

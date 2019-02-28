@@ -41,9 +41,10 @@ namespace App.Shared.Components.Ui
 
     public enum MapLevel
     {
-        Min = 0,
-        Medium = 1,
-        Max = 2,
+        None = 0,
+        Min = 1,
+        Medium = 2,
+        Max = 3,
     }
 
     public enum MiniMapPlayStatue
@@ -58,10 +59,11 @@ namespace App.Shared.Components.Ui
 
     public class MiniMapTeamPlayInfo
     {
-        public MiniMapTeamPlayInfo(long playerId, bool isPlayer, int num, Color color, MiniMapPlayStatue statue, Vector2 pos, float faceDirection, List<MiniMapPlayMarkInfo> markList, bool isShooting, int shootingCount,
+        public MiniMapTeamPlayInfo(long playerId,int entityId, bool isPlayer, int num, Color color, MiniMapPlayStatue statue, Vector2 pos, float faceDirection, List<MiniMapPlayMarkInfo> markList, bool isShooting, int shootingCount,
             string playerName, int curHp, int maxHp, int curHpInHurted, bool isMark, Vector3 topPos)
         {
             this.PlayerId = playerId;
+            this.EntityId = entityId;
             this.IsPlayer = isPlayer;
             this.Num = num;
             this.Color = color;
@@ -84,6 +86,7 @@ namespace App.Shared.Components.Ui
 
 
         public long PlayerId;                       //玩家ID
+        public int EntityId;
         public bool IsPlayer;                       //是不是玩家本人
         public int Num;                             //0 就是不现实编号
         public Color Color;                         //小队颜色
@@ -112,6 +115,7 @@ namespace App.Shared.Components.Ui
         {
             get { return Statue == MiniMapPlayStatue.DEAD; }
         }
+
     }
 
     public class BombAreaInfo   //轰炸区数据

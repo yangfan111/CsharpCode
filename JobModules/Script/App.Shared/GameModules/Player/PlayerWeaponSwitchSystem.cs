@@ -1,19 +1,19 @@
 ﻿using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using App.Shared.Util;
 using Core;
-using Core.Common;
 using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Player
 {
     public class PlayerWeaponSwitchSystem : IUserCmdExecuteSystem
     {
-        public PlayerWeaponSwitchSystem()
-        {
-        } 
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerWeaponSwitchSystem));
+        private Contexts _contexts;
+        public PlayerWeaponSwitchSystem(Contexts contexts)
+        {
+            _contexts = contexts;
+        } 
        /// <summary>
        /// 切换槽位
        /// </summary>
@@ -46,16 +46,16 @@ namespace App.Shared.GameModules.Player
                 }
             }
             var newSlot = playerEntity.modeLogic.ModeLogic.GetSlotByIndex(cmd.CurWeapon);
-            playerEntity.GetController<PlayerWeaponController>().SwitchIn(newSlot);
-            //if (!playerEntity.hasWeaponComponentAgent)
+            playerEntity.WeaponController().SwitchIn(newSlot);
+            //playerEntity.WeaponController().PureSwitchIn(newSlot);
             //{
             //    Logger.Error("No bag attached to player");
             //    return;
             //}
             //
 
-            //    var weaponAchive = playerEntity.GetController<PlayerWeaponController>();
-            //   var curSlot = playerEntity.GetController<PlayerWeaponController>().CurrSlotType;
+            //    var weaponAchive = playerEntity.WeaponController();
+            //   var curSlot = playerEntity.WeaponController().CurrSlotType;
 
             //   var newWeapon = weaponAchive.GetSlotWeaponInfo(newSlot);
             //if(newWeapon.Id < 1)

@@ -1,4 +1,5 @@
 ﻿using App.Shared;
+using App.Shared.Audio;
 using App.Shared.WeaponLogic;
 using Core.Common;
 using Core.Utils;
@@ -24,12 +25,13 @@ namespace Core.WeaponLogic
 
         public bool IsCanFire(PlayerEntity playerEntity, WeaponEntity weaponEntity, IWeaponCmd weaponCmd)
         {
-            var weaponState = weaponEntity.weaponData;
-            if (weaponCmd.RenderTime < weaponState.NextAttackTimer)
+            var basicInfo = weaponEntity.weaponBasicInfo;
+            var runtimeInfo = weaponEntity.weaponRuntimeInfo;
+            if (weaponCmd.RenderTime < runtimeInfo.NextAttackTimer)
             {
                 return false;
             }
-            if (weaponState.Bullet <= 0)
+            if (basicInfo.Bullet <= 0)
             {
                 if(playerEntity.hasTip)
                 {
@@ -37,10 +39,10 @@ namespace Core.WeaponLogic
                 }
                 return false;
             }
-            EFireMode currentMode = (EFireMode)weaponState.FireMode; 
+            EFireMode currentMode = (EFireMode)basicInfo.FireMode; 
             if (currentMode == EFireMode.Manual)
             {
-                if (weaponState.IsPrevCmdFire)
+                if (runtimeInfo.IsPrevCmdFire)
                     return false;
                 else
                     return true;
@@ -61,14 +63,15 @@ namespace Core.WeaponLogic
 
         public void OnAfterFire(PlayerEntity playerEntity, WeaponEntity weaponEntity, IWeaponCmd cmd)
         {
-            var weaponState = weaponEntity.weaponData;
+            var basicInfo = weaponEntity.weaponBasicInfo;
+            var runtimeInfo = weaponEntity.weaponRuntimeInfo;
             // 爆发模式的攻击间隔单独设定
-            if ((EFireMode)weaponState.FireMode != EFireMode.Burst)
+            if ((EFireMode)basicInfo.FireMode != EFireMode.Burst)
             {
                 var common = GetCommonFireConfig(playerEntity);
                 if(null != common)
                 {
-                    weaponState.NextAttackTimer = (cmd.RenderTime + common.AttackInterval);
+                    runtimeInfo.NextAttackTimer = (cmd.RenderTime + common.AttackInterval);
                 }
                 else
                 {
@@ -76,13 +79,14 @@ namespace Core.WeaponLogic
                 }
             }
 
-            weaponState.LastFireTime = cmd.RenderTime;
+            runtimeInfo.LastFireTime = cmd.RenderTime;
         }
 
         public void OnFrame(PlayerEntity playerEntity, WeaponEntity weaponEntity, IWeaponCmd cmd)
         {
-            var weaponState = weaponEntity.weaponData;
-            weaponState.IsPrevCmdFire = cmd.IsFire;
+            var runtimeInfo = weaponEntity.weaponRuntimeInfo;
+            var basicInfo = weaponEntity.weaponBasicInfo;
+            runtimeInfo.IsPrevCmdFire = cmd.IsFire;
             if (cmd.IsSwitchFireMode && cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsSwitchFireMode))
             {
                 var config = GetConfig(playerEntity);
@@ -90,13 +94,13 @@ namespace Core.WeaponLogic
                 {
                     return;
                 }
-                EFireMode mode = (EFireMode)weaponState.FireMode;
-                EFireMode nextMode = config.AvaiableModes[0];
-                for (int i = 0; i < config.AvaiableModes.Length; i++)
+                EFireMode mode = (EFireMode)basicInfo.FireMode;
+                EFireMode nextMode = config.AvaliableModes[0];
+                for (int i = 0; i < config.AvaliableModes.Length; i++)
                 {
-                    if (config.AvaiableModes[i] == mode)
+                    if (config.AvaliableModes[i] == mode)
                     {
-                        nextMode = config.AvaiableModes[(i + 1) % config.AvaiableModes.Length];
+                        nextMode = config.AvaliableModes[(i + 1) % config.AvaliableModes.Length];
                     }
                 }
                 if(nextMode == mode)
@@ -114,8 +118,9 @@ namespace Core.WeaponLogic
                 {
                     ShowFireModeChangeTip(playerEntity, nextMode);
                 }
-                weaponState.FireMode = (int)nextMode;
-                playerEntity.PlayWeaponSound(XmlConfig.EWeaponSoundType.SwitchFireMode);
+                basicInfo.FireMode = (int)nextMode;
+                GameAudioMedium.SwitchFireModelAudio(nextMode, playerEntity.appearanceInterface.Appearance.GetWeaponP1InHand());
+               // playerEntity.PlayWeaponSound(XmlConfig.EWeaponSoundType.SwitchFireMode);
             }
         }
 

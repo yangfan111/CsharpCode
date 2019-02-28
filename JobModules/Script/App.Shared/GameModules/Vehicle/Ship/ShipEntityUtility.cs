@@ -343,7 +343,7 @@ namespace App.Shared.GameModules.Vehicle.Ship
 
         public static ShipConfig GetShipConfig(VehicleEntity vehicle)
         {
-            var go = vehicle.gameObject.UnityObjWrapper.Value;
+            var go = vehicle.gameObject.UnityObject.AsGameObject;
             return go.GetComponent<ShipConfig>();
         }
 

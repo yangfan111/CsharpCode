@@ -8,17 +8,12 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Free
 {
     class FreeOnMotor : AbstractCameraMotor
     {
-        private float _transitionTime = 300;
-        public FreeOnMotor(float transitionTime
-        )
+        private float _transitionTime ;
+        private SubCameraMotorType _motorType;
+        
+        public FreeOnMotor()
         {
-            _transitionTime = transitionTime;
-        }
-        public FreeOnMotor(
-        )
-        {
-           
-            
+            _motorType = SubCameraMotorType.View;
         }
 
         public override short ModeId
@@ -46,11 +41,9 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Free
         {
             if (last.ModeId == (short) ECameraFreeMode.Off)
             {
-
-                var elapsedPercent = ElapsedPercent(clientTime, subState.ModeTime, _transitionTime);
+//                var elapsedPercent = ElapsedPercent(clientTime, subState.ModeTime, _transitionTime);
 //                output.ArchorPostOffset =
 //                    Vector3.Lerp(Vector3.zero, -state.GetMainConfig().ScreenOffset, elapsedPercent);
-
             }
 
             output.EulerAngle = new Vector3(state.FreePitch, state.FreeYaw, 0);
@@ -60,8 +53,6 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Free
         public override void UpdatePlayerRotation(ICameraMotorInput input, ICameraMotorState state, PlayerEntity player)
         {
         }
-
-       
 
         public override HashSet<short> ExcludeNextMotor()
         {

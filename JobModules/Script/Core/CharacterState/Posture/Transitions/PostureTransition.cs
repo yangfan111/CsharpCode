@@ -23,6 +23,7 @@ namespace Core.CharacterState.Posture.Transitions
         /// 用于第一人称的向前偏移
         /// </summary>
         private readonly float _firstPersonForwardOffsetFromValue;
+
         private readonly float _firstPersonForwardOffsetToValue;
 
         private readonly CharacterControllerCapsule _fromCharacterControllerConfig;
@@ -45,19 +46,19 @@ namespace Core.CharacterState.Posture.Transitions
         /// <param name="toCharacterControllerConfig"></param>
         /// <param name="updateP3"></param>
         internal PostureTransition(short id,
-                                   Func<IFsmInputCommand, Action<FsmOutput>, bool> transfer,
-                                   Func<IFsmInputCommand, Action<FsmOutput>, FsmTransitionResponseType> interrupt,
-                                   PostureStateId target,
-                                   int duration,
-                                   float firstPersonFromValue,
-                                   float firstPersonToValue,
-                                   float firstPersonForwardOffsetFromValue,
-                                   float firstPersonForwardOffsetToValue,
-                                   float thirdPersonFromValue,
-                                   float thirdPersonToValue,
+            Func<IFsmInputCommand, Action<FsmOutput>, bool> transfer,
+            Func<IFsmInputCommand, Action<FsmOutput>, FsmTransitionResponseType> interrupt,
+            PostureStateId target,
+            int duration,
+            float firstPersonFromValue,
+            float firstPersonToValue,
+            float firstPersonForwardOffsetFromValue,
+            float firstPersonForwardOffsetToValue,
+            float thirdPersonFromValue,
+            float thirdPersonToValue,
             CharacterControllerCapsule fromCharacterControllerConfig,
             CharacterControllerCapsule toCharacterControllerConfig,
-			bool updateP3 = true) : base(id, (short)target, duration)
+            bool updateP3 = true) : base(id, (short) target, duration)
         {
             _fromValueP1 = firstPersonFromValue;
             _toValueP1 = firstPersonToValue;
@@ -81,18 +82,20 @@ namespace Core.CharacterState.Posture.Transitions
             if (_updateP3)
             {
                 FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
-                                        AnimatorParametersHash.Instance.PostureName,
-                                        NormalizedTime <= 1 ? Mathf.Lerp(_fromValueP3, _toValueP3, NormalizedTime) : _toValueP3,
-                                        CharacterView.ThirdPerson);
+                    AnimatorParametersHash.Instance.PostureName,
+                    NormalizedTime <= 1 ? Mathf.Lerp(_fromValueP3, _toValueP3, NormalizedTime) : _toValueP3,
+                    CharacterView.ThirdPerson);
                 addOutput(FsmOutput.Cache);
             }
-            
+
             FsmOutput.Cache.SetValue(FsmOutputType.FirstPersonHeight,
-                                     NormalizedTime <= 1 ? Mathf.Lerp(_fromValueP1, _toValueP1, NormalizedTime) : _toValueP1);
+                NormalizedTime <= 1 ? Mathf.Lerp(_fromValueP1, _toValueP1, NormalizedTime) : _toValueP1);
             addOutput(FsmOutput.Cache);
 
             FsmOutput.Cache.SetValue(FsmOutputType.FirstPersonForwardOffset,
-                NormalizedTime <= 1 ? Mathf.Lerp(_firstPersonForwardOffsetFromValue, _firstPersonForwardOffsetToValue, NormalizedTime) : _firstPersonForwardOffsetToValue);
+                NormalizedTime <= 1
+                    ? Mathf.Lerp(_firstPersonForwardOffsetFromValue, _firstPersonForwardOffsetToValue, NormalizedTime)
+                    : _firstPersonForwardOffsetToValue);
             addOutput(FsmOutput.Cache);
 
             LerpCharacterControllerCapsule(_fromCharacterControllerConfig, _toCharacterControllerConfig, NormalizedTime,
@@ -104,9 +107,11 @@ namespace Core.CharacterState.Posture.Transitions
         protected static void LerpCharacterControllerCapsule(CharacterControllerCapsule from,
             CharacterControllerCapsule to, float normalizedTime, Action<FsmOutput> addOutput)
         {
-            FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerHeight, normalizedTime <= 1 ? Mathf.Lerp(from.Height, to.Height, normalizedTime) : to.Height);
+            FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerHeight,
+                normalizedTime <= 1 ? Mathf.Lerp(from.Height, to.Height, normalizedTime) : to.Height);
             addOutput(FsmOutput.Cache);
-            FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerRadius, normalizedTime <= 1 ? Mathf.Lerp(from.Radius, to.Radius, normalizedTime) : to.Radius);
+            FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerRadius,
+                normalizedTime <= 1 ? Mathf.Lerp(from.Radius, to.Radius, normalizedTime) : to.Radius);
             addOutput(FsmOutput.Cache);
         }
     }

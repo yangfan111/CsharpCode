@@ -4,10 +4,12 @@ using Core.Components;
 using Core.EntityComponent;
 using Core.GameInputFilter;
 using Core.Network;
+using Core.Playback;
 using Core.Prediction;
 using Core.Prediction.UserPrediction;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
+using Core.SyncLatest;
 using Core.UpdateLatest;
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
@@ -60,11 +62,11 @@ namespace App.Shared.Components.Player
     }
 
     [Player]
-    public class LatestAdjustCmdComponent : IGameComponent
+    public class LatestAdjustCmdComponent : ISelfLatestComponent
     {
-        [DontInitilize] private Vector3 AdjustPos;
-        [DontInitilize] private int Seq;
-        [DontInitilize] private bool hasNewValue;
+        [DontInitilize] [NetworkProperty] public Vector3 AdjustPos;
+        [NetworkProperty] public int ServerSeq;
+        public int ClientSeq = -1;
         
         public int GetComponentId()
         {
@@ -73,21 +75,31 @@ namespace App.Shared.Components.Player
 
         public Vector3? GetPos(int seq)
         {
-            if (hasNewValue)
+            if (ClientSeq < ServerSeq)
             {
-                hasNewValue = false;
-                Seq = seq;
-            }
-            if (seq == Seq)
+                ClientSeq = ServerSeq;
                 return AdjustPos;
+            }
+                
             return null;
         }
         
         public void SetPos(Vector3 pos)
         {
             AdjustPos = pos;
-            hasNewValue = true;
         }   
+        
+        public void CopyFrom(object target)
+        {
+            var right = target as LatestAdjustCmdComponent;
+            AdjustPos = right.AdjustPos;
+            ServerSeq = right.ServerSeq;
+        }
+        
+        public void SyncLatestFrom(object rightComponent)
+        {
+            CopyFrom(rightComponent);
+        }
     }
     
     [Player]

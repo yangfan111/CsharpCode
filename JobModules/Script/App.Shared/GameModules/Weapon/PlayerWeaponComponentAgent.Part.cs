@@ -5,17 +5,18 @@ using Core.Enums;
 using Utils.Configuration;
 using App.Shared.Util;
 using Utils.Utils;
-using App.Shared.Components.Bag;
 using Core.WeaponLogic.Attachment;
 using Utils.Singleton;
+using Core.Utils;
+
 namespace App.Shared.GameModules.Weapon
 {
     public partial class PlayerWeaponComponentAgent
     {
 
-        internal EFuncResult SetSlotWeaponPart(EWeaponSlotType slot, int id, System.Action onWeaponAttachmentRefresh, WeaponPartsModelRefresh onModelPartsRefresh)
+        internal EFuncResult SetSlotWeaponPart(Contexts contexts, EWeaponSlotType slot, int id, System.Action<Contexts> onWeaponAttachmentRefresh, WeaponPartsModelRefresh onModelPartsRefresh)
         {
-            WeaponComponent destWeaponComp = slotExtractor(slot);
+            var destWeaponComp = slotExtractor(contexts, slot);
             NewWeaponConfigItem wpConfig;
             EFuncResult ret = WeaponUtil.VertifyWeaponComponent(destWeaponComp, out wpConfig);
             if (ret != EFuncResult.Success)
@@ -31,16 +32,21 @@ namespace App.Shared.GameModules.Weapon
                 realAttachId);
             destWeaponComp.ApplyParts(attachments);
             if (slot == CurrSlotType)
-                onWeaponAttachmentRefresh();
-            onModelPartsRefresh(destWeaponComp.ToWeaponInfo(), slot, lastParts, destWeaponComp.GetParts(),false);
+                onWeaponAttachmentRefresh(contexts);
+            WeaponPartsRefreshData refreshData = new WeaponPartsRefreshData();
+            refreshData.weaponInfo = destWeaponComp.ToWeaponInfo();
+            refreshData.slot = slot;
+            refreshData.oldParts = lastParts;
+            refreshData.newParts = destWeaponComp.GetParts();
+            onModelPartsRefresh(contexts, refreshData);
             return EFuncResult.Success;
         }
-        internal void DeleteSlotWeaponPart(EWeaponSlotType slot, EWeaponPartType part, System.Action onCurrWeaponAttachmentRefresh, WeaponPartsModelRefresh onPartModelRefresh)
+        internal void DeleteSlotWeaponPart(Contexts contexts, EWeaponSlotType slot, EWeaponPartType part, System.Action<Contexts> onCurrWeaponAttachmentRefresh, WeaponPartsModelRefresh onPartModelRefresh)
         {
             if (slot == EWeaponSlotType.None)
                 return;
-            var weaponComp = slotExtractor(slot);
-            CommonUtil.WeakAssert(weaponComp != null);
+            var weaponComp = slotExtractor(contexts, slot);
+            AssertUtility.Assert(weaponComp != null);
 
             WeaponPartsStruct lastParts = weaponComp.GetParts();
             var parts = WeaponPartsUtil.ModifyParts(
@@ -48,10 +54,15 @@ namespace App.Shared.GameModules.Weapon
                 UniversalConsts.InvalidIntId);
             weaponComp.ApplyParts(parts);
             if (slot == CurrSlotType)
-                onCurrWeaponAttachmentRefresh();
+                onCurrWeaponAttachmentRefresh(contexts);
             var newParts = WeaponPartsUtil.ModifyParts(lastParts, part, UniversalConsts.InvalidIntId);
-            newParts = newParts.ApplyDefaultParts(weaponComp.Id);
-            onPartModelRefresh(weaponComp.ToWeaponInfo(), slot, lastParts, newParts,false);
+            newParts = newParts.ApplyDefaultParts(weaponComp.WeaponId);
+            WeaponPartsRefreshData refreshData = new WeaponPartsRefreshData();
+            refreshData.weaponInfo = weaponComp.ToWeaponInfo();
+            refreshData.slot = slot;
+            refreshData.oldParts = lastParts;
+            refreshData.newParts = newParts ;
+            onPartModelRefresh(contexts, refreshData);
         }
 
     }

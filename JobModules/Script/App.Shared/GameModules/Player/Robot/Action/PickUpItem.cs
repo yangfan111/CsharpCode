@@ -35,7 +35,7 @@ namespace App.Shared.GameModules.Player.Robot.Action
             if (ItemEntity.Value.hasMultiUnityObject)
                 ItemGameObject.Value = ItemEntity.Value.multiUnityObject.FirstAsset as GameObject;
             if (ItemEntity.Value.hasUnityObject)
-                ItemGameObject.Value = ItemEntity.Value.unityObject.UnityObjWrapper.Value;
+                ItemGameObject.Value = ItemEntity.Value.unityObject.UnityObject;
            
         }
 

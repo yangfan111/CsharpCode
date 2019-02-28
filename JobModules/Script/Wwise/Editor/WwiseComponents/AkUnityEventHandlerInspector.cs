@@ -48,7 +48,7 @@ public class AkUnityEventHandlerInspector
 	{
 		UnityEngine.GUILayout.Space(UnityEditor.EditorGUIUtility.standardVerticalSpacing);
 
-		UnityEngine.GUILayout.BeginVertical("Box");
+		using (new UnityEditor.EditorGUILayout.VerticalScope("box"))
 		{
 			var currentTriggers = GetCurrentTriggers();
 			var oldMask = BuildCurrentMaskValue(currentTriggers);
@@ -86,7 +86,6 @@ public class AkUnityEventHandlerInspector
 					m_useOtherObject.boolValue = false;
 			}
 		}
-		UnityEngine.GUILayout.EndVertical();
 
 		UnityEngine.GUILayout.Space(UnityEditor.EditorGUIUtility.standardVerticalSpacing);
 	}

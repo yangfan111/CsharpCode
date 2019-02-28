@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace Core.Room
 {
     public interface IHallRoom
@@ -27,6 +29,8 @@ namespace Core.Room
         bool IsValid { get; }
 
         void AddPlayer(IPlayerInfo player);
+
+        List<IPlayerInfo> GetAllPlayers();
 
         IPlayerInfo GetPlayer(long playerId);
 

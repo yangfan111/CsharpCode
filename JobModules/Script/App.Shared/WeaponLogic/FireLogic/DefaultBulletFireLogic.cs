@@ -31,7 +31,7 @@ namespace App.Shared.WeaponLogic.FireLogic
                 return;
             }
             var cmdSeq = cmd.CmdSeq;
-            var weaponState = weaponEntity.weaponData;
+            var weaponState = weaponEntity.weaponRuntimeInfo;
 
             _bulletInfoProvider.Prepare(playerEntity);
             // 射出子弹
@@ -45,14 +45,15 @@ namespace App.Shared.WeaponLogic.FireLogic
                 playerEntity.playerBulletData.DataList.Add(bulletData);
             }
             var playerWeaponController = playerEntity.GetController<PlayerWeaponController>();
-            if(null != playerWeaponController)
-            {
-                playerWeaponController.OnExpend(_contexts, (EWeaponSlotType)playerEntity.bagState.CurSlot);
-            }
             if (playerEntity.hasWeaponAutoState)
             {
                 playerEntity.weaponAutoState.AutoFire = 0;
             }
+            if (null != playerWeaponController)
+            {
+                playerWeaponController.OnExpend(_contexts, (EWeaponSlotType)playerEntity.bagState.CurSlot);
+            }
+           
         }
 
         private BulletConfig GetConfig(PlayerEntity playerEntity)

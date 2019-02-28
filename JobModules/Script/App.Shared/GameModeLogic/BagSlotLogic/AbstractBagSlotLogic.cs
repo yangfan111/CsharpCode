@@ -1,5 +1,5 @@
 ﻿using Core;
-using Core.GameModeLogic;
+using Core;
 using Core.Utils;
 
 namespace App.Shared.GameModeLogic.BagSlotLogic

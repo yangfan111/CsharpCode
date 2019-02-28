@@ -128,7 +128,7 @@ public class AkRoomPortal : AkUnityEventHandler
 
 		center = transform.TransformPoint(center);
 
-        var colliders = UnityEngine.Physics.OverlapBox(center, halfExtents, transform.rotation, -1, UnityEngine.QueryTriggerInteraction.Collide);
+		var colliders = UnityEngine.Physics.OverlapBox(center, halfExtents, transform.rotation, -1, UnityEngine.QueryTriggerInteraction.Collide);
 
 		foreach (var collider in colliders)
 		{

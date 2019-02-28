@@ -19,6 +19,11 @@ namespace Core.Replicaton
             Instance.Start();
         }
 
+        public RefCounterRecycler() : base("RefCounterRecycler")
+        {
+            
+        }
+
         private BlockingQueue<IRefCounter> _disposeQueue = new BlockingQueue<IRefCounter>(2048);
         private int _rate;
 

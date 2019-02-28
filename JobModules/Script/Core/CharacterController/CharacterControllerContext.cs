@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ECM.Components;
 using UnityEngine;
 using Utils.Appearance;
 using Utils.Compare;
@@ -139,9 +140,40 @@ namespace Core.CharacterController
             return _currentState.GetLastGroundHitPoint();
         }
 
+        public Vector3 GetLastHitNormal()
+        {
+            return _currentState.GetLastHitNormal();
+        }
+
+        public Vector3 GetLastHitPoint()
+        {
+            return _currentState.GetLastHitPoint();
+
+        }
+
         public KeyValuePair<float, float> GetRotateBound(Quaternion prevRot, Vector3 prevPos, int frameInterval)
         {
             return _currentState.GetRotateBound(prevRot, prevPos, frameInterval);
+        }
+
+        public GroundHit GetGroundHit
+        {
+            get { return _currentState.GetGroundHit; }
+        }
+
+        public void DrawBoundingBox()
+        {
+            _currentState.DrawBoundingBox();
+        }
+
+        public void DrawLastGroundHit()
+        {
+            _currentState.DrawLastGroundHit();
+        }
+
+        public void DrawGround()
+        {
+            _currentState.DrawGround();
         }
 
         public CharacterControllerType controllerType { get; set; }

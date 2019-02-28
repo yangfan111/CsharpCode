@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Core.Components;
 using Core.EntityComponent;
 using Core.Replicaton;
+using Core.Utils;
 // ReSharper disable once PossibleNullReferenceException
 namespace Core.Prediction
 {
@@ -34,7 +36,6 @@ namespace Core.Prediction
                         {
                             var remoteComponent = dstEntity.AddComponent(component.GetComponentId());
                             var comp = remoteComponent as ICloneableComponent;
-
                             comp.CopyFrom(component);
                         }
                     }

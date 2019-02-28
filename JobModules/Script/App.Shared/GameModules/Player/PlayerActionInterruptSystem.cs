@@ -13,8 +13,8 @@ namespace App.Shared.GameModules.Player
             {
                 return;
             }
-            var playerEntity = owner.OwnerEntity as PlayerEntity;
-           playerEntity.GetController<PlayerWeaponController>().Interrupt();
+            var controller = GameModuleManagement.Get<PlayerWeaponController>(owner.OwnerEntityKey.EntityId);
+            controller.Interrupt();
         }
     }
 }

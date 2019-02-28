@@ -33,6 +33,11 @@ namespace Core.Fsm
         PeekRight,
         // 不侧身
         NoPeek,
+        
+        // force set posture
+        PostureStand,
+        PostureCrouch,
+        PostureProne,
 
         // 蹲
         Crouch,
@@ -51,6 +56,10 @@ namespace Core.Fsm
         JumpEndFinished,
         // 自由落体(跳跃空中循环)
         Freefall,
+        // 滑落
+        Slide,
+        // Slide End
+        SlideEnd,
         // 游泳
         Swim,
         // 上岸

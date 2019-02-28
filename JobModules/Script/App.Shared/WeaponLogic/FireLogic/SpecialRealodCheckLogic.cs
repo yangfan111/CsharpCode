@@ -33,11 +33,11 @@ namespace App.Shared.WeaponLogic.Common
                 return true;
             }
             var config = GetConfig(playerEntity);
-            if (config.SpecialReloadCount > 0 && weaponEntity.weaponData.Bullet > 0)
+            if (config.SpecialReloadCount > 0 && weaponEntity.weaponBasicInfo.Bullet > 0)
             {
                 //TODO 特殊换弹打断逻辑
                 var weaponState = playerEntity.GetCurrentWeaponInfo(_contexts);
-                if (weaponEntity.weaponData.PullBolt)
+                if (weaponEntity.weaponBasicInfo.PullBolt)
                 {
                     //如果已经上膛，直接打断并开枪
                     playerEntity.stateInterface.State.ForceBreakSpecialReload(null);
@@ -47,7 +47,7 @@ namespace App.Shared.WeaponLogic.Common
                 {
                     //如果没有上膛，执行上膛，结束后开枪
                     playerEntity.stateInterface.State.BreakSpecialReload();
-                    weaponEntity.weaponData.PullBolt = true;
+                    weaponEntity.weaponBasicInfo.PullBolt = true;
                     if (playerEntity.hasWeaponAutoState)
                     {
                         FireUtil.SetFlag(ref playerEntity.weaponAutoState.AutoFire, (int)EAutoFireState.ReloadBreak);

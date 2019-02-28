@@ -9,6 +9,7 @@ using Core.CameraControl.NewMotor;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.SessionState;
+using XmlConfig;
 
 namespace Assets.App.Shared.GameModules.Camera
 {
@@ -20,16 +21,18 @@ namespace Assets.App.Shared.GameModules.Camera
         DummyCameraMotorInput _input = new DummyCameraMotorInput();
         private DummyCameraMotorState _state ;
         private VehicleContext _vehicleContext;
+        private Contexts _contexts;
 
         private FreeMoveContext _freeMoveContext;
         private readonly  Array _subCameraMotorTypeArray;
          
-        public ClientCameraPreUpdateSystem(VehicleContext vehicleContext, FreeMoveContext freeMoveContext, PlayerContext playerContext, Motors m)
+        public ClientCameraPreUpdateSystem(Contexts contexts, Motors m)
         {
-            _vehicleContext = vehicleContext;
-            _freeMoveContext = freeMoveContext;
+            _vehicleContext = contexts.vehicle;
+            _freeMoveContext = contexts.freeMove;
             _motors = m;
-            _playerContext = playerContext;
+            _playerContext = contexts.player;
+            _contexts = contexts;
             _state = new DummyCameraMotorState(m);
             _subCameraMotorTypeArray = Enum.GetValues(typeof(SubCameraMotorType));
         }
@@ -63,7 +66,7 @@ namespace Assets.App.Shared.GameModules.Camera
            
             DummyCameraMotorState.Convert(player.cameraStateNew, _state);
             var archotRotation = player.cameraArchor.ArchorEulerAngle;
-            _input.Generate(player, cmd, archotRotation.y,archotRotation.x);
+            _input.Generate(_contexts, player, cmd, archotRotation.y,archotRotation.x);
            
             foreach (int i in _subCameraMotorTypeArray)
             {

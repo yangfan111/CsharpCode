@@ -15,7 +15,7 @@ namespace Core.WeaponLogic
 
         public void BeforeFireBullet(PlayerEntity playerEntity, WeaponEntity weaponEntity, IWeaponCmd cmd)
         {
-            var weaponState = weaponEntity.weaponData;
+            var weaponState = weaponEntity.weaponRuntimeInfo;
             float spread = UpdateSpread(playerEntity, weaponEntity, weaponState.Accuracy);
             var config = GetConfig(playerEntity);
             weaponState.LastSpreadX = spread * config.SpreadScale.ScaleX;
@@ -24,7 +24,7 @@ namespace Core.WeaponLogic
 
         protected float UpdateSpread(PlayerEntity playerEntity, WeaponEntity weaponEntity, float accuracy)
         {
-            var weaponState = weaponEntity.weaponData;
+            var weaponState = weaponEntity.weaponRuntimeInfo;
             var config = GetConfig(playerEntity);
             float param;
             var posture = playerEntity.stateInterface.State.GetCurrentPostureState();

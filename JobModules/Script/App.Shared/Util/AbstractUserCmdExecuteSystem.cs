@@ -1,5 +1,7 @@
+using Assets.Utils.Configuration;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
+using Utils.Singleton;
 
 namespace App.Shared.Util
 {
@@ -19,5 +21,6 @@ namespace App.Shared.Util
                 ExecuteUserCmd(player, cmd);
             }
         }
+        protected WeaponConfigManagement UserWeaponConfigManagement { get { return SingletonManager.Get<WeaponConfigManagement>(); } }
     }
 }

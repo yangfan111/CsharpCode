@@ -12,7 +12,7 @@ using Entitas.CodeGeneration.Attributes;
 using UnityEngine;
 using Core;
 using Core.Components;
-using Core.GameModeLogic;
+using Core;
 using Core.UpdateLatest;
 
 namespace App.Shared.Components.Player
@@ -22,7 +22,7 @@ namespace App.Shared.Components.Player
     [Player]
     [Serializable]
     
-    public class Orientation : IComponent, IUserPredictionComponent, IPlaybackComponent, ICompensationComponent
+    public class OrientationComponent : IComponent, IUserPredictionComponent, IPlaybackComponent, ICompensationComponent
     {
         public int GetComponentId() { { return (int)EComponentIds.MoveOrientation; } }
 
@@ -64,7 +64,7 @@ namespace App.Shared.Components.Player
 
         public void CopyFrom(object rightComponent)
         {
-            var r = rightComponent as Orientation;
+            var r = rightComponent as OrientationComponent;
             Yaw = r.Yaw;
             Pitch = r.Pitch;
             Roll = r.Roll;
@@ -77,7 +77,7 @@ namespace App.Shared.Components.Player
 
         public bool IsApproximatelyEqual(object right)
         {
-            var r = right as Orientation;
+            var r = right as OrientationComponent;
             if (r.AlwaysEqual || AlwaysEqual)
                 return true;
             return CompareUtility.IsApproximatelyEqual(Yaw, r.Yaw)
@@ -91,8 +91,8 @@ namespace App.Shared.Components.Player
         public bool IsInterpolateEveryFrame(){ return true; }
         public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
         {
-            var l = left as Orientation;
-            var r = right as Orientation;
+            var l = left as OrientationComponent;
+            var r = right as OrientationComponent;
             var rotio = interpolationInfo.Ratio;
 
             Yaw = ShortInterpolateAngle(l.Yaw, r.Yaw, rotio);

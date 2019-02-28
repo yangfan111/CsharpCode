@@ -65,9 +65,7 @@ namespace com.wd.free.@event
 
         void Trigger(int eventId, IPara para);
 
-        void Trigger(int eventId, TempUnit unit);
-
-        void Trigger(int eventId, TempUnit[] units);
+        void Trigger(int eventId, params TempUnit[] units);
 
         void Trigger(int eventId, TempUnit[] units, IPara[] paras);
 
@@ -75,9 +73,7 @@ namespace com.wd.free.@event
 
         void Act(IGameAction action, TriggerArgs args);
 
-        void Act(IGameAction action, TempUnit unit);
-
-        void Act(IGameAction action, TempUnit[] units);
+        void Act(IGameAction action, params TempUnit[] units);
 
         int GetInt(string v);
 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Core.CharacterState.Posture;
 using Sharpen;
 using UnityEngine;
 
@@ -21,7 +22,7 @@ namespace App.Shared.GameModules.Player.Appearance.AnimationEvent
         private static Dictionary<short, string> _eventIdToClassName = new Dictionary<short, string>();
         private static Dictionary<string,short> _classNameToEventId = new Dictionary<string,short>();
         
-        public List<KeyValuePair<short,string>> EventParams = new List<KeyValuePair<short, string>>();
+        public List<KeyValuePair<short,AnimationEventParam>> EventParams = new List<KeyValuePair<short, AnimationEventParam>>();
 
         #region MyRegion
 
@@ -144,15 +145,14 @@ namespace App.Shared.GameModules.Player.Appearance.AnimationEvent
             Func(paramArr[0], eventParam);
         }
 
-        public void ServerFunc(short eventId)
+        public void ServerFunc(short eventId, AnimationEventParam param)
         {
             string className;
              _eventIdToClassName.TryGetValue(eventId, out className);
             if (_eventCallbacks.ContainsKey(className))
             {
-                EventParams.Add(new KeyValuePair<short, string>(_classNameToEventId[className], ""));
-                _eventCallbacks[className].AnimationEventCallback(Player,"", null);
-                _logger.DebugFormat("invoke :class name:{0}", className);
+                _eventCallbacks[className].AnimationEventCallback(Player,param.EventParam, param.ToAnimationEvent());
+                _logger.DebugFormat("invoke :class name:{0}, param:{1}", className, param.ToString());
             }
             else
             {
@@ -169,7 +169,13 @@ namespace App.Shared.GameModules.Player.Appearance.AnimationEvent
                 param = paramArr[1];
             if (_eventCallbacks.ContainsKey(className))
             {
-                EventParams.Add(new KeyValuePair<short, string>(_classNameToEventId[className], param));
+                EventParams.Add(new KeyValuePair<short, AnimationEventParam>(_classNameToEventId[className], new AnimationEventParam
+                {
+                    EventParam  = string.IsNullOrEmpty(param) ? string.Empty : param,
+                    FloatParameter = eventParam.floatParameter,
+                    IntParameter = eventParam.intParameter,
+                    StringParameter = string.IsNullOrEmpty(eventParam.stringParameter) ? string.Empty : eventParam.stringParameter
+                }));
                 _eventCallbacks[className].AnimationEventCallback(Player,param, eventParam);
             }
             else

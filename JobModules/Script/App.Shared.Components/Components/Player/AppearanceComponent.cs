@@ -39,14 +39,17 @@ namespace App.Shared.Components.Player
     }
 
     [Player]
-    
     public class FirstPersonAppearanceComponent : IUserPredictionComponent, IPredictedAppearanceState
     {
         #region Properties
 
         public override string ToString()
         {
-            return string.Format("FirstPersonHeight: {0}, FirstPersonForwardOffset: {1}, SightHorizontalShift: {2}, SightVerticalShift: {3}, SightVerticalShiftRange: {4}, SightHorizontalShiftDirection: {5}, SightVerticalShiftDirection: {6}, SightRemainVerticalPeriodTime: {7}, RandomSeed: {8}", FirstPersonHeight, FirstPersonForwardOffset, SightHorizontalShift, SightVerticalShift, SightVerticalShiftRange, SightHorizontalShiftDirection, SightVerticalShiftDirection, SightRemainVerticalPeriodTime, RandomSeed);
+            return string.Format(
+                "FirstPersonHeight: {0}, FirstPersonForwardOffset: {1}, SightHorizontalShift: {2}, SightVerticalShift: {3}, SightVerticalShiftRange: {4}, SightHorizontalShiftDirection: {5}, SightVerticalShiftDirection: {6}, SightRemainVerticalPeriodTime: {7}, RandomSeed: {8}",
+                FirstPersonHeight, FirstPersonForwardOffset, SightHorizontalShift, SightVerticalShift,
+                SightVerticalShiftRange, SightHorizontalShiftDirection, SightVerticalShiftDirection,
+                SightRemainVerticalPeriodTime, RandomSeed);
         }
 
         [DontInitilize] [NetworkProperty] public float FirstPersonHeight { get; set; }
@@ -63,7 +66,7 @@ namespace App.Shared.Components.Player
 
         public int GetComponentId()
         {
-            return (int)EComponentIds.PlayerFirstPersonAppearance;
+            return (int) EComponentIds.PlayerFirstPersonAppearance;
         }
 
         public bool IsApproximatelyEqual(object right)
@@ -72,15 +75,20 @@ namespace App.Shared.Components.Player
             if (rightObj != null)
             {
                 return CompareUtility.IsApproximatelyEqual(FirstPersonHeight, rightObj.FirstPersonHeight)
-                       && CompareUtility.IsApproximatelyEqual(FirstPersonForwardOffset, rightObj.FirstPersonForwardOffset)
+                       && CompareUtility.IsApproximatelyEqual(FirstPersonForwardOffset,
+                           rightObj.FirstPersonForwardOffset)
                        && CompareUtility.IsApproximatelyEqual(SightHorizontalShift, rightObj.SightHorizontalShift)
                        && CompareUtility.IsApproximatelyEqual(SightVerticalShift, rightObj.SightVerticalShift)
                        && CompareUtility.IsApproximatelyEqual(SightVerticalShiftRange, rightObj.SightVerticalShiftRange)
-                       && CompareUtility.IsApproximatelyEqual(SightHorizontalShiftDirection, rightObj.SightHorizontalShiftDirection)
-                       && CompareUtility.IsApproximatelyEqual(SightVerticalShiftDirection, rightObj.SightVerticalShiftDirection)
-                       && CompareUtility.IsApproximatelyEqual(SightRemainVerticalPeriodTime, rightObj.SightRemainVerticalPeriodTime)
+                       && CompareUtility.IsApproximatelyEqual(SightHorizontalShiftDirection,
+                           rightObj.SightHorizontalShiftDirection)
+                       && CompareUtility.IsApproximatelyEqual(SightVerticalShiftDirection,
+                           rightObj.SightVerticalShiftDirection)
+                       && CompareUtility.IsApproximatelyEqual(SightRemainVerticalPeriodTime,
+                           rightObj.SightRemainVerticalPeriodTime)
                        && CompareUtility.IsApproximatelyEqual(RandomSeed, rightObj.RandomSeed);
             }
+
             return false;
         }
 
@@ -118,7 +126,7 @@ namespace App.Shared.Components.Player
         [DontInitilize] [NetworkProperty] public int SightVerticalShiftDirection { get; set; }
         [DontInitilize] [NetworkProperty] public int SightRemainVerticalPeriodTime { get; set; }
         [DontInitilize] [NetworkProperty] public int RandomSeed { get; set; }
-        
+
         public void CopyFrom(object rightComponent)
         {
             var right = rightComponent as FirstPersonAppearanceUpdateComponent;
@@ -133,53 +141,77 @@ namespace App.Shared.Components.Player
 
         public int GetComponentId()
         {
-            return (int)EComponentIds.PlayerFirstPersonAppearanceUpdate;
+            return (int) EComponentIds.PlayerFirstPersonAppearanceUpdate;
         }
     }
-        
-        
-        
+
+
     [Player]
-    
     public class ThirdPersonAppearanceComponent : IPlaybackComponent
     {
         #region Properties
 
         // never use these directly
         [DontInitilize] [NetworkProperty] public int PostureValue;
+        [DontInitilize] [NetworkProperty] public int NextPostureValue;
         [DontInitilize] [NetworkProperty] public int ActionValue;
+        [DontInitilize] [NetworkProperty] public int MovementValue;
         [DontInitilize] [NetworkProperty] public float PeekDegree;
         [DontInitilize] [NetworkProperty] public bool NeedUpdateController;
         [DontInitilize] [NetworkProperty] public float CharacterHeight;
         [DontInitilize] [NetworkProperty] public Vector3 CharacterCenter;
         [DontInitilize] [NetworkProperty] public float CharacterRadius;
 
-        [DontInitilize] public ThirdPersonPosture Posture
+        [DontInitilize]
+        public ThirdPersonPosture Posture
         {
-            get { return (ThirdPersonPosture)PostureValue; }
-            set { PostureValue = (int)value; }
+            get { return (ThirdPersonPosture) PostureValue; }
+            set { PostureValue = (int) value; }
         }
-        [DontInitilize] public ThirdPersonAction Action
+        
+        [DontInitilize]
+        public ThirdPersonPosture NextPosture
         {
-            get { return (ThirdPersonAction)ActionValue; }
-            set { ActionValue = (int)value; }
+            get { return (ThirdPersonPosture) NextPostureValue; }
+            set { NextPostureValue = (int) value; }
+        }
+
+        [DontInitilize]
+        public ThirdPersonAction Action
+        {
+            get { return (ThirdPersonAction) ActionValue; }
+            set { ActionValue = (int) value; }
+        }
+
+        [DontInitilize]
+        public ThirdPersonMovement Movement
+        {
+            get { return (ThirdPersonMovement) MovementValue; }
+            set { MovementValue = (int) value; }
         }
 
         #endregion
 
         public int GetComponentId()
         {
-            return (int)EComponentIds.PlayerThirdPersonAppearance;
+            return (int) EComponentIds.PlayerThirdPersonAppearance;
         }
-        public bool IsInterpolateEveryFrame(){ return true; }
+
+        public bool IsInterpolateEveryFrame()
+        {
+            return true;
+        }
+
         public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
         {
             ThirdPersonAppearanceComponent leftComponent = left as ThirdPersonAppearanceComponent;
             ThirdPersonAppearanceComponent rightComponent = right as ThirdPersonAppearanceComponent;
             CopyFrom(rightComponent);
             PeekDegree = Mathf.Lerp(leftComponent.PeekDegree, rightComponent.PeekDegree, interpolationInfo.Ratio);
-            CharacterHeight = Mathf.Lerp(leftComponent.CharacterHeight, rightComponent.CharacterHeight, interpolationInfo.Ratio);
-            CharacterRadius = Mathf.Lerp(leftComponent.CharacterRadius, rightComponent.CharacterRadius, interpolationInfo.Ratio);
+            CharacterHeight = Mathf.Lerp(leftComponent.CharacterHeight, rightComponent.CharacterHeight,
+                interpolationInfo.Ratio);
+            CharacterRadius = Mathf.Lerp(leftComponent.CharacterRadius, rightComponent.CharacterRadius,
+                interpolationInfo.Ratio);
         }
 
         public void CopyFrom(object rightComponent)
@@ -188,68 +220,73 @@ namespace App.Shared.Components.Player
             if (right != null)
             {
                 Posture = right.Posture;
+                NextPosture = right.NextPosture;
                 Action = right.Action;
+                Movement = right.Movement;
                 PeekDegree = right.PeekDegree;
                 NeedUpdateController = right.NeedUpdateController;
                 CharacterHeight = right.CharacterHeight;
                 CharacterCenter = right.CharacterCenter;
                 CharacterRadius = right.CharacterRadius;
-            };
+            }
         }
 
         public override string ToString()
         {
-            return string.Format("PostureValue: {0}, ActionValue: {1}, PeekDegree: {2}, NeedUpdateController: {3}, CharacterHeight: {4}, CharacterCenter: {5}, CharacterRadius: {6}", PostureValue, ActionValue, PeekDegree, NeedUpdateController, CharacterHeight, CharacterCenter, CharacterRadius);
+            return string.Format(
+                "PostureValue: {0}, ActionValue: {1}, PeekDegree: {2}, NeedUpdateController: {3}, CharacterHeight: {4}, CharacterCenter: {5}, CharacterRadius: {6}",
+                PostureValue, ActionValue, PeekDegree, NeedUpdateController, CharacterHeight, CharacterCenter,
+                CharacterRadius);
         }
     }
 
     [Player]
-    
-    public class LatestAppearanceComponent : ILatestAppearanceState, ISelfLatestComponent, IPlaybackComponent
+    public class LatestAppearanceComponent : ISelfLatestComponent, IPlaybackComponent
     {
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOne { get; set; }
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOneMuzzle { get; set; }
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOneLowRail { get; set; }
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOneMagazine { get; set; }
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOneButtstock { get; set; }
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOneScope { get; set; }
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwo { get; set; }
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwoMuzzle { get; set; }
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwoLowRail { get; set; }
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwoMagazine { get; set; }
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwoButtstock { get; set; }
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwoScope { get; set; }
-        [DontInitilize] [NetworkProperty] public int SideArm { get; set; }
-        [DontInitilize] [NetworkProperty] public int SideArmMuzzle { get; set; }
-        [DontInitilize] [NetworkProperty] public int SideArmLowRail { get; set; }
-        [DontInitilize] [NetworkProperty] public int SideArmMagazine { get; set; }
-        [DontInitilize] [NetworkProperty] public int SideArmButtstock { get; set; }
-        [DontInitilize] [NetworkProperty] public int SideArmScope { get; set; }
-        [DontInitilize] [NetworkProperty] public int MeleeWeapon { get; set; }
-        [DontInitilize] [NetworkProperty] public int ThrownWeapon { get; set; }
-        [DontInitilize] [NetworkProperty] public int TacticWeapon { get; set; }
-        [DontInitilize] [NetworkProperty] public int Cap { get; set; }
-        [DontInitilize] [NetworkProperty] public int PendantFace { get; set; }
-        [DontInitilize] [NetworkProperty] public int Inner { get; set; }
-        [DontInitilize] [NetworkProperty] public int Armor { get; set; }
-        [DontInitilize] [NetworkProperty] public int Outer { get; set; }
-        [DontInitilize] [NetworkProperty] public int Glove { get; set; }
-        [DontInitilize] [NetworkProperty] public int Waist { get; set; }
-        [DontInitilize] [NetworkProperty] public int Trouser { get; set; }
-        [DontInitilize] [NetworkProperty] public int Foot { get; set; }
-        [DontInitilize] [NetworkProperty] public int Bag { get; set; }
-        [DontInitilize] [NetworkProperty] public int Entirety { get; set; }
-        [DontInitilize] [NetworkProperty] public int CharacterHair { get; set; }
-        [DontInitilize] [NetworkProperty] public int CharacterHead { get; set; }
-        [DontInitilize] [NetworkProperty] public int CharacterGlove { get; set; }
-        [DontInitilize] [NetworkProperty] public int CharacterInner { get; set; }
-        [DontInitilize] [NetworkProperty] public int CharacterTrouser { get; set; }
-        [DontInitilize] [NetworkProperty] public int CharacterFoot { get; set; }
-        [DontInitilize] [NetworkProperty] public int PropId { get; set; }
+        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOne;
+        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOneMuzzle;
+        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOneLowRail;
+        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOneMagazine;
+        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOneButtstock;
+        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOneScope;
+        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwo;
+        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwoMuzzle;
+        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwoLowRail;
+        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwoMagazine;
+        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwoButtstock;
+        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwoScope;
+        [DontInitilize] [NetworkProperty] public int SideArm;
+        [DontInitilize] [NetworkProperty] public int SideArmMuzzle;
+        [DontInitilize] [NetworkProperty] public int SideArmLowRail;
+        [DontInitilize] [NetworkProperty] public int SideArmMagazine;
+        [DontInitilize] [NetworkProperty] public int SideArmButtstock;
+        [DontInitilize] [NetworkProperty] public int SideArmScope;
+        [DontInitilize] [NetworkProperty] public int MeleeWeapon;
+        [DontInitilize] [NetworkProperty] public int ThrownWeapon;
+        [DontInitilize] [NetworkProperty] public int TacticWeapon;
+
+        [DontInitilize] [NetworkProperty] public int Cap;
+        [DontInitilize] [NetworkProperty] public int PendantFace;
+        [DontInitilize] [NetworkProperty] public int Inner;
+        [DontInitilize] [NetworkProperty] public int Armor;
+        [DontInitilize] [NetworkProperty] public int Outer;
+        [DontInitilize] [NetworkProperty] public int Glove;
+        [DontInitilize] [NetworkProperty] public int Waist;
+        [DontInitilize] [NetworkProperty] public int Trouser;
+        [DontInitilize] [NetworkProperty] public int Foot;
+        [DontInitilize] [NetworkProperty] public int Bag;
+        [DontInitilize] [NetworkProperty] public int Entirety;
+        [DontInitilize] [NetworkProperty] public int CharacterHair;
+        [DontInitilize] [NetworkProperty] public int CharacterHead;
+        [DontInitilize] [NetworkProperty] public int CharacterGlove;
+        [DontInitilize] [NetworkProperty] public int CharacterInner;
+        [DontInitilize] [NetworkProperty] public int CharacterTrouser;
+        [DontInitilize] [NetworkProperty] public int CharacterFoot;
+        [DontInitilize] [NetworkProperty] public int PropId;
 
         public int GetComponentId()
         {
-            return (int)EComponentIds.PlayerLatestAppearance;
+            return (int) EComponentIds.PlayerLatestAppearance;
         }
 
         public void Init()
@@ -294,12 +331,22 @@ namespace App.Shared.Components.Player
             CharacterFoot = UniversalConsts.InvalidIntId;
             PropId = UniversalConsts.InvalidIntId;
         }
-        public bool IsInterpolateEveryFrame(){ return false; }
+
+        public bool IsInterpolateEveryFrame()
+        {
+            return false;
+        }
+
         public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
         {
             CopyFrom(left);
         }
-        
+
+        public void SyncLatestFrom(object rightComponent)
+        {
+            CopyFrom(rightComponent);
+        }
+
         public void CopyFrom(object rightComponent)
         {
             var right = rightComponent as LatestAppearanceComponent;
@@ -343,30 +390,29 @@ namespace App.Shared.Components.Player
                 CharacterInner = right.CharacterInner;
                 CharacterTrouser = right.CharacterTrouser;
                 CharacterFoot = right.CharacterFoot;
+                PropId = right.PropId;
             }
-        }
-
-        public void SyncLatestFrom(object rightComponent)
-        {
-            CopyFrom(rightComponent);
         }
     }
 
     [Player]
-    
-    public class PredictedAppearanceComponent : IPredictedPlaybackAppearanceState, IUserPredictionComponent, ICompensationComponent, IPlaybackComponent
+    public class PredictedAppearanceComponent : IUserPredictionComponent, ICompensationComponent, IPlaybackComponent
     {
-        [DontInitilize] [NetworkProperty] public int WeaponInHand { get; set; }
-        [DontInitilize] [NetworkProperty] public int AlternativeWeaponLocator { get; set; }
-        [DontInitilize] [NetworkProperty] public int AlternativeP3WeaponLocator { get; set; }
-        [DontInitilize] [NetworkProperty] public int ReloadState { get; set; }
-        [DontInitilize] [NetworkProperty] public bool EnableIK { get; set; }
+        [DontInitilize] [NetworkProperty] public int WeaponInHand;
+        [DontInitilize] [NetworkProperty] public int AlternativeWeaponLocator;
+        [DontInitilize] [NetworkProperty] public int AlternativeP3WeaponLocator;
+        [DontInitilize] [NetworkProperty] public int ReloadState;
 
         public int GetComponentId()
         {
-            return (int)EComponentIds.PlayerPredictedAppearance;
+            return (int) EComponentIds.PlayerPredictedAppearance;
         }
-        public bool IsInterpolateEveryFrame(){ return false; }
+
+        public bool IsInterpolateEveryFrame()
+        {
+            return false;
+        }
+
         public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
         {
             PredictedAppearanceComponent rightComponent = right as PredictedAppearanceComponent;
@@ -379,11 +425,13 @@ namespace App.Shared.Components.Player
             if (rightObj != null)
             {
                 return CompareUtility.IsApproximatelyEqual(WeaponInHand, rightObj.WeaponInHand) &&
-                    CompareUtility.IsApproximatelyEqual(AlternativeWeaponLocator, rightObj.AlternativeWeaponLocator) &&
-                    CompareUtility.IsApproximatelyEqual(AlternativeP3WeaponLocator, rightObj.AlternativeP3WeaponLocator) &&
-                    CompareUtility.IsApproximatelyEqual(ReloadState, rightObj.ReloadState) &&
-                    CompareUtility.IsApproximatelyEqual(EnableIK, rightObj.EnableIK);
+                       CompareUtility.IsApproximatelyEqual(AlternativeWeaponLocator,
+                           rightObj.AlternativeWeaponLocator) &&
+                       CompareUtility.IsApproximatelyEqual(AlternativeP3WeaponLocator,
+                           rightObj.AlternativeP3WeaponLocator) &&
+                       CompareUtility.IsApproximatelyEqual(ReloadState, rightObj.ReloadState);
             }
+
             return false;
         }
 
@@ -396,16 +444,18 @@ namespace App.Shared.Components.Player
                 AlternativeWeaponLocator = right.AlternativeWeaponLocator;
                 AlternativeP3WeaponLocator = right.AlternativeP3WeaponLocator;
                 ReloadState = right.ReloadState;
-                EnableIK = right.EnableIK;
-            };
+            }
+
+            ;
         }
 
         public override string ToString()
         {
-            return string.Format("WeaponInHand: {0}, AlternativeWeaponLocator: {1}, AlternativeP3WeaponLocator: {2}, ReloadState: {3}, EnableIK: {4}", WeaponInHand, AlternativeWeaponLocator, AlternativeP3WeaponLocator, ReloadState, EnableIK);
+            return string.Format(
+                "WeaponInHand: {0}, AlternativeWeaponLocator: {1}, AlternativeP3WeaponLocator: {2}, ReloadState: {3}",
+                WeaponInHand, AlternativeWeaponLocator, AlternativeP3WeaponLocator, ReloadState);
         }
 
-      
 
         public void RewindTo(object rightComponent)
         {

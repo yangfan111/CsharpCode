@@ -47,5 +47,14 @@ namespace Core.CharacterState.Action.Transitions
 
             _update = GetLerpFunc(FsmOutputType.FirstPersonSight, 0, 1);
         }
+
+        public override void Init(IFsmInputCommand command)
+        {
+            base.Init(command);
+            if (InitValue != 0)
+            {
+                NormalizedTime = 1 - InitValue;
+            }
+        }
     }
 }

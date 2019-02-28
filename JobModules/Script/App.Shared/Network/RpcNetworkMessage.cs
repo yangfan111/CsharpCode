@@ -46,9 +46,7 @@ namespace RpcNetwork.RpcNetwork
 
         public INetworkMessageSerializer GetRpcMessageSerializer()
         {
-            ISerializeInfo[] _serializeInfo = new ISerializeInfo[1];
-            _serializeInfo[0] = new ProtoBufSerializeInfo<Apc>(Apc.Parser);
-            INetworkMessageSerializer _defaultSerializer = new NetworkMessageSerializer(new AppMessageTypeInfo(_serializeInfo));
+            INetworkMessageSerializer _defaultSerializer = new NetworkMessageSerializer(new AppMessageTypeInfo(new ProtoBufSerializeInfo<Apc>(Apc.Parser)));
              return _defaultSerializer;
         }
 
@@ -67,7 +65,7 @@ namespace RpcNetwork.RpcNetwork
                 apc.Parameters.Add(byteString);
             }
 
-            channel.SendReliable(0, apc);
+            channel.SendReliable(messageName.GetHashCode(), apc);
             apc.ReleaseReference();
         }
 

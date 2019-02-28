@@ -59,7 +59,7 @@ namespace Core.Utils
                     _labels[4] = string.Format( "{0}   Interval:{1} , Delta:{2} rTime:{3} sTime:{4} d:{5}",
                         StepExecuteManager.Instance.FpsString(), SingletonManager.Get<DurationHelp>().LastAvgInterpolateInterval, 
                         SingletonManager.Get<DurationHelp>().ServerClientDelta, SingletonManager.Get<DurationHelp>().RenderTime, SingletonManager.Get<DurationHelp>().LastServerTime, SingletonManager.Get<DurationHelp>().LastServerTime-SingletonManager.Get<DurationHelp>().RenderTime) ;
-                    _labels[5] = string.Format("serverip: {0}",SingletonManager.Get<DurationHelp>().ServerInfo);
+                    _labels[5] = string.Format("serverip: {0} ServerId: {1}",SingletonManager.Get<DurationHelp>().ServerInfo, SingletonManager.Get<Core.Utils.ServerInfo>().ServerId);
                     _bb.normal.background = null; //这是设置背景填充的
                     _bb.normal.textColor = new Color(1.0f, 1f, 1.0f); //设置字体颜色的
                     _bb.fontSize = 10; //当然，这是字体大小

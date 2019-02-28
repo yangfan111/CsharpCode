@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Core.CameraControl;
 using Core.Utils;
+using ECM.Components;
 using UnityEngine;
 using Utils.Compare;
 using Debug = UnityEngine.Debug;
@@ -97,6 +98,23 @@ namespace KinematicCharacterController
 
             GroundCollider = transientGroundingReport.GroundCollider;
             GroundPoint = Vector3.zero;
+        }
+
+        public GroundHit ToGroundHit()
+        {
+            GroundHit ret = new GroundHit();
+            ret.groundNormal = GroundNormal;
+            ret.groundCollider = GroundCollider;
+            ret.groundDistance = 0f;
+            ret.groundPoint = GroundPoint;
+            ret.groundRigidbody = null;
+            ret.ledgeDistance = 0f;
+            ret.stepHeight = 0f;
+            ret.surfaceNormal = GroundNormal;
+            ret.isOnGround = IsStableOnGround;
+            ret.isOnStep = !IsStableOnGround;
+            ret.isValidGround = IsStableOnGround;
+            return ret;
         }
     }
 

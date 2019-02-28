@@ -18,4 +18,10 @@ namespace App.Shared.Components.Player
             return Value == EPlayerLoginStage.EnterRunning || Value == EPlayerLoginStage.Running;
         }
     }
+
+    [Player]
+    public class InitializedComponent : IComponent
+    {
+        
+    }
 }

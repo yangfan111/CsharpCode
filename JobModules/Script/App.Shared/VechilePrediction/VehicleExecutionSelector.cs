@@ -5,19 +5,45 @@ using Core.Utils;
 using Entitas;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Linq;
 using Utils.Singleton;
 
 namespace App.Shared.VechilePrediction
 {
     public class VehicleExecutionSelector : IVehicleExecutionSelector
     {
+        protected struct ActiveSetting
+        {
+            public VehicleEntity Vehicle;
+            public bool Active;
+            public bool LowLod;
+
+            public ActiveSetting(VehicleEntity vehicle, bool active)
+            {
+                Vehicle = vehicle;
+                Active = active;
+                LowLod = false;
+            }
+
+            public ActiveSetting(VehicleEntity vehicle, bool active, bool lowlod)
+            {
+                Vehicle = vehicle;
+                Active = active;
+                LowLod = lowlod;
+            }
+        }
+
         protected VehicleContext VehicleContext;
         protected PlayerContext PlayerContext;
         protected IGroup<VehicleEntity> Vehicles;
         private IGroup<PlayerEntity> _players;
-        private IList<Entity> _activeVehicleCache;
+        private int _activeCacheIndex = 0;
+        private List<Entity>[] _activeVehicleCaches;
         private bool _ignorePlayerVehicleCollision;
         protected float SqrPhysicsDistance;
+
+        private Queue<ActiveSetting> _activeWaitingQueue = new Queue<ActiveSetting>();
 
         protected static  readonly float PhysicsDistanceDamper = 0.81f;
 
@@ -26,7 +52,11 @@ namespace App.Shared.VechilePrediction
         {
             VehicleContext = contexts.vehicle;
             PlayerContext = contexts.player;
-            _activeVehicleCache = new List<Entity>();
+
+            _activeVehicleCaches = new List<Entity>[2];
+            _activeVehicleCaches[0] = new List<Entity>();
+            _activeVehicleCaches[1] = new List<Entity>();
+
             Vehicles = VehicleContext.GetGroup(VehicleMatcher.AllOf(VehicleMatcher.GameObject, VehicleMatcher.Position));
             _players = PlayerContext.GetGroup(PlayerMatcher.AllOf(PlayerMatcher.ThirdPersonModel, PlayerMatcher.GamePlay));
             _ignorePlayerVehicleCollision = false;
@@ -46,12 +76,22 @@ namespace App.Shared.VechilePrediction
         public void Update()
         {
             SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.VehicleEntityUpdate);
-            _activeVehicleCache.Clear();
-            UpdateVehicles();
+            if (CanUpdate())
+            {
+                NextActiveVehicles.Clear();
+                UpdateVehicles();
+            }
+            
+            SetVehicleStates();
             SingletonManager.Get<DurationHelp>().ProfileEnd(CustomProfilerStep.VehicleEntityUpdate);
             SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.VehiclePlayerLayerSet);
             UpdatePlayers();
             SingletonManager.Get<DurationHelp>().ProfilePause(CustomProfilerStep.VehiclePlayerLayerSet);
+        }
+
+        private void ChangeActiveCache()
+        {
+            _activeCacheIndex = _activeCacheIndex == 0 ? 1 : 0;
         }
 
         public void LateUpdate()
@@ -59,6 +99,22 @@ namespace App.Shared.VechilePrediction
             SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.VehiclePlayerLayerSet);
             LateUpdatePlayers();
             SingletonManager.Get<DurationHelp>().ProfileEnd(CustomProfilerStep.VehiclePlayerLayerSet);
+        }
+
+        private void SetVehicleStates()
+        {
+            int updateCount = SharedConfig.VehicleActiveUpdateRate;
+            while (_activeWaitingQueue.Count > 0 && updateCount > 0)
+            {
+                var activeSetting = _activeWaitingQueue.Dequeue();
+                SetActive(activeSetting);
+                updateCount--;
+
+                if (_activeWaitingQueue.Count == 0)
+                {
+                    ChangeActiveCache();
+                }
+            }
         }
 
         protected virtual void UpdateVehicles()
@@ -91,19 +147,47 @@ namespace App.Shared.VechilePrediction
 
                 bool active = isPlayerNear || !isPlayerFar && v.IsActiveSelf();
 
-                v.SetActive(active);
-                if (active)
-                {
-                    NotifyVehicleActive(v);
-                }
+                SetActiveDelay(new ActiveSetting(v, active));
             }
         }
 
-        public IList<Entity> ActiveVehicles {get { return _activeVehicleCache; }}
+        protected void SetActiveDelay(ActiveSetting activeSetting)
+        {
+            _activeWaitingQueue.Enqueue(activeSetting);
+        }
+
+        private bool CanUpdate()
+        {
+            return _activeWaitingQueue.Count == 0;
+        }
+
+        protected  virtual void SetActive(ActiveSetting activeSetting)
+        {
+            var vehicle = activeSetting.Vehicle;
+            var active = activeSetting.Active;
+            vehicle.SetActive(active);
+            if (active)
+            {
+                NotifyVehicleActive(vehicle);
+            }
+        }
+
+        public IList<Entity> ActiveVehicles {get { return _activeVehicleCaches[_activeCacheIndex]; }}
+
+        private IList<Entity> NextActiveVehicles
+        {
+            get
+            {
+                var nextActiveCacheIndex = _activeCacheIndex == 0 ? 1 : 0;
+
+                return _activeVehicleCaches[nextActiveCacheIndex];
+            }
+        }
 
         protected void NotifyVehicleActive(VehicleEntity vehicle)
         {
-            _activeVehicleCache.Add(vehicle);
+
+            NextActiveVehicles.Add(vehicle);
         }
 
         private void UpdatePlayers()
@@ -122,7 +206,7 @@ namespace App.Shared.VechilePrediction
 
         private void IgnorePlayerVehicleCollision(bool ignore)
         {
-            var layer = ignore ? UnityLayers.PlayerIgnoreVehicleLayer : UnityLayers.PlayerLayer;
+            var layer = ignore ? UnityLayerManager.GetLayerIndex(EUnityLayerName.PlayerIgnoreVehicle) : UnityLayerManager.GetLayerIndex(EUnityLayerName.Player);
             var players = _players.GetEntities();
             int playerCount = players.Length;
             for (int i = 0; i < playerCount; ++i)
@@ -155,7 +239,7 @@ namespace App.Shared.VechilePrediction
 
         public int ActiveCount
         {
-            get { return _activeVehicleCache.Count; }
+            get { return _activeVehicleCaches[_activeCacheIndex].Count; }
         }
 
         public PlayerContext GetPlayerContext()

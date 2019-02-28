@@ -1,7 +1,11 @@
-﻿using App.Shared.GameModules.Weapon;
+﻿using App.Server.GameModules.GamePlay.free.player;
+using App.Shared.FreeFramework.framework.trigger;
 using App.Shared.Util;
+using com.wd.free.@event;
+using com.wd.free.para;
 using Core;
 using Core.EntityComponent;
+using Core.Free;
 using Core.Utils;
 
 namespace App.Shared.GameModeLogic.PickupLogic
@@ -11,21 +15,23 @@ namespace App.Shared.GameModeLogic.PickupLogic
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(AutoPickupLogic));
         private SceneObjectContext _sceneObjectContext;
         private PlayerContext _playerContext;
+        private Contexts _contexts;
         private ISceneObjectEntityFactory _sceneObjectEntityFactory;
 
-        public AutoPickupLogic(SceneObjectContext sceneObjectContext, PlayerContext playerContext, ISceneObjectEntityFactory sceneObjectEntityFactory)
+        public AutoPickupLogic(Contexts contexts, ISceneObjectEntityFactory sceneObjectEntityFactory)
         {
-            _sceneObjectContext = sceneObjectContext;
-            _playerContext = playerContext;
+            _contexts = contexts;
+            _sceneObjectContext = contexts.sceneObject;
+            _playerContext = contexts.player;
             _sceneObjectEntityFactory = sceneObjectEntityFactory;
         }
 
-        public virtual void AutoPickupWeapon(int playerEntityId, int weaponEntityId)
+        public virtual void AutoPickupWeapon(int playerEntityId, int sceneEnityId)
         {
-            var entity = _sceneObjectContext.GetEntityWithEntityKey(new EntityKey(weaponEntityId, (short)EEntityType.SceneObject));
+            var entity = _sceneObjectContext.GetEntityWithEntityKey(new EntityKey(sceneEnityId, (short)EEntityType.SceneObject));
             if (null == entity)
             {
-                Logger.ErrorFormat("{0} doesn't exist in scene object context ", weaponEntityId);
+                Logger.ErrorFormat("{0} doesn't exist in scene object context ", sceneEnityId);
                 return;
             }
             var player = _playerContext.GetEntityWithEntityKey(new EntityKey(playerEntityId, (short)EEntityType.Player));
@@ -34,7 +40,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
                 Logger.ErrorFormat("{0} doesn't exist in player context ", playerEntityId);
                 return;
             }
-            if (!entity.hasWeapon)
+            if (!entity.hasWeaponObject)
             {
                 Logger.ErrorFormat("only weapon is supported in normal mode");
                 return;
@@ -43,10 +49,19 @@ namespace App.Shared.GameModeLogic.PickupLogic
             {
                 return;
             }
-            var pickupSuccess = player.GetController<PlayerWeaponController>().AutoPickUpWeapon(entity.weapon.ToWeaponInfo());
+            var newWeaponScan = (WeaponScanStruct)entity.weaponObject;
+            var pickupSuccess = player.WeaponController().AutoPickUpWeapon(newWeaponScan);
             if (pickupSuccess)
             {
-                _sceneObjectEntityFactory.DestroyEquipmentEntity(entity.entityKey.Value.EntityId);
+                IEventArgs args = _contexts.session.commonSession.FreeArgs as IEventArgs;
+                if (null != args)
+                {
+                    TriggerArgs ta = new TriggerArgs();
+                    ta.AddPara(new IntPara("weaponId", entity.weaponObject.ConfigId));
+                    ta.AddUnit("current", (FreeData)player.freeData.FreeData);
+                    args.Trigger(FreeTriggerConstant.WEAPON_PICKUP, ta);
+                }
+                _sceneObjectEntityFactory.DestroySceneWeaponObjectEntity(entity.entityKey.Value.EntityId);
             }
         }   
     }

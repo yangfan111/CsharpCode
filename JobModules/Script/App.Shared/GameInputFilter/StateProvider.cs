@@ -25,6 +25,10 @@ namespace App.Shared.GameInputFilter
             var states = _playerState.GetCurrentStates();
             foreach(var state in states)
             {
+                if(state == EPlayerState.None)
+                {
+                    continue;
+                }
                 processor.AddState(_statePool.GetState(state));
             }
             //处理复合状态

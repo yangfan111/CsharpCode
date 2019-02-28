@@ -29,7 +29,7 @@ namespace Core.Prediction.UserPrediction.Parallel
         IParallelExecute _mainThread;
 
         public TaskDispatcher(int threadCount, IParallelExecute mainThread, WorkThread[] slaveThreads,
-            List<TaskInfo> taskInfos)
+            List<TaskInfo> taskInfos): base("TaskDispatcher")
         {
             _threadCount = threadCount;
             _slaveThreads = new WorkThread[threadCount];

@@ -1,4 +1,5 @@
 ﻿using App.Shared.Components.Bag;
+using App.Shared.Components.Weapon;
 using Assets.Utils.Configuration;
 using Core;
 using Core.Enums;
@@ -31,16 +32,16 @@ namespace App.Shared.Util
             return config != null;
         }
         /// <summary>
-        /// 验证weaponComponentData合法
+        /// 验证weaponDataComponent合法
         /// </summary>
         /// <param name="comp"></param>
         /// <returns></returns>
-        public static EFuncResult VertifyWeaponComponent(WeaponComponent comp)
+        public static EFuncResult VertifyWeaponComponent(WeaponBasicInfoComponent comp)
         {
             NewWeaponConfigItem itemCfg;
             return VertifyWeaponComponent(comp, out itemCfg);
-
         }
+
         public static bool VertifyWeaponInfo(WeaponInfo wpInfo)
         {
             NewWeaponConfigItem itemCfg;
@@ -58,52 +59,32 @@ namespace App.Shared.Util
             return true;
         }
         /// <summary>
-        /// 验证weaponComponentData合法
+        /// 验证weaponDataComponent合法
         /// </summary>
         /// <param name="comp"></param>
         /// <returns></returns>
-        public static EFuncResult VertifyWeaponComponent(WeaponComponent comp, out NewWeaponConfigItem wpConfig)
+        public static EFuncResult VertifyWeaponComponent(WeaponBasicInfoComponent comp, out NewWeaponConfigItem wpConfig)
         {
             wpConfig = null;
-            if (comp == null || comp.Id < 1)
+            if (comp == null || comp.WeaponId < 1)
                 return EFuncResult.Exception;
-            wpConfig = SingletonManager.Get<WeaponConfigManager>().GetConfigById(comp.Id);
+            wpConfig = SingletonManager.Get<WeaponConfigManager>().GetConfigById(comp.WeaponId);
             if (wpConfig == null)
                 return EFuncResult.Exception;
             return EFuncResult.Success;
         }
+ 
         /// <summary>
         /// 判断weaponComponentData是已装填
         /// </summary>
         /// <param name="comp"></param>
         /// <returns></returns>
-        public static bool VertifyWeaponComponentStuffed(WeaponComponent comp)
+        public static bool VertifyWeaponComponentStuffed(WeaponBasicInfoComponent comp)
         {
-            return comp != null && comp.Id > 0;
+            return comp != null && comp.WeaponId > 0;
         }
 
         #endregion
-
-        /// <summary>
-        /// ComponentData ==>WeaponInfo
-        /// </summary>
-        /// <param name="comp"></param>
-        /// <returns></returns>
-        public static WeaponInfo ToWeaponInfo(WeaponComponent comp)
-        {
-            if (VertifyWeaponComponent(comp) == EFuncResult.Success)
-            {
-                return WeaponInfoEx.ToWeaponInfo(comp);
-            }
-
-            return WeaponInfo.Empty;
-        }
-        public static EWeaponSlotType GetSlotByStateComponent(WeaponStateComponent stateCmp)
-        {
-            return stateCmp != null ? (EWeaponSlotType)stateCmp.CurrentWeaponSlot : EWeaponSlotType.None;
-        }
-    
-
     }
 }
 

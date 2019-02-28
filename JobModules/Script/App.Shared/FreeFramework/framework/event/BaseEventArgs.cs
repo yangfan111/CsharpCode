@@ -200,15 +200,7 @@ namespace com.wd.free.@event
             triggerArgs.Trigger(this, _triggers, eventId);
         }
 
-        public void Trigger(int eventId, TempUnit unit)
-        {
-            triggerArgs.Reset();
-            triggerArgs.AddUnit(unit.key, unit.unit);
-
-            triggerArgs.Trigger(this, _triggers, eventId);
-        }
-
-        public void Trigger(int eventId, TempUnit[] units)
+        public void Trigger(int eventId, params TempUnit[] units)
         {
             triggerArgs.Reset();
             for (int i = 0; i < units.Length; i++)
@@ -262,7 +254,7 @@ namespace com.wd.free.@event
             }
         }
 
-        public void Act(IGameAction action, TempUnit[] units)
+        public void Act(IGameAction action, params TempUnit[] units)
         {
             if (action != null)
             {

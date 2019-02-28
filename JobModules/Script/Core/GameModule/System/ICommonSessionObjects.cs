@@ -5,13 +5,14 @@ using Core.GameInputFilter;
 using Core.IFactory;
 using Core.WeaponLogic;
 using Core.Common;
-using Core.GameModeLogic;
+using Core;
 using Core.Room;
 using Core.Configuration;
 using Core.Free;
 using Core.BulletSimulation;
 using Core.SceneManagement;
 using UnityEngine;
+using App.Shared;
 
 namespace Core.GameModule.System
 {
@@ -19,19 +20,15 @@ namespace Core.GameModule.System
     {
         ISceneObjectEntityFactory SceneObjectEntityFactory { get; set; }
         ISoundEntityFactory SoundEntityFactory{ get; set; }
-        IBulletEntityFactory BulletEntityFactory{ get; set; }
     }
 
     public interface ICommonSessionObjects
     {
-      
-        IGameObjectPool GameObjectPool { get; set; }
-        ILoadRequestManager LoadRequestManager { get; set; }
+        IUnityAssetManager AssetManager { get; set; }
         ICoRoutineManager CoRoutineManager { get; set; }
-        IAssetPool AssetPool { get; set; }
         IGameContexts GameContexts { get; set; }
        
-        IWeaponModeLogic WeaponModeLogic { get; set; }
+        IWeaponMode WeaponModeLogic { get; set; }
         IGameStateProcessorFactory GameStateProcessorFactory{ get; set; }
         RoomInfo RoomInfo { get; set; }
         RuntimeGameConfig RuntimeGameConfig { get; set; }

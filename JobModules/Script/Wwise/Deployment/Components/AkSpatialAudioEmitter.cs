@@ -5,36 +5,58 @@
 public class AkSpatialAudioEmitter : AkSpatialAudioBase
 {
 	[UnityEngine.Header("Early Reflections")]
+	[UnityEngine.Tooltip("The Auxiliary Bus with a Reflect plug-in Effect applied.")]
 	/// The Auxiliary Bus with a Reflect plug-in Effect applied.
 	public AK.Wwise.AuxBus reflectAuxBus;
 
+	[UnityEngine.Tooltip("A heuristic to stop the computation of reflections. Should be no longer (and possibly shorter for less CPU usage) than the maximum attenuation of the sound emitter.")]
 	/// A heuristic to stop the computation of reflections. Should be no longer (and possibly shorter for less CPU usage) than the maximum attenuation of the sound emitter.
 	public float reflectionMaxPathLength = 1000;
 
 	[UnityEngine.Range(0, 1)]
+	[UnityEngine.Tooltip("The gain [0, 1] applied to the reflect auxiliary bus.")]
 	/// The gain [0, 1] applied to the reflect auxiliary bus.
 	public float reflectionsAuxBusGain = 1;
 
 	[UnityEngine.Range(1, 4)]
+	[UnityEngine.Tooltip("The maximum number of reflections that will be processed for a sound path before it reaches the listener.")]
 	/// The maximum number of reflections that will be processed for a sound path before it reaches the listener.
 	/// Reflection processing grows exponentially with the order of reflections, so this number should be kept low. Valid range: 1-4.
 	public uint reflectionsOrder = 1;
 
 	[UnityEngine.Header("Rooms")] [UnityEngine.Range(0, 1)]
+	[UnityEngine.Tooltip("Send gain (0.f-1.f) that is applied when sending to the aux bus associated with the room that the emitter is in.")]
 	/// Send gain (0.f-1.f) that is applied when sending to the aux bus associated with the room that the emitter is in.
 	public float roomReverbAuxBusGain = 1;
+
+	[UnityEngine.Header("Geometric Diffraction (Experimental)")]
+	[UnityEngine.Tooltip("The maximum number of edges that the sound can diffract around between the emitter and the listener.")]
+	/// The maximum number of edges that the sound can diffract around between the emitter and the listener.
+	public uint diffractionMaxEdges = 0;
+
+	[UnityEngine.Tooltip("The maximum number of paths to the listener that the sound can take around obstacles.")]
+	/// The maximum number of paths to the listener that the sound can take around obstacles.
+	public uint diffractionMaxPaths = 0;
+
+	[UnityEngine.Tooltip("The maximum length that a diffracted sound can travel.")]
+	/// The maximum length that a diffracted sound can travel. Should be no longer (and possibly shorter for less CPU usage) than the maximum attenuation of the sound emitter.
+	public uint diffractionMaxPathLength = 0;
 
 	private void OnEnable()
 	{
 		var emitterSettings = new AkEmitterSettings();
 
-		emitterSettings.reflectAuxBusID = (uint) reflectAuxBus.ID;
+		emitterSettings.reflectAuxBusID = reflectAuxBus.Id;
 		emitterSettings.reflectionMaxPathLength = reflectionMaxPathLength;
 		emitterSettings.reflectionsAuxBusGain = reflectionsAuxBusGain;
 		emitterSettings.reflectionsOrder = reflectionsOrder;
 		emitterSettings.reflectorFilterMask = unchecked((uint) -1);
 		emitterSettings.roomReverbAuxBusGain = roomReverbAuxBusGain;
 		emitterSettings.useImageSources = 0;
+		emitterSettings.diffractionMaxEdges = diffractionMaxEdges;
+		emitterSettings.diffractionMaxPaths = diffractionMaxPaths;
+		emitterSettings.diffractionMaxPathLength = diffractionMaxPathLength;
+
 
 		if (AkSoundEngine.RegisterEmitter(gameObject, emitterSettings) == AKRESULT.AK_Success)
 			SetGameObjectInRoom();
@@ -47,6 +69,7 @@ public class AkSpatialAudioEmitter : AkSpatialAudioBase
 
 #if UNITY_EDITOR
 	[UnityEngine.Header("Debug Draw")]
+
 	/// This allows you to visualize first order reflection sound paths.
 	public bool drawFirstOrderReflections = false;
 
@@ -56,17 +79,22 @@ public class AkSpatialAudioEmitter : AkSpatialAudioBase
 	/// This allows you to visualize third or higher order reflection sound paths.
 	public bool drawHigherOrderReflections = false;
 
+	/// This allows you to visualize geometric diffraction sound paths between an obstructed emitter and the listener.
+	public bool drawGeometricDiffraction = false;
+
+	/// This allows you to visualize sound propagation paths through portals.
 	public bool drawSoundPropagation = false;
 
 	private const uint kMaxIndirectPaths = 64;
-	private const uint kMaxPropagationPaths = 16;
-	private readonly AkSoundPathInfoArray indirectPathInfoArray = new AkSoundPathInfoArray((int) kMaxIndirectPaths);
+	private readonly AkReflectionPathInfoArray indirectPathInfoArray = new AkReflectionPathInfoArray((int) kMaxIndirectPaths);
 
 	private readonly AkPropagationPathInfoArray propagationPathInfoArray =
-		new AkPropagationPathInfoArray((int) kMaxPropagationPaths);
+		new AkPropagationPathInfoArray((int)AkPropagationPathInfo.kMaxNodes);
 
-	private readonly AkSoundPropagationPathParams indirectPathsParams = new AkSoundPropagationPathParams();
-	private readonly AkSoundPropagationPathParams soundPropagationPathsParams = new AkSoundPropagationPathParams();
+	private readonly AkDiffractionPathInfoArray diffractionPathInfoArray =
+		new AkDiffractionPathInfoArray((int)AkDiffractionPathInfo.kMaxNodes);
+
+	private readonly AkPathParams pathsParams = new AkPathParams();
 
 	private readonly UnityEngine.Color32 colorLightBlue = new UnityEngine.Color32(157, 235, 243, 255);
 	private readonly UnityEngine.Color32 colorDarkBlue = new UnityEngine.Color32(24, 96, 103, 255);
@@ -95,6 +123,9 @@ public class AkSpatialAudioEmitter : AkSpatialAudioBase
 			if (drawFirstOrderReflections || drawSecondOrderReflections || drawHigherOrderReflections)
 				DebugDrawEarlyReflections();
 
+			if (drawGeometricDiffraction)
+				DebugDrawDiffraction();
+
 			if (drawSoundPropagation)
 				DebugDrawSoundPropagation();
 		}
@@ -112,7 +143,7 @@ public class AkSpatialAudioEmitter : AkSpatialAudioBase
 		var oncam = UnityEngine.Camera.current.WorldToScreenPoint(position);
 
 		if (oncam.x >= 0 && oncam.x <= UnityEngine.Camera.current.pixelWidth && oncam.y >= 0 &&
-		    oncam.y <= UnityEngine.Camera.current.pixelHeight && oncam.z > 0 && oncam.z < distance)
+			oncam.y <= UnityEngine.Camera.current.pixelHeight && oncam.z > 0 && oncam.z < distance)
 		{
 			style.normal.textColor = c;
 			UnityEditor.Handles.Label(position, name, style);
@@ -121,16 +152,16 @@ public class AkSpatialAudioEmitter : AkSpatialAudioBase
 
 	private void DebugDrawEarlyReflections()
 	{
-		if (AkSoundEngine.QueryIndirectPaths(gameObject, indirectPathsParams, indirectPathInfoArray,
-			    (uint) indirectPathInfoArray.Count()) == AKRESULT.AK_Success)
+		if (AkSoundEngine.QueryIndirectPaths(gameObject, pathsParams, indirectPathInfoArray,
+				(uint) indirectPathInfoArray.Count()) == AKRESULT.AK_Success)
 		{
-			for (var idxPath = (int) indirectPathsParams.numValidPaths - 1; idxPath >= 0; --idxPath)
+			for (var idxPath = (int)pathsParams.numValidPaths - 1; idxPath >= 0; --idxPath)
 			{
-				var path = indirectPathInfoArray.GetSoundPathInfo(idxPath);
+				var path = indirectPathInfoArray[idxPath];
 				var order = path.numReflections;
 
 				if (drawFirstOrderReflections && order == 1 || drawSecondOrderReflections && order == 2 ||
-				    drawHigherOrderReflections && order > 2)
+					drawHigherOrderReflections && order > 2)
 				{
 					UnityEngine.Color32 colorLight;
 					UnityEngine.Color32 colorDark;
@@ -152,34 +183,32 @@ public class AkSpatialAudioEmitter : AkSpatialAudioBase
 							break;
 					}
 
-					var emitterPos = ConvertVector(indirectPathsParams.emitterPos);
-					var listenerPt = ConvertVector(indirectPathsParams.listenerPos);
+					var emitterPos = ConvertVector(pathsParams.emitterPos);
+					var listenerPt = ConvertVector(pathsParams.listenerPos);
 
-					for (var idxSeg = (int) path.numReflections - 1; idxSeg >= 0; --idxSeg)
+					for (var idxSeg = (int) path.numPathPoints - 1; idxSeg >= 0; --idxSeg)
 					{
-						var reflectionPt = ConvertVector(path.GetReflectionPoint((uint) idxSeg));
+						var pt = ConvertVector(path.GetPathPoint((uint) idxSeg));
 
-						UnityEngine.Debug.DrawLine(listenerPt, reflectionPt, path.isOccluded ? colorLightGrey : colorLight);
+						UnityEngine.Debug.DrawLine(listenerPt, pt, path.isOccluded ? colorLightGrey : colorLight);
 
 						UnityEngine.Gizmos.color = path.isOccluded ? colorLightGrey : colorLight;
-						UnityEngine.Gizmos.DrawWireSphere(reflectionPt, radiusSphere / 2 / order);
+						UnityEngine.Gizmos.DrawWireSphere(pt, radiusSphere / 2 / order);
 
 						if (!path.isOccluded)
 						{
-							var triangle = path.GetTriangle((uint) idxSeg);
-
-							var triPt0 = ConvertVector(triangle.point0);
-							var triPt1 = ConvertVector(triangle.point1);
-							var triPt2 = ConvertVector(triangle.point2);
-
-							UnityEngine.Debug.DrawLine(triPt0, triPt1, colorDark);
-							UnityEngine.Debug.DrawLine(triPt1, triPt2, colorDark);
-							UnityEngine.Debug.DrawLine(triPt2, triPt0, colorDark);
-
-							DrawLabelInFrontOfCam(reflectionPt, path.GetTriangle((uint) idxSeg).strName, 100000, colorDark);
+							var surface = path.GetAcousticSurface((uint) idxSeg);
+							DrawLabelInFrontOfCam(pt, surface.strName, 100000, colorDark);
 						}
 
-						listenerPt = reflectionPt;
+						float dfrnAmount = path.GetDiffraction((uint)idxSeg);
+						if (dfrnAmount > 0)
+						{
+							string dfrnAmountStr = dfrnAmount.ToString("0.#%");
+							DrawLabelInFrontOfCam(pt, dfrnAmountStr, 100000, colorDark);
+						}
+
+						listenerPt = pt;
 					}
 
 					if (!path.isOccluded)
@@ -198,39 +227,71 @@ public class AkSpatialAudioEmitter : AkSpatialAudioBase
 		}
 	}
 
+	private void DebugDrawDiffraction()
+	{
+		if (AkSoundEngine.QueryDiffractionPaths(gameObject, pathsParams, diffractionPathInfoArray,
+		(uint)diffractionPathInfoArray.Count()) == AKRESULT.AK_Success)
+		{
+			for (var idxPath = (int)pathsParams.numValidPaths - 1; idxPath >= 0; --idxPath)
+			{
+				var path = diffractionPathInfoArray[idxPath];
+				var emitterPos = ConvertVector(pathsParams.emitterPos);
+				var prevPt = ConvertVector(pathsParams.listenerPos);
+
+				if (path.nodeCount > 0)
+				{
+					for (var idxSeg = 0; idxSeg < (int)path.nodeCount; ++idxSeg)
+					{
+						var pt = ConvertVector(path.GetNodes((uint)idxSeg));
+
+						UnityEngine.Debug.DrawLine(prevPt, pt, colorGreen);
+
+						float angle = path.GetAngles((uint)idxSeg) / UnityEngine.Mathf.PI;
+						if (angle > 0)
+						{
+							string angleStr = angle.ToString("0.#%");
+							DrawLabelInFrontOfCam(pt, angleStr, 100000, colorGreen);
+						}
+
+						prevPt = pt;
+					}
+
+					UnityEngine.Debug.DrawLine(prevPt, emitterPos, colorGreen);
+				}
+			}
+		}
+	}
+
 	private void DebugDrawSoundPropagation()
 	{
-		if (AkSoundEngine.QuerySoundPropagationPaths(gameObject, soundPropagationPathsParams, propagationPathInfoArray,
-			    (uint) propagationPathInfoArray.Count()) != AKRESULT.AK_Success)
-			return;
-
-		for (var idxPath = (int) soundPropagationPathsParams.numValidPaths - 1; idxPath >= 0; --idxPath)
+		if (AkSoundEngine.QuerySoundPropagationPaths(gameObject, pathsParams, propagationPathInfoArray,
+				(uint)propagationPathInfoArray.Count()) == AKRESULT.AK_Success)
 		{
-			var path = propagationPathInfoArray.GetPropagationPathInfo(idxPath);
-			var emitterPos = ConvertVector(soundPropagationPathsParams.emitterPos);
-			var prevPt = ConvertVector(soundPropagationPathsParams.listenerPos);
-
-			for (var idxSeg = 0; idxSeg < (int) path.numNodes; ++idxSeg)
+			for (var idxPath = (int)pathsParams.numValidPaths - 1; idxPath >= 0; --idxPath)
 			{
-				var portalPt = ConvertVector(path.GetNodePoint((uint) idxSeg));
+				var path = propagationPathInfoArray[idxPath];
+				var emitterPos = ConvertVector(pathsParams.emitterPos);
+				var prevPt = ConvertVector(pathsParams.listenerPos);
 
-				if (idxSeg != 0)
+				for (var idxSeg = 0; idxSeg < (int)path.numNodes; ++idxSeg)
+				{
+					var portalPt = ConvertVector(path.GetNodePoint((uint)idxSeg));
+
 					UnityEngine.Debug.DrawLine(prevPt, portalPt, colorPurple);
 
-				var radWet = radiusSphereMin + (1.0f - path.wetDiffractionAngle / (float) System.Math.PI) *
-				             (radiusSphereMax - radiusSphereMin);
-				var radDry = radiusSphereMin + (1.0f - path.dryDiffractionAngle / (float) System.Math.PI) *
-				             (radiusSphereMax - radiusSphereMin);
+					var radWet = radiusSphereMin + (1.0f - path.wetDiffraction) * (radiusSphereMax - radiusSphereMin);
+					var radDry = radiusSphereMin + (1.0f - path.dryDiffraction) * (radiusSphereMax - radiusSphereMin);
 
-				UnityEngine.Gizmos.color = colorGreen;
-				UnityEngine.Gizmos.DrawWireSphere(portalPt, radWet);
-				UnityEngine.Gizmos.color = colorRed;
-				UnityEngine.Gizmos.DrawWireSphere(portalPt, radDry);
+					UnityEngine.Gizmos.color = colorGreen;
+					UnityEngine.Gizmos.DrawWireSphere(portalPt, radWet);
+					UnityEngine.Gizmos.color = colorRed;
+					UnityEngine.Gizmos.DrawWireSphere(portalPt, radDry);
 
-				prevPt = portalPt;
+					prevPt = portalPt;
+				}
+
+				UnityEngine.Debug.DrawLine(prevPt, emitterPos, colorPurple);
 			}
-
-			UnityEngine.Debug.DrawLine(prevPt, emitterPos, colorPurple);
 		}
 	}
 #endif

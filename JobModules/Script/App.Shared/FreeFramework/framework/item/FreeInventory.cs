@@ -81,7 +81,7 @@ namespace com.wd.free.item
         public void StartUseItem(IEventArgs args, FreeData fd, ItemPosition ip, int sing, int sound)
         {
             PlayerStateUtil.RemoveGameState(EPlayerGameState.InterruptItem, fd.Player.gamePlay);
-            fd.Player.playerMove.InterruptAutoRun();
+            fd.Player.autoMoveInterface.PlayerAutoMove.StopAutoMove();
 
             SkillTimeTrigger trigger = (SkillTimeTrigger)itemSkill.trigger;
             trigger.SetTime(sing * 1000);
@@ -249,7 +249,7 @@ namespace com.wd.free.item
                     use.Act(args);
                     args.Resume("current");
                     args.Resume("item");
-                    PlayerAnimationAction.DoAnimation(PlayerAnimationAction.Stop, fd.Player);
+                    PlayerAnimationAction.DoAnimation(args.GameContext, PlayerAnimationAction.Stop, fd.Player);
                     FreeSoundUtil.Stop("use", args, fd);
 
                     PlayerStateUtil.RemoveGameState(EPlayerGameState.InterruptItem, fd.Player.gamePlay);

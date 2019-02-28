@@ -8,6 +8,7 @@ using Core.GameModule.Module;
 using Core.SessionState;
 using Utils.AssetManager;
 using Utils.Configuration;
+using Utils.SettingManager;
 using Utils.Singleton;
 
 namespace App.Shared.GameModules.Configuration
@@ -18,23 +19,23 @@ namespace App.Shared.GameModules.Configuration
 
         public BaseConfigurationInitModule(Contexts context, ISessionState sessionState)
         {
-            
-
-
             AddConfigSystem<AssetConfigManager>(sessionState, "svn.version");
             AddConfigSystem<CharacterStateConfigManager>(sessionState, "SpeedConfig");
             AddConfigSystem<AvatarAssetConfigManager>(sessionState, "role_avator_res");
+            AddConfigSystem<MeleeAttackCDConfigManager>(sessionState, "MeleeAttackCDConfig");
 
             AddConfigSystem<FirstPersonOffsetConfigManager>(sessionState, "FirstPersonOffset");
             AddConfigSystem<RoleConfigManager>(sessionState, "role");
             AddConfigSystem<KillFeedBackConfigManager>(sessionState, "killfeedback");
-            AddConfigSystem<CameraConfigManager>(sessionState, "NewCamera");
+            
+            AddConfigSystem<CameraConfigManager>(sessionState, "Camera");
+            
             AddConfigSystem<SoundConfigManager>(sessionState, "Sound");
             AddConfigSystem<PlayerSoundConfigManager>(sessionState, "PlayerSound");
             AddConfigSystem<BulletDropConfigManager>(sessionState, "BulletDrop");
             AddConfigSystem<ClientEffectCommonConfigManager>(sessionState, "ClientEffectCommon");
-            AddConfigSystem<WeaponDataConfigManager>(sessionState, "WeaponData");
-            AddConfigSystem<WeaponConfigManager>(sessionState, "weapon");
+            AddConfigSystem<WeaponConfigManagement>(sessionState, "WeaponData");
+            AddConfigSystem<WeaponResourceConfigManager>(sessionState, "weapon");
             AddConfigSystem<ClipDropConfigManager>(sessionState, "ClipDrop");
             AddConfigSystem<WeaponPartsConfigManager>(sessionState, "weapon_parts");
             AddConfigSystem<MapPositionConfigManager>(sessionState, "temp");
@@ -69,6 +70,16 @@ namespace App.Shared.GameModules.Configuration
             AddConfigSystem<WeaponAvatarConfigManager>(sessionState, "weapon_avator");
             AddConfigSystem<StreamingLevelStructure>(sessionState, "streaminglevel", "tablesfrombuilding");
             AddConfigSystem<MapsDescription>(sessionState, "mapConfig");
+            AddConfigSystem<AudioWeaponManager>(sessionState, "WeaponAudio");
+            AddConfigSystem<AudioEventManager>(sessionState, "AudioEvent");
+            AddConfigSystem<AudioGroupManager>(sessionState, "AudioGroup");
+            if (!SettingManager.GetInstance().IsInitialized())
+            {
+                AddConfigSystem<SettingManager>(sessionState, "setting");
+            }
+
+            AddConfigSystem<VideoSettingConfigManager>(sessionState, "video_setting");
+            AddConfigSystem<LoadingTipConfigManager>(sessionState, "loadingtips");
         }
 
         private void AddConfigSystem<T>(ISessionState sessionState, string asset,

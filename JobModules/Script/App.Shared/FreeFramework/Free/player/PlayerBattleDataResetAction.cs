@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Assets.App.Server.GameModules.GamePlay.Free;
 using com.wd.free.action;
 using com.wd.free.@event;
 using Core.Free;
 using Free.framework;
-using UnityEngine;
 
 namespace App.Shared.FreeFramework.Free.player
 {

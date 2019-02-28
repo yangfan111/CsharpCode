@@ -13,6 +13,9 @@ using Entitas.CodeGeneration.Attributes;
 using Core.SceneTriggerObject;
 using Core.Utils;
 using Core.UpdateLatest;
+using Core.EntityComponent;
+using App.Shared.Components.Weapon;
+using Core;
 
 namespace App.Shared.Components.SceneObject
 {
@@ -31,15 +34,8 @@ namespace App.Shared.Components.SceneObject
         }
     }
 
-    [SceneObject]
-    public class FlashObjComponent : SingleAssetComponent
-    {
-        public override int GetComponentId()
-        {
-            return (int)EComponentIds.SceneObjectFlashGameObject;
-        }
-
-    }
+   
+   
 
     [SceneObject]
     public class MultiUnityObjectComponent : MultiAssetComponent
@@ -57,64 +53,70 @@ namespace App.Shared.Components.SceneObject
     }
 
     [SceneObject, ]
-    public class WeaponComponent : IPlaybackComponent 
+    public class WeaponObjectComponent : IPlaybackComponent 
     {
-        [DontInitilize, NetworkProperty] public int Id;
-        [DontInitilize, NetworkProperty] public int AvatarId;
+        //    [DontInitilize, NetworkProperty] public EntityKey WeaponKey;
+        [DontInitilize, NetworkProperty] public int ConfigId;
+        [DontInitilize, NetworkProperty] public int WeaponAvatarId;
         [DontInitilize, NetworkProperty] public int UpperRail;
         [DontInitilize, NetworkProperty] public int LowerRail;
-        [DontInitilize, NetworkProperty] public int Magazine;
-        [DontInitilize, NetworkProperty] public int Muzzle;
         [DontInitilize, NetworkProperty] public int Stock;
+        [DontInitilize, NetworkProperty] public int Muzzle;
+        [DontInitilize, NetworkProperty] public int Magazine;
         [DontInitilize, NetworkProperty] public int Bullet;
-        [DontInitilize, NetworkProperty] public int ReservedBullet;
+     //   [DontInitilize, NetworkProperty] public bool PullBolt;
+        //[DontInitilize, NetworkProperty] public int FireModel;
+   //     [DontInitilize, NetworkProperty] public int ReservedBullet;
+
+        public void CopyFrom(object rightComponent)
+        {
+            var remote = rightComponent as WeaponObjectComponent;
+            ConfigId = remote.ConfigId;
+            WeaponAvatarId = remote.WeaponAvatarId;
+            UpperRail = remote.UpperRail;
+            LowerRail = remote.LowerRail;
+            Stock = remote.Stock;
+            Muzzle = remote.Muzzle;
+            Magazine = remote.Magazine;
+            Bullet = remote.Bullet;
+            //ReservedBullet = remote.ReservedBullet;
+            //PullBolt = remote.PullBolt;
+            //FireModel = remote.FireModel;
+        }
+        public void GameCopyFrom(WeaponScanStruct remote)
+        {
+            ConfigId = remote.ConfigId;
+            WeaponAvatarId = remote.AvatarId;
+            UpperRail = remote.UpperRail;
+            LowerRail = remote.LowerRail;
+            Stock = remote.Stock;
+            Muzzle = remote.Muzzle;
+            Magazine = remote.Magazine;
+            Bullet = remote.Bullet;
+        }
+     
+        public static explicit operator WeaponScanStruct(WeaponObjectComponent remote)
+        {
+            var newComp = new WeaponScanStruct();
+            newComp.ConfigId = remote.ConfigId;
+            newComp.AvatarId = remote.WeaponAvatarId;
+            newComp.UpperRail = remote.UpperRail;
+            newComp.LowerRail = remote.LowerRail;
+            newComp.Stock = remote.Stock;
+            newComp.Muzzle = remote.Muzzle;
+            newComp.Magazine = remote.Magazine;
+            newComp.Bullet = remote.Bullet;
+            //newComp.ReservedBullet = remote.ReservedBullet;
+            //newComp.PullBolt = remote.PullBolt;
+            //newComp.FireModel = remote.FireModel;
+            return newComp;
+        }
+
         public int GetComponentId()
         {
             return (int)EComponentIds.SceneObjectWeapon;
         }
-
-        public void FillPartList(List<int> partList)
-        {
-            if(null == partList)
-            {
-                return;
-            }
-            partList.Clear();
-            if(UpperRail > 0)
-            {
-                partList.Add(UpperRail);
-            }
-            if(LowerRail> 0)
-            {
-                partList.Add(LowerRail);
-            }
-            if(Magazine > 0)
-            {
-                partList.Add(Magazine);
-            }
-            if(Stock > 0)
-            {
-                partList.Add(Stock);
-            }
-            if(Muzzle > 0)
-            {
-                partList.Add(Muzzle);
-            }
-        }
-
-        public void CopyFrom(object rightComponent)
-        {
-            var remoteWeapon = rightComponent as WeaponComponent;
-            Id = remoteWeapon.Id;
-            AvatarId = remoteWeapon.AvatarId;
-            UpperRail = remoteWeapon.UpperRail;
-            LowerRail = remoteWeapon.LowerRail;
-            Magazine = remoteWeapon.Magazine;
-            Muzzle = remoteWeapon.Muzzle;
-            Stock = remoteWeapon.Stock;
-            Bullet = remoteWeapon.Bullet;
-            ReservedBullet = remoteWeapon.ReservedBullet;
-        }
+     
         public bool IsInterpolateEveryFrame(){ return false; }
         public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
         {
@@ -325,6 +327,13 @@ namespace App.Shared.Components.SceneObject
         }
     }
 
+
+    public struct DestrutibleDataSync
+    {
+        public int StateDiff;
+        public bool Reset;
+    }
+
     [MapObject]
     public class DestructibleDataComponent : BitsMapComponent, IPlaybackComponent, IResetableComponent
     {
@@ -338,9 +347,20 @@ namespace App.Shared.Components.SceneObject
         [DontInitilize]
         public int DestructionState;
 
+        [DontInitilize]
+        public int LocalSyncDestructionState;
+
         [NetworkProperty]
         [DontInitilize]
         public int LastSyncDestructionState;
+        
+        [DontInitilize]
+        public int LocalResetCount;
+
+        [NetworkProperty]
+        [DontInitilize]
+        public int ResetCount;
+
 
         public bool HasAnyChunkDetached()
         {
@@ -364,11 +384,16 @@ namespace App.Shared.Components.SceneObject
             }
         }
 
-        public int SyncDestructionState()
+        public DestrutibleDataSync SyncDestructionState()
         {
-            var stateDiff = LastSyncDestructionState ^ DestructionState;
-            DestructionState = LastSyncDestructionState;
-            return stateDiff;
+            DestrutibleDataSync sync;
+            sync.Reset = LocalResetCount != ResetCount;
+            sync.StateDiff = sync.Reset ? LastSyncDestructionState : LastSyncDestructionState ^ LocalSyncDestructionState;
+
+            LocalResetCount = ResetCount;
+            DestructionState = sync.Reset ? sync.StateDiff : DestructionState | LastSyncDestructionState;
+            LocalSyncDestructionState = LastSyncDestructionState;
+            return sync;
         }
 
         public int GetComponentId()
@@ -385,7 +410,8 @@ namespace App.Shared.Components.SceneObject
 
         public void Reset()
         {
-            DestructionState = LastSyncDestructionState = 0;
+            DestructionState = LocalSyncDestructionState = LastSyncDestructionState = 0;
+            ResetCount++;
         }
         public bool IsInterpolateEveryFrame(){ return false; }
         public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
@@ -395,6 +421,7 @@ namespace App.Shared.Components.SceneObject
 
             StartAsWhole = l.StartAsWhole || r.StartAsWhole;
             LastSyncDestructionState = l.LastSyncDestructionState | r.LastSyncDestructionState;
+            ResetCount = r.ResetCount;
         }
 
         public int GetNextDetachedChunkId(int currentBrokenId = -1)

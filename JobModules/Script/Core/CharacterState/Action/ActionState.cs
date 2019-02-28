@@ -418,7 +418,7 @@ namespace Core.CharacterState.Action
                     FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MeleeAttackHash,
                                              AnimatorParametersHash.Instance.MeleeAttackName,
                                              AnimatorParametersHash.Instance.MeleeAttackStart,
-                                             CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                                             CharacterView.FirstPerson | CharacterView.ThirdPerson, true);
                     addOutput(FsmOutput.Cache);
                     
                     command.Handled = true;
@@ -929,7 +929,7 @@ namespace Core.CharacterState.Action
             addOutput(FsmOutput.Cache);
         }
 
-        private static void TurnOnUpperBodyOverlay(Action<FsmOutput> addOutput)
+        protected static void TurnOnUpperBodyOverlay(Action<FsmOutput> addOutput)
         {
             FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.UpperBodyLayer,
                 AnimatorParametersHash.Instance.UpperBodyEnableValue,

@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace App.Shared
 {
     public class GameModuleLogicManagement
     {
-        private static readonly HashSet<object> entireInstances = new HashSet<object>();
+        private static readonly HashSet<IDisposable> entireInstances = new HashSet<IDisposable>();
 
         internal static void Submit<T>(T instance) where T : ModuleLogicActivator<T>, new()
         {
@@ -30,14 +32,28 @@ namespace App.Shared
             Submit(instance);
             return instance;
         }
-
+        public static void Dispose()
+        {
+            var disposeArray = entireInstances.ToList();
+            foreach(var data in disposeArray)
+            {
+                data.Dispose();
+            }
+            disposeArray.Clear();
+        }
+        internal static void UnCache(IDisposable instance)
+        {
+            entireInstances.Remove(instance);
+        }
+     
 
     }
-    public class ModuleLogicActivator<T> where T : ModuleLogicActivator<T>, new()
+    public class ModuleLogicActivator<T> : IDisposable where T : ModuleLogicActivator<T>, new()
     {
 
         internal static T s_Default { get; private set; }
         private static readonly Dictionary<int, T> logics = new Dictionary<int, T>();
+        private int cookie;
         internal static T Get(int cookie)
         {
             if (logics.ContainsKey(cookie)) return logics[cookie];
@@ -50,9 +66,10 @@ namespace App.Shared
         internal static T Allocate(System.Action<T> processor)
         {
             var instance = new T();
+            int cookie = instance.GetHashCode();
+            instance.cookie = cookie;
             if (processor != null)
                 processor(instance);
-            int cookie = instance.GetHashCode();
             if (s_Default == null) s_Default = instance;
             logics.Add(cookie, instance);
             return instance;
@@ -61,14 +78,20 @@ namespace App.Shared
         {
             if (logics.ContainsKey(cookie)) return logics[cookie] ;
             var instance = new T();
+            instance.cookie = cookie;
             if (processor != null)
                 processor(instance);
             if (s_Default == null) s_Default = instance;
             logics.Add(cookie, instance);
             return instance;
         }
-
-
-
+        public void Dispose()
+        {
+            logics.Remove(cookie);
+            if (s_Default == this)
+                s_Default = null;
+            GameModuleLogicManagement.UnCache(this);
+        }
+       
     }
 }

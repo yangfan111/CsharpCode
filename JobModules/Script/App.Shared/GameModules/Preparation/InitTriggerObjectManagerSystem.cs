@@ -27,7 +27,7 @@ namespace App.Shared.GameModules.Preparation
             }
         }
 
-        public void OnInitModule(ILoadRequestManager manager)
+        public void OnInitModule(IUnityAssetManager assetManager)
         {
             
         }
@@ -42,8 +42,8 @@ namespace App.Shared.GameModules.Preparation
         private void RegisterLoaderForBigMap(Contexts contexts)
         {
             var manager = SingletonManager.Get<TriggerObjectManager>();
-            contexts.session.commonSession.LevelManager.GoLoaded += gameObj => manager.OnMapObjLoaded(gameObj);
-            contexts.session.commonSession.LevelManager.GoUnloaded += gameObj => manager.OnMapObjUnloaded(gameObj);
+            contexts.session.commonSession.LevelManager.AfterGoLoaded += gameObj => manager.OnMapObjLoaded(gameObj);
+            contexts.session.commonSession.LevelManager.BeforeGoUnloaded += gameObj => manager.OnMapObjUnloaded(gameObj);
         }
     }
 }

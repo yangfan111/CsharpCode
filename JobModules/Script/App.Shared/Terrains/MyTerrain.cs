@@ -48,8 +48,6 @@ namespace App.Shared.Terrains
         private HashSet<string> setLoadedAssets = new HashSet<string>();
 
         private Vector3 _terrainInitPos = new Vector3();
-        private Vector3 _terrainOriginPos = new Vector3();
-        private Vector3 _size = new Vector3();
         private float _defaultFrictionGrip = 2.3f;
         private float _defaultFrictionDrag = 0.1f;
         private int _defaultId = 0;
@@ -57,7 +55,7 @@ namespace App.Shared.Terrains
         private int _defaultEffectId = 0;
         private int _defaultMaterialId = 0;
 
-        private ILoadRequestManager _manager;
+        private IUnityAssetManager _assetManager;
         private System.Random _randGen = new System.Random();
 
         private static AssetInfo GetAssetInfo(string mapName, int subId)
@@ -65,16 +63,15 @@ namespace App.Shared.Terrains
             return new AssetInfo("terrains/" + mapName, "TerrainData_" + subId);
         }
 
-        public MyTerrain(ILoadRequestManager manager, AbstractMapConfig sceneConfig)
+        public MyTerrain(IUnityAssetManager assetManager, AbstractMapConfig sceneConfig)
         {
-            _manager = manager;
+            _assetManager = assetManager;
             _isLoaded = false;
             if (sceneConfig != null)
             {
                 _mapId = sceneConfig.Id;
                 _mapName = sceneConfig.MapName;
-                _terrainOriginPos.Set(sceneConfig.OriginPosition.x, sceneConfig.OriginPosition.y, sceneConfig.OriginPosition.z);
-                _size.Set(sceneConfig.Size.x, sceneConfig.Size.y, sceneConfig.Size.z);
+               
                 if (sceneConfig is SceneConfig)
                 {
                     SceneConfig config = sceneConfig as SceneConfig;
@@ -142,7 +139,7 @@ namespace App.Shared.Terrains
 
             AssetInfo assetInfo = GetAssetInfo(_mapName, subId);
             int[] para = {(int)EAssetType.BYTES, subId};
-            _manager.AppendLoadRequest(para, assetInfo, OnLoadSucc);
+            _assetManager.LoadAssetAsync(para, assetInfo, OnLoadSucc);
         }
 
         private bool IsNeedLoad(EAssetType type, int id)
@@ -166,7 +163,7 @@ namespace App.Shared.Terrains
             {
                 AssetInfo assetInfo = new AssetInfo(config.Asset.BundleName, config.Asset.AssetName);
                 int[] para = { (int)EAssetType.AUDIO, soundId };
-                _manager.AppendLoadRequest(para, assetInfo, OnGoLoadSucc);
+                _assetManager.LoadAssetAsync(para, assetInfo, OnGoLoadSucc);
             }
         }
 
@@ -177,7 +174,7 @@ namespace App.Shared.Terrains
             {
                 AssetInfo assetInfo = new AssetInfo(config.Asset.BundleName, config.Asset.AssetName);
                 int[] para = { (int)EAssetType.EFFECT, effectId };
-                _manager.AppendLoadRequest(para, assetInfo, OnGoLoadSucc);
+                _assetManager.LoadAssetAsync(para, assetInfo, OnGoLoadSucc);
             }
         }
 
@@ -188,7 +185,7 @@ namespace App.Shared.Terrains
             {
                 AssetInfo assetInfo = new AssetInfo(config.Asset.BundleName, config.Asset.AssetName);
                 int[] para = { (int)EAssetType.MATERIAL, materialId };
-                _manager.AppendLoadRequest(para, assetInfo, OnLoadSucc);
+                _assetManager.LoadAssetAsync(para, assetInfo, OnLoadSucc);
             }
         }
 
@@ -239,20 +236,6 @@ namespace App.Shared.Terrains
             get
             {
                 return _terrainInitPos;
-            }
-        }
-        public Vector3 OriginPosition
-        {
-            get
-            {
-                return _terrainOriginPos;
-            }
-        }
-        public Vector3 Size
-        {
-            get
-            {
-                return _size;
             }
         }
 
@@ -473,14 +456,16 @@ namespace App.Shared.Terrains
             return material;
         }
 
-        public void OnLoadSucc(object source, AssetInfo assetInfo, UnityEngine.Object obj)
+        public void OnLoadSucc(int[] para, UnityObject unityObj)
         {
+            var assetInfo = unityObj.Address;
+            var obj = unityObj.AsObject;
             if (null == obj)
             {
                 _logger.ErrorFormat("Asset {0}:{1} Load Fialed ", assetInfo.BundleName, assetInfo.AssetName);
                 return;
             }
-            int[] para = (int[]) source;
+
             if (para == null || para.Length != 2)
             {
                 return;
@@ -527,20 +512,15 @@ namespace App.Shared.Terrains
             }
         }
 
-        public void OnGoLoadSucc(object source, UnityObjectWrapper<GameObject> obj)
+        public void OnGoLoadSucc(int[] para, UnityObject unityObj)
         {
+            var obj = unityObj.AsGameObject;
             if (null == obj)
             {
-                _logger.ErrorFormat("Load GameObject Asset Fialed: obj is null.");
-                return;
-            }
-            if (null == obj.Value)
-            {
-                _logger.ErrorFormat("Asset {0}:{1} Load GameObject Fialed ", obj.Address.BundleName, obj.Address.AssetName);
+                _logger.ErrorFormat("Asset {0}:{1} Load GameObject Fialed ", unityObj.Address.BundleName, unityObj.Address.AssetName);
                 return;
             }
 
-            int[] para = (int[])source;
             if (para == null || para.Length != 2)
             {
                 return;
@@ -557,7 +537,7 @@ namespace App.Shared.Terrains
                         int soundId = para[1];
                         if (!_dictSounds.ContainsKey(soundId))
                         {
-                            AudioSource audio = obj.Value.GetComponent<AudioSource>();
+                            AudioSource audio = obj.GetComponent<AudioSource>();
                             if (null != audio)
                                 _dictSounds.Add(soundId, audio.clip);
                         }
@@ -567,11 +547,12 @@ namespace App.Shared.Terrains
                     {
                         //Effect
                         int effectId = para[1];
-                        _effectPool.AddEffectPrefab(effectId, obj.Value);
+                        _effectPool.AddEffectPrefab(effectId, obj);
                         break;
                     }
                 }
-                _manager.AddRecycleRequest(obj);
+
+                _assetManager.Recycle(unityObj);
             }
             catch (Exception e)
             {

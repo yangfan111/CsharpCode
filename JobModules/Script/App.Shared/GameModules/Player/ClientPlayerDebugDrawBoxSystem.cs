@@ -16,13 +16,22 @@ namespace App.Shared.GameModules.Player
 
         protected override bool Filter(PlayerEntity entity)
         {
-            return SharedConfig.ShowCharacterBoundingBox;
+            return SharedConfig.ShowCharacterBoundingBox || SharedConfig.ShowGroundInfo;
         }
 
         protected override void OnGamePlay(PlayerEntity entity)
         {
-            entity.characterContoller.Value.DrawBoundingBox();
-            entity.characterContoller.Value.DrawLastGroundHit();
+            if (SharedConfig.ShowCharacterBoundingBox)
+            {
+                entity.characterContoller.Value.DrawBoundingBox();
+                entity.characterContoller.Value.DrawLastGroundHit();
+            }
+
+            if (SharedConfig.ShowGroundInfo)
+            {
+                entity.characterContoller.Value.DrawGround();
+            }
+
         }
     }
 }

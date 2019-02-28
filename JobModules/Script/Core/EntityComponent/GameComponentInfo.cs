@@ -31,6 +31,10 @@ namespace Core.EntityComponent
         }
         public IGameComponent Allocate(int componentId)
         {
+            if(_allocators[componentId]== null)
+            {
+                throw new ArgumentException(string.Format("componentId:{0}", componentId));
+            }
             var rc = (IGameComponent)_allocators[componentId].Allocate();
             if (rc is IResetableComponent)
             {

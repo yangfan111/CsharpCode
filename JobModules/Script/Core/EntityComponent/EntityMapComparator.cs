@@ -173,7 +173,7 @@ namespace Core.EntityComponent
                 EntityCount = entityCount,
                 ComponentCount = componentCount,
                 CreateTime = DateTime.Now,
-				Interval = (int)(DateTime.Now - startTime).TotalMilliseconds
+				Interval = (int)(startTime- startTime).TotalMilliseconds
             };
         }
     }

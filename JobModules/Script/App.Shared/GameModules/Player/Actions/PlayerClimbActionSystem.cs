@@ -35,7 +35,7 @@ namespace App.Shared.GameModules.Player.Actions
             _genericAction = player.genericActionInterface.GenericAction;
             _genericAction.Update(player);
             
-            if (cmd.IsJump)
+            if (cmd.IsJump && CanClimb(player))
                 TriggerActionInput(player);
         }
 
@@ -43,22 +43,28 @@ namespace App.Shared.GameModules.Player.Actions
         {
             _genericAction.ActionInput(player);
         }
+
+        private static bool CanClimb(PlayerEntity player)
+        {
+            var postureState = player.stateInterface.State.GetCurrentPostureState();
+            return PostureInConfig.Jump != postureState && PostureInConfig.Climb != postureState;
+        }
         
         #region LifeState
 
         private void CheckPlayerLifeState(PlayerEntity player)
         {
-            if (null == player || null == player.gamePlay) return;
-
-            var gamePlay = player.gamePlay;
-            if (!gamePlay.HasLifeStateChangedFlag()) return;
-
-            if (gamePlay.IsLifeState(EPlayerLifeState.Alive) &&
-                gamePlay.IsLastLifeState(EPlayerLifeState.Dead))
-                Reborn(player);
-
-            if (gamePlay.IsLifeState(EPlayerLifeState.Dead))
-                Dead(player);
+            if (null == player || null == player.playerGameState) return;
+            var gameState = player.playerGameState;
+            switch (gameState.CurrentPlayerLifeState)
+            {
+                case PlayerLifeStateEnum.Reborn:
+                    Reborn(player);
+                    break;
+                case PlayerLifeStateEnum.Dead:
+                    Dead(player);
+                    break;
+            }
         }
 
         private void Reborn(PlayerEntity player)
@@ -75,6 +81,7 @@ namespace App.Shared.GameModules.Player.Actions
             var genericAction = player.genericActionInterface.GenericAction;
             if (null == genericAction) return;
             genericAction.PlayerDead(player);
+            _logger.InfoFormat("PlayerClimbDead");
         }
 
         #endregion

@@ -10,11 +10,13 @@ namespace App.Shared.SceneManagement
         void AddLoadSceneRequest(AssetInfo addr);
         void AddLoadGoRequest(AssetInfo addr);
         void AddUnloadSceneRequest(string sceneName);
-        void AddUnloadGoRequest(UnityObjectWrapper<GameObject> go);
+        void AddUnloadGoRequest(UnityObject go);
 
         event Action<Scene, LoadSceneMode> SceneLoaded;
         event Action<Scene> SceneUnloaded;
-        event Action<UnityObjectWrapper<GameObject>> GoLoaded;
-        event Action<UnityObjectWrapper<GameObject>> GoUnloaded;
+        event Action<UnityObject> GoLoaded;
+        event Action<UnityObject> AfterGoLoaded;
+        event Action<UnityObject> BeforeGoUnloaded;
+        event Action<UnityObject> GoUnloaded;
     }
 }

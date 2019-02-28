@@ -62,11 +62,21 @@ public class AkPropagationPathInfo : global::System.IDisposable {
   public float gain { set { AkSoundEnginePINVOKE.CSharp_AkPropagationPathInfo_gain_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkPropagationPathInfo_gain_get(swigCPtr); } 
   }
 
-  public float dryDiffractionAngle { set { AkSoundEnginePINVOKE.CSharp_AkPropagationPathInfo_dryDiffractionAngle_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkPropagationPathInfo_dryDiffractionAngle_get(swigCPtr); } 
+  public float dryDiffraction { set { AkSoundEnginePINVOKE.CSharp_AkPropagationPathInfo_dryDiffraction_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkPropagationPathInfo_dryDiffraction_get(swigCPtr); } 
   }
 
-  public float wetDiffractionAngle { set { AkSoundEnginePINVOKE.CSharp_AkPropagationPathInfo_wetDiffractionAngle_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkPropagationPathInfo_wetDiffractionAngle_get(swigCPtr); } 
+  public float wetDiffraction { set { AkSoundEnginePINVOKE.CSharp_AkPropagationPathInfo_wetDiffraction_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkPropagationPathInfo_wetDiffraction_get(swigCPtr); } 
   }
+
+  public static int GetSizeOf() { return AkSoundEnginePINVOKE.CSharp_AkPropagationPathInfo_GetSizeOf(); }
+
+  public AkVector GetNodePoint(uint idx) {
+    global::System.IntPtr cPtr = AkSoundEnginePINVOKE.CSharp_AkPropagationPathInfo_GetNodePoint(swigCPtr, idx);
+    AkVector ret = (cPtr == global::System.IntPtr.Zero) ? null : new AkVector(cPtr, false);
+    return ret;
+  }
+
+  public void Clone(AkPropagationPathInfo other) { AkSoundEnginePINVOKE.CSharp_AkPropagationPathInfo_Clone(swigCPtr, AkPropagationPathInfo.getCPtr(other)); }
 
   public AkPropagationPathInfo() : this(AkSoundEnginePINVOKE.CSharp_new_AkPropagationPathInfo(), true) {
   }

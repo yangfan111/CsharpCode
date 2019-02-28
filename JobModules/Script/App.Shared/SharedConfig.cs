@@ -49,9 +49,13 @@ namespace App.Shared
 
         public static bool DisableVehicleCull = false;
 
+        public static int VehicleActiveUpdateRate = 1;
+
         public static bool IsServer;
 
         public static bool IsOffline;
+
+        public static bool IsMute = false;
 
         /**
          * Only for client
@@ -91,10 +95,22 @@ namespace App.Shared
         public static bool InSamplingMode = false;
         public static bool InLegacySampleingMode = false;
         public static int ModeId = 1002;
+
+        /// <summary>
+        /// 是否显示self角色包围盒
+        /// </summary>
+        public static bool ShowCharacterBoundingBox = false;
+        public static bool ShowGroundInfo = false;
+        // 是否关闭下滑
+        public static bool EnableSlide = true;
+        public static bool DebugAnimation = false;
         // Disable Occlusion Culling
         public static bool EnableOC = true;
         // Disable Distance Culling
         public static bool EnableDC = true;
+
+        //大厅传过来的模式，加载需要提前知道
+        public static int GameRule = GameRules.Offline;
 
         public static UnityEngine.Vector3 GetPlayerBirthPosition(int entityId)
         {

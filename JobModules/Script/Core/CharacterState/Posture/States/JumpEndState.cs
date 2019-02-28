@@ -29,6 +29,8 @@ namespace Core.CharacterState.Posture.States
                             AnimatorParametersHash.Instance.JumpStartEnable,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
+                        
+                        SetJumpMoveState(command.AdditioanlValue, command.AlternativeAdditionalValue, addOutput);
 
                         command.Handled = true;
                     }
@@ -45,13 +47,28 @@ namespace Core.CharacterState.Posture.States
             AddTransition(new JumpEndToStandTransition(AvailableTransitionId(),
                     (int)PostureStateId.Stand,
                     AnimatorParametersHash.ImpossibleTransitionTime),
-                new[] { FsmInput.Land });
+                new[] { FsmInput.Land , FsmInput.SlideEnd });
 
             #endregion
 
             #region jumpend to dying
             AddTransitionFromJumpToDying(this);
             #endregion
+        }
+
+        private static void SetJumpMoveState(float value, float moveJumpState, Action<FsmOutput> addOutput)
+        {
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.JumpStateHash,
+                AnimatorParametersHash.Instance.JumpStateName,
+                value,
+                CharacterView.ThirdPerson);
+            addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MoveJumpStateHash,
+                AnimatorParametersHash.Instance.MoveJumpStateName,
+                moveJumpState,
+                CharacterView.ThirdPerson);
+            addOutput(FsmOutput.Cache);
         }
 
         public override void DoBeforeEntering(IFsmInputCommand command, Action<FsmOutput> addOutput)

@@ -45,41 +45,29 @@ public class AkTriangle : global::System.IDisposable {
     }
   }
 
-  public AkTriangle() : this(AkSoundEnginePINVOKE.CSharp_new_AkTriangle(), true) {
+  public AkTriangle() : this(AkSoundEnginePINVOKE.CSharp_new_AkTriangle__SWIG_0(), true) {
   }
 
-  public AkVector point0 { set { AkSoundEnginePINVOKE.CSharp_AkTriangle_point0_set(swigCPtr, AkVector.getCPtr(value)); } 
-    get {
-      global::System.IntPtr cPtr = AkSoundEnginePINVOKE.CSharp_AkTriangle_point0_get(swigCPtr);
-      AkVector ret = (cPtr == global::System.IntPtr.Zero) ? null : new AkVector(cPtr, false);
-      return ret;
-    } 
+  public AkTriangle(ushort in_pt0, ushort in_pt1, ushort in_pt2, ushort in_surfaceInfo) : this(AkSoundEnginePINVOKE.CSharp_new_AkTriangle__SWIG_1(in_pt0, in_pt1, in_pt2, in_surfaceInfo), true) {
   }
 
-  public AkVector point1 { set { AkSoundEnginePINVOKE.CSharp_AkTriangle_point1_set(swigCPtr, AkVector.getCPtr(value)); } 
-    get {
-      global::System.IntPtr cPtr = AkSoundEnginePINVOKE.CSharp_AkTriangle_point1_get(swigCPtr);
-      AkVector ret = (cPtr == global::System.IntPtr.Zero) ? null : new AkVector(cPtr, false);
-      return ret;
-    } 
+  public ushort point0 { set { AkSoundEnginePINVOKE.CSharp_AkTriangle_point0_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkTriangle_point0_get(swigCPtr); } 
   }
 
-  public AkVector point2 { set { AkSoundEnginePINVOKE.CSharp_AkTriangle_point2_set(swigCPtr, AkVector.getCPtr(value)); } 
-    get {
-      global::System.IntPtr cPtr = AkSoundEnginePINVOKE.CSharp_AkTriangle_point2_get(swigCPtr);
-      AkVector ret = (cPtr == global::System.IntPtr.Zero) ? null : new AkVector(cPtr, false);
-      return ret;
-    } 
+  public ushort point1 { set { AkSoundEnginePINVOKE.CSharp_AkTriangle_point1_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkTriangle_point1_get(swigCPtr); } 
   }
 
-  public uint textureID { set { AkSoundEnginePINVOKE.CSharp_AkTriangle_textureID_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkTriangle_textureID_get(swigCPtr); } 
+  public ushort point2 { set { AkSoundEnginePINVOKE.CSharp_AkTriangle_point2_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkTriangle_point2_get(swigCPtr); } 
   }
 
-  public uint reflectorChannelMask { set { AkSoundEnginePINVOKE.CSharp_AkTriangle_reflectorChannelMask_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkTriangle_reflectorChannelMask_get(swigCPtr); } 
+  public ushort surface { set { AkSoundEnginePINVOKE.CSharp_AkTriangle_surface_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkTriangle_surface_get(swigCPtr); } 
   }
 
-  public string strName { set { AkSoundEnginePINVOKE.CSharp_AkTriangle_strName_set(swigCPtr, value); }  get { return AkSoundEngine.StringFromIntPtrString(AkSoundEnginePINVOKE.CSharp_AkTriangle_strName_get(swigCPtr)); } 
-  }
+  public void Clear() { AkSoundEnginePINVOKE.CSharp_AkTriangle_Clear(swigCPtr); }
+
+  public static int GetSizeOf() { return AkSoundEnginePINVOKE.CSharp_AkTriangle_GetSizeOf(); }
+
+  public void Clone(AkTriangle other) { AkSoundEnginePINVOKE.CSharp_AkTriangle_Clone(swigCPtr, AkTriangle.getCPtr(other)); }
 
 }
 #endif // #if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.

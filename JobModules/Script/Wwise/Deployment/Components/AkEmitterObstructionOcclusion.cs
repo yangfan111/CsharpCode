@@ -36,7 +36,7 @@ public class AkEmitterObstructionOcclusion : AkObstructionOcclusion
 		System.Collections.Generic.KeyValuePair<AkAudioListener, ObstructionOcclusionValue> ObsOccPair)
 	{
 		if (AkRoom.IsSpatialAudioEnabled)
-			AkSoundEngine.SetEmitterObstruction(gameObject, ObsOccPair.Value.currentValue);
+			AkSoundEngine.SetEmitterObstructionAndOcclusion(gameObject, ObsOccPair.Value.currentValue, 0.0f);
 		else
 		{
 			AkSoundEngine.SetObjectObstructionAndOcclusion(gameObject, ObsOccPair.Key.gameObject, 0.0f,

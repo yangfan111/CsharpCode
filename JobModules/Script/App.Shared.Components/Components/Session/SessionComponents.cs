@@ -8,7 +8,7 @@ using Core.Configuration;
 using Core.EntitasAdpater;
 using Core.Free;
 using Core.GameInputFilter;
-using Core.GameModeLogic;
+using Core;
 using Core.GameModule.System;
 using Core.GameTime;
 using Core.IFactory;
@@ -27,6 +27,7 @@ using Core.SyncLatest;
 using Core.UpdateLatest;
 using Core.Utils;
 using Core.WeaponLogic;
+using Core.WeaponLogic.Attachment;
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
 using UnityEngine;
@@ -43,9 +44,6 @@ namespace App.Shared.Components
         [DontInitilize] public ISceneObjectEntityFactory SceneObjectEntityFactory { get; set; }
         [DontInitilize] public IMapObjectEntityFactory MapObjectEntityFactory { get; set; }
         [DontInitilize] public ISoundEntityFactory SoundEntityFactory { get; set; }
-        [DontInitilize] public IBulletEntityFactory BulletEntityFactory { get; set; }
-        [DontInitilize]public IWeaponLogicFactory WeaponLogicFactory { get; set; }
-        [DontInitilize]public IWeaponLogicComponentsFactory WeaponLogicComponentsFactory { get; set; }
     }
 
     /// <summary>
@@ -64,13 +62,11 @@ namespace App.Shared.Components
     public class CommonSessionComponent : ICommonSessionObjects, IComponent
     {
         
-        [DontInitilize]public IGameObjectPool GameObjectPool { get; set; }
-        [DontInitilize]public ILoadRequestManager LoadRequestManager { get; set; }
+        [DontInitilize]public IUnityAssetManager AssetManager { get; set; }
         [DontInitilize]public ICoRoutineManager CoRoutineManager { get; set; }
-        [DontInitilize]public IAssetPool AssetPool { get; set; }
         [DontInitilize]public IGameContexts GameContexts { get; set; }
       
-        [DontInitilize]public IWeaponModeLogic WeaponModeLogic { get; set; }
+        [DontInitilize]public IWeaponMode WeaponModeLogic { get; set; }
         [DontInitilize]public IGameStateProcessorFactory GameStateProcessorFactory { get; set; }
         [DontInitilize]public RoomInfo RoomInfo { get; set; }
         [DontInitilize]public RuntimeGameConfig RuntimeGameConfig { get; set; }
@@ -80,9 +76,11 @@ namespace App.Shared.Components
         [DontInitilize]public IBulletInfoCollector BulletInfoCollector { get; set; }
         [DontInitilize]public ILevelManager LevelManager { get; set; }
         [DontInitilize]public Vector3 InitPosition { get; set; }
+        [DontInitilize] public IWeaponLogicManager WeaponLogicManager { get; set; }
+     //   [DontInitilize] public IPlayerWeaponResourceConfigManager PlayerWeaponResourceConfigManager { get; set; }
     }
     
-     public enum EClientSessionStates
+    public enum EClientSessionStates
     {
         LoadConfig,
         LoadSubResourceConfig,
@@ -134,8 +132,7 @@ namespace App.Shared.Components
        
         [DontInitilize] public ISoundPlayer SoundPlayer;
         [DontInitilize] public int GameRule { get; set; }
-        [DontInitilize] public WeaponDataConfigManager WeaponConfigs { get; set; }
-     
+        [DontInitilize] public IGlobalEffectManager GlobalEffectManager;
       
         //服务器状态
         [DontInitilize] public FpsSatatus FpsSatatus { get; set; }
@@ -161,9 +158,6 @@ namespace App.Shared.Components
         [DontInitilize] public int GameRule;
         [DontInitilize] public IUpdateMessagePool UpdateMessagePool { get; set; }
 
-
-        // 用来动态配置
-        [DontInitilize] public WeaponDataConfigManager WeaponConfig;
 
         //服务器状态
         [DontInitilize] public FpsSatatus FpsSatatus;

@@ -40,9 +40,9 @@ namespace App.Shared
         {
             switch(slot)
             {
-                case EWeaponSlotType.PrimeWeapon1:
-                case EWeaponSlotType.PrimeWeapon2:
-                case EWeaponSlotType.SubWeapon:
+                case EWeaponSlotType.PrimeWeapon:
+                case EWeaponSlotType.SecondaryWeapon:
+                case EWeaponSlotType.PistolWeapon:
                     return true;
                 default:
                     return false;
@@ -59,11 +59,11 @@ namespace App.Shared
             switch(slot)
             {
                 default:
-                case EWeaponSlotType.PrimeWeapon1:
-                case EWeaponSlotType.PrimeWeapon2:
-                case EWeaponSlotType.SubWeapon:
+                case EWeaponSlotType.PrimeWeapon:
+                case EWeaponSlotType.SecondaryWeapon:
+                case EWeaponSlotType.PistolWeapon:
                 case EWeaponSlotType.TacticWeapon:
-                case EWeaponSlotType.GrenadeWeapon:
+                case EWeaponSlotType.ThrowingWeapon:
                     return true;
                 case EWeaponSlotType.MeleeWeapon:
                     return false;
@@ -74,9 +74,9 @@ namespace App.Shared
         {
             switch (slot)
             {
-                case EWeaponSlotType.PrimeWeapon1:
-                case EWeaponSlotType.PrimeWeapon2:
-                case EWeaponSlotType.SubWeapon:
+                case EWeaponSlotType.PrimeWeapon:
+                case EWeaponSlotType.SecondaryWeapon:
+                case EWeaponSlotType.PistolWeapon:
                     return true;
                 default:
                     return false;
@@ -87,15 +87,15 @@ namespace App.Shared
         {
             switch(slot)
             {
-                case EWeaponSlotType.PrimeWeapon1:
+                case EWeaponSlotType.PrimeWeapon:
                     return WeaponInPackage.PrimaryWeaponOne;
-                case EWeaponSlotType.PrimeWeapon2:
+                case EWeaponSlotType.SecondaryWeapon:
                     return WeaponInPackage.PrimaryWeaponTwo;
-                case EWeaponSlotType.SubWeapon:
+                case EWeaponSlotType.PistolWeapon:
                     return WeaponInPackage.SideArm;
                 case EWeaponSlotType.MeleeWeapon:
                     return WeaponInPackage.MeleeWeapon;
-                case EWeaponSlotType.GrenadeWeapon:
+                case EWeaponSlotType.ThrowingWeapon:
                     return WeaponInPackage.ThrownWeapon;
                 case EWeaponSlotType.TacticWeapon:
                     return WeaponInPackage.TacticWeapon;
@@ -110,13 +110,13 @@ namespace App.Shared
             switch(weaponType)
             {
                 case EWeaponType.PrimeWeapon:
-                    return EWeaponSlotType.PrimeWeapon1;
+                    return EWeaponSlotType.PrimeWeapon;
                 case EWeaponType.SubWeapon:
-                    return EWeaponSlotType.SubWeapon;
+                    return EWeaponSlotType.PistolWeapon;
                 case EWeaponType.MeleeWeapon:
                     return EWeaponSlotType.MeleeWeapon;
                 case EWeaponType.ThrowWeapon:
-                    return EWeaponSlotType.GrenadeWeapon;
+                    return EWeaponSlotType.ThrowingWeapon;
                 case EWeaponType.TacticWeapon:
                     return EWeaponSlotType.TacticWeapon;
                 default:

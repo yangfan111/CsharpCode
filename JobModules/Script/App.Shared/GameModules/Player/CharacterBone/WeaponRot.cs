@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using App.Shared.Components.Player;
 using UnityEngine;
 using Utils.Appearance;
 using Utils.CharacterState;
@@ -165,10 +166,10 @@ namespace App.Shared.GameModules.Player.CharacterBone
             _rightHandP1 = BoneMount.FindChildBone(obj, BoneName.CharacterRightHandName);
         }
 
-        public void SyncTo(ICharacterBoneState state)
+        public void SyncTo(CharacterBoneComponent value)
         {
-            state.WeaponPitch = _weaponPitchPercent;
-            state.WeaponRot = _weaponRot;
+            value.WeaponPitch = _weaponPitchPercent;
+            value.WeaponRot = _weaponRot;
         }
     }
 }

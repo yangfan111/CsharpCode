@@ -22,10 +22,11 @@ namespace App.Shared.GameModules.Player
         protected override void ExecuteUserCmd(PlayerEntity playerEntity, IUserCmd cmd)
         {
             playerEntity.stage.Value = EPlayerLoginStage.Running;
-
+            playerEntity.isInitialized = true;
             FreeRuleEventArgs args = (FreeRuleEventArgs)contexts.session.commonSession.FreeArgs;
             IGameRule rule = (IGameRule)args.Rule;
             rule.PlayerEnter(contexts, playerEntity);
+           
         }
     }
 }

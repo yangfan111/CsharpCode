@@ -61,11 +61,15 @@ namespace App.Shared.GameModules.Bullet
             IBulletEntity bulletEntity,
             RaycastHit hit)
         {
+            if(srcPlayer.gamePlay.IsDead())
+            {
+                return;
+            }
             Collider collider = hit.collider;
             VehiclePartIndex partIndex;
             var hitBoxFactor = VehicleEntityUtility.GetHitFactor(targetVehicle, collider, out partIndex);
 
-            var totalDamage = GetBulletDamage(bulletEntity, hitBoxFactor);
+            var totalDamage = GetBulletDamage(bulletEntity, hitBoxFactor, Vector3.Distance(hit.point, bulletEntity.GunEmitPosition));
             var gameData = targetVehicle.GetGameData();
             gameData.DecreaseHp(partIndex, totalDamage, srcPlayer.entityKey.Value);
             srcPlayer.statisticsData.Statistics.TotalDamage += totalDamage;
@@ -88,9 +92,13 @@ namespace App.Shared.GameModules.Bullet
                 hit.normal);
         }
 
-        public void OnHitPlayer(PlayerEntity srcPlayer, PlayerEntity targetPlayer, IBulletEntity bulletEntity,
-            RaycastHit hit, UnityEngine.Vector3 targetPlayerPostion)
+        public void OnHitPlayer(Contexts contexts, PlayerEntity srcPlayer, PlayerEntity targetPlayer, IBulletEntity bulletEntity,
+            RaycastHit hit, Vector3 targetPlayerPostion, int cmdSeq)
         {
+            if(srcPlayer.gamePlay.IsDead())
+            {
+                return;
+            }
             Collider collider = hit.collider;
 
             EBodyPart part = BulletPlayerUtility.GetBodyPartByHitBoxName(collider);
@@ -99,16 +107,20 @@ namespace App.Shared.GameModules.Bullet
             _logger.DebugFormat("OnHitPlayer in {0}", part);
             
             float hitboxFactor = bulletEntity.GetDamageFactor(part);
-            float totalDamage = GetBulletDamage(bulletEntity, hitboxFactor);
+            float totalDamage = GetBulletDamage(bulletEntity, hitboxFactor, Vector3.Distance(hit.point, bulletEntity.GunEmitPosition));
 
             bulletEntity.IsValid = false;
 
-            ClientEffectFactory.AddHitPlayerEffectEvent(srcPlayer, targetPlayer.entityKey.Value, hit.point, hit.point - targetPlayer.position.Value);
-         
-            if (targetPlayer.hasStateInterface && targetPlayer.stateInterface.State.CanBeenHit())
-                targetPlayer.stateInterface.State.BeenHit();
+            //由于动画放在客户端做了,服务器调用的命令会被忽视,需要发送事件到客户端
+//            if (targetPlayer.hasStateInterface && targetPlayer.stateInterface.State.CanBeenHit())
+//            {
+//                targetPlayer.stateInterface.State.BeenHit();
+//            }
             
-            _logger.DebugFormat(
+            ClientEffectFactory.AddBeenHitEvent(srcPlayer, targetPlayer.entityKey.Value, GeneraterUniqueHitId(srcPlayer, cmdSeq), contexts.session.currentTimeObject.CurrentTime);
+            ClientEffectFactory.AddHitPlayerEffectEvent(srcPlayer, targetPlayer.entityKey.Value, hit.point, hit.point - targetPlayer.position.Value);
+            
+            _logger.InfoFormat(
                 "bullet from {0} hit player {1}, part {2}, hitbox factor {3}, result damage {4}",
                 bulletEntity.OwnerEntityKey,
                 targetPlayer.entityKey.Value,
@@ -128,6 +140,7 @@ namespace App.Shared.GameModules.Bullet
             }
 
             BulletPlayerUtility.ProcessPlayerHealthDamage(
+                contexts,
                 _damager,
                 srcPlayer, 
                 targetPlayer, 
@@ -135,23 +148,25 @@ namespace App.Shared.GameModules.Bullet
                 _damageInfoCollector);
         }
 
-        private float GetBulletDamage(IBulletEntity bulletEntity, float hitboxFactor)
+        public static int GeneraterUniqueHitId(PlayerEntity srcPlayer, int cmdSeq)
+        {
+            return (srcPlayer.entityKey.Value.EntityId << 16) + cmdSeq;   
+        }
+
+        private float GetBulletDamage(IBulletEntity bulletEntity, float hitboxFactor, float distance)
         {
             float baseHarm = bulletEntity.BaseDamage;
             float distanceDecay = bulletEntity.DistanceDecayFactor;
-            float distance = bulletEntity.Distance;
             // 武器基础伤害 * (距离系数 ^ (实际命中距离 / 1270)) * hitbox系数 * 防弹装备系数 * 穿透系数
             float totalDamage = baseHarm * Mathf.Pow(distanceDecay, distance / 12.7f) * hitboxFactor;
 
-           
-            _logger.DebugFormat(
+            _logger.InfoFormat(
                 "bullet damage baseHarm {0}, distance decay {1}, distance {2}, hitbox factor {3}, result damage {4}",
                 baseHarm,
                 distanceDecay,
                 distance,
                 hitboxFactor,
                 totalDamage);
-            
 
             return totalDamage;
         }
@@ -193,20 +208,19 @@ namespace App.Shared.GameModules.Bullet
             {
                 try
                 {
-
                     _OnHitPlayer.BeginProfileOnlyEnableProfile();
                     Vector3 pos;
-                    if(compensationWorld.TryGetEntityPosition(targetPlayer.entityKey.Value, out pos))
+                    if (compensationWorld.TryGetEntityPosition(targetPlayer.entityKey.Value, out pos))
                     {
-                        OnHitPlayer(srcPlayer, targetPlayer, bulletEntity, hit, pos);
+                        OnHitPlayer(_contexts, srcPlayer, targetPlayer, bulletEntity, hit, pos, cmdSeq);
                     }
                     else
                     {
                         _logger.ErrorFormat("cant get player compensation position with key {0}", targetPlayer.entityKey.Value);
-                        OnHitPlayer(srcPlayer, targetPlayer, bulletEntity, hit, targetPlayer.position.Value);
+                        OnHitPlayer(_contexts, srcPlayer, targetPlayer, bulletEntity, hit, targetPlayer.position.Value, cmdSeq);
                     }
                     bulletEntity.HitType = EHitType.Player;
-                    }
+                }
                 finally
                 {
                     _OnHitPlayer.EndProfileOnlyEnableProfile();
@@ -244,6 +258,10 @@ namespace App.Shared.GameModules.Bullet
 
         private void OnHitEnvironment(PlayerEntity srcPlayer, IBulletEntity bulletEntity, RaycastHit hit)
         {
+            if(srcPlayer.gamePlay.IsDead())
+            {
+                return;
+            }
             ThicknessInfo thicknessInfo;
             EnvironmentInfo info = BulletEnvironmentUtility.GetEnvironmentInfoByHitBoxName(hit, bulletEntity.Velocity, out thicknessInfo);
             float damageDecayFactor = _environmentTypeConfigManager.GetDamageDecayFactorByEnvironmentType(info.Type);
@@ -338,8 +356,6 @@ namespace App.Shared.GameModules.Bullet
                 oldThickNess, bulletEntity.PenetrableThickness,
                 info,
                 bulletEntity.PenetrableLayerCount);
-            
-            DamageInfoDebuger.OnEnvironmentHit(_contexts.player, _damager, _damageInfoCollector);
         }
     }
 }

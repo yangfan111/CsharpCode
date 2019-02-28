@@ -10,8 +10,9 @@ namespace App.Shared.SceneManagement.Streaming
     class StreamingGoByScene : IStreamingGoManager
     {
         private IStreamingResourceHandler _streamingResourceHandler;
-        private readonly Dictionary<int, StreamingScene> _loadedScenes = new Dictionary<int, StreamingScene>();
         private readonly Dictionary<string, int> _sceneNameToId = new Dictionary<string, int>();
+        private readonly Dictionary<int, List<UnityObject>> _loadedGoes = new Dictionary<int, List<UnityObject>>();
+        private readonly Dictionary<int, GameObject> _goRoot = new Dictionary<int, GameObject>();
 
         public void SetResourceHandler(IStreamingResourceHandler handler)
         {
@@ -19,6 +20,10 @@ namespace App.Shared.SceneManagement.Streaming
         }
 
         public void UpdateOrigin(Vector3 pos, OriginStatus status)
+        {
+        }
+
+        public void SetAsapMode(bool value)
         {
         }
 
@@ -31,9 +36,9 @@ namespace App.Shared.SceneManagement.Streaming
             if (sceneIndex < 0)
                 return;
 
-            if (!_loadedScenes.ContainsKey(sceneIndex))
+            if (!_loadedGoes.ContainsKey(sceneIndex))
             {
-                _loadedScenes.Add(sceneIndex, sceneStruct);
+                _loadedGoes.Add(sceneIndex, new List<UnityObject>());
                 _sceneNameToId.Add(sceneName, sceneIndex);
                 
                 var count = sceneStruct.Objects.Count;
@@ -41,6 +46,10 @@ namespace App.Shared.SceneManagement.Streaming
                 {
                     _streamingResourceHandler.LoadGo(sceneIndex, i);
                 }
+                
+                var go = new GameObject("StreamingRoot");
+                SceneManager.MoveGameObjectToScene(go, scene);
+                _goRoot.Add(sceneIndex, go);
             }
         }
 
@@ -49,23 +58,26 @@ namespace App.Shared.SceneManagement.Streaming
             if (_sceneNameToId.ContainsKey(sceneName))
             {
                 var sceneIndex = _sceneNameToId[sceneName];
-                var scene = _loadedScenes[sceneIndex];
-                var count = scene.Objects.Count;
+                var goes = _loadedGoes[sceneIndex];
+
+                var count = goes.Count;
                 for (int i = 0; i < count; i++)
                 {
-                    _streamingResourceHandler.UnloadGo(sceneIndex, i);
+                    _streamingResourceHandler.UnloadGo(goes[i], sceneIndex);
                 }
                 
-                _loadedScenes.Remove(sceneIndex);
                 _sceneNameToId.Remove(sceneName);
+                _loadedGoes.Remove(sceneIndex);
+                _goRoot.Remove(sceneIndex);
             }
         }
 
-        public void GoLoaded(int sceneIndex, int goIndex, UnityObjectWrapper<GameObject> obj)
+        public void GoLoaded(int sceneIndex, int goIndex, UnityObject unityObj)
         {
-            if (_loadedScenes.ContainsKey(sceneIndex))
+            if (_loadedGoes.ContainsKey(sceneIndex))
             {
-                
+                _loadedGoes[sceneIndex].Add(unityObj);
+                unityObj.AsGameObject.transform.SetParent(_goRoot[sceneIndex].transform);
             }
         }
     }

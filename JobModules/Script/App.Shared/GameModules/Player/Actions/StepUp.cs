@@ -37,12 +37,12 @@ namespace App.Shared.GameModules.Player.Actions
         {
             _logger.InfoFormat("TriggerAnimation");
 
+            _isPlayingAnimation = true;
             _thirdPersonAnimator.applyRootMotion = true;
 
             _player.stateInterface.State.StartClimb((float)GenericActionKind.Step, () => {
                 _logger.InfoFormat("Finish Step");
                 ResetConcretAction();
-
                 _thirdPersonAnimator.applyRootMotion = false;
             });
 
@@ -54,7 +54,7 @@ namespace App.Shared.GameModules.Player.Actions
             if (null == _player) return;
             if (PlayingAnimation)
             {
-                if (!_thirdPersonAnimator.isMatchingTarget && 
+                if (!_thirdPersonAnimator.isMatchingTarget && _thirdPersonAnimator.GetCurrentAnimatorStateInfo(0).IsName("ClimbStart") &&
                     _thirdPersonAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime <= 0.3f)
                     _thirdPersonAnimator.MatchTarget(MatchTarget, Quaternion.identity, AvatarTarget.LeftHand,
                         new MatchTargetWeightMask(Vector3.one, 0), 0, 0.3f);
@@ -74,13 +74,16 @@ namespace App.Shared.GameModules.Player.Actions
                 var playerPosture = _player.stateInterface.State.GetCurrentPostureState();
 
                 var baseLayerInfo = _thirdPersonAnimator.GetCurrentAnimatorStateInfo(0);
-
-                if (!_isPlayingAnimation && playerPosture == PostureInConfig.Climb && baseLayerInfo.IsName("ClimbState"))
+                
+                if (!_isPlayingAnimation && playerPosture == PostureInConfig.Climb &&
+                    (baseLayerInfo.IsName("ClimbStart") || baseLayerInfo.IsName("ClimbEnd")))
                 {
                     _isPlayingAnimation = true;
                 }
-                else if (_isPlayingAnimation && playerPosture != PostureInConfig.Climb && !baseLayerInfo.IsName("ClimbState"))
+                else if (_isPlayingAnimation && playerPosture != PostureInConfig.Climb &&
+                         (!baseLayerInfo.IsName("ClimbState") || !baseLayerInfo.IsName("ClimbEnd")))
                     _isPlayingAnimation = false;
+                    
 
                 return _isPlayingAnimation;
             }

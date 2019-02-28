@@ -11,6 +11,7 @@ namespace Core.Prediction.VehiclePrediction
     /// </summary>
     public interface IVehicleCmdExecuteSystem
     {
+        bool IsEntityValid(Entity entity);
         void UpdateSimulationTime(int simulationTime);
         void SyncFromComponent(Entity entity);
         void ExecuteVehicleCmd(Entity entity, IVehicleCmd cmd);

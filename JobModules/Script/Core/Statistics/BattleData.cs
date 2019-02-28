@@ -9,7 +9,7 @@ namespace Core.Statistics
         //击杀者（击杀我的人）
         public PlayerBattleInfo Killer = new PlayerBattleInfo();
         //本场对手数据（我对别人造成的伤害）
-        public Dictionary<EntityKey, OpponentBattleInfo> OpponentDict = new Dictionary<EntityKey, OpponentBattleInfo>(new EntityKeyComparer());
+        public Dictionary<int, OpponentBattleInfo> OpponentDict = new Dictionary<int, OpponentBattleInfo>();
         //历史对手数据（我对别人造成的伤害）
         public List<OpponentBattleInfo> OpponentList = new List<OpponentBattleInfo>();
 
@@ -18,6 +18,7 @@ namespace Core.Statistics
 
         public void Reset()
         {
+            Killer = new PlayerBattleInfo();
             OpponentDict.Clear();
             OpponentList.Clear();
             OtherDict.Clear();
@@ -34,12 +35,15 @@ namespace Core.Statistics
         public int BadgeId;
         public int WeaponId;
 	    public EUIDeadType DeadType;
+        public long timestamp;
     }
 
     public class OpponentBattleInfo : PlayerBattleInfo
     {
         public bool IsKill;
         public bool IsHitDown;
+        public float TrueDamage;
         public int Damage;
+        public int DeathCount;
     }
 }

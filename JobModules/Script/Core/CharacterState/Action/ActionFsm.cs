@@ -75,6 +75,12 @@ namespace Core.CharacterState.Action
 
         private void ResetCommon(Action<FsmOutput> addOutput)
         {
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.UpperBodySpeedRatioHash,
+                AnimatorParametersHash.Instance.UpperBodySpeedRatioName,
+                1.0f,
+                CharacterView.FirstPerson | CharacterView.ThirdPerson);
+            addOutput(FsmOutput.Cache);
+           
             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireHash,
                 AnimatorParametersHash.Instance.FireName,
                 AnimatorParametersHash.Instance.FireDisableValue,
@@ -152,6 +158,12 @@ namespace Core.CharacterState.Action
                 AnimatorParametersHash.Instance.MeleeAttackEnd,
                 CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
             addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MeleeStateHash,
+                AnimatorParametersHash.Instance.MeleeStateName,
+                AnimatorParametersHash.Instance.NullMelee,
+                CharacterView.FirstPerson | CharacterView.ThirdPerson);
+            addOutput(FsmOutput.Cache);
 
             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.StartThrowHash,
                 AnimatorParametersHash.Instance.StartThrowName,
@@ -221,6 +233,16 @@ namespace Core.CharacterState.Action
         public ActionInConfig GetActionState()
         {
             var ret = StateIdAdapter.GetActionStateId((ActionStateId) CurrentState.StateId);
+            return ret;
+        }
+
+        //TODO 确认逻辑是否正确
+        public ActionInConfig GetNextActionState()
+        {
+            var next = CurrentState.ActiveTransition == null
+                ? ActionStateId.KeepNull
+                : (ActionStateId) CurrentState.ActiveTransition.To;
+            var ret = StateIdAdapter.GetActionStateId(next);
             return ret;
         }
 

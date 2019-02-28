@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Core.CharacterState.Action;
 using Core.CharacterState.Movement;
 using Core.CharacterState.Posture;
@@ -24,6 +22,7 @@ namespace Core.CharacterState
         private readonly List<FsmSnapshot> _snapshotsCache;
         private ICharacterSpeed _speed;
         private bool _needReset;
+
         public CharacterStateManager()
         {
             int snapshotCount = 0;
@@ -62,6 +61,7 @@ namespace Core.CharacterState
         #region ICharacterState
 
         private string _name;
+
         public void SetName(string name)
         {
             _posture.SetName(name);
@@ -81,6 +81,7 @@ namespace Core.CharacterState
         }
 
         private bool _moveInWater;
+
         public void SetMoveInWater(bool value)
         {
             _moveInWater = value;
@@ -92,6 +93,7 @@ namespace Core.CharacterState
         }
 
         private bool _steepSlope;
+
         public void SetSteepSlope(bool value)
         {
             _steepSlope = value;
@@ -103,16 +105,19 @@ namespace Core.CharacterState
         }
 
         private bool _beenSlowDown;
+
         public void SetBeenSlowDown(bool value)
         {
             _beenSlowDown = value;
         }
+
         public bool IsSlowDown()
         {
             return _beenSlowDown;
         }
 
         private bool _exceedSlopeLimit;
+
         public void SetExceedSlopeLimit(bool value)
         {
             _exceedSlopeLimit = value;
@@ -123,14 +128,27 @@ namespace Core.CharacterState
             return _exceedSlopeLimit;
         }
 
+        private bool _isSlide;
+
+        
+        public void SetSlide(bool value)
+        {
+            _isSlide = value;
+        }
+        
+        public bool IsSlide()
+        {
+            return _isSlide;
+        }
+
         #endregion
 
         #region IFsmUpdate
 
         public void Update(IAdaptiveContainer<IFsmInputCommand> commands,
-                           int frameInterval,
-                           Action<FsmOutput> addOutput,
-                           FsmUpdateType updateType)
+            int frameInterval,
+            Action<FsmOutput> addOutput,
+            FsmUpdateType updateType)
         {
             if (_needReset)
             {
@@ -184,6 +202,11 @@ namespace Core.CharacterState
             return _action.GetActionState();
         }
 
+        public ActionInConfig GetNextActionState()
+        {
+            return _action.GetNextActionState();
+        }
+
         public ActionKeepInConfig GetActionKeepState()
         {
             return _action.GetActionKeepState();
@@ -199,14 +222,12 @@ namespace Core.CharacterState
             return _posture.IsNeedJumpSpeed();
         }
 
-        public bool IsNeedJumpForSync {
-            get
-            {
-                return _posture.IsNeedJumpForSync;
-            }
+        public bool IsNeedJumpForSync
+        {
+            get { return _posture.IsNeedJumpForSync; }
             set { _posture.IsNeedJumpForSync = value; }
         }
-		
+
         #endregion
 
         #region ISyncFsmSnapshot
@@ -242,19 +263,22 @@ namespace Core.CharacterState
         #endregion
 
         #region ICharacterSpeed
+
         // 更新全身动画速率
         private bool _speedRatioChanged = false;
         private float _ratio = 1;
+
         private void UpdateFullBodySpeedScale(Action<FsmOutput> addOutput)
         {
-            _speedRatioChanged = SpeedRatio() != _ratio && !float.IsNaN(SpeedRatio()) && !float.IsInfinity(SpeedRatio());
+            _speedRatioChanged =
+                SpeedRatio() != _ratio && !float.IsNaN(SpeedRatio()) && !float.IsInfinity(SpeedRatio());
             if (_speedRatioChanged)
             {
                 _ratio = SpeedRatio();
                 FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FullBodySpeedRatioHash,
-                                                 AnimatorParametersHash.Instance.FullBodySpeedScaleName,
-                                                 _ratio,
-                                                 CharacterView.FirstPerson | CharacterView.ThirdPerson);
+                    AnimatorParametersHash.Instance.FullBodySpeedScaleName,
+                    _ratio,
+                    CharacterView.FirstPerson | CharacterView.ThirdPerson);
                 addOutput(FsmOutput.Cache);
             }
         }
@@ -293,14 +317,46 @@ namespace Core.CharacterState
             return _movement.GetNextMovementState();
         }
 
-        public bool IsForth { get { return _movement.IsForth; } }
-        public bool IsBack { get { return _movement.IsBack; } }
-        public bool IsLeft { get { return _movement.IsLeft; } }
-        public bool IsRight { get { return _movement.IsRight; } }
-        public bool IsUp { get { return _movement.IsUp; } }
-        public bool IsDown { get { return _movement.IsDown; } }
-        public float HorizontalValue { get { return _movement.HorizontalValue; } }
-        public float VerticalValue { get { return _movement.VerticalValue; } }
+        public bool IsForth
+        {
+            get { return _movement.IsForth; }
+        }
+
+        public bool IsBack
+        {
+            get { return _movement.IsBack; }
+        }
+
+        public bool IsLeft
+        {
+            get { return _movement.IsLeft; }
+        }
+
+        public bool IsRight
+        {
+            get { return _movement.IsRight; }
+        }
+
+        public bool IsUp
+        {
+            get { return _movement.IsUp; }
+        }
+
+        public bool IsDown
+        {
+            get { return _movement.IsDown; }
+        }
+
+        public float HorizontalValue
+        {
+            get { return _movement.HorizontalValue; }
+        }
+
+        public float VerticalValue
+        {
+            get { return _movement.VerticalValue; }
+        }
+
         public float UpDownValue
         {
             get { return _movement.UpDownValue; }
@@ -308,7 +364,7 @@ namespace Core.CharacterState
 
         public void UpdateAxis(float horizontalValue, float verticalValue, float upDownValue)
         {
-            _movement.UpdateAxis( horizontalValue,  verticalValue,  upDownValue);
+            _movement.UpdateAxis(horizontalValue, verticalValue, upDownValue);
         }
 
         #endregion
@@ -318,7 +374,11 @@ namespace Core.CharacterState
         public bool CanFire()
         {
             var moveState = GetCurrentMovementState();
-            return _action.CanFire() && (moveState == MovementInConfig.Idle || moveState == MovementInConfig.Walk || moveState == MovementInConfig.Run || moveState == MovementInConfig.Sprint) && GetCurrentPostureState() != PostureInConfig.Dying && GetCurrentPostureState() != PostureInConfig.Swim;
+            return _action.CanFire() &&
+                   (moveState == MovementInConfig.Idle || moveState == MovementInConfig.Walk ||
+                    moveState == MovementInConfig.Run || moveState == MovementInConfig.Sprint) &&
+                   GetCurrentPostureState() != PostureInConfig.Dying &&
+                   GetCurrentPostureState() != PostureInConfig.Swim;
         }
 
         public bool CanDraw()
@@ -336,16 +396,16 @@ namespace Core.CharacterState
         public bool NeedInterruptRescue(PostureInConfig posture)
         {
             return ActionKeepInConfig.Rescue == GetActionKeepState() &&
-                (ActionInConfig.Null != GetActionState() ||
-                posture != GetCurrentPostureState() ||
-                MovementInConfig.Idle != GetCurrentMovementState());
+                   (ActionInConfig.Null != GetActionState() ||
+                    posture != GetCurrentPostureState() ||
+                    MovementInConfig.Idle != GetCurrentMovementState());
         }
 
         // 是否可以进入受击状态
         public bool CanBeenHit()
         {
             return ActionInConfig.Null == GetActionState() &&
-                ActionKeepInConfig.Null == GetActionKeepState();
+                   ActionKeepInConfig.Null == GetActionKeepState();
         }
 
         #endregion

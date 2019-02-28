@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,16 +12,20 @@ namespace Core.Room
     {
         Invalid = 0,
         HallServerConnect,
+        HallServerDisconnect,
         LoginServer,
         PlayerLogin,
         CreateRoom,
         CreateRoomResponse,
         JoinRoom,
         JoinRoomResponse,
+        JointRoomList,
+        JoinRoomListResponse,
         MandatoryLogOut,
         UpdateRoomStatus,
         UpdatePlayerStatus,
         GameOver,
+        GameExit,
         GameOverMessage,
         LeaveRoom,
 
@@ -31,10 +36,13 @@ namespace Core.Room
     {
         public ERoomEventType EventType;
 
+        public bool IsDisposed;
+
         private IObjectAllocator _allocator;
 
         public virtual void Reset()
         {
+            IsDisposed = false;
             _allocator = null;
         }
 
@@ -50,7 +58,7 @@ namespace Core.Room
             var allocator = e._allocator;
             if (allocator == null)
             {
-                throw new Exception("The room event is not allocated from RoomEvent.Allocate<T>!");
+                throw new Exception(String.Format("The room event {0} {1} is not allocated from RoomEvent.Allocate<T>!",  e.EventType,  e.GetType()));
             }
 
             e.Reset();
@@ -73,7 +81,53 @@ namespace Core.Room
 
             return newValue;
         }
+
+
+        protected static T[] ChangeReferenceValue<T>(T[] originVal, T[] newValue) where T : BaseRefCounter
+        {
+
+            if (newValue != null)
+            {
+                foreach (var newRef in newValue)
+                {
+                    if(newRef !=  null)
+                        newRef.AcquireReference();
+                }
+                
+            }
+
+            if (originVal != null)
+            {
+                foreach (var orgRef in originVal)
+                {
+                    if(orgRef != null)
+                        orgRef.ReleaseReference();
+                }
+            }
+
+            return newValue;
+        }
 #pragma warning restore RefCounter001, RefCounter002 
+
+    }
+
+    public class RoomEventArg
+    {
+        private bool _filtered;
+
+        public RoomEvent Event;
+
+        public bool Filtered
+        {
+            get { return _filtered; }
+            set { _filtered = value || _filtered; }
+        }
+
+        public void ResetEvent(RoomEvent e)
+        {
+            Event = e;
+            _filtered = false;
+        }
 
     }
 
@@ -81,38 +135,69 @@ namespace Core.Room
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(RoomEventDispatcher));
 
-        private List<RoomEvent> _eventList = new List<RoomEvent>(); 
-        private List<RoomEvent> _execList = new List<RoomEvent>();
+        private Queue[] _eventBuffers = new Queue[2]
+        {
+            Queue.Synchronized(new Queue()),
+            Queue.Synchronized(new Queue())
+        };
+
+        private volatile int _activeBufferIndex = 0;
 
         public event Action<RoomEvent> OnRoomEvent;
+        public event Action<RoomEventArg> Intercept; 
+
+        private RoomEventArg _eventArg = new RoomEventArg();
 
         public void Update()
         {
-            if (_eventList.Count > 0)
+            var activeBuffer = _eventBuffers[_activeBufferIndex];
+            ChangeEventBuffer();
+            while (activeBuffer.Count > 0)
             {
-                _execList.AddRange(_eventList);
-                _eventList.Clear();
-                foreach (var e in _execList)
+                var e = activeBuffer.Dequeue() as RoomEvent;
+                try
                 {
-                    try
-                    {
-                        OnRoomEvent(e);
-                    }
-                    catch (Exception exception)
-                    {
-                       _logger.ErrorFormat("Room Event {0}", exception);
-                    }
+                    _eventArg.ResetEvent(e);
 
-                    RoomEvent.FreeEvent(e);
+                    if (Intercept != null)
+                        Intercept(_eventArg);
+
+                    if (!_eventArg.Filtered)
+                    {
+                        if (!e.IsDisposed)
+                            OnRoomEvent(e);
+
+                        RoomEvent.FreeEvent(e);
+                    }
+                    else
+                    {
+                        if (!e.IsDisposed)
+                        {
+                            AddEvent(e);
+                        }
+                        else
+                        {
+                            RoomEvent.FreeEvent(e);
+                        }
+                    }
                 }
-
-                _execList.Clear();
+                catch (Exception exception)
+                {
+                    _logger.ErrorFormat("Room Event {0}", exception);
+                }
             }
+        }
+
+        private void ChangeEventBuffer()
+        {
+            int activeBufferIndex = _activeBufferIndex == 0 ? 1 : 0;
+
+            _activeBufferIndex = activeBufferIndex;
         }
 
         public void AddEvent(RoomEvent e)
         {
-            _eventList.Add(e);
+            _eventBuffers[_activeBufferIndex].Enqueue(e);
         }
     }
 }

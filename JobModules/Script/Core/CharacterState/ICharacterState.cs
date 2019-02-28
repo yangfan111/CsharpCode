@@ -24,10 +24,15 @@ namespace Core.CharacterState
         bool IsSteepSlope();
         void SetBeenSlowDown(bool value);
         bool IsSlowDown();                 //因为涉水或爬坡禁止冲刺，且一直输入冲刺指令
-        void SetExceedSlopeLimit(bool value);
-        bool IsExceedSlopeLimit();
         bool CanDraw();
 
+        void SetExceedSlopeLimit(bool value);
+        bool IsExceedSlopeLimit();
+
+        void SetSlide(bool value);
+        bool IsSlide();
+        
         ICharacterMovementInConfig GetIMovementInConfig();
+        ICharacterPostureInConfig GetIPostureInConfig();
     }
 }

@@ -73,9 +73,6 @@ public class AkRoomParams : global::System.IDisposable {
   public float WallOcclusion { set { AkSoundEnginePINVOKE.CSharp_AkRoomParams_WallOcclusion_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkRoomParams_WallOcclusion_get(swigCPtr); } 
   }
 
-  public int Priority { set { AkSoundEnginePINVOKE.CSharp_AkRoomParams_Priority_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkRoomParams_Priority_get(swigCPtr); } 
-  }
-
   public float RoomGameObj_AuxSendLevelToSelf { set { AkSoundEnginePINVOKE.CSharp_AkRoomParams_RoomGameObj_AuxSendLevelToSelf_set(swigCPtr, value); }  get { return AkSoundEnginePINVOKE.CSharp_AkRoomParams_RoomGameObj_AuxSendLevelToSelf_get(swigCPtr); } 
   }
 

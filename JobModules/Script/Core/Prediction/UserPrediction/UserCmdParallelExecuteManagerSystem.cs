@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Core.EntityComponent;
@@ -44,21 +45,19 @@ namespace Core.Prediction.UserPrediction
             int count = _systems.Count;
             _systemsPool = new List<IUserCmdExecuteSystem>[threadCount];
             InitTask(threadCount, count);
-            _mainThread = new WorkThread("Main", _systems);
+            _mainThread = new WorkThread("MainThread", _systems);
             WorkThread[] slaveThreads = new WorkThread[threadCount];
             for (var i = 0; i < threadCount; i++)
             {
-                slaveThreads[i] = new WorkThread("Slave" ,_systemsPool[i]);
+                slaveThreads[i] = new WorkThread(String.Format("SlaveThread_{0}", i) ,_systemsPool[i]);
             }
 
             _taskDisparcher = new TaskDispatcher(threadCount, _mainThread, slaveThreads, _taskInfos);
 
-            _mainThread.Name = "MainThread";
             _mainThread.SetTaskDisparcher(_taskDisparcher);
             for (var i = 0; i < threadCount; i++)
             {
                 slaveThreads[i].SetTaskDisparcher(_taskDisparcher);
-                slaveThreads[i].Name = string.Format("SlaveThreads:{0}", i);
             }
 
             _taskDisparcher.Start();

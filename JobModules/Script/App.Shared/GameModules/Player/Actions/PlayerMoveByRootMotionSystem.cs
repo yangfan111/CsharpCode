@@ -54,6 +54,11 @@ namespace App.Shared.GameModules.Player.Actions
             player.playerMoveByAnimUpdate.Position = player.position.Value = parent.position;
             player.playerMoveByAnimUpdate.ModelPitch = player.orientation.ModelPitch = YawPitchUtility.Normalize(parent.rotation.eulerAngles.x);
             player.playerMoveByAnimUpdate.ModelYaw = player.orientation.ModelYaw = YawPitchUtility.Normalize(parent.rotation.eulerAngles.y);
+            
+            if(player.hasPlayerMove)
+                player.playerMove.Velocity = Vector3.zero;
+            if(player.hasMoveUpdate)
+                player.moveUpdate.Velocity = Vector3.zero;
         }
     }
 }

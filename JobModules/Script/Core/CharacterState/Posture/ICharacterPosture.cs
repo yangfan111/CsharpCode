@@ -20,6 +20,7 @@ namespace Core.CharacterState.Posture
     {
         bool InTransition();
         float TransitionRemainTime();
+        float TransitionTime();
         PostureInConfig CurrentPosture();
         PostureInConfig NextPosture();
     }

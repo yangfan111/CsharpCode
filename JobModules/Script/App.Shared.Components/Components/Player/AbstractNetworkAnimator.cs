@@ -6,6 +6,7 @@ using Core.Playback;
 using Core.Prediction;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
 using Core.Utils;
+using Entitas;
 using Entitas.CodeGeneration.Attributes;
 using UnityEngine;
 

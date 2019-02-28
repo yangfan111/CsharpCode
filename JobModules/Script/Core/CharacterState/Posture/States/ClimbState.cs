@@ -20,34 +20,57 @@ namespace Core.CharacterState.Posture.States
             #region climb to stand
 
             AddTransition(
+                (command, addOutput) => FsmTransition.SimpleCommandHandler(command, FsmInput.GenericActionFinished),
+                null, (int) PostureStateId.Stand, null, 0, new[] {FsmInput.GenericActionFinished});
+
+            AddTransition(
                 (command, addOutput) =>
                 {
-                    if (command.IsMatch(FsmInput.GenericActionFinished))
+                    if (command.IsMatch(FsmInput.Freefall))
                     {
-                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ClimbHash,
-                                                 AnimatorParametersHash.Instance.ClimbName,
-                                                 AnimatorParametersHash.Instance.ClimbDisableValue,
-                                                 CharacterView.ThirdPerson, false);
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FreeFallHash,
+                            AnimatorParametersHash.Instance.FreeFallName,
+                            AnimatorParametersHash.Instance.FreeFallEnable,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
 
-                        return FsmStateResponseType.Reenter;
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.JumpStateHash,
+                            AnimatorParametersHash.Instance.JumpStateName,
+                            AnimatorParametersHash.Instance.JumpStateNormal,
+                            CharacterView.ThirdPerson);
+                        addOutput(FsmOutput.Cache);
+
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MoveJumpStateHash,
+                            AnimatorParametersHash.Instance.MoveJumpStateName,
+                            AnimatorParametersHash.Instance.MoveJumpStateNormal,
+                            CharacterView.ThirdPerson);
+                        addOutput(FsmOutput.Cache);
+
+                        command.Handled = true;
+
+                        return true;
                     }
 
-                    return FsmStateResponseType.Pass;
-                },
-                (command, addOutput) => FsmTransitionResponseType.NoResponse,
-                (int)PostureStateId.Stand, null, 0, new[] { FsmInput.GenericActionFinished });
+                    return false;
+                }, null, (int) PostureStateId.Freefall, null, 0, new[] {FsmInput.Freefall});
 
             #endregion
         }
 
-        public override void DoBeforeEntering(IFsmInputCommand command, Action<FsmOutput> addOutput)
-        {
-            base.DoBeforeEntering(command, addOutput);
-        }
-
         public override void DoBeforeLeaving(Action<FsmOutput> addOutput)
         {
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ClimbHash,
+                AnimatorParametersHash.Instance.ClimbName,
+                AnimatorParametersHash.Instance.ClimbDisableValue,
+                CharacterView.ThirdPerson | CharacterView.FirstPerson, false);
+            addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ClimbEndHash,
+                AnimatorParametersHash.Instance.ClimbEndName,
+                AnimatorParametersHash.Instance.ClimbEndDisableValue,
+                CharacterView.ThirdPerson, false);
+            addOutput(FsmOutput.Cache);
+
             base.DoBeforeLeaving(addOutput);
         }
     }

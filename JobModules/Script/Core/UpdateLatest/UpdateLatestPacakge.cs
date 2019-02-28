@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Core.Components;
 using Core.EntityComponent;
 using Core.ObjectPool;
+using Core.Utils;
 
 namespace Core.UpdateLatest
 {
@@ -45,6 +47,10 @@ namespace Core.UpdateLatest
             foreach (var updateComponent in updateComponents)
             {
                 IUpdateComponent c = (IUpdateComponent)GameComponentInfo.Instance.Allocate(updateComponent.GetComponentId());
+                if(updateComponent.GetComponentId() ==   (int)EComponentIds.WeaponBagSet)
+                {
+                    DebugUtil.LogInUnity("update lastest:"+ updateComponent.ToString());
+                }
                 c.CopyFrom(updateComponent);
                 UpdateComponents.Add(c);
             }

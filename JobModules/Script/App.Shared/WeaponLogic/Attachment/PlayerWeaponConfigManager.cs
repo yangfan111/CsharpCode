@@ -17,6 +17,20 @@ namespace Core.WeaponLogic.Attachment
     /// </summary>
     public class PlayerWeaponConfigManager : IPlayerWeaponConfigManager
     {
+
+        private class IdComparer : IEqualityComparer<int>
+        {
+            public bool Equals(int x, int y)
+            {
+                return x == y;
+            }
+
+            public int GetHashCode(int obj)
+            {
+                return obj;
+            }
+        }
+
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerWeaponConfigManager));
         private delegate void Action<T1,T2,T3,T4,T5>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
         IWeaponPartsConfigManager _attachConfigManager;
@@ -29,7 +43,7 @@ namespace Core.WeaponLogic.Attachment
         }
 
         private Dictionary<WeaponAttributeType, float?> _attachAttributeDic = new Dictionary<WeaponAttributeType, float?>(CommonIntEnumEqualityComparer<WeaponAttributeType>.Instance);
-        private List<Dictionary<WeaponPartsStruct, ExpandDefaultWeaponLogicConfig>> _configCache = new List<Dictionary<WeaponPartsStruct, ExpandDefaultWeaponLogicConfig>>();
+        private Dictionary<int, Dictionary<WeaponPartsStruct, ExpandWeaponLogicConfig>> _configCache = new Dictionary<int, Dictionary<WeaponPartsStruct, ExpandWeaponLogicConfig>>(new IdComparer());
 
         private List<int> _attachmentList = new List<int>();
 
@@ -68,72 +82,64 @@ namespace Core.WeaponLogic.Attachment
 
         private void InitCache()
         {
-            if(_configCache.Count < 1)
+            if(null == _configCache)
             {
-                var cacheCount = _weaponDataConfigManager.ConfigCount + 1; 
-                _configCache = new List<Dictionary<WeaponPartsStruct, ExpandDefaultWeaponLogicConfig>>(cacheCount);
-                // 0没有数据
-                _configCache.Add(null);
-                for(int i = 1; i < cacheCount; i++)
-                {
-                    _configCache.Add(new Dictionary<WeaponPartsStruct, ExpandDefaultWeaponLogicConfig>(WeaponPartsStructComparer.Instance));
-                }
+                _configCache = new Dictionary<int, Dictionary<WeaponPartsStruct, ExpandWeaponLogicConfig>>(new IdComparer());
             }
         }
 
-        public ExpandDefaultWeaponLogicConfig GetWeaponLogicConfig(int id, WeaponPartsStruct weaponParts)
+        public ExpandWeaponLogicConfig GetWeaponLogicConfig(int id, WeaponPartsStruct weaponParts)
         {
             return GetAndCacheConfig(id, weaponParts);
         } 
 
-        private ExpandDefaultWeaponLogicConfig GetAndCacheConfig(int id, WeaponPartsStruct weaponParts)
+        private ExpandWeaponLogicConfig GetAndCacheConfig(int id, WeaponPartsStruct weaponParts)
         {
             InitCache();
-            if (id < 1 || id >= _configCache.Count)
+            Dictionary<WeaponPartsStruct, ExpandWeaponLogicConfig> partsDic;
+            if(_configCache.TryGetValue(id, out partsDic))
             {
-                Logger.ErrorFormat("id {0} is illegal", id);
-                return null;
-            }
-            if(_configCache[id].ContainsKey(weaponParts))
-            {
-                return _configCache[id][weaponParts];
+                ExpandWeaponLogicConfig config;
+                if(partsDic.TryGetValue(weaponParts, out config))
+                {
+                    return config;
+                }
             }
 
             Prepare(weaponParts);
             var weaponConfig = _weaponDataConfigManager.GetConfigById(id);
             if(null == weaponConfig)
             {
+                Logger.ErrorFormat("WeaponConfig is null for {0}", id);
                 return null;
             }
             var baseConfig = weaponConfig.WeaponLogic;
-            var srcConfig = (baseConfig as DefaultWeaponLogicConfig).FireLogic as DefaultFireLogicConfig;
-            EFireMode[] srcFireModes = null; 
-            if(null != srcConfig)
-            {
-                var cfg = srcConfig.FireModeLogic as DefaultFireModeLogicConfig;
-                srcFireModes = cfg.AvaiableModes;
-            }
             var targetConfig = baseConfig.Copy();
-            //TODO 查找Copy失败的原因
-            var tarConfig = (targetConfig as DefaultWeaponLogicConfig).FireLogic as DefaultFireLogicConfig;
-            if(null != tarConfig)
-            {
-                var cfg = tarConfig.FireModeLogic as DefaultFireModeLogicConfig;
-                cfg.AvaiableModes = new EFireMode[srcFireModes.Length];
-                for(int i = 0; i < srcFireModes.Length; i++)
-                {
-                    cfg.AvaiableModes[i] = srcFireModes[i];
-                }
-            }
             ApplyAttachment(baseConfig, targetConfig);
-            if(null != tarConfig)
+            if(!_configCache.ContainsKey(id))
             {
-                var cfg = tarConfig.FireModeLogic as DefaultFireModeLogicConfig;
+                _configCache[id] = new Dictionary<WeaponPartsStruct, ExpandWeaponLogicConfig>(WeaponPartsStructComparer.Instance);
             }
  
-            var detailConfig = new ExpandDefaultWeaponLogicConfig(targetConfig as DefaultWeaponLogicConfig);
-            _configCache[id][weaponParts] = detailConfig;
-            return detailConfig;
+            var defaultWeaponLogicCfg = targetConfig as DefaultWeaponLogicConfig;
+            if(null != defaultWeaponLogicCfg)
+            {
+                var expandConfig  = new ExpandWeaponLogicConfig(defaultWeaponLogicCfg);
+                _configCache[id][weaponParts] = expandConfig;
+                return expandConfig;
+            }
+            else
+            {
+                var tacticWeaponLogicCfg = targetConfig as TacticWeaponLogicConfig;
+                if(null != tacticWeaponLogicCfg)
+                {
+                    var expandConfig  = new ExpandWeaponLogicConfig(tacticWeaponLogicCfg);
+                    _configCache[id][weaponParts] = expandConfig;
+                    return expandConfig;
+                }
+            }
+            Logger.ErrorFormat("illegal weapon config for {0}", id);
+            return null;
         }
 
         private void Reset()

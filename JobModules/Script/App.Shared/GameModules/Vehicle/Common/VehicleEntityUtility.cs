@@ -106,13 +106,13 @@ namespace App.Shared.GameModules.Vehicle
             VehicleCommonUtility.SetTimer(vehicle, timer);
         }
 
-        public static void AddVehicleComponentsPostInit(this VehicleEntity vehicle, EVehicleType type, UnityObjectWrapper<GameObject> goWrapper, PlayerContext playerContext, bool isServer)
+        public static void AddVehicleComponentsPostInit(this VehicleEntity vehicle, EVehicleType type, UnityObject unityObj, PlayerContext playerContext, bool isServer)
         {
-            var go = goWrapper.Value;
+            var go = unityObj.AsGameObject;
             if (!vehicle.hasGameObject)
             {
                 var controller = go.GetComponent<VehicleCommonController>();
-                vehicle.AddGameObject(controller, goWrapper.Address, goWrapper);
+                vehicle.AddGameObject(controller, unityObj);
                 controller.PutToSleep();
             }
 
@@ -183,7 +183,7 @@ namespace App.Shared.GameModules.Vehicle
                 const float checkRadius = 5.0f;
                 while (true)
                 {
-                    var colliders = Physics.OverlapSphere(position, checkRadius, UnityLayers.VehicleBodyLayerMask);
+                    var colliders = Physics.OverlapSphere(position, checkRadius, UnityLayerManager.GetLayerMask(EUnityLayerName.Vehicle));
                     if (colliders.Length == 0)
                     {
                         break;
@@ -244,7 +244,7 @@ namespace App.Shared.GameModules.Vehicle
 
         public static VehicleSeatConfigInfo GetSeatConfig(this VehicleEntity vehicle)
         {
-            var go = vehicle.gameObject.UnityObjWrapper.Value;
+            var go = vehicle.gameObject.UnityObject.AsGameObject;
             var cfg = go.GetComponent<VehicleBaseConfig>();
 
             var seatInfo = ObjectAllocatorHolder<VehicleSeatConfigInfo>.Allocate();
@@ -331,14 +331,15 @@ namespace App.Shared.GameModules.Vehicle
 
         private static void AddEntityKeyIdentifier(this VehicleEntity vehicle, EntityKey entityKey)
         {
-            vehicle.gameObject.UnityObjWrapper.Value.AddComponent<EntityReference>();
-            var comp = vehicle.gameObject.UnityObjWrapper.Value.GetComponent<EntityReference>();
+            var go = vehicle.gameObject.UnityObject.AsGameObject;
+            go.AddComponent<EntityReference>();
+            var comp = go.GetComponent<EntityReference>();
             comp.Init(vehicle.entityAdapter);
         }
 
         private static void AddVehicleObjectCollision(this VehicleEntity vehicle, PlayerContext context)
         {
-            vehicle.gameObject.UnityObjWrapper.Value.AddComponent<VehicleObjectCollision>();
+            vehicle.gameObject.UnityObject.AsGameObject.AddComponent<VehicleObjectCollision>();
         }
 
         public static VehicleEntity GetVehicleEntity(VehicleContext context, ControlledVehicleComponent vehicleComp)
@@ -488,7 +489,7 @@ namespace App.Shared.GameModules.Vehicle
 
         public static void EnablePassagerCollider(this VehicleEntity vehicle, PlayerEntity player)
         {
-            var go = vehicle.gameObject.UnityObjWrapper.Value;
+            var go = vehicle.gameObject.UnityObject.AsGameObject;
             var cfg = go.GetComponent<VehicleBaseConfig>();
             bool enable = player.IsOnVehicle();
             if (cfg.passagerColider)
@@ -541,7 +542,7 @@ namespace App.Shared.GameModules.Vehicle
             var parent = player.RootGo().transform.parent;
             if (parent != null)
             {
-                var go = vehicle.gameObject.UnityObjWrapper.Value;
+                var go = vehicle.gameObject.UnityObject.AsGameObject;
                 var cfg = go.GetComponent<VehicleBaseConfig>();
 
                 if (cfg.driverSeat == parent)
@@ -594,9 +595,12 @@ namespace App.Shared.GameModules.Vehicle
             var seats = vehicle.vehicleSeat;
             seats.RemoveOccupation(seat);
 
-            player.RootGo().transform.SetParent(null);
-        }
+            var seatPosition = player.RootGo().transform.parent.position;
+            player.RootGo().transform.SetParent(null, false);
 
+            player.RootGo().transform.position = seatPosition;
+            player.position.Value = seatPosition;
+        }
 
         public static bool IsOnVehicleSeat(this VehicleEntity vehicle, PlayerEntity player, int seat)
         {
@@ -786,7 +790,10 @@ namespace App.Shared.GameModules.Vehicle
 
         public static void SetLodLevel(this VehicleEntity vehicle, bool isLowLevel)
         {
-            GetController(vehicle).SetLodLevel(isLowLevel);
+            if (vehicle.hasGameObject)
+            {
+                GetController(vehicle).SetLodLevel(isLowLevel);
+            }   
         }
 
         public static bool IsLowLod(this VehicleEntity vehicle)
@@ -1023,16 +1030,16 @@ namespace App.Shared.GameModules.Vehicle
             float radius;
             PlayerEntityUtility.GetCapsule(playerEntity, p, out p1, out p2, out radius);
 
-            vehicleEntity.SetLayer(UnityLayers.TempPlayerLayer);
+            vehicleEntity.SetLayer(UnityLayerManager.GetLayerIndex(EUnityLayerName.User));
 
             resolvedPosition = character.transform.position;
             var hit = new RaycastHit();
             var hitDist = 2.0f;
 
             var lowOffset = new Vector3(0, -0.5f, 0);
-            if (Physics.CapsuleCast(p1, p2, radius, direction, out hit, sweepDistance, UnityLayers.TempPlayerLayerMask) ||
+            if (Physics.CapsuleCast(p1, p2, radius, direction, out hit, sweepDistance, UnityLayerManager.GetLayerMask(EUnityLayerName.User)) ||
                 //the seat position may be higher than the vehicle's height, then low the position to get collided position
-                Physics.CapsuleCast(p1 + lowOffset, p2 + lowOffset, radius, direction, out hit, sweepDistance, UnityLayers.TempPlayerLayerMask))
+                Physics.CapsuleCast(p1 + lowOffset, p2 + lowOffset, radius, direction, out hit, sweepDistance, UnityLayerManager.GetLayerMask(EUnityLayerName.User)))
             {
                 hitDist = hit.distance;
             }
@@ -1044,7 +1051,7 @@ namespace App.Shared.GameModules.Vehicle
                 var colliders = Physics.OverlapCapsule(p1 + distance, p2 + distance, radius);
                 if (colliders.Length > 0)
                 {
-                    vehicleEntity.SetLayer(UnityLayers.VehicleBodyLayer);
+                    vehicleEntity.SetLayer(UnityLayerManager.GetLayerIndex(EUnityLayerName.Vehicle));
                     return false;
                 }
 
@@ -1065,14 +1072,14 @@ namespace App.Shared.GameModules.Vehicle
     
                 if (Physics.Raycast(ray, out hit, dist.magnitude, UnityLayers.AllCollidableLayerMask))
                 {
-                    vehicleEntity.SetLayer(UnityLayers.VehicleBodyLayer);
+                    vehicleEntity.SetLayer(UnityLayerManager.GetLayerIndex(EUnityLayerName.Vehicle));
                     return false;
                 }
 
                 resolvedPosition = position;
             }
             
-            vehicleEntity.SetLayer(UnityLayers.VehicleBodyLayer);
+            vehicleEntity.SetLayer(UnityLayerManager.GetLayerIndex(EUnityLayerName.Vehicle));
             return true;
         }
 

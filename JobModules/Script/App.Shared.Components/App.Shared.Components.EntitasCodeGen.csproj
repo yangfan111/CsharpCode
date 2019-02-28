@@ -1,408 +1,253 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup Label="Globals">
-    <ProjectGuid>{3EF05141-824D-38B6-B340-0456507C93F2}</ProjectGuid>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
-    <Keyword>Win32Proj</Keyword>
-    <Platform>Win32</Platform>
-    <ProjectName>App.Shared.Components.EntitasCodeGen</ProjectName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
-    <BaseIntermediateOutputPath>../build_obj/App.Shared.Components.EntitasCodeGen</BaseIntermediateOutputPath>
-    <PostBuildEvent>mkdir "F:/voyager/UnityPackages/App.Shared.Components/Generated/" 
- mkdir "F:/voyager/UnityPackages/App.Shared.Components/Generated/Serializer" 
- mkdir "F:/voyager/UnityPackages/App.Shared.Components/Generated/Entitas" 
-
- call F:/voyager/UnityPackages/App.Shared.Components/generate_components.bat
-echo =============================
-call F:/voyager/UnityPackages/App.Shared.Components/generate_serializer.bat
-</PostBuildEvent>
-    <RootNamespace>App.Shared</RootNamespace>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FAA6EC12-E68D-AE0A-8FDE-14287BA42771}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-  </PropertyGroup>
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"/>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' Or '$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
-    <OutputPath>F:\voyager\UnityPackages\Dll.Temp\</OutputPath>
-    <PlatformTarget>anycpu</PlatformTarget>
-    <PlatformToolset>v141</PlatformToolset>
+    <RootNamespace>App.Shared</RootNamespace>
     <AssemblyName>App.Shared.Components.EntitasCodeGen</AssemblyName>
-    <DefineConstants>TRACE;TRACE%3BDEBUG%3BUNITY_SOURCE_MODIFIED%3BUNITY_5%3BUNITY_53_OR_GREATER%3BUNITY_52_OR_GREATER</DefineConstants>
-    <LangVersion>default</LangVersion>
-    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32' Or '$(Configuration)|$(Platform)'=='Release|x86'" Label="Configuration">
-    <OutputPath>F:\voyager\UnityPackages\Dll.Temp\Release\</OutputPath>
-    <PlatformTarget>anycpu</PlatformTarget>
-    <PlatformToolset>v141</PlatformToolset>
-    <AssemblyName>App.Shared.Components.EntitasCodeGen</AssemblyName>
-    <DefineConstants>TRACE;TRACE%3BDEBUG%3BUNITY_SOURCE_MODIFIED%3BUNITY_5%3BUNITY_53_OR_GREATER%3BUNITY_52_OR_GREATER</DefineConstants>
-    <LangVersion>default</LangVersion>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32' Or '$(Configuration)|$(Platform)'=='MinSizeRel|x86'" Label="Configuration">
-    <OutputPath>F:\voyager\UnityPackages\Dll.Temp\MinSizeRel\</OutputPath>
-    <PlatformTarget>x64</PlatformTarget>
-    <PlatformToolset>v141</PlatformToolset>
-    <AssemblyName>App.Shared.Components.EntitasCodeGen</AssemblyName>
-    <DebugType>none</DebugType>
-    <DefineConstants>TRACE</DefineConstants>
-    <LangVersion>3</LangVersion>
-    <Optimize>true</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32' Or '$(Configuration)|$(Platform)'=='RelWithDebInfo|x86'" Label="Configuration">
-    <DebugSymbols>true</DebugSymbols>
-    <DefineDebug>true</DefineDebug>
-    <OutputPath>F:\voyager\UnityPackages\Dll.Temp\RelWithDebInfo\</OutputPath>
-    <PlatformTarget>x64</PlatformTarget>
-    <PlatformToolset>v141</PlatformToolset>
-    <AssemblyName>App.Shared.Components.EntitasCodeGen</AssemblyName>
-    <DebugType>full</DebugType>
-    <DefineConstants>TRACE</DefineConstants>
-    <LangVersion>3</LangVersion>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
     <Optimize>false</Optimize>
+    <OutputPath>..\..\Dll.Temp\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\build_obj_dir\Release\App.Shared.Components.EntitasCodeGen\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.CSharp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.CSharp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Dll.Temp\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\build_obj_dir\Debug\App.Shared.Components.EntitasCodeGen\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
   <ItemGroup>
-    <None Include="F:\voyager\UnityPackages\App.Shared.Components\CMakeLists.txt">
-    </None>
-  </ItemGroup>
-  <Target Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' Or '$(Configuration)|$(Platform)'=='Debug|x86'"
-    Name="CustomCommand_Debug_f64228cfebc66b6a38633afb20b95c4f"
-    Inputs="F:/voyager/UnityPackages/App.Shared.Components/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared.Components\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared.Components\CMakeLists.txt"
-    Outputs="F:\voyager\UnityPackages\App.Shared.Components\CMakeFiles\generate.stamp">
-    <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/App.Shared.Components/CMakeLists.txt" />
-    <Exec Command="setlocal
-&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared.Components/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd" />
-  </Target>
-  <Target Condition="'$(Configuration)|$(Platform)'=='Release|Win32' Or '$(Configuration)|$(Platform)'=='Release|x86'"
-    Name="CustomCommand_Release_f64228cfebc66b6a38633afb20b95c4f"
-    Inputs="F:/voyager/UnityPackages/App.Shared.Components/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared.Components\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared.Components\CMakeLists.txt"
-    Outputs="F:\voyager\UnityPackages\App.Shared.Components\CMakeFiles\generate.stamp">
-    <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/App.Shared.Components/CMakeLists.txt" />
-    <Exec Command="setlocal
-&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared.Components/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd" />
-  </Target>
-  <Target Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32' Or '$(Configuration)|$(Platform)'=='MinSizeRel|x86'"
-    Name="CustomCommand_MinSizeRel_f64228cfebc66b6a38633afb20b95c4f"
-    Inputs="F:/voyager/UnityPackages/App.Shared.Components/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared.Components\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared.Components\CMakeLists.txt"
-    Outputs="F:\voyager\UnityPackages\App.Shared.Components\CMakeFiles\generate.stamp">
-    <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/App.Shared.Components/CMakeLists.txt" />
-    <Exec Command="setlocal
-&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared.Components/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd" />
-  </Target>
-  <Target Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32' Or '$(Configuration)|$(Platform)'=='RelWithDebInfo|x86'"
-    Name="CustomCommand_RelWithDebInfo_f64228cfebc66b6a38633afb20b95c4f"
-    Inputs="F:/voyager/UnityPackages/App.Shared.Components/CMakeLists.txt;F:\voyager\UnityPackages\App.Shared.Components\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\App.Shared.Components\CMakeLists.txt"
-    Outputs="F:\voyager\UnityPackages\App.Shared.Components\CMakeFiles\generate.stamp">
-    <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/App.Shared.Components/CMakeLists.txt" />
-    <Exec Command="setlocal
-&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/App.Shared.Components/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd" />
-  </Target>
-  <ItemGroup>
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Adapter\IPlayerEntity.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Bag\BagComponents.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Bullet\BulletComponents.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\ClientEffect\ClientEffectComponents.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Common\CommonComponents.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\EComponentIds.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\FreeMove\AirPlaneComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\FreeMove\FreeDataComponent.cs">
-      <ObjectFileName>$(IntDir)/Components/FreeMove/FreeDataComponent.cs</ObjectFileName>
-    </Compile>
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\FreeMove\FreeMoveCatComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\FreeMove\FreeMoveKeyComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\FreeMove\UnityGameObjectComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\GameRules.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\GenericActions\IGenericAction.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Oxygen\IOxygenEnergy.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Oxygen\IPredictedOxygenState.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\AbstractNetworkAnimator.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\AnimationExComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\AnimatorClipComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\AppearanceComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\AttackDamageComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\BonesComponents.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\CameraComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\CharacterBoneComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\CharacterContollerComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\ControlledVehicleComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\FirePosition.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\FirstPersonAnimatorComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\FirstPersonModelComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\FpAnimStatusComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\FreeDataComponent.cs">
-      <ObjectFileName>$(IntDir)/Components/Player/FreeDataComponent.cs</ObjectFileName>
-    </Compile>
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\GamePlayComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\GenericActionComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\MeleeAttackerComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\ModeLogicComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\NetworkAnimatorComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\OrientationComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\OxygenEnergyComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\PingStatisticsComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\PlayerEventsComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\PlayerGameStateComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\PlayerInfoComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\PlayerInterceptComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\PlayerMaskComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\PlayerMoveComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\PlayerSkyMoveComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\PlayerSoundComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\PlayerStateAdapterComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\PlayerWeaponComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\RaycastComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\RecycleableAssetComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\RobotComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\SoundComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\StageComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\StateComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\StatisticsDataComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\ThirdPersonAnimatorComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\ThirdPersonModelComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\ThrowingActionComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\TimeComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\TipComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\UpdateMessagePoolComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\UserCmdComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Player\UserCmdOwnerComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\SceneObject\SceneObjectComponents.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\CList.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\DummyComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldCloneUtil.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldEqualUtil.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldMergeUtil.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializeUtil.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\BoolSerializer.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\ByteSerialize.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\DoubleSerializer.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\EntityKeySerializer.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\EventsSerializer.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\FloatSerializer.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\IFieldSerializer.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\IntSerializer.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\LongSerializer.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\QuaternionSerializer.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\ShortSerialize.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\StateInterCommandsSerializer.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\StringSerializer.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\Uint16Serializer.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\UintSerializer.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\UnityAnimationEventCommandsSerializer.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\Vector2Serializer.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Serializer\FieldSerializer\Vector3Serializer.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Session\FpsSatatus.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Session\ServerStatus.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Session\SessionComponents.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Sound\AssetInfoComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Sound\AudioSourceKeyComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Sound\FlagPreventDestroyComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Sound\ParentComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Sound\PlayOnceComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Sound\PlayingComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Sound\SoundPlayInfoComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Sound\TimeInfoComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Sound\UnityObjComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Throwing\ThrowingComponents.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\BlastComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\ChatComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\ChickenComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\CrossHairHurtedData.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\FrontComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\GroupComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\ICountdownTipData.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\IGroupBattleData.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\IKillInfoItem.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\INoticeInfoItem.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\IPlayerCountData.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\ITaskTipData.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\IUIAdapter.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\MapComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\MapInfos.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\ScreenFlashInfo.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\SplitPropInfo.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\UIComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\UISessionComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Ui\WaitToBeLoadedComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\UserInput\UserInputManagerComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\Car\CarDynamicDataComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\Car\CarGameDataComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\Car\CarHitBoxComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\Car\CarWheelComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\GameObjectComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\IVehicleResetableComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\Ship\ShipDynamicDataComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\Ship\ShipGameDataComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\Ship\ShipHitBoxComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\VehicleAssetInfoComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\VehicleBaseGameDataComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\VehicleBrokenFlagComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\VehicleCmdOwnerComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\VehicleCollisionDamageComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\VehicleDrivableComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\VehicleDynamicDataComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\VehicleGameEventComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\VehicleSeatComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\VehicleSyncEventComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Vehicle\VehicleTypeComponent.cs" />
-    <Compile Include="F:\voyager\UnityPackages\App.Shared.Components\Components\Weapon\WeaponComponents.cs" />
-    <None Include="F:\voyager\UnityPackages\App.Shared.Components\packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System">
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Entitas">
+      <HintPath>..\..\CommonLibs\Entitas.dll</HintPath>
     </Reference>
-    <Reference Include="System.Core">
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    <Reference Include="Entitas.CodeGeneration.Attributes">
+      <HintPath>..\..\CommonLibs\Entitas.CodeGeneration.Attributes.dll</HintPath>
     </Reference>
-    <Reference Include="System.Data">
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    <Reference Include="Entitas.Utils">
+      <HintPath>..\..\CommonLibs\Entitas.Utils.dll</HintPath>
     </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    <Reference Include="Entitas.VisualDebugging.Unity">
+      <HintPath>..\..\CommonLibs\Entitas.VisualDebugging.Unity.dll</HintPath>
     </Reference>
-    <Reference Include="System.Xml">
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-    </Reference>
-    <Reference Include="System.Xml.Linq">
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-    </Reference>
-    <Reference Include="../CommonLibs/Entitas.dll">
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-    </Reference>
-    <Reference Include="../CommonLibs/Entitas.CodeGeneration.Attributes.dll">
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-    </Reference>
-    <Reference Include="../CommonLibs/Entitas.Utils.dll">
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-    </Reference>
-    <Reference Include="../CommonLibs/Entitas.VisualDebugging.Unity.dll">
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-    </Reference>
-    <Reference Include="../ThirdParty/Unity/5_6/UnityEngine.dll">
-      <Private>False</Private>
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    <Reference Include="UnityEngine">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="F:\voyager\UnityPackages\ZERO_CHECK.vcxproj">
-      <Project>{0F55FAB8-D7EA-304E-A7AE-79B396AFBC70}</Project>
-      <Name>ZERO_CHECK</Name>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="F:\voyager\UnityPackages\App.Shared.Entity\App.Shared.Entity.csproj">
-      <Project>{F6851B2F-C7F9-3192-851B-70C71B22E421}</Project>
-      <Name>App.Shared.Entity</Name>
-    </ProjectReference>
-    <ProjectReference Include="F:\voyager\UnityPackages\AssetBundleManager\AssetBundleManager.csproj">
-      <Project>{39A6EA94-026A-37BD-9D46-A7CD6DB1F86B}</Project>
-      <Name>AssetBundleManager</Name>
-    </ProjectReference>
-    <ProjectReference Include="F:\voyager\UnityPackages\Common\Common.csproj">
-      <Project>{B270B73F-8D5C-3E62-8D45-89ACE8D63DE3}</Project>
+    <Compile Include="Components\Adapter\IPlayerEntity.cs" />
+    <Compile Include="Components\Bullet\BulletComponents.cs" />
+    <Compile Include="Components\ClientEffect\ClientEffectComponents.cs" />
+    <Compile Include="Components\Common\CommonComponents.cs" />
+    <Compile Include="Components\EComponentIds.cs" />
+    <Compile Include="Components\Effect\EffectsComponent.cs" />
+    <Compile Include="Components\FreeMove\AirPlaneComponent.cs" />
+    <Compile Include="Components\FreeMove\FreeDataComponent.cs" />
+    <Compile Include="Components\FreeMove\FreeMoveCatComponent.cs" />
+    <Compile Include="Components\FreeMove\FreeMoveKeyComponent.cs" />
+    <Compile Include="Components\FreeMove\UnityGameObjectComponent.cs" />
+    <Compile Include="Components\GameRules.cs" />
+    <Compile Include="Components\GenericActions\IGenericAction.cs" />
+    <Compile Include="Components\Oxygen\IOxygenEnergy.cs" />
+    <Compile Include="Components\Oxygen\IPredictedOxygenState.cs" />
+    <Compile Include="Components\Player\AbstractNetworkAnimator.cs" />
+    <Compile Include="Components\Player\AnimationExComponent.cs" />
+    <Compile Include="Components\Player\AnimatorClipComponent.cs" />
+    <Compile Include="Components\Player\AppearanceComponent.cs" />
+    <Compile Include="Components\Player\AttackDamageComponent.cs" />
+    <Compile Include="Components\Player\BonesComponents.cs" />
+    <Compile Include="Components\Player\CameraComponent.cs" />
+    <Compile Include="Components\Player\CharacterBoneComponent.cs" />
+    <Compile Include="Components\Player\CharacterContollerComponent.cs" />
+    <Compile Include="Components\Player\CommonResourceComponent.cs" />
+    <Compile Include="Components\Player\ControlledVehicleComponent.cs" />
+    <Compile Include="Components\Player\FirePosition.cs" />
+    <Compile Include="Components\Player\FirstPersonAnimatorComponent.cs" />
+    <Compile Include="Components\Player\FirstPersonModelComponent.cs" />
+    <Compile Include="Components\Player\FpAnimStatusComponent.cs" />
+    <Compile Include="Components\Player\FreeDataComponent.cs" />
+    <Compile Include="Components\Player\GamePlayComponent.cs" />
+    <Compile Include="Components\Player\GenericActionComponent.cs" />
+    <Compile Include="Components\Player\MeleeAttackerComponent.cs" />
+    <Compile Include="Components\Player\ModeLogicComponent.cs" />
+    <Compile Include="Components\Player\NetworkAnimatorComponent.cs" />
+    <Compile Include="Components\Player\OrientationComponent.cs" />
+    <Compile Include="Components\Player\OverrideNetworkAnimatorComponent.cs" />
+    <Compile Include="Components\Player\OxygenEnergyComponent.cs" />
+    <Compile Include="Components\Player\PingStatisticsComponent.cs" />
+    <Compile Include="Components\Player\PlayerEventsComponent.cs" />
+    <Compile Include="Components\Player\PlayerGameStateComponent.cs" />
+    <Compile Include="Components\Player\PlayerInfoComponent.cs" />
+    <Compile Include="Components\Player\PlayerInterceptComponent.cs" />
+    <Compile Include="Components\Player\PlayerMaskComponent.cs" />
+    <Compile Include="Components\Player\PlayerMoveComponent.cs" />
+    <Compile Include="Components\Player\PlayerSkyMoveComponent.cs" />
+    <Compile Include="Components\Player\PlayerSoundComponent.cs" />
+    <Compile Include="Components\Player\PlayerStateAdapterComponent.cs" />
+    <Compile Include="Components\Player\RaycastComponent.cs" />
+    <Compile Include="Components\Player\RaycastTestComponent.cs" />
+    <Compile Include="Components\Player\RecycleableAssetComponent.cs" />
+    <Compile Include="Components\Player\RobotComponent.cs" />
+    <Compile Include="Components\Player\SoundComponent.cs" />
+    <Compile Include="Components\Player\StageComponent.cs" />
+    <Compile Include="Components\Player\StateComponent.cs" />
+    <Compile Include="Components\Player\StatisticsDataComponent.cs" />
+    <Compile Include="Components\Player\ThirdPersonAnimatorComponent.cs" />
+    <Compile Include="Components\Player\ThirdPersonModelComponent.cs" />
+    <Compile Include="Components\Player\ThrowingActionComponent.cs" />
+    <Compile Include="Components\Player\TimeComponent.cs" />
+    <Compile Include="Components\Player\TipComponent.cs" />
+    <Compile Include="Components\Player\TriggerEventComponent.cs" />
+    <Compile Include="Components\Player\UpdateMessagePoolComponent.cs" />
+    <Compile Include="Components\Player\UserCmdComponent.cs" />
+    <Compile Include="Components\Player\UserCmdOwnerComponent.cs" />
+    <Compile Include="Components\SceneObject\SceneObjectComponents.cs" />
+    <Compile Include="Components\Serializer\CList.cs" />
+    <Compile Include="Components\Serializer\DummyComponent.cs" />
+    <Compile Include="Components\Serializer\FieldCloneUtil.cs" />
+    <Compile Include="Components\Serializer\FieldEqualUtil.cs" />
+    <Compile Include="Components\Serializer\FieldMergeUtil.cs" />
+    <Compile Include="Components\Serializer\FieldSerializeUtil.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\BoolSerializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\ByteSerialize.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\DoubleSerializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\EntityKeySerializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\EventsSerializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\FloatSerializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\IFieldSerializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\IntSerializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\LongSerializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\QuaternionSerializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\ShortSerialize.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\StateInterCommandsSerializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\StringSerializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\Uint16Serializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\UintSerializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\UnityAnimationEventCommandsSerializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\Vector2Serializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\Vector3Serializer.cs" />
+    <Compile Include="Components\Session\FpsSatatus.cs" />
+    <Compile Include="Components\Session\ServerStatus.cs" />
+    <Compile Include="Components\Session\SessionComponents.cs" />
+    <Compile Include="Components\Sound\AssetInfoComponent.cs" />
+    <Compile Include="Components\Sound\AudioSourceKeyComponent.cs" />
+    <Compile Include="Components\Sound\FlagPreventDestroyComponent.cs" />
+    <Compile Include="Components\Sound\ParentComponent.cs" />
+    <Compile Include="Components\Sound\PlayOnceComponent.cs" />
+    <Compile Include="Components\Sound\PlayingComponent.cs" />
+    <Compile Include="Components\Sound\SoundPlayInfoComponent.cs" />
+    <Compile Include="Components\Sound\TimeInfoComponent.cs" />
+    <Compile Include="Components\Sound\UnityObjComponent.cs" />
+    <Compile Include="Components\Throwing\ThrowingComponents.cs" />
+    <Compile Include="Components\Ui\BlastComponent.cs" />
+    <Compile Include="Components\Ui\ChatComponent.cs" />
+    <Compile Include="Components\Ui\ChickenComponent.cs" />
+    <Compile Include="Components\Ui\CrossHairHurtedData.cs" />
+    <Compile Include="Components\Ui\FrontComponent.cs" />
+    <Compile Include="Components\Ui\GroupComponent.cs" />
+    <Compile Include="Components\Ui\ICountdownTipData.cs" />
+    <Compile Include="Components\Ui\IGroupBattleData.cs" />
+    <Compile Include="Components\Ui\IKillInfoItem.cs" />
+    <Compile Include="Components\Ui\INoticeInfoItem.cs" />
+    <Compile Include="Components\Ui\IPlayerCountData.cs" />
+    <Compile Include="Components\Ui\ITaskTipData.cs" />
+    <Compile Include="Components\Ui\IUIAdapter.cs" />
+    <Compile Include="Components\Ui\MapComponent.cs" />
+    <Compile Include="Components\Ui\MapInfos.cs" />
+    <Compile Include="Components\Ui\ScreenFlashInfo.cs" />
+    <Compile Include="Components\Ui\SplitPropInfo.cs" />
+    <Compile Include="Components\Ui\UIComponent.cs" />
+    <Compile Include="Components\Ui\UISessionComponent.cs" />
+    <Compile Include="Components\Ui\WaitToBeLoadedComponent.cs" />
+    <Compile Include="Components\UserInput\UserInputManagerComponent.cs" />
+    <Compile Include="Components\Vehicle\Car\CarDynamicDataComponent.cs" />
+    <Compile Include="Components\Vehicle\Car\CarGameDataComponent.cs" />
+    <Compile Include="Components\Vehicle\Car\CarHitBoxComponent.cs" />
+    <Compile Include="Components\Vehicle\Car\CarWheelComponent.cs" />
+    <Compile Include="Components\Vehicle\GameObjectComponent.cs" />
+    <Compile Include="Components\Vehicle\IVehicleResetableComponent.cs" />
+    <Compile Include="Components\Vehicle\Ship\ShipDynamicDataComponent.cs" />
+    <Compile Include="Components\Vehicle\Ship\ShipGameDataComponent.cs" />
+    <Compile Include="Components\Vehicle\Ship\ShipHitBoxComponent.cs" />
+    <Compile Include="Components\Vehicle\VehicleAssetInfoComponent.cs" />
+    <Compile Include="Components\Vehicle\VehicleBaseGameDataComponent.cs" />
+    <Compile Include="Components\Vehicle\VehicleBrokenFlagComponent.cs" />
+    <Compile Include="Components\Vehicle\VehicleCmdOwnerComponent.cs" />
+    <Compile Include="Components\Vehicle\VehicleCollisionDamageComponent.cs" />
+    <Compile Include="Components\Vehicle\VehicleDrivableComponent.cs" />
+    <Compile Include="Components\Vehicle\VehicleDynamicDataComponent.cs" />
+    <Compile Include="Components\Vehicle\VehicleGameEventComponent.cs" />
+    <Compile Include="Components\Vehicle\VehicleSeatComponent.cs" />
+    <Compile Include="Components\Vehicle\VehicleSyncEventComponent.cs" />
+    <Compile Include="Components\Vehicle\VehicleTypeComponent.cs" />
+    <Compile Include="Components\Weapon\PlayerWeaponComponents.cs" />
+    <Compile Include="Components\Weapon\WeaponComponents.cs" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}</Project>
       <Name>Common</Name>
     </ProjectReference>
-    <ProjectReference Include="F:\voyager\UnityPackages\Core\Core.csproj">
-      <Project>{89347114-9496-3679-85F4-60D1E379C6B6}</Project>
-      <Name>Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="F:\voyager\UnityPackages\EVP5\EVP5.csproj">
-      <Project>{003B63BA-72E0-36A6-B10C-29801809F546}</Project>
-      <Name>EVP5</Name>
-    </ProjectReference>
-    <ProjectReference Include="F:\voyager\UnityPackages\LiteNetLib\LiteNetLib.csproj">
-      <Project>{1CF26A34-4FEE-349B-B5D1-949BE742AD2E}</Project>
-      <Name>LiteNetLib</Name>
-    </ProjectReference>
-    <ProjectReference Include="F:\voyager\UnityPackages\Shared.Scripts\Shared.Scripts.csproj">
-      <Project>{9D26015F-C182-358F-BD14-3CC7B2CE8F9E}</Project>
-      <Name>Shared.Scripts</Name>
-    </ProjectReference>
-    <ProjectReference Include="F:\voyager\UnityPackages\UserInputManager\UserInputManager.csproj">
-      <Project>{A4428365-FD29-3BEB-AEC1-2EB4210E31EC}</Project>
-      <Name>UserInputManager</Name>
-    </ProjectReference>
-    <ProjectReference Include="F:\voyager\UnityPackages\Utils\Utils.csproj">
-      <Project>{4AB31266-306B-30CD-A2B9-5EF5E1CEFBEB}</Project>
-      <Name>Utils</Name>
-    </ProjectReference>
-    <ProjectReference Include="F:\voyager\UnityPackages\VehicleCommon\VehicleCommon.csproj">
-      <Project>{9413F78D-7F23-3E4F-BBB4-D636C992C414}</Project>
+    <ProjectReference Include="..\VehicleCommon\VehicleCommon.csproj">
+      <Project>{EEE6EAF7-5AA7-662E-23E2-AFAB8F61AB0A}</Project>
       <Name>VehicleCommon</Name>
     </ProjectReference>
-    <ProjectReference Include="F:\voyager\UnityPackages\Wwise\Wwise.csproj">
-      <Project>{9CC5BE84-06A7-383C-BC53-04EAD3049134}</Project>
-      <Name>Wwise</Name>
+    <ProjectReference Include="..\Shared.Scripts\Shared.Scripts.csproj">
+      <Project>{D2164AE1-BEE4-3DE7-A778-AE0D93E5194C}</Project>
+      <Name>Shared.Scripts</Name>
     </ProjectReference>
-    <ProjectReference Include="F:\voyager\UnityPackages\XmlConfig\XmlConfig.csproj">
-      <Project>{A849630B-9445-3E6E-B2F7-41639D1DA19B}</Project>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utils\Utils.csproj">
+      <Project>{F68B420E-62A0-6ABF-2B22-0E1F97F566F0}</Project>
+      <Name>Utils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UserInputManager\UserInputManager.csproj">
+      <Project>{AF9B4541-9B94-6493-C4C6-4918B01E449F}</Project>
+      <Name>UserInputManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XmlConfig\XmlConfig.csproj">
+      <Project>{CCFBDCB2-3866-9129-81A4-42CFED4D6F7E}</Project>
       <Name>XmlConfig</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\App.Shared.Entity\App.Shared.Entity.csproj">
+      <Project>{1693DEDC-82A9-DC72-CB20-68943776ADFA}</Project>
+      <Name>App.Shared.Entity</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'MinSizeRel'">
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'RelWithDebInfo'">
-  </PropertyGroup>
-  <PropertyGroup>
-    <BuildDependsOn>
-      CustomCommand_Debug_f64228cfebc66b6a38633afb20b95c4f;
-      CustomCommand_MinSizeRel_f64228cfebc66b6a38633afb20b95c4f;
-      CustomCommand_RelWithDebInfo_f64228cfebc66b6a38633afb20b95c4f;
-      CustomCommand_Release_f64228cfebc66b6a38633afb20b95c4f;
-      $(BuildDependsOn)
-    </BuildDependsOn>
-  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>

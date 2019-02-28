@@ -34,6 +34,10 @@ namespace Core.CharacterState
         public const float FirstPersonCrouchCameraHeight = 1.0f;
         public const float FirstPersonProneCameraHeight = 0.25f;
 
+        public static readonly string InjureyStateString = "UpperBody Add Layer.Injury";
+        public static readonly int InjureyStateHash = Animator.StringToHash(InjureyStateString);
+        public static readonly float InjureyStateDuration = 0.333f;
+
         /// <summary>
         /// 0.17f是站立相机位置和人眼位置的偏移
         /// </summary>
@@ -62,6 +66,10 @@ namespace Core.CharacterState
             StandValue = 2;
             StableValue = 3;
 
+            FrontPostureName = "FrontPosture";
+            FrontStand = 0f;
+            FrontCrouch = 1f;
+
             HandStateName = "UpDown";
             HandDownValue = -1;
             HandIdleValue = 0;
@@ -75,15 +83,33 @@ namespace Core.CharacterState
             ForceEndProneEnable = true;
             ForceEndProneDisable = false;
 
+            ForceToProneName = "ForceToProne";
+            ForceToProneEnable = true;
+            ForceToProneDisable = false;
+
             MotionName = "Speed";
             MotionlessValue = 0;
             MotionNullValue = 0.1f;
             MotionValue = 1;
 
+
+            JumpStateName = "JumpState";
+            JumpStateNormal = 0.0f;
+            JumpStateMove = 1.0f;
+            
+            MoveJumpStateName = "MoveJumpState";
+            MoveJumpStateNormal = 0.0f;
+            MoveJumpStateLF = -1.0f;
+            MoveJumpStateRF = 1.0f;
+            
             MovementName = "MoveState";
             WalkValue = 0;
             RunValue = 1;
             SprintValue = 2;
+
+            IsWalkName = "IsWalk";
+            IsWalkEnable = true;
+            IsWalkDisable = false;
 
             FireName = "Fire";
             FireEnableValue = true;
@@ -92,6 +118,10 @@ namespace Core.CharacterState
             ClimbName = "Climb";
             ClimbEnableValue = true;
             ClimbDisableValue = false;
+
+            ClimbEndName = "ClimbEnd";
+            ClimbEndEnableValue = true;
+            ClimbEndDisableValue = false;
 
             ClimbStateName = "ClimbState";
             VaultValue = 0;
@@ -121,6 +151,10 @@ namespace Core.CharacterState
             InjuryName = "Injury";
             InjuryStartValue = true;
             InjuryEndValue = false;
+
+            SlideName = "Slide";
+            SlideEnable = true;
+            SlideDisable = false;
 
             JumpStartName = "Jump";
             JumpStartEnable = true;
@@ -200,9 +234,10 @@ namespace Core.CharacterState
             MeleeAttackEnd = false;
 
             MeleeStateName = "MeleeState";
-            LightMeleeOne = 0;
-            LightMeleeTwo = 1;
-            ForceMelee = 2;
+            NullMelee = 0;
+            LightMeleeOne = 1;
+            LightMeleeTwo = 2;
+            ForceMelee = 3;
 
             StartThrowName = "Throw";
             StartThrowEnable = true;
@@ -309,6 +344,22 @@ namespace Core.CharacterState
         public float StableValue { get; private set; }
         #endregion
 
+        #region FrontPosture
+
+        private string _frontPostureName = String.Empty;
+        public string FrontPostureName
+        {
+            get { return _frontPostureName; }
+            set { _frontPostureName = value;
+                FrontPostureHash = StringToHash(value);
+            }
+        }
+        public int FrontPostureHash { get; private set; }
+        public float FrontStand { get; private set; }
+        public float FrontCrouch { get; private set; }
+
+        #endregion
+
         #region Prone
         private string _proneName = string.Empty;
         public string ProneName
@@ -345,7 +396,76 @@ namespace Core.CharacterState
         public bool ForceEndProneEnable { get; private set; }
         public bool ForceEndProneDisable { get; private set; }
         #endregion
+        
+        #region ForceToProne
+        private string _forceToProneName = string.Empty;
+        public string ForceToProneName
+        {
+            get { return _forceToProneName; }
+            set { _forceToProneName = value; ForceToProneHash = StringToHash(value); }
+        }
+        public int ForceToProneHash { get; private set; }
+        public bool ForceToProneEnable { get; private set; }
+        public bool ForceToProneDisable { get; private set; }
+        #endregion
 
+        #region JumpState
+        private string _jumpStateName = string.Empty;
+        public string JumpStateName
+        {
+            get { return _jumpStateName; }
+            set { _jumpStateName = value; JumpStateHash = StringToHash(value); }
+        }
+        public int JumpStateHash { get; private set; }
+        public float JumpStateNormal { get; private set; }
+        public float JumpStateMove { get; private set; }
+        #endregion
+
+        #region MoveJumpState
+
+        private string _moveJumpStateName = string.Empty;
+
+        public string MoveJumpStateName
+        {
+            get { return _moveJumpStateName; }
+            set
+            {
+                _moveJumpStateName = value;
+                MoveJumpStateHash = StringToHash(value);
+            }
+        }
+        public int MoveJumpStateHash { get; private set; }
+        public float MoveJumpStateLF { get; private set; }
+        public float MoveJumpStateRF { get; private set; }
+        public float MoveJumpStateNormal { get; private set; }
+
+        #endregion
+
+        #region Slide
+
+        private string _slideName = string.Empty;
+
+        public string SlideName
+        {
+            get { return _slideName; }
+            set
+            {
+                _slideName = value;
+                SlideHash = StringToHash(_slideName);
+            }
+        }
+
+        public int SlideHash
+        {
+            get;
+            private set;
+        }
+
+        public bool SlideEnable { get; private set; }
+        public bool SlideDisable { get; private set; }
+
+        #endregion
+        
         #region Jump
         private string _jumpStartName = string.Empty;
         public string JumpStartName
@@ -395,6 +515,18 @@ namespace Core.CharacterState
         public float RunValue { get; private set; }
         public float SprintValue { get; private set; }
         #endregion
+        
+        #region IsWalk
+        private string _isWalkName = string.Empty;
+        public string IsWalkName
+        {
+            get { return _isWalkName; }
+            set { _isWalkName = value; IsWalkHash = StringToHash(value); }
+        }
+        public int IsWalkHash { get; private set; }
+        public bool IsWalkEnable { get; private set; }
+        public bool IsWalkDisable { get; private set; }
+        #endregion
 
         #region Fire
         private string _fireName = string.Empty;
@@ -420,7 +552,19 @@ namespace Core.CharacterState
         public bool ClimbDisableValue { get; private set; }
         #endregion
 
-        #region actionState
+        #region climbEnd
+        private string _climbEndName = string.Empty;
+        public string ClimbEndName
+        {
+            get { return _climbEndName; }
+            set { _climbEndName = value;  ClimbEndHash = StringToHash(value); }
+        }
+        public int ClimbEndHash { get; private set; }
+        public bool ClimbEndEnableValue { get; private set; }
+        public bool ClimbEndDisableValue { get; private set; }
+        #endregion
+
+        #region climbState
         private string _climbStateName = string.Empty;
         public string ClimbStateName
         {
@@ -741,7 +885,7 @@ namespace Core.CharacterState
         public bool MeleeAttackStart { get; private set; }
         public bool MeleeAttackEnd { get; private set; }
         #endregion
-
+        
         #region MeleeState
 
         private string _meleeStateName = string.Empty;
@@ -751,9 +895,10 @@ namespace Core.CharacterState
             set { _meleeStateName = value; MeleeStateHash = StringToHash(value); }
         }
         public int MeleeStateHash { get; private set; }
-        public float LightMeleeOne { get; private set; }
-        public float LightMeleeTwo { get; private set; }
-        public float ForceMelee { get; private set; }
+        public int NullMelee { get; private set; }
+        public int LightMeleeOne { get; private set; }
+        public int LightMeleeTwo { get; private set; }
+        public int ForceMelee { get; private set; }
 
         #endregion
 
@@ -921,6 +1066,7 @@ namespace Core.CharacterState
             "InjuredMove Layer.Move -> InjuredMove Layer.Idle",
             "LowerBody Layer.Move -> LowerBody Layer.Jump_Loop",
             "LowerBody Layer.Move -> LowerBody Layer.Jump_Start",
+            "UpperBody Add Layer.Injury"
         };
 
         public string GetHashString(int hash)

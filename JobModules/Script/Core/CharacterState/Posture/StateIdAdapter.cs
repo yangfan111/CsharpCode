@@ -56,6 +56,9 @@ namespace Core.CharacterState.Posture
                 case PostureStateId.Climb:
                     ret = PostureInConfig.Climb;
                     break;
+                case PostureStateId.Slide:
+                    ret = PostureInConfig.Slide;
+                    break;
                 default:
                     ret = PostureInConfig.Null;
                     Logger.ErrorFormat("can not convert PostureStateId type:{0} to PostureInConfig type", stateId);

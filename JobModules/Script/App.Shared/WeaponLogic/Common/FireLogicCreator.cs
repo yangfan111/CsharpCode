@@ -1,4 +1,6 @@
 ﻿using App.Shared.WeaponLogic.FireLogic;
+using Assets.XmlConfig;
+using Core.Utils;
 using Core.WeaponLogic;
 using Core.WeaponLogic.Common;
 using System.Collections.Generic;
@@ -6,21 +8,22 @@ using WeaponConfigNs;
 
 namespace App.Shared.WeaponLogic.Common
 {
-    public interface IFireLogicCreator
+    public interface IFireLogicProvider
     {
         IFireLogic GetFireLogic(NewWeaponConfigItem newWeaponConfig, FireLogicConfig config);
         void ClearCache();
     }
 
-    public class FireLogicCreator : IFireLogicCreator
+    public class FireLogicProvider : IFireLogicProvider
     {
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(FireLogicProvider));
         private ShowFireInMap _showFireInMap;
         private IWeaponLogicComponentsFactory _componentsFactory;
 
         private Dictionary<int, IFireLogic> _cache = new Dictionary<int, IFireLogic>();
         private Contexts _contexts;
 
-        public FireLogicCreator(Contexts contexts, 
+        public FireLogicProvider(Contexts contexts, 
             IWeaponLogicComponentsFactory weaponLogicComponentsFactory)
         {
             _contexts = contexts;
@@ -53,7 +56,15 @@ namespace App.Shared.WeaponLogic.Common
                         _componentsFactory);
                 }
             }
-            return _cache[newWeaponConfig.Id];
+            if(_cache.ContainsKey(newWeaponConfig.Id))
+            {
+                return _cache[newWeaponConfig.Id];
+            }
+            if(newWeaponConfig.Type != (int)EWeaponType.TacticWeapon)
+            {
+                Logger.ErrorFormat("no firelogic for weapon {0}", newWeaponConfig.Id);
+            }
+            return null;
         }
 
         private IFireLogic CreateDefaultFireLogic(NewWeaponConfigItem newWeaponConfig, 

@@ -60,27 +60,31 @@ namespace App.Shared.VechilePrediction
                     lowLod = vehicle.IsLowLod();
                 }
 
-                vehicle.SetActive(active);
-                if (active)
-                {
-                    if(_isPredictMode)
-                        NotifyVehicleActive(vehicle);
-                    vehicle.SetLodLevel(lowLod);
-                }
+                SetActiveDelay(new ActiveSetting(vehicle, active, lowLod));
             }
+        }
 
-            if (!_isPredictMode)
+        protected override void SetActive(ActiveSetting activeSetting)
+        {
+            var vehicle = activeSetting.Vehicle;
+            var active = activeSetting.Active;
+            vehicle.SetActive(active);
+            if (active)
             {
-                if (selfEntity.IsOnVehicle())
+                if (_isPredictMode)
+                    NotifyVehicleActive(vehicle);
+                else
                 {
-                    var vehicle =
-                        VehicleContext.GetEntityWithEntityKey(selfEntity.controlledVehicle.EntityKey);
+                    var selfEntity = PlayerContext.flagSelfEntity;
 
-                    if (vehicle != null)
+                    if (selfEntity.IsOnVehicle() && 
+                        vehicle == VehicleContext.GetEntityWithEntityKey(selfEntity.controlledVehicle.EntityKey))
                     {
                         NotifyVehicleActive(vehicle);
                     }
                 }
+
+                vehicle.SetLodLevel(activeSetting.LowLod);
             }
         }
     }

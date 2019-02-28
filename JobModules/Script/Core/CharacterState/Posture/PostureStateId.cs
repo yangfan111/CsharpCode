@@ -31,6 +31,7 @@ namespace Core.CharacterState.Posture
         NoPeek,                     // 14
 
         Climb,
+        Slide,
 
         EnumEnd
     }

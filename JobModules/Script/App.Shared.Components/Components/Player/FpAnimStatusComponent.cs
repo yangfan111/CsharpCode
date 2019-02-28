@@ -38,7 +38,7 @@ namespace App.Shared.Components.Player
             {
 //                for (int i = 0; i < AnimatorLayers.Count; i++)
 //                {
-//                    var equal = AnimatorLayers[i].NeedPatch(rightComp.AnimatorLayers[i]);
+//                    var equal = AnimatorLayers[i].IsSimilar(rightComp.AnimatorLayers[i]);
 //                    if (!equal)
 //                    {
 //                        _logger.Debug(AnimatorLayers[i].ToString());
@@ -50,7 +50,7 @@ namespace App.Shared.Components.Player
 
                 for (int i = 0; i < AnimatorParameters.Count; i++)
                 {
-                    var equal = AnimatorParameters[i].NeedPatch(rightComp.AnimatorParameters[i]);
+                    var equal = AnimatorParameters[i].IsSimilar(rightComp.AnimatorParameters[i]);
                     if (!equal)
                     {
                         _logger.Debug(AnimatorParameters[i].ToString());

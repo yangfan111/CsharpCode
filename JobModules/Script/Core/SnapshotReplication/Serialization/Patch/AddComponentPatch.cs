@@ -55,6 +55,7 @@ namespace Core.SnapshotReplication.Serialization.Patch
 
         public override void ApplyPatchTo(INetworkObject target, INetworkObjectSerializerManager serializerManager)
         {
+       
             target.CopyFrom(Component);
         }
 

@@ -56,11 +56,11 @@ namespace App.Shared.GameModules.Player
                 statisticsData.LastIsSwimState = false;
             }
             //治疗量（模式中获取）
-            statisticsData.CureVolume = 0;
+            //statisticsData.CureVolume = 0;
             //加速时间（模式中获取）
-            statisticsData.AccSpeedTime = 0;
+            //statisticsData.AccSpeedTime = 0;
             //全副武装（模式中获取）
-            statisticsData.IsFullArmed = false;
+            //statisticsData.IsFullArmed = false;
 
             //最后统计时间
             statisticsData.LastSamplingTime = player.time.ClientTime;

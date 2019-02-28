@@ -1,7 +1,7 @@
 ﻿using System;
 using App.Shared.Components;
 using App.Shared.GameModules.Player;
-using Assets.XmlConfig;
+using App.Shared.GameModules.Weapon;
 using Core.EntityComponent;
 using Core.Utils;
 using UnityEngine;
@@ -15,14 +15,14 @@ namespace App.Shared.EntityFactory
         public static ThrowingEntity CreateThrowingEntity(
             ThrowingContext throwingContext,
             IEntityIdGenerator entityIdGenerator,
-            PlayerEntity playerEntity,
+            PlayerWeaponController controller,
             int serverTime, Vector3 dir, float initVel,
-            NewWeaponConfigItem newWeaponConfig,
+            WeaponResConfigItem newWeaponConfig,
             ThrowingConfig throwingConfig)
         {
             int throwingEntityId = entityIdGenerator.GetNextEntityId();
 
-            var emitPost = PlayerEntityUtility.GetThrowingEmitPosition(playerEntity);
+            var emitPost = PlayerEntityUtility.GetThrowingEmitPosition(controller);
             Vector3 velocity = dir * initVel;
             var throwingEntity = throwingContext.CreateEntity();
 
@@ -41,7 +41,7 @@ namespace App.Shared.EntityFactory
             );
 
             throwingEntity.AddPosition(emitPost);
-            throwingEntity.AddOwnerId(playerEntity.entityKey.Value);
+            throwingEntity.AddOwnerId(controller.Owner);
             throwingEntity.isFlagSyncNonSelf = true;
             throwingEntity.AddLifeTime(DateTime.Now, throwingConfig.CountdownTime + 2000);
             return throwingEntity;

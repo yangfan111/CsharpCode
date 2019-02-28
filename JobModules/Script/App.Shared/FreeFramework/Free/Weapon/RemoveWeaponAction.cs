@@ -28,7 +28,7 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
 
                 int index = FreeUtil.ReplaceInt(weaponKey, args);
 
-                EWeaponSlotType currentSlot = p.GetController<PlayerWeaponController>().CurrSlotType;
+                EWeaponSlotType currentSlot = p.WeaponController().HeldSlotType;
 
                 if (index > 0)
                 {
@@ -37,7 +37,7 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
 
                 Debug.LogFormat("remove weapon: " + index);
 
-                p.GetController<PlayerWeaponController>().DropSlotWeapon(currentSlot);
+                p.WeaponController().DropWeapon();
 
                 //SimpleProto message = new SimpleProto();
                 //message.Key = FreeMessageConstant.ChangeAvatar;

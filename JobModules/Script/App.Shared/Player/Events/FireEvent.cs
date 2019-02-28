@@ -3,7 +3,8 @@ using Core.Event;
 using Core.ObjectPool;
 using Entitas;
 using UnityEngine;
-using Core.Audio;
+using App.Shared.GameModules.Weapon;
+using App.Shared.Audio;
 
 namespace App.Shared.Player.Events
 {
@@ -41,12 +42,20 @@ namespace App.Shared.Player.Events
       
         public override void DoEventClient( Entitas.IContexts contexts, IEntity entity, IEvent e)
         {
-            var playerEntity = entity as PlayerEntity;
-            if (playerEntity != null)
+            var controller= (entity as PlayerEntity).WeaponController();
+            if (controller != null)
             {
-               
-                playerEntity.weaponLogic.WeaponEffect.PlayMuzzleSparkEffect(playerEntity.weaponLogic.State);
-                GameAudioMedium.PerformOnGunFire(playerEntity.weaponLogic.State);
+                controller.PlayFireAudio();
+                controller.EffectList.Add(XmlConfig.EClientEffectType.MuzzleSpark);
+               // GameAudioMedium.ProcessWeaponAudio(playerEntity,allContexts,(item)=>item.Fire);
+                // if (playerEntity.appearanceInterface.Appearance.IsFirstPerson)
+                // {
+
+                // }
+                // else
+                // {
+                ////     GameAudioMedium.PerformOnGunFire();
+                // }
             }
         }
 
@@ -55,7 +64,7 @@ namespace App.Shared.Player.Events
         public override bool ClientFilter(IEntity entity, IEvent e)
         {
             var playerEntity = entity as PlayerEntity;
-            return playerEntity != null && playerEntity.hasWeaponLogic&&playerEntity.hasWeaponState;
+            return playerEntity != null && playerEntity.WeaponController().EffectList != null;
         }
      
     }

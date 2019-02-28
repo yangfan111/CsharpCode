@@ -10,5 +10,6 @@ namespace Core.Free
         long ServerTime { get; }
         string FreeType { get; }
         bool GameOver { get; set; }
+        bool GameExit { get; set; }
     }
 }

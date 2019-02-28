@@ -30,6 +30,9 @@ using UltimateFracturing;
 using Utils.Singleton;
 using App.Shared.Util;
 using App.Shared.GameModules.Weapon;
+using App.Shared.GameModules.Weapon;
+using Assets.Utils.Configuration;
+using App.Shared.GameModules.Weapon.Behavior;
 
 namespace App.Shared.GameModules.Throwing
 {
@@ -62,7 +65,7 @@ namespace App.Shared.GameModules.Throwing
             ISoundEntityFactory soundEntityFactory)
         {
             _contexts = contexts;
-            _layerMask = UnityLayers.SceneCollidableLayerMask | UnityLayers.GlassLayerMask;//BulletLayers.GetBulletLayer();
+            _layerMask = UnityLayers.SceneCollidableLayerMask | UnityLayerManager.GetLayerIndex(EUnityLayerName.UI);//BulletLayers.GetBulletLayer();
             _moveSimulator = new ThrowingMoveSimulator(20, contexts.player);
             _compensationWorldFactory = compensationWorldFactory;
             _throwingHitHandler = hitHandler;
@@ -82,7 +85,6 @@ namespace App.Shared.GameModules.Throwing
 
         private List<IThrowingSegment> _allThrowingSegments = new List<IThrowingSegment>();
         private ThrowingSegmentComparator _comparator = new ThrowingSegmentComparator();
-        private object weaponState;
 
         public void Update(EntityKey ownerKey, int frameTime)
         {
@@ -124,7 +126,7 @@ namespace App.Shared.GameModules.Throwing
                     if(!throwing.throwingData.IsFly)
                     {
                         player.stateInterface.State.FinishGrenadeThrow();
-                        CastGrenade(player);
+                        CastGrenade(_contexts, player);
                     }
                     continue;
                 }
@@ -174,14 +176,14 @@ namespace App.Shared.GameModules.Throwing
             }
         }
 
-        private void CastGrenade(PlayerEntity playerEntity)
+        private void CastGrenade(Contexts contexts, PlayerEntity playerEntity)
         {
             if(!playerEntity.throwingAction.ActionInfo.IsReady)
             {
                 return;
             }
             playerEntity.throwingAction.ActionInfo.ClearState();
-            playerEntity.GetController<PlayerWeaponController>().OnExpend(EWeaponSlotType.GrenadeWeapon);
+            playerEntity.WeaponController().ExpendAfterAttack(EWeaponSlotType.ThrowingWeapon);
         }
 
         private void OldRaycast()
@@ -249,21 +251,18 @@ namespace App.Shared.GameModules.Throwing
         {
             if (throwing.hasThrowingGameObject && throwing.throwingData.IsThrow && throwing.throwingData.IsFly)
             {
-                throwing.throwingGameObject.UnityObjWrapper.Value.SetActive(true);
+                throwing.throwingGameObject.UnityObject.AsGameObject.SetActive(true);
             }
         }
 
         private void StartFlying(PlayerEntity playerEntity, ThrowingEntity throwingEntity)
         {
-            IPlayerWeaponState playerWeapon = playerEntity.weaponLogic.State;
-            var dir = BulletDirUtility.GetThrowingDir(playerWeapon);
+            var dir = BulletDirUtility.GetThrowingDir(playerEntity.WeaponController());
             Vector3 vel = dir * throwingEntity.throwingData.InitVelocity;
-            Vector3 pos = PlayerEntityUtility.GetThrowingEmitPosition(playerEntity);
+            Vector3 pos = PlayerEntityUtility.GetThrowingEmitPosition(playerEntity.WeaponController());
             throwingEntity.position.Value = pos;
             throwingEntity.throwingData.Velocity = vel;
             throwingEntity.throwingData.IsFly = true;
-            //扔掉手雷
-            playerWeapon.LastGrenadeId = playerEntity.grenade.Id;
 
             if (SharedConfig.IsServer)
             {
@@ -272,20 +271,24 @@ namespace App.Shared.GameModules.Throwing
                 if (!args.Triggers.IsEmpty((int)EGameEvent.WeaponState))
                 {
                     SimpleParaList dama = new SimpleParaList();
-                    dama.AddFields(new ObjectFields(playerWeapon));
-                    dama.AddPara(new IntPara("CarryClip", playerWeapon.ReservedBulletCount));
-                    dama.AddPara(new IntPara("Clip", playerWeapon.LoadedBulletCount));
-                    dama.AddPara(new IntPara("ClipType", (int)playerWeapon.Caliber));
-                    dama.AddPara(new IntPara("id", (int)playerWeapon.CurrentWeapon));
+                    //TODO 确认逻辑
+                    dama.AddFields(new ObjectFields(playerEntity));
+                    var weaponData = playerEntity.WeaponController().HeldWeaponAgent.BaseComponentScan;
+                    if (!weaponData.IsSafeVailed)
+                        return;
+                    dama.AddPara(new IntPara("CarryClip", playerEntity.WeaponController().GetReservedBullet()));
+                    dama.AddPara(new IntPara("Clip", weaponData.Bullet));
+                    var config = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(weaponData.ConfigId);
+                    dama.AddPara(new IntPara("ClipType", null == config ? 0 : config.Caliber));
+                    dama.AddPara(new IntPara("id", weaponData.ConfigId));
                     SimpleParable sp = new SimpleParable(dama);
 
-                    args.Trigger((int)EGameEvent.WeaponState, new TempUnit[] { new TempUnit("state", sp), new TempUnit("current", (FreeData)((PlayerEntity)playerWeapon.Owner).freeData.FreeData) });
+                    args.Trigger((int)EGameEvent.WeaponState, new TempUnit("state", sp), new TempUnit("current", (FreeData)(playerEntity).freeData.FreeData) );
                 }
             }
-            playerWeapon.LastGrenadeId = 0;
-            playerWeapon.IsThrowingStartFly = false;
+
             //清理状态
-            CastGrenade(playerEntity);
+            CastGrenade(_contexts, playerEntity);
         }
 
         private void ExplosionEffect(ThrowingEntity throwing)
@@ -359,7 +362,7 @@ namespace App.Shared.GameModules.Throwing
             //            Debug.LogFormat("Throwing collision dir:{0}, pos:{1}, normal:{2}", segment.RaySegment.Ray.direction, segment.RaySegment.Ray.origin, hit.normal);
             //glass broken
             var reflectiveFace = true;
-            if (hit.collider.gameObject.layer == UnityLayers.GlassLayer)
+            if (hit.collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.Glass))
             {
                 var glassChunk = hit.collider.GetComponent<FracturedGlassyChunk>();
                 if (glassChunk != null)
@@ -440,7 +443,7 @@ namespace App.Shared.GameModules.Throwing
                     || !CommonMathUtil.Raycast(throwing.position.Value, headPos, dis, _layerMask, out hitPoint)) )
                 {
                     float damage = (1 - dis/throwing.throwingData.Config.DamageRadius) * throwing.throwingData.Config.BaseDamage;
-                    _throwingHitHandler.OnPlayerDamage(sourcePlayer, player, new PlayerDamageInfo(damage, (int)EUIDeadType.Weapon, (int)EBodyPart.Chest, GetWeaponIdBySubType((EWeaponSubType)throwing.throwingData.WeaponSubType)));
+                    _throwingHitHandler.OnPlayerDamage(sourcePlayer, player, new PlayerDamageInfo(damage, (int)EUIDeadType.Weapon, (int)EBodyPart.None, GetWeaponIdBySubType((EWeaponSubType)throwing.throwingData.WeaponSubType)));
                 }
             }
             foreach (VehicleEntity vehicle in _vehicles)

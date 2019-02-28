@@ -7,7 +7,7 @@
 
 [UnityEngine.AddComponentMenu("Wwise/AkGameObj")]
 [UnityEngine.DisallowMultipleComponent]
-//[UnityEngine.ExecuteInEditMode] //ExecuteInEditMode necessary to maintain proper state of isStaticObject.
+[UnityEngine.ExecuteInEditMode] //ExecuteInEditMode necessary to maintain proper state of isStaticObject.
 ///@brief This component represents a sound object in your scene tracking its position and other game syncs such as Switches, RTPC and environment values. You can add this to any object that will emit sound, and it will be added to any object that an AkAudioListener is attached to. Note that if it is not present, Wwise will add it automatically, with the default values, to any Unity Game Object that is passed to Wwise.
 /// \sa
 /// - <a href="https://www.audiokinetic.com/library/edge/?source=SDK&id=soundengine__gameobj.html" target="_blank">Integration Details - Game Objects</a> (Note: This is described in the Wwise SDK documentation.)
@@ -18,9 +18,6 @@
 /// - <a href="https://www.audiokinetic.com/library/edge/?source=SDK&id=soundengine__environments.html" target="_blank">Integration Details - Environments and Game-defined Auxiliary Sends</a> (Note: This is described in the Wwise SDK documentation.)
 public class AkGameObj : UnityEngine.MonoBehaviour
 {
-    /// <summary>
-    ///-每个AKGameObj包含一个AkGameObjListenerList
-    /// </summary>
 	[UnityEngine.SerializeField] private AkGameObjListenerList m_listeners = new AkGameObjListenerList();
 
 	/// Is this object affected by Environment changes?  Set to false if not affected in order to save some useless calls.  Default is true.
@@ -51,13 +48,11 @@ public class AkGameObj : UnityEngine.MonoBehaviour
 
 	private bool isRegistered = false;
 
-	// If AkGameObj.AddListener() was used, consider using AkAudioListener.StartListeningToEmitter() instead.
 	internal void AddListener(AkAudioListener listener)
 	{
 		m_listeners.Add(listener);
 	}
 
-	// If AkGameObj.RemoveListener() was used, consider using AkAudioListener.StopListeningToEmitter() instead.
 	internal void RemoveListener(AkAudioListener listener)
 	{
 		m_listeners.Remove(listener);
@@ -116,10 +111,17 @@ public class AkGameObj : UnityEngine.MonoBehaviour
 		if (AkUtilities.IsMigrating)
 			return;
 
-		if (gameObject != null && isStaticObject != gameObject.isStatic)
+		try
 		{
-			isStaticObject = gameObject.isStatic;
-			UnityEditor.EditorUtility.SetDirty(this);
+			if (gameObject != null && isStaticObject != gameObject.isStatic)
+			{
+				isStaticObject = gameObject.isStatic;
+				UnityEditor.EditorUtility.SetDirty(this);
+			}
+		}
+		catch
+		{
+			UnityEditor.EditorApplication.update -= CheckStaticStatus;
 		}
 #endif
 	}
@@ -263,11 +265,14 @@ public class AkGameObj : UnityEngine.MonoBehaviour
 
 #pragma warning disable 0414 // private field assigned but not used.
 
-	[UnityEngine.SerializeField] private AkGameObjPosOffsetData m_posOffsetData;
+	[UnityEngine.HideInInspector]
+	[UnityEngine.SerializeField]
+	private AkGameObjPosOffsetData m_posOffsetData;
 
 	// Wwise v2016.2 and below supported up to 8 listeners[0-7].
 	private const int AK_NUM_LISTENERS = 8;
 
+	[UnityEngine.HideInInspector]
 	[UnityEngine.SerializeField]
 	/// Listener 0 by default.
 	private int listenerMask = 1;

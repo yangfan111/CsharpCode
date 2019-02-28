@@ -18,6 +18,8 @@ namespace gameplay.gamerule.free.ui
 
         private bool show;
 
+        private int layer;
+
         private bool atBottom;
 
         private IList<IFreeComponent> components;
@@ -53,15 +55,15 @@ namespace gameplay.gamerule.free.ui
             return components;
         }
 
-        public static void Build(SimpleProto b, IEventArgs args, string key, string desc, bool show, bool atBottom, Iterable<IFreeComponent> components)
+        public static void Build(SimpleProto b, IEventArgs args, string key, string desc, bool show, bool atBottom, Iterable<IFreeComponent> components, int layer = 0)
         {
             b.Key = 50;
 
             b.Bs.Add(show);
             b.Bs.Add(atBottom);
-            b.Ks.Add(0);
+            b.Ks.Add(layer);
 
-            if(desc == null)
+            if (desc == null)
             {
                 desc = "";
             }
@@ -118,7 +120,7 @@ namespace gameplay.gamerule.free.ui
 
         protected override void BuildMessage(IEventArgs args)
         {
-            Build(builder, args, key, desc, show, atBottom, components.AsIterable());
+            Build(builder, args, key, desc, show, atBottom, components.AsIterable(), layer);
         }
 
         public override string ToString()

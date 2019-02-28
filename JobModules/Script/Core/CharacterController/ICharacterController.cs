@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ECM.Components;
 using UnityEngine;
 using Utils.Appearance;
 using XmlConfig;
 
 namespace Core.CharacterController
 {
-    public interface ICharacterController
+    public interface ICharacterController:ICharacterDebugDraw
     {
         object RealValue { get; }
         /// <summary>
@@ -53,7 +54,21 @@ namespace Core.CharacterController
         UnityEngine.CollisionFlags collisionFlags { get; }
         Vector3 GetLastGroundNormal();
         Vector3 GetLastGroundHitPoint();
+        
+        Vector3 GetLastHitNormal();
+        Vector3 GetLastHitPoint();
+        
         KeyValuePair<float, float> GetRotateBound(Quaternion prevRot, Vector3 prevPos, int frameInterval);
+        
+        GroundHit GetGroundHit { get; }
+        
+    }
+
+    public interface ICharacterDebugDraw
+    {
+        void DrawBoundingBox();
+        void DrawLastGroundHit();
+        void DrawGround();
     }
 
     public enum CharacterControllerType

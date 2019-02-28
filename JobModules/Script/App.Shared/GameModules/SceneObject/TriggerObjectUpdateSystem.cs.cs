@@ -21,7 +21,6 @@ namespace App.Shared.GameModules.SceneObject
         {
             _manager =  SingletonManager.Get<TriggerObjectManager>();
             _contexts = contexts;
-            RegistLoader();
         }
         
         
@@ -31,10 +30,5 @@ namespace App.Shared.GameModules.SceneObject
             _manager.ProcessLastUnloadedObjects();
         }
 
-        private void RegistLoader()
-        {
-            _contexts.session.commonSession.LevelManager.GoLoaded += gameObj => _manager.OnMapObjLoaded(gameObj);
-            _contexts.session.commonSession.LevelManager.GoUnloaded += gameObj => _manager.OnMapObjUnloaded(gameObj);
-        }
     }
 }

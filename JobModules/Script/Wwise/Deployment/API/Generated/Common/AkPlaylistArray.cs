@@ -83,6 +83,12 @@ public class AkPlaylistArray : global::System.IDisposable {
 
   public uint Length() { return AkSoundEnginePINVOKE.CSharp_AkPlaylistArray_Length(swigCPtr); }
 
+  public AkPlaylistItem Data() {
+    global::System.IntPtr cPtr = AkSoundEnginePINVOKE.CSharp_AkPlaylistArray_Data(swigCPtr);
+    AkPlaylistItem ret = (cPtr == global::System.IntPtr.Zero) ? null : new AkPlaylistItem(cPtr, false);
+    return ret;
+  }
+
   public bool IsEmpty() { return AkSoundEnginePINVOKE.CSharp_AkPlaylistArray_IsEmpty(swigCPtr); }
 
   public AkPlaylistItem Exists(AkPlaylistItem in_Item) {

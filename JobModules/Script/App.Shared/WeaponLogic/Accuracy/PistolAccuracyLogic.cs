@@ -14,7 +14,7 @@ namespace Core.WeaponLogic.Accuracy
 
         public void BeforeFireBullet(PlayerEntity playerEntity, WeaponEntity weaponEntity, IWeaponCmd cmd)
         {
-            var weaponState = weaponEntity.weaponData;
+            var weaponState = weaponEntity.weaponRuntimeInfo;
             if (weaponState.LastFireTime == 0)
             {
                 //
@@ -37,7 +37,7 @@ namespace Core.WeaponLogic.Accuracy
 
         public void OnIdle(PlayerEntity playerEntity, WeaponEntity weaponEntity, IWeaponCmd cmd)
         {
-            var weaponState = weaponEntity.weaponData;
+            var weaponState = weaponEntity.weaponRuntimeInfo;
             if (weaponState.ContinuesShootCount == 0)
             {
                 var config = GetConfig(playerEntity);

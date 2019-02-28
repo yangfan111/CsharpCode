@@ -27,10 +27,9 @@ namespace App.Shared.GameModules.Player.CharacterBone
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             var player = owner.OwnerEntity as PlayerEntity;
-            if (null != player && (player.gamePlay.IsLifeState(EPlayerLifeState.Dead)   || player.gamePlay.IsLastLifeState(EPlayerLifeState.Dead)))
-            {
-                return;
-            }
+            CheckPlayerLifeState(player);
+            
+            if(null != player && player.gamePlay.IsLifeState(EPlayerLifeState.Dead)) return;
 
             SightUpdate(player, cmd.FrameInterval);
             SyncSightComponent(player);
@@ -90,10 +89,12 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
             var animator = player.thirdPersonAnimator.UnityAnimator;
             var state = player.stateInterface.State;
-            var postureType = ThirdPersonAppearanceUtils.GetPosture(state);
             var action = player.stateInterface.State.GetActionState();
             var keepAction = player.stateInterface.State.GetActionKeepState();
             var posture = player.stateInterface.State.GetCurrentPostureState();
+            var nextPosture = player.stateInterface.State.GetNextPostureState();
+            var movement = player.stateInterface.State.GetCurrentMovementState();
+            var postureType = ThirdPersonAppearanceUtils.GetPosture(posture);
 
             UpdateOffsetData(player);
 
@@ -106,7 +107,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 SightHorizontalShift = appearanceP1.SightShift.Buff * player.firstPersonAppearance.SightHorizontalShift,
                 SightVerticalShift = appearanceP1.SightShift.Buff * player.firstPersonAppearance.SightVerticalShift,
                 SightShiftBuff = player.oxygenEnergyInterface.Oxygen.SightShiftBuff,
-                IKActive = IKFilter.FilterPlayerIK(action, keepAction, posture),
+                IKActive = IKFilter.FilterPlayerIK(action, keepAction, posture, nextPosture, movement),
                 HeadPitch = player.characterBone.PitchHeadAngle,
                 HeadYaw = player.characterBone.RotHeadAngle,
                 HandPitch = player.characterBone.PitchHandAngle,
@@ -180,5 +181,44 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
             return realWeaponIdInHand;
         }
+        
+        #region LifeState
+
+        private void CheckPlayerLifeState(PlayerEntity player)
+        {
+            if (null == player || null == player.playerGameState) return;
+            var gameState = player.playerGameState;
+            switch (gameState.CurrentPlayerLifeState)
+            {
+                case PlayerLifeStateEnum.Reborn:
+                    Reborn(player);
+                    break;
+                case PlayerLifeStateEnum.Dead:
+                    Dead(player);
+                    break;
+            }
+        }
+
+        private void Reborn(PlayerEntity player)
+        {
+            if (null == player) return;
+            
+            var characterBone = player.characterBoneInterface.CharacterBone;
+            if (null != characterBone)
+                characterBone.Reborn();
+            Logger.InfoFormat("PlayerCharacterBoneReborn");
+        }
+        
+        private void Dead(PlayerEntity player)
+        {
+            if (null == player) return;
+            
+            var characterBone = player.characterBoneInterface.CharacterBone;
+            if (null != characterBone)
+                characterBone.Dead();
+            Logger.InfoFormat("PlayerCharacterBoneDead");
+        }
+
+        #endregion
     }
 }

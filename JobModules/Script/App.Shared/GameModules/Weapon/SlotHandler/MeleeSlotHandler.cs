@@ -1,18 +1,15 @@
-﻿using App.Shared.Components.Bag;
-using App.Shared.Util;
+﻿
 using Core;
-using Core;
-using Core.GameModeLogic;
-using Core.Sound;
+
 
 namespace App.Shared.GameModules.Weapon
 {
     [WeaponSpecies(EWeaponSlotType.MeleeWeapon)]
-    public class MeleeSlotHandler : WeaponSlotHandlerBase
+    public class MeleeSlotHandler : CommonSlotHandler
     {
         //public TacticSlotHandler(
         //    PlayerEntity playerEntity,
-        //    IPlayerModuleController playerWeaponActionLogic,
+        //    ISharedPlayerWeaponGetter playerWeaponActionLogic,
         //    WeaponComponent weapon, 
         //    IReservedBulletLogic reservedBulletController, 
         //    IPlayerSoundManager playerSoundManager) : 

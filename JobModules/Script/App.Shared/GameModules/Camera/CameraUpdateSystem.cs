@@ -28,13 +28,15 @@ namespace App.Shared.GameModules.Camera
 
         private Motors _motors;
 
-        DummyCameraMotorState _state;
+        private DummyCameraMotorState _state;
+        private DummyCameraMotorState _dummyState;
+
         private VehicleContext _vehicleContext;
 
         private FreeMoveContext _freeMoveContext;
         private PlayerContext _playerContext;
         private int _cmdSeq = 0;
-        private readonly List<SubCameraMotorType> _subCameraMotorTypeArray = new List<SubCameraMotorType>();
+
         DummyCameraMotorOutput _output = new DummyCameraMotorOutput();
         DummyCameraMotorOutput _tempOutput = new DummyCameraMotorOutput();
         private Contexts _context;
@@ -47,10 +49,7 @@ namespace App.Shared.GameModules.Camera
             _playerContext = context.player;
             _motors = m;
             _state = new DummyCameraMotorState(_motors);
-            foreach (SubCameraMotorType value in Enum.GetValues(typeof(SubCameraMotorType)))
-            {
-                _subCameraMotorTypeArray.Add(value);
-            }
+            _dummyState = new DummyCameraMotorState(_motors);
         }
 
 
@@ -61,22 +60,38 @@ namespace App.Shared.GameModules.Camera
 
             if (!player.hasCameraStateNew) return;
             if (!player.hasCameraStateOutputNew) return;
+            if (player.gamePlay.IsObserving()) return;
 
+            var archotRotation = player.cameraArchor.ArchorEulerAngle;
+            var result = player.cameraStateOutputNew;
+            
+            CalcuForNormal(cmd, player, archotRotation, result);
+
+            DummyCameraMotorState.Convert(_state, player.cameraStateNew);
+
+            CopyStateToUploadComponent(player.cameraStateNew, player.cameraStateUpload);
+            player.cameraStateUpload.ArchorType = (Byte) player.cameraArchor.ArchorType;
+
+            if (player.appearanceInterface.Appearance.IsFirstPerson && player.hasObserveCamera)
+            {
+                CalcuForObserving(cmd, player, archotRotation, player.thirdPersonDataForObserving.ThirdPersonData);
+            }
+        }
+
+        private void CalcuForNormal(IUserCmd cmd, PlayerEntity player, Vector3 archotRotation,
+            CameraStateOutputNewComponent result)
+        {
             DummyCameraMotorState.Convert(player.cameraStateNew, _state);
             DummyCameraMotorInput _input = (DummyCameraMotorInput) player.cameraStateNew.CameraMotorInput;
-            var archotRotation = player.cameraArchor.ArchorEulerAngle;
-            _input.Generate(player, cmd, archotRotation.y, archotRotation.x);
+            _input.Generate(_context, player, cmd, archotRotation.y, archotRotation.x);
 
-            //if (_input.IsChange(player.cameraStateNew.LastCameraMotorInput))
+            for (int i = 0; i < (int) SubCameraMotorType.End; i++)
             {
-                foreach (SubCameraMotorType i in _subCameraMotorTypeArray)
-                {
-                    var type = i;
-                    SetNextMotor(player, type, _state, _input);
-                }
+                var type = (SubCameraMotorType) i;
+                SetNextMotor(player, type, _state, _input);
             }
 
-            CameraActionManager.OnAction(player,_state);
+            CameraActionManager.OnAction(player, _state);
 
             player.cameraStateUpload.EnterActionCode = CameraActionManager.GetActionCode(CameraActionType.Enter);
             player.cameraStateUpload.LeaveActionCode = CameraActionManager.GetActionCode(CameraActionType.Leave);
@@ -86,13 +101,21 @@ namespace App.Shared.GameModules.Camera
             player.cameraStateNew.LastCameraMotorInput = _input;
 
             CalcFinalOutput(player, (DummyCameraMotorInput) player.cameraStateNew.LastCameraMotorInput,
-                player.cameraStateOutputNew);
-            DummyCameraMotorState.Convert(_state, player.cameraStateNew);
-
-            CopyStateToUploadComponent(player.cameraStateNew, player.cameraStateUpload);
-            player.cameraStateUpload.ArchorType = (Byte)player.cameraArchor.ArchorType;
+                result,_state);
         }
 
+        private void CalcuForObserving(IUserCmd cmd, PlayerEntity player, Vector3 archotRotation,
+            CameraStateOutputNewComponent result)
+        {
+            DummyCameraMotorState.Convert(player.cameraStateNew, _dummyState);
+            _dummyState.Dict[(int) SubCameraMotorType.View].NowMode = (byte)ECameraViewMode.ThirdPerson;
+            _dummyState.Dict[(int) SubCameraMotorType.View].LastMode = (byte)ECameraViewMode.FirstPerson;
+            DummyCameraMotorInput _input = (DummyCameraMotorInput) player.cameraStateNew.CameraMotorInput;
+            _input.Generate(_context, player, cmd, archotRotation.y, archotRotation.x);
+            CalcFinalOutput(player, _input, result, _dummyState);
+            result.ArchorPosition = player.thirdPersonDataForObserving.ThirdPersonArchorPosition;
+        }
+        
         private void CopyStateToUploadComponent(CameraStateNewComponent input, CameraStateUploadComponent output)
         {
             output.MainNowMode = input.MainNowMode;
@@ -121,9 +144,9 @@ namespace App.Shared.GameModules.Camera
         }
 
         private void CalcFinalOutput(PlayerEntity player, DummyCameraMotorInput input,
-            CameraStateOutputNewComponent finalOutput)
+            CameraStateOutputNewComponent finalOutput, DummyCameraMotorState state)
         {
-            player.cameraConfigNow.Config = _state.GetMainConfig();
+            player.cameraConfigNow.Config = state.GetMainConfig();
             player.cameraConfigNow.PeekConfig = SingletonManager.Get<CameraConfigManager>().Config.PeekConfig;
             player.cameraConfigNow.DeadConfig = SingletonManager.Get<CameraConfigManager>().Config.DeadConfig;
             _output.Init();
@@ -132,13 +155,12 @@ namespace App.Shared.GameModules.Camera
                 player.cameraArchor.ArchorTransitionOffsetPosition;
             _output.ArchorEulerAngle = player.cameraArchor.ArchorEulerAngle;
 
-            foreach (SubCameraMotorType i in _subCameraMotorTypeArray)
+            for(int i=0;i<(int)SubCameraMotorType.End;i++)
             {
-                var type = i;
-                _output.Append(CalcSubFinalCamera(player, input, _state, _motors.GetDict(type), _state.Get(type),
+                var type = (SubCameraMotorType)i;
+                _output.Append(CalcSubFinalCamera(player, input, state, _motors.GetDict(type), state.Get(type),
                     player.time.ClientTime));
             }
-
 
             finalOutput.ArchorPosition = _output.ArchorPosition;
             finalOutput.ArchorEulerAngle = _output.ArchorEulerAngle;
@@ -216,7 +238,7 @@ namespace App.Shared.GameModules.Camera
             if (!player.hasCameraStateNew) return;
             if (!player.hasCameraStateOutputNew) return;
             CalcFinalOutput(player, (DummyCameraMotorInput) player.cameraStateNew.LastCameraMotorInput,
-                player.cameraStateOutputNew);
+                player.cameraStateOutputNew,_state);
             //DummyCameraMotorState.Convert(_state, player.cameraStateNew);
         }
     }

@@ -11,7 +11,7 @@ namespace App.Shared.GameModules.Camera
 {
     class DummyCameraMotorInput : ICameraMotorInput
     {
-        public void Generate(PlayerEntity player, IUserCmd usercmd,float archorYaw,float archorPitch)
+        public void Generate(Contexts contexts, PlayerEntity player, IUserCmd usercmd,float archorYaw,float archorPitch)
         {
             DeltaYaw = usercmd.DeltaYaw;
             DeltaPitch = usercmd.DeltaPitch;
@@ -21,7 +21,7 @@ namespace App.Shared.GameModules.Camera
                 FilteredChangeCamera = usercmd.FilteredInput.IsInput(EPlayerInput.ChangeCamera);
                 FilteredCameraFocus = usercmd.FilteredInput.IsInput(EPlayerInput.IsCameraFocus);
             }
-
+            var controller = player.WeaponController();
             FrameInterval = usercmd.FrameInterval;
             ChangeCamera = usercmd.ChangeCamera;
           
@@ -37,25 +37,24 @@ namespace App.Shared.GameModules.Camera
             ActionKeepState = player.stateInterface.State.GetActionKeepState();
             IsDriveCar =  player.IsOnVehicle();            
             IsDead = player.gamePlay.IsLifeState(EPlayerLifeState.Dead);
-            CanWeaponGunSight = player.hasWeaponComponentAgent && player.GetController<PlayerWeaponController>().CurrSlotWeaponId >= 1 & player.weaponLogic.State.CanCameraFocus();
+            CanWeaponGunSight = controller.HeldWeaponAgent.CanWeaponSight;
             ArchorPitch = YawPitchUtility.Normalize(archorPitch);
             ArchorYaw = YawPitchUtility.Normalize(archorYaw);
             IsParachuteAttached = player.hasPlayerSkyMove && player.playerSkyMove.IsParachuteAttached;
-
-            ForceChangeGunSight = player.playerWeaponState.ForceChangeGunSight;
-            ForceInterruptGunSight = UseActionOrIsStateNoGunSight(usercmd, player);
-            player.playerWeaponState.ForceChangeGunSight = false;
+            if(!controller.IsHeldSlotEmpty)
+            {
+                ForceChangeGunSight = controller.HeldWeaponAgent.RunTimeComponent.ForceChangeGunSight;
+            }
+            ForceInterruptGunSight = UseActionOrIsStateNoGunSight(usercmd, controller);
+            controller.HeldWeaponAgent.RunTimeComponent.ForceChangeGunSight = false;
         }
 
-        private bool UseActionOrIsStateNoGunSight(IUserCmd userCmd, PlayerEntity playerEntity)
+        private bool UseActionOrIsStateNoGunSight(IUserCmd userCmd, PlayerWeaponController controller)
         {
             var interrupt = userCmd.IsUseAction || userCmd.IsTabDown || userCmd.FilteredInput.IsInputBlocked(EPlayerInput.IsCameraFocus);
             if(!interrupt)
             {
-                if(playerEntity.hasPlayerInterruptState)
-                {
-                    interrupt |= playerEntity.playerInterruptState.ForceInterruptGunSight > 0;
-                }
+                interrupt |= controller.ForceInterruptGunSight> 0;
             }
             return interrupt;
         }

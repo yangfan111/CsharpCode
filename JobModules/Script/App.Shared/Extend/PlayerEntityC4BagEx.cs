@@ -1,5 +1,6 @@
 ﻿using App.Shared.Player;
 using Assets.Utils.Configuration;
+using Shared.Scripts;
 using Utils.Appearance;
 using Utils.Configuration;
 using Utils.Singleton;
@@ -27,7 +28,7 @@ namespace App.Shared
         public static void RemoveC4(this PlayerEntity playerEntity)
         {
             playerEntity.appearanceInterface.Appearance.UnmountWeaponInPackage(WeaponInPackage.TacticWeapon);
-            playerEntity.appearanceInterface.Appearance.ClearAvatar(Utils.CharacterState.Wardrobe.Bag);
+            playerEntity.appearanceInterface.Appearance.ClearAvatar(Wardrobe.Bag);
         }
 
         private static void ChangeC4ToBag(this PlayerEntity playerEntity)
@@ -41,7 +42,7 @@ namespace App.Shared
         {
             var c4AvatarId = SingletonManager.Get<WeaponConfigManager>().GetAvatarByWeaponId(weaponId);
             playerEntity.appearanceInterface.Appearance.MountWeaponInPackage(WeaponInPackage.TacticWeapon, c4AvatarId);
-            playerEntity.appearanceInterface.Appearance.ClearAvatar(Utils.CharacterState.Wardrobe.Bag);
+            playerEntity.appearanceInterface.Appearance.ClearAvatar(Wardrobe.Bag);
         }
     }
 }

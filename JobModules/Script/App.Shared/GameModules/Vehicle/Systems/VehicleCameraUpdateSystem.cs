@@ -48,7 +48,7 @@ namespace App.Shared.GameModules.Vehicle
                 _lastTime = currentTime;
                 return;
             }
-            var target = vehicleEntity.gameObject.UnityObjWrapper.Value.transform;
+            var target = vehicleEntity.gameObject.UnityObject.AsGameObject.transform;
             var targetOffset = target.TransformDirection(controlledVehicle.CameraLocalTargetOffSet);
 
             var right = target.right;

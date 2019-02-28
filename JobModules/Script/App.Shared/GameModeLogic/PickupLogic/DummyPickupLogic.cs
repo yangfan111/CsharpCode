@@ -1,5 +1,5 @@
 ﻿using Core;
-using Core.GameModeLogic;
+using Core;
 
 namespace App.Shared.GameModeLogic.PickupLogic
 {
@@ -20,7 +20,7 @@ namespace App.Shared.GameModeLogic.PickupLogic
             //DO NOTHING
         }
 
-        public virtual void Dorp(int playerEntityId, EWeaponSlotType slot)
+        public virtual void Drop(int playerEntityId, EWeaponSlotType slot)
         {
             //DO NOTHING
         }

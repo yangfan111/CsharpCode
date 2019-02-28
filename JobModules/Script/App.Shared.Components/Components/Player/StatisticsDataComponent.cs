@@ -1,4 +1,5 @@
-﻿using Core.Components;
+﻿using System.Security.Cryptography.X509Certificates;
+using Core.Components;
 using Core.EntityComponent;
 using Core.Enums;
 using Core.Statistics;
@@ -39,7 +40,7 @@ namespace App.Shared.Components.Player
             }
         }
 
-        private void SetBattleInfo(EntityKey key, int weaponId, PlayerInfoComponent playerInfo, PlayerBattleInfo battleInfo)
+        private void SetBattleInfo(EntityKey key, int weaponId, PlayerInfoComponent playerInfo, PlayerBattleInfo battleInfo, long timestamp)
         {
             battleInfo.PlayerKey = key;
             battleInfo.PlayerLv = playerInfo.Level;
@@ -48,32 +49,44 @@ namespace App.Shared.Components.Player
             battleInfo.TitleId = playerInfo.TitleId;
             battleInfo.BadgeId = playerInfo.BadgeId;
             battleInfo.WeaponId = weaponId;
+            battleInfo.timestamp = timestamp;
         }
 
-        public void AddOpponentInfo(EntityKey key, int weaponId, bool isKill, bool isHitDown, int damage, PlayerInfoComponent playerInfo)
+        public void AddOpponentInfo(EntityKey key, int weaponId, bool isKill, bool isHitDown, float damage, PlayerInfoComponent playerInfo, int deathCount)
         {
-            OpponentBattleInfo opponent;
-            Battle.OpponentDict.TryGetValue(key, out opponent);
-            if (null == opponent)
+            OpponentBattleInfo opponent = new OpponentBattleInfo();;
+            bool containsFlag = false;
+            if (Battle.OpponentDict.Count > 0)
             {
-                opponent = new OpponentBattleInfo();
-                Battle.OpponentDict.Add(key, opponent);
+                foreach (OpponentBattleInfo obi in Battle.OpponentDict.Values)
+                {
+                    if (obi.PlayerKey == key && obi.DeathCount == deathCount)
+                    {
+                        opponent = obi;
+                        containsFlag = true;
+                        break;
+                    }
+                }
             }
-            if (!opponent.IsKill)
-                opponent.IsKill = isKill;
-            if (!opponent.IsHitDown)
-                opponent.IsHitDown = isHitDown;
-            opponent.Damage += damage;
-            SetBattleInfo(key, weaponId, playerInfo, opponent);
+            if (!containsFlag)
+            {
+                Battle.OpponentDict.Add(Battle.OpponentDict.Count, opponent);
+            }
+            if (!opponent.IsKill) opponent.IsKill = isKill;
+            if (!opponent.IsHitDown) opponent.IsHitDown = isHitDown;
+            opponent.TrueDamage += damage;
+            opponent.Damage = (int) opponent.TrueDamage;
+            opponent.DeathCount = deathCount;
+            SetBattleInfo(key, weaponId, playerInfo, opponent, 0L);
         }
 
         public void AddKillerInfo(EntityKey key, int weaponId, int deadType, PlayerInfoComponent playerInfo)
         {
-            SetBattleInfo(key, weaponId, playerInfo, Battle.Killer);
+            SetBattleInfo(key, weaponId, playerInfo, Battle.Killer, 0L);
             SetDeadType(deadType);
         }
 
-        public void AddOtherInfo(EntityKey key, int weaponId, bool isKill, bool isHitDown, int damage, PlayerInfoComponent playerInfo)
+        public void AddOtherInfo(EntityKey key, int weaponId, bool isKill, bool isHitDown, float damage, PlayerInfoComponent playerInfo, long timestamp)
         {
             OpponentBattleInfo other;
             Battle.OtherDict.TryGetValue(key, out other);
@@ -86,8 +99,9 @@ namespace App.Shared.Components.Player
                 other.IsKill = isKill;
             if (!other.IsHitDown)
                 other.IsHitDown = isHitDown;
-            other.Damage += damage;
-            SetBattleInfo(key, weaponId, playerInfo, other);
+            other.TrueDamage += damage;
+            other.Damage = (int) other.TrueDamage;
+            SetBattleInfo(key, weaponId, playerInfo, other, timestamp);
         }
 
         public bool BeKilledOrHitDown(EntityKey key)

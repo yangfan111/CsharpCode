@@ -1,8 +1,4 @@
 ﻿using Core.GameModule.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using App.Shared.Components.Player;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
@@ -11,11 +7,8 @@ using App.Shared.Configuration;
 using App.Shared.Player;
 using Core.CharacterState;
 using XmlConfig;
-using App.Shared.GameModules.Vehicle;
-using Utils.Compare;
 using Utils.Utils;
 using Utils.Singleton;
-using App.Shared.Util;
 using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Player
@@ -32,6 +25,12 @@ namespace App.Shared.GameModules.Player
         // 站立进入游泳时，position为水面下1.55，之后改为位于水面下0.1f，差值1.45，预留0.05过渡
         private float SwimPositionUnderWater = 0f;
         private float AshoreDepth = 0f;
+        private Contexts _contexts;
+
+        public PlayerSpecialZoneEventSystem(Contexts contexts)
+        {
+            _contexts = contexts;
+        }
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
@@ -39,14 +38,20 @@ namespace App.Shared.GameModules.Player
             {
                 return;
             }
+            
             PlayerEntity player = (PlayerEntity)owner.OwnerEntity;
+            
+            player.triggerEvent.NeedUnmountWeapon = false;
+            
             if (player.IsOnVehicle() || player.gamePlay.IsLifeState(EPlayerLifeState.Dead))
             {
                 return;
             }
 
             WaterTest(player);
+
         }
+
 
         private bool WaterTest(PlayerEntity player)
         {
@@ -148,7 +153,7 @@ namespace App.Shared.GameModules.Player
             var radius = controller.radius;
             var gameObject = playerEntity.RootGo();
             var prevLayer = gameObject.layer;
-            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayers.TempPlayerLayer);
+            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayerManager.GetLayerIndex(EUnityLayerName.User));
             var playerPos = playerEntity.position.Value;
             var startPoint = new Vector3(playerPos.x,SingletonManager.Get<MapConfigManager>().WaterSurfaceHeight(playerPos),playerPos.z );
             // a shift lift up
@@ -173,8 +178,10 @@ namespace App.Shared.GameModules.Player
             player.position.Value = syncTransform.position;
           
             PlayerMoveSystem.SyncUpdateComponentPos(player, syncTransform.position);
-            player.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon();
             player.stateInterface.State.Swim();
+            player.triggerEvent.NeedUnmountWeapon = true;
+            player.WeaponController().ForceUnArmHeldWeapon();
+
             //_logger.InfoFormat("swim ashore pos:{0}",player.position.Value.ToStringExt());
         }
 
@@ -191,8 +198,9 @@ namespace App.Shared.GameModules.Player
 
         private void Dive(PlayerEntity player)
         {
-            player.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon();
             player.stateInterface.State.Dive();
+            player.triggerEvent.NeedUnmountWeapon = true;
+            player.WeaponController().ForceUnArmHeldWeapon();
         }
     }
 }

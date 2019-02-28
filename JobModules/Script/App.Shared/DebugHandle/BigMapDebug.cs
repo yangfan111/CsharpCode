@@ -395,6 +395,29 @@ namespace App.Shared.DebugHandle
             return SceneManager.GetSceneByName("002 " + (int)(player.position.Value.x + 4000) / 1000 + "x" + (int)(player.position.Value.z + 4000) / 1000);
         }
 
+        private static string SaveTerrainData()
+        {
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+            {
+                Scene scene = SceneManager.GetSceneAt(i);
+
+                foreach (GameObject obj in scene.GetRootGameObjects())
+                {
+                    Terrain t = obj.GetComponent<Terrain>();
+                    if (t != null)
+                    {
+                        TerrainData data = t.terrainData;
+                        for (int j = 0; j < data.detailPrototypes.Length; i++)
+                        {
+                            data.GetDetailLayer(0, 0, data.detailWidth, data.detailHeight, j);
+                        }
+                    }
+                }
+            }
+
+            return "ok";
+        }
+
         public static string HandleCommand(PlayerEntity player, string[] args)
         {
             countDic.Clear();
@@ -403,7 +426,13 @@ namespace App.Shared.DebugHandle
             {
                 return ls;
             }
-
+            if (args.Length > 0)
+            {
+                if (args[0] == "savedata")
+                {
+                    ls = SaveTerrainData();
+                }
+            }
             if (args.Length > 2)
             {
                 ls = ShowComponent(args[0], args[1], args[2]);

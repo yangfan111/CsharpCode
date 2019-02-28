@@ -15,6 +15,7 @@ using UnityEngine;
 using Utils.Utils;
 using XmlConfig;
 using System.Collections.Specialized;
+using Core.Interpolate;
 
 namespace App.Shared.Components.Player
 {
@@ -124,6 +125,7 @@ namespace App.Shared.Components.Player
         [DontInitilize] public PeekCameraConfig PeekConfig;
         [DontInitilize] public DeadCameraConfig DeadConfig;
     }
+    
     public enum ECameraArchorType{
         Third,
         AirPlane,
@@ -161,13 +163,14 @@ namespace App.Shared.Components.Player
         [DontInitilize] public Vector3 ArchorTransitionPosition;
         [DontInitilize] public Vector3 ArchorTransitionOffsetPosition;
         [DontInitilize] public int EnterTime;
+        [DontInitilize] public bool Active;
     }
 
     [Player]
     [Serializable]
     public class CameraStateOutputNewComponent : IComponent, ICameraMotorOutput
     {
-       
+    
         [DontInitilize] public Vector3 ArchorPosition { get; set; }
         [DontInitilize] public Vector3 FinalArchorPosition { get; set; }
         [DontInitilize] public Vector3 ArchorEulerAngle { get; set; }
@@ -196,7 +199,9 @@ namespace App.Shared.Components.Player
         [NetworkProperty] [DontInitilize] public float Fov;
         [NetworkProperty] [DontInitilize] public float Far;
         [NetworkProperty] [DontInitilize] public float Near;
-
+        [DontInitilize] public int LastCollisionTime;
+        [DontInitilize] public Vector3 LastCollisionOffset;
+        public int PostTransitionTime;
 
         public int GetComponentId()
         {
@@ -222,7 +227,6 @@ namespace App.Shared.Components.Player
                    && CompareUtility.IsApproximatelyEqual(Fov, r.Fov)
                    && CompareUtility.IsApproximatelyEqual(Far, r.Far)
                    && CompareUtility.IsApproximatelyEqual(Near, r.Near);
-
         }
 
         public override string ToString()
@@ -230,10 +234,74 @@ namespace App.Shared.Components.Player
             return string.Format("Position: {0}, EulerAngle: {1}, Fov: {2}, Far: {3}, Near: {4}", Position.ToStringExt(), EulerAngle.ToStringExt(), Fov, Far, Near);
         }
     }
-
+   
+    [Player]
+    public class ThirdPersonDataForObservingComponent : IComponent
+    {
+        [DontInitilize] public Vector3 ThirdPersonArchorPosition;
+        public CameraStateOutputNewComponent ThirdPersonData;
+        public CameraFinalOutputNewComponent ThirdPersonOutput;
+    }
+    
     [Player]
     [Serializable]
+    public class ObserveCameraComponent : IPlaybackComponent
+    {
+        [NetworkProperty] [DontInitilize] public Vector3 CameraPosition;
+        [NetworkProperty] [DontInitilize] public Vector3 PlayerPosition;
+        [NetworkProperty] [DontInitilize] public Vector3 CameraEularAngle;
+        [NetworkProperty] [DontInitilize] public bool IsFirstAppearance;
+        [NetworkProperty] [DontInitilize] public float Fov;
+        
+        public int GetComponentId()
+        {
+            return (int) EComponentIds.ObserveCamera;
+        }
+
+        public void CopyFrom(object rightComponent)
+        {
+            var r = rightComponent as ObserveCameraComponent;
+
+            CameraPosition = r.CameraPosition;
+            PlayerPosition = r.PlayerPosition;
+            CameraEularAngle = r.CameraEularAngle;
+            IsFirstAppearance = r.IsFirstAppearance;
+            Fov = r.Fov;
+        }
+
+        public bool IsApproximatelyEqual(object right)
+        {
+            var r = right as ObserveCameraComponent;
+
+            return r.IsFirstAppearance == IsFirstAppearance &&
+                   CompareUtility.IsApproximatelyEqual(r.Fov, Fov) &&
+                   CompareUtility.IsApproximatelyEqual(r.CameraPosition, CameraPosition) &&
+                   CompareUtility.IsApproximatelyEqual(r.PlayerPosition, PlayerPosition) &&
+                   CompareUtility.IsApproximatelyEqual(r.CameraEularAngle, CameraEularAngle);
+
+        }
+
+        public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
+        {
+            var l = left as ObserveCameraComponent;
+            var r = right as ObserveCameraComponent;
+
+            IsFirstAppearance = r.IsFirstAppearance;
+            Fov = InterpolateUtility.Interpolate(l.Fov, r.Fov, interpolationInfo);
+            CameraPosition = InterpolateUtility.Interpolate(l.CameraPosition, r.CameraPosition, interpolationInfo);
+            PlayerPosition = InterpolateUtility.Interpolate(l.PlayerPosition, r.PlayerPosition, interpolationInfo);
+            CameraEularAngle =
+                InterpolateUtility.Interpolate(l.CameraEularAngle, r.CameraEularAngle, interpolationInfo);
+        }
+
+        public bool IsInterpolateEveryFrame()
+        {
+            return true;
+        }
+    }
     
+    [Player]
+    [Serializable]
     public class CameraStateUploadComponent: IUpdateComponent
     {
         [NetworkProperty] [DontInitilize] public Vector3 Position;
@@ -271,7 +339,10 @@ namespace App.Shared.Components.Player
         [DontInitilize] [NetworkProperty] public int LeaveActionCode;
 
         [DontInitilize] [NetworkProperty] public Byte ArchorType;
+        
+        [DontInitilize] [NetworkProperty] public Vector3 ThirdPersonCameraPostion;
 
+        
         public void CopyFrom(object rightComponent)
         {
             var r = rightComponent as CameraStateUploadComponent;
@@ -306,6 +377,7 @@ namespace App.Shared.Components.Player
             PlayerFocusPosition = r.PlayerFocusPosition;
 
             ArchorType = r.ArchorType;
+            ThirdPersonCameraPostion = r.ThirdPersonCameraPostion;
         }
 
         public int GetComponentId()
@@ -344,7 +416,8 @@ namespace App.Shared.Components.Player
                 EnterActionCode == r.EnterActionCode &&
                 LeaveActionCode == r.LeaveActionCode &&
                 ArchorType == r.ArchorType &&
-                PlayerFocusPosition == r.PlayerFocusPosition;
+                PlayerFocusPosition == r.PlayerFocusPosition &&
+                ThirdPersonCameraPostion == r.ThirdPersonCameraPostion;
         }
     }
 

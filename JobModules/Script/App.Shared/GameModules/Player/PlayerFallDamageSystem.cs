@@ -10,9 +10,11 @@ namespace App.Shared.GameModules.Player
     public class PlayerFallDamageSystem : IUserCmdExecuteSystem
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerFallDamageSystem));
+        private Contexts _contexts;
 
-        public PlayerFallDamageSystem()
+        public PlayerFallDamageSystem(Contexts contexts)
         {
+            _contexts = contexts;
         }
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
@@ -45,7 +47,7 @@ namespace App.Shared.GameModules.Player
 
                 if ((damage > 0) && (SharedConfig.HaveFallDamage ==true ))
                 {
-                    VehicleDamageUtility.DoPlayerDamage(null, player, damage, EUIDeadType.Fall);
+                    VehicleDamageUtility.DoPlayerDamage(_contexts, null, player, damage, EUIDeadType.Fall);
 //                    Debug.LogFormat("IsCollided ... xzSpeed:{0}, ySpeed:{1}, damage:{2}", xzSpeed, ySpeed, damage);
                 }
             }

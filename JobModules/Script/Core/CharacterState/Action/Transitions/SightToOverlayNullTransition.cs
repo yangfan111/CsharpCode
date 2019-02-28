@@ -40,7 +40,28 @@ namespace Core.CharacterState.Action.Transitions
 
                 return ret;
             };
+
+            _interruptCondition = (command, action) =>
+            {
+                if (command.IsMatch(FsmInput.Sight))
+                {
+                    command.AdditioanlValue = NormalizedTime;
+                    return FsmTransitionResponseType.ForceEnd;
+                }
+
+                return FsmTransitionResponseType.NoResponse;
+            };
+            
             _update = GetLerpFunc(FsmOutputType.FirstPersonSight, 1, 0);
+        }
+
+        public override void Init(IFsmInputCommand command)
+        {
+            base.Init(command);
+            if (InitValue != 0)
+            {
+                NormalizedTime = 1 - InitValue;
+            }
         }
     }
 }

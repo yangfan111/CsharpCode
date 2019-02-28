@@ -79,6 +79,7 @@ namespace Assets.App.Shared.GameModules.Camera
 
         public DummyCameraMotorOutput Append(DummyCameraMotorOutput append)
         {
+            ArchorEulerAngle += append.ArchorEulerAngle;
             ArchorOffset.x += append.ArchorOffset.x;
             ArchorOffset.y += append.ArchorOffset.y;
             ArchorOffset.z += append.ArchorOffset.z;

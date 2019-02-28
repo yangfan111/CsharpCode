@@ -1,8 +1,8 @@
-﻿using Utils.AssetManager;
+﻿using System;
+using Utils.AssetManager;
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace App.Shared.Components.Ui
 {
@@ -10,6 +10,6 @@ namespace App.Shared.Components.Ui
     public class WaitToBeLoadedComponent : IComponent
     {
         public List<AssetInfo> LoadInfos;
-        public List<GameObject> RecycleObjs;
+        public List<Object> RecycleObjs;
     }
 }

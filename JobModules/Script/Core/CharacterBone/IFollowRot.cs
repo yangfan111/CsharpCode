@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Core.EntityComponent;
 using Utils.Appearance;
 
 namespace Core.CharacterBone
@@ -9,6 +10,6 @@ namespace Core.CharacterBone
     public interface IFollowRot
     {
         void PreUpdate(FollowRotParam param, ICharacterBone characterBone);
-        void SyncTo(ICharacterBoneState state);
+        void SyncTo(IGameComponent characterBoneComponent);
     }
 }

@@ -38,8 +38,10 @@ namespace App.Server.GameModules.GamePlay
 
         void HandleFreeEvent(Contexts room, PlayerEntity player, SimpleProto message);
 
-        void HandleWeaponState(Contexts room, PlayerEntity player, IPlayerWeaponState state);
+        //TODO 修改
+        //void HandleWeaponState(Contexts room, PlayerEntity player, IPlayerWeaponState state);
+        void HandleWeaponState(Contexts room, PlayerEntity player);
 
-        void HandleWeaponFire(Contexts room, PlayerEntity player, NewWeaponConfigItem info);
+        void HandleWeaponFire(Contexts room, PlayerEntity player, WeaponResConfigItem info);
     }
 }

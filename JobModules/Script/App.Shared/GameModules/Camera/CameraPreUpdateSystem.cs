@@ -6,11 +6,14 @@ using App.Shared;
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Camera;
 using App.Shared.GameModules.Camera.Utils;
+using App.Shared.Player;
 using Core.CameraControl.NewMotor;
+using Core.EntityComponent;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using UnityEngine;
+using XmlConfig;
 
 namespace Assets.App.Shared.GameModules.Camera
 {
@@ -20,22 +23,19 @@ namespace Assets.App.Shared.GameModules.Camera
        
         private DummyCameraMotorState _state ;
         private VehicleContext _vehicleContext;
+        private Contexts _contexts;
 
         private FreeMoveContext _freeMoveContext;
-        private readonly  List<SubCameraMotorType> _subCameraMotorTypeArray = new List<SubCameraMotorType>();
         
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CameraPreUpdateSystem));
          
-        public CameraPreUpdateSystem(VehicleContext vehicleContext, FreeMoveContext freeMoveContext, Motors m)
+        public CameraPreUpdateSystem(Contexts contexts, Motors m)
         {
-            _vehicleContext = vehicleContext;
-            _freeMoveContext = freeMoveContext;
+            _vehicleContext = contexts.vehicle;
+            _freeMoveContext = contexts.freeMove;
+            _contexts = contexts;
             _motors = m;
             _state = new DummyCameraMotorState(m);
-            foreach (SubCameraMotorType value in Enum.GetValues(typeof(SubCameraMotorType)))
-            {
-                _subCameraMotorTypeArray.Add(value);
-            }
         }
 
         private void PreProcessInput(PlayerEntity player, DummyCameraMotorInput input,
@@ -43,46 +43,50 @@ namespace Assets.App.Shared.GameModules.Camera
         {
             if (!dict.ContainsKey(subState.NowMode)) return;
             if (!dict.ContainsKey(subState.LastMode)) return;
-            var oldMotor = dict[subState.LastMode];
             var nowMotor = dict[subState.NowMode];
             nowMotor.PreProcessInput(player, input, state);
         }
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
-            
             //Logger.InfoFormat("seq:{0}, delata yaw:{2},  client return judge:{1}", cmd.Seq, (!cmd.NeedStepPredication && !SharedConfig.IsServer), cmd.DeltaYaw);
-            if (!cmd.NeedStepPredication && !SharedConfig.IsServer) return;
-            
+            if (!cmd.NeedStepPredication && !SharedConfig.IsServer) 
+                return;    
             UpdateCamera(owner, cmd);
         }
 
         public ISimpleParallelUserCmdExecuteSystem CreateCopy()
         {
-            return new CameraPreUpdateSystem(_vehicleContext,_freeMoveContext,_motors);
+            return new CameraPreUpdateSystem(_contexts, _motors);
         }
 
         private void UpdateCamera(IUserCmdOwner owner, IUserCmd cmd)
         {
+            
             PlayerEntity player = owner.OwnerEntity as PlayerEntity;
-
             if (!player.hasCameraStateNew) return;
             if (!player.hasCameraStateOutputNew) return;
-//            var finalOutput = player.cameraStateOutputNew;
+            if (player.gamePlay.IsObserving())
+            {
+                int objId = player.gamePlay.CameraEntityId;
+                var entity = _contexts.player.GetEntityWithEntityKey(new EntityKey(objId, (short) EEntityType.Player));
+                if (entity != null) return;
+            }
+            
             DummyCameraMotorState.Convert(player.cameraStateNew, _state);
-
 
             var archotRotation = player.cameraArchor.ArchorEulerAngle;
             if (player.cameraStateNew.CameraMotorInput == null)
                 player.cameraStateNew.CameraMotorInput = new DummyCameraMotorInput();
             DummyCameraMotorInput _input = (DummyCameraMotorInput) player.cameraStateNew.CameraMotorInput;
-            _input.Generate(player, cmd, archotRotation.y, archotRotation.x);
-            foreach (SubCameraMotorType i in _subCameraMotorTypeArray)
+            _input.Generate(_contexts, player, cmd, archotRotation.y, archotRotation.x);
+
+            for (int i=0;i<(int)SubCameraMotorType.End;i++)
             {
-                var type = i;
+                var type = (SubCameraMotorType)i;
                 PreProcessInput(player, _input, _motors.GetDict(type), _state.Get(type), _state);
             }
-
+            
             DummyCameraMotorState.Convert(_state, player.cameraStateNew);
         }
 

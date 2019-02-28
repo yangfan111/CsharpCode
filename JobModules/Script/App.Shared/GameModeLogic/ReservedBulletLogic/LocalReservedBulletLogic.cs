@@ -1,33 +1,48 @@
-﻿using Core;
-using Core.GameModeLogic;
-using Entitas;
+﻿using App.Shared.GameModules.Weapon;
+using Core;
 using WeaponConfigNs;
 
 namespace App.Shared.GameModeLogic.ReservedBulletLogic
 {
+    /// <summary>
+    /// Defines the <see cref="LocalReservedBulletLogic" />
+    /// </summary>
     public class LocalReservedBulletLogic : IReservedBulletLogic
     {
-        public int GetReservedBullet(Entity entity, EWeaponSlotType slot)
+        private Contexts _contexts;
+
+        public LocalReservedBulletLogic(Contexts contexts)
         {
-            var playerEntity = entity as PlayerEntity;
-            var weaponComp = playerEntity.GetWeaponComponentBySlot(slot);
-            return weaponComp.ReservedBullet;
+            _contexts = contexts;
         }
 
-        public int GetReservedBullet(Entity playerEntity, EBulletCaliber caliber)
+        public int GetReservedBullet(IPlayerWeaponGetter controller, EWeaponSlotType slot)
+        {
+            return GetReservedBullet((PlayerWeaponController)controller, slot);
+        }
+
+        private int GetReservedBullet(PlayerWeaponController controller, EWeaponSlotType slot)
+        {
+            return controller.HeldWeaponAgent.BaseComponent.ReservedBullet;
+        }
+
+        public int GetReservedBullet(IPlayerWeaponGetter controller, EBulletCaliber caliber)
         {
             return 0;
         }
 
-        public int SetReservedBullet(Entity entity, EWeaponSlotType slot, int count)
+        public int SetReservedBullet(IPlayerWeaponGetter controller, EWeaponSlotType slot, int count)
         {
-            var playerEntity = entity as PlayerEntity;
-            var weaponComp = playerEntity.GetWeaponComponentBySlot(slot);
-            weaponComp.ReservedBullet = count;
+            return SetReservedBullet((PlayerWeaponController)controller, slot, count);
+        }
+
+        private int SetReservedBullet(PlayerWeaponController controller, EWeaponSlotType slot, int count)
+        {
+            controller.HeldWeaponAgent.BaseComponent.ReservedBullet = count;
             return count;
         }
 
-        public int SetReservedBullet(Entity playerEntity, EBulletCaliber caliber, int count)
+        public int SetReservedBullet(IPlayerWeaponGetter controller, EBulletCaliber caliber, int count)
         {
             return count;
         }

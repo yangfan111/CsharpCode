@@ -2,6 +2,7 @@
 using App.Shared.Components.Player;
 using Core.Animation;
 using Core.CharacterState;
+using Core.CharacterState.Posture;
 using Core.EntityComponent;
 using Core.Event;
 using Core.UpdateLatest;
@@ -35,8 +36,30 @@ namespace App.Shared.Components.Serializer
             to.AddRange(patch);
             return to;
         }
+        /// <summary>
+        /// size是不会变的，否则重新生成
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dest"></param>
+        /// <param name="origin"></param>
+        /// <returns></returns>
+        public static T[] Merge<T>(T[] dest,
+        T[] origin) where T : class, IPatchClass<T>, new()
+        {
+            var oc = origin.Length;
+            var dc = dest.Length;
+            dest = FieldSerializeUtil.Resize(dest, oc);
+            for (int i = 0; i < oc; i++)
+            {
+                if (origin[i].HasValue)
+                {
+                    dest[i].MergeFromPatch(origin[i]);
+                }
+            }
 
-
+            return dest;
+        }
+       
         public static int Merge(int basevalue, int patchvalue)
         {
             return patchvalue;
@@ -110,6 +133,13 @@ namespace App.Shared.Components.Serializer
         }
 
         public static StateInterCommands Merge(StateInterCommands basevalue, StateInterCommands patchvalue)
+        {
+            basevalue.Reset();
+            basevalue.CopyFrom(patchvalue);
+            return basevalue;
+        }
+        
+        public static UnityAnimationEventCommands Merge(UnityAnimationEventCommands basevalue, UnityAnimationEventCommands patchvalue)
         {
             basevalue.Reset();
             basevalue.CopyFrom(patchvalue);

@@ -26,19 +26,21 @@ namespace App.Shared.GameModules.Preparation
         private List<AssetInfo> _sceneRequests = new List<AssetInfo>();
         private List<AssetInfo> _goRequests = new List<AssetInfo>();
         
-        public bool IsServer { get; set; }
+        public bool IsServer { get; protected set; }
         public bool AsapMode { get; set; }
         private readonly Vector3 _initPosition;
-        public InitialSceneLoadingSystem(ISessionState sessionState, Contexts ctx, IStreamingGoManager streamingGo)
+        public InitialSceneLoadingSystem(ISessionState sessionState, Contexts ctx, IStreamingGoManager streamingGo, bool isServer)
         {
             _sessionState = sessionState;
             _contexts = ctx;
             
             _sessionState.CreateExitCondition(typeof(InitialSceneLoadingSystem));
 
-            _levelManager = new LevelManager();
+            _levelManager = new LevelManager(_contexts.session.commonSession.AssetManager);
             _contexts.session.commonSession.LevelManager = _levelManager;
             _initPosition = _contexts.session.commonSession.InitPosition;
+
+            IsServer = isServer;
 
             var allMaps = SingletonManager.Get<MapsDescription>();
             
@@ -74,23 +76,22 @@ namespace App.Shared.GameModules.Preparation
                             allMaps.SmallMapParameters.AssetName
                         }
                     });
-                    RegistLoader();
                     break;
                 case LevelType.Exception:
                     throw new InvalidEnumArgumentException("map id not set");
             }
         }
         
-        public void OnInitModule(ILoadRequestManager manager)
+        public void OnInitModule(IUnityAssetManager assetManager)
         {
             _levelManager.UpdateOrigin(IsServer ? Vector3.zero : _initPosition);
 
-            RequestForResource(manager);
+            RequestForResource(assetManager);
         }
 
-        public void OnLoadResources(ILoadRequestManager loadRequestManager)
+        public void OnLoadResources(IUnityAssetManager assetManager)
         {
-            RequestForResource(loadRequestManager);
+            RequestForResource(assetManager);
 
             if (_levelManager.NotFinishedRequests <= 0)
             {
@@ -99,34 +100,22 @@ namespace App.Shared.GameModules.Preparation
             }
         }
 
-        private void RequestForResource(ILoadRequestManager manager)
+        private void RequestForResource(IUnityAssetManager assetManager)
         {
             _levelManager.GetRequests(_sceneRequests, _goRequests);
             
             foreach (var request in _sceneRequests)
             {
-                manager.AddSceneRequest(new SceneRequest
-                {
-                    Address = request,
-                    IsAdditive = true,
-                    IsLoad = true
-                });
+                assetManager.LoadSceneAsync(request, true);
             }
             
             foreach (var request in _goRequests)
             {
-                manager.AppendLoadRequest(null, request, _levelManager.GoLoadedWrapper);
+                assetManager.LoadAssetAsync("InitialSceneLoadingSystem",  request, _levelManager.GoLoadedWrapper);
             }
             
             _sceneRequests.Clear();
             _goRequests.Clear();
-        }
-        
-        private void RegistLoader()
-        {
-            SceneObjManager sm = new SceneObjManager();
-            _contexts.session.commonSession.LevelManager.SceneLoaded += (scene,type) => sm.OnSceneLoaded(scene);
-            _contexts.session.commonSession.LevelManager.SceneUnloaded += scene => sm.OnSceneUnloaded(scene);
         }
     }
 }

@@ -190,6 +190,7 @@ namespace App.Shared.Components.Player
             SavePlayerKey = hp.SavePlayerKey;
             SaveEnterState = hp.SaveEnterState;
             IsInteruptSave = hp.IsInteruptSave;
+
         }
 
         public float DecreaseHp(float damage, int time = 0)
@@ -210,19 +211,10 @@ namespace App.Shared.Components.Player
             }
             return ret;
         }
-        public bool IsInterpolateEveryFrame(){ return false; }
+        public bool IsInterpolateEveryFrame(){ return true; }
         public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
         {
             CopyFrom(left);
-            GamePlayComponent leftGamePlay = (GamePlayComponent)left;
-            GamePlayComponent rightGamePlay = (GamePlayComponent)right;
-            // 复活的时候延时赋值，其他情况立即赋值
-            if(leftGamePlay.LifeState != rightGamePlay.LifeState && rightGamePlay.LifeState != (int)EPlayerLifeState.Alive)
-            {
-                this.LifeState = rightGamePlay.LifeState;
-                this.LastLifeState = rightGamePlay.LastLifeState;
-                this.CurHp = rightGamePlay.CurHp;
-            }
         }
 
         public void SyncLatestFrom(object rightComponent)
@@ -230,6 +222,9 @@ namespace App.Shared.Components.Player
             CopyFrom(rightComponent);
         }
 
-      
+        public bool IsObserving()
+        {
+            return CameraEntityId != 0;
+        }
     }
 }

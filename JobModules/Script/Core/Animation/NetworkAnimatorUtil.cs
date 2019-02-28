@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using Core.CharacterState;
 using UnityEngine;
 
 namespace Core.Animation
@@ -149,6 +150,35 @@ namespace Core.Animation
                     Cache.Add(new NetworkAnimatorLayer());
                 }
             }
+        }
+
+        public static void ForceChangeNetworkAnimator(List<NetworkAnimatorLayer> layers, int layer, float layerWeight,
+            int stateHash, float normalizeTime, float stateDuration, float transitionNormalizedTime = NetworkAnimatorLayer.NotInTransition,
+            float transitionDuration = 0)
+        {
+            try
+            {
+                if (layer >= 0 && layer < layers.Count)
+                {
+                    var animation = layers[layer];
+                    animation.Weight = layerWeight;
+                    animation.CurrentStateHash = stateHash;
+                    animation.NormalizedTime = normalizeTime;
+                    animation.StateDuration = stateDuration;
+                    animation.TransitionNormalizedTime = transitionNormalizedTime;
+                    animation.TransitionDuration = transitionDuration;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        public static void ForceToInjureState(List<NetworkAnimatorLayer> layers, float normalizeTime)
+        {
+            ForceChangeNetworkAnimator(layers, NetworkAnimatorLayer.PlayerUpperBodyAddLayer, 1.0f, AnimatorParametersHash.InjureyStateHash, normalizeTime, AnimatorParametersHash.InjureyStateDuration);
         }
     }
 }

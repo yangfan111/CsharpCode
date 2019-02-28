@@ -2,6 +2,7 @@
 using App.Shared.Components;
 using Assets.XmlConfig;
 using Core;
+using Core.EntityComponent;
 using Core.GameTime;
 using Entitas;
 using UnityEngine;
@@ -10,9 +11,9 @@ namespace App.Shared.EntityFactory
 {
     public class ClientSceneObjectEntityFactory : ServerSceneObjectEntityFactory
     {
-        public ClientSceneObjectEntityFactory(SceneObjectContext sceneObjectContext,
+        public ClientSceneObjectEntityFactory(SceneObjectContext sceneObjectContext, PlayerContext playerContext,
             IEntityIdGenerator entityIdGenerator, IEntityIdGenerator equipGenerator, ICurrentTime currentTime) : base(
-            sceneObjectContext, entityIdGenerator, equipGenerator, currentTime)
+            sceneObjectContext, playerContext, entityIdGenerator, equipGenerator, currentTime)
         {
 
         }
@@ -22,16 +23,16 @@ namespace App.Shared.EntityFactory
             return null;
         }
 
-        public override void DestroyEquipmentEntity(int key)
+        public override void DestroySceneWeaponObjectEntity(int key)
         {
         }
 
-        public override IEntity CreateWeaponEntity(WeaponInfo weaponInfo, Vector3 position)
+        public override IEntity CreateSceneWeaponObjectEntity(WeaponScanStruct weaponInfo, Vector3 position)
         {
             return null;
         }
 
-        public override IEntity CreateDropWeaponEntity(WeaponInfo weaponInfo, Vector3 position, int lifeTime)
+        public override IEntity CreateDropSceneWeaponObjectEntity(WeaponScanStruct weaponKey, Vector3 position, int lifeTime)
         {
             return null;
         }

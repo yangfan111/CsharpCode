@@ -1,4 +1,5 @@
-﻿using Core.GameModule.Interface;
+﻿using App.Shared.GameModules.Weapon;
+using Core.GameModule.Interface;
 using Core.GameModule.System;
 using Core.Prediction.UserPrediction.Cmd;
 
@@ -14,16 +15,18 @@ namespace App.Shared.GameModules.Player
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
-            if(cmd.BagIndex > 0)
+            
+            if (cmd.BagIndex > 0)
             {
                 var player = owner.OwnerEntity as PlayerEntity;
-                if(!player.modeLogic.ModeLogic.IsBagSwithEnabled(player))
+                var controller = GameModuleManagement.Get<PlayerWeaponController>(owner.OwnerEntityKey.EntityId);
+                if(!controller.RelatedModelLogic.CanModeSwitchBag(controller))
                 {
                     return;
                 }
                 var bags = player.playerInfo.WeaponBags;
                 var realBagIndex = cmd.BagIndex -1;
-                player.modeLogic.ModeLogic.ResetWeaponWithBagIndex(realBagIndex, player);
+                player.modeLogic.ModeLogic.RecoveryBagContainer(realBagIndex, controller);
             }
         }
     }

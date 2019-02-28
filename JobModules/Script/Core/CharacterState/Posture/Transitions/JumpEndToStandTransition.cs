@@ -14,7 +14,22 @@ namespace Core.CharacterState.Posture.Transitions
     {
         public JumpEndToStandTransition(short id, short target, int duration) : base(id, target, duration)
         {
-            _simpleTransferCondition = (command, addOutput) => SimpleCommandHandler(command, FsmInput.Land);
+            _simpleTransferCondition = (command, addOutput) =>
+            {
+                if (SimpleCommandHandler(command, FsmInput.Land))
+                {
+                    //Logger.InfoFormat("jumpend to stand , condition: FsmInput.Land!!!");
+                    return true;
+                }
+                
+                if (SimpleCommandHandler(command, FsmInput.SlideEnd))
+                {
+                    //Logger.InfoFormat("jumpend to stand , condition: FsmInput.SlideEnd!!!");
+                    return true;
+                }
+
+                return false;
+            };
             _interruptCondition = (command, addOutput) =>
             {
                 // 每帧根据动画剩余时间更新NormalizedTime
@@ -24,11 +39,24 @@ namespace Core.CharacterState.Posture.Transitions
                 }
                 else if (command.IsMatch(FsmInput.JumpEndFinished))
                 {
+                    //Logger.InfoFormat("JumpEndFinished!!!");
                     FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
                                              AnimatorParametersHash.Instance.PostureName,
                                              AnimatorParametersHash.Instance.StandValue,
                                              CharacterView.FirstPerson | CharacterView.ThirdPerson);
                     addOutput(FsmOutput.Cache);
+                    
+//                    FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.JumpStateHash,
+//                        AnimatorParametersHash.Instance.JumpStateName,
+//                        AnimatorParametersHash.Instance.JumpStateNormal,
+//                       CharacterView.ThirdPerson);
+//                    addOutput(FsmOutput.Cache);
+//                    
+//                    FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MoveJumpStateHash,
+//                        AnimatorParametersHash.Instance.MoveJumpStateName,
+//                        AnimatorParametersHash.Instance.MoveJumpStateNormal,
+//                        CharacterView.ThirdPerson);
+//                    addOutput(FsmOutput.Cache);
 
                     return FsmTransitionResponseType.ExternalEnd;
                 }
@@ -40,6 +68,10 @@ namespace Core.CharacterState.Posture.Transitions
                 {
                     return FsmTransitionResponseType.ChangeRoad;
                 }
+//                else if (command.IsMatch(FsmInput.Slide))
+//                {
+//                    return FsmTransitionResponseType.ForceEnd;
+//                }
 
                 return FsmTransitionResponseType.NoResponse;
             };

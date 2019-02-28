@@ -23,6 +23,7 @@ namespace Core.Event
 
         public void AddEvent(IEvent e)
         {
+           
             if (_events.ContainsKey(e.EventType))
             {
             }

@@ -20,7 +20,11 @@ namespace App.Shared
        var configFile = Application.dataPath + "\\Config\\log4net.xml";
         log4net.GlobalContext.Properties["LogDir"] = Application.dataPath;
 #else
-                    var configFile = Application.dataPath + "/Config/log4net_56.xml";
+#if UNITY_EDITOR
+                    var configFile = Application.dataPath + "/Config/log4net_56_editor.xml";
+#else
+                     var configFile = Application.dataPath + "/Config/log4net_56.xml";
+#endif
                     var logDir = (Application.dataPath + "/../log/");
                     logDir = logDir.Replace("/", Path.DirectorySeparatorChar + "");
                     logDir = Path.GetFullPath(logDir);

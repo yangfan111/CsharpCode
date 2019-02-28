@@ -20,11 +20,11 @@ namespace App.Shared.GameModules
         {
             topLevelGameModule.Init();
             
-            Add(new ModuleInitSystem(topLevelGameModule, commonSessionObjects.LoadRequestManager));
+            Add(new ModuleInitSystem(topLevelGameModule, commonSessionObjects.AssetManager));
             Add(new EntityCreateSystem(topLevelGameModule)); 
             
-            Add(new LoadRequestManagerSystem(commonSessionObjects));
-            Add(new ResourceLoadSystem(topLevelGameModule, commonSessionObjects.LoadRequestManager));
+            Add(new UnityAssetManangerSystem(commonSessionObjects));
+            Add(new ResourceLoadSystem(topLevelGameModule, commonSessionObjects.AssetManager));
             Add(new EntityCleanUpSystem(topLevelGameModule));
           
             Add(new CommonDestroySystem(commonSessionObjects));

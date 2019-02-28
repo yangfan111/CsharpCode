@@ -4,7 +4,7 @@
 [UnityEngine.DisallowMultipleComponent]
 /// @brief An AkRoom is an enclosed environment that can only communicate to the outside/other rooms with AkRoomPortals
 /// @details 
-public class AkRoom : UnityEngine.MonoBehaviour
+public class AkRoom : AkUnityEventHandler
 {
 	public static ulong INVALID_ROOM_ID = unchecked((ulong) -1.0f);
 
@@ -26,6 +26,14 @@ public class AkRoom : UnityEngine.MonoBehaviour
 	/// Occlusion level modeling transmission through walls.
 	public float wallOcclusion = 1;
 
+	/// Wwise Event to be posted on the room game object.
+	public AK.Wwise.Event roomToneEvent;
+
+	[UnityEngine.Range(0, 1)]
+	[UnityEngine.Tooltip("Send level for sounds that are posted on the room game object; adds reverb to ambience and room tones. Valid range: (0.f-1.f). A value of 0 disables the aux send.")]
+	/// Send level for sounds that are posted on the room game object; adds reverb to ambience and room tones. Valid range: (0.f-1.f). A value of 0 disables the aux send.
+	public float roomToneAuxSend = 0;
+
 	public static bool IsSpatialAudioEnabled
 	{
 		get { return AkSpatialAudioListener.TheSpatialAudioListener != null && RoomCount > 0; }
@@ -34,7 +42,7 @@ public class AkRoom : UnityEngine.MonoBehaviour
 	/// Access the room's ID
 	public ulong GetID()
 	{
-		return (ulong) GetInstanceID();
+		return AkSoundEngine.GetAkGameObjectID(gameObject);
 	}
 
 	private void OnEnable()
@@ -49,12 +57,25 @@ public class AkRoom : UnityEngine.MonoBehaviour
 		roomParams.Front.Y = transform.forward.y;
 		roomParams.Front.Z = transform.forward.z;
 
-		roomParams.ReverbAuxBus = (uint) reverbAuxBus.ID;
+		roomParams.ReverbAuxBus = reverbAuxBus.Id;
 		roomParams.ReverbLevel = reverbLevel;
 		roomParams.WallOcclusion = wallOcclusion;
 
+		roomParams.RoomGameObj_AuxSendLevelToSelf = roomToneAuxSend;
+		roomParams.RoomGameObj_KeepRegistered = roomToneEvent.IsValid() ? true : false;
+
 		RoomCount++;
 		AkSoundEngine.SetRoom(GetID(), roomParams, name);
+	}
+
+	protected override void Start()
+	{
+		base.Start();
+	}
+
+	public override void HandleEvent(UnityEngine.GameObject in_gameObject)
+	{
+		roomToneEvent.Post(gameObject);
 	}
 
 	private void OnDisable()

@@ -1,55 +1,57 @@
 ﻿using Assets.Utils.Configuration;
 using Core;
-using Core.GameModeLogic;
+using Core;
 using Core.Utils;
 using Entitas;
 using WeaponConfigNs;
 using App.Shared.GameModules.Weapon;
+using Utils.Singleton;
 
 namespace App.Shared.GameModeLogic.ReservedBulletLogic
 {
     public class SharedReservedBulletLogic : IReservedBulletLogic
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(SharedReservedBulletLogic));
-        private INewWeaponConfigManager _weaponConfigManager;
         private const int BulletLimit = int.MaxValue;
-        public SharedReservedBulletLogic(INewWeaponConfigManager weaponConfigManager)
+        private Contexts _contexts;
+        public SharedReservedBulletLogic(Contexts contexts)
         {
-            _weaponConfigManager = weaponConfigManager;
+            _contexts = contexts;
         }
 
-        public int SetReservedBullet(Entity playerEntity, EBulletCaliber caliber, int count)
+        public int SetReservedBullet(IPlayerWeaponGetter controller, EBulletCaliber caliber, int count)
         {
-            var player = playerEntity as PlayerEntity;
+            var relatedAmmunition = (controller as PlayerWeaponController).RelatedAmmunition;
             switch (caliber)
             {
                 case EBulletCaliber.E12No:
-                    return DoSetReserveBullet(ref player.weaponState.ReservedBullet12, count);
+                    return DoSetReserveBullet(ref relatedAmmunition.ReservedBullet12, count);
                 case EBulletCaliber.E300Mag:
-                    return DoSetReserveBullet(ref player.weaponState.ReservedBullet300, count);
+                    return DoSetReserveBullet(ref relatedAmmunition.ReservedBullet300, count);
                 case EBulletCaliber.E45apc:
-                    return DoSetReserveBullet(ref player.weaponState.ReservedBullet45, count);
+                    return DoSetReserveBullet(ref relatedAmmunition.ReservedBullet45, count);
                 case EBulletCaliber.E50AE:
-                    return DoSetReserveBullet(ref player.weaponState.ReservedBullet50, count);
+                    return DoSetReserveBullet(ref relatedAmmunition.ReservedBullet50, count);
                 case EBulletCaliber.E556mm:
-                    return DoSetReserveBullet(ref player.weaponState.ReservedBullet556, count);
+                    return DoSetReserveBullet(ref relatedAmmunition.ReservedBullet556, count);
                 case EBulletCaliber.E762mm:
-                    return DoSetReserveBullet(ref player.weaponState.ReservedBullet762, count);
+                    return DoSetReserveBullet(ref relatedAmmunition.ReservedBullet762, count);
                 case EBulletCaliber.E9mm:
-                    return DoSetReserveBullet(ref player.weaponState.ReservedBullet9, count);
+                    return DoSetReserveBullet(ref relatedAmmunition.ReservedBullet9, count);
                 case EBulletCaliber.E57mm:
-                    return DoSetReserveBullet(ref player.weaponState.ReservedBullet57, count);
+                    return DoSetReserveBullet(ref relatedAmmunition.ReservedBullet57, count);
                 default:
                     Logger.ErrorFormat("Illegal caliber {0}", caliber);
                     return 0;
             }
         }
 
-        public int SetReservedBullet(Entity playerEntity, EWeaponSlotType slot, int count)
+        public int SetReservedBullet(IPlayerWeaponGetter controller, EWeaponSlotType slot, int count)
         {
-            var player = playerEntity as PlayerEntity;
-            var caliber = GetCaliber(playerEntity, slot);
-            return SetReservedBullet(playerEntity, caliber, count);
+            var relatedAmmunition = (controller as PlayerWeaponController).RelatedAmmunition;
+
+            var caliber = GetCaliber(controller as PlayerWeaponController, slot);
+            return SetReservedBullet(controller, caliber, count);
         }
 
         private int DoSetReserveBullet( ref int bagReservedBullet,  int count)
@@ -66,48 +68,47 @@ namespace App.Shared.GameModeLogic.ReservedBulletLogic
             }
         }
 
-        public int GetReservedBullet(Entity entity, EBulletCaliber caliber)
+        public int GetReservedBullet(IPlayerWeaponGetter controller, EBulletCaliber caliber)
         {
-            var playerEntity = entity as PlayerEntity;
+            var relatedAmmunition = (controller as PlayerWeaponController).RelatedAmmunition;
+
             switch (caliber)
             {
                 case EBulletCaliber.E12No:
-                    return playerEntity.weaponState.ReservedBullet12;
+                    return relatedAmmunition.ReservedBullet12;
                 case EBulletCaliber.E300Mag:
-                    return playerEntity.weaponState.ReservedBullet300;
+                    return relatedAmmunition.ReservedBullet300;
                 case EBulletCaliber.E45apc:
-                    return playerEntity.weaponState.ReservedBullet45;
+                    return relatedAmmunition.ReservedBullet45;
                 case EBulletCaliber.E50AE:
-                    return playerEntity.weaponState.ReservedBullet50;
+                    return relatedAmmunition.ReservedBullet50;
                 case EBulletCaliber.E556mm:
-                    return playerEntity.weaponState.ReservedBullet556;
+                    return relatedAmmunition.ReservedBullet556;
                 case EBulletCaliber.E762mm:
-                    return playerEntity.weaponState.ReservedBullet762;
+                    return relatedAmmunition.ReservedBullet762;
                 case EBulletCaliber.E9mm:
-                    return playerEntity.weaponState.ReservedBullet9;
+                    return relatedAmmunition.ReservedBullet9;
                 case EBulletCaliber.E57mm:
-                    return playerEntity.weaponState.ReservedBullet57;
+                    return relatedAmmunition.ReservedBullet57;
                 default:
                     Logger.ErrorFormat("Illegal caliber {0}", caliber);
                     return 0;
             }
         }
 
-        public int GetReservedBullet(Entity entity, EWeaponSlotType slot)
+        public int GetReservedBullet(IPlayerWeaponGetter controller, EWeaponSlotType slot)
         {
-            var playerEntity = entity as PlayerEntity;
-            var caliber = GetCaliber(playerEntity, slot);
-            return GetReservedBullet(playerEntity, caliber);
+            var caliber = GetCaliber(controller as PlayerWeaponController, slot);
+            return GetReservedBullet(controller, caliber);
         }
 
-        private EBulletCaliber GetCaliber(Entity entity, EWeaponSlotType slot)
+        private EBulletCaliber GetCaliber(PlayerWeaponController controller, EWeaponSlotType slot)
         {
-            var playerEntity = entity as PlayerEntity;
-            var weapon = playerEntity.GetController<PlayerWeaponController>().GetSlotWeaponInfo(slot);
-            var weaponId = weapon.Id;
-            if (weaponId > 0)
+            var weapon = controller.GetWeaponAgent(slot);
+            if (weapon.ConfigId>0)
             {
-                var cfg = _weaponConfigManager.GetConfigById(weaponId);
+                
+                var cfg =   SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(weapon.ConfigId);
                 return (EBulletCaliber)cfg.Caliber;
             }
             Logger.ErrorFormat("no weapon in slot {0} !!", slot);

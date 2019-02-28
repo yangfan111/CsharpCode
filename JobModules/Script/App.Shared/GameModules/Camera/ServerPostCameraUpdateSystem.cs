@@ -8,6 +8,7 @@ using Core.CameraControl.NewMotor;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
+using XmlConfig;
 
 namespace App.Shared.GameModules.Camera
 {
@@ -39,7 +40,9 @@ namespace App.Shared.GameModules.Camera
             if (!playerEntity.hasCameraStateOutputNew) return;
 
             CopyClientOutputToComponent(playerEntity.cameraStateUpload, playerEntity.cameraFinalOutputNew);
-
+            if (playerEntity.gamePlay.IsObserving())
+                playerEntity.thirdPersonDataForObserving.ThirdPersonArchorPosition =
+                    playerEntity.cameraStateUpload.ThirdPersonCameraPostion;
         }
 
         private void CopyClientOutputToComponent(CameraStateUploadComponent input,

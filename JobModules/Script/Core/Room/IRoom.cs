@@ -15,7 +15,7 @@ namespace Core.Room
         void SendSnapshot();
         void CompensationSnapshot();
         void RunFreeGameRule();
-        void GameOver();
+        void GameOver(bool forceExit);
         void SetGameMode(int mode);
         bool SendLoginSucc(IPlayerInfo playerInfo, INetworkChannel channel);
         void SetPlayerStageRunning(IPlayerInfo playerInfo, INetworkChannel channel);

@@ -12,22 +12,27 @@ namespace App.Shared.GameModules.Configuration
     public abstract class AbstractSubResourceLoadHandler 
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(AbstractSubResourceLoadHandler));
-        private ILoadRequestManager _loadRequestManager;
+        private IUnityAssetManager _assetManager;
         private HashSet<AssetInfo> _assetSet = new HashSet<AssetInfo>(AssetInfo.AssetInfoComparer.Instance);
+        private HashSet<AssetInfo> _loadingAsset = new HashSet<AssetInfo>(AssetInfo.AssetInfoComparer.Instance);
         private OnSubResourcesHandled _handledCallback;
 
-        protected void AddLoadRequest(AssetInfo asset)
+        protected bool AddLoadRequest(AssetInfo asset)
         {
             if (!_assetSet.Contains(asset))
             {
-                _loadRequestManager.AppendLoadRequest(null, asset, OnLoadSucc);
+                _loadingAsset.Add(asset);
+                _assetManager.LoadAssetAsync(GetType().ToString(), asset, OnLoadSucc);
                 _assetSet.Add(asset);
+                return true;
             }
+
+            return false;
         }
 
-        public void LoadSubResources(ILoadRequestManager loadRequestManager, OnSubResourcesHandled handledCallback)
+        public void LoadSubResources(IUnityAssetManager assetManager, OnSubResourcesHandled handledCallback)
         {
-            _loadRequestManager = loadRequestManager;
+            _assetManager = assetManager;
             _handledCallback = handledCallback;
             if (!LoadSubResourcesImpl())
             {
@@ -35,13 +40,15 @@ namespace App.Shared.GameModules.Configuration
             }
         }
 
-        private void OnLoadSucc(object source, AssetInfo assetInfo, UnityEngine.Object obj)
+        private void OnLoadSucc(string source, UnityObject unityObj)
         {
-            _assetSet.Remove(assetInfo);
+            var assetInfo = unityObj.Address;
+
+            _loadingAsset.Remove(assetInfo);
 
             try
             {
-                OnLoadSuccImpl(assetInfo, obj);
+                OnLoadSuccImpl(unityObj);
             }
             catch (Exception e)
             {
@@ -49,7 +56,7 @@ namespace App.Shared.GameModules.Configuration
             }
 
 
-            if (_assetSet.Count == 0 && _handledCallback != null)
+            if (_loadingAsset.Count == 0 && _handledCallback != null)
             {
                 _handledCallback();
             }
@@ -58,6 +65,6 @@ namespace App.Shared.GameModules.Configuration
 
         //return wether we have asset to load
         protected abstract bool LoadSubResourcesImpl();
-        protected abstract void OnLoadSuccImpl(AssetInfo assetInfo, UnityEngine.Object obj);
+        protected abstract void OnLoadSuccImpl(UnityObject unityObj);
     }
 }

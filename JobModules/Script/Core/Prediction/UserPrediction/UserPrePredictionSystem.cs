@@ -63,6 +63,7 @@ namespace Core.Prediction.UserPrediction
 
                 var owner = _predicatoinInfoProvider.UserCmdOwner;
                 var cmd = owner.LastTempCmd;
+                
                 if (cmd == null) return;
                 _currentCmd = cmd;
                 //过滤输入状态

@@ -25,6 +25,11 @@ namespace App.Shared.FreeFramework.Free.Action
         {
             RoomInfo info = args.GameContext.session.commonSession.RoomInfo;
 
+            PreloadUI(args, info);
+        }
+
+        private void PreloadUI(IEventArgs args, RoomInfo info)
+        {
             HashSet<string> set = new HashSet<string>();
 
             if (!string.IsNullOrEmpty(info.PreLoadUI))
@@ -38,7 +43,7 @@ namespace App.Shared.FreeFramework.Free.Action
                     }
                 }
             }
-            
+
             if (!string.IsNullOrEmpty(ui))
             {
                 string[] uis = ui.Split(',');

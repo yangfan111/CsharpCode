@@ -11,12 +11,10 @@ namespace App.Shared.GameModules.Player.Appearance
 {
     static class ThirdPersonAppearanceUtils
     {
-        public static ThirdPersonPosture GetPosture(ICharacterState state)
+        public static ThirdPersonPosture GetPosture(PostureInConfig posture)
         {
             ThirdPersonPosture ret;
-            var stateInConfig = state.GetCurrentPostureState();
-            
-            switch (stateInConfig)
+            switch (posture)
             {
                 case PostureInConfig.Stand:
                     ret = ThirdPersonPosture.Stand;
@@ -56,12 +54,10 @@ namespace App.Shared.GameModules.Player.Appearance
             return ret;
         }
 
-        public static ThirdPersonAction GetAction(ICharacterState state)
+        public static ThirdPersonAction GetAction(ActionInConfig action)
         {
             ThirdPersonAction ret;
-            var stateActionInConfig = state.GetActionState();
-            
-            switch (stateActionInConfig)
+            switch (action)
             {
                 case ActionInConfig.SwitchWeapon:
                     ret = ThirdPersonAction.SwitchWeapon;
@@ -77,6 +73,22 @@ namespace App.Shared.GameModules.Player.Appearance
                     break;
                 default:
                     ret = ThirdPersonAction.EndOfTheWorld;
+                    break;
+            }
+
+            return ret;
+        }
+
+        public static ThirdPersonMovement GetMovement(MovementInConfig movement)
+        {
+            ThirdPersonMovement ret;
+            switch (movement)
+            {
+                case MovementInConfig.Sprint:
+                    ret = ThirdPersonMovement.Sprint;
+                    break;
+                default:
+                    ret = ThirdPersonMovement.EndOfTheWorld;
                     break;
             }
 

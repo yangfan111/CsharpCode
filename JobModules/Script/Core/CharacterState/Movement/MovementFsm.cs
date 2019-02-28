@@ -47,6 +47,12 @@ namespace Core.CharacterState.Movement
 
         private void ResetMovement(Action<FsmOutput> addOutput)
         {
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.IsWalkHash,
+                AnimatorParametersHash.Instance.IsWalkName,
+                AnimatorParametersHash.Instance.IsWalkDisable,
+                CharacterView.ThirdPerson, false);
+            addOutput(FsmOutput.Cache);
+            
             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MotionHash,
                 AnimatorParametersHash.Instance.MotionName,
                 AnimatorParametersHash.Instance.MotionlessValue,

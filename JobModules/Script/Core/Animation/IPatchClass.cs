@@ -8,7 +8,7 @@ namespace Core.Animation
     {
         void RewindTo(T right);
 
-        bool NeedPatch(T right);
+        bool IsSimilar(T right);
 
        
 

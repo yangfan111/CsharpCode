@@ -10,12 +10,12 @@ namespace App.Shared.GameModules.Player
     public class PlayerDeadAnimSystem : AbstractGamePlaySystem<PlayerEntity>
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerDeadAnimSystem));
-        private IGroup<PlayerEntity> _players;
+        private Contexts _contexts;
 
         public PlayerDeadAnimSystem(Contexts context) : base(context)
         {
+            _contexts = context;
         }
-
 
         protected override IGroup<PlayerEntity> GetIGroup(Contexts contexts)
         {
@@ -30,53 +30,52 @@ namespace App.Shared.GameModules.Player
 
         protected override void OnGamePlay(PlayerEntity playerEntity)
         {
-            var gamePlay = playerEntity.gamePlay;
-            var playerState = playerEntity.stateInterface.State;
-            var playerAppearance = playerEntity.appearanceInterface.Appearance;
-            var characterControllerAppearance = playerEntity.characterControllerInterface.CharacterController;
-
-            if (gamePlay.HasLifeStateChangedFlag())
+            if(null == playerEntity || null == playerEntity.playerGameState ||
+               null == playerEntity.characterControllerInterface) 
+                return;
+            
+            var gameState = playerEntity.playerGameState;
+            switch (gameState.CurrentPlayerLifeState)
             {
-                if (gamePlay.IsLifeState(EPlayerLifeState.Dead))
-                {
-                    _logger.InfoFormat("{0} play die", playerEntity.entityKey);
-                    playerEntity.appearanceInterface.Appearance.SetThridPerson();
-                    playerEntity.appearanceInterface.Appearance.UnmountWeaponFromHandAtOnce();
-                    playerEntity.characterBoneInterface.CharacterBone.SetThridPerson();
-                    playerEntity.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon();
-                    playerAppearance.PlayerDead();
-                    characterControllerAppearance.PlayerDead();
-                    playerEntity.genericActionInterface.GenericAction.PlayerDead(playerEntity);
-                    //playerEntity.RootGo().SendMessage("PlayerDead");
-                    playerEntity.RootGo().BroadcastMessage("PlayerDead");
-                    //playerState.Die();
-                }
-                else if (gamePlay.IsLifeState(EPlayerLifeState.Alive))
-                {
-                    if (gamePlay.IsLastLifeState(EPlayerLifeState.Dying))
-                    {
-                        _logger.InfoFormat("{0} play revive", playerEntity.entityKey);
-                        playerState.Revive();
-                    }
-                    else if (gamePlay.IsLastLifeState(EPlayerLifeState.Dead))
-                    {
-                        _logger.InfoFormat("{0} play rebirth", playerEntity.entityKey);
-                        playerState.PlayerReborn();
-                        playerEntity.genericActionInterface.GenericAction.PlayerReborn(playerEntity);
-                        playerAppearance.PlayerReborn();
-                        characterControllerAppearance.PlayerReborn();
-                        playerEntity.RootGo().BroadcastMessage("PlayerRelive");
-                    }
-                }
-                else if (gamePlay.IsLifeState(EPlayerLifeState.Dying))
-                {
-                    _logger.InfoFormat("{0} play dying", playerEntity.entityKey);
-                    playerState.Dying();
-                    playerEntity.GetController<PlayerWeaponController>().ForceUnmountCurrWeapon();
-                }
+                case PlayerLifeStateEnum.Reborn:
+                    Reborn(playerEntity);
+                    break;
+                case PlayerLifeStateEnum.Revive:
+                    Revive(playerEntity);
+                    break;
+                case PlayerLifeStateEnum.Dying:
+                    Dying(playerEntity);
+                    break;
+                case PlayerLifeStateEnum.Dead:
+                    Dead(playerEntity);
+                    break;
             }
+        }
+        
+        private void Reborn(PlayerEntity player)
+        {
+            _logger.InfoFormat("{0} play rebirth", player.entityKey);                   
+            player.characterControllerInterface.CharacterController.PlayerReborn();
+        }
 
-            gamePlay.ClearLifeStateChangedFlag();
+        private void Dead(PlayerEntity player)
+        {
+            _logger.InfoFormat("{0} play die", player.entityKey);
+                    
+            player.WeaponController().ForceUnArmHeldWeapon();
+            player.characterControllerInterface.CharacterController.PlayerDead();
+            _logger.InfoFormat("PlayerDeadAnimDead");
+        }
+
+        private void Dying(PlayerEntity player)
+        {
+            _logger.InfoFormat("{0} play dying", player.entityKey);
+            player.WeaponController().ForceUnArmHeldWeapon();
+        }
+
+        private void Revive(PlayerEntity player)
+        {
+            _logger.InfoFormat("{0} play revive", player.entityKey);
         }
     }
 }

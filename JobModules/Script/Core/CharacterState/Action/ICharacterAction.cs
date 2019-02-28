@@ -25,6 +25,10 @@ namespace Core.CharacterState.Action
 
         void SetDiveUpDownValue(float value);
 
+        void SetPostureStand();
+        void SetPostureCrouch();
+        void SetPostureProne();
+
         void Stand();
         void Crouch();
         void Rescue();
@@ -33,6 +37,8 @@ namespace Core.CharacterState.Action
         void Dive();
         void Ashore();
         void Freefall();
+        void Slide();
+        void SlideEnd();
 
         void DriveStart(int seatId, int postureId);
         void DriveEnd();

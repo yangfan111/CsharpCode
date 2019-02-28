@@ -24,10 +24,17 @@ namespace Core.CharacterState.Movement
             state.AddTransition(
                 (command, addOutput) =>
                 {
-                    var ret = command.IsMatch(FsmInput.Walk) || command.IsMatch(FsmInput.Run) || command.IsMatch(FsmInput.Sprint);
+                    var walkRet = command.IsMatch(FsmInput.Walk);
+                    var runRet = command.IsMatch(FsmInput.Run) || command.IsMatch(FsmInput.Sprint);
                     
-                    if (ret)
+                    if (walkRet || runRet)
                     {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.IsWalkHash,
+                            AnimatorParametersHash.Instance.IsWalkName,
+                            walkRet,
+                            CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+                        
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MotionHash,
                                                  AnimatorParametersHash.Instance.MotionName,
                                                  AnimatorParametersHash.Instance.MotionValue,
@@ -42,7 +49,7 @@ namespace Core.CharacterState.Movement
 
                         command.Handled = true;
                     }
-                    return ret;
+                    return walkRet || runRet;
                 },
                 (command, addOutput) =>
                 {

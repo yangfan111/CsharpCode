@@ -1,11 +1,13 @@
 ﻿using App.Shared.EntityFactory;
 using App.Shared.Player;
 using App.Shared.Util;
+using App.Shared.WeaponLogic;
 using Assets.Utils.Configuration;
 using Core;
 using Core.Common;
 using Core.GameModeLogic;
 using Core.WeaponLogic.Attachment;
+using UnityEngine;
 using Utils.Appearance;
 using Utils.Singleton;
 using Utils.Utils;
@@ -128,10 +130,15 @@ namespace App.Shared.GameModules.Weapon
         {
             ProcessListener.OnPickup(entity, slot);
         }
+        public GameObject WeaponHandObject()
+        {
+            return entity.appearanceInterface.Appearance.GetWeaponP1InHand();
+        }
         public int Model_GetReserveBullet(EWeaponSlotType slot)
         {
             return entity.modeLogic.ModeLogic.GetReservedBullet(entity, slot);
         }
+        
         public int Model_GetReserveBullet(EBulletCaliber caliber)
         {
             return entity.modeLogic.ModeLogic.GetReservedBullet(entity, caliber);
@@ -152,21 +159,18 @@ namespace App.Shared.GameModules.Weapon
         {
             ProcessListener.OnExpend(entity, slot);
         }
-        public void Player_ClearPlayerWeaponState()
+        public void Player_ClearPlayerWeaponState(Contexts contexts)
         {
-            entity.ClearPlayerWeaponState();
+            entity.ClearPlayerWeaponState(contexts);
         }
-        public void Player_RefreshPlayerWeaponLogic(int id )
+        public void Player_RefreshPlayerWeaponLogic(Contexts contexts, int id)
         {
-            entity.RefreshPlayerWeaponLogic(id);
+            entity.RefreshPlayerWeaponLogic(contexts, id);
         }
-        public void Weapon_SetAttachment(WeaponPartsStruct attachments)
+        public void Apperance_RefreshABreath(Contexts contexts)
         {
-            entity.weaponLogic.Weapon.SetAttachment(attachments);
-        }
-        public void Apperance_RefreshABreath()
-        {
-            var breath = entity.weaponLogic.Weapon.GetBreathFactor();
+            //TODO 动态获取
+            var breath = entity.GetWeaponConfig(contexts).GetBreathFactor();
             entity.appearanceInterface.FirstPersonAppearance.SightShift.SetAttachmentFactor(breath);
         }
         public void Model_RefreshWeaponModel(int weaponId,EWeaponSlotType slot,WeaponPartsStruct attachments)
@@ -200,7 +204,7 @@ namespace App.Shared.GameModules.Weapon
             var pull = entity.throwingAction.ActionInfo.IsPull;
             var destroy = entity.throwingAction.ActionInfo.IsInterrupt;
             var fly = entity.throwingUpdate.IsStartFly;
-            bool ret = (pull && !destroy && !fly);
+            bool ret = (!pull && !destroy && !fly);
             return ret ? Err_WeaponLogicErrCode.Sucess : Err_WeaponLogicErrCode.Err_PlayerGrenadePullVertifyFailed;
         }
     }

@@ -1,17 +1,13 @@
 ﻿using App.Shared.Components.Player;
-using App.Shared.Configuration;
 using App.Shared.GameModules.Player;
 using App.Shared.Player;
 using Core.Components;
 using Core.EntityComponent;
 using Core.Enums;
-using Core.GameHandler;
 using Core.GameModule.Interface;
-using Core.GameModule.System;
 using Core.GameTime;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using EVP;
 using UnityEngine;
 
 namespace App.Shared.GameModules.Vehicle
@@ -19,15 +15,15 @@ namespace App.Shared.GameModules.Vehicle
     public class VehicleRideSystem : IUserCmdExecuteSystem
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(VehicleRideSystem));
-        private VehicleContext _context;
+        private VehicleContext _vehicleContext;
         private const float MaxVehicleEnterDistance = 5f;
         private ICurrentTime _currentTime;
+        private Contexts _contexts;
         public VehicleRideSystem(Contexts contexts)
         {
-            _context = contexts.vehicle;
-            
-           
-                _currentTime = contexts.session.currentTimeObject;
+            _vehicleContext = contexts.vehicle;
+            _contexts = contexts;
+            _currentTime = contexts.session.currentTimeObject;
         }
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
@@ -56,7 +52,7 @@ namespace App.Shared.GameModules.Vehicle
                 }
                 else
                 {
-                    RideOffVehicle(playerEntity);
+                    RideOffVehicle( playerEntity);
                 }
             }
             else if (cmd.ChangedSeat > 0)
@@ -95,7 +91,7 @@ namespace App.Shared.GameModules.Vehicle
         {
             if(CheckRideOnVehicle(playerEntity)){
 
-                var vehicle = _context.GetEntityWithEntityKey(new EntityKey(vehicleEntityId, (short)EEntityType.Vehicle));
+                var vehicle = _vehicleContext.GetEntityWithEntityKey(new EntityKey(vehicleEntityId, (short)EEntityType.Vehicle));
                 if(DistanceTooLarge(playerEntity, vehicle))
                 {
                     Logger.Error("player is too far away from vehicle , wrong logic or client is cheating");
@@ -106,7 +102,7 @@ namespace App.Shared.GameModules.Vehicle
                     var preferedSeat = seatId;
                     if (!vehicle.vehicleSeat.IsOccupied(seatId))
                     {
-                        playerEntity.playerMove.InterruptAutoRun();
+                        playerEntity.autoMoveInterface.PlayerAutoMove.StopAutoMove();
                         RideOnVehicle(playerEntity, vehicle, preferedSeat);
                     }
                     else
@@ -149,18 +145,18 @@ namespace App.Shared.GameModules.Vehicle
                 return;
             }
 
-            var rigidBody = vehicle.gameObject.UnityObjWrapper.Value.GetComponent<Rigidbody>();
+            var rigidBody = vehicle.gameObject.UnityObject.AsGameObject.GetComponent<Rigidbody>();
             playerEntity.controlledVehicle.RideOn(preferedSeat, vehicle.entityKey.Value, rigidBody, _currentTime.CurrentTime);
             CheckAndAddOwnerId(vehicle, playerEntity);
             SetPositionInterpolateMode(playerEntity);
-            playerEntity.SetCharacterStateWithVehicle(_context);
+            playerEntity.SetCharacterStateWithVehicle(_contexts, _vehicleContext);
         }
 
         private void RideOffVehicle(PlayerEntity playerEntity)
         {
             if (playerEntity.IsOnVehicle())
             {
-                var vehicle = _context.GetEntityWithEntityKey(playerEntity.controlledVehicle.EntityKey);
+                var vehicle = _vehicleContext.GetEntityWithEntityKey(playerEntity.controlledVehicle.EntityKey);
                 if (vehicle == null)
                 {
                     return;
@@ -177,7 +173,7 @@ namespace App.Shared.GameModules.Vehicle
             }
 
             playerEntity.controlledVehicle.RideOff(_currentTime.CurrentTime);
-            playerEntity.SetCharacterStateWithVehicle(_context);
+            playerEntity.SetCharacterStateWithVehicle(_contexts, _vehicleContext);
         }
 
         private void SetPositionInterpolateMode(PlayerEntity playerEntity)
@@ -243,7 +239,7 @@ namespace App.Shared.GameModules.Vehicle
         private bool RideOffFromLeft(PlayerEntity playerEntity, VehicleEntity vehicleEntity)
         {
 
-            var vehicle = vehicleEntity.gameObject.UnityObjWrapper.Value;
+            var vehicle = vehicleEntity.gameObject.UnityObject.AsGameObject;
             var direction = -vehicle.transform.right;
 
             return RideOffFromDirection(playerEntity, vehicleEntity, direction); ;
@@ -251,7 +247,7 @@ namespace App.Shared.GameModules.Vehicle
 
         private bool RideOffFromRight(PlayerEntity playerEntity, VehicleEntity vehicleEntity)
         {
-            var vehicle = vehicleEntity.gameObject.UnityObjWrapper.Value;
+            var vehicle = vehicleEntity.gameObject.UnityObject.AsGameObject;
             var direction = vehicle.transform.right;
 
             return RideOffFromDirection(playerEntity, vehicleEntity, direction); ;
@@ -259,7 +255,7 @@ namespace App.Shared.GameModules.Vehicle
 
         private bool RideOffFromFront(PlayerEntity playerEntity, VehicleEntity vehicleEntity)
         {
-            var vehicle = vehicleEntity.gameObject.UnityObjWrapper.Value;
+            var vehicle = vehicleEntity.gameObject.UnityObject.AsGameObject;
             var direction = vehicle.transform.forward;
 
             return RideOffFromDirection(playerEntity, vehicleEntity, direction); ;
@@ -267,7 +263,7 @@ namespace App.Shared.GameModules.Vehicle
 
         private bool RideOffFromBack(PlayerEntity playerEntity, VehicleEntity vehicleEntity)
         {
-            var vehicle = vehicleEntity.gameObject.UnityObjWrapper.Value;
+            var vehicle = vehicleEntity.gameObject.UnityObject.AsGameObject;
             var direction = -vehicle.transform.forward;
 
             return RideOffFromDirection(playerEntity, vehicleEntity, direction); ;
@@ -308,7 +304,7 @@ namespace App.Shared.GameModules.Vehicle
             }
 
             var vehicleComp = playerEntity.controlledVehicle;
-            var vehicle = _context.GetEntityWithEntityKey(vehicleComp.EntityKey);
+            var vehicle = _vehicleContext.GetEntityWithEntityKey(vehicleComp.EntityKey);
             if (vehicle == null)
             {
                 return;
@@ -336,7 +332,7 @@ namespace App.Shared.GameModules.Vehicle
             CheckAndRemoveOwnerId(vehicle, originSeat);
             CheckAndAddOwnerId(vehicle, playerEntity);
 
-            playerEntity.DriveStart(seat, vehicle.vehicleAssetInfo.PostureId);
+            playerEntity.DriveStart(_contexts, seat, vehicle.vehicleAssetInfo.PostureId);
         }
 
         private int GetSeatIdFromCmdSeatIndex(VehicleEntity vehicle, int seatIndex)

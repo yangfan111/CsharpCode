@@ -10,6 +10,7 @@ using App.Shared.Components.Player;
 using Core.Utils;
 using XmlConfig;
 using Utils.Appearance;
+using Utils.AssetManager;
 
 namespace App.Shared.GameModules.Player.Appearance.WeaponControllerPackage
 {
@@ -123,6 +124,11 @@ namespace App.Shared.GameModules.Player.Appearance.WeaponControllerPackage
             value.AlternativeWeaponLocator = GetPredictedWeaponValue(PredictedWeaponStateIndex.AlternativeWeaponLocator);
             value.AlternativeP3WeaponLocator = GetPredictedWeaponValue(PredictedWeaponStateIndex.AlternativeP3WeaponLocator);
             value.ReloadState = GetPredictedWeaponValue(PredictedWeaponStateIndex.ReloadState);
+        }
+
+        protected override AbstractLoadRequest CreateLoadRequest(AssetInfo assetInfo, ILoadedHandler loadedHanlder)
+        {
+            return LoadRequestFactory.Create<PlayerEntity>(assetInfo, loadedHanlder.OnLoadSucc);
         }
 
         #endregion

@@ -89,9 +89,10 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
         private static bool CanPitchHand()
         {
-            if (Player.weaponState.CurrentWeaponSlot != (int)EWeaponSlotType.PrimeWeapon1 &&
-                Player.weaponState.CurrentWeaponSlot != (int)EWeaponSlotType.PrimeWeapon2 &&
-                Player.weaponState.CurrentWeaponSlot != (int)EWeaponSlotType.SubWeapon)
+            var heldType = Player.WeaponController().HeldSlotType;
+            if (heldType != EWeaponSlotType.PrimeWeapon &&
+                heldType != EWeaponSlotType.SecondaryWeapon &&
+                heldType != EWeaponSlotType.PistolWeapon)
                 return false;
             var actionState = Player.stateInterface.State.GetActionState();
             var postureState = Player.stateInterface.State.GetCurrentPostureState();

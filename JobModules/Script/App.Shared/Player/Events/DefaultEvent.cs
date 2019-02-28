@@ -35,7 +35,7 @@ namespace App.Shared.Player.Events
 
         public abstract void DoEventClient( Entitas.IContexts contexts, IEntity entity, IEvent e);
 
-        public void DoEventServer( Entitas.IContexts contexts, IEntity entity, IEvent e)
+        public virtual void DoEventServer( Entitas.IContexts contexts, IEntity entity, IEvent e)
         {
             var playerEntity = entity as PlayerEntity;
             if (playerEntity != null)

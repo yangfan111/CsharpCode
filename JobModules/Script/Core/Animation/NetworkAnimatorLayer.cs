@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.IO;
 using Core.Compare;
 using Core.SnapshotReplication.Serialization.Serializer;
@@ -15,6 +14,7 @@ namespace Core.Animation
         private BitArrayWrapper _bitArray;
         public const int PlayerSyncLayer = 1;
         public const int PlayerUpperBodyOverlayLayer = 4;
+        public const int PlayerUpperBodyAddLayer = 5;
         public const int FirstPersonIKPassLayer = 3;
         public const int ThirdPersonIKPassLayer = 8;
 
@@ -58,7 +58,7 @@ namespace Core.Animation
             RewindTo(right);
         }
 
-        public bool NeedPatch(NetworkAnimatorLayer right)
+        public bool IsSimilar(NetworkAnimatorLayer right)
         {
             return IsApproximatelyEqual(right);
         }

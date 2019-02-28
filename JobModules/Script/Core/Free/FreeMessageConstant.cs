@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Core.Free
 {
@@ -20,6 +17,15 @@ namespace Core.Free
         public const int DragImage = 5;
         public const int DebugData = 6;
         public const int SplitItem = 7;
+        public const int ObservePlayer = 8;
+
+        public const int MSG_SEE_ALL = 43;
+        public const int CONFIG_ALLOW_MOUSE_KEYS = 44;
+        public const int FROG_EFFECT = 45;
+        public const int CHANGE_SKYBOX = 46;
+        public const int LIGHTMAP = 47;
+        public const int PVS = 48;
+        public const int BLOOD_SPAY = 49;
 
         public const int MSG_UI_CREATE = 50;
         public const int MSG_UI_SHOW = 51;
@@ -59,10 +65,14 @@ namespace Core.Free
 		public const int PlayerCmd = 105;
         public const int PlayerAnimation = 106;
 		public const int BlastScoreUI = 107;
-
+        public const int ChangeWeapon = 108;
         public const int CommonRoundOverUI = 109;
         public const int CountDownTipUI = 110;
         public const int ResetBattleData = 111;
+        public const int BombAreaMarkUI = 112;
+        public const int BombDropTipUI = 113;
+        public const int RevengeTagUI = 114;
+        public const int FetchUIValue = 113;
 
         private static Dictionary<int, string> MessageDesc = new Dictionary<int, string>();
 

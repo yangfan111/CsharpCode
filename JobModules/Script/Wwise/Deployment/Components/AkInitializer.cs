@@ -5,94 +5,19 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-[UnityEngine.AddComponentMenu("Wwise/AkInitializer")]
-[UnityEngine.RequireComponent(typeof(AkTerminator))]
+[UnityEngine.AddComponentMenu ("Wwise/AkInitializer")]
 [UnityEngine.DisallowMultipleComponent]
 //[UnityEngine.ExecuteInEditMode]
-/// This script deals with initialization, and frame updates of the Wwise audio engine.  
-/// It is marked as \c DontDestroyOnLoad so it stays active for the life of the game, 
-/// not only one scene. You can, and probably should, modify this script to change the 
-/// initialization parameters for the sound engine. A few are already exposed in the property inspector.
-/// It must be present on one Game Object at the beginning of the game to initialize the audio properly.
-/// It must be executed BEFORE any other MonoBehaviors that use AkSoundEngine.
-/// \sa
-/// - <a href="https://www.audiokinetic.com/library/edge/?source=SDK&id=workingwithsdks__initialization.html" target="_blank">Initialize the Different Modules of the Sound Engine</a> (Note: This is described in the Wwise SDK documentation.)
-/// - <a href="https://www.audiokinetic.com/library/edge/?source=SDK&id=namespace_a_k_1_1_sound_engine_a27257629833b9481dcfdf5e793d9d037.html#a27257629833b9481dcfdf5e793d9d037" target="_blank">AK::SoundEngine::Init()</a> (Note: This is described in the Wwise SDK documentation.)
-/// - <a href="https://www.audiokinetic.com/library/edge/?source=SDK&id=namespace_a_k_1_1_sound_engine_a9176602bbe972da4acc1f8ebdb37f2bf.html#a9176602bbe972da4acc1f8ebdb37f2bf" target="_blank">AK::SoundEngine::Term()</a> (Note: This is described in the Wwise SDK documentation.)
-/// - AkCallbackManager
 public class AkInitializer : UnityEngine.MonoBehaviour
 {
-    #region Public Data Members
-    [UnityEngine.HideInInspector]
-    ///Path for the soundbanks. This must contain one sub folder per platform, with the same as in the Wwise project.
-   // public string basePath = AkSoundEngineController.s_DefaultBasePath;
-
-    /// Language sub-folder.
-    public string language = AkSoundEngineController.s_Language;
-
-	///Default Pool size.  This contains the meta data for your audio project.  Default size is 4 MB, but you should adjust for your needs.
-	public int defaultPoolSize = AkSoundEngineController.s_DefaultPoolSize;
-
-	///Lower Pool size.  This contains the audio processing buffers and DSP data.  Default size is 2 MB, but you should adjust for your needs.
-	public int lowerPoolSize = AkSoundEngineController.s_LowerPoolSize;
-
-	///Streaming Pool size.  This contains the streaming buffers.  Default size is 1 MB, but you should adjust for your needs.
-	public int streamingPoolSize = AkSoundEngineController.s_StreamingPoolSize;
-
-	///Prepare Pool size.  This contains the banks loaded using PrepareBank (Banks decoded on load use this).  Default size is 0 MB, but you should adjust for your needs.
-	public int preparePoolSize = AkSoundEngineController.s_PreparePoolSize;
-
-	///This setting will trigger the killing of sounds when the memory is reaching 95% of capacity.  Lowest priority sounds are killed.
-	public float memoryCutoffThreshold = AkSoundEngineController.s_MemoryCutoffThreshold;
-
-	///Monitor Pool size.  Size of the monitoring pool, in bytes. This parameter is not used in Release build.
-	public int monitorPoolSize = AkSoundEngineController.s_MonitorPoolSize;
-
-	///Monitor Queue Pool size.  Size of the monitoring queue pool, in bytes. This parameter is not used in Release build.
-	public int monitorQueuePoolSize = AkSoundEngineController.s_MonitorQueuePoolSize;
-
-	///CallbackManager buffer size.  The size of the buffer used per-frame to transfer callback data. Default size is 4 KB, but you should increase this, if required.
-	public int callbackManagerBufferSize = AkSoundEngineController.s_CallbackManagerBufferSize;
-
-	///Spatial Audio Lower Pool size.  Default size is 4 MB, but you should adjust for your needs.
-	public int spatialAudioPoolSize = AkSoundEngineController.s_SpatialAudioPoolSize;
-
-	[UnityEngine.Range(0, AkSoundEngine.AK_MAX_SOUND_PROPAGATION_DEPTH)]
-	/// Spatial Audio Max Sound Propagation Depth. Maximum number of rooms that sound can propagate through; must be less than or equal to AK_MAX_SOUND_PROPAGATION_DEPTH.
-	public uint maxSoundPropagationDepth = AkSoundEngine.AK_MAX_SOUND_PROPAGATION_DEPTH;
-
-	[UnityEngine.Tooltip("Default Diffraction Flags combine all the diffraction flags")]
-	/// Enable or disable specific diffraction features. See AkDiffractionFlags.
-	public AkDiffractionFlags diffractionFlags = AkDiffractionFlags.DefaultDiffractionFlags;
-
-	///Enable Wwise engine logging. Option to turn on/off the logging of the Wwise engine.
-	public bool engineLogging = AkSoundEngineController.s_EngineLogging;
-
-	#endregion
-
 	private static AkInitializer ms_Instance;
 
-	public static string GetBasePath()
-	{
-        return AudioPluginSettingAgent.GetBankAssetFolder();
-        //        return WwiseSettings.LoadSettings().SoundbankPath;
-        //#if UNITY_EDITOR
-        //        return WwiseSettings.LoadSettings().SoundbankPath;
-        //#else
-        //		return AkSoundEngineController.Instance.basePath;
-        //#endif
-    }
+	private AkPluginSettingsContainer InitializationSettings;
 
-	public static string GetCurrentLanguage()
+	private void Awake ()
 	{
-		return AkSoundEngineController.Instance.language;
-	}
-
-	private void Awake()
-	{
-		if (ms_Instance)
-		{
-			DestroyImmediate(this);
+		if (ms_Instance) {
+			DestroyImmediate (this);
 			return;
 		}
 
@@ -103,61 +28,140 @@ public class AkInitializer : UnityEngine.MonoBehaviour
 			return;
 #endif
 
-		DontDestroyOnLoad(this);
+		DontDestroyOnLoad (this);
 	}
 
-	private void OnEnable()
+	private void OnEnable ()
 	{
-        UnityEngine.Debug.Log("Enable");
-        
-        if (ms_Instance == this)
-        {
-            AkSoundEngineController.Instance.Init(this);
-          //  gameObject.SendMessage("OnWiseEngineStartupReady", this, UnityEngine.SendMessageOptions.DontRequireReceiver);
-        }
-	}
-    private void Start()
-    {
-        UnityEngine.Debug.Log("Start");
-    }
+		InitializationSettings = AkPluginSettingsContainer.Instance;
 
-    private void OnDisable()
+		if (ms_Instance == this)
+			AkSoundEngineController.Instance.Init (this);
+	}
+
+	private void OnDisable ()
 	{
-        UnityEngine.Debug.Log("Disable");
-        if (ms_Instance == this)
-			AkSoundEngineController.Instance.OnDisable();
+		if (ms_Instance == this)
+			AkSoundEngineController.Instance.OnDisable ();
 	}
 
-	private void OnDestroy()
+	private void OnDestroy ()
 	{
 		if (ms_Instance == this)
 			ms_Instance = null;
 	}
 
-	private void OnApplicationPause(bool pauseStatus)
+	private void OnApplicationPause (bool pauseStatus)
 	{
 		if (ms_Instance == this)
-			AkSoundEngineController.Instance.OnApplicationPause(pauseStatus);
+			AkSoundEngineController.Instance.OnApplicationPause (pauseStatus);
 	}
 
-	private void OnApplicationFocus(bool focus)
+	private void OnApplicationFocus (bool focus)
 	{
 		if (ms_Instance == this)
-			AkSoundEngineController.Instance.OnApplicationFocus(focus);
+			AkSoundEngineController.Instance.OnApplicationFocus (focus);
 	}
 
-	private void OnApplicationQuit()
+	private void OnApplicationQuit ()
 	{
-        UnityEngine.Debug.Log("Quit");
-        if (ms_Instance == this)
-			AkSoundEngineController.Instance.Terminate();
+		if (ms_Instance == this)
+			AkSoundEngineController.Instance.Terminate ();
 	}
 
 	//Use LateUpdate instead of Update() to ensure all gameobjects positions, listener positions, environements, RTPC, etc are set before finishing the audio frame.
-	private void LateUpdate()
+	private void LateUpdate ()
 	{
 		if (ms_Instance == this)
-			AkSoundEngineController.Instance.LateUpdate();
+			AkSoundEngineController.Instance.LateUpdate ();
 	}
+
+	#region WwiseMigration
+
+	#if UNITY_EDITOR
+	#pragma warning disable 0414 // private field assigned but not used.
+
+	// previously serialized data that will be consumed by migration
+	//[UnityEngine.HideInInspector][UnityEngine.SerializeField] private string basePath;
+	[UnityEngine.HideInInspector][UnityEngine.SerializeField] private string language;
+	[UnityEngine.HideInInspector][UnityEngine.SerializeField] private int defaultPoolSize;
+	[UnityEngine.HideInInspector][UnityEngine.SerializeField] private int lowerPoolSize;
+	[UnityEngine.HideInInspector][UnityEngine.SerializeField] private int streamingPoolSize;
+	[UnityEngine.HideInInspector][UnityEngine.SerializeField] private int preparePoolSize;
+	[UnityEngine.HideInInspector][UnityEngine.SerializeField] private float memoryCutoffThreshold;
+	[UnityEngine.HideInInspector][UnityEngine.SerializeField] private int monitorPoolSize;
+	[UnityEngine.HideInInspector][UnityEngine.SerializeField] private int monitorQueuePoolSize;
+	[UnityEngine.HideInInspector][UnityEngine.SerializeField] private int callbackManagerBufferSize;
+	[UnityEngine.HideInInspector][UnityEngine.SerializeField] private int spatialAudioPoolSize;
+	[UnityEngine.HideInInspector][UnityEngine.SerializeField] private uint maxSoundPropagationDepth;
+	[UnityEngine.HideInInspector][UnityEngine.SerializeField] private AkDiffractionFlags diffractionFlags;
+	[UnityEngine.HideInInspector][UnityEngine.SerializeField] private bool engineLogging;
+
+	#pragma warning restore 0414 // private field assigned but not used.
+
+	private class Migration15Data
+	{
+		bool hasMigrated = false;
+
+		public void Migrate (AkInitializer akInitializer)
+		{
+			if (hasMigrated)
+				return;
+
+			var initializationSettings = akInitializer.InitializationSettings;
+			if (!initializationSettings) {
+				initializationSettings = AkPluginSettingsContainer.Instance;
+				if (!initializationSettings)
+					return;
+			}
+
+			//	initializationSettings.UserSettings.m_EditorBasePath = akInitializer.basePath;
+			initializationSettings.UserSettings.m_StartupLanguage = akInitializer.language;
+			initializationSettings.UserSettings.m_DefaultPoolSize = (uint)akInitializer.defaultPoolSize * 1024;
+			initializationSettings.UserSettings.m_LowerEnginePoolSize = (uint)akInitializer.lowerPoolSize * 1024;
+			initializationSettings.UserSettings.m_StreamManagerPoolSize = (uint)akInitializer.streamingPoolSize * 1024;
+			initializationSettings.UserSettings.m_PreparePoolSize = (uint)akInitializer.preparePoolSize * 1024;
+			initializationSettings.UserSettings.m_LowerEngineMemoryCutoffThreshold = akInitializer.memoryCutoffThreshold;
+
+			initializationSettings.AdvancedSettings.m_MonitorPoolSize = (uint)akInitializer.monitorPoolSize * 1024;
+			initializationSettings.AdvancedSettings.m_MonitorQueuePoolSize = (uint)akInitializer.monitorQueuePoolSize * 1024;
+
+			initializationSettings.CallbackManagerInitializationSettings.BufferSize = akInitializer.callbackManagerBufferSize * 1024;
+
+			initializationSettings.AkSpatialAudioInitSettings.uPoolSize = (uint)akInitializer.spatialAudioPoolSize * 1024;
+			initializationSettings.AkSpatialAudioInitSettings.uMaxSoundPropagationDepth = akInitializer.maxSoundPropagationDepth;
+			initializationSettings.AkSpatialAudioInitSettings.uDiffractionFlags = (uint)akInitializer.diffractionFlags;
+
+			initializationSettings.CallbackManagerInitializationSettings.IsLoggingEnabled = akInitializer.engineLogging;
+
+			UnityEditor.EditorUtility.SetDirty (initializationSettings);
+			UnityEditor.AssetDatabase.SaveAssets ();
+
+			UnityEngine.Debug.Log ("WwiseUnity: Converted from AkInitializer to AkPluginSettingsContainer.");
+			hasMigrated = true;
+		}
+	}
+
+	private static Migration15Data migration15data;
+
+	public static void PreMigration15 ()
+	{
+		migration15data = new Migration15Data ();
+	}
+
+	public void Migrate15 ()
+	{
+		UnityEngine.Debug.Log ("WwiseUnity: AkInitializer.Migrate15 for " + gameObject.name);
+
+		if (migration15data != null)
+			migration15data.Migrate (this);
+	}
+
+	public static void PostMigration15 ()
+	{
+		migration15data = null;
+	}
+	#endif
+	#endregion
 }
 #endif // #if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.

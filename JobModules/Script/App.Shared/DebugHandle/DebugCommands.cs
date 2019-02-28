@@ -51,11 +51,13 @@
         public const string ShowServerVehicle = "ServerVehicle";
         public const string ResetVehicle = "ResetVehicle";
         public const string EnableVehicleCull = "VCull";
+        public const string SetVehicleActiveUpdateRate = "ActiveUpdateRate";
 
         public const string SetCurBullet = "sb";
         public const string SetReservedBullet = "srb";
 
         public const string SetWeapon = "sw";
+        public const string SetGrenade = "sg";
         public const string DropWeapon = "dw";
         public const string TestWeaponAssemble = "twa";
 
@@ -77,8 +79,12 @@
         public const string PrintEntity = "printEntity";
         public const string ListEntity = "listEntity";
         public const string CountEntity = "countEntity";
-        
+
         public const string ShowAniInfo = "ShowAniInfo";
+        public const string DebugAnimation = "DebugAnimation";
+        public const string ShowBox = "ShowBox";
+        public const string ShowGround = "ShowGround";
+        public const string SlideOff = "EnableSlide";
 
 
         public const string ClientMove = "m";
@@ -121,7 +127,23 @@
 
         public const string ForbidSystem = "stopsys";
         public const string PermitSystem = "startsys";
-        public const string ShowSystem = "sys";    }
+        public const string ShowSystem = "sys";
+
+        public const string ListTriggerObj = "mapObj";
+
+        public const string GetVisibleRenders = "getvisiblerenders";
+        public static string CustomProfile = "customProfile";
+
+        public const string WoodToggle = "woodtoggle";
+        public const string WoodResetTrees = "woodresettrees";
+        public const string WoodResetDetails = "woodresetdetails";
+        public const string WoodDecreaseTrees = "wooddecreasetrees";
+        public const string WoodDecreaseDetails = "wooddecreasedetails";
+        public const string WoodGetTrees = "woodgettrees";
+        public const string WoodPostFxProfile = "woodpostfxprofile";
+
+        public const string ShowVideoSetting = "video";
+    }
 
     public interface IDebugCommandHandler
     {

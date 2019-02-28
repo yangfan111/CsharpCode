@@ -47,5 +47,9 @@ namespace App.Shared.Components.Ui
         /// 是否是当前玩家的统计信息
         /// </summary>
         bool IsMySelf { get; set; }
+
+        int C4PlantCount { get; set; }
+        int C4DefuseCount { get; set; }
+        bool HaveC4 { get; set; }
     }
 }

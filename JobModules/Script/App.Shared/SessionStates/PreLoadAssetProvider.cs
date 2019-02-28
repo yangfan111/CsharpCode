@@ -15,11 +15,7 @@ namespace App.Shared.SessionStates
 
         private static readonly List<AssetInfo> CommonPreLoadAsset = new List<AssetInfo>()
         {
-            new AssetInfo
-            {
-                BundleName = "equipment/parachute",
-                AssetName = "I002",
-            }
+           
         };
 
         private ICommonSessionObjects _commonSessionObjects;

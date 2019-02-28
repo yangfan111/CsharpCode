@@ -12,18 +12,15 @@ using Assets.Utils.Configuration;
 using Core.GameInputFilter;
 using Assets.XmlConfig;
 using Core.Common;
-using com.wd.free.para;
 using com.wd.free.@event;
-using App.Server.GameModules.GamePlay.free.player;
-using App.Shared.FreeFramework.framework.trigger;
 using App.Shared.FreeFramework.framework.@event;
 using Utils.Singleton;
 using App.Shared.GameModules.Weapon;
-using App.Shared.Util;
 
 namespace App.Shared.GameModules.GamePlay.SimpleTest
 {
-    public class SimpleLoadBulletSystem : ReactiveGamePlaySystem<PlayerEntity>, IUserCmdExecuteSystem, IOnGuiSystem
+    //TODO 移到firelogic
+    public class SimpleLoadBulletSystem : IUserCmdExecuteSystem
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(SimpleLoadBulletSystem));
 
@@ -32,79 +29,63 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
         private Contexts _contexts;
         private ICommonSessionObjects _sessonObjects;
 
-        protected override ICollector<PlayerEntity> GetTrigger(IContext<PlayerEntity> context)
-        {
-            return context.CreateCollector(PlayerMatcher.AllOf(PlayerMatcher.GamePlay, PlayerMatcher.PlayerWeaponState));
-        }
-
-        protected override bool Filter(PlayerEntity entity)
-        {
-            return entity.hasGamePlay && entity.hasPlayerWeaponState && entity.isFlagSelf && entity.hasWeaponLogic;
-        }
-
-        public SimpleLoadBulletSystem(Contexts contexts, ICommonSessionObjects sessionObjects) : base(contexts.player)
+        public SimpleLoadBulletSystem(Contexts contexts, ICommonSessionObjects sessionObjects)
         {
             this._contexts = contexts;
             this._sessonObjects = sessionObjects;
         }
 
-        public override void SingleExecute(PlayerEntity entity)
-        {
-            entity.weaponLogic.State.LoadedBulletCount = entity.weaponLogic.State.BulletCountLimit;
-        }
-
-
-
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             PlayerEntity player = (PlayerEntity)owner.OwnerEntity;
+            PlayerWeaponController controller = player.WeaponController();
             if (cmd.IsReload)// && cmd.FilteredInput.IsInput(EPlayerInput.IsReload))
             {
                 if (!cmd.FilteredInput.IsInput(EPlayerInput.IsReload) && !player.playerMove.IsAutoRun)
                 {
                     return;
                 }
-                if (!player.hasWeaponComponentAgent)
-                    return;
-                ISharedPlayerWeaponComponentGetter sharedAPI = player.GetController<PlayerWeaponController>();
-            
-                WeaponInfo currWeapon = sharedAPI.CurrSlotWeaponInfo;
-                var config = SingletonManager.Get<WeaponConfigManager>().GetConfigById(currWeapon.Id);
+
+                var heldAgent = controller.HeldWeaponAgent;
+                if (!heldAgent.IsVailed()) return;
+                var config = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(controller.HeldWeaponAgent.ConfigId);
                 if (NoReloadAction(config))
                 {
                     return;
                 }
-                if (MagazineIsFull(player.weaponLogic.State, currWeapon.Bullet))
+                var commonfireConfig = heldAgent.CommonFireCfg;
+                if (commonfireConfig == null) return;
+                if (heldAgent.BaseComponent.Bullet >= heldAgent.CommonFireCfg.MagazineCapacity)
                 {
                     return;
                 }
-                if (HasNoReservedBullet(sharedAPI, player))
+                if (HasNoReservedBullet(controller, player))
                 {
                     return;
                 }
                 if (!_reloading)
                 {
-                    player.weaponLogic.WeaponSound.PlaySound(EWeaponSoundType.ClipDrop);
+                    player.PlayWeaponSound(EWeaponSoundType.ClipDrop);
                     _reloading = true;
                 }
-                var weaponState = player.weaponLogic.State;
-                var reloadSpeed = weaponState.ReloadSpeed;
+
+                var reloadSpeed = heldAgent.ReloadSpeed;
                 reloadSpeed = Mathf.Max(0.1f, reloadSpeed);
 
-                player.playerMove.InterruptAutoRun();
+                player.autoMoveInterface.PlayerAutoMove.StopAutoMove();
 
                 player.animatorClip.ClipManager.SetReloadSpeedBuff(reloadSpeed);
-                if (weaponState.SpecialReloadCount > 0)
+                if (commonfireConfig.SpecialReloadCount > 0)
                 {
-                    var target = weaponState.BulletCountLimit - weaponState.LoadedBulletCount;
-                    target = Mathf.Min(target, weaponState.ReservedBulletCount);
-                    var count = Mathf.CeilToInt((float)target / weaponState.SpecialReloadCount);
+                    var target = commonfireConfig.MagazineCapacity - heldAgent.BaseComponent.Bullet;
+                    target = Mathf.Min(target, player.WeaponController().GetReservedBullet());
+                    var count = Mathf.CeilToInt((float)target / commonfireConfig.SpecialReloadCount);
                     count = Mathf.Max(1, count);
                     player.stateInterface.State.SpecialReload(
                         () =>
                         {
-                            SpecialReload(weaponState);
+                            SpecialReload(controller);
                         },
                         count,
                         () =>
@@ -114,9 +95,9 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                 }
                 else
                 {
-                    if (weaponState.LoadedBulletCount > 0 && !weaponState.IsAlwaysEmptyReload)
+                    if (heldAgent.BaseComponent.Bullet > 0 && !heldAgent.IsWeaponEmptyReload)
                     {
-                        var needActionDeal = CheckNeedActionDeal(sharedAPI, ActionDealEnum.Reload);
+                        var needActionDeal = CheckNeedActionDeal(controller, ActionDealEnum.Reload);
                         if (needActionDeal)
                         {
                             player.appearanceInterface.Appearance.MountWeaponOnAlternativeLocator();
@@ -127,14 +108,14 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                             {
                                 player.appearanceInterface.Appearance.RemountWeaponOnRightHand();
                             }
-                            Reload(weaponState);
+                            Reload(controller);
                             player.animatorClip.ClipManager.ResetReloadSpeedBuff();
                             _reloading = false;
                         });
                     }
                     else
                     {
-                        var needActionDeal = CheckNeedActionDeal(sharedAPI, ActionDealEnum.ReloadEmpty);
+                        var needActionDeal = CheckNeedActionDeal(controller, ActionDealEnum.ReloadEmpty);
                         if (needActionDeal)
                         {
                             player.appearanceInterface.Appearance.MountWeaponOnAlternativeLocator();
@@ -145,7 +126,7 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                             {
                                 player.appearanceInterface.Appearance.RemountWeaponOnRightHand();
                             }
-                            Reload(weaponState);
+                            Reload(controller);
                             player.animatorClip.ClipManager.ResetReloadSpeedBuff();
                             _reloading = false;
                         });
@@ -154,25 +135,20 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
             }
         }
 
-        private bool NoReloadAction(NewWeaponConfigItem config)
+        private bool NoReloadAction(WeaponResConfigItem config)
         {
             if (null == config)
             {
                 return true;
             }
-            return config.Type == (int)EWeaponType.ThrowWeapon || config.Type == (int)EWeaponType.MeleeWeapon;
+            return config.Type == (int)EWeaponType_Config.ThrowWeapon || config.Type == (int)EWeaponType_Config.MeleeWeapon;
         }
 
-        private bool MagazineIsFull(IPlayerWeaponState weaponState, int bulletCount)
-        {
-            return bulletCount >= weaponState.BulletCountLimit;
-        }
 
-        private bool HasNoReservedBullet(ISharedPlayerWeaponComponentGetter agent, PlayerEntity playerEntity)
+        private bool HasNoReservedBullet(PlayerWeaponController controller, PlayerEntity playerEntity)
         {
-            if (agent.GetReservedBullet() < 1)
+            if (controller.GetReservedBullet() < 1)
             {
-                _elapse = 0;
                 if (SharedConfig.CurrentGameMode == Components.GameMode.Normal)
                 {
                     playerEntity.tip.TipType = ETipType.BulletRunout;
@@ -186,66 +162,53 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
             return false;
         }
 
-        private void SpecialReload(IPlayerWeaponState weaponState)
+        private void SpecialReload(PlayerWeaponController controller)
         {
-            var loadCount = weaponState.SpecialReloadCount;
-            var target = weaponState.BulletCountLimit - weaponState.LoadedBulletCount;
+            var cfg = controller.HeldWeaponAgent.CommonFireCfg;
+            var loadCount = cfg.SpecialReloadCount;
+            var target = cfg.MagazineCapacity - controller.HeldWeaponAgent.BaseComponent.Bullet;
             loadCount = Mathf.Min(loadCount, target);
-            DoRealod(weaponState, loadCount);
+            DoRealod(controller, loadCount);
         }
 
-        private void Reload(IPlayerWeaponState weaponState)
+        private void Reload(PlayerWeaponController controller)
         {
-            var target = weaponState.BulletCountLimit - weaponState.LoadedBulletCount;
+            var cfg = controller.HeldWeaponAgent.CommonFireCfg;
+            var target = cfg.MagazineCapacity - controller.HeldWeaponAgent.BaseComponent.Bullet;
             target = Mathf.Max(0, target);
-            DoRealod(weaponState, target);
+            DoRealod(controller, target);
         }
 
-        private void DoRealod(IPlayerWeaponState weaponState, int target)
+        private void DoRealod(PlayerWeaponController controller, int target)
         {
-            target = Mathf.Min(target, weaponState.ReservedBulletCount);
-            weaponState.LoadedBulletCount += target;
-            weaponState.ReservedBulletCount -= target;
-           
+            //PlayerWeaponController controller = playerEntity.WeaponController();
+            //var configAssy = controller.HeldWeaponLogicConfigAssy;
+            var cfg = controller.HeldWeaponAgent.CommonFireCfg;
+            var lastReservedBullet = controller.GetReservedBullet();
+            target = Mathf.Min(target, lastReservedBullet);
+            controller.HeldWeaponAgent.BaseComponent.Bullet += target;
+            controller.SetReservedBullet(lastReservedBullet - target);
+
             IEventArgs args = (IEventArgs)(_sessonObjects).FreeArgs;
 
             if (!args.Triggers.IsEmpty((int)EGameEvent.WeaponState))
             {
-                SimpleParaList dama = new SimpleParaList();
-                dama.AddFields(new ObjectFields(weaponState));
-                dama.AddPara(new IntPara("CarryClip", weaponState.ReservedBulletCount));
-                dama.AddPara(new IntPara("Clip", weaponState.LoadedBulletCount));
-                dama.AddPara(new IntPara("ClipType", (int)weaponState.Caliber));
-                dama.AddPara(new IntPara("id", (int)weaponState.CurrentWeapon));
-                SimpleParable sp = new SimpleParable(dama);
+                //TODO Implement
+                //SimpleParaList dama = new SimpleParaList();
+                //dama.AddFields(new ObjectFields(weaponState));
+                //dama.AddPara(new IntPara("CarryClip", weaponState.ReservedBulletCount));
+                //dama.AddPara(new IntPara("Clip", weaponState.LoadedBulletCount));
+                //dama.AddPara(new IntPara("ClipType", (int)weaponState.Caliber));
+                //dama.AddPara(new IntPara("id", (int)weaponState.CurrentWeapon));
+                //SimpleParable sp = new SimpleParable(dama);
 
-                args.Trigger((int)EGameEvent.WeaponState, new TempUnit[] { new TempUnit("state", sp), new TempUnit("current", (FreeData)((PlayerEntity)weaponState.Owner).freeData.FreeData) });
-            }
-
-            if (weaponState.LoadedBulletCount >= weaponState.BulletCountLimit || weaponState.ReservedBulletCount < 1)
-            {
-                //如果前置弹夹已满，或者后备弹夹已空，这时应该执行了最后一次换弹，应附带有拉栓动作
-                weaponState.IsBolted = true;
+                //args.Trigger((int)EGameEvent.WeaponState, new TempUnit[] { new TempUnit("state", sp), new TempUnit("current", (FreeData)((PlayerEntity)weaponState.Owner).freeData.FreeData) });
             }
         }
 
-        private bool CheckNeedActionDeal(ISharedPlayerWeaponComponentGetter sharedApi, ActionDealEnum action)
+        private bool CheckNeedActionDeal(PlayerWeaponController sharedApi, ActionDealEnum action)
         {
-            return SingletonManager.Get<WeaponConfigManager>().NeedActionDeal(sharedApi.CurrSlotWeaponId, action);
-        }
-
-        // 临时代码
-        //TODO 使用正式UI资源
-        private float _showTime = 2f;
-        private float _elapse;
-        private string _tip = "";
-        public void OnGUI()
-        {
-            _elapse += Time.deltaTime;
-            if (_elapse < _showTime)
-            {
-                GUI.Label(new Rect(Screen.width / 2, Screen.height / 2, Screen.width, Screen.height), _tip);
-            }
+            return SingletonManager.Get<WeaponResourceConfigManager>().NeedActionDeal(sharedApi.HeldWeaponAgent.ConfigId, action);
         }
     }
 }

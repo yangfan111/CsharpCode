@@ -1,4 +1,5 @@
-﻿using Utils.AssetManager;
+﻿using Core.GameModule.Interface;
+using Utils.AssetManager;
 using Core.GameModule.Module;
 using Entitas;
 
@@ -8,12 +9,12 @@ namespace Core.GameModule.System
     public class ModuleInitSystem : IInitializeSystem
     {
         private readonly IGameModule _module;
-        private ILoadRequestManager _loadRequestManager;
+        private IUnityAssetManager _assetManager;
 
         public ModuleInitSystem(IGameModule module, 
-            ILoadRequestManager loadRequestManager)
+            IUnityAssetManager assetManager)
         {
-            _loadRequestManager = loadRequestManager;
+            _assetManager = assetManager;
             _module = module;
         }
 
@@ -22,7 +23,7 @@ namespace Core.GameModule.System
         {
           foreach (var module in _module.ModuleInitSystems)
             {
-                module.OnInitModule(_loadRequestManager);
+                module.OnInitModule(_assetManager);
             }
             
         }

@@ -44,9 +44,10 @@ public partial class AkBuildPreprocessor
 			case UnityEditor.BuildTarget.PS4:
 				return "PS4";
 
-			case UnityEditor.BuildTarget.PSP2:
+#if !UNITY_2018_3_OR_NEWER
+            case UnityEditor.BuildTarget.PSP2:
 				return "Vita";
-
+#endif
 			case UnityEditor.BuildTarget.StandaloneWindows:
 			case UnityEditor.BuildTarget.StandaloneWindows64:
 			case UnityEditor.BuildTarget.WSAPlayer:
@@ -78,7 +79,7 @@ public partial class AkBuildPreprocessor : UnityEditor.Build.IPreprocessBuild, U
 
 	private static bool SetDestinationPath(string platformName, ref string destinationFolder)
 	{
-		destinationFolder = System.IO.Path.Combine(AkBasePathGetter.GetFullSoundBankPath(), platformName);
+		destinationFolder = System.IO.Path.Combine(AkUtilities.GetWiseBankFolder_Full(), platformName);
 		return !string.IsNullOrEmpty(destinationFolder);
 	}
 
@@ -94,7 +95,7 @@ public partial class AkBuildPreprocessor : UnityEditor.Build.IPreprocessBuild, U
 				AkUtilities.GenerateSoundbanks(platforms);
 			}
 
-			var sourceFolder = AkBasePathGetter.GetPlatformBasePathEditor(platformName);
+			var sourceFolder = AkUtilities.GetPlatformBasePathEditor(platformName);
 			if (string.IsNullOrEmpty(sourceFolder))
 			{
 				UnityEngine.Debug.LogError("WwiseUnity: Could not find source folder for <" + platformName +

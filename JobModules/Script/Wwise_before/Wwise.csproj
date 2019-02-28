@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{9CC5BE84-06A7-383C-BC53-04EAD3049134}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>Wwise</ProjectName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+    <BaseIntermediateOutputPath>../build_obj/Wwise</BaseIntermediateOutputPath>
+    <RootNamespace>Wwise</RootNamespace>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"/>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' Or '$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
+    <OutputPath>F:\voyager\UnityPackages\Dll.Export\</OutputPath>
+    <PlatformTarget>anycpu</PlatformTarget>
+    <PlatformToolset>v141</PlatformToolset>
+    <AssemblyName>Wwise</AssemblyName>
+    <DefineConstants>TRACE;TRACE%3BDEBUG%3BUNITY_EDITOR%3BUNITY_5_6%3BUNITY_5_6_1_OR_NEWER%3BUNITY_SOURCE_MODIFIED%3BUNITY_5%3BUNITY_53_OR_GREATER%3BUNITY_52_OR_GREATER</DefineConstants>
+    <LangVersion>default</LangVersion>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32' Or '$(Configuration)|$(Platform)'=='Release|x86'" Label="Configuration">
+    <OutputPath>F:\voyager\UnityPackages\Dll.Export\Release\</OutputPath>
+    <PlatformTarget>anycpu</PlatformTarget>
+    <PlatformToolset>v141</PlatformToolset>
+    <AssemblyName>Wwise</AssemblyName>
+    <DefineConstants>TRACE;TRACE%3BDEBUG%3BUNITY_EDITOR%3BUNITY_5_6%3BUNITY_5_6_1_OR_NEWER%3BUNITY_SOURCE_MODIFIED%3BUNITY_5%3BUNITY_53_OR_GREATER%3BUNITY_52_OR_GREATER</DefineConstants>
+    <LangVersion>default</LangVersion>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32' Or '$(Configuration)|$(Platform)'=='MinSizeRel|x86'" Label="Configuration">
+    <OutputPath>F:\voyager\UnityPackages\Dll.Export\MinSizeRel\</OutputPath>
+    <PlatformTarget>x64</PlatformTarget>
+    <PlatformToolset>v141</PlatformToolset>
+    <AssemblyName>Wwise</AssemblyName>
+    <DebugType>none</DebugType>
+    <DefineConstants>TRACE</DefineConstants>
+    <LangVersion>3</LangVersion>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32' Or '$(Configuration)|$(Platform)'=='RelWithDebInfo|x86'" Label="Configuration">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <OutputPath>F:\voyager\UnityPackages\Dll.Export\RelWithDebInfo\</OutputPath>
+    <PlatformTarget>x64</PlatformTarget>
+    <PlatformToolset>v141</PlatformToolset>
+    <AssemblyName>Wwise</AssemblyName>
+    <DebugType>full</DebugType>
+    <DefineConstants>TRACE</DefineConstants>
+    <LangVersion>3</LangVersion>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.CSharp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.CSharp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemGroup>
+    <None Include="F:\voyager\UnityPackages\Wwise\CMakeLists.txt">
+    </None>
+  </ItemGroup>
+  <Target Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' Or '$(Configuration)|$(Platform)'=='Debug|x86'"
+    Name="CustomCommand_Debug_80dc8cdd554da9b25be193fd6915f6d2"
+    Inputs="F:/voyager/UnityPackages/Wwise/CMakeLists.txt;F:\voyager\UnityPackages\Wwise\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\Wwise\CMakeLists.txt"
+    Outputs="F:\voyager\UnityPackages\Wwise\CMakeFiles\generate.stamp">
+    <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/Wwise/CMakeLists.txt" />
+    <Exec Command="setlocal
+&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/Wwise/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd" />
+  </Target>
+  <Target Condition="'$(Configuration)|$(Platform)'=='Release|Win32' Or '$(Configuration)|$(Platform)'=='Release|x86'"
+    Name="CustomCommand_Release_80dc8cdd554da9b25be193fd6915f6d2"
+    Inputs="F:/voyager/UnityPackages/Wwise/CMakeLists.txt;F:\voyager\UnityPackages\Wwise\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\Wwise\CMakeLists.txt"
+    Outputs="F:\voyager\UnityPackages\Wwise\CMakeFiles\generate.stamp">
+    <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/Wwise/CMakeLists.txt" />
+    <Exec Command="setlocal
+&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/Wwise/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd" />
+  </Target>
+  <Target Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32' Or '$(Configuration)|$(Platform)'=='MinSizeRel|x86'"
+    Name="CustomCommand_MinSizeRel_80dc8cdd554da9b25be193fd6915f6d2"
+    Inputs="F:/voyager/UnityPackages/Wwise/CMakeLists.txt;F:\voyager\UnityPackages\Wwise\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\Wwise\CMakeLists.txt"
+    Outputs="F:\voyager\UnityPackages\Wwise\CMakeFiles\generate.stamp">
+    <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/Wwise/CMakeLists.txt" />
+    <Exec Command="setlocal
+&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/Wwise/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd" />
+  </Target>
+  <Target Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32' Or '$(Configuration)|$(Platform)'=='RelWithDebInfo|x86'"
+    Name="CustomCommand_RelWithDebInfo_80dc8cdd554da9b25be193fd6915f6d2"
+    Inputs="F:/voyager/UnityPackages/Wwise/CMakeLists.txt;F:\voyager\UnityPackages\Wwise\CMakeLists.txt;F:\voyager\UnityPackages\cmake_common_lib.txt;F:\voyager\UnityPackages\Wwise\CMakeLists.txt"
+    Outputs="F:\voyager\UnityPackages\Wwise\CMakeFiles\generate.stamp">
+    <Exec Command="echo Building Custom Rule F:/voyager/UnityPackages/Wwise/CMakeLists.txt" />
+    <Exec Command="setlocal
+&quot;D:\Program Files\CMake\bin\cmake.exe&quot; -HF:/voyager/UnityPackages -BF:/voyager/UnityPackages --check-stamp-file F:/voyager/UnityPackages/Wwise/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd" />
+  </Target>
+  <ItemGroup>
+    <Compile Include="F:\voyager\UnityPackages\Wwise\AKMemManager.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\AkBankManagerExt.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\AudioPluginManagement.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\AudioPluginSettingData.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AKRESULT.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\Ak3DSpatializationMode.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkActionOnEventType.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkAudioDeviceState.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkAudioFormat.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkAudioInterruptionCallbackInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkAudioSettings.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkAudioSourceChangeCallbackInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkAuxSendValue.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkBankCallbackInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkBankContent.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkBusHierarchyFlags.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkCallbackInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkCallbackSerializer.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkCallbackType.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkChannelConfig.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkChannelConfigType.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkChannelEmitter.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkChannelOrdering.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkConnectionType.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkCurveInterpolation.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkDeviceSettings.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkDiffractionFlags.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkDurationCallbackInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkDynamicSequenceItemCallbackInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkDynamicSequenceType.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkEmitterSettings.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkEventCallbackInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkExternalSourceInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkGlobalCallbackLocation.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkGroupType.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkImageSourceParams.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkImageSourceSettings.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkInitSettings.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkIterator.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkMIDICcTypes.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkMIDIEvent.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkMIDIEventCallbackInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkMIDIEventTypes.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkMIDIPost.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkMarkerCallbackInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkMemSettings.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkMeteringFlags.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkMonitorErrorCode.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkMonitorErrorLevel.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkMonitoringCallbackInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkMultiPositionType.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkMusicPlaylistCallbackInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkMusicSettings.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkMusicSyncCallbackInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkObjectInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkObstructionOcclusionValues.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkOutputSettings.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkPannerType.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkPanningRule.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkPlaylist.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkPlaylistArray.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkPlaylistItem.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkPluginType.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkPositionSourceType.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkPositioningInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkPreparationType.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkPropagationPathInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkPropagationPathInfoProxy.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkQueryRTPCValue.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkRamp.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkRoomParams.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkSegmentInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkSerializedCallbackHeader.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkSoundPathInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkSoundPathInfoProxy.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkSoundPropagationPathParams.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkSourceChannelOrdering.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkSourceSettings.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkSpatialAudioInitSettings.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkStreamMgrSettings.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkTransform.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkTriangle.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkTriangleProxy.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\AkVector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\_ArrayPoolDefault.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\_ArrayPoolLEngineDefault.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Common\_ArrayPoolSpatialAudio.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Mac\AkMemPoolAttributes_Mac.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Mac\AkPlatformInitSettings_Mac.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Mac\AkSoundEnginePINVOKE_Mac.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Mac\AkSoundEngine_Mac.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Mac\AkThreadProperties_Mac.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Windows\AkAudioAPI_Windows.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Windows\AkMemPoolAttributes_Windows.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Windows\AkPlatformInitSettings_Windows.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Windows\AkSoundEnginePINVOKE_Windows.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Windows\AkSoundEngine_Windows.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Generated\Windows\AkThreadProperties_Windows.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\AkAudioInputManager.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\AkAuxSendArray.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\AkBankManager.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\AkBasePathGetter.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\AkBasePathGetterExt.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\AkCallbackManager.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\AkChannelEmitterArray.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\AkLogger.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\AkMIDIPostArray.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\AkPositionArray.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\AkPropagationPathInfoArray.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\AkSoundEngine.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\AkSoundPathInfoArray.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\AkTriangleArray.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\AkUtilities.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\AudioPluginSettingAgent.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\API\Handwritten\WwiseTypes.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkAmbient.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkAudioListener.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkBank.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkDragDropHelper.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkEmitterObstructionOcclusion.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkEnvironment.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkEnvironmentPortal.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkEvent.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkEventCallbackData.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkEventPlayable.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkEventTrack.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkGameObj.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkGameObjEnvironmentData.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkGameObjListenerList.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkGameObjPosOffsetData.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkGameObjPositionData.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkGameObjPositionOffsetData.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkInitializer.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkMemBankLoader.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkObstructionOcclusion.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkRTPCPlayable.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkRTPCTrack.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkRoom.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkRoomPortal.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkRoomPortalObstruction.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkSoundEngineController.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkSpatialAudioBase.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkSpatialAudioEmitter.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkSpatialAudioListener.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkState.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkSurfaceReflector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkSwitch.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkTerminator.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkTriggerBase.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkTriggerCollisionEnter.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkTriggerCollisionExit.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkTriggerDisable.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkTriggerEnable.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkTriggerEnter.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkTriggerExit.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkTriggerMouseDown.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkTriggerMouseEnter.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkTriggerMouseExit.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkTriggerMouseUp.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Deployment\Components\AkUnityEventHandler.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkAmbientInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkAudioListenerInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkBankInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkBaseInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkEnvironmentInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkEnvironmentPortalInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkEventCallbackDataDrawer.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkEventInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkEventPlayableInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkGameObjListenerListDrawer.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkGameObjectInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkInitializerInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkPortalManager.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkRTPCPlayableInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkRTPCTrackInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkRoomInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkRoomPortalInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkSpatialAudioListenerInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkStateInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkSwitchInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkUnityEventHandlerInspector.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseComponents\AkWwiseXMLWatcher.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseMenu\Common\AkUnityBuilderBase.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseMenu\Common\AkUnityPluginInstallerBase.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseMenu\Common\AkWwiseIdConverter.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseMenu\Mac\AkWwiseMenu_Mac.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseSetupWizard\AkBuildPreprocessor.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseSetupWizard\AkPluginActivator.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseSetupWizard\AkSceneUtils.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseSetupWizard\AkUnitySettingsParser.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseSetupWizard\AkWSAUtils.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseSetupWizard\AkWwisePostImportCallbackSetup.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseSetupWizard\AkWwiseSettingsWindow.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseSetupWizard\AkWwiseSetupWizard.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseSetupWizard\AkXboxOneUtils.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseTypes\AcousticTextureDrawer.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseTypes\AuxBusDrawer.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseTypes\BankDrawer.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseTypes\BaseTypeDrawer.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseTypes\CallbackFlagsDrawer.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseTypes\EventDrawer.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseTypes\RTPCDrawer.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseTypes\StateDrawer.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseTypes\SwitchDrawer.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseTypes\TriggerDrawer.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseWindows\AkWwiseComponentPicker.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseWindows\AkWwisePicker.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseWindows\AkWwiseProjectData.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseWindows\AkWwiseProjectInfo.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseWindows\AkWwiseTreeView.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseWindows\AkWwiseWWUBuilder.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseWindows\AkWwiseXMLBuilder.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseWindows\TreeViewControl\TreeViewControl.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Editor\WwiseWindows\TreeViewControl\TreeViewItem.cs" />
+    <Compile Include="F:\voyager\UnityPackages\Wwise\Extensions\AkSoundEngine.extensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Core">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Data">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Xml">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="../../UnityPackages/ThirdParty/Unity/5_6/UnityEngine.dll">
+      <Private>False</Private>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="../../UnityPackages/ThirdParty/Unity/5_6/UnityEditor.dll">
+      <Private>False</Private>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="F:\voyager\UnityPackages\ZERO_CHECK.vcxproj">
+      <Project>{0F55FAB8-D7EA-304E-A7AE-79B396AFBC70}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'MinSizeRel'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'RelWithDebInfo'">
+  </PropertyGroup>
+  <PropertyGroup>
+    <BuildDependsOn>
+      CustomCommand_Debug_80dc8cdd554da9b25be193fd6915f6d2;
+      CustomCommand_MinSizeRel_80dc8cdd554da9b25be193fd6915f6d2;
+      CustomCommand_RelWithDebInfo_80dc8cdd554da9b25be193fd6915f6d2;
+      CustomCommand_Release_80dc8cdd554da9b25be193fd6915f6d2;
+      $(BuildDependsOn)
+    </BuildDependsOn>
+  </PropertyGroup>
+</Project>

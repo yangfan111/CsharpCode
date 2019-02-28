@@ -8,7 +8,6 @@ using Core.Event;
 using Core.Utils;
 using UnityEngine;
 using Utils.Singleton;
-using WeaponConfigNs;
 using XmlConfig;
 
 namespace App.Shared.EntityFactory
@@ -153,7 +152,14 @@ namespace App.Shared.EntityFactory
             effectEntity.isFlagSyncNonSelf = false;
         }
 
-      
+        public static void AddBeenHitEvent(PlayerEntity srcPlayer, EntityKey target, int damageId, int triggerTime)
+        {
+            BeenHitEvent e = (BeenHitEvent) EventInfos.Instance.Allocate(EEventType.BeenHit, false);
+            e.Target = target;
+            e.UniqueId = damageId;
+            e.TriggerTime = triggerTime;
+            srcPlayer.localEvents.Events.AddEvent(e);
+        }
 
         public static void AddHitPlayerEffectEvent(PlayerEntity srcPlayer, EntityKey target, Vector3 hitPoint, Vector3 offset)
         {

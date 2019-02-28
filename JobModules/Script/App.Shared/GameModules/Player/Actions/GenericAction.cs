@@ -1,20 +1,27 @@
 ﻿using App.Shared.Components.GenericActions;
+using App.Shared.GameModules.Player.CharacterState;
 using App.Shared.Player;
+using Core.Fsm;
 using Core.Utils;
 using UnityEngine;
+using Utils.Appearance;
+using Utils.Utils;
+using XmlConfig;
 
 namespace App.Shared.GameModules.Player.Actions
 {
     public class GenericAction : IGenericAction
     {
-        private IAction _climbAction = new ClimbUp(); //攀爬
-        private IAction _stepAction = new StepUp();  //台阶
-        private IAction _vaultAction = new Vault();  //翻越
-        private IAction _concretAction;
+        private const bool DrawDebugTest = false;
+        private static Vector3 _capsuleBottom = Vector3.zero;
+        private static Vector3 _capsuleUp = Vector3.zero;
+        private static float _capsuleRadius;
+        private const float ProbeDist = 1f;
         
-        private Vector3 _capsuleBottom;
-        private Vector3 _capsuleUp;
-        private float _capsuleRadius;
+        private readonly IAction _climbAction = new ClimbUp(); //攀爬
+        private readonly IAction _stepAction = new StepUp();  //台阶
+        private readonly IAction _vaultAction = new Vault();  //翻越
+        private IAction _concretAction;
 
         public void PlayerReborn(PlayerEntity player)
         {
@@ -22,6 +29,7 @@ namespace App.Shared.GameModules.Player.Actions
                 player.thirdPersonAnimator.UnityAnimator.applyRootMotion = false;
             if(player.hasThirdPersonModel)
                 player.thirdPersonModel.Value.transform.localPosition.Set(0, 0, 0);
+            ResetConcretAction();
         }
 
         public void PlayerDead(PlayerEntity player)
@@ -30,6 +38,7 @@ namespace App.Shared.GameModules.Player.Actions
                 player.thirdPersonAnimator.UnityAnimator.applyRootMotion = false;
             if(player.hasThirdPersonModel)
                 player.thirdPersonModel.Value.transform.localPosition.Set(0, 0, 0);
+            ResetConcretAction();
         }
 
         public void Update(PlayerEntity player)
@@ -64,18 +73,29 @@ namespace App.Shared.GameModules.Player.Actions
             var overlapPos = playerTransform.position;
             
             PlayerEntityUtility.GetCapsule(player, overlapPos, out _capsuleBottom, out _capsuleUp, out _capsuleRadius);
-            var capsuleHight = _capsuleUp.y - _capsuleBottom.y;
+            var capsuleHeight = _capsuleUp.y - _capsuleBottom.y;
             _capsuleBottom.y = (playerTransform.position + playerTransform.up * 0.5f).y;
+
             if ((null == _concretAction || !_concretAction.PlayingAnimation) &&
                 Physics.CapsuleCast(_capsuleBottom, _capsuleUp, 0.001f, playerTransform.forward, out hit, 1,
                 UnityLayers.SceneCollidableLayerMask))
             {
+                if (DrawDebugTest)
+                {
+                    DebugDraw.DebugWireSphere(hit.point, Color.red, 0.1f, 1f);
+                    Debug.DrawRay(hit.point, hit.normal, Color.green, 1f);
+                }
+                
                 //如果碰撞点到发射点的距离大于0.5
                 if (hit.distance < 0.5)
                 {
                     //得到碰撞点
-                    Vector3 point = hit.point;
-                    Vector3 sphereCenter = new Vector3(hit.point.x, hit.collider.bounds.center.y + hit.collider.bounds.extents.y + capsuleHight, hit.point.z);
+                    var sphereCenter = new Vector3(hit.point.x, hit.collider.bounds.center.y + hit.collider.bounds.extents.y + capsuleHeight, hit.point.z);
+
+                    if (DrawDebugTest)
+                    {
+                        DebugDraw.DebugWireSphere(sphereCenter, Color.red, 0.3f, 1f);
+                    }
 
                     // 检测发射源是否处于碰撞体中
                     if (Physics.OverlapSphere(sphereCenter, 0.3f, UnityLayers.SceneCollidableLayerMask).Length >
@@ -83,29 +103,41 @@ namespace App.Shared.GameModules.Player.Actions
                     
                     RaycastHit sphereHit;
                     Physics.SphereCast(sphereCenter, 0.3f, Vector3.down, out sphereHit,
-                        hit.collider.bounds.center.y + hit.collider.bounds.extents.y + capsuleHight,
+                        hit.collider.bounds.center.y + hit.collider.bounds.extents.y + capsuleHeight,
                         UnityLayers.SceneCollidableLayerMask);
-                    point = sphereHit.point;
+                    var point = sphereHit.point;
+
+                    if (DrawDebugTest)
+                    {
+                        RuntimeDebugDraw.Draw.DrawLine(sphereCenter, point, Color.green, 1f);
+                        DebugDraw.DebugWireSphere(point, Color.red, 0.1f, 1f);
+                    }
                     
                     var distance = point.y - playerTransform.position.y;
                     if (distance > 1.5 && distance < 2.3)
                     {
                         //一定高度内为climb
                         ResetConcretAction();
-
                         _concretAction = _climbAction;
-                        _concretAction.MatchTarget = point;
+                        _concretAction.MatchTarget = point - playerTransform.right * 0.2f;
+                        
                         _concretAction.CanTriggerAction = true;
                     }else if (distance > 0.5 && distance <= 1.5)
                     {
                         ResetConcretAction();
+
+                        // 检测翻越过程中障碍
+                        _capsuleBottom.y = (point + playerTransform.up * 0.3f).y;
+                        _capsuleUp.y = _capsuleBottom.y + capsuleHeight;
+                        var canVault = !Physics.CapsuleCast(_capsuleBottom, _capsuleUp, 0.1f, playerTransform.forward,
+                            out hit, 1, UnityLayers.SceneCollidableLayerMask);
 
                         //
                         overlapPos = playerTransform.position + playerTransform.forward * (1.0f + _capsuleRadius) + playerTransform.up * 0.2f;
                         PlayerEntityUtility.GetCapsule(player, overlapPos, out _capsuleBottom, out _capsuleUp, out _capsuleRadius);
                         var casts = Physics.OverlapCapsule(_capsuleBottom, _capsuleUp, _capsuleRadius, UnityLayers.SceneCollidableLayerMask);
                         //
-                        if (casts.Length <= 0 && distance > 0.8f)
+                        if (casts.Length <= 0 && distance > 0.8f && canVault)
                         {
                             _concretAction = _vaultAction;
                         }
@@ -133,6 +165,60 @@ namespace App.Shared.GameModules.Player.Actions
             if (null != _concretAction)
                 _concretAction.ResetConcretAction();
             _concretAction = null;
+        }
+        
+        public static void ClimbStateFreeFallTest(PlayerEntity player, IAdaptiveContainer<IFsmInputCommand> commands)
+        {
+            if (!CanTestFreeFall(player) || OverlapCapsuleTest(player) || IsHitGround(player, ProbeDist)) return;
+            
+            for (var i = 0; i < commands.Length; ++i)
+            {
+                var v = commands[i];
+                if (v.Type == FsmInput.None) continue;
+                v.Type = FsmInput.Freefall;
+                break;
+            }
+        }
+
+        private static bool CanTestFreeFall(PlayerEntity player)
+        {
+            if (null == player || !player.hasThirdPersonAnimator) return false;
+            var thirdPersonAnimator = player.thirdPersonAnimator.UnityAnimator;
+            return thirdPersonAnimator.GetCurrentAnimatorStateInfo(0).IsName("ClimbEnd");
+        }
+        
+        private static bool OverlapCapsuleTest(PlayerEntity playerEntity)
+        {
+            var gameObject = playerEntity.RootGo();
+            var prevLayer = gameObject.layer;
+            
+            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayerManager.GetLayerIndex(EUnityLayerName.User));
+            
+            var overlapPos = gameObject.transform.position;
+            PlayerEntityUtility.GetCapsule(playerEntity, overlapPos, out _capsuleBottom, out _capsuleUp, out _capsuleRadius);
+            var casts = Physics.OverlapCapsule(_capsuleBottom, _capsuleUp, _capsuleRadius, UnityLayers.AllCollidableLayerMask);
+            
+            IntersectionDetectTool.SetColliderLayer(gameObject, prevLayer);
+            
+            return casts.Length > 0;
+        }
+        
+        private static bool IsHitGround(PlayerEntity playerEntity, float dist)
+        {
+            var gameObject = playerEntity.RootGo();
+            var prevLayer = gameObject.layer;
+            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayerManager.GetLayerIndex(EUnityLayerName.User));
+            
+            var startPoint = gameObject.transform.position;
+            startPoint.y += _capsuleRadius;
+            
+            RaycastHit outHit;
+            var isHit = Physics.SphereCast(startPoint, _capsuleRadius, Vector3.down, out outHit, _capsuleRadius + dist,
+                UnityLayers.AllCollidableLayerMask);
+            
+            IntersectionDetectTool.SetColliderLayer(gameObject, prevLayer);
+            
+            return isHit;
         }
     }
 

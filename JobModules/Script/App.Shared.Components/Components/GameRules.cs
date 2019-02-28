@@ -54,6 +54,7 @@
             {
                 case Bomb:
                 case Team:
+                case Annihilation:
                     return true;
                 default:
                     return false;

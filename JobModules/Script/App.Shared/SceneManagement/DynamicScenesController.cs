@@ -400,14 +400,14 @@ namespace App.Shared.SceneManagement
                     var terrain = gameObject.GetComponent<Terrain>();
                     if (terrain != null)
                     {
-                        Type t = Type.GetType("ArtPlugins.TerrainProxy, Assembly-CSharp-firstpass");
+                        Type t = Type.GetType("ArtPlugins.TerrainProxy, Assembly-CSharp");
                         if (t != null)
                         {
                             terrain.gameObject.AddComponent(t);
-                            Logger.Debug("ArtPlugins.TerrainProxy, Assembly-CSharp-firstpass Founded");
+                            Logger.Debug("ArtPlugins.TerrainProxy, Assembly-CSharp Founded");
                         }
                         else
-                            Logger.Debug("ArtPlugins.TerrainProxy, Assembly-CSharp-firstpass Not Founded");
+                            Logger.Debug("ArtPlugins.TerrainProxy, Assembly-CSharp Not Founded");
                     }
                 }
 
@@ -448,7 +448,7 @@ namespace App.Shared.SceneManagement
                             v.enabled = false;
                         else
                         {
-                            Type t = Type.GetType("ArtPlugins.GQS_Bind_Camera, Assembly-CSharp-firstpass");
+                            Type t = Type.GetType("ArtPlugins.GQS_Bind_Camera, Assembly-CSharp");
                             if (t != null)
                             {
                                 v.gameObject.AddComponent(t);

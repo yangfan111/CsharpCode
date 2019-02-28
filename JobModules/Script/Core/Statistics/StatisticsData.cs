@@ -16,6 +16,7 @@ namespace Core.Statistics
 
     public class StatisticsData
     {
+        public bool DataCollectSwitch;
         /// <summary>
         /// 击杀人数
         /// </summary>
@@ -123,6 +124,10 @@ namespace Core.Statistics
         /// 连杀数量
         /// </summary>
         public int EvenKillCount;
+        /// <summary>
+        /// 最大连杀数量
+        /// </summary>
+        public int MaxEvenKillCount;
         /// <summary>
         /// 被救援次数
         /// </summary>
@@ -240,13 +245,22 @@ namespace Core.Statistics
         /// 上次击杀的时间
         /// </summary>
         public int LastKillTime;
+
         /// <summary>
         /// 死亡的持续时间
         /// </summary>
         public int DeadTime;
+  
         /// <summary>
         /// 上次死亡的时间
         /// </summary>
         public int LastDeadTime;
+
+        public int Rank;
+
+        public int C4PlantCount;
+        public int C4DefuseCount;
+        public bool HasC4;
+        public long RevengeKillerId;
     }
 }

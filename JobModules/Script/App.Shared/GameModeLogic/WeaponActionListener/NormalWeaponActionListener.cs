@@ -1,42 +1,46 @@
-﻿using Core;
-using Core.GameModeLogic;
+﻿using App.Shared.Audio;
+using App.Shared.GameModules.Weapon;
+using Core;
+using Core.EntityComponent;
 using Core.Utils;
-using Entitas;
 
 namespace App.Shared.GameModeLogic.WeaponActionListener
 {
     public class NormalWeaponActionListener : IWeaponProcessListener
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(NormalWeaponActionListener));
-        public void OnExpend(Entity playerEntity, EWeaponSlotType slot)
+        public void OnExpend(IPlayerWeaponGetter controller, EWeaponSlotType slot)
         {
-            if(!slot.IsSlotChangeByCost())
+            //TODO:音频播放
+           //GameAudioMedium.PlayWeaponAudio(controller., RelatedAppearence.WeaponHandObject(), (item) => item.Fire);
+
+            if (!slot.IsSlotChangeByCost())
             {
                 return;
             }
-            var player = playerEntity as PlayerEntity;
-            Logger.DebugFormat("{0} OnExpend", player.entityKey.Value);
-            LockPlayerBag(player);
+            if(Logger.IsDebugEnabled)
+            {
+                Logger.DebugFormat("{0} OnExpend", controller.Owner);
+            }
+            ((PlayerWeaponController)controller).BagLockState = true;
         }
 
-        public void OnDrop(Entity playerEntity, EWeaponSlotType slot)
+        public void OnDrop(IPlayerWeaponGetter controller, EWeaponSlotType slot, EntityKey key)
         {
-            var player = playerEntity as PlayerEntity;
-            Logger.DebugFormat("{0} OnDrop", player.entityKey.Value);
-            LockPlayerBag(player);
+            Logger.DebugFormat("{0} OnDrop", controller.Owner);
+            ((PlayerWeaponController)controller).BagLockState = true;
         }
 
-        public void OnPickup(Entity playerEntity, EWeaponSlotType slot)
+        public void OnPickup(IPlayerWeaponGetter controller, EWeaponSlotType slot)
         {
-            var player = playerEntity as PlayerEntity;
-            Logger.DebugFormat("{0} OnPickup", player.entityKey.Value);
-            LockPlayerBag(player);
+            Logger.DebugFormat("{0} OnPickup", controller.Owner);
+            ((PlayerWeaponController)controller).BagLockState = true;
         }
-
-        private void LockPlayerBag(PlayerEntity player)
+        private void LockPlayerBag(IPlayerWeaponGetter controller)
         {
-            Logger.DebugFormat("{0} LockPlayerBag", player.entityKey.Value);
-            player.weaponState.BagLocked = true;
+            Logger.DebugFormat("{0} LockPlayerBag", controller.Owner);
+            ((PlayerWeaponController)controller).BagLockState = true;
+
         }
     }
 }

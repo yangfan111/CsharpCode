@@ -27,6 +27,7 @@ namespace Core.CharacterState.Movement
     {
         bool InTransition();
         float TransitionRemainTime();
+        float TransitionTime();
         MovementInConfig CurrentMovement();
         MovementInConfig NextMovement();
     }

@@ -1,16 +1,19 @@
 ﻿using App.Shared.GameModules.Player;
 using App.Shared.Player;
+using BehaviorDesigner.Runtime.Tasks.Movement;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using Entitas;
 using UnityEngine;
+using Utils.Appearance;
 
 namespace App.Shared.GameModules.Vehicle
 {
     public class UpdatePlayerPositionOnVehicle : IUserCmdExecuteSystem
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(UpdatePlayerPositionOnVehicle));
+        private BoneMount _mount = new BoneMount();
         private IGroup<PlayerEntity> _players;
         private VehicleContext _vehicleContext;
         private PlayerContext _playerContext;
@@ -25,20 +28,20 @@ namespace App.Shared.GameModules.Vehicle
         {
             var playerEntities = _playerContext.GetEntities();
             var ownerEntity = owner.OwnerEntity as PlayerEntity;
-            for(int i = 0; i < playerEntities.Length; ++i)
+            for(var i = 0; i < playerEntities.Length; ++i)
             {
                 var playerEntity = playerEntities[i];
                 if (!playerEntity.IsOnVehicle())
                     continue;
 
-                Transform seat = playerEntity.GetVehicleSeatTransform(_vehicleContext);
+                var seat = playerEntity.GetVehicleSeatTransform(_vehicleContext);
                 if (null == seat) continue;
                 var characterTransform = playerEntity.RootGo().transform;
+                var character = playerEntity.RootGo();
                 if (seat != characterTransform.parent)
                 {
-                    characterTransform.parent = seat;
-                    characterTransform.localPosition = Vector3.zero;
-                    characterTransform.localRotation = Quaternion.identity;
+                    _mount.MountCharacterToVehicleSeat(character, seat);
+                    
                     // 切换座位，并且换到主驾驶位，设置IK
                     if (playerEntity.IsVehicleDriver())
                     {

@@ -30,6 +30,18 @@ namespace App.Server.GameModules.Vehicle
 
         private bool _first = true;
 
+        public bool IsEntityValid(Entity entity)
+        {
+            var vehicleEntity = entity as VehicleEntity;
+            if (vehicleEntity == null || !vehicleEntity.hasVehicleType || !vehicleEntity.HasDynamicData())
+            {
+                //_logger.InfoFormat("VehicleEntity {0} is invalid!", vehicleEntity);
+                return false;
+            }
+
+            return true;
+        }
+
         public virtual void UpdateSimulationTime(int simulationTime)
         {
             _vehicleTimer.SetCurrentTime(simulationTime);

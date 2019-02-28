@@ -31,7 +31,8 @@ namespace Core.Animation
                 else if (AnimatorControllerParameterType.Bool == param.ParamType)
                 {
                     animator.SetBool(param.NameHash, param.BoolValue);
-                }else if (AnimatorControllerParameterType.Trigger == param.ParamType)
+                }else if (AnimatorControllerParameterType.Trigger == param.ParamType ||
+                    AnimatorControllerParameterType.Int == param.ParamType)
                 {
                     animator.SetInteger(param.NameHash, param.IntValue);
                 }

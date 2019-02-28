@@ -1,0 +1,417 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{EB93922D-D74B-D47A-4053-ADD62C2A6F6B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>App.Server</RootNamespace>
+    <AssemblyName>App.Server</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Dll.Temp\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\build_obj_dir\Release\App.Server\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Dll.Temp\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\build_obj_dir\Debug\App.Server\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BehaviorDesignerRuntime">
+      <HintPath>..\BehaviorDesigner\Runtime\BehaviorDesignerRuntime.dll</HintPath>
+    </Reference>
+    <Reference Include="commons">
+      <HintPath>..\CommonLibs\commons.dll</HintPath>
+    </Reference>
+    <Reference Include="Entitas.CodeGeneration.Attributes">
+      <HintPath>..\CommonLibs\Entitas.CodeGeneration.Attributes.dll</HintPath>
+    </Reference>
+    <Reference Include="Entitas">
+      <HintPath>..\CommonLibs\Entitas.dll</HintPath>
+    </Reference>
+    <Reference Include="Entitas.Utils">
+      <HintPath>..\CommonLibs\Entitas.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="Entitas.VisualDebugging.Unity">
+      <HintPath>..\CommonLibs\Entitas.VisualDebugging.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="I18N">
+      <HintPath>..\CommonLibs\I18N.dll</HintPath>
+    </Reference>
+    <Reference Include="I18N.West">
+      <HintPath>..\CommonLibs\I18N.West.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\CommonLibs\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Mysql.Data">
+      <HintPath>..\CommonLibs\Mysql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf3">
+      <HintPath>..\CommonLibs\protobuf3.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data">
+      <HintPath>..\CommonLibs\System.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AllocationClient.cs" />
+    <Compile Include="Bullet\ServerBulletInfoCollector.cs" />
+    <Compile Include="Common\ServerRuntimeGameConfig.cs" />
+    <Compile Include="Damage\ServerDamageInfoCollector.cs" />
+    <Compile Include="FileSystemConfig\ServerFileSystemConfigManager.cs" />
+    <Compile Include="GameModules\Bullet\ServerBulletInfoCollectSystem.cs" />
+    <Compile Include="GameModules\Bullet\ServerBulletModule.cs" />
+    <Compile Include="GameModules\GamePlay\Free\FreeArgConstant.cs" />
+    <Compile Include="GameModules\GamePlay\Free\FreeGameContext.cs" />
+    <Compile Include="GameModules\GamePlay\Free\FreeGameRule.cs" />
+    <Compile Include="GameModules\GamePlay\Free\FreeRuleConfig.cs" />
+    <Compile Include="GameModules\GamePlay\Free\ParaConstant.cs" />
+    <Compile Include="GameModules\GamePlay\Free\RoomData.cs" />
+    <Compile Include="GameModules\GamePlay\Free\RuleMap.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UnitTest\SetUnitTestDataAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UnitTest\UnitTestMysqlData.cs" />
+    <Compile Include="GameModules\GamePlay\Free\action\BattleEndAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\action\CommentAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\action\DebugInfoAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\action\GameOverAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\action\MysqlLogAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\action\RaycatHit.cs" />
+    <Compile Include="GameModules\GamePlay\Free\action\RealTimeAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\action\RegisterCommandAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\action\ReloadRuleAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\action\ServerShutdownAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\action\SingleEndAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\action\TextMessageAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\action\TraceAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\action\UseCodeAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\app\GroupTechStatUiAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\chicken\BagItemAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\chicken\CanDropCondition.cs" />
+    <Compile Include="GameModules\GamePlay\Free\chicken\ChickenBombUtil.cs" />
+    <Compile Include="GameModules\GamePlay\Free\chicken\ChickenConstant.cs" />
+    <Compile Include="GameModules\GamePlay\Free\chicken\ChickenFuncUtil.cs" />
+    <Compile Include="GameModules\GamePlay\Free\chicken\ChickenRuleAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\chicken\ChickenRuleCondition.cs" />
+    <Compile Include="GameModules\GamePlay\Free\chicken\ChickenRuleVars.cs" />
+    <Compile Include="GameModules\GamePlay\Free\chicken\ChickenWeaponAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\chicken\ComputeLineAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\chicken\FlyLineHideAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\chicken\FlyLineShowAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\chicken\InitialItemAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\client\FreeAddMarkHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\client\FreeClickImageHander.cs" />
+    <Compile Include="GameModules\GamePlay\Free\client\FreeDebugCommandHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\client\FreeDebugDataHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\client\FreeDragImageHander.cs" />
+    <Compile Include="GameModules\GamePlay\Free\client\FreeLoginSucessHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\client\FreeMessageHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\client\FreeMoveImageHander.cs" />
+    <Compile Include="GameModules\GamePlay\Free\client\FreeObservePlayerHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\client\FreePickupHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\client\IFreeMessageHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\client\PickupItemUtil.cs" />
+    <Compile Include="GameModules\GamePlay\Free\client\SplitItemHander.cs" />
+    <Compile Include="GameModules\GamePlay\Free\condition\DistanceCondition.cs" />
+    <Compile Include="GameModules\GamePlay\Free\condition\PlayerStateCondition.cs" />
+    <Compile Include="GameModules\GamePlay\Free\condition\PosTypeCondition.cs" />
+    <Compile Include="GameModules\GamePlay\Free\condition\UseCodeCondition.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\AbstractFreeMove.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\AlwaysOneSpeed.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\ClearSceneEntitiesAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\CreateCarAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\CreateCastSceneEntityAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\CreateFixEntityAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\CreateMoveEntityAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\CreateSceneObjectAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\FindItemAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\FreeNotMove.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\FreePositionMove.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\IMoveSpeed.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\RemoveCastSceneEntityAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\RemoveEntityAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\RemoveSceneObjectAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\SelectFreeMoveAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\hall\BattleReportAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\hall\PlayerReportAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\BagCapacityUtil.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\CarryClipUtil.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\ConditionHotKey.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\CreateBoxItemAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\CreateInventoryAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\CreateItemToPlayerAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\CreateItemToSceneAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\DefineItemAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\DropItemToSceneAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\FreeGameItem.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\FreeInventory.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\FreeItemDrop.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\FreeItemManager.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\IHotKey.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\IItemLayout.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\IItemUI.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\ItemInventoryUtil.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\ItemMoveAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\ItemSimpleLayout.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\OnlyDataItemUI.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\OpenInventoryAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\PlayerDropItemAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\PlayerRemoveItemAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\PlayerUseItemAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\PositionHotKey.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\ReduceDamageUtil.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\RefreshItemAtPosAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\RefreshSceneItemAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\ResortInventoryAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\SceneItemManager.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\SelectItemAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\SetItemCountAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\SimpleBackUI.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\SimpleInventoryUI.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\SimpleItemUI.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\UnityEmptyInventoryUI .cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\UnityInventoryUI.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\UnityInventoryUtil.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\UnityOneInventoryUI.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\config\FreeItemConfig.cs" />
+    <Compile Include="GameModules\GamePlay\Free\item\config\ItemDefReplacer.cs" />
+    <Compile Include="GameModules\GamePlay\Free\map\FreeMapPosition.cs" />
+    <Compile Include="GameModules\GamePlay\Free\map\PlaySoundAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\map\SelectNearPointAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\map\SelectPointAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\map\position\PosAngleSelector.cs" />
+    <Compile Include="GameModules\GamePlay\Free\map\position\PosEditSelector.cs" />
+    <Compile Include="GameModules\GamePlay\Free\map\position\PosEntitySelector.cs" />
+    <Compile Include="GameModules\GamePlay\Free\map\position\PosGroundSelector.cs" />
+    <Compile Include="GameModules\GamePlay\Free\map\position\UnityPositionUtil.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\BombHurtAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\FollowEntityAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\FreePlayerCmdSystem.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\PlayerArmorAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\PlayerBagLockAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\PlayerHideAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\PlayerHurtAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\PlayerItemAvatarAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\PlayerItemPartAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\PlayerItemWeaponction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\PlayerMaskAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\PlayerMoveAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\PlayerReliveAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\PlayerResetAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\PlayerSpeedAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\PlayerWeaponDropAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\SelectPlayerAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\SetPlayerCastStateAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\SetPlayerGameStateAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\SetPlayerUiStateAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\SimplePlayerDamager.cs" />
+    <Compile Include="GameModules\GamePlay\Free\replacer\ItemDropReplacer.cs" />
+    <Compile Include="GameModules\GamePlay\Free\replacer\TextDescReplacer.cs" />
+    <Compile Include="GameModules\GamePlay\Free\ui\BombCircleAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\ui\LockMouseAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\ui\PoisonCirlceAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\ui\ScoreInfoAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\ui\ShowAppUiAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\ui\ShowPartAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\ui\SimpleBagAuto.cs" />
+    <Compile Include="GameModules\GamePlay\Free\weapon\AddWeaponAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\weapon\ChangeWeaponAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\weapon\SelectWeaponAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\weapon\SwitchWeaponAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\weapon\WeaponClipAction.cs" />
+    <Compile Include="GameModules\GamePlay\PingSystem.cs" />
+    <Compile Include="GameModules\GamePlay\ServerGamePlayModule.cs" />
+    <Compile Include="GameModules\Player\ServerPlayerCameraInitSystem.cs" />
+    <Compile Include="GameModules\Player\ServerPlayerModule.cs" />
+    <Compile Include="GameModules\Player\ServerPlayerWeaponInitSystem.cs" />
+    <Compile Include="GameModules\Player\ServerPostPredictionModule.cs" />
+    <Compile Include="GameModules\Player\ServerRemoteEventInitSystem.cs" />
+    <Compile Include="GameModules\Player\ServerTimeWriterSystem.cs" />
+    <Compile Include="GameModules\SceneManagement\ServerScenePostprocessorSystem.cs" />
+    <Compile Include="GameModules\SceneObject\ServerAbstractTriggerObjectListener.cs" />
+    <Compile Include="GameModules\SceneObject\ServerDebugSystem.cs" />
+    <Compile Include="GameModules\SceneObject\ServerDestructibleObjectListener.cs" />
+    <Compile Include="GameModules\SceneObject\ServerDestructibleObjectUpdateSystem.cs" />
+    <Compile Include="GameModules\SceneObject\ServerDoorListener.cs" />
+    <Compile Include="GameModules\SceneObject\ServerFracturedChunkDetachCallback.cs" />
+    <Compile Include="GameModules\SceneObject\ServerFreeCastSceneEntityDestroySystem.cs" />
+    <Compile Include="GameModules\SceneObject\ServerGlassyObjectListener.cs" />
+    <Compile Include="GameModules\SceneObject\ServerSceneObjectModule.cs" />
+    <Compile Include="GameModules\SceneObject\ServerSceneObjectThrowingSystem.cs" />
+    <Compile Include="GameModules\ServerInit\ServerEntitiesInitSystem.cs" />
+    <Compile Include="GameModules\ServerInit\ServerInitModule.cs" />
+    <Compile Include="GameModules\TopLevelServerGameModule.cs" />
+    <Compile Include="GameModules\Vehicle\RideOffVehicleOnPlayerDestroy.cs" />
+    <Compile Include="GameModules\Vehicle\ServerVehicleEntityInitSystem.cs" />
+    <Compile Include="GameModules\Vehicle\ServerVehicleModule.cs" />
+    <Compile Include="HallRoom.cs" />
+    <Compile Include="HallServerNetwork.cs" />
+    <Compile Include="LoginServer.cs" />
+    <Compile Include="MessageHandler\AbstractServerMessageHandler.cs" />
+    <Compile Include="MessageHandler\DebugMessageHandler.cs" />
+    <Compile Include="MessageHandler\DebugScriptInfoMessageHandler.cs" />
+    <Compile Include="MessageHandler\FireInfoMessageHandler.cs" />
+    <Compile Include="MessageHandler\FreeEventMessageHandler.cs" />
+    <Compile Include="MessageHandler\Hall\RequestCreateRoomMessageHandler.cs" />
+    <Compile Include="MessageHandler\Hall\RequestJoinRoomListMessageHandler.cs" />
+    <Compile Include="MessageHandler\Hall\RequestJoinRoomMessageHandler.cs" />
+    <Compile Include="MessageHandler\Hall\ResponseRegisterBattleServerMessageHandler.cs" />
+    <Compile Include="MessageHandler\IPlayerEntityDic.cs" />
+    <Compile Include="MessageHandler\PingReqMessageHandler.cs" />
+    <Compile Include="MessageHandler\ServerGameOverMessageHandler.cs" />
+    <Compile Include="MessageHandler\SimulationTimeServerSyncHandler.cs" />
+    <Compile Include="MessageHandler\TriggerObejctEventMessageHandler.cs" />
+    <Compile Include="MessageHandler\UserCmdMessageHandler.cs" />
+    <Compile Include="MessageHandler\UserUpdateAckMsgHandler.cs" />
+    <Compile Include="MessageHandler\UserUpdateMsgHandler.cs" />
+    <Compile Include="MessageHandler\VehicleCmdMessageHandler.cs" />
+    <Compile Include="MessageHandler\VehicleEventMessageHandler.cs" />
+    <Compile Include="PlayerNetworkMonitor.cs" />
+    <Compile Include="Robot\RobotFakeNetworkChannel.cs" />
+    <Compile Include="Robot\RobotsManager.cs" />
+    <Compile Include="RoomId.cs" />
+    <Compile Include="SceneManagement\ServerScenePostprocessor.cs" />
+    <Compile Include="SendSnapshotManager.cs" />
+    <Compile Include="ServerDebugCommandHandler.cs" />
+    <Compile Include="ServerRoom.cs" />
+    <Compile Include="ServerRoomEvent.cs" />
+    <Compile Include="ServerRoomExt.cs" />
+    <Compile Include="ServerRoomFactory.cs" />
+    <Compile Include="ServerSessionStateMachine.cs" />
+    <Compile Include="ServerSessionStateMachineMonitor.cs" />
+    <Compile Include="ServerSessionStateProgress.cs" />
+    <Compile Include="ServerStatusCollectUtil.cs" />
+    <Compile Include="SingleRoomManager.cs" />
+    <Compile Include="StatisticData\BaseGameStatisticData.cs" />
+    <Compile Include="StatisticData\GroupGameStatisticData.cs" />
+    <Compile Include="StatisticData\IGameStatisticData.cs" />
+    <Compile Include="StatisticData\Rank\GroupRank.cs" />
+    <Compile Include="StatisticData\Rank\IRankData.cs" />
+    <Compile Include="StatisticData\Rank\SurvivalRank.cs" />
+    <Compile Include="StatisticData\SurvivalGameStatisticData.cs" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\App.Hall.ProtoBuf\App.Hall.ProtoBuf.csproj">
+      <Project>{1414D718-802A-D5AE-C9A1-60D035F7A536}</Project>
+      <Name>App.Hall.ProtoBuf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\App.ProtoBuf\App.ProtoBuf.csproj">
+      <Project>{05E657F9-F148-E79D-9ACE-1F548610B320}</Project>
+      <Name>App.ProtoBuf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\App.Shared\App.Shared.csproj">
+      <Project>{EB79BF2D-D731-017B-4039-DAD62C109C6B}</Project>
+      <Name>App.Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\App.Shared.Components\App.Shared.Components.csproj">
+      <Project>{DFC0B886-4B2D-7481-1421-0CDF804C96E9}</Project>
+      <Name>App.Shared.Components</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AssetBundleManager\AssetBundleManager.csproj">
+      <Project>{BA76FEAD-A65A-BF03-0FBB-B956FBBDA985}</Project>
+      <Name>AssetBundleManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BehaviorDesigner\BehaviorDesigner.csproj">
+      <Project>{2663188B-125C-37DD-3B8E-1C6227E616E9}</Project>
+      <Name>BehaviorDesigner</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DWP\DWP.csproj">
+      <Project>{B0DF870B-1CE9-877C-A564-9E7C116D937C}</Project>
+      <Name>DWP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EVP5\EVP5.csproj">
+      <Project>{055E847C-F194-850D-9A81-6B108697010F}</Project>
+      <Name>EVP5</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Fracturing\Fracturing.csproj">
+      <Project>{FAF4CE90-E6AC-10DE-4FB4-E9393B8BABCE}</Project>
+      <Name>Fracturing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LiteNetLib\LiteNetLib.csproj">
+      <Project>{B1B5C059-9D6D-02A7-0675-DB02F24B9D97}</Project>
+      <Name>LiteNetLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RpcNetwork\RpcNetwork.csproj">
+      <Project>{74EC443D-60A4-868A-C9AB-5FE6B582217B}</Project>
+      <Name>RpcNetwork</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shared.Scripts\Shared.Scripts.csproj">
+      <Project>{D2164AE1-BEE4-3DE7-A778-AE0D93E5194C}</Project>
+      <Name>Shared.Scripts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tools\Tools.csproj">
+      <Project>{16CF2D0E-82E3-55BF-4B65-F91EB73852F0}</Project>
+      <Name>Tools</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UserInputManager\UserInputManager.csproj">
+      <Project>{AF9B4541-9B94-6493-C4C6-4918B01E449F}</Project>
+      <Name>UserInputManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utils\Utils.csproj">
+      <Project>{F68B420E-62A0-6ABF-2B22-0E1F97F566F0}</Project>
+      <Name>Utils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VehicleCommon\VehicleCommon.csproj">
+      <Project>{EEE6EAF7-5AA7-662E-23E2-AFAB8F61AB0A}</Project>
+      <Name>VehicleCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Wwise\Wwise.csproj">
+      <Project>{F462680E-6077-90BF-29F9-331F95CC8CF0}</Project>
+      <Name>Wwise</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XmlConfig\XmlConfig.csproj">
+      <Project>{CCFBDCB2-3866-9129-81A4-42CFED4D6F7E}</Project>
+      <Name>XmlConfig</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

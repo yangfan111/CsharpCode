@@ -4,7 +4,6 @@ using Core.EntityComponent;
 using Core.Interpolate;
 using Core.Playback;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
-using Core.SyncLatest;
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
 using UnityEngine;
@@ -20,10 +19,10 @@ namespace App.Shared.Components.ClientEffect
         void Initialize(ClientEffectEntity entity);
         //void OnCreate(Contexts contexts, int subType);
         void OnCreate(EClientEffectType type, int effectId);
+        void SetContexts(IContexts contexts);
     }
 
     [ClientEffect]
-    
     public class AssetsComponent : MultiAssetComponent
     {
         public bool IsLoadSucc;

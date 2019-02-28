@@ -294,6 +294,11 @@ namespace Core.CharacterState.Movement
             return _commonFsm.TransitionRemainTime();
         }
 
+        public float TransitionTime()
+        {
+            return _commonFsm.TransitionTime();
+        }
+
         public MovementInConfig CurrentMovement()
         {
             return _commonFsm.GetCurrentMovementState();

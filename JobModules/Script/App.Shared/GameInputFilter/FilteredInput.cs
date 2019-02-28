@@ -8,8 +8,8 @@ namespace App.Shared.GameInputFilter
 
     public class FilteredInput : IFilteredInput
     {
-        Dictionary<EPlayerInput, bool> _inputDic = new Dictionary<EPlayerInput, bool>(CommonEnumEqualityComparer<EPlayerInput>.Instance);
-        HashSet<EPlayerInput> _blockedInputs = new HashSet<EPlayerInput>(CommonEnumEqualityComparer<EPlayerInput>.Instance);
+        Dictionary<EPlayerInput, bool> _inputDic = new Dictionary<EPlayerInput, bool>(CommonIntEnumEqualityComparer<EPlayerInput>.Instance);
+        HashSet<EPlayerInput> _blockedInputs = new HashSet<EPlayerInput>(CommonIntEnumEqualityComparer<EPlayerInput>.Instance);
 
         public bool IsInput(EPlayerInput input)
         {

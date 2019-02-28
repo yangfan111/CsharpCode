@@ -7,7 +7,7 @@ namespace Core.Configuration
 {
     public class ClientEffectCommonConfigManager : AbstractConfigManager<ClientEffectCommonConfigManager>
     {
-        private Dictionary<EClientEffectType, ClientEffectCommonConfigItem> _configs = new Dictionary<EClientEffectType, ClientEffectCommonConfigItem>(CommonEnumEqualityComparer<EClientEffectType>.Instance);
+        private Dictionary<EClientEffectType, ClientEffectCommonConfigItem> _configs = new Dictionary<EClientEffectType, ClientEffectCommonConfigItem>(CommonIntEnumEqualityComparer<EClientEffectType>.Instance);
         
         public int BulletDropLifeTime { get; private set; }
         public int DecayLifeTime { get; private set; }

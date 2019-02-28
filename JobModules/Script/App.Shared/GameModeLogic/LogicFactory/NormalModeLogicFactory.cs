@@ -5,7 +5,7 @@ using App.Shared.GameModeLogic.WeaponActionListener;
 using App.Shared.GameModeLogic.WeaponInitLoigc;
 using App.Shared.GameModules.Weapon;
 using Assets.Utils.Configuration;
-using Core.GameModeLogic;
+using Core;
 using Core.GameModule.System;
 using Utils.Configuration;
 using Utils.Singleton;
@@ -21,6 +21,7 @@ namespace App.Shared.GameModeLogic.LogicFactory
 
         public NormalModeLogicFactory(Contexts contexts, ICommonSessionObjects commonSessionObjects, int modeId)
         {
+            UnityEngine.Debug.Log("normal mode ");
             _contexts = contexts;
             _commonSessionObjects = commonSessionObjects;
             _modeId = modeId;
@@ -35,21 +36,16 @@ namespace App.Shared.GameModeLogic.LogicFactory
 
         protected override IPickupLogic GetPickupLogic()
         {
-            var pickupLogic = new NormalPickupLogic(_contexts.sceneObject,
-                _contexts.player,
+            var pickupLogic = new NormalPickupLogic(_contexts,
                 _contexts.session.entityFactoryObject.SceneObjectEntityFactory,
                 _commonSessionObjects.RuntimeGameConfig,
                 SingletonManager.Get<GameModeConfigManager>().GetWepaonStayTime(_modeId));
-
-
             return pickupLogic;
         }
 
         protected override IReservedBulletLogic GetReservedBulletLogic()
         {
-            var reservedBulletLogic = new LocalReservedBulletLogic();
-
-
+            var reservedBulletLogic = new LocalReservedBulletLogic(_contexts);
             return reservedBulletLogic;
         }
 
@@ -61,12 +57,13 @@ namespace App.Shared.GameModeLogic.LogicFactory
             return weaponActionListener;
         }
 
-        protected override IWeaponInitLogic GetWeaponIniLogic()
+        protected override IWeaponInitHandler InitializeHandler()
         {
-            var weaponInitLogic = new NormalWeaponInitLogic(_commonSessionObjects.RoomInfo.ModeId,
-                SingletonManager.Get<GameModeConfigManager>(),
-                SingletonManager.Get<WeaponConfigManager>(),
-                SingletonManager.Get<WeaponPropertyConfigManager>());
+            var weaponInitLogic = new ServerWeaponInitHandler(
+                _commonSessionObjects.RoomInfo.ModeId);
+                //SingletonManager.Get<WeaponResourceConfigManager>(),
+                //SingletonManager.Get<WeaponPropertyConfigManager>(),
+                //SingletonManager.Get<WeaponPartsConfigManager>());
 
 
             return weaponInitLogic;

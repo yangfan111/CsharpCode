@@ -36,19 +36,19 @@ namespace App.Shared.FreeFramework.Entitas
                 FreeLog.Reset();  
             }
             args.GetInput().SetUserCmd(cmd);
-            if(player.gamePlay.LifeState != (int)EPlayerLifeState.Dead)
-            {
+            //if(player.gamePlay.LifeState != (int)EPlayerLifeState.Dead)
+            //{
                 FreeData fd = ((FreeData)player.freeData.FreeData);
                 args.TempUse("current", fd);
 
-                if (cmd.IsPDown)
+                /*if (cmd.IsPDown)
                 {
                     Debug.LogFormat("p down {0}, is server {1}", cmd.Seq, SharedConfig.IsServer);
-                }
+                }*/
                 fd.GetUnitSkill().Frame(args);
 
                 args.Resume("current");
-            }
+            //}
 
             if (SharedConfig.IsServer)
             {

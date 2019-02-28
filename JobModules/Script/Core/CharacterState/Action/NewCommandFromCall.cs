@@ -13,150 +13,8 @@ using Utils.Utils;
 
 namespace Core.CharacterState.Action
 {
-
-    internal enum AnimationCallBackCommandType
+    public class NewCommandFromCall : NewCommandImpl, INewCommandFromCall
     {
-        Apply = 0,
-        Interupt,
-    }
-    
-    public struct AnimationCallBackCommand
-    {
-        public short CommandType;
-        public int FsmType;
-    }
-    
-    public class NewCommandFromCall: INewCommandFromCall
-    {
-        protected static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(NewCommandFromCall));
-
-        class NewCommandContainer : AdaptiveContainerImpl<INewCommand, NewCommand>
-        {
-
-            private int useCount = 0;
-
-            public NewCommandContainer(int initSize) : base(initSize)
-            {
-                _defaultGetItemCondition = DefaultGetItemCondition;
-                Reset();
-            }
-
-            public void Reset()
-            {
-                useCount = 0;
-                for (int i = 0; i < this.Length; ++i)
-                {
-                    this[i].Reset();
-                }
-            }
-
-            private bool DefaultGetItemCondition(INewCommand newCommand)
-            {
-                return newCommand.Type == FsmInput.None;
-            }
-
-            protected override int GetAvailable(Func<INewCommand, bool> getItemCondition)
-            {
-                int ret = 0;
-                int index = useCount;
-                while (index < this.Length)
-                {
-                    if (getItemCondition(this[index]))
-                    {
-                        ret = index;
-                        useCount = ret + 1;
-						return ret;
-                    }
-                    index++;
-                }
-                
-                Logger.WarnFormat("resize NewCommandContainer list from {0} to {1}, useCount:{2}!!!", this.Length, ret + 1, useCount);
-                ret = index;
-                useCount = ret + 1;
-                Resize(ret + 1);
-                var newCommand = new NewCommand();
-                newCommand.Reset();
-                this[ret] = newCommand;
-                return ret;
-            }
-        }
-
-        interface INewCommand
-        {
-            FsmInput Type { get; set; }
-            float AdditionalValue { get; set; }
-            void Reset();
-        }
-
-        class NewCommand: INewCommand
-        {
-            public NewCommand()
-            {
-                Reset();
-            }
-            public FsmInput Type { get; set; }
-            public float AdditionalValue { get; set; }
-            public void Reset()
-            {
-                Type = FsmInput.None;
-                AdditionalValue = 0f;
-            }
-        }
-
-        class CallBackRegister
-        {
-            private Dictionary<FsmInput, System.Action> _inputCallBack = new Dictionary<FsmInput, System.Action>(CommonEnumEqualityComparer<FsmInput>.Instance);
-            private Dictionary<FsmInput, System.Action> _callBackRemove = new Dictionary<FsmInput, System.Action>(CommonEnumEqualityComparer<FsmInput>.Instance);
-
-            public void AddNewCallBack(FsmInput trigger, FsmInput removeCondition, System.Action callBack)
-            {
-                if (!_inputCallBack.ContainsKey(trigger))
-                {
-                    if (!_callBackRemove.ContainsKey(removeCondition))
-                    {
-                        _callBackRemove[removeCondition] = default(System.Action);
-                    }
-                    _callBackRemove[removeCondition] += () => _inputCallBack[trigger] = null;
-                }
-                _inputCallBack[trigger] = callBack;
-            }
-
-            public void TryInvokeCallBack(FsmInput type)
-            {
-                System.Action callBack;
-                _inputCallBack.TryGetValue(type, out callBack);
-
-                if (callBack != null)
-                {
-                    callBack.Invoke();
-                    Logger.DebugFormat("Animation End Callback: {0}", type);
-                }
-            }
-
-            public void TryRemoveCallBack(FsmInput type)
-            {
-                System.Action remove;
-                _callBackRemove.TryGetValue(type, out remove);
-                
-                if (remove != null)
-                    remove.Invoke();
-            }
-        }
-
-        private static readonly int CommandsInitLen = 5;
-
-        private NewCommandContainer commandsContainer = new NewCommandContainer(CommandsInitLen);
-
-        private FsmOutputCache _directOutputs = new FsmOutputCache();
-
-        private CallBackRegister _callBackRegister = new CallBackRegister();
-
-        private List<FsmInput> _interruptInputs = new List<FsmInput>();
-        
-        private List<AnimationCallBackCommand> _animationCallBackCommand = new List<AnimationCallBackCommand>();
-
-        private float _reloadSpeedRatio = 1;
-
         protected NewCommandFromCall()
         {
         }
@@ -216,6 +74,7 @@ namespace Core.CharacterState.Action
         public void Revive()
         {
             SetNewCommandFromFunctionCall(FsmInput.Revive);
+            SetPostureCrouch();
         }
 
         public void Unarm(System.Action callBack, float holsterParam)
@@ -227,10 +86,10 @@ namespace Core.CharacterState.Action
         public void Draw(System.Action callBack, float drawParam)
         {
             SetNewCommandFromFunctionCall(FsmInput.Draw, drawParam);
-            SetNewCallbackFromFunctionCall(FsmInput.SelectFinished,FsmInput.SelectFinished,callBack);
+            SetNewCallbackFromFunctionCall(FsmInput.SelectFinished, FsmInput.SelectFinished, callBack);
         }
 
-        public void SwitchWeapon(System.Action unarmCallBack,System.Action drawCallBack, float SwitchType)
+        public void SwitchWeapon(System.Action unarmCallBack, System.Action drawCallBack, float SwitchType)
         {
             SetNewCommandFromFunctionCall(FsmInput.SwitchWeapon, SwitchType);
             SetNewCallbackFromFunctionCall(FsmInput.HolsterFinished, FsmInput.HolsterFinished, unarmCallBack);
@@ -250,6 +109,22 @@ namespace Core.CharacterState.Action
         public void RescueEnd()
         {
             SetNewCommandFromFunctionCall(FsmInput.RescueEnd);
+            SetPostureCrouch();
+        }
+
+        public void SetPostureStand()
+        {
+            SetNewCommandFromFunctionCall(FsmInput.PostureStand);
+        }
+
+        public void SetPostureCrouch()
+        {
+            SetNewCommandFromFunctionCall(FsmInput.PostureCrouch);
+        }
+
+        public void SetPostureProne()
+        {
+            SetNewCommandFromFunctionCall(FsmInput.PostureProne);
         }
 
         public void Stand()
@@ -320,7 +195,8 @@ namespace Core.CharacterState.Action
         public void ForceBreakSpecialReload(System.Action callBack)
         {
             SetNewCommandFromFunctionCall(FsmInput.ForceBreakSpecialReload);
-            SetNewCallbackFromFunctionCall(FsmInput.ForceBreakSpecialReload, FsmInput.ForceBreakSpecialReload, callBack);
+            SetNewCallbackFromFunctionCall(FsmInput.ForceBreakSpecialReload, FsmInput.ForceBreakSpecialReload,
+                callBack);
         }
 
         // 拾取
@@ -364,7 +240,7 @@ namespace Core.CharacterState.Action
             SetNewCommandFromFunctionCall(FsmInput.MeleeSpecialAttack);
             SetNewCallbackFromFunctionCall(FsmInput.MeleeAttackFinished, FsmInput.MeleeAttackFinished, callBack);
         }
-        
+
         // c4动作
         public void C4Animation(System.Action callBack)
         {
@@ -374,14 +250,17 @@ namespace Core.CharacterState.Action
 
         public void BuriedBomb(System.Action callBack)
         {
+            Logger.InfoFormat("BuriedBomb--------------");
             SetNewCommandFromFunctionCall(FsmInput.BuriedBomb);
             SetNewCallbackFromFunctionCall(FsmInput.BuriedBombFinished, FsmInput.BuriedBombFinished, callBack);
+            SetPostureStand();
         }
 
         public void DismantleBomb(System.Action callBack)
         {
             SetNewCommandFromFunctionCall(FsmInput.DismantleBomb);
             SetNewCallbackFromFunctionCall(FsmInput.DismantleBombFinished, FsmInput.DismantleBombFinished, callBack);
+            SetPostureCrouch();
         }
 
         //投掷动作
@@ -448,182 +327,36 @@ namespace Core.CharacterState.Action
             SetNewCommandFromFunctionCall(FsmInput.Freefall);
         }
 
+        // 下滑
+        public void Slide()
+        {
+            Logger.InfoFormat("Slide!!!");
+            SetNewCommandFromFunctionCall(FsmInput.Slide);
+        }
+
+        // 下滑
+        public void SlideEnd()
+        {
+            Logger.InfoFormat("SlideEnd!!!");
+            SetNewCommandFromFunctionCall(FsmInput.SlideEnd);
+        }
+
         // 打断行为
         public void InterruptAction()
         {
-            Logger.DebugFormat("Request Interrupt Action");
+            Logger.InfoFormat("Request Interrupt Action");
             SetNewCommandFromFunctionCall(FsmInput.InterruptAction);
+            InterruptInputs();
         }
-        
+
         public void SetDiveUpDownValue(float value)
         {
             if (Logger.IsDebugEnabled)
             {
                 //Logger.DebugFormat("SetDiveUpAngle value to:{0}", value);
             }
+
             SetNewCommandFromFunctionCall(FsmInput.DiveUpDown, value);
-        }
-
-        #endregion
-
-        #region Impl
-
-        private void SetNewCommandFromFunctionCall(FsmInput type, float additionalValue = 0)
-        {
-            Logger.DebugFormat("Request Do Action : {0}   AdditionalValue  : {1}", type, additionalValue);
-            var availableCommand = commandsContainer.GetAvailableItem();
-            availableCommand.Type = type;
-            availableCommand.AdditionalValue = additionalValue;
-        }
-
-        private void SetNewCallbackFromFunctionCall(FsmInput trigger, FsmInput removeCondition, System.Action callBack)
-        {
-            if (callBack != null)
-            {
-                _callBackRegister.AddNewCallBack(trigger, removeCondition, callBack);
-                Logger.DebugFormat("New callback from function call: {0}", trigger);
-            }
-        }
-
-        protected void ApplyNewCommand(IAdaptiveContainer<IFsmInputCommand> commands, Action<FsmOutput> addOutput)
-        {
-            for (int i = 0; i < commandsContainer.Length; ++i)
-            {
-                var newCommand = commandsContainer[i];
-                if (newCommand.Type != FsmInput.None)
-                {
-                    var item = commands.GetAvailableItem();
-                    item.Type = newCommand.Type;
-                    item.AdditioanlValue = newCommand.AdditionalValue;
-                }
-            }
-            ClearAction(commands);
-            commandsContainer.Reset();
-            _directOutputs.Apply(addOutput);
-        }
-
-        public void TryAnimationBasedCallBack(IAdaptiveContainer<IFsmInputCommand> commands)
-        {
-            InterruptAnimationCallBack(commands);
-            for (int i = 0; i < commands.Length; ++i)
-            {
-                var cmd = commands[i];
-                if (cmd.Type != FsmInput.None)
-                {
-                    _callBackRegister.TryInvokeCallBack(cmd.Type);
-                    _callBackRegister.TryRemoveCallBack(cmd.Type);
-                    _animationCallBackCommand.Add(new AnimationCallBackCommand
-                    {
-                        CommandType = (int)AnimationCallBackCommandType.Apply,
-                        FsmType = (int)cmd.Type
-                    });
-                }
-            }
-        }
-
-        // 添加需要打断的 input
-        public void AddInterruptInput(FsmInput input)
-        {
-            _interruptInputs.Add(input);
-        }
-
-        public virtual void ServerUpdate()
-        {
-            commandsContainer.Reset();
-        }
-
-        public void CollectAnimationCallback(Action<short, float> addCallback)
-        {
-            foreach (AnimationCallBackCommand backCommand in _animationCallBackCommand)
-            {
-                addCallback.Invoke(backCommand.CommandType, backCommand.FsmType);
-            }
-        }
-
-        public void ClearAnimationCallback()
-        {
-            _animationCallBackCommand.Clear();
-        }
-
-        public void HandleAnimationCallback(List<KeyValuePair<short, float>> commands)
-        {
-            foreach (KeyValuePair<short,float> keyValuePair in commands)
-            {
-                if (Mathf.Abs((keyValuePair.Value - (float) ((short) keyValuePair.Value))) > 0.1f)
-                {
-                    Logger.ErrorFormat("HandleAnimationCallback, float:{0} convert to int:{1} error", keyValuePair.Value, (short)keyValuePair.Value);
-                }
-                
-                if (keyValuePair.Key == (short) AnimationCallBackCommandType.Apply)
-                {
-                    var type = (FsmInput) ((short) keyValuePair.Value);
-                    _callBackRegister.TryInvokeCallBack(type);
-                    _callBackRegister.TryRemoveCallBack(type);
-                }
-                else if (keyValuePair.Key == (short) AnimationCallBackCommandType.Interupt)
-                {
-                    var type = (FsmInput) ((short) keyValuePair.Value);
-                    _callBackRegister.TryRemoveCallBack(type);
-                }
-            }
-        }
-
-        // 拦截需要销毁的input(打断不触发)
-        private void InterruptAnimationCallBack(IAdaptiveContainer<IFsmInputCommand> commands)
-        {
-            if (_interruptInputs.Count <= 0) return;
-            for (int i = 0; i < _interruptInputs.Count; ++i)
-            {
-                var input = _interruptInputs[i];
-                for (int j = 0; j < commands.Length; ++j)
-                {
-                    var cmd = commands[j];
-                    if (cmd.Type == input)
-                    {
-                        _callBackRegister.TryRemoveCallBack(cmd.Type);
-                        _animationCallBackCommand.Add(new AnimationCallBackCommand
-                        {
-                            CommandType = (int)AnimationCallBackCommandType.Interupt,
-                            FsmType = (int)cmd.Type
-                        });
-                    }
-                }
-            }
-            _interruptInputs.Clear();
-        }
-
-        /// <summary>
-        /// 拦截一些action(不执行)
-        /// </summary>
-        /// <param name="commands"></param>
-        private void ClearAction(IAdaptiveContainer<IFsmInputCommand> commands)
-        {
-            ClearActionByCmd(commands, FsmInput.Climb, FsmInput.Jump);
-        }
-
-        private void ClearActionByCmd(IAdaptiveContainer<IFsmInputCommand> commands, FsmInput cmd, FsmInput clearAction)
-        {
-            for (int i = 0; i < commands.Length; ++i)
-            {
-                if (commands[i].Type == cmd)
-                {
-                    ClearActionByCmdHelper(commands, clearAction);
-                    return;
-                }
-            }
-        }
-
-        private void ClearActionByCmdHelper(IAdaptiveContainer<IFsmInputCommand> commands, FsmInput clearAction)
-        {
-            for (int i = 0; i < commands.Length; ++i)
-            {
-                if (commands[i].Type == clearAction)
-                {
-                    commands[i].Type = FsmInput.None;
-                    commands[i].Handled = false;
-                    return;
-                }
-            }
         }
 
         #endregion

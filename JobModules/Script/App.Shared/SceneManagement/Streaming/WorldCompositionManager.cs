@@ -44,10 +44,12 @@ namespace App.Shared.SceneManagement.Streaming
             {
                 for (int j = 0; j < param.TerrainDimension; j++)
                 {
-                    var node = new SceneNode();
-                    node.Center = new Vector2(i + 0.5f, j + 0.5f);
-                    node.Status = SceneLoadingStatus.Unloaded;
-                    node.SceneName = string.Format(_param.TerrainNamePattern, i, j);
+                    var node = new SceneNode
+                    {
+                        Center = new Vector2(i + 0.5f, j + 0.5f),
+                        Status = SceneLoadingStatus.Unloaded,
+                        SceneName = string.Format(_param.TerrainNamePattern, i, j)
+                    };
                     node.Dimension = new Vector4(
                         node.Center.x * _param.TerrainSize + _param.TerrainMin.x,
                         _param.TerrainSize * 0.5f,
@@ -81,6 +83,7 @@ namespace App.Shared.SceneManagement.Streaming
                             {
                                 UnloadScene(node.SceneName);
                                 node.Status = SceneLoadingStatus.Unloading;
+                                _logger.InfoFormat("unload scene {0}/{1}/{2}/{3}", node.SceneName, pos, gridCoordinate, node.Center);
                             }
 
                             break;
@@ -89,6 +92,7 @@ namespace App.Shared.SceneManagement.Streaming
                             {
                                 LoadScene(node.SceneName);
                                 node.Status = SceneLoadingStatus.Loading;
+                                _logger.InfoFormat("load scene {0}/{1}/{2}/{3}", node.SceneName, pos, gridCoordinate, node.Center);
                             }
 
                             break;

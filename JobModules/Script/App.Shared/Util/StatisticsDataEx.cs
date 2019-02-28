@@ -29,6 +29,9 @@ namespace App.Shared.Util
                 case EUIDeadType.Weapon:
                     data.KillByPlayer = true;
                     break;
+                case EUIDeadType.Unarmed:
+                    data.KillByPlayer = true;
+                    break;
             }
         }
 

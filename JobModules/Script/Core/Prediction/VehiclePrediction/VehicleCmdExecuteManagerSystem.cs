@@ -157,7 +157,7 @@ namespace Core.Prediction.VehiclePrediction
                     _firstStep = false;
                 }
 
-                SingletonManager.Get<DurationHelp>().ProfileAddInfo(CustomProfilerStep.VehicleExecuteCmds, executeCount.ToString());
+                SingletonManager.Get<DurationHelp>().ProfileAddExecuteCount(CustomProfilerStep.VehicleSimulation, executeCount);
 
                 if (_simulationTimer.CurrentTime > 0)
                 {
@@ -172,7 +172,7 @@ namespace Core.Prediction.VehiclePrediction
             { 
                 _vehicleSelector.LateUpdate();
                 var elapsed = StopProfiler(CustomProfilerStep.VechiclePrediction);
-                SingletonManager.Get<DurationHelp>().ProfileAddInfo(CustomProfilerStep.VehicleSimulation, elapsed.ToString());
+                SingletonManager.Get<DurationHelp>().ProfileAddInfo(CustomProfilerStep.VechiclePrediction, elapsed.ToString("F3"));
             }
         }
 
@@ -197,6 +197,7 @@ namespace Core.Prediction.VehiclePrediction
                 {
                     var entity = vehicleEntityList[i];
                     _currentEntity = entity;
+  
                     ExecuteVehicleSystems();
                 }
             }
@@ -218,7 +219,8 @@ namespace Core.Prediction.VehiclePrediction
                 var module = Systems[i];
                 try
                 {
-                    SingleExecute(module);
+                    if(module.IsEntityValid(_currentEntity))
+                        SingleExecute(module);
                 }
                 catch (Exception e)
                 {
@@ -293,7 +295,7 @@ namespace Core.Prediction.VehiclePrediction
                         _logger.DebugFormat("execute vehicle simulation {0}, at time {1} on vehicle {2}", startTime, userCmd.ExecuteTime, userCmd.VehicleId);
                     }
 
-                    _logger.DebugFormat("Simulation Cmd is {0}", userCmd.ExecuteTime);
+                    _logger.DebugFormat("Simulation Cmd is {0} seq {1} move {2} {3}", userCmd.ExecuteTime, userCmd.CmdSeq, userCmd.MoveHorizontal, userCmd.MoveVertical);
                     ExecuteVehicleSystems();
                 }
             }

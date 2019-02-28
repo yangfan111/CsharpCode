@@ -35,6 +35,7 @@ namespace Core.Event
         PullBolt,
         HitVehicle,
         HitPlayer,
+        BeenHit,
         HitEnvironment,
         End,
 
@@ -58,6 +59,9 @@ namespace Core.Event
     
     public interface IEventHandler
     {
+        /// <summary>
+        /// 通过EventType和IEvent关联
+        /// </summary>
         EEventType EventType { get; }
         IEvent MergeEvent(IEvent self, IEvent other);
 

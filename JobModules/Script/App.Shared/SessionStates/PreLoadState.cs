@@ -24,7 +24,7 @@ namespace App.Shared.SessionStates
         private IAssetInfoProvider _assetInfoProvider;
         private bool _isLoading = false;
         private int _loadingCount = 0;
-        private ILoadRequestManager _loadRequestManager;
+        private IUnityAssetManager _assetManager;
         public PreLoadSystem(ISessionState sessionState,  IAssetInfoProvider assetInfoProvider)
         {
             _sessionState = sessionState;
@@ -35,16 +35,16 @@ namespace App.Shared.SessionStates
             SingletonManager.Get<SubProgressBlackBoard>().Add((uint) _assetInfoProvider.AssetInfos.Count);
         }
 
-        public void OnLoadResources(ILoadRequestManager loadRequestManager)
+        public void OnLoadResources(IUnityAssetManager assetManager)
         {
             if (!_isLoading)
             {
-                _loadRequestManager = loadRequestManager;
+                _assetManager = assetManager;
 
                 var assetInfos = _assetInfoProvider.AssetInfos;
                 foreach (var assetInfo in assetInfos)
                 {
-                    loadRequestManager.AppendLoadRequest(null, assetInfo, OnLoadSucc);
+                    _assetManager.LoadAssetAsync("PreLoadSystem", assetInfo, OnLoadSucc);
                 }
 
                 _loadingCount = assetInfos.Count;
@@ -59,18 +59,18 @@ namespace App.Shared.SessionStates
             }
         }
 
-        public void OnLoadSucc(object source, UnityObjectWrapper<GameObject> obj)
+        public void OnLoadSucc(string source, UnityObject unityObj)
         {
             SingletonManager.Get<SubProgressBlackBoard>().Step();
             _loadingCount--;
 
-            if (obj.Value == null)
+            if (unityObj.AsObject == null)
             {
-                _logger.ErrorFormat("Preload asset {0} failed", obj.Address);
+                _logger.ErrorFormat("Preload asset {0} failed", unityObj.Address);
             }
             else
             {
-                _loadRequestManager.AddRecycleRequest(obj);
+                _assetManager.Recycle(unityObj);
             }
 
             if (_loadingCount <= 0)
@@ -106,10 +106,10 @@ namespace App.Shared.SessionStates
             var systems = new Feature("PreLoadingState");
             var contextsImpl = contexts as Contexts;
             var commonSession = contextsImpl.session.commonSession;
-            systems.Add(new LoadRequestManagerSystem(commonSession));
+            systems.Add(new UnityAssetManangerSystem(commonSession));
             systems.Add(new ResourceLoadSystem(
                 new PreLoadModule(this,  contexts),
-                commonSession.LoadRequestManager));
+                commonSession.AssetManager));
            
             return systems;
         }

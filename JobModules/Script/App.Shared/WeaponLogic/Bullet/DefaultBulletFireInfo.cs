@@ -11,7 +11,7 @@ namespace App.Shared.GameModules.Weapon.Bullet
 
         public virtual Vector3 GetFireDir(int seed, PlayerEntity playerEntity, WeaponEntity weaponEntity, Contexts contexts)
         {
-            var weaponState = weaponEntity.weaponData;
+            var weaponState = weaponEntity.weaponRuntimeInfo;
             if(!playerEntity.hasOrientation)
             {
                 LogError("playerEntity has no orientation");
@@ -71,9 +71,9 @@ namespace App.Shared.GameModules.Weapon.Bullet
                 return Vector3.zero;
             }
             var cameraAngle = playerEntity.cameraFinalOutputNew.EulerAngle;
-            var matrix = Matrix4x4.TRS(BulletEmittorOffset, Quaternion.Euler(cameraAngle), Vector3.one);
-            var offset = matrix.ExtractPosition();
-            return offset + playerEntity.cameraFinalOutputNew.Position;
+          //  var matrix = Matrix4x4.TRS(BulletEmittorOffset, Quaternion.Euler(cameraAngle), Vector3.one);
+            //var offset = matrix.ExtractPosition();
+            return  playerEntity.cameraFinalOutputNew.Position;
         }
 
         private void LogError(string msg)

@@ -12,6 +12,7 @@ using com.wd.free.unit;
 using com.wd.free.util;
 using com.wd.free.para;
 using App.Server.GameModules.GamePlay.free.player;
+using App.Shared.GameModules.Player;
 
 namespace Assets.App.Server.GameModules.GamePlay.Free
 {
@@ -35,8 +36,8 @@ namespace Assets.App.Server.GameModules.GamePlay.Free
 
         public void SendMessage(IEventArgs args, SimpleProto message, int scope, string player)
         {
+            //PlayerEntity[] players = args.GameContext.player.GetInitializedPlayerEntities();
             PlayerEntity[] players = args.GameContext.player.GetEntities();
-
             if (scope == 4)
             {
                 foreach (PlayerEntity p in players)

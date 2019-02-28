@@ -70,6 +70,11 @@ namespace Core.CharacterState.Action
             return _commonFsm.GetActionState();
         }
 
+        public ActionInConfig GetNextActionState()
+        {
+            return _commonFsm.GetNextActionState();
+        }
+
         public ActionKeepInConfig GetActionKeepState()
         {
             return _keepFsm.GetActionKeepState();

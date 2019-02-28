@@ -1,24 +1,26 @@
 ﻿using Core;
-using Core.GameModeLogic;
+using Core;
+using Core.EntityComponent;
 using Entitas;
 
 namespace App.Shared.GameModeLogic.WeaponActionListener
 {
     public class DummyWeaponActionListener : IWeaponProcessListener
     {
-        public void OnExpend(Entity playerEntity, EWeaponSlotType slot)
+        public void OnExpend(IPlayerWeaponGetter controller, EWeaponSlotType slot)
         {
             //DO NOTHING
         }
 
-        public void OnDrop(Entity playerEntity, EWeaponSlotType slot)
+    
+
+        public void OnPickup(IPlayerWeaponGetter controller, EWeaponSlotType slot)
         {
             //DO NOTHING
         }
 
-        public void OnPickup(Entity playerEntity, EWeaponSlotType slot)
+        public void OnDrop(IPlayerWeaponGetter controller, EWeaponSlotType slot, EntityKey dropedWeapon)
         {
-            //DO NOTHING
         }
     }
 }

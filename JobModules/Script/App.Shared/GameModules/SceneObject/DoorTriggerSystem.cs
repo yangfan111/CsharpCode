@@ -36,7 +36,7 @@ namespace App.Shared.GameModules.SceneObject
                 if (!door.hasDoorRotate && door.doorData.IsOpenable())
                 {
                     var player = (PlayerEntity)owner.OwnerEntity;
-                    player.playerMove.InterruptAutoRun();
+                    player.autoMoveInterface.PlayerAutoMove.StopAutoMove();
                     var go = door.rawGameObject.Value;
                     var playerPosition = player.RootGo().transform.position;
                     var doorPosition = go.transform.position;

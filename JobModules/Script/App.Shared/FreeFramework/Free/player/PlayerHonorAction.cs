@@ -9,6 +9,7 @@ using com.wd.free.para;
 using com.wd.free.para.exp;
 using com.wd.free.util;
 using App.Server.GameModules.GamePlay.free.player;
+using App.Shared.GameModules.Player;
 
 namespace gameplay.gamerule.free.player
 {
@@ -49,7 +50,7 @@ namespace gameplay.gamerule.free.player
                         map[id].Add(ph_1);
                     }
                 }
-                foreach (PlayerEntity player in contexts.player.GetEntities())
+                foreach (PlayerEntity player in contexts.player.GetInitializedPlayerEntities())
                 {
                     int id_1 = (int)player.playerInfo.PlayerId;
                     FreeData fd = (FreeData)player.freeData.FreeData;

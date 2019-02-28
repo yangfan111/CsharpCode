@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using App.Shared.Components.FreeMove;
+using App.Shared.GameModules.Camera.Utils;
 using Assets.App.Shared.GameModules.Camera;
 using Assets.App.Shared.GameModules.Camera.Motor.Pose;
 using Core.CameraControl;
@@ -100,28 +101,28 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
     class NormalPoseMotor : AbstractCameraMainMotor
     {
         private short _modeId;
-
+        private SubCameraMotorType _motorType;
         private HashSet<short> _excludes;
         private IMotorActive _active;
         private readonly float Epsilon = 0.01f;
-        protected float _transitionTime = 200f;
+        protected float _transitionTime ;
 
         public NormalPoseMotor(ECameraPoseMode modeId,
-            CameraConfigItem config,
+            CameraConfig config,
             HashSet<ECameraPoseMode> excludes,
-            IMotorActive active, int transitionTime = 200
+            IMotorActive active
         )
         {
             _modeId = (short)modeId;
-
+            _motorType = SubCameraMotorType.Pose;
+            
             this._excludes = new HashSet<short>();
             foreach (var e in excludes)
             {
                 this._excludes.Add((short)e);
             }
 
-            _transitionTime = transitionTime;
-            _config = config;
+            _config = config.GetCameraConfigItem(modeId);
             _active = active;
 
         }
@@ -162,7 +163,7 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
         {
             get { return _config.Order; }
         }
-
+        
         public override void CalcOutput(PlayerEntity player, ICameraMotorInput input, ICameraMotorState state,
             SubCameraMotorState subState,
             DummyCameraMotorOutput output,
@@ -171,42 +172,28 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
             
             output.Far = _config.Far;
             output.Near = _config.Near;
+
+            _transitionTime = CameraUtility.GetPostureTransitionTime(_motorType, subState);
+            var elapsedPercent = ElapsedPercent(clientTime, subState.ModeTime, _transitionTime);
+            var realPercent = EaseInOutQuad(0, 1, elapsedPercent);
             if (state.IsFristPersion())
             {
                 //一人称和瞄准相机没有偏移
-                var elapsedPercent = ElapsedPercent(clientTime, subState.ModeTime, _transitionTime);
-                var realPercent = EaseInOutQuad(0, 1, elapsedPercent);
                 output.Fov = Mathf.Lerp(last.FinalFov, FinalFov, realPercent);
-                
             }
             else
             {
-                float realPercent = 1;
-                var elapsedPercent = ElapsedPercent(clientTime, subState.ModeTime, _transitionTime);
-                realPercent = EaseInOutQuad(0, 1, elapsedPercent);
                 if (last is AirplanePoseMotor || last is DrivePoseMotor)
                 {
                     realPercent = 1;
                 }
-
-                if (realPercent < 1)
-                {
-                    output.ArchorOffset = Vector3.Lerp(last.FinalArchorOffset, FinalArchorOffset, realPercent);
-                    output.ArchorPostOffset =
-                        Vector3.Lerp(last.FinalArchorPostOffset, FinalArchorPostOffset, realPercent);
-                    output.Offset = Vector3.Lerp(last.FinalOffset, FinalOffset, realPercent);
-                    output.ArchorEulerAngle = Vector3.Lerp(last.FinalEulerAngle, FinalEulerAngle, realPercent);
-                    output.Fov = Mathf.Lerp(last.FinalFov, FinalFov, realPercent);
-                }
-                else
-                {
-                    output.ArchorOffset = FinalArchorOffset;
-                    output.ArchorPostOffset = FinalArchorPostOffset;
-                    output.Offset = FinalOffset;
-                    output.ArchorEulerAngle = FinalEulerAngle;
-                    output.Fov = FinalFov;
-                }
-
+                
+                output.ArchorOffset = Vector3.Lerp(last.FinalArchorOffset, FinalArchorOffset, realPercent);
+                output.ArchorPostOffset =
+                    Vector3.Lerp(last.FinalArchorPostOffset, FinalArchorPostOffset, realPercent);
+                output.Offset = Vector3.Lerp(last.FinalOffset, FinalOffset, realPercent);
+                output.ArchorEulerAngle = Vector3.Lerp(last.FinalEulerAngle, FinalEulerAngle, realPercent);
+                output.Fov = Mathf.Lerp(last.FinalFov, FinalFov, realPercent);
             }
         }
 
@@ -244,9 +231,7 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
 //                    CalculateFrameVal(player.orientation.Yaw, newDeltaAngle, _config.YawLimit),
 //                    input.DeltaYaw
 //                );
-                
-                
-                
+
                 var deltaPitch = HandlePunchPitch(player, input);
                 player.orientation.Pitch =
                     CalculateFrameVal(player.orientation.Pitch, deltaPitch, _config.PitchLimit);

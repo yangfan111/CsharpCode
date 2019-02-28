@@ -73,7 +73,9 @@ namespace AK.Wwise.TreeView
 		{
 			get
 			{
-				if (null == m_roomItem) m_roomItem = new TreeViewItem(this, null) { Header = "Root item" };
+				if (null == m_roomItem)
+					m_roomItem = new TreeViewItem(this, null) { Header = "Root item" };
+
 				return m_roomItem;
 			}
 		}
@@ -142,56 +144,72 @@ namespace AK.Wwise.TreeView
 					if (null == m_textureGuide || m_forceButtonText)
 						UnityEngine.GUILayout.Label("", UnityEngine.GUILayout.MaxWidth(4));
 					else
+					{
 						UnityEngine.GUILayout.Label(m_textureBlank, UnityEngine.GUILayout.MaxWidth(4),
 							UnityEngine.GUILayout.MaxHeight(16));
+					}
+
 					return false;
+
 				case TreeViewItem.TextureIcons.GUIDE:
 					if (null == m_textureGuide || m_forceButtonText)
 						UnityEngine.GUILayout.Label("|", UnityEngine.GUILayout.MaxWidth(16));
 					else
+					{
 						UnityEngine.GUILayout.Label(m_textureGuide, UnityEngine.GUILayout.MaxWidth(16),
 							UnityEngine.GUILayout.MaxHeight(16));
+					}
+
 					return false;
+
 				case TreeViewItem.TextureIcons.LAST_SIBLING_COLLAPSED:
 					if (null == m_textureLastSiblingCollapsed || m_forceButtonText)
 						return UnityEngine.GUILayout.Button("<", UnityEngine.GUILayout.MaxWidth(16));
 					else
 						return ShowButtonTexture(m_textureLastSiblingCollapsed);
+
 				case TreeViewItem.TextureIcons.LAST_SIBLING_EXPANDED:
 					if (null == m_textureLastSiblingExpanded || m_forceButtonText)
 						return UnityEngine.GUILayout.Button(">", UnityEngine.GUILayout.MaxWidth(16));
 					else
 						return ShowButtonTexture(m_textureLastSiblingExpanded);
+
 				case TreeViewItem.TextureIcons.LAST_SIBLING_NO_CHILD:
 					if (null == m_textureLastSiblingNoChild || m_forceButtonText)
 						return UnityEngine.GUILayout.Button("-", UnityEngine.GUILayout.MaxWidth(16));
 					else
 						return UnityEngine.GUILayout.Button(m_textureLastSiblingNoChild, UnityEngine.GUILayout.MaxWidth(16));
+
 				case TreeViewItem.TextureIcons.MIDDLE_SIBLING_COLLAPSED:
 					if (null == m_textureMiddleSiblingCollapsed || m_forceButtonText)
 						return UnityEngine.GUILayout.Button("<", UnityEngine.GUILayout.MaxWidth(16));
 					else
 						return ShowButtonTexture(m_textureMiddleSiblingCollapsed);
+
 				case TreeViewItem.TextureIcons.MIDDLE_SIBLING_EXPANDED:
 					if (null == m_textureMiddleSiblingExpanded || m_forceButtonText)
 						return UnityEngine.GUILayout.Button(">", UnityEngine.GUILayout.MaxWidth(16));
 					else
 						return UnityEngine.GUILayout.Button(m_textureMiddleSiblingExpanded, UnityEngine.GUILayout.MaxWidth(16));
+
 				case TreeViewItem.TextureIcons.MIDDLE_SIBLING_NO_CHILD:
 					if (null == m_textureMiddleSiblingNoChild || m_forceButtonText)
 						return UnityEngine.GUILayout.Button("-", UnityEngine.GUILayout.MaxWidth(16));
 					else
 						return ShowButtonTexture(m_textureMiddleSiblingNoChild);
+
 				case TreeViewItem.TextureIcons.NORMAL_CHECKED:
 					if (null == m_textureNormalChecked || m_forceButtonText)
 						return UnityEngine.GUILayout.Button("x", UnityEngine.GUILayout.MaxWidth(16));
 					else
 						return UnityEngine.GUILayout.Button(m_textureNormalChecked, UnityEngine.GUILayout.MaxWidth(16));
+
 				case TreeViewItem.TextureIcons.NORMAL_UNCHECKED:
 					if (null == m_textureNormalUnchecked || m_forceButtonText)
 						return UnityEngine.GUILayout.Button("o", UnityEngine.GUILayout.MaxWidth(16));
 					else
 						return ShowButtonTexture(m_textureNormalUnchecked);
+
 				default:
 					return false;
 			}
@@ -202,39 +220,38 @@ namespace AK.Wwise.TreeView
 		/// </summary>
 		public virtual void DisplayTreeView(DisplayTypes displayType)
 		{
-			UnityEngine.GUILayout.BeginHorizontal("box");
-
-			AssignDefaults();
-			if (!m_forceDefaultSkin) ApplySkinKeepingScrollbars();
-
-			switch (displayType)
+			using (new UnityEngine.GUILayout.HorizontalScope("box"))
 			{
-				case DisplayTypes.USE_SCROLL_VIEW:
-					m_scrollView =
-						UnityEngine.GUILayout.BeginScrollView(m_scrollView); //, GUILayout.MaxWidth(Width), GUILayout.MaxHeight(Height));
-					break;
-				//case TreeViewControl.DisplayTypes.USE_SCROLL_AREA:
-				//	GUILayout.BeginArea(new Rect(X, Y, Width, Height));
-				//	m_scrollView = GUILayout.BeginScrollView(m_scrollView);//, GUILayout.MaxWidth(Width), GUILayout.MaxHeight(Height));
-				//	break;
+				AssignDefaults();
+				if (!m_forceDefaultSkin)
+					ApplySkinKeepingScrollbars();
+
+				switch (displayType)
+				{
+					case DisplayTypes.USE_SCROLL_VIEW:
+						using (var scope = new UnityEngine.GUILayout.ScrollViewScope(m_scrollView)
+						) //, GUILayout.MaxWidth(Width), GUILayout.MaxHeight(Height));
+						{
+							m_scrollView = scope.scrollPosition;
+							RootItem.DisplayItem(0, TreeViewItem.SiblingOrder.FIRST_CHILD);
+						}
+
+						break;
+					//case TreeViewControl.DisplayTypes.USE_SCROLL_AREA:
+					//	using (var area = new GUILayout.AreaScope(new Rect(X, Y, Width, Height)))
+					//	using (var scope = new GUILayout.ScrollViewScope(m_scrollView))//, GUILayout.MaxWidth(Width), GUILayout.MaxHeight(Height));
+					//	{
+					//		m_scrollView = scope.scrollPosition;
+					//		RootItem.DisplayItem(0, TreeViewItem.SiblingOrder.FIRST_CHILD);
+					//	}
+					//	break;
+					default:
+						RootItem.DisplayItem(0, TreeViewItem.SiblingOrder.FIRST_CHILD);
+						break;
+				}
+
+				UnityEngine.GUI.skin = null;
 			}
-
-			RootItem.DisplayItem(0, TreeViewItem.SiblingOrder.FIRST_CHILD);
-
-			switch (displayType)
-			{
-				case DisplayTypes.USE_SCROLL_VIEW:
-					UnityEngine.GUILayout.EndScrollView();
-					break;
-				//case TreeViewControl.DisplayTypes.USE_SCROLL_AREA:
-				//	GUILayout.EndScrollView();
-				//	GUILayout.EndArea();
-				//	break;
-			}
-
-			UnityEngine.GUI.skin = null;
-
-			UnityEngine.GUILayout.EndHorizontal();
 		}
 
 		private void ApplySkinKeepingScrollbars()
@@ -395,10 +412,11 @@ namespace AK.Wwise.TreeView
 			try
 			{
 #if UNITY_EDITOR_MAC
-				UnityEditor.TextureImporter importer = UnityEditor.AssetImporter.GetAtPath(texturePath) as UnityEditor.TextureImporter;
+				var importer = UnityEditor.AssetImporter.GetAtPath(texturePath) as UnityEditor.TextureImporter;
 				importer.textureType = UnityEditor.TextureImporterType.Cursor;
 				UnityEditor.AssetDatabase.WriteImportSettingsIfDirty(texturePath);
 #endif
+
 				return UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Texture2D>(texturePath);
 			}
 			catch (System.Exception ex)

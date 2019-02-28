@@ -102,7 +102,7 @@ namespace Core.Animation
                     for (var i = 0; i < aimEvents.Length; ++i)
                     {
                         var aimEvent = aimEvents[i];
-                        var isClean = _matcher.Match(aimEvent.stringParameter).Equals(_cleanStr);
+                        var isClean = _matcher.Match(aimEvent.stringParameter).Equals(_cleanStr, System.StringComparison.Ordinal);
                         if (isClean)
                         {
                             if (null != _animationCleanEventCallback)
@@ -114,7 +114,7 @@ namespace Core.Animation
             }
         }
 
-        virtual public void ChangeSpeedMultiplier(float speed)
+        virtual public void ChangeSpeedMultiplier(float speed, bool reset = false)
         {
 
         }
@@ -127,7 +127,7 @@ namespace Core.Animation
         {
             if (null == left && null == right) return true;
             if (null == left || null == right) return false;
-            return left.Equals(right);
+            return left.Equals(right, System.StringComparison.Ordinal);
         }
     }
 

@@ -16,5 +16,9 @@ namespace App.Shared.Components.Ui
         //C4掉落点
         [DontInitilize] public Vector3 C4DropPosition;
 
+        [DontInitilize] public bool IsC4Droped;
+
+        [DontInitilize] public int C4SetStatus;
+
     }
 }

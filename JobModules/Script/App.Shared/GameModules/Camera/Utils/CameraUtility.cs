@@ -1,41 +1,25 @@
-﻿using System;
-using App.Shared.Components;
+﻿using System.Collections;
 using App.Shared.Components.Player;
-using App.Shared.GameModules.Player;
-using UnityEngine;
-using App.Shared.GameModules.Vehicle;
+using App.Shared.GameModules.Weapon;
+using App.Shared.Components.Player;
+using App.Shared.GameModules.Weapon;
 using Core.CameraControl.NewMotor;
 using Core.Utils;
-using Utils.CharacterState;
-using Assets.Utils.Configuration;
+using Core.Configuration;
 using Utils.Singleton;
-using App.Shared.GameModules.Weapon;
+using XmlConfig;
 
 namespace App.Shared.GameModules.Camera.Utils
 {
     public static class CameraUtility
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CameraUtility));
-
-        public static float GetWeaponFov(this PlayerEntity player)
+        private static 
+            CameraConfigManager _manager = SingletonManager.Get<CameraConfigManager>();
+        
+        public static float GetPostureTransitionTime(SubCameraMotorType motorType, SubCameraMotorState state)
         {
-            if(player.weaponLogic.Weapon.IsFovModified())
-            {
-                return player.weaponLogic.Weapon.GetFov();
-            }
-            else
-            {
-                if(player.oxygenEnergyInterface.Oxygen.InShiftState)
-                {
-                    var weaponId = player.weaponLogicInfo.WeaponId;
-                    var weaponCfg = SingletonManager.Get<WeaponConfigManager>().GetConfigById(weaponId);
-                    if(null != weaponCfg)
-                    {
-                        return weaponCfg.ShiftFov;
-                    }
-                }
-                return player.weaponLogic.Weapon.GetFov();
-            }
+            return _manager.GetTransitionTime(motorType, state);
         }
 
         public static bool IsCameraCanFire(this PlayerEntity playerEntity)
@@ -53,27 +37,28 @@ namespace App.Shared.GameModules.Camera.Utils
                    return freeMoveEntity;
                }
            }
-          
-
-
             return null;
         }
 
-        public static bool IsCameraGunSight(this PlayerEntity playerEntity)
+        public static bool IsAiming(this PlayerEntity playerEntity)
         {
-            return playerEntity.cameraStateNew.ViewNowMode == (short) ECameraViewMode.GunSight;
-        }
-
-        public static bool CanWeaponGunSight(this PlayerEntity player)
-        {
-            return player.hasWeaponComponentAgent && player.GetController<PlayerWeaponController>().CurrSlotWeaponId > 0 &&
-                   player.weaponLogic.State.CanCameraFocus();
+            if(playerEntity.hasCameraStateNew)
+            {
+                return playerEntity.cameraStateNew.ViewNowMode == (short) ECameraViewMode.GunSight;
+            }
+            LogError("playerEntity has no cameraStateNew");
+            return false;
         }
 
         public static ECameraArchorType GetCameraArchorType(this PlayerEntity player)
         {
             return player.cameraArchor.ArchorType;
         }
-      
+
+        private static void LogError(string msg)
+        {
+            Logger.Error(msg);
+            System.Console.WriteLine(msg);
+        }
     }
 }

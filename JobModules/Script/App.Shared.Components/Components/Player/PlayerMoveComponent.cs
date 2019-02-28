@@ -1,5 +1,5 @@
 ﻿using System;
-
+using App.Shared.PlayerAutoMove;
 using Core.Compare;
 using Core.Components;
 using Core.Interpolate;
@@ -226,9 +226,9 @@ namespace App.Shared.Components.Player
         [NetworkProperty] [DontInitilize] public float UpDownValue;
         [NetworkProperty] [DontInitilize] public float MoveSpeedRatio;
         [DontInitilize] public float AirTime;
-        [DontInitilize] public float DefaultSpeed;
         [DontInitilize] public float Steep;
         [DontInitilize] public float SteepAverage;
+        [DontInitilize] public float MoveVel;
         [DontInitilize] public bool IsCollided;
         [DontInitilize] public bool FirstOnGround;
         [DontInitilize] public bool LastIsCollided;
@@ -238,8 +238,8 @@ namespace App.Shared.Components.Player
         public override string ToString()
         {
             return string.Format(
-                "Velocity: {0}, SpeedAffect: {1}, IsGround: {2}, IsAutoRun: {3}, SpeedRatio: {4}, Steep: {5}, SteepAverage: {6}, UpDownValue: {7}, MoveSpeedRatio:{8}",
-                Velocity, SpeedAffect, IsGround, IsAutoRun, SpeedRatio, Steep, SteepAverage, UpDownValue, MoveSpeedRatio);
+                "Velocity: {0}, SpeedAffect: {1}, IsGround: {2}, IsAutoRun: {3}, SpeedRatio: {4}, Steep: {5}, SteepAverage: {6}, UpDownValue: {7}, MoveSpeedRatio:{8}, MoveVel:{9}",
+                Velocity, SpeedAffect, IsGround, IsAutoRun, SpeedRatio, Steep, SteepAverage, UpDownValue, MoveSpeedRatio, MoveVel);
         }
 
         public void ClearState()
@@ -257,11 +257,6 @@ namespace App.Shared.Components.Player
         public float HorizontalVelocity
         {
             get { return Mathf.Sqrt(Velocity.x * Velocity.x + Velocity.z * Velocity.z); }
-        }
-
-        public void InterruptAutoRun()
-        {
-            IsAutoRun = false;
         }
 
         public bool IsApproximatelyEqual(object right)
@@ -284,9 +279,16 @@ namespace App.Shared.Components.Player
             IsGround = r.IsGround;
             Steep = r.Steep;
             SteepAverage = r.SteepAverage;
+            MoveVel = r.MoveVel;
             UpDownValue = r.UpDownValue;
             MoveSpeedRatio = r.MoveSpeedRatio;
         }
+    }
+    
+    [Player]
+    public class AutoMoveInterfaceComponent : IComponent
+    {
+        public IPlayerAutoMove PlayerAutoMove;
     }
 }
 

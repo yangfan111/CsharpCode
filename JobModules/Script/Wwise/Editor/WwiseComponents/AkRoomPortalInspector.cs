@@ -33,7 +33,7 @@ public class AkRoomPortalInspector : UnityEditor.Editor
 		m_OpenPortalEventHandlerInspector.Init(serializedObject, "triggerList", "Open On: ", false);
 		m_ClosePortalEventHandlerInspector.Init(serializedObject, "closePortalTriggerList", "Close On: ", false);
 
-        m_roomPortal = target as AkRoomPortal;
+		m_roomPortal = target as AkRoomPortal;
 
 		m_roomPortal.FindOverlappingRooms(roomList);
 		for (var i = 0; i < 2; i++)
@@ -43,14 +43,14 @@ public class AkRoomPortalInspector : UnityEditor.Editor
 		}
 	}
 
-    public override void OnInspectorGUI()
-    {
-        serializedObject.Update();
+	public override void OnInspectorGUI()
+	{
+		serializedObject.Update();
 
-        m_OpenPortalEventHandlerInspector.OnGUI();
-        m_ClosePortalEventHandlerInspector.OnGUI();
+		m_OpenPortalEventHandlerInspector.OnGUI();
+		m_ClosePortalEventHandlerInspector.OnGUI();
 
-        m_roomPortal.FindOverlappingRooms(roomList);
+		m_roomPortal.FindOverlappingRooms(roomList);
 
 		using (new UnityEditor.EditorGUILayout.VerticalScope("box"))
 		{
@@ -73,7 +73,7 @@ public class AkRoomPortalInspector : UnityEditor.Editor
 			}
 		}
 
-        serializedObject.ApplyModifiedProperties();
-    }
+		serializedObject.ApplyModifiedProperties();
+	}
 }
 #endif

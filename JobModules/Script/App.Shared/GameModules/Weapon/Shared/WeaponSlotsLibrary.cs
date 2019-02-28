@@ -11,17 +11,17 @@ namespace App.Shared.GameModules.Weapon
 
         private static readonly EWeaponSlotType[] DefaultSlotIndices = new EWeaponSlotType[]
 {
-            EWeaponSlotType.PrimeWeapon1,
-            EWeaponSlotType.PrimeWeapon2,
-            EWeaponSlotType.SubWeapon,
+            EWeaponSlotType.PrimeWeapon,
+            EWeaponSlotType.SecondaryWeapon,
+            EWeaponSlotType.PistolWeapon,
             EWeaponSlotType.MeleeWeapon,
-            EWeaponSlotType.GrenadeWeapon,
+            EWeaponSlotType.ThrowingWeapon,
 };
         private static readonly EWeaponSlotType[] GroupSlotIndices = new EWeaponSlotType[]
 {
-            EWeaponSlotType.PrimeWeapon1,
-            EWeaponSlotType.SubWeapon,
-            EWeaponSlotType.GrenadeWeapon,
+            EWeaponSlotType.PrimeWeapon,
+            EWeaponSlotType.PistolWeapon,
+            EWeaponSlotType.ThrowingWeapon,
             EWeaponSlotType.MeleeWeapon,
             EWeaponSlotType.TacticWeapon
 };
@@ -36,17 +36,6 @@ namespace App.Shared.GameModules.Weapon
                     return new WeaponSlotsLibrary(GroupSlotIndices);
             }
         }
-        public static readonly Dictionary<EWeaponSlotType, Action<PlayerEntity>> AllAddWeaponComponentDic = new Dictionary<EWeaponSlotType, Action<PlayerEntity>>()
-            {
-                {EWeaponSlotType.PrimeWeapon1, (player)=>  player.AddPrimeWeapon() },
-                {EWeaponSlotType.PrimeWeapon2, (player)=>  player.AddSubWeapon() },
-                {EWeaponSlotType.SubWeapon, (player)=>  player.AddPistol() },
-                {EWeaponSlotType.MeleeWeapon, (player)=>  player.AddMelee() },
-                {EWeaponSlotType.GrenadeWeapon, (player)=>  {
-                    player.AddGrenade();
-                    player.AddGrenadeCacheData(0, 0, 0, 0); } },
-                {EWeaponSlotType.TacticWeapon, (player)=>  player.AddTacticWeapon() },
-            };
         private EWeaponSlotType[] availableIndices;
 
         public EWeaponSlotType[] AvaliableSlots { get { return availableIndices; } }
@@ -73,18 +62,6 @@ namespace App.Shared.GameModules.Weapon
                 return EWeaponSlotType.None;
             }
             return availableIndices[index];
-        }
-
-        public void AllocateWeaponComponents(Entity entity)
-        {
-            var playerEntity = entity as PlayerEntity;
-            for (int i = 0; i < AvaliableSlots.Length; i++)
-            {
-                Action<PlayerEntity> addWeaponComponent;
-                if (!AllAddWeaponComponentDic.TryGetValue(AvaliableSlots[i], out addWeaponComponent))
-                    continue;
-                addWeaponComponent(playerEntity);
-            }
         }
     }
 }

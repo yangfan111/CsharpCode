@@ -1,17 +1,17 @@
-﻿using App.Shared.Components.Bag;
+﻿using App.Shared.Components.Player;
 using App.Shared.Util;
 using Core;
-using Core.GameModeLogic;
+using Core;
 using Core.Sound;
 
 namespace App.Shared.GameModules.Weapon
 {
     [WeaponSpecies(EWeaponSlotType.TacticWeapon)]
-    class TacticSlotHandler : WeaponSlotHandlerBase 
+    class TacticSlotHandler : CommonSlotHandler 
     {
         //public TacticSlotHandler(
         //    PlayerEntity playerEntity,
-        //    IPlayerModuleController playerWeaponActionLogic,
+        //    ISharedPlayerWeaponGetter playerWeaponActionLogic,
         //    WeaponComponent weapon, 
         //    IReservedBulletLogic reservedBulletController, 
         //    IPlayerSoundManager playerSoundManager) : 

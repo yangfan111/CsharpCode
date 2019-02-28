@@ -45,7 +45,7 @@ namespace App.Shared.DebugHandle
 
         private static GameObject GetSphereRange(VehicleEntity vehicle, string objName, Color color)
         {
-            var go = vehicle.gameObject.UnityObjWrapper.Value;
+            var go = vehicle.gameObject.UnityObject.AsGameObject;
             for (int i = 0; i < go.transform.childCount; ++i)
             {
                 var child = go.transform.GetChild(i);
@@ -96,7 +96,7 @@ namespace App.Shared.DebugHandle
                 var dragPosition = position + new Vector3(0.0f, 5.0f, 0.0f);
                 var dynamicData = nearestVehicle.GetDynamicData();
                 dynamicData.Position = dragPosition;
-                var go = nearestVehicle.gameObject.UnityObjWrapper.Value;
+                var go = nearestVehicle.gameObject.UnityObject.AsGameObject;
                 go.transform.position = dragPosition;
             }
         }
@@ -242,7 +242,7 @@ namespace App.Shared.DebugHandle
                 {
                     if (vehicle.hasGameObject)
                     {
-                        var go = vehicle.gameObject.UnityObjWrapper.Value;
+                        var go = vehicle.gameObject.UnityObject.AsGameObject;
 
                         if (go.activeSelf)
                         {
@@ -274,7 +274,7 @@ namespace App.Shared.DebugHandle
                     }
                 }
 
-                var go = vehicle.gameObject.UnityObjWrapper.Value;
+                var go = vehicle.gameObject.UnityObject.AsGameObject;
                 var eulerAngles = go.transform.eulerAngles;
                 go.transform.eulerAngles = new Vector3(0.0f, eulerAngles.y, 0.0f);
                 vehicle.Reset(true);
@@ -285,6 +285,12 @@ namespace App.Shared.DebugHandle
         {
             if (SharedConfig.IsServer == isServer)
                 SharedConfig.DisableVehicleCull = !enabled;
+        }
+
+        public static void SetVehicleActiveUpdateRate(bool isServer, int rate)
+        {
+            if (SharedConfig.IsServer == isServer)
+                SharedConfig.VehicleActiveUpdateRate = Math.Max(1, rate);
         }
 
         private static VehicleEntity GetVehicle(VehicleContext context, int id)

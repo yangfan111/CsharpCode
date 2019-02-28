@@ -326,6 +326,10 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         private static void SetAnimatorParameterP3(Animator animator, FsmOutput output, NetworkAnimatorComponent latestValue)
         {
+            if(!latestValue.AnimatorParameterIndex.ContainsKey(output.TargetHash))
+            {
+                Logger.ErrorFormat("animator param is not found:{0}!!!", output.Target);
+            }
             var index = latestValue.AnimatorParameterIndex[output.TargetHash];
             var latestParam = latestValue.AnimatorParameters[index];
 

@@ -17,8 +17,11 @@ namespace App.Shared.SceneManagement
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(LevelManager));
 
-        public LevelManager()
+        private IUnityAssetManager _assetManager;
+        public LevelManager(IUnityAssetManager assetManager)
         {
+            _assetManager = assetManager;
+
             SceneManager.sceneLoaded += SceneLoadedWrapper;
             SceneManager.sceneUnloaded += SceneUnloadedWrapper;
         }
@@ -30,6 +33,8 @@ namespace App.Shared.SceneManagement
             SceneLoaded = null;
             SceneUnloaded = null;
             GoLoaded = null;
+            AfterGoLoaded = null;
+            BeforeGoUnloaded = null;
             GoUnloaded = null;
         }
 
@@ -37,8 +42,10 @@ namespace App.Shared.SceneManagement
 
         public event Action<Scene, LoadSceneMode> SceneLoaded;
         public event Action<Scene> SceneUnloaded;
-        public event Action<UnityObjectWrapper<GameObject>> GoLoaded;
-        public event Action<UnityObjectWrapper<GameObject>> GoUnloaded;
+        public event Action<UnityObject> GoLoaded;
+        public event Action<UnityObject> AfterGoLoaded;
+        public event Action<UnityObject> BeforeGoUnloaded;
+        public event Action<UnityObject> GoUnloaded;
         
         private OriginStatus _status = new OriginStatus();
         public OriginStatus UpdateOrigin(Vector3 pos)
@@ -47,12 +54,18 @@ namespace App.Shared.SceneManagement
             return _status;
         }
 
-        public void GoLoadedWrapper(object nul, UnityObjectWrapper<GameObject> go)
+        public void GoLoadedWrapper(string source, UnityObject unityObj)
         {
             if (GoLoaded != null)
             {
-                GoLoaded.Invoke(go);
+                GoLoaded.Invoke(unityObj);
             }
+
+            if (AfterGoLoaded != null)
+            {
+                AfterGoLoaded(unityObj);
+            }
+
             --NotFinishedRequests;
         }
 
@@ -70,7 +83,7 @@ namespace App.Shared.SceneManagement
                 _cachedLoadGoRequest.Clear();
             }
 
-            DestroyGo();
+            ProcessUnloadRequests();
         }
 
         public int NotFinishedRequests { get; private set; }
@@ -79,26 +92,27 @@ namespace App.Shared.SceneManagement
 
         private ISceneResourceManager _sceneManager;
 
-        private List<AssetInfo> _cachedLoadSceneRequest = new List<AssetInfo>();
-        private List<AssetInfo> _cachedLoadGoRequest = new List<AssetInfo>();
-        private Queue<UnityObjectWrapper<GameObject>> _cachedUnloadGoRequest = new Queue<UnityObjectWrapper<GameObject>>();
+        private readonly List<AssetInfo> _cachedLoadSceneRequest = new List<AssetInfo>();
+        private readonly List<AssetInfo> _cachedLoadGoRequest = new List<AssetInfo>();
+        private readonly Queue<string> _cachedUnloadSceneRequest = new Queue<string>();
+        private readonly Queue<UnityObject> _cachedUnloadGoRequest = new Queue<UnityObject>();
 
         private List<string> _fixedSceneNames;
 
         public void SetToWorldCompositionLevel(WorldCompositionParam param, IStreamingGoManager streamingGo)
         {
-            // compromise for deadline
-            _sceneManager = new StreamingManager(this, null, streamingGo, SingletonManager.Get<StreamingLevelStructure>().Data, param);
-
             _fixedSceneNames = param.FixedScenes;
+            _sceneManager = new StreamingManager(this, streamingGo, SingletonManager.Get<StreamingLevelStructure>().Data,
+                param, _fixedSceneNames.Count);
+
             RequestForFixedScenes(param.AssetBundleName);
         }
 
         public void SetToFixedScenesLevel(OnceForAllParam param)
         {
+            _fixedSceneNames = param.FixedScenes;
             _sceneManager = new FixedScenesManager(this, param);
             
-            _fixedSceneNames = param.FixedScenes;
             RequestForFixedScenes(param.AssetBundleName);
         }
 
@@ -111,7 +125,7 @@ namespace App.Shared.SceneManagement
     
         public void AddUnloadSceneRequest(string sceneName)
         {
-            SceneManager.UnloadSceneAsync(sceneName);
+            _cachedUnloadSceneRequest.Enqueue(sceneName);
             ++NotFinishedRequests;
         }
         
@@ -127,9 +141,9 @@ namespace App.Shared.SceneManagement
             ++NotFinishedRequests;
         }
 
-        public void AddUnloadGoRequest(UnityObjectWrapper<GameObject> go)
+        public void AddUnloadGoRequest(UnityObject unityObj)
         {
-            _cachedUnloadGoRequest.Enqueue(go);
+            _cachedUnloadGoRequest.Enqueue(unityObj);
             ++NotFinishedRequests;
         }
         
@@ -144,6 +158,8 @@ namespace App.Shared.SceneManagement
                 SceneLoaded.Invoke(scene, mode);
 
             --NotFinishedRequests;
+
+            _logger.InfoFormat("scene loaded {0}", scene.name);
         }
 
         private void SceneUnloadedWrapper(Scene scene)
@@ -152,27 +168,38 @@ namespace App.Shared.SceneManagement
                 SceneUnloaded.Invoke(scene);
             
             --NotFinishedRequests;
+
+            _logger.InfoFormat("scene unloaded {0}", scene.name);
         }
 
-        private void DestroyGo()
+        private void ProcessUnloadRequests()
         {
-            var count = _cachedUnloadGoRequest.Count;
-            for (int i = 0; i < count; i++)
+            var goCount = _cachedUnloadGoRequest.Count;
+            var sceneCount = _cachedUnloadSceneRequest.Count;
+
+            for (int i = 0; i < goCount; i++)
             {
                 var go = _cachedUnloadGoRequest.Dequeue();
 
-                if (go.Value != null)
-                {
-                    if (GoUnloaded != null)
-                        GoUnloaded.Invoke(go);
+                if (BeforeGoUnloaded != null)
+                    BeforeGoUnloaded(go);
 
-                    UnityEngine.Object.Destroy(go.Value);
-                }
+                if (GoUnloaded != null)
+                    GoUnloaded.Invoke(go);
+
+                _assetManager.Recycle(go);
 
                 --NotFinishedRequests;
-            }           
+            }
+
+            for (int i = 0; i < sceneCount; i++)
+            {
+                var scene = _cachedUnloadSceneRequest.Dequeue();
+                SceneManager.UnloadSceneAsync(scene);
+                _logger.InfoFormat("unload scene {0}", scene);
+            }
         }
-        
+
         private void RequestForFixedScenes(string bundleName)
         {
             foreach (var sceneName in _fixedSceneNames)

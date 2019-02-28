@@ -25,16 +25,21 @@ namespace App.Shared.GameModules.Vehicle
             }
 
             //Debug.Log("Collision Enter ....");
-            if (collision.collider.gameObject.layer == UnityLayers.DefaultLayer ||
-                collision.collider.gameObject.layer == UnityLayers.TerrainLayer ||
-                collision.collider.gameObject.layer == UnityLayers.VehicleBodyLayer ||
-                collision.collider.gameObject.layer == UnityLayers.NoCollisionWithBulletLayer)
+            if (collision.collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.Default) ||
+                collision.collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.Terrain) ||
+                collision.collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.Vehicle) ||
+                collision.collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.NoCollisionWithBullet))
             {
                 DebugCollision(collision);
                 var entityRef = GetComponent<EntityReference>();
                 if (entityRef != null)
                 {
                     var vehicle = (VehicleEntity) entityRef.Reference;
+                    if (!vehicle.hasVehicleType || !vehicle.hasGameObject)
+                    {
+                        _logger.ErrorFormat("VehicleEntity {0} is not exist", vehicle);
+                        return;
+                    }
                     var deltaVel = GetCollisionVelocityChange(vehicle).magnitude * 3.6f;
                     var collider = collision.contacts[0].thisCollider;
 #if UNITY_EDITOR
@@ -124,7 +129,15 @@ namespace App.Shared.GameModules.Vehicle
         {
             var prevVelocity = vehicle.GetPrevLinearVelocity();
             var velocity = vehicle.GetLinearVelocity();
-           // Debug.LogFormat("Collision Change From {0} to {1}", prevVelocity.ToString("f10"), velocity.ToString("f10"));
+            // Debug.LogFormat("Collision Change From {0} to {1}", prevVelocity.ToString("f10"), velocity.ToString("f10"));
+
+
+            //If the velocity after the collision is opposite to the original velocity, the original velocity will be calculated;
+            if ((velocity - prevVelocity).sqrMagnitude > prevVelocity.sqrMagnitude)
+           {
+               return prevVelocity;
+           }
+           
             return velocity - prevVelocity;
         }
 

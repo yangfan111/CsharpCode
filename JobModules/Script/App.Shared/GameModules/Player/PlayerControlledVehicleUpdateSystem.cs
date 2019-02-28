@@ -12,10 +12,12 @@ namespace App.Shared.GameModules.Player
     {
         private VehicleContext _vehicle;
         private IGroup<PlayerEntity> _players;
+        private Contexts _contexts;
         public PlayerControlledVehicleUpdateSystem(Contexts context)
         {
             _vehicle = context.vehicle;
             _players = context.player.GetGroup(PlayerMatcher.ThirdPersonModel);
+            _contexts = context;
         }
 
         public void OnGamePlay()
@@ -24,7 +26,7 @@ namespace App.Shared.GameModules.Player
             for(int i = 0; i < playerEntities.Length; ++i)
             {
                 var player = playerEntities[i];
-                player.SetCharacterStateWithVehicle(_vehicle);
+                player.SetCharacterStateWithVehicle(_contexts, _vehicle);
             }
         }
     }
