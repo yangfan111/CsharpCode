@@ -27,8 +27,9 @@ public class AudioPluginManagement
                 settingData = TryLoadSettingFile();
 #else
 
- customizeSettings = new AudioPluginSettingData();
+    settingData = new AudioPluginSettingData();
 #endif
+
             }
             return settingData;
         }
@@ -293,23 +294,25 @@ public class AudioPluginManagement
 
     public static bool GetCreateWwiseGlobal()
     {
+        return AudioPluginSettingData.D_CreateWwiseGlobal;
 #if UNITY_EDITOR
 
+        //        return ProjCustomizeSettings.CreateWwiseGlobal;
 
-        return AudioPluginSettingData.D_CreateWwiseGlobal;
 
 #else
-          return ProjCustomizeSettings.CreateWwiseGlobal;
+          
 #endif
     }
     public static bool GetCreateWwiseListener()
     {
 #if UNITY_EDITOR
 
-        return AudioPluginSettingData.D_CreateWwiseListener;
+
 #else
-          return ProjCustomizeSettings.CreateWwiseListener;
+         // return ProjCustomizeSettings.CreateWwiseListener;
 #endif
+        return AudioPluginSettingData.D_CreateWwiseListener;
     }
     /// <summary>
     /// bankµÄ×îÖÕÄ¿Â¼

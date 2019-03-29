@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using UnityEditor;
 namespace YF
 {
@@ -74,6 +75,8 @@ namespace YF
                 return false;
             }
         }
+
+        #region// platform
         ///**********************************************platformName******************************************
         ///UNITY_STANDALONE_WIN,
         ///UNITY_ANDROID
@@ -172,6 +175,7 @@ namespace YF
             return target.ToString();
         }
     }
+    #endregion
     #region//scene 
     public class SceneLib
     {
@@ -205,9 +209,39 @@ namespace YF
             return ret;
         }
 
+        #endregion
+        #region//scriptableObject
+        /// <summary>
+        /// 通过scriptobject 来创建各种.Asset
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="className"></param>
+        /// <param name="assetRelativeFilePath"></param>
+        /// <returns></returns>
+        public static T GetOrCreateAsset<T>(string className, string assetRelativeFilePath) where T : UnityEngine.Object
+        {
+            string relativeDirPath = Path.GetDirectoryName(assetRelativeFilePath);
+            T asset = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(assetRelativeFilePath) ;
+            if (!asset)
+            {
+                var fullPath = System.IO.Path.Combine(UnityEngine.Application.dataPath, relativeDirPath);
+                if (!System.IO.Directory.Exists(fullPath))
+                    System.IO.Directory.CreateDirectory(fullPath);
+
+                asset = UnityEngine.ScriptableObject.CreateInstance(className) as T;
+                UnityEditor.AssetDatabase.CreateAsset(asset, assetRelativeFilePath);
+            }
+
+            return asset;
+        }
+
 
     }
-    #endregion
+
+
+ 
+
+
 }
 
 //    #region//editor uses---------------------------------------------------------------------------

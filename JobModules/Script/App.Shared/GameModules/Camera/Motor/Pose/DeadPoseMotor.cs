@@ -34,6 +34,7 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
             
             _finalRotation = _config.Roatation;
             base.CalcOutput(player, input, state, subState, output, last, clientTime);
+            Debug.Log("DeadTranTime: "+_transitionTime );
         }
     }
 }
