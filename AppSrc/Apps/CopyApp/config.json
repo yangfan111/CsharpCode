@@ -1,16 +1,36 @@
 {
   "SDList": [
     {
-      "DS": "E:\\Github\\CsharpCode\\JobModules\\Wise_Unity\\API",
-      "SS": "F:\\voyager\\UnityPackages\\Wwise\\Deployment\\API\\"
+      "DS": "E:\\Github\\CsharpCode\\JobModules\\Wise",
+      "SS": "F:\\voyager\\UnityPackages\\Wwise"
     },
     {
-      "DS": "E:\\Github\\CsharpCode\\JobModules\\Wise_Unity\\Components",
-      "SS": "F:\\voyager\\UnityPackages\\Wwise\\Deployment\\Components"
+      "DS": "E:\\Github\\CsharpCode\\JobModules\\Core",
+      "SS": "F:\\voyager\\UnityPackages\\Core"
     },
     {
-      "DS": "E:\\Github\\CsharpCode\\JobModules\\Wise_Imp\\",
-      "SS": "F:\\voyager\\UnityProjects\\App.Client.Unity\\App.Client.Unity-Windows\\Assets\\Core\\Audio\\"
+      "DS": "E:\\Github\\CsharpCode\\JobModules\\AppClient\\",
+      "SS": "F:\\voyager\\UnityPackages\\App.Client"
+    },
+	{    
+      "DS": "E:\\Github\\CsharpCode\\JobModules\\AppClientScripts",
+      "SS": "F:\\voyager\\UnityPackages\\App.Client.Scripts"
+    },
+	{    
+      "DS": "E:\\Github\\CsharpCode\\JobModules\\AppShared",
+      "SS": "F:\\voyager\\UnityPackages\\App.Shared"
+    },
+	{    
+      "DS": "E:\\Github\\CsharpCode\\JobModules\\AppServer",
+      "SS": "f:\\voyager\\UnityPackages\\App.Server"
+    },
+	{    
+      "DS": "E:\\Github\\CsharpCode\\JobModules\\Util",
+      "SS": "f:\\voyager\\UnityPackages\\Util"
+    },
+	{    
+      "DS": "E:\\Github\\CsharpCode\\JobModules\\XmlConfig",
+      "SS": "f:\\voyager\\UnityPackages\\XmlConfig"
     },
     {
       "DS": "E:\\Github\\Mics\\放置所有配置文件\\.gitconfig",
@@ -27,15 +47,9 @@
       {    
       "DS": "E:\\Github\\Mics\\放置所有配置文件\\syHub.bat",
       "SS": "E:\\Github\\syHub.bat"
-    },
-    {    
-      "DS": "E:\\Github\\CsharpCode\\JobModules\\Client_Scripts",
-      "SS": "F:\\voyager\\UnityPackages\\App.Client.Scripts\\Scripts"
-    },
-    {    
-      "DS": "E:\\Github\\CsharpCode\\JobModules\\Wise_Unity\\Editor",
-      "SS": "f:\\voyager\\UnityPackages\\Wwise\\Editor"
     }
+ 
+   
     
   ]
 }

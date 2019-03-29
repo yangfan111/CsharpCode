@@ -1,0 +1,790 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D37EB908-BF36-FB55-283E-D4B114159646}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>App.Client</RootNamespace>
+    <AssemblyName>App.Client</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Dll.Temp\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\build_obj_dir\Release\App.Client\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Dll.Temp\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\build_obj_dir\Debug\App.Client\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BehaviorDesignerRuntime">
+      <HintPath>..\BehaviorDesigner\Runtime\BehaviorDesignerRuntime.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween">
+      <HintPath>..\CommonLibs\DOTween\DOTween\DOTween.dll</HintPath>
+    </Reference>
+    <Reference Include="Entitas.CodeGeneration.Attributes">
+      <HintPath>..\CommonLibs\Entitas.CodeGeneration.Attributes.dll</HintPath>
+    </Reference>
+    <Reference Include="Entitas">
+      <HintPath>..\CommonLibs\Entitas.dll</HintPath>
+    </Reference>
+    <Reference Include="Entitas.Utils">
+      <HintPath>..\CommonLibs\Entitas.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="Entitas.VisualDebugging.Unity">
+      <HintPath>..\CommonLibs\Entitas.VisualDebugging.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\CommonLibs\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf3">
+      <HintPath>..\CommonLibs\protobuf3.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Loxodon.Framework.Binding">
+      <HintPath>..\UiFramework\Libs\Loxodon\Loxodon.Framework.Binding.dll</HintPath>
+    </Reference>
+    <Reference Include="Loxodon.Framework">
+      <HintPath>..\UiFramework\Libs\Loxodon\Loxodon.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Loxodon.Framework.Localizations">
+      <HintPath>..\UiFramework\Libs\Loxodon\Loxodon.Framework.Localizations.dll</HintPath>
+    </Reference>
+    <Reference Include="Loxodon.Log">
+      <HintPath>..\UiFramework\Libs\Loxodon\Loxodon.Log.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ArtModule\ArtModule.cs" />
+    <Compile Include="Battle\ClientDamageInfoCollector.cs" />
+    <Compile Include="Bullet\ClientBulletInfoCollector.cs" />
+    <Compile Include="CastObjectUtil\BaseCastData.cs" />
+    <Compile Include="CastObjectUtil\BaseGoAssemble.cs" />
+    <Compile Include="CastObjectUtil\CommonCastData.cs" />
+    <Compile Include="CastObjectUtil\CommonObjectCastUtil.cs" />
+    <Compile Include="CastObjectUtil\DoorCastData.cs" />
+    <Compile Include="CastObjectUtil\Enums.cs" />
+    <Compile Include="CastObjectUtil\FreeObjectCastData.cs" />
+    <Compile Include="CastObjectUtil\FreeObjectGoAssemble.cs" />
+    <Compile Include="CastObjectUtil\PlayerCastData.cs" />
+    <Compile Include="CastObjectUtil\SceneObjectCastData.cs" />
+    <Compile Include="CastObjectUtil\SceneObjectGoAssemble.cs" />
+    <Compile Include="CastObjectUtil\VehicleCastData.cs" />
+    <Compile Include="ClientDebugCommandHandler.cs" />
+    <Compile Include="ClientSystems\DriveTimeSystem.cs" />
+    <Compile Include="ClientSystems\MouseLockSystem.cs" />
+    <Compile Include="ClientSystems\PingSystem.cs" />
+    <Compile Include="ClientSystems\RaycastTestSystem.cs" />
+    <Compile Include="ClientSystems\UserCmdCollectSystem.cs" />
+    <Compile Include="ClientSystems\UserCmdMergeSystem.cs" />
+    <Compile Include="ClientSystems\UserCmdSendSystem.cs" />
+    <Compile Include="ClientSystems\UserCmdUpdateSystem.cs" />
+    <Compile Include="Cmd\RobotUserCmdGenerator.cs" />
+    <Compile Include="Cmd\UnityUserCmdGenerator.cs" />
+    <Compile Include="Cmd\UnityVehicleCmdGenerator.cs" />
+    <Compile Include="FileSystemConfig\ClientFileSystemConfigManager.cs" />
+    <Compile Include="GameMode\ClientGameCommonModeController.cs" />
+    <Compile Include="GameMode\ClientGameSurviveModeController.cs" />
+    <Compile Include="GameMode\GameModeUtil.cs" />
+    <Compile Include="GameMode\InputMapper\DefaultModeInputMapper.cs" />
+    <Compile Include="GameMode\InputMapper\GroupModeInputMapper.cs" />
+    <Compile Include="GameMode\InputMapper\IGlobalInputMapper.cs" />
+    <Compile Include="GameMode\PickupLogic\ClientCommonPickupDropHandler.cs" />
+    <Compile Include="GameMode\PickupLogic\ClientSurvivalPickupDropHandler.cs" />
+    <Compile Include="GameModules\Bullet\BulletCleanUpSystem.cs" />
+    <Compile Include="GameModules\Bullet\BulletEntityInitSytem.cs" />
+    <Compile Include="GameModules\Bullet\BulletModule.cs" />
+    <Compile Include="GameModules\Bullet\BulletRenderSystem.cs" />
+    <Compile Include="GameModules\Bullet\ClientBulletInfoCollectSystem.cs" />
+    <Compile Include="GameModules\ClientEffect\BatchLoadHandler.cs" />
+    <Compile Include="GameModules\ClientEffect\ClientEffectCleanUpSystem.cs" />
+    <Compile Include="GameModules\ClientEffect\ClientEffectEntityInitSystem.cs" />
+    <Compile Include="GameModules\ClientEffect\ClientEffectLimitSystem.cs" />
+    <Compile Include="GameModules\ClientEffect\ClientEffectModule.cs" />
+    <Compile Include="GameModules\ClientEffect\ClientEffectRenderSystem.cs" />
+    <Compile Include="GameModules\ClientEffect\EffectLogic\AbstractClientEffect.cs" />
+    <Compile Include="GameModules\ClientEffect\EffectLogic\BulletDropClientEffect.cs" />
+    <Compile Include="GameModules\ClientEffect\EffectLogic\ClipDorpClientEffect.cs" />
+    <Compile Include="GameModules\ClientEffect\EffectLogic\EnvironmentHitClientEffect.cs" />
+    <Compile Include="GameModules\ClientEffect\EffectLogic\HumanHitClientEffect.cs" />
+    <Compile Include="GameModules\ClientEffect\EffectLogic\MuzzleSparkClientEffect.cs" />
+    <Compile Include="GameModules\ClientEffect\EffectLogic\Ssjj2AssetsUtility.cs" />
+    <Compile Include="GameModules\ClientEffect\EffectLogic\ThrowingClientEffect.cs" />
+    <Compile Include="GameModules\ClientEffect\EffectLogicFactory.cs" />
+    <Compile Include="GameModules\ClientInit\CheckPreparingPlayerSystem.cs" />
+    <Compile Include="GameModules\ClientInit\ClientInitModule.cs" />
+    <Compile Include="GameModules\ClientInit\RequestPlayerInfoSystem.cs" />
+    <Compile Include="GameModules\ClientInit\RequestRoomInfoSystem.cs" />
+    <Compile Include="GameModules\ClientInit\RequestSnapshotSystem.cs" />
+    <Compile Include="GameModules\Effect\GlobalEffectManager.cs" />
+    <Compile Include="GameModules\Effect\GlobalEffectManagerInitSystem.cs" />
+    <Compile Include="GameModules\GamePlay\ClientGamePlayModule.cs" />
+    <Compile Include="GameModules\GamePlay\ClientRule.cs" />
+    <Compile Include="GameModules\GamePlay\Free\App\BlastUIHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\App\ChickenUIUtil.cs" />
+    <Compile Include="GameModules\GamePlay\Free\App\FetchUIValueHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\App\GroupClassicUIHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\App\GroupUIHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\App\ItemInfoHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\App\ShowCodeUIHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\App\ShowSplitUIHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\App\TipData.cs" />
+    <Compile Include="GameModules\GamePlay\Free\AsyncManager.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\AutoClientValue.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\AutoConstValue.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\AutoField.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\AutoOneTimeValue.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\AutoPercentValue.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\AutoPlayerValue.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\AutoPositionValue.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\AutoRotateValue.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\AutoScaleValue.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\AutoServerTimeValue.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\AutoTimeStringValue.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\AutoTimeUnitValue.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\AutoTimeValue.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\AutoTwoPositionValue.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\AutoValue.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\BaseAutoFields.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\IAutoValue.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\PlayerStatus.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Auto\Prefab\SimpleBagAuto.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Const\FOVConstant.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Const\SimpleProtoConstant.cs" />
+    <Compile Include="GameModules\GamePlay\Free\CoroutineRunner.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Data\AllObserverNameData.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Data\BattleModel.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Data\GameModelLocator.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Data\IUIDataManager.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Data\ProfitModel.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Data\ProfitModelWrapper.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Data\RoomData.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Data\RoomInfoModel.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Data\SimpleFreeUIData.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Data\SimpleUIData.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Data\UIBaseData.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Data\UIDataManager.cs" />
+    <Compile Include="GameModules\GamePlay\Free\DictionaryExtension.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Effect\EffectCreateHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Effect\EffectDeleteHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Effect\EffectFixInfo.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Effect\EffectShowHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Effect\EffectUpdateHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Effect\FreeBaseEffect.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Effect\FreeEffectManager.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Effect\FreeParticleEffect.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Effect\FreeRenderObject.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Effect\FreeSingleEffect.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Effect\IFreeEffect.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Effect\RaderImage.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Entitas\AirPlaneInitSystem.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Entitas\ClientFreeMoveInitModule.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Entitas\ClientFreeMoveModule.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Entitas\FreeMoveAddSystem.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Entitas\FreeMoveCleanupSystem.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Entitas\ItemComponent.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Entitas\PlayerInterceptCmdSystem.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Entitas\PlayerStateChangeSystem.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Entity\AllowMouseKeyHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Entity\ChangeAvatarHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Entity\SeeAllHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\FreeConstant.cs" />
+    <Compile Include="GameModules\GamePlay\Free\FreeGlobalVars.cs" />
+    <Compile Include="GameModules\GamePlay\Free\FreePrefabLoader.cs" />
+    <Compile Include="GameModules\GamePlay\Free\FreeUILoader.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Game\GameOverHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\ICoRoutineManager.cs" />
+    <Compile Include="GameModules\GamePlay\Free\ISimpleMesssageHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Player\ClientSkillHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Player\PlayerAnimationHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Player\PlayerCmdHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Player\PlayerMoveHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Player\PlayerMoveSpeedHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Render\IEffectModel3D.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Render\IObject3D.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Render\IScreenManage.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Render\ISprite3D.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Render\IUiObject.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Render\UnityEffectModel3D.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Render\UnityObject3D.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Render\UnityUiObject.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Scene\BloodSprayHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Scene\ClosePvsHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Scene\FogHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Scene\FogManager.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Scene\FreeFog.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Scene\Map2D.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Scene\PlayerAudioHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Scene\PlayerAudioHandlerExt.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Scene\PoisonCircleHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Scene\RealTimeCullingUpdater.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Scene\SceneLightHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Scene\SkyBoxHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Scene\TestFrameHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Scripts\ClientFPSUpdater.cs" />
+    <Compile Include="GameModules\GamePlay\Free\SimpleMessageManager.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\DebugDataUpdater.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\FreeBaseComponent.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\FreeExpComponent.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\FreeImageComponent.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\FreeLayoutConverter.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\FreeListComponent.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\FreeNumberComponent.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\FreePrefabComponent.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\FreeRaderComponent.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\FreeSmallMapComponent.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\FreeTextComponent.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\FreeUIEvent.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\FreeUIManager.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\FreeUIUtil.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\FreeUiSystem.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\FreeUnityImageComponent.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\IComponentGroup.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\IFreeComponent.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\IShowStyle.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\IUIUpdater.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\MinMapUpdater.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\ModeTips.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\RegisterCommandHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\ShowSimpleStyle.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\SimpleFreeUI.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\SimpleUIUpdater.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\TipsMessageHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\UIAddChildMessageHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\UIAddMarkHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\UIAirLineDataHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\UICountDownHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\UICreateMessageHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\UIDeleteMessageHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\UIDuplicateMessageHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\UILockMouseHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\UIRemoveAllHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\UIScoreInfoHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\UI\UIShowMessageHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Utility\FreeMathUtility.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Utility\FreeResourceUtil.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Utility\ResourceUtility.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Utility\StringExtension.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Utility\UnitySceneManager.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Utility\UnityUIUtility.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Utility\UrlRule.cs" />
+    <Compile Include="GameModules\GamePlay\InputIniSystem.cs" />
+    <Compile Include="GameModules\GamePlay\Offline\OfflineGamePlay.cs" />
+    <Compile Include="GameModules\GamePlay\TestFrameSystem.cs" />
+    <Compile Include="GameModules\Player\AbstractPlayerBackSystem.cs" />
+    <Compile Include="GameModules\Player\AbstractRenderSystem.cs" />
+    <Compile Include="GameModules\Player\AbstractSelfPlayerRenderSystem.cs" />
+    <Compile Include="GameModules\Player\CameraFxInitSystem.cs" />
+    <Compile Include="GameModules\Player\ClientCameraEffectSystem.cs" />
+    <Compile Include="GameModules\Player\ClientCameraFinalRenderSystem.cs" />
+    <Compile Include="GameModules\Player\ClientFreeCmdGenerateSystem.cs" />
+    <Compile Include="GameModules\Player\ClientPlayerCameraInitSystem.cs" />
+    <Compile Include="GameModules\Player\ClientPlayerEntityInitSystem.cs" />
+    <Compile Include="GameModules\Player\ClientPlayerModule.cs" />
+    <Compile Include="GameModules\Player\ClientPlayerResourceLoadSystem.cs" />
+    <Compile Include="GameModules\Player\ClientPlayerSaveSystem.cs" />
+    <Compile Include="GameModules\Player\ClientPlayerTipShowSystem.cs" />
+    <Compile Include="GameModules\Player\ClientSoundPlaybackSystem.cs" />
+    <Compile Include="GameModules\Player\InputSchemeUpdateSystem.cs" />
+    <Compile Include="GameModules\Player\PlayerAutoMoveSystem.cs" />
+    <Compile Include="GameModules\Player\PlayerFirstPersonHandRotationSystem.cs" />
+    <Compile Include="GameModules\Player\PlayerGunCameraSystem.cs" />
+    <Compile Include="GameModules\Player\PlayerPlayBackFilterSystem.cs" />
+    <Compile Include="GameModules\Player\PlayerPlaybackSystem.cs" />
+    <Compile Include="GameModules\Player\PlayerRaycastInitSystem.cs" />
+    <Compile Include="GameModules\Player\PlayerShowPackage\CreatePlaybackPlayerLifeStateDataSystem.cs" />
+    <Compile Include="GameModules\Player\PlayerShowPackage\PlayerAnimationPlaybackSystem.cs" />
+    <Compile Include="GameModules\Player\PlayerShowPackage\PlayerAppearancePlaybackSystem.cs" />
+    <Compile Include="GameModules\Player\PlayerShowPackage\PlayerAvatarPlaybackSystem.cs" />
+    <Compile Include="GameModules\Player\PlayerShowPackage\PlayerBonePlaybackSystem.cs" />
+    <Compile Include="GameModules\Player\PlayerShowPackage\WeaponAnimationPlaybackSystem.cs" />
+    <Compile Include="GameModules\Player\PlayerUpdateRotationRenderSystem.cs" />
+    <Compile Include="GameModules\Player\PositionRelatedEffectUpdateSystem.cs" />
+    <Compile Include="GameModules\Player\Robot\ClientRobotModule.cs" />
+    <Compile Include="GameModules\Player\Robot\RobotBehaviorLoadSystem.cs" />
+    <Compile Include="GameModules\Player\Robot\RobotUserCmdProviderInitSystem.cs" />
+    <Compile Include="GameModules\SceneManagement\ClientScenePostprocessorSystem.cs" />
+    <Compile Include="GameModules\SceneManagement\VisionCenterUpdateSystem.cs" />
+    <Compile Include="GameModules\SceneObject\ClientAbstractTriggerObjectListener.cs" />
+    <Compile Include="GameModules\SceneObject\ClientDebugSystem.cs" />
+    <Compile Include="GameModules\SceneObject\ClientDestructibleObjectListener.cs" />
+    <Compile Include="GameModules\SceneObject\ClientDestructibleObjectUpdateSystem.cs" />
+    <Compile Include="GameModules\SceneObject\ClientDoorListener.cs" />
+    <Compile Include="GameModules\SceneObject\ClientFracturedChunkDetachCallback.cs" />
+    <Compile Include="GameModules\SceneObject\ClientGlassyObjectListener.cs" />
+    <Compile Include="GameModules\SceneObject\ClientSceneObjectModule.cs" />
+    <Compile Include="GameModules\SceneObject\ClientSceneObjectRenderSystem.cs" />
+    <Compile Include="GameModules\SceneObject\DoorPlaybackSystem.cs" />
+    <Compile Include="GameModules\SceneObject\FreeObjectCleanUpSystem.cs" />
+    <Compile Include="GameModules\SceneObject\FreeObjectLoadSystem.cs" />
+    <Compile Include="GameModules\SceneObject\FreeObjectPositionUpdateSystem.cs" />
+    <Compile Include="GameModules\SceneObject\SceneObjectCastTargetLoadSystem.cs" />
+    <Compile Include="GameModules\SceneObject\SceneObjectCleanupSystem.cs" />
+    <Compile Include="GameModules\SceneObject\SceneObjectConstant.cs" />
+    <Compile Include="GameModules\SceneObject\SceneObjectLoadSystem.cs" />
+    <Compile Include="GameModules\SceneObject\SceneObjectTriggerEnterListener.cs" />
+    <Compile Include="GameModules\Sound\ClientSoundAutoStopSystem.cs" />
+    <Compile Include="GameModules\Sound\ClientSoundModule.cs" />
+    <Compile Include="GameModules\Sound\SoundCleanupSystem.cs" />
+    <Compile Include="GameModules\Sound\SoundLimitSystem.cs" />
+    <Compile Include="GameModules\Sound\SoundParentController.cs" />
+    <Compile Include="GameModules\Sound\SoundPlaySystem.cs" />
+    <Compile Include="GameModules\Sound\SoundResourcesLoadSystem.cs" />
+    <Compile Include="GameModules\Terrain\TerrainTestSystem.cs" />
+    <Compile Include="GameModules\Throwing\ThrowingCleanUpSystem.cs" />
+    <Compile Include="GameModules\Throwing\ThrowingCountDownSystem.cs" />
+    <Compile Include="GameModules\Throwing\ThrowingEntityInitSytem.cs" />
+    <Compile Include="GameModules\Throwing\ThrowingLineSystem.cs" />
+    <Compile Include="GameModules\Throwing\ThrowingModule.cs" />
+    <Compile Include="GameModules\Throwing\ThrowingRenderSystem.cs" />
+    <Compile Include="GameModules\Ui\Logic\AbstractCastLogic.cs" />
+    <Compile Include="GameModules\Ui\Logic\CommonCastLogic.cs" />
+    <Compile Include="GameModules\Ui\Logic\DoorCastLogic.cs" />
+    <Compile Include="GameModules\Ui\Logic\FreeObjectCastLogic.cs" />
+    <Compile Include="GameModules\Ui\Logic\ICastLogic.cs" />
+    <Compile Include="GameModules\Ui\Logic\IPlayerStateTipLogic.cs" />
+    <Compile Include="GameModules\Ui\Logic\MapObjectCastLogic.cs" />
+    <Compile Include="GameModules\Ui\Logic\PlayerCastLogic.cs" />
+    <Compile Include="GameModules\Ui\Logic\PlayerStateTipLogic.cs" />
+    <Compile Include="GameModules\Ui\Logic\SceneObjectCastLogic.cs" />
+    <Compile Include="GameModules\Ui\Logic\VehicleCastLogic.cs" />
+    <Compile Include="GameModules\Ui\Models\Blast\BlastRecordInfo.cs" />
+    <Compile Include="GameModules\Ui\Models\Blast\BlastRecordModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Blast\BlastScoreModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Blast\BlastWeaponHudModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Chicken\ChickenScoreModel.cs" />
+    <Compile Include="GameModules\Ui\Models\ClientAbstractModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonBlastTipsModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonChatModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonCountdownTipModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonCrossHairModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonCrossModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonDeadModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonDebugInfoModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonFocusMaskModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonGameOverModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonGameTitleModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonHealthGroupModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonHurtedModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonKillFeedbackModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonKillMessageModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonLoadingModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonLocateModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonLocationModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonMCountDownModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonMenuModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonMiniMap.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonNoticeModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonParachuteModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonPickUpModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonPlayerInfo.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonRangingModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonRevengeTagModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonRoundOverModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonScreenFlashModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonSplitModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonSuoDuModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonTaskTipModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonTeam.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonTechStatModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonTestModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonTipModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonVehicleTipModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonVideoSettingModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonWeaponBagModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonWeaponBagTipModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonWeaponHudModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\MainGuiModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\Map\AirPlane.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\Map\BaneCircle.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\Map\BombArea.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\Map\CommonMaxMap.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\Map\CommonMaxMapAirPlane.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\Map\CommonMaxMapDuanQuan.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\Map\CommonMaxMapGridBg.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\Map\CommonMaxMapPlayMark.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\Map\MapGird.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\Map\MapLabel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\Map\MapMark.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\Map\MapPlayer.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\Map\RouteLine.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\Map\SafeMiniDis.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\MaxMap\CommonMaxMap.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\MaxMap\CommonMaxMapAirPlane.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\MaxMap\CommonMaxMapDuanQuan.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\MaxMap\CommonMaxMapGridBg.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\MaxMap\CommonMaxMapPlayMark.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\MaxMap\MaxMapCommon.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\PrivateChat.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\WeaponHudAnime.cs" />
+    <Compile Include="GameModules\Ui\Models\Group\GroupRecordInfo.cs" />
+    <Compile Include="GameModules\Ui\Models\Group\GroupRecordModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Group\GroupScoreModel.cs" />
+    <Compile Include="GameModules\Ui\System\PlayerAddMarkSystem.cs" />
+    <Compile Include="GameModules\Ui\System\PlayerAddMarkUtility.cs" />
+    <Compile Include="GameModules\Ui\System\UISessionSystem.cs" />
+    <Compile Include="GameModules\Ui\System\UiLoadSystem.cs" />
+    <Compile Include="GameModules\Ui\System\UiPlayerDataInitSystem.cs" />
+    <Compile Include="GameModules\Ui\UICommon.cs" />
+    <Compile Include="GameModules\Ui\UICreateFactory.cs" />
+    <Compile Include="GameModules\Ui\UINameConstant.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Blast\BlastScoreUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Blast\BlastWeaponStateUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Chicken\ChickenScoreUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Chicken\SplitUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Chicken\SuoDuUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\BlastTipsAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\ChatUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\CountDownUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\CountdownTipUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\CrossHairUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\DeadUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\DebugInfoUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\FocusMaskUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\GameOverUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\GameTitleUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\HurtedUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\KillFeedbackUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\KillMessageUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\LoadingUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\LocationUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\MenuUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\MiniMapAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\NoticeUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\ParachuteStateUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\PickUpUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\PlayerInfoUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\PlayerStateUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\RangingUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\RevengeTagUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\RoundOverUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\ScreenFlashUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\TaskTipUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\TeamUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\TechStatUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\VehicleTipUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\VideoSettingUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\WeaponBagTipUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\WeaponBagUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\WeaponStateUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Group\GroupRecordUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Group\GroupScoreUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Blast\IBlastScoreUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Chicken\IChickenScoreUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Chicken\IParachuteStateUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Chicken\ISplitUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Chicken\ISuoDuUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IBlastTipsUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IChatUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\ICountDownUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\ICountdownTipUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\ICrossHairUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IDeadUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IDebugInfoUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IFocusMaskUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IGameOverUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IGameTitleUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IHurtedUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IKillFeedBackUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IKillMessageUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\ILoadingUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\ILocationUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IMenuUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IMiniMapUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\INoticeUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IPickUpUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IPlayerInfoUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IPlayerStateUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IRangingUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IRevengeTagUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IRoundOverUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IScreenFlashUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\ITaskTipUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\ITeamUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\ITechStatUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IVehicleUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IVideoSettingUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IWeaponBagTipUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IWeaponBagUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IWeaponStateUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Group\IGroupRecordUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Group\IGroupScoreUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\IAbstractUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\UIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiConstant.cs" />
+    <Compile Include="GameModules\Ui\UiLoadModule.cs" />
+    <Compile Include="GameModules\Ui\UiModule.cs" />
+    <Compile Include="GameModules\Ui\UiResourceLoader.cs" />
+    <Compile Include="GameModules\Ui\Utils\MiniMaxMapCommon.cs" />
+    <Compile Include="GameModules\Ui\Utils\UICommonColor.cs" />
+    <Compile Include="GameModules\Ui\Utils\UIUtils.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Blast\BlastRecordInfoViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Blast\BlastScoreViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Chicken\ChickenScoreViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonBagViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonBlastTipsViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonCarryTipViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonChatViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonCountdownTipViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonCrossHairViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonCrossViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonDeadViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonDebugInfoViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonFocusMaskViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonGameOverViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonGameTitleViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonHealthGroupViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonHurtedViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonKillFeedbackViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonKillMessageViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonLoadingViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonLocateViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonLocationViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonMCountDownViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonMaxMapViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonMenuViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonMiniMapViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonNoticeViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonParachuteViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonPickUpViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonPlayerInfoViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonRangingViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonRevengeTagViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonRoundOverViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonScreenFlashViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonSimpleTipViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonSplitViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonSuoDuViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonTaskTipViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonTeamViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonTechStatViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonTestViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonTipViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonVideoSettingViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonWeaponBagTipViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonWeaponBagViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonWeaponHudViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\MainGuiViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Group\GroupRecordInfoViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Group\GroupRecordViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Group\GroupScoreViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Group\GroupTechStatViewModel.cs" />
+    <Compile Include="GameModules\UserInput\InputCollectSystem.cs" />
+    <Compile Include="GameModules\UserInput\InputConfigInitSystem.cs" />
+    <Compile Include="GameModules\UserInput\InputManagerConfigInitSystem.cs" />
+    <Compile Include="GameModules\UserInput\PlayerInputManager.cs" />
+    <Compile Include="GameModules\UserInput\UserInputConst.cs" />
+    <Compile Include="GameModules\UserPhysics\SimulationTimeSyncClientSystem.cs" />
+    <Compile Include="GameModules\Vehicle\ClientVehicleEntityInitSystem.cs" />
+    <Compile Include="GameModules\Vehicle\ClientVehicleModule.cs" />
+    <Compile Include="GameModules\Vehicle\ClientVehicleOwnerIdActiveSystem.cs" />
+    <Compile Include="GameModules\Vehicle\ClientVehiclePlaybackSystem.cs" />
+    <Compile Include="GameModules\Vehicle\ClientVehicleSoundUpdateSystem.cs" />
+    <Compile Include="MessageHandler\AbstractClientMessageHandler.cs" />
+    <Compile Include="MessageHandler\ClearSceneMessageHandler.cs" />
+    <Compile Include="MessageHandler\ClientGameOverMessageHandler.cs" />
+    <Compile Include="MessageHandler\ClientHeartBeatMessageHandler.cs" />
+    <Compile Include="MessageHandler\DamageInfoMessageHandler.cs" />
+    <Compile Include="MessageHandler\FireInfoAckMessagehandler.cs" />
+    <Compile Include="MessageHandler\PingRespMessageHandler.cs" />
+    <Compile Include="MessageHandler\ServerDebugMessageHandler.cs" />
+    <Compile Include="MessageHandler\SnapshotMessageHandler.cs" />
+    <Compile Include="MessageHandler\SnapshotSyncTimeHandler.cs" />
+    <Compile Include="MessageHandler\StatisticsMessageHandler.cs" />
+    <Compile Include="MessageHandler\UdpIdMessageHandler.cs" />
+    <Compile Include="MessageHandler\UpdateMessageAckMessageHandler.cs" />
+    <Compile Include="SceneManagement\ClientScenePostprocessor.cs" />
+    <Compile Include="SceneManagement\DistanceCulling\Constants.cs" />
+    <Compile Include="SceneManagement\DistanceCulling\Factory\CullingHandler.cs" />
+    <Compile Include="SceneManagement\DistanceCulling\Factory\CullingItemFactory.cs" />
+    <Compile Include="SceneManagement\DistanceCulling\Factory\ProbeCullingHandler.cs" />
+    <Compile Include="SceneManagement\DistanceCulling\Factory\ShadowCullingHandler.cs" />
+    <Compile Include="SceneManagement\DistanceCulling\GenericPool.cs" />
+    <Compile Include="SceneManagement\DistanceCulling\ICacheableElement.cs" />
+    <Compile Include="SceneManagement\DistanceCulling\IGenericPool.cs" />
+    <Compile Include="SceneManagement\DistanceCulling\MultiTagHelper.cs" />
+    <Compile Include="SceneManagement\DistanceCulling\OctreeNode.cs" />
+    <Compile Include="SceneManagement\DistanceCulling\StreamingGo.cs" />
+    <Compile Include="SceneManagement\DistanceCulling\StreamingGoBuilder.cs" />
+    <Compile Include="SceneManagement\DistanceCulling\StreamingGoByDistance.cs" />
+    <Compile Include="SessionStates\ClientPreLoadState.cs" />
+    <Compile Include="SessionStates\ClientProfileSessionStateMachine.cs" />
+    <Compile Include="SessionStates\ClientSessionStateMachine.cs" />
+    <Compile Include="SessionStates\ClientSessionStateMachineMonitor.cs" />
+    <Compile Include="SessionStates\ClientSessionStateProgress.cs" />
+    <Compile Include="SessionStates\GameModuleFactory.cs" />
+    <Compile Include="SessionStates\InitUiModuleState.cs" />
+    <Compile Include="SessionStates\LoadBaseConfigureState.cs" />
+    <Compile Include="SessionStates\LoadSceneMapConfig.cs" />
+    <Compile Include="SessionStates\LoadSubResourceConfigureState.cs" />
+    <Compile Include="SessionStates\LoginSuccState.cs" />
+    <Compile Include="SessionStates\PreparingPlayerState.cs" />
+    <Compile Include="SessionStates\ProfilePreparationState.cs" />
+    <Compile Include="SessionStates\ProfileState.cs" />
+    <Compile Include="SessionStates\RequestRoomInfoState.cs" />
+    <Compile Include="SessionStates\WaitSnapshotState.cs" />
+    <Compile Include="StartUp\IClientContextInitilizer.cs" />
+    <Compile Include="StartUp\Offline\OfflineSimulationSystem.cs" />
+    <Compile Include="StartUp\Offline\OfflineSnapshotSelector.cs" />
+    <Compile Include="StartUp\Online\ClientContextInitilizer.cs" />
+    <Compile Include="StartUp\Online\ClientRoom.cs" />
+    <Compile Include="Tools\AutoTerrainNavigatorSystem.cs" />
+    <Compile Include="Tools\MinRendererSetSampler.cs" />
+    <Compile Include="Tools\MinRendererSetSystem.cs" />
+    <Compile Include="Tools\ProfileFeature.cs" />
+    <Compile Include="Tools\SampleData.cs" />
+    <Compile Include="Tools\TerrainSampler.cs" />
+    <Compile Include="Tools\WoodConflictSystem.cs" />
+    <Compile Include="Utility\CursorLocker.cs" />
+    <Compile Include="Utility\HallUtility.cs" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\App.Hall.ProtoBuf\App.Hall.ProtoBuf.csproj">
+      <Project>{1414D718-802A-D5AE-C9A1-60D035F7A536}</Project>
+      <Name>App.Hall.ProtoBuf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\App.Localization\App.Localization.csproj">
+      <Project>{5D1781E6-4910-A038-7242-85BD5E9A7F44}</Project>
+      <Name>App.Localization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\App.ProtoBuf\App.ProtoBuf.csproj">
+      <Project>{05E657F9-F148-E79D-9ACE-1F548610B320}</Project>
+      <Name>App.ProtoBuf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\App.Shared\App.Shared.csproj">
+      <Project>{EB79BF2D-D731-017B-4039-DAD62C109C6B}</Project>
+      <Name>App.Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\App.Shared.Components\App.Shared.Components.csproj">
+      <Project>{DFC0B886-4B2D-7481-1421-0CDF804C96E9}</Project>
+      <Name>App.Shared.Components</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AssetBundleManager\AssetBundleManager.csproj">
+      <Project>{BA76FEAD-A65A-BF03-0FBB-B956FBBDA985}</Project>
+      <Name>AssetBundleManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BehaviorDesigner\BehaviorDesigner.csproj">
+      <Project>{2663188B-125C-37DD-3B8E-1C6227E616E9}</Project>
+      <Name>BehaviorDesigner</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DWP\DWP.csproj">
+      <Project>{B0DF870B-1CE9-877C-A564-9E7C116D937C}</Project>
+      <Name>DWP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EVP5\EVP5.csproj">
+      <Project>{055E847C-F194-850D-9A81-6B108697010F}</Project>
+      <Name>EVP5</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Fracturing\Fracturing.csproj">
+      <Project>{FAF4CE90-E6AC-10DE-4FB4-E9393B8BABCE}</Project>
+      <Name>Fracturing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\I2Localization\I2Localization.csproj">
+      <Project>{094E10E3-F51B-04E9-DEAF-740FCA1CE04D}</Project>
+      <Name>I2Localization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\iTween\iTween.csproj">
+      <Project>{51B5FF02-3D57-2AD9-2612-3E2D1253B129}</Project>
+      <Name>iTween</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LiteNetLib\LiteNetLib.csproj">
+      <Project>{B1B5C059-9D6D-02A7-0675-DB02F24B9D97}</Project>
+      <Name>LiteNetLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RpcNetwork\RpcNetwork.csproj">
+      <Project>{74EC443D-60A4-868A-C9AB-5FE6B582217B}</Project>
+      <Name>RpcNetwork</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shared.Scripts\Shared.Scripts.csproj">
+      <Project>{D2164AE1-BEE4-3DE7-A778-AE0D93E5194C}</Project>
+      <Name>Shared.Scripts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tools\Tools.csproj">
+      <Project>{16CF2D0E-82E3-55BF-4B65-F91EB73852F0}</Project>
+      <Name>Tools</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UIComponent\UIComponent.csproj">
+      <Project>{368C361B-A241-AF10-2B36-A9E797EAA514}</Project>
+      <Name>UIComponent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UiFramework\UiFramework.csproj">
+      <Project>{7154591B-DD09-D210-66FE-CBE7D2B2C814}</Project>
+      <Name>UiFramework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UITween\UITween.csproj">
+      <Project>{E6655143-5245-D0DE-5B5D-5BB5C7BB3640}</Project>
+      <Name>UITween</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UserInputManager\UserInputManager.csproj">
+      <Project>{AF9B4541-9B94-6493-C4C6-4918B01E449F}</Project>
+      <Name>UserInputManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utils\Utils.csproj">
+      <Project>{F68B420E-62A0-6ABF-2B22-0E1F97F566F0}</Project>
+      <Name>Utils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VehicleCommon\VehicleCommon.csproj">
+      <Project>{EEE6EAF7-5AA7-662E-23E2-AFAB8F61AB0A}</Project>
+      <Name>VehicleCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Wwise\Wwise.csproj">
+      <Project>{F462680E-6077-90BF-29F9-331F95CC8CF0}</Project>
+      <Name>Wwise</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XmlConfig\XmlConfig.csproj">
+      <Project>{CCFBDCB2-3866-9129-81A4-42CFED4D6F7E}</Project>
+      <Name>XmlConfig</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

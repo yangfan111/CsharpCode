@@ -1,0 +1,4654 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68019d084312a6242b5725bf1d79b7fc, type: 3}
+  m_Name: AkWwiseProjectData
+  m_EditorClassIdentifier: 
+  AcousticTextureWwu:
+  - PhysicalPath: Virtual Acoustics\Default Work Unit.wwu
+    ParentPhysicalPath: 
+    guid: cfc19ab3d6191d49b9b4ee9eddfcfc13
+    m_lastTime: -8586527019370598793
+    List: []
+  - PhysicalPath: Virtual Acoustics\Factory Reflect Acoustic Textures.wwu
+    ParentPhysicalPath: 
+    guid: 6b663d46a83ca54f8b4a5fef12b883f6
+    m_lastTime: -8586527019370473461
+    List:
+    - name: Acoustic_Banner
+      guid: f2532d2fccda8e408b8898b1b52a26d6
+      id: 4168643977
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Acoustic_Banner
+        ObjectType: 15
+      Path: Factory Reflect Acoustic Textures\Textures\Acoustic_Banner
+    - name: Anechoic
+      guid: 32c20a8be202de4ebeacfdd1a900e3ed
+      id: 1873957695
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Anechoic
+        ObjectType: 15
+      Path: Factory Reflect Acoustic Textures\Textures\Anechoic
+    - name: Brick
+      guid: a9a586b004f2534ca838bdb18b18f6d6
+      id: 504532776
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Brick
+        ObjectType: 15
+      Path: Factory Reflect Acoustic Textures\Textures\Brick
+    - name: Carpet
+      guid: 8975223456dc604296c4b9f4b669092b
+      id: 2412606308
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Carpet
+        ObjectType: 15
+      Path: Factory Reflect Acoustic Textures\Textures\Carpet
+    - name: Concrete
+      guid: 001cf85c9628e04aaf7c3080bdaba682
+      id: 841620460
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Concrete
+        ObjectType: 15
+      Path: Factory Reflect Acoustic Textures\Textures\Concrete
+    - name: Cork_Tiles
+      guid: 19c9d2305f92434189063dbb3c4ae5e2
+      id: 3195498748
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Cork_Tiles
+        ObjectType: 15
+      Path: Factory Reflect Acoustic Textures\Textures\Cork_Tiles
+    - name: Curtains
+      guid: 339ee6f8975c6849b508a1535f2d66e8
+      id: 2928161104
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Curtains
+        ObjectType: 15
+      Path: Factory Reflect Acoustic Textures\Textures\Curtains
+    - name: Drywall
+      guid: f4e3a4680b4c8746a8b8a84db93dbc8f
+      id: 3670307564
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Drywall
+        ObjectType: 15
+      Path: Factory Reflect Acoustic Textures\Textures\Drywall
+    - name: Fabric
+      guid: 32d581836edbed4ea7a3bc7b0a0b8ba8
+      id: 1970351858
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Fabric
+        ObjectType: 15
+      Path: Factory Reflect Acoustic Textures\Textures\Fabric
+    - name: Mountain
+      guid: 313793c51a00b44a98dd9b033a8c8eab
+      id: 513139656
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Mountain
+        ObjectType: 15
+      Path: Factory Reflect Acoustic Textures\Textures\Mountain
+    - name: Tile
+      guid: c4da82a82a13b747ba9db9907ba29cc0
+      id: 2637588553
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Tile
+        ObjectType: 15
+      Path: Factory Reflect Acoustic Textures\Textures\Tile
+    - name: Wood
+      guid: 96bcff1fe76f9e48ba6c7c14a71391ae
+      id: 2058049674
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Wood
+        ObjectType: 15
+      Path: Factory Reflect Acoustic Textures\Textures\Wood
+    - name: Wood_Bright
+      guid: e5d1857ba2c1634e9a13cec54b641adc
+      id: 4262522749
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Wood_Bright
+        ObjectType: 15
+      Path: Factory Reflect Acoustic Textures\Textures\Wood_Bright
+    - name: Wood_Deep
+      guid: 8e474652dac50c4ea0dec98d1479529a
+      id: 1755085759
+      PathAndIcons:
+      - ElementName: Factory Reflect Acoustic Textures
+        ObjectType: 12
+      - ElementName: Textures
+        ObjectType: 4
+      - ElementName: Wood_Deep
+        ObjectType: 15
+      Path: Factory Reflect Acoustic Textures\Textures\Wood_Deep
+  AuxBusWwu:
+  - PhysicalPath: Master-Mixer Hierarchy\Default Work Unit.wwu
+    ParentPhysicalPath: 
+    guid: 621e10c56a530348831ef756904fc519
+    m_lastTime: -8586513935710332335
+    List:
+    - name: Reverb_Room_Large
+      guid: 17912eccf5863846906a1938c702cafa
+      id: 1699010785
+      PathAndIcons:
+      - ElementName: Default Work Unit
+        ObjectType: 12
+      - ElementName: Master Audio Bus
+        ObjectType: 2
+      - ElementName: SFX
+        ObjectType: 2
+      - ElementName: Reverb
+        ObjectType: 2
+      - ElementName: Reverb_Room_Large
+        ObjectType: 1
+      Path: Default Work Unit\Master Audio Bus\SFX\Reverb\Reverb_Room_Large
+    - name: Reverb_Room_medium
+      guid: b9e5eb5dee9859428b3c2aa1cff7592c
+      id: 985637097
+      PathAndIcons:
+      - ElementName: Default Work Unit
+        ObjectType: 12
+      - ElementName: Master Audio Bus
+        ObjectType: 2
+      - ElementName: SFX
+        ObjectType: 2
+      - ElementName: Reverb
+        ObjectType: 2
+      - ElementName: Reverb_Room_medium
+        ObjectType: 1
+      Path: Default Work Unit\Master Audio Bus\SFX\Reverb\Reverb_Room_medium
+    - name: Reverb_Room_small
+      guid: 3ef57010300bf44ea403b6ee9b26815a
+      id: 3477108777
+      PathAndIcons:
+      - ElementName: Default Work Unit
+        ObjectType: 12
+      - ElementName: Master Audio Bus
+        ObjectType: 2
+      - ElementName: SFX
+        ObjectType: 2
+      - ElementName: Reverb
+        ObjectType: 2
+      - ElementName: Reverb_Room_small
+        ObjectType: 1
+      Path: Default Work Unit\Master Audio Bus\SFX\Reverb\Reverb_Room_small
+    - name: Roomverb
+      guid: 71c93702450cc94d97fb04ddde3b6387
+      id: 1572913279
+      PathAndIcons:
+      - ElementName: Default Work Unit
+        ObjectType: 12
+      - ElementName: Master Audio Bus
+        ObjectType: 2
+      - ElementName: Main_Scene
+        ObjectType: 2
+      - ElementName: Roomverb
+        ObjectType: 1
+      Path: Default Work Unit\Master Audio Bus\Main_Scene\Roomverb
+    - name: Underwater_FX
+      guid: 4e62479138fc0644bad08ee0de2545c3
+      id: 2445731875
+      PathAndIcons:
+      - ElementName: Default Work Unit
+        ObjectType: 12
+      - ElementName: Master Audio Bus
+        ObjectType: 2
+      - ElementName: SFX
+        ObjectType: 2
+      - ElementName: Underwater_FX
+        ObjectType: 1
+      Path: Default Work Unit\Master Audio Bus\SFX\Underwater_FX
+  BankWwu:
+  - PhysicalPath: SoundBanks\Default Work Unit.wwu
+    ParentPhysicalPath: 
+    guid: b2b39eeb565fc847adfaa15ce1b7e85d
+    m_lastTime: -8586527019369569466
+    List:
+    - name: MainScene
+      guid: 7756aa0e181d9141ad25eaeb77282a21
+      id: 3587119738
+      PathAndIcons:
+      - ElementName: Default Work Unit
+        ObjectType: 12
+      - ElementName: MainScene
+        ObjectType: 7
+      Path: Default Work Unit\MainScene
+    - name: Weapon_Footstep
+      guid: 499002e7f1ea7e438d7b88fb632892b9
+      id: 2143464946
+      PathAndIcons:
+      - ElementName: Default Work Unit
+        ObjectType: 12
+      - ElementName: Weapon_Footstep
+        ObjectType: 7
+      Path: Default Work Unit\Weapon_Footstep
+  EventWwu:
+  - PhysicalPath: Events\Act.wwu
+    ParentPhysicalPath: 
+    guid: b09baab7188b034da9c3501829b343aa
+    m_lastTime: -8586508779365408525
+    List:
+    - name: Act_footstep
+      guid: 595d18a646f60f4aaff292fb3838aaeb
+      id: 3959130588
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Act_Footstep
+        ObjectType: 4
+      - ElementName: Act_footstep
+        ObjectType: 3
+      Path: Act\Act_Footstep\Act_footstep
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Act_getdown
+      guid: 536d3ba9c3832f44ad25d752af2b1728
+      id: 1058121406
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Act_Footstep
+        ObjectType: 4
+      - ElementName: Act_getdown
+        ObjectType: 3
+      Path: Act\Act_Footstep\Act_getdown
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Act_getup
+      guid: a764416af5d3f6448b79c97ddb03d3d8
+      id: 3438243301
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Act_Footstep
+        ObjectType: 4
+      - ElementName: Act_getup
+        ObjectType: 3
+      Path: Act\Act_Footstep\Act_getup
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Act_jump
+      guid: 52e5e396c957e548856cfde8039ad083
+      id: 4118803930
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Act_Footstep
+        ObjectType: 4
+      - ElementName: Act_jump
+        ObjectType: 3
+      Path: Act\Act_Footstep\Act_jump
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Act_Squat
+      guid: e6fd9a49b8efdb48b33ff1e3ae8a3077
+      id: 2464690592
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Act_Footstep
+        ObjectType: 4
+      - ElementName: Act_Squat
+        ObjectType: 3
+      Path: Act\Act_Footstep\Act_Squat
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Act_Squat_getup
+      guid: 6de16b5278cf554080e5e38b26dae1c0
+      id: 4030000862
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Act_Footstep
+        ObjectType: 4
+      - ElementName: Act_Squat_getup
+        ObjectType: 3
+      Path: Act\Act_Footstep\Act_Squat_getup
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Act_underwater_dive
+      guid: d9c273fff2926f459787407bf62cebc0
+      id: 214363854
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Act_Water
+        ObjectType: 4
+      - ElementName: Act_underwater_dive
+        ObjectType: 3
+      Path: Act\Act_Water\Act_underwater_dive
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Act_underwater_stay
+      guid: f27fdf85393f4042bd0cccf014ed6b35
+      id: 1391452043
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Act_Water
+        ObjectType: 4
+      - ElementName: Act_underwater_stay
+        ObjectType: 3
+      Path: Act\Act_Water\Act_underwater_stay
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Act_water_fall
+      guid: 0b89324464d85c43ae623f76fde6ef28
+      id: 3602448469
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Act_Water
+        ObjectType: 4
+      - ElementName: Act_water_fall
+        ObjectType: 3
+      Path: Act\Act_Water\Act_water_fall
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Act_water_jumpout
+      guid: 1365cc7ef20d9846a583237b956c9f74
+      id: 764985762
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Act_Water
+        ObjectType: 4
+      - ElementName: Act_water_jumpout
+        ObjectType: 3
+      Path: Act\Act_Water\Act_water_jumpout
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Act_water_stay
+      guid: 5a296e0e02331b4a949e62327aa08499
+      id: 3358237501
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Act_Water
+        ObjectType: 4
+      - ElementName: Act_water_stay
+        ObjectType: 3
+      Path: Act\Act_Water\Act_water_stay
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Act_water_swim
+      guid: 00f3946f55f46f4f8c01ae309c5c5037
+      id: 3760459050
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Act_Water
+        ObjectType: 4
+      - ElementName: Act_water_swim
+        ObjectType: 3
+      Path: Act\Act_Water\Act_water_swim
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_bag_discard_common
+      guid: 2f43be8b8faa5142820e20dcabe6e1e0
+      id: 3488177772
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Object_bag_discard_common
+        ObjectType: 3
+      Path: Act\OtherObject\Object_bag_discard_common
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_bag_get_common
+      guid: 12b9cf1a03198a4badcc2d200f3dd85c
+      id: 2808938306
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Object_bag_get_common
+        ObjectType: 3
+      Path: Act\OtherObject\Object_bag_get_common
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_bandage_get
+      guid: 193004c74af45c4d820758bb820929fc
+      id: 2310052318
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Pickup
+        ObjectType: 4
+      - ElementName: Object_bandage_get
+        ObjectType: 3
+      Path: Act\OtherObject\Pickup\Object_bandage_get
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_bandage_use
+      guid: 98570f44ea22134eadd3ad7dd8d1176d
+      id: 2212240563
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Use
+        ObjectType: 4
+      - ElementName: Object_bandage_use
+        ObjectType: 3
+      Path: Act\OtherObject\Use\Object_bandage_use
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_bucket_get
+      guid: 95310f3924af3a408a2e63e50bf7b8c3
+      id: 3723739872
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Pickup
+        ObjectType: 4
+      - ElementName: Object_bucket_get
+        ObjectType: 3
+      Path: Act\OtherObject\Pickup\Object_bucket_get
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_bucket_topple
+      guid: 695f6619b611c84ca4cb4e4e061fa59b
+      id: 262882398
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Object_bucket_topple
+        ObjectType: 3
+      Path: Act\OtherObject\Object_bucket_topple
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_bullet_get
+      guid: f73822fafa67354e9ee37d862cf9880b
+      id: 3367268526
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Pickup
+        ObjectType: 4
+      - ElementName: Object_bullet_get
+        ObjectType: 3
+      Path: Act\OtherObject\Pickup\Object_bullet_get
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_cloth_get
+      guid: df0b4186e4e2d24f847c6735e17c0e59
+      id: 3364889812
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Pickup
+        ObjectType: 4
+      - ElementName: Object_cloth_get
+        ObjectType: 3
+      Path: Act\OtherObject\Pickup\Object_cloth_get
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_door_close
+      guid: 1d5a03add7226248bfd72a593bab658b
+      id: 2067090206
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Object_door_close
+        ObjectType: 3
+      Path: Act\OtherObject\Object_door_close
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_door_open
+      guid: 1277e8e0ba998b4b8ead64f126a57c8a
+      id: 1101366970
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Object_door_open
+        ObjectType: 3
+      Path: Act\OtherObject\Object_door_open
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_drinks_get
+      guid: 5d30ea97a66a7b46b8ee262e54717148
+      id: 470036803
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Pickup
+        ObjectType: 4
+      - ElementName: Object_drinks_get
+        ObjectType: 3
+      Path: Act\OtherObject\Pickup\Object_drinks_get
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_drinks_use
+      guid: ebfc013d6e8c2d44896b52ac1b3eaf85
+      id: 836878834
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Use
+        ObjectType: 4
+      - ElementName: Object_drinks_use
+        ObjectType: 3
+      Path: Act\OtherObject\Use\Object_drinks_use
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_drug_get
+      guid: 040847f207e2c04982e02687c6b83e51
+      id: 4090211864
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Pickup
+        ObjectType: 4
+      - ElementName: Object_drug_get
+        ObjectType: 3
+      Path: Act\OtherObject\Pickup\Object_drug_get
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_drug_use
+      guid: 06a97bfbefb1944abcabc701002b5d0b
+      id: 295616109
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Use
+        ObjectType: 4
+      - ElementName: Object_drug_use
+        ObjectType: 3
+      Path: Act\OtherObject\Use\Object_drug_use
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_firepan_burn
+      guid: 35fbadd28d367a47bd525dcbeb6353fd
+      id: 1082457532
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Object_firepan_burn
+        ObjectType: 3
+      Path: Act\OtherObject\Object_firepan_burn
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_get_common
+      guid: 1a52961643def74bbf9da3c39d821f65
+      id: 732677407
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Pickup
+        ObjectType: 4
+      - ElementName: Object_get_common
+        ObjectType: 3
+      Path: Act\OtherObject\Pickup\Object_get_common
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_glass_broken
+      guid: 3af0accd5c3eed44a57398faea7d00a7
+      id: 667280815
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Object_glass_broken
+        ObjectType: 3
+      Path: Act\OtherObject\Object_glass_broken
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_gun_sight_get
+      guid: 35f460b3dbc045418e90eccf8e2d6eb3
+      id: 2627408028
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Pickup
+        ObjectType: 4
+      - ElementName: Object_gun_sight_get
+        ObjectType: 3
+      Path: Act\OtherObject\Pickup\Object_gun_sight_get
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_injection_get
+      guid: 463d1f44f66f624aac0186de63736f42
+      id: 753406439
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Pickup
+        ObjectType: 4
+      - ElementName: Object_injection_get
+        ObjectType: 3
+      Path: Act\OtherObject\Pickup\Object_injection_get
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_injection_use
+      guid: 2679f46b14bd5c4593a31b2940577286
+      id: 1259692046
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Use
+        ObjectType: 4
+      - ElementName: Object_injection_use
+        ObjectType: 3
+      Path: Act\OtherObject\Use\Object_injection_use
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_magazine_get
+      guid: 431e683c4ad1bc4d889aa57ef0f61a32
+      id: 1496757116
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Pickup
+        ObjectType: 4
+      - ElementName: Object_magazine_get
+        ObjectType: 3
+      Path: Act\OtherObject\Pickup\Object_magazine_get
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_medical_bag_get
+      guid: bcf9e6fb74182a47ba18601b6a0188a1
+      id: 1706271090
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Pickup
+        ObjectType: 4
+      - ElementName: Object_medical_bag_get
+        ObjectType: 3
+      Path: Act\OtherObject\Pickup\Object_medical_bag_get
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_medical_bag_use
+      guid: a5e5cf6d3da6ae42ad0dffb4de1595dd
+      id: 2274444335
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Use
+        ObjectType: 4
+      - ElementName: Object_medical_bag_use
+        ObjectType: 3
+      Path: Act\OtherObject\Use\Object_medical_bag_use
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_medical_kit_get
+      guid: 519d1ddef3eeda4f99565a62d8f24203
+      id: 2421584764
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Pickup
+        ObjectType: 4
+      - ElementName: Object_medical_kit_get
+        ObjectType: 3
+      Path: Act\OtherObject\Pickup\Object_medical_kit_get
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_medical_kit_use
+      guid: cbcc1cc7ae0db14483ef154094d334ff
+      id: 1987632185
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Use
+        ObjectType: 4
+      - ElementName: Object_medical_kit_use
+        ObjectType: 3
+      Path: Act\OtherObject\Use\Object_medical_kit_use
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_weapon_get
+      guid: b0a93bfbaaa10048b75aca028d2536ae
+      id: 1674362318
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: Pickup
+        ObjectType: 4
+      - ElementName: Object_weapon_get
+        ObjectType: 3
+      Path: Act\OtherObject\Pickup\Object_weapon_get
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: UI_bag_error
+      guid: 4d7cc0fe8a8bb9459dc0ef764a1e64c6
+      id: 847807691
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: OtherObject
+        ObjectType: 4
+      - ElementName: UI_bag_error
+        ObjectType: 3
+      Path: Act\OtherObject\UI_bag_error
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+  - PhysicalPath: Events\Amb.wwu
+    ParentPhysicalPath: 
+    guid: 5fed10a2f8474e42bc706f19f54ab6e7
+    m_lastTime: -8586527019370303008
+    List:
+    - name: Act_air_land
+      guid: a783281bc9cb5c4d8af440a4b9a28ef0
+      id: 644840894
+      PathAndIcons:
+      - ElementName: Amb
+        ObjectType: 12
+      - ElementName: Map_01
+        ObjectType: 4
+      - ElementName: Act_air_land
+        ObjectType: 3
+      Path: Amb\Map_01\Act_air_land
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Act_parachute_open
+      guid: 46cffb0f43baa142ac0d8e59813b5cf2
+      id: 182149962
+      PathAndIcons:
+      - ElementName: Amb
+        ObjectType: 12
+      - ElementName: Map_01
+        ObjectType: 4
+      - ElementName: Act_parachute_open
+        ObjectType: 3
+      Path: Amb\Map_01\Act_parachute_open
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Amb_ocean_loop
+      guid: ea932ff1547ab94f93ae80dfc1f564cc
+      id: 3963015021
+      PathAndIcons:
+      - ElementName: Amb
+        ObjectType: 12
+      - ElementName: Map_01
+        ObjectType: 4
+      - ElementName: Amb_ocean_loop
+        ObjectType: 3
+      Path: Amb\Map_01\Amb_ocean_loop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Amb_sea_wave_loop
+      guid: b0afca1e4899644e9c4004424000f1c4
+      id: 1602303378
+      PathAndIcons:
+      - ElementName: Amb
+        ObjectType: 12
+      - ElementName: Map_01
+        ObjectType: 4
+      - ElementName: Amb_sea_wave_loop
+        ObjectType: 3
+      Path: Amb\Map_01\Amb_sea_wave_loop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Amb_wind_soft_loop
+      guid: 001e86272465da4bad1a80516bea14d3
+      id: 3481965872
+      PathAndIcons:
+      - ElementName: Amb
+        ObjectType: 12
+      - ElementName: Map_01
+        ObjectType: 4
+      - ElementName: Amb_wind_soft_loop
+        ObjectType: 3
+      Path: Amb\Map_01\Amb_wind_soft_loop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_teleporter_loop
+      guid: 5db56f0c717fbc429baf84fe0d3364a1
+      id: 230837500
+      PathAndIcons:
+      - ElementName: Amb
+        ObjectType: 12
+      - ElementName: Map_02
+        ObjectType: 4
+      - ElementName: Object_teleporter_loop
+        ObjectType: 3
+      Path: Amb\Map_02\Object_teleporter_loop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Object_teleporter_popup
+      guid: e5b3712baaa18447affa7ff60e63a84d
+      id: 2555830200
+      PathAndIcons:
+      - ElementName: Amb
+        ObjectType: 12
+      - ElementName: Map_02
+        ObjectType: 4
+      - ElementName: Object_teleporter_popup
+        ObjectType: 3
+      Path: Amb\Map_02\Object_teleporter_popup
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: System_air_volplane
+      guid: 56942a5e411a45449fbc2cfe888275b6
+      id: 1639297721
+      PathAndIcons:
+      - ElementName: Amb
+        ObjectType: 12
+      - ElementName: Map_01
+        ObjectType: 4
+      - ElementName: System_air_volplane
+        ObjectType: 3
+      Path: Amb\Map_01\System_air_volplane
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: System_airdrop
+      guid: dcd12b686b3600429309bf212016c242
+      id: 1347349964
+      PathAndIcons:
+      - ElementName: Amb
+        ObjectType: 12
+      - ElementName: Map_01
+        ObjectType: 4
+      - ElementName: System_airdrop
+        ObjectType: 3
+      Path: Amb\Map_01\System_airdrop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: System_missile_explosion_ground
+      guid: 7326c9c4652fe14cbdcae0a3b3ff5f78
+      id: 4232951399
+      PathAndIcons:
+      - ElementName: Amb
+        ObjectType: 12
+      - ElementName: Map_01
+        ObjectType: 4
+      - ElementName: Missile
+        ObjectType: 4
+      - ElementName: System_missile_explosion_ground
+        ObjectType: 3
+      Path: Amb\Map_01\Missile\System_missile_explosion_ground
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: System_missile_explosion_water
+      guid: 5dc92f7c0cd3274b8fc3e73a6c8ee491
+      id: 1830914119
+      PathAndIcons:
+      - ElementName: Amb
+        ObjectType: 12
+      - ElementName: Map_01
+        ObjectType: 4
+      - ElementName: Missile
+        ObjectType: 4
+      - ElementName: System_missile_explosion_water
+        ObjectType: 3
+      Path: Amb\Map_01\Missile\System_missile_explosion_water
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: System_missile_fly
+      guid: d670382c8b497842916c1e8158438959
+      id: 532467221
+      PathAndIcons:
+      - ElementName: Amb
+        ObjectType: 12
+      - ElementName: Map_01
+        ObjectType: 4
+      - ElementName: Missile
+        ObjectType: 4
+      - ElementName: System_missile_fly
+        ObjectType: 3
+      Path: Amb\Map_01\Missile\System_missile_fly
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: System_redsmoke
+      guid: 05b7d3bbb7629645bb1046e953f16a11
+      id: 3940182473
+      PathAndIcons:
+      - ElementName: Amb
+        ObjectType: 12
+      - ElementName: Map_01
+        ObjectType: 4
+      - ElementName: System_redsmoke
+        ObjectType: 3
+      Path: Amb\Map_01\System_redsmoke
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: System_survival_zone_inside
+      guid: 1f3804fa9fa8cf4cb2c54825628436f6
+      id: 3295937911
+      PathAndIcons:
+      - ElementName: Amb
+        ObjectType: 12
+      - ElementName: Map_01
+        ObjectType: 4
+      - ElementName: System_survival_zone_inside
+        ObjectType: 3
+      Path: Amb\Map_01\System_survival_zone_inside
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: System_survival_zone_outside
+      guid: 0d9880bf91ac1e4bb7ae0a89eafc8e84
+      id: 3358288228
+      PathAndIcons:
+      - ElementName: Amb
+        ObjectType: 12
+      - ElementName: Map_01
+        ObjectType: 4
+      - ElementName: System_survival_zone_outside
+        ObjectType: 3
+      Path: Amb\Map_01\System_survival_zone_outside
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: System_survival_zone_through
+      guid: 8c20253dff30b64a9792fdf3c0c0cb28
+      id: 2561909670
+      PathAndIcons:
+      - ElementName: Amb
+        ObjectType: 12
+      - ElementName: Map_01
+        ObjectType: 4
+      - ElementName: System_survival_zone_through
+        ObjectType: 3
+      Path: Amb\Map_01\System_survival_zone_through
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+  - PhysicalPath: Events\Car.wwu
+    ParentPhysicalPath: 
+    guid: c38713fa071a8a46a08c55b59c3a440c
+    m_lastTime: -8586508761989778784
+    List:
+    - name: Car_engine
+      guid: a09f4da191aba449915352f312404326
+      id: 1020321262
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: Old
+        ObjectType: 4
+      - ElementName: Car_engine
+        ObjectType: 3
+      Path: Car\Old\Car_engine
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Car_speedup_stop
+      guid: 1d5d5c1524cb9c42bb15c7d23bf2acd1
+      id: 1863213617
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: Old
+        ObjectType: 4
+      - ElementName: Car_speedup_stop
+        ObjectType: 3
+      Path: Car\Old\Car_speedup_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Car_start
+      guid: f287023718362c448089c628bf881a3f
+      id: 2744306108
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: Old
+        ObjectType: 4
+      - ElementName: Car_start
+        ObjectType: 3
+      Path: Car\Old\Car_start
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Car_stop_impact
+      guid: a745e5a7bcf8344a9337f89a1f64f527
+      id: 2950724533
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: Old
+        ObjectType: 4
+      - ElementName: Car_stop
+        ObjectType: 4
+      - ElementName: Car_stop_impact
+        ObjectType: 3
+      Path: Car\Old\Car_stop\Car_stop_impact
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Car_stop_normal
+      guid: 076cd31303d4d941a8df6e9b8b787d9c
+      id: 2771360878
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: Old
+        ObjectType: 4
+      - ElementName: Car_stop
+        ObjectType: 4
+      - ElementName: Car_stop_normal
+        ObjectType: 3
+      Path: Car\Old\Car_stop\Car_stop_normal
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: fdsfsd1
+      guid: bd979d523b60dd46b82c2778f362adaf
+      id: 2821565762
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: fdsfsd1
+        ObjectType: 3
+      Path: Car\fdsfsd1
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: New_car_engine
+      guid: 44da533add90a14c9ca981ace70dde79
+      id: 3685435951
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: New
+        ObjectType: 4
+      - ElementName: New_car_engine
+        ObjectType: 3
+      Path: Car\New\New_car_engine
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: New_car_idle
+      guid: 472600c344e73c47ab5f02d23d644b2e
+      id: 2797391875
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: New
+        ObjectType: 4
+      - ElementName: New_car_idle
+        ObjectType: 3
+      Path: Car\New\New_car_idle
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: New_car_land
+      guid: 5a28b8702de68d4890b32edcd4311621
+      id: 3856955082
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: New
+        ObjectType: 4
+      - ElementName: New_car_land
+        ObjectType: 3
+      Path: Car\New\New_car_land
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: New_car_start
+      guid: d4d38c3a48bbb34c98e6e360b8bdc3ca
+      id: 2278505611
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: New
+        ObjectType: 4
+      - ElementName: New_car_start
+        ObjectType: 3
+      Path: Car\New\New_car_start
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: New_car_stop
+      guid: 1c95fd560203024a96f9b2fd1177d7e2
+      id: 856791593
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: New
+        ObjectType: 4
+      - ElementName: New_car_stop
+        ObjectType: 3
+      Path: Car\New\New_car_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: New_car_stop_SpeedEngine
+      guid: b47c7478d6188247a0482b810d2531d3
+      id: 570981267
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: New
+        ObjectType: 4
+      - ElementName: New_car_stop_SpeedEngine
+        ObjectType: 3
+      Path: Car\New\New_car_stop_SpeedEngine
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: New_Event_04
+      guid: 0cb6201657ac6049904722fbdcdd10af
+      id: 1027751979
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: Old
+        ObjectType: 4
+      - ElementName: New_Event_04
+        ObjectType: 3
+      Path: Car\Old\New_Event_04
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: New_Event_05
+      guid: b3799427a33f6c4ebff0956ea6198802
+      id: 1027751978
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: Old
+        ObjectType: 4
+      - ElementName: New_Event_05
+        ObjectType: 3
+      Path: Car\Old\New_Event_05
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Test_car_idle_start
+      guid: a7c88ef740ca224db705ed82ed839ddd
+      id: 3550170458
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: New01
+        ObjectType: 4
+      - ElementName: Test_car_idle_start
+        ObjectType: 3
+      Path: Car\New01\Test_car_idle_start
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Test_car_jump_engine
+      guid: 4e75d158ced42c4fb86cfa2bc1f4f741
+      id: 4095122522
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: New01
+        ObjectType: 4
+      - ElementName: Test_car_jump_engine
+        ObjectType: 3
+      Path: Car\New01\Test_car_jump_engine
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Test_Car_speed_speeddown
+      guid: bd3728e40cc3214cb452dd9b0a2d3417
+      id: 465294590
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: New01
+        ObjectType: 4
+      - ElementName: Test_Car_speed_speeddown
+        ObjectType: 3
+      Path: Car\New01\Test_Car_speed_speeddown
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Test_car_start
+      guid: fe9292095151a3469d23466270aa09ff
+      id: 3105308383
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: New01
+        ObjectType: 4
+      - ElementName: Test_car_start
+        ObjectType: 3
+      Path: Car\New01\Test_car_start
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Testcar_engine
+      guid: 8089e21d04448345a19393a6f0007a48
+      id: 11769810
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: New01
+        ObjectType: 4
+      - ElementName: Testcar_engine
+        ObjectType: 3
+      Path: Car\New01\Testcar_engine
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+  - PhysicalPath: Events\Default Work Unit.wwu
+    ParentPhysicalPath: 
+    guid: 710cf9e82d1b9347ac2ee898cd7f8556
+    m_lastTime: -8586527019370232821
+    List:
+    - name: Master_bus_pause
+      guid: 584de87e18690c48882e0c99e47b955f
+      id: 3995772663
+      PathAndIcons:
+      - ElementName: Default Work Unit
+        ObjectType: 12
+      - ElementName: Master_bus_pause
+        ObjectType: 3
+      Path: Default Work Unit\Master_bus_pause
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Master_bus_resume
+      guid: 67fac488769e014f9b825a1f61ad19d7
+      id: 1458835174
+      PathAndIcons:
+      - ElementName: Default Work Unit
+        ObjectType: 12
+      - ElementName: Master_bus_resume
+        ObjectType: 3
+      Path: Default Work Unit\Master_bus_resume
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+  - PhysicalPath: Events\MainScene.wwu
+    ParentPhysicalPath: 
+    guid: bf75c41639748e43ba77a7b69dc41eb1
+    m_lastTime: -8586527019369584510
+    List:
+    - name: UI_Main_click_common
+      guid: 604d31f11fe10445970bdf35c5221291
+      id: 1470539732
+      PathAndIcons:
+      - ElementName: MainScene
+        ObjectType: 12
+      - ElementName: UI_Main_click_common
+        ObjectType: 3
+      Path: MainScene\UI_Main_click_common
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+  - PhysicalPath: Events\Weapon.wwu
+    ParentPhysicalPath: 
+    guid: 96f75b5d425d8248a562f87fef570d1b
+    m_lastTime: -8586508646410585808
+    List:
+    - name: Act_change_shot_mode
+      guid: 64141c189908f94bb200c2a96a2af0f9
+      id: 954179497
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: OtherParts
+        ObjectType: 4
+      - ElementName: Act_change_shot_mode
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\OtherParts\Act_change_shot_mode
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Act_change_weapon_takeback
+      guid: 093f6794ae809b4fac9b246bdea909e1
+      id: 1565645852
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: OtherParts
+        ObjectType: 4
+      - ElementName: Act_change_weapon_takeback
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\OtherParts\Act_change_weapon_takeback
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Act_gun_sight_close
+      guid: b70de5878cd66240a20bfeacd057206b
+      id: 2150972543
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: OtherParts
+        ObjectType: 4
+      - ElementName: Act_gun_sight_close
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\OtherParts\Act_gun_sight_close
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Act_gun_sight_open
+      guid: ab0e4fc9b155114ca4aa469579426874
+      id: 1619592857
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: OtherParts
+        ObjectType: 4
+      - ElementName: Act_gun_sight_open
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\OtherParts\Act_gun_sight_open
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: ColdWeapon_Axe_attack
+      guid: 77fe7e25e4787a4bb78411e6b2f36e4a
+      id: 3219213081
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: ColdWeapon
+        ObjectType: 4
+      - ElementName: ColdWeapon_Axe_attack
+        ObjectType: 3
+      Path: Weapon\ColdWeapon\ColdWeapon_Axe_attack
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: ColdWeapon_Axt_hit
+      guid: 8943a27385e7734488a896eb174cf104
+      id: 789335753
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: ColdWeapon
+        ObjectType: 4
+      - ElementName: ColdWeapon_Axt_hit
+        ObjectType: 3
+      Path: Weapon\ColdWeapon\ColdWeapon_Axt_hit
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: ColdWeapon_Bat_attack
+      guid: 2af8aece7a6da443b1cc0d54a8cb51dc
+      id: 4259107106
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: ColdWeapon
+        ObjectType: 4
+      - ElementName: ColdWeapon_Bat_attack
+        ObjectType: 3
+      Path: Weapon\ColdWeapon\ColdWeapon_Bat_attack
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: ColdWeapon_Bat_hit
+      guid: 1957e89b1950f441b495be8aa7a97bfe
+      id: 2705946921
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: ColdWeapon
+        ObjectType: 4
+      - ElementName: ColdWeapon_Bat_hit
+        ObjectType: 3
+      Path: Weapon\ColdWeapon\ColdWeapon_Bat_hit
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: ColdWeapon_Crowbar_attack
+      guid: b61526e4ab69104fbbd88136e2ec8112
+      id: 1081187597
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: ColdWeapon
+        ObjectType: 4
+      - ElementName: ColdWeapon_Crowbar_attack
+        ObjectType: 3
+      Path: Weapon\ColdWeapon\ColdWeapon_Crowbar_attack
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: ColdWeapon_Crowbar_hit
+      guid: acd582a980b85240a566df92d63ecffe
+      id: 1448535968
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: ColdWeapon
+        ObjectType: 4
+      - ElementName: ColdWeapon_Crowbar_hit
+        ObjectType: 3
+      Path: Weapon\ColdWeapon\ColdWeapon_Crowbar_hit
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: ColdWeapon_Dagger_attack
+      guid: 5a6d965cd006c84b8ccddbf500323e7e
+      id: 2763589999
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: ColdWeapon
+        ObjectType: 4
+      - ElementName: ColdWeapon_Dagger_attack
+        ObjectType: 3
+      Path: Weapon\ColdWeapon\ColdWeapon_Dagger_attack
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: ColdWeapon_Dagger_hit
+      guid: 0947b0ba36e2f749a29a1e4457ce6dc7
+      id: 3460582958
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: ColdWeapon
+        ObjectType: 4
+      - ElementName: ColdWeapon_Dagger_hit
+        ObjectType: 3
+      Path: Weapon\ColdWeapon\ColdWeapon_Dagger_hit
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: ColdWeapon_Fist_attack
+      guid: 1fca089f447b5748a0c087c7b24c15e7
+      id: 3755397675
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: ColdWeapon
+        ObjectType: 4
+      - ElementName: ColdWeapon_Fist_attack
+        ObjectType: 3
+      Path: Weapon\ColdWeapon\ColdWeapon_Fist_attack
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: ColdWeapon_Fist_hit
+      guid: 665bdd341f2abb488da867e79b9e8756
+      id: 2160281850
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: ColdWeapon
+        ObjectType: 4
+      - ElementName: ColdWeapon_Fist_hit
+        ObjectType: 3
+      Path: Weapon\ColdWeapon\ColdWeapon_Fist_hit
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: ColdWeapon_Pan_attack
+      guid: d5b3624a3d697140948b65b1ed82fb96
+      id: 3621124230
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: ColdWeapon
+        ObjectType: 4
+      - ElementName: ColdWeapon_Pan_attack
+        ObjectType: 3
+      Path: Weapon\ColdWeapon\ColdWeapon_Pan_attack
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: ColdWeapon_Pan_hit
+      guid: 5362aa64d3fe23418b62698a65a67138
+      id: 2416942157
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: ColdWeapon
+        ObjectType: 4
+      - ElementName: ColdWeapon_Pan_hit
+        ObjectType: 3
+      Path: Weapon\ColdWeapon\ColdWeapon_Pan_hit
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: ColdWeapon_Saber_attack
+      guid: 8c4b518a9b983f40aa08993129327978
+      id: 3509981948
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: ColdWeapon
+        ObjectType: 4
+      - ElementName: ColdWeapon_Saber_attack
+        ObjectType: 3
+      Path: Weapon\ColdWeapon\ColdWeapon_Saber_attack
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: ColdWeapon_Saber_hit
+      guid: ec26044e13ce05478630890480f45059
+      id: 3122353823
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: ColdWeapon
+        ObjectType: 4
+      - ElementName: ColdWeapon_Saber_hit
+        ObjectType: 3
+      Path: Weapon\ColdWeapon\ColdWeapon_Saber_hit
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_56_shot
+      guid: 61e88e485d5c0c4588efb257375d44c5
+      id: 2397386488
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pricision-Rifle
+        ObjectType: 4
+      - ElementName: Gun_56_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pricision-Rifle\Gun_56_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_56_shot_continue_stop
+      guid: ab6ae83eb9708e46b5f9766f8b7c96ec
+      id: 3771645931
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pricision-Rifle
+        ObjectType: 4
+      - ElementName: Gun_56_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pricision-Rifle\Gun_56_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_92FS_shot
+      guid: 33eaef75d13b6143a0cc0914090f36ab
+      id: 4028890207
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pistol
+        ObjectType: 4
+      - ElementName: Gun_92FS_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pistol\Gun_92FS_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_92FS_shot_continue_stop
+      guid: 24f98c1bfd2da842ad0339ea56ecc5f4
+      id: 1427590296
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pistol
+        ObjectType: 4
+      - ElementName: Gun_92FS_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pistol\Gun_92FS_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_AKM_shot
+      guid: f0a41f96ac6be8498fa79bf2106d03c5
+      id: 3110859572
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Assault-Rifle
+        ObjectType: 4
+      - ElementName: Gun_AKM_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_AKM_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_AKM_shot_continue_stop
+      guid: 11e1dc7a1336114bb642f640a2f2a5a2
+      id: 1415950951
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Assault-Rifle
+        ObjectType: 4
+      - ElementName: Gun_AKM_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_AKM_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_APS_shot
+      guid: 53a639950bc78142bc18feb25dc24b82
+      id: 3780594701
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Assault-Rifle
+        ObjectType: 4
+      - ElementName: Gun_APS_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_APS_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_APS_shot_continue_stop
+      guid: 062db8beeefb64499959c41f2e8b82e4
+      id: 1313405726
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Assault-Rifle
+        ObjectType: 4
+      - ElementName: Gun_APS_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_APS_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_ASVal_shot
+      guid: 7dca7d47262f31438529d873587772fe
+      id: 211736172
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Assault-Rifle
+        ObjectType: 4
+      - ElementName: Gun_ASVal_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_ASVal_shot
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_ASVal_shot_continue_stop
+      guid: 9ec0d9f767507249b0e82c8ddd2e6b5d
+      id: 367367759
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Assault-Rifle
+        ObjectType: 4
+      - ElementName: Gun_ASVal_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_ASVal_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_AWM_shot
+      guid: cc0b494611714d48be7ca93ff5371c06
+      id: 2504057272
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Sniper-Rifle
+        ObjectType: 4
+      - ElementName: Gun_AWM_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Sniper-Rifle\Gun_AWM_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_AWM_shot_continue_stop
+      guid: e3bad8f534a20742a0f274f52f54bdaf
+      id: 2492216747
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Sniper-Rifle
+        ObjectType: 4
+      - ElementName: Gun_AWM_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Sniper-Rifle\Gun_AWM_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_bullet_drop_texture
+      guid: c4ced5f1a1c67142b471cda3af73755a
+      id: 3082299324
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_bullet
+        ObjectType: 4
+      - ElementName: Gun_bullet_drop_texture
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_bullet\Gun_bullet_drop_texture
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_bullet_fly
+      guid: 1cf43e303556bf41bfb014d52d91f9d6
+      id: 3082116834
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_bullet
+        ObjectType: 4
+      - ElementName: Gun_bullet_fly
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_bullet\Gun_bullet_fly
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_bullet_hit_texture
+      guid: 2309719b54d6a941895cfab429959c2c
+      id: 3118825358
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_bullet
+        ObjectType: 4
+      - ElementName: Gun_bullet_hit_texture
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_bullet\Gun_bullet_hit_texture
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_DesertEagle_shot
+      guid: 86de1684bcca474083fc9fe13e19d46e
+      id: 3597187064
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pistol
+        ObjectType: 4
+      - ElementName: Gun_DesertEagle_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pistol\Gun_DesertEagle_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_DesertEagle_shot_continue_stop
+      guid: d18cf64c3cdaa945a24d232c498acbd3
+      id: 419715307
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pistol
+        ObjectType: 4
+      - ElementName: Gun_DesertEagle_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pistol\Gun_DesertEagle_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_DT22_shot
+      guid: 64ab6a673330334ea0d086defc34f6fc
+      id: 2897909583
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Shotgun
+        ObjectType: 4
+      - ElementName: Gun_DT22_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Shotgun\Gun_DT22_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_DT22_shot_continue_stop
+      guid: 5936240b2d951c4a9c2f7d20fc8686cb
+      id: 1833881064
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Shotgun
+        ObjectType: 4
+      - ElementName: Gun_DT22_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Shotgun\Gun_DT22_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_FAMAS_shot
+      guid: 3197a62b6bea0a45a21f9b8f3e8c98c2
+      id: 1477710431
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Assault-Rifle
+        ObjectType: 4
+      - ElementName: Gun_FAMAS_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_FAMAS_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_FAMAS_shot_continue_stop
+      guid: d0d44dd15a832f4693b0e216a7d12e18
+      id: 2241688216
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Assault-Rifle
+        ObjectType: 4
+      - ElementName: Gun_FAMAS_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_FAMAS_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_fire_trigger
+      guid: d000d99d92412243ac47a9c60f8e2042
+      id: 283114649
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: OtherParts
+        ObjectType: 4
+      - ElementName: Gun_fire_trigger
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\OtherParts\Gun_fire_trigger
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_FNFal_shot
+      guid: ee0c3fee480e074090dabb68f2020919
+      id: 3829115936
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Assault-Rifle
+        ObjectType: 4
+      - ElementName: Gun_FNFal_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_FNFal_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_FNFal_shot_continue_stop
+      guid: 04705ff7ec2efe4caf401ea6030aec8e
+      id: 4152731267
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Assault-Rifle
+        ObjectType: 4
+      - ElementName: Gun_FNFal_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_FNFal_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_Glock18C_shot
+      guid: 4cb2bb4fa181bd47ac507be2559dc7c3
+      id: 2206480795
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pistol
+        ObjectType: 4
+      - ElementName: Gun_Glock18C_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pistol\Gun_Glock18C_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_Glock18C_shot_continue_stop
+      guid: 3232258a05916146b01d4eb8434c1742
+      id: 1095933236
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pistol
+        ObjectType: 4
+      - ElementName: Gun_Glock18C_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pistol\Gun_Glock18C_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_GLOZA_shot
+      guid: d7d2cb14440f7645be25f5506fc2dbb8
+      id: 66842706
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Assault-Rifle
+        ObjectType: 4
+      - ElementName: Gun_GLOZA_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_GLOZA_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_GLOZA_shot_continue_stop
+      guid: 804191f8f47dcb4292c1e9f7877b96c0
+      id: 1751858597
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Assault-Rifle
+        ObjectType: 4
+      - ElementName: Gun_GLOZA_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_GLOZA_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_Kar98K_shot
+      guid: d91d80afa2ea4b46a1a56fbf13da91f7
+      id: 1800163575
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Sniper-Rifle
+        ObjectType: 4
+      - ElementName: Gun_Kar98K_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Sniper-Rifle\Gun_Kar98K_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_Kar98K_shot_continue_stop
+      guid: 49064976bd4c5e488fada6cb377ebe6d
+      id: 855606208
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Sniper-Rifle
+        ObjectType: 4
+      - ElementName: Gun_Kar98K_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Sniper-Rifle\Gun_Kar98K_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_KSG25_shot
+      guid: f9a376f86592fd499153389dbdb27aea
+      id: 2687986985
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Shotgun
+        ObjectType: 4
+      - ElementName: Gun_KSG25_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Shotgun\Gun_KSG25_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_KSG25_shot_stop
+      guid: 631d8510dcceaf40abb030ddef487999
+      id: 4252663324
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Shotgun
+        ObjectType: 4
+      - ElementName: Gun_KSG25_shot_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Shotgun\Gun_KSG25_shot_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_M16A4_shot
+      guid: 3645ef23ed018c42ae719ab9af6d6600
+      id: 903720994
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pricision-Rifle
+        ObjectType: 4
+      - ElementName: Gun_M16A4_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pricision-Rifle\Gun_M16A4_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_M16A4_shot_continue_stop
+      guid: c1baaf5f4fcba0489d20ca0813fc7bd1
+      id: 1086719189
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pricision-Rifle
+        ObjectType: 4
+      - ElementName: Gun_M16A4_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pricision-Rifle\Gun_M16A4_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_M1917_shot
+      guid: f8ce75c5e3c8ea4d979f5fd1c6c953d4
+      id: 2701895214
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pistol
+        ObjectType: 4
+      - ElementName: Gun_M1917_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pistol\Gun_M1917_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_M1917_shot_continue_stop
+      guid: 3ed39b495c3a5e48aefd514a669b868d
+      id: 1433075489
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pistol
+        ObjectType: 4
+      - ElementName: Gun_M1917_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pistol\Gun_M1917_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_M249_shot
+      guid: 53c56e56efa7144591cc7dafb68e8db6
+      id: 3279629563
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Machinegun
+        ObjectType: 4
+      - ElementName: Gun_M249_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Machinegun\Gun_M249_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_M249_shot_continue_stop
+      guid: 352c40fe6492a34996ef7579c4879e5d
+      id: 2032076820
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Machinegun
+        ObjectType: 4
+      - ElementName: Gun_M249_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Machinegun\Gun_M249_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_M4A1_shot
+      guid: 30dce0e33be30742bb2fbf132bb4c090
+      id: 3769357640
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Assault-Rifle
+        ObjectType: 4
+      - ElementName: Gun_M4A1_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_M4A1_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_M4A1_shot_continue_stop
+      guid: 0008d4025285b94292248b073b180995
+      id: 1327583963
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Assault-Rifle
+        ObjectType: 4
+      - ElementName: Gun_M4A1_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_M4A1_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_M590A1_shot
+      guid: eaac460d9d9c604e90a29971de0d9d34
+      id: 3132680530
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Shotgun
+        ObjectType: 4
+      - ElementName: Gun_M590A1_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Shotgun\Gun_M590A1_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_M590A1_shot_continue_stop
+      guid: a601a2b0e52eee47b1719ef531bb2e03
+      id: 2135789221
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Shotgun
+        ObjectType: 4
+      - ElementName: Gun_M590A1_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Shotgun\Gun_M590A1_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_56
+      guid: f297a831c5ece24c878b454e34fc73c6
+      id: 3336868008
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_56
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_56
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_92FS
+      guid: 6b1ef255b79e6f4895b9e592e1a47dd4
+      id: 1416543553
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_92FS
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_92FS
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_AKM
+      guid: b42f7d244c02d347b5a8d5f19537bbd8
+      id: 127898318
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_AKM
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_AKM
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_APS
+      guid: 278f6fd35c634b418490d0689cc2f325
+      id: 10455021
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_APS
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_APS
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_ASVal
+      guid: 106483c1f8c92e4c8397a2b2a16f3392
+      id: 1484752702
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_ASVal
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_ASVal
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_AWM
+      guid: cc64f59d1b27a043b37cf4eb74a78e97
+      id: 60787770
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_AWM
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_AWM
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_DesertEagle
+      guid: e8e9e5651c75f841923a12ebb832fcae
+      id: 1143239118
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_DesertEagle
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_DesertEagle
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_DT22
+      guid: 70260c7bac96b045a046e842f235129c
+      id: 3815144821
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_DT22
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_DT22
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_FAMAS
+      guid: 321482f18a533a47927941e812e0e78f
+      id: 1815963259
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_FAMAS
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_FAMAS
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_FNFal
+      guid: af08a6f801c4c84ea18cca3cdddbd50c
+      id: 832812018
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_FNFal
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_FNFal
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_Glock18C
+      guid: 57046f82fe3f4545b21fd1f9c12b0e3c
+      id: 983808277
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_Glock18C
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_Glock18C
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_GROZA
+      guid: 66cd095a5b6f3142996d3d6d674f9aed
+      id: 2989217578
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_GROZA
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_GROZA
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_Kar98K
+      guid: b388440000fab94880e33dbdac4271bd
+      id: 1385464901
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_Kar98K
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_Kar98K
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_KSG25
+      guid: b96275a19bd1744081be6be232a93abf
+      id: 367457825
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_KSG25
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_KSG25
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_M16A4
+      guid: f5e34e7656069c4fafa61e78cc9045df
+      id: 2073181836
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_M16A4
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_M16A4
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_M1917
+      guid: 49f1ba1e9f172d459a08ee118501b4d1
+      id: 1135062248
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_M1917
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_M1917
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_M249
+      guid: ba17c140ba49d84cb95394e57bc8f9b2
+      id: 2253219473
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_M249
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_M249
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_M4A1
+      guid: e53db9dd4360c64e992013768de4cbba
+      id: 2940704564
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_M4A1
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_M4A1
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_M590A1_FillBullet
+      guid: e615df9859b2df4aafb9df95c32368a0
+      id: 4029390850
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_M590A1_FillBullet
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_M590A1_FillBullet
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_M590A1_Prepare
+      guid: c8e0d29c644d6642883609472501d7f3
+      id: 1083637194
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_M590A1_Prepare
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_M590A1_Prepare
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_M590A1_Pullbolt
+      guid: 88421df6ae3f8d4abb9654731c4d82f6
+      id: 3008913909
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_M590A1_Pullbolt
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_M590A1_Pullbolt
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_MK14EBR
+      guid: 9059baadf1457144b7b82fc1518a389d
+      id: 4058558359
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_MK14EBR
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_MK14EBR
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_MP5A3
+      guid: 20af94006252014384b676b39cd9fc53
+      id: 3424739487
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_MP5A3
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_MP5A3
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_MSR
+      guid: f1c0210ce206194ebcc4a0e752b15e00
+      id: 4152452141
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_MSR
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_MSR
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_P08
+      guid: 2f0f75ba02c6a14fa439809a7f02b6dd
+      id: 3329907535
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_P08
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_P08
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_P1911
+      guid: 0141635533079e4e95969c953fdf3b2b
+      id: 3199996627
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_P1911
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_P1911
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_P90
+      guid: f54484ff583da0479dbf9ccc7afb4369
+      id: 3178909052
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_P90
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_P90
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_QJB95
+      guid: 4235785025e69c4c805169aca1b56839
+      id: 3226665624
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_QJB95
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_QJB95
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_RPK
+      guid: 3a9a1e31411f9b49a5754fcfb719733b
+      id: 4202049614
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_RPK
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_RPK
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_Saiga12K
+      guid: 504be190054c814da8bcea7c764baf5f
+      id: 1310366482
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_Saiga12K
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_Saiga12K
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_SawedOff
+      guid: 38aec175ae2e064dbdade3a248c706fe
+      id: 1158390346
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_SawedOff
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_SawedOff
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_SCARL
+      guid: bc8d132f470e2848a9c628dfaf497f51
+      id: 1391851190
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_SCARL
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_SCARL
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_SG550
+      guid: 1a58104243466e469fc38ac556ed4b7a
+      id: 1245511699
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_SG550
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_SG550
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_SPP1
+      guid: dfa3122f6cff554390f3e84c87bc4df8
+      id: 1047978549
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_SPP1
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_SPP1
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_UMP45
+      guid: 1cca5e39e136a74fb89f1259993c8336
+      id: 909153064
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_UMP45
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_UMP45
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_UziPro
+      guid: 713ad71f6c1120498b113e9794156c45
+      id: 1191576242
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_UziPro
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_UziPro
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_Vector
+      guid: 605bfb2afad57b42a8b60ff48aba7594
+      id: 908817460
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_Vector
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_Vector
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_magazine_VSSM
+      guid: e90817cea99f674c8071c005d3795f69
+      id: 4051564204
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_Component
+        ObjectType: 4
+      - ElementName: Gun_magazine
+        ObjectType: 4
+      - ElementName: Gun_magazine_VSSM
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_VSSM
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_MK14EBR_shot
+      guid: 0526cf7702a7ff4bb4e0c638cbe2fc17
+      id: 3242771147
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pricision-Rifle
+        ObjectType: 4
+      - ElementName: Gun_MK14EBR_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pricision-Rifle\Gun_MK14EBR_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_MK14EBR_shot_continue_stop
+      guid: 1ed3192253fb0e408810ed52fb8ed369
+      id: 1708265092
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pricision-Rifle
+        ObjectType: 4
+      - ElementName: Gun_MK14EBR_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pricision-Rifle\Gun_MK14EBR_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_MP5A3_shot
+      guid: 1e704d8badbb134b962302dcc9a3ad60
+      id: 3417648939
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Submachine
+        ObjectType: 4
+      - ElementName: Gun_MP5A3_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Submachine\Gun_MP5A3_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_MP5A3_shot_continue_stop
+      guid: 6aab1bc96632c74ba9f3ff5f9087f854
+      id: 2315347556
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Submachine
+        ObjectType: 4
+      - ElementName: Gun_MP5A3_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Submachine\Gun_MP5A3_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_MSR_shot
+      guid: 20e4533ecf88184489b133294c22d72f
+      id: 1932446041
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Sniper-Rifle
+        ObjectType: 4
+      - ElementName: Gun_MSR_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Sniper-Rifle\Gun_MSR_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_MSR_shot_continue_stop
+      guid: 82b00a76d027d64cafd844aecae5fe81
+      id: 3883505546
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Sniper-Rifle
+        ObjectType: 4
+      - ElementName: Gun_MSR_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Sniper-Rifle\Gun_MSR_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_P08_shot
+      guid: 081fb3f245a02546b286c87c5fbfc10b
+      id: 3003543859
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pistol
+        ObjectType: 4
+      - ElementName: Gun_P08_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pistol\Gun_P08_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_P08_shot_continue_stop
+      guid: ce9f6f77f479564083b718396dd7f6e3
+      id: 4045170588
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pistol
+        ObjectType: 4
+      - ElementName: Gun_P08_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pistol\Gun_P08_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_P1911_shot
+      guid: 5d76eec9b392e94fb0590b5c71bc2aea
+      id: 81611623
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pistol
+        ObjectType: 4
+      - ElementName: Gun_P1911_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pistol\Gun_P1911_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_P1911_shot_continue_stop
+      guid: 5952c65da21fa741a11aa7cf3d0b7775
+      id: 363921552
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pistol
+        ObjectType: 4
+      - ElementName: Gun_P1911_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pistol\Gun_P1911_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_P90_shot
+      guid: f8a0c82130192e42b8ddcbaf2c7cf744
+      id: 2552999602
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Submachine
+        ObjectType: 4
+      - ElementName: Gun_P90_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Submachine\Gun_P90_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_P90_shot_continue_stop
+      guid: b8e7234997de3049acaa05fb3d25088e
+      id: 262665093
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Submachine
+        ObjectType: 4
+      - ElementName: Gun_P90_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Submachine\Gun_P90_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_QJB95_shot
+      guid: 9bada46eacf902419484c657b42762e8
+      id: 10666242
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Machinegun
+        ObjectType: 4
+      - ElementName: Gun_QJB95_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Machinegun\Gun_QJB95_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_QJB95_shot_continue_stop
+      guid: 2392ceaf09a71a4396f6e2e840c3e1c5
+      id: 4118722229
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Machinegun
+        ObjectType: 4
+      - ElementName: Gun_QJB95_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Machinegun\Gun_QJB95_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_RPK_shot_single
+      guid: fc6b4e93c19e9f45a17c4a65932f294b
+      id: 1741531003
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Machinegun
+        ObjectType: 4
+      - ElementName: Gun_RPK_shot_single
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Machinegun\Gun_RPK_shot_single
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_RPK_shot_single_continue_stop
+      guid: 4679cb48a609a143b88c821eeac6fe58
+      id: 3584556692
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Machinegun
+        ObjectType: 4
+      - ElementName: Gun_RPK_shot_single_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Machinegun\Gun_RPK_shot_single_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_Saiga12K_shot
+      guid: 15fcd77bb17e9d428753d0ec15d2db1d
+      id: 4237820274
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Shotgun
+        ObjectType: 4
+      - ElementName: Gun_Saiga12K_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Shotgun\Gun_Saiga12K_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_Saiga12K_shot_continue_stop
+      guid: bc2bf5b978d98245bc57c03712fd8e34
+      id: 1141387077
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Shotgun
+        ObjectType: 4
+      - ElementName: Gun_Saiga12K_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Shotgun\Gun_Saiga12K_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_SawedOff_shot
+      guid: 9aeeea2dbbbf874ca617a339a1bd2711
+      id: 758343954
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pistol
+        ObjectType: 4
+      - ElementName: Gun_SawedOff_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pistol\Gun_SawedOff_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_SawedOff_shot_continue_stop
+      guid: 5b8dbb1ea06a1e4eafba5e1ad4f18f65
+      id: 48060261
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pistol
+        ObjectType: 4
+      - ElementName: Gun_SawedOff_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pistol\Gun_SawedOff_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_SCARL_shot
+      guid: ddee2df1e0e6764abcac029ca7a420d7
+      id: 3629446656
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Assault-Rifle
+        ObjectType: 4
+      - ElementName: Gun_SCARL_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_SCARL_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_SCARL_shot_continue_stop
+      guid: 9b019194006b594faa46d94d3bbc123a
+      id: 2536469475
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Assault-Rifle
+        ObjectType: 4
+      - ElementName: Gun_SCARL_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_SCARL_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_SG550_shot
+      guid: be2ad9cfe0937f4ba9a7a2a94e7902cd
+      id: 3443987131
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pricision-Rifle
+        ObjectType: 4
+      - ElementName: Gun_SG550_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pricision-Rifle\Gun_SG550_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_SG550_shot_continue_stop
+      guid: e478da21742f324b8d24d407dacf4a3e
+      id: 935909332
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pricision-Rifle
+        ObjectType: 4
+      - ElementName: Gun_SG550_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pricision-Rifle\Gun_SG550_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_SPS_shot
+      guid: cf3610364921af46973d115b1ab5f6da
+      id: 585700435
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pistol
+        ObjectType: 4
+      - ElementName: Gun_SPS_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pistol\Gun_SPS_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_SPS_shot_continue_stop
+      guid: 6867d0b3d6cb334fa384460f2aa3e7b7
+      id: 3111923772
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pistol
+        ObjectType: 4
+      - ElementName: Gun_SPS_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pistol\Gun_SPS_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_UMP45_shot
+      guid: 7ae48fd586af6342b52457ddafddfd7c
+      id: 2306424798
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Submachine
+        ObjectType: 4
+      - ElementName: Gun_UMP45_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Submachine\Gun_UMP45_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_UMP45_shot_continue_stop
+      guid: 6592576153ccb844afc9051d441e43a7
+      id: 1285118833
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Submachine
+        ObjectType: 4
+      - ElementName: Gun_UMP45_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Submachine\Gun_UMP45_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_UziPro_shot
+      guid: e36bb6d40f417748ba08f20aff12f902
+      id: 1352767042
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Submachine
+        ObjectType: 4
+      - ElementName: Gun_UziPro_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Submachine\Gun_UziPro_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_UziPro_shot_continue_stop
+      guid: d8267e3e2a694449af93648081dd6246
+      id: 2741340405
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Submachine
+        ObjectType: 4
+      - ElementName: Gun_UziPro_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Submachine\Gun_UziPro_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_Vector_shot
+      guid: 33c5eda820c8fa44903f441771e587af
+      id: 886459988
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Submachine
+        ObjectType: 4
+      - ElementName: Gun_Vector_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Submachine\Gun_Vector_shot
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_Vector_shot_continue_stop
+      guid: 5b94daf3b368164abd2886678f8302d0
+      id: 1275891975
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Submachine
+        ObjectType: 4
+      - ElementName: Gun_Vector_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Submachine\Gun_Vector_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_VSSM_shot
+      guid: 4a5640d0f90d3d4f93b9f92d68eb72bc
+      id: 615188396
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pricision-Rifle
+        ObjectType: 4
+      - ElementName: Gun_VSSM_shot
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pricision-Rifle\Gun_VSSM_shot
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: Gun_VSSM_shot_continue_stop
+      guid: f91d1b65b8f50e4188f93610b557ea26
+      id: 3106937743
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_fire
+        ObjectType: 4
+      - ElementName: Pricision-Rifle
+        ObjectType: 4
+      - ElementName: Gun_VSSM_shot_continue_stop
+        ObjectType: 3
+      Path: Weapon\Gun\Gun_fire\Pricision-Rifle\Gun_VSSM_shot_continue_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: TacticWeapon_FlashBomb_dizzy
+      guid: 034556e551e030449dd5de7c2a41a20a
+      id: 1087713781
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: TacticWeapon
+        ObjectType: 4
+      - ElementName: TacticWeapon_FlashBomb_dizzy
+        ObjectType: 3
+      Path: Weapon\TacticWeapon\TacticWeapon_FlashBomb_dizzy
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: TacticWeapon_FlashBomb_dizzy_stop_die
+      guid: daa33f6e0dfd0e49a2abf29927b8533a
+      id: 2639759419
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: TacticWeapon
+        ObjectType: 4
+      - ElementName: TacticWeapon_FlashBomb_dizzy_stop_die
+        ObjectType: 3
+      Path: Weapon\TacticWeapon\TacticWeapon_FlashBomb_dizzy_stop_die
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: TacticWeapon_Impact_common
+      guid: c79c4122ffb2044282690ed169184cc7
+      id: 1204487206
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: TacticWeapon
+        ObjectType: 4
+      - ElementName: TacticWeapon_Impact_common
+        ObjectType: 3
+      Path: Weapon\TacticWeapon\TacticWeapon_Impact_common
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: TacticWeapon_Molotov_explosion
+      guid: ba2eb3a25159474986baacf1c3f14c78
+      id: 3254820502
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: TacticWeapon
+        ObjectType: 4
+      - ElementName: Molotov
+        ObjectType: 4
+      - ElementName: TacticWeapon_Molotov_explosion
+        ObjectType: 3
+      Path: Weapon\TacticWeapon\Molotov\TacticWeapon_Molotov_explosion
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: TacticWeapon_Molotov_explosion_stop
+      guid: faeb3e124a8b6642a73e9bad9d94b29d
+      id: 627576005
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: TacticWeapon
+        ObjectType: 4
+      - ElementName: Molotov
+        ObjectType: 4
+      - ElementName: TacticWeapon_Molotov_explosion_stop
+        ObjectType: 3
+      Path: Weapon\TacticWeapon\Molotov\TacticWeapon_Molotov_explosion_stop
+      maxAttenuation: 0
+      maxDuration: 0
+      minDuration: 0
+    - name: TacticWeapon_Molotov_impact
+      guid: 5321eecdae2fd0488382821f1d7695b5
+      id: 1737472443
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: TacticWeapon
+        ObjectType: 4
+      - ElementName: Molotov
+        ObjectType: 4
+      - ElementName: TacticWeapon_Molotov_impact
+        ObjectType: 3
+      Path: Weapon\TacticWeapon\Molotov\TacticWeapon_Molotov_impact
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: TacticWeapon_Molotov_throw
+      guid: 47ab4523283099408d7cd634fc0124c4
+      id: 1434462175
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: TacticWeapon
+        ObjectType: 4
+      - ElementName: Molotov
+        ObjectType: 4
+      - ElementName: TacticWeapon_Molotov_throw
+        ObjectType: 3
+      Path: Weapon\TacticWeapon\Molotov\TacticWeapon_Molotov_throw
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: TacticWeapon_Molotov_trigger
+      guid: d4a4395d183b2547a44c82b0c25e2543
+      id: 2183881239
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: TacticWeapon
+        ObjectType: 4
+      - ElementName: Molotov
+        ObjectType: 4
+      - ElementName: TacticWeapon_Molotov_trigger
+        ObjectType: 3
+      Path: Weapon\TacticWeapon\Molotov\TacticWeapon_Molotov_trigger
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: TacticWeapon_Smokeshell_explosion
+      guid: ac7876d90859d04cafc19e016e5b60b3
+      id: 3050587679
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: TacticWeapon
+        ObjectType: 4
+      - ElementName: TacticWeapon_Smokeshell_explosion
+        ObjectType: 3
+      Path: Weapon\TacticWeapon\TacticWeapon_Smokeshell_explosion
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: TacticWeapon_Throw_common
+      guid: 1f5bc6108ef0f043b1dcb3da01b4e89b
+      id: 2333108008
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: TacticWeapon
+        ObjectType: 4
+      - ElementName: TacticWeapon_Throw_common
+        ObjectType: 3
+      Path: Weapon\TacticWeapon\TacticWeapon_Throw_common
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+    - name: TacticWeapon_Trigger_common
+      guid: 3989f5487dc5884fb261c8de47fe8e8b
+      id: 2977841972
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: TacticWeapon
+        ObjectType: 4
+      - ElementName: TacticWeapon_Trigger_common
+        ObjectType: 3
+      Path: Weapon\TacticWeapon\TacticWeapon_Trigger_common
+      maxAttenuation: 100
+      maxDuration: 0
+      minDuration: 0
+  RtpcWwu:
+  - PhysicalPath: Game Parameters\Default Work Unit.wwu
+    ParentPhysicalPath: 
+    guid: 106195e6e1b56241845a6110bb9ccecd
+    m_lastTime: -8586527019369870994
+    List:
+    - name: Different_Player_effect
+      guid: 762cb1045e6be949a301e75e1c0f652c
+      id: 678245580
+      PathAndIcons:
+      - ElementName: Default Work Unit
+        ObjectType: 12
+      - ElementName: Different_Player_effect
+        ObjectType: 13
+      Path: Default Work Unit\Different_Player_effect
+  - PhysicalPath: Game Parameters\Model.wwu
+    ParentPhysicalPath: 
+    guid: 9bffbe0ed56478429f38008363d3046c
+    m_lastTime: -8586508768679344321
+    List:
+    - name: Car_jump
+      guid: 6f1372016c99b449aedda1a2be9de37f
+      id: 2988560604
+      PathAndIcons:
+      - ElementName: Model
+        ObjectType: 12
+      - ElementName: Car_jump
+        ObjectType: 13
+      Path: Model\Car_jump
+    - name: Distance_Doppler
+      guid: 1043521bea7630419300031d97674ef3
+      id: 397800773
+      PathAndIcons:
+      - ElementName: Model
+        ObjectType: 12
+      - ElementName: Distance_Doppler
+        ObjectType: 13
+      Path: Model\Distance_Doppler
+    - name: Model_car_engine
+      guid: b8c3f6d0dafbd343912eefd047d86145
+      id: 1909548668
+      PathAndIcons:
+      - ElementName: Model
+        ObjectType: 12
+      - ElementName: Model_car_engine
+        ObjectType: 13
+      Path: Model\Model_car_engine
+    - name: Sea_distance
+      guid: 0fa0c867bcafbc4ca4b652c83213cc28
+      id: 664127884
+      PathAndIcons:
+      - ElementName: Model
+        ObjectType: 12
+      - ElementName: Sea_distance
+        ObjectType: 13
+      Path: Model\Sea_distance
+    - name: Test_car
+      guid: 4a738676966bbc42880f4cd9a2b0a2c6
+      id: 3195007030
+      PathAndIcons:
+      - ElementName: Model
+        ObjectType: 12
+      - ElementName: Test_car
+        ObjectType: 13
+      Path: Model\Test_car
+  StateWwu:
+  - PhysicalPath: States\Default Work Unit.wwu
+    ParentPhysicalPath: 
+    guid: 5f0691725b6a714c9145a47e22afd415
+    m_lastTime: -8586527019369896062
+    List: []
+  - PhysicalPath: States\Global.wwu
+    ParentPhysicalPath: 
+    guid: 7fc39440c7c24248bf1c12fbf88d913a
+    m_lastTime: -8586525054851058767
+    List:
+    - name: Car_jump_state
+      guid: 3ddfb35d986f384f8ebf30bb6b179cd5
+      id: 1762240694
+      PathAndIcons:
+      - ElementName: Global
+        ObjectType: 12
+      - ElementName: Car_jump_state
+        ObjectType: 9
+      Path: Global\Car_jump_state
+      values:
+      - name: No
+        guid: ec36d9d19b449c47a9c999dcdaa65c71
+        id: 1668749452
+        PathAndIcons:
+        - ElementName: No
+          ObjectType: 8
+      - name: None
+        guid: 56e8e5a518160b46aff6b61967613755
+        id: 748895195
+        PathAndIcons:
+        - ElementName: None
+          ObjectType: 8
+      - name: Yes
+        guid: c881d6e008748a4eaaa4975885cebc4b
+        id: 979470758
+        PathAndIcons:
+        - ElementName: Yes
+          ObjectType: 8
+    - name: FlashBomb
+      guid: 01b8b401348a774bbb0a573750d02172
+      id: 527817437
+      PathAndIcons:
+      - ElementName: Global
+        ObjectType: 12
+      - ElementName: FlashBomb
+        ObjectType: 9
+      Path: Global\FlashBomb
+      values:
+      - name: FlashBomb_dizzy
+        guid: 4bb35270f7d10f44800854540667c13a
+        id: 1104817230
+        PathAndIcons:
+        - ElementName: FlashBomb_dizzy
+          ObjectType: 8
+      - name: FlashBomb_Restore
+        guid: c4ec53ec5ab7ec44963c23b9b13f182e
+        id: 2743656622
+        PathAndIcons:
+        - ElementName: FlashBomb_Restore
+          ObjectType: 8
+      - name: None
+        guid: 4ed50fe3b6b96841b2482734bff0f37d
+        id: 748895195
+        PathAndIcons:
+        - ElementName: None
+          ObjectType: 8
+    - name: Global_camera
+      guid: 80838506b0ec8b48af3e59658110874c
+      id: 3396107022
+      PathAndIcons:
+      - ElementName: Global
+        ObjectType: 12
+      - ElementName: Global_camera
+        ObjectType: 9
+      Path: Global\Global_camera
+      values:
+      - name: Global_camera_overwater
+        guid: 92b4834d4e0fe344ac7bcfe2b0640ff1
+        id: 2338144800
+        PathAndIcons:
+        - ElementName: Global_camera_overwater
+          ObjectType: 8
+      - name: Global_camera_underwater
+        guid: 541feb3947f4c444a824daa4704e6302
+        id: 1315062734
+        PathAndIcons:
+        - ElementName: Global_camera_underwater
+          ObjectType: 8
+      - name: None
+        guid: c938ff2aa70ef541b8269e3702db85a0
+        id: 748895195
+        PathAndIcons:
+        - ElementName: None
+          ObjectType: 8
+    - name: Outdoor_Reverb_Gun_shot_mode_type
+      guid: 6b68ade15711f945a5757dda67496c8e
+      id: 377032017
+      PathAndIcons:
+      - ElementName: Global
+        ObjectType: 12
+      - ElementName: Outdoor_Reverb_Gun_shot_mode_type
+        ObjectType: 9
+      Path: Global\Outdoor_Reverb_Gun_shot_mode_type
+      values:
+      - name: Gun_shot_mode_type_continue
+        guid: fee17021a4dc79479c8ef2bbe5386404
+        id: 3388677639
+        PathAndIcons:
+        - ElementName: Gun_shot_mode_type_continue
+          ObjectType: 8
+      - name: Gun_shot_mode_type_silencer
+        guid: 7a3fdfc4ef58b549ab9d1274f48598ff
+        id: 4042252677
+        PathAndIcons:
+        - ElementName: Gun_shot_mode_type_silencer
+          ObjectType: 8
+      - name: Gun_shot_mode_type_single
+        guid: 8db10d8ec3cac44e93271dba1ee4ee61
+        id: 740487104
+        PathAndIcons:
+        - ElementName: Gun_shot_mode_type_single
+          ObjectType: 8
+      - name: Gun_shot_mode_type_triple
+        guid: 19aa50f6beed9044aba2b4cd6a6e21e2
+        id: 337121988
+        PathAndIcons:
+        - ElementName: Gun_shot_mode_type_triple
+          ObjectType: 8
+      - name: None
+        guid: c590fa9889b7d744a227fb8f633be5e6
+        id: 748895195
+        PathAndIcons:
+        - ElementName: None
+          ObjectType: 8
+    - name: Reverb_room
+      guid: 6707a75102d349479dfbbb160814e2a9
+      id: 3258416929
+      PathAndIcons:
+      - ElementName: Global
+        ObjectType: 12
+      - ElementName: Reverb_room
+        ObjectType: 9
+      Path: Global\Reverb_room
+      values:
+      - name: Indoor_Reverb_large
+        guid: 535ca962d1608145ae04859713c25df1
+        id: 1519066631
+        PathAndIcons:
+        - ElementName: Indoor_Reverb_large
+          ObjectType: 8
+      - name: Indoor_Reverb_medium
+        guid: 660bc3cea3d6684d859d129c53167e34
+        id: 521822083
+        PathAndIcons:
+        - ElementName: Indoor_Reverb_medium
+          ObjectType: 8
+      - name: Indoor_Reverb_small
+        guid: 629c5d2e930ca24b85f5f708e7c73fc0
+        id: 1095134611
+        PathAndIcons:
+        - ElementName: Indoor_Reverb_small
+          ObjectType: 8
+      - name: None
+        guid: a69e65d16caf4641bb54627d1681d249
+        id: 748895195
+        PathAndIcons:
+        - ElementName: None
+          ObjectType: 8
+      - name: Outdoor
+        guid: b4f5924bab191b45b4132eb5da38ec7f
+        id: 144697359
+        PathAndIcons:
+        - ElementName: Outdoor
+          ObjectType: 8
+  SwitchWwu:
+  - PhysicalPath: Switches\Act.wwu
+    ParentPhysicalPath: 
+    guid: 226cf24a9298674f87db16ece6447ad2
+    m_lastTime: -8586527019369549412
+    List:
+    - name: Footstep_Act_type
+      guid: 175f52dd96b92242b6b42f4bb9fa3adc
+      id: 3312628285
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Footstep_Act_type
+        ObjectType: 11
+      Path: Act\Footstep_Act_type
+      values:
+      - name: crawl
+        guid: 09ce42ca516426469637bd06df4744be
+        id: 3115216662
+        PathAndIcons:
+        - ElementName: crawl
+          ObjectType: 10
+      - name: squat
+        guid: 4048d5469ebe8d42ab0a8e32679cf769
+        id: 1990176681
+        PathAndIcons:
+        - ElementName: squat
+          ObjectType: 10
+      - name: walk
+        guid: cfdcd156ba9a3a4a81c578b4c01ba60d
+        id: 2108779966
+        PathAndIcons:
+        - ElementName: walk
+          ObjectType: 10
+    - name: Footstep_material_type
+      guid: 0a5e63a7d500d04b957ce29579adda84
+      id: 2413444692
+      PathAndIcons:
+      - ElementName: Act
+        ObjectType: 12
+      - ElementName: Footstep_material_type
+        ObjectType: 11
+      Path: Act\Footstep_material_type
+      values:
+      - name: Concrete
+        guid: e60cbcfd00e92f4484aa331767be87bc
+        id: 841620460
+        PathAndIcons:
+        - ElementName: Concrete
+          ObjectType: 10
+      - name: Grass
+        guid: 8e8e7aa7ce8be3459789274ec014bebc
+        id: 4248645337
+        PathAndIcons:
+        - ElementName: Grass
+          ObjectType: 10
+      - name: Metal
+        guid: 0a8692c812d8cf49b77db2d5fdb5cf6d
+        id: 2473969246
+        PathAndIcons:
+        - ElementName: Metal
+          ObjectType: 10
+      - name: Rock
+        guid: ff93616e71423a40982e92d0a1889bb2
+        id: 2144363834
+        PathAndIcons:
+        - ElementName: Rock
+          ObjectType: 10
+      - name: Rug
+        guid: 2ac8c52566ed094181b3abca43210446
+        id: 712161697
+        PathAndIcons:
+        - ElementName: Rug
+          ObjectType: 10
+      - name: Sand
+        guid: 9d4125392d37f247a8af956e0ead63ce
+        id: 803837735
+        PathAndIcons:
+        - ElementName: Sand
+          ObjectType: 10
+      - name: Wetland
+        guid: c914349b2e9efa4b905497e2b46d230c
+        id: 65510648
+        PathAndIcons:
+        - ElementName: Wetland
+          ObjectType: 10
+      - name: Wood
+        guid: da9660911f667b49bf6b0771af2463f8
+        id: 2058049674
+        PathAndIcons:
+        - ElementName: Wood
+          ObjectType: 10
+  - PhysicalPath: Switches\Car.wwu
+    ParentPhysicalPath: 
+    guid: 9dcaf7d2ff0aba41a5e40271b7b466b7
+    m_lastTime: -8586514949318071941
+    List:
+    - name: Car_speed
+      guid: fd2b6d6e9b1aa344bb4a6b3be681f51f
+      id: 4164958897
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: Car_speed
+        ObjectType: 11
+      Path: Car\Car_speed
+      values:
+      - name: Speed_0_10
+        guid: 5073407ec2c2b444bc120f733db7dd61
+        id: 1786650565
+        PathAndIcons:
+        - ElementName: Speed_0_10
+          ObjectType: 10
+      - name: Speed_11_100
+        guid: 483c08b6663f9545b2cb56177af3c1f3
+        id: 1315921443
+        PathAndIcons:
+        - ElementName: Speed_11_100
+          ObjectType: 10
+    - name: Test_car
+      guid: 76b997eade735b4bbf16a459f8e7ddc2
+      id: 3195007030
+      PathAndIcons:
+      - ElementName: Car
+        ObjectType: 12
+      - ElementName: Test_car
+        ObjectType: 11
+      Path: Car\Test_car
+      values:
+      - name: idle
+        guid: d204541e0db05647b15e16db1c233aed
+        id: 1874288895
+        PathAndIcons:
+        - ElementName: idle
+          ObjectType: 10
+      - name: Speed0
+        guid: b6279899091cc84e96d0252a73a4199f
+        id: 34379594
+        PathAndIcons:
+        - ElementName: Speed0
+          ObjectType: 10
+      - name: speed1
+        guid: bf0095980824b04780aded5141978a8b
+        id: 34379595
+        PathAndIcons:
+        - ElementName: speed1
+          ObjectType: 10
+      - name: Speed2
+        guid: 8f35fb2c11ccd24ca21400f41010495c
+        id: 34379592
+        PathAndIcons:
+        - ElementName: Speed2
+          ObjectType: 10
+      - name: Speed3
+        guid: a328429a169a444887c3618a34e71548
+        id: 34379593
+        PathAndIcons:
+        - ElementName: Speed3
+          ObjectType: 10
+  - PhysicalPath: Switches\Default Work Unit.wwu
+    ParentPhysicalPath: 
+    guid: 47639649ff646345b3044c952ece15ab
+    m_lastTime: -8586527019369714856
+    List: []
+  - PhysicalPath: Switches\Weapon.wwu
+    ParentPhysicalPath: 
+    guid: 3c24bfbe4765564c9252e9c1dcb30499
+    m_lastTime: -8586510388551130525
+    List:
+    - name: ColdWeapon_attack
+      guid: b66e1593bc8ef446b8681deffc024bff
+      id: 23843566
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: ColdWeapon
+        ObjectType: 4
+      - ElementName: ColdWeapon_attack
+        ObjectType: 11
+      Path: Weapon\ColdWeapon\ColdWeapon_attack
+      values:
+      - name: ColdWeapon_attack_hard
+        guid: 232a79229ae7d14a8824ca0a41efe8d0
+        id: 1479114014
+        PathAndIcons:
+        - ElementName: ColdWeapon_attack_hard
+          ObjectType: 10
+      - name: ColdWeapon_attack_soft
+        guid: d6146cb9c3a8fa4ba3b118c6c112f7bd
+        id: 623454705
+        PathAndIcons:
+        - ElementName: ColdWeapon_attack_soft
+          ObjectType: 10
+    - name: Gun_bullet_caliber_type
+      guid: 57e24ab31cbe7840a5e6ed79f9360f75
+      id: 331291836
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_bullet_caliber_type
+        ObjectType: 11
+      Path: Weapon\Gun\Gun_bullet_caliber_type
+      values:
+      - name: Gun_bullet_caliber_12
+        guid: 27e6cd8c8b5fde4e9e0ba9965ea72354
+        id: 206167461
+        PathAndIcons:
+        - ElementName: Gun_bullet_caliber_12
+          ObjectType: 10
+      - name: Gun_bullet_caliber_45acp
+        guid: 0645a7c8a2d0894fa79b67f0764ed33e
+        id: 2108749347
+        PathAndIcons:
+        - ElementName: Gun_bullet_caliber_45acp
+          ObjectType: 10
+      - name: Gun_bullet_caliber_5_56mm
+        guid: 10a2b1e041c1c448b3bfe6e4cedc929b
+        id: 4146870355
+        PathAndIcons:
+        - ElementName: Gun_bullet_caliber_5_56mm
+          ObjectType: 10
+      - name: Gun_bullet_caliber_50ae
+        guid: 4c867546357fe94d8fa99db63838c78e
+        id: 2800758821
+        PathAndIcons:
+        - ElementName: Gun_bullet_caliber_50ae
+          ObjectType: 10
+      - name: Gun_bullet_caliber_7_62_67mm
+        guid: 65775947d5be2e46ae174b33a3b9d6a6
+        id: 1708779582
+        PathAndIcons:
+        - ElementName: Gun_bullet_caliber_7_62_67mm
+          ObjectType: 10
+      - name: Gun_bullet_caliber_7_62mm
+        guid: 35a42cd8a4459146887a5854a3fe9877
+        id: 1678788480
+        PathAndIcons:
+        - ElementName: Gun_bullet_caliber_7_62mm
+          ObjectType: 10
+      - name: Gun_bullet_caliber_9mm
+        guid: ded691b14650ab4193563e7f7a9eb074
+        id: 1379095995
+        PathAndIcons:
+        - ElementName: Gun_bullet_caliber_9mm
+          ObjectType: 10
+    - name: Gun_bullet_whoosh_distance
+      guid: 4fc208eb6ad33848a0137519327fee85
+      id: 3447163105
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_bullet_whoosh_distance
+        ObjectType: 11
+      Path: Weapon\Gun\Gun_bullet_whoosh_distance
+      values:
+      - name: Gun_bullet_whoosh_close
+        guid: ab4909bdab039440a6e200ba15872778
+        id: 2196227780
+        PathAndIcons:
+        - ElementName: Gun_bullet_whoosh_close
+          ObjectType: 10
+      - name: Gun_bullet_whoosh_far
+        guid: c4e34e718cb1e24fa425dbc4cd6760b4
+        id: 1329945235
+        PathAndIcons:
+        - ElementName: Gun_bullet_whoosh_far
+          ObjectType: 10
+    - name: Gun_bullet_whoosh_type
+      guid: 8b0e3ebf9a39384b94d5d8eb39e0c501
+      id: 3228437104
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_bullet_whoosh_type
+        ObjectType: 11
+      Path: Weapon\Gun\Gun_bullet_whoosh_type
+      values:
+      - name: Gun_bullet_whoosh_common
+        guid: 21e382b78f54984baeb494d54572c179
+        id: 3418320571
+        PathAndIcons:
+        - ElementName: Gun_bullet_whoosh_common
+          ObjectType: 10
+      - name: Gun_bullet_whoosh_sniper
+        guid: 7d47fbfaf8120942aa0f9b05fdf975b6
+        id: 2404127953
+        PathAndIcons:
+        - ElementName: Gun_bullet_whoosh_sniper
+          ObjectType: 10
+    - name: Gun_magazine_act
+      guid: 2c18d62c98b43f45b352649aa847d555
+      id: 262119247
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_magazine_act
+        ObjectType: 11
+      Path: Weapon\Gun\Gun_magazine_act
+      values:
+      - name: Gun_magazine_nopull
+        guid: 963420cbeee09a47b0d58faeaa04e0fd
+        id: 1779637289
+        PathAndIcons:
+        - ElementName: Gun_magazine_nopull
+          ObjectType: 10
+      - name: Gun_magazine_pull
+        guid: d4bd75b5bba587468cf3e4843ff2fb77
+        id: 2284845488
+        PathAndIcons:
+        - ElementName: Gun_magazine_pull
+          ObjectType: 10
+    - name: Gun_shot_mode_type
+      guid: 7b844b5297a50f41b623f8f137266d96
+      id: 2973703745
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Gun_shot_mode_type
+        ObjectType: 11
+      Path: Weapon\Gun\Gun_shot_mode_type
+      values:
+      - name: Gun_shot_mode_type_continue
+        guid: aa918ebf575adc4e8e3a0dabc991c796
+        id: 3388677639
+        PathAndIcons:
+        - ElementName: Gun_shot_mode_type_continue
+          ObjectType: 10
+      - name: Gun_shot_mode_type_silencer
+        guid: 223fff26e4fb4343a9d7fb4408eca138
+        id: 4042252677
+        PathAndIcons:
+        - ElementName: Gun_shot_mode_type_silencer
+          ObjectType: 10
+      - name: Gun_shot_mode_type_single
+        guid: 02fd7ddd9d61ec4f932ccb0ae2fe339e
+        id: 740487104
+        PathAndIcons:
+        - ElementName: Gun_shot_mode_type_single
+          ObjectType: 10
+      - name: Gun_shot_mode_type_triple
+        guid: 17a6d6e2e105c1468b11a7ae69e9a308
+        id: 337121988
+        PathAndIcons:
+        - ElementName: Gun_shot_mode_type_triple
+          ObjectType: 10
+    - name: Ref_Gun_shot_mode_type
+      guid: 186611d038ba584583abd4f671f4188c
+      id: 2392490155
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Gun
+        ObjectType: 4
+      - ElementName: Ref_Gun_shot_mode_type
+        ObjectType: 11
+      Path: Weapon\Gun\Ref_Gun_shot_mode_type
+      values:
+      - name: Ref_Gun_shot_mode_normal
+        guid: a9cba948ab22554f986f13625ed3f82b
+        id: 699478402
+        PathAndIcons:
+        - ElementName: Ref_Gun_shot_mode_normal
+          ObjectType: 10
+      - name: Ref_Gun_shot_mode_silencer
+        guid: e9a835ccab4f96459980798c72cfb679
+        id: 60670634
+        PathAndIcons:
+        - ElementName: Ref_Gun_shot_mode_silencer
+          ObjectType: 10
+    - name: Tactic_Weapon_explosion_env
+      guid: 88a50d309707d04b84cfc7315a0b2d22
+      id: 1541587452
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Tactic_Weapon
+        ObjectType: 4
+      - ElementName: Tactic_Weapon_explosion_env
+        ObjectType: 11
+      Path: Weapon\Tactic_Weapon\Tactic_Weapon_explosion_env
+      values:
+      - name: Ground
+        guid: ef2c87cccff6f849b4b4bacc0d5484df
+        id: 2528658256
+        PathAndIcons:
+        - ElementName: Ground
+          ObjectType: 10
+      - name: Underwater
+        guid: 4e0d011998b14c47bc76c532ead25974
+        id: 2213237662
+        PathAndIcons:
+        - ElementName: Underwater
+          ObjectType: 10
+    - name: Tactic_Weapon_impact_texture
+      guid: a5d6457e3625064aada632decf6065f6
+      id: 3056506841
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Tactic_Weapon
+        ObjectType: 4
+      - ElementName: Tactic_Weapon_impact_texture
+        ObjectType: 11
+      Path: Weapon\Tactic_Weapon\Tactic_Weapon_impact_texture
+      values:
+      - name: Ground
+        guid: c61b055bb8785e4eb82eb980307c4a20
+        id: 2528658256
+        PathAndIcons:
+        - ElementName: Ground
+          ObjectType: 10
+      - name: Underwater
+        guid: 5bcb08bf09b02c42b9dcb93a90a7226e
+        id: 2213237662
+        PathAndIcons:
+        - ElementName: Underwater
+          ObjectType: 10
+    - name: Weapon_hit_texture
+      guid: 64f72976022a1e4fa0b5164a0d90d4f1
+      id: 3193251995
+      PathAndIcons:
+      - ElementName: Weapon
+        ObjectType: 12
+      - ElementName: Weapon_hit_texture
+        ObjectType: 11
+      Path: Weapon\Weapon_hit_texture
+      values:
+      - name: Weapon_hit_armor
+        guid: 3f18f3cc471b3a4eaf6b6162625a017e
+        id: 2868425935
+        PathAndIcons:
+        - ElementName: Weapon_hit_armor
+          ObjectType: 10
+      - name: Weapon_hit_body
+        guid: 38d0b0a5f12e5941b7dfff701693e889
+        id: 2310482854
+        PathAndIcons:
+        - ElementName: Weapon_hit_body
+          ObjectType: 10
+      - name: Weapon_hit_concrete
+        guid: bc860beb4626b642a4deb40564ade962
+        id: 1278003431
+        PathAndIcons:
+        - ElementName: Weapon_hit_concrete
+          ObjectType: 10
+      - name: Weapon_hit_head
+        guid: 3e7887ded6c5864a81363c524f28d663
+        id: 4272721672
+        PathAndIcons:
+        - ElementName: Weapon_hit_head
+          ObjectType: 10
+      - name: Weapon_hit_helmet
+        guid: 6ace2f54070fb9448ec36db85321bba8
+        id: 2032005217
+        PathAndIcons:
+        - ElementName: Weapon_hit_helmet
+          ObjectType: 10
+      - name: Weapon_hit_metal
+        guid: 3c07fdf1d6c4334d84ee202d7dea043b
+        id: 1764642863
+        PathAndIcons:
+        - ElementName: Weapon_hit_metal
+          ObjectType: 10
+      - name: Weapon_hit_water
+        guid: 8c4b3d4784b44141851843570c650795
+        id: 338695155
+        PathAndIcons:
+        - ElementName: Weapon_hit_water
+          ObjectType: 10
+      - name: Weapon_hit_wood
+        guid: 2b3160c3835ddf4db207febc60557063
+        id: 2094457341
+        PathAndIcons:
+        - ElementName: Weapon_hit_wood
+          ObjectType: 10
+  TriggerWwu:
+  - PhysicalPath: Triggers\Default Work Unit.wwu
+    ParentPhysicalPath: 
+    guid: 2cfbabad60212e43b23864386771eaca
+    m_lastTime: -8586527019370840962
+    List: []
+  ExpandedItems:
+  - /ShengSiJuJi_2018.1.5
+  - /ShengSiJuJi_2018.1.5/Events
+  - /ShengSiJuJi_2018.1.5/Events/Weapon
+  - /ShengSiJuJi_2018.1.5/Events/Weapon/Gun
+  - /ShengSiJuJi_2018.1.5/Events/Weapon/Gun/Gun_Component
+  - /ShengSiJuJi_2018.1.5/Events/Weapon/Gun/Gun_Component/Gun_bullet
+  - /ShengSiJuJi_2018.1.5/SoundBanks
+  - /ShengSiJuJi_2018.1.5/SoundBanks/Default Work Unit
+  autoPopulateEnabled: 1
+  CurrentPluginConfig: 

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AudioPluginSettingData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <CopySoundBanksAsPreBuildStep>false</CopySoundBanksAsPreBuildStep>
+  <CreateWwiseGlobal>true</CreateWwiseGlobal>
+  <CreateWwiseListener>false</CreateWwiseListener>
+  <GenerateSoundBanksAsPreBuildStep>false</GenerateSoundBanksAsPreBuildStep>
+  <ShowMissingRigidBodyWarning>false</ShowMissingRigidBodyWarning>
+  <defaultPoolSizeKB>8192</defaultPoolSizeKB>
+  <lowerPoolSizeKB>8192</lowerPoolSizeKB>
+  <memoryCutoffThreshold>0.95</memoryCutoffThreshold>
+  <spatialAudioPoolSizeKB>4096</spatialAudioPoolSizeKB>
+  <streamingPoolSizeKB>4096</streamingPoolSizeKB>
+  <preparePoolSizeKB>0</preparePoolSizeKB>
+  <maxPoolNum>20</maxPoolNum>
+  <callbackManagerBufferSize>4096</callbackManagerBufferSize>
+  <BankFolder_UnityEditor>F:\voyager\UnityProjects\App.Client.Unity\App.Client.Unity-Windows\Assets\Assets\Sound\WiseBank\</BankFolder_UnityEditor>
+</AudioPluginSettingData>

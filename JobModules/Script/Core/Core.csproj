@@ -1,0 +1,605 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Core</RootNamespace>
+    <AssemblyName>Core</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Dll.Temp\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\build_obj_dir\Release\Core\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Dll.Temp\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\build_obj_dir\Debug\Core\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Entitas.VisualDebugging.Unity">
+      <HintPath>..\CommonLibs\Entitas.VisualDebugging.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Entitas">
+      <HintPath>..\CommonLibs\Entitas.dll</HintPath>
+    </Reference>
+    <Reference Include="Entitas.CodeGeneration.Attributes">
+      <HintPath>..\CommonLibs\Entitas.CodeGeneration.Attributes.dll</HintPath>
+    </Reference>
+    <Reference Include="Entitas.Utils">
+      <HintPath>..\CommonLibs\Entitas.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\CommonLibs\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.dll</HintPath>
+    </Reference>
+    <Analyzer Include="../ThirdParty/RefCounterAnalyzer/RefCounterAnalyzer.dll">
+      <HintPath>..\ThirdParty\RefCounterAnalyzer\RefCounterAnalyzer.dll</HintPath>
+    </Analyzer>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Animation\AnimatorPoseReplayer.cs" />
+    <Compile Include="Animation\IPatchClass.cs" />
+    <Compile Include="Animation\NetworkAnimatorLayer.cs" />
+    <Compile Include="Animation\NetworkAnimatorParameter.cs" />
+    <Compile Include="Animation\NetworkAnimatorUtil.cs" />
+    <Compile Include="AnimatorClip\AnimationClipNameMatcher.cs" />
+    <Compile Include="AnimatorClip\AnimatorClipBehavior.cs" />
+    <Compile Include="AnimatorClip\AnimatorClipManager.cs" />
+    <Compile Include="AnimatorClip\AnimatorClipMonitor.cs" />
+    <Compile Include="AnimatorClip\IClipBehavior.cs" />
+    <Compile Include="Appearance\ICharacterAppearance.cs" />
+    <Compile Include="Appearance\ICharacterControllerAppearance.cs" />
+    <Compile Include="Appearance\ICharacterFirstPersonAppearance.cs" />
+    <Compile Include="Appearance\IInputScheme.cs" />
+    <Compile Include="Attack\IHitMaskController.cs" />
+    <Compile Include="Attack\MeleeAttack.cs" />
+    <Compile Include="BulletSimulation\BulletHitSimulator.cs" />
+    <Compile Include="BulletSimulation\BulletLayers.cs" />
+    <Compile Include="BulletSimulation\BulletMoveSimulator.cs" />
+    <Compile Include="BulletSimulation\BulletSegmentComparator.cs" />
+    <Compile Include="BulletSimulation\IBulletEntity.cs" />
+    <Compile Include="BulletSimulation\IBulletEntityCollector.cs" />
+    <Compile Include="BulletSimulation\IBulletHitHandler.cs" />
+    <Compile Include="BulletSimulation\IBulletInfoCollector.cs" />
+    <Compile Include="BulletSimulation\IBulletSegment.cs" />
+    <Compile Include="BulletSimulation\PlayerMask.cs" />
+    <Compile Include="CameraControl\ICameraInput.cs" />
+    <Compile Include="CameraControl\ICameraState.cs" />
+    <Compile Include="CameraControl\NewMotor\CameraIntfaces.cs" />
+    <Compile Include="CameraControl\TransitionMotroUtility.cs" />
+    <Compile Include="CameraControl\YawPitchUtility.cs" />
+    <Compile Include="CharacterBone\FollowRotParam.cs" />
+    <Compile Include="CharacterBone\ICharacterBone.cs" />
+    <Compile Include="CharacterBone\ICharacterBoneState.cs" />
+    <Compile Include="CharacterBone\IFollowRot.cs" />
+    <Compile Include="CharacterBone\IWeaponRot.cs" />
+    <Compile Include="CharacterController\AirMoveCurve.cs" />
+    <Compile Include="CharacterController\CharacterControllerContext.cs" />
+    <Compile Include="CharacterController\ConcreteController\DiveCharacterController.cs" />
+    <Compile Include="CharacterController\ConcreteController\ProneCharacterController.cs" />
+    <Compile Include="CharacterController\ConcreteController\SwimCharacterController.cs" />
+    <Compile Include="CharacterController\GroundDetection\BaseGroundDetection.cs" />
+    <Compile Include="CharacterController\GroundDetection\CharacterControllerAdapter.cs" />
+    <Compile Include="CharacterController\GroundDetection\GroundDetection.cs" />
+    <Compile Include="CharacterController\GroundDetection\GroundDetectionCollider.cs" />
+    <Compile Include="CharacterController\GroundDetection\GroundHit.cs" />
+    <Compile Include="CharacterController\GroundDetection\PhysicsCastHelper.cs" />
+    <Compile Include="CharacterController\ICharacterController.cs" />
+    <Compile Include="CharacterController\KinematicCharacterController\BaseCharacterController.cs" />
+    <Compile Include="CharacterController\KinematicCharacterController\BaseMoverController.cs" />
+    <Compile Include="CharacterController\KinematicCharacterController\KinematicCharacterMotor.cs" />
+    <Compile Include="CharacterController\KinematicCharacterController\KinematicCharacterSystem.cs" />
+    <Compile Include="CharacterController\KinematicCharacterController\PhysicsMover.cs" />
+    <Compile Include="CharacterController\KinematicCharacterController\ReadOnlyAttribute.cs" />
+    <Compile Include="CharacterController\KinematicCharacterController.cs" />
+    <Compile Include="CharacterController\PlayerScript.cs" />
+    <Compile Include="CharacterController\UnityCharacterController.cs" />
+    <Compile Include="CharacterState\Action\ActionFsm.cs" />
+    <Compile Include="CharacterState\Action\ActionManager.cs" />
+    <Compile Include="CharacterState\Action\ActionState.cs" />
+    <Compile Include="CharacterState\Action\ActionStateId.cs" />
+    <Compile Include="CharacterState\Action\ICharacterAction.cs" />
+    <Compile Include="CharacterState\Action\INewCommandFromCall.cs" />
+    <Compile Include="CharacterState\Action\NewCommandFromCall.cs" />
+    <Compile Include="CharacterState\Action\NewCommandImpl.cs" />
+    <Compile Include="CharacterState\Action\States\BuriedBombState.cs" />
+    <Compile Include="CharacterState\Action\States\DismantleBombState.cs" />
+    <Compile Include="CharacterState\Action\States\DrawState.cs" />
+    <Compile Include="CharacterState\Action\States\DriveState.cs" />
+    <Compile Include="CharacterState\Action\States\FireState.cs" />
+    <Compile Include="CharacterState\Action\States\GrenadeState.cs" />
+    <Compile Include="CharacterState\Action\States\InjuryState.cs" />
+    <Compile Include="CharacterState\Action\States\MeleeAttackState.cs" />
+    <Compile Include="CharacterState\Action\States\OpenDoorState.cs" />
+    <Compile Include="CharacterState\Action\States\PickUpState.cs" />
+    <Compile Include="CharacterState\Action\States\PropsState.cs" />
+    <Compile Include="CharacterState\Action\States\ReloadState.cs" />
+    <Compile Include="CharacterState\Action\States\SpecialFire\SpecialFireEndState.cs" />
+    <Compile Include="CharacterState\Action\States\SpecialFire\SpecialFireHoldState.cs" />
+    <Compile Include="CharacterState\Action\States\SpecialFire\SpecialFireState.cs" />
+    <Compile Include="CharacterState\Action\States\SpecialReloadState.cs" />
+    <Compile Include="CharacterState\Action\States\SwitchWeaponState.cs" />
+    <Compile Include="CharacterState\Action\States\UnarmState.cs" />
+    <Compile Include="CharacterState\Action\Transitions\OverlayNullToSightTransition.cs" />
+    <Compile Include="CharacterState\Action\Transitions\SightToOverlayNullTransition.cs" />
+    <Compile Include="CharacterState\AnimatorParametersHash.cs" />
+    <Compile Include="CharacterState\CharacterStateManager.cs" />
+    <Compile Include="CharacterState\FsmManager.cs" />
+    <Compile Include="CharacterState\ICharacterSpeed.cs" />
+    <Compile Include="CharacterState\ICharacterState.cs" />
+    <Compile Include="CharacterState\ISyncFsmSnapshot.cs" />
+    <Compile Include="CharacterState\Movement\DiveTransition.cs" />
+    <Compile Include="CharacterState\Movement\ICharacterMovement.cs" />
+    <Compile Include="CharacterState\Movement\IGetMovementState.cs" />
+    <Compile Include="CharacterState\Movement\MovementFsm.cs" />
+    <Compile Include="CharacterState\Movement\MovementManager.cs" />
+    <Compile Include="CharacterState\Movement\MovementState.cs" />
+    <Compile Include="CharacterState\Movement\MovementStateId.cs" />
+    <Compile Include="CharacterState\Posture\CustomPostureState.cs" />
+    <Compile Include="CharacterState\Posture\ICharacterPosture.cs" />
+    <Compile Include="CharacterState\Posture\IGetActionState.cs" />
+    <Compile Include="CharacterState\Posture\IGetPostureState.cs" />
+    <Compile Include="CharacterState\Posture\PostureFsm.cs" />
+    <Compile Include="CharacterState\Posture\PostureManager.cs" />
+    <Compile Include="CharacterState\Posture\PostureState.cs" />
+    <Compile Include="CharacterState\Posture\PostureStateId.cs" />
+    <Compile Include="CharacterState\Posture\StateIdAdapter.cs" />
+    <Compile Include="CharacterState\Posture\States\ClimbState.cs" />
+    <Compile Include="CharacterState\Posture\States\DiveState.cs" />
+    <Compile Include="CharacterState\Posture\States\FreefallState.cs" />
+    <Compile Include="CharacterState\Posture\States\JumpEndState.cs" />
+    <Compile Include="CharacterState\Posture\States\JumpStartState.cs" />
+    <Compile Include="CharacterState\Posture\States\PeekLeftState.cs" />
+    <Compile Include="CharacterState\Posture\States\PeekRightState.cs" />
+    <Compile Include="CharacterState\Posture\States\ProneToCrouchState.cs" />
+    <Compile Include="CharacterState\Posture\States\ProneToStandState.cs" />
+    <Compile Include="CharacterState\Posture\States\ProneTransitState.cs" />
+    <Compile Include="CharacterState\Posture\States\SlideState.cs" />
+    <Compile Include="CharacterState\Posture\Transitions\DiveTransition.cs" />
+    <Compile Include="CharacterState\Posture\Transitions\JumpEndToStandTransition.cs" />
+    <Compile Include="CharacterState\Posture\Transitions\NoPeekToPeekLeftTransition.cs" />
+    <Compile Include="CharacterState\Posture\Transitions\NoPeekToPeekRightTransition.cs" />
+    <Compile Include="CharacterState\Posture\Transitions\PeekLeftToNoPeekTransition.cs" />
+    <Compile Include="CharacterState\Posture\Transitions\PeekRightToNoPeekTransition.cs" />
+    <Compile Include="CharacterState\Posture\Transitions\PostureTransition.cs" />
+    <Compile Include="CharacterState\Posture\UnityAnimationEventCommands.cs" />
+    <Compile Include="CharacterState\StateInterCommands.cs" />
+    <Compile Include="Common\IGlobalEffectManager.cs" />
+    <Compile Include="Common\ITipManager.cs" />
+    <Compile Include="CommonResource\AssetStatus.cs" />
+    <Compile Include="CommonResource\BaseCommonResourceComponent.cs" />
+    <Compile Include="CommonResource\EAssetLoadStatus.cs" />
+    <Compile Include="CommonResource\ICommonResourceComponent.cs" />
+    <Compile Include="Compare\CompareUtility.cs" />
+    <Compile Include="Compare\IComparableComponent.cs" />
+    <Compile Include="Compensation\CompensationSnapshotHandler.cs" />
+    <Compile Include="Compensation\CompensationWorld.cs" />
+    <Compile Include="Compensation\ICompensationComponent.cs" />
+    <Compile Include="Compensation\ICompensationWorld.cs" />
+    <Compile Include="Compensation\IHitBoxEntityManager.cs" />
+    <Compile Include="Compensation\ISnapshotEntityMapFilter.cs" />
+    <Compile Include="Compensation\RaySegment.cs" />
+    <Compile Include="Compensation\ServerCompensationWorldFactory.cs" />
+    <Compile Include="Components\EComponentIds.cs" />
+    <Compile Include="Components\EntityAdapterComponent.cs" />
+    <Compile Include="Components\EntityKeyComponent.cs" />
+    <Compile Include="Components\FlagCompensationComponent.cs" />
+    <Compile Include="Components\FlagDestroyComponent.cs" />
+    <Compile Include="Components\FlagImmutabilityComponent.cs" />
+    <Compile Include="Components\FlagPlayBackFilterComponent.cs" />
+    <Compile Include="Components\FlagSelfComponent.cs" />
+    <Compile Include="Components\FlagSyncNonSelfComponent.cs" />
+    <Compile Include="Components\FlagSyncSelfComponent.cs" />
+    <Compile Include="Components\GlobalFlagComponent.cs" />
+    <Compile Include="Components\IAssetComponent.cs" />
+    <Compile Include="Components\LifeTimeComponent.cs" />
+    <Compile Include="Components\MultiAssetComponent.cs" />
+    <Compile Include="Components\NetworkMessageListComponent.cs" />
+    <Compile Include="Components\NormalComponent.cs" />
+    <Compile Include="Components\OwnerIdComponent.cs" />
+    <Compile Include="Components\PositionComponent.cs" />
+    <Compile Include="Configuration\AssetConfigManager.cs" />
+    <Compile Include="Configuration\BulletDropConfigManager.cs" />
+    <Compile Include="Configuration\CameraConfigManager.cs" />
+    <Compile Include="Configuration\ClientEffectCommonConfigManager.cs" />
+    <Compile Include="Configuration\ClientEffectConfigManager.cs" />
+    <Compile Include="Configuration\ClientEffectFactoryConfig.cs" />
+    <Compile Include="Configuration\ClipDropConfigManager.cs" />
+    <Compile Include="Configuration\ConfigSet.cs" />
+    <Compile Include="Configuration\DynamicPredictionErrorCorrectionConfigManager.cs" />
+    <Compile Include="Configuration\Equipment\BasisParser.cs" />
+    <Compile Include="Configuration\Equipment\Combination.cs" />
+    <Compile Include="Configuration\Equipment\DeterminedLocation.cs" />
+    <Compile Include="Configuration\Equipment\EquipmentGeneration.cs" />
+    <Compile Include="Configuration\Equipment\IEquipmentInitilizerHandler.cs" />
+    <Compile Include="Configuration\Equipment\Location.cs" />
+    <Compile Include="Configuration\Equipment\LocationParser.cs" />
+    <Compile Include="Configuration\Equipment\Package.cs" />
+    <Compile Include="Configuration\Equipment\ResourceItem.cs" />
+    <Compile Include="Configuration\LadderRankConfigManager.cs" />
+    <Compile Include="Configuration\MapPositionConfigManager.cs" />
+    <Compile Include="Configuration\PlayerSoundConfigManager.cs" />
+    <Compile Include="Configuration\RuntimeGameConfig.cs" />
+    <Compile Include="Configuration\SoundConfigManager.cs" />
+    <Compile Include="Configuration\Terrains\TerrainEffectConfigManager.cs" />
+    <Compile Include="Configuration\Terrains\TerrainMaterialConfigManager.cs" />
+    <Compile Include="Configuration\Terrains\TerrainSoundConfigManager.cs" />
+    <Compile Include="Configuration\Terrains\TerrainTextureConfigManager.cs" />
+    <Compile Include="Configuration\Terrains\TerrainTextureTypeConfigManager.cs" />
+    <Compile Include="Configuration\Terrains\TerrainVehicleFrictionConfigManager.cs" />
+    <Compile Include="Configuration\Utils\IXmlNodeParser.cs" />
+    <Compile Include="Configuration\Utils\StringUtil.cs" />
+    <Compile Include="Configuration\Utils\XmlNodeAttribute.cs" />
+    <Compile Include="Configuration\Utils\XmlNodeBase.cs" />
+    <Compile Include="Configuration\VehicleAssetConfigManager.cs" />
+    <Compile Include="Configuration\VehicleSoundConfigManager.cs" />
+    <Compile Include="Effect\IEffectPlayer.cs" />
+    <Compile Include="EntitasAdpater\ComponentIndexLookUp.cs" />
+    <Compile Include="EntitasAdpater\ComponentWrapper.cs" />
+    <Compile Include="EntitasAdpater\EntitasGameContext.cs" />
+    <Compile Include="EntitasAdpater\EntitasGameEntity.cs" />
+    <Compile Include="EntitasAdpater\GameGroup.cs" />
+    <Compile Include="EntitasAdpater\IComponentTypeLookup.cs" />
+    <Compile Include="EntitasAdpater\IGameContexts.cs" />
+    <Compile Include="EntitasAdpater\IGameGroup.cs" />
+    <Compile Include="EntitasAdpater\SnapshotFactory.cs" />
+    <Compile Include="EntityComponent\EntityIdGenerator.cs" />
+    <Compile Include="EntityComponent\EntityKey.cs" />
+    <Compile Include="EntityComponent\EntityMap.cs" />
+    <Compile Include="EntityComponent\EntityMapCloner.cs" />
+    <Compile Include="EntityComponent\EntityMapComparator.cs" />
+    <Compile Include="EntityComponent\EntityMapDummyCompareHandler.cs" />
+    <Compile Include="EntityComponent\GameComponentComparatorHandler.cs" />
+    <Compile Include="EntityComponent\GameComponentInfo.cs" />
+    <Compile Include="EntityComponent\GameContexts.cs" />
+    <Compile Include="EntityComponent\GameEntityComparator.cs" />
+    <Compile Include="EntityComponent\GameEntityComparatorHandler.cs" />
+    <Compile Include="EntityComponent\GameEntityDic.cs" />
+    <Compile Include="EntityComponent\IEntityIdGenerator.cs" />
+    <Compile Include="EntityComponent\IEntityMapCloneHandler.cs" />
+    <Compile Include="EntityComponent\IEntityMapCompareHandler.cs" />
+    <Compile Include="EntityComponent\IGameComponent.cs" />
+    <Compile Include="EntityComponent\IGameContext.cs" />
+    <Compile Include="EntityComponent\IGameEntity.cs" />
+    <Compile Include="EntityComponent\ListBasedGameEntity.cs" />
+    <Compile Include="EntityComponent\SortedEnumeratableComparator.cs" />
+    <Compile Include="EnumEntityType.cs" />
+    <Compile Include="Enums\CommonEnum.cs" />
+    <Compile Include="Enums\EBulletType.cs" />
+    <Compile Include="Enums\EFActionType.cs" />
+    <Compile Include="Enums\FunctionResult.cs" />
+    <Compile Include="Enums\TerrainEnumType.cs" />
+    <Compile Include="Event\EventInfos.cs" />
+    <Compile Include="Event\IEvent.cs" />
+    <Compile Include="Event\PlayerEvents.cs" />
+    <Compile Include="Free\FreeMessageConstant.cs" />
+    <Compile Include="Free\FreeTriggerConstant.cs" />
+    <Compile Include="Free\IFreeArgs.cs" />
+    <Compile Include="Free\IFreeData.cs" />
+    <Compile Include="Free\IFreeRule.cs" />
+    <Compile Include="Fsm\FiniteStateMachine.cs" />
+    <Compile Include="Fsm\FsmEnum.cs" />
+    <Compile Include="Fsm\FsmInput.cs" />
+    <Compile Include="Fsm\FsmOutput.cs" />
+    <Compile Include="Fsm\FsmSnapshot.cs" />
+    <Compile Include="Fsm\FsmState.cs" />
+    <Compile Include="Fsm\FsmTransition.cs" />
+    <Compile Include="Fsm\IFsmUpdate.cs" />
+    <Compile Include="GameGlobal\Composition\AudioHitEffectData.cs" />
+    <Compile Include="GameGlobal\Composition\GrenadeCacheData.cs" />
+    <Compile Include="GameGlobal\Composition\WeaponBagContainer.cs" />
+    <Compile Include="GameGlobal\Composition\WeaponBagSlotData.cs" />
+    <Compile Include="GameGlobal\GlobalConst.cs" />
+    <Compile Include="GameGlobal\GlobalEnum.cs" />
+    <Compile Include="GameGlobal\GlobalException.cs" />
+    <Compile Include="GameGlobal\GlobalInterface.cs" />
+    <Compile Include="GameGlobal\GlobalStruct.cs" />
+    <Compile Include="GameHandler\BaseGameHandlerRegister.cs" />
+    <Compile Include="GameHandler\DataBase.cs" />
+    <Compile Include="GameHandler\DataBaseComponent.cs" />
+    <Compile Include="GameHandler\GameEvent.cs" />
+    <Compile Include="GameHandler\GameEventComponent.cs" />
+    <Compile Include="GameHandler\IGameEventHandler.cs" />
+    <Compile Include="GameHandler\IGameStateUpdateHandler.cs" />
+    <Compile Include="GameInputFilter\IFilteredInput.cs" />
+    <Compile Include="GameInputFilter\IGameInputProcessor.cs" />
+    <Compile Include="GameInputFilter\IGameState.cs" />
+    <Compile Include="GameInputFilter\IGameStateProcessFactory.cs" />
+    <Compile Include="GameInputFilter\IStatePool.cs" />
+    <Compile Include="GameInputFilter\IStateProvider.cs" />
+    <Compile Include="GameInputFilter\IStateProviderPool.cs" />
+    <Compile Include="GameModule\Common\CommoTickImmutabblitySystem.cs" />
+    <Compile Include="GameModule\Common\CommonDestroySystem.cs" />
+    <Compile Include="GameModule\Common\CommonLifeTimeSystem.cs" />
+    <Compile Include="GameModule\Interface\IEntityCleanUpSystem.cs" />
+    <Compile Include="GameModule\Interface\IEntityInitSystem.cs" />
+    <Compile Include="GameModule\Interface\IGameStateUpdateSystem.cs" />
+    <Compile Include="GameModule\Interface\IGizmosRenderSystem.cs" />
+    <Compile Include="GameModule\Interface\ILateUpdateSystem.cs" />
+    <Compile Include="GameModule\Interface\IModuleInitSystem.cs" />
+    <Compile Include="GameModule\Interface\IPhysicsInitSystem.cs" />
+    <Compile Include="GameModule\Interface\IPhysicsUpdateSystem.cs" />
+    <Compile Include="GameModule\Interface\IPlaybackSystem.cs" />
+    <Compile Include="GameModule\Interface\IRenderSystem.cs" />
+    <Compile Include="GameModule\Interface\IResourceLoadSystem.cs" />
+    <Compile Include="GameModule\Interface\IUiSystem.cs" />
+    <Compile Include="GameModule\Interface\IUserCmdExecuteSystem.cs" />
+    <Compile Include="GameModule\Module\CompositeGameModule.cs" />
+    <Compile Include="GameModule\Module\GameModule.cs" />
+    <Compile Include="GameModule\Module\IGameModule.cs" />
+    <Compile Include="GameModule\Step\EEcecuteStep.cs" />
+    <Compile Include="GameModule\Step\StepExecuteManager.cs" />
+    <Compile Include="GameModule\System\AbstractFrameworkSystem.cs" />
+    <Compile Include="GameModule\System\BaseGameStateUpdateSystem.cs" />
+    <Compile Include="GameModule\System\CompensationSnapshotSystem.cs" />
+    <Compile Include="GameModule\System\CustomProfilerFactory.cs" />
+    <Compile Include="GameModule\System\EntityCleanUpSystem.cs" />
+    <Compile Include="GameModule\System\EntityCreateSystem.cs" />
+    <Compile Include="GameModule\System\FreeGameRuleSystem.cs" />
+    <Compile Include="GameModule\System\GameStateUpdateSystem.cs" />
+    <Compile Include="GameModule\System\GizmosRenderSystem.cs" />
+    <Compile Include="GameModule\System\ICommonSessionObjects.cs" />
+    <Compile Include="GameModule\System\ICustomProfiler.cs" />
+    <Compile Include="GameModule\System\ModuleInitSystem.cs" />
+    <Compile Include="GameModule\System\PhysicUpdateSystem.cs" />
+    <Compile Include="GameModule\System\PhysicsInitSystem.cs" />
+    <Compile Include="GameModule\System\PhysicsUtility.cs" />
+    <Compile Include="GameModule\System\PlaybackInitSystem.cs" />
+    <Compile Include="GameModule\System\PlaybackSystem.cs" />
+    <Compile Include="GameModule\System\ReactiveEntityCleanUpSystem.cs" />
+    <Compile Include="GameModule\System\ReactiveEntityInitSystem.cs" />
+    <Compile Include="GameModule\System\ReactiveGamePlaySystem.cs" />
+    <Compile Include="GameModule\System\ReactiveResourceLoadSystem.cs" />
+    <Compile Include="GameModule\System\RenderSystem.cs" />
+    <Compile Include="GameModule\System\ResourceLoadSystem.cs" />
+    <Compile Include="GameModule\System\SendSnapshotSystem.cs" />
+    <Compile Include="GameModule\System\SyncLatestSystem.cs" />
+    <Compile Include="GameModule\System\UiSystem.cs" />
+    <Compile Include="GameTime\CalcFixTimeInterval.cs" />
+    <Compile Include="GameTime\ICurrentTime.cs" />
+    <Compile Include="GameTime\ITimeManager.cs" />
+    <Compile Include="GameTime\TimeConstant.cs" />
+    <Compile Include="GameTime\TimeManager.cs" />
+    <Compile Include="Geography\ZoneController.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="HitBox\HitBoxGameObjectUpdater.cs" />
+    <Compile Include="HitBox\HitBoxHierarchyGenerator.cs" />
+    <Compile Include="HitBox\HitBoxOwnerComponent.cs" />
+    <Compile Include="HitBox\HitBoxTransformProvider.cs" />
+    <Compile Include="HitBox\IHitBoxTransformProvider.cs" />
+    <Compile Include="Http\HttpRequestParser.cs" />
+    <Compile Include="Http\HttpUtility.cs" />
+    <Compile Include="Http\SimpleHttpServer.cs" />
+    <Compile Include="IFactory\ISceneObjectEntityFactory.cs" />
+    <Compile Include="IFactory\ISoundEntityFactory.cs" />
+    <Compile Include="Interpolate\InterpolateUtility.cs" />
+    <Compile Include="Playback\IInterpolatableComponent.cs" />
+    <Compile Include="Playback\IInterpolationInfo.cs" />
+    <Compile Include="Playback\IPlaybackComponent.cs" />
+    <Compile Include="Playback\IPlaybackInfoProvider.cs" />
+    <Compile Include="Playback\IPlaybackManager.cs" />
+    <Compile Include="Playback\InterpolationInfo.cs" />
+    <Compile Include="Playback\PlaybackDiffHandler.cs" />
+    <Compile Include="Playback\PlaybackInfoProvider.cs" />
+    <Compile Include="Playback\PlaybackIntroplateHandler.cs" />
+    <Compile Include="Playback\PlaybackManager.cs" />
+    <Compile Include="PlayerAutoMove\IPlayerAutoMove.cs" />
+    <Compile Include="Prediction\AbstractPredictionInfoProvider.cs" />
+    <Compile Include="Prediction\AbstractPredictionInitManager.cs" />
+    <Compile Include="Prediction\CmdListComponent.cs" />
+    <Compile Include="Prediction\EntityMapDeepCloner.cs" />
+    <Compile Include="Prediction\ICmd.cs" />
+    <Compile Include="Prediction\IPredictionInfoProvider.cs" />
+    <Compile Include="Prediction\IPredictionInitManager.cs" />
+    <Compile Include="Prediction\IRewindableComponent.cs" />
+    <Compile Include="Prediction\IUserPredictionInfoProvider.cs" />
+    <Compile Include="Prediction\PredictionCompareHandler.cs" />
+    <Compile Include="Prediction\PredictionInitSystem.cs" />
+    <Compile Include="Prediction\PredictionRewindHandler.cs" />
+    <Compile Include="Prediction\UserPrediction\Cmd\IUserCmd.cs" />
+    <Compile Include="Prediction\UserPrediction\Cmd\IUserCmdGenerator.cs" />
+    <Compile Include="Prediction\UserPrediction\Cmd\IUserCmdOwner.cs" />
+    <Compile Include="Prediction\UserPrediction\Cmd\UserCmd.cs" />
+    <Compile Include="Prediction\UserPrediction\Cmd\UserMoveCmd.cs" />
+    <Compile Include="Prediction\UserPrediction\IUserPredictionComponent.cs" />
+    <Compile Include="Prediction\UserPrediction\Parallel\Base.cs" />
+    <Compile Include="Prediction\UserPrediction\Parallel\TaskDispatcher.cs" />
+    <Compile Include="Prediction\UserPrediction\Parallel\UserCmdPostExecuteSystem.cs" />
+    <Compile Include="Prediction\UserPrediction\Parallel\UserCmdPreExecuteSystem.cs" />
+    <Compile Include="Prediction\UserPrediction\Parallel\WorkThread.cs" />
+    <Compile Include="Prediction\UserPrediction\UserCmdExecuteManagerSystem.cs" />
+    <Compile Include="Prediction\UserPrediction\UserCmdParallelExecuteManagerSystem.cs" />
+    <Compile Include="Prediction\UserPrediction\UserCmdUpdateMsgExecuteManagerSystem.cs" />
+    <Compile Include="Prediction\UserPrediction\UserPrePredictionSystem.cs" />
+    <Compile Include="Prediction\UserPrediction\UserPredictionSystem.cs" />
+    <Compile Include="Prediction\VehiclePrediction\Cmd\IVehicleCmd.cs" />
+    <Compile Include="Prediction\VehiclePrediction\Cmd\IVehicleCmdGenerator.cs" />
+    <Compile Include="Prediction\VehiclePrediction\Cmd\VehicleCmd.cs" />
+    <Compile Include="Prediction\VehiclePrediction\Cmd\VehicleIndex.cs" />
+    <Compile Include="Prediction\VehiclePrediction\Event\IVehicleSyncEvent.cs" />
+    <Compile Include="Prediction\VehiclePrediction\Event\VehicleDamangeSyncEvent.cs" />
+    <Compile Include="Prediction\VehiclePrediction\IVehicleCmdExecuteSystem.cs" />
+    <Compile Include="Prediction\VehiclePrediction\IVehicleCmdExecuteSystemHandler.cs" />
+    <Compile Include="Prediction\VehiclePrediction\IVehicleCmdOwner.cs" />
+    <Compile Include="Prediction\VehiclePrediction\IVehicleExecutionSelector.cs" />
+    <Compile Include="Prediction\VehiclePrediction\IVehiclePredictionComponent.cs" />
+    <Compile Include="Prediction\VehiclePrediction\TimeSync\ClientSimulationTimer.cs" />
+    <Compile Include="Prediction\VehiclePrediction\TimeSync\IClientSimulationTimer.cs" />
+    <Compile Include="Prediction\VehiclePrediction\TimeSync\ISimulationTimer.cs" />
+    <Compile Include="Prediction\VehiclePrediction\TimeSync\PhysicsTimeConfig.cs" />
+    <Compile Include="Prediction\VehiclePrediction\TimeSync\ServerSimulationTimer.cs" />
+    <Compile Include="Prediction\VehiclePrediction\TimeSync\SimulationTimeMessage.cs" />
+    <Compile Include="Prediction\VehiclePrediction\TimeSync\SimulationTimeSyncClient.cs" />
+    <Compile Include="Prediction\VehiclePrediction\TimeSync\SimulationTimeSyncInfo.cs" />
+    <Compile Include="Prediction\VehiclePrediction\TimeSync\SimulationTimeSyncServer.cs" />
+    <Compile Include="Prediction\VehiclePrediction\VehicleCmdExecuteManagerSystem.cs" />
+    <Compile Include="Replicaton\EntityMapCache.cs" />
+    <Compile Include="Replicaton\ISnapshot.cs" />
+    <Compile Include="Replicaton\ISnapshotPool.cs" />
+    <Compile Include="Replicaton\ISnapshotSelector.cs" />
+    <Compile Include="Replicaton\ISnapshotSerializeFilter.cs" />
+    <Compile Include="Replicaton\ListBasedSnapshot.cs" />
+    <Compile Include="Replicaton\RefCounterRecycler.cs" />
+    <Compile Include="Replicaton\ReplicationFilter.cs" />
+    <Compile Include="Replicaton\ReplicationUtility.cs" />
+    <Compile Include="Replicaton\Snapshot.cs" />
+    <Compile Include="Replicaton\SnapshotEntityMapFilter.cs" />
+    <Compile Include="Replicaton\SnapshotHeader.cs" />
+    <Compile Include="Replicaton\SnapshotPair.cs" />
+    <Compile Include="Replicaton\SnapshotPool.cs" />
+    <Compile Include="Replicaton\SnapshotSelector.cs" />
+    <Compile Include="Replicaton\SnapshotSerializeFilter.cs" />
+    <Compile Include="Room\CommonEnum.cs" />
+    <Compile Include="Room\IHallRoom.cs" />
+    <Compile Include="Room\ILoginMessage.cs" />
+    <Compile Include="Room\IPlayerInfo.cs" />
+    <Compile Include="Room\IRoom.cs" />
+    <Compile Include="Room\IRoomEventDispatchter.cs" />
+    <Compile Include="Room\IRoomId.cs" />
+    <Compile Include="Room\IRoomManager.cs" />
+    <Compile Include="Room\PlayerInfo.cs" />
+    <Compile Include="Room\PlayerInfoManager.cs" />
+    <Compile Include="Room\RoomEventDispatcher.cs" />
+    <Compile Include="Room\RoomInfo.cs" />
+    <Compile Include="Room\RoomManager.cs" />
+    <Compile Include="SceneManagement\ILevelManager.cs" />
+    <Compile Include="SceneManagement\OriginStatus.cs" />
+    <Compile Include="SceneTriggerObject\TriggerObjectSyncEvent.cs" />
+    <Compile Include="SessionState\AbstractSessionState.cs" />
+    <Compile Include="SessionState\AbstractStepExecuteSystem.cs" />
+    <Compile Include="SessionState\ISessionState.cs" />
+    <Compile Include="SessionState\ISessionStateMachineMonitor.cs" />
+    <Compile Include="SessionState\SessionStateMachine.cs" />
+    <Compile Include="SessionState\SessionStateMachineMonitor.cs" />
+    <Compile Include="SessionState\SessionStateOnGuiSystem.cs" />
+    <Compile Include="SessionState\SessionStateProgress.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Channel\ISnapshotRecvChannel.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Channel\ISnapshotSendChannel.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Channel\SnapshotRecvChannel.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Channel\SnapshotSendChannel.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Clone\EntityCloner.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Clone\SnapshotCloner.cs" />
+    <Compile Include="SnapshotReplication\Serialization\NetworkObject\INetworkObject.cs" />
+    <Compile Include="SnapshotReplication\Serialization\NetworkProperty\NetworkPropertyAttribute.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Patch\AbstractComponentPatch.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Patch\AbstractEntityPatch.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Patch\AddComponentPatch.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Patch\AddEntityPatch.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Patch\ComponentReplicateOperationType.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Patch\DeleteComponentPatch.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Patch\DeleteEntityPatch.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Patch\EntityReplicateOperationType.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Patch\ModifyComponentPatch.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Patch\ModifyEntityPatch.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Patch\SnapshotPatch.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Patch\SnapshotPatchGenerator.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Serializer\BitArray32.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Serializer\INetworkObjectSerializer.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Serializer\INetworkObjectSerializerManager.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Serializer\ISnapshotSerializer.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Serializer\SerializerUtil.cs" />
+    <Compile Include="SnapshotReplication\Serialization\Serializer\SnapshotSerializer.cs" />
+    <Compile Include="SnapshotReplication\SnapshotReplicator.cs" />
+    <Compile Include="Sound\IPlayerSoundManager.cs" />
+    <Compile Include="Sound\ISoundPlayer.cs" />
+    <Compile Include="Sound\ISoundPlayerDispatcher.cs" />
+    <Compile Include="Sound\SoundPlayer.cs" />
+    <Compile Include="SpatialPartition\Bin2D.cs" />
+    <Compile Include="SpatialPartition\Bin2DUtility.cs" />
+    <Compile Include="SpatialPartition\Grid2D.cs" />
+    <Compile Include="SpatialPartition\IBin2DManager.cs" />
+    <Compile Include="Statistics\BattleData.cs" />
+    <Compile Include="Statistics\EStatisticsID.cs" />
+    <Compile Include="Statistics\StatisticsData.cs" />
+    <Compile Include="SyncLatest\ILatestComponent.cs" />
+    <Compile Include="SyncLatest\SyncLatestManager.cs" />
+    <Compile Include="ThreadUtils\Task.cs" />
+    <Compile Include="Ui\IUiGroupController.cs" />
+    <Compile Include="Ui\UiGroup.cs" />
+    <Compile Include="UpdateLatest\IUpdateComponent.cs" />
+    <Compile Include="UpdateLatest\IUpdateLatestHandler.cs" />
+    <Compile Include="UpdateLatest\IUpdateMessagePool.cs" />
+    <Compile Include="UpdateLatest\UpdateLatestHandler.cs" />
+    <Compile Include="UpdateLatest\UpdateLatestHead.cs" />
+    <Compile Include="UpdateLatest\UpdateLatestManager.cs" />
+    <Compile Include="UpdateLatest\UpdateLatestPacakge.cs" />
+    <Compile Include="Utils\BitUtility.cs" />
+    <Compile Include="Utils\DumpEntatis.cs" />
+    <Compile Include="Utils\IEcsDebugHelper.cs" />
+    <Compile Include="Utils\LoggerNameHolder.cs" />
+    <Compile Include="Utils\QuaternionToEuler.cs" />
+    <Compile Include="Utils\ServerInfo.cs" />
+    <Compile Include="Utils\Version.cs" />
+    <Compile Include="Utils\VersionDisplay.cs" />
+    <Compile Include="WeaponAnimation\IWeaponAnimProgress.cs" />
+    <Compile Include="WeaponAnimation\WeaponAnimationController.cs" />
+    <Compile Include="WeaponLogic\IWeaponFireUpdateManagaer.cs" />
+    <Compile Include="WeaponLogic\Throwing\ThrowingActionInfo.cs" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XmlConfig\XmlConfig.csproj">
+      <Project>{CCFBDCB2-3866-9129-81A4-42CFED4D6F7E}</Project>
+      <Name>XmlConfig</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utils\Utils.csproj">
+      <Project>{F68B420E-62A0-6ABF-2B22-0E1F97F566F0}</Project>
+      <Name>Utils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Wwise\Wwise.csproj">
+      <Project>{F462680E-6077-90BF-29F9-331F95CC8CF0}</Project>
+      <Name>Wwise</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shared.Scripts\Shared.Scripts.csproj">
+      <Project>{D2164AE1-BEE4-3DE7-A778-AE0D93E5194C}</Project>
+      <Name>Shared.Scripts</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
