@@ -383,6 +383,11 @@ namespace App.Shared.Components.SceneObject
         {
             DestrutibleDataSync sync;
             sync.Reset = LocalResetCount != ResetCount;
+            if (sync.Reset)
+            {
+                ResetState();
+            }
+
             sync.StateDiff = sync.Reset ? LastSyncDestructionState : (LastSyncDestructionState ^ LocalSyncDestructionState) & LastSyncDestructionState;
 
             LocalResetCount = ResetCount;
@@ -551,6 +556,12 @@ namespace App.Shared.Components.SceneObject
         [DontInitilize]
         public bool IsStateChanged;
 
+        [DontInitilize]
+        public bool HasLocalBrokenChunks;
+
+        [DontInitilize]
+        public bool HasFirstLocalSync;
+
         public int GetComponentId()
         {
             return (int) EComponentIds.SceneGlassyData;
@@ -563,6 +574,17 @@ namespace App.Shared.Components.SceneObject
             BrokenState1 = r.BrokenState1;
             BrokenState2 = r.BrokenState2;
             BrokenState3 = r.BrokenState3;
+        }
+
+        public bool HasChangedState()
+        {
+            return IsStateChanged || (HasLocalBrokenChunks && !HasAnyChunkBroken()) || !HasFirstLocalSync; 
+        }
+
+        public void ClearChangedState()
+        {
+            IsStateChanged = false;
+            HasFirstLocalSync = true;
         }
 
         private int CombineState(int originState, int newState)

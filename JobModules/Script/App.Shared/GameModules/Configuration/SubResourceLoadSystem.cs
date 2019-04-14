@@ -23,7 +23,7 @@ namespace App.Shared.GameModules.Configuration
 
         private AbstractSubResourceLoadHandler _resourceHandler;
         private ISessionState _sessionState;
-        private IUnityAssetManager _assetManager;
+        private ILoadRequestManager _loadRequestManager;
         
         public SubResourceLoadSystem(ISessionState sessionState, AbstractSubResourceLoadHandler resourceHandler)
         {
@@ -40,10 +40,10 @@ namespace App.Shared.GameModules.Configuration
             get { return string.Format("SubResourceLoadSystem : {0}", _resourceHandler.GetType()); }
         }
 
-        public void OnLoadResources(IUnityAssetManager assetManager)
+        public void OnLoadResources(ILoadRequestManager loadRequestManager)
         {
-            _assetManager = assetManager;
-            _resourceHandler.LoadSubResources(_assetManager, Done);
+            _loadRequestManager = loadRequestManager;
+            _resourceHandler.LoadSubResources(_loadRequestManager, Done);
         }
 
         private void Done()

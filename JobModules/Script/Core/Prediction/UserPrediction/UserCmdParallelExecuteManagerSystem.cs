@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Core.EntityComponent;
-using Core.GameInputFilter;
+using Core;
 using Core.GameModule.Interface;
 using Core.GameModule.Module;
 using Core.GameModule.System;
@@ -32,12 +32,12 @@ namespace Core.Prediction.UserPrediction
 
         public UserCmdParallelExecuteManagerSystem(IGameModule gameModule,
             IUserCmdExecuteSystemHandler handler,
-            IGameStateProcessorFactory gameStateProcessorFactory,
+          //  PlayerStateCollectorPool gameStateProcessorFactory,
             int threadCount)
         {
             _systems = new List<IUserCmdExecuteSystem>();
             _taskInfos = new List<TaskInfo>();
-            _systems.Add(new UserCmdPreExecuteSystem(gameStateProcessorFactory));
+            _systems.Add(new UserCmdPreExecuteSystem());
             _systems.AddRange(gameModule.UserCmdExecuteSystems);
             _systems.Add(new UserCmdPostExecuteSystem());
 

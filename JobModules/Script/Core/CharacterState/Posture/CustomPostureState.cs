@@ -37,6 +37,37 @@ namespace Core.CharacterState.Posture
             
             FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerRadius, _controllerRadius);
             addOutput(FsmOutput.Cache);
+
+            switch (_stateId)
+            {
+                case PostureStateId.Prone:
+                {
+                    FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
+                        AnimatorParametersHash.Instance.PostureName,
+                        AnimatorParametersHash.Instance.ProneValue,
+                        CharacterView.FirstPerson | CharacterView.ThirdPerson);
+                    addOutput(FsmOutput.Cache);
+                    break;
+                }
+                case PostureStateId.Crouch:
+                {
+                    FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
+                        AnimatorParametersHash.Instance.PostureName,
+                        AnimatorParametersHash.Instance.CrouchValue,
+                        CharacterView.FirstPerson | CharacterView.ThirdPerson);
+                    addOutput(FsmOutput.Cache);
+                    break;
+                }
+                case PostureStateId.Stand:
+                {
+                    FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
+                        AnimatorParametersHash.Instance.PostureName,
+                        AnimatorParametersHash.Instance.StandValue,
+                        CharacterView.FirstPerson | CharacterView.ThirdPerson);
+                    addOutput(FsmOutput.Cache);
+                    break;
+                }  
+            }
         }
 
         public override void DoBeforeLeaving(Action<FsmOutput> addOutput)

@@ -1,4 +1,5 @@
 ﻿using Assets.Utils.Configuration;
+using Core.Utils;
 using Utils.Singleton;
 using WeaponConfigNs;
 using XmlConfig;
@@ -16,17 +17,32 @@ namespace App.Shared.GameModules.Weapon.Behavior
             {
                 return;
             }
-            var weaponAgent = controller.HeldWeaponAgent;
-            if (weaponAgent.RunTimeComponent.PullBolting && !IsFireEnd(controller) && !IsFireHold(controller))
+            var state = controller.RelatedCharState.GetActionState();
+            //开火中：重置拉栓
+            if (state == ActionInConfig.SpecialFireHold)
+            {
+                controller.RelatedCharState.SpecialFireEnd();
+                SetPullBolting(controller, true);
+                controller.AudioController.PlayPullBoltAudio( controller.HeldWeaponAgent.ConfigId);
+                return;
+            }
+            //拉栓行为结束：拉栓成功
+            if (state != ActionInConfig.SpecialFireEnd)
             {
                 SetPullBolting(controller, false);
             }
-            if (IsFireHold(controller))
-            {
-                EndSpecialFire(controller);
-                SetPullBolting(controller, true);
-                controller.AudioController.PlayPullBoltAudio(weaponAgent.ConfigId);
-            }
+         
+//            if (IsFireHold(controller))
+//            {
+//                EndSpecialFire(controller);
+//                SetPullBolting(controller, true);
+//                controller.AudioController.PlayPullBoltAudio(weaponAgent.ConfigId);
+//                return;
+//            }
+//            if (!IsFireEnd(controller) && !IsFireHold(controller))
+//            {
+//                SetPullBolting(controller, false);
+//            }
         }
 
         public override  void OnAfterFire(PlayerWeaponController controller, IWeaponCmd cmd)
@@ -48,9 +64,9 @@ namespace App.Shared.GameModules.Weapon.Behavior
         {
             if (controller.RelatedCameraSNew.ViewNowMode == (int)ECameraViewMode.GunSight)
             {
-                if (controller.RelatedStateInterface != null)
+                if (controller.RelatedCharState != null)
                 {
-                    controller.RelatedStateInterface.SpecialSightsFire(() =>
+                    controller.RelatedCharState.SpecialSightsFire(() =>
                     {
                         if (needActionDeal)
                         {
@@ -61,10 +77,10 @@ namespace App.Shared.GameModules.Weapon.Behavior
             }
             else
             {
-                if (controller.RelatedStateInterface != null)
+                if (controller.RelatedCharState != null)
 
                 {
-                    controller.RelatedStateInterface.SpecialFire(() =>
+                    controller.RelatedCharState.SpecialFire(() =>
                     {
                         if (needActionDeal)
                         {
@@ -81,38 +97,28 @@ namespace App.Shared.GameModules.Weapon.Behavior
         }
         private void SetPullBolting(PlayerWeaponController controller, bool value)
         {
-            var weaponData = controller.HeldWeaponAgent.RunTimeComponent;
-            if (value)
-            {
-                var gunSight = controller.RelatedCameraSNew.ViewNowMode == (int)ECameraViewMode.GunSight;
-                weaponData.GunSightBeforePullBolting = gunSight;
-                weaponData.ForceChangeGunSight = gunSight;
-            }
-            else
-            {
-                if (weaponData.GunSightBeforePullBolting)
-                {
-                    weaponData.ForceChangeGunSight = true;
-                    weaponData.GunSightBeforePullBolting = false;
-                }
-            }
-            weaponData.PullBolting = value;
+            var weaponData = controller.HeldWeaponAgent.ClientSyncComponent;
+        
+            weaponData.IsPullingBolt = value;
+            weaponData.PullBoltEnd = !value;
+//            if (value)
+//               controller.AddPullboltInterrupt();
         }
 
-        private bool IsFireEnd(PlayerWeaponController controller)
-        {
-            var state = controller.RelatedStateInterface;
-            return state.GetActionState() == ActionInConfig.SpecialFireEnd;
-        }
+//        private bool IsFireEnd(PlayerWeaponController controller)
+//        {
+//            var state = controller.RelatedCharState;
+//            return state.GetActionState() == ActionInConfig.SpecialFireEnd;
+//        }
+//
+//        private bool IsFireHold(PlayerWeaponController controller)
+//        {
+//            return controller.RelatedCharState.GetActionState() == ActionInConfig.SpecialFireHold;
+//        }
 
-        private bool IsFireHold(PlayerWeaponController controller)
-        {
-            return controller.RelatedStateInterface.GetActionState() == ActionInConfig.SpecialFireHold;
-        }
-
-        private void EndSpecialFire(PlayerWeaponController controller)
-        {
-            controller.RelatedStateInterface.SpecialFireEnd();
-        }
+//        private void EndSpecialFire(PlayerWeaponController controller)
+//        {
+//            controller.RelatedCharState.SpecialFireEnd();
+//        }
     }
 }

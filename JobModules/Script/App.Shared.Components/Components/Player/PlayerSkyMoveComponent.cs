@@ -25,7 +25,7 @@ namespace App.Shared.Components.Player
         
         [NetworkProperty]
         public bool IsMoveEnabled;
- 
+
         [DontInitilize]
         public bool IsMoving;
 
@@ -47,7 +47,7 @@ namespace App.Shared.Components.Player
 
         [DontInitilize]
         [NetworkProperty]
-        public Vector3 Position;
+        public FixedVector3 Position;
 
         [DontInitilize]
         [NetworkProperty]
@@ -99,10 +99,7 @@ namespace App.Shared.Components.Player
             IsMoving = r.IsMoving;
             IsMoveEnabled = r.IsMoveEnabled;
             MoveStage = r.MoveStage;
-//            MotionLessTime = r.MotionLessTime;
-//            ParachuteTime = r.ParachuteTime;
-//            SwingVelocity = r.SwingVelocity;
-//            ExtraVerticalVelocity = r.ExtraVerticalVelocity;
+
             Position = r.Position;
             Rotation = r.Rotation;
 
@@ -135,22 +132,6 @@ namespace App.Shared.Components.Player
             GameState = l.GameState;
             Velocity = r.Velocity;
         }
-
-        public bool IsApproximatelyEqual(object right)
-        {
-            var r = right as PlayerSkyMoveComponent;
-            return 
-                    CompareUtility.IsApproximatelyEqual(IsMoveEnabled, r.IsMoveEnabled) &&
-                   //CompareUtility.IsApproximatelyEqual(IsMoving, r.IsMoving) &&
-                   CompareUtility.IsApproximatelyEqual(MoveStage, r.MoveStage) &&
-                   CompareUtility.IsApproximatelyEqual(Position, r.Position) &&
-                   CompareUtility.IsApproximatelyEqual(Rotation, r.Rotation) &&
-                   CompareUtility.IsApproximatelyEqual(LocalPlayerPosition, r.LocalPlayerPosition) &&
-                   CompareUtility.IsApproximatelyEqual(LocalPlayerRotation, r.LocalPlayerRotation) &&
-                   CompareUtility.IsApproximatelyEqual(GameState, r.GameState) &&
-                   CompareUtility.IsApproximatelyEqual(Velocity, r.Velocity)
-                    ;
-        }
         
         public void SyncFrom(PlayerSkyMoveInterVarComponent r)
         {
@@ -175,7 +156,7 @@ namespace App.Shared.Components.Player
 
         [DontInitilize]
         [NetworkProperty]
-        public Vector3 Position;
+        public FixedVector3 Position;
 
         [DontInitilize]
         [NetworkProperty]

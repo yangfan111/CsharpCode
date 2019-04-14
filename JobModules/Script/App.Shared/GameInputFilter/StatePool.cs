@@ -9,7 +9,7 @@ namespace App.Shared.GameInputFilter
     public class GameStatePool : IStatePool
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(GameStatePool));
-        private readonly Dictionary<EPlayerState, IGameState> _gameStateDic = new Dictionary<EPlayerState, IGameState>(CommonIntEnumEqualityComparer<EPlayerState>.Instance);
+        private readonly Dictionary<EPlayerState, IGameState> _gameStateDic = new Dictionary<EPlayerState, IGameState>(CommonEnumEqualityComparer<EPlayerState>.Instance);
 
         public GameStatePool(Dictionary<EPlayerState, HashSet<EPlayerInput>> datas)
         {
@@ -30,7 +30,7 @@ namespace App.Shared.GameInputFilter
 
         public IGameState GetState(EPlayerState state)
         {
-            if(!_gameStateDic.ContainsKey(state) && state != EPlayerState.None)
+            if(!_gameStateDic.ContainsKey(state))
             {
                 Logger.ErrorFormat("state {0} doesn't exist in game state dic ", state);
                 return null;

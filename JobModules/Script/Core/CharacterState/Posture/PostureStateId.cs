@@ -32,6 +32,7 @@ namespace Core.CharacterState.Posture
 
         Climb,
         Slide,
+        DyingTransition,
 
         EnumEnd
     }

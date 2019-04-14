@@ -1,8 +1,4 @@
 ﻿using Core.Fsm;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Utils.CharacterState;
 
 namespace Core.CharacterState.Action.Transitions
@@ -32,6 +28,12 @@ namespace Core.CharacterState.Action.Transitions
                                              AnimatorParametersHash.Instance.PostureName,
                                              AnimatorParametersHash.Instance.StandValue,
                                              CharacterView.FirstPerson);
+                    addOutput(FsmOutput.Cache);
+                    
+                    FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.EnableSightMoveHash,
+                        AnimatorParametersHash.Instance.EnableSightMoveName,
+                        AnimatorParametersHash.Instance.EnableSightMoveDisableValue,
+                        CharacterView.FirstPerson, true);
                     addOutput(FsmOutput.Cache);
 
                     _speedRatio = command.AdditioanlValue;

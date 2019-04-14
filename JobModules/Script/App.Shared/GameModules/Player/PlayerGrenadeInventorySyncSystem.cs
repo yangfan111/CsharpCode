@@ -17,8 +17,8 @@ namespace App.Shared.GameModules.Player
                 Logger.Error("player entity is null");
                 return;
             }
-            IGrenadeCacheHelper helper = player.WeaponController().GrenadeHelper;
-            helper.Rewind();
+            IGrenadeCacheHandler handler = player.WeaponController().GrenadeHandler;
+            handler.Rewind();
         }
     }
 }

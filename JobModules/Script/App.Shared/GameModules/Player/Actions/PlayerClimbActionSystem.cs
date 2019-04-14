@@ -1,5 +1,6 @@
 ﻿using App.Shared.Components.GenericActions;
 using App.Shared.Components.Player;
+using Core;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
@@ -25,9 +26,13 @@ namespace App.Shared.GameModules.Player.Actions
 
             _genericAction = player.genericActionInterface.GenericAction;
             _genericAction.Update(player);
-            
+
             if (cmd.IsJump && CanClimb(player))
+            {
+           
                 TriggerActionInput(player);
+                
+            }
         }
 
         private void TriggerActionInput(PlayerEntity player)

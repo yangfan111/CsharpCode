@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using App.Client.GameModules.Ui.System;
+using App.Shared.Components.Player;
 using App.Shared.Components.Ui;
 using App.Shared.Configuration;
 using App.Shared.Terrains;
@@ -9,6 +10,9 @@ using Assets.Sources.Free.Auto;
 using UnityEngine;
 using App.Shared.GameModules.Player;
 using App.Shared.GameModules.Vehicle;
+using Core.Components;
+using Core.SpatialPartition;
+using Core.Ui.Map;
 using Utils.Singleton;
 
 namespace App.Client.GameModules.Ui.UiAdapter
@@ -31,14 +35,14 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public float CurMapSize
         {
-            get { return TerrainCommonData.size.x; }
+            get { return MapOrigin.Size.x; }
         }
 
         public Vector2 MapShowSizeByRice {
             get { return _mapShowSizeByRice; }
         }
         public Vector2 MapRealSizeByRice {
-            get { return TerrainCommonData.size; }
+            get { return MapOrigin.Size; }
         }
 
         public Vector2 MapCenterByRice
@@ -125,7 +129,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
             {
                 if (null == CurPlayer)
                     return Vector2.zero;
-                return CurPlayer.Pos;
+                return CurPlayer.Pos.ShiftedUIVector2();
             }
         }
         #endregion
@@ -141,7 +145,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
                     FreeRenderObject circle = SingletonManager.Get<FreeEffectManager>().GetEffect("circle");
                     if (null != circle)
                     {
-                        _currInfo.Center = new Vector2(circle.model3D.x - TerrainCommonData.leftMinPos.x, circle.model3D.z - TerrainCommonData.leftMinPos.z);
+                        _currInfo.Center = new MapFixedVector2(WorldOrigin.WorldPosition(new Vector3(circle.model3D.x, circle.model3D.y, circle.model3D.z)).To2D());
                         _currInfo.Radius = circle.GetEffect(0).EffectModel3D.model3D.scaleX / 2;
                     }
                 }
@@ -177,44 +181,11 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                AirPlaneData planeData = _contexts.ui.map.PlaneData;
-                if (planeData == null)
-                {
-                    planeData = new AirPlaneData(1, new Vector2(0, 0), 0);
-                }
-
-                Vector3 leftMinPos = TerrainCommonData.leftMinPos;
-
-                FreeRenderObject plane = SingletonManager.Get<FreeEffectManager>().GetEffect("plane");
-                if (plane == null)
-                {                   
-                    plane = SingletonManager.Get<FreeEffectManager>().GetEffect("plane1");
-                    if (plane != null)
-                    {
-                        planeData.Type = 1;
-                        planeData.Pos = new Vector2(plane.model3D.x - leftMinPos.x, plane.model3D.z - leftMinPos.z);
-                        planeData.Direction = -plane.GetEffect(0).EffectModel3D.model3D.rotationY;
-                    }
-                }
-                else
-                {
-                    planeData.Type = 2;
-                    planeData.Pos = new Vector2(plane.model3D.x - leftMinPos.x, plane.model3D.z - leftMinPos.z);
-                    planeData.Direction = -plane.GetEffect(0).EffectModel3D.model3D.rotationY;
-                }
-
-                if (plane == null)
-                {
-                    planeData.Type = 0;
-                    planeData.Pos = new Vector2(0, 0);
-                    planeData.Direction = 0;
-                }
-
-                return planeData;
+                return _contexts.ui.map.PlaneData;
             }
         }
 
-        public List<Vector2> KongTouList()
+        public List<MapFixedVector2> KongTouList()
         {
             int planeId = 0;
             FreeRenderObject plane = SingletonManager.Get<FreeEffectManager>().GetEffect("plane1");
@@ -228,7 +199,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
             }
 
             kongTouList.Clear();
-            Vector3 leftMinPos = TerrainCommonData.leftMinPos;
 
             foreach (FreeRenderObject drop in SingletonManager.Get<FreeEffectManager>().FreeEffects.Values)
             {
@@ -240,7 +210,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
                         int realId = int.Parse(((AutoConstValue)id).GetValue());
                         if (realId == planeId)
                         {
-                            kongTouList.Add(new Vector2(drop.model3D.x - leftMinPos.x, drop.model3D.z - leftMinPos.z));
+                            kongTouList.Add(new MapFixedVector2(WorldOrigin.WorldPosition(new Vector3(drop.model3D.x, drop.model3D.y, drop.model3D.z)).To2D()));
                         }
 //                        Debug.LogFormat("********************************** planeId:{0} dropId:{1}", planeId, realId);
                     }
@@ -250,7 +220,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
             return kongTouList;
         }
 
-        private List<Vector2> kongTouList = new List<Vector2>() { new Vector2(10, 10), new Vector2(15, 15) };
+        private List<MapFixedVector2> kongTouList = new List<MapFixedVector2>() { new MapFixedVector2(10, 10), new MapFixedVector2(15, 15) };
         #endregion
 
         #region 地图ID
@@ -295,12 +265,12 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public Vector2 RouteLineStartPoint         //跳伞开始位置
         {
-            get { return _contexts.ui.map.RouteLineStartPoint; }
+            get { return _contexts.ui.map.RouteLineStartPoint.ShiftedUIVector2(); }
         }
 
         public Vector2 RouteLineEndPoint    //跳伞结束位置
         {
-            get { return _contexts.ui.map.RouteLineEndPoint; }
+            get { return _contexts.ui.map.RouteLineEndPoint.ShiftedUIVector2(); }
         }
         #endregion
 
@@ -326,8 +296,13 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                return _contexts.ui.blast.C4DropPosition - TerrainCommonData.leftMinPos;
+                return _contexts.ui.blast.C4DropPosition.ShiftedUIVector3();
             }
+        }
+
+        public GamePlayComponent gamePlay
+        {
+            get { return _contexts.player.flagSelfEntity.gamePlay; }
         }
     }
 }

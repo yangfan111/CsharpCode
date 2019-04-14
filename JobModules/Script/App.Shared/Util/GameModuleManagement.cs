@@ -62,7 +62,7 @@ namespace App.Shared
         internal static T Get(int cookie)
         {
             
-            if (s_Default != null && s_Default.cookie == cookie) return s_Default;
+            if (!SharedConfig.IsServer && s_Default != null && s_Default.cookie == cookie) return s_Default;
             if (logics.ContainsKey(cookie))
             {
           //      DebugUtil.LogInUnity(logics[cookie].ToString());

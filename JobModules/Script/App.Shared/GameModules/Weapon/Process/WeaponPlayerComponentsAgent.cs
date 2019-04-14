@@ -5,6 +5,7 @@ using Core.Attack;
 using Core.Common;
 using Core.Utils;
 using WeaponConfigNs;
+using XmlConfig;
 
 namespace App.Shared.GameModules.Weapon
 {
@@ -55,6 +56,8 @@ namespace App.Shared.GameModules.Weapon
             RelatedCharState.SwitchWeapon(unarmCallback, drawCallback, switchParam);
         }
 
+        
+
         public void CharacterDraw(System.Action drawCallback, float drawParam)
         {
             RelatedCharState.Draw(drawCallback, drawParam);
@@ -74,20 +77,7 @@ namespace App.Shared.GameModules.Weapon
             RelatedCharState.Unarm(unarm, unarmParam);
         }
 
-        public void CharacterInterrupt()
-        {
-            RelatedCharState.InterruptAction();
-            RelatedCharState.InterruptSwitchWeapon();
-            PlayerStateUtil.AddPlayerState(EPlayerGameState.InterruptItem, entity.gamePlay);
-            RelatedCharState.ForceBreakSpecialReload(null);
-            RelatedCharState.ForceFinishGrenadeThrow();
-            if (entity.hasThrowingAction)
-            {
-                RelatedThrowAction.ClearState();
-            }
-        }
-
-
+     
 
         public void ThrowActionExecute()
         {
@@ -128,7 +118,7 @@ namespace App.Shared.GameModules.Weapon
                     return false;
                 var pull = RelatedThrowAction.IsPull;
                 var destroy = RelatedThrowAction.IsInterrupt;
-                DebugUtil.MyLog("destroy :" + destroy + " pull:" + pull, DebugUtil.DebugColor.Default);
+              //  DebugUtil.MyLog("destroy :" + destroy + " pull:" + pull, DebugUtil.DebugColor.Default);
                 return (!pull && !destroy);
             }
         }

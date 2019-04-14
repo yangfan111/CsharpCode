@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -53,29 +54,27 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonWeaponBagTipView>();
-			if(view != null)
+			if(view == null)
 			{
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonWeaponBagTipView>();
+				view.FillField();
+			}
+			DataInit(view);
+			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
 			}
 
-            view = obj.AddComponent<CommonWeaponBagTipView>();
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonWeaponBagTipView, CommonWeaponBagTipViewModel> bindingSet =
-                view.CreateBindingSet<CommonWeaponBagTipView, CommonWeaponBagTipViewModel>();
-
-            bindingSet.Build();
-
-			SpriteReset();
         }
 		private void EventTriggerBind(CommonWeaponBagTipView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -99,12 +98,36 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonWeaponBagTipView view)
+		{
+		     BindingSet<CommonWeaponBagTipView, CommonWeaponBagTipViewModel> bindingSet =
+                view.CreateBindingSet<CommonWeaponBagTipView, CommonWeaponBagTipViewModel>();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonWeaponBagTipView view)
+		{
+		}
+
+
+		void SaveOriData(CommonWeaponBagTipView view)
+		{
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			SpriteReset();
 		}
 
@@ -131,7 +154,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonWeaponBagTip"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

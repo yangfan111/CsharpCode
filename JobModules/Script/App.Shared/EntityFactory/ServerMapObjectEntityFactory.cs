@@ -79,7 +79,8 @@ namespace App.Shared.EntityFactory
         {
             var obj = _mapObjectContext.CreateEntity();
             obj.AddEntityKey(new EntityKey(entityId, (short) EEntityType.MapObject));
-            obj.AddPosition(gameObject.transform.position);
+            obj.AddPosition();
+            obj.position.Value = gameObject.transform.position;
             obj.isFlagSyncNonSelf = true;
             obj.AddTriggerObjectId(objectId);
             obj.AddRawGameObject(gameObject);
@@ -96,7 +97,7 @@ namespace App.Shared.EntityFactory
             var entityReference = gameObject.GetComponent<EntityReference>();
             if (entityReference == null)
             {
-                entityReference = gameObject.AddComponent<EntityReference>();
+                entityReference = gameObject.AddComponentUncheckRequireAndDisallowMulti<EntityReference>();
             }
             var mapObj = mapObject as MapObjectEntity;
             if (mapObj != null)
@@ -212,7 +213,8 @@ namespace App.Shared.EntityFactory
         {
             var obj = _mapObjectContext.CreateEntity();
             obj.AddEntityKey(new EntityKey(entityId, (short) EEntityType.MapObject));
-            obj.AddPosition(gameObject.transform.position);
+            obj.AddPosition();
+            obj.position.Value = gameObject.transform.position;
             obj.isFlagSyncNonSelf = true;
             obj.AddTriggerObjectId(objectId);
             obj.AddRawGameObject(gameObject);

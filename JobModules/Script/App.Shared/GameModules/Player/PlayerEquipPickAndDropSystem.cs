@@ -24,15 +24,15 @@ namespace App.Shared.GameModules.Player
             {
                 return;
             }
-            if (cmd.PickUpEquip > 0)
+            if (cmd.ManualPickUpEquip > 0 || cmd.AutoPickUpEquip.Count > 0)
             {
-                if(cmd.IsManualPickUp)
+                if(cmd.ManualPickUpEquip > 0 && cmd.IsManualPickUp)
                 {
-                    player.ModeController().DoPickup(player, cmd.PickUpEquip);
+                    player.ModeController().DoPickup(player, cmd.ManualPickUpEquip);
                 }
-                else
+                if(cmd.AutoPickUpEquip.Count > 0)
                 {
-                    player.ModeController().AutoPickupWeapon(player, cmd.PickUpEquip);
+                    player.ModeController().AutoPickupWeapon(player, cmd.AutoPickUpEquip);
                 }
             }
             else if (cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsDropWeapon))

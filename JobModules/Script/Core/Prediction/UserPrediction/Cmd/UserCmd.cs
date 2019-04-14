@@ -1,47 +1,47 @@
-﻿using System.Collections.Specialized;
-using Core.GameInputFilter;
+﻿using System.Collections.Generic;
 using Core.ObjectPool;
+using System;
 
 namespace Core.Prediction.UserPrediction.Cmd
 {
-     
     public class EUserCmdFlags
     {
-        public const int IsRun = 1;
-        public const int IsCrouch = 1 << (int)UserCmdEnum.IsCrouch;
-        public const int IsProne = 1 << (int)UserCmdEnum.IsProne;
-        public const int IsSlightWalk = 1 << (int)UserCmdEnum.IsSlightWalk;
-        public const int IsCameraFree = 1 << (int)UserCmdEnum.IsCameraFree;
-        public const int IsLeftAttack = 1 << (int)UserCmdEnum.IsLeftAttack;
-        public const int IsRightAttack = 1 << (int)UserCmdEnum.IsRightAttack;
-        public const int IsJump = 1 << (int)UserCmdEnum.IsJump;
-        public const int IsF = 1 << (int)UserCmdEnum.IsF;
-        public const int IsCameraFocus = 1 << (int)UserCmdEnum.IsCameraFocus;
-        public const int ChangeCamera = 1 << (int)UserCmdEnum.ChangeCamera;
-        public const int IsSwitchFireMode = 1 << (int)UserCmdEnum.IsSwitchFireMode;
-        public const int IsReload = 1 << (int)UserCmdEnum.IsReload;
-        public const int IsPeekLeft = 1 << (int)UserCmdEnum.IsPeekLeft;
-        public const int IsPeekRight = 1 << (int)UserCmdEnum.IsPeekRight;
-        public const int IsSwitchWeapon = 1 << (int)UserCmdEnum.IsSwitchWeapon;
-        public const int IsDropWeapon = 1 << (int)UserCmdEnum.IsDropWeapon;
-        public const int IsYDown = 1 << (int)UserCmdEnum.IsYDown;
-        public const int IsPDown = 1 << (int)UserCmdEnum.IsPDown;
-        public const int IsCDown = 1 << (int)UserCmdEnum.IsCDown;
-        public const int IsSpaceDown = 1 << (int)UserCmdEnum.IsSpaceDown;
-        public const int IsStopFire = 1 << (int)UserCmdEnum.IsStopFire;
-        public const int IsDrawWeapon = 1 << (int)UserCmdEnum.IsDrawWeapon;
-        public const int IsTabDown = 1 << (int)UserCmdEnum.IsTabDown;
-        public const int IsThrowing = 1 << (int)UserCmdEnum.IsThrowing;
-        public const int IsAddMark = 1 << (int)UserCmdEnum.IsAddMark;
-        public const int IsHoldBreath = 1 << (int)UserCmdEnum.IsHoldBreath;
-        public const int IsSwitchAutoRun = 1 << (int)UserCmdEnum.IsSwitchAutoRun;
-        public const int IsPickUp = 1 << (int)UserCmdEnum.IsPickUp;
-        public const int IsUseAction = 1 << (int)UserCmdEnum.IsHoldF;
-        public const int IsForceUnmountWeapon = 1 << (int)UserCmdEnum.IsForceUnmountWeapon;
+        public const int IsRun = 0;
+        public const int IsCrouch = /*1 <<*/ (int)UserCmdEnum.IsCrouch;
+        public const int IsProne = /*1 <<*/ (int)UserCmdEnum.IsProne;
+        public const int IsSlightWalk = /*1 <<*/ (int)UserCmdEnum.IsSlightWalk;
+        public const int IsCameraFree = /*1 <<*/ (int)UserCmdEnum.IsCameraFree;
+        public const int IsLeftAttack = /*1 <<*/ (int)UserCmdEnum.IsLeftAttack;
+        public const int IsRightAttack = /*1 <<*/ (int)UserCmdEnum.IsRightAttack;
+        public const int IsJump = /*1 <<*/ (int)UserCmdEnum.IsJump;
+        public const int IsF = /*1 <<*/ (int)UserCmdEnum.IsF;
+        public const int IsCameraFocus = /*1 <<*/ (int)UserCmdEnum.IsCameraFocus;
+        public const int ChangeCamera = /*1 <<*/ (int)UserCmdEnum.ChangeCamera;
+        public const int IsSwitchFireMode = /*1 <<*/ (int)UserCmdEnum.IsSwitchFireMode;
+        public const int IsReload = /*1 <<*/ (int)UserCmdEnum.IsReload;
+        public const int IsPeekLeft = /*1 <<*/ (int)UserCmdEnum.IsPeekLeft;
+        public const int IsPeekRight = /*1 <<*/ (int)UserCmdEnum.IsPeekRight;
+        public const int IsSwitchWeapon = /*1 <<*/ (int)UserCmdEnum.IsSwitchWeapon;
+        public const int IsDropWeapon = /*1 <<*/ (int)UserCmdEnum.IsDropWeapon;
+        public const int IsYDown = /*1 <<*/ (int)UserCmdEnum.IsYDown;
+        public const int IsPDown = /*1 <<*/ (int)UserCmdEnum.IsPDown;
+        public const int IsCDown = /*1 <<*/ (int)UserCmdEnum.IsCDown;
+        public const int IsSpaceDown = /*1 <<*/ (int)UserCmdEnum.IsSpaceDown;
+        public const int IsStopFire = /*1 <<*/ (int)UserCmdEnum.IsStopFire;
+        public const int IsDrawWeapon = /*1 <<*/ (int)UserCmdEnum.IsDrawWeapon;
+        public const int IsTabDown = /*1 <<*/ (int)UserCmdEnum.IsTabDown;
+        public const int IsThrowing = /*1 <<*/ (int)UserCmdEnum.IsThrowing;
+        public const int IsAddMark = /*1 <<*/ (int)UserCmdEnum.IsAddMark;
+        public const int IsHoldBreath = /*1 <<*/ (int)UserCmdEnum.IsHoldBreath;
+        public const int IsSwitchAutoRun = /*1 <<*/ (int)UserCmdEnum.IsSwitchAutoRun;
+        public const int IsPickUp = /*1 <<*/ (int)UserCmdEnum.IsPickUp;
+        public const int IsUseAction = /*1 <<*/ (int)UserCmdEnum.IsHoldF;
+        public const int IsForceUnmountWeapon = /*1 <<*/ (int)UserCmdEnum.IsForceUnmountWeapon;
         /// <summary>
         /// 客户端发起的打断状态，比如打开某些界面时需要终止当前动作
         /// </summary>
-        public const int IsInInterruptState = 1 << (int)UserCmdEnum.IsInterrupt;
+        public const int IsInInterruptState = /*1 <<*/ (int)UserCmdEnum.IsInterrupt;
+        public const int IsSprayPaint = /*1 <<*/ (int)UserCmdEnum.IsSprayPaint;
     }
 
     public class UserCmd : BaseRefCounter, IUserCmd
@@ -50,8 +50,11 @@ namespace Core.Prediction.UserPrediction.Cmd
         {
         }
 
-        private BitVector32 _flags = new BitVector32();
+        /*private BitVector32 _flags = new BitVector32();*/
+        /*暂定8，有越界风险*/
         
+        private byte[] _flags = new byte[8];
+
         public int FrameInterval { get; set; }
         public bool NeedStepPredication { get; set; }
         public int RenderTime { get; set; }
@@ -63,87 +66,116 @@ namespace Core.Prediction.UserPrediction.Cmd
         public float MoveVertical { get; set; }
         public float MoveUpDown { get; set; }
         public int CurWeapon { get; set; }
-        public int Buttons
+        public long Buttons
         {
-            get { return _flags.Data; }
-            set { _flags =new BitVector32(value); }
+            get { return BitConverter.ToInt64(_flags, 0); }
+            set { _flags =  /*new BitVector32(value)*/BitConverter.GetBytes(value); }
+        }
+
+        private bool AddEnum(int idx, bool add) {
+            if (idx < 0 || idx >= this._flags.Length * 8)
+            {
+                return false;
+            }
+            if (((int)this._flags[idx / 8] & 1 << idx % 8) != 0)
+            {
+                return false;
+            }
+            byte[] expr_cp_0 = this._flags;
+            int expr_cp_1 = idx / 8;
+            if (add) {
+                expr_cp_0[expr_cp_1] |= (byte)(1 << idx % 8);
+            }
+            else {
+                expr_cp_0[expr_cp_1] &= (byte)(~(byte)(1 << idx % 8));
+            }
+            return true;
+        }
+
+        private void ClearEnum() {
+            for (int i = 0, maxi = _flags.Length; i < maxi; i++) {
+                _flags[i] = 0;
+            }
+        }
+
+        private bool HasEnum(int idx) {
+            return idx >= 0 && idx < this._flags.Length * 8 && ((int)this._flags[idx / 8] & 1 << idx % 8) != 0;
         }
 
         public bool IsSwitchFireMode
         {
-            get { return _flags[EUserCmdFlags.IsSwitchFireMode]; }
-            set { _flags[EUserCmdFlags.IsSwitchFireMode] = value; }
-
+            get { return HasEnum((int)EUserCmdFlags.IsSwitchFireMode); }
+            set { AddEnum((int)EUserCmdFlags.IsSwitchFireMode, value); }
         }
         public bool IsRun
         {
-            get { return _flags[ EUserCmdFlags.IsRun]; }
-            set { _flags[ EUserCmdFlags.IsRun] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsRun); }
+            set { AddEnum((int)EUserCmdFlags.IsRun, value); }
         }
 
         public bool IsCrouch
         {
-            get { return _flags[EUserCmdFlags.IsCrouch]; }
-            set { _flags[EUserCmdFlags.IsCrouch] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsCrouch); }
+            set { AddEnum((int)EUserCmdFlags.IsCrouch, value); }
         }
         public bool IsProne
         {
-            get { return _flags[EUserCmdFlags.IsProne]; }
-            set { _flags[EUserCmdFlags.IsProne] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsProne); }
+            set { AddEnum((int)EUserCmdFlags.IsProne, value); }
         }
         public bool IsSlightWalk
         {
-            get { return _flags[EUserCmdFlags.IsSlightWalk]; }
-            set { _flags[EUserCmdFlags.IsSlightWalk] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsSlightWalk); }
+            set { AddEnum((int)EUserCmdFlags.IsSlightWalk, value); }
         }
         public bool IsCameraFree
         {
-            get { return _flags[EUserCmdFlags.IsCameraFree]; }
-            set { _flags[EUserCmdFlags.IsCameraFree] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsCameraFree); }
+            set { AddEnum((int)EUserCmdFlags.IsCameraFree, value); }
         }
         public bool IsLeftAttack
         {
-            get { return _flags[EUserCmdFlags.IsLeftAttack]; }
-            set { _flags[EUserCmdFlags.IsLeftAttack] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsLeftAttack); }
+            set { AddEnum((int)EUserCmdFlags.IsLeftAttack, value); }
         }
         public bool IsRightAttack
         {
-            get { return _flags[EUserCmdFlags.IsRightAttack]; }
-            set { _flags[EUserCmdFlags.IsRightAttack] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsRightAttack); }
+            set { AddEnum((int)EUserCmdFlags.IsRightAttack, value); }
         }
         public bool IsJump
         {
-            get { return _flags[EUserCmdFlags.IsJump]; }
-            set { _flags[EUserCmdFlags.IsJump] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsJump); }
+            set { AddEnum((int)EUserCmdFlags.IsJump, value); }
         }
         public bool IsF
         {
-            get { return _flags[EUserCmdFlags.IsF]; }
-            set { _flags[EUserCmdFlags.IsF] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsF); }
+            set { AddEnum((int)EUserCmdFlags.IsF, value); }
         }
 
         public bool IsCameraFocus
         {
-            get { return _flags[EUserCmdFlags.IsCameraFocus]; }
-            set { _flags[EUserCmdFlags.IsCameraFocus] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsCameraFocus); }
+            set { AddEnum((int)EUserCmdFlags.IsCameraFocus, value); }
         }
 
         public bool IsDrawWeapon
         {
-            get { return _flags[EUserCmdFlags.IsDrawWeapon]; }
-            set { _flags[EUserCmdFlags.IsDrawWeapon] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsDrawWeapon); }
+            set { AddEnum((int)EUserCmdFlags.IsDrawWeapon, value); }
         }
 
         public bool IsForceUnmountWeapon
         {
-            get { return _flags[EUserCmdFlags.IsForceUnmountWeapon]; }
-            set { _flags[EUserCmdFlags.IsForceUnmountWeapon] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsForceUnmountWeapon); }
+            set { AddEnum((int)EUserCmdFlags.IsForceUnmountWeapon, value); }
         }
 
         public bool ChangeCamera
         {
-            get { return _flags[EUserCmdFlags.ChangeCamera]; }
-            set { _flags[EUserCmdFlags.ChangeCamera] = value; }
+            get { return HasEnum((int)EUserCmdFlags.ChangeCamera); }
+            set { AddEnum((int)EUserCmdFlags.ChangeCamera, value); }
         }
 
         public int BeState { get; set; }
@@ -151,92 +183,109 @@ namespace Core.Prediction.UserPrediction.Cmd
         public int BagIndex { get; set; }
         public bool IsReload
 		{
-			get { return _flags[EUserCmdFlags.IsReload]; }
-			set { _flags[EUserCmdFlags.IsReload] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsReload); }
+            set { AddEnum((int)EUserCmdFlags.IsReload, value); }
 		}
         public bool IsPeekLeft
 		{
-			get { return _flags[EUserCmdFlags.IsPeekLeft]; }
-			set { _flags[EUserCmdFlags.IsPeekLeft] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsPeekLeft); }
+            set { AddEnum((int)EUserCmdFlags.IsPeekLeft, value); }
 		}	
         public bool IsPeekRight
 		{
-			get { return _flags[EUserCmdFlags.IsPeekRight]; }
-			set { _flags[EUserCmdFlags.IsPeekRight] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsPeekRight); }
+            set { AddEnum((int)EUserCmdFlags.IsPeekRight, value); }
 		}
         public bool IsSwitchWeapon
         {
-            get { return _flags[EUserCmdFlags.IsSwitchWeapon]; }
-            set { _flags[EUserCmdFlags.IsSwitchWeapon] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsSwitchWeapon); }
+            set { AddEnum((int)EUserCmdFlags.IsSwitchWeapon, value); }
         }
 
         public bool IsDropWeapon
         {
-            get { return _flags[EUserCmdFlags.IsDropWeapon]; }
-            set { _flags[EUserCmdFlags.IsDropWeapon] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsDropWeapon); }
+            set { AddEnum((int)EUserCmdFlags.IsDropWeapon, value); }
         }
 
         public bool IsPDown
         {
-            get { return _flags[EUserCmdFlags.IsPDown]; }
-            set { _flags[EUserCmdFlags.IsPDown] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsPDown); }
+            set { AddEnum((int)EUserCmdFlags.IsPDown, value); }
         }
 
         public bool IsYDown
         {
-            get { return _flags[EUserCmdFlags.IsYDown]; }
-            set { _flags[EUserCmdFlags.IsYDown] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsYDown); }
+            set { AddEnum((int)EUserCmdFlags.IsYDown, value); }
         }
         
         public bool IsCDown
         {
-            get { return _flags[EUserCmdFlags.IsCDown]; }
-            set { _flags[EUserCmdFlags.IsCDown] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsCDown); }
+            set { AddEnum((int)EUserCmdFlags.IsCDown, value); }
         }
         
         public bool IsSpaceDown
         {
-            get { return _flags[EUserCmdFlags.IsSpaceDown]; }
-            set { _flags[EUserCmdFlags.IsSpaceDown] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsSpaceDown); }
+            set { AddEnum((int)EUserCmdFlags.IsSpaceDown, value); }
         }
 
         public bool IsTabDown
         {
-            get { return _flags[EUserCmdFlags.IsTabDown]; }
-            set { _flags[EUserCmdFlags.IsTabDown] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsTabDown); }
+            set { AddEnum((int)EUserCmdFlags.IsTabDown, value); }
         }
 
         public bool IsThrowing
         {
-            get { return _flags[EUserCmdFlags.IsThrowing]; }
-            set { _flags[EUserCmdFlags.IsThrowing] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsThrowing); }
+            set { AddEnum((int)EUserCmdFlags.IsThrowing, value); }
         }
 
         public bool IsAddMark
         {
-            get { return _flags[EUserCmdFlags.IsAddMark]; }
-            set { _flags[EUserCmdFlags.IsAddMark] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsAddMark); }
+            set { AddEnum((int)EUserCmdFlags.IsAddMark, value); }
         }
 
         public bool IsHoldBreath
         {
-            get { return _flags[EUserCmdFlags.IsHoldBreath]; }
-            set { _flags[EUserCmdFlags.IsHoldBreath] = value; }
+            get { return HasEnum((int)EUserCmdFlags.IsHoldBreath); }
+            set { AddEnum((int)EUserCmdFlags.IsHoldBreath, value); }
         }
 
-        public bool IsSwitchAutoRun { get { return _flags[EUserCmdFlags.IsSwitchAutoRun]; } set { _flags[EUserCmdFlags.IsSwitchAutoRun] = value; } } 
-        public bool IsManualPickUp { get { return _flags[EUserCmdFlags.IsPickUp]; } set { _flags[EUserCmdFlags.IsPickUp] = value; } } 
-        public bool IsInterrupt { get { return _flags[EUserCmdFlags.IsInInterruptState]; } set { _flags[EUserCmdFlags.IsInInterruptState] = value; } } 
-        public bool IsUseAction { get { return _flags[EUserCmdFlags.IsUseAction];} set { _flags[EUserCmdFlags.IsUseAction] = value; } }
+        public bool IsSprayPaint {
+            get { return HasEnum((int)EUserCmdFlags.IsSprayPaint); }
+            set { AddEnum((int)EUserCmdFlags.IsSprayPaint, value); }
+        }
+
+        public bool IsSwitchAutoRun {
+            get { return HasEnum((int)EUserCmdFlags.IsSwitchAutoRun); }
+            set { AddEnum((int)EUserCmdFlags.IsSwitchAutoRun, value); }
+        } 
+        public bool IsManualPickUp {
+            get { return HasEnum((int)EUserCmdFlags.IsPickUp); }
+            set { AddEnum((int)EUserCmdFlags.IsPickUp, value); }
+        } 
+        public bool IsInterrupt {
+            get { return HasEnum((int)EUserCmdFlags.IsInInterruptState); }
+            set { AddEnum((int)EUserCmdFlags.IsInInterruptState, value); }
+        } 
+        public bool IsUseAction {
+            get { return HasEnum((int)EUserCmdFlags.IsUseAction); }
+            set { AddEnum((int)EUserCmdFlags.IsUseAction, value); }
+        }
 
         public float DeltaYaw { get; set; }
         public float DeltaPitch { get; set; }
         public float Roll { get; set; }
         public int ChangedSeat { get; set; }  
         public int ChangeChannel { get; set; }
-        public int PickUpEquip { get; set; }
-        public int PickUpEquipItemId { get; set; }
-        public int PickUpEquipItemCount { get; set; }
+
+        public int ManualPickUpEquip { get; set; }
+        public List<int> AutoPickUpEquip { get; set; }
 
         public IFilteredInput FilteredInput { get; set; }
         public int UseEntityId { get; set; }
@@ -291,9 +340,8 @@ namespace Core.Prediction.UserPrediction.Cmd
             cmd.IsSwitchFireMode = IsSwitchFireMode;
             cmd.CurWeapon = CurWeapon;
             cmd.IsDropWeapon = IsDropWeapon;
-            cmd.PickUpEquip = PickUpEquip;
-            cmd.PickUpEquipItemId = PickUpEquipItemId;
-            cmd.PickUpEquipItemCount = PickUpEquipItemCount;
+            cmd.ManualPickUpEquip = ManualPickUpEquip;
+            cmd.AutoPickUpEquip = AutoPickUpEquip;
             cmd.IsPDown = IsPDown;
             cmd.IsYDown = IsYDown;
             cmd.IsCDown = IsCDown;
@@ -310,12 +358,15 @@ namespace Core.Prediction.UserPrediction.Cmd
             cmd.UseType = UseType;
             cmd.BagIndex = BagIndex;
             cmd.IsInterrupt = IsInterrupt;
+            cmd.IsSprayPaint = IsSprayPaint; /*喷漆*/
             cmd.IsUseAction = IsUseAction;
             cmd.IsForceUnmountWeapon = IsForceUnmountWeapon;
+
         }
 
         public void Reset()
         {
+            ClearEnum();
             FrameInterval = 0;
             RenderTime = 0;
             ClientTime = 0;
@@ -349,9 +400,9 @@ namespace Core.Prediction.UserPrediction.Cmd
             IsSwitchFireMode = false;
             IsDropWeapon = false;
             CurWeapon = 0;
-            PickUpEquip = 0;
-            PickUpEquipItemId = 0;
-            PickUpEquipItemCount = 0;
+            ManualPickUpEquip = 0;
+            if(null == AutoPickUpEquip) AutoPickUpEquip = new List<int>();
+            AutoPickUpEquip.Clear();
             IsPDown = false;
             IsYDown = false;
             IsCDown = false;
@@ -368,6 +419,7 @@ namespace Core.Prediction.UserPrediction.Cmd
             UseType = 0;
             BagIndex = 0;
             IsInterrupt = false;
+            IsSprayPaint = false;
             IsUseAction = false;
             IsForceUnmountWeapon = false;
         }
@@ -381,6 +433,23 @@ namespace Core.Prediction.UserPrediction.Cmd
         public override string ToString()
         {
             return string.Format("{0}, Seq: {1}, SnapshotId: {2}", "UserCmd", Seq, SnapshotId);
+        }
+        public static List<int> CopyList(List<int> l, List<int> r)
+        {
+            if (l == null)
+            {
+                l = new List<int>();
+            }
+            else
+            {
+                l.Clear();
+            }
+
+            if (r != null)
+            {
+                l.AddRange(r);
+            }
+            return l;
         }
     }
 }

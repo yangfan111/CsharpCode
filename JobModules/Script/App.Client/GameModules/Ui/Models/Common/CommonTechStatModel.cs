@@ -2,6 +2,7 @@
 using App.Client.GameModules.Ui.Utils;
 using App.Client.GameModules.Ui.ViewModels.Common;
 using App.Client.GameModules.Ui.UiAdapter;
+using Assets.App.Client.GameModules.Ui;
 using Assets.UiFramework.Libs;
 using Utils.AssetManager;
 using Core.Enums;
@@ -29,12 +30,10 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private Transform _curInfoItem;
 
-        private string _weaponIconBundleName;
         private string _badgeIconBundleName;
 
         private bool _initPanel;
         private DateTime _initPanelTime;
-        private string _killIconBundleName;
         private string _handAssetName;
         private Image _deathTypeIconImage;
 
@@ -50,9 +49,6 @@ namespace App.Client.GameModules.Ui.Models.Common
             _infoItemModel = FindChildGo("HurtInfo");
             _infoItemModel.gameObject.SetActive(false);
             _deathTypeIconImage = FindChildGo("DeathTypeIcon").GetComponent<Image>();
-            _badgeIconBundleName = "ui/common";
-            _weaponIconBundleName = "icon/weapon";
-            _killIconBundleName = "icon/killinfo";
             _handAssetName = "HandKill";
         }
 
@@ -164,7 +160,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void ShowVehicleIcon(int vehicleId)
         {
-            AssetInfo assetInfo = new AssetInfo("icon/carry", "carry_" + vehicleId);
+            AssetInfo assetInfo = new AssetInfo(AssetBundleConstant.Icon_Carry, "carry_" + vehicleId);
             Loader.RetriveSpriteAsync(assetInfo.BundleName, assetInfo.AssetName,
                 (sprite) => { _viewModel.DeathTypeIconSprite = sprite; });
             SetDeathIconView(true);
@@ -198,7 +194,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void ShowHandIcon()
         {
-            Loader.RetriveSpriteAsync(_killIconBundleName, _handAssetName,
+            Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_Weapon, _handAssetName,
                 (sprite) => { _viewModel.DeathTypeIconSprite = sprite; });
             SetDeathIconView(true);
         }

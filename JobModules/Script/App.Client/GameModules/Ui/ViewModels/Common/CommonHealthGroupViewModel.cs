@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -280,76 +281,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonHealthGroupView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonHealthGroupView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonHealthGroupView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonHealthGroupView, CommonHealthGroupViewModel> bindingSet =
-                view.CreateBindingSet<CommonHealthGroupView, CommonHealthGroupViewModel>();
-
-            view.orirootLocation = _rootLocation = view.rootLocation.anchoredPosition;
-            bindingSet.Bind(view.rootLocation).For(v => v.anchoredPosition).To(vm => vm.rootLocation).OneWay();
-            view.orirootSizeDelta = _rootSizeDelta = view.rootSizeDelta.sizeDelta;
-            bindingSet.Bind(view.rootSizeDelta).For(v => v.sizeDelta).To(vm => vm.rootSizeDelta).OneWay();
-            view.oriHpGroupGameObjectActiveSelf = _hpGroupGameObjectActiveSelf = view.HpGroupGameObjectActiveSelf.activeSelf;
-            bindingSet.Bind(view.HpGroupGameObjectActiveSelf).For(v => v.activeSelf).To(vm => vm.HpGroupGameObjectActiveSelf).OneWay();
-            view.oricurrentHpValue = _currentHpValue = view.currentHpValue.value;
-            bindingSet.Bind(view.currentHpValue).For(v => v.value).To(vm => vm.currentHpValue).OneWay();
-            view.oricurrentHpFillColor = _currentHpFillColor = view.currentHpFillColor.color;
-            bindingSet.Bind(view.currentHpFillColor).For(v => v.color).To(vm => vm.currentHpFillColor).OneWay();
-            view.orispecialHpBgValue = _specialHpBgValue = view.specialHpBgValue.value;
-            bindingSet.Bind(view.specialHpBgValue).For(v => v.value).To(vm => vm.specialHpBgValue).OneWay();
-            view.oriHpGroupInHurtGameObjectActiveSelf = _hpGroupInHurtGameObjectActiveSelf = view.HpGroupInHurtGameObjectActiveSelf.activeSelf;
-            bindingSet.Bind(view.HpGroupInHurtGameObjectActiveSelf).For(v => v.activeSelf).To(vm => vm.HpGroupInHurtGameObjectActiveSelf).OneWay();
-            view.oriHpGroupHurtValue = _hpGroupHurtValue = view.HpGroupHurtValue.fillAmount;
-            bindingSet.Bind(view.HpGroupHurtValue).For(v => v.fillAmount).To(vm => vm.HpGroupHurtValue).OneWay();
-            view.oriShowPoseGroupGameObjectActiveSelf = _showPoseGroupGameObjectActiveSelf = view.ShowPoseGroupGameObjectActiveSelf.activeSelf;
-            bindingSet.Bind(view.ShowPoseGroupGameObjectActiveSelf).For(v => v.activeSelf).To(vm => vm.ShowPoseGroupGameObjectActiveSelf).OneWay();
-            bindingSet.Bind(view.currentPoseImg).For(v => v.sprite).To(vm => vm.currentPoseImg).OneWay();
-            view.orio2BufActive = _o2BufActive = view.o2BufActive.activeSelf;
-            bindingSet.Bind(view.o2BufActive).For(v => v.activeSelf).To(vm => vm.o2BufActive).OneWay();
-            view.oricurO2FillAmount = _curO2FillAmount = view.curO2FillAmount.fillAmount;
-            bindingSet.Bind(view.curO2FillAmount).For(v => v.fillAmount).To(vm => vm.curO2FillAmount).OneWay();
-            view.orispeedBufActive = _speedBufActive = view.speedBufActive.activeSelf;
-            bindingSet.Bind(view.speedBufActive).For(v => v.activeSelf).To(vm => vm.speedBufActive).OneWay();
-            view.oriretreatBufActive = _retreatBufActive = view.retreatBufActive.activeSelf;
-            bindingSet.Bind(view.retreatBufActive).For(v => v.activeSelf).To(vm => vm.retreatBufActive).OneWay();
-            view.oriPowerGroupActive = _powerGroupActive = view.PowerGroupActive.activeSelf;
-            bindingSet.Bind(view.PowerGroupActive).For(v => v.activeSelf).To(vm => vm.PowerGroupActive).OneWay();
-            view.oriduan1 = _duan1 = view.duan1.value;
-            bindingSet.Bind(view.duan1).For(v => v.value).To(vm => vm.duan1).OneWay();
-            view.oriduan2 = _duan2 = view.duan2.value;
-            bindingSet.Bind(view.duan2).For(v => v.value).To(vm => vm.duan2).OneWay();
-            view.oriduan3 = _duan3 = view.duan3.value;
-            bindingSet.Bind(view.duan3).For(v => v.value).To(vm => vm.duan3).OneWay();
-            view.oriduan4 = _duan4 = view.duan4.value;
-            bindingSet.Bind(view.duan4).For(v => v.value).To(vm => vm.duan4).OneWay();
-            view.oriHelmetActive = _helmetActive = view.HelmetActive.activeSelf;
-            bindingSet.Bind(view.HelmetActive).For(v => v.activeSelf).To(vm => vm.HelmetActive).OneWay();
-            view.oriBulletproofActive = _bulletproofActive = view.BulletproofActive.activeSelf;
-            bindingSet.Bind(view.BulletproofActive).For(v => v.activeSelf).To(vm => vm.BulletproofActive).OneWay();
-            view.oriBulletproofFillAmount = _bulletproofFillAmount = view.BulletproofFillAmount.fillAmount;
-            bindingSet.Bind(view.BulletproofFillAmount).For(v => v.fillAmount).To(vm => vm.BulletproofFillAmount).OneWay();
-            view.oriHelmetFillAmount = _helmetFillAmount = view.HelmetFillAmount.fillAmount;
-            bindingSet.Bind(view.HelmetFillAmount).For(v => v.fillAmount).To(vm => vm.HelmetFillAmount).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonHealthGroupView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -373,6 +326,93 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonHealthGroupView view)
+		{
+		     BindingSet<CommonHealthGroupView, CommonHealthGroupViewModel> bindingSet =
+                view.CreateBindingSet<CommonHealthGroupView, CommonHealthGroupViewModel>();
+            bindingSet.Bind(view.rootLocation).For(v => v.anchoredPosition).To(vm => vm.rootLocation).OneWay();
+            bindingSet.Bind(view.rootSizeDelta).For(v => v.sizeDelta).To(vm => vm.rootSizeDelta).OneWay();
+            bindingSet.Bind(view.HpGroupGameObjectActiveSelf).For(v => v.activeSelf).To(vm => vm.HpGroupGameObjectActiveSelf).OneWay();
+            bindingSet.Bind(view.currentHpValue).For(v => v.value).To(vm => vm.currentHpValue).OneWay();
+            bindingSet.Bind(view.currentHpFillColor).For(v => v.color).To(vm => vm.currentHpFillColor).OneWay();
+            bindingSet.Bind(view.specialHpBgValue).For(v => v.value).To(vm => vm.specialHpBgValue).OneWay();
+            bindingSet.Bind(view.HpGroupInHurtGameObjectActiveSelf).For(v => v.activeSelf).To(vm => vm.HpGroupInHurtGameObjectActiveSelf).OneWay();
+            bindingSet.Bind(view.HpGroupHurtValue).For(v => v.fillAmount).To(vm => vm.HpGroupHurtValue).OneWay();
+            bindingSet.Bind(view.ShowPoseGroupGameObjectActiveSelf).For(v => v.activeSelf).To(vm => vm.ShowPoseGroupGameObjectActiveSelf).OneWay();
+            bindingSet.Bind(view.currentPoseImg).For(v => v.sprite).To(vm => vm.currentPoseImg).OneWay();
+            bindingSet.Bind(view.o2BufActive).For(v => v.activeSelf).To(vm => vm.o2BufActive).OneWay();
+            bindingSet.Bind(view.curO2FillAmount).For(v => v.fillAmount).To(vm => vm.curO2FillAmount).OneWay();
+            bindingSet.Bind(view.speedBufActive).For(v => v.activeSelf).To(vm => vm.speedBufActive).OneWay();
+            bindingSet.Bind(view.retreatBufActive).For(v => v.activeSelf).To(vm => vm.retreatBufActive).OneWay();
+            bindingSet.Bind(view.PowerGroupActive).For(v => v.activeSelf).To(vm => vm.PowerGroupActive).OneWay();
+            bindingSet.Bind(view.duan1).For(v => v.value).To(vm => vm.duan1).OneWay();
+            bindingSet.Bind(view.duan2).For(v => v.value).To(vm => vm.duan2).OneWay();
+            bindingSet.Bind(view.duan3).For(v => v.value).To(vm => vm.duan3).OneWay();
+            bindingSet.Bind(view.duan4).For(v => v.value).To(vm => vm.duan4).OneWay();
+            bindingSet.Bind(view.HelmetActive).For(v => v.activeSelf).To(vm => vm.HelmetActive).OneWay();
+            bindingSet.Bind(view.BulletproofActive).For(v => v.activeSelf).To(vm => vm.BulletproofActive).OneWay();
+            bindingSet.Bind(view.BulletproofFillAmount).For(v => v.fillAmount).To(vm => vm.BulletproofFillAmount).OneWay();
+            bindingSet.Bind(view.HelmetFillAmount).For(v => v.fillAmount).To(vm => vm.HelmetFillAmount).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonHealthGroupView view)
+		{
+            _rootLocation = view.rootLocation.anchoredPosition;
+            _rootSizeDelta = view.rootSizeDelta.sizeDelta;
+            _hpGroupGameObjectActiveSelf = view.HpGroupGameObjectActiveSelf.activeSelf;
+            _currentHpValue = view.currentHpValue.value;
+            _currentHpFillColor = view.currentHpFillColor.color;
+            _specialHpBgValue = view.specialHpBgValue.value;
+            _hpGroupInHurtGameObjectActiveSelf = view.HpGroupInHurtGameObjectActiveSelf.activeSelf;
+            _hpGroupHurtValue = view.HpGroupHurtValue.fillAmount;
+            _showPoseGroupGameObjectActiveSelf = view.ShowPoseGroupGameObjectActiveSelf.activeSelf;
+            _o2BufActive = view.o2BufActive.activeSelf;
+            _curO2FillAmount = view.curO2FillAmount.fillAmount;
+            _speedBufActive = view.speedBufActive.activeSelf;
+            _retreatBufActive = view.retreatBufActive.activeSelf;
+            _powerGroupActive = view.PowerGroupActive.activeSelf;
+            _duan1 = view.duan1.value;
+            _duan2 = view.duan2.value;
+            _duan3 = view.duan3.value;
+            _duan4 = view.duan4.value;
+            _helmetActive = view.HelmetActive.activeSelf;
+            _bulletproofActive = view.BulletproofActive.activeSelf;
+            _bulletproofFillAmount = view.BulletproofFillAmount.fillAmount;
+            _helmetFillAmount = view.HelmetFillAmount.fillAmount;
+		}
+
+
+		void SaveOriData(CommonHealthGroupView view)
+		{
+            view.orirootLocation = _rootLocation;
+            view.orirootSizeDelta = _rootSizeDelta;
+            view.oriHpGroupGameObjectActiveSelf = _hpGroupGameObjectActiveSelf;
+            view.oricurrentHpValue = _currentHpValue;
+            view.oricurrentHpFillColor = _currentHpFillColor;
+            view.orispecialHpBgValue = _specialHpBgValue;
+            view.oriHpGroupInHurtGameObjectActiveSelf = _hpGroupInHurtGameObjectActiveSelf;
+            view.oriHpGroupHurtValue = _hpGroupHurtValue;
+            view.oriShowPoseGroupGameObjectActiveSelf = _showPoseGroupGameObjectActiveSelf;
+            view.orio2BufActive = _o2BufActive;
+            view.oricurO2FillAmount = _curO2FillAmount;
+            view.orispeedBufActive = _speedBufActive;
+            view.oriretreatBufActive = _retreatBufActive;
+            view.oriPowerGroupActive = _powerGroupActive;
+            view.oriduan1 = _duan1;
+            view.oriduan2 = _duan2;
+            view.oriduan3 = _duan3;
+            view.oriduan4 = _duan4;
+            view.oriHelmetActive = _helmetActive;
+            view.oriBulletproofActive = _bulletproofActive;
+            view.oriBulletproofFillAmount = _bulletproofFillAmount;
+            view.oriHelmetFillAmount = _helmetFillAmount;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 			currentPoseImg = ViewModelUtil.EmptySprite;
@@ -380,6 +420,10 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			rootLocation = _view.orirootLocation;
 			rootSizeDelta = _view.orirootSizeDelta;
 			HpGroupGameObjectActiveSelf = _view.oriHpGroupGameObjectActiveSelf;
@@ -428,7 +472,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonHealthGroup"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

@@ -10,6 +10,7 @@ using XmlConfig;
 using Utils.Utils;
 using Utils.Singleton;
 using App.Shared.GameModules.Weapon;
+using Core;
 
 namespace App.Shared.GameModules.Player
 {
@@ -180,7 +181,7 @@ namespace App.Shared.GameModules.Player
             PlayerMoveSystem.SyncUpdateComponentPos(player, syncTransform.position);
             player.stateInterface.State.Swim();
             player.triggerEvent.NeedUnmountWeapon = true;
-            player.WeaponController().ForceUnArmHeldWeapon();
+         //   player.ModeController().CallBeforeAction(player.WeaponController(),EPlayerActionType.Swim);
 
             //_logger.InfoFormat("swim ashore pos:{0}",player.position.Value.ToStringExt());
         }
@@ -199,8 +200,8 @@ namespace App.Shared.GameModules.Player
         private void Dive(PlayerEntity player)
         {
             player.stateInterface.State.Dive();
-            player.triggerEvent.NeedUnmountWeapon = true;
-            player.WeaponController().ForceUnArmHeldWeapon();
+            //player.triggerEvent.NeedUnmountWeapon = true;
+            //player.WeaponController().UnArmWeapon(false);
         }
     }
 }

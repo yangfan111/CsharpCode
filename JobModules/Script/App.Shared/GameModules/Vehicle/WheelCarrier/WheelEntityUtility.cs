@@ -5,6 +5,7 @@ using System.Text;
 using App.Shared.Components.Vehicle;
 using App.Shared.GameModules.Vehicle.Common;
 using App.Shared.Terrains;
+using Core.Components;
 using Core.EntityComponent;
 using Core.ObjectPool;
 using Core.Prediction.VehiclePrediction.Cmd;
@@ -43,7 +44,7 @@ namespace App.Shared.GameModules.Vehicle.WheelCarrier
         {
             if (!vehicle.hasCarRewindData)
             {
-                vehicle.AddCarRewindData(false, SharedConfig.ServerAuthorative, position, rotation);
+                vehicle.AddCarRewindData(false, SharedConfig.ServerAuthorative, position.ShiftedToFixedVector3(), rotation);
             }
         }
 

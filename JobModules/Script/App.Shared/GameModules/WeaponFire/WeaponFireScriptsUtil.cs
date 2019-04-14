@@ -71,7 +71,7 @@ namespace App.Shared.GameModules.Weapon
             }
             else if (config is SniperSpreadLogicConfig)
             {
-                return new SniperSpreadProcessor(_contexts);
+                return new SniperSpreadProcessor();
             }
             else if (config is RifleSpreadLogicConfig)
             {
@@ -142,7 +142,7 @@ namespace App.Shared.GameModules.Weapon
         {
             if (config is RifleFireCounterConfig)
             {
-                return new RifleFireProcessCounter();
+                return new ContinueFireCounter();
             }
 
             return null;

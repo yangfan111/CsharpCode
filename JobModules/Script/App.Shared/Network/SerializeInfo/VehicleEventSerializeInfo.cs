@@ -2,6 +2,7 @@
 using App.Protobuf;
 using Core.Network;
 using Core.Prediction.VehiclePrediction.Event;
+using RpcNetwork.RpcNetwork;
 
 namespace App.Shared.Network
 {

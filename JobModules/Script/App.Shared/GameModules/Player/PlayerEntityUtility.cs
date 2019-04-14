@@ -61,7 +61,7 @@ namespace App.Shared.GameModules.Player
             cc.stepOffset = 0.3f;
             //太小会导致跳跃角色卡主,Use it to avoid numerical precision issues.
             //Two colliders can penetrate each other as deep as their Skin Width. Larger Skin Widths reduce jitter. Low Skin Width can cause the character to get stuck. A good setting is to make this value 10% of the Radius.
-            cc.skinWidth = 0.03f;
+            cc.skinWidth = CcSkinWidth;
             cc.minMoveDistance = 0.001f;
             cc.radius = config.Radius;
             cc.height = height;
@@ -292,6 +292,7 @@ namespace App.Shared.GameModules.Player
         }
 
         private static readonly AnimatorPoseReplayer PoseReplayer = new AnimatorPoseReplayer();
+        public static readonly float CcSkinWidth= 0.03f;
 
         public static void UpdateTransform(PlayerEntity player, NetworkAnimatorComponent networkAnimator,
             PredictedAppearanceComponent appearance, OrientationComponent orientation)
@@ -349,20 +350,20 @@ namespace App.Shared.GameModules.Player
             characterBoneInterface.CharacterBone.WeaponRotPlayback(param);
             characterBoneInterface.CharacterBone.Update(param);
 
+            player.characterContoller.Value.SetCurrentControllerType(
+                ThirdPersonPostureTool.ConvertToPostureInConfig(thirdPersonAppearance.Posture));
+            
             // 更新包围盒
 
             if (thirdPersonAppearance.NeedUpdateController)
             {
                 characterControllerInterface.CharacterController.SetCharacterControllerHeight(thirdPersonAppearance
-                    .CharacterHeight);
+                    .CharacterHeight, player.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController);
                 characterControllerInterface.CharacterController.SetCharacterControllerCenter(thirdPersonAppearance
-                    .CharacterCenter);
+                    .CharacterCenter, player.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController);
                 characterControllerInterface.CharacterController.SetCharacterControllerRadius(thirdPersonAppearance
-                    .CharacterRadius);
+                    .CharacterRadius, player.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController);
             }
-
-            player.characterContoller.Value.SetCurrentControllerType(
-                ThirdPersonPostureTool.ConvertToPostureInConfig(thirdPersonAppearance.Posture));
         }
 
         public static bool ActiveIK(ThirdPersonAction action, ThirdPersonPosture posture,

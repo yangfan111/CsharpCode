@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
+using Core.Utils;
 
 namespace Core.UpdateLatest
 {
@@ -17,6 +18,7 @@ namespace Core.UpdateLatest
 
     public class UpdateMessagePool : IUpdateMessagePool
     {
+        private static LoggerAdapter _logger = new LoggerAdapter(typeof(UpdateMessagePool));
         private List<UpdateLatestPacakge> _list = new List<UpdateLatestPacakge>(16);
         private Dictionary<int, UpdateLatestPacakge> dict = new Dictionary<int, UpdateLatestPacakge>();
         public UpdateLatestPacakge LatestMessage { get; private set; }
@@ -87,13 +89,16 @@ namespace Core.UpdateLatest
 
         public void Dispose()
         {
+            _logger.InfoFormat("Dispose {0}",_list.Count);
             LatestMessage = null;
             foreach (var updateLatestPacakge in _list)
             {
+                _logger.InfoFormat("{0}",updateLatestPacakge.RefCount);
                 updateLatestPacakge.ReleaseReference();
             }
             _list.Clear();
             dict.Clear();
+            _lastSeq = -1;
         }
     }
 }

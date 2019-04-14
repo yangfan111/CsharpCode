@@ -1,4 +1,4 @@
-﻿using Core.GameInputFilter;
+﻿using Core;
 
 namespace App.Shared.GameModules.Weapon.Behavior
 {

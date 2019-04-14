@@ -14,6 +14,7 @@ using Entitas;
 using Shared.Scripts;
 using UnityEngine;
 using Utils.Appearance;
+using Utils.Singleton;
 using Object = UnityEngine.Object;
 
 namespace App.Shared.CommonResource.Updaters
@@ -153,7 +154,6 @@ namespace App.Shared.CommonResource.Updaters
             go.transform.localRotation = Quaternion.identity;
             go.transform.localScale = Vector3.one;
             _logger.InfoFormat("P3 loaded: {0}", player.entityKey);
-
            
             BoneTool.CacheTransform(go);
 
@@ -189,6 +189,7 @@ namespace App.Shared.CommonResource.Updaters
             player.characterControllerInterface.CharacterController.SetCharacterRoot(player.characterContoller.Value.gameObject);
             player.appearanceInterface.Appearance.SetThirdPersonCharacter(go);
             player.thirdPersonAnimator.UnityAnimator.Update(0);
+            player.characterControllerInterface.CharacterController.SetThirdModel(player.thirdPersonModel.Value);
 
             player.characterBoneInterface.CharacterBone.SetCharacterRoot(player.characterContoller.Value.gameObject);
             player.characterBoneInterface.CharacterBone.SetThirdPersonCharacter(go);
@@ -230,11 +231,7 @@ namespace App.Shared.CommonResource.Updaters
 
                 foreach (var body in go.GetComponentsInChildren<Rigidbody>()) Object.Destroy(body);
 
-                foreach (var collider in go.GetComponentsInChildren<BoxCollider>()) Object.Destroy(collider);
-
-                foreach (var collider in go.GetComponentsInChildren<SphereCollider>()) Object.Destroy(collider);
-
-                foreach (var collider in go.GetComponentsInChildren<CapsuleCollider>()) Object.Destroy(collider);
+                foreach (var collider in go.GetComponentsInChildren<Collider>()) Object.Destroy(collider);
             }
         }
     }

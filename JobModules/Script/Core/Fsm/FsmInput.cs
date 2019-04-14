@@ -260,7 +260,7 @@ namespace Core.Fsm
         Climb,
         Step,
         GenericActionFinished,
-
+        DyingTransitionFinished,
         None
         
     }

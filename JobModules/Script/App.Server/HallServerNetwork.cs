@@ -198,6 +198,7 @@ namespace App.Server
 
         private void ClientOnChannelDisConnected(INetworkChannel networkChannel)
         {
+            _logger.ErrorFormat("Disconnect from Allocation Server");
             DisposeClientConnect();
         }
 

@@ -6,5 +6,7 @@ namespace App.Client.GameModules.Ui.UiAdapter.Interface.Common
     {
         Vector3 KillerTopPos { get;}
         bool KillerChanged { get; set; }
+        long KillerId { get; }
+        bool IsKillerDead { get; }
     }
 }

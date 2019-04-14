@@ -7,6 +7,7 @@ using Core.CharacterState.Posture;
 using Core.Compare;
 using Core.Components;
 using Core.EntityComponent;
+using Core;
 using Core.Prediction;
 using Core.Prediction.UserPrediction;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
@@ -306,4 +307,5 @@ namespace App.Shared.Components.Player
     {
         public ICharacterState State;
     }
+  
 }

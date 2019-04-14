@@ -110,8 +110,8 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
 
             if (bag.Visible)
             {
-                FreePrefabLoader.CacheGameObject(new AssetInfo("bag", "ItemBar"), 50);
-                FreePrefabLoader.CacheGameObject(new AssetInfo("bag", "CaseNameBar"), 5);
+                FreePrefabLoader.CacheGameObject(new AssetInfo("ui/client/prefab/chicken", "ItemBar"), 50);
+                FreePrefabLoader.CacheGameObject(new AssetInfo("ui/client/prefab/chicken", "CaseNameBar"), 5);
 
                 if (parentGround != null && parentBag != null && DateTime.Now.Ticks - lastUpdateTime > 10000)
                 {

@@ -131,24 +131,25 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private float _mapWidth;
         private void UodateLocation(MiniMapTeamPlayInfo data, float rate, ref Vector2 selfPlayPos, float miniMapRepresentWHByRice)
         {
-            if (_isPlayer.Equals(data.IsPlayer) && _pos.Equals(data.Pos) && _selfPlayPos.Equals(selfPlayPos) &&
+            var shiftVec = data.Pos.ShiftedUIVector2();
+            if (_isPlayer.Equals(data.IsPlayer) && _pos.Equals(shiftVec) && _selfPlayPos.Equals(selfPlayPos) &&
                 _rate.Equals(rate) && _mapWidth.Equals(miniMapRepresentWHByRice)) return;
 
             _isPlayer = data.IsPlayer;
-            _pos = data.Pos;
+            _pos = shiftVec;
             _selfPlayPos = selfPlayPos;
             _rate = rate;
             _mapWidth = miniMapRepresentWHByRice;
 
             if (data.IsPlayer == true)
             {
-                rectTransform.anchoredPosition = data.Pos * rate;
+                rectTransform.anchoredPosition = _pos * rate;
                 UIUtils.SetActive(direction, false);
             }
             else
             {
                 var offset = new Vector2(rectTransform.sizeDelta.y + directionRectTf.sizeDelta.y, rectTransform.sizeDelta.y + directionRectTf.sizeDelta.y) / (2 * rate);
-                var result = UIUtils.MathUtil.IsInSquare(selfPlayPos, miniMapRepresentWHByRice, miniMapRepresentWHByRice, offset, true, data.Pos);
+                var result = UIUtils.MathUtil.IsInSquare(selfPlayPos, miniMapRepresentWHByRice, miniMapRepresentWHByRice, offset, true, _pos);
                 tran.GetComponent<RectTransform>().anchoredPosition = (selfPlayPos + result.ContactPoint) * rate;
                 if (!result.IsContact)
                 {
@@ -220,11 +221,12 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private int _shootingCount = -1;
         private void UpdatePlayStatue(ref Vector2 referPos, MiniMapTeamPlayInfo data, MapLevel mapLevel)
         {
+            var shiftVec = data.Pos.ShiftedUIVector2();
             if (referPos.Equals(_referPos) && data.Statue.Equals(_miniMapPlayStatue) &&
-                data.Pos.Equals(_infoPos) && data.ShootingCount.Equals(_shootingCount)) return;
+                shiftVec.Equals(_infoPos) && data.ShootingCount.Equals(_shootingCount)) return;
             _referPos = referPos;
             _miniMapPlayStatue = data.Statue;
-            _infoPos = data.Pos;
+            _infoPos = shiftVec;
             _shootingCount = data.ShootingCount;
             
            switch (data.Statue)

@@ -31,7 +31,7 @@ namespace App.Client.GameModules.Ui.System
             if (mapdata == null)
                 return;
             Vector2 markPos = Vector2.zero;
-            if (mapdata.CurPlayer != null) markPos = mapdata.CurPlayer.Pos;
+            if (mapdata.CurPlayer != null) markPos = mapdata.CurPlayer.Pos.ShiftedUIVector2();
 
             PlayerAddMarkUtility.SendMarkMessage(_contexts, markPos);
         }

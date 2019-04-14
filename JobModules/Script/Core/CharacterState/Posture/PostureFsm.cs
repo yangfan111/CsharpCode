@@ -79,6 +79,7 @@ namespace Core.CharacterState.Posture
             AddState(PostureState.CreateFreefallState(), infoProvider);
             AddState(PostureState.CreateSwimState(), infoProvider);
             AddState(PostureState.CreateDiveState(), infoProvider);
+            AddState(PostureState.CreateDyingTransition(), infoProvider);
             AddState(PostureState.CreateDyingState(), infoProvider);
 
             AddState(PostureState.CreateClimbState(), infoProvider);
@@ -169,6 +170,13 @@ namespace Core.CharacterState.Posture
                 AnimatorParametersHash.Instance.ClimbEndDisableValue,
                 CharacterView.ThirdPerson, false);
             addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.InjuredMoveHash,
+                AnimatorParametersHash.Instance.InjuredMoveName,
+                AnimatorParametersHash.Instance.InjuredMoveDisableValue,
+                CharacterView.ThirdPerson,
+                false);
+            addOutput(FsmOutput.Cache);
 
             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ClimbStateHash,
                 AnimatorParametersHash.Instance.ClimbStateName,
@@ -178,11 +186,6 @@ namespace Core.CharacterState.Posture
 
             FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.SwimLayer,
                 AnimatorParametersHash.Instance.SwimDisableValue,
-                CharacterView.ThirdPerson);
-            addOutput(FsmOutput.Cache);
-
-            FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.DyingLayer,
-                AnimatorParametersHash.Instance.DyingDisableValue,
                 CharacterView.ThirdPerson);
             addOutput(FsmOutput.Cache);
         }
@@ -220,6 +223,11 @@ namespace Core.CharacterState.Posture
                 ? (PostureStateId) CurrentState.StateId
                 : (PostureStateId) CurrentState.ActiveTransition.To;
             return StateIdAdapter.GetLeanStateId(id);
+        }
+
+        public bool IsState(short id)
+        {
+            return CurrentState.StateId == id;
         }
     }
 }

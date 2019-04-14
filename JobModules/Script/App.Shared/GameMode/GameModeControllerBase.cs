@@ -1,12 +1,11 @@
 ﻿using App.Shared.GameMode;
+using App.Shared.GameModules;
 using Core;
-using Core.EntityComponent;
+using Core.Prediction.UserPrediction.Cmd;
 using Core.Room;
 using Core.Utils;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Core.Prediction.UserPrediction.Cmd;
 using WeaponConfigNs;
 
 namespace App.Shared
@@ -23,6 +22,8 @@ namespace App.Shared
         public IReservedBulletHandler ReservedBulletHandler { get; protected set; }
 
         public IWeaponSlotsLibrary SlotLibary { get; protected set; }
+        
+        
 
         public virtual EWeaponSlotType GetSlotByIndex(int index)
         {
@@ -44,7 +45,6 @@ namespace App.Shared
         public virtual void Initialize(Contexts contexts, int modeId)
         {
         }
-
         public virtual bool CanModeSwitchBag
         {
             get { return true; }
@@ -194,9 +194,9 @@ namespace App.Shared
             PickupHandler.SendAutoPickupWeapon(entityId);
         }
 
-        public void AutoPickupWeapon(PlayerEntity player, int sceneEntityValue)
+        public void AutoPickupWeapon(PlayerEntity player, List<int> sceneEntityValues)
         {
-            PickupHandler.AutoPickupWeapon(player, sceneEntityValue);
+            PickupHandler.AutoPickupWeapon(player, sceneEntityValues);
         }
 
         public void DoPickup(PlayerEntity player, int sceneEntityValue)
@@ -209,9 +209,42 @@ namespace App.Shared
             PickupHandler.Drop(player, slot,cmd);
         }
 
-        public void OnSwitch(IPlayerWeaponProcessor controller, int weaponId, InOrOff op)
+        public void OnSwitch(IPlayerWeaponProcessor controller, int weaponId, EInOrOff op)
         {
             ProcessListener.OnSwitch(controller, weaponId,op);
         }
+
+ 
+
+        //        public void CallBeforeAction(IPlayerWeaponProcessor controller, EPlayerActionType actionType)
+        //        {
+        //        }
+
+        //        private void HandleRollbackInterrupt(IPlayerWeaponProcessor controller, EPlayerActionType actionType)
+        //        {
+        //            switch (actionType)
+        //            {
+        //                case EPlayerActionType.Drive:
+        //                    controller.AddVehicleInterrupt();
+        //                    break;
+        //                case EPlayerActionType.Climp:
+        //                    controller.AddClimbInterrupt();
+        //                    break;
+        //                case EPlayerActionType.Swim:
+        //                    controller.AddSwimInterrupt();
+        //                    break;
+        //                case EPlayerActionType.Prone:
+        //                    controller.AddProneInterrupt();
+        //                    break;
+        //                case EPlayerActionType.PullBolt:
+        //                    controller.AddPullboltInterrupt();
+        //                    break;
+        //            }
+        //        }
+        //
+        //        private void HandleSightInterrupt(IPlayerWeaponProcessor controller, EPlayerActionType actionType)
+        //        {
+        //                controller.AddSightViewInterrupt();
+        //        }
     }
 }

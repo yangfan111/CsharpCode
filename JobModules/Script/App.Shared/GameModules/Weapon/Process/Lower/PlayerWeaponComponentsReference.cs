@@ -1,4 +1,7 @@
-﻿using App.Shared.Components.Player;
+﻿using System.Collections.Generic;
+using App.Shared.Components.Player;
+using App.Shared.Components.Weapon;
+using Core;
 
 namespace App.Shared.GameModules
 {
@@ -13,11 +16,14 @@ namespace App.Shared.GameModules
         {
             get { return entity.playerWeaponBagSet; }
         }
-        public PlayerWeaponUpdateComponent WeaponUpdate
+        public PlayerWeaponClientUpdateComponent WeaponClientUpdate
         {
-            get { return entity.playerWeaponUpdate; }
+            get { return entity.playerWeaponClientUpdate; }
         }
-
+        public PlayerWeaponServerUpdateComponent WeaponServerUpdate
+        {
+            get { return entity.playerWeaponServerUpdate; }
+        }
         public PlayerWeaponAuxiliaryComponent WeaponAux
         {
             get

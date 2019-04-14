@@ -46,6 +46,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
 
             float realRadius = FreeUtil.ReplaceFloat(radius, args);
             float realDamage = FreeUtil.ReplaceFloat(damage, args);
+            EUIDeadType realType = (EUIDeadType) FreeUtil.ReplaceInt(type, args);
 
             if (damagePara == null)
             {
@@ -57,24 +58,33 @@ namespace App.Server.GameModules.GamePlay.Free.player
             if (up != null)
             {
                 var bombPos = new Vector3(up.GetX(), up.GetY(), up.GetZ());
-                var colliders = Physics.OverlapSphere(bombPos, realRadius, UnityLayerManager.GetLayerMask(EUnityLayerName.Player) | UnityLayerManager.GetLayerMask(EUnityLayerName.UserInputRaycast) | UnityLayerManager.GetLayerMask(EUnityLayerName.Vehicle));
+                var colliders = Physics.OverlapSphere(bombPos, realRadius,
+                    UnityLayerManager.GetLayerMask(EUnityLayerName.Player) | UnityLayerManager.GetLayerMask(EUnityLayerName.UserInputRaycast)
+                    | UnityLayerManager.GetLayerMask(EUnityLayerName.Vehicle) | UnityLayerManager.GetLayerMask(EUnityLayerName.Glass));
+
                 foreach (var collider in colliders)
                 {
+                    float trueDamage = CalculateBombDamage(collider.transform, bombPos, realDamage, realType);
+
                     if (Logger.IsDebugEnabled)
                     {
                         Logger.DebugFormat("Process {0}", collider.name);
                     }
                     if (collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.Player))
                     {
-                        HandlePlayer(collider, args, args.GameContext, realDamage, bombPos);
+                        HandlePlayer(collider, args, args.GameContext, trueDamage, bombPos);
                     }
-                    else if (collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.UserInputRaycast))
+                    if (collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.UserInputRaycast))
                     {
-                        HandleFracturedObjects(collider.transform, bombPos);
+                        HandleFracturedObjects(collider.transform, bombPos, trueDamage);
                     }
-                    else if (collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.Vehicle))
+                    if (collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.Vehicle))
                     {
-                        HandleVehicle(collider.transform, realDamage, bombPos);
+                        HandleVehicle(collider.transform, trueDamage);
+                    }
+                    if (collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.Glass))
+                    {
+                        HandleGlass(collider.transform);
                     }
                 }
 
@@ -117,7 +127,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
             return false;
         }
 
-        private void HandleVehicle(Transform trans, float damage, Vector3 bombPos)
+        private void HandleVehicle(Transform trans, float damage)
         {
             var parent = trans;
             while (null != parent)
@@ -140,7 +150,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
             }
         }
 
-        private void HandleFracturedObjects(Transform trans, Vector3 bombPos)
+        private void HandleFracturedObjects(Transform trans, Vector3 bombPos, float damage)
         {
             if (Logger.IsDebugEnabled)
             {
@@ -170,9 +180,23 @@ namespace App.Server.GameModules.GamePlay.Free.player
                         {
                             Logger.DebugFormat("do fractured explode ");
                         }
-                        fractured.Explode(Vector3.zero, 50);
+                        fractured.Explode(Vector3.zero, damage);
                     }
                     break;
+                }
+                parent = parent.parent;
+            }
+        }
+
+        private void HandleGlass(Transform trans)
+        {
+            var parent = trans;
+            while (null != parent)
+            {
+                var fractured = parent.GetComponent<FracturedGlassyChunk>();
+                if (null != fractured)
+                {
+                    fractured.MakeBroken();
                 }
                 parent = parent.parent;
             }
@@ -191,7 +215,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 Logger.ErrorFormat("player {0} has no player reference ", collider.name);
                 return;
             }
-            if (player.IsOnVehicle())
+            /*if (player.IsOnVehicle())
             {
                 if (Logger.IsDebugEnabled)
                 {
@@ -201,18 +225,43 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 vehicleEntity.GetGameData().DecreaseHp(Core.Prediction.VehiclePrediction.Cmd.VehiclePartIndex.Body, damage);
             }
             else
+            {*/
+            if (null != action)
             {
-                disPara.SetValue(Math.Max(0, (fr.GetFloat(radius) - Vector3.Distance(bombPos, player.position.Value)) / fr.GetFloat(radius)));
+                disPara.SetValue(Math.Max(0,
+                    (fr.GetFloat(radius) - Vector3.Distance(bombPos, player.position.Value)) / fr.GetFloat(radius)));
                 fr.TempUsePara(damagePara);
                 fr.TempUsePara(disPara);
                 fr.TempUsePara(typePara);
-                fr.TempUse("current", (FreeData)player.freeData.FreeData);
+                fr.TempUse("current", (FreeData) player.freeData.FreeData);
                 action.Act(fr);
 
                 fr.ResumePara("damage");
                 fr.ResumePara("dis");
                 fr.ResumePara("type");
                 fr.Resume("current");
+            }
+
+            //}
+        }
+
+        private float CalculateBombDamage(Transform transform, Vector3 bombPos, float damage, EUIDeadType damageType)
+        {
+            var distance = Vector3.Distance(transform.position, bombPos);
+            switch (damageType)
+            {
+                case EUIDeadType.Weapon:
+                    if (distance > 9f) return 0f;
+                    return Mathf.Max(0f, damage * (1 - distance / 9f));
+                case EUIDeadType.Bombing:
+                    if (distance > 15f) return 0;
+                    return damage;
+                case EUIDeadType.Bomb:
+                    if (distance <= 24f) return damage;
+                    if (distance > 24f && distance <= 56f) return Mathf.Max(0, 3.2f * (55 - distance));
+                    return 0f;
+                default:
+                    return damage;
             }
         }
     }

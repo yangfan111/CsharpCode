@@ -105,7 +105,7 @@
     <Compile Include="Components\Player\PlayerMaskComponent.cs" />
     <Compile Include="Components\Player\PlayerMoveComponent.cs" />
     <Compile Include="Components\Player\PlayerSkyMoveComponent.cs" />
-    <Compile Include="Components\Player\PlayerStateAdapterComponent.cs" />
+    <Compile Include="Components\Player\PlayerSoundComponent.cs" />
     <Compile Include="Components\Player\RaycastComponent.cs" />
     <Compile Include="Components\Player\RaycastTestComponent.cs" />
     <Compile Include="Components\Player\RecycleableAssetComponent.cs" />
@@ -135,9 +135,11 @@
     <Compile Include="Components\Serializer\FieldSerializer\DoubleSerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\EntityKeySerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\EventsSerializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\FixedVector3Serializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\FloatSerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\IFieldSerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\IntSerializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\InterruptSerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\LongSerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\QuaternionSerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\ShortSerialize.cs" />
@@ -202,8 +204,16 @@
     <Compile Include="Components\Vehicle\VehicleSeatComponent.cs" />
     <Compile Include="Components\Vehicle\VehicleSyncEventComponent.cs" />
     <Compile Include="Components\Vehicle\VehicleTypeComponent.cs" />
-    <Compile Include="Components\Weapon\PlayerWeaponComponents.cs" />
-    <Compile Include="Components\Weapon\WeaponComponents.cs" />
+    <Compile Include="Components\Weapon\PlayerWeapon\GrenadeCacheDataComponent.cs" />
+    <Compile Include="Components\Weapon\PlayerWeapon\PlayerClientEventsUpdateComponent.cs" />
+    <Compile Include="Components\Weapon\PlayerWeapon\PlayerWeaponAmmunitionComponent.cs" />
+    <Compile Include="Components\Weapon\PlayerWeapon\PlayerWeaponBagSetComponent.cs" />
+    <Compile Include="Components\Weapon\PlayerWeapon\PlayerWeaponCustomizeComponent.cs" />
+    <Compile Include="Components\Weapon\PlayerWeapon\PlayerWeaponMicsComponents.cs" />
+    <Compile Include="Components\Weapon\PlayerWeapon\PlayerWeaponServerUpdateComponent.cs" />
+    <Compile Include="Components\Weapon\WeaponBasicDataComponent.cs" />
+    <Compile Include="Components\Weapon\WeaponClientComponents.cs" />
+    <Compile Include="Components\Weapon\WeaponRuntimeDataComponent.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

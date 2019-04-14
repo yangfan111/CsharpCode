@@ -1,12 +1,14 @@
 ﻿using App.Server.GameModules.GamePlay.free.player;
 using App.Shared;
+using com.cpkf.yyjd.tools.util;
 using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.unit;
 using com.wd.free.util;
 using Core;
 using System;
-using UnityEngine;
+using System.Collections.Generic;
+using Assets.XmlConfig;
 
 namespace App.Server.GameModules.GamePlay.Free.weapon
 {
@@ -14,6 +16,7 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
     public class NewRemoveWeaponAction : AbstractPlayerAction
     {
         private string weaponKey;
+        private string weaponType;
 
         public override void DoAction(IEventArgs args)
         {
@@ -25,24 +28,35 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
             {
                 PlayerEntity p = ((FreeData)unit).Player;
 
-                int index = FreeUtil.ReplaceInt(weaponKey, args);
-
-                EWeaponSlotType currentSlot = p.WeaponController().HeldSlotType;
-
-                if (index > 0)
+                if (!StringUtil.IsNullOrEmpty(weaponKey))
                 {
-                    currentSlot = FreeWeaponUtil.GetSlotType(index);
+                    int index = FreeUtil.ReplaceInt(weaponKey, args);
+                    EWeaponSlotType currentSlot = index > 0 ? FreeWeaponUtil.GetSlotType(index) : p.WeaponController().HeldSlotType;
+                    p.WeaponController().DestroyWeapon(currentSlot, -1);
                 }
-
-                Debug.LogFormat("remove weapon: " + index);
-
-                p.WeaponController().DestroyWeapon(currentSlot, -1);
-
-                //SimpleProto message = new SimpleProto();
-                //message.Key = FreeMessageConstant.ChangeAvatar;
-                //message.Ins.Add((int)currentSlot);
-                //message.Ks.Add(6);
-                //p.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.FreeData, message);
+                else
+                {
+                    int index = FreeUtil.ReplaceInt(weaponType, args);
+                    if (index > 0)
+                    {
+                        if (index == (int) EWeaponSubType.Throw)
+                        {
+                            p.WeaponController().DestroyWeapon(EWeaponSlotType.ThrowingWeapon, -1);
+                            /*var helper = p.WeaponController().GrenadeHelper;
+                            helper.ClearCache();
+                            p.playerWeaponUpdate.UpdateHeldAppearance = true;*/
+                        }
+                        else
+                        {
+                            for (int i = (int) EWeaponSlotType.PrimeWeapon; i < (int) EWeaponSlotType.Length; i++)
+                            {
+                                var weaponAgent = p.WeaponController().GetWeaponAgent((EWeaponSlotType) i);
+                                if (weaponAgent.WeaponConfigAssy.NewWeaponCfg.SubType == index)
+                                    p.WeaponController().DestroyWeapon((EWeaponSlotType) i, -1);
+                            }
+                        }
+                    }
+                }
             }
         }
     }

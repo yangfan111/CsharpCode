@@ -1,7 +1,9 @@
 ﻿using App.Shared.Terrains;
 using Assets.Sources.Free;
 using Assets.Sources.Free.UI;
+using Core.Components;
 using Core.Free;
+using Core.Ui.Map;
 using Free.framework;
 using UnityEngine;
 using Utils.Singleton;
@@ -24,10 +26,9 @@ namespace App.Client.GameModules.GamePlay.Free.UI
             }
             else
             {
-                Vector3 leftMinPos = TerrainCommonData.leftMinPos;
                 data.IsShowRouteLine = true;
-                data.RouteLineStartPoint = new Vector2(simpleProto.Fs[0] - leftMinPos.x, simpleProto.Fs[1] - leftMinPos.z);
-                data.RouteLineEndPoint = new Vector2(simpleProto.Fs[2] - leftMinPos.x, simpleProto.Fs[3] - leftMinPos.z);
+                data.RouteLineStartPoint = new MapFixedVector2(simpleProto.Fs[0], simpleProto.Fs[1]);
+                data.RouteLineEndPoint = new MapFixedVector2(simpleProto.Fs[2], simpleProto.Fs[3]);
             }
         }
     }

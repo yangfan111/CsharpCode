@@ -1,20 +1,18 @@
-﻿using Assets.Utils.Configuration;
-using com.cpkf.yyjd.tools.util.collection;
-using com.cpkf.yyjd.tools.util.math;
-using commons.data;
-using commons.data.mysql;
+﻿using com.cpkf.yyjd.tools.util.math;
+using Core.Utils;
+using Shared.Scripts.MapConfigPoint;
 using Sharpen;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
-using WeaponConfigNs;
+using XmlConfig;
 
 namespace App.Server.GameModules.GamePlay.Free.item
 {
     public class FreeItemDrop
     {
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(FreeItemDrop));
+
         private static MyDictionary<int, CatPriority> dropDic;
         private static MyDictionary<int, DropRange> rangeDic;
         private static MyDictionary<string, ItemPriority> catDic;
@@ -22,7 +20,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
         private static Dictionary<int, List<ItemDrop>> dropCache;
 
-        public static void Initial()
+        public static void Initial(int mapId)
         {
             if (dropDic == null)
             {
@@ -32,34 +30,27 @@ namespace App.Server.GameModules.GamePlay.Free.item
                 rangeDic = new MyDictionary<int, DropRange>();
                 dropCache = new Dictionary<int, List<ItemDrop>>();
 
-                List<DataRecord> dropList = MysqlUtil.SelectRecords("select * from new_item_drop", FreeRuleConfig.MysqlConnection);
-                foreach (DataRecord dr in dropList)
+                foreach (var item in DropAreaConfig.current.Items)
                 {
-                    int id = int.Parse(dr.GetValue("id"));
-                    string range = dr.GetValue("range");
-                    string drop = dr.GetValue("drop");
-                    string count = dr.GetValue("count");
-
-                    rangeDic[id] = new DropRange(range, count);
-                    dropDic[id] = new CatPriority(drop);
+                    if (item.MapId == mapId)
+                    {
+                        rangeDic[item.AwardId] = new DropRange(item.Range, item.Count);
+                        dropDic[item.AwardId] = new CatPriority(item.Drop);
+                    }
                 }
-
-                List<DataRecord> catList = MysqlUtil.SelectRecords("select * from new_drop_cat", FreeRuleConfig.MysqlConnection);
-                MyDictionary<string, List<DataRecord>> catMap = new MyDictionary<string, List<DataRecord>>();
-                foreach (DataRecord dr in catList)
+                MyDictionary<string, List<DropPool>> catMap = new MyDictionary<string, List<DropPool>>();
+                foreach (var item in DropPoolConfig.current.Items)
                 {
-                    string cat = dr.GetValue("cat");
+                    string cat = item.Cat;
                     if (!catMap.ContainsKey(cat))
                     {
-                        catMap[cat] = new List<DataRecord>();
+                        catMap[cat] = new List<DropPool>();
                     }
-
-                    catMap[cat].Add(dr);
+                    catMap[cat].Add(item);
                 }
                 foreach (string key in catMap.Keys)
                 {
-                    List<DataRecord> list = catMap[key];
-
+                    List<DropPool> list = catMap[key];
                     int[] cats = new int[list.Count];
                     int[] ids = new int[list.Count];
                     int[] ps = new int[list.Count];
@@ -67,53 +58,43 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
                     for (int i = 0; i < list.Count; i++)
                     {
-                        cats[i] = int.Parse(list[i].GetValue("itemCat"));
-                        ids[i] = int.Parse(list[i].GetValue("itemId"));
-                        ps[i] = int.Parse(list[i].GetValue("priority"));
-                        cs[i] = int.Parse(list[i].GetValue("count"));
+                        cats[i] = int.Parse(list[i].ItemType);
+                        ids[i] = int.Parse(list[i].ItemId);
+                        ps[i] = int.Parse(list[i].Proiority);
+                        cs[i] = int.Parse(list[i].DropCount);
                     }
-
                     catDic[key] = new ItemPriority(cats, ids, ps, cs);
                 }
-
-                List<DataRecord> extraList = MysqlUtil.SelectRecords("select * from new_item_extra", FreeRuleConfig.MysqlConnection);
-                foreach (DataRecord dr in extraList)
+                foreach (var item in DropItemConfig.current.Items)
                 {
-                    int item = int.Parse(dr.GetValue("item"));
-                    int cat = int.Parse(dr.GetValue("cat"));
-                    string drop = dr.GetValue("extraDrop");
+                    int index = int.Parse(item.Item);
+                    int cat = int.Parse(item.ItemType);
+                    string drop = item.ExtraDrop;
                     if (!extraDic.ContainsKey(cat))
                     {
                         extraDic.Add(cat, new MyDictionary<int, CatPriority>());
                     }
-                    extraDic[cat][item] = new CatPriority(drop);
+                    extraDic[cat][index] = new CatPriority(drop);
                 }
-
-                List<DataRecord> itemList = MysqlUtil.SelectRecords("select * from new_item", FreeRuleConfig.MysqlConnection);
-                foreach (DataRecord dr in itemList)
-                {
-                    string item = dr.GetValue("item");
-                    int id = int.Parse(dr.GetValue("id"));
-                }
-
-                InitialPoints();
+                
+                InitialPoints(mapId);
             }
         }
 
-        private static void InitialPoints()
+        private static void InitialPoints(int mapId)
         {
             foreach (MapConfigPoints.ID_Point point in MapConfigPoints.current.IDPints)
             {
                 if (!dropCache.ContainsKey(point.ID))
                 {
-                    dropCache.Add(point.ID, GetDropItems(point.ID));
+                    dropCache.Add(point.ID, GetDropItems(point.ID, mapId));
                 }
             }
         }
 
-        public static ItemDrop[] GetDropItems(string cat, int count)
+        public static ItemDrop[] GetDropItems(string cat, int count, int mapId)
         {
-            Initial();
+            Initial(mapId);
 
             List<ItemDrop> items = new List<ItemDrop>();
 
@@ -155,9 +136,9 @@ namespace App.Server.GameModules.GamePlay.Free.item
             return list;
         }
 
-        public static List<ItemDrop> GetDropItems(int id)
+        public static List<ItemDrop> GetDropItems(int id, int mapId)
         {
-            Initial();
+            Initial(mapId);
 
             if (dropCache.ContainsKey(id))
             {
@@ -189,7 +170,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
                     int[] pIndex = RandomUtil.Random(0, idPoint.points.Count - 1, itemCount);
                     for (int p = 0; p < pIndex.Length; p++)
                     {
-                        Vector3 pos = idPoint.points[pIndex[p]];
+                        Vector3 pos = idPoint.points[pIndex[p]].pos;
 
                         int[] cats = catPriority.GetCats(RandomUtil.Random(r.dropFromCount, r.dropToCount));
 
@@ -220,7 +201,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
         public CatPriority(string drop)
         {
-            string[] ss = drop.Split(",");
+            string[] ss = drop.Split(new string[]{",", "，"}, StringSplitOptions.RemoveEmptyEntries);
             cats = new string[ss.Length];
             prioritys = new int[ss.Length];
             counts = new int[ss.Length];
@@ -322,7 +303,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
         public DropRange(string range, string count)
         {
-            string[] ss = range.Split("-");
+            string[] ss = range.Split(",");
             if (ss.Length == 2)
             {
                 this.posFromCount = int.Parse(ss[0]);
@@ -334,7 +315,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
                 this.posToCount = int.Parse(ss[0]);
             }
 
-            ss = count.Split("-");
+            ss = count.Split(",");
             if (ss.Length == 2)
             {
                 this.dropFromCount = int.Parse(ss[0]);

@@ -27,7 +27,7 @@ namespace App.Shared.GameModules
    
             if (player.triggerEvent.NeedUnmountWeapon)
             {
-                player.WeaponController().ForceUnArmHeldWeapon();
+                player.WeaponController().UnArmWeapon(false);
             }
         }
 

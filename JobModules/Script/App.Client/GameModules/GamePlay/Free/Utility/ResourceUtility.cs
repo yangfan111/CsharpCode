@@ -213,7 +213,7 @@ namespace Assets.Sources.Free.Utility
             }
             else if (url.IndexOf("common") == 0)
             {
-                return new AssetInfo("ui/common".ToLower(), string.Format("Assets/Res/Assets/ui/GameGUIRes/{0}", url));
+                return new AssetInfo("ui/client/common".ToLower(), string.Format("Assets/Res/Assets/ui/GameGUIRes/{0}", url));
             }
             else if (url.IndexOf("halfLoadedRes") == 0)
             {

@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -71,33 +72,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonKillMessageView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonKillMessageView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonKillMessageView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonKillMessageView, CommonKillMessageViewModel> bindingSet =
-                view.CreateBindingSet<CommonKillMessageView, CommonKillMessageViewModel>();
-
-            view.oriShow = _show = view.Show.activeSelf;
-            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonKillMessageView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -121,12 +117,39 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonKillMessageView view)
+		{
+		     BindingSet<CommonKillMessageView, CommonKillMessageViewModel> bindingSet =
+                view.CreateBindingSet<CommonKillMessageView, CommonKillMessageViewModel>();
+            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonKillMessageView view)
+		{
+            _show = view.Show.activeSelf;
+		}
+
+
+		void SaveOriData(CommonKillMessageView view)
+		{
+            view.oriShow = _show;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			Show = _view.oriShow;
 			SpriteReset();
 		}
@@ -154,7 +177,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonKillMessage"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

@@ -1,16 +1,10 @@
 ﻿using Core.CharacterBone;
 using Core.Components;
-using Core.EntityComponent;
 using Core.Playback;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
 using Core.UpdateLatest;
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 
 namespace App.Shared.Components.Player
@@ -26,6 +20,7 @@ namespace App.Shared.Components.Player
         [DontInitilize] [NetworkProperty] public bool IsHeadRotCW;
         [NetworkProperty] public float WeaponPitch;
         [NetworkProperty] public float WeaponRot;
+        [NetworkProperty] public bool IsWeaponRotState;
 
         [DontInitilize] [NetworkProperty] public Vector3 FirstPersonPositionOffset;
         [DontInitilize] [NetworkProperty] public Vector3 FirstPersonRotationOffset;
@@ -78,6 +73,8 @@ namespace App.Shared.Components.Player
             RealWeaponId = leftComponent.RealWeaponId;
 
             EnableIK = leftComponent.EnableIK;
+            
+            IsWeaponRotState = leftComponent.IsWeaponRotState;
         }
 
         public void CopyFrom(object rightComponent)
@@ -90,6 +87,7 @@ namespace App.Shared.Components.Player
             IsHeadRotCW = right.IsHeadRotCW;
             WeaponPitch = right.WeaponPitch;
             WeaponRot = right.WeaponRot;
+            IsWeaponRotState = right.IsWeaponRotState;
 
             FirstPersonPositionOffset = right.FirstPersonPositionOffset;
             FirstPersonRotationOffset = right.FirstPersonRotationOffset;

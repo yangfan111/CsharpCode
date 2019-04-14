@@ -40,7 +40,7 @@ namespace App.Shared.GameModules.Vehicle.Common
         {
             var state = new VehicleDynamicState()
             {
-                Position = cmd.Body.Position,
+                Position = cmd.Body.Position.ShiftedVector3(),
                 Rotation = cmd.Body.Rotation,
                 LinearVelocity = cmd.Body.LinearVelocity,
                 AngularVelocity = cmd.Body.AngularVelocity,

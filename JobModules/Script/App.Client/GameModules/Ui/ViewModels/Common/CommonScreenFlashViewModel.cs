@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -88,35 +89,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonScreenFlashView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonScreenFlashView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonScreenFlashView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonScreenFlashView, CommonScreenFlashViewModel> bindingSet =
-                view.CreateBindingSet<CommonScreenFlashView, CommonScreenFlashViewModel>();
-
-            view.oriShow = _show = view.Show.activeSelf;
-            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
-            view.oriFlashColor = _flashColor = view.FlashColor.color;
-            bindingSet.Bind(view.FlashColor).For(v => v.color).To(vm => vm.FlashColor).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonScreenFlashView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -140,12 +134,42 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonScreenFlashView view)
+		{
+		     BindingSet<CommonScreenFlashView, CommonScreenFlashViewModel> bindingSet =
+                view.CreateBindingSet<CommonScreenFlashView, CommonScreenFlashViewModel>();
+            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
+            bindingSet.Bind(view.FlashColor).For(v => v.color).To(vm => vm.FlashColor).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonScreenFlashView view)
+		{
+            _show = view.Show.activeSelf;
+            _flashColor = view.FlashColor.color;
+		}
+
+
+		void SaveOriData(CommonScreenFlashView view)
+		{
+            view.oriShow = _show;
+            view.oriFlashColor = _flashColor;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			Show = _view.oriShow;
 			FlashColor = _view.oriFlashColor;
 			SpriteReset();
@@ -174,7 +198,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonScreenFlash"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

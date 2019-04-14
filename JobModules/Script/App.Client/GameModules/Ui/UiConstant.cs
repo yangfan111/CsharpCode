@@ -46,6 +46,11 @@
 
         public const Layer weaponBagWindowLayer = Layer.Env;
         public const Layer weaponBagWindowKeyBlockLayer = Layer.Env + 1;
+
+        //喷漆
+        public const Layer paintWindowLayer = Layer.Env + 6;
+        public const Layer paintWindowKeyBlockLayer = Layer.Env + 1;
+        public const Layer paintWindowPointBlockLayer = Layer.Env + 1;
     }
 
 }

@@ -4,6 +4,7 @@ using App.Client.GameModules.Ui.Utils;
 using App.Client.GameModules.Ui.ViewModels.Common;
 using App.Shared.Components.Ui;
 using App.Shared.Components.Ui.UiAdapter;
+using Assets.App.Client.GameModules.Ui;
 using Assets.UiFramework.Libs;
 using Core.Enums;
 using Core.GameModule.Interface;
@@ -245,7 +246,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         /// </summary>
         private void SetDeathTypeIcon(IKillInfoItem item, CellInfo cell)
         {
-			string bundleName = "icon/killinfo";
+			string bundleName = AssetBundleConstant.Icon_Killinfo;
 			String deathIconName = null;
 
             UIUtils.SetActive(cell.KillerName.transform, true);

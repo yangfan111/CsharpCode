@@ -40,8 +40,13 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public override List<int> SlotIndexList
         {
-            get { return new List<int> { 6, 1, 3, 4, 5 }; }
+            get
+            {
+                return _slotIndexList;
+            }
         }
+
+        private readonly List<int> _slotIndexList = new List<int> {6, 1, 3, 4, 5};
 
     }
 }

@@ -1,17 +1,19 @@
-﻿using App.Client.GameModules.Ui.ViewModels.Common;
-using Assets.UiFramework.Libs;
-using Core.GameModule.Interface;
-using UserInputManager.Lib;
-using UnityEngine;
-using System.Collections.Generic;
-using App.Client.GameModules.Ui.Common.MaxMap;
+﻿using App.Client.GameModules.Ui.Common.MaxMap;
 using App.Client.GameModules.Ui.System;
-using UnityEngine.EventSystems;
-using Core.Utils;
 using App.Client.GameModules.Ui.UiAdapter;
 using App.Client.GameModules.Ui.Utils;
+using App.Client.GameModules.Ui.ViewModels.Common;
 using App.Shared.Components.Ui;
+using App.Shared.Player;
 using Assets.App.Client.GameModules.Ui;
+using Assets.UiFramework.Libs;
+using Core.GameModule.Interface;
+using Core.Utils;
+using System.Collections.Generic;
+using App.Shared.GameModules.Player;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UserInputManager.Lib;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {
@@ -207,10 +209,12 @@ namespace App.Client.GameModules.Ui.Models.Common
             {
                 if (visible && !adapter.Enable)
                 {
+                    PlayerStateUtil.AddUIState(EPlayerUIState.MapOpen, adapter.gamePlay);
                     adapter.Enable = true;
                 }
                 else if (!visible && adapter.Enable)
                 {
+                    PlayerStateUtil.RemoveUIState(EPlayerUIState.MapOpen, adapter.gamePlay);
                     adapter.Enable = false;
                 }
             }

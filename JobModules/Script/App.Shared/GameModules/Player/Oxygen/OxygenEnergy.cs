@@ -20,7 +20,6 @@ namespace App.Shared.GameModules.Player.Oxygen
         public bool InSightDebuffState { get { return _sightEnergy.InDebuffState; } }
         public bool InDivingDeffState { get { return _divingEnergy.InDebuffState; } }
         // energy
-        public int ShiftVeryTime { get; set; }
         
         private float _currentOxygen = 0;
 

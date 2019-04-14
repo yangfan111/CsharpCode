@@ -1,4 +1,5 @@
-﻿using XmlConfig;
+﻿using Core.Utils;
+using XmlConfig;
 
 namespace App.Shared.GameModules.Weapon.Behavior
 {
@@ -25,9 +26,9 @@ namespace App.Shared.GameModules.Weapon.Behavior
         private bool CheckSpecialReload(PlayerWeaponController controller)
         {
 
-
-            if (controller.RelatedStateInterface.GetActionState() != ActionInConfig.Reload &&
-                controller.RelatedStateInterface.GetActionState() != ActionInConfig.SpecialReload)
+           // DebugUtil.MyLog("GetActionState:"+controller.RelatedCharState.GetActionState());
+            if (controller.RelatedCharState.GetActionState() != ActionInConfig.Reload &&
+                controller.RelatedCharState.GetActionState() != ActionInConfig.SpecialReload)
             {
                 return true;
             }
@@ -44,13 +45,13 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 if (weaponBase.PullBolt)
                 {
                     //如果已经上膛，直接打断并开枪
-                    controller.RelatedStateInterface.ForceBreakSpecialReload(null);
+                    controller.RelatedCharState.ForceBreakSpecialReload(null);
                     return true;
                 }
                 else
                 {
                     //如果没有上膛，执行上膛，结束后开枪
-                    controller.RelatedStateInterface.BreakSpecialReload();
+                    controller.RelatedCharState.BreakSpecialReload();
                     weaponBase.PullBolt = true;
                  
                     if (controller.AutoFire.HasValue )

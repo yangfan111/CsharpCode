@@ -40,7 +40,8 @@ namespace App.Server.GameModules.GamePlay.Free.player
             //     var lastWeaponScan = player.WeaponController().HeldWeaponAgent.ComponentScan;
             if (!generateSceneObj || lastWeaponScan.IsUnSafeOrEmpty()) return;
             var unitPos = pos.Select(args);
-            var weapon = factory.CreateDropSceneWeaponObjectEntity(lastWeaponScan, new UnityEngine.Vector3(unitPos.GetX(), unitPos.GetY(), unitPos.GetZ()), args.GetInt(lifeTime)) as SceneObjectEntity;
+            var weapon = factory.CreateDropSceneWeaponObjectEntity(lastWeaponScan, 
+                new UnityEngine.Vector3(unitPos.GetX(), unitPos.GetY(), unitPos.GetZ()), args.GetInt(lifeTime)) as SceneObjectEntity;
             if (null != weapon)
             {
                 TriggerArgs ta = new TriggerArgs();

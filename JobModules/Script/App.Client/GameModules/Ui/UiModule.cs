@@ -58,7 +58,8 @@ namespace App.Client.GameModules.Ui
         {
             foreach (var model in _uiModels)
             {
-                AddSystem(model);
+                if(model is IUserSystem)
+                    AddSystem(model as IUserSystem);
             }
         }
 

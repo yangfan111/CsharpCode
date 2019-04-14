@@ -7,14 +7,18 @@ using Core.Network;
 using Core.ObjectPool;
 using Core.SnapshotReplication;
 using Core.UpdateLatest;
+using Core.Utils;
 using Entitas.Utils;
 using Google.Protobuf;
 using Free.framework;
+using RpcNetwork.RpcNetwork;
 
 namespace App.Shared.Network
 {
     public class AppMessageTypeInfo: IMessageTypeInfo
     {
+        private readonly string _name;
+        private static LoggerAdapter _logger = new LoggerAdapter(typeof(AppMessageTypeInfo));
         public void PrintDebugInfo(StringBuilder sb)
         {
             sb.Append("full:").Append(_replicatedSnapshotSerializeInfo.SnapshotReplicator.SendChannel.FullCount)
@@ -81,8 +85,9 @@ namespace App.Shared.Network
 
         private ReplicatedSnapshotSerializeInfo _replicatedSnapshotSerializeInfo;
         private ReplicatedUpdateEntitySerializeInfo _replicatedUpdateEntitySerializeInfo;
-        public AppMessageTypeInfo()
+        public AppMessageTypeInfo(string name="default")
         {
+            _name = name;
             _serializeInfo = new ISerializeInfo[(int) EServer2ClientMessage.Max];
             _serializeInfo[(int) EClient2ServerMessage.Login] = new ProtoBufSerializeInfo<LoginMessage>(Protobuf.LoginMessage.Parser);
             _serializeInfo[(int)EServer2ClientMessage.LoginSucc] = new ProtoBufSerializeInfo<LoginSuccMessage>(Protobuf.LoginSuccMessage.Parser);
@@ -95,11 +100,11 @@ namespace App.Shared.Network
             _serializeInfo[(int) EClient2ServerMessage.LocalLogin] = null;
             _serializeInfo[(int)EClient2ServerMessage.ClothChange] = new ProtoBufSerializeInfo<ClothChangeMessage>(Protobuf.ClothChangeMessage.Parser);
             _serializeInfo[(int)EClient2ServerMessage.DebugCommand] = new ProtoBufSerializeInfo<DebugCommandMessage>(Protobuf.DebugCommandMessage.Parser);
-            _serializeInfo[(int) EClient2ServerMessage.UpdateMsg] = _replicatedUpdateEntitySerializeInfo=new ReplicatedUpdateEntitySerializeInfo(ComponentSerializerManager.Instance, new UpdateMessagePool());
+            _serializeInfo[(int) EClient2ServerMessage.UpdateMsg] = _replicatedUpdateEntitySerializeInfo=new ReplicatedUpdateEntitySerializeInfo(ComponentSerializerManager.Instance, new UpdateMessagePool(), ComponentSerializerManager.HashMd5);
             _serializeInfo[(int) EClient2ServerMessage.FireInfo] = new ProtoBufSerializeInfo<FireInfoMessage>(Protobuf.DebugCommandMessage.Parser);
             _serializeInfo[(int) EClient2ServerMessage.DebugScriptInfo] =  new  ProtoBufSerializeInfo<DebugScriptInfo>(Protobuf.DebugScriptInfo.Parser);
             _serializeInfo[(int) EClient2ServerMessage.GameOver ] = new ProtoBufSerializeInfo<GameOverMesssage>(Protobuf.GameOverMesssage.Parser);
-            _replicatedSnapshotSerializeInfo = new ReplicatedSnapshotSerializeInfo(new SnapshotReplicator(ComponentSerializerManager.Instance));
+            _replicatedSnapshotSerializeInfo = new ReplicatedSnapshotSerializeInfo(new SnapshotReplicator(ComponentSerializerManager.Instance, ComponentSerializerManager.HashMd5));
             _serializeInfo[(int) EServer2ClientMessage.Snapshot] = _replicatedSnapshotSerializeInfo;
 
             //            _replicatedUserCmdSerializeInfo = new ReplicatedCmddSerializeInfo(new SnapshotReplicator(ComponentSerializerManager.Instance));
@@ -161,10 +166,13 @@ namespace App.Shared.Network
 
         public void Dispose()
 	    {
+            _logger.InfoFormat("name{0} Dispose {1}", _name, _serializeInfo.Length);
 		    for (int i = 0; i < _serializeInfo.Length; i++)
 		    {
+               
 			    if (_serializeInfo[i] != null)
 			    {
+                    _logger.InfoFormat("idx:{0} type:{1} dispose", i, _serializeInfo[i].GetType());
 				    _serializeInfo[i].Dispose();
 				    _serializeInfo[i] = null;
 			    }

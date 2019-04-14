@@ -93,7 +93,7 @@ namespace App.Shared.Audio
         {
             config = SingletonManager.Get<AudioGroupManager>().FindById(in_grpId);
 
-    //        AssertUtility.Assert(config != null);
+            AssertUtility.Assert(config != null);
             if (stateIndex < 0)
                 currState = config.DefaultState;
             else

@@ -7,6 +7,7 @@ using App.Server.GameModules.GamePlay.free.player;
 using App.Shared.Player;
 using com.wd.free.item;
 using com.wd.free.skill;
+using Core.Components;
 using Core.HitBox;
 using Core.Utils;
 using Utils.Appearance;
@@ -80,7 +81,7 @@ namespace App.Shared.GameModules.Player
                     BoneMount.FixedObj2Bones(transform.gameObject, target, anchor);
                     parachute.position += position - transform.position;
 
-                    player.playerSkyMove.Position = parachute.transform.position;
+                    player.playerSkyMove.Position = parachute.transform.position.ShiftedToFixedVector3();
                     player.playerSkyMove.Rotation = parachute.transform.rotation;
                     player.playerSkyMove.MoveStage = (int)SkyMoveStage.Parachuting;
                     player.playerSkyMove.LocalPlayerPosition = transform.localPosition;
@@ -89,7 +90,7 @@ namespace App.Shared.GameModules.Player
                 else
                 {
                     transform.parent = anchor;
-                    player.playerSkyMove.Parachute.position = player.playerSkyMove.Position;
+                    player.playerSkyMove.Parachute.position = player.playerSkyMove.Position.ShiftedVector3();
                     player.playerSkyMove.Parachute.rotation = player.playerSkyMove.Rotation;
                     transform.localPosition = player.playerSkyMove.LocalPlayerPosition;
                     transform.localRotation = player.playerSkyMove.LocalPlayerRotation;

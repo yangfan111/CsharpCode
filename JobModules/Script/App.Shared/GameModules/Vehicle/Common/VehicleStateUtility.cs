@@ -5,6 +5,7 @@ using System.Text;
 using App.Shared.Components.Vehicle;
 using App.Shared.GameModules.Vehicle.Ship;
 using App.Shared.GameModules.Vehicle.WheelCarrier;
+using Core.Components;
 using Core.Prediction.VehiclePrediction.Cmd;
 using Core.Utils;
 using UnityEngine;
@@ -56,7 +57,7 @@ namespace App.Shared.GameModules.Vehicle
             {
                 if (!IsTransformSameWithComponent(controller, data))
                 {
-                    controller.transform.SetPositionAndRotation(data.Position, data.Rotation);
+                    controller.transform.SetPositionAndRotation(data.Position.ShiftedVector3(), data.Rotation);
                 }
 
                 return true;
@@ -133,7 +134,7 @@ namespace App.Shared.GameModules.Vehicle
                     //for client, we only need to sync position and rotation
                     var data = vehicle.GetDynamicData();
                     var controller = vehicle.GetController<VehicleCommonController>();
-                    data.Position = controller.cachedRigidbody.position;
+                    data.Position = controller.cachedRigidbody.position.ShiftedToFixedVector3();
                     data.Rotation = controller.cachedRigidbody.rotation;
                 }
             }

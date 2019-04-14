@@ -5,55 +5,15 @@ namespace App.Shared.GameModules.Weapon.Behavior
     /// <summary>
     /// Defines the <see cref="SniperSpreadProcessor" />
     /// </summary>
-    public class SniperSpreadProcessor : ISpreadProcessor
+    public class SniperSpreadProcessor : AbstractSpreadProcessor
     {
-        protected int Length2D1 = 350;
+        protected override void Update(PlayerWeaponController controller, IWeaponCmd cmd)
 
-        protected int Length2D2 = 25;
-
-        public SniperSpreadProcessor(Contexts contexts)
         {
-        }
-
-        public void OnBeforeFire(PlayerWeaponController controller, IWeaponCmd cmd)
-        {
-            SniperSpreadLogicConfig config = controller.HeldWeaponAgent.SniperSpreadLogicCfg;
-            var weaponState = controller.HeldWeaponAgent.RunTimeComponent;
-            float spread = UpdateSpread(controller, weaponState.Accuracy);
-            weaponState.LastSpreadX = spread * config.SpreadScale.ScaleX;
-            weaponState.LastSpreadY = spread * config.SpreadScale.ScaleY;
-        }
-
-        protected float UpdateSpread(PlayerWeaponController controller, float accuracy)
-        {
-            SniperSpreadLogicConfig config = controller.HeldWeaponAgent.SniperSpreadLogicCfg;
-            float param;
-            var posture = controller.RelatedStateInterface.GetCurrentPostureState();
-            if (!controller.RelatedPlayerMove.IsGround)
-            {
-                param = config.AirParam;
-            }
-            else if (controller.RelatedPlayerMove.HorizontalVelocity > Length2D1)
-            {
-                param = config.LengthParam1;
-            }
-            else if (controller.RelatedPlayerMove.HorizontalVelocity > Length2D2)
-            {
-                param = config.LengthParam2;
-            }
-            else if (posture == XmlConfig.PostureInConfig.Crouch || posture == XmlConfig.PostureInConfig.Prone)
-            {
-                param = config.DuckParam;
-            }
-            else
-            {
-                param = config.DefaultParam;
-            }
-            if (!controller.RelatedCameraSNew.IsAiming())
-            {
-                param += config.FovAddParam;
-            }
-            return param;
+            SniperSpreadLogicConfig config           = controller.HeldWeaponAgent.SniperSpreadLogicCfg;
+            var                     runTimeComponent = controller.HeldWeaponAgent.RunTimeComponent;
+            float                   spread           = FireSpreadProvider.GetSpreadScaleFactor(config, controller);
+            FireSpreadFormula.ApplyFixedFinalSpread(spread, config.SpreadScale, runTimeComponent);
         }
     }
 }

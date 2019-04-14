@@ -7,11 +7,11 @@ using Core.EntityComponent;
 using Core.Network;
 using Core.ObjectPool;
 using Core.SnapshotReplication.Serialization.Patch;
-
 using Core.UpdateLatest;
 using Core.Utils;
 using log4net.Core;
 using Sharpen;
+using Version = System.Version;
 
 namespace App.Shared.Network.SerializeInfo
 {
@@ -20,37 +20,43 @@ namespace App.Shared.Network.SerializeInfo
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(ReplicatedUpdateEntitySerializeInfo));
         private ComponentSerializerManager _componentSerializerManager;
 
-      //  private Dictionary<int, UpdateLatestPacakge> _updateLatestHistory = new Dictionary<int, UpdateLatestPacakge>();
+        //  private Dictionary<int, UpdateLatestPacakge> _updateLatestHistory = new Dictionary<int, UpdateLatestPacakge>();
         public IUpdateMessagePool MessagePool { get; private set; }
 
-        public ReplicatedUpdateEntitySerializeInfo(ComponentSerializerManager instance, IUpdateMessagePool updateMessagePool)
+        public ReplicatedUpdateEntitySerializeInfo(ComponentSerializerManager instance,
+            IUpdateMessagePool updateMessagePool, string version)
         {
             _componentSerializerManager = instance;
             MessagePool = updateMessagePool;
             Statistics = new SerializationStatistics("UpdateEntity");
+           
+            _version = version;
         }
 
         public void Dispose()
         {
+            _logger.InfoFormat("Dispose");
             MessagePool.Dispose();
-           
         }
 
         private List<IUpdateComponent> _emptyUpdateComponents = new List<IUpdateComponent>();
         private List<MemoryStream> _sendHistoryStreams = new List<MemoryStream>();
         private List<int> _sendHistorySeqs = new List<int>();
+        private string _version;
         public const int SendCount = 5;
 
         public void Serialize(Stream outStream, object message)
         {
             var msg = message as UpdateLatestPacakge;
             var binaryWriter = MyBinaryWriter.Allocate(outStream);
-            if (MessagePool.GetPackageBySeq(msg.Head.UserCmdSeq)!=null)
+            binaryWriter.Write(_version);
+            if (MessagePool.GetPackageBySeq(msg.Head.UserCmdSeq) != null)
             {
                 _logger.ErrorFormat("repetition  msg.Head.UserCmdSeq{0}", msg.Head.UserCmdSeq);
-                binaryWriter.Write((byte)0);
+                binaryWriter.Write((byte) 0);
                 return;
             }
+
             MessagePool.AddMessage(msg);
             if (_sendHistoryStreams.Count > SendCount)
             {
@@ -59,7 +65,8 @@ namespace App.Shared.Network.SerializeInfo
 
             for (int i = 0; i < SendCount; i++)
             {
-                if (_sendHistorySeqs.Count >0 &&msg.Head.BaseUserCmdSeq >0 && _sendHistorySeqs.First() <= msg.Head.BaseUserCmdSeq)
+                if (_sendHistorySeqs.Count > 0 && msg.Head.BaseUserCmdSeq > 0 &&
+                    _sendHistorySeqs.First() <= msg.Head.BaseUserCmdSeq)
                 {
                     RemoveHistoryFirst();
                 }
@@ -68,20 +75,21 @@ namespace App.Shared.Network.SerializeInfo
                     break;
                 }
             }
-       
+
             var stream = SerializeSinaglePackage(msg);
             _sendHistoryStreams.AddLast(stream);
             _sendHistorySeqs.AddLast(msg.Head.UserCmdSeq);
-           
+
 
             binaryWriter.Write((byte) _sendHistoryStreams.Count);
-            
+
             foreach (var sendHistroyStream in _sendHistoryStreams)
             {
                 binaryWriter.Write(sendHistroyStream.GetBuffer(),
                     (int) (sendHistroyStream.Position - sendHistroyStream.Length), (int) sendHistroyStream.Length);
             }
-            _logger.DebugFormat("send package{0}",binaryWriter.Position);
+
+            _logger.DebugFormat("send package{0}", binaryWriter.Position);
             binaryWriter.ReleaseReference();
         }
 
@@ -104,13 +112,13 @@ namespace App.Shared.Network.SerializeInfo
                 {
                     if (currentComponent.GetComponentId() == oldComponent.GetComponentId())
                     {
-                        var bitMask = serializer.DiffNetworkObject(oldComponent ,
-                            currentComponent );                       
+                        var bitMask = serializer.DiffNetworkObject(oldComponent,
+                            currentComponent);
                         var modifyPatch = ModifyComponentPatch.Allocate(oldComponent, currentComponent, bitMask);
 
                         modifyPatch.Serialize(binaryWriter, _componentSerializerManager);
                         modifyPatch.ReleaseReference();
-                        
+
                         isModife = true;
 
                         break;
@@ -138,7 +146,6 @@ namespace App.Shared.Network.SerializeInfo
             var old = MessagePool.GetPackageBySeq(msg.Head.BaseUserCmdSeq);
             if (old != null)
             {
-              
                 msg.Head.Serialize(binaryWriter);
                 bodyLength = SerializeComponents(binaryWriter, old.UpdateComponents, msg.UpdateComponents);
             }
@@ -159,58 +166,64 @@ namespace App.Shared.Network.SerializeInfo
         {
             ReusableList<UpdateLatestPacakge> list = ReusableList<UpdateLatestPacakge>.Allocate();
             BinaryReader binaryReader = new BinaryReader(inStream);
+            string version = binaryReader.ReadString();
+            if (!version.Equals(_version))
+            {
+                _logger.ErrorFormat("ComponentSerializer Hash {0} Not Equal{1}",_version,version);
+            }
             int count = binaryReader.ReadByte();
             for (int i = 0; i < count; i++)
             {
                 UpdateLatestPacakge pacakge = UpdateLatestPacakge.Allocate();
-
-                pacakge.Head.Deserialize(binaryReader);
-                var seq = pacakge.Head.UserCmdSeq;
-                var bodyLenght = pacakge.Head.BodyLength;
-                if (MessagePool.GetPackageBySeq(seq) == null)
+                try
                 {
-                    var baseSeq = pacakge.Head.BaseUserCmdSeq;
-                    var old = MessagePool.GetPackageBySeq(baseSeq);
-                    if (old != null)
+                    pacakge.Head.Deserialize(binaryReader);
+                    var seq = pacakge.Head.UserCmdSeq;
+                    var bodyLenght = pacakge.Head.BodyLength;
+                    if (MessagePool.GetPackageBySeq(seq) == null)
                     {
-                        pacakge.CopyUpdateComponentsFrom(old.UpdateComponents);
-                    }
+                        var baseSeq = pacakge.Head.BaseUserCmdSeq;
+                        var old = MessagePool.GetPackageBySeq(baseSeq);
+                        if (old != null)
+                        {
+                            pacakge.CopyUpdateComponentsFrom(old.UpdateComponents);
+                        }
 
 
-                  
-                  
-                    for (int c = 0; c < pacakge.Head.ComponentCount; c++)
-                    {
-                        var opType = (ComponentReplicateOperationType) binaryReader.ReadByte();
+                        for (int c = 0; c < pacakge.Head.ComponentCount; c++)
+                        {
+                            var opType = (ComponentReplicateOperationType) binaryReader.ReadByte();
 
-                        var patch = CreateEmptyComponentPatch(opType);
-                        patch.DeSerialize(binaryReader, _componentSerializerManager);
-                        ApplyPatchTo(patch, pacakge.UpdateComponents);
+                            var patch = CreateEmptyComponentPatch(opType);
+                            patch.DeSerialize(binaryReader, _componentSerializerManager);
+                            ApplyPatchTo(patch, pacakge.UpdateComponents);
 
-                        patch.ReleaseReference();
-                    }
+                            patch.ReleaseReference();
+                        }
 
-                    if (pacakge.Head.ComponentCount == pacakge.UpdateComponents.Count)
-                    {
-                        MessagePool.AddMessage(pacakge);
-                        pacakge.AcquireReference();
-                        list.Value.Add(pacakge);
-                        
+                        if (pacakge.Head.ComponentCount == pacakge.UpdateComponents.Count)
+                        {
+                            MessagePool.AddMessage(pacakge);
+                            pacakge.AcquireReference();
+                            list.Value.Add(pacakge);
+                        }
+                        else
+                        {
+                            _logger.WarnFormat("Skip package {0} with length {1} baseSeq;{2}", pacakge.Head.UserCmdSeq,
+                                pacakge.Head.BodyLength, pacakge.Head.BaseUserCmdSeq);
+                        }
                     }
                     else
                     {
-                        _logger.WarnFormat("Skip package {0} with length {1} baseSeq;{2}",pacakge.Head.UserCmdSeq, pacakge.Head.BodyLength,pacakge.Head.BaseUserCmdSeq);
+                        _logger.DebugFormat("Skip package {0} with length {1}", pacakge.Head.UserCmdSeq,
+                            pacakge.Head.BodyLength);
+                        binaryReader.BaseStream.Seek(bodyLenght, SeekOrigin.Current);
                     }
                 }
-                else
+                finally
                 {
-                    
-                    _logger.DebugFormat("Skip package {0} with length {1}",pacakge.Head.UserCmdSeq, pacakge.Head.BodyLength);
-                    binaryReader.BaseStream.Seek(bodyLenght, SeekOrigin.Current);
+                    pacakge.ReleaseReference();
                 }
-
-            
-                pacakge.ReleaseReference();
             }
 
             return list;
@@ -235,10 +248,11 @@ namespace App.Shared.Network.SerializeInfo
                 {
                     if (component.GetComponentId() == patch.Component.GetComponentId())
                     {
-                       throw new ArgumentException(string.Format("repetition component;{0}",
+                        throw new ArgumentException(string.Format("repetition component;{0}",
                             component.GetComponentId()));
                     }
                 }
+
                 IUpdateComponent add =
                     (IUpdateComponent) GameComponentInfo.Instance.Allocate(patch.Component.GetComponentId());
                 patch.ApplyPatchTo(add, _componentSerializerManager);

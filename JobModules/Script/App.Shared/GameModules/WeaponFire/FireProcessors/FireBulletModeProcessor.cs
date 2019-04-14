@@ -20,14 +20,14 @@ namespace App.Shared.GameModules.Weapon.Behavior
         public bool IsCanFire(PlayerWeaponController controller, IWeaponCmd weaponCmd)
         {
             WeaponBaseAgent weaponAgent = controller.HeldWeaponAgent;
-            if (weaponCmd.RenderTime < weaponAgent.RunTimeComponent.NextAttackTimer)
+            if (weaponCmd.RenderTime < weaponAgent.RunTimeComponent.NextAttackTimestamp)
             {
                 return false;
             }
+
             if (weaponAgent.BaseComponent.Bullet <= 0)
             {
-                controller.ShowTip(ETipType.FireWithNoBullet);
-
+                controller.ShowTip(ETipType.FireWithNoBullet);  
                 return false;
             }
             EFireMode currentMode = (EFireMode)weaponAgent.BaseComponent.RealFireModel;
@@ -59,10 +59,10 @@ namespace App.Shared.GameModules.Weapon.Behavior
             if ((EFireMode)heldAgent.BaseComponent.RealFireModel != EFireMode.Burst)
             {
                 var commonFireCfg = heldAgent.CommonFireCfg;
-                heldAgent.RunTimeComponent.NextAttackTimer = cmd.RenderTime + commonFireCfg.AttackInterval;
+                heldAgent.RunTimeComponent.NextAttackTimestamp = cmd.RenderTime + commonFireCfg.AttackInterval;
 
             }
-            heldAgent.RunTimeComponent.LastFireTime = cmd.RenderTime;
+            heldAgent.RunTimeComponent.LastAttackTimestamp = cmd.RenderTime;
         }
 
         public void OnFrame(PlayerWeaponController controller, IWeaponCmd cmd)

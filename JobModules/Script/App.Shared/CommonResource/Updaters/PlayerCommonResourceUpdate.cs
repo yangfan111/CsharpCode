@@ -90,7 +90,7 @@ namespace App.Shared.CommonResource.Updaters
             var cc = PlayerEntityUtility.InitCharacterController(character);
             var kcc = PlayerEntityUtility.InitKinematicCharacterMotor(character);
             var characterControllerContext = new CharacterControllerContext(
-                new UnityCharacterController(cc),
+                new UnityCharacterController(cc, !player.isFlagSelf),
                 new ProneCharacterController(kcc,
                     new ProneController()),
                 new DiveCharacterController(kcc,

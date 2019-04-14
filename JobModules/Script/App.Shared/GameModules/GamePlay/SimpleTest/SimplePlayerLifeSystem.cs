@@ -10,9 +10,6 @@ using Random = System.Random;
 using Core.Configuration.Equipment;
 using Core.GameTime;
 using Utils.Singleton;
-using App.Shared.GameModules.Weapon;
-using Assets.Utils.Configuration;
-using Utils.Configuration;
 
 namespace App.Shared.GameModules.GamePlay.SimpleTest
 {
@@ -20,7 +17,6 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(SimplePlayerLifeSystem));
         private IGroup<PlayerEntity> _players;
-        private Contexts _contexts;
         private ICurrentTime _currentTimeObject;
 
       
@@ -40,13 +36,12 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
         {
             _players = contexts.player.GetGroup(PlayerMatcher.GamePlay);
             _currentTimeObject = currentTimeObject;
-            _contexts = contexts;
         }
 
         public override void SingleExecute(PlayerEntity entity)
         {
            entity.gamePlay.MaxHp = 100;
-                Rebirth(entity, _contexts, _currentTimeObject.CurrentTime, SingletonManager.Get<MapConfigManager>().SceneParameters.PlayerBirthPosition);
+                Rebirth(entity, _currentTimeObject.CurrentTime, SingletonManager.Get<MapConfigManager>().SceneParameters.PlayerBirthPosition);
         }
 
        
@@ -83,34 +78,24 @@ namespace App.Shared.GameModules.GamePlay.SimpleTest
                         else
                         {
                             
-                            Rebirth(playerEntity, _contexts, time, SingletonManager.Get<MapConfigManager>().SceneParameters.PlayerBirthPosition);
+                            Rebirth(playerEntity, time, SingletonManager.Get<MapConfigManager>().SceneParameters.PlayerBirthPosition);
                         }
                     }
                     else if (gp.IsLifeState(EPlayerLifeState.Dead) && gp.IsLifeChangeOlderThan(time - 500000))
                     {
-                        Rebirth(playerEntity, _contexts, time, SingletonManager.Get<MapConfigManager>().SceneParameters.PlayerBirthPosition);
+                        Rebirth(playerEntity, time, SingletonManager.Get<MapConfigManager>().SceneParameters.PlayerBirthPosition);
                     }
                 }
             }
         }
 
-        private static void Rebirth(PlayerEntity playerEntity, Contexts contexts, int time, Vector3 pos)
+        private static void Rebirth(PlayerEntity playerEntity, int time, Vector3 pos)
         {
             _logger.InfoFormat("{0} rebirth", playerEntity.entityKey);
             playerEntity.gamePlay.ChangeLifeState(EPlayerLifeState.Alive, time);
             playerEntity.gamePlay.CurHp = 100;
+            playerEntity.weaponLogic.State.LoadedBulletCount = playerEntity.weaponLogic.State.BulletCountLimit;
             playerEntity.position.Value = pos;
-            PlayerWeaponController controller = playerEntity.WeaponController();
-            var config = controller.HeldWeaponAgent.CommonFireCfg;
-            if (config == null)
-                return;
-            int clipSize = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(controller.HeldWeaponAgent.ConfigId).PropertyCfg.Bullet;
-            if (controller.HeldWeaponAgent.BaseComponent.Magazine > 0)
-            {
-                clipSize += SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(controller.HeldWeaponAgent.BaseComponent.Magazine).Bullet;
-            }
-            controller.HeldWeaponAgent.BaseComponent.Bullet = clipSize;
-
         }
     }
 }

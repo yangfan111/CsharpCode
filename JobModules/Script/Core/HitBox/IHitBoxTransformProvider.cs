@@ -1,13 +1,18 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Core.HitBox
 {
     public interface IHitBoxTransformProvider
     {
-        void Update(Vector3 rootPosition, Quaternion rotation);
-        Transform GetTransform(Transform bone);
-        Vector3 RootPosition { get; }
+        float BoundSphereRadius();
 
-        Quaternion RootRotation { get; }
+        Vector3 BoundSpherePosition();
+
+        void SetActive(bool active);
+        
+        Dictionary<string, Collider> GetHitBoxColliders();
+
+        Dictionary<string, Transform> GetHitBoxTransforms();
     }
 }

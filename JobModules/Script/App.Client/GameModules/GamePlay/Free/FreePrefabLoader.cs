@@ -89,8 +89,17 @@ namespace App.Client.GameModules.GamePlay.Free
             {
                 cache[info.BundleName].Add(info.AssetName, new Queue<GameObject>());
             }
-            obj.SetActive(false);
-            cache[info.BundleName][info.AssetName].Enqueue(obj);
+
+            if (obj != null)
+            {
+                obj.SetActive(false);
+                cache[info.BundleName][info.AssetName].Enqueue(obj);
+            }
+            else
+            {
+                _logger.ErrorFormat("Load {0} Failed", info.BundleName + "/" + info.AssetName);
+            }
+
         }
 
         public void OnLoadSucc(Action<GameObject> action, UnityObject unityObj)

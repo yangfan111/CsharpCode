@@ -1,6 +1,6 @@
 namespace Core.GameModule.Interface
 {
-    public interface IEntityCleanUpSystem
+    public interface IEntityCleanUpSystem:IUserSystem
     {
         void OnEntityCleanUp();
     }

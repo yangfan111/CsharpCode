@@ -74,6 +74,10 @@ namespace Core.Free
         public const int RevengeTagUI = 114;
         public const int FetchUIValue = 115;
         public const int PlayerMoveSpeedSet = 116;
+        public const int PlayerVisibility = 117;
+        public const int PlayerJumpSpeedSet = 118;
+        public const int PlayerTipHide = 119;
+		public const int PlayerSprayPaint = 120;
 
         private static Dictionary<int, string> MessageDesc = new Dictionary<int, string>();
 

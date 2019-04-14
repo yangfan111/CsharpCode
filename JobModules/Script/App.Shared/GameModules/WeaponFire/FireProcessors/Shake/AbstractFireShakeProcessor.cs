@@ -6,7 +6,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
     /// Defines the <see cref="AbstractFireShakeProcessor{T1}" />
     /// </summary>
     /// <typeparam name="T1"></typeparam>
-    public abstract class AbstractFireShakeProcessor<T1> : IFireShakeProcess
+    public abstract class AbstractFireShakeProcessor: IFireShakeProcess
     {
         protected Contexts _contexts;
 
@@ -28,26 +28,30 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
         public void OnFrame(PlayerWeaponController controller, IWeaponCmd cmd)
         {
-            var weaponState = controller.HeldWeaponAgent.RunTimeComponent;
+            var runTimeComponent = controller.HeldWeaponAgent.RunTimeComponent;
             int frameInterval = cmd.FrameInterval;
-            if (weaponState.PunchDecayCdTime > 0)
+            //枪械震动回落:RelatedOrient
+            if (runTimeComponent.PunchDecayCdTime > 0)
             {
-                weaponState.PunchDecayCdTime -= frameInterval;
                 var duration = GetDecayCdTime(controller);
-                var deltaTime = cmd.RenderTime - weaponState.LastRenderTime;
-                weaponState.LastRenderTime = cmd.RenderTime;
-                controller.RelatedOrient.NegPunchPitch += weaponState.PunchPitchSpeed * deltaTime;
-                controller.RelatedOrient.WeaponPunchPitch =
-                    controller.RelatedOrient.NegPunchPitch *
-                    controller.HeldWeaponAgent.RifleShakeCfg.Default.VPunchOffsetFactor;
-                controller.RelatedOrient.NegPunchYaw += weaponState.PunchYawSpeed * deltaTime;
-                controller.RelatedOrient.WeaponPunchYaw =
-                    controller.RelatedOrient.NegPunchYaw *
-                    controller.HeldWeaponAgent.RifleShakeCfg.Default.HPunchOffsetFactor;
+                var lastDecayTime = runTimeComponent.PunchDecayCdTime;
+                runTimeComponent.PunchDecayCdTime -= frameInterval;
+                var lastPostion = easeOutExpo(duration - lastDecayTime, 0, runTimeComponent.PunchPitchSpeed, duration);
+                var newPostion = easeOutExpo(duration - runTimeComponent.PunchDecayCdTime, 0, runTimeComponent.PunchPitchSpeed, duration);
+                controller.RelatedOrient.NegPunchPitch += newPostion - lastPostion;
+                /*controller.RelatedOrient.NegPunchPitch += runTimeComponent.PunchPitchSpeed * deltaTime;*/
+                controller.RelatedOrient.WeaponPunchPitch = controller.RelatedOrient.NegPunchPitch * controller.HeldWeaponAgent.RifleShakeCfg.Default.VPunchOffsetFactor;
+                //var duration = FireShakeProvider.GetDecayInterval(controller);
+                var deltaTime = cmd.RenderTime - runTimeComponent.LastRenderTime;
+                runTimeComponent.LastRenderTime = cmd.RenderTime;
+                //controller.RelatedOrient.NegPunchPitch += runTimeComponent.PunchPitchSpeed * deltaTime;
+                
+                controller.RelatedOrient.NegPunchYaw += runTimeComponent.PunchYawSpeed * deltaTime;
+                controller.RelatedOrient.WeaponPunchYaw = controller.RelatedOrient.NegPunchYaw * controller.HeldWeaponAgent.RifleShakeCfg.Default.HPunchOffsetFactor;
             }
             else
             {
-                weaponState.LastRenderTime = cmd.RenderTime;
+                runTimeComponent.LastRenderTime = cmd.RenderTime;
                 var punchYaw = controller.RelatedOrient.NegPunchYaw;
                 var punchPitch = controller.RelatedOrient.NegPunchPitch;
                 var frameTime = frameInterval / 1000f;
@@ -69,8 +73,12 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
         protected int GetDecayCdTime(PlayerWeaponController controller)
         {
-            return (int) (controller.HeldWeaponAgent.CommonFireCfg.AttackInterval *
-                          controller.HeldWeaponAgent.RifleShakeCfg.DecaytimeFactor);
+            return (int) (controller.HeldWeaponAgent.CommonFireCfg.AttackInterval * controller.HeldWeaponAgent.RifleShakeCfg.DecaytimeFactor);
+        }
+
+        public static float easeOutExpo(float t, float b , float c, float d) {
+            //t当前时间|b起始位置|c最大距离|d总时间
+            return (t == d) ? b + c : c * (-(float) Mathf.Pow(2, -10 * t/d) + 1) + b;	
         }
     }
 }

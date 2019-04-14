@@ -1,9 +1,7 @@
 using System;
 using App.Shared.Components.Player;
-using Shared.Scripts;
 using Utils.Appearance;
-using Utils.Appearance.WardrobePackage;
-using Utils.AssetManager;
+using Utils.CharacterState;
 
 namespace App.Shared.GameModules.Player.Appearance.WardrobeControllerPackage
 {
@@ -20,11 +18,6 @@ namespace App.Shared.GameModules.Player.Appearance.WardrobeControllerPackage
         public void SyncToLatestComponent(LatestAppearanceComponent value)
         {
             CopyToLatestWardrobeComponent(value);
-        }
-
-        protected override AbstractLoadRequest CreateLoadRequest(AssetInfo assetInfo, ILoadedHandler mountHandler)
-        {
-            return LoadRequestFactory.Create<PlayerEntity>(assetInfo, mountHandler.OnLoadSucc);
         }
 
         #region Helper

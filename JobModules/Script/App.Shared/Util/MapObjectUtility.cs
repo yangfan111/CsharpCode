@@ -33,7 +33,7 @@ namespace App.Shared.Util
             var entityReference = gameObject.GetComponent<EntityReference>();
             if (entityReference == null)
             {
-                entityReference = gameObject.AddComponent<EntityReference>();
+                entityReference = gameObject.AddComponentUncheckRequireAndDisallowMulti<EntityReference>();
             }
             entityReference.Init(mapObject.entityAdapter);
         }

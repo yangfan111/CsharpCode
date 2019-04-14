@@ -151,18 +151,27 @@ namespace App.Client.GameModules.SceneObject
             {
                 var obj = objs[i];
                 var data = obj.glassyData;
-                if (data.IsStateChanged)
+                if (data.HasChangedState())
                 {
                     var fo = obj.rawGameObject.Value.GetComponent<FracturedGlassyObject>();
 
-                    var chunkId = data.GetNextBrokenChunkId();
-                    while (chunkId >= 0)
+                    if (data.HasAnyChunkBroken())
                     {
-                        fo.MakeBroken(chunkId);
-                        chunkId = data.GetNextBrokenChunkId(chunkId);
+                        var chunkId = data.GetNextBrokenChunkId();
+                        while (chunkId >= 0)
+                        {
+                            fo.MakeBroken(chunkId);
+                            chunkId = data.GetNextBrokenChunkId(chunkId);
+                            data.HasLocalBrokenChunks = true;
+                        }
+                    }
+                    else
+                    {
+                        fo.ResetChunks();
+                        data.HasLocalBrokenChunks = false;
                     }
 
-                    data.IsStateChanged = false;
+                    data.ClearChangedState();
                 }
             }
         }

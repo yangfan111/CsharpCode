@@ -9,7 +9,7 @@
                 && player.hasThrowingUpdate
                 && player.throwingAction.ActionInfo.IsReady)
             {
-                player.throwingUpdate.ReadyFly = true;
+                player.throwingUpdate.IsStartFly = true;
             }
         }
     }

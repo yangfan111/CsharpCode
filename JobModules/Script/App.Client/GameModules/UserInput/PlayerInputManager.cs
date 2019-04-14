@@ -51,5 +51,37 @@ namespace App.Client.GameModules.UserInput
                 }
             }
         }
+
+        public static void BlockAction(string action)
+        {
+            var exists = Luminosity.IO.InputManager.Exists;
+            if (exists)
+            {
+                Luminosity.IO.InputManager.BlockAction(action, Luminosity.IO.PlayerID.One);
+            }
+            else
+            {
+                if (!SharedConfig.IsServer)
+                {
+                    Logger.InfoFormat("Luminosity.IO.InputManager is not init!");
+                }
+            }
+        }
+        
+        public static void ReleaseAction(string action)
+        {
+            var exists = Luminosity.IO.InputManager.Exists;
+            if (exists)
+            {
+                Luminosity.IO.InputManager.ReleaseAction(action, Luminosity.IO.PlayerID.One);
+            }
+            else
+            {
+                if (!SharedConfig.IsServer)
+                {
+                    Logger.InfoFormat("Luminosity.IO.InputManager is not init!");
+                }
+            }
+        }
     }
 }

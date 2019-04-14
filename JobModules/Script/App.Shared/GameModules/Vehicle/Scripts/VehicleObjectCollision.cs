@@ -61,7 +61,7 @@ namespace App.Shared.GameModules.Vehicle
 
         private float CalcObjectCollisionDamageToPlayer(float factor, float velocity)
         {
-            var damage = velocity > 30 ? ((velocity - 30) * 0.5f * factor) * 0.01f : 0.0f;
+            var damage = velocity > 30 ? ((velocity - 30) * factor) * 0.01f : 0.0f;
 
 #if UNITY_EDITOR
             if (DebugEnable && DamageEnabled && damage > 0)

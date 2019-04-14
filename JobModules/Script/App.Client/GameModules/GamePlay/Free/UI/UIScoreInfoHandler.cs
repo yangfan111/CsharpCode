@@ -59,7 +59,7 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                 int feedbackType = simpleProto.Ins[2];
                 if (killerName.Equals(SingletonManager.Get<FreeUiManager>().Contexts1.player.flagSelfEntity.playerInfo.PlayerName))
                 {
-                    for (var fbType = EUIKillFeedbackType.Normal; fbType <= EUIKillFeedbackType.FirstBlood; fbType++)
+                    for (var fbType = EUIKillFeedbackType.Normal; fbType <= EUIKillFeedbackType.Hit; fbType++)
                     {
                         if (((feedbackType >> (int)fbType) & 1) == 1)
                         {

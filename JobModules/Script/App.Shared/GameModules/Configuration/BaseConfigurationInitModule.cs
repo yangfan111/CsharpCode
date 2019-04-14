@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using App.Shared.Configuration;
+﻿using App.Shared.Configuration;
 using Assets.Core.Configuration;
 using Assets.Utils.Configuration;
 using Core.Configuration;
@@ -7,31 +6,21 @@ using Core.Configuration.Sound;
 using Core.Configuration.Terrains;
 using Core.GameModule.Module;
 using Core.SessionState;
-using Entitas;
 using Utils.AssetManager;
 using Utils.Configuration;
-using Utils.SettingManager;
 using Utils.Singleton;
 
 namespace App.Shared.GameModules.Configuration
 {
-    public class BaseConfigurationInitModule : Systems
+    public class BaseConfigurationInitModule : GameModule
     {
-        private readonly IUnityAssetManager _assetManager;
+      
 
-
-        /// <summary>
-        ///
-        /// 注意：不能加载特定模式地图需要的配置文件
-        /// </summary>
-        /// <param name="sessionState"></param>
-        public BaseConfigurationInitModule( ISessionCondition sessionState, IUnityAssetManager assetManager)
+        public BaseConfigurationInitModule(Contexts context, ISessionState sessionState)
         {
-            _assetManager = assetManager;
             AddConfigSystem<AssetConfigManager>(sessionState, "svn.version");
             AddConfigSystem<CharacterStateConfigManager>(sessionState, "SpeedConfig");
             AddConfigSystem<AvatarAssetConfigManager>(sessionState, "role_avator_res");
-            AddConfigSystem<MeleeAttackCDConfigManager>(sessionState, "MeleeAttackCDConfig");
 
             AddConfigSystem<FirstPersonOffsetConfigManager>(sessionState, "FirstPersonOffset");
             AddConfigSystem<RoleConfigManager>(sessionState, "role");
@@ -43,8 +32,8 @@ namespace App.Shared.GameModules.Configuration
             AddConfigSystem<PlayerSoundConfigManager>(sessionState, "PlayerSound");
             AddConfigSystem<BulletDropConfigManager>(sessionState, "BulletDrop");
             AddConfigSystem<ClientEffectCommonConfigManager>(sessionState, "ClientEffectCommon");
-            AddConfigSystem<WeaponConfigManagement>(sessionState, "WeaponData");
-            AddConfigSystem<WeaponResourceConfigManager>(sessionState, "weapon");
+            AddConfigSystem<WeaponDataConfigManager>(sessionState, "WeaponData");
+            AddConfigSystem<WeaponConfigManager>(sessionState, "weapon");
             AddConfigSystem<ClipDropConfigManager>(sessionState, "ClipDrop");
             AddConfigSystem<WeaponPartsConfigManager>(sessionState, "weapon_parts");
             AddConfigSystem<MapPositionConfigManager>(sessionState, "temp");
@@ -79,27 +68,16 @@ namespace App.Shared.GameModules.Configuration
             AddConfigSystem<WeaponAvatarConfigManager>(sessionState, "weapon_avator");
             AddConfigSystem<StreamingLevelStructure>(sessionState, "streaminglevel", "tablesfrombuilding");
             AddConfigSystem<MapsDescription>(sessionState, "mapConfig");
-            AddConfigSystem<AudioWeaponManager>(sessionState, "WeaponAudio");
-            AddConfigSystem<AudioEventManager>(sessionState, "AudioEvent");
-            AddConfigSystem<AudioGroupManager>(sessionState, "AudioGroup");
-            if (!SettingManager.GetInstance().IsInitialized())
-            {
-                AddConfigSystem<SettingManager>(sessionState, "setting");
-            }
-
-            AddConfigSystem<VideoSettingConfigManager>(sessionState, "video_setting");
-            AddConfigSystem<LoadingTipConfigManager>(sessionState, "loadingtips");
         }
 
-        private void AddConfigSystem<T>(ISessionCondition sessionState, string asset,
+        private void AddConfigSystem<T>(ISessionState sessionState, string asset,
             string bundleName = "tables")
             where T : AbstractConfigManager<T>, IConfigParser, new()
         {
            
-            this.Add(new DefaultConfigInitSystem<T>(_assetManager, sessionState, new AssetInfo(bundleName, asset),
+            AddSystem(new DefaultConfigInitSystem<T>(sessionState, new AssetInfo(bundleName, asset),
                 SingletonManager.Get<T>()));
         }
-        List<IExecuteSystem> _systems = new List<IExecuteSystem>();
-      
+        
     }
 }

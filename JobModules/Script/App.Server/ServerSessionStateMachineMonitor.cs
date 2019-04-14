@@ -9,7 +9,7 @@ namespace App.Server
 {
     public class ServerSessionStateMachineMonitor : SessionStateMachineMonitor
     {
-        public ServerSessionStateMachineMonitor(IContexts contexts, ServerRoom room)
+        public ServerSessionStateMachineMonitor(ServerRoom room)
         {
             AddMonitor(new ServerSessionStateProgress(room));
         }

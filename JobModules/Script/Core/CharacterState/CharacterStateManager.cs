@@ -92,28 +92,28 @@ namespace Core.CharacterState
             return _moveInWater;
         }
 
-        private bool _steepSlope;
+        private float _steepSlopeAngle;
 
-        public void SetSteepSlope(bool value)
+        public void SetSteepAngle(float value)
         {
-            _steepSlope = value;
+            _steepSlopeAngle = value;
         }
 
-        public bool IsSteepSlope()
+        public float GetSteepAngle()
         {
-            return _steepSlope;
+            return _steepSlopeAngle;
         }
 
-        private bool _beenSlowDown;
+        private int _steepSlowDownType;
 
-        public void SetBeenSlowDown(bool value)
+        public void SetSteepSlowDown(int value)
         {
-            _beenSlowDown = value;
+            _steepSlowDownType = value;
         }
 
-        public bool IsSlowDown()
+        public int GetSteepSlowDown()
         {
-            return _beenSlowDown;
+            return _steepSlowDownType;
         }
 
         private bool _exceedSlopeLimit;
@@ -228,6 +228,11 @@ namespace Core.CharacterState
             set { _posture.IsNeedJumpForSync = value; }
         }
 
+        public bool IsFreefallState()
+        {
+            return _posture.IsFreefallState();
+        }
+
         #endregion
 
         #region ISyncFsmSnapshot
@@ -296,6 +301,11 @@ namespace Core.CharacterState
         public void SetSpeedAffect(float affect)
         {
             _speed.SetSpeedAffect(affect);
+        }
+
+        public void SetJumpAffect(float affect)
+        {
+            _speed.SetJumpAffect(affect);
         }
 
         public float SpeedRatio()

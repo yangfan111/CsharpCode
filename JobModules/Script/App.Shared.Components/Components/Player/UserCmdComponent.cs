@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Core.Components;
 using Core.EntityComponent;
-using Core.GameInputFilter;
+using Core;
 using Core.Network;
 using Core.Playback;
 using Core.Prediction;
@@ -64,7 +64,7 @@ namespace App.Shared.Components.Player
     [Player]
     public class LatestAdjustCmdComponent : ISelfLatestComponent
     {
-        [DontInitilize] [NetworkProperty] public Vector3 AdjustPos;
+        [DontInitilize] [NetworkProperty] public FixedVector3 AdjustPos;
         [NetworkProperty] public int ServerSeq;
         public int ClientSeq = -1;
         
@@ -73,20 +73,24 @@ namespace App.Shared.Components.Player
             return (int) EComponentIds.LatestAdjustCmd;
         }
 
-        public Vector3? GetPos(int seq)
+        public bool HasPos()
+        {
+            return ClientSeq < ServerSeq;
+        }
+        public Vector3 GetPos(int seq)
         {
             if (ClientSeq < ServerSeq)
             {
                 ClientSeq = ServerSeq;
-                return AdjustPos;
+                return AdjustPos.ShiftedVector3();
             }
                 
-            return null;
+            return Vector3.zero;
         }
         
         public void SetPos(Vector3 pos)
         {
-            AdjustPos = pos;
+            AdjustPos = pos.ShiftedToFixedVector3();
         }   
         
         public void CopyFrom(object target)
@@ -182,7 +186,8 @@ namespace App.Shared.Components.Player
 
             component.CurWeapon = right.CurWeapon;
             component.UseEntityId = right.UseEntityId;
-            component.PickUpEquip = right.PickUpEquip;
+            component.ManualPickUpEquip = right.ManualPickUpEquip;
+            component.AutoPickUpEquip = UserCmd.CopyList(component.AutoPickUpEquip, right.AutoPickUpEquip);
             component.UseVehicleSeat = right.UseVehicleSeat;
             component.UseType = right.UseType;
             component.ChangeChannel = right.ChangeChannel;
@@ -207,10 +212,11 @@ namespace App.Shared.Components.Player
         [DontInitilize] [NetworkProperty] public int ChangedSeat;
         //[DontInitilize] [NetworkProperty] public int SnapshotId;
         [DontInitilize] [NetworkProperty] public int BeState;
-        [DontInitilize] [NetworkProperty] public int Buttons;
+        [DontInitilize] [NetworkProperty] public long Buttons;
         [DontInitilize] [NetworkProperty] public int SwitchNumber;
         [DontInitilize] [NetworkProperty] public int CurWeapon;
-        [DontInitilize] [NetworkProperty] public int PickUpEquip;
+        [DontInitilize] [NetworkProperty] public int ManualPickUpEquip;
+        [DontInitilize] [NetworkProperty] public List<int> AutoPickUpEquip;
         [DontInitilize] [NetworkProperty] public int UseEntityId;
         [DontInitilize] [NetworkProperty] public int UseVehicleSeat;
         [DontInitilize] [NetworkProperty] public int UseType;
@@ -241,7 +247,8 @@ namespace App.Shared.Components.Player
            
             CurWeapon = right.CurWeapon;
             UseEntityId = right.UseEntityId;
-            PickUpEquip = right.PickUpEquip;
+            ManualPickUpEquip = right.ManualPickUpEquip;
+            AutoPickUpEquip = UserCmd.CopyList(AutoPickUpEquip, right.AutoPickUpEquip);
             UseVehicleSeat = right.UseVehicleSeat;
             UseType = right.UseType;
             ChangeChannel = right.ChangeChannel;
@@ -251,7 +258,7 @@ namespace App.Shared.Components.Player
 
         public void Reset()
         {
-            
+          
         }
 
      } 
@@ -262,11 +269,7 @@ namespace App.Shared.Components.Player
         public INetworkChannel NetworkChannel;
     }
 
-    [Player]
-    public class UserCmdFilterComponent:IComponent
-    {
-        public IGameInputProcessor GameInputProcessor; 
-    }
+   
 
     [Player]
     public class FreeUserCmdComponent : IComponent

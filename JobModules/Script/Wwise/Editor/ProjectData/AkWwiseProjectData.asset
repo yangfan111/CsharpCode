@@ -294,7 +294,7 @@ MonoBehaviour:
       - ElementName: Act_footstep
         ObjectType: 3
       Path: Act\Act_Footstep\Act_footstep
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Act_getdown
@@ -308,7 +308,7 @@ MonoBehaviour:
       - ElementName: Act_getdown
         ObjectType: 3
       Path: Act\Act_Footstep\Act_getdown
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Act_getup
@@ -322,7 +322,7 @@ MonoBehaviour:
       - ElementName: Act_getup
         ObjectType: 3
       Path: Act\Act_Footstep\Act_getup
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Act_jump
@@ -336,7 +336,7 @@ MonoBehaviour:
       - ElementName: Act_jump
         ObjectType: 3
       Path: Act\Act_Footstep\Act_jump
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Act_Squat
@@ -350,7 +350,7 @@ MonoBehaviour:
       - ElementName: Act_Squat
         ObjectType: 3
       Path: Act\Act_Footstep\Act_Squat
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Act_Squat_getup
@@ -364,7 +364,7 @@ MonoBehaviour:
       - ElementName: Act_Squat_getup
         ObjectType: 3
       Path: Act\Act_Footstep\Act_Squat_getup
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Act_underwater_dive
@@ -406,7 +406,7 @@ MonoBehaviour:
       - ElementName: Act_water_fall
         ObjectType: 3
       Path: Act\Act_Water\Act_water_fall
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Act_water_jumpout
@@ -420,7 +420,7 @@ MonoBehaviour:
       - ElementName: Act_water_jumpout
         ObjectType: 3
       Path: Act\Act_Water\Act_water_jumpout
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Act_water_stay
@@ -448,7 +448,7 @@ MonoBehaviour:
       - ElementName: Act_water_swim
         ObjectType: 3
       Path: Act\Act_Water\Act_water_swim
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_bag_discard_common
@@ -462,7 +462,7 @@ MonoBehaviour:
       - ElementName: Object_bag_discard_common
         ObjectType: 3
       Path: Act\OtherObject\Object_bag_discard_common
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_bag_get_common
@@ -476,7 +476,7 @@ MonoBehaviour:
       - ElementName: Object_bag_get_common
         ObjectType: 3
       Path: Act\OtherObject\Object_bag_get_common
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_bandage_get
@@ -492,7 +492,7 @@ MonoBehaviour:
       - ElementName: Object_bandage_get
         ObjectType: 3
       Path: Act\OtherObject\Pickup\Object_bandage_get
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_bandage_use
@@ -508,7 +508,7 @@ MonoBehaviour:
       - ElementName: Object_bandage_use
         ObjectType: 3
       Path: Act\OtherObject\Use\Object_bandage_use
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_bucket_get
@@ -538,7 +538,7 @@ MonoBehaviour:
       - ElementName: Object_bucket_topple
         ObjectType: 3
       Path: Act\OtherObject\Object_bucket_topple
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_bullet_get
@@ -554,7 +554,7 @@ MonoBehaviour:
       - ElementName: Object_bullet_get
         ObjectType: 3
       Path: Act\OtherObject\Pickup\Object_bullet_get
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_cloth_get
@@ -570,7 +570,7 @@ MonoBehaviour:
       - ElementName: Object_cloth_get
         ObjectType: 3
       Path: Act\OtherObject\Pickup\Object_cloth_get
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_door_close
@@ -584,7 +584,7 @@ MonoBehaviour:
       - ElementName: Object_door_close
         ObjectType: 3
       Path: Act\OtherObject\Object_door_close
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_door_open
@@ -598,7 +598,7 @@ MonoBehaviour:
       - ElementName: Object_door_open
         ObjectType: 3
       Path: Act\OtherObject\Object_door_open
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_drinks_get
@@ -614,7 +614,7 @@ MonoBehaviour:
       - ElementName: Object_drinks_get
         ObjectType: 3
       Path: Act\OtherObject\Pickup\Object_drinks_get
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_drinks_use
@@ -630,7 +630,7 @@ MonoBehaviour:
       - ElementName: Object_drinks_use
         ObjectType: 3
       Path: Act\OtherObject\Use\Object_drinks_use
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_drug_get
@@ -646,7 +646,7 @@ MonoBehaviour:
       - ElementName: Object_drug_get
         ObjectType: 3
       Path: Act\OtherObject\Pickup\Object_drug_get
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_drug_use
@@ -662,7 +662,7 @@ MonoBehaviour:
       - ElementName: Object_drug_use
         ObjectType: 3
       Path: Act\OtherObject\Use\Object_drug_use
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_firepan_burn
@@ -676,7 +676,7 @@ MonoBehaviour:
       - ElementName: Object_firepan_burn
         ObjectType: 3
       Path: Act\OtherObject\Object_firepan_burn
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_get_common
@@ -692,7 +692,7 @@ MonoBehaviour:
       - ElementName: Object_get_common
         ObjectType: 3
       Path: Act\OtherObject\Pickup\Object_get_common
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_glass_broken
@@ -706,7 +706,7 @@ MonoBehaviour:
       - ElementName: Object_glass_broken
         ObjectType: 3
       Path: Act\OtherObject\Object_glass_broken
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_gun_sight_get
@@ -722,7 +722,7 @@ MonoBehaviour:
       - ElementName: Object_gun_sight_get
         ObjectType: 3
       Path: Act\OtherObject\Pickup\Object_gun_sight_get
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_injection_get
@@ -738,7 +738,7 @@ MonoBehaviour:
       - ElementName: Object_injection_get
         ObjectType: 3
       Path: Act\OtherObject\Pickup\Object_injection_get
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_injection_use
@@ -754,7 +754,7 @@ MonoBehaviour:
       - ElementName: Object_injection_use
         ObjectType: 3
       Path: Act\OtherObject\Use\Object_injection_use
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_magazine_get
@@ -770,7 +770,7 @@ MonoBehaviour:
       - ElementName: Object_magazine_get
         ObjectType: 3
       Path: Act\OtherObject\Pickup\Object_magazine_get
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_medical_bag_get
@@ -786,7 +786,7 @@ MonoBehaviour:
       - ElementName: Object_medical_bag_get
         ObjectType: 3
       Path: Act\OtherObject\Pickup\Object_medical_bag_get
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_medical_bag_use
@@ -802,7 +802,7 @@ MonoBehaviour:
       - ElementName: Object_medical_bag_use
         ObjectType: 3
       Path: Act\OtherObject\Use\Object_medical_bag_use
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_medical_kit_get
@@ -818,7 +818,7 @@ MonoBehaviour:
       - ElementName: Object_medical_kit_get
         ObjectType: 3
       Path: Act\OtherObject\Pickup\Object_medical_kit_get
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_medical_kit_use
@@ -834,7 +834,7 @@ MonoBehaviour:
       - ElementName: Object_medical_kit_use
         ObjectType: 3
       Path: Act\OtherObject\Use\Object_medical_kit_use
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Object_weapon_get
@@ -850,7 +850,7 @@ MonoBehaviour:
       - ElementName: Object_weapon_get
         ObjectType: 3
       Path: Act\OtherObject\Pickup\Object_weapon_get
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: UI_bag_error
@@ -953,7 +953,7 @@ MonoBehaviour:
       - ElementName: Object_teleporter_loop
         ObjectType: 3
       Path: Amb\Map_02\Object_teleporter_loop
-      maxAttenuation: 0
+      maxAttenuation: 30
       maxDuration: 0
       minDuration: 0
     - name: Object_teleporter_popup
@@ -967,7 +967,7 @@ MonoBehaviour:
       - ElementName: Object_teleporter_popup
         ObjectType: 3
       Path: Amb\Map_02\Object_teleporter_popup
-      maxAttenuation: 0
+      maxAttenuation: 30
       maxDuration: 0
       minDuration: 0
     - name: System_air_volplane
@@ -1011,7 +1011,7 @@ MonoBehaviour:
       - ElementName: System_missile_explosion_ground
         ObjectType: 3
       Path: Amb\Map_01\Missile\System_missile_explosion_ground
-      maxAttenuation: 0
+      maxAttenuation: 100
       maxDuration: 0
       minDuration: 0
     - name: System_missile_explosion_water
@@ -1027,7 +1027,7 @@ MonoBehaviour:
       - ElementName: System_missile_explosion_water
         ObjectType: 3
       Path: Amb\Map_01\Missile\System_missile_explosion_water
-      maxAttenuation: 0
+      maxAttenuation: 100
       maxDuration: 0
       minDuration: 0
     - name: System_missile_fly
@@ -1043,7 +1043,7 @@ MonoBehaviour:
       - ElementName: System_missile_fly
         ObjectType: 3
       Path: Amb\Map_01\Missile\System_missile_fly
-      maxAttenuation: 0
+      maxAttenuation: 100
       maxDuration: 0
       minDuration: 0
     - name: System_redsmoke
@@ -1057,7 +1057,7 @@ MonoBehaviour:
       - ElementName: System_redsmoke
         ObjectType: 3
       Path: Amb\Map_01\System_redsmoke
-      maxAttenuation: 0
+      maxAttenuation: 30
       maxDuration: 0
       minDuration: 0
     - name: System_survival_zone_inside
@@ -1459,7 +1459,7 @@ MonoBehaviour:
       - ElementName: Act_change_weapon_takeback
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\OtherParts\Act_change_weapon_takeback
-      maxAttenuation: 0
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Act_gun_sight_close
@@ -1509,7 +1509,7 @@ MonoBehaviour:
       - ElementName: ColdWeapon_Axe_attack
         ObjectType: 3
       Path: Weapon\ColdWeapon\ColdWeapon_Axe_attack
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: ColdWeapon_Axt_hit
@@ -1537,7 +1537,7 @@ MonoBehaviour:
       - ElementName: ColdWeapon_Bat_attack
         ObjectType: 3
       Path: Weapon\ColdWeapon\ColdWeapon_Bat_attack
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: ColdWeapon_Bat_hit
@@ -1551,7 +1551,7 @@ MonoBehaviour:
       - ElementName: ColdWeapon_Bat_hit
         ObjectType: 3
       Path: Weapon\ColdWeapon\ColdWeapon_Bat_hit
-      maxAttenuation: 100
+      maxAttenuation: 30
       maxDuration: 0
       minDuration: 0
     - name: ColdWeapon_Crowbar_attack
@@ -1565,7 +1565,7 @@ MonoBehaviour:
       - ElementName: ColdWeapon_Crowbar_attack
         ObjectType: 3
       Path: Weapon\ColdWeapon\ColdWeapon_Crowbar_attack
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: ColdWeapon_Crowbar_hit
@@ -1579,7 +1579,7 @@ MonoBehaviour:
       - ElementName: ColdWeapon_Crowbar_hit
         ObjectType: 3
       Path: Weapon\ColdWeapon\ColdWeapon_Crowbar_hit
-      maxAttenuation: 100
+      maxAttenuation: 30
       maxDuration: 0
       minDuration: 0
     - name: ColdWeapon_Dagger_attack
@@ -1593,7 +1593,7 @@ MonoBehaviour:
       - ElementName: ColdWeapon_Dagger_attack
         ObjectType: 3
       Path: Weapon\ColdWeapon\ColdWeapon_Dagger_attack
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: ColdWeapon_Dagger_hit
@@ -1607,7 +1607,7 @@ MonoBehaviour:
       - ElementName: ColdWeapon_Dagger_hit
         ObjectType: 3
       Path: Weapon\ColdWeapon\ColdWeapon_Dagger_hit
-      maxAttenuation: 100
+      maxAttenuation: 30
       maxDuration: 0
       minDuration: 0
     - name: ColdWeapon_Fist_attack
@@ -1621,7 +1621,7 @@ MonoBehaviour:
       - ElementName: ColdWeapon_Fist_attack
         ObjectType: 3
       Path: Weapon\ColdWeapon\ColdWeapon_Fist_attack
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: ColdWeapon_Fist_hit
@@ -1635,7 +1635,7 @@ MonoBehaviour:
       - ElementName: ColdWeapon_Fist_hit
         ObjectType: 3
       Path: Weapon\ColdWeapon\ColdWeapon_Fist_hit
-      maxAttenuation: 100
+      maxAttenuation: 30
       maxDuration: 0
       minDuration: 0
     - name: ColdWeapon_Pan_attack
@@ -1649,7 +1649,7 @@ MonoBehaviour:
       - ElementName: ColdWeapon_Pan_attack
         ObjectType: 3
       Path: Weapon\ColdWeapon\ColdWeapon_Pan_attack
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: ColdWeapon_Pan_hit
@@ -1663,7 +1663,7 @@ MonoBehaviour:
       - ElementName: ColdWeapon_Pan_hit
         ObjectType: 3
       Path: Weapon\ColdWeapon\ColdWeapon_Pan_hit
-      maxAttenuation: 100
+      maxAttenuation: 30
       maxDuration: 0
       minDuration: 0
     - name: ColdWeapon_Saber_attack
@@ -1677,7 +1677,7 @@ MonoBehaviour:
       - ElementName: ColdWeapon_Saber_attack
         ObjectType: 3
       Path: Weapon\ColdWeapon\ColdWeapon_Saber_attack
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: ColdWeapon_Saber_hit
@@ -1691,7 +1691,7 @@ MonoBehaviour:
       - ElementName: ColdWeapon_Saber_hit
         ObjectType: 3
       Path: Weapon\ColdWeapon\ColdWeapon_Saber_hit
-      maxAttenuation: 100
+      maxAttenuation: 30
       maxDuration: 0
       minDuration: 0
     - name: Gun_56_shot
@@ -1709,7 +1709,7 @@ MonoBehaviour:
       - ElementName: Gun_56_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Pricision-Rifle\Gun_56_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_56_shot_continue_stop
@@ -1745,7 +1745,7 @@ MonoBehaviour:
       - ElementName: Gun_92FS_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Pistol\Gun_92FS_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_92FS_shot_continue_stop
@@ -1781,7 +1781,7 @@ MonoBehaviour:
       - ElementName: Gun_AKM_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_AKM_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_AKM_shot_continue_stop
@@ -1817,7 +1817,7 @@ MonoBehaviour:
       - ElementName: Gun_APS_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_APS_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_APS_shot_continue_stop
@@ -1853,7 +1853,7 @@ MonoBehaviour:
       - ElementName: Gun_ASVal_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_ASVal_shot
-      maxAttenuation: 100
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_ASVal_shot_continue_stop
@@ -1889,7 +1889,7 @@ MonoBehaviour:
       - ElementName: Gun_AWM_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Sniper-Rifle\Gun_AWM_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_AWM_shot_continue_stop
@@ -1925,7 +1925,7 @@ MonoBehaviour:
       - ElementName: Gun_bullet_drop_texture
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_bullet\Gun_bullet_drop_texture
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_bullet_fly
@@ -1961,7 +1961,7 @@ MonoBehaviour:
       - ElementName: Gun_bullet_hit_texture
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_bullet\Gun_bullet_hit_texture
-      maxAttenuation: 100
+      maxAttenuation: 30
       maxDuration: 0
       minDuration: 0
     - name: Gun_DesertEagle_shot
@@ -1979,7 +1979,7 @@ MonoBehaviour:
       - ElementName: Gun_DesertEagle_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Pistol\Gun_DesertEagle_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_DesertEagle_shot_continue_stop
@@ -2015,7 +2015,7 @@ MonoBehaviour:
       - ElementName: Gun_DT22_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Shotgun\Gun_DT22_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_DT22_shot_continue_stop
@@ -2051,7 +2051,7 @@ MonoBehaviour:
       - ElementName: Gun_FAMAS_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_FAMAS_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_FAMAS_shot_continue_stop
@@ -2105,7 +2105,7 @@ MonoBehaviour:
       - ElementName: Gun_FNFal_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_FNFal_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_FNFal_shot_continue_stop
@@ -2141,7 +2141,7 @@ MonoBehaviour:
       - ElementName: Gun_Glock18C_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Pistol\Gun_Glock18C_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_Glock18C_shot_continue_stop
@@ -2177,7 +2177,7 @@ MonoBehaviour:
       - ElementName: Gun_GLOZA_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_GLOZA_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_GLOZA_shot_continue_stop
@@ -2213,7 +2213,7 @@ MonoBehaviour:
       - ElementName: Gun_Kar98K_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Sniper-Rifle\Gun_Kar98K_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_Kar98K_shot_continue_stop
@@ -2249,7 +2249,7 @@ MonoBehaviour:
       - ElementName: Gun_KSG25_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Shotgun\Gun_KSG25_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_KSG25_shot_stop
@@ -2285,7 +2285,7 @@ MonoBehaviour:
       - ElementName: Gun_M16A4_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Pricision-Rifle\Gun_M16A4_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_M16A4_shot_continue_stop
@@ -2321,7 +2321,7 @@ MonoBehaviour:
       - ElementName: Gun_M1917_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Pistol\Gun_M1917_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_M1917_shot_continue_stop
@@ -2357,7 +2357,7 @@ MonoBehaviour:
       - ElementName: Gun_M249_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Machinegun\Gun_M249_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_M249_shot_continue_stop
@@ -2393,7 +2393,7 @@ MonoBehaviour:
       - ElementName: Gun_M4A1_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_M4A1_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_M4A1_shot_continue_stop
@@ -2429,7 +2429,7 @@ MonoBehaviour:
       - ElementName: Gun_M590A1_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Shotgun\Gun_M590A1_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_M590A1_shot_continue_stop
@@ -2465,7 +2465,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_56
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_56
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_92FS
@@ -2483,7 +2483,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_92FS
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_92FS
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_AKM
@@ -2501,7 +2501,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_AKM
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_AKM
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_APS
@@ -2537,7 +2537,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_ASVal
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_ASVal
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_AWM
@@ -2555,7 +2555,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_AWM
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_AWM
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_DesertEagle
@@ -2573,7 +2573,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_DesertEagle
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_DesertEagle
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_DT22
@@ -2591,7 +2591,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_DT22
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_DT22
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_FAMAS
@@ -2609,7 +2609,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_FAMAS
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_FAMAS
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_FNFal
@@ -2627,7 +2627,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_FNFal
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_FNFal
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_Glock18C
@@ -2645,7 +2645,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_Glock18C
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_Glock18C
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_GROZA
@@ -2681,7 +2681,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_Kar98K
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_Kar98K
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_KSG25
@@ -2699,7 +2699,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_KSG25
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_KSG25
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_M16A4
@@ -2717,7 +2717,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_M16A4
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_M16A4
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_M1917
@@ -2735,7 +2735,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_M1917
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_M1917
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_M249
@@ -2753,7 +2753,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_M249
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_M249
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_M4A1
@@ -2771,7 +2771,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_M4A1
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_M4A1
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_M590A1_FillBullet
@@ -2843,7 +2843,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_MK14EBR
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_MK14EBR
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_MP5A3
@@ -2861,7 +2861,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_MP5A3
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_MP5A3
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_MSR
@@ -2879,7 +2879,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_MSR
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_MSR
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_P08
@@ -2897,7 +2897,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_P08
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_P08
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_P1911
@@ -2915,7 +2915,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_P1911
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_P1911
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_P90
@@ -2933,7 +2933,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_P90
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_P90
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_QJB95
@@ -2951,7 +2951,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_QJB95
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_QJB95
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_RPK
@@ -2969,7 +2969,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_RPK
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_RPK
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_Saiga12K
@@ -2987,7 +2987,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_Saiga12K
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_Saiga12K
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_SawedOff
@@ -3005,7 +3005,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_SawedOff
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_SawedOff
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_SCARL
@@ -3023,7 +3023,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_SCARL
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_SCARL
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_SG550
@@ -3041,7 +3041,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_SG550
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_SG550
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_SPP1
@@ -3077,7 +3077,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_UMP45
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_UMP45
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_UziPro
@@ -3095,7 +3095,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_UziPro
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_UziPro
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_Vector
@@ -3113,7 +3113,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_Vector
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_Vector
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_magazine_VSSM
@@ -3131,7 +3131,7 @@ MonoBehaviour:
       - ElementName: Gun_magazine_VSSM
         ObjectType: 3
       Path: Weapon\Gun\Gun_Component\Gun_magazine\Gun_magazine_VSSM
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: Gun_MK14EBR_shot
@@ -3149,7 +3149,7 @@ MonoBehaviour:
       - ElementName: Gun_MK14EBR_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Pricision-Rifle\Gun_MK14EBR_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_MK14EBR_shot_continue_stop
@@ -3185,7 +3185,7 @@ MonoBehaviour:
       - ElementName: Gun_MP5A3_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Submachine\Gun_MP5A3_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_MP5A3_shot_continue_stop
@@ -3221,7 +3221,7 @@ MonoBehaviour:
       - ElementName: Gun_MSR_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Sniper-Rifle\Gun_MSR_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_MSR_shot_continue_stop
@@ -3257,7 +3257,7 @@ MonoBehaviour:
       - ElementName: Gun_P08_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Pistol\Gun_P08_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_P08_shot_continue_stop
@@ -3293,7 +3293,7 @@ MonoBehaviour:
       - ElementName: Gun_P1911_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Pistol\Gun_P1911_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_P1911_shot_continue_stop
@@ -3329,7 +3329,7 @@ MonoBehaviour:
       - ElementName: Gun_P90_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Submachine\Gun_P90_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_P90_shot_continue_stop
@@ -3365,7 +3365,7 @@ MonoBehaviour:
       - ElementName: Gun_QJB95_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Machinegun\Gun_QJB95_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_QJB95_shot_continue_stop
@@ -3401,7 +3401,7 @@ MonoBehaviour:
       - ElementName: Gun_RPK_shot_single
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Machinegun\Gun_RPK_shot_single
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_RPK_shot_single_continue_stop
@@ -3437,7 +3437,7 @@ MonoBehaviour:
       - ElementName: Gun_Saiga12K_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Shotgun\Gun_Saiga12K_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_Saiga12K_shot_continue_stop
@@ -3473,7 +3473,7 @@ MonoBehaviour:
       - ElementName: Gun_SawedOff_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Pistol\Gun_SawedOff_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_SawedOff_shot_continue_stop
@@ -3509,7 +3509,7 @@ MonoBehaviour:
       - ElementName: Gun_SCARL_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Assault-Rifle\Gun_SCARL_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_SCARL_shot_continue_stop
@@ -3545,7 +3545,7 @@ MonoBehaviour:
       - ElementName: Gun_SG550_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Pricision-Rifle\Gun_SG550_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_SG550_shot_continue_stop
@@ -3581,7 +3581,7 @@ MonoBehaviour:
       - ElementName: Gun_SPS_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Pistol\Gun_SPS_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_SPS_shot_continue_stop
@@ -3617,7 +3617,7 @@ MonoBehaviour:
       - ElementName: Gun_UMP45_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Submachine\Gun_UMP45_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_UMP45_shot_continue_stop
@@ -3653,7 +3653,7 @@ MonoBehaviour:
       - ElementName: Gun_UziPro_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Submachine\Gun_UziPro_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_UziPro_shot_continue_stop
@@ -3689,7 +3689,7 @@ MonoBehaviour:
       - ElementName: Gun_Vector_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Submachine\Gun_Vector_shot
-      maxAttenuation: 0
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_Vector_shot_continue_stop
@@ -3725,7 +3725,7 @@ MonoBehaviour:
       - ElementName: Gun_VSSM_shot
         ObjectType: 3
       Path: Weapon\Gun\Gun_fire\Pricision-Rifle\Gun_VSSM_shot
-      maxAttenuation: 100
+      maxAttenuation: 200
       maxDuration: 0
       minDuration: 0
     - name: Gun_VSSM_shot_continue_stop
@@ -3785,7 +3785,7 @@ MonoBehaviour:
       - ElementName: TacticWeapon_Impact_common
         ObjectType: 3
       Path: Weapon\TacticWeapon\TacticWeapon_Impact_common
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: TacticWeapon_Molotov_explosion
@@ -3833,7 +3833,7 @@ MonoBehaviour:
       - ElementName: TacticWeapon_Molotov_impact
         ObjectType: 3
       Path: Weapon\TacticWeapon\Molotov\TacticWeapon_Molotov_impact
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: TacticWeapon_Molotov_throw
@@ -3849,7 +3849,7 @@ MonoBehaviour:
       - ElementName: TacticWeapon_Molotov_throw
         ObjectType: 3
       Path: Weapon\TacticWeapon\Molotov\TacticWeapon_Molotov_throw
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: TacticWeapon_Molotov_trigger
@@ -3865,7 +3865,7 @@ MonoBehaviour:
       - ElementName: TacticWeapon_Molotov_trigger
         ObjectType: 3
       Path: Weapon\TacticWeapon\Molotov\TacticWeapon_Molotov_trigger
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: TacticWeapon_Smokeshell_explosion
@@ -3893,7 +3893,7 @@ MonoBehaviour:
       - ElementName: TacticWeapon_Throw_common
         ObjectType: 3
       Path: Weapon\TacticWeapon\TacticWeapon_Throw_common
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
     - name: TacticWeapon_Trigger_common
@@ -3907,7 +3907,7 @@ MonoBehaviour:
       - ElementName: TacticWeapon_Trigger_common
         ObjectType: 3
       Path: Weapon\TacticWeapon\TacticWeapon_Trigger_common
-      maxAttenuation: 100
+      maxAttenuation: 20
       maxDuration: 0
       minDuration: 0
   RtpcWwu:
@@ -4644,10 +4644,9 @@ MonoBehaviour:
   ExpandedItems:
   - /ShengSiJuJi_2018.1.5
   - /ShengSiJuJi_2018.1.5/Events
-  - /ShengSiJuJi_2018.1.5/Events/Weapon
-  - /ShengSiJuJi_2018.1.5/Events/Weapon/Gun
-  - /ShengSiJuJi_2018.1.5/Events/Weapon/Gun/Gun_Component
-  - /ShengSiJuJi_2018.1.5/Events/Weapon/Gun/Gun_Component/Gun_bullet
+  - /ShengSiJuJi_2018.1.5/Events/Act
+  - /ShengSiJuJi_2018.1.5/Events/Act/OtherObject
+  - /ShengSiJuJi_2018.1.5/Events/Act/OtherObject/Pickup
   - /ShengSiJuJi_2018.1.5/SoundBanks
   - /ShengSiJuJi_2018.1.5/SoundBanks/Default Work Unit
   autoPopulateEnabled: 1

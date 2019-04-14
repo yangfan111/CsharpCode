@@ -1,29 +1,22 @@
-﻿using Core.CameraControl;
-using Core.GameInputFilter;
+﻿using System.Collections.Generic;
+using Core.CameraControl;
 using Core.ObjectPool;
 
 namespace Core.Prediction.UserPrediction.Cmd
 {
-
     public interface IUserCmd: IVariableCameraInput, ICmd, IRefCounter
     {
         bool PredicatedOnce { get; set; }
         bool NeedStepPredication { get; set; }
 
         int RenderTime { get; set; }
-
         int ClientTime { get; set; }
         
         float MoveHorizontal { get; set; }
-
         float MoveVertical { get; set; }
-
         float MoveUpDown { get; set; }
 
-
-
         float Roll { get; set; }
-
 
         bool IsJump { get; set; }
 
@@ -86,15 +79,15 @@ namespace Core.Prediction.UserPrediction.Cmd
         int SnapshotId { get; set; }
         
         bool IsRightAttack { get; set; }
-        int Buttons { get; set; }
+        long Buttons { get; set; }
         bool IsSwitchFireMode { get; set; }
 
         int CurWeapon { get; set; }
         bool IsDropWeapon { get; set; }
         bool IsDrawWeapon { get; set; }
-        int PickUpEquip { get; set; }
-        int PickUpEquipItemId { get; set; }
-        int PickUpEquipItemCount { get; set; }
+
+        int ManualPickUpEquip { get; set; }
+        List<int> AutoPickUpEquip { get; set; }
 
         bool IsThrowing { get; set; }
 
@@ -105,6 +98,7 @@ namespace Core.Prediction.UserPrediction.Cmd
         bool IsManualPickUp { get; set; }
         int BagIndex { get; set; }
         bool IsInterrupt { get; set; }
+        bool IsSprayPaint { get; set; }
 
         IFilteredInput FilteredInput { get; set; }
 
@@ -117,5 +111,6 @@ namespace Core.Prediction.UserPrediction.Cmd
         /// 卸载武器，无动作
         /// </summary>
         bool IsForceUnmountWeapon{ get; set; }
+       
     }
 }

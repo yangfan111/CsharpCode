@@ -18,6 +18,7 @@ namespace App.Shared.VehicleGameHandler
             bool isOffline = SharedConfig.IsOffline;
             if (SharedConfig.IsOffline)
             {
+                RegisterUpdateHandler(new VehicleFireHpChangeHandler());
                 RegisterUpdateHandler(new VehicleFuelUpdateHandler());
                 RegisterEventHandler(GameEvent.VehicleCrash, new VehicleCrashedHandler(contexts));
                 RegisterUpdateHandler(new ShipSleepingStateUpdateHandler());

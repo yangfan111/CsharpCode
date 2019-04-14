@@ -20,21 +20,14 @@ namespace App.Shared.GameModules.Player
     public class LandHandler
     {
         private static readonly LoggerAdapter _logger = new LoggerAdapter(typeof(LandHandler));
-
-        private static readonly float SteepLimitBegin =
-            Mathf.Tan(Mathf.Deg2Rad * SingletonManager.Get<CharacterStateConfigManager>().SteepLimitBegin);
-
-        private static readonly float SteepLimitStop =
-            Mathf.Tan(Mathf.Deg2Rad * SingletonManager.Get<CharacterStateConfigManager>().SteepLimitStop);
-
         private static readonly float SteepAverRatio =
             SingletonManager.Get<CharacterStateConfigManager>().SteepAverRatio;
 
         private static readonly SpeedCalculator SpeedCalculator = new SpeedCalculator();
 
         private static readonly float DefaultSpeed = -0.1f;
-        
-        
+        private static readonly float CompareMaxError = 0.00001f;
+
 
         public static void Move(Contexts contexts, PlayerEntity player, float deltaTime)
         {
@@ -43,7 +36,7 @@ namespace App.Shared.GameModules.Player
             SyncTransformFromComponent(player);
             
             // 分离角色
-            ResolveOverlapWithPlayer(contexts, player);
+            //ResolveOverlapWithPlayer(contexts, player);
             
             // 旋转角色
             RotateCharacter(player, deltaTime);
@@ -110,32 +103,56 @@ namespace App.Shared.GameModules.Player
                 QueryTriggerInteraction.Ignore,
                 collider =>
                 {
-                    if (collider == controller.GetCollider() || !(collider is CharacterController))
+                    //和角色做分离，趴下不需要，自带分离
+                    if (collider == controller.GetCollider() || !(collider is CapsuleCollider && (collider as CapsuleCollider).direction == 1))
                     {
                         return true;
                     }
                     return false;
                 });
-            
+
+            int MaxStep = 1;
             // calculate penetration
             for (int i = 0; i < hits; ++i)
             {
                 Vector3 resolutionDirection = Vector3.up;
                 float resolutionDistance = 0f;
                 Transform overlappedTransform = colliders[i].GetComponent<Transform>();
-                if (Physics.ComputePenetration(controller.GetCollider(),
-                    controller.transform.position,
-                    controller.transform.rotation,
-                    colliders[i],
-                    overlappedTransform.position,
-                    overlappedTransform.rotation,
-                    out resolutionDirection,
-                    out resolutionDistance
-                ))
+                for (int j = 0; j < MaxStep; ++j)
                 {
-                    characterController.Move(resolutionDirection * resolutionDistance);
-                    //_logger.InfoFormat("resolutionDirection:{0}, resolutionDistance:{1}, hitCollider:{2}", resolutionDirection, resolutionDistance, overlappedTransform.name);
-                    //DebugDraw.DebugArrow(controller.transform.position, resolutionDirection, Color.magenta, 20f, false);
+                    if (Physics.ComputePenetration(characterController,
+                        characterController.transform.position,
+                        characterController.transform.rotation,
+                        colliders[i],
+                        colliders[i].transform.position,
+                        colliders[i].transform.rotation,
+                        out resolutionDirection,
+                        out resolutionDistance
+                    ))
+                    {
+                        //characterController.Move(resolutionDirection.normalized * (resolutionDirection.magnitude + CollisionOffset));
+//                        PhysicsCastHelper.DrawCollider(characterController, Color.green, 60f, true);
+//
+//                        DebugDraw.DebugArrow(controller.transform.position, resolutionDirection, Color.magenta, 60f,
+//                            true);
+//                        DebugDraw.DebugArrow(controller.transform.position, resolutionDirection*resolutionDistance, Color.green, 60f,
+//                            true);
+                        characterController.Move(new Vector3(0,-0.01f,0));                        
+                        _logger.DebugFormat(
+                            "ResolveOverlapWithPlayer ResolveOverlapWithPlayer resolutionDirection:{0}, resolutionDistance:{1}, hitCollider:{2}",
+                            resolutionDirection.ToStringExt(), resolutionDistance, overlappedTransform.name);
+                        
+//                        var collider = colliders[i] as CapsuleCollider;
+//                        if (collider != null)
+//                        {
+//                            PhysicsCastHelper.DrawCollider(collider, Color.blue, 60f, true);
+//                            PhysicsCastHelper.DrawCollider(characterController, Color.red, 60f, true);
+//                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
         }
@@ -203,7 +220,7 @@ namespace App.Shared.GameModules.Player
             var horizontalComponent =
                 Mathf.Sqrt(actualMovement.x * actualMovement.x + actualMovement.z * actualMovement.z);
 
-            var steep = CompareUtility.IsApproximatelyEqual(horizontalComponent, 0.0f)
+            var steep = CompareUtility.IsApproximatelyEqual(horizontalComponent, 0.0f, CompareMaxError)
                 ? 0
                 : actualMovement.y / horizontalComponent; //+ (1 - ratio) * lastSteep;
             
@@ -211,14 +228,8 @@ namespace App.Shared.GameModules.Player
             player.playerMove.SteepAverage = aveSteep;
             player.playerMove.Steep = steep;
 
-            if (horizontalComponent > 0)
-            {
-                exceedSteepLimit =
-                    (aveSteep >= SteepLimitBegin) ||
-                    ((aveSteep > SteepLimitStop) && player.stateInterface.State.IsSlowDown());
-            }
 
-            player.stateInterface.State.SetSteepSlope(exceedSteepLimit);
+            player.stateInterface.State.SetSteepAngle(aveSteep);
         }
 
         private static void ChangeVelocityYAfterCollision(PlayerEntity player)
@@ -311,6 +322,8 @@ namespace App.Shared.GameModules.Player
         private static readonly float SlideSlopeOffsetUp = 8f;
 		private static readonly float SlideSlopeOffsetLow = 0f;
         private static readonly float SlideSlopeMinSpeed = 2.5f;
+        private static readonly float SlideMaxAngle = 90.0f;
+        private static readonly float MinSlideVecValue = 0.01f;
 
         /// <summary>
         /// 初始化变量
@@ -360,9 +373,10 @@ namespace App.Shared.GameModules.Player
         {
             LastVelocity = Quaternion.Inverse(player.orientation.RotationYaw) * player.playerMove.Velocity.ToVector4();
             CurrentVelocity = LastVelocity.ToVector4();
-            LastNormal = GroundInfo.surfaceNormal;
             DeltaTime = time;
             GroundInfo = player.characterContoller.Value.GetGroundHit;
+            LastNormal = GroundInfo.surfaceNormal;
+            //Logger.InfoFormat("angle:{0}", Vector3.Angle(LastNormal, Vector3.up));
         }
 
         /// <summary>
@@ -455,6 +469,8 @@ namespace App.Shared.GameModules.Player
 
             return false;
         }
+        
+        
 
         /// <summary>
         /// 计算当前速度
@@ -467,31 +483,31 @@ namespace App.Shared.GameModules.Player
             // 需要在斜面下滑
             if (IsSlideAloneSlope(player.characterContoller.Value, SlideSlopeOffsetLow))
             {
-                offsetSlope = HandleSlideAloneSlope(SlideDirection);
+                offsetSlope = HandleSlideAloneSlope(CalcOnPlayerSpeed(SlideDirection,player.characterContoller.Value.transform.forward));
                 KeepSlide = true;
                 // 只有在速度大于SlideSlopeMinSpeed时才播放下滑动画
                 if (Mathf.Abs(CurrentVelocity.y) > SlideSlopeMinSpeed )
                 {
 					player.stateInterface.State.SetSlide(true);
-                    //Logger.InfoFormat("curvelocity:{0},IsSlideAloneSlope:{1}", CurVelocity.y, IsSlideAloneSlope(player.characterContoller.Value, SlideSlopeOffsetUp));
+                    Logger.DebugFormat("set ani to slide, curvelocity:{0},IsSlideAloneSlope:{1}", CurrentVelocity.y, IsSlideAloneSlope(player.characterContoller.Value, SlideSlopeOffsetUp));
                 }
-                //Logger.InfoFormat("slide alone slope, vec:{0}, Angle:{1}, slopeVec:{2}", CurVelocity.y, Vector3.Angle(Vector3.up, groundInfo.groundNormal), direction.ToVector4());
+                Logger.DebugFormat("set to move slide, slide alone slope, vec:{0}, Angle:{1}, slopeVec:{2}", CurrentVelocity.y, Vector3.Angle(Vector3.up, GroundInfo.groundNormal), SlideDirection.ToVector4());
             }
             else if (IsSlideFreefall(player))
             {
                 KeepSlide = true;
                 player.stateInterface.State.SetSlide(true);
                 CalcuSpeedIfNotSlide(player, DeltaTime, currentBuff, LastVelocity);
+                Logger.DebugFormat("freefall slide");
             }
             else
             {
                 KeepSlide = false;
                 player.stateInterface.State.SetSlide(false);
                 CalcuSpeedIfNotSlide(player, DeltaTime, currentBuff, LastVelocity);
-                if (IsHeadingOnPlain()) //贴合地面                                          
+                if (IsHeadingOnPlain(player)) //贴合地面                                          
                 {
-                    CurrentVelocity.y = SlideDirectionTan * CurrentVelocity.magnitude - 0.1f; 
-                    //Logger.InfoFormat("IsHeadingOnPlain, vec:{0}, offset:{1}, prev:{2}, prev offset:{3}, velocityTan:{4}", CurVelocity, offsetSlope,vefore,veoff, velocityTan);
+                    CurrentVelocity.y = SlideDirectionTan * CurrentVelocity.magnitude - 0.1f;
                 }
             }
 
@@ -511,6 +527,7 @@ namespace App.Shared.GameModules.Player
                 CurrentVelocity = Vector3.zero;
             }
         }
+        
 
         /// <summary>
         /// 跳跃过程是否碰到场景
@@ -556,13 +573,27 @@ namespace App.Shared.GameModules.Player
 
             return (depth >= BeginSlowDownInWater)
                    ||
-                   (depth >= StopSlowDownInWater && player.stateInterface.State.IsSlowDown());
+                   (depth >= StopSlowDownInWater && player.stateInterface.State.GetSteepSlowDown() >= PlayerStateUpdateSystem.LimitSprint);
         }
 
         private bool IsSlideAloneSlope( ICharacterControllerContext controller, float angleOffset)
         {
             return GroundInfo.IsSlideSlopeGround(controller.slopeLimit + angleOffset) && Vector3.Dot(LastNormal, Vector3.up) > 0.0f &&
-                   LastVelocity.y <= 0.0f && SharedConfig.EnableSlide;
+                   LastVelocity.y <= 0.0f && SharedConfig.EnableSlide && Vector3.Angle(LastNormal, Vector3.up) <= SlideMaxAngle;
+        }
+
+        private Vector3 CalcOnPlayerSpeed(Vector3 origionVec, Vector3 defaultForward)
+        {
+            Vector3 ret = origionVec;
+            if (GroundInfo.IsOnPlayer())
+            {
+                Vector3 vec = new Vector3(origionVec.x, 0, origionVec.z);
+                if (vec.magnitude < MinSlideVecValue)
+                {
+                    ret = defaultForward * Mathf.Max(Mathf.Abs(origionVec.y), MinSlideVecValue);
+                }
+            }
+            return ret;
         }
 
         private Vector3 HandleSlideAloneSlope(Vector3 slopeVec)
@@ -592,10 +623,10 @@ namespace App.Shared.GameModules.Player
         /// 是否需要贴着斜面走
         /// </summary>
         /// <returns></returns>
-        private bool IsHeadingOnPlain()
+        private bool IsHeadingOnPlain(PlayerEntity player)
         {
             return CurrentVelocity.y < 0 &&
-                   GroundInfo.isOnGround && GroundInfo.isValidGround;
+                   GroundInfo.isOnGround && GroundInfo.isValidGround && Vector3.Angle(LastNormal, Vector3.up) <= player.characterContoller.Value.slopeLimit;
         }
 
         /// <summary>

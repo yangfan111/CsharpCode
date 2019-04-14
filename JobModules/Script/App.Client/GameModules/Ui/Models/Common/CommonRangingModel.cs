@@ -132,8 +132,11 @@ namespace App.Client.GameModules.Ui.Models.Common
             var receiver = new KeyReceiver(UiConstant.rangingWindowLayer, BlockType.None);
             receiver.AddAction(UserInputKey.CheckRanging, (data) =>
             {
+               
                 Debug.Log("CheckRanging..........................");
                 var selfPlayer = adapter.GetPlayerEntity();
+                if (selfPlayer.gamePlay.IsObserving())
+                    return;
                 var playerTrans = selfPlayer.characterContoller.Value.transform;
 
                 var cameraPos = selfPlayer.cameraObj.MainCamera.transform.position;

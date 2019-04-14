@@ -2,6 +2,7 @@ using System.IO;
 using App.Shared.Components.Serializer;
 using Core.EntityComponent;
 using Core.Event;
+using Core.ObjectPool;
 using Core.Utils;
 using Entitas;
 
@@ -9,6 +10,21 @@ namespace App.Shared.Player.Events
 {
     public class BeenHitEvent:IEvent
     {
+        public class ObjcetFactory : CustomAbstractObjectFactory
+        {
+            public ObjcetFactory() : base(typeof(BeenHitEvent))
+            {
+            }
+
+            public override object MakeObject()
+            {
+                return new BeenHitEvent();
+            }
+        }
+        public BeenHitEvent()
+        {
+        }
+
         public EntityKey Target;
         public int UniqueId;
         public int TriggerTime;

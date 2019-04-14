@@ -12,6 +12,7 @@ using Core.Utils;
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
 using UnityEngine;
+
 // ReSharper disable PossibleNullReferenceException
 
 namespace Core.Components
@@ -28,42 +29,43 @@ namespace Core.Components
     /// 
     /// </summary>
     [Serializable]
-    public class PositionComponent : IPlaybackComponent, ICompensationComponent,IResetableComponent
+    public class PositionComponent : IPlaybackComponent, ICompensationComponent, IResetableComponent
     {
-        [DontInitilize] [NetworkProperty]public bool AlwaysEqual;
+        [DontInitilize] [NetworkProperty] public bool AlwaysEqual;
 
-        private Vector3 _value;
+
         [DontInitilize] [NetworkProperty] public byte InterpolateType;
         [DontInitilize] [NetworkProperty] public int ServerTime;
-        
-        [NetworkProperty]
-        public Vector3 Value
+        [DontInitilize] [NetworkProperty] public FixedVector3 FixedVector3;
+
+        [DontInitilize] public Vector3 Value
         {
-            get { return _value; }
+            get { return FixedVector3.ShiftedVector3(); }
             set
             {
-                var old = _value;
-                _value = value;
-                for (int i = 0; i < _positionListener.Count;i++)
+                var old = FixedVector3.ShiftedVector3();
+                FixedVector3 = value.ShiftedToFixedVector3();
+                for (int i = 0; i < _positionListener.Count; i++)
                 {
-                    if( _positionListener[i]!=null)
+                    if (_positionListener[i] != null)
                         _positionListener[i](_owner, old, value);
                 }
             }
         }
 
-        
-        
+
         private List<PositionChangedDelgate> _positionListener = new List<PositionChangedDelgate>();
 
         public void AddPositionListener(PositionChangedDelgate func)
-        {
+        { 
             _positionListener.Add(func);
         }
+
         public void RemovePositionListener(PositionChangedDelgate func)
         {
             _positionListener.Remove(func);
         }
+
         private IGameEntity _owner;
 
         public void SetOwner(IGameEntity owner)
@@ -82,7 +84,12 @@ namespace Core.Components
         {
             return string.Format("AlwaysEqual: {0}, Value: {1}", AlwaysEqual, Value.ToStringExt());
         }
-        public bool IsInterpolateEveryFrame(){ return true; }
+
+        public bool IsInterpolateEveryFrame()
+        {
+            return true;
+        }
+
         public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
         {
             PositionComponent l = left as PositionComponent;
@@ -96,15 +103,16 @@ namespace Core.Components
                 InterpolateType = r.InterpolateType;
                 ServerTime = r.ServerTime;
 
-                if (interpolationInfo.LeftServerTime <= r.ServerTime && interpolationInfo.RightServerTime >= r.ServerTime)
+                if (interpolationInfo.LeftServerTime <= r.ServerTime &&
+                    interpolationInfo.RightServerTime >= r.ServerTime)
                 {
                     if (interpolationInfo.CurrentRenderTime > r.ServerTime)
                     {
-                        Value = r._value;
+                        Value = r.Value;
                     }
                     else
                     {
-                        Value = l._value;
+                        Value = l.Value;
                     }
                 }
                 else
@@ -112,13 +120,12 @@ namespace Core.Components
                     Value = InterpolateUtility.Interpolate(l.Value, r.Value, interpolationInfo.RatioWithOutClamp);
                 }
             }
-
         }
 
         public void CopyFrom(object rightComponent)
         {
             var r = (PositionComponent) rightComponent;
-            Value = r.Value;
+            FixedVector3 = r.FixedVector3;
             AlwaysEqual = r.AlwaysEqual;
             ServerTime = r.ServerTime;
             InterpolateType = r.InterpolateType;
@@ -129,14 +136,19 @@ namespace Core.Components
             var r = (right as PositionComponent);
             if (r.AlwaysEqual || AlwaysEqual)
                 return true;
-            return CompareUtility.IsApproximatelyEqual(Value, r.Value);
+            return CompareUtility.IsApproximatelyEqual(FixedVector3.WorldVector3(), r.FixedVector3.WorldVector3());
         }
 
-        public int GetComponentId() { { return (int)ECoreComponentIds.Position; } }
+        public int GetComponentId()
+        {
+            {
+                return (int) ECoreComponentIds.Position;
+            }
+        }
 
         protected bool Equals(PositionComponent other)
         {
-            return Value.Equals(other.Value);
+            return FixedVector3.Equals(other.FixedVector3);
         }
 
         public override bool Equals(object obj)
@@ -164,5 +176,4 @@ namespace Core.Components
             ServerTime = 0;
         }
     }
-
 }

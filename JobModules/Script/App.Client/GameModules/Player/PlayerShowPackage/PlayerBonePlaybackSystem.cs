@@ -10,6 +10,7 @@ using Core.Animation;
 using App.Shared.GameModules.Player;
 using App.Shared.Components.Player;
 using App.Shared.Player;
+using Core.CharacterController;
 using Core.WeaponAnimation;
 using UnityEngine;
 using Utils.Appearance;
@@ -94,16 +95,16 @@ namespace App.Client.GameModules.Player.PlayerShowPackage
             characterBoneInterface.CharacterBone.WeaponRotPlayback(param);
             characterBoneInterface.CharacterBone.Update(param);
 
+            player.characterContoller.Value.SetCurrentControllerType(ThirdPersonPostureTool.ConvertToPostureInConfig(thirdPersonAppearance.Posture));
+            
             // 更新包围盒
 
             if (thirdPersonAppearance.NeedUpdateController)
             {
-                characterControllerInterface.CharacterController.SetCharacterControllerHeight(thirdPersonAppearance.CharacterHeight);
-                characterControllerInterface.CharacterController.SetCharacterControllerCenter(thirdPersonAppearance.CharacterCenter);
-                characterControllerInterface.CharacterController.SetCharacterControllerRadius(thirdPersonAppearance.CharacterRadius);
+                characterControllerInterface.CharacterController.SetCharacterControllerHeight(thirdPersonAppearance.CharacterHeight, player.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController);
+                characterControllerInterface.CharacterController.SetCharacterControllerCenter(thirdPersonAppearance.CharacterCenter, player.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController);
+                characterControllerInterface.CharacterController.SetCharacterControllerRadius(thirdPersonAppearance.CharacterRadius, player.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController);
             }
-            
-            player.characterContoller.Value.SetCurrentControllerType(ThirdPersonPostureTool.ConvertToPostureInConfig(thirdPersonAppearance.Posture));
         }
         
         #region LifeState
@@ -129,7 +130,7 @@ namespace App.Client.GameModules.Player.PlayerShowPackage
             var characterController = player.characterControllerInterface.CharacterController;
             if (null != characterController)
                 characterController.PlayerReborn();
-
+            
             var go = player.RootGo();
             if(null != go)
                 go.BroadcastMessage("PlayerRelive");
@@ -142,7 +143,7 @@ namespace App.Client.GameModules.Player.PlayerShowPackage
             if (null == player) return;
             var characterController = player.characterControllerInterface.CharacterController;
             if (null != characterController)
-                characterController.PlayerDead();
+                characterController.PlayerDead(player.isFlagSelf);
 
             var go = player.RootGo();
             if(null != go)

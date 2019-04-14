@@ -100,7 +100,7 @@ namespace App.Server.GameModules.GamePlay.Free.chicken
                 int count = FreeUtil.ReplaceInt(ParaItemCount, args);
                 for (int i = 0; i < count; i++)
                 {
-                    var helper = playerEntity.WeaponController().GrenadeHelper;
+                    var helper = playerEntity.WeaponController().GrenadeHandler;
                     playerEntity.WeaponController().TryHoldGrenade(itemId);
                     SimpleProto message = new SimpleProto();
                     message.Ks.Add(8);

@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Group
 {
@@ -110,41 +111,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<GroupScoreView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<GroupScoreView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<GroupScoreView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<GroupScoreView, GroupScoreViewModel> bindingSet =
-                view.CreateBindingSet<GroupScoreView, GroupScoreViewModel>();
-
-            view.oriShow = _show = view.Show.activeSelf;
-            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
-            view.oriWinContionText = _winContionText = view.WinContionText.text;
-            bindingSet.Bind(view.WinContionText).For(v => v.text).To(vm => vm.WinContionText).OneWay();
-            view.oriWinContionColor = _winContionColor = view.WinContionColor.color;
-            bindingSet.Bind(view.WinContionColor).For(v => v.color).To(vm => vm.WinContionColor).OneWay();
-            view.oriCampKillCountText1 = _campKillCountText1 = view.CampKillCountText1.text;
-            bindingSet.Bind(view.CampKillCountText1).For(v => v.text).To(vm => vm.CampKillCountText1).OneWay();
-            view.oriCampKillCountText2 = _campKillCountText2 = view.CampKillCountText2.text;
-            bindingSet.Bind(view.CampKillCountText2).For(v => v.text).To(vm => vm.CampKillCountText2).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(GroupScoreView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -168,12 +156,51 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
             }
         }
 
+		void ViewBind(GroupScoreView view)
+		{
+		     BindingSet<GroupScoreView, GroupScoreViewModel> bindingSet =
+                view.CreateBindingSet<GroupScoreView, GroupScoreViewModel>();
+            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
+            bindingSet.Bind(view.WinContionText).For(v => v.text).To(vm => vm.WinContionText).OneWay();
+            bindingSet.Bind(view.WinContionColor).For(v => v.color).To(vm => vm.WinContionColor).OneWay();
+            bindingSet.Bind(view.CampKillCountText1).For(v => v.text).To(vm => vm.CampKillCountText1).OneWay();
+            bindingSet.Bind(view.CampKillCountText2).For(v => v.text).To(vm => vm.CampKillCountText2).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(GroupScoreView view)
+		{
+            _show = view.Show.activeSelf;
+            _winContionText = view.WinContionText.text;
+            _winContionColor = view.WinContionColor.color;
+            _campKillCountText1 = view.CampKillCountText1.text;
+            _campKillCountText2 = view.CampKillCountText2.text;
+		}
+
+
+		void SaveOriData(GroupScoreView view)
+		{
+            view.oriShow = _show;
+            view.oriWinContionText = _winContionText;
+            view.oriWinContionColor = _winContionColor;
+            view.oriCampKillCountText1 = _campKillCountText1;
+            view.oriCampKillCountText2 = _campKillCountText2;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			Show = _view.oriShow;
 			WinContionText = _view.oriWinContionText;
 			WinContionColor = _view.oriWinContionColor;
@@ -205,7 +232,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/group"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/group"; } }
         public string ResourceAssetName { get { return "GroupScore"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

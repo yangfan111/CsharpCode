@@ -1,16 +1,16 @@
 namespace Core.GameModule.Interface
 {
-    public interface IGizmosRenderSystem
+    public interface IGizmosRenderSystem:IUserSystem
     {
         void OnGizmosRender();
     }
 
-    public interface IOnGuiSystem
+    public interface IOnGuiSystem:IUserSystem
     {
         void OnGUI();
     }
 
-    public interface IGamePlaySystem
+    public interface IGamePlaySystem:IUserSystem
     {
         void OnGamePlay();
     }

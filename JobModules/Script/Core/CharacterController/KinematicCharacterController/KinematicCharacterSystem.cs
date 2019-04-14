@@ -78,7 +78,7 @@ namespace KinematicCharacterController
                         : RigidbodyInterpolation.None;
                 for (int i = 0; i < CharacterMotors.Count; i++)
                 {
-                    CharacterMotors[i].Rigidbody.interpolation = interpMethod;
+                    //CharacterMotors[i].Rigidbody.interpolation = interpMethod;
                 }
 
                 for (int i = 0; i < PhysicsMovers.Count; i++)
@@ -137,7 +137,7 @@ namespace KinematicCharacterController
                 (_internalInterpolationMethod == CharacterSystemInterpolationMethod.Unity)
                     ? RigidbodyInterpolation.Interpolate
                     : RigidbodyInterpolation.None;
-            motor.Rigidbody.interpolation = interpMethod;
+            //motor.Rigidbody.interpolation = interpMethod;
         }
 
         /// <summary>
@@ -247,8 +247,8 @@ namespace KinematicCharacterController
                 CharacterMotors[i].UpdatePhase2(deltaTime);
                 CharacterMotors[i].Transform.SetPositionAndRotation(CharacterMotors[i].TransientPosition,
                     CharacterMotors[i].TransientRotation);
-                CharacterMotors[i].Rigidbody.position = CharacterMotors[i].TransientPosition;
-                CharacterMotors[i].Rigidbody.rotation = CharacterMotors[i].TransientRotation;
+//                CharacterMotors[i].Rigidbody.position = CharacterMotors[i].TransientPosition;
+//                CharacterMotors[i].Rigidbody.rotation = CharacterMotors[i].TransientRotation;
             }
         }
 
@@ -284,8 +284,8 @@ namespace KinematicCharacterController
             {
                 motors[i].UpdatePhase2(deltaTime);
                 motors[i].Transform.SetPositionAndRotation(motors[i].TransientPosition, motors[i].TransientRotation);
-                motors[i].Rigidbody.position = motors[i].TransientPosition;
-                motors[i].Rigidbody.rotation = motors[i].TransientRotation;
+//                motors[i].Rigidbody.position = motors[i].TransientPosition;
+//                motors[i].Rigidbody.rotation = motors[i].TransientRotation;
             }
 #pragma warning restore 0162
         }
@@ -296,8 +296,8 @@ namespace KinematicCharacterController
             if (InterpolationMethod == CharacterSystemInterpolationMethod.Custom)
             {
                 motor.Transform.SetPositionAndRotation(motor.TransientPosition, motor.TransientRotation);
-                motor.Rigidbody.position = motor.TransientPosition;
-                motor.Rigidbody.rotation = motor.TransientRotation;
+//                motor.Rigidbody.position = motor.TransientPosition;
+//                motor.Rigidbody.rotation = motor.TransientRotation;
             }
 
             // Save pre-simulation poses
@@ -314,10 +314,10 @@ namespace KinematicCharacterController
             // Return characters to their initial poses and move to target
 //            motor.Rigidbody.position = motor.InitialTickPosition;
 //            motor.Rigidbody.rotation = motor.InitialTickRotation;
-            motor.Rigidbody.position = motor.TransientPosition;
-            motor.Rigidbody.rotation = motor.TransientRotation;
-            motor.Rigidbody.MovePosition(motor.TransientPosition);
-            motor.Rigidbody.MoveRotation(motor.TransientRotation);
+//            motor.Rigidbody.position = motor.TransientPosition;
+//            motor.Rigidbody.rotation = motor.TransientRotation;
+//            motor.Rigidbody.MovePosition(motor.TransientPosition);
+//            motor.Rigidbody.MoveRotation(motor.TransientRotation);
         }
 
 
@@ -385,8 +385,8 @@ namespace KinematicCharacterController
             //Logger.ErrorFormat("capsule center - (0,1,0):{0}, capsuleM * toCenter.inverse:{1}, prevPos:{2},capsule center pos:{3}", newPos.ToStringExt(), newCharacterMatrix.ExtractPosition().ToStringExt(),prevPos.ToStringExt() ,capsuleCenterMatrix.ExtractPosition().ToStringExt());
 
             motor.Transform.SetPositionAndRotation(newCharacterMatrix.ExtractPosition(), newCharacterMatrix.ExtractRotation());
-            motor.Rigidbody.position = newCharacterMatrix.ExtractPosition();
-            motor.Rigidbody.rotation = newCharacterMatrix.ExtractRotation();
+//            motor.Rigidbody.position = newCharacterMatrix.ExtractPosition();
+//            motor.Rigidbody.rotation = newCharacterMatrix.ExtractRotation();
             //Logger.InfoFormat("after rot:{0}", newCharacterMatrix.ExtractRotation().eulerAngles.ToStringExt());
 //            var tmp1 = newCharacterMatrix.ExtractPosition();
 //            var tmp2 = capsuleCenterMatrix.ExtractPosition();
@@ -420,8 +420,8 @@ namespace KinematicCharacterController
         public static KeyValuePair<float, float> MyCalcRotateBound(KinematicCharacterMotor motor, int frameInterval)
         {
             motor.Transform.SetPositionAndRotation(motor.TransientPosition, motor.TransientRotation);
-            motor.Rigidbody.position = motor.TransientPosition;
-            motor.Rigidbody.rotation = motor.TransientRotation;
+//            motor.Rigidbody.position = motor.TransientPosition;
+//            motor.Rigidbody.rotation = motor.TransientRotation;
 
             motor.UpdatePhase1(frameInterval * 0.001f);
             return motor.CalcRotateBound(frameInterval * 0.001f);
@@ -430,12 +430,14 @@ namespace KinematicCharacterController
 
         public static void Simulate(float deltaTime, KinematicCharacterMotor motor)
         {
+//            var before = motor.Transform.position;
             motor.UpdatePhase1(deltaTime);
 
             motor.UpdatePhase2(deltaTime);
             motor.Transform.SetPositionAndRotation(motor.TransientPosition, motor.TransientRotation);
-            motor.Rigidbody.position = motor.TransientPosition;
-            motor.Rigidbody.rotation = motor.TransientRotation;
+//            motor.Rigidbody.position = motor.TransientPosition;
+//            motor.Rigidbody.rotation = motor.TransientRotation;
+            //Logger.InfoFormat("Simulate before:{0}, after:{1}, delta:{2}\n---------------------------------------------", before.ToStringExt(), motor.Transform.position.ToStringExt(),(motor.Transform.position - before).ToStringExt());
         }
 
         /// <summary>
@@ -483,10 +485,10 @@ namespace KinematicCharacterController
             // Return characters to their initial poses and move to target
             for (int i = 0; i < CharacterMotors.Count; i++)
             {
-                CharacterMotors[i].Rigidbody.position = CharacterMotors[i].InitialTickPosition;
-                CharacterMotors[i].Rigidbody.rotation = CharacterMotors[i].InitialTickRotation;
-                CharacterMotors[i].Rigidbody.MovePosition(CharacterMotors[i].TransientPosition);
-                CharacterMotors[i].Rigidbody.MoveRotation(CharacterMotors[i].TransientRotation);
+//                CharacterMotors[i].Rigidbody.position = CharacterMotors[i].InitialTickPosition;
+//                CharacterMotors[i].Rigidbody.rotation = CharacterMotors[i].InitialTickRotation;
+//                CharacterMotors[i].Rigidbody.MovePosition(CharacterMotors[i].TransientPosition);
+//                CharacterMotors[i].Rigidbody.MoveRotation(CharacterMotors[i].TransientRotation);
             }
 
             // Return movers to their initial poses and move to target
@@ -508,8 +510,8 @@ namespace KinematicCharacterController
             {
                 CharacterMotors[i].Transform.SetPositionAndRotation(CharacterMotors[i].TransientPosition,
                     CharacterMotors[i].TransientRotation);
-                CharacterMotors[i].Rigidbody.position = CharacterMotors[i].TransientPosition;
-                CharacterMotors[i].Rigidbody.rotation = CharacterMotors[i].TransientRotation;
+//                CharacterMotors[i].Rigidbody.position = CharacterMotors[i].TransientPosition;
+//                CharacterMotors[i].Rigidbody.rotation = CharacterMotors[i].TransientRotation;
             }
 
             for (int i = 0; i < PhysicsMovers.Count; i++)

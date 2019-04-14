@@ -1,6 +1,6 @@
 namespace Core.GameModule.Interface
 {
-    public interface IRenderSystem
+    public interface IRenderSystem:IUserSystem
     {
         void OnRender();
     }

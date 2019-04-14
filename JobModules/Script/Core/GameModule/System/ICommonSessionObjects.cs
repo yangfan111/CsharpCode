@@ -1,7 +1,7 @@
 ﻿using App.Shared.Components;
 using Utils.AssetManager;
 using Core.EntitasAdpater;
-using Core.GameInputFilter;
+using Core;
 using Core.IFactory;
 using Core.WeaponLogic;
 using Core.Common;
@@ -29,7 +29,7 @@ namespace Core.GameModule.System
         IGameContexts GameContexts { get; set; }
        
        // IWeaponMode WeaponModeLogic { get; set; }
-        IGameStateProcessorFactory GameStateProcessorFactory{ get; set; }
+    //    PlayerStateCollectorPool PlayerStateCollectorPool { get; set; }
         RoomInfo RoomInfo { get; set; }
         RuntimeGameConfig RuntimeGameConfig { get; set; }
         IEntityIdGenerator EntityIdGenerator{ get; set; }

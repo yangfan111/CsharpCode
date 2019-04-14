@@ -5,6 +5,7 @@ using DG.Tweening;
 using System;
 using System.Collections.Generic;
 using App.Shared.Components.Ui;
+using Assets.App.Client.GameModules.Ui;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Profiling;
@@ -113,7 +114,7 @@ namespace App.Client.GameModules.Ui.Utils.MiniMaxMapCommon
             if (rectT == null || imgCom == null)
                 return;
 
-            if (UnityEngine.Vector2.Distance(refePosByRice, safeDuquan.Center) > 1.414f * windowWidthByRice / 2 + safeDuquan.Radius) //不在地图视野内
+            if (UnityEngine.Vector2.Distance(refePosByRice, safeDuquan.Center.ShiftedUIVector2()) > 1.414f * windowWidthByRice / 2 + safeDuquan.Radius) //不在地图视野内
             {
                 UIUtils.SetActive(safeDuquanRoot, false);
             }
@@ -129,7 +130,7 @@ namespace App.Client.GameModules.Ui.Utils.MiniMaxMapCommon
                 material.SetTextureScale("_MainTex", new Vector2(tilingX, tilingY));
 
                 //设置位置    
-                Vector2 startPoint = referPosByPixel + (safeDuquan.Center - refePosByRice) * rate;
+                Vector2 startPoint = referPosByPixel + (safeDuquan.Center.ShiftedUIVector2() - refePosByRice) * rate;
                 var halfW = rectT.rect.width / 2;
                 Vector2 endPoint = referPosByPixel - new Vector2(halfW, halfW) + new Vector2(beishu * halfW, beishu * halfW);
                 var deltaX = (endPoint.x - startPoint.x) / (beishu * rectT.rect.width);
@@ -155,7 +156,7 @@ namespace App.Client.GameModules.Ui.Utils.MiniMaxMapCommon
             if (rectT == null || imgCom == null)
                 return;
 
-            if (Vector2.Distance(refePosByRice, curDuquan.Center) > 1.414f * windowWidthByRice / 2 + curDuquan.Radius) //不在小地图视野内
+            if (Vector2.Distance(refePosByRice, curDuquan.Center.ShiftedUIVector2()) > 1.414f * windowWidthByRice / 2 + curDuquan.Radius) //不在小地图视野内
             {
                 UIUtils.SetActive(curDuquanRoot, false);
             }
@@ -174,7 +175,7 @@ namespace App.Client.GameModules.Ui.Utils.MiniMaxMapCommon
                     material.SetTextureScale("_MainTex", temper);
 
                     //设置位置
-                    Vector2 startPoint = referPosByPixel + (curDuquan.Center - refePosByRice) * rate;
+                    Vector2 startPoint = referPosByPixel + (curDuquan.Center.ShiftedUIVector2() - refePosByRice) * rate;
                     var halfW = rectT.rect.width / 2;
                     Vector2 endPoint = referPosByPixel - new Vector2(halfW, halfW) + new Vector2(beishu * halfW, beishu * halfW);
                     var deltaX = (endPoint.x - startPoint.x) / (beishu * rectT.rect.width);
@@ -208,7 +209,7 @@ namespace App.Client.GameModules.Ui.Utils.MiniMaxMapCommon
             if (rectT == null || imgCom == null)
                 return;
 
-            var temperVec = new Vector2(curBombAreaInfo.Center.x, curBombAreaInfo.Center.z);
+            var temperVec = curBombAreaInfo.Center.ShiftedUIVector2();
             if (UnityEngine.Vector2.Distance(refePosByRice, temperVec) > 1.414f * windowWidthByRice / 2 + curBombAreaInfo.Radius) //不在小地图视野内
             {
                 UIUtils.SetActive(curBombAreaRoot, false);
@@ -427,13 +428,13 @@ namespace App.Client.GameModules.Ui.Utils.MiniMaxMapCommon
                                 {
                                     loftIconCom.sprite = temperSprite;
                                 }
-
-                                if (data.Pos.y > referPos.y)       //上方
+                                var wpos = data.Pos.ShiftedUIVector2();
+                                if (wpos.y > referPos.y)       //上方
                                 {
                                     if (loftIcon.transform.localScale != Vector3.one)
                                         loftIcon.transform.localScale = Vector3.one;
                                 }
-                                else if (data.Pos.y <= referPos.y)   //下方
+                                else if (wpos.y <= referPos.y)   //下方
                                 {
                                     if (loftIcon.transform.localScale != new UnityEngine.Vector3(1, -1, 1))
                                         loftIcon.transform.localScale = new UnityEngine.Vector3(1, -1, 1);
@@ -645,7 +646,6 @@ namespace App.Client.GameModules.Ui.Utils.MiniMaxMapCommon
 
         //空投点 通用
         private Dictionary<string, Sprite> kTouSpriteDic = new Dictionary<string, Sprite>();
-        private const string uiIconsBundleName = "ui/icons";
         public int spriteSum = 13;
         public float intervalTime = 0.03f;
 
@@ -655,7 +655,7 @@ namespace App.Client.GameModules.Ui.Utils.MiniMaxMapCommon
             for (int i = 1; i <= spriteSum; i++)
             {
                 var name = GetSpriteNameByNum(i);
-                Loader.RetriveSpriteAsync(uiIconsBundleName, name,
+                Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_UiIcons, name,
                             (sprite) =>
                             {
                                 kTouSpriteDic.Add(name, sprite);
@@ -766,31 +766,30 @@ namespace App.Client.GameModules.Ui.Utils.MiniMaxMapCommon
             return instance;
         }
         private Dictionary<string, Sprite> playerMarkSpriteDic = new Dictionary<string, Sprite>();
-        private const string uiIconsBundleName = "ui/icons";
         public void PreparedSprites()
         {
             playerMarkSpriteDic.Clear();
-            Loader.RetriveSpriteAsync(uiIconsBundleName, "Loft_icon", (sprite) =>
+            Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_UiIcons, "Loft_icon", (sprite) =>
             {
                 playerMarkSpriteDic.Add("Loft_icon", sprite);
             });
 
-            Loader.RetriveSpriteAsync(uiIconsBundleName, "icon_parachute", (sprite) =>
+            Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_UiIcons, "icon_parachute", (sprite) =>
             {
                 playerMarkSpriteDic.Add("icon_parachute", sprite);
             });
 
-            Loader.RetriveSpriteAsync(uiIconsBundleName, "icon_drive", (sprite) =>
+            Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_UiIcons, "icon_drive", (sprite) =>
             {
                 playerMarkSpriteDic.Add("icon_drive", sprite);
             });
 
-            Loader.RetriveSpriteAsync(uiIconsBundleName, "icon_hurt", (sprite) =>
+            Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_UiIcons, "icon_hurt", (sprite) =>
             {
                 playerMarkSpriteDic.Add("icon_hurt", sprite);
             });
 
-            Loader.RetriveSpriteAsync(uiIconsBundleName, "icon_die", (sprite) =>
+            Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_UiIcons, "icon_die", (sprite) =>
             {
                 playerMarkSpriteDic.Add("icon_die", sprite);
             });

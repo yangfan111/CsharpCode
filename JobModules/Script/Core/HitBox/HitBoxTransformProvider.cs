@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Core.Utils;
 using UnityEngine;
+using Utils.Appearance;
 using Utils.Singleton;
 
 namespace Core.HitBox
@@ -11,16 +13,9 @@ namespace Core.HitBox
         public HitBoxTransformProvider GetProvider(GameObject o)
         {
             var id =  o.GetInstanceID();
-            if (_providers.ContainsKey(id))
-            {
-                return _providers[id];
-            }
-            else
-            {
-                var p= new HitBoxTransformProvider(o);
-                _providers[id] = p;
-                return p;
-            }
+            if (!_providers.ContainsKey(id))
+                _providers[id] = new HitBoxTransformProvider(o);
+            return _providers[id];
         }
 
         protected override void OnDispose()
@@ -31,54 +26,70 @@ namespace Core.HitBox
     public class HitBoxTransformProvider : IHitBoxTransformProvider
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(HitBoxTransformProvider));
-        private readonly Dictionary<string, Transform> _transformCache;
-        private readonly Dictionary<int, Transform> _boneToTransformsCache;
+
+        private readonly GameObject _currentGameObject;
+        private HitBoxCache _handler;
+
+        public float BoundSphereRadius()
+        {
+            return _handler.SphereRadius(); 
+        }
+
+        public Vector3 BoundSpherePosition()
+        {
+            return _handler.SphereCenter();
+        }
+
         public HitBoxTransformProvider(GameObject currentGameObject)
         {
             _currentGameObject = currentGameObject;
-            _transformCache = new Dictionary<string, Transform>();
-            _boneToTransformsCache = new Dictionary<int, Transform>();
-            BuildTransformCache(currentGameObject.transform, _transformCache);
+            _handler = currentGameObject.GetComponent<HitBoxCache>();
+            if (_handler == null)
+                _handler = currentGameObject.AddComponent<HitBoxCache>();
+            _handler.Init();
         }
-
-        public void Update(Vector3 rootPosition, Quaternion rotation)
+        
+        public void SetActive(bool active)
         {
-            RootPosition = rootPosition;
-            RootRotation = rotation;
-        }
-
-        private void  BuildTransformCache(Transform transform, Dictionary<string,Transform> transformCache)
-        {
-            // if fetch the transform dynamic, weapon will be included
-            if (!transformCache.ContainsKey(transform.name))
+            foreach (var item in _handler.GetHitBox())
             {
-                transformCache.Add(transform.name, transform);
-                for (int i = 0; i < transform.childCount; i++)
-                {
-                    var tf = transform.GetChild(i);
-                    BuildTransformCache(tf, transformCache);
-                }
+                if(item.Value!=null)
+                    item.Value.enabled = active;
             }
         }
 
-        private readonly GameObject _currentGameObject;
-        public Vector3 RootPosition { get; private set; }
-
-        public Quaternion RootRotation { get; private set; }
-
-        public Transform GetTransform(Transform bone)
+        public void SetColliderInRigidBody(bool active)
         {
-            var id = bone.gameObject.GetInstanceID();
-            if (_boneToTransformsCache.ContainsKey(id))
+            foreach (var item in _handler.GetRigidBobies())
             {
-                return _boneToTransformsCache[id];
+                if(item.Value!=null)
+                    item.Value.detectCollisions = active;
             }
-            Transform rc = null;
-            _transformCache.TryGetValue(bone.name, out rc);
-            _boneToTransformsCache[id] = rc;
-            return rc;
         }
 
+        public void FlushLayerOfHitBox()
+        {
+            foreach (var item in _handler.GetTransforms())
+            {
+                item.Value.gameObject.layer = UnityLayerManager.GetLayerIndex(EUnityLayerName.Hitbox);
+            }
+        }
+
+        public Dictionary<string,Collider> GetHitBoxColliders()
+        {
+            return _handler.GetHitBox();
+        }
+
+        public Dictionary<string, Rigidbody> GetRigidBodies()
+        {
+            return _handler.GetRigidBobies();
+        }
+        
+        public Dictionary<string, Transform> GetHitBoxTransforms()
+        {
+            return _handler.GetTransforms();
+        }
+        
         public override string ToString()
         {
             return _currentGameObject.name;

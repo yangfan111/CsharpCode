@@ -10,15 +10,15 @@ namespace Core.SnapshotReplication.Serialization.Serializer
     
     public class SnapshotSerializer : ISnapshotSerializer
     {
+        private static LoggerAdapter _logger = new LoggerAdapter(typeof(SnapshotSerializer));
         private MyBinaryWriter _binaryWriter;
         
         private INetworkObjectSerializerManager _serializerManager;
-        
-        public SnapshotSerializer(INetworkObjectSerializerManager manager)
+        private readonly string _version;
+        public SnapshotSerializer(INetworkObjectSerializerManager manager, string version)
         {
-            
-            
             _serializerManager = manager;
+            _version = version;
         }
 
         public INetworkObjectSerializerManager GetSerializerManager()
@@ -30,7 +30,7 @@ namespace Core.SnapshotReplication.Serialization.Serializer
 //            _binaryWriter = new MyBinaryWriter(stream);
             _binaryWriter = MyBinaryWriter.Allocate(stream);
             Reset();
-            snap.Header.Serialize(_binaryWriter);
+            snap.Header.Serialize(_binaryWriter,_version);
             var baseMap = baseSnap.EntityMap;
             var currentMap = snap.EntityMap;
             SnapshotPatchGenerator handler = new SnapshotPatchGenerator(_serializerManager);
@@ -46,7 +46,11 @@ namespace Core.SnapshotReplication.Serialization.Serializer
         public SnapshotPatch DeSerialize(BinaryReader reader, out SnapshotHeader header)
         {
             header = new SnapshotHeader();
-            header.DeSerialize(reader);
+            string version = header.DeSerialize(reader);
+            if (!version.Equals(_version))
+            {
+                _logger.ErrorFormat("ComponentSerializer Hash {0} Not Equal{1}",_version,version);
+            }
             SnapshotPatch patch = SnapshotPatch.Allocate();
             patch.DeSerialize(reader, _serializerManager);
             return patch;

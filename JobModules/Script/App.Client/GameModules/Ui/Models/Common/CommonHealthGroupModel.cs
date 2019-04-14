@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using App.Client.GameModules.Ui.Utils;
 using App.Client.GameModules.Ui.UiAdapter;
+using Assets.App.Client.GameModules.Ui;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {
@@ -15,7 +16,6 @@ namespace App.Client.GameModules.Ui.Models.Common
     {
         private IPlayerStateUiAdapter adapter = null;
 
-        private const string uiIconsBundleName = "ui/icons";
         private int lastUIMode = 0;
         private bool isGameObjectCreated = false;
         private List<float> powerConfigList = new List<float>();  //能量条范围 读取配表
@@ -233,14 +233,14 @@ namespace App.Client.GameModules.Ui.Models.Common
                     {
                         case 1: //站
                             {
-                                Loader.RetriveSpriteAsync(uiIconsBundleName, "pose_stand", (sprite)=> {
+                                Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_UiIcons, "pose_stand", (sprite)=> {
                                     _viewModel.currentPoseImg = sprite;
                                 });
                             }
                             break;
                         case 2:  //蹲
                             {
-                                Loader.RetriveSpriteAsync(uiIconsBundleName, "pose_squat", (sprite) =>
+                                Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_UiIcons, "pose_squat", (sprite) =>
                                 {
                                     _viewModel.currentPoseImg = sprite;
                                 });
@@ -248,7 +248,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                             break;
                         case 3:  //趴着
                             {
-                                Loader.RetriveSpriteAsync(uiIconsBundleName, "pose_fall", (sprite) =>
+                                Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_UiIcons, "pose_fall", (sprite) =>
                                 {
                                     _viewModel.currentPoseImg = sprite;
                                 });
@@ -403,7 +403,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                             powerTween.Kill();
                             powerTween = null;
                         }
-                        powerTween = UIUtils.CallTween(curtTweenPower, curPower, (value) => { UpdateFunc(value); }, (value) => { CompleteFunc(value); }, 3f);
+                        powerTween = UIUtils.CallTween(curtTweenPower, curPower, (value) => { UpdateFunc(value); }, (value) => { CompleteFunc(value); }, 1f);
                         lastPower = curPower;
                     }
                 }

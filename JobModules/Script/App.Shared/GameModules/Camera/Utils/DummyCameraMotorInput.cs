@@ -11,7 +11,7 @@ namespace App.Shared.GameModules.Camera
 {
     class DummyCameraMotorInput : ICameraMotorInput
     {
-        public void Generate(Contexts contexts, PlayerEntity player, IUserCmd usercmd,float archorYaw,float archorPitch)
+        public void Generate(PlayerEntity player, IUserCmd usercmd,float archorYaw,float archorPitch)
         {
             DeltaYaw = usercmd.DeltaYaw;
             DeltaPitch = usercmd.DeltaPitch;
@@ -21,7 +21,7 @@ namespace App.Shared.GameModules.Camera
                 FilteredChangeCamera = usercmd.FilteredInput.IsInput(EPlayerInput.ChangeCamera);
                 FilteredCameraFocus = usercmd.FilteredInput.IsInput(EPlayerInput.IsCameraFocus);
             }
-            var controller = player.WeaponController();
+
             FrameInterval = usercmd.FrameInterval;
             ChangeCamera = usercmd.ChangeCamera;
           
@@ -37,25 +37,25 @@ namespace App.Shared.GameModules.Camera
             ActionKeepState = player.stateInterface.State.GetActionKeepState();
             IsDriveCar =  player.IsOnVehicle();            
             IsDead = player.gamePlay.IsLifeState(EPlayerLifeState.Dead);
-            CanWeaponGunSight = controller.HeldWeaponAgent.CanWeaponSight;
+            CanWeaponGunSight = player.hasWeaponComponentAgent && player.GetController<PlayerWeaponController>().CurrSlotWeaponId >= 1 & player.weaponLogic.State.CanCameraFocus();
             ArchorPitch = YawPitchUtility.Normalize(archorPitch);
             ArchorYaw = YawPitchUtility.Normalize(archorYaw);
             IsParachuteAttached = player.hasPlayerSkyMove && player.playerSkyMove.IsParachuteAttached;
-            if(!controller.IsHeldSlotEmpty)
-            {
-                ForceChangeGunSight = controller.HeldWeaponAgent.RunTimeComponent.ForceChangeGunSight;
-            }
-            ForceInterruptGunSight = UseActionOrIsStateNoGunSight(usercmd, controller);
-            controller.HeldWeaponAgent.RunTimeComponent.ForceChangeGunSight = false;
-            LastViewByOrder = player.gamePlay.LastViewModeByCmd;
+
+            ForceChangeGunSight = player.playerWeaponState.ForceChangeGunSight;
+            ForceInterruptGunSight = UseActionOrIsStateNoGunSight(usercmd, player);
+            player.playerWeaponState.ForceChangeGunSight = false;
         }
 
-        private bool UseActionOrIsStateNoGunSight(IUserCmd userCmd, PlayerWeaponController controller)
+        private bool UseActionOrIsStateNoGunSight(IUserCmd userCmd, PlayerEntity playerEntity)
         {
             var interrupt = userCmd.IsUseAction || userCmd.IsTabDown || userCmd.FilteredInput.IsInputBlocked(EPlayerInput.IsCameraFocus);
             if(!interrupt)
             {
-                interrupt |= controller.ForceInterruptGunSight> 0;
+                if(playerEntity.hasPlayerInterruptState)
+                {
+                    interrupt |= playerEntity.playerInterruptState.ForceInterruptGunSight > 0;
+                }
             }
             return interrupt;
         }
@@ -91,7 +91,7 @@ namespace App.Shared.GameModules.Camera
         public bool FilteredCameraFocus { get; set; }
         public bool ForceChangeGunSight { get; set; }
         public bool ForceInterruptGunSight { get; set; }
-        public short LastViewByOrder { get; set; }
+
         public override string ToString()
         {
             return string.Format("DeltaYaw: {0}, DeltaPitch: {1}, IsCameraFree: {2}, FrameInterval: {3}, ChangeCamera: {4}, IsCameraFocus: {5}, CanCameraFocus: {6}, NextPostureState: {7}, CurrentPostureState: {8}, LeanState: {9}, ActionState: {10}, IsDriveCar: {11}, IsAirPlane: {12}, IsDead: {13}, CanWeaponGunSight: {14}, IsCmdRun: {15}, IsCmdMoveVertical: {16}, ArchorYaw: {17}, ArchorPitch: {18}", 
@@ -120,8 +120,8 @@ namespace App.Shared.GameModules.Camera
                    || FilteredCameraFocus!=r.FilteredCameraFocus
                    || ForceChangeGunSight!=r.ForceChangeGunSight
                    || ForceInterruptGunSight!=r.ForceInterruptGunSight
-                   || ActionKeepState!=r.ActionKeepState
-                   || LastViewByOrder != r.LastViewByOrder;
+                   || ActionKeepState!=r.ActionKeepState;
+                  
         }
     }
 }

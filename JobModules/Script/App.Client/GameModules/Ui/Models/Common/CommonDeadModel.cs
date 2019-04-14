@@ -1,9 +1,11 @@
-﻿using System;
+using System;
 using App.Client.GameModules.Ui.UiAdapter.Interface.Common;
 using App.Client.GameModules.Ui.ViewModels.Common;
+using Assets.App.Client.GameModules.Ui;
 using Assets.UiFramework.Libs;
 using Core.GameModule.Interface;
 using Core.Utils;
+using UnityEngine;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {
@@ -29,12 +31,21 @@ namespace App.Client.GameModules.Ui.Models.Common
             InitGui();
         }
 
-
+        Transform AnimeRoot;
         private void InitGui()
         {
             _viewModel.ButtonGroupShow = false;
             _viewModel.ContinueBtnClick = _adapter.BackToHall;
             _viewModel.ObserverBtnClick = _adapter.Observe;
+            AnimeRoot = FindChildGo("MaskGroup");
+            if (AnimeRoot != null)
+            {
+                Loader.LoadAsync(AssetBundleConstant.Effect_Common, "death_interface_ui", (obj) =>
+                {
+                    GameObject go = obj as GameObject;
+                    go.transform.SetParent(AnimeRoot, false);
+                });
+            }
         }
 
         public CommonDeadModel(IDeadUiAdapter adapter) : base(adapter)
@@ -85,12 +96,12 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         public string BackToHallText
         {
-            get { return "返回大厅"; }
+            get { return I2.Loc.ScriptLocalization.client_common.word67; }
         }
 
         public string ContinueText
         {
-            get { return "继续"; }
+            get { return I2.Loc.ScriptLocalization.client_common.word68; }
         }
 
         protected override void OnCanvasEnabledUpdate(bool enable)

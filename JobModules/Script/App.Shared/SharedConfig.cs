@@ -78,7 +78,7 @@ namespace App.Shared
         
         public static int BulletSimulationIntervalTime = 50;
 
-        public static int BulletLifeTime = 1200;
+        public static int BulletLifeTime = 5000;
         public static int CreateSnapshotThreadCount = 8;
         public static int LoginServerThreadCount = 8;
 
@@ -106,17 +106,24 @@ namespace App.Shared
         public static bool EnableSlide = true;
         public static bool DebugAnimation = false;
         // Disable Occlusion Culling
-        public static bool EnableOC = true;
+        public static bool EnableOC = false;
         // Disable Distance Culling
         public static bool EnableDC = true;
+
+        public static bool EnableCustomOC = false;
 
         //大厅传过来的模式，加载需要提前知道
         public static int GameRule = GameRules.Offline;
 
+        public static float WorldShiftDistance = 1000;
+        public static bool WorldShiftEnable = true;
+        public static bool WorldShiftDisableTerrainDetail = false;
+        public static float WorldShiftTerrainDetailDistance = 60;
+
         public static bool EnableAnimator = false;
         public static bool DisableAnimator = false;
         public static bool UpdateRender = false;
-        
+
         public static UnityEngine.Vector3 GetPlayerBirthPosition(int entityId)
         {
             

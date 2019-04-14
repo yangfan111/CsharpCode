@@ -1,6 +1,7 @@
 ﻿using App.Client.CastObjectUtil;
 using App.Shared;
 using App.Shared.GameMode;
+using Core;
 using Core.Configuration;
 using Core.EntityComponent;
 using Core.Prediction.UserPrediction.Cmd;
@@ -31,11 +32,14 @@ namespace App.Client.GameMode
 
         public override void SendPickup(int entityId, int itemId, int category, int count)
         {
-            _userCmdGenerator.SetUserCmd((cmd) => cmd.PickUpEquip = entityId);
-            _userCmdGenerator.SetUserCmd((cmd) => cmd.IsManualPickUp = true);
+            _userCmdGenerator.SetUserCmd((cmd) =>
+            {
+                cmd.IsManualPickUp = true;
+                cmd.ManualPickUpEquip = entityId;
+            });
         }
 
-        protected override void DoDropGrenade(PlayerEntity playerEntity)
+        protected override void DoDropGrenade(PlayerEntity playerEntity,EWeaponSlotType slot, IUserCmd cmd)
         {
             if (null != _userCmdGenerator)
             {
@@ -53,7 +57,7 @@ namespace App.Client.GameMode
             var model = target.hasUnityObject ? target.unityObject.UnityObject : target.multiUnityObject.FirstAsset;
             if (!CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(Player, target.position.Value, model))
             {
-                _userCmdGenerator.SetUserCmd((cmd) => cmd.PickUpEquip = entityId);
+                _userCmdGenerator.SetUserCmd((cmd) => cmd.AutoPickUpEquip.Add(entityId));
             }
         }
     }

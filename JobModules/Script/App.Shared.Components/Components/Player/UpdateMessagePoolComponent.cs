@@ -9,15 +9,23 @@ namespace App.Shared.Components.Player
     [Serializable]
     public class UpdateMessagePoolComponent:IComponent,IResetableComponent
     {
-        [DontInitilize] public IUpdateMessagePool UpdateMessagePool;
+        [DontInitilize] public IUpdateMessagePool UpdateMessagePool {
+            get { return _updateMessagePool;}
+        }
         [DontInitilize] public int LastestExecuteUserCmdSeq;
+        private IUpdateMessagePool _updateMessagePool;
+
         public void Reset()
         {
             LastestExecuteUserCmdSeq = -1;
-            if (UpdateMessagePool == null)
+            if (_updateMessagePool == null)
             {
-                UpdateMessagePool = new UpdateMessagePool();
+                _updateMessagePool = new UpdateMessagePool();
                 
+            }
+            else
+            {
+                _updateMessagePool.Dispose();
             }
         }
     }

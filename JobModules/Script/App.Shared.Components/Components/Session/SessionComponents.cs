@@ -7,12 +7,13 @@ using Core.Common;
 using Core.Configuration;
 using Core.EntitasAdpater;
 using Core.Free;
-using Core.GameInputFilter;
+using Core;
 using Core;
 using Core.GameModule.System;
 using Core.GameTime;
 using Core.IFactory;
 using Core.Network;
+using Core.OC;
 using Core.Playback;
 using Core.Prediction;
 using Core.Prediction.UserPrediction.Cmd;
@@ -59,7 +60,7 @@ namespace App.Shared.Components
     [Session]
     [Unique]
     [Serializable]
-    public class CommonSessionComponent : ICommonSessionObjects, IComponent
+    public class CommonSessionComponent : ICommonSessionObjects, IComponent,IDisposable
     {
         
         [DontInitilize]public IUnityAssetManager AssetManager { get; set; }
@@ -69,8 +70,8 @@ namespace App.Shared.Components
       //[DontInitilize]public IWeaponMode WeaponModeLogic { get; set; }
 
         [DontInitilize] public ISessionMode SessionMode{ get; set; }
-
-        [DontInitilize]public IGameStateProcessorFactory GameStateProcessorFactory { get; set; }
+   //     [System.Obsolete]
+       // [DontInitilize]public PlayerStateCollectorPool PlayerStateCollectorPool { get; set; }
         [DontInitilize]public RoomInfo RoomInfo { get; set; }
         [DontInitilize]public RuntimeGameConfig RuntimeGameConfig { get; set; }
         [DontInitilize]public IEntityIdGenerator EntityIdGenerator{ get; set; }
@@ -81,6 +82,11 @@ namespace App.Shared.Components
         [DontInitilize]public Vector3 InitPosition { get; set; }
         [DontInitilize] public IWeaponFireUpdateManagaer WeaponFireUpdateManager { get; set; }
      //   [DontInitilize] public IPlayerWeaponResourceConfigManager PlayerWeaponResourceConfigManager { get; set; }
+     public void Dispose()
+     {
+         if(LevelManager!=null)
+             LevelManager.Dispose();
+     }
     }
     
     public enum EClientSessionStates
@@ -89,6 +95,7 @@ namespace App.Shared.Components
         LoadSubResourceConfig,
         RequestRoomInfo,
         LoadSceneMapConfig,
+        LoadOCConfig,
         PreloadResource,
         PreparingPlayer,
         InitUiModule,
@@ -102,7 +109,7 @@ namespace App.Shared.Components
     [Session]
     [Unique]
     [Serializable]
-    public class ClientSessionObjectsComponent : IComponent
+    public class ClientSessionObjectsComponent : IComponent,IDisposable
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(ClientSessionObjectsComponent));
         [DontInitilize] public NetworkMessageDispatcher MessageDispatcher;
@@ -140,11 +147,23 @@ namespace App.Shared.Components
         //服务器状态
         [DontInitilize] public FpsSatatus FpsSatatus { get; set; }
         [DontInitilize] public ServerStatus ServerFpsSatatus { get; set; }
+
+        [DontInitilize] public IOcclusionCullingController OCController { get; set; }
+
+        public void Dispose()
+        {
+            if(NetworkChannel!=null)
+                NetworkChannel.Dispose();
+            if(SnapshotPool!=null)
+                SnapshotPool.Dispose();
+            if(OCController != null)
+                OCController.Dispose();
+        }
     }
      [Session]
     [Unique]
     [Serializable]
-    public class ServerSessionObjectsComponent : IComponent
+    public class ServerSessionObjectsComponent : IComponent,IDisposable
     {
         [DontInitilize] public ISnapshotPool CompensationSnapshotPool;
         [DontInitilize] public ISnapshotSelectorContainer CompensationSnapshotSelector;
@@ -172,6 +191,16 @@ namespace App.Shared.Components
         public int GetNextSnapshotSeq()
         {
             return _nextSnapshotSeq++;
+        }
+
+        public void Dispose()
+        {
+            if(CompensationSnapshotPool!=null)
+            CompensationSnapshotPool.Dispose();
+            if(Bin2dManager!=null)
+                Bin2dManager.Dispose();
+            if(UpdateMessagePool!=null)
+                UpdateMessagePool.Dispose();
         }
     }
 }

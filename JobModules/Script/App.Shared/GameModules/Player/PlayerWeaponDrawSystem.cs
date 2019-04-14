@@ -28,7 +28,7 @@ namespace App.Shared.GameModules.Player
             if (cmd.IsForceUnmountWeapon)
             {
               
-                controller.ForceUnArmHeldWeapon();
+                controller.UnArmWeapon(false);
                 return;
             }
 
@@ -50,7 +50,7 @@ namespace App.Shared.GameModules.Player
                 if (lastSlot != EWeaponSlotType.None)
                 {
                     //player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.ChangeWeapon);
-                    controller.DrawWeapon(lastSlot);
+                    controller.ArmWeapon(lastSlot,true);
                 }
                 else
                 {
@@ -64,13 +64,13 @@ namespace App.Shared.GameModules.Player
             else
             {
                 //   player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.ChangeWeapon);
-                controller.UnArmHeldWeapon(null); 
+                controller.UnArmWeapon(true); 
                  
             }
-            if (changeWeaponSucess)
-            {
-                player.PlayWeaponSound(XmlConfig.EWeaponSoundType.SwitchIn);
-            }
+//            if (changeWeaponSucess)
+//            {
+//                player.PlayWeaponSound(XmlConfig.EWeaponSoundType.SwitchIn);
+//            }
         }
     }
 }

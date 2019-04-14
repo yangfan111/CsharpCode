@@ -15,7 +15,7 @@ namespace App.Client.SessionStates
             Contexts ctx = (Contexts) contexts;
             var player = ctx.player.CreateEntity();
             player.isFlagSelf = true;
-            player.AddPosition(Vector3.zero);
+            player.AddPosition();
             player.AddOrientation(0, 0, 0, 0, 0);
             player.AddCameraObj();
         }

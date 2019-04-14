@@ -23,49 +23,44 @@ namespace App.Shared.GameModules.Player.Event
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerEventsExtensions));
         public static  void DoAllEvent(this PlayerEvents events, Contexts contexts, PlayerEntity entity,  bool isServer)
         {
-            foreach (var eventList in events.Events.Values)
+            foreach (var v in events.Events.Values)
             {
-                foreach(var evt in eventList)
+                var handler = EventInfos.Instance.GetEventHandler(v.EventType);
+
+                try
                 {
-                    var handler = EventInfos.Instance.GetEventHandler(evt.EventType);
-                    try
+                    _infos[(int) v.EventType].BeginProfileOnlyEnableProfile();
+                    if (isServer)
                     {
-                        _infos[(int)evt.EventType].BeginProfileOnlyEnableProfile();
-                        if (isServer)
+                        if (handler.ServerFilter(entity, v))
                         {
-                            if (handler.ServerFilter(entity, evt))
-                            {
-                                handler.DoEventServer(contexts, entity, evt);
-                            }
-                            else
-                            {
-                                _logger.DebugFormat("Skip Handler:{0} {1}", evt.EventType, evt.IsRemote);
-                            }
+                            handler.DoEventServer(contexts, entity, v);
                         }
                         else
                         {
-                            if (handler.ClientFilter(entity, evt) && EventSwitch[(int)evt.EventType])
-                            {
-                                handler.DoEventClient(contexts, entity, evt);
-                            }
-                            else
-                            {
-                                _logger.DebugFormat("Skip Handler:{0} {1}", evt.EventType, evt.IsRemote);
-                            }
+                            _logger.DebugFormat("Skip Handler:{0} {1}", v.EventType, v.IsRemote);
                         }
                     }
-                    catch (Exception e)
+                    else
                     {
-                        _logger.ErrorFormat("Handler:{0} {1}", evt.EventType, e);
-                    }
-                    finally
-                    {
-                        _infos[(int)evt.EventType].EndProfileOnlyEnableProfile();
+                        if (handler.ClientFilter(entity, v) && EventSwitch[(int) v.EventType])
+                        {
+                            handler.DoEventClient(contexts, entity, v);
+                        }
+                        else
+                        {
+                            _logger.DebugFormat("Skip Handler:{0} {1}", v.EventType, v.IsRemote);
+                        }
                     }
                 }
-               
-
-            
+                catch (Exception e)
+                {
+                    _logger.ErrorFormat("Handler:{0} {1}", v.EventType, e);
+                }
+                finally
+                {
+                    _infos[(int) v.EventType].EndProfileOnlyEnableProfile();
+                }
             }
         }
     }

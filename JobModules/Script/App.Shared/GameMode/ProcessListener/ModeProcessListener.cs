@@ -1,5 +1,7 @@
-﻿using Core;
+﻿using App.Shared.GameModules.Weapon;
+using Core;
 using Core.EntityComponent;
+using Core.Fsm;
 
 namespace App.Shared.GameMode
 {
@@ -13,6 +15,7 @@ namespace App.Shared.GameMode
            
         }
 
+     
         public virtual void OnPickup(IPlayerWeaponProcessor controller, EWeaponSlotType slot)
         {
         }
@@ -22,7 +25,7 @@ namespace App.Shared.GameMode
         }
 
       
-        public void OnSwitch(IPlayerWeaponProcessor controller, int weaponId, InOrOff op)
+        public void OnSwitch(IPlayerWeaponProcessor controller, int weaponId, EInOrOff op)
         {
             controller.AudioController.PlaySwitchAuido(weaponId, op);
         }

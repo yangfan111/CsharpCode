@@ -23,6 +23,8 @@ namespace Core.CharacterController.ConcreteController
             _motor.ChangeCharacterController(_controller);
             DefaultInit();
             _motor.CapsuleDirection = 2;
+            _motor.UseSphereGroundDetection = false;
+            _motor.SafeMovement = false;
             _motor.OnValidate();
         }
 

@@ -1,10 +1,11 @@
 ﻿using App.Server.GameModules.GamePlay.free.player;
-using App.Shared.Components.Ui;
 using App.Shared.GameModules.Player;
 using com.wd.free.action;
 using com.wd.free.@event;
+using Sharpen;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace App.Shared.FreeFramework.Free.player
 {
@@ -29,88 +30,80 @@ namespace App.Shared.FreeFramework.Free.player
             }
         }
 
-        public static bool ObservePlayer(IEventArgs args, FreeData fd, bool observeEnemy, bool wiseFlag)
+        public static bool ObservePlayer(IEventArgs args, FreeData fd, bool observeEnemyFlag, bool wiseFlag)
         {
-            bool hasTeamMate = false;
+            List<PlayerEntity> teammateEntities = new List<PlayerEntity>();
+            List<PlayerEntity> enemyEntities = new List<PlayerEntity>();
             PlayerEntity revenge = null;
-            bool hasEnemy = false;
 
-            foreach (PlayerEntity p in args.GameContext.player.GetInitializedPlayerEntities())
+            foreach (PlayerEntity playerEntity in args.GameContext.player.GetInitializedPlayerEntities())
             {
-                if (CanOb(fd.Player, p))
+                if (!playerEntity.gamePlay.IsDead() && playerEntity.playerInfo.PlayerId != fd.Player.playerInfo.PlayerId)
                 {
-                    if (p.playerInfo.Camp == fd.Player.playerInfo.Camp)
+                    if (playerEntity.playerInfo.TeamId == fd.Player.playerInfo.TeamId)
                     {
-                        hasTeamMate = true;
+                        teammateEntities.Add(playerEntity);
                     }
-                    if (fd.Player.statisticsData.Statistics.RevengeKillerId == p.playerInfo.PlayerId)
+                    else
                     {
-                        revenge = p;
+                        enemyEntities.Add(playerEntity);
                     }
-                    if (p.playerInfo.Camp != fd.Player.playerInfo.Camp)
+                    if (playerEntity.playerInfo.PlayerId == fd.Player.statisticsData.Statistics.RevengeKillerId)
                     {
-                        hasEnemy = true;
+                        revenge = playerEntity;
                     }
                 }
             }
 
-            if (hasTeamMate)
+            if (!teammateEntities.IsEmpty())
             {
-                if (FindTeamMate(args, fd, wiseFlag))
+                if (FindObserveObject(teammateEntities, fd, false, wiseFlag))
                 {
                     return true;
                 }
             }
-            else if (revenge != null && observeEnemy)
+            else if (revenge != null && observeEnemyFlag)
             {
-                fd.Player.gamePlay.CameraEntityId = revenge.entityKey.Value.EntityId;
+                fd.Player.gamePlay.CameraEntityId = revenge.playerInfo.EntityId;
                 return true;
             }
-            else if (hasEnemy && observeEnemy)
+            else if (!enemyEntities.IsEmpty() && observeEnemyFlag)
             {
-                if (!FindSomeOne(args, fd, wiseFlag))
+                if (FindObserveObject(enemyEntities, fd, true, wiseFlag))
                 {
-                    fd.Player.gamePlay.CameraEntityId = wiseFlag ? 0 : 999;
-                    FindSomeOne(args, fd, wiseFlag);
+                    return true;
                 }
-                return true;
             }
-
             return false;
         }
 
-        private static bool FindTeamMate(IEventArgs args, FreeData fd, bool wiseFlag)
+        private static bool FindObserveObject(List<PlayerEntity> playerEntities, FreeData fd, bool observeEnemyFlag, bool wiseFlag)
         {
-            List<PlayerEntity> playerEntities = new List<PlayerEntity>();
-            foreach (PlayerEntity playerEntity in args.GameContext.player.GetInitializedPlayerEntities())
-            {
-                if (playerEntity.playerInfo.TeamId == fd.Player.playerInfo.TeamId &&
-                    playerEntity.playerInfo.PlayerId != fd.Player.playerInfo.PlayerId &&
-                    !playerEntity.gamePlay.IsDead())
-                {
-                    playerEntities.Add(playerEntity);
-                }
-            }
-
-            if (playerEntities.Count == 0)
-            {
-                return false;
-            }
             if (playerEntities.Count == 1)
             {
                 fd.Player.gamePlay.CameraEntityId = playerEntities[0].playerInfo.EntityId;
                 return true;
             }
+
             playerEntities.Sort((x, y) =>
             {
-                if (x.playerInfo.Num > y.playerInfo.Num) return 1;
+                if (observeEnemyFlag)
+                {
+                    if (Vector3.Distance(fd.Player.position.Value, x.position.Value) > Vector3.Distance(fd.Player.position.Value, y.position.Value))
+                        return 1;
+                    return -1;
+                }
+                if (x.playerInfo.Num > y.playerInfo.Num)
+                    return 1;
                 return -1;
             });
+
             if (fd.Player.gamePlay.CameraEntityId == 0)
             {
                 fd.Player.gamePlay.CameraEntityId = playerEntities[0].playerInfo.EntityId;
                 return true;
             }
+
             for (int i = 0; i < playerEntities.Count; i++)
             {
                 if (playerEntities[i].playerInfo.EntityId == fd.Player.gamePlay.CameraEntityId)
@@ -128,38 +121,6 @@ namespace App.Shared.FreeFramework.Free.player
             }
             fd.Player.gamePlay.CameraEntityId = playerEntities[0].playerInfo.EntityId;
             return true;
-        }
-
-        private static bool FindSomeOne(IEventArgs args, FreeData fd, bool wiseFlag)
-        {
-            foreach (PlayerEntity p in args.GameContext.player.GetInitializedPlayerEntities())
-            {
-                if (CanOb(fd.Player, p) && p.playerInfo.Camp != fd.Player.playerInfo.Camp)
-                {
-                    if (wiseFlag)
-                    {
-                        if (p.entityKey.Value.EntityId > fd.Player.gamePlay.CameraEntityId)
-                        {
-                            fd.Player.gamePlay.CameraEntityId = p.entityKey.Value.EntityId;
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        if (p.entityKey.Value.EntityId < fd.Player.gamePlay.CameraEntityId)
-                        {
-                            fd.Player.gamePlay.CameraEntityId = p.entityKey.Value.EntityId;
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
-        private static bool CanOb(PlayerEntity p, PlayerEntity candidate)
-        {
-            return p != candidate && !candidate.gamePlay.IsDead();
         }
     }
 }

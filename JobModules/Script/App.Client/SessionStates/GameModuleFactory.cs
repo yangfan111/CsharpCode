@@ -4,6 +4,7 @@ using App.Client.GameModules.ClientEffect;
 using App.Client.GameModules.GamePlay;
 using App.Client.GameModules.GamePlay.Free.Entitas;
 using App.Client.GameModules.GamePlay.Free.Scene;
+using App.Client.GameModules.OC;
 using App.Client.GameModules.Player;
 using App.Client.GameModules.Player.Robot;
 using App.Client.GameModules.SceneManagement;
@@ -71,6 +72,7 @@ namespace App.Client.SessionStates
                 contexts.session.commonSession,
                 motors);
             cmdModule.AddSystem(new PlayerAddMarkSystem(contexts));
+            cmdModule.AddSystem(new PlayerSprayPaintSystem(contexts));
 
             gameModule.AddModule(cmdModule);
             gameModule.AddModule(new BulletModule(contexts));
@@ -86,7 +88,10 @@ namespace App.Client.SessionStates
             if (SingletonManager.Get<MapConfigManager>().SceneParameters is SceneConfig)
             {
                 gameModule.AddSystem(new VisionCenterUpdateSystem(contexts));
+                gameModule.AddSystem(new ClientAutoWorldShiftRenderSystem(contexts));
             }
+
+            gameModule.AddSystem(new OcclusionCullingSystem(contexts));
 
             gameModule.AddModule(new ClientSceneObjectModule(contexts, sessionObjects));
             gameModule.AddModule(new ClientSoundModule(contexts));

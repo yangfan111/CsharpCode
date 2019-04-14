@@ -1,7 +1,10 @@
 ﻿using App.Client.CastObjectUtil;
 using App.Shared;
 using App.Shared.GameModules.GamePlay.Free;
+using Assets.Sources.Free.Utility;
+using com.cpkf.yyjd.tools.util;
 using Core.EntityComponent;
+using Core.Free;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using I2.Loc;
@@ -57,15 +60,14 @@ namespace App.Client.GameModules.Ui.Logic
                 case FreeEntityConstant.DeadBoxGroup:
                     if(freeMoveEntity.hasFreeData)
                     {
-                        var playerEntityId= freeMoveEntity.freeData.IntValue;
-                        var owner = _playerContext.GetEntityWithEntityKey(new EntityKey(playerEntityId, (short)EEntityType.Player));
-                        if(null != owner)
+                        var freeDataValue = freeMoveEntity.freeData.Value;
+                        if (StringUtil.IsNullOrEmpty(freeDataValue))
                         {
-                            Tip = string.Format(ScriptLocalization.client_actiontip.deadbox, owner.playerInfo.PlayerName);
+                            Logger.Error("dead box free data value is missing.");
                         }
                         else
                         {
-                            Logger.ErrorFormat("no player with entity id {0} exist", playerEntityId);
+                            Tip = string.Format(ScriptLocalization.client_actiontip.deadbox, freeDataValue);
                         }
                     }
                     else

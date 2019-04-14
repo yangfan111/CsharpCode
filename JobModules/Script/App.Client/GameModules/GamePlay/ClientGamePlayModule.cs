@@ -30,7 +30,7 @@ namespace App.Client.GameModules.GamePlay
             AddSystem(new FreePredictCmdSystem(contexts));
             AddSystem(new RigidbodyDebugInfoSystem(contexts));
             AddSystem(new MapObjectDebugInfoSystem(contexts));
-            AddSystem(new WeaponCleanupSystem(contexts));
+          
         }
     }
 }

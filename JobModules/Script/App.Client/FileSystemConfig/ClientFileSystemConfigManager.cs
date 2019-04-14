@@ -12,8 +12,8 @@ namespace App.Client.Scripts
     {
         public ClientFileSystemConfigManager()
         {
-
-            BootConfig = FileSystemConfigLoader.LoadXml<ClientBootConfig>("/Config/Client/boot_config.xml");
+            if (File.Exists(Application.dataPath +"/Config/Client/boot_config.xml"))
+                BootConfig = FileSystemConfigLoader.LoadXml<ClientBootConfig>("/Config/Client/boot_config.xml");
 #if UNITY_EDITOR
             var configName = "/Config/Client/boot_config2.xml";
             if (File.Exists(Application.dataPath + "/" + configName))
@@ -34,7 +34,7 @@ namespace App.Client.Scripts
             }
         }
 
-        public ClientBootConfig BootConfig { get; private set; }
+        public ClientBootConfig BootConfig { get; set; }
 
         public TerrainSampleConfig TerrainSampleConfig { get; private set; }
     }

@@ -42,7 +42,8 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         {
             Vector2 referPosByPixel = Vector2.zero;
 
-            if (duQuanInfo.Level == 0 || duQuanInfo.Radius == 0 || UnityEngine.Vector2.Distance(selfPlayPos, duQuanInfo.Center) > 1.414f * windowWidthByRice / 2 + duQuanInfo.Radius) //不在地图视野内
+            var duquanPos = duQuanInfo.Center.ShiftedUIVector2();
+            if (duQuanInfo.Level == 0 || duQuanInfo.Radius == 0 || UnityEngine.Vector2.Distance(selfPlayPos, duquanPos) > 1.414f * windowWidthByRice / 2 + duQuanInfo.Radius) //不在地图视野内
             {
                 UIUtils.SetActive(tran, false);
             }
@@ -58,7 +59,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                 material.SetTextureScale("_MainTex", new Vector2(tilingX, tilingY));
 
                 //设置位置    
-                Vector2 startPoint = referPosByPixel + (duQuanInfo.Center - selfPlayPos) * rate;
+                Vector2 startPoint = referPosByPixel + (duquanPos - selfPlayPos) * rate;
                 var halfW = rectTransform.rect.width / 2;
                 Vector2 endPoint = referPosByPixel - new Vector2(halfW, halfW) + new Vector2(beishu * halfW, beishu * halfW);
                 var deltaX = (endPoint.x - startPoint.x) / (beishu * rectTransform.rect.width);

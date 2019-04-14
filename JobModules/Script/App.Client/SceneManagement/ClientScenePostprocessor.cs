@@ -46,6 +46,10 @@ namespace App.Client.SceneManagement
                     }
                             
                     v.useOcclusionCulling = SharedConfig.EnableOC;
+//                    if (v.GetComponent<AudioListener>() == null)
+//                    {
+//                        v.gameObject.AddComponent<AudioListener>();
+//                    }
                 }
             }
         }

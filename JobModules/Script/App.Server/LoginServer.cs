@@ -8,6 +8,7 @@ using Core.Room;
 using Core.Utils;
 using VNet;
 using App.Server.Scripts.Config;
+using App.Shared.Components.Serializer;
 using UnityEngine;
 using Version = Core.Utils.Version;
 using Utils.Singleton;
@@ -21,7 +22,7 @@ namespace App.Server
         private RoomEventDispatcher _dispatcher;
         private INetworkServer _server;
         private PlayerNetworkMonitor _networkMonitor;
-        private INetworkMessageSerializer _defaultSerializer = new NetworkMessageSerializer(new AppMessageTypeInfo());
+      //  private INetworkMessageSerializer _defaultSerializer = new NetworkMessageSerializer(new AppMessageTypeInfo("default2"));
         public LoginServer(RoomEventDispatcher dispatcher, IRoomManager roomManager)
         {
             _dispatcher = dispatcher;
@@ -49,7 +50,7 @@ namespace App.Server
 
         private void ServerOnChannelConnected(INetworkChannel networkChannel)
         {
-            networkChannel.Serializer = _defaultSerializer;
+            networkChannel.Serializer = new NetworkMessageSerializer(new AppMessageTypeInfo("default2"));
             networkChannel.MessageReceived += NetworkChannelOnMessageReceived;
             var msg = UdpIdMessage.Allocate();
             msg.Id = networkChannel.LocalConnId;
@@ -119,7 +120,15 @@ namespace App.Server
             }
             else if (message.LoginStage == ELoginStage.RequestSnapshot)
             {
-                _roomManager.SetPlayerStageRunning(message.Token, channel);
+                if (message.ComponentSerializerVersion.Equals(ComponentSerializerManager.HashMd5))
+                {
+                    _roomManager.SetPlayerStageRunning(message.Token, channel);
+                }
+                else
+                {
+                    _logger.ErrorFormat("illegal ComponentSerializerVersion: client:{0} != server{1}", message.LoginStage ,ELoginStage.RequestSnapshot);
+                    channel.Disconnect();
+                }
             }
         }
 

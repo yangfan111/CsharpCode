@@ -16,7 +16,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
     public class PlayerSpeedAction : AbstractPlayerAction
     {
         private string speed;
-        private string time;
+        private string jump;
 
         public override void DoAction(IEventArgs args)
         {
@@ -28,6 +28,12 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 sp.Key = FreeMessageConstant.PlayerMoveSpeedSet;
                 sp.Fs.Add(FreeUtil.ReplaceFloat(speed, args));
                 FreeMessageSender.SendMessage(fd.Player, sp);
+
+                fd.Player.stateInterface.State.SetJumpAffect(FreeUtil.ReplaceFloat(jump, args));
+                SimpleProto ps = FreePool.Allocate();
+                ps.Key = FreeMessageConstant.PlayerJumpSpeedSet;
+                ps.Fs.Add(FreeUtil.ReplaceFloat(jump, args));
+                FreeMessageSender.SendMessage(fd.Player, ps);
             }
         }
     }

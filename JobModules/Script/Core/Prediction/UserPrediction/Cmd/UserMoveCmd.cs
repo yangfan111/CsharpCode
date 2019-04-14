@@ -52,6 +52,7 @@ namespace Core.Prediction.UserPrediction.Cmd
         IsHoldF,
         IsForceUnmountWeapon,
         IsInterrupt,
+        IsSprayPaint, /*喷漆*/
 
         IsIdle, // 
         IsSureWalk,

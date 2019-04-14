@@ -87,6 +87,8 @@
         //手雷击杀
         Grenade,
         //一血
-        FirstBlood
+        FirstBlood,
+        //击倒
+        Hit
     }
 }

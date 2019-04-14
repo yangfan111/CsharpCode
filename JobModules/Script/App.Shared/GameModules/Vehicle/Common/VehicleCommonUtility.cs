@@ -65,8 +65,13 @@ namespace App.Shared.GameModules.Vehicle
 
         public static TController GetController<TController>(this VehicleEntity vehicle) where TController: class
         {
-            var controller = vehicle.gameObject.Controller;
-            return controller as TController;
+            if (vehicle.hasGameObject)
+            {
+                var controller = vehicle.gameObject.Controller;
+                return controller as TController;
+            }
+
+            return null;
         }
 
         public static GameObject GetVehicleGameObjectFromChildCollider<TController>(Collider collider)

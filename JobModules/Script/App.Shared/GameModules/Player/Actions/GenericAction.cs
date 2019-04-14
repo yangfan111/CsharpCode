@@ -1,53 +1,52 @@
 ﻿using App.Shared.Components.GenericActions;
-using App.Shared.GameModules.Player.Actions.ClimbPackage;
-using App.Shared.GameModules.Player.Actions.VaultPackage;
+using App.Shared.Player;
+using Core.Utils;
 using UnityEngine;
 
 namespace App.Shared.GameModules.Player.Actions
 {
     public class GenericAction : IGenericAction
     {
-        private readonly IAction[] _climbClasses = new IAction[(int)GenericActionKind.Null];
-        private IAction _concretenessAction;
-
-        public GenericAction()
-        {
-            RegisterClimbClass();
-        }
+        private IAction _climbAction = new ClimbUp(); //攀爬
+        private IAction _stepAction = new StepUp();  //台阶
+        private IAction _vaultAction = new Vault();  //翻越
+        private IAction _concretAction;
+        
+        private Vector3 _capsuleBottom;
+        private Vector3 _capsuleUp;
+        private float _capsuleRadius;
 
         public void PlayerReborn(PlayerEntity player)
         {
-            if (player.hasThirdPersonAnimator)
+            if(player.hasThirdPersonAnimator)
                 player.thirdPersonAnimator.UnityAnimator.applyRootMotion = false;
-            if (player.hasThirdPersonModel)
+            if(player.hasThirdPersonModel)
                 player.thirdPersonModel.Value.transform.localPosition.Set(0, 0, 0);
-            ResetConcretenessAction();
         }
 
         public void PlayerDead(PlayerEntity player)
         {
-            if (player.hasThirdPersonAnimator)
+            if(player.hasThirdPersonAnimator)
                 player.thirdPersonAnimator.UnityAnimator.applyRootMotion = false;
-            if (player.hasThirdPersonModel)
+            if(player.hasThirdPersonModel)
                 player.thirdPersonModel.Value.transform.localPosition.Set(0, 0, 0);
-            ResetConcretenessAction();
         }
 
         public void Update(PlayerEntity player)
         {
-            if (null != _concretenessAction)
+            if(null != _concretAction)
             {
-                _concretenessAction.Update();
-                _concretenessAction.AnimationBehaviour();
+                _concretAction.Update();
+                _concretAction.AnimationBehaviour();
             }
         }
 
         public void ActionInput(PlayerEntity player)
         {
             TestTrigger(player);
-            if (null != _concretenessAction)
+            if (null != _concretAction)
             {
-                _concretenessAction.ActionInput(player);
+                _concretAction.ActionInput(player);
             }
         }
 
@@ -60,61 +59,87 @@ namespace App.Shared.GameModules.Player.Actions
          */
         private void TestTrigger(PlayerEntity player)
         {
-            if (null == player) return;
+            var playerTransform = player.RootGo().transform;
+            RaycastHit hit;
+            var overlapPos = playerTransform.position;
             
-            if (null != _concretenessAction && _concretenessAction.PlayingAnimation ||
-                !ClimbUpCollisionTest.ClimbUpFrontDistanceTest(player))
+            PlayerEntityUtility.GetCapsule(player, overlapPos, out _capsuleBottom, out _capsuleUp, out _capsuleRadius);
+            var capsuleHight = _capsuleUp.y - _capsuleBottom.y;
+            _capsuleBottom.y = (playerTransform.position + playerTransform.up * 0.5f).y;
+            if ((null == _concretAction || !_concretAction.PlayingAnimation) &&
+                Physics.CapsuleCast(_capsuleBottom, _capsuleUp, 0.001f, playerTransform.forward, out hit, 1,
+                UnityLayers.SceneCollidableLayerMask))
             {
-                ResetConcretenessAction();
-                return;
+                //如果碰撞点到发射点的距离大于0.5
+                if (hit.distance < 0.5)
+                {
+                    //得到碰撞点
+                    Vector3 point = hit.point;
+                    Vector3 sphereCenter = new Vector3(hit.point.x, hit.collider.bounds.center.y + hit.collider.bounds.extents.y + capsuleHight, hit.point.z);
+
+                    // 检测发射源是否处于碰撞体中
+                    if (Physics.OverlapSphere(sphereCenter, 0.3f, UnityLayers.SceneCollidableLayerMask).Length >
+                        0) return;
+                    
+                    RaycastHit sphereHit;
+                    Physics.SphereCast(sphereCenter, 0.3f, Vector3.down, out sphereHit,
+                        hit.collider.bounds.center.y + hit.collider.bounds.extents.y + capsuleHight,
+                        UnityLayers.SceneCollidableLayerMask);
+                    point = sphereHit.point;
+                    
+                    var distance = point.y - playerTransform.position.y;
+                    if (distance > 1.5 && distance < 2.3)
+                    {
+                        //一定高度内为climb
+                        ResetConcretAction();
+
+                        _concretAction = _climbAction;
+                        _concretAction.MatchTarget = point;
+                        _concretAction.CanTriggerAction = true;
+                    }else if (distance > 0.5 && distance <= 1.5)
+                    {
+                        ResetConcretAction();
+
+                        //
+                        overlapPos = playerTransform.position + playerTransform.forward * (1.0f + _capsuleRadius) + playerTransform.up * 0.2f;
+                        PlayerEntityUtility.GetCapsule(player, overlapPos, out _capsuleBottom, out _capsuleUp, out _capsuleRadius);
+                        var casts = Physics.OverlapCapsule(_capsuleBottom, _capsuleUp, _capsuleRadius, UnityLayers.SceneCollidableLayerMask);
+                        //
+                        if (casts.Length <= 0 && distance > 0.8f)
+                        {
+                            _concretAction = _vaultAction;
+                        }
+                        else
+                        {
+                            _concretAction = _stepAction;
+                        }
+                        _concretAction.MatchTarget = point;
+                        _concretAction.CanTriggerAction = true;
+                    }
+                }
+                else
+                {
+                    ResetConcretAction();
+                }
             }
-
-            GenericActionKind kind;
-            Vector3 matchTarget;
-            ClimbUpCollisionTest.ClimbUpTypeTest(player, out kind, out matchTarget);
-            CreateConcretenessAction(kind, matchTarget);
+            else
+            {//没有探测到障碍物
+                ResetConcretAction();
+            }
         }
 
-        private void CreateConcretenessAction(GenericActionKind kind, Vector3 matchTarget)
+        private void ResetConcretAction()
         {
-            ResetConcretenessAction();
-            
-            if((int)kind < 0 || (int)kind >= _climbClasses.Length) return;
-            
-            _concretenessAction = _climbClasses[(int)kind];
-            
-            if (null == _concretenessAction) return;
-            
-            _concretenessAction.MatchTarget = matchTarget;
-            _concretenessAction.CanTriggerAction = true;
-        }
-
-        private void ResetConcretenessAction()
-        {
-            if (null != _concretenessAction)
-                _concretenessAction.ResetConcretAction();
-            _concretenessAction = null;
-        }
-
-        private void RegisterClimbClass()
-        {
-            _climbClasses[(int)GenericActionKind.Vault50Cm] = new VaultUp50Cm(GenericActionKind.Vault50Cm);
-            _climbClasses[(int)GenericActionKind.Vault1M] = new VaultUp1M(GenericActionKind.Vault1M);
-            _climbClasses[(int)GenericActionKind.Vault2M] = new VaultUp2M(GenericActionKind.Vault2M);
-            _climbClasses[(int)GenericActionKind.Climb50Cm] = new ClimbUp50Cm(GenericActionKind.Climb50Cm);
-            _climbClasses[(int)GenericActionKind.Climb1M] = new ClimbUp1M(GenericActionKind.Climb1M);
-            _climbClasses[(int)GenericActionKind.Climb2M] = new ClimbUp2M(GenericActionKind.Climb2M);
+            if (null != _concretAction)
+                _concretAction.ResetConcretAction();
+            _concretAction = null;
         }
     }
 
-    public enum GenericActionKind
+    enum GenericActionKind
     {
-        Vault50Cm,
-        Vault1M,
-        Vault2M,
-        Climb50Cm,
-        Climb1M,
-        Climb2M,
-        Null
+        Vault,
+        Step,
+        Climb
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Utils;
 using Entitas;
 using Entitas.VisualDebugging.Unity;
+using UnityEngine;
 
 namespace Core.SessionState
 {
@@ -60,12 +61,35 @@ namespace Core.SessionState
             if (_lateUpdateSystems == null)
                 _lateUpdateSystems = new Systems();
             if (_onGUISystems == null)
-                _onGUISystems = new Systems(); 
+                _onGUISystems = new Systems();
+            if (_entityAction != null)
+            {
+                try
+                {
+                    _entityAction();
+                }
+                catch (Exception e)
+                {
+                    _logger.ErrorFormat("{0}  Entiry",e);
+                }
+            }
         }
 
         public virtual void Leave()
         {
-            GC.Collect();
+            if (_levelAction != null)
+            {
+                try
+                {
+                    _levelAction();
+                }
+                catch (Exception e)
+                {
+                    _logger.ErrorFormat("{0}  Leave",e);
+                }
+               
+            }
+            
             var root = GetUpdateSystems();
             root.ClearReactiveSystems();
             _logger.InfoFormat("{0}  Leave",GetType());
@@ -79,6 +103,7 @@ namespace Core.SessionState
                 }
                 
             }
+            GC.Collect();
         }
 
         public abstract Systems CreateUpdateSystems(IContexts contexts);
@@ -157,6 +182,9 @@ namespace Core.SessionState
 
 	    private DateTime _lastPrintTime = DateTime.Now;
         private int _logInterval = 5000;
+        private Action _entityAction;
+        private Action _levelAction;
+
         public bool IsFullfilled
         {
             get
@@ -191,6 +219,18 @@ namespace Core.SessionState
         public virtual void Dispose()
         {
           
+        }
+
+        public AbstractSessionState WithEnterAction(Action action)
+        {
+            _entityAction = action;
+            return this;
+        }
+
+        public AbstractSessionState WithLevelAction(Action action)
+        {
+            _levelAction = action;
+            return this;
         }
     }
 }

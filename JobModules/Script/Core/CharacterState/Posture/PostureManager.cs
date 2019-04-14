@@ -134,6 +134,11 @@ namespace Core.CharacterState.Posture
             return ret;
         }
 
+        public bool IsFreefallState()
+        {
+            return _commonFsm.IsState((short)PostureStateId.Freefall);
+        }
+
         #endregion
     }
 }

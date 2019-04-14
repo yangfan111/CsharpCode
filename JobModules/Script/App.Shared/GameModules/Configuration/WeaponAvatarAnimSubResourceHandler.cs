@@ -28,24 +28,22 @@ namespace App.Shared.GameModules.Configuration
             bool hasAsset = false;
             foreach (var asset in config.AnimSubResourceAssetInfos)
             {
-                if(AddLoadRequest(asset))
-                    _logger.InfoFormat("Add WeaponAvatarAnimSubResource {0}", asset);
+                AddLoadRequest(asset);
                 hasAsset = true;
             }
 
             return hasAsset;
         }
 
-        protected override void OnLoadSuccImpl(UnityObject unityObj)
+        protected override void OnLoadSuccImpl(AssetInfo assetInfo, UnityEngine.Object obj)
         {
-            _logger.InfoFormat("WeaponAvatarAnimSubResource {0} Loaded Has Object: {1}", unityObj.Address, unityObj.AsObject != null);
-            if (unityObj.AsObject == null)
+            if (obj == null)
             {
-                _logger.ErrorFormat("preload animator controller asset:{0} is loaded failed, the asset is not preload, please check the weapon_avator.xml is correctly config and asset:{0} is exist in assetbundle", unityObj.Address);
+                _logger.ErrorFormat("preload animator controller asset:{0} is loaded failed, the asset is not preload, please check the weapon_avator.xml is correctly config and asset:{0} is exist in assetbundle", assetInfo);
             }
             else
             {
-                SingletonManager.Get<WeaponAvatarConfigManager>().AddToAssetPool(unityObj.Address, unityObj);
+                SingletonManager.Get<WeaponAvatarConfigManager>().AddToAssetPool(assetInfo, obj);
             }
         }
     }

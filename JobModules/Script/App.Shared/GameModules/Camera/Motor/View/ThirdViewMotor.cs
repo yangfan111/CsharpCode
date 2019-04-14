@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using App.Shared.GameModules.Camera.Utils;
 using Assets.App.Shared.GameModules.Camera;
 using UnityEngine;
 using XmlConfig;
@@ -18,7 +17,6 @@ namespace Core.CameraControl.NewMotor.View
                 {
                     player.appearanceInterface.Appearance.SetThridPerson();
                     player.characterBoneInterface.CharacterBone.SetThridPerson();
-                    player.UpdateCameraArchorPostion();
                 }
             });
         }

@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -88,35 +89,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonTeamView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonTeamView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonTeamView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonTeamView, CommonTeamViewModel> bindingSet =
-                view.CreateBindingSet<CommonTeamView, CommonTeamViewModel>();
-
-            view.orirootLocation = _rootLocation = view.rootLocation.anchoredPosition;
-            bindingSet.Bind(view.rootLocation).For(v => v.anchoredPosition).To(vm => vm.rootLocation).OneWay();
-            view.orirootActiveSelf = _rootActiveSelf = view.rootActiveSelf.activeSelf;
-            bindingSet.Bind(view.rootActiveSelf).For(v => v.activeSelf).To(vm => vm.rootActiveSelf).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonTeamView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -140,12 +134,42 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonTeamView view)
+		{
+		     BindingSet<CommonTeamView, CommonTeamViewModel> bindingSet =
+                view.CreateBindingSet<CommonTeamView, CommonTeamViewModel>();
+            bindingSet.Bind(view.rootLocation).For(v => v.anchoredPosition).To(vm => vm.rootLocation).OneWay();
+            bindingSet.Bind(view.rootActiveSelf).For(v => v.activeSelf).To(vm => vm.rootActiveSelf).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonTeamView view)
+		{
+            _rootLocation = view.rootLocation.anchoredPosition;
+            _rootActiveSelf = view.rootActiveSelf.activeSelf;
+		}
+
+
+		void SaveOriData(CommonTeamView view)
+		{
+            view.orirootLocation = _rootLocation;
+            view.orirootActiveSelf = _rootActiveSelf;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			rootLocation = _view.orirootLocation;
 			rootActiveSelf = _view.orirootActiveSelf;
 			SpriteReset();
@@ -174,7 +198,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonTeam"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

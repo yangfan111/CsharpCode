@@ -74,18 +74,15 @@
     <Reference Include="System.Data">
       <HintPath>..\CommonLibs\System.Data.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEditor">
-      <HintPath>..\ThirdParty\Unity\5_6\UnityEditor.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AllocationClient.cs" />
@@ -106,6 +103,7 @@
     <Compile Include="GameModules\GamePlay\Free\UnitTest\UnitTestMysqlData.cs" />
     <Compile Include="GameModules\GamePlay\Free\action\BattleEndAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\action\CommentAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\action\ConsoleCommandAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\action\DebugInfoAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\action\GameOverAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\action\MysqlLogAction.cs" />
@@ -142,6 +140,7 @@
     <Compile Include="GameModules\GamePlay\Free\client\FreeMoveImageHander.cs" />
     <Compile Include="GameModules\GamePlay\Free\client\FreeObservePlayerHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\client\FreePickupHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\client\FreeSprayPaintHandle.cs" />
     <Compile Include="GameModules\GamePlay\Free\client\IFreeMessageHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\client\PickupItemUtil.cs" />
     <Compile Include="GameModules\GamePlay\Free\client\SplitItemHander.cs" />

@@ -2,6 +2,7 @@
 using App.Shared.Components.Ui;
 using App.Shared.Terrains;
 using Assets.Sources.Free.UI;
+using Core.Ui.Map;
 using UnityEngine;
 using Utils.Singleton;
 
@@ -10,20 +11,19 @@ namespace App.Client.GameModules.Ui.UiAdapter
     public class SuoDuUiAdapter : UIAdapter, ISuoDuUiAdapter
     {
         private Contexts _contexts;
-        private Vector3 _playerPos;
+        private MapFixedVector3 _playerPos;
 
         public SuoDuUiAdapter(Contexts contexts)
         {
             _contexts = contexts;
-            _playerPos = new Vector3(0, 0, 0);
+            _playerPos = new MapFixedVector3(0, 0, 0);
         }
 
-        public Vector3 _CurPosition
+        public MapFixedVector3 CurPosition
         {
             get
             {
-                Vector3 pos = _contexts.player.flagSelfEntity.position.Value;
-                _playerPos.Set(pos.x - TerrainCommonData.leftMinPos.x, pos.y, pos.z - TerrainCommonData.leftMinPos.z);
+                _playerPos.Set(_contexts.player.flagSelfEntity.position.FixedVector3);
                 return _playerPos;
             }
         }

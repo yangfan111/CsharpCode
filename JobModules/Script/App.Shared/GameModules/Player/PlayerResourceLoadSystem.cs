@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Common;
 using App.Shared.GameModules.HitBox;
@@ -72,7 +73,10 @@ namespace App.Shared.GameModules.Player
                     _p1Handler.OnLoadSucc);
             }
                 
-            _logger.InfoFormat("created client player entity {0}", player.entityKey);               
+            _logger.InfoFormat("created client player entity {0}, modelName:{1}, id:{2}, avatarIds:{3}", player.entityKey, player.playerInfo.ModelName,
+                player.playerInfo.RoleModelId,
+                string.Join(",", player.playerInfo.AvatarIds.Select(i => i.ToString()).ToArray()));               
+                       
         }
 
         public override void OnLoadResources(IUnityAssetManager assetManager)
@@ -125,7 +129,7 @@ namespace App.Shared.GameModules.Player
                     CharacterController cc = PlayerEntityUtility.InitCharacterController(character);
                     KinematicCharacterMotor kcc = PlayerEntityUtility.InitKinematicCharacterMotor(character);
                     CharacterControllerContext characterControllerContext = new CharacterControllerContext(
-                        new UnityCharacterController(cc),
+                        new UnityCharacterController(cc, !player.isFlagSelf),
                         new Core.CharacterController.ConcreteController.ProneCharacterController(kcc,
                             new ProneController()),
                         new Core.CharacterController.ConcreteController.DiveCharacterController(kcc,
@@ -138,8 +142,9 @@ namespace App.Shared.GameModules.Player
                     var curver = character.AddComponent<AirMoveCurve>();
                     curver.AireMoveCurve = SingletonManager.Get<CharacterStateConfigManager>().AirMoveCurve;
                     curver.MovementCurve = SingletonManager.Get<CharacterStateConfigManager>().MovementCurve;
-
-                    character.AddComponent<EntityReference>();
+                    curver.PostureCurve = SingletonManager.Get<CharacterStateConfigManager>().PostureCurve;
+                    if( character.GetComponent<EntityReference>() ==null)
+                        character.AddComponentUncheckRequireAndDisallowMulti<EntityReference>();
                     character.GetComponent<EntityReference>().Init(player.entityAdapter);
                     var comp = character.AddComponent<PlayerVehicleCollision>();
                     comp.AllContext = _contexts;
@@ -252,17 +257,21 @@ namespace App.Shared.GameModules.Player
             {
                 GameObject go = unityObj;
 
-                RemoveRagdollOnServerSide(go);
+                player.AddThirdPersonModel(go);
+                
+                var provider = SingletonManager.Get<HitBoxTransformProviderCache>()
+                    .GetProvider(player.thirdPersonModel.Value);
+                HitBoxComponentUtility.InitHitBoxComponent(player.entityKey.Value, player, provider);
+                
+                RemoveRagdollOnServerSide(go,provider.GetHitBoxColliders().Values.ToList());
                 
                 HandleLoadedModel(player, go);
                 
                 player.AddAsset(unityObj);
 
-                player.AddThirdPersonModel(go);
-
                 go.name = go.name.Replace("(Clone)", "");
                 go.transform.SetParent(player.RootGo().transform);
-                go.transform.localPosition = Vector3.zero;
+                go.transform.localPosition = new Vector3(0,-PlayerEntityUtility.CcSkinWidth,0);
                 go.transform.localRotation = Quaternion.identity;
                 go.transform.localScale = Vector3.one;
                 _logger.InfoFormat("P3 loaded: {0}", player.entityKey);
@@ -290,7 +299,6 @@ namespace App.Shared.GameModules.Player
                     var animationEvent = go.AddComponent<AnimationClipEvent>();
                     animationEvent.Player = player;
                     player.animatorClip.ClipManager.SetAnimationCleanEventCallback(animationEvent.InterruptAnimationEventFunc);
-                    
                 }
                 else
                 {
@@ -303,13 +311,14 @@ namespace App.Shared.GameModules.Player
                 player.characterControllerInterface.CharacterController.SetCharacterRoot(player.characterContoller.Value.gameObject);
                 player.appearanceInterface.Appearance.SetThirdPersonCharacter(go);
 				player.thirdPersonAnimator.UnityAnimator.Update(0);
+                player.characterControllerInterface.CharacterController.SetThirdModel(player.thirdPersonModel.Value);
 
                 player.characterBoneInterface.CharacterBone.SetCharacterRoot(player.characterContoller.Value.gameObject);
                 player.characterBoneInterface.CharacterBone.SetThirdPersonCharacter(go);
                 player.characterBoneInterface.CharacterBone.SetStablePelvisRotation();
 
                 player.appearanceInterface.Appearance.SetAnimatorP3(player.thirdPersonAnimator.UnityAnimator);
-
+                
                 player.appearanceInterface.Appearance.PlayerReborn();
                 player.characterControllerInterface.CharacterController.PlayerReborn();
                 
@@ -338,10 +347,10 @@ namespace App.Shared.GameModules.Player
                 else
                     player.thirdPersonAnimator.UnityAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 
-                _assetManager.LoadAssetAsync(player, AssetConfig.GetCharacterHitboxAssetInfo(player.playerInfo.ModelName), new HitboxLoadResponseHandler().OnLoadSucc);
+//                _assetManager.LoadAssetAsync(player, AssetConfig.GetCharacterHitboxAssetInfo(player.playerInfo.ModelName), new HitboxLoadResponseHandler().OnLoadSucc);
             }
 
-            private void RemoveRagdollOnServerSide(GameObject go)
+            private void RemoveRagdollOnServerSide(GameObject go,List<Collider> except)
             {
                 if (SharedConfig.IsServer)
                 {
@@ -355,18 +364,9 @@ namespace App.Shared.GameModules.Player
                         GameObject.Destroy(body);
                     }
 
-                    foreach (var collider in go.GetComponentsInChildren<BoxCollider>())
+                    foreach (var collider in go.GetComponentsInChildren<Collider>())
                     {
-                        GameObject.Destroy(collider);
-                    }
-
-                    foreach (var collider in go.GetComponentsInChildren<SphereCollider>())
-                    {
-                        GameObject.Destroy(collider);
-                    }
-
-                    foreach (var collider in go.GetComponentsInChildren<CapsuleCollider>())
-                    {
+                        if(except.Contains(collider)) continue;
                         GameObject.Destroy(collider);
                     }
                 }

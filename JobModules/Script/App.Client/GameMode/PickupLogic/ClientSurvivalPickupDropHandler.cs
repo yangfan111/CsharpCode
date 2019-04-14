@@ -26,7 +26,7 @@ namespace App.Client.GameMode
             get { return _contexts.player.flagSelfEntity; }
         }
 
-        public ClientSurvivalPickupDropHandler(Contexts contexts) : base(contexts)
+        public ClientSurvivalPickupDropHandler(Contexts contexts,int modeId) : base(contexts,modeId)
         {
             _userCmdGenerator = contexts.session.clientSessionObjects.UserCmdGenerator;
             _contexts = contexts;
@@ -61,7 +61,7 @@ namespace App.Client.GameMode
             var model = target.hasUnityObject ? target.unityObject.UnityObject : target.multiUnityObject.FirstAsset;
             if (!CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(Player, target.position.Value, model))
             {
-                _userCmdGenerator.SetUserCmd((cmd) => cmd.PickUpEquip = entityId);
+                _userCmdGenerator.SetUserCmd((cmd) => cmd.AutoPickUpEquip.Add(entityId));
             }
         }
     }

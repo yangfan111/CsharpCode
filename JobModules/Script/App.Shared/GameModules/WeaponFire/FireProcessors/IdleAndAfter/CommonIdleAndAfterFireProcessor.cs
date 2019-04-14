@@ -20,9 +20,9 @@ namespace App.Shared.GameModules.Weapon.Behavior
            
             if (controller.RelatedCameraSNew != null && controller.RelatedCameraSNew.ViewNowMode == (int)ECameraViewMode.GunSight)
             {
-                if (controller.RelatedStateInterface != null)
+                if (controller.RelatedCharState != null)
                 {
-                    controller.RelatedStateInterface.SightsFire();
+                    controller.RelatedCharState.SightsFire();
                 }
                 else
                 {
@@ -31,9 +31,9 @@ namespace App.Shared.GameModules.Weapon.Behavior
             }
             else
             {
-                if (controller.RelatedStateInterface != null)
+                if (controller.RelatedCharState != null)
                 {
-                    controller.RelatedStateInterface.Fire();
+                    controller.RelatedCharState.Fire();
                 }
                 else
                 {

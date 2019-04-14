@@ -6,6 +6,7 @@ using System.Text;
 using Free.framework;
 using Core.Free;
 using Assets.Sources.Free.UI;
+using Core.Components;
 using UnityEngine;
 using Utils.Singleton;
 

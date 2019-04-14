@@ -4,6 +4,7 @@ using App.Shared;
 using App.Shared.Components.Vehicle;
 using App.Shared.GameModules.Vehicle;
 using App.Shared.GameModules.Vehicle.Common;
+using Core.Components;
 using Core.Prediction.VehiclePrediction.Cmd;
 using Core.Utils;
 using EVP;
@@ -91,7 +92,7 @@ namespace App.Shared.GameModules.Vehicle.WheelCarrier
 
             vehicleCmd.VehicleType = (int)EVehicleType.Car;
 
-            vehicleCmd.Body.Position = controller.cachedRigidbody.position;
+            vehicleCmd.Body.Position = controller.cachedRigidbody.position.ShiftedToFixedVector3();
             vehicleCmd.Body.Rotation = controller.cachedRigidbody.rotation;
             vehicleCmd.Body.LinearVelocity = controller.Velocity;
             vehicleCmd.Body.AngularVelocity = controller.AngularVelocity;
@@ -335,7 +336,7 @@ namespace App.Shared.GameModules.Vehicle.WheelCarrier
             var vehicleCmd = (VehicleCmd)cmd;
             var controller = GetController(vehicle);
 
-            SetControllerState(controller, vehicleCmd.Body.Position, vehicleCmd.Body.Rotation, 
+            SetControllerState(controller, vehicleCmd.Body.Position.ShiftedVector3(), vehicleCmd.Body.Rotation, 
                 vehicleCmd.Body.LinearVelocity, vehicleCmd.Body.AngularVelocity,
                 vehicleCmd.Body.Crashed);
 

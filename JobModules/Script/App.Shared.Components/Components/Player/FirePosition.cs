@@ -10,9 +10,9 @@ namespace App.Shared.Components.Player
     public class FirePosition:IUpdateComponent
     {
         [DontInitilize][NetworkProperty] public bool SightValid;
-        [DontInitilize][NetworkProperty] public Vector3 SightPosition;
+        [DontInitilize][NetworkProperty] public FixedVector3 SightPosition;
         [DontInitilize][NetworkProperty] public bool MuzzleP3Valid;
-        [DontInitilize][NetworkProperty] public Vector3 MuzzleP3Position;
+        [DontInitilize][NetworkProperty] public FixedVector3 MuzzleP3Position;
 
         public void CopyFrom(object rightComponent)
         {

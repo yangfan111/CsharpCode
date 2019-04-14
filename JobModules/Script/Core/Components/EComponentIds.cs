@@ -108,10 +108,12 @@
         PlayerMask,
         PlayerHitDiagnosis,
         PlayerCast,
-        WeaponUpdateComponent,
+        WeaponClientUpdateComponent,
         //tmp
         WeaponUpdateComponent2,
         WeaponAux,
+        WeaponServerUpdate,
+
         PlayerWeaponCustomize,
         PlayerAudio,
         GenericActionComponent,
@@ -185,12 +187,15 @@
         Statistics,
         WeaponBasicInfo,
         WeaponActiveFlag,
-        WeaponData,
+        WeaponRuntimeData,
+        WeaponClientData,
         
         TriggerEvent,
         PlayerResource,
         RaycastTest,
         Effects,
+        // 喷漆
+        SprayPaint,
         End,
 
        

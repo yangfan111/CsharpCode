@@ -1,6 +1,7 @@
 ﻿using App.Client.GameModules.Ui.Utils;
 using App.Client.GameModules.Ui.ViewModels.Common;
 using App.Shared.Components.Ui.UiAdapter;
+using Assets.App.Client.GameModules.Ui;
 using Assets.UiFramework.Libs;
 using Core.Enums;
 using Core.GameModule.Interface;
@@ -43,9 +44,23 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         Transform winAnime, loseAnime,tieAnime;
 
+
+        void InitEffect(Transform root, string bundle)
+        {
+            if (root == null) return;
+            Loader.LoadAsync(AssetBundleConstant.Effect, bundle, (obj) =>
+            {
+                GameObject go = obj as GameObject;
+                go.transform.SetParent(root, false);
+            });
+        }
+
         private void InitGui()
         {
             _viewModel.ContinueBtnShow = false;
+            InitEffect(winAnime, "shengli");
+            InitEffect(loseAnime, "shibai");
+            InitEffect(tieAnime, "pinju");
         }
 
         private void InitVariable()

@@ -36,10 +36,11 @@ namespace App.Client.GameModules.SceneObject
         private PlayerContext _playerContext;
 
         // private static readonly AssetInfo GroundProbFlashAsset = new AssetInfo("effect/common", "GroundPropFlash");
-        public SceneObjectLoadSystem(Contexts contexts, ICommonSessionObjects sessionObjects) : base(contexts.sceneObject)
+        public SceneObjectLoadSystem(Contexts contexts, ICommonSessionObjects sessionObjects) : base(
+            contexts.sceneObject)
         {
-            _assetManager = sessionObjects.AssetManager;
-            _playerContext = contexts.player;
+            _assetManager      = sessionObjects.AssetManager;
+            _playerContext     = contexts.player;
             _simpleLoadHandler = new SimpleLoadRespondHander(contexts);
             _weaponLoadHandler = new LoadWeaponRespondHandler(contexts);
         }
@@ -62,6 +63,7 @@ namespace App.Client.GameModules.SceneObject
             {
                 LoadSimpleEquip(sceneObjectEntity);
             }
+
             if (sceneObjectEntity.hasWeaponObject)
             {
                 LoadWeapon(sceneObjectEntity);
@@ -84,21 +86,27 @@ namespace App.Client.GameModules.SceneObject
         private void LoadSimpleEquip(SceneObjectEntity sceneObjectEntity)
         {
             var category = sceneObjectEntity.simpleEquipment.Category;
-            var id = sceneObjectEntity.simpleEquipment.Id;
+            var id       = sceneObjectEntity.simpleEquipment.Id;
             if (id < 1)
             {
                 Logger.ErrorFormat("itemid is illegal for weapon {0}", sceneObjectEntity.entityKey);
                 return;
             }
-            switch ((ECategory)category)
+
+            switch ((ECategory) category)
             {
                 case ECategory.Weapon:
-                    var allConfigs = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(sceneObjectEntity.weaponObject.ConfigId);
-                    var weaponAvatarCfg = SingletonManager.Get<WeaponAvatarConfigManager>().GetConfigById(allConfigs.NewWeaponCfg.AvatorId);
+                    var allConfigs = SingletonManager
+                                     .Get<WeaponConfigManagement>()
+                                     .FindConfigById(sceneObjectEntity.weaponObject.ConfigId);
+                    var weaponAvatarCfg = SingletonManager
+                                          .Get<WeaponAvatarConfigManager>()
+                                          .GetConfigById(allConfigs.NewWeaponCfg.AvatorId);
                     if (null == weaponAvatarCfg || allConfigs == null)
                     {
                         return;
                     }
+
                     if (weaponAvatarCfg.Size != 1)
                         sceneObjectEntity.AddSize(weaponAvatarCfg.Size);
 
@@ -115,20 +123,24 @@ namespace App.Client.GameModules.SceneObject
                             LoadAvatar(sceneObjectEntity, player, avatarCfg);
                         }
                     }
+
                     break;
                 case ECategory.WeaponPart:
-                    var partId = SingletonManager.Get<WeaponPartSurvivalConfigManager>().GetDefaultPartBySetId(id);
-                    var partCfg = SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(partId);
+                    var partId    = SingletonManager.Get<WeaponPartSurvivalConfigManager>().GetDefaultPartBySetId(id);
+                    var partCfg   = SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(partId);
                     var partAsset = new AssetInfo(partCfg.Bundle, partCfg.Res);
                     if (string.IsNullOrEmpty(partAsset.AssetName) || string.IsNullOrEmpty(partAsset.BundleName))
                     {
-                        break; ;
+                        break;
+                        ;
                     }
+
                     var partSize = SingletonManager.Get<WeaponPartSurvivalConfigManager>().GetSizeById(id);
                     if (partSize != 1)
                     {
                         sceneObjectEntity.AddSize(partSize);
                     }
+
                     _assetManager.LoadAssetAsync(sceneObjectEntity, partAsset, _simpleLoadHandler.OnLoadSucc);
 
                     sceneObjectEntity.effects.AddGlobalEffect(GlobalEffectManager.GlobalGroundPropFlash);
@@ -140,61 +152,85 @@ namespace App.Client.GameModules.SceneObject
                     {
                         return;
                     }
+
                     var itemSize = SingletonManager.Get<GameItemConfigManager>().GetSizeById(id);
                     if (itemSize != 1)
                     {
                         sceneObjectEntity.AddSize(itemSize);
                     }
+
                     _assetManager.LoadAssetAsync(sceneObjectEntity, itemSsset, _simpleLoadHandler.OnLoadSucc);
                     sceneObjectEntity.effects.AddGlobalEffect(GlobalEffectManager.GlobalGroundPropFlash);
                     break;
             }
         }
 
-        private void LoadWeaponResources(SceneObjectEntity sceneObjectEntity, WeaponConfigNs.WeaponResConfigItem weaponCfg)
+        private void LoadWeaponResources(SceneObjectEntity                  sceneObjectEntity,
+                                         WeaponConfigNs.WeaponResConfigItem weaponCfg)
         {
             var avatarId = weaponCfg.AvatorId;
             if (sceneObjectEntity.hasWeaponObject && sceneObjectEntity.weaponObject.WeaponAvatarId > 0)
             {
                 avatarId = sceneObjectEntity.weaponObject.WeaponAvatarId;
             }
-            AssetInfo? effectAssetInfo = null;
-            if (WeaponUtil.IsC4p(weaponCfg.Id))
+
+            AssetInfo asset =
+                SingletonManager.Get<WeaponAvatarConfigManager>().GetThirdPersonModel(avatarId);
+            bool alreadyInitializedBefore = true;
+            if (!sceneObjectEntity.hasMultiUnityObject || !sceneObjectEntity.hasWeaponAttachment)
             {
-                effectAssetInfo = SingletonManager.Get<WeaponAvatarConfigManager>().GetEffectAsset(avatarId);
+                alreadyInitializedBefore = false;
+                
+                sceneObjectEntity.AddMultiUnityObject();
+                sceneObjectEntity.AddWeaponAttachment(
+                    new Dictionary<AssetInfo, int>(AssetInfo.AssetInfoComparer.Instance), new List<AssetInfo>());
             }
-            AssetInfo asset = SingletonManager.Get<WeaponAvatarConfigManager>().GetThirdPersonModel(avatarId);
-            sceneObjectEntity.AddMultiUnityObject();
+
             var dic = sceneObjectEntity.multiUnityObject.LoadedAssets;
-            AssetInfo assetInfo = new AssetInfo(asset.BundleName, asset.AssetName);
-            dic[assetInfo] = null;
-            _assetManager.LoadAssetAsync(sceneObjectEntity, assetInfo, _weaponLoadHandler.OnLoadSucc);
-            sceneObjectEntity.AddWeaponAttachment(new Dictionary<AssetInfo, int>(AssetInfo.AssetInfoComparer.Instance), new List<AssetInfo>());
+            if (!alreadyInitializedBefore)
+            {
+                AssetInfo assetInfo = new AssetInfo(asset.BundleName, asset.AssetName);
+                dic[assetInfo] = null;
+                _assetManager.LoadAssetAsync(sceneObjectEntity, assetInfo, _weaponLoadHandler.OnLoadSucc);
+            }
+
             var weaponParts = sceneObjectEntity.weaponObject.CollectParts();
             for (int i = 0; i < weaponParts.Count; i++)
             {
-                var attachId = weaponParts[i];
-                var attach = SingletonManager.Get<WeaponPartsConfigManager>().GetAsset(attachId);
+                var       attachId  = weaponParts[i];
+                var       attach    = SingletonManager.Get<WeaponPartsConfigManager>().GetAsset(attachId);
                 AssetInfo partsInfo = new AssetInfo(attach.BundleName, attach.AssetName);
-                dic[partsInfo] = null;
-                _assetManager.LoadAssetAsync(sceneObjectEntity, partsInfo, _weaponLoadHandler.OnLoadSucc);
-                sceneObjectEntity.weaponAttachment.AttachmentDic[partsInfo] = (int)SingletonManager.Get<WeaponPartsConfigManager>().GetPartType(attachId);
+                if (!sceneObjectEntity.weaponAttachment.AttachmentDic.ContainsKey(partsInfo))
+                {
+                    dic[partsInfo] = null;
+                    sceneObjectEntity.weaponAttachment.AttachmentDic[partsInfo] =
+                        (int) SingletonManager.Get<WeaponPartsConfigManager>().GetPartType(attachId);
+                    _assetManager.LoadAssetAsync(sceneObjectEntity, partsInfo, _weaponLoadHandler.OnLoadSucc);
+                }
             }
-            if (effectAssetInfo.HasValue)
+
+            List<AssetInfo> effectAssetInfo =
+                SingletonManager.Get<WeaponAvatarConfigManager>().GetEffectAsset(avatarId);
+            if (effectAssetInfo.Count > 0)
             {
-                dic[effectAssetInfo.Value] = null;
-                _assetManager.LoadAssetAsync(sceneObjectEntity, effectAssetInfo.Value, _weaponLoadHandler.OnLoadSucc);
-                sceneObjectEntity.weaponAttachment.EffectDic.Add(effectAssetInfo.Value);
+                foreach (var effect in effectAssetInfo)
+                {
+                    dic[effect] = null;
+                    _assetManager.LoadAssetAsync(sceneObjectEntity, effect, _weaponLoadHandler.OnLoadSucc);
+                    sceneObjectEntity.weaponAttachment.EffectDic.Add(effect);
+                }
             }
+
             sceneObjectEntity.effects.AddGlobalEffect(GlobalEffectManager.GlobalGroundPropFlash);
         }
 
-        private void LoadAvatar(SceneObjectEntity sceneObjectEntity, PlayerEntity playerEntity, RoleAvatarConfigItem avatarCfg)
+        private void LoadAvatar(SceneObjectEntity    sceneObjectEntity, PlayerEntity playerEntity,
+                                RoleAvatarConfigItem avatarCfg)
         {
             var role = SingletonManager.Get<RoleConfigManager>().GetRoleItemById(playerEntity.playerInfo.RoleModelId);
             if (null != role)
             {
-                switch ((Sex)role.Sex)
+                switch ((Sex) role.Sex)
                 {
                     case Sex.Female:
                         var fAvatarAsset = new AssetInfo(avatarCfg.Bundle, avatarCfg.FPrefab);
@@ -205,6 +241,7 @@ namespace App.Client.GameModules.SceneObject
                         _assetManager.LoadAssetAsync(sceneObjectEntity, mAvatarAsset, _simpleLoadHandler.OnLoadSucc);
                         break;
                 }
+
                 sceneObjectEntity.effects.AddGlobalEffect(GlobalEffectManager.GlobalGroundPropFlash);
             }
         }
@@ -233,6 +270,7 @@ namespace App.Client.GameModules.SceneObject
                 {
                     entity.AddUnityObject(unityObj);
                 }
+
                 AppearanceUtils.EnableRender(model);
                 InitSceneObject(entity, model);
             }
@@ -261,17 +299,20 @@ namespace App.Client.GameModules.SceneObject
                     Logger.Error("Entity type mismatched !!");
                     return;
                 }
+
                 var model = unityObj.AsGameObject;
                 if (null == model)
                 {
                     Logger.Error("Resource load type mismatched");
                     return;
                 }
+
                 if (!entity.hasMultiUnityObject)
                 {
                     Logger.Error("MultiUnityObject component is needed !");
                     return;
                 }
+
                 if (entity.multiUnityObject.LoadedAssets.ContainsKey(unityObj.Address))
                 {
                     entity.multiUnityObject.LoadedAssets[unityObj.Address] = unityObj;
@@ -281,6 +322,7 @@ namespace App.Client.GameModules.SceneObject
                 {
                     Logger.ErrorFormat("asset {0} should not be treated as multi asset ", unityObj.Address);
                 }
+
                 bool finished = true;
                 foreach (var loaded in entity.multiUnityObject.LoadedAssets)
                 {
@@ -289,6 +331,7 @@ namespace App.Client.GameModules.SceneObject
                         finished = false;
                     }
                 }
+
                 if (!finished)
                 {
                     return;
@@ -309,7 +352,7 @@ namespace App.Client.GameModules.SceneObject
                     {
                         var attachGo = entity.multiUnityObject.LoadedAssets[pair.Key];
                         var location = WeaponPartLocation.EndOfTheWorld;
-                        location = WeaponTypeConvertUtil.GetLocationByPartType((EWeaponPartType)pair.Value);
+                        location = WeaponTypeConvertUtil.GetLocationByPartType((EWeaponPartType) pair.Value);
                         if (location != WeaponPartLocation.EndOfTheWorld)
                         {
                             _boneMount.MountWeaponAttachment(attachGo, weaponGo, location);
@@ -321,10 +364,13 @@ namespace App.Client.GameModules.SceneObject
                     }
 
                     var effectDic = entity.weaponAttachment.EffectDic;
-                    foreach (var effect in effectDic)
+                    if (effectDic.Count > 0)
                     {
-                        var attachGo = entity.multiUnityObject.LoadedAssets[effect];
-                        attachGo.AsGameObject.transform.position = entity.position.Value;
+                        foreach (var effect in effectDic)
+                        {
+                            var attachGo = entity.multiUnityObject.LoadedAssets[effect];
+                            attachGo.AsGameObject.transform.position = entity.position.Value;
+                        }
                     }
                 }
             }
@@ -354,9 +400,10 @@ namespace App.Client.GameModules.SceneObject
                 if (entity.hasSize)
                 {
                     var size = Mathf.Max(1f, entity.size.Value);
-                    model.transform.localScale = Vector3.one * entity.size.Value;
+                    model.transform.localScale  = Vector3.one * entity.size.Value;
                     target.transform.localScale = Vector3.one * size;
                 }
+
                 if (entity.hasEffects)
                 {
                     foreach (var effect in entity.effects.GlobalEffects)
@@ -377,11 +424,11 @@ namespace App.Client.GameModules.SceneObject
 
             private void ProcessSimpleEquipment(SceneObjectEntity entity, RayCastTarget target)
             {
-                var equip = entity.simpleEquipment;
+                var equip    = entity.simpleEquipment;
                 var category = entity.simpleEquipment.Category;
                 var entityId = entity.entityKey.Value.EntityId;
                 SceneObjCastData.Make(target, entityId, equip.Id, equip.Count, category);
-                switch ((ECategory)category)
+                switch ((ECategory) category)
                 {
                     case ECategory.Weapon:
                         var weaponCfg = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(equip.Id);
@@ -389,11 +436,13 @@ namespace App.Client.GameModules.SceneObject
                         {
                             break;
                         }
-                        var weaponType = (EWeaponType_Config)weaponCfg.Type;
+
+                        var weaponType = (EWeaponType_Config) weaponCfg.Type;
                         if (weaponType.CanAutoPick())
                         {
                             EnableAutoPickup(entityId, target.gameObject);
                         }
+
                         break;
                     default:
                         break;
@@ -402,10 +451,12 @@ namespace App.Client.GameModules.SceneObject
 
             private void ProcessWeapon(SceneObjectEntity entity, RayCastTarget target)
             {
-                var weapon = entity.weaponObject;
+                var weapon   = entity.weaponObject;
                 var entityId = entity.entityKey.Value.EntityId;
-                SceneObjCastData.Make(target, entityId, weapon.ConfigId, 1, (int)ECategory.Weapon);
-                var weaponType = (EWeaponType_Config)SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(weapon.ConfigId).Type;
+                SceneObjCastData.Make(target, entityId, weapon.ConfigId, 1, (int) ECategory.Weapon);
+                var weaponType = (EWeaponType_Config) SingletonManager
+                                                      .Get<WeaponResourceConfigManager>().GetConfigById(weapon.ConfigId)
+                                                      .Type;
                 if (weaponType.CanAutoPick())
                 {
                     EnableAutoPickup(entityId, target.gameObject);

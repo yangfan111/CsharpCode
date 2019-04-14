@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using App.Shared.Components.Player;
 using Core.Compare;
+using Core.Components;
 using Core.Interpolate;
 using Core.Playback;
 using Core.Prediction;
@@ -76,7 +77,7 @@ namespace App.Shared.Components.Vehicle
         public float ThrottleInput;
 
         [NetworkProperty]
-        public Vector3 Position;
+        public FixedVector3 Position;
 
         [NetworkProperty]
         public Quaternion Rotation = Quaternion.identity;

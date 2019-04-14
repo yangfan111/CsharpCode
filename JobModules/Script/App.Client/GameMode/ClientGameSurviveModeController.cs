@@ -13,7 +13,7 @@ namespace App.Client.GameMode
             SetMode(modeId);
             ProcessListener = new ModeProcessListener();
             ReservedBulletHandler = new SharedReservedBulletHandler();
-            PickupHandler = new ClientSurvivalPickupDropHandler(contexts);
+            PickupHandler = new ClientSurvivalPickupDropHandler(contexts,modeId);
             SlotLibary = WeaponSlotsLibrary.Allocate(EWeaponSlotsGroupType.Default);
         }
     }

@@ -80,6 +80,12 @@ namespace Core.CharacterState.Action
                 1.0f,
                 CharacterView.FirstPerson | CharacterView.ThirdPerson);
             addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.EnableSightMoveHash,
+                AnimatorParametersHash.Instance.EnableSightMoveName,
+                AnimatorParametersHash.Instance.EnableSightMoveDisableValue,
+                CharacterView.FirstPerson, true);
+            addOutput(FsmOutput.Cache);
            
             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireHash,
                 AnimatorParametersHash.Instance.FireName,

@@ -20,10 +20,10 @@ namespace Core.CharacterState
 
         void SetMoveInWater(bool value);
         bool IsMoveInWater();
-        void SetSteepSlope(bool value);
-        bool IsSteepSlope();
-        void SetBeenSlowDown(bool value);
-        bool IsSlowDown();                 //因为涉水或爬坡禁止冲刺，且一直输入冲刺指令
+        void SetSteepAngle(float value);
+        float GetSteepAngle();
+        void SetSteepSlowDown(int value);
+        int GetSteepSlowDown();                 //因为涉水或爬坡禁止冲刺，且一直输入冲刺指令
         bool CanDraw();
 
         void SetExceedSlopeLimit(bool value);

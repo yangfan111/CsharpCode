@@ -1,6 +1,7 @@
 ﻿using App.Shared.Configuration;
 using App.Shared.Terrains;
 using Core.GameModule.Interface;
+using Core.Ui.Map;
 using Entitas;
 using Utils.AssetManager;
 using Utils.Singleton;
@@ -32,8 +33,10 @@ namespace App.Shared.GameModules.Preparation
             //if (SingletonManager.Get<MapsDescription>().CurrentLevelType == LevelType.BigMap)
             SingletonManager.Get<TerrainManager>().LoadTerrain(assetManager, SingletonManager.Get<MapConfigManager>().SceneParameters);
 
-            TerrainCommonData.size = SingletonManager.Get<MapConfigManager>().SceneParameters.Size;
-            TerrainCommonData.leftMinPos = SingletonManager.Get<MapConfigManager>().SceneParameters.OriginPosition;
+//            TerrainCommonData.size = SingletonManager.Get<MapConfigManager>().SceneParameters.Size;
+//            TerrainCommonData.leftMinPos = SingletonManager.Get<MapConfigManager>().SceneParameters.OriginPosition;
+            MapOrigin.Size  = SingletonManager.Get<MapConfigManager>().SceneParameters.Size;
+            MapOrigin.Origin  = SingletonManager.Get<MapConfigManager>().SceneParameters.OriginPosition;
 
 
         }

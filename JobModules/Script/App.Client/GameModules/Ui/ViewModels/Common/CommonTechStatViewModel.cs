@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -161,49 +162,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonTechStatView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonTechStatView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonTechStatView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonTechStatView, CommonTechStatViewModel> bindingSet =
-                view.CreateBindingSet<CommonTechStatView, CommonTechStatViewModel>();
-
-            view.oriShow = _show = view.Show.activeSelf;
-            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
-            view.oriKillerNameString = _killerNameString = view.KillerNameString.text;
-            bindingSet.Bind(view.KillerNameString).For(v => v.text).To(vm => vm.KillerNameString).OneWay();
-            view.oriKillerLvString = _killerLvString = view.KillerLvString.text;
-            bindingSet.Bind(view.KillerLvString).For(v => v.text).To(vm => vm.KillerLvString).OneWay();
-            bindingSet.Bind(view.KillerTitleSprite).For(v => v.sprite).To(vm => vm.KillerTitleSprite).OneWay();
-            bindingSet.Bind(view.BadgeIconSprite).For(v => v.sprite).To(vm => vm.BadgeIconSprite).OneWay();
-            bindingSet.Bind(view.DeathTypeIconSprite).For(v => v.sprite).To(vm => vm.DeathTypeIconSprite).OneWay();
-            view.oriDeathTypeGroupShow = _deathTypeGroupShow = view.DeathTypeGroupShow.activeSelf;
-            bindingSet.Bind(view.DeathTypeGroupShow).For(v => v.activeSelf).To(vm => vm.DeathTypeGroupShow).OneWay();
-            bindingSet.Bind(view.KillerCardBgSprite).For(v => v.sprite).To(vm => vm.KillerCardBgSprite).OneWay();
-            view.oriKillerLvShow = _killerLvShow = view.KillerLvShow.activeSelf;
-            bindingSet.Bind(view.KillerLvShow).For(v => v.activeSelf).To(vm => vm.KillerLvShow).OneWay();
-            view.oriKillerTitleShow = _killerTitleShow = view.KillerTitleShow.activeSelf;
-            bindingSet.Bind(view.KillerTitleShow).For(v => v.activeSelf).To(vm => vm.KillerTitleShow).OneWay();
-            view.oriKillerCardBgShow = _killerCardBgShow = view.KillerCardBgShow.activeSelf;
-            bindingSet.Bind(view.KillerCardBgShow).For(v => v.activeSelf).To(vm => vm.KillerCardBgShow).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonTechStatView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -227,6 +207,51 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonTechStatView view)
+		{
+		     BindingSet<CommonTechStatView, CommonTechStatViewModel> bindingSet =
+                view.CreateBindingSet<CommonTechStatView, CommonTechStatViewModel>();
+            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
+            bindingSet.Bind(view.KillerNameString).For(v => v.text).To(vm => vm.KillerNameString).OneWay();
+            bindingSet.Bind(view.KillerLvString).For(v => v.text).To(vm => vm.KillerLvString).OneWay();
+            bindingSet.Bind(view.KillerTitleSprite).For(v => v.sprite).To(vm => vm.KillerTitleSprite).OneWay();
+            bindingSet.Bind(view.BadgeIconSprite).For(v => v.sprite).To(vm => vm.BadgeIconSprite).OneWay();
+            bindingSet.Bind(view.DeathTypeIconSprite).For(v => v.sprite).To(vm => vm.DeathTypeIconSprite).OneWay();
+            bindingSet.Bind(view.DeathTypeGroupShow).For(v => v.activeSelf).To(vm => vm.DeathTypeGroupShow).OneWay();
+            bindingSet.Bind(view.KillerCardBgSprite).For(v => v.sprite).To(vm => vm.KillerCardBgSprite).OneWay();
+            bindingSet.Bind(view.KillerLvShow).For(v => v.activeSelf).To(vm => vm.KillerLvShow).OneWay();
+            bindingSet.Bind(view.KillerTitleShow).For(v => v.activeSelf).To(vm => vm.KillerTitleShow).OneWay();
+            bindingSet.Bind(view.KillerCardBgShow).For(v => v.activeSelf).To(vm => vm.KillerCardBgShow).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonTechStatView view)
+		{
+            _show = view.Show.activeSelf;
+            _killerNameString = view.KillerNameString.text;
+            _killerLvString = view.KillerLvString.text;
+            _deathTypeGroupShow = view.DeathTypeGroupShow.activeSelf;
+            _killerLvShow = view.KillerLvShow.activeSelf;
+            _killerTitleShow = view.KillerTitleShow.activeSelf;
+            _killerCardBgShow = view.KillerCardBgShow.activeSelf;
+		}
+
+
+		void SaveOriData(CommonTechStatView view)
+		{
+            view.oriShow = _show;
+            view.oriKillerNameString = _killerNameString;
+            view.oriKillerLvString = _killerLvString;
+            view.oriDeathTypeGroupShow = _deathTypeGroupShow;
+            view.oriKillerLvShow = _killerLvShow;
+            view.oriKillerTitleShow = _killerTitleShow;
+            view.oriKillerCardBgShow = _killerCardBgShow;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 			KillerTitleSprite = ViewModelUtil.EmptySprite;
@@ -237,6 +262,10 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			Show = _view.oriShow;
 			KillerNameString = _view.oriKillerNameString;
 			KillerLvString = _view.oriKillerLvString;
@@ -270,7 +299,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonTechStat"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

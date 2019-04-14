@@ -1,18 +1,11 @@
-﻿using com.wd.free.action;
+﻿using App.Shared.GameModules.Vehicle;
+using Assets.XmlConfig;
+using com.wd.free.action;
+using com.wd.free.@event;
+using Shared.Scripts.MapConfigPoint;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using com.wd.free.@event;
-using gameplay.gamerule.free.item;
-using com.wd.free.item;
-using com.wd.free.unit;
-using App.Server.GameModules.GamePlay.Free.map.position;
-using App.Server.GameModules.GamePlay.Free.action;
-using Assets.XmlConfig;
 using UnityEngine;
-using gameplay.gamerule.free.action;
-using com.cpkf.yyjd.tools.util.collection;
 
 namespace App.Server.GameModules.GamePlay.Free.item
 {
@@ -29,33 +22,22 @@ namespace App.Server.GameModules.GamePlay.Free.item
             }
             else
             {
-                Accumulator<string> acc = new Accumulator<string>();
                 if (MapConfigPoints.current != null)
                 {
                     foreach (MapConfigPoints.ID_Point point in MapConfigPoints.current.IDPints)
                     {
-                        List<ItemDrop> list = FreeItemDrop.GetDropItems(point.ID);
+                        List<ItemDrop> list = FreeItemDrop.GetDropItems(point.ID, args.GameContext.session.commonSession.RoomInfo.MapId);
 
-                        foreach (ItemDrop item in list)
+                        if (list.Count > 0)
                         {
-                            acc.AddKey(string.Format("{0}_{1}",item.cat , item.id), 1);
+                            TimerGameAction timer = new TimerGameAction();
+                            timer.time = "200";
+                            timer.count = list.Count.ToString();
+                            timer.SetAction(new RefreshItemAction(list));
+                            timer.Act(args);
                         }
-
-                        TimerGameAction timer = new TimerGameAction();
-                        timer.time = "200";
-                        timer.count = list.Count.ToString();
-                        timer.SetAction(new RefreshItemAction(list));
-
-                        timer.Act(args);
                     }
                 }
-
-                List<string> items = new List<string>();
-                foreach (string key in acc.KeysSortedByValue())
-                {
-                    items.Add(string.Format("{0}={1}",key ,acc.GetCount(key)));
-                }
-                Debug.LogFormat("items:\n{0}", string.Join("\n", items.ToArray()));
             }
         }
     }
@@ -77,20 +59,45 @@ namespace App.Server.GameModules.GamePlay.Free.item
                 for (int i = 0; i < 20; i++)
                 {
                     ItemDrop drop = list[index++];
-                    args.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.
-                                        CreateSimpleEquipmentEntity((ECategory)drop.cat, drop.id, drop.count, new Vector3(drop.pos.x, drop.pos.y, drop.pos.z));
+                    if (drop.cat == (int) ECategory.Vehicle)
+                    {
+                        VehicleEntityUtility.CreateNewVehicle(args.GameContext.vehicle, drop.id, args.GameContext.session.commonSession.EntityIdGenerator.GetNextEntityId(), GetGround(drop.pos));
+                        break;
+                    }
+                    else
+                    {
+                        args.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleEquipmentEntity((ECategory)drop.cat, drop.id, drop.count, GetGround(drop.pos));
+                    }
 
                     List<ItemDrop> extra = FreeItemDrop.GetExtraItems(drop);
                     foreach (ItemDrop e in extra)
                     {
-                        args.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.
-                        CreateSimpleEquipmentEntity((ECategory)e.cat, e.id, e.count, new Vector3(drop.pos.x, drop.pos.y, drop.pos.z));
+                        args.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleEquipmentEntity((ECategory)e.cat, e.id, e.count, GetGround(drop.pos));
                     }
                     if (index >= list.Count)
                     {
                         break;
                     }
                 }
+            }
+        }
+
+        private Vector3 GetGround(Vector3 v)
+        {
+            Vector3 fromV = v;
+            Vector3 toV = new Vector3(v.x, -10000, v.z);
+
+            Ray r = new Ray(fromV, new Vector3(toV.x - fromV.x, toV.y - fromV.y, toV.z - fromV.z));
+            RaycastHit hitInfo;
+            bool hited = Physics.Raycast(r, out hitInfo);
+
+            if (hited)
+            {
+                return hitInfo.point;
+            }
+            else
+            {
+                return v;
             }
         }
     }

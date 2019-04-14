@@ -1,10 +1,13 @@
 ﻿using App.Client.CastObjectUtil;
+using App.Shared;
 using App.Shared.Components.Player;
 using Core.Utils;
+using Entitas.Utils;
 using UnityEngine;
 using UserInputManager.Lib;
 using Utils.Configuration;
 using Utils.Singleton;
+using XmlConfig;
 
 namespace App.Client.GameModules.Ui.Logic
 {
@@ -34,24 +37,17 @@ namespace App.Client.GameModules.Ui.Logic
         protected bool IsUseActionEnabled()
         {
             var player = _playerContext.flagSelfEntity;
-            if(!player.hasPlayerStateProvider)
-            {
-                Logger.Error("player has no playerstateprovider");
-                return true;
-            }
-            if(null == player.playerStateProvider.Provider)
-            {
-                Logger.Error("provider in playerstateprovider is null");
-                return true;
-            }
-            var states = player.playerStateProvider.Provider.GetCurrentStates();
+            var states = player.StateInteractController().GetCurrStates();
+//            string s = "";
+//            foreach(var val in states)
+//            {
+//                s += (EPlayerState)val+"|";
+//            }
+//            Logger.InfoFormat("Input:"+s);
             foreach(var state in states)
             {
-                if(state == XmlConfig.EPlayerState.None)
-                {
-                    continue;
-                }
-                var condition = SingletonManager.Get<StateTransitionConfigManager>().GetConditionByState(state);
+                StateTransitionConfigItem condition = SingletonManager.Get<StateTransitionConfigManager>().GetConditionByState(state);
+                if (condition == null) continue;
                 if(!condition.IsUseAction)
                 {
                     if(Logger.IsDebugEnabled)

@@ -39,7 +39,7 @@ namespace App.Shared.GameModules.Bullet
         public void UpdateHitBox(IGameEntity gameEntity)
         {
             var position = gameEntity.Position.Value;
-            var rotation = gameEntity.GetComponent<OrientationComponent>().RotationYaw;
+            var rotation = gameEntity.GetComponent<Orientation>().RotationYaw;
             var hitBoxComponent = GetHitBoxComponent(gameEntity.EntityKey);
 
             if (hitBoxComponent != null)

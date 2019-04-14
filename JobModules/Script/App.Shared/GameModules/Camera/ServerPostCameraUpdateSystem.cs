@@ -40,6 +40,7 @@ namespace App.Shared.GameModules.Camera
             if (!playerEntity.hasCameraStateOutputNew) return;
 
             CopyClientOutputToComponent(playerEntity.cameraStateUpload, playerEntity.cameraFinalOutputNew);
+
         }
 
         private void CopyClientOutputToComponent(CameraStateUploadComponent input,

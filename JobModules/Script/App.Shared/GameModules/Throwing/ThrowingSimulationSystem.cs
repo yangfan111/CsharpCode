@@ -1,38 +1,34 @@
-﻿using App.Shared.GameModules.Player;
+﻿using App.Server.GameModules.GamePlay;
+using App.Server.GameModules.GamePlay.free.player;
+using App.Shared.Configuration;
+using App.Shared.EntityFactory;
+using App.Shared.FreeFramework.framework.@event;
+using App.Shared.FreeFramework.framework.trigger;
+using App.Shared.GameModules.Bullet;
+using App.Shared.GameModules.Player;
+using App.Shared.GameModules.Weapon.Behavior;
+using App.Shared.Player;
+using Assets.Utils.Configuration;
+using Assets.XmlConfig;
+using com.wd.free.@event;
+using com.wd.free.para;
 using Core.Compensation;
+using Core.EntityComponent;
+using Core.Enums;
 using Core.GameModule.Interface;
+using Core.IFactory;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using System.Collections.Generic;
-using UnityEngine;
 using Entitas;
 using System;
-using App.Shared.GameModules.Bullet;
-using App.Shared.EntityFactory;
-using Core.WeaponLogic;
-using Core.EntityComponent;
-using App.Shared.Configuration;
-using Assets.XmlConfig;
-using Core;
-using Core.Enums;
+using System.Collections.Generic;
+using UltimateFracturing;
+using UnityEngine;
+using Utils.Appearance;
+using Utils.Singleton;
 using Utils.Utils;
 using WeaponConfigNs;
 using XmlConfig;
-using Utils.Appearance;
-using Core.IFactory;
-using App.Server.GameModules.GamePlay.free.player;
-using App.Shared.Player;
-using com.wd.free.@event;
-using com.wd.free.para;
-using App.Shared.FreeFramework.framework.@event;
-using App.Shared.FreeFramework.framework.trigger;
-using UltimateFracturing;
-using Utils.Singleton;
-using App.Shared.Util;
-using App.Shared.GameModules.Weapon;
-using App.Shared.GameModules.Weapon;
-using Assets.Utils.Configuration;
-using App.Shared.GameModules.Weapon.Behavior;
 
 namespace App.Shared.GameModules.Throwing
 {
@@ -117,6 +113,11 @@ namespace App.Shared.GameModules.Throwing
                 {
                     //爆炸
                     ExplosionEffect(throwing);
+                    if (SharedConfig.IsServer)
+                    {
+                        FreeRuleEventArgs args = _contexts.session.commonSession.FreeArgs as FreeRuleEventArgs;
+                        (args.Rule as IGameRule).HandleWeaponFire(_contexts, player, player.WeaponController().GetWeaponAgent().ResConfig);
+                    }
                     //伤害
                     if (SharedConfig.IsOffline || SharedConfig.IsServer)
                     {
@@ -125,7 +126,8 @@ namespace App.Shared.GameModules.Throwing
                     throwing.isFlagDestroy = true;
                     if(!throwing.throwingData.IsFly)
                     {
-                        player.stateInterface.State.FinishGrenadeThrow();
+                        player.WeaponController().RelatedStatisticsData.UseThrowingCount++;
+                        player.stateInterface.State.ForceFinishGrenadeThrow();
                         CastGrenade(_contexts, player);
                     }
                     continue;
@@ -183,7 +185,7 @@ namespace App.Shared.GameModules.Throwing
                 return;
             }
             playerEntity.throwingAction.ActionInfo.ClearState();
-            playerEntity.WeaponController().ExpendAfterAttack();
+            playerEntity.WeaponController().AfterAttack();
         }
 
         private void OldRaycast()
@@ -321,10 +323,7 @@ namespace App.Shared.GameModules.Throwing
 
         private void PlayOneEffect(ThrowingEntity throwing, int effectId, Vector3 effectPos, bool isBomb)
         {
-           
-           
            var entityIdGenerator = _contexts.session.commonSession.EntityIdGenerator;
-       
 
             EClientEffectType effectType = EClientEffectType.GrenadeExplosion;
             int effectTime = _bombEffectTime;
@@ -456,6 +455,53 @@ namespace App.Shared.GameModules.Throwing
                     _throwingHitHandler.OnVehicleDamage(vehicle, damage);
                 }
             }
+            var colliders = Physics.OverlapSphere(throwing.position.Value, throwing.throwingData.Config.DamageRadius, UnityLayerManager.GetLayerMask(EUnityLayerName.UserInputRaycast) | UnityLayerManager.GetLayerMask(EUnityLayerName.Glass));
+            foreach (var collider in colliders)
+            {
+                var distance = Vector3.Distance(collider.transform.position, throwing.position.Value);
+                float trueDamage = distance > throwing.throwingData.Config.DamageRadius ? 0f : Mathf.Max(0f, throwing.throwingData.Config.BaseDamage * (1 - distance / throwing.throwingData.Config.DamageRadius));
+
+                if (collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.UserInputRaycast))
+                {
+                    var parent = collider.transform;
+                    while (null != parent)
+                    {
+                        var fractured = parent.GetComponent<FracturedObject>();
+                        if (null != fractured)
+                        {
+                            if (!HasObstacle(collider.transform.position, throwing.position.Value, (obstacleTrans) =>
+                            {
+                                var obstacleParent = obstacleTrans.parent;
+                                while (null != obstacleParent)
+                                {
+                                    if (obstacleParent == fractured.transform)
+                                    {
+                                        return true;
+                                    }
+                                    obstacleParent = obstacleParent.parent;
+                                }
+                                return false;
+                            }))
+                            fractured.Explode(Vector3.zero, trueDamage);
+                            break;
+                        }
+                        parent = parent.parent;
+                    }
+                }
+                if (collider.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.Glass))
+                {
+                    var parent = collider.transform;
+                    while (null != parent)
+                    {
+                        var fractured = parent.GetComponent<FracturedGlassyChunk>();
+                        if (null != fractured)
+                        {
+                            fractured.MakeBroken();
+                        }
+                        parent = parent.parent;
+                    }
+                }
+            }
         }
 
         private void FlashDamageHandler(ThrowingEntity throwing)
@@ -492,6 +538,30 @@ namespace App.Shared.GameModules.Throwing
                     break;
             }
             return weaponId;
+        }
+
+        private bool HasObstacle(Vector3 colPosition, Vector3 bombPosition, Func<Transform, bool> exclude = null)
+        {
+            RaycastHit hitInfo;
+            if (null == exclude)
+            {
+                Debug.DrawLine(bombPosition, colPosition, Color.red, 10f);
+                if (Physics.Linecast(bombPosition, colPosition, out hitInfo, UnityLayerManager.GetLayerMask(EUnityLayerName.Default)))
+                {
+                    return true;
+                }
+                return false;
+            }
+            var dir = colPosition - bombPosition;
+            var obstacles = Physics.RaycastAll(bombPosition, dir, dir.magnitude, UnityLayerManager.GetLayerMask(EUnityLayerName.Default));
+            foreach (var obstacle in obstacles)
+            {
+                if (!exclude(obstacle.transform))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

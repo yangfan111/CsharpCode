@@ -35,9 +35,9 @@ namespace com.wd.free.map.position
 
 		private void Adjust(UnitPosition up, IEventArgs args)
 		{
-			up.SetX(up.GetX() + FreeUtil.ReplaceInt(x, args));
-			up.SetY(up.GetY() + FreeUtil.ReplaceInt(y, args));
-			up.SetZ(up.GetZ() + FreeUtil.ReplaceInt(z, args));
+			up.SetX(up.GetX() + FreeUtil.ReplaceFloat(x, args));
+			up.SetY(up.GetY() + FreeUtil.ReplaceFloat(y, args));
+			up.SetZ(up.GetZ() + FreeUtil.ReplaceFloat(z, args));
 			if (!StringUtil.IsNullOrEmpty(pitch))
 			{
 				up.SetPitch(FreeUtil.ReplaceFloat(pitch, args));

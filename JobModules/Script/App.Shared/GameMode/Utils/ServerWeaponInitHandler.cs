@@ -93,7 +93,7 @@ namespace App.Shared.GameMode
         [System.Obsolete]
         private void GenerateGrenadeList(List<PlayerWeaponBagData> sortedList,IPlayerWeaponProcessor processor)
         {
-            processor.GrenadeHelper.ClearCache();
+            processor.GrenadeHandler.ClearCache();
             foreach (var value in sortedList)
             {
                 foreach (var weapon in value.weaponList)
@@ -101,7 +101,7 @@ namespace App.Shared.GameMode
                     var slot = PlayerWeaponBagData.Index2Slot(weapon.Index);
                     if (slot == EWeaponSlotType.ThrowingWeapon)
                     {
-                        processor.GrenadeHelper.AddCache(weapon.WeaponTplId);
+                        processor.GrenadeHandler.AddCache(weapon.WeaponTplId);
                     }
                 }
             }
@@ -120,7 +120,7 @@ namespace App.Shared.GameMode
                     break;
                 }
             }
-            player.playerWeaponUpdate.UpdateHeldAppearance = true;
+            player.playerWeaponServerUpdate.UpdateHeldAppearance = true;
              
             //defaultBagFstSlot =processor.PollGetLastSlotType();
             //DebugUtil.MyLog("defaultBagFstSlot:" + defaultBagFstSlot,DebugUtil.DebugColor.Blue);
@@ -135,7 +135,7 @@ namespace App.Shared.GameMode
             {
                 removedList.Add(j);
             }
-            controller.GrenadeHelper.ClearCache();
+            controller.GrenadeHandler.ClearCache();
             
             foreach (PlayerWeaponData weapon in srcBagData.weaponList)
             {
@@ -162,7 +162,7 @@ namespace App.Shared.GameMode
                 }
                 else
                 {
-                    controller.GrenadeHelper.AddCache(weapon.WeaponTplId);
+                    controller.GrenadeHandler.AddCache(weapon.WeaponTplId);
                 }
                 removedList.Remove(slot);
             }

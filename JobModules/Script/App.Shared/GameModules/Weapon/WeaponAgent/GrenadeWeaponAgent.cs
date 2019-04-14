@@ -4,7 +4,6 @@ using com.wd.free.para;
 using Core;
 using Core.EntityComponent;
 using Core.Free;
-
 using System;
 using Assets.App.Shared.EntityFactory;
 using Core.Utils;
@@ -17,20 +16,22 @@ namespace App.Shared.GameModules.Weapon
     [WeaponSpecies(EWeaponSlotType.ThrowingWeapon)]
     internal class GrenadeWeaponAgent : WeaponBaseAgent
     {
-        private GrenadeCacheHelper bagCacheHelper;
+        private GrenadeCacheHandler _bagCacheHandler;
 
-        public GrenadeWeaponAgent(Func<EntityKey> in_holdExtractor, Func<EntityKey> in_emptyExtractor, EWeaponSlotType slot, GrenadeCacheHelper grenadeHelper) : base(in_holdExtractor, in_emptyExtractor, slot, grenadeHelper)
+        public GrenadeWeaponAgent(Func<EntityKey> in_holdExtractor, Func<EntityKey>    in_emptyExtractor,
+                                  EWeaponSlotType slot,             GrenadeCacheHandler grenadeHandler) :
+            base(in_holdExtractor, in_emptyExtractor, slot, grenadeHandler)
         {
-            bagCacheHelper = grenadeHelper;
+            _bagCacheHandler = grenadeHandler;
         }
+
         protected override WeaponEntity Entity
         {
             get
             {
-                
-                if(IsValid())
+                if (IsValid())
                 {
-                    entityCache = bagCacheHelper.GetGrenadeEntity();
+                    entityCache = _bagCacheHandler.GrenadeEntity;
                 }
                 else
                 {
@@ -40,52 +41,56 @@ namespace App.Shared.GameModules.Weapon
                 return entityCache;
             }
         }
-        internal override EntityKey WeaponKey { get { return IsValid() ? bagCacheHelper.GetGrenadeEntity().entityKey.Value:emptyKeyExtractor(); } }
+
+        internal override EntityKey WeaponKey
+        {
+            get { return IsValid() ? _bagCacheHandler.GrenadeEntity.entityKey.Value : emptyKeyExtractor(); }
+        }
+
         public override bool IsValid()
         {
-            entityCache = bagCacheHelper.GetGrenadeEntity();
-            return entityCache.weaponBasicData.ConfigId > 0;
+            var ret = _bagCacheHandler.GrenadeEntity.weaponBasicData.ConfigId > 0;
+            if (ret)
+                entityCache = _bagCacheHandler.GrenadeEntity;
+            return ret;
         }
+
         ///need auto stuff
         public override bool ExpendWeapon()
         {
             var expendId = ConfigId;
             if (expendId < 1) return false;
-            bagCacheHelper.RemoveCache(expendId);
+            _bagCacheHandler.RemoveCache(expendId);
             if (!SharedConfig.IsOffline)
-                bagCacheHelper.SendFreeTrigger(expendId);
+                _bagCacheHandler.SendFreeTrigger(expendId);
             ReleaseWeapon();
             return true;
         }
-        public  LoggerAdapter logger = new LoggerAdapter(typeof(GrenadeWeaponAgent));
+
+        public LoggerAdapter logger = new LoggerAdapter(typeof(GrenadeWeaponAgent));
+
         public override int ConfigId
         {
             get
             {
-                var entityCache = bagCacheHelper.GetGrenadeEntity();
-                if (entityCache == null)
-                {
-                    logger.Error("grenadeEntity is null");
-                    return WeaponUtil.EmptyHandId;
-                }
-
-                if(entityCache.weaponBasicData.ConfigId>0)
-                    return entityCache.weaponBasicData.ConfigId;
+                if (IsValid())
+                    return _bagCacheHandler.GrenadeEntity.weaponBasicData.ConfigId;
                 return WeaponUtil.EmptyHandId;
             }
         }
+
         public override int FindNextWeapon(bool autoStuff)
         {
-            return bagCacheHelper.FindUsable(autoStuff);
+            return _bagCacheHandler.FindUsable(autoStuff);
         }
 
         public override void ReleaseWeapon()
         {
             if (IsValid())
             {
-                var grenadeEntity = bagCacheHelper.GetGrenadeEntity();
-                grenadeEntity.weaponBasicData.Reset();
-                grenadeEntity.weaponRuntimeData.Reset();
+                entityCache = _bagCacheHandler.GrenadeEntity;
+                entityCache.weaponBasicData.Reset();
+                entityCache.weaponRuntimeData.Reset();
             }
         }
 
@@ -96,19 +101,20 @@ namespace App.Shared.GameModules.Weapon
         /// <param name="orient"></param>
         /// <param name="refreshParams"></param>
         /// <returns></returns>
-        public override WeaponEntity ReplaceWeapon(EntityKey Owner, WeaponScanStruct orient, ref WeaponPartsRefreshStruct refreshParams)
+        public override WeaponEntity ReplaceWeapon(EntityKey                    Owner, WeaponScanStruct orient,
+                                                   ref WeaponPartsRefreshStruct refreshParams)
         {
-            if (bagCacheHelper.ShowCount(orient.ConfigId) == 0) return null;
+            if (_bagCacheHandler.ShowCount(orient.ConfigId) == 0) return null;
             refreshParams.lastWeaponKey = WeaponKey;
             ReleaseWeapon();
-            bagCacheHelper.SetCurr(orient.ConfigId);
+            _bagCacheHandler.SetCurr(orient.ConfigId);
             WeaponPartsStruct parts = WeaponPartUtil.CreateParts(orient);
-            refreshParams.weaponInfo = orient;
-            refreshParams.slot = handledSlot;
-            refreshParams.oldParts = new WeaponPartsStruct();
-            refreshParams.newParts = parts;
+            refreshParams.weaponInfo   = orient;
+            refreshParams.slot         = handledSlot;
+            refreshParams.oldParts     = new WeaponPartsStruct();
+            refreshParams.newParts     = parts;
             refreshParams.armInPackage = true;
-            return bagCacheHelper.GetGrenadeEntity();
+            return _bagCacheHandler.GrenadeEntity;
         }
     }
 }

@@ -100,17 +100,18 @@ namespace Core.CharacterState.Posture.States
 
                     if (ret)
                     {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.InjuredMoveHash,
+                            AnimatorParametersHash.Instance.InjuredMoveName,
+                            AnimatorParametersHash.Instance.InjuredMoveEnableValue,
+                            CharacterView.ThirdPerson,
+                            false);
+						addOutput(FsmOutput.Cache);
                         command.Handled = true;
-
-                        FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.DyingLayer,
-                            AnimatorParametersHash.Instance.DyingEnableValue,
-                            CharacterView.ThirdPerson);
-                        addOutput(FsmOutput.Cache);
                     }
 
                     return ret;
                 },
-                null, (int)PostureStateId.Dying, null, 0, new[] { FsmInput.Dying });
+                null, (int)PostureStateId.DyingTransition, null, 0, new[] { FsmInput.Dying });
 
             #endregion
         }

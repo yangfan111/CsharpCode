@@ -97,5 +97,10 @@ namespace App.Shared.Components.Player
             }
             WeaponAvatarIds.Clear();
         }
+
+        public override string ToString()
+        {
+            return string.Format("EntityId: {0}, PlayerId: {1}, PlayerName: {2}, RoleModelId: {3}, ModelName: {4}, AvatarIds: {5}", EntityId, PlayerId, PlayerName, RoleModelId, ModelName, AvatarIds);
+        }
     }
 }

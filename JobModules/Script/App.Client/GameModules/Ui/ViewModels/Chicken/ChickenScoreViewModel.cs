@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Chicken
 {
@@ -136,47 +137,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<ChickenScoreView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<ChickenScoreView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<ChickenScoreView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<ChickenScoreView, ChickenScoreViewModel> bindingSet =
-                view.CreateBindingSet<ChickenScoreView, ChickenScoreViewModel>();
-
-            view.oriShow = _show = view.Show.activeSelf;
-            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
-            view.oriTotalPlayerInfoShow = _totalPlayerInfoShow = view.TotalPlayerInfoShow.activeSelf;
-            bindingSet.Bind(view.TotalPlayerInfoShow).For(v => v.activeSelf).To(vm => vm.TotalPlayerInfoShow).OneWay();
-            view.oriBeatGroupShow = _beatGroupShow = view.BeatGroupShow.activeSelf;
-            bindingSet.Bind(view.BeatGroupShow).For(v => v.activeSelf).To(vm => vm.BeatGroupShow).OneWay();
-            view.oriBeatPlayerCountString = _beatPlayerCountString = view.BeatPlayerCountString.text;
-            bindingSet.Bind(view.BeatPlayerCountString).For(v => v.text).To(vm => vm.BeatPlayerCountString).OneWay();
-            view.oriSurvivalGroupShow = _survivalGroupShow = view.SurvivalGroupShow.activeSelf;
-            bindingSet.Bind(view.SurvivalGroupShow).For(v => v.activeSelf).To(vm => vm.SurvivalGroupShow).OneWay();
-            view.oriSurvivalPlayerCountString = _survivalPlayerCountString = view.SurvivalPlayerCountString.text;
-            bindingSet.Bind(view.SurvivalPlayerCountString).For(v => v.text).To(vm => vm.SurvivalPlayerCountString).OneWay();
-            view.oriJoinGroupShow = _joinGroupShow = view.JoinGroupShow.activeSelf;
-            bindingSet.Bind(view.JoinGroupShow).For(v => v.activeSelf).To(vm => vm.JoinGroupShow).OneWay();
-            view.oriJoinPlayerCountString = _joinPlayerCountString = view.JoinPlayerCountString.text;
-            bindingSet.Bind(view.JoinPlayerCountString).For(v => v.text).To(vm => vm.JoinPlayerCountString).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(ChickenScoreView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -200,12 +182,60 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
             }
         }
 
+		void ViewBind(ChickenScoreView view)
+		{
+		     BindingSet<ChickenScoreView, ChickenScoreViewModel> bindingSet =
+                view.CreateBindingSet<ChickenScoreView, ChickenScoreViewModel>();
+            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
+            bindingSet.Bind(view.TotalPlayerInfoShow).For(v => v.activeSelf).To(vm => vm.TotalPlayerInfoShow).OneWay();
+            bindingSet.Bind(view.BeatGroupShow).For(v => v.activeSelf).To(vm => vm.BeatGroupShow).OneWay();
+            bindingSet.Bind(view.BeatPlayerCountString).For(v => v.text).To(vm => vm.BeatPlayerCountString).OneWay();
+            bindingSet.Bind(view.SurvivalGroupShow).For(v => v.activeSelf).To(vm => vm.SurvivalGroupShow).OneWay();
+            bindingSet.Bind(view.SurvivalPlayerCountString).For(v => v.text).To(vm => vm.SurvivalPlayerCountString).OneWay();
+            bindingSet.Bind(view.JoinGroupShow).For(v => v.activeSelf).To(vm => vm.JoinGroupShow).OneWay();
+            bindingSet.Bind(view.JoinPlayerCountString).For(v => v.text).To(vm => vm.JoinPlayerCountString).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(ChickenScoreView view)
+		{
+            _show = view.Show.activeSelf;
+            _totalPlayerInfoShow = view.TotalPlayerInfoShow.activeSelf;
+            _beatGroupShow = view.BeatGroupShow.activeSelf;
+            _beatPlayerCountString = view.BeatPlayerCountString.text;
+            _survivalGroupShow = view.SurvivalGroupShow.activeSelf;
+            _survivalPlayerCountString = view.SurvivalPlayerCountString.text;
+            _joinGroupShow = view.JoinGroupShow.activeSelf;
+            _joinPlayerCountString = view.JoinPlayerCountString.text;
+		}
+
+
+		void SaveOriData(ChickenScoreView view)
+		{
+            view.oriShow = _show;
+            view.oriTotalPlayerInfoShow = _totalPlayerInfoShow;
+            view.oriBeatGroupShow = _beatGroupShow;
+            view.oriBeatPlayerCountString = _beatPlayerCountString;
+            view.oriSurvivalGroupShow = _survivalGroupShow;
+            view.oriSurvivalPlayerCountString = _survivalPlayerCountString;
+            view.oriJoinGroupShow = _joinGroupShow;
+            view.oriJoinPlayerCountString = _joinPlayerCountString;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			Show = _view.oriShow;
 			TotalPlayerInfoShow = _view.oriTotalPlayerInfoShow;
 			BeatGroupShow = _view.oriBeatGroupShow;
@@ -240,7 +270,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/chicken"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/chicken"; } }
         public string ResourceAssetName { get { return "ChickenScore"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

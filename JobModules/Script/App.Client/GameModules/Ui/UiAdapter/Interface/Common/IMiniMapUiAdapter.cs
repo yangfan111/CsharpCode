@@ -1,7 +1,9 @@
 ﻿using Entitas;
 using System.Collections.Generic;
+using App.Shared.Components.Player;
 using App.Shared.Components.Ui;
 using Assets.App.Client.GameModules.Ui.UiAdapter.Interface;
+using Core.Ui.Map;
 using UnityEngine;
 using UserInputManager.Lib;
 
@@ -233,7 +235,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         Vector2 CurPlayerPos { get; }   //当前玩家位置
 
         AirPlaneData PlaneData { get; } //当前飞机 
-        List<Vector2> KongTouList(); //空投点
+        List<MapFixedVector2> KongTouList(); //空投点
 
         int MapId { get; set; } //地图ID
 
@@ -259,5 +261,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         bool IsC4Drop { get; }
         Vector3 C4DropPosition { get; }
+
+        GamePlayComponent gamePlay { get; }
     }
 }

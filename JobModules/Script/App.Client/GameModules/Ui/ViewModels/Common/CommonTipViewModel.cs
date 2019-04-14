@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -184,54 +185,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonTipView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonTipView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonTipView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonTipView, CommonTipViewModel> bindingSet =
-                view.CreateBindingSet<CommonTipView, CommonTipViewModel>();
-
-            view.orirootLocation = _rootLocation = view.rootLocation.anchoredPosition;
-            bindingSet.Bind(view.rootLocation).For(v => v.anchoredPosition).To(vm => vm.rootLocation).OneWay();
-            view.orirootActiveSelf = _rootActiveSelf = view.rootActiveSelf.activeSelf;
-            bindingSet.Bind(view.rootActiveSelf).For(v => v.activeSelf).To(vm => vm.rootActiveSelf).OneWay();
-            view.oritypeText = _typeText = view.typeText.text;
-            bindingSet.Bind(view.typeText).For(v => v.text).To(vm => vm.typeText).OneWay();
-            view.orinameText = _nameText = view.nameText.text;
-            bindingSet.Bind(view.nameText).For(v => v.text).To(vm => vm.nameText).OneWay();
-            view.oriinfoOneText = _infoOneText = view.infoOneText.text;
-            bindingSet.Bind(view.infoOneText).For(v => v.text).To(vm => vm.infoOneText).OneWay();
-            view.oriinfoOneActiveSelf = _infoOneActiveSelf = view.infoOneActiveSelf.activeSelf;
-            bindingSet.Bind(view.infoOneActiveSelf).For(v => v.activeSelf).To(vm => vm.infoOneActiveSelf).OneWay();
-            view.oriinfoTwoText = _infoTwoText = view.infoTwoText.text;
-            bindingSet.Bind(view.infoTwoText).For(v => v.text).To(vm => vm.infoTwoText).OneWay();
-            view.oriinfoTwoActiveSelf = _infoTwoActiveSelf = view.infoTwoActiveSelf.activeSelf;
-            bindingSet.Bind(view.infoTwoActiveSelf).For(v => v.activeSelf).To(vm => vm.infoTwoActiveSelf).OneWay();
-            bindingSet.Bind(view.Icon).For(v => v.sprite).To(vm => vm.Icon).OneWay();
-            view.oriattrGroupActiveSelf = _attrGroupActiveSelf = view.attrGroupActiveSelf.activeSelf;
-            bindingSet.Bind(view.attrGroupActiveSelf).For(v => v.activeSelf).To(vm => vm.attrGroupActiveSelf).OneWay();
-            view.oridesTextActiveSelf = _desTextActiveSelf = view.desTextActiveSelf.activeSelf;
-            bindingSet.Bind(view.desTextActiveSelf).For(v => v.activeSelf).To(vm => vm.desTextActiveSelf).OneWay();
-            view.oridesText = _desText = view.desText.text;
-            bindingSet.Bind(view.desText).For(v => v.text).To(vm => vm.desText).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonTipView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -255,6 +230,60 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonTipView view)
+		{
+		     BindingSet<CommonTipView, CommonTipViewModel> bindingSet =
+                view.CreateBindingSet<CommonTipView, CommonTipViewModel>();
+            bindingSet.Bind(view.rootLocation).For(v => v.anchoredPosition).To(vm => vm.rootLocation).OneWay();
+            bindingSet.Bind(view.rootActiveSelf).For(v => v.activeSelf).To(vm => vm.rootActiveSelf).OneWay();
+            bindingSet.Bind(view.typeText).For(v => v.text).To(vm => vm.typeText).OneWay();
+            bindingSet.Bind(view.nameText).For(v => v.text).To(vm => vm.nameText).OneWay();
+            bindingSet.Bind(view.infoOneText).For(v => v.text).To(vm => vm.infoOneText).OneWay();
+            bindingSet.Bind(view.infoOneActiveSelf).For(v => v.activeSelf).To(vm => vm.infoOneActiveSelf).OneWay();
+            bindingSet.Bind(view.infoTwoText).For(v => v.text).To(vm => vm.infoTwoText).OneWay();
+            bindingSet.Bind(view.infoTwoActiveSelf).For(v => v.activeSelf).To(vm => vm.infoTwoActiveSelf).OneWay();
+            bindingSet.Bind(view.Icon).For(v => v.sprite).To(vm => vm.Icon).OneWay();
+            bindingSet.Bind(view.attrGroupActiveSelf).For(v => v.activeSelf).To(vm => vm.attrGroupActiveSelf).OneWay();
+            bindingSet.Bind(view.desTextActiveSelf).For(v => v.activeSelf).To(vm => vm.desTextActiveSelf).OneWay();
+            bindingSet.Bind(view.desText).For(v => v.text).To(vm => vm.desText).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonTipView view)
+		{
+            _rootLocation = view.rootLocation.anchoredPosition;
+            _rootActiveSelf = view.rootActiveSelf.activeSelf;
+            _typeText = view.typeText.text;
+            _nameText = view.nameText.text;
+            _infoOneText = view.infoOneText.text;
+            _infoOneActiveSelf = view.infoOneActiveSelf.activeSelf;
+            _infoTwoText = view.infoTwoText.text;
+            _infoTwoActiveSelf = view.infoTwoActiveSelf.activeSelf;
+            _attrGroupActiveSelf = view.attrGroupActiveSelf.activeSelf;
+            _desTextActiveSelf = view.desTextActiveSelf.activeSelf;
+            _desText = view.desText.text;
+		}
+
+
+		void SaveOriData(CommonTipView view)
+		{
+            view.orirootLocation = _rootLocation;
+            view.orirootActiveSelf = _rootActiveSelf;
+            view.oritypeText = _typeText;
+            view.orinameText = _nameText;
+            view.oriinfoOneText = _infoOneText;
+            view.oriinfoOneActiveSelf = _infoOneActiveSelf;
+            view.oriinfoTwoText = _infoTwoText;
+            view.oriinfoTwoActiveSelf = _infoTwoActiveSelf;
+            view.oriattrGroupActiveSelf = _attrGroupActiveSelf;
+            view.oridesTextActiveSelf = _desTextActiveSelf;
+            view.oridesText = _desText;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 			Icon = ViewModelUtil.EmptySprite;
@@ -262,6 +291,10 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			rootLocation = _view.orirootLocation;
 			rootActiveSelf = _view.orirootActiveSelf;
 			typeText = _view.oritypeText;
@@ -299,7 +332,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonTip"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

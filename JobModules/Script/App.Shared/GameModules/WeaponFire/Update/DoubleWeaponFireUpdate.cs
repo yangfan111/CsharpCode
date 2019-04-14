@@ -14,12 +14,12 @@ namespace App.Shared.GameModules.Weapon.Behavior
             _rightWeaponFire = rightWeaponFire;
         }
 
-        public void Update(PlayerWeaponController controller, IUserCmd cmd)
+        public void Update(PlayerWeaponController controller, IUserCmd cmd, Contexts contexts)
         {
             _leftcmd.SetCurrentCmd(cmd);
             _rightCmd.SetCurrentCmd(cmd);
-            _leftWeaponFire.OnUpdate(controller, _leftcmd);
-            _rightWeaponFire.OnUpdate(controller, _rightCmd);
+            _leftWeaponFire.OnUpdate(controller, _leftcmd, contexts);
+            _rightWeaponFire.OnUpdate(controller, _rightCmd, contexts);
         }
     }
 }

@@ -9,6 +9,9 @@ using App.Client.GameModules.Ui.Utils;
 using Utils.Configuration;
 using Assets.XmlConfig;
 using App.Client.Utility;
+using Assets.App.Client.GameModules.Ui;
+using Core;
+using Core.Utils;
 using Utils.Singleton;
 
 namespace App.Client.GameModules.Ui.Models.Common
@@ -20,8 +23,21 @@ namespace App.Client.GameModules.Ui.Models.Common
         private bool isGameObjectCreated = false;
         private CrossHairType _lastType = CrossHairType.None;
 
+        private float XEndPosOffset
+        {
+            get { return ConstStartPosOffset + GlobalConst.WeaponSpreadPerOffset * adapter.XSpread; }
+        }
+
+        private float XHistoryEndPosOffset;
+        private float YHistoryEndPosOffset;
+
+        private float YEndPosOffset
+        {
+            get { return ConstStartPosOffset + GlobalConst.WeaponSpreadPerOffset *  adapter.YSpread; }
+        }
+        
         //准心 变量
-        private float normalTypeStartPos = 0;   //准心的每个刻度的 起始位置
+        private float ConstStartPosOffset = 0;   //准心的每个刻度的 起始位置
         private float normalTypeLineWH = 0;     //准心的每个刻度的 长宽 
         private float normalTypeEndPos = 0;
         private Transform sTop = null;
@@ -41,7 +57,9 @@ namespace App.Client.GameModules.Ui.Models.Common
         private Image centerImg = null;
 
 
-        private Tween moveTween = null;
+        private Tween YMoveTween = null;
+        private Tween XMoveTween = null;
+
         private Tween shootTween = null;
         private float lastShootNum = 0;
         private int lastWeaponAvatarId = -1;
@@ -99,9 +117,9 @@ namespace App.Client.GameModules.Ui.Models.Common
             centerRt = FindComponent<RectTransform>("center");
             centerImg = FindComponent<Image>("center");
 
-            normalTypeStartPos = sTopRt.localPosition.y;
+            ConstStartPosOffset = sTopRt.localPosition.y;
             normalTypeLineWH = sTopRt.sizeDelta.y;
-            normalTypeEndPos = normalTypeStartPos + 0.7f * normalTypeLineWH;
+         //   normalTypeEndPos = normalTypeStartPos + 0.7f * normalTypeLineWH;
 
             _viewModel.ImageWhiteActive = false;
             _viewModel.ImageRedActive = false;
@@ -120,49 +138,76 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
         }
 
+       
+
         private void RefreshCrossHair(float interval)
         {
             SelectTypePanel(adapter.Type);
+            
+            
             switch (adapter.Type)
             {
                 case CrossHairType.Normal:
                     {
                         SetNormalCrossType(adapter.WeaponAvatarId);  //根据weapon不同过得subtype 设置不同的准心图片
-                        CleanTween(adapter.Statue);
-                        switch (adapter.Statue)
+                        float startPos = Mathf.Abs(sTopRt.localPosition.y) ;
+                        float endPos = Mathf.Abs(YEndPosOffset);
+#if UNITY_EDITOR
+                        if(GlobalConst.EnableWeaponLog)
+                            DebugUtil.MyLog("SpreadUI EndPos:"+endPos+"||"+"currPos:"+startPos);
+#endif
+                        if (Mathf.Abs(YHistoryEndPosOffset - endPos) > 0.1f ||YMoveTween == null)
                         {
-                            case CrossHairNormalTypeStatue.Move:
-                                {
-                                    if (moveTween == null)  //想外移动 0.5秒内到达 endPos
-                                    {
-                                        float startPos = sTopRt.localPosition.y;
-                                        float endPos = normalTypeEndPos;
-                                        moveTween = UIUtils.CallTween(startPos, endPos, UpdateNormalLinePos, (value) => { moveTween = null; }, 0.5f);
-                                    }
-                                }
-                                break;
-                            case CrossHairNormalTypeStatue.Shot:    //每颗子弹会使准星向外移动1像素，最大移动至自身长度*3的距离（10像素的线段会移动20像素）。
-                                {
-                                    if (lastShootNum != adapter.ShootNum)
-                                    {
-                                        float startPos = sTopRt.localPosition.y;
-                                        float temperPos = startPos + (adapter.ShootNum - lastShootNum) * 1;
-                                        UpdateNormalLinePos(temperPos);
-                                        lastShootNum = adapter.ShootNum;
-                                    }
-                                }
-                                break;
-                            case CrossHairNormalTypeStatue.StopShot:    //0.3秒内，十字的每一条线段，会向内移动（准星中心点方向）移动到默认位置
-                                {
-                                    if (shootTween == null)
-                                    {
-                                        float startPos = sTopRt.localPosition.y;
-                                        float endPos = normalTypeStartPos;
-                                        shootTween = UIUtils.CallTween(startPos, endPos, UpdateNormalLinePos, (value) => { shootTween = null; }, 0.3f);
-                                    }
-                                }
-                                break;
+                          
+                            YHistoryEndPosOffset = endPos;
+                            YMoveTween = UIUtils.CallTween(startPos, endPos, UpdateYLinesPos,
+                                (value) => { YMoveTween = null; }, adapter.SpreadDuration); //Mathf.Abs(startPos - endPos)/speed);
+                          
                         }
+                        startPos = Mathf.Abs(hRight.localPosition.x) ;
+                        endPos = Mathf.Abs(XEndPosOffset);
+                        if (Mathf.Abs(XHistoryEndPosOffset - endPos) > 0.1f ||XMoveTween == null)
+                        {
+                            XHistoryEndPosOffset = endPos;
+                            XMoveTween = UIUtils.CallTween(startPos, endPos, UpdateXLinesPos,
+                                (value) => { XMoveTween = null; }, adapter.SpreadDuration); //Mathf.Abs(startPos - endPos)/speed);
+                     
+                        }
+//                        CleanTween(adapter.Statue);
+//                        switch (adapter.Statue)
+//                        {
+//                            case CrossHairNormalTypeStatue.Move:
+//                                {
+//                                    if (moveTween == null)  //想外移动 0.5秒内到达 endPos
+//                                    {
+//                                        float startPos = sTopRt.localPosition.y;
+//                                        float endPos = normalTypeEndPos;
+//                                        moveTween = UIUtils.CallTween(startPos, endPos, UpdateNormalLinePos, (value) => { moveTween = null; }, 0.5f);
+//                                    }
+//                                }
+//                                break;
+//                            case CrossHairNormalTypeStatue.Shot:    //每颗子弹会使准星向外移动1像素，最大移动至自身长度*3的距离（10像素的线段会移动20像素）。
+//                                {
+//                                    if (lastShootNum != adapter.ShootNum)
+//                                    {
+//                                        float startPos = sTopRt.localPosition.y;
+//                                        float temperPos = startPos + (adapter.ShootNum - lastShootNum) * 1;
+//                                        UpdateNormalLinePos(temperPos);
+//                                        lastShootNum = adapter.ShootNum;
+//                                    }
+//                                }
+//                                break;
+//                            case CrossHairNormalTypeStatue.StopShot:    //0.3秒内，十字的每一条线段，会向内移动（准星中心点方向）移动到默认位置
+//                                {
+//                                    if (shootTween == null)
+//                                    {
+//                                        float startPos = sTopRt.localPosition.y;
+//                                        float endPos = ConstStartPosOffset;
+//                                        shootTween = UIUtils.CallTween(startPos, endPos, UpdateNormalLinePos, (value) => { shootTween = null; }, 0.3f);
+//                                    }
+//                                }
+//                                break;
+//                        }
                     }
                     break;               
                 case CrossHairType.AddBlood:
@@ -309,51 +354,63 @@ namespace App.Client.GameModules.Ui.Models.Common
                 }
             }
         }     
-        private void CleanTween(CrossHairNormalTypeStatue type)
-        {            
-            if (type == CrossHairNormalTypeStatue.Move)
-            {               
-                if (shootTween != null)
-                {
-                    shootTween.Kill();
-                    shootTween = null;
-                }
-            }
-            else if (type == CrossHairNormalTypeStatue.StopShot)
-            {
-                if (moveTween != null)
-                {
-                    moveTween.Kill();
-                    moveTween = null;
-                }
-            }
-            else if (type == CrossHairNormalTypeStatue.Shot)
-            {
-                if (moveTween != null)
-                {
-                    moveTween.Kill();
-                    moveTween = null;
-                }
-                if (shootTween != null)
-                {
-                    shootTween.Kill();
-                    shootTween = null;
-                }
-            }
+//        private void CleanTween(CrossHairNormalTypeStatue type)
+//        {            
+//            if (type == CrossHairNormalTypeStatue.Move)
+//            {               
+//                if (shootTween != null)
+//                {
+//                    shootTween.Kill();
+//                    shootTween = null;
+//                }
+//            }
+//            else if (type == CrossHairNormalTypeStatue.StopShot)
+//            {
+//                if (moveTween != null)
+//                {
+//                    moveTween.Kill();
+//                    moveTween = null;
+//                }
+//            }
+//            else if (type == CrossHairNormalTypeStatue.Shot)
+//            {
+//                if (moveTween != null)
+//                {
+//                    moveTween.Kill();
+//                    moveTween = null;
+//                }
+//                if (shootTween != null)
+//                {
+//                    shootTween.Kill();
+//                    shootTween = null;
+//                }
+//            }
+//        }
+
+        private void UpdateYLinesPos(float value)
+        {
+            sTopRt.localPosition  = new Vector3(sTopRt.localPosition.x, value, sTopRt.localPosition.z);
+            sDownRt.localPosition = new Vector3(sDownRt.localPosition.x, -value, sDownRt.localPosition.z);
+        }
+
+        private void UpdateXLinesPos(float value)
+        {
+            hLeftRt.localPosition  = new Vector3(-value, hLeftRt.localPosition.y, hLeftRt.localPosition.z);
+            hRightRt.localPosition = new Vector3(value, hRightRt.localPosition.y, hRightRt.localPosition.z);
         }
         //更新上下左右 四个线段的位置
-        private void UpdateNormalLinePos(float value)
-        {
-            if (value > normalTypeEndPos)
-                value = normalTypeEndPos;
-            if (value < normalTypeStartPos)
-                value = normalTypeStartPos;
-            sTopRt.localPosition = new Vector3(sTopRt.localPosition.x, value, sTopRt.localPosition.z);
-            sDownRt.localPosition = new Vector3(sDownRt.localPosition.x, -value, sDownRt.localPosition.z);
-
-            hLeftRt.localPosition = new Vector3(-value, hLeftRt.localPosition.y, hLeftRt.localPosition.z);
-            hRightRt.localPosition = new Vector3(value, hRightRt.localPosition.y, hRightRt.localPosition.z);
-        }       
+//        private void UpdateNormalLinePos(float value)
+//        {
+//            if (value > normalTypeEndPos)
+//                value = normalTypeEndPos;
+//            if (value < ConstStartPosOffset)
+//                value = ConstStartPosOffset;
+//            sTopRt.localPosition = new Vector3(sTopRt.localPosition.x, value, sTopRt.localPosition.z);
+//            sDownRt.localPosition = new Vector3(sDownRt.localPosition.x, -value, sDownRt.localPosition.z);
+//
+//            hLeftRt.localPosition = new Vector3(-value, hLeftRt.localPosition.y, hLeftRt.localPosition.z);
+//            hRightRt.localPosition = new Vector3(value, hRightRt.localPosition.y, hRightRt.localPosition.z);
+//        }       
         private void SetNormalCrossType(int weaponAvatarId)
         {
             if(weaponAvatarId != lastWeaponAvatarId)
@@ -421,12 +478,12 @@ namespace App.Client.GameModules.Ui.Models.Common
                     else
                     {
                         Debug.Log(I2.Loc.ScriptLocalization.client_common.word46);
-                        Loader.RetriveSpriteAsync("icon/reticle", "reticledot", (sprite) =>
+                        Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_Reticle, "reticledot", (sprite) =>
                         {
                             centerImg.sprite = sprite;
                         });
 
-                        Loader.RetriveSpriteAsync("icon/reticle", "hairLine", (sprite) =>
+                        Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_Reticle, "hairLine", (sprite) =>
                         {
                             sTopImg.sprite = sprite;
                             sDownImg.sprite = sprite;
@@ -448,10 +505,15 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         protected override void OnGameobjectDestoryed()
         {
-            if (moveTween != null)
+            if (XMoveTween != null)
             {
-                moveTween.Kill();
-                moveTween = null;
+                XMoveTween.Kill();
+                XMoveTween = null;
+            }
+            if (YMoveTween != null)
+            {
+                YMoveTween.Kill();
+                YMoveTween = null;
             }
             if(shootTween != null)
             {

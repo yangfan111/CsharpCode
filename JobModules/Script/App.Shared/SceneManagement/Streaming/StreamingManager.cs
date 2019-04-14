@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.Components;
 using Core.SceneManagement;
 using Core.Utils;
 using Shared.Scripts.SceneManagement;
@@ -18,9 +19,9 @@ namespace App.Shared.SceneManagement.Streaming
             public int SceneIndex;
             public int GoIndex;
         }
-        
+
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(StreamingManager));
-        
+
         private readonly ISceneResourceRequestHandler _requestHandler;
         private readonly StreamingData _sceneDescription;
 
@@ -36,7 +37,7 @@ namespace App.Shared.SceneManagement.Streaming
 
         private int _destroyingCount;
         private const int DestroyLimit = 20;
-        
+
         private readonly Queue<LoadingGo> _goRequestQueue = new Queue<LoadingGo>();
         private readonly Queue<AssetInfo> _sceneRequestQueue = new Queue<AssetInfo>();
         private readonly Dictionary<AssetInfo, Queue<LoadingGo>> _loadingGoes = new Dictionary<AssetInfo, Queue<LoadingGo>>();
@@ -53,7 +54,7 @@ namespace App.Shared.SceneManagement.Streaming
             _requestHandler = requestHandler;
             _sceneDescription = sceneDescription;
             _concurrentCount = preloadSceneCount;
-            
+
             _worldComposition = new WorldCompositionManager(this, param);
             _streamingGo = streamingGo ?? new StreamingGoByScene();
 
@@ -87,7 +88,7 @@ namespace App.Shared.SceneManagement.Streaming
         }
 
         #endregion
-        
+
         #region IStreamingResourceHandler
 
         public void LoadScene(AssetInfo addr)
@@ -136,14 +137,14 @@ namespace App.Shared.SceneManagement.Streaming
             {
                 if (!_toBeDestroyedGo.ContainsKey(sceneName))
                     _toBeDestroyedGo.Add(sceneName, new Queue<UnityObject>());
-                
+
                 _toBeDestroyedGo[sceneName].Enqueue(go);
                 RequestForUnload();
             }
         }
-        
+
         #endregion
-       
+
         private bool EnoughRoom()
         {
             return _concurrentCount < _concurrentLimit;
@@ -205,13 +206,13 @@ namespace App.Shared.SceneManagement.Streaming
                 _requestHandler.AddUnloadSceneRequest(emptyScene);
             }
         }
-    
+
         private void SceneLoaded(Scene scene, LoadSceneMode mode)
         {
             var sceneIndex = -1;
             if (_sceneIndex.ContainsKey(scene.name))
                 sceneIndex = _sceneIndex[scene.name];
-            
+
             --_concurrentCount;
             RequestForLoad();
 
@@ -225,7 +226,7 @@ namespace App.Shared.SceneManagement.Streaming
                     _worldComposition.GetDimensionOfScene(scene.name));
             }
         }
-        
+
         private void SceneUnloaded(Scene scene)
         {
             _worldComposition.SceneUnloaded(scene);
@@ -250,9 +251,27 @@ namespace App.Shared.SceneManagement.Streaming
                     _streamingGo.GoLoaded(loadingGo.SceneIndex, loadingGo.GoIndex, unityObj);
                     var data = _sceneDescription.Scenes[loadingGo.SceneIndex].Objects[loadingGo.GoIndex];
                     var go = unityObj.AsGameObject;
-                    go.transform.localPosition = data.Position;
+                    go.transform.localPosition = data.Position.ShiftedPosition();
                     go.transform.localEulerAngles = data.Rotation;
                     go.transform.localScale = data.Scale;
+
+                    // 烘焙贴图数据的复原
+                    var mrs = go.GetComponentsInChildren<MeshRenderer>();
+                    foreach (MeshRenderer mr in mrs)
+                    {
+                        if (mr != null)
+                        {
+                            Transform tr = mr.transform;
+                            string pos = tr.position.WorldPosition().ToString("F4");
+                            string identify = string.Format("{0}|{1}", tr.name, pos);
+                            var record = ArtPlugins.ScenesLightmapData.Instance.GetMeshRecord(identify);
+                            if (record != null)
+                            {
+                                mr.lightmapIndex = record.lightmapIndex;
+                                mr.lightmapScaleOffset = record.lightMapScaleOffset;
+                            }
+                        }
+                    }
 
                     RequestForLoad();
                 }

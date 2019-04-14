@@ -183,6 +183,8 @@ namespace Assets.App.Client.GameModules.Ui
                 new UiGroup[] { UiGroup.Pop, UiGroup.Singleton });
             RegisterUi(UiNameConstant.CommonNoticeModel, typeof(CommonNoticeModel), typeof(NoticeUiAdapter), UILayer.Alert, new object[] { contexts },
                 new UiGroup[] { UiGroup.Alert });
+            RegisterUi(UiNameConstant.CommonPaintDiscModel, typeof(CommonPaintDiscModel), typeof(PaintUiAdapter), UILayer.Pop, new object[] { contexts },
+                new UiGroup[] { UiGroup.Pop,UiGroup.MapHide,UiGroup.SurvivalBagHide });
 
             //team
             RegisterUi(UiNameConstant.GroupScoreModel, typeof(GroupScoreModel), typeof(GroupScoreUiAdapter), UILayer.Base, new object[] { contexts }, 
@@ -246,6 +248,7 @@ namespace Assets.App.Client.GameModules.Ui
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonDeadModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonDebugInfoModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonVideoSettingModel);
+            contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonPaintDiscModel);
         }
 
         public static void CreateTeamUI(int gameRule)

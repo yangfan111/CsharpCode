@@ -60,6 +60,8 @@ namespace App.Client.SessionStates
             gameModule.AddSystem(new InitTriggerObjectManagerSystem(contexts));
             
             gameModule.AddSystem(new ClientScenePostprocessorSystem(contexts.session.commonSession));
+            gameModule.AddSystem(new ClientWorldShiftPostProcessSystem(contexts.session.commonSession));
+            
 
             return gameModule;
         }

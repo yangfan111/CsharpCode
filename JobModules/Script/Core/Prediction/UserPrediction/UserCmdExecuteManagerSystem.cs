@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Core.GameInputFilter;
+using Core;
 using Core.GameModule.Interface;
 using Core.GameModule.Module;
 using Core.GameModule.System;
@@ -22,19 +22,12 @@ namespace Core.Prediction.UserPrediction
         private IList<IUserCmdExecuteSystem> _systems;
         private IUserCmd _currentCmd;
         private IUserCmdOwner _currentUserCmdOwner;
-        private IGameStateProcessorFactory _gameStateProcessorFactory;
-        private IStateProviderPool _stateProviderPool;
-        private IStatePool _statePool;
 
         public UserCmdExecuteManagerSystem(IGameModule gameModule, 
-            IUserCmdExecuteSystemHandler handler, 
-            IGameStateProcessorFactory gameStateProcessorFactory)
+            IUserCmdExecuteSystemHandler handler)
         {
             _systems = gameModule.UserCmdExecuteSystems;
             _handler = handler;
-            _gameStateProcessorFactory = gameStateProcessorFactory;
-            _stateProviderPool = gameStateProcessorFactory.GetProviderPool();
-            _statePool = gameStateProcessorFactory.GetStatePool();
             Init();
         }
 
@@ -71,7 +64,7 @@ namespace Core.Prediction.UserPrediction
                         {
                             _logger.DebugFormat("processing user cmd {0}", _currentCmd);
                         }
-                        userCmd.FilteredInput = owner.Filter(userCmd);
+                        userCmd.FilteredInput = owner.GetFiltedInput(userCmd);
                         ExecuteSystems();
                         userCmd.FilteredInput = null;
                         owner.LastCmdSeq = userCmd.Seq;

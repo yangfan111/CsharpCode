@@ -6,6 +6,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using App.Client.GameModules.Ui.UiAdapter;
 using App.Shared.Components.Ui;
+using Core.SpatialPartition;
+using Core.Ui.Map;
 using UnityEngine.UI;
 using Core.Utils;
 
@@ -16,10 +18,9 @@ namespace App.Client.GameModules.Ui.Models.Common
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CommonMiniMap));
         ISuoDuUiAdapter adapter = null;
         private bool isGameObjectCreated = false;
-        private const string uiIconsBundleName = "ui/icons";
-        private DuQuanInfo curDuquan = new DuQuanInfo(-1,Vector2.zero, 0, 0,0);
-        private DuQuanInfo safeArea = new DuQuanInfo(-1, Vector2.zero, 0, 0, 0);
-        private DuQuanInfo rawDuquan = new DuQuanInfo(-1, Vector2.zero, 0, 0, 0);
+        private DuQuanInfo curDuquan = new DuQuanInfo(-1,new MapFixedVector2(Vector2.zero), 0, 0,0);
+        private DuQuanInfo safeArea = new DuQuanInfo(-1, new MapFixedVector2(Vector2.zero), 0, 0, 0);
+        private DuQuanInfo rawDuquan = new DuQuanInfo(-1, new MapFixedVector2(Vector2.zero), 0, 0, 0);
         private UnityEngine.Vector2 curPlayPos = new UnityEngine.Vector2(0, 0);
 
         //滑动条相关变量
@@ -80,8 +81,9 @@ namespace App.Client.GameModules.Ui.Models.Common
                 //设置当前数据
                 curDuquan = adapter.CurDuquan;
                 safeArea = adapter.NextDuquan;
-                curPlayPos.x = adapter._CurPosition.x;
-                curPlayPos.y = adapter._CurPosition.z;
+//                curPlayPos.x = adapter.CurPosition.x;
+//                curPlayPos.y = adapter.CurPosition.z;
+                curPlayPos = adapter.CurPosition.WorldVector3().To2D();
 
                 if (curDuquan.Level != adapter.OffLineNum && safeArea.Level != adapter.OffLineNum && rawDuquan.Level != adapter.OffLineNum
                     && curDuquan.Radius != 0 && safeArea.Radius != 0  && rawDuquan.Radius != 0)
@@ -98,7 +100,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void RefreshSlider(float interval)
         {
-            GetContactPoints(curPlayPos, curDuquan.Center, curDuquan.Radius, safeArea.Center, safeArea.Radius, rawDuquan.Center, rawDuquan.Radius);
+            GetContactPoints(curPlayPos, curDuquan.Center.WorldVector2(), curDuquan.Radius, safeArea.Center.WorldVector2(), safeArea.Radius, rawDuquan.Center.WorldVector2(), rawDuquan.Radius);
             RefreshSliderProcess(interval);
             RefreshSliderTime(interval);
         }
@@ -207,7 +209,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             float movingDuquanToSafe = Vector2.Distance(intersectPointWithMoving, intersectPointWithSafe);
             float rawDuquanToSafe = Vector2.Distance(intersectPointWithRaw, intersectPointWithSafe);
             float playToSafe = Vector2.Distance(curPlayPos, intersectPointWithSafe);
-            float playToSafeCenter = Vector2.Distance(curPlayPos, safeArea.Center);
+            float playToSafeCenter = Vector2.Distance(curPlayPos, safeArea.Center.WorldVector2());
 
             //更新小人的位置
             if (playToSafeCenter <= safeArea.Radius)    //安全区内

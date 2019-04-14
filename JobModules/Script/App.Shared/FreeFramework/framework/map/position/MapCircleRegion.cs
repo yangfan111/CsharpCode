@@ -1,9 +1,9 @@
-using System;
-using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.unit;
 using com.wd.free.util;
 using gameplay.gamerule.free.ui;
+using Sharpen;
+using System;
 
 namespace com.wd.free.map.position
 {
@@ -29,15 +29,16 @@ namespace com.wd.free.map.position
             {
                 pos = selector.Select(args);
             }
-            int r = 0;
+            float r = 0f;
             try
             {
-                r = int.Parse(radius);
+                r = float.Parse(radius);
             }
             catch (Exception)
             {
-                r = FreeUtil.ReplaceInt(radius, args);
+                r = FreeUtil.ReplaceFloat(radius, args);
             }
+
             double dx = MyMath.Abs(entity.GetX() - pos.GetX());
             if (dx > r)
             {
@@ -45,11 +46,7 @@ namespace com.wd.free.map.position
                 {
                     return true;
                 }
-                else
-                {
-                    return false;
-                }
-                
+                return false;
             }
             double dz = MyMath.Abs(entity.GetZ() - pos.GetZ());
             if (dz > r)
@@ -58,14 +55,11 @@ namespace com.wd.free.map.position
                 {
                     return true;
                 }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
             double dy = MyMath.Abs(entity.GetY() - pos.GetY());
-            int zrange = FreeUtil.ReplaceInt(zRange, args);
-            if (zrange == 0)
+            float zrange = FreeUtil.ReplaceFloat(zRange, args);
+            if (zrange <= 0)
             {
                 zrange = 170;
             }
@@ -76,10 +70,7 @@ namespace com.wd.free.map.position
             {
                 return !isIn;
             }
-            else
-            {
-                return isIn;
-            }
+            return isIn;
         }
 
         public override bool InRectange(FreeUIUtil.Rectangle rec, IEventArgs args)
@@ -90,19 +81,19 @@ namespace com.wd.free.map.position
             }
             int px = (int)(pos.GetX());
             int py = (int)(pos.GetY());
-            int r = 0;
+            float r = 0f;
             try
             {
-                r = int.Parse(radius);
+                r = float.Parse(radius);
             }
             catch (Exception)
             {
-                r = FreeUtil.ReplaceInt(radius, args);
+                r = FreeUtil.ReplaceFloat(radius, args);
             }
-            int x1 = rec.x - r;
-            int x2 = rec.x + rec.width + r;
-            int y1 = rec.y - r;
-            int y2 = rec.y + rec.height + r;
+            float x1 = rec.x - r;
+            float x2 = rec.x + rec.width + r;
+            float y1 = rec.y - r;
+            float y2 = rec.y + rec.height + r;
             // 圆心在矩形的加上圆半径的范围内
             return px >= x1 && px <= x2 && py >= y1 && py <= y2;
         }

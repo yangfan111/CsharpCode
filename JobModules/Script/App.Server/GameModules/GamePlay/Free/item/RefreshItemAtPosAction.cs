@@ -1,15 +1,12 @@
-﻿using com.wd.free.action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using App.Server.GameModules.GamePlay.Free.map.position;
+using Assets.XmlConfig;
+using com.cpkf.yyjd.tools.util.math;
+using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.map.position;
 using com.wd.free.util;
-using App.Server.GameModules.GamePlay.Free.map.position;
+using System;
 using UnityEngine;
-using com.cpkf.yyjd.tools.util.math;
-using Assets.XmlConfig;
 
 namespace App.Server.GameModules.GamePlay.Free.item
 {
@@ -22,7 +19,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
         public override void DoAction(IEventArgs args)
         {
-            ItemDrop[] list = FreeItemDrop.GetDropItems(FreeUtil.ReplaceVar(cat, args), FreeUtil.ReplaceInt(count, args));
+            ItemDrop[] list = FreeItemDrop.GetDropItems(FreeUtil.ReplaceVar(cat, args), FreeUtil.ReplaceInt(count, args), args.GameContext.session.commonSession.RoomInfo.MapId);
 
             if (list != null)
             {

@@ -277,6 +277,7 @@ namespace App.Shared.Components.Player
         [DontInitilize] [NetworkProperty] public int Bag;
         [DontInitilize] [NetworkProperty] public int Entirety;
         [DontInitilize] [NetworkProperty] public int CharacterHair;
+        [DontInitilize] [NetworkProperty] public int CharacterHairContainer;
         [DontInitilize] [NetworkProperty] public int CharacterHead;
         [DontInitilize] [NetworkProperty] public int CharacterGlove;
         [DontInitilize] [NetworkProperty] public int CharacterInner;
@@ -324,6 +325,7 @@ namespace App.Shared.Components.Player
             Bag = UniversalConsts.InvalidIntId;
             Entirety = UniversalConsts.InvalidIntId;
             CharacterHair = UniversalConsts.InvalidIntId;
+            CharacterHairContainer = UniversalConsts.InvalidIntId;
             CharacterHead = UniversalConsts.InvalidIntId;
             CharacterGlove = UniversalConsts.InvalidIntId;
             CharacterInner = UniversalConsts.InvalidIntId;
@@ -385,6 +387,7 @@ namespace App.Shared.Components.Player
                 Bag = right.Bag;
                 Entirety = right.Entirety;
                 CharacterHair = right.CharacterHair;
+                CharacterHairContainer = right.CharacterHairContainer;
                 CharacterHead = right.CharacterHead;
                 CharacterGlove = right.CharacterGlove;
                 CharacterInner = right.CharacterInner;

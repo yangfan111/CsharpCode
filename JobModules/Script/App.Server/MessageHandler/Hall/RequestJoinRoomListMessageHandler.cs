@@ -28,7 +28,7 @@ namespace App.Server.MessageHandler.Hall
 
             _dispatcher.AddEvent(e);
 
-            _logger.InfoFormat("Receive Join Room List Message Hall Room Id {0} Count {1}", e.HallRoomId, count);
+            _logger.InfoFormat("Receive Join Room List Message Hall Room Id {0} Count {1} {2}", e.HallRoomId, count, message);
         }
     }
 }

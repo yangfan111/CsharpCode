@@ -2,6 +2,7 @@
 using Core.BulletSimulation;
 using System.Collections.Generic;
 using App.Shared.Components.Player;
+using UnityEngine;
 
 namespace App.Shared.GameModules.Weapon.Behavior
 {
@@ -32,7 +33,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 {
                     if ((otherPlayer.playerMask.SelfMask & _playerEntity.playerMask.TargetMask) == 0
                         || otherPlayer.playerMask.SelfMask == (byte)EPlayerMask.Invincible
-                        || otherPlayer.stage.Value != EPlayerLoginStage.Running)
+                        || !otherPlayer.gamePlay.CoverInit)
                     {
                         _excludeList.Add(otherPlayer.entityKey.Value.EntityId);
                     }
@@ -51,7 +52,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 {
                     if ((otherPlayer.playerMask.SelfMask & _playerEntity.playerMask.TargetMask) == 0
                         || otherPlayer.playerMask.SelfMask == (byte)EPlayerMask.Invincible
-                        || otherPlayer.stage.Value != EPlayerLoginStage.Running)
+                        || !otherPlayer.gamePlay.CoverInit)
                     {
                         _excludeList.Add(otherPlayer.entityKey.Value.EntityId);
                     }
@@ -69,7 +70,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 foreach (var otherPlayer in players)
                 {
                     if (otherPlayer.playerMask.SelfMask == (byte)EPlayerMask.Invincible
-                        || otherPlayer.stage.Value != EPlayerLoginStage.Running)
+                        || !otherPlayer.gamePlay.CoverInit)
                     {
                         _excludeList.Add(otherPlayer.entityKey.Value.EntityId);
                     }

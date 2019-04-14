@@ -1,8 +1,7 @@
 ﻿using App.Shared.GameModules.Weapon;
 using Assets.App.Client.GameModules.Ui.UiAdapter.Interface;
-using UserInputManager.Lib;
-using Utils.AssetManager;
 using XmlConfig;
+using AssetInfo = Utils.AssetManager.AssetInfo;
 
 namespace App.Shared.Components.Ui.UiAdapter
 {

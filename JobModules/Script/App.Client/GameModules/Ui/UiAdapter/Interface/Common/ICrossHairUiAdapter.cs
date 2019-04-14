@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using App.Shared.Components.Ui;
+using App.Shared.Components.Weapon;
 using Assets.App.Client.GameModules.Ui.UiAdapter.Interface;
 using UnityEngine;
 
@@ -26,9 +27,14 @@ namespace App.Client.GameModules.Ui.UiAdapter
     public interface ICrossHairUiAdapter : IAbstractUiAdapter
     {
         CrossHairType Type { get; }                 //准心类型
-        CrossHairNormalTypeStatue Statue { get; }   //常态类型准心的状态
+        //CrossHairNormalTypeStatue Statue { get; }   //常态类型准心的状态
+
+        float XSpread { get; }
+        float YSpread { get; }
+        float SpreadDuration { get; }
         bool IsOpenCrossHairMotion { get; set; }   //是否开启准心运动
-        int ShootNum { get; }  
+        int ShootNum { get; }
+        WeaponRuntimeDataComponent RuntimeDataComponent { get; }
         float AttackNum { get; }
         bool IsBurstHeart { get; }
         int WeaponAvatarId { get; }    //当前正在使用的武器类型

@@ -110,16 +110,34 @@ namespace KinematicCharacterController
                 if (stableOnHit)
                 {
                     movement = Motor.GetDirectionTangentToSurface(movement, obstructionNormal) * movement.magnitude;
+                    //DebugDraw.DebugArrow(Motor.TransientPosition, movement.normalized * 2, Color.blue, 0, false);
+                    //DebugDraw.DebugArrow(Motor.TransientPosition, obstructionNormal.normalized * 2, Color.cyan, 0, false);
                 }
                 // On blocking hits, project the movement on the obstruction while following the grounding plane
                 else
                 {
                     //这几个名字有迷惑性，其实是沿着障碍物走
+                    var prevMove = movement;
                     Vector3 obstructionRightAlongGround = Vector3.Cross(obstructionNormal, Motor.GroundingStatus.GroundNormal).normalized;
                     Vector3 obstructionUpAlongGround = Vector3.Cross(obstructionRightAlongGround, obstructionNormal).normalized;
-                    movement = Motor.GetDirectionTangentToSurface(movement, obstructionUpAlongGround) * movement.magnitude;
+                    var tangetToSurface = Motor.GetDirectionTangentToSurface(movement, obstructionUpAlongGround);
+                    movement =  tangetToSurface * movement.magnitude;
+                    var beforeProject = movement;
                     //丢失能量
                     movement = Vector3.ProjectOnPlane(movement, obstructionNormal);
+                    //if (Mathf.Abs(Vector3.Angle(tangetToSurface, obstructionNormal) - 180.0f) <= 2f)
+                    //{
+                        ///Log.InfoFormat("the angle is approlex 180!!!!");
+                    //}
+                    ///DebugDraw.DebugArrow(Motor.TransientPosition, movement.normalized * 2, Color.blue, 0, false);
+                    ///DebugDraw.DebugArrow(Motor.TransientPosition, prevMove.normalized * 2, new Color(0.33f, 0.37f, 0.13f,1.0f), 0, false);
+                    ///DebugDraw.DebugArrow(Motor.TransientPosition, beforeProject.normalized * 5, new Color(0.6f, 0.87f, 0.7f,1.0f), 0, false);
+                    ///DebugDraw.DebugArrow(Motor.TransientPosition, Motor.GetDirectionTangentToSurface(prevMove, obstructionUpAlongGround) * 2, new Color(0.77f, 0.37f, 0.13f,1.0f), 0, false);
+                    ///DebugDraw.DebugArrow(Motor.TransientPosition, obstructionNormal.normalized * 2, Color.cyan, 0, false);
+                    ///DebugDraw.DebugArrow(Motor.TransientPosition, obstructionUpAlongGround.normalized * 2, Color.yellow, 0, false);
+                    ///Log.InfoFormat("On blocking hits, obstructionUpAlongGround:{0}, obstructionNormal:{1}, movement:{2}, tangetToSurface:{3}, angle:{4}", obstructionUpAlongGround.ToStringExt(), obstructionNormal.ToStringExt(), movement.ToStringExt(),
+                    ///    tangetToSurface.ToStringExt(),
+                    ///    Vector3.Angle(tangetToSurface, obstructionNormal));
                 }
             }
             else

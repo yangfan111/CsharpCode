@@ -21,15 +21,16 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
         public void Update(DuQuanInfo safeDuquan, Vector2 selfPlayPos, float playItemModelWidth, float rate, float miniMapRepresentWHByRice)
         {
+            var salfCenter = safeDuquan.Center.ShiftedUIVector2();
             // 安全区和当前玩家的连线的方向
-            if (safeDuquan.Level != 0 && safeDuquan.Radius > 0 && Vector2.Distance(selfPlayPos, safeDuquan.Center) > safeDuquan.Radius)  //安全区外
+            if (safeDuquan.Level != 0 && safeDuquan.Radius > 0 && Vector2.Distance(selfPlayPos, salfCenter) > safeDuquan.Radius)  //安全区外
             {
                 UIUtils.SetActive(tran, true);
                 {
                     Vector2 fromVector = new Vector2(0, 1);
-                    Vector3 temper = safeDuquan.Center - selfPlayPos;
+                    Vector3 temper = salfCenter - selfPlayPos;
                     Vector2 toVector = new Vector3(temper.x * -1, temper.y, temper.z);  // 以玩家为中心的坐标系 转化unity的3d坐标系
-                    float angle = Vector2.Angle(fromVector, toVector); //求出两向量之间的夹角  
+                    float angle = Vector2.Angle(fromVector, toVector) - 180; //求出两向量之间的夹角  
                     Vector3 normal = Vector3.Cross(fromVector, toVector);//叉乘求出法线向量  
                     if (normal.z < 0)
                     {
@@ -38,13 +39,14 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                     line.localEulerAngles = new UnityEngine.Vector3(0, 0, -angle % 360);
 
                     //控制连线的长度
-                    var width = temper.magnitude * rate - safeDuquan.Radius * rate - playItemModelWidth / 2;
+                    var width = temper.magnitude * rate - safeDuquan.Radius * rate;
                     var showWidth = miniMapRepresentWHByRice * rate;
                     if (width > showWidth) width = showWidth;
                     lineRT.sizeDelta = new Vector2(2, width);
 
                     //控制pivot
-                    lineRT.pivot = new Vector2(0.5f, - playItemModelWidth / (2 * width));
+//                    lineRT.pivot = new Vector2(0.5f, - playItemModelWidth / (2 * width));
+                    lineRT.pivot = new Vector2(1f,1f);
                     lineRT.anchoredPosition = selfPlayPos * rate;
                 }
             }

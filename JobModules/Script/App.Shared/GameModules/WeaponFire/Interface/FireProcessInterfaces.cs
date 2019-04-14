@@ -64,6 +64,14 @@ namespace  App.Shared.GameModules.Weapon.Behavior
     }
 
     /// <summary>
+    /// Defines the <see cref="IBulletFire" />
+    /// </summary>
+    public interface IBulletFire : IFireProcess
+    {
+        void OnBulletFire(PlayerWeaponController controller, IWeaponCmd cmd);
+    }
+
+    /// <summary>
     /// Defines the <see cref="IFireTriggger" />
     /// </summary>
     public interface IFireTriggger : IFireProcess
@@ -79,5 +87,6 @@ namespace  App.Shared.GameModules.Weapon.Behavior
         bool IsCanFire(PlayerWeaponController controller, IWeaponCmd cmd);
     }
 
- 
+
+    
 }

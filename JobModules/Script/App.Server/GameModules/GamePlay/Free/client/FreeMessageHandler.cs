@@ -29,6 +29,7 @@ namespace App.Server.GameModules.GamePlay.free.client
             handlers.Add(new FreeDebugDataHandler());
             handlers.Add(new SplitItemHandler());
             handlers.Add(new FreeObservePlayerHandler());
+            handlers.Add(new FreeSprayPaintHandle());
         }
 
         public static void Handle(ServerRoom room, PlayerEntity player, SimpleProto message)

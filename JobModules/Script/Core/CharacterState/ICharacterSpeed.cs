@@ -13,6 +13,7 @@ namespace Core.CharacterState
         Vector3 GetSpeedOffset(float buff = 0);
         // 人物速度增加
         void SetSpeedAffect(float affect);
+        void SetJumpAffect(float affect);
         float SpeedRatio();
     }
 }

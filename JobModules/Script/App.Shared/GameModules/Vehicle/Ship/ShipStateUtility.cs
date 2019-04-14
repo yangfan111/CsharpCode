@@ -2,6 +2,7 @@
 using App.Shared.Components.Vehicle;
 using App.Shared.GameModules.Vehicle.Common;
 using App.Shared.GameModules.Vehicle.Ship;
+using Core.Components;
 using Core.Prediction.VehiclePrediction.Cmd;
 using Core.Utils;
 using DWP;
@@ -55,7 +56,7 @@ namespace App.Shared.GameModules.Vehicle.Ship
             state.SteerInput = data.SteerInput;
             state.ThrottleInput = data.ThrottleInput;
 
-            state.Position = data.Position;
+            state.Position = data.Position.ShiftedVector3();
             state.Rotation = data.Rotation;
             state.IsSleeping = data.IsSleeping;
             state.LinearVelocity = data.LinearVelocity;
@@ -178,7 +179,7 @@ namespace App.Shared.GameModules.Vehicle.Ship
             data.SteerInput = state.RudderInput;
             data.ThrottleInput = state.ThrottleInput;
 
-            data.Position = state.Position;
+            data.Position = state.Position.ShiftedToFixedVector3();
             data.Rotation = state.Rotation;
             data.IsSleeping = state.IsSleeping;
             data.LinearVelocity = state.BodyState.LinearVelocity;
@@ -222,7 +223,7 @@ namespace App.Shared.GameModules.Vehicle.Ship
            
 
             vehicleCmd.VehicleType = (int) EVehicleType.Ship;
-            vehicleCmd.Body.Position = controller.cachedRigidbody.position;
+            vehicleCmd.Body.Position = controller.cachedRigidbody.position.ShiftedToFixedVector3();
             vehicleCmd.Body.Rotation = controller.cachedRigidbody.rotation;
             vehicleCmd.Body.LinearVelocity = controller.Velocity;
             vehicleCmd.Body.AngularVelocity = controller.AngularVelocity;
@@ -296,7 +297,7 @@ namespace App.Shared.GameModules.Vehicle.Ship
             var controller = GetController(vehicle);
             SetRudderAnglesFromCmd(controller, vehicleCmd);
             VehicleDynamicPredictionUtility.SetControllerState(controller, 
-                body.Position, body.Rotation, 
+                body.Position.ShiftedVector3(), body.Rotation, 
                 body.LinearVelocity, body.AngularVelocity, 
                 controller.IsSleeping, 0);
 

@@ -5,6 +5,7 @@ using System.Text;
 using App.Shared.Components.Vehicle;
 using App.Shared.GameModules.Vehicle.Common;
 using App.Shared.Terrains;
+using Core.Components;
 using Core.EntityComponent;
 using Core.ObjectPool;
 using Core.Prediction.VehiclePrediction.Cmd;
@@ -26,7 +27,7 @@ namespace App.Shared.GameModules.Vehicle.Ship
         {
             if (!vehicle.hasShipDynamicData)
             {
-                vehicle.AddShipDynamicData(SharedConfig.ServerAuthorative, position, rotation);
+                vehicle.AddShipDynamicData(SharedConfig.ServerAuthorative, position.ShiftedToFixedVector3(), rotation);
             }
         }
 

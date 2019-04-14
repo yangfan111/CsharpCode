@@ -1,10 +1,6 @@
-﻿using com.wd.free.action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using App.Server.GameModules.GamePlay.Free.item;
+using com.wd.free.action;
 using com.wd.free.@event;
-using App.Server.GameModules.GamePlay.Free.item;
 
 namespace App.Server.GameModules.GamePlay.Free.chicken
 {
@@ -12,7 +8,7 @@ namespace App.Server.GameModules.GamePlay.Free.chicken
     {
         public override void DoAction(IEventArgs args)
         {
-            FreeItemDrop.Initial();
+            FreeItemDrop.Initial(args.GameContext.session.commonSession.RoomInfo.MapId);
         }
     }
 }

@@ -180,7 +180,7 @@ namespace KinematicCharacterController
     /// <summary>
     /// Component that manages character collisions and movement solving
     /// </summary>
-    [RequireComponent(typeof(Rigidbody))]
+    //[RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(CapsuleCollider))]
     public class KinematicCharacterMotor : MonoBehaviour
     {
@@ -197,11 +197,11 @@ namespace KinematicCharacterController
         /// </summary>
         [ReadOnly]
         public CapsuleCollider Capsule;
-        /// <summary>
-        /// The rigidbody of this motor
-        /// </summary>
-        [ReadOnly]
-        public Rigidbody Rigidbody;
+//        /// <summary>
+//        /// The rigidbody of this motor
+//        /// </summary>
+//        [ReadOnly]
+//        public Rigidbody Rigidbody;
 
         [Header("Capsule Settings")]
         /// <summary>
@@ -347,6 +347,9 @@ namespace KinematicCharacterController
         
         [Tooltip("(We suggest leaving this off. This has a pretty heavy performance cost, and is not necessary unless you start seeing situations where a fast-moving character moves through colliders) Makes sure the character cannot perform a move at all if it would be overlapping with any collidable objects at its destination. Useful for preventing \"tunneling\". ")]
         public bool SafeRotate = false;
+
+        [Tooltip("use sphere ground detection default use capsule cast")]
+        public bool UseSphereGroundDetection = false;
 
         /// <summary>
         /// Contains the current grounding information
@@ -652,18 +655,18 @@ namespace KinematicCharacterController
         /// </summary>
         public void ValidateData()
         {
-            Rigidbody = GetComponent<Rigidbody>();
-            Rigidbody.centerOfMass = Vector3.zero;
-            Rigidbody.useGravity = false;
-            Rigidbody.mass = 0.1f;
-            Rigidbody.drag = 0f;
-            Rigidbody.angularDrag = 0f;
-            Rigidbody.maxAngularVelocity = Mathf.Infinity;
-            Rigidbody.maxDepenetrationVelocity = Mathf.Infinity;
-            Rigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
-            Rigidbody.isKinematic = true;
-            Rigidbody.constraints = RigidbodyConstraints.None;
-            Rigidbody.interpolation = KinematicCharacterSystem.InterpolationMethod == CharacterSystemInterpolationMethod.Unity ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
+//            Rigidbody = GetComponent<Rigidbody>();
+//            Rigidbody.centerOfMass = Vector3.zero;
+//            Rigidbody.useGravity = false;
+//            Rigidbody.mass = 0.1f;
+//            Rigidbody.drag = 0f;
+//            Rigidbody.angularDrag = 0f;
+//            Rigidbody.maxAngularVelocity = Mathf.Infinity;
+//            Rigidbody.maxDepenetrationVelocity = Mathf.Infinity;
+//            Rigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
+//            Rigidbody.isKinematic = true;
+//            Rigidbody.constraints = RigidbodyConstraints.None;
+//            Rigidbody.interpolation = KinematicCharacterSystem.InterpolationMethod == CharacterSystemInterpolationMethod.Unity ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
 
             Capsule = GetComponent<CapsuleCollider>();
             CapsuleRadius = Mathf.Clamp(CapsuleRadius, 0f, CapsuleHeight * 0.5f);
@@ -682,8 +685,8 @@ namespace KinematicCharacterController
             transform.localScale = Vector3.one;
 
 #if UNITY_EDITOR
-            Capsule.hideFlags = HideFlags.NotEditable;
-            Rigidbody.hideFlags = HideFlags.NotEditable;
+            //Capsule.hideFlags = HideFlags.NotEditable;
+            //Rigidbody.hideFlags = HideFlags.NotEditable;
             if (!Mathf.Approximately(transform.lossyScale.x, 1f) || !Mathf.Approximately(transform.lossyScale.y, 1f) || !Mathf.Approximately(transform.lossyScale.z, 1f))
             {
                 Debug.LogError("Character's lossy scale is not (1,1,1). This is not allowed. Make sure the character's transform and all of its parents have a (1,1,1) scale.", this.gameObject);
@@ -696,7 +699,7 @@ namespace KinematicCharacterController
         /// </summary>
         public void SetCapsuleCollisionsActivation(bool kinematicCapsuleActive)
         {
-            Rigidbody.detectCollisions = kinematicCapsuleActive;
+            //Rigidbody.detectCollisions = kinematicCapsuleActive;
         }
 
         /// <summary>
@@ -720,9 +723,10 @@ namespace KinematicCharacterController
         /// </summary>
         public void SetPosition(Vector3 position, bool bypassInterpolation = true)
         {
-            Rigidbody.interpolation = RigidbodyInterpolation.None;
+            
             Transform.position = position;
-            Rigidbody.position = position;
+//            Rigidbody.interpolation = RigidbodyInterpolation.None;
+//            Rigidbody.position = position;
             InitialSimulationPosition = position;
             TransientPosition = position;
             
@@ -733,7 +737,7 @@ namespace KinematicCharacterController
                 InitialTickPosition = position;
             }
             
-            Rigidbody.interpolation = KinematicCharacterSystem.InterpolationMethod == CharacterSystemInterpolationMethod.Unity ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
+            //Rigidbody.interpolation = KinematicCharacterSystem.InterpolationMethod == CharacterSystemInterpolationMethod.Unity ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
             IsPositionReWind = true;
         }
 
@@ -748,9 +752,9 @@ namespace KinematicCharacterController
         /// </summary>
         public void SetRotation(Quaternion rotation, bool bypassInterpolation = true)
         {
-            Rigidbody.interpolation = RigidbodyInterpolation.None;
             Transform.rotation = rotation;
-            Rigidbody.rotation = rotation;
+//            Rigidbody.interpolation = RigidbodyInterpolation.None;
+//            Rigidbody.rotation = rotation;
             InitialSimulationRotation = rotation;
             TransientRotation = rotation;
 
@@ -759,7 +763,7 @@ namespace KinematicCharacterController
                 InitialTickRotation = rotation;
             }
 
-            Rigidbody.interpolation = KinematicCharacterSystem.InterpolationMethod == CharacterSystemInterpolationMethod.Unity ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
+            //Rigidbody.interpolation = KinematicCharacterSystem.InterpolationMethod == CharacterSystemInterpolationMethod.Unity ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
             IsRotationReWind = true;
         }
 
@@ -782,8 +786,8 @@ namespace KinematicCharacterController
         public void SetPositionAndRotation(Vector3 position, Quaternion rotation, bool bypassInterpolation = true)
         {
             Transform.SetPositionAndRotation(position, rotation);
-            Rigidbody.position = position;
-            Rigidbody.rotation = rotation;
+//            Rigidbody.position = position;
+//            Rigidbody.rotation = rotation;
             InitialSimulationPosition = position;
             InitialSimulationRotation = rotation;
             TransientPosition = position;
@@ -795,7 +799,7 @@ namespace KinematicCharacterController
                 InitialTickRotation = rotation;
             }
 
-            Rigidbody.interpolation = KinematicCharacterSystem.InterpolationMethod == CharacterSystemInterpolationMethod.Unity ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
+            //Rigidbody.interpolation = KinematicCharacterSystem.InterpolationMethod == CharacterSystemInterpolationMethod.Unity ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
         }
 
         /// <summary>
@@ -924,8 +928,9 @@ namespace KinematicCharacterController
             //Logger.InfoFormat("resolutionDistance:{0}, resolutionDirection:{1}, probedCollider name:{2}\n stack:{3}", resolutionDistance, resolutionDirection, probedCollider.name, new StackTrace());
             // Solve overlap
             Vector3 resolutionMovement = resolutionDirection * (resolutionDistance + CollisionOffset);
-            TransientPosition += resolutionMovement;
-            
+            InternalMoveCharacterPosition(ref _internalTransientPosition, TransientPosition + resolutionMovement,
+                TransientRotation);
+            Logger.DebugFormat("SolvePenetration resolution movement:{0}, expected:{1}, after TransientPosition:{2}", resolutionMovement.ToStringExt(), (resolutionDirection * resolutionDistance).ToStringExt(), TransientPosition.ToStringExt());
             // Remember overlaps
             if (OverlapsCount < _overlaps.Length)
             {
@@ -1085,16 +1090,16 @@ namespace KinematicCharacterController
                                         out resolutionDirection,
                                         out resolutionDistance))
                                 {
-                                    if (resolutionDistance > 0.1f && false)
+                                    if (resolutionDistance > 0.001f && false)
                                     {
-                                        Logger.InfoFormat("resolutionDirection:{0}, resolutionDistance:{1}, overlappedTransform:{2}", resolutionDirection, resolutionDistance, overlappedTransform.name);
-                                        DebugDraw.DebugArrow(TransientPosition, resolutionDirection, Color.red, 70f);
+                                        Logger.InfoFormat("update phase1 resolutionDirection:{0}, resolutionDistance:{1}, overlappedTransform:{2}", resolutionDirection, resolutionDistance, overlappedTransform.name);
+                                        DebugDraw.DebugArrow(TransientPosition, resolutionDirection.normalized * 4f, Color.cyan, 0f);
                                         DebugDraw.DebugCapsule(
                                             TransientPosition + TransientRotation * CharacterTransformToCapsuleBottom,
                                             TransientPosition + TransientRotation * CharacterTransformToCapsuleTop,
                                             Color.red,
                                             Capsule.radius,
-                                            70.0f
+                                            0f
                                             );
                                     }
                                     SolvePenetration(resolutionDirection, resolutionDistance, _internalProbedColliders[i]);
@@ -1141,92 +1146,6 @@ namespace KinematicCharacterController
                 CharacterController.PostGroundingUpdate(deltaTime);
             }
 
-            if(InteractiveRigidbodyHandling)
-            {
-                #region Interactive Rigidbody Handling 
-                _lastAttachedRigidbody = AttachedRigidbody;
-                if (AttachedRigidbodyOverride)
-                {
-                    AttachedRigidbody = AttachedRigidbodyOverride;
-                }
-                else
-                {
-                    // Detect interactive rigidbodies from grounding
-                    if (GroundingStatus.IsStableOnGround && GroundingStatus.GroundCollider.attachedRigidbody)
-                    {
-                        Rigidbody interactiveRigidbody = GetInteractiveRigidbody(GroundingStatus.GroundCollider);
-                        if (interactiveRigidbody)
-                        {
-                            AttachedRigidbody = interactiveRigidbody;
-                        }
-                    }
-                    else
-                    {
-                        AttachedRigidbody = null;
-                    }
-                }
-
-                Vector3 tmpVelocityFromCurrentAttachedRigidbody = Vector3.zero;
-                if(AttachedRigidbody)
-                {
-                    tmpVelocityFromCurrentAttachedRigidbody = GetVelocityFromRigidbodyMovement(AttachedRigidbody, TransientPosition, deltaTime);
-                }
-
-                // Conserve momentum when de-stabilized from an attached rigidbody
-                if (PreserveAttachedRigidbodyMomentum && _lastAttachedRigidbody != null && AttachedRigidbody != _lastAttachedRigidbody)
-                {
-                    _baseVelocity += _attachedRigidbodyVelocity;
-                    _baseVelocity -= tmpVelocityFromCurrentAttachedRigidbody;
-                }
-
-                // Process additionnal Velocity from attached rigidbody
-                _attachedRigidbodyVelocity = _cachedZeroVector;
-                if (AttachedRigidbody)
-                {
-                    _attachedRigidbodyVelocity = tmpVelocityFromCurrentAttachedRigidbody;
-
-                    // Rotation from attached rigidbody
-                    Vector3 newForward = Vector3.ProjectOnPlane(Quaternion.Euler(Mathf.Rad2Deg * AttachedRigidbody.angularVelocity * deltaTime) * CharacterForward, CharacterUp).normalized;
-                    TransientRotation = Quaternion.LookRotation(newForward, CharacterUp);
-                    Logger.InfoFormat("rotate frome attached rigidbody!");
-                }
-
-                // Cancel out horizontal velocity upon landing on an attached rigidbody
-                if (GroundingStatus.GroundCollider &&
-                    GroundingStatus.GroundCollider.attachedRigidbody && 
-                    GroundingStatus.GroundCollider.attachedRigidbody == AttachedRigidbody && 
-                    AttachedRigidbody != null && 
-                    _lastAttachedRigidbody == null)
-                {
-                    _baseVelocity -= Vector3.ProjectOnPlane(_attachedRigidbodyVelocity, CharacterUp);
-                }
-
-                // Movement from Attached Rigidbody
-                if (_attachedRigidbodyVelocity.sqrMagnitude > 0f)
-                {
-                    _isMovingFromAttachedRigidbody = true;
-
-                    if (_solveMovementCollisions)
-                    {
-                        // Perform the move from rgdbdy velocity
-                        if (InternalCharacterMove(_attachedRigidbodyVelocity * deltaTime, deltaTime, out _internalResultingMovementMagnitude, out _internalResultingMovementDirection))
-                        {
-                            _attachedRigidbodyVelocity = (_internalResultingMovementDirection * _internalResultingMovementMagnitude) / deltaTime;
-                        }
-                        else
-                        {
-                            _attachedRigidbodyVelocity = Vector3.zero;
-                        }
-                    }
-                    else
-                    {
-                        TransientPosition += _attachedRigidbodyVelocity * deltaTime;
-                    }
-                    
-                    _isMovingFromAttachedRigidbody = false;
-                }
-                #endregion
-            }
         }
         
         public KeyValuePair<float, float> CalcRotateBound(float deltaTime)
@@ -1250,7 +1169,7 @@ namespace KinematicCharacterController
             groundNormal = Vector3.Slerp(CharacterUp, groundNormal, CompareUtility.IsApproximatelyEqual(angle, 0.0f) 
                 ? 1 : Mathf.Clamp01(RotateSpeed * deltaTime / angle));
 
-            CalcRotateBound(-180f, 180f, groundNormal, out retLeft, out retRight);
+            CalcRotateBound(-RotateUpperBound, RotateUpperBound, groundNormal, out retLeft, out retRight);
             return new KeyValuePair<float, float>(retLeft, retRight);
         }
         
@@ -1356,6 +1275,20 @@ namespace KinematicCharacterController
                                         out resolutionDirection,
                                         out resolutionDistance))
                                 {
+									if (resolutionDistance > 0.001f && false)
+									{
+										Logger.InfoFormat("update phase2 resolutionDirection:{0}, resolutionDistance:{1}, overlappedTransform:{2}", resolutionDirection, resolutionDistance, overlappedTransform.name);
+                                    	DebugDraw.DebugArrow(TransientPosition, resolutionDirection.normalized * 4f, Color.green, 0f);
+	                                    DebugDraw.DebugCapsule(
+	                                        TransientPosition + TransientRotation * CharacterTransformToCapsuleBottom,
+	                                        TransientPosition + TransientRotation * CharacterTransformToCapsuleTop,
+	                                        Color.green,
+	                                        Capsule.radius,
+	                                        0f
+	                                    );
+									}
+                                    
+                                    
                                     SolvePenetration(resolutionDirection, resolutionDistance, _internalProbedColliders[i]);
 
                                     // If physicsMover, register as rigidbody hit for velocity
@@ -1689,7 +1622,8 @@ namespace KinematicCharacterController
         }
 
         private static readonly float MaxAngleError = 1f;
-        
+        private static readonly float RotateUpperBound = 60f;
+
         private float GetBound(float target, Quaternion baseRot, Vector3 pos, Vector3 groundNormal)
         {
             float neg = 1.0f;
@@ -1902,22 +1836,27 @@ namespace KinematicCharacterController
             {
                 // Sweep for ground detection
                 // Todo change to sphere ground detection
-#if USE_SPHERE_CAST
-                if (CharacterSphereGroundSweep(
-                        GetSphereCenter(groundSweepPosition, rotation, CapsuleDirection),
+                bool detected = false;
+                if (UseSphereGroundDetection)
+                {
+                    detected = CharacterSphereGroundSweep(
+                        GetSphereCenter(groundSweepPosition, atRotation, CapsuleDirection),// position
+                        atRotation, // rotation
+                        groundSweepDirection, // direction
+                        groundProbeDistanceRemaining, // distance
+                        out groundSweepHit);
+                }
+                else
+                {
+                    detected = CharacterGroundSweep(
                         groundSweepPosition, // position
                         atRotation, // rotation
                         groundSweepDirection, // direction
                         groundProbeDistanceRemaining, // distance
-                        out groundSweepHit)) // hit
-#else
-                if (CharacterGroundSweep(
-                        groundSweepPosition, // position
-                        atRotation, // rotation
-                        groundSweepDirection, // direction
-                        groundProbeDistanceRemaining, // distance
-                        out groundSweepHit)) // hit
-#endif   
+                        out groundSweepHit);
+                }
+                
+                if (detected)
                 {
                     Vector3 targetPosition = groundSweepPosition + (groundSweepDirection * groundSweepHit.distance);
                     HitStabilityReport groundHitStabilityReport = new HitStabilityReport();
@@ -1983,7 +1922,7 @@ namespace KinematicCharacterController
                         if (!groundingReport.SnappingPrevented)
                         {
                             targetPosition += (-groundSweepDirection * CollisionOffset);
-                            //InternalMoveCharacterPosition(ref probingPosition, targetPosition, atRotation);
+                            InternalMoveCharacterPosition(ref probingPosition, targetPosition, atRotation);
                         }
 
                         this.CharacterController.OnGroundHit(groundSweepHit.collider, groundSweepHit.normal, groundSweepHit.point, ref groundHitStabilityReport);
@@ -2099,6 +2038,10 @@ namespace KinematicCharacterController
                             ref resultingMovementMagnitude,
                             ref remainingMovementDirection,
                             ref remainingMovementMagnitude);
+                    //DebugDraw.DebugArrow(TransientPosition, resultingMovementDirection.normalized * 4, Color.yellow, 0,true);
+                    //DebugDraw.DebugArrow(TransientPosition, originalMoveDirection.normalized * 4, Color.magenta, 0,true);
+                    //DebugDraw.DebugArrow(TransientPosition, remainingMovementDirection.normalized * 4, Color.black, 0,true);
+                    //DebugDraw.DebugArrow(TransientPosition, _overlaps[i].Normal.normalized* 4, Color.cyan,0, true);
                 }
             }
 
@@ -2216,6 +2159,7 @@ namespace KinematicCharacterController
 
             // Move position for the remainder of the movement
             Vector3 targetFinalPosition = tmpMovedPosition + (remainingMovementDirection * remainingMovementMagnitude);
+            //Logger.InfoFormat("Internal character move:{0}", (remainingMovementDirection * remainingMovementMagnitude).ToStringExt());
             InternalMoveCharacterPosition(ref _internalTransientPosition, targetFinalPosition, TransientRotation);
             resultingMovementDirection = remainingMovementDirection;
 
@@ -2233,7 +2177,7 @@ namespace KinematicCharacterController
             {
                 Vector3 obstructionLeftAlongGround = Vector3.Cross(GroundingStatus.GroundNormal, obstructionNormal).normalized;
                 obstructionNormal = Vector3.Cross(obstructionLeftAlongGround, CharacterUp).normalized;
-                Logger.DebugFormat("obstructionNormal is changed!!!!!");
+                ///Logger.InfoFormat("obstructionNormal is changed!!!!!");
             }
 
             // Catch cases where cross product between parallel normals returned 0
@@ -2345,6 +2289,11 @@ namespace KinematicCharacterController
 
             if(movementValid)
             {
+                //if (Mathf.Abs(movedPosition.x - targetPosition.x) >= 0.001f ||Mathf.Abs(movedPosition.z - targetPosition.z) >= 0.001f)
+                {
+                    //Logger.InfoFormat("InternalMoveCharacterPosition, from:{0} to :{1}, delta:{3}\nstack:{2}", movedPosition.ToStringExt(), targetPosition.ToStringExt(), new StackTrace(),
+                     //   (targetPosition - movedPosition).ToStringExt());
+                }
                 movedPosition = targetPosition;
             }
             
@@ -2984,6 +2933,69 @@ namespace KinematicCharacterController
             return nbHits;
         }
 
+        
+        public int CharacterCollisionsSweep2(Vector3 position, Quaternion rotation, Vector3 direction, float distance, out RaycastHit closestHit, RaycastHit[] hits)
+        {
+            direction.Normalize();
+            float SweepProbingBackstepDistance1 = SweepProbingBackstepDistance;
+            // Capsule cast
+            int nbHits = 0;
+            int nbUnfilteredHits = Physics.CapsuleCastNonAlloc(
+                position + (rotation * CharacterTransformToCapsuleBottomHemi) - (direction * SweepProbingBackstepDistance1),
+                position + (rotation * CharacterTransformToCapsuleTopHemi) - (direction * SweepProbingBackstepDistance1),
+                Capsule.radius,
+                direction,
+                hits,
+                distance + SweepProbingBackstepDistance1,
+                CollidableLayers,
+                QueryTriggerInteraction.Ignore);
+
+            // Hits filter
+            closestHit = new RaycastHit();
+            float closestDistance = Mathf.Infinity;
+            nbHits = nbUnfilteredHits;
+            for (int i = nbUnfilteredHits - 1; i >= 0; i--)
+            {
+                hits[i].distance -= SweepProbingBackstepDistance1;
+
+                // Filter out the invalid hits
+                if (hits[i].distance <= 0f ||
+                    !CheckIfColliderValidForCollisions(hits[i].collider))
+                {
+                    nbHits--;
+                    if (i < nbHits)
+                    {
+                        hits[i] = hits[nbHits];
+                    }
+                }
+                else
+                {
+                    // Remember closest valid hit
+                    if (hits[i].distance < closestDistance)
+                    {
+                        closestHit = hits[i];
+                        closestDistance = hits[i].distance;
+                    }
+                }
+            }
+
+            if (nbHits == 0)
+            {
+                for (int i = 0; i < nbUnfilteredHits; ++i)
+                {
+                    if (CheckIfColliderValidForCollisions(hits[i].collider))
+                    {
+                        Logger.InfoFormat("collider:{0}, hitNormal:{1}, distance:{2}, hitPoint:{3}",
+                            hits[i].collider.name, hits[i].normal, hits[i].distance, hits[i].point);
+                        DebugDraw.DebugArrow(hits[i].point, hits[i].normal * 2, Color.blue, 0f, false);
+                        DebugDraw.DebugArrow(hits[i].point, direction.normalized * 2, Color.cyan, 0f, false);
+                    }
+                }
+            }
+            
+            return nbHits;
+        }
+
         /// <summary>
         /// Sweeps the capsule's volume to detect hits
         /// </summary>
@@ -3055,7 +3067,8 @@ namespace KinematicCharacterController
             direction.Normalize();
             closestHit = new RaycastHit();
             // Capsule cast
-            int nbUnfilteredHits = Physics.SphereCastNonAlloc(position,
+            int nbUnfilteredHits = Physics.SphereCastNonAlloc(
+                position - direction * GroundProbingBackstepDistance,
                 Capsule.radius,
                 direction, 
                 _internalCharacterHits,
@@ -3125,11 +3138,6 @@ namespace KinematicCharacterController
                 }
             }
 
-            //if (nbUnfilteredHits > 1)
-            //{
-
-            //}
-
             return foundValidHit;
         }
 
@@ -3182,242 +3190,119 @@ namespace KinematicCharacterController
         }
         
         
-        public void SphereProbeGround(ref Vector3 probingPosition, Quaternion atRotation, float probingDistance,
-            ref CharacterGroundingReport groundingReport)
-        {
-            if (probingDistance < MinimumGroundProbingDistance)
-            {
-                probingDistance = MinimumGroundProbingDistance;
-            }
-
-            int groundSweepsMade = 0;
-            RaycastHit groundSweepHit = new RaycastHit();
-            bool groundSweepingIsOver = false;
-            Vector3 groundSweepPosition = probingPosition;
-            //需要探测的方向
-            //Todo 
-            Vector3 groundSweepDirection = GetGroundSweepDirection(atRotation, CapsuleDirection);
-            float groundProbeDistanceRemaining = probingDistance;
-            while (groundProbeDistanceRemaining > 0 && (groundSweepsMade <= MaxGroundingSweepIterations) && !groundSweepingIsOver)
-            {
-                // Sweep for ground detection
-                // Todo change to sphere ground detection
-                if (CharacterSphereGroundSweep(
-                        groundSweepPosition, // position
-                        atRotation, // rotation
-                        groundSweepDirection, // direction
-                        groundProbeDistanceRemaining, // distance
-                        out groundSweepHit)) // hit
-                {
-                    Vector3 targetPosition = groundSweepPosition + (groundSweepDirection * groundSweepHit.distance);
-                    HitStabilityReport groundHitStabilityReport = new HitStabilityReport();
-                    EvaluateHitStability(groundSweepHit.collider, groundSweepHit.normal, groundSweepHit.point, targetPosition, TransientRotation, ref groundHitStabilityReport);
-
-                    // Handle ledge stability
-                    if (groundHitStabilityReport.LedgeDetected)
-                    {
-                        if (groundHitStabilityReport.IsOnEmptySideOfLedge && groundHitStabilityReport.DistanceFromLedge > MaxStableDistanceFromLedge)
-                        {
-                            groundHitStabilityReport.IsStable = false;
-                            Logger.InfoFormat("IsOnEmptySideOfLedge is ture, DistanceFromLedge > MaxStableDistanceFromLedge:{0}, set IsStable to false", MaxStableDistanceFromLedge);
-                        }
-                    }
-
-                    groundingReport.IsOnGround = true;
-                    groundingReport.GroundNormal = groundSweepHit.normal;
-                    groundingReport.InnerGroundNormal = groundHitStabilityReport.InnerNormal;
-                    groundingReport.OuterGroundNormal = groundHitStabilityReport.OuterNormal;
-                    groundingReport.GroundCollider = groundSweepHit.collider;
-                    groundingReport.GroundPoint = groundSweepHit.point;
-                    groundingReport.SnappingPrevented = false;
-
-                    // Found stable ground
-                    if (groundHitStabilityReport.IsStable)
-                    {
-                        // Find all scenarios where ground snapping should be canceled
-                        if (LedgeHandling)
-                        {
-                            // "Launching" off of slopes of a certain denivelation angle
-                            if (LastGroundingStatus.IsOnGround && groundHitStabilityReport.InnerNormal.sqrMagnitude != 0f && groundHitStabilityReport.OuterNormal.sqrMagnitude != 0f)
-                            {
-                                float denivelationAngle = Vector3.Angle(groundHitStabilityReport.InnerNormal, groundHitStabilityReport.OuterNormal);
-                                if (denivelationAngle > MaxStableDenivelationAngle)
-                                {
-                                    groundingReport.SnappingPrevented = true;
-                                }
-                                else
-                                {
-                                    denivelationAngle = Vector3.Angle(LastGroundingStatus.InnerGroundNormal, groundHitStabilityReport.OuterNormal);
-                                    if (denivelationAngle > MaxStableDenivelationAngle)
-                                    {
-                                        groundingReport.SnappingPrevented = true;
-                                    }
-                                }
-                            }
-
-                            // Ledge stability
-                            if (PreventSnappingOnLedges && groundHitStabilityReport.LedgeDetected)
-                            {
-                                groundingReport.SnappingPrevented = true;
-                            }
-                        }
-
-                        groundingReport.IsStableOnGround = true;
-
-                        // Ground snapping
-                        if (!groundingReport.SnappingPrevented)
-                        {
-                            targetPosition += (-groundSweepDirection * CollisionOffset);
-                            probingPosition = targetPosition;
-                        }
-
-                        this.CharacterController.OnGroundHit(groundSweepHit.collider, groundSweepHit.normal, groundSweepHit.point, ref groundHitStabilityReport);
-                        groundSweepingIsOver = true;
-                    }
-                    else
-                    {
-                        // Calculate movement from this iteration and advance position
-                        Vector3 sweepMovement = (groundSweepDirection * groundSweepHit.distance) + ((atRotation * Vector3.up) * Mathf.Clamp(CollisionOffset, 0f, groundSweepHit.distance));
-                        groundSweepPosition = groundSweepPosition + sweepMovement;
-
-                        // Set remaining distance
-                        groundProbeDistanceRemaining = Mathf.Min(GroundProbeReboundDistance, Mathf.Clamp(groundProbeDistanceRemaining - sweepMovement.magnitude, 0f, Mathf.Infinity));
-
-                        // Reorient direction
-                        groundSweepDirection = Vector3.ProjectOnPlane(groundSweepDirection, groundSweepHit.normal).normalized;
-                    }
-                }
-                else
-                {
-                    groundSweepingIsOver = true;
-                }
-
-                groundSweepsMade++;
-            }
-        }
-
-        public void MyProbeGround(ref Vector3 probingPosition, Quaternion atRotation, float probingDistance,
-            ref CharacterGroundingReport groundingReport)
-        {
-            if (probingDistance < MinimumGroundProbingDistance)
-            {
-                probingDistance = MinimumGroundProbingDistance;
-            }
-
-            int groundSweepsMade = 0;
-            RaycastHit groundSweepHit = new RaycastHit();
-            bool groundSweepingIsOver = false;
-            Vector3 groundSweepPosition = probingPosition;
-            //需要探测的方向
-            //Todo 
-            Vector3 groundSweepDirection = GetGroundSweepDirection(atRotation, CapsuleDirection);
-            float groundProbeDistanceRemaining = probingDistance;
-            while (groundProbeDistanceRemaining > 0 && (groundSweepsMade <= MaxGroundingSweepIterations) && !groundSweepingIsOver)
-            {
-                // Sweep for ground detection
-                // Todo change to sphere ground detection
-#if USE_SPHERE_CAST
-                if (CharacterSphereGroundSweep(
-                        groundSweepPosition, // position
-                        atRotation, // rotation
-                        groundSweepDirection, // direction
-                        groundProbeDistanceRemaining, // distance
-                        out groundSweepHit)) // hit
-#else
-                if (CharacterGroundSweep(
-                        groundSweepPosition, // position
-                        atRotation, // rotation
-                        groundSweepDirection, // direction
-                        groundProbeDistanceRemaining, // distance
-                        out groundSweepHit)) // hit
-#endif   
-                {
-                    Vector3 targetPosition = groundSweepPosition + (groundSweepDirection * groundSweepHit.distance);
-                    HitStabilityReport groundHitStabilityReport = new HitStabilityReport();
-                    EvaluateHitStability(groundSweepHit.collider, groundSweepHit.normal, groundSweepHit.point, targetPosition, TransientRotation, ref groundHitStabilityReport);
-
-                    // Handle ledge stability
-                    if (groundHitStabilityReport.LedgeDetected)
-                    {
-                        if (groundHitStabilityReport.IsOnEmptySideOfLedge && groundHitStabilityReport.DistanceFromLedge > MaxStableDistanceFromLedge)
-                        {
-                            groundHitStabilityReport.IsStable = false;
-                            Logger.InfoFormat("IsOnEmptySideOfLedge is ture, DistanceFromLedge > MaxStableDistanceFromLedge:{0}, set IsStable to false", MaxStableDistanceFromLedge);
-                        }
-                    }
-
-                    groundingReport.IsOnGround = true;
-                    groundingReport.GroundNormal = groundSweepHit.normal;
-                    groundingReport.InnerGroundNormal = groundHitStabilityReport.InnerNormal;
-                    groundingReport.OuterGroundNormal = groundHitStabilityReport.OuterNormal;
-                    groundingReport.GroundCollider = groundSweepHit.collider;
-                    groundingReport.GroundPoint = groundSweepHit.point;
-                    groundingReport.SnappingPrevented = false;
-
-                    // Found stable ground
-                    if (groundHitStabilityReport.IsStable)
-                    {
-                        // Find all scenarios where ground snapping should be canceled
-                        if (LedgeHandling)
-                        {
-                            // "Launching" off of slopes of a certain denivelation angle
-                            if (LastGroundingStatus.IsOnGround && groundHitStabilityReport.InnerNormal.sqrMagnitude != 0f && groundHitStabilityReport.OuterNormal.sqrMagnitude != 0f)
-                            {
-                                float denivelationAngle = Vector3.Angle(groundHitStabilityReport.InnerNormal, groundHitStabilityReport.OuterNormal);
-                                if (denivelationAngle > MaxStableDenivelationAngle)
-                                {
-                                    groundingReport.SnappingPrevented = true;
-                                }
-                                else
-                                {
-                                    denivelationAngle = Vector3.Angle(LastGroundingStatus.InnerGroundNormal, groundHitStabilityReport.OuterNormal);
-                                    if (denivelationAngle > MaxStableDenivelationAngle)
-                                    {
-                                        groundingReport.SnappingPrevented = true;
-                                    }
-                                }
-                            }
-
-                            // Ledge stability
-                            if (PreventSnappingOnLedges && groundHitStabilityReport.LedgeDetected)
-                            {
-                                groundingReport.SnappingPrevented = true;
-                            }
-                        }
-
-                        groundingReport.IsStableOnGround = true;
-
-                        // Ground snapping
-                        if (!groundingReport.SnappingPrevented)
-                        {
-                            targetPosition += (-groundSweepDirection * CollisionOffset);
-                            InternalMoveCharacterPosition(ref probingPosition, targetPosition, atRotation);
-                        }
-
-                        this.CharacterController.OnGroundHit(groundSweepHit.collider, groundSweepHit.normal, groundSweepHit.point, ref groundHitStabilityReport);
-                        groundSweepingIsOver = true;
-                    }
-                    else
-                    {
-                        // Calculate movement from this iteration and advance position
-                        Vector3 sweepMovement = (groundSweepDirection * groundSweepHit.distance) + ((atRotation * Vector3.up) * Mathf.Clamp(CollisionOffset, 0f, groundSweepHit.distance));
-                        groundSweepPosition = groundSweepPosition + sweepMovement;
-
-                        // Set remaining distance
-                        groundProbeDistanceRemaining = Mathf.Min(GroundProbeReboundDistance, Mathf.Clamp(groundProbeDistanceRemaining - sweepMovement.magnitude, 0f, Mathf.Infinity));
-
-                        // Reorient direction
-                        groundSweepDirection = Vector3.ProjectOnPlane(groundSweepDirection, groundSweepHit.normal).normalized;
-                    }
-                }
-                else
-                {
-                    groundSweepingIsOver = true;
-                }
-
-                groundSweepsMade++;
-            }
-        }
+//        public void SphereProbeGround(ref Vector3 probingPosition, Quaternion atRotation, float probingDistance,
+//            ref CharacterGroundingReport groundingReport)
+//        {
+//            if (probingDistance < MinimumGroundProbingDistance)
+//            {
+//                probingDistance = MinimumGroundProbingDistance;
+//            }
+//
+//            int groundSweepsMade = 0;
+//            RaycastHit groundSweepHit = new RaycastHit();
+//            bool groundSweepingIsOver = false;
+//            Vector3 groundSweepPosition = probingPosition;
+//            //需要探测的方向
+//            //Todo 
+//            Vector3 groundSweepDirection = GetGroundSweepDirection(atRotation, CapsuleDirection);
+//            float groundProbeDistanceRemaining = probingDistance;
+//            while (groundProbeDistanceRemaining > 0 && (groundSweepsMade <= MaxGroundingSweepIterations) && !groundSweepingIsOver)
+//            {
+//                // Sweep for ground detection
+//                // Todo change to sphere ground detection
+//                if (CharacterSphereGroundSweep(
+//                        groundSweepPosition, // position
+//                        atRotation, // rotation
+//                        groundSweepDirection, // direction
+//                        groundProbeDistanceRemaining, // distance
+//                        out groundSweepHit)) // hit
+//                {
+//                    Vector3 targetPosition = groundSweepPosition + (groundSweepDirection * groundSweepHit.distance);
+//                    HitStabilityReport groundHitStabilityReport = new HitStabilityReport();
+//                    EvaluateHitStability(groundSweepHit.collider, groundSweepHit.normal, groundSweepHit.point, targetPosition, TransientRotation, ref groundHitStabilityReport);
+//
+//                    // Handle ledge stability
+//                    if (groundHitStabilityReport.LedgeDetected)
+//                    {
+//                        if (groundHitStabilityReport.IsOnEmptySideOfLedge && groundHitStabilityReport.DistanceFromLedge > MaxStableDistanceFromLedge)
+//                        {
+//                            groundHitStabilityReport.IsStable = false;
+//                            Logger.InfoFormat("IsOnEmptySideOfLedge is ture, DistanceFromLedge > MaxStableDistanceFromLedge:{0}, set IsStable to false", MaxStableDistanceFromLedge);
+//                        }
+//                    }
+//
+//                    groundingReport.IsOnGround = true;
+//                    groundingReport.GroundNormal = groundSweepHit.normal;
+//                    groundingReport.InnerGroundNormal = groundHitStabilityReport.InnerNormal;
+//                    groundingReport.OuterGroundNormal = groundHitStabilityReport.OuterNormal;
+//                    groundingReport.GroundCollider = groundSweepHit.collider;
+//                    groundingReport.GroundPoint = groundSweepHit.point;
+//                    groundingReport.SnappingPrevented = false;
+//
+//                    // Found stable ground
+//                    if (groundHitStabilityReport.IsStable)
+//                    {
+//                        // Find all scenarios where ground snapping should be canceled
+//                        if (LedgeHandling)
+//                        {
+//                            // "Launching" off of slopes of a certain denivelation angle
+//                            if (LastGroundingStatus.IsOnGround && groundHitStabilityReport.InnerNormal.sqrMagnitude != 0f && groundHitStabilityReport.OuterNormal.sqrMagnitude != 0f)
+//                            {
+//                                float denivelationAngle = Vector3.Angle(groundHitStabilityReport.InnerNormal, groundHitStabilityReport.OuterNormal);
+//                                if (denivelationAngle > MaxStableDenivelationAngle)
+//                                {
+//                                    groundingReport.SnappingPrevented = true;
+//                                }
+//                                else
+//                                {
+//                                    denivelationAngle = Vector3.Angle(LastGroundingStatus.InnerGroundNormal, groundHitStabilityReport.OuterNormal);
+//                                    if (denivelationAngle > MaxStableDenivelationAngle)
+//                                    {
+//                                        groundingReport.SnappingPrevented = true;
+//                                    }
+//                                }
+//                            }
+//
+//                            // Ledge stability
+//                            if (PreventSnappingOnLedges && groundHitStabilityReport.LedgeDetected)
+//                            {
+//                                groundingReport.SnappingPrevented = true;
+//                            }
+//                        }
+//
+//                        groundingReport.IsStableOnGround = true;
+//
+//                        // Ground snapping
+//                        if (!groundingReport.SnappingPrevented)
+//                        {
+//                            targetPosition += (-groundSweepDirection * CollisionOffset);
+//                            probingPosition = targetPosition;
+//                        }
+//
+//                        this.CharacterController.OnGroundHit(groundSweepHit.collider, groundSweepHit.normal, groundSweepHit.point, ref groundHitStabilityReport);
+//                        groundSweepingIsOver = true;
+//                    }
+//                    else
+//                    {
+//                        // Calculate movement from this iteration and advance position
+//                        Vector3 sweepMovement = (groundSweepDirection * groundSweepHit.distance) + ((atRotation * Vector3.up) * Mathf.Clamp(CollisionOffset, 0f, groundSweepHit.distance));
+//                        groundSweepPosition = groundSweepPosition + sweepMovement;
+//
+//                        // Set remaining distance
+//                        groundProbeDistanceRemaining = Mathf.Min(GroundProbeReboundDistance, Mathf.Clamp(groundProbeDistanceRemaining - sweepMovement.magnitude, 0f, Mathf.Infinity));
+//
+//                        // Reorient direction
+//                        groundSweepDirection = Vector3.ProjectOnPlane(groundSweepDirection, groundSweepHit.normal).normalized;
+//                    }
+//                }
+//                else
+//                {
+//                    groundSweepingIsOver = true;
+//                }
+//
+//                groundSweepsMade++;
+//            }
+//        }
 
         public bool EnableMotor
         {

@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -120,43 +121,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonRoundOverView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonRoundOverView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonRoundOverView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonRoundOverView, CommonRoundOverViewModel> bindingSet =
-                view.CreateBindingSet<CommonRoundOverView, CommonRoundOverViewModel>();
-
-            view.oriShow = _show = view.Show.activeSelf;
-            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
-            view.oriAnimeGroupShow = _animeGroupShow = view.AnimeGroupShow.activeSelf;
-            bindingSet.Bind(view.AnimeGroupShow).For(v => v.activeSelf).To(vm => vm.AnimeGroupShow).OneWay();
-            view.oriRoundGroupShow = _roundGroupShow = view.RoundGroupShow.activeSelf;
-            bindingSet.Bind(view.RoundGroupShow).For(v => v.activeSelf).To(vm => vm.RoundGroupShow).OneWay();
-            view.oriTitleText = _titleText = view.TitleText.text;
-            bindingSet.Bind(view.TitleText).For(v => v.text).To(vm => vm.TitleText).OneWay();
-            view.oriCampScoreText1 = _campScoreText1 = view.CampScoreText1.text;
-            bindingSet.Bind(view.CampScoreText1).For(v => v.text).To(vm => vm.CampScoreText1).OneWay();
-            view.oriCampScoreText2 = _campScoreText2 = view.CampScoreText2.text;
-            bindingSet.Bind(view.CampScoreText2).For(v => v.text).To(vm => vm.CampScoreText2).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonRoundOverView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -180,12 +166,54 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonRoundOverView view)
+		{
+		     BindingSet<CommonRoundOverView, CommonRoundOverViewModel> bindingSet =
+                view.CreateBindingSet<CommonRoundOverView, CommonRoundOverViewModel>();
+            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
+            bindingSet.Bind(view.AnimeGroupShow).For(v => v.activeSelf).To(vm => vm.AnimeGroupShow).OneWay();
+            bindingSet.Bind(view.RoundGroupShow).For(v => v.activeSelf).To(vm => vm.RoundGroupShow).OneWay();
+            bindingSet.Bind(view.TitleText).For(v => v.text).To(vm => vm.TitleText).OneWay();
+            bindingSet.Bind(view.CampScoreText1).For(v => v.text).To(vm => vm.CampScoreText1).OneWay();
+            bindingSet.Bind(view.CampScoreText2).For(v => v.text).To(vm => vm.CampScoreText2).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonRoundOverView view)
+		{
+            _show = view.Show.activeSelf;
+            _animeGroupShow = view.AnimeGroupShow.activeSelf;
+            _roundGroupShow = view.RoundGroupShow.activeSelf;
+            _titleText = view.TitleText.text;
+            _campScoreText1 = view.CampScoreText1.text;
+            _campScoreText2 = view.CampScoreText2.text;
+		}
+
+
+		void SaveOriData(CommonRoundOverView view)
+		{
+            view.oriShow = _show;
+            view.oriAnimeGroupShow = _animeGroupShow;
+            view.oriRoundGroupShow = _roundGroupShow;
+            view.oriTitleText = _titleText;
+            view.oriCampScoreText1 = _campScoreText1;
+            view.oriCampScoreText2 = _campScoreText2;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			Show = _view.oriShow;
 			AnimeGroupShow = _view.oriAnimeGroupShow;
 			RoundGroupShow = _view.oriRoundGroupShow;
@@ -218,7 +246,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonRoundOver"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

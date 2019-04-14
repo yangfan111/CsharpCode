@@ -9,6 +9,7 @@ using com.wd.free.para;
 using App.Shared.FreeFramework.framework.trigger;
 using com.wd.free.map.position;
 using com.wd.free.unit;
+using Shared.Scripts.MapConfigPoint;
 
 namespace App.Server.GameModules.GamePlay.Free.map
 {
@@ -34,14 +35,14 @@ namespace App.Server.GameModules.GamePlay.Free.map
             {
                 if (p.ID == realType)
                 {
-                    foreach (Vector3 v in p.points)
+                    foreach (MapConfigPoints.SavedPointData v in p.points)
                     {
-                        if (IsNear(v, target, dis))
+                        if (IsNear(v.pos, target, dis))
                         {
                             TriggerArgs ta = new TriggerArgs();
-                            ta.AddPara(new FloatPara("x", v.x));
-                            ta.AddPara(new FloatPara("y", v.y));
-                            ta.AddPara(new FloatPara("z", v.z));
+                            ta.AddPara(new FloatPara("x", v.pos.x));
+                            ta.AddPara(new FloatPara("y", v.pos.y));
+                            ta.AddPara(new FloatPara("z", v.pos.z));
                             ta.AddPara(new FloatPara("index", i++));
 
                             args.Act(action, ta);

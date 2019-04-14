@@ -110,17 +110,27 @@ namespace App.Server
 
         private void CreateRoom(CreateRoomEvent e)
         {
-            if (_room != null || (!e.IsDummy  && e.Message == null))
+            bool success = false;
+            if (_room == null && (e.IsDummy || e.Message != null))
+            {
+                try
+                {
+                    _room = _roomFactory.Create(e.Message);
+                    FinishRoomCreate(e.Message);
+                    success = true;
+                }
+                catch (Exception exception)
+                {
+                    _logger.Error("Create Room Failed: ", exception);
+                }
+            }
+
+            if (!success)
             {
                 var evt = RoomEvent.AllocEvent<CreateRoomResponseEvent>();
                 evt.Success = false;
                 evt.ErrCode = _room != null ? ErrorCode.CreateRoom_ServerRoom_Exist : ErrorCode.CreateRoom_Message_Error;
                 _dispatcher.AddEvent(evt);
-            }
-            else
-            {
-                _room = _roomFactory.Create(e.Message);
-                FinishRoomCreate(e.Message);
             }
         }
 

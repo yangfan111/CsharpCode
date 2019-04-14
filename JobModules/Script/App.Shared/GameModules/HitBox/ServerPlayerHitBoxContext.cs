@@ -38,7 +38,7 @@ namespace App.Shared.GameModules.Bullet
         public void UpdateHitBox(IGameEntity gameEntity)
         {
             var position = gameEntity.Position.Value;
-            var rotation = gameEntity.GetComponent<OrientationComponent>().RotationYaw;
+            var rotation = gameEntity.GetComponent<Orientation>().RotationYaw;
             var hitBoxComponent = GetHitBoxComponent(gameEntity.EntityKey);
 
             if (hitBoxComponent != null)
@@ -53,7 +53,7 @@ namespace App.Shared.GameModules.Bullet
                 PlayerEntityUtility.UpdateTransform(playerEntity,
                         gameEntity.GetComponent<NetworkAnimatorComponent>(),
                         gameEntity.GetComponent<PredictedAppearanceComponent>(),
-                        gameEntity.GetComponent<OrientationComponent>());
+                        gameEntity.GetComponent<Orientation>());
                 //_logger.DebugFormat("server animator {0}", gameEntity.GetComponent<NetworkAnimatorComponent>().ToStringExt());
                 
                 var provider = SingletonManager.Get<HitBoxTransformProviderCache>().GetProvider(playerEntity.thirdPersonModel.Value);

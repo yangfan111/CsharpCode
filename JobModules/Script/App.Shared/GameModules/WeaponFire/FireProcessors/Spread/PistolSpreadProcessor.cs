@@ -1,47 +1,22 @@
-﻿using WeaponConfigNs;
+﻿using App.Shared.Components.Serializer;
+using WeaponConfigNs;
 
 namespace App.Shared.GameModules.Weapon.Behavior
 {
     /// <summary>
     /// Defines the <see cref="PistolSpreadProcessor" />
     /// </summary>
-    public class PistolSpreadProcessor : ISpreadProcessor
+    public class PistolSpreadProcessor : AbstractSpreadProcessor
     {
-        public PistolSpreadProcessor()
+        
+        protected override void Update(PlayerWeaponController controller, IWeaponCmd cmd)
         {
+            var config = controller.HeldWeaponAgent.PistolSpreadLogicCfg;
+            var weaponRuntime = controller.HeldWeaponAgent.RunTimeComponent;
+            float spreadScaleFactor = FireSpreadProvider.GetSpreadScaleFactor(config, controller);
+            FireSpreadFormula.ApplyPistolFinalSpread(spreadScaleFactor,config.SpreadScale,weaponRuntime);
         }
 
-        public void OnBeforeFire(PlayerWeaponController controller, IWeaponCmd cmd)
-        {
-            PistolSpreadLogicConfig config = controller.HeldWeaponAgent.PistolSpreadLogicCfg;
-            var weaponState = controller.HeldWeaponAgent.RunTimeComponent;
-            float spread = UpdateSpread(controller, weaponState.Accuracy);
-            weaponState.LastSpreadX = spread * config.SpreadScale.ScaleX;
-            weaponState.LastSpreadY = spread * config.SpreadScale.ScaleY;
-        }
-
-        protected float UpdateSpread(PlayerWeaponController controller, float accuracy)
-        {
-            PistolSpreadLogicConfig config = controller.HeldWeaponAgent.PistolSpreadLogicCfg;
-            float param;
-            var posture = controller.RelatedStateInterface.GetCurrentPostureState();
-            if (!controller.RelatedPlayerMove.IsGround)
-            {
-                param = config.AirParam;
-            }
-            else if (controller.RelatedPlayerMove.HorizontalVelocity > 13)
-            {
-                param = config.LengthGreater13Param;
-            }
-            else if (posture == XmlConfig.PostureInConfig.Prone || posture == XmlConfig.PostureInConfig.Crouch)
-            {
-                param = config.DuckParam;
-            }
-            else
-            {
-                param = config.DefaultParam;
-            }
-            return param * (1 - accuracy);
-        }
+       
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Core.Utils;
 using UnityEngine;
+using Utils.Appearance;
 
 namespace Core.HitBox
 {
@@ -7,33 +8,32 @@ namespace Core.HitBox
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(HitBoxGameObjectUpdater));
 
-        public static void Update(Transform hitbox, IHitBoxTransformProvider transformProvider)
+
+        public static void DrawBoundBox(Collider collider, float duration)
         {
-            UpdateBones(hitbox.GetChild(0), transformProvider);
-            hitbox.transform.position = transformProvider.RootPosition;
-            hitbox.transform.rotation = transformProvider.RootRotation;
-        }
-        private static void UpdateBones(Transform hitbox, IHitBoxTransformProvider transformProvider)
-        {
-            for (int i = 0; i < hitbox.childCount; i++)
+            var bc = collider as BoxCollider;
+            if (bc != null)
             {
-                var child = hitbox.GetChild(i);
-                
-                Transform modelTransform = transformProvider.GetTransform(child);
-                if (modelTransform != null)
-                {
-                    child.localPosition = modelTransform.transform.localPosition;
-                    child.localRotation = modelTransform.transform.localRotation;
-                }
-                else
-                {
-                    _logger.DebugFormat("can't find hitbox node [{0}] in model {1}", child, transformProvider);
-                }
-
-                UpdateBones(child, transformProvider);
+                DrawBoxCollider(bc, collider.transform, duration);
+                return;
             }
-        }
 
+            var cc = collider as CapsuleCollider;
+            if (cc != null)
+            {
+                DrawCapsuleCollider(cc, collider.transform, duration);
+                return;
+            }
+
+            var sc = collider as SphereCollider;
+            if (sc != null)
+            {
+                DrawSphereCollider(sc, collider.transform, duration);
+                return;
+            }
+
+        }
+        
         public static void DrawBoundBox(Transform hitbox, float duration)
         {
             var bc = hitbox.GetComponent<BoxCollider>();
@@ -42,16 +42,57 @@ namespace Core.HitBox
                 DrawBoxCollider(bc, hitbox, duration);
             }
 
+            var cc = hitbox.GetComponent<CapsuleCollider>();
+            if (cc != null && cc.enabled)
+            {
+                DrawCapsuleCollider(cc, hitbox, duration);
+            }
+
+            var sc = hitbox.GetComponent<SphereCollider>();
+            if (sc != null && sc.enabled)
+            {
+                DrawSphereCollider(sc, hitbox, duration);
+            }
+
             foreach (Transform child in hitbox.transform)
             {
                 DrawBoundBox(child, duration);
             }
         }
 
+        private static void DrawSphereCollider(SphereCollider sphereCollider, Transform transform, float duration)
+        {
+            Vector3 size = Vector3.one * sphereCollider.radius;
+            DrawABox(sphereCollider.center, size, transform, duration);
+        }
+        
+        private static void DrawCapsuleCollider(CapsuleCollider capsuleCollider, Transform transform, float duration)
+        {
+            Vector3 size= new Vector3(2*capsuleCollider.radius, 2*capsuleCollider.radius, 2*capsuleCollider.radius);
+            switch (capsuleCollider.direction)
+            {
+                case 0:
+                    size.x = capsuleCollider.height;
+                    break;    
+                case 1:
+                    size.y = capsuleCollider.height;
+                    break;        
+                case 2:
+                    size.z = capsuleCollider.height;
+                    break;
+            }
+            DrawABox(capsuleCollider.center,size, transform, duration);
+        }
+
         private static void DrawBoxCollider(BoxCollider boxCollider, Transform transform, float duration)
         {
-            var min = boxCollider.center - boxCollider.size / 2;
-            var max = boxCollider.center + boxCollider.size/2;
+            DrawABox(boxCollider.center, boxCollider.size, transform, duration);
+        }
+        
+        private static void DrawABox(Vector3 center, Vector3 size, Transform transform, float duration)
+        {
+            var min = center - size / 2;
+            var max = center + size/2;
             var points = new Vector3[8];
             points[0] = new Vector3(min.x, min.y, min.z);
             points[1] = new Vector3(max.x, min.y, min.z);

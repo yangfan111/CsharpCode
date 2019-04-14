@@ -1,4 +1,5 @@
-﻿using App.Client.GameModules.Ui.UiAdapter;
+using System;
+using App.Client.GameModules.Ui.UiAdapter;
 using App.Client.GameModules.Ui.ViewModels.Group;
 using Assets.UiFramework.Libs;
 using Core.Enums;
@@ -44,6 +45,22 @@ namespace App.Client.GameModules.Ui.Models.Group
             _viewModel.ImgGroupShow = !data.IsTitle;
             _viewModel.TextGroupShow = data.NeedShow;
             _viewModel.IconGroupShow = data.NeedShow && !data.IsTitle;
+            if (data.IsTitle)
+            {
+                InitTitleText();
+            }
+        }
+
+        private void InitTitleText()
+        {
+            _viewModel.RankText = I2.Loc.ScriptLocalization.client_group.word1;
+            _viewModel.PlayerNameText = I2.Loc.ScriptLocalization.client_group.word2;
+            _viewModel.CorpsText = I2.Loc.ScriptLocalization.client_group.word3;
+            _viewModel.KillText = I2.Loc.ScriptLocalization.client_group.word4;
+            _viewModel.DamageText = I2.Loc.ScriptLocalization.client_group.word5;
+            _viewModel.DeadText = I2.Loc.ScriptLocalization.client_group.word6;
+            _viewModel.AssistText = I2.Loc.ScriptLocalization.client_group.word7;
+            _viewModel.PingText = "ping";
         }
 
         private Color origColor = new Color32(0xf4, 0xf4, 0xf4, 255);

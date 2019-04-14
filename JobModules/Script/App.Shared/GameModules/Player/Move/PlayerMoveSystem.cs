@@ -22,6 +22,7 @@ using Core.CameraControl;
 using Core.CharacterController;
 using App.Shared.GameModules.Player.Appearance;
 using Core.CharacterController.ConcreteController;
+using Core.Components;
 using Utils.Singleton;
 using Utils.Utils;
 
@@ -51,13 +52,14 @@ namespace App.Shared.GameModules.Player
             
             PlayerEntity player = (PlayerEntity)owner.OwnerEntity;
 
+            //服务器通过tcp指令修改客户端位置
             CorrectPositionByServer(cmd, player);
             
             CheckPlayerLifeState(player);
 
             var updateComponent = player.moveUpdate;
             
-            updateComponent.LastPosition = player.position.Value;
+            updateComponent.LastPosition = player.position.Value.ShiftedToFixedVector3();
 
             updateComponent.Reset();
             
@@ -68,6 +70,7 @@ namespace App.Shared.GameModules.Player
             
             player.playerMove.ClearState();
 
+            // swimhandler和divehandler未解耦，handler内部函数声明为static，解耦后可以不使用switch
             MoveType moveType = GetPlayerMoveType(player);
             switch (moveType)
             {
@@ -116,8 +119,8 @@ namespace App.Shared.GameModules.Player
 
         private void CorrectPositionByServer(IUserCmd cmd, PlayerEntity player)
         {
-            var adjustPos = player.latestAdjustCmd.GetPos(cmd.Seq);
-            if (adjustPos != null) player.position.Value = adjustPos.Value;
+           
+            if ( player.latestAdjustCmd.HasPos()) player.position.Value =  player.latestAdjustCmd.GetPos(cmd.Seq);
         }
 
         private MoveType GetPlayerMoveType(PlayerEntity player)
@@ -144,7 +147,7 @@ namespace App.Shared.GameModules.Player
             uploadComponent.IsGround = player.playerMove.IsGround;
             uploadComponent.IsCollided = player.playerMove.IsCollided;
             uploadComponent.MoveInWater = player.stateInterface.State.IsMoveInWater();
-            uploadComponent.ExceedSteepLimit = player.stateInterface.State.IsSteepSlope();
+            uploadComponent.TanSteepAngle = player.stateInterface.State.GetSteepAngle();
             uploadComponent.Velocity = player.playerMove.Velocity;
             uploadComponent.Rotation = player.RootGo().transform.eulerAngles;
             uploadComponent.ModelPitch = player.orientation.ModelPitch;
@@ -172,7 +175,7 @@ namespace App.Shared.GameModules.Player
         {
             MoveUpdateComponent updateComponent = player.moveUpdate;
             player.position.Value = pos;
-            updateComponent.Dist = player.position.Value - updateComponent.LastPosition;
+            updateComponent.Dist = player.position.Value - updateComponent.LastPosition.ShiftedVector3();
         }
 
         /// <summary>

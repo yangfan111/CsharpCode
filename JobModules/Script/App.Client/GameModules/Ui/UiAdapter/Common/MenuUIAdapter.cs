@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using App.Client.GameModules.Ui.UiAdapter;
+using App.Shared.Components.Player;
 using App.Shared.Components.Ui;
 using UnityEngine;
 using UserInputManager.Lib;
@@ -65,6 +66,14 @@ namespace App.Client.GameModules.Ui.UiAdapter
         public void ShowNoticeWindow(string title, Action yesCallback, Action noCallback, string yesText, string noText)
         {
             _contexts.ui.uI.ShowNoticeWindow(NoticeWindowStyle.YESNO, title, yesCallback, noCallback, yesText, noText, 0, null);
+        }
+
+        public GamePlayComponent gamePlay
+        {
+            get
+            {
+                return _contexts.player.flagSelfEntity.gamePlay;
+            }
         }
     }
 }

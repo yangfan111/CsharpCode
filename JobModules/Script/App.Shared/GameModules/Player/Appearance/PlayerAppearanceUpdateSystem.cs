@@ -22,8 +22,11 @@ namespace App.Shared.GameModules.Player.Appearance
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
-            var player = owner.OwnerEntity as PlayerEntity;
-            CheckPlayerLifeState(player);
+            PlayerEntity player = owner.OwnerEntity as PlayerEntity;
+            if (player.gamePlay.IsLifeState(EPlayerLifeState.Dead))
+            {
+                return;
+            }
             AppearanceUpdate(player);
         }
 
@@ -33,53 +36,12 @@ namespace App.Shared.GameModules.Player.Appearance
             
             appearance.SyncLatestFrom(player.latestAppearance);
             appearance.SyncPredictedFrom(player.predictedAppearance);
-            appearance.SyncClientFrom(player.clientAppearance);
             
             appearance.TryRewind();
             appearance.Execute();
             
             appearance.SyncLatestTo(player.latestAppearance);
             appearance.SyncPredictedTo(player.predictedAppearance);
-            appearance.SyncClientTo(player.clientAppearance);
         }
-
-        #region LifeState
-
-        private void CheckPlayerLifeState(PlayerEntity player)
-        {
-            if (null == player || null == player.playerGameState) return;
-            var gameState = player.playerGameState;
-            switch (gameState.CurrentPlayerLifeState)
-            {
-                case PlayerLifeStateEnum.Reborn:
-                    Reborn(player);
-                    break;
-                case PlayerLifeStateEnum.Dead:
-                    Dead(player);
-                    break;
-            }
-        }
-
-        private void Reborn(PlayerEntity player)
-        {
-            if (null == player) return;
-            var appearance = player.appearanceInterface.Appearance;
-            if (null == appearance) return;
-            appearance.PlayerReborn();
-            
-            Logger.InfoFormat("AppearancePlayerReborn");
-        }
-        
-        private void Dead(PlayerEntity player)
-        {
-            if (null == player) return;
-            var appearance = player.appearanceInterface.Appearance;
-            if (null == appearance) return;
-            appearance.PlayerDead();
-            
-            Logger.InfoFormat("AppearancePlayerDead");
-        }
-
-        #endregion
     }
 }

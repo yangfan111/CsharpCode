@@ -7,6 +7,7 @@ using Core.Utils;
 using Entitas;
 using Object = UnityEngine.Object;
 using UnityEngine;
+using App.Client.ClientSystems;
 
 namespace App.Client.GameModules.ClientEffect
 {
@@ -41,6 +42,15 @@ namespace App.Client.GameModules.ClientEffect
                     ClientEffectLogicFactory.CreateEffectLogic(entity.effectType.Value, _contexts,
                         entity.effectId.Value);
             }
+            else if (entity.hasSprayPaint)
+            {
+                /*喷漆*/
+                Vector3 position = entity.sprayPaint.SprayPaintPos;
+                Vector3 forward = entity.sprayPaint.SprayPaintForward;
+                Vector3 debugSize = entity.sprayPaint.SprayPrintSize;
+                PlayerSprayPaintUtility.CreateSprayPaint(_contexts, debugSize, position, forward);
+                return;
+            }
             else
             {
                 effectLogic = ClientEffectLogicFactory.CreateEffectLogic(entity.effectType.Value, _contexts);
@@ -53,7 +63,7 @@ namespace App.Client.GameModules.ClientEffect
             }
            
             entity.AddLogic(effectLogic);
-            entity.AddAssets(false, false);
+            //entity.AddAssets(false, false);
 
             if (null == effectLogic.AssetInfos)
             {

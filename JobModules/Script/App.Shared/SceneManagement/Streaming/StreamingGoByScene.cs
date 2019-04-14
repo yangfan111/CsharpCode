@@ -47,9 +47,10 @@ namespace App.Shared.SceneManagement.Streaming
                     _streamingResourceHandler.LoadGo(sceneIndex, i);
                 }
                 
-                var go = new GameObject("StreamingRoot");
-                SceneManager.MoveGameObjectToScene(go, scene);
-                _goRoot.Add(sceneIndex, go);
+//                var go = new GameObject("StreamingRoot");
+//                SceneManager.MoveGameObjectToScene(go, scene);
+//                _goRoot.Add(sceneIndex, go);
+                _goRoot.Add(sceneIndex, DefaultGo.StreamingRoot);
             }
         }
 

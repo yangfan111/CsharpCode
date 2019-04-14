@@ -13,18 +13,23 @@ namespace Core.CharacterController
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(UnityCharacterController));
         protected static readonly float CastDistance = 0.05f;
         protected UnityEngine.CharacterController _controller;
+        protected CapsuleCollider _capsuleCollider;
         private BaseGroundDetection _groundDetection;
         private float _referenceCastDistance;
         private bool _slideOnSteepSlope = true;
+        private bool _isUseCapsuleCollider = false;
         /// <summary>
         /// Is the character sliding off a steep slope?
         /// </summary>
 
         public bool isSliding { get; private set; }
 
-        public UnityCharacterController(UnityEngine.CharacterController controller)
+        public UnityCharacterController(UnityEngine.CharacterController controller, bool isUseCapsuleCollider = false)
         {
             _controller = controller;
+            _capsuleCollider = controller.gameObject.GetComponent<CapsuleCollider>();
+            _isUseCapsuleCollider = isUseCapsuleCollider;
+            AssertUtility.Assert(_capsuleCollider != null);
             InitGroundDetection();
         }
 
@@ -118,8 +123,27 @@ namespace Core.CharacterController
 
         public virtual bool enabled
         {
-            get { return _controller.enabled; }
-            set { _controller.enabled = value; }
+            get
+            {
+                if (_isUseCapsuleCollider)
+                {
+                    return _capsuleCollider.enabled;
+                }
+
+                return _controller.enabled;
+            }
+            set
+            {
+                if (_isUseCapsuleCollider)
+                {
+                    _controller.enabled = false;
+                    _capsuleCollider.enabled = value;
+                }
+                else
+                {
+                    _controller.enabled = value;
+                }
+            }
         }
 
         public bool isGrounded
@@ -168,6 +192,12 @@ namespace Core.CharacterController
             //_groundDetection.groundMask = UnityLayers.SceneCollidableLayerMask;
             _referenceCastDistance = CastDistance;
             _groundDetection.OnValidate();
+            
+            _capsuleCollider.direction = 1;
+            _capsuleCollider.radius = radius;
+            _capsuleCollider.center = center;
+            _capsuleCollider.height = height;
+            //Logger.InfoFormat("_capsuleCollider direction:{0}, radius:{1}, center:{2}, orcenter:{3}", _capsuleCollider.direction, _capsuleCollider.radius,  _capsuleCollider.center, center);
         }
 
         public CollisionFlags collisionFlags

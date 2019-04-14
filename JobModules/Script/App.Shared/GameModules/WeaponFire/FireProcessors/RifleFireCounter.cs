@@ -11,10 +11,8 @@
 
         public void OnIdle(PlayerWeaponController controller, IWeaponCmd cmd)
         {
-
             var config = controller.HeldWeaponAgent.RifleFireCounterCfg;
-            if (config == null)
-                return;
+            if (config == null) return;
             var weaponState = controller.HeldWeaponAgent.RunTimeComponent;
             if (weaponState.ContinuesShootDecreaseNeeded)
             {
@@ -31,16 +29,20 @@
                 weaponState.ContinuesShootDecreaseTimer = controller.RelatedTime + config.DecreaseStepInterval;
                 weaponState.ContinuesShootCount--;
             }
-            else if (weaponState.ContinuesShootCount == 0)
-            {
-            }
         }
 
         public void OnBeforeFire(PlayerWeaponController controller, IWeaponCmd cmd)
         {
             var weaponState = controller.HeldWeaponAgent.RunTimeComponent;
             weaponState.ContinuesShootDecreaseNeeded = true;
-            weaponState.ContinuesShootCount++;
+            if (weaponState.ContinuesShootCount >= controller.HeldWeaponAgent.RifleFireCounterCfg.MaxCount)
+            {
+                weaponState.ContinuesShootCount = controller.HeldWeaponAgent.RifleFireCounterCfg.MaxCount;
+            }
+            else
+            {
+                weaponState.ContinuesShootCount++;
+            }
         }
     }
 }

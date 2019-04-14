@@ -1,9 +1,11 @@
 using App.Client.GameModules.Ui.UiAdapter.Interface;
 using App.Client.GameModules.Ui.ViewModels.Common;
+using Assets.App.Client.GameModules.Ui;
 using Assets.UiFramework.Libs;
 using Core.Enums;
 using Core.GameModule.Interface;
 using Core.Utils;
+using UnityEngine;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {
@@ -30,10 +32,18 @@ namespace App.Client.GameModules.Ui.Models.Common
             InitVariable();
         }
 
-
+        Transform AnimeRoot;
         private void InitVariable()
         {
-
+            AnimeRoot = FindChildGo("RoundGroup");
+            if (AnimeRoot != null)
+            {
+                Loader.LoadAsync(AssetBundleConstant.Effect, "huihejieshu", (obj) =>
+                {
+                    GameObject go = obj as GameObject;
+                    go.transform.SetParent(AnimeRoot, false);
+                });
+            }
         }
 
 

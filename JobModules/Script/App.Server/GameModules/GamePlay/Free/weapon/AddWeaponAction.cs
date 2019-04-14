@@ -16,7 +16,9 @@ using Core.Free;
 using XmlConfig;
 using Assets.App.Server.GameModules.GamePlay.Free;
 using App.Shared.GameModules.Weapon;
+using Assets.Utils.Configuration;
 using Core.Utils;
+using Utils.Singleton;
 
 namespace App.Server.GameModules.GamePlay.Free.weapon
 {
@@ -29,6 +31,8 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
 
         private string weaponId;
 
+        private string fullAmmo;
+
         public override void DoAction(IEventArgs args)
         {
             FreeRuleEventArgs fr = (FreeRuleEventArgs)args;
@@ -38,36 +42,33 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
             if (unit != null)
             {
                 PlayerEntity p = ((FreeData)unit).Player;
-
-
+                
                 int itemId = FreeUtil.ReplaceInt(weaponId, args);
-
                 int index = FreeUtil.ReplaceInt(weaponKey, args);
-
                 EWeaponSlotType st = FreeWeaponUtil.GetSlotType(index);
 
-                Debug.LogFormat("add weapon: " + itemId + "," + index);
-                Logger.Debug("add weapon to team " + p.playerInfo.Camp + " player " + p.playerInfo.PlayerName);
-
                 SimpleProto message = new SimpleProto();
+                var scan = WeaponUtil.CreateScan(itemId);
+                if (FreeUtil.ReplaceBool(fullAmmo, args))
+                {
+                    var weaponAllConfig = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(itemId);
+                    scan.Bullet = weaponAllConfig.PropertyCfg.Bullet;
+                    scan.ReservedBullet = weaponAllConfig.PropertyCfg.Bulletmax;
+                }
                 if (index == 0)
                 {
-                    p.WeaponController().PickUpWeapon(WeaponUtil.CreateScan(itemId));
-                    //p.bag.Bag.SetWeaponBullet(30);
-                    //p.bag.Bag.SetReservedCount(100);
+                    p.WeaponController().PickUpWeapon(scan);
                 }
                 else
                 {
-                    p.WeaponController().ReplaceWeaponToSlot(st, WeaponUtil.CreateScan(itemId));
-
+                    p.WeaponController().ReplaceWeaponToSlot(st, scan);
                     if (p.stateInterface.State.CanDraw() && p.WeaponController().HeldSlotType == EWeaponSlotType.None)
                     {
-                        p.WeaponController().TryArmWeapon(st);
+                        p.WeaponController().TryArmWeaponImmediately(st);
                     }
-
-                    //SwitchWeaponAction.WeaponToHand(p, st);
                 }
 
+                
                 message.Ins.Add(itemId);
                 if (index > 0)
                 {

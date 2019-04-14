@@ -111,7 +111,7 @@ namespace Core.Fsm
             {
                 _currentState.DoBeforeLeaving(addOutput);
                 _currentState = _states[id];
-                Logger.DebugFormat("{0}: Source: {1} TargetId: {2}", _name, msg, id);
+                Logger.InfoFormat("{0}: Source: {1} TargetId: {2}", _name, msg, id);
                 _currentState.DoBeforeEntering(command, addOutput);
 
                 _currentStateChanged = true;

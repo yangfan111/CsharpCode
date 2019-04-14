@@ -2,6 +2,7 @@
 using App.Shared.GameModules.Player;
 using App.Shared.GameModules.Vehicle;
 using App.Shared.GameModules.Vehicle.WheelCarrier;
+using Assets.App.Client.GameModules.Ui;
 using Utils.AssetManager;
 using Core.Prediction.VehiclePrediction.Cmd;
 using Core.Utils;
@@ -163,7 +164,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
                 var vehicle = GetCurrentVehicle();
                 var curId = vehicle.vehicleAssetInfo.Id;
-                AssetInfo assetInfo = new AssetInfo("uiprefabs/carry", "CarryTopView" + curId);
+                AssetInfo assetInfo = new AssetInfo(AssetBundleConstant.UiPrefab_Carry, "CarryTopView" + curId);
                 return assetInfo;
             }
         }

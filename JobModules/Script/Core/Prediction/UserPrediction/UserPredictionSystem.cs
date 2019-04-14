@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Core.GameInputFilter;
+using Core;
 using Core.GameModule.Interface;
 using Core.GameModule.Module;
 using Core.GameModule.System;
@@ -18,22 +18,21 @@ namespace Core.Prediction.UserPrediction
         private IUserCmd _currentCmd;
         private IPredictionInitManager _predictionInitManager;
         private IPredictionExecuteInfoProvider _predicatoinInfoProvider;
-        private IGameStateProcessorFactory _gameStateProcessorFactory;
-        private IStateProviderPool _stateProviderPool;
-        private IStatePool _statePool;
+//        private PlayerStateCollectorPool _gameStateProcessorFactory;
+//        private IStateProviderPool _stateProviderPool;
+//        private IPlayerStateMap _playerStateMap;
 
         public UserPredictionSystem(IGameModule gameModule, 
             IPredictionExecuteInfoProvider handler, 
-            IPredictionInitManager predictionInitManager,
-            IGameStateProcessorFactory gameStateProcessorFactory)
+            IPredictionInitManager predictionInitManager)
         {
             _logger.Info("start");
             _predicatoinInfoProvider = handler;
             _predictionInitManager = predictionInitManager;
             _systems = gameModule.UserCmdExecuteSystems;
-            _gameStateProcessorFactory = gameStateProcessorFactory;
-            _stateProviderPool = gameStateProcessorFactory.GetProviderPool();
-            _statePool = gameStateProcessorFactory.GetStatePool();
+//            _gameStateProcessorFactory = gameStateProcessorFactory;
+//            _stateProviderPool = gameStateProcessorFactory.GetProviderPool();
+//            _playerStateMap = gameStateProcessorFactory.GetStatePool();
             Init();
         }
 
@@ -68,7 +67,7 @@ namespace Core.Prediction.UserPrediction
                     if (_currentCmd.Seq > owner.LastCmdSeq)
                     {
                         //过滤输入状态
-                        cmd.FilteredInput = owner.Filter(cmd);
+                        cmd.FilteredInput = owner.GetFiltedInput(cmd);
                         if (_logger.IsDebugEnabled)
                         {
                             _logger.DebugFormat("processing user cmd {0}", cmd.ToString());

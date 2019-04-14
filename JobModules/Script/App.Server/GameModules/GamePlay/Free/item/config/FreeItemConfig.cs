@@ -221,6 +221,7 @@ namespace App.Server.GameModules.GamePlay.Free.item.config
                     Utils.AssetManager.AssetInfo asset = SingletonManager.Get<WeaponAvatarConfigManager>().GetIcon(item.AvatorId);
                     FreeItemInfo itemInfo = new FreeItemInfo((int)ECategory.Weapon, item.Id, ((int)ECategory.Weapon * 10000 + item.Id).ToString(),
                         item.Name, "weapon", "w" + item.Type.ToString(), "", asset.BundleName + "/" + asset.AssetName, asset.BundleName + "/" + asset.AssetName, 0);
+                    itemInfo.weight = item.Weight;
                     list.Add(itemInfo);
                     AddToInfoDic(itemInfo);
                 }

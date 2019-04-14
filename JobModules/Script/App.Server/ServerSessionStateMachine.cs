@@ -49,7 +49,7 @@ namespace App.Server
             var gameModule = new CompositeGameModule();
             var contexts = contexts1 as Contexts;
             gameModule.AddModule(new ServerInitModule(contexts, this));
-            
+           
             var feature = new Feature("ServerLoadConfigurationState");
             feature.Add( new ServerPrepareFeature("loadConfig", gameModule, contexts.session.commonSession.AssetManager));
             feature.Add(new BaseConfigurationInitModule(this, contexts.session.commonSession.AssetManager));
@@ -90,10 +90,12 @@ namespace App.Server
             loadSceneSystem.AsapMode = true;
             gameModule.AddSystem(loadSceneSystem);
             gameModule.AddSystem(new InitTriggerObjectManagerSystem(contexts));
-
+           
             gameModule.AddSystem(new ServerScenePostprocessorSystem(contexts.session.commonSession));
             //gameModule.AddModule(new ResourcePreloadModule(this));
+            
             var featrue = new ServerPrepareFeature("loadMapConfig", gameModule, contexts.session.commonSession.AssetManager);
+            featrue.Add(new MapConfigInitModule(contexts, this));
             return featrue;
         }
 
@@ -223,14 +225,20 @@ namespace App.Server
     public class ServerSessionStateMachine : SessionStateMachine
     {
         public ServerSessionStateMachine(Contexts contexts, ServerRoom room):
-            base(new ServerSessionStateMachineMonitor(contexts, room))
+            base(new ServerSessionStateMachineMonitor(room))
         {
-            AddState(new ServerLoadConfigurationState(contexts, EServerSessionStates.LoadConfig, EServerSessionStates.LoadSubResourceConfig));
+            BackroundloadSettings defaultSettings = BackroundloadSettings.GetCurrentSettings();
+            AddState(new ServerLoadConfigurationState(contexts, EServerSessionStates.LoadConfig, EServerSessionStates.LoadSubResourceConfig)
+                .WithEnterAction(() => { BackroundloadSettings.SetCurrentSettings(BackroundloadSettings.LoadSettsings);})
+            );
             AddState(new ServerLoadSubResourceState(contexts, EServerSessionStates.LoadSubResourceConfig, EServerSessionStates.PreLoad));
             AddState(new ServerPreLoadState(contexts, EServerSessionStates.PreLoad, EServerSessionStates.LoadSceneMapConfig));
             AddState(new ServerLoadMapConfigState(contexts, EServerSessionStates.LoadSceneMapConfig, EServerSessionStates.Gaming));
-            AddState(new GameSessionState(contexts, room, EServerSessionStates.Gaming, EServerSessionStates.Gaming));
+            AddState(new GameSessionState(contexts, room, EServerSessionStates.Gaming, EServerSessionStates.Gaming)
+                .WithEnterAction(() => { BackroundloadSettings.SetCurrentSettings(defaultSettings);})
+            );
             Initialize((int) EServerSessionStates.LoadConfig);
         }
     }
+    
 }

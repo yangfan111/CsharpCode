@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -511,46 +512,66 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonWeaponHudView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonWeaponHudView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonWeaponHudView>();
+			DataInit(view);
+			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
 			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
 
-            BindingSet<CommonWeaponHudView, CommonWeaponHudViewModel> bindingSet =
+        }
+		private void EventTriggerBind(CommonWeaponHudView view)
+		{
+		}
+
+        private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
+        private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
+
+        static CommonWeaponHudViewModel()
+        {
+            Type type = typeof(CommonWeaponHudViewModel);
+            foreach (var property in type.GetProperties())
+            {
+                if (property.CanWrite)
+                {
+                    PropertySetter.Add(property.Name, property);
+                }
+            }
+			foreach (var methodInfo in type.GetMethods())
+            {
+                if (methodInfo.IsPublic)
+                {
+                    MethodSetter.Add(methodInfo.Name, methodInfo);
+                }
+            }
+        }
+
+		void ViewBind(CommonWeaponHudView view)
+		{
+		     BindingSet<CommonWeaponHudView, CommonWeaponHudViewModel> bindingSet =
                 view.CreateBindingSet<CommonWeaponHudView, CommonWeaponHudViewModel>();
-
-            view.oriShow = _show = view.Show.activeSelf;
             bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
-            view.oriWeaponGroupShow = _weaponGroupShow = view.WeaponGroupShow.activeSelf;
             bindingSet.Bind(view.WeaponGroupShow).For(v => v.activeSelf).To(vm => vm.WeaponGroupShow).OneWay();
-            view.oriWeaponModeShow = _weaponModeShow = view.WeaponModeShow.activeSelf;
             bindingSet.Bind(view.WeaponModeShow).For(v => v.activeSelf).To(vm => vm.WeaponModeShow).OneWay();
-            view.oriAtkModeShow = _atkModeShow = view.AtkModeShow.activeSelf;
             bindingSet.Bind(view.AtkModeShow).For(v => v.activeSelf).To(vm => vm.AtkModeShow).OneWay();
-            view.oriAtkModeString = _atkModeString = view.AtkModeString.text;
             bindingSet.Bind(view.AtkModeString).For(v => v.text).To(vm => vm.AtkModeString).OneWay();
-            view.oriBulletCountShow = _bulletCountShow = view.BulletCountShow.activeSelf;
             bindingSet.Bind(view.BulletCountShow).For(v => v.activeSelf).To(vm => vm.BulletCountShow).OneWay();
-            view.oriBulletCountString = _bulletCountString = view.BulletCountString.text;
             bindingSet.Bind(view.BulletCountString).For(v => v.text).To(vm => vm.BulletCountString).OneWay();
-            view.oriBulletCountColor = _bulletCountColor = view.BulletCountColor.color;
             bindingSet.Bind(view.BulletCountColor).For(v => v.color).To(vm => vm.BulletCountColor).OneWay();
-            view.oriBulletAlapha = _bulletAlapha = view.BulletAlapha.alpha;
             bindingSet.Bind(view.BulletAlapha).For(v => v.alpha).To(vm => vm.BulletAlapha).OneWay();
-            view.oriBulletScale = _bulletScale = view.BulletScale.localScale;
             bindingSet.Bind(view.BulletScale).For(v => v.localScale).To(vm => vm.BulletScale).OneWay();
-            view.oriReservedBulletCountShow = _reservedBulletCountShow = view.ReservedBulletCountShow.activeSelf;
             bindingSet.Bind(view.ReservedBulletCountShow).For(v => v.activeSelf).To(vm => vm.ReservedBulletCountShow).OneWay();
-            view.oriReservedBulletCountString = _reservedBulletCountString = view.ReservedBulletCountString.text;
             bindingSet.Bind(view.ReservedBulletCountString).For(v => v.text).To(vm => vm.ReservedBulletCountString).OneWay();
             bindingSet.Bind(view.WeaponSlotShow1).For(v => v.activeSelf).To(vm => vm.WeaponSlotShow1).OneWay();
             bindingSet.Bind(view.WeaponSlotScale1).For(v => v.localScale).To(vm => vm.WeaponSlotScale1).OneWay();
@@ -604,36 +625,45 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             bindingSet.Bind(view.GrenadeIconScale3).For(v => v.localScale).To(vm => vm.GrenadeIconScale3).OneWay();
             bindingSet.Bind(view.GrenadeIconSprite4).For(v => v.sprite).To(vm => vm.GrenadeIconSprite4).OneWay();
             bindingSet.Bind(view.GrenadeIconScale4).For(v => v.localScale).To(vm => vm.GrenadeIconScale4).OneWay();
-            bindingSet.Build();
+		
+			bindingSet.Build();
+		}
 
-			SpriteReset();
-        }
-		private void EventTriggerBind(CommonWeaponHudView view)
+		void DataInit(CommonWeaponHudView view)
 		{
+            _show = view.Show.activeSelf;
+            _weaponGroupShow = view.WeaponGroupShow.activeSelf;
+            _weaponModeShow = view.WeaponModeShow.activeSelf;
+            _atkModeShow = view.AtkModeShow.activeSelf;
+            _atkModeString = view.AtkModeString.text;
+            _bulletCountShow = view.BulletCountShow.activeSelf;
+            _bulletCountString = view.BulletCountString.text;
+            _bulletCountColor = view.BulletCountColor.color;
+            _bulletAlapha = view.BulletAlapha.alpha;
+            _bulletScale = view.BulletScale.localScale;
+            _reservedBulletCountShow = view.ReservedBulletCountShow.activeSelf;
+            _reservedBulletCountString = view.ReservedBulletCountString.text;
 		}
 
 
-        private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
-        private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
+		void SaveOriData(CommonWeaponHudView view)
+		{
+            view.oriShow = _show;
+            view.oriWeaponGroupShow = _weaponGroupShow;
+            view.oriWeaponModeShow = _weaponModeShow;
+            view.oriAtkModeShow = _atkModeShow;
+            view.oriAtkModeString = _atkModeString;
+            view.oriBulletCountShow = _bulletCountShow;
+            view.oriBulletCountString = _bulletCountString;
+            view.oriBulletCountColor = _bulletCountColor;
+            view.oriBulletAlapha = _bulletAlapha;
+            view.oriBulletScale = _bulletScale;
+            view.oriReservedBulletCountShow = _reservedBulletCountShow;
+            view.oriReservedBulletCountString = _reservedBulletCountString;
+		}
 
-        static CommonWeaponHudViewModel()
-        {
-            Type type = typeof(CommonWeaponHudViewModel);
-            foreach (var property in type.GetProperties())
-            {
-                if (property.CanWrite)
-                {
-                    PropertySetter.Add(property.Name, property);
-                }
-            }
-			foreach (var methodInfo in type.GetMethods())
-            {
-                if (methodInfo.IsPublic)
-                {
-                    MethodSetter.Add(methodInfo.Name, methodInfo);
-                }
-            }
-        }
+
+
 
 		private void SpriteReset()
 		{
@@ -649,6 +679,10 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			Show = _view.oriShow;
 			WeaponGroupShow = _view.oriWeaponGroupShow;
 			WeaponModeShow = _view.oriWeaponModeShow;
@@ -1175,7 +1209,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
         		return default(Vector3);
         	}
         }
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonWeaponHud"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

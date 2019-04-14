@@ -65,7 +65,7 @@ namespace App.Shared.GameModules.Vehicle
             var controlledVehicle = playerEntity.controlledVehicle;
             if (controlledVehicle.IsLocalOnVehicle)
             {
-                //the player is dead, ride off vehicle
+                //the player is dead, ride off vehicle 
                 if (!playerEntity.gamePlay.IsLifeState(EPlayerLifeState.Alive))
                     return true;
 
@@ -99,6 +99,7 @@ namespace App.Shared.GameModules.Vehicle
                 }
                 if (vehicle != null)
                 {
+                    
                     var preferedSeat = seatId;
                     if (!vehicle.vehicleSeat.IsOccupied(seatId))
                     {
@@ -286,7 +287,7 @@ namespace App.Shared.GameModules.Vehicle
             {
                 
                 var radius = playerEntity.characterContoller.Value.radius;
-                resolved = VehicleEntityUtility.GetRideOffPosition(playerEntity, vehicleEntity, direction, out position, 0.3f, radius * 2);
+                resolved = VehicleEntityUtility.GetRideOffPosition(playerEntity, vehicleEntity, direction, out position, 0.3f, radius * 3);
                 playerEntity.moveUpdate.VehicleRideOffOffset = position;
             }
 

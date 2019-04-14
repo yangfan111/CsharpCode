@@ -6,6 +6,7 @@ using App.Shared.Components.Player;
 using App.Shared.Configuration;
 using App.Shared.Player;
 using Core.CameraControl;
+using Core.Components;
 using Core.Configuration;
 using Core.HitBox;
 using Core.Prediction.UserPrediction.Cmd;
@@ -162,8 +163,6 @@ namespace App.Shared.GameModules.Player
             {
                 _logger.Warn("Sky Start State is not valid.");
                 PlayerSkyMoveUtility.DetachParachute(contexts, player);
-//                player.playerSkyMove.MoveStage = (int) SkyMoveStage.Parachuting;
-//                return false;
             }
             return true;
         }
@@ -269,41 +268,29 @@ namespace App.Shared.GameModules.Player
         protected Vector3 SkyMove(Vector3 originAngles, PlayerEntity player, bool isGliding, Vector3 forwardMove, Vector3 rightMove, float deltaTime,
            out Vector3 newAngles)
         {
-            // _logger.ErrorFormat("pos {0} rot {1} velocity {2} ", syncTransform.position.ToString("f10"),
-            //     syncTransform.eulerAngles.ToString("f10"), playerMove.Velocity.ToString("f10"));
             //calc player rotationa
             var playerSkyMove = player.playerSkyMove;
             newAngles = CalcSkyMovePlayerRotation(ref originAngles, isGliding,
                 forwardMove, rightMove, deltaTime);
 
-            //_logger.ErrorFormat("Angles is {0}, original angles is {1}", angles.ToString("f10"), originAngles.ToString("f10"));
             //calc Vertical velocity
             var playerMove = player.playerMove;
             var originVerticalVelocity = new Vector2(playerSkyMove.ExtraVerticalVelocity, playerMove.Velocity.y);
             var verticalVelocity = CalcSkyMoveVerticalVelocity(originVerticalVelocity, newAngles, forwardMove, deltaTime);
             playerSkyMove.ExtraVerticalVelocity = verticalVelocity.x;
 
-            //            //_logger.ErrorFormat("verticalVelocity is {0}", verticalVelocity.ToString("f10"));
-            //            //calc Horizontal velocity
-            //            syncTransform.localEulerAngles = angles;
+            //calc Horizontal velocity
             float newSwingVelocity;
             var horizontalVelocity = CalcSkyMoveHorizontalVelocity(isGliding, originAngles, newAngles,
                 playerMove.Velocity, playerSkyMove.SwingVelocity, verticalVelocity.y,
                  forwardMove, rightMove, deltaTime, out newSwingVelocity);
             playerSkyMove.SwingVelocity = newSwingVelocity;
 
-            // _logger.ErrorFormat("horizontalVelocity is {0}", verticalVelocity.ToString("f10"));
             //calc compound velocity
             var compoundVelocity = horizontalVelocity;
             compoundVelocity.y = verticalVelocity.y;
             return compoundVelocity;
 
-            //            Debug.LogForma`t("angle from {0} to {1} , velocity H {2}, V {3}, D {4}",
-            //                originAngles.ToString("f8"),
-            //                angles.ToString("f8"),
-            //                Mathf.Sqrt(compoundVelocity.x * compoundVelocity.x + compoundVelocity.z * compoundVelocity.z),
-            //                compoundVelocity.y,
-            //                compoundVelocity.ToString("f8"));
         }
 
         private Vector3 CalcSkyMovePlayerRotation(ref Vector3 originAngles, bool isGliding,
@@ -358,7 +345,6 @@ namespace App.Shared.GameModules.Player
             }
             
             targetPitch += IdlePitchAngle;
-           // Debug.LogFormat("targetpitch is {0} {1}", targetPitch, originAngles.x);
 
             var ptichSpeedFrac = (originAngles.x <= IdlePitchAngle ? Mathf.Abs(pitchUpAngle) : Mathf.Abs(pitchDownAngle)) /
                              (Mathf.Abs(pitchUpAngle) + Mathf.Abs(pitchDownAngle));
@@ -449,8 +435,6 @@ namespace App.Shared.GameModules.Player
                 targetHorizontalForwardVelocity = Mathf.Abs(targetVerticalVelocity * Mathf.Tan(IdlePitchAngle * Mathf.Deg2Rad));
             }
 
-            //Debug.LogWarningFormat("Target Angle x {0} VVel {1} HVel {2}", targetAngles.x, targetVerticalVelocity, targetHorizontalForwardVelocity);
-
             var targetHorizontalUpVehlocity = 0.0f;
             if (RollVelocityDamper > 0)
             {
@@ -472,7 +456,6 @@ namespace App.Shared.GameModules.Player
 
             var horizontalDamper = rightMove.sqrMagnitude > 0 ? HorizontalDamper : 1.0f;
             var targetHorizontalVelocity = (up * targetHorizontalUpVehlocity + forward * targetHorizontalForwardVelocity) * horizontalDamper;
-            //Debug.LogFormat("Horizontal Damper {0}", horizontalDamper);
 
             currentVelocity.y = 0;
             if (!currentSwingVelocity.Equals(0))
@@ -491,9 +474,6 @@ namespace App.Shared.GameModules.Player
             {
                 horizontalVelocity = maxHorizontalVelocity;
             }
-
-            //            Debug.LogFormat("F {0}, U {1} Final {2}, {3}, {4} Forward {5} currentVelocity {6}", targetHorizontalForwardVelocity, targetHorizontalUpVehlocity, horizontalVelocity, targetHorizontalVelocity.ToString("f10"),
-            //                maxPitchAngle, forward.ToString("f10"), currentVelocity.ToString("f10"));
 
             var velocity = horizontalVelocity * targetHorizontalVelocity.normalized;
             newSwingVelocity = 0.0f;
@@ -545,9 +525,6 @@ namespace App.Shared.GameModules.Player
             swingVelocity *= Mathf.Max(0.0f, 1 - SwingAirResistance * deltaTime);
             swingVelocity = Mathf.Clamp(swingVelocity, -MaxSwingVelocity, MaxSwingVelocity);
 
-            //Debug.LogFormat("Swing Velocity is {0}, forward {1}, acceleration {2} updot {3}, accelDamper {4}, deltaTime {5}", 
-             //   swingVelocity, forward, acceleration, updot, accelDamper, deltaTime);
-
             return swingVelocity;
 
         }
@@ -559,10 +536,6 @@ namespace App.Shared.GameModules.Player
 
         public override void Move(PlayerEntity player, float moveVertical, float moveHorizontal, float deltaTime)
         {
-//            if (player.playerSkyMove.IsWaitForAttach)
-//            {
-//                return;
-//            }
 
             Init();
 
@@ -653,8 +626,6 @@ namespace App.Shared.GameModules.Player
             {
                 _logger.Warn("Sky Gliding State is not valid.");
                 PlayerSkyMoveUtility.DetachParachute(contexts, player);
-//                player.playerSkyMove.MoveStage = (int) SkyMoveStage.Parachuting;
-//                return false;
             }
 
             return true;
@@ -744,18 +715,12 @@ namespace App.Shared.GameModules.Player
 
         public override void Move(PlayerEntity player, float moveVertical, float moveHorizontal, float deltaTime)
         {
-            //            if (player.stateInterface.State.GetActionState() == ActionInConfig.ParachutingOpen)
-            //            {
-            //                return;
-            //            }
             Init();
 
             var remainDeltaTime = player.playerSkyMove.RemainDeltaTime  + deltaTime;
             while (remainDeltaTime > StepTime)
             {
                 SyncPoseFromComponent(player);
-                // _logger.ErrorFormat("start pos {0} rot {1}, orot {2}", syncTransform.position.ToString("f10"), syncTransform.eulerAngles.ToString("f10"), eulerAngles.ToString("f10"));
-                //  Debug.LogFormat("PlayerPosition is {0}", player.characterGameObject.PlayerRoot.transform.position.ToString("f11"));
 
                 var syncTransform = player.playerSkyMove.Parachute;
 
@@ -868,10 +833,9 @@ namespace App.Shared.GameModules.Player
 
             if (hitted)
             {
-                // _logger.ErrorFormat("hitted!!!");
                 velocity = Vector3.zero;
             }
-            //_logger.InfoFormat("direction is {0} dist {1}, deltaTime is {2},vel is {3}", direction.ToString("f10"), distance, deltaTime, velocity.ToString("f10"));
+
             syncTransform.position += direction * distance;
             player.playerSkyMove.Velocity = velocity;
         }
@@ -942,7 +906,6 @@ namespace App.Shared.GameModules.Player
         {
             _logger.DebugFormat("SKyDive: Detach Parachute To Landing State");
 
-            var playerSkyMove = player.playerSkyMove;
             player.stateInterface.State.ParachutingEnd();
             PlayerSkyMoveUtility.DetachParachute(contexts, player);
         }
@@ -957,7 +920,7 @@ namespace App.Shared.GameModules.Player
         private void SyncPoseFromComponent(PlayerEntity player)
         {
             var syncTransform = player.playerSkyMove.Parachute.transform;
-            syncTransform.position = player.playerSkyMove.Position;
+            syncTransform.position = player.playerSkyMove.Position.ShiftedVector3();
             syncTransform.rotation = player.playerSkyMove.Rotation;
             player.playerMove.Velocity = player.playerSkyMove.Velocity;
             var playerSyncTransform = player.RootGo().transform;
@@ -975,7 +938,7 @@ namespace App.Shared.GameModules.Player
             player.orientation.Roll = YawPitchUtility.Normalize(angles.z);
 
             var syncTransform = player.playerSkyMove.Parachute.transform;
-            player.playerSkyMove.Position = syncTransform.position;
+            player.playerSkyMove.Position = syncTransform.position.ShiftedToFixedVector3();
             player.playerSkyMove.Rotation = syncTransform.rotation;
         }
     }
@@ -1046,10 +1009,6 @@ namespace App.Shared.GameModules.Player
         {
             var velocity = player.playerMove.Velocity;
             velocity.x = velocity.z = 0.0f;
-            if (velocity.y >= -1.0f)
-            {
-                //player.gamePlay.GameState = GameState.Normal;
-            }
         }
 
         protected override bool ValidateState(Contexts contexts, PlayerEntity player)
@@ -1060,8 +1019,6 @@ namespace App.Shared.GameModules.Player
             {
                 _logger.Warn("Sky Landing State is not valid.");
                 PlayerSkyMoveUtility.DetachParachute(contexts, player);
-//                player.playerSkyMove.MoveStage = (int)SkyMoveStage.Parachuting;
-//                return false;
             }
 
             return true;

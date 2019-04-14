@@ -6,10 +6,12 @@ using System.IO;
 using System.Linq;
 using App.Shared.Components.Player;
 using App.Shared.Components.Serializer.FieldSerializer;
+using Core;
 using Core.Animation;
 using Core.CameraControl;
 using Core.CharacterState;
 using Core.CharacterState.Posture;
+using Core.Components;
 using Core.EntityComponent;
 using Core.Event;
 using Core.SnapshotReplication.Serialization.Serializer;
@@ -35,6 +37,7 @@ namespace App.Shared.Components.Serializer
         private static BoolSerializer _boolSerializer = new BoolSerializer();
         private static Vector2Serializer _vector2Serializer = new Vector2Serializer();
         private static Vector3Serializer _vector3Serializer = new Vector3Serializer();
+        private static FixedVector3Serializer _fixedVector3Serializer = new FixedVector3Serializer();
         private static QuaternionSerializer _quaternionSerializer = new QuaternionSerializer();
         private static EntityKeySerializer _entityKeySerializer = new EntityKeySerializer();
         private static StringSerializer _stringSerializer = new StringSerializer();
@@ -42,6 +45,7 @@ namespace App.Shared.Components.Serializer
         private static StateInterCommandsSerializer _stateInterCommandsSerializer = new StateInterCommandsSerializer();
         private static UnityAnimationEventCommandsSerializer _unityAnimationEventCommandsSerializer = new UnityAnimationEventCommandsSerializer();
         private static EventsSerializer _eventsSerializer = new EventsSerializer();
+        private static InterruptSerializer _interruptSerializer = new InterruptSerializer();
 
         private static void SendCompressedData(int sendTime, uint toSend, Core.Utils.MyBinaryWriter writer)
         {
@@ -444,7 +448,8 @@ namespace App.Shared.Components.Serializer
         public static List<int> Deserialize(List<int> list, BinaryReader reader)
         {
             int count = reader.ReadInt16();
-
+            if(list == null)
+                list = new List<int>();
             list.Clear();
             for (int i = 0; i < count; i++)
             {
@@ -731,9 +736,26 @@ namespace App.Shared.Components.Serializer
         {
             return _entityKeySerializer.Read(reader);
         }
+        public static InterruptData Deserialize(InterruptData typeTag, BinaryReader reader)
+        {
+            return _interruptSerializer.Read(reader);
+        }
         public static PlayerEvents Deserialize(PlayerEvents typeTag, BinaryReader reader)
         {
             return _eventsSerializer.Read(reader, typeTag);
+        }
+        public static void Serialize(InterruptData data, MyBinaryWriter writer , InterruptData last = default(InterruptData), bool weiteAll = false)
+        {
+            _interruptSerializer.Write(data, writer);
+        }
+        public static void Serialize(FixedVector3 typeTag, MyBinaryWriter writer, FixedVector3 last = default(FixedVector3), bool weiteAll = false)
+        {
+            _fixedVector3Serializer.Write(typeTag, writer);
+        }
+
+        public static FixedVector3 Deserialize(FixedVector3 typeTag, BinaryReader reader)
+        {
+           return  _fixedVector3Serializer.Read(reader);
         }
     }
 }

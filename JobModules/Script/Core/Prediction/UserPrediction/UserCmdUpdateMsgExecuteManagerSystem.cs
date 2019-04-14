@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Core.GameInputFilter;
+using Core;
 using Core.GameModule.Interface;
 using Core.GameModule.Module;
 using Core.GameModule.System;
@@ -72,7 +72,7 @@ namespace Core.Prediction.UserPrediction
                             _logger.DebugFormat("processing user cmd {0}", _currentCmd);
 
 
-                            userCmd.FilteredInput = owner.Filter(userCmd);
+                            userCmd.FilteredInput = owner.GetFiltedInput(userCmd);
                             // _logger.InfoFormat("{0} execute cmd {1} ", update.Head.UserCmdSeq, userCmd.Seq);
                             ExecuteSystems();
                             userCmd.FilteredInput = null;

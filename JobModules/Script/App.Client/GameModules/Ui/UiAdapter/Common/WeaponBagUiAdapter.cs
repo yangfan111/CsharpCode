@@ -5,6 +5,8 @@ using Assets.Utils.Configuration;
 using Core.Room;
 using Core.Utils;
 using System.Collections.Generic;
+using App.Shared.GameModules.Player;
+using App.Shared.Player;
 using UnityEngine;
 using UserInputManager.Lib;
 using Utils.Configuration;
@@ -158,32 +160,26 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 if (!WeaponController.CanSwitchWeaponBag)
                 {
                     _enable = false;
-                    if(IsReady())SetGunSightFlag(false);
+                    //if(IsReady()) WeaponController.InterruptGunSight = false ;
                 }
                 else
                 {
                     if (value)
                     {
                         _contexts.session.clientSessionObjects.UserCmdGenerator.SetUserCmd(cmd => cmd.IsInterrupt = true);
+                        
                     }
-                    if (IsReady()) SetGunSightFlag(value);
                     _enable = value;
                 }
+                if(_enable)
+                    PlayerStateUtil.AddUIState(EPlayerUIState.BagOpen,_contexts.player.flagSelfEntity.gamePlay);
+                else
+                    PlayerStateUtil.RemoveUIState(EPlayerUIState.BagOpen,_contexts.player.flagSelfEntity.gamePlay);
+                    
             }
         }
 
-        private void SetGunSightFlag(bool val)
-        {
-            if(val)
-            {
-                Controller.ForceInterruptGunSight |= (int)Shared.Components.Player.PlayerWeaponAuxiliaryComponent.InterruptReason.BagUI;
-            }
-            else
-            {
-                Controller.ForceInterruptGunSight &= ~(int)Shared.Components.Player.PlayerWeaponAuxiliaryComponent.InterruptReason.BagUI;
-            }
-        }
-
+       
         public int RemainOperating
         {
             get

@@ -15,7 +15,7 @@ namespace App.Shared.CommonResource
         private readonly IGroup<TEntity> _initializedGroup;
         private readonly Queue<RemoveAssetStatus> _oldResource;
         private readonly IGroup<TEntity> _uninitializedGroup;
-        private readonly AssetLoadOption _assetLoadOption = new AssetLoadOption(true, null, 0);
+        private readonly AssetLoadOption _assetLoadOption = new AssetLoadOption(true, null);
         private readonly IContexts _contexts;
         private IUnityAssetManager _loadRequestManager;
 

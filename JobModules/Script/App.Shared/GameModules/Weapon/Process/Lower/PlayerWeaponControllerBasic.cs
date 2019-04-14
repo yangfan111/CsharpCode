@@ -1,77 +1,59 @@
-﻿using App.Server.GameModules.GamePlay.free.player;
-using App.Shared.Audio;
+﻿using App.Shared.Audio;
 using App.Shared.Components.Player;
+
+using App.Shared.GameModules.Weapon;
+using App.Shared.Player;
 using App.Shared.Util;
 using Core;
-using Core.Appearance;
-using Core.CharacterBone;
-using Core.CharacterState;
-using Core.Common;
+
 using Core.EntityComponent;
-using Core.Event;
-using Core.Statistics;
-using Core.Utils;
-using Core.WeaponLogic.Throwing;
+
 using System;
 using System.Collections.Generic;
+using App.Shared.GameModules.Player;
 using Utils.Configuration;
 using Utils.Singleton;
-using Utils.Utils;
 using WeaponConfigNs;
 using XmlConfig;
 
-///     #region//service api
-//partial void DrawWeapon(EWeaponSlotType slot, bool includeAction = true);
-//public partial void TryArmWeapon(EWeaponSlotType slot);
-//public partial void UnArmHeldWeapon(Action onfinish);
-//public partial void ForceUnArmHeldWeapon();
-//public partial void DropWeapon(EWeaponSlotType slot);
-//public partial void RemoveWeapon(EWeaponSlotType slot, bool interrupt = true);
-//public partial bool AutoPickUpWeapon(WeaponScanStruct orient);
-//public partial EntityKey PickUpWeapon(WeaponScanStruct orient);
-//public partial void SwitchIn(EWeaponSlotType in_slot);
-//public partial void PureSwitchIn(EWeaponSlotType in_slot);
-//public partial void ExpendAfterAttack(EWeaponSlotType slot);
-//public partial bool ReplaceWeaponToSlot(EWeaponSlotType slotType, WeaponScanStruct orient);
-//public partial bool ReplaceWeaponToSlot(EWeaponSlotType slotType, WeaponScanStruct orient, bool vertify, out EntityKey lastKey);
-//public partial void Interrupt();
-//public partial void SetReservedBullet(int count);
-//public partial void SetReservedBullet(EWeaponSlotType slot, int count);
-//public partial int SetReservedBullet(EBulletCaliber caliber, int count);
-//public partial bool SetWeaponPart(EWeaponSlotType slot, int id);
-//public partial void DeleteWeaponPart(EWeaponSlotType slot, EWeaponPartType part);
-
-/// </summary>
 namespace App.Shared.GameModules.Weapon
 {
-    /// <summary>
-    /// Defines the <see cref="PlayerWeaponController" />
-    /// </summary>
-    public partial class PlayerWeaponController : ModuleLogicActivator<PlayerWeaponController>, IPlayerWeaponSharedGetter
-    {
 
+    public partial class PlayerWeaponController : ModuleLogicActivator<PlayerWeaponController>, IPlayerWeaponSharedGetter
+
+    {
         public GameModeControllerBase ModeController
         {
             get { return GameModuleManagement.Get<GameModeControllerBase>(Owner.EntityId); }
         }
+
+
         public PlayerAudioController AudioController
         {
             get { return GameModuleManagement.Get<PlayerAudioController>(Owner.EntityId); }
         }
+        public PlayerStateInteractController InteractController
+        {
+            get { return GameModuleManagement.Get<PlayerStateInteractController>(Owner.EntityId); }
+        }
+
         //  private readonly WeaponSlotsAux slotsAux;
-        private WeaponPlayerComponentsAgent weaponPlayerAgent;
+      
 
-        private readonly WeaponProcessUtil weaponProcessor;
+        private readonly WeaponProcessHelper processHelper;
 
-        private GrenadeCacheHelper grenadeHelper;
+        private GrenadeCacheHandler _grenadeHandler;
 
         private WeaponBaseAgent[] slotWeaponAgents;
 
-        public bool CanUseGrenade { get { return weaponPlayerAgent.CanUseGreande; } }
 
-        public IGrenadeCacheHelper GrenadeHelper { get { return grenadeHelper; } }
 
-       //     private readonly Dictionary<EWeaponSlotType, System.Type> weaponAgentAssTypeDict = new Dictionary<EWeaponSlotType, Type>();
+        public IGrenadeCacheHandler GrenadeHandler
+        {
+            get { return _grenadeHandler; }
+        }
+
+        //     private readonly Dictionary<EWeaponSlotType, System.Type> weaponAgentAssTypeDict = new Dictionary<EWeaponSlotType, Type>();
 
         /// <summary>
         /// 槽位武器监听事件
@@ -80,12 +62,14 @@ namespace App.Shared.GameModules.Weapon
         {
             if (slotWeaponAgents[(int)slotType] == null)
             {
-                var func1 = weaponPlayerAgent.GenerateBagWeaponKeyExtractor(slotType);
-                var func2 = weaponPlayerAgent.GenerateBagEmptyKeyExtractor();
+                
+                var func1 = GenerateBagWeaponKeyExtractor(slotType);
+                var func2 = GenerateBagEmptyKeyExtractor();
                 var newAgent = (WeaponBaseAgent)Activator.CreateInstance(t,
-                    func1, func2, slotType, grenadeHelper);
+                    func1, func2, slotType, _grenadeHandler);
                 slotWeaponAgents[(int)slotType] = newAgent;
             }
+
             return slotWeaponAgents[(int)slotType];
         }
 
@@ -100,9 +84,9 @@ namespace App.Shared.GameModules.Weapon
         //}
         public PlayerWeaponController()
         {
-            weaponProcessor = new WeaponProcessUtil(this);
+            processHelper = new WeaponProcessHelper(this);
             slotWeaponAgents = new WeaponBaseAgent[GlobalConst.WeaponSlotMaxLength];
-        
+            //     interruptUpdateHandler = new InterruptUpdateHandler(this);
         }
 
         private void OnDerivedTypeInstanceProcess(Type t)
@@ -112,17 +96,17 @@ namespace App.Shared.GameModules.Weapon
             foreach (Attribute attr in attributes)
             {
                 speciesAttr = attr as WeaponSpeciesAttribute;
-               CreateWeaponAgent(speciesAttr.slotType, t);
-              //  weaponAgentAssTypeDict.Add(speciesAttr.slotType, t);
+                CreateWeaponAgent(speciesAttr.slotType, t);
+                //  weaponAgentAssTypeDict.Add(speciesAttr.slotType, t);
             }
         }
 
-        public void Initialize(EntityKey owner, WeaponPlayerComponentsAgent agent, GrenadeCacheHelper helper)
+        public void Initialize(PlayerEntity entity, GrenadeCacheHandler handler)
         {
-            Owner = owner;
-            grenadeHelper = helper;
-            weaponPlayerAgent = agent;
+            SetEnity(entity);
+            _grenadeHandler = handler;
             CommonUtil.ProcessDerivedTypes(typeof(WeaponBaseAgent), true, (Type t) => OnDerivedTypeInstanceProcess(t));
+
             //  int modeBagLength = ModeController.GetUsableWeapnBagLength(RelatedPlayerInfo);
             ////多个背包共享一份投掷武器代理
             //if (modeBagLength > 1)
@@ -130,7 +114,6 @@ namespace App.Shared.GameModules.Weapon
             //    for (int i = 1; i < modeBagLength; i++)
             //        slotWeaponAgents[i, (int)EWeaponSlotType.ThrowingWeapon] = throwWeaponAgent;
             //}
-
         }
 
         public void ResetAllComponents()
@@ -142,7 +125,8 @@ namespace App.Shared.GameModules.Weapon
         public void ResetBagLockState()
         {
             BagLockState = false;
-            BagOpenLimitTIme = RelatedTime + SingletonManager.Get<GameModeConfigManager>().GetBagLimitTime(ModeController.ModeId);
+            BagOpenLimitTIme = RelatedTime +
+                               SingletonManager.Get<GameModeConfigManager>().GetBagLimitTime(ModeController.ModeId);
         }
 
 
@@ -150,13 +134,14 @@ namespace App.Shared.GameModules.Weapon
 
         public EntityKey EmptyWeaponKey
         {
-            get { return weaponPlayerAgent.Customize.EmptyConstWeaponkey; }
+            get { return RelatedCustomize.EmptyConstWeaponkey; }
         }
 
         public WeaponBaseAgent HeldWeaponAgent
         {
             get { return this[HeldSlotType]; }
         }
+
         public WeaponBaseAgent this[EWeaponSlotType slot]
         {
             get { return slotWeaponAgents[(int)slot]; }
@@ -173,17 +158,17 @@ namespace App.Shared.GameModules.Weapon
             else if (slotType == EWeaponSlotType.LastPointer) slotType = LastSlotType;
             return this[slotType];
         }
+
         public WeaponBaseAgent GetWeaponAgent(int configId)
         {
-            EWeaponSlotType slotType = weaponProcessor.GetMatchedSlot(configId);
+            EWeaponSlotType slotType = processHelper.GetMatchedSlotType(configId);
             return this[slotType];
-
         }
 
 
         public EWeaponSlotType HeldSlotType
         {
-            get { return (EWeaponSlotType)weaponPlayerAgent.BagSet.HeldSlotIndex; }
+            get { return (EWeaponSlotType)RelatedBagSet.HeldSlotIndex; }
         }
 
         public bool IsHeldSlotEmpty
@@ -193,10 +178,7 @@ namespace App.Shared.GameModules.Weapon
 
         public EWeaponSlotType LastSlotType
         {
-            get
-            {
-                return (EWeaponSlotType)weaponPlayerAgent.BagSet.LastSlotIndex;
-            }
+            get { return (EWeaponSlotType)RelatedBagSet.LastSlotIndex; }
         }
 
         public int HeldBagPointer
@@ -206,8 +188,8 @@ namespace App.Shared.GameModules.Weapon
 
         public int HeldBagPointer2
         {
-            get { return weaponPlayerAgent.BagSet.HeldBagPointer2; }
-            set { weaponPlayerAgent.BagSet.HeldBagPointer2 = value; }
+            get { return RelatedBagSet.HeldBagPointer2; }
+            set { RelatedBagSet.HeldBagPointer2 = value; }
         }
 
 
@@ -231,33 +213,39 @@ namespace App.Shared.GameModules.Weapon
                     return last;
                 }
             }
+
             for (EWeaponSlotType s = EWeaponSlotType.None + 1; s < EWeaponSlotType.Length; s++)
             {
                 if (!IsWeaponSlotEmpty(s))
                     return s;
             }
-            return EWeaponSlotType.None;
 
+            return EWeaponSlotType.None;
         }
-      
+
 
         public int BagOpenLimitTIme
         {
-            get { return weaponPlayerAgent.WeaponAux.BagOpenLimitTime; }
-            set { weaponPlayerAgent.WeaponAux.BagOpenLimitTime = value; }
+            get { return RelatedCustomize.BagOpenLimitTime; }
+            set { RelatedCustomize.BagOpenLimitTime = value; }
         }
 
         ///overridebag components
         public int OverrideBagTactic
         {
-            get { return weaponPlayerAgent.WeaponUpdate.TacticWeapon; }
-            set { weaponPlayerAgent.WeaponUpdate.TacticWeapon = value; }
+            get { return RelatedCustomize.TacticWeapon; }
+            set { RelatedCustomize.TacticWeapon = value; }
         }
 
         public bool BagLockState
         {
-            get { return weaponPlayerAgent.WeaponAux.BagLockState; }
-            set { weaponPlayerAgent.WeaponAux.BagLockState = value; }
+            get { return RelatedCustomize.BagLockState; }
+            set { RelatedCustomize.BagLockState = value; }
+        }
+        public int LastFireWeaponId
+        {
+            get { return RelatedCustomize.LastFireWeaponId; }
+            set { RelatedCustomize.LastFireWeaponId = value; }
         }
 
         public bool CanSwitchWeaponBag
@@ -265,128 +253,36 @@ namespace App.Shared.GameModules.Weapon
             get { return ModeController.CanModeSwitchBag && !BagLockState && (BagOpenLimitTIme > RelatedTime); }
         }
 
-//        public void PlayFireAudio()
-//        {
-//            if (!IsHeldSlotEmpty)
-//                GameAudioMedia.PlayWeaponAudio(HeldConfigId, RelatedAppearence.WeaponHandObject(), (config) => config.Fire);
-//        }
-//        public void PlayPullBoltAudio()
-//        {
-//            if (!IsHeldSlotEmpty)
-//                GameAudioMedia.PlayWeaponAudio(HeldConfigId, RelatedAppearence.WeaponHandObject(), (config) => config.PullBolt);
-//        }
-//        public void PlayReloadAudio()
-//        {
-//            if (!IsHeldSlotEmpty)
-//                GameAudioMedia.PlayWeaponAudio(HeldConfigId, RelatedAppearence.WeaponHandObject(), (config) => config.ReloadStart);
-//        }
-        public OrientationComponent RelatedOrient
+        //        public void PlayFireAudio()
+        //        {
+        //            if (!IsHeldSlotEmpty)
+        //                GameAudioMedia.PlayWeaponAudio(HeldConfigId, RelatedAppearence.WeaponHandObject(), (config) => config.Fire);
+        //        }
+        //        public void PlayPullBoltAudio()
+        //        {
+        //            if (!IsHeldSlotEmpty)
+        //                GameAudioMedia.PlayWeaponAudio(HeldConfigId, RelatedAppearence.WeaponHandObject(), (config) => config.PullBolt);
+        //        }
+        //        public void PlayReloadAudio()
+        //        {
+        //            if (!IsHeldSlotEmpty)
+        //                GameAudioMedia.PlayWeaponAudio(HeldConfigId, RelatedAppearence.WeaponHandObject(), (config) => config.ReloadStart);
+        //        }
+
+
+        public List<PlayerBulletData> BulletList
         {
-            get { return weaponPlayerAgent.RelatedOrient; }
+            get { return RelatedWeaponAux.BulletList; }
         }
 
-        public FirePosition RelatedFirePos
+        public List<EClientEffectType> EffectList
         {
-            get { return weaponPlayerAgent.RelatedFirePos; }
+            get { return RelatedWeaponAux.EffectList; }
         }
 
-        public int RelatedTime
-        {
-            get { return weaponPlayerAgent.RelatedTime; }
-        }
 
-        public CameraFinalOutputNewComponent RelatedCameraFinal
-        {
-            get { return weaponPlayerAgent.RelatedCameraFinal; }
-        }
 
-        public ThrowingActionInfo RelatedThrowActionInfo
-        {
-            get { return weaponPlayerAgent.RelatedThrowAction; }
-        }
 
-        public ICharacterState RelatedStateInterface
-        {
-            get { return weaponPlayerAgent.RelatedCharState; }
-        }
-
-        public ThrowingUpdateComponent RelatedThrowUpdate
-        {
-
-            get { return weaponPlayerAgent.RelatedThrowUpdate; }
-        }
-
-        public StatisticsData RelatedStatics
-        {
-            get { return weaponPlayerAgent.RelatedStatistics.Statistics; }
-        }
-
-        public CameraStateNewComponent RelatedCameraSNew
-        {
-            get { return weaponPlayerAgent.RelatedCameraSNew; }
-        }
-
-        public ICharacterAppearance RelatedAppearence
-        {
-            get { return weaponPlayerAgent.RelatedAappearence; }
-        }
-
-        public ICharacterBone RelatedBones
-        {
-            get { return weaponPlayerAgent.RelatedBones; }
-        }
-
-        public PlayerInfoComponent RelatedPlayerInfo
-        {
-            get { return weaponPlayerAgent.RelatedPlayerInfo; }
-        }
-
-        public PlayerMoveComponent RelatedPlayerMove
-        {
-            get { return weaponPlayerAgent.RelatedPlayerMove; }
-        }
-
-        public FreeData RelatedFreeData
-        {
-            get { return (FreeData)weaponPlayerAgent.RelatedFreeData; }
-        }
-
-        public PlayerEvents RelatedLocalEvents
-        {
-            get { return weaponPlayerAgent.RelatedLocalEvents; }
-        }
-
-        public PlayerWeaponAmmunitionComponent RelatedAmmunition
-        {
-            get { return weaponPlayerAgent.RelatedAmmunition; }
-        }
-
-        public void AddAuxEffect()
-        {
-            weaponPlayerAgent.AddAuxEffect();
-        }
-        public void AddAuxEffect(EClientEffectType effectType)
-        {
-            weaponPlayerAgent.AddAuxEffect(effectType);
-        }
-        public void AddAuxBullet()
-        {
-            weaponPlayerAgent.AddAuxBullet();
-        }
-        public void  AddAuxBullet(PlayerBulletData bulletData)
-        {
-            weaponPlayerAgent.AddAuxBullet(bulletData);
-        }
-        public int ForceInterruptGunSight { get { return weaponPlayerAgent.ForceInterruptGunSight; } set { weaponPlayerAgent.ForceInterruptGunSight = value; } }
-
-        public bool? AutoThrowing { get { return weaponPlayerAgent.AutoThrowing; }set { weaponPlayerAgent.AutoThrowing = value.Value; } }
-
-        public int? AutoFire
-        { get { return weaponPlayerAgent.AutoFire; } set { weaponPlayerAgent.AutoFire = value; } }
-
-        public List<PlayerBulletData> BulletList { get { return weaponPlayerAgent.WeaponAux.BulletList; } }
-
-        public List<EClientEffectType> EffectList { get { return weaponPlayerAgent.WeaponAux.EffectList; } }
 
         public int GetReservedBullet(EBulletCaliber caliber)
         {
@@ -411,6 +307,7 @@ namespace App.Shared.GameModules.Weapon
             if (slotType == EWeaponSlotType.None) return false;
             return this[slotType].ConfigId == configId;
         }
-
     }
+
+  
 }

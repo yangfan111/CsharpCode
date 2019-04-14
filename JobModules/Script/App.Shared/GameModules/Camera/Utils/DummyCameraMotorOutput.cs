@@ -26,6 +26,7 @@ namespace Assets.App.Shared.GameModules.Camera
         private float _near;
 
 
+
         public float Far
         {
             get { return _far; }
@@ -79,7 +80,6 @@ namespace Assets.App.Shared.GameModules.Camera
 
         public DummyCameraMotorOutput Append(DummyCameraMotorOutput append)
         {
-            ArchorEulerAngle += append.ArchorEulerAngle;
             ArchorOffset.x += append.ArchorOffset.x;
             ArchorOffset.y += append.ArchorOffset.y;
             ArchorOffset.z += append.ArchorOffset.z;

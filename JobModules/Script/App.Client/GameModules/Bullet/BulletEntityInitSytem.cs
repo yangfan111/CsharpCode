@@ -40,6 +40,7 @@ namespace App.Client.ClientGameModules.Bullet
             if(null != bullet)
             {
                 bullet.AddBulletGameObject(unityObj);
+                GameAudioMedia.PlayBulletFlyAudio(unityObj.AsGameObject);
             }
         }
     }

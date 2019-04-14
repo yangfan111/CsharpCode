@@ -26,7 +26,7 @@ namespace App.Client.Tools
         private static TreeInstance[] trees;
         private static Dictionary<int, int[,]> details = null;
 
-        private static GameObject collisionGo, waterGo, mapGo;
+        private static GameObject collisionGo, waterGo, mapGo, treeGo;
         private static Terrain terrain;
 
         public WoodConflictSystem(Contexts context)
@@ -57,6 +57,11 @@ namespace App.Client.Tools
                     if (mapGo == null && root.name.Equals("map"))
                     {
                         mapGo = root;
+                    }
+
+                    if (treeGo == null && root.name.Equals("Tree"))
+                    {
+                        treeGo = root;
                     }
 
                     if (terrain == null)
@@ -94,110 +99,118 @@ namespace App.Client.Tools
             switch (key)
             {
                 case 0: // collision
-                {
-                    if (collisionGo == null) return "can't find collision gamobject";
-                    collisionGo.SetActive(status);
+                    {
+                        if (collisionGo == null) return "can't find collision gamobject";
+                        collisionGo.SetActive(status);
 
-                    break;
-                }
+                        break;
+                    }
                 case 1: // water
-                {
-                    if (waterGo == null) return "can't find water gameobject";
-                    waterGo.SetActive(status);
+                    {
+                        if (waterGo == null) return "can't find water gameobject";
+                        waterGo.SetActive(status);
 
-                    break;
-                }
+                        break;
+                    }
                 case 2: // map
-                {
-                    if (mapGo == null) return "can't find map gameobject";
-                    mapGo.SetActive(status);
+                    {
+                        if (mapGo == null) return "can't find map gameobject";
+                        mapGo.SetActive(status);
 
-                    break;
-                }
+                        break;
+                    }
                 case 3: // post-fx
-                {
-                    if (Camera.main == null) return "can't find main camera";
-
-                    Type postProcessLayerTp = null, sunShaftsTp = null, globalFogTp = null;
-                    var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                    foreach (var assembly in assemblies)
                     {
-                        if (postProcessLayerTp == null)
-                        {
-                            postProcessLayerTp =
-                                assembly.GetType("UnityEngine.Rendering.PostProcessing.PostProcessLayer");
-                        }
+                        return "please use postfxtoggle false/true to replace this";
 
-                        if (sunShaftsTp == null)
-                        {
-                            sunShaftsTp = assembly.GetType("UnityStandardAssets.ImageEffects.SunShafts");
-                        }
+                        // if (Camera.main == null) return "can't find main camera";
 
-                        if (globalFogTp == null)
-                        {
-                            globalFogTp = assembly.GetType("LightingBox.Effects.GlobalFog");
-                        }
+                        // Type postProcessLayerTp = null, sunShaftsTp = null, globalFogTp = null;
+                        // var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                        // foreach (var assembly in assemblies)
+                        // {
+                        //     if (postProcessLayerTp == null)
+                        //     {
+                        //         postProcessLayerTp =
+                        //             assembly.GetType("UnityEngine.Rendering.PostProcessing.PostProcessLayer");
+                        //     }
+
+                        //     if (sunShaftsTp == null)
+                        //     {
+                        //         sunShaftsTp = assembly.GetType("UnityStandardAssets.ImageEffects.SunShafts");
+                        //     }
+
+                        //     if (globalFogTp == null)
+                        //     {
+                        //         globalFogTp = assembly.GetType("LightingBox.Effects.GlobalFog");
+                        //     }
+                        // }
+
+                        // Behaviour postBh = Camera.main.GetComponent(postProcessLayerTp) as Behaviour;
+                        // Behaviour sunBh = Camera.main.GetComponent(sunShaftsTp) as Behaviour;
+                        // Behaviour fogBh = Camera.main.GetComponent(globalFogTp) as Behaviour;
+
+                        // postBh.enabled = status;
+                        // sunBh.enabled = status;
+                        // fogBh.enabled = status;
+
+                        // break;
                     }
-
-                    Behaviour postBh = Camera.main.GetComponent(postProcessLayerTp) as Behaviour;
-                    Behaviour sunBh = Camera.main.GetComponent(sunShaftsTp) as Behaviour;
-                    Behaviour fogBh = Camera.main.GetComponent(globalFogTp) as Behaviour;
-
-                    postBh.enabled = status;
-                    sunBh.enabled = status;
-                    fogBh.enabled = status;
-
-                    break;
-                }
                 case 4: // trees
-                {
-                    if (terrain == null) return "can't find terrain";
+                    {
+                        if (terrain == null) return "can't find terrain";
 
-                    if (status)
-                    {
-                        terrain.terrainData.treePrototypes = treeProtos;
-                    }
-                    else
-                    {
-                        var protos = new TreePrototype[terrain.terrainData.treePrototypes.Length];
-                        for (int i = 0; i < protos.Length; i++)
+                        if (status)
                         {
-                            protos[i] = new TreePrototype();
-                            protos[i].prefab = null;
+                            terrain.terrainData.treePrototypes = treeProtos;
+                        }
+                        else
+                        {
+                            var protos = new TreePrototype[terrain.terrainData.treePrototypes.Length];
+                            for (int i = 0; i < protos.Length; i++)
+                            {
+                                protos[i] = new TreePrototype();
+                                protos[i].prefab = null;
+                            }
+
+                            terrain.terrainData.treePrototypes = protos;
                         }
 
-                        terrain.terrainData.treePrototypes = protos;
+                        break;
                     }
-
-                    break;
-                }
                 case 5: // details
-                {
-                    if (terrain == null) return "can't find terrain";
+                    {
+                        if (terrain == null) return "can't find terrain";
 
-                    if (status)
-                    {
-                        terrain.terrainData.detailPrototypes = detailProtos;
-                    }
-                    else
-                    {
-                        var protos = new DetailPrototype[terrain.terrainData.detailPrototypes.Length];
-                        for (int i = 0; i < protos.Length; i++)
+                        if (status)
                         {
-                            protos[i] = new DetailPrototype();
-                            protos[i].prototype = null;
-                            protos[i].prototypeTexture = null;
+                            terrain.terrainData.detailPrototypes = detailProtos;
+                        }
+                        else
+                        {
+                            var protos = new DetailPrototype[terrain.terrainData.detailPrototypes.Length];
+                            for (int i = 0; i < protos.Length; i++)
+                            {
+                                protos[i] = new DetailPrototype();
+                                protos[i].prototype = null;
+                                protos[i].prototypeTexture = null;
+                            }
+
+                            terrain.terrainData.detailPrototypes = protos;
                         }
 
-                        terrain.terrainData.detailPrototypes = protos;
+                        break;
                     }
-
-                    break;
-                }
+                case 6: // model tree
+                    {
+                        if (treeGo == null) return "can't find treeGo";
+                        treeGo.SetActive(status);
+                        break;
+                    }
                 default:
-                {
-                    return string.Format("error key:{0}", key.ToString());
-                }
+                    {
+                        return string.Format("error key:{0}", key.ToString());
+                    }
             }
 
             return "OK";

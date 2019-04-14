@@ -163,7 +163,7 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
         {
             get { return _config.Order; }
         }
-        
+
         public override void CalcOutput(PlayerEntity player, ICameraMotorInput input, ICameraMotorState state,
             SubCameraMotorState subState,
             DummyCameraMotorOutput output,

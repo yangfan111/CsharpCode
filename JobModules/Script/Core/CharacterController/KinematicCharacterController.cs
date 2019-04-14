@@ -155,6 +155,9 @@ namespace Core.CharacterController
             _motor.FlyModePosYOffset = 0f;
             _motor.FlyModeAngleXMin = -35f;
             _motor.FlyModeAngleXMax = 89f;
+            _motor.UseSphereGroundDetection = false;
+            _motor.SafeMovement = false;
+            _motor.SafeRotate = false;
         }
 
         public virtual void Init()

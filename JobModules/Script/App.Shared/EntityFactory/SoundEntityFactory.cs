@@ -68,7 +68,8 @@ namespace App.Shared.EntityFactory
             var entity = CreateSelfOnlySound(id, loop) as SoundEntity; 
             if(null != entity)
             {
-                entity.AddPosition(position);
+                entity.AddPosition();
+                entity.position.Value = position;
             }
             return entity;
         }

@@ -68,17 +68,7 @@ namespace App.Shared.GameModules.Weapon
             if (WeaponAux.EffectList != null)
                 WeaponAux.EffectList.Add(effectType);
         }
-        internal int ForceInterruptGunSight
-        {
-            get
-            {
-                if (WeaponAux == null) return -1;
-                if (WeaponAux.ClientInitialize)
-                    return WeaponAux.ForceInterruptGunSight;
-                return -1;
-            }
-            set { WeaponAux.ForceInterruptGunSight = value; }
-        }
+   
         internal int? AutoFire
         {
             get

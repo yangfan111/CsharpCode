@@ -4,6 +4,7 @@ using App.Shared.Terrains;
 using Assets.Sources.Free;
 using Assets.Sources.Free.UI;
 using Core.Free;
+using Core.Ui.Map;
 using Free.framework;
 using UnityEngine;
 using Utils.Singleton;
@@ -26,19 +27,18 @@ namespace App.Client.GameModules.GamePlay.Free.Scene
             int type = message.Ks[0];
 
             //获取当前所在地图配置数据
-            Vector3 leftMinPos = TerrainCommonData.leftMinPos;
            
             if (type == 0)
             {
                 //DuQuanInfo 构造函数修改了参数 需要重新接入数据
                 int level = data.CurDuquan.Level + 1;
 
-                data.CurDuquan = new DuQuanInfo(level, new Vector2(message.Fs[0] - leftMinPos.x, message.Fs[1] - leftMinPos.z), message.Ins[0], message.Ins[1], message.Ins[2]);
-                data.NextDuquan = new DuQuanInfo(level + 1, new Vector2(message.Fs[2] - leftMinPos.x, message.Fs[3] - leftMinPos.z), message.Ins[3], message.Ins[4], message.Ins[5]);
+                data.CurDuquan = new DuQuanInfo(level, new MapFixedVector2(message.Fs[0], message.Fs[1]), message.Ins[0], message.Ins[1], message.Ins[2]);
+                data.NextDuquan = new DuQuanInfo(level + 1, new MapFixedVector2(message.Fs[2], message.Fs[3]), message.Ins[3], message.Ins[4], message.Ins[5]);
             }
             else
             {
-                data.BombArea = new BombAreaInfo(new Vector3(message.Fs[0] - leftMinPos.x, 0, message.Fs[1] - leftMinPos.z), message.Ins[0], data.BombArea.Num + 1);
+                data.BombArea = new BombAreaInfo(new MapFixedVector2(message.Fs[0], message.Fs[1]), message.Ins[0], data.BombArea.Num + 1);
             }
         }
     }

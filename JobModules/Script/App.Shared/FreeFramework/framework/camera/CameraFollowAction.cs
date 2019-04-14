@@ -1,10 +1,7 @@
-﻿using com.wd.free.action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using App.Server.GameModules.GamePlay.free.player;
+using com.wd.free.action;
 using com.wd.free.@event;
-using App.Server.GameModules.GamePlay.free.player;
+using System;
 
 namespace App.Shared.FreeFramework.framework.camera
 {

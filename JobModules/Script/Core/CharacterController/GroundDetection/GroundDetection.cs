@@ -252,6 +252,7 @@ namespace ECM.Components
                 groundHitInfo.surfaceNormal = controllerHitInfo.HitNormal;
                 groundHitInfo.isOnGround = true;
                 groundHitInfo.isValidGround = Vector3.Angle(groundHitInfo.surfaceNormal, Vector3.up) < groundLimit;
+                //DebugDraw.DebugArrow(controllerHitInfo.HitPoint, controllerHitInfo.HitNormal * 2, Color.magenta, 0, false);
             }
             else
             {

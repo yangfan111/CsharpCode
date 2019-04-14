@@ -2,12 +2,12 @@
 
 namespace Core.GameModule.Interface
 {
-    public interface IUiSystem
+    public interface IUiSystem:IUserSystem
     {
         void OnUiRender(float intervalTime);
     } 
     
-    public interface IUiHfrSystem
+    public interface IUiHfrSystem:IUserSystem
     {
         void OnUiRender(float intervalTime);
     }

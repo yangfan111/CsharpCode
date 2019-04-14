@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Core.EntityComponent;
-using Core.GameInputFilter;
+using Core;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.UpdateLatest;
 using Core.Utils;
@@ -10,7 +10,7 @@ namespace App.Shared.GameModules.Player
     public class UserCmdOwnerAdapter : IUserCmdOwner
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(UserCmdOwnerAdapter));
-        private PlayerEntity _playerEntity;
+        private                 PlayerEntity  _playerEntity;
 
         public UserCmdOwnerAdapter(PlayerEntity playerEntity)
         {
@@ -27,26 +27,36 @@ namespace App.Shared.GameModules.Player
                 int lastSeq = _playerEntity.userCmdSeq.LastCmdSeq;
 
                 return _playerEntity.userCmd.GetLargerThan(lastSeq);
-                
             }
-
         }
-        
-        public List<UpdateLatestPacakge> UpdateList {  get
+
+        public List<UpdateLatestPacakge> UpdateList
         {
-            if (!_playerEntity.hasUpdateMessagePool)
-                _playerEntity.AddUpdateMessagePool();;
-            return _playerEntity.updateMessagePool.UpdateMessagePool.GetPackagesLargeThan(_playerEntity
-                .updateMessagePool.LastestExecuteUserCmdSeq);
-        } }
+            get
+            {
+                if (!_playerEntity.hasUpdateMessagePool)
+                    _playerEntity.AddUpdateMessagePool();
+                ;
+                return _playerEntity.updateMessagePool.UpdateMessagePool.GetPackagesLargeThan(_playerEntity
+                                                                                              .updateMessagePool
+                                                                                              .LastestExecuteUserCmdSeq);
+            }
+        }
 
         public int LastestExecuteUserCmdSeq
         {
-            get { return _playerEntity
-                .updateMessagePool.LastestExecuteUserCmdSeq; }
-            set { _playerEntity
-                .updateMessagePool.LastestExecuteUserCmdSeq = value; }
+            get
+            {
+                return _playerEntity
+                       .updateMessagePool.LastestExecuteUserCmdSeq;
+            }
+            set
+            {
+                _playerEntity
+                    .updateMessagePool.LastestExecuteUserCmdSeq = value;
+            }
         }
+
         public int LastCmdSeq
         {
             get { return _playerEntity.userCmdSeq.LastCmdSeq; }
@@ -58,7 +68,11 @@ namespace App.Shared.GameModules.Player
             get { return _playerEntity; }
         }
 
-        public EntityKey OwnerEntityKey { get { return _playerEntity.entityKey.Value; } }
+        public EntityKey OwnerEntityKey
+        {
+            get { return _playerEntity.entityKey.Value; }
+        }
+
         public IUserCmd LastTempCmd
         {
             get
@@ -69,41 +83,22 @@ namespace App.Shared.GameModules.Player
             }
         }
 
-        public IGameInputProcessor UserInputProcessor
+    /// <summary>
+    /// 获得过滤后的input命令
+    /// </summary>
+    /// <param name="userCmd"></param>
+    /// <returns></returns>
+        public IFilteredInput GetFiltedInput(IUserCmd userCmd)
         {
-            get
-            {
-                if(!_playerEntity.hasUserCmdFilter)
-                {
-                    return null;
-                }
-                return _playerEntity.userCmdFilter.GameInputProcessor;
-            }
-        }
-
-        public IFilteredInput Filter(IUserCmd userCmd)
-        {
-            var inputProcessor = _playerEntity.userCmdFilter.GameInputProcessor;
-            if(!_playerEntity.isEnabled)
+            var interactController= _playerEntity.StateInteractController();
+            if (!_playerEntity.isEnabled || _playerEntity.isFlagDestroy)
             {
                 Logger.Error("player is destroyed");
-                return inputProcessor.DummyInput(); 
+                return interactController.EmptyInput;
             }
-            if(_playerEntity.isFlagDestroy)
-            {
-                return inputProcessor.DummyInput(); 
-            }
-            if(null != inputProcessor)
-            {
-                inputProcessor.Init();
-                inputProcessor.SetUserCmd(userCmd);
-                return inputProcessor.Filter();
-            }
-            else
-            {
-                Logger.Error("no GameInputProcessor attached to player ");
-                return inputProcessor.DummyInput(); 
-            }
+
+            return interactController.ApplyUserCmd(userCmd);
+       
         }
     }
 }

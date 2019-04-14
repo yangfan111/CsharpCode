@@ -1,4 +1,5 @@
-﻿using Core.Utils;
+﻿using Core.Components;
+using Core.Utils;
 using UnityEngine;
 
 namespace App.Shared.GameModules.Weapon.Behavior
@@ -54,10 +55,10 @@ namespace App.Shared.GameModules.Weapon.Behavior
             var firePosition = controller.RelatedFirePos;
             if (firePosition == null)
                 return Vector3.zero;
-            var muzzleP3LocatorPosition = firePosition.MuzzleP3Valid ? firePosition.MuzzleP3Position : (Vector3?)null;
-            if (muzzleP3LocatorPosition.HasValue)
+            
+            if (firePosition.MuzzleP3Valid)
             {
-                return muzzleP3LocatorPosition.Value;
+                return firePosition.MuzzleP3Position.ShiftedVector3();
             }
             return GetFireViewPosition(controller);
         }

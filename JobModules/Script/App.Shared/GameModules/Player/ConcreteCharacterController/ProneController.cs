@@ -130,45 +130,5 @@ namespace App.Shared.GameModules.Player.ConcreteCharacterController
 //                DebugDraw.DrawArrow(hitPoint, hitStabilityReport.LedgeFacingDirection, Color.blue);
 //            }
         }
-
-        public override void SortOverlap(int nums, Collider[] colliders)
-        {
-			return;
-            if (nums <= 1)
-            {
-                return;
-            }
-
-            int start = 0;
-            int end = nums - 1;
-            bool flag = false;
-            while (start < end)
-            {
-                if (colliders[end] is CharacterController)
-                {
-                    while ((colliders[start] is CharacterController) && start < end )
-                    {
-                        start++;
-                    }
-
-                    if (start != end)
-                    {
-                        var tmp = colliders[end];
-                        colliders[end] = colliders[start];
-                        colliders[start] = tmp;
-                        flag = true;
-                    }
-                }
-                
-                end--;
-            }
-
-            for (int i = 0; i < nums; i++)
-            {
-                Logger.InfoFormat("{0}, collider:{1}\n", i, colliders[i].name);
-            }
-            
-
-        }
     }
 }

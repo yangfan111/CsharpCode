@@ -1,4 +1,5 @@
-﻿using Core.Playback;
+﻿using Core.Components;
+using Core.Playback;
 using UnityEngine;
 
 namespace Core.Interpolate
@@ -71,6 +72,23 @@ namespace Core.Interpolate
         public static Quaternion Interpolate(Quaternion l, Quaternion r, float ratio)
         {
 	        return Quaternion.Slerp(l, r, ratio);
+        }
+
+        public static FixedVector3 Interpolate(FixedVector3 l, FixedVector3 r, IInterpolationInfo interpolationInfo)
+        {
+            var ratio = interpolationInfo.Ratio;
+            return new FixedVector3(
+                l.x + (r.x - l.x) * ratio,
+                l.y + (r.y - l.y) * ratio,
+                l.z + (r.z - l.z) * ratio);
+        }
+
+        public static FixedVector3 Interpolate(FixedVector3 l, FixedVector3 r, float ratio)
+        {
+            return new FixedVector3(
+                l.x + (r.x - l.x) * ratio,
+                l.y + (r.y - l.y) * ratio,
+                l.z + (r.z - l.z) * ratio);
         }
     }
 }

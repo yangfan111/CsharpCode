@@ -1,5 +1,4 @@
 using System;
-using Sharpen;
 using UnityEngine;
 
 namespace com.wd.free.unit
@@ -8,31 +7,31 @@ namespace com.wd.free.unit
 	public class UnitPosition
 	{
 	    private float x;
-
 		private float y;
-
 		private float z;
 
 		private float yaw;
-
 		private float pitch;
 
-		public UnitPosition()
-			: base()
+        private float cylinderVolR;
+        private float cylinderVolH;
+
+		public UnitPosition() : base()
 		{
 		}
 
-		public UnitPosition(float x, float y, float z, float yaw, float pitch)
-			: base()
+		public UnitPosition(float x, float y, float z, float yaw, float pitch, float cylinderVolR, float cylinderVolH) : base()
 		{
 			this.x = x;
 			this.y = y;
 			this.z = z;
             this.yaw = yaw;
             this.pitch = pitch;
+            this.cylinderVolR = cylinderVolR;
+            this.cylinderVolH = cylinderVolH;
         }
 
-		public virtual float Distance(com.wd.free.unit.UnitPosition another)
+		public virtual float Distance(UnitPosition another)
 		{
 			float dx = x - another.x;
 			float dy = y - another.y;
@@ -44,7 +43,6 @@ namespace com.wd.free.unit
 		{
 			return x;
 		}
-
 		public virtual void SetX(float x)
 		{
 			this.x = x;
@@ -54,7 +52,6 @@ namespace com.wd.free.unit
 		{
 			return y;
 		}
-
 		public virtual void SetY(float y)
 		{
 			this.y = y;
@@ -64,7 +61,6 @@ namespace com.wd.free.unit
 		{
 			return z;
 		}
-
 		public virtual void SetZ(float z)
 		{
 			this.z = z;
@@ -74,7 +70,6 @@ namespace com.wd.free.unit
 		{
 			return yaw;
 		}
-
 		public virtual void SetYaw(float yaw)
 		{
 			this.yaw = yaw;
@@ -84,11 +79,28 @@ namespace com.wd.free.unit
 		{
 			return pitch;
 		}
-
 		public virtual void SetPitch(float pitch)
 		{
 			this.pitch = pitch;
 		}
+
+        public virtual float GetCylinderVolR()
+        {
+            return cylinderVolR;
+        }
+        public virtual void SetCylinderVolR(float cylinderVolR)
+        {
+            this.cylinderVolR = cylinderVolR;
+        }
+
+        public virtual float GetCylinderVolH()
+        {
+            return cylinderVolH;
+        }
+        public virtual void SetCylinderVolH(float cylinderVolH)
+        {
+            this.cylinderVolH = cylinderVolH;
+        }
 
         public Vector3 Vector3
         {
@@ -97,7 +109,8 @@ namespace com.wd.free.unit
 
 	    protected bool Equals(UnitPosition other)
 	    {
-	        return x.Equals(other.x) && y.Equals(other.y) && z.Equals(other.z) && yaw.Equals(other.yaw) && pitch.Equals(other.pitch);
+	        return x.Equals(other.x) && y.Equals(other.y) && z.Equals(other.z) && yaw.Equals(other.yaw) && pitch.Equals(other.pitch)
+	               && cylinderVolR.Equals(other.cylinderVolR) && cylinderVolH.Equals(other.cylinderVolH);
 	    }
 
 	    public override bool Equals(object obj)
@@ -117,13 +130,15 @@ namespace com.wd.free.unit
 	            hashCode = (hashCode * 397) ^ z.GetHashCode();
 	            hashCode = (hashCode * 397) ^ yaw.GetHashCode();
 	            hashCode = (hashCode * 397) ^ pitch.GetHashCode();
+                hashCode = (hashCode * 397) ^ cylinderVolR.GetHashCode();
+                hashCode = (hashCode * 397) ^ cylinderVolH.GetHashCode();
 	            return hashCode;
 	        }
 	    }
 
         public override string ToString()
 		{
-			return x + "," + y + "," + z + "," + yaw + "," + pitch;
+			return x + "," + y + "," + z + "," + yaw + "," + pitch + "," + cylinderVolR + "," + cylinderVolH;
 		}
 	}
 }

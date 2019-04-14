@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using App.Shared.Components.Vehicle;
+using Core.Components;
 using Core.Prediction.VehiclePrediction.Cmd;
 using Core.Utils;
 using EVP.Scripts;
@@ -23,7 +24,7 @@ namespace App.Shared.GameModules.Vehicle.WheelCarrier
             comp.SteerInput = state.SteerInput;
             comp.ThrottleInput = state.ThrottleInput;
  
-            comp.Position = state.BodyState.Position;
+            comp.Position = state.BodyState.Position.ShiftedToFixedVector3();
             comp.Rotation = state.BodyState.Rotation;
             comp.LinearVelocity = state.BodyState.LinearVelocity;
             comp.AngularVelocity = state.BodyState.AngularVelocity;
@@ -76,7 +77,7 @@ namespace App.Shared.GameModules.Vehicle.WheelCarrier
             SteerInput = comp.SteerInput;
             ThrottleInput = comp.ThrottleInput;
 
-            Position = comp.Position;
+            Position = comp.Position.ShiftedVector3();
             Rotation = comp.Rotation;
             LinearVelocity = comp.LinearVelocity;
             AngularVelocity = comp.AngularVelocity;

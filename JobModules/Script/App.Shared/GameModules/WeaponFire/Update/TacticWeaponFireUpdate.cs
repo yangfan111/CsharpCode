@@ -35,7 +35,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
         {
         }
 
-        public void Update(PlayerWeaponController controller, IUserCmd cmd)
+        public void Update(PlayerWeaponController controller, IUserCmd cmd, Contexts contexts)
         {
             if (SharedConfig.IsServer)
             {

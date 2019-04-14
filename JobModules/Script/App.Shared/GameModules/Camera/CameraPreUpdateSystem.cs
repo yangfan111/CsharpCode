@@ -6,9 +6,7 @@ using App.Shared;
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Camera;
 using App.Shared.GameModules.Camera.Utils;
-using App.Shared.Player;
 using Core.CameraControl.NewMotor;
-using Core.EntityComponent;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
@@ -23,17 +21,15 @@ namespace Assets.App.Shared.GameModules.Camera
        
         private DummyCameraMotorState _state ;
         private VehicleContext _vehicleContext;
-        private Contexts _contexts;
 
         private FreeMoveContext _freeMoveContext;
         
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CameraPreUpdateSystem));
          
-        public CameraPreUpdateSystem(Contexts contexts, Motors m)
+        public CameraPreUpdateSystem(VehicleContext vehicleContext, FreeMoveContext freeMoveContext, Motors m)
         {
-            _vehicleContext = contexts.vehicle;
-            _freeMoveContext = contexts.freeMove;
-            _contexts = contexts;
+            _vehicleContext = vehicleContext;
+            _freeMoveContext = freeMoveContext;
             _motors = m;
             _state = new DummyCameraMotorState(m);
         }
@@ -43,46 +39,40 @@ namespace Assets.App.Shared.GameModules.Camera
         {
             if (!dict.ContainsKey(subState.NowMode)) return;
             if (!dict.ContainsKey(subState.LastMode)) return;
+            var oldMotor = dict[subState.LastMode];
             var nowMotor = dict[subState.NowMode];
             nowMotor.PreProcessInput(player, input, state);
         }
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
+            
             //Logger.InfoFormat("seq:{0}, delata yaw:{2},  client return judge:{1}", cmd.Seq, (!cmd.NeedStepPredication && !SharedConfig.IsServer), cmd.DeltaYaw);
-            if (!cmd.NeedStepPredication && !SharedConfig.IsServer) 
-                return;    
+            if (!cmd.NeedStepPredication && !SharedConfig.IsServer) return;
+            
             UpdateCamera(owner, cmd);
         }
 
         public ISimpleParallelUserCmdExecuteSystem CreateCopy()
         {
-            return new CameraPreUpdateSystem(_contexts, _motors);
+            return new CameraPreUpdateSystem(_vehicleContext,_freeMoveContext,_motors);
         }
 
         private void UpdateCamera(IUserCmdOwner owner, IUserCmd cmd)
         {
-            
             PlayerEntity player = owner.OwnerEntity as PlayerEntity;
+            ;
             if (!player.hasCameraStateNew) return;
             if (!player.hasCameraStateOutputNew) return;
-            
-            //观战玩家时，摄像机方向由被观战玩家决定
-            if (player.gamePlay.IsObserving())
-            {
-                int objId = player.gamePlay.CameraEntityId;
-                var entity = _contexts.player.GetEntityWithEntityKey(new EntityKey(objId, (short) EEntityType.Player));
-                if (entity != null) return;
-            }
-            
+//            var finalOutput = player.cameraStateOutputNew;
             DummyCameraMotorState.Convert(player.cameraStateNew, _state);
+
 
             var archotRotation = player.cameraArchor.ArchorEulerAngle;
             if (player.cameraStateNew.CameraMotorInput == null)
                 player.cameraStateNew.CameraMotorInput = new DummyCameraMotorInput();
             DummyCameraMotorInput _input = (DummyCameraMotorInput) player.cameraStateNew.CameraMotorInput;
-            _input.Generate(_contexts, player, cmd, archotRotation.y, archotRotation.x);
-
+            _input.Generate(player, cmd, archotRotation.y, archotRotation.x);
             for (int i=0;i<(int)SubCameraMotorType.End;i++)
             {
                 var type = (SubCameraMotorType)i;

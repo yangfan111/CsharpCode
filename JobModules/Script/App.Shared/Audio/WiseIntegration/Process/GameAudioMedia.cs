@@ -7,6 +7,7 @@ using Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using App.Shared.Player.Events;
 using Core.ObjectPool;
 using UnityEngine;
 using Utils.Configuration;
@@ -22,7 +23,6 @@ namespace App.Shared
     public class GameAudioMedia
     {
         
-        private static readonly LoggerAdapter audioLogger = new LoggerAdapter(typeof(AKAudioDispatcher));
         private readonly static AudioObjectGenerator audioObjectGenerator = new AudioObjectGenerator();
         
         public static void Dispose()
@@ -39,23 +39,28 @@ namespace App.Shared
                 AKAudioEntry.Dispatcher.PostEvent(evtConfig, target);
               
             }
+            else
+            {
+                AKAudioEntry.AudioLogger.ErrorFormat("Wise Audio Process Error,target:{0},evtCfg:{1}",target,evtConfig);    
+
+            }
         //    audioLogger.Info("Auido play once");
         }
+
         public static void PlayWeaponFireAudio(int weaponId, Vector3 firePos,AudioGrp_ShotMode shotMode)
         {
             if (SharedConfig.IsServer)
                 return;
             AudioEventItem evtConfig = SingletonManager.Get<AudioWeaponManager>().FindById(weaponId,(item)=>item.Fire);
-            if (evtConfig != null && AKAudioEntry.Dispatcher != null)
+            var target = GetEmitter(firePos);
+            if (evtConfig != null && target != null)
             {
-                var target = audioObjectGenerator.GetAudioEmitter();
-                target.transform.position = firePos;
-                target.SetActive(true);
                 AKAudioEntry.Dispatcher.SetSwitch(target,shotMode);
                 AKAudioEntry.Dispatcher.PostEvent(evtConfig, target);
-                audioLogger.Info("Wise Fire Once");
-                
-              
+            }
+            else
+            {
+                AKAudioEntry.AudioLogger.ErrorFormat("Wise Audio Process Error,target:{0},evtCfg:{1}",target,evtConfig);    
             }
         }
         public static void PlayWeaponReloadAudio(int weaponId,AudioGrp_Magazine magazineIndex,  GameObject target)
@@ -70,14 +75,6 @@ namespace App.Shared
               
             }
            // audioLogger.Info("Auido play once");
-        }
-        private static IMyTerrain terrainConfig;
-
-        private static IMyTerrain GetTerrainConfig(int sceneId)
-        {
-            if(terrainConfig == null ||terrainConfig._mapId != sceneId)       
-                terrainConfig = SingletonManager.Get<TerrainManager>().GetTerrain(sceneId);
-            return terrainConfig;
         }
 
         private static AudioEventItem footStepEventConfig;
@@ -100,54 +97,78 @@ namespace App.Shared
                 return bulletFireEventConfig;
             }
         }
-        public static void PlayBulletHitEnvironmentAudio(AudioGrp_HitMatType hitMatType,Vector3 Position)
+        private static AudioEventItem bulletFlyEventConfig;
+        private static AudioEventItem BulletFlyEventConfig
         {
-            if (BulletFireEventConfig == null)
-                return;
+            get
+            {
+                if(bulletFlyEventConfig == null)
+                    bulletFlyEventConfig = SingletonManager.Get<AudioEventManager>().FindById(GlobalConst.AudioEvt_BulletFly);
+                return bulletFlyEventConfig;
+            }
+        }
+        private static GameObject GetEmitter(Vector3 Position)
+        {
             var target = audioObjectGenerator.GetAudioEmitter();
             target.transform.position = Position;
             target.SetActive(true);
+            return target;
+        }
+
+        public static void PlayBulletFlyAudio(GameObject target)
+        {
+            AKAudioEntry.Dispatcher.PostEvent(BulletFlyEventConfig, target);
+        }
+        public static void PlayBulletDropAudio(int eventId,AudioGrp_FootMatType dropMatType, Vector3 Position)
+        {
+            if (SharedConfig.IsServer) return;
+
+            var target = GetEmitter(Position);
+            var evtCfg = SingletonManager.Get<AudioEventManager>().FindById(eventId);
+            if (target != null && evtCfg != null)
+            {
+           //     DebugUtil.MyLog(dropMatType);
+                AKAudioEntry.Dispatcher.SetSwitch(target,dropMatType);
+                AKAudioEntry.Dispatcher.PostEvent(evtCfg, target);
+            }
+            else
+            {
+                AKAudioEntry.AudioLogger.ErrorFormat("Wise Audio Process Error,target:{0},evtCfg:{1}",target,evtCfg);    
+            }
+        }
+        public static void PlayHitEnvironmentAudio(AudioGrp_HitMatType hitMatType,Vector3 Position)
+        {
+            if (SharedConfig.IsServer) return;
+            var target = GetEmitter(Position);
             AKAudioEntry.Dispatcher.SetSwitch(target,hitMatType);
             AKAudioEntry.Dispatcher.PostEvent(BulletFireEventConfig, target);
         }
-
-        public static bool PlayStepEnvironmentAudio(AudioGrp_Footstep sourceType, Vector3 Position)
+        //播放自己的脚步音频
+        public static bool PlayStepEnvironmentAudio(AudioGrp_Footstep sourceType,AudioGrp_FootMatType matType,GameObject target)
         {
             if (SharedConfig.IsServer || AKAudioEntry.Dispatcher == null|| sourceType == AudioGrp_Footstep.None)
                 return false;
-          
-            var target = audioObjectGenerator.GetAudioEmitter();
-            target.transform.position = Position;
-            target.SetActive(true);
-            int sceneId = SingletonManager.Get<MapConfigManager>().SceneParameters.Id;
-            TerrainMatOriginType matType = (TerrainMatOriginType)GetTerrainConfig(sceneId).GetTerrainPositionMatType(Position);
-            AudioGrp_MatIndex matGrpIndex = matType.ToAudioMatGrp();
-            AKAudioEntry.Dispatcher.SetSwitch(target, matGrpIndex);
+            AKAudioEntry.Dispatcher.SetSwitch(target, matType);
             AKAudioEntry.Dispatcher.SetSwitch(target, sourceType);
+            AKAudioEntry.Dispatcher.PostEvent(FootStepEvent, target);
+            return true;
+        }
+        public static bool PlayStepEnvironmentAudio(AudioEvent audioEvent)
+        {
+            if (SharedConfig.IsServer || AKAudioEntry.Dispatcher == null)
+                return false;
+          
+            var target = GetEmitter(audioEvent.relatedPos);
+            int sceneId = SingletonManager.Get<MapConfigManager>().SceneParameters.Id;
+            if (target == null) return false;
+            AKAudioEntry.Dispatcher.SetSwitch(target, audioEvent.footMatType);
+            AKAudioEntry.Dispatcher.SetSwitch(target, audioEvent.footstepState);
         //    audioLogger.InfoFormat("AKAudioEntry.Dispatcher.SetSwitch:{0},{1}",matGrpIndex,sourceType);
             AKAudioEntry.Dispatcher.PostEvent(FootStepEvent, target);
-            audioLogger.Info("wise step once");
+            //audioLogger.Info("wise step once");
             return true;
         }
        
-    
-        /// <summary>
-        /// 枪械模式切换
-        /// </summary>
-        /// <param name="weaponCfg"></param>
-        public static void SwitchFireModelAudio(EFireMode model, GameObject target)
-        {
-            if (SharedConfig.IsServer)
-                return;
-#if UNITY_EDITOR
-            if (AudioInfluence.IsForbidden) return;
-#endif
-           
-            AudioGrp_ShotMode shotMode = model.ToAudioGrpShotMode();
-            if (AKAudioEntry.Dispatcher != null)
-                AKAudioEntry.Dispatcher.SetSwitch(target, shotMode);
-        }
-
         public static void PostAutoRegisterGameObjAudio(Vector3 position, bool createObject)
         {
         }

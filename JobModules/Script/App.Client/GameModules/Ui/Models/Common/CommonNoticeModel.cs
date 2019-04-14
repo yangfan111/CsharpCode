@@ -14,7 +14,6 @@ namespace App.Client.GameModules.Ui.Models.Common
     {
         private INoticeUiAdapter adapter = null;
         private bool isGameObjectCreated = false;
-        private const string uiIconsBundleName = "ui/icons";
 
         private string title = string.Empty;
         private string yesTex = string.Empty;

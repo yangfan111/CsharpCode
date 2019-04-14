@@ -13,12 +13,12 @@ namespace Core.GameModule.Interface
         void PostExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd);
         IComplexParallelUserCmdExecuteSystem CreateCopy();
     }
-    public interface IUserCmdExecuteSystem
+    public interface IUserCmdExecuteSystem:IUserSystem
     {
         void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd);
     }
     
-    public interface IBeforeUserCmdExecuteSystem
+    public interface IBeforeUserCmdExecuteSystem:IUserSystem
     {
         void BeforeExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd);
     }

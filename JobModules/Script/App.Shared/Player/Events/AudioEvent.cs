@@ -10,15 +10,17 @@ namespace App.Shared.Player.Events
 {
     public class AudioEvent : IEvent
     {
-        public AudioGrp_Footstep footstepState;
+        public AudioGrp_Footstep    footstepState;
+        public AudioGrp_FootMatType footMatType;
+
         public Vector3 relatedPos;
-        
+
         public class ObjcetFactory : CustomAbstractObjectFactory
         {
             public ObjcetFactory() : base(typeof(AudioEvent))
             {
             }
-            
+
             public override object MakeObject()
             {
                 return new AudioEvent();
@@ -29,7 +31,7 @@ namespace App.Shared.Player.Events
         {
         }
 
-        public  EEventType EventType
+        public EEventType EventType
         {
             get { return EEventType.BroadcastAudio; }
         }
@@ -38,24 +40,26 @@ namespace App.Shared.Player.Events
 
         public void ReadBody(BinaryReader reader)
         {
-            
-            relatedPos = FieldSerializeUtil.Deserialize(relatedPos, reader);
-            footstepState = (AudioGrp_Footstep)FieldSerializeUtil.Deserialize((byte) 0, reader);
+            footstepState = (AudioGrp_Footstep) FieldSerializeUtil.Deserialize((byte) 0, reader);
+            footMatType   = (AudioGrp_FootMatType) FieldSerializeUtil.Deserialize((byte) 0, reader);
+            relatedPos    = FieldSerializeUtil.Deserialize(relatedPos, reader);
         }
 
         public void WriteBody(MyBinaryWriter writer)
         {
-           
+            FieldSerializeUtil.Serialize((byte) footstepState, writer);
+            FieldSerializeUtil.Serialize((byte) footMatType, writer);
             FieldSerializeUtil.Serialize(relatedPos, writer);
-            FieldSerializeUtil.Serialize((byte)footstepState, writer);
         }
 
         public void RewindTo(IEvent value)
         {
             AudioEvent right = value as AudioEvent;
-           
-            relatedPos = right.relatedPos;
+
+            relatedPos    = right.relatedPos;
             footstepState = right.footstepState;
+            footMatType = right.footMatType;
+
         }
     }
 
@@ -67,6 +71,7 @@ namespace App.Shared.Player.Events
         }
 
         static LoggerAdapter logger = new LoggerAdapter("FireEventHandler");
+
         /// <summary>
         /// 
         /// </summary>
@@ -75,11 +80,15 @@ namespace App.Shared.Player.Events
         /// <param name="e"></param>
         public override void DoEventClient(Entitas.IContexts contexts, IEntity entity, IEvent e)
         {
-            logger.Info("Wise step come in");
-          //  var controller = (entity as PlayerEntity).AudioController();
+            //  logger.Info("Wise step come in");
+            if ((entity as PlayerEntity).isFlagSelf)
+            {
+                return;
+            }
+            //  var controller = (entity as PlayerEntity).AudioController();
             AudioEvent audioEvent = e as AudioEvent;
-            GameAudioMedia.PlayStepEnvironmentAudio(audioEvent.footstepState, audioEvent.relatedPos);
- 
+            GameAudioMedia.PlayStepEnvironmentAudio(audioEvent);
+
             // GameAudioMedium.ProcessWeaponAudio(playerEntity,allContexts,(item)=>item.Fire);
             // if (playerEntity.appearanceInterface.Appearance.IsFirstPerson)
             // {
@@ -94,7 +103,7 @@ namespace App.Shared.Player.Events
 
         public override bool ClientFilter(IEntity entity, IEvent e)
         {
-            return(entity as PlayerEntity) != null;
+            return (entity as PlayerEntity) != null;
         }
     }
 }

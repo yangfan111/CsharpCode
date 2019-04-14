@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.IO;
+using System.Xml.Linq;
 using App.Shared;
 using App.Shared.Configuration;
 using Core.Utils;
@@ -20,9 +21,10 @@ namespace App.Server.Scripts.Config
         public void Reload()
         {
             var path = "/Config/Server/boot_config.xml";
-            BootConfig = FileSystemConfigLoader.LoadXml<ServerBootConfig>(path);
+            if (File.Exists(Application.dataPath + path))
+                BootConfig = FileSystemConfigLoader.LoadXml<ServerBootConfig>(path);
         }
-        public ServerBootConfig BootConfig { get; private set; }
+        public ServerBootConfig BootConfig { get; set; }
 
     }
 }

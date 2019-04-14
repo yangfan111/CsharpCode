@@ -171,6 +171,28 @@ namespace ECM.Components
             point1 = position + rotation * characterTransformToCapsuleBottom;
             point2 = position + rotation * characterTransformToCapsuleTop;
         }
+
+        public static void DrawCollider(CapsuleCollider collider, Color color, float duration = 0.0f, bool depthTest = true)
+        {
+            Vector3 point1, point2;
+            float radius;
+            var height = collider.height;
+            radius = collider.radius;
+            var center = collider.center;
+            GetDebugDrawTypeCapsule(collider.transform.position, collider.transform.rotation, height, radius, center, GetCapsuleForwardDirection(collider.direction), out point1, out point2);
+            DebugDraw.DebugCapsule(point1, point2, color, radius, duration, depthTest);
+        }
+        
+        public static void DrawCollider(CharacterController collider, Color color, float duration = 0.0f, bool depthTest = true)
+        {
+            Vector3 point1, point2;
+            float radius;
+            var height = collider.height;
+            radius = collider.radius;
+            var center = collider.center;
+            GetDebugDrawTypeCapsule(collider.transform.position, collider.transform.rotation, height, radius, center, Vector3.up, out point1, out point2);
+            DebugDraw.DebugCapsule(point1, point2, color, radius, duration, depthTest);
+        }
         
         /// <summary>
         /// The direction of the capsule.The value can be 0, 1 or 2 corresponding to the X, Y and Z axes, respectively.

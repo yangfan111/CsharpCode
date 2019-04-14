@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -203,59 +204,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonCrossHairView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonCrossHairView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonCrossHairView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonCrossHairView, CommonCrossHairViewModel> bindingSet =
-                view.CreateBindingSet<CommonCrossHairView, CommonCrossHairViewModel>();
-
-            view.oricrossHariRootActive = _crossHariRootActive = view.crossHariRootActive.activeSelf;
-            bindingSet.Bind(view.crossHariRootActive).For(v => v.activeSelf).To(vm => vm.crossHariRootActive).OneWay();
-            view.orinormalActive = _normalActive = view.normalActive.activeSelf;
-            bindingSet.Bind(view.normalActive).For(v => v.activeSelf).To(vm => vm.normalActive).OneWay();
-            view.oricountDownActive = _countDownActive = view.countDownActive.activeSelf;
-            bindingSet.Bind(view.countDownActive).For(v => v.activeSelf).To(vm => vm.countDownActive).OneWay();
-            view.orinumBgFillAmount = _numBgFillAmount = view.numBgFillAmount.fillAmount;
-            bindingSet.Bind(view.numBgFillAmount).For(v => v.fillAmount).To(vm => vm.numBgFillAmount).OneWay();
-            view.oricountNumText = _countNumText = view.countNumText.text;
-            bindingSet.Bind(view.countNumText).For(v => v.text).To(vm => vm.countNumText).OneWay();
-            view.oriaddBloodActive = _addBloodActive = view.addBloodActive.activeSelf;
-            bindingSet.Bind(view.addBloodActive).For(v => v.activeSelf).To(vm => vm.addBloodActive).OneWay();
-            view.orinoVisibleActive = _noVisibleActive = view.noVisibleActive.activeSelf;
-            bindingSet.Bind(view.noVisibleActive).For(v => v.activeSelf).To(vm => vm.noVisibleActive).OneWay();
-            view.oriattackRootActive = _attackRootActive = view.attackRootActive.activeSelf;
-            bindingSet.Bind(view.attackRootActive).For(v => v.activeSelf).To(vm => vm.attackRootActive).OneWay();
-            view.oriImageWhiteActive = _imageWhiteActive = view.ImageWhiteActive.activeSelf;
-            bindingSet.Bind(view.ImageWhiteActive).For(v => v.activeSelf).To(vm => vm.ImageWhiteActive).OneWay();
-            view.oriImageWhiteSize = _imageWhiteSize = view.ImageWhiteSize.sizeDelta;
-            bindingSet.Bind(view.ImageWhiteSize).For(v => v.sizeDelta).To(vm => vm.ImageWhiteSize).OneWay();
-            view.oriImageWhiteColor = _imageWhiteColor = view.ImageWhiteColor.color;
-            bindingSet.Bind(view.ImageWhiteColor).For(v => v.color).To(vm => vm.ImageWhiteColor).OneWay();
-            view.oriImageRedActive = _imageRedActive = view.ImageRedActive.activeSelf;
-            bindingSet.Bind(view.ImageRedActive).For(v => v.activeSelf).To(vm => vm.ImageRedActive).OneWay();
-            view.oriImageRedSize = _imageRedSize = view.ImageRedSize.sizeDelta;
-            bindingSet.Bind(view.ImageRedSize).For(v => v.sizeDelta).To(vm => vm.ImageRedSize).OneWay();
-            view.oriImageRedColor = _imageRedColor = view.ImageRedColor.color;
-            bindingSet.Bind(view.ImageRedColor).For(v => v.color).To(vm => vm.ImageRedColor).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonCrossHairView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -279,12 +249,78 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonCrossHairView view)
+		{
+		     BindingSet<CommonCrossHairView, CommonCrossHairViewModel> bindingSet =
+                view.CreateBindingSet<CommonCrossHairView, CommonCrossHairViewModel>();
+            bindingSet.Bind(view.crossHariRootActive).For(v => v.activeSelf).To(vm => vm.crossHariRootActive).OneWay();
+            bindingSet.Bind(view.normalActive).For(v => v.activeSelf).To(vm => vm.normalActive).OneWay();
+            bindingSet.Bind(view.countDownActive).For(v => v.activeSelf).To(vm => vm.countDownActive).OneWay();
+            bindingSet.Bind(view.numBgFillAmount).For(v => v.fillAmount).To(vm => vm.numBgFillAmount).OneWay();
+            bindingSet.Bind(view.countNumText).For(v => v.text).To(vm => vm.countNumText).OneWay();
+            bindingSet.Bind(view.addBloodActive).For(v => v.activeSelf).To(vm => vm.addBloodActive).OneWay();
+            bindingSet.Bind(view.noVisibleActive).For(v => v.activeSelf).To(vm => vm.noVisibleActive).OneWay();
+            bindingSet.Bind(view.attackRootActive).For(v => v.activeSelf).To(vm => vm.attackRootActive).OneWay();
+            bindingSet.Bind(view.ImageWhiteActive).For(v => v.activeSelf).To(vm => vm.ImageWhiteActive).OneWay();
+            bindingSet.Bind(view.ImageWhiteSize).For(v => v.sizeDelta).To(vm => vm.ImageWhiteSize).OneWay();
+            bindingSet.Bind(view.ImageWhiteColor).For(v => v.color).To(vm => vm.ImageWhiteColor).OneWay();
+            bindingSet.Bind(view.ImageRedActive).For(v => v.activeSelf).To(vm => vm.ImageRedActive).OneWay();
+            bindingSet.Bind(view.ImageRedSize).For(v => v.sizeDelta).To(vm => vm.ImageRedSize).OneWay();
+            bindingSet.Bind(view.ImageRedColor).For(v => v.color).To(vm => vm.ImageRedColor).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonCrossHairView view)
+		{
+            _crossHariRootActive = view.crossHariRootActive.activeSelf;
+            _normalActive = view.normalActive.activeSelf;
+            _countDownActive = view.countDownActive.activeSelf;
+            _numBgFillAmount = view.numBgFillAmount.fillAmount;
+            _countNumText = view.countNumText.text;
+            _addBloodActive = view.addBloodActive.activeSelf;
+            _noVisibleActive = view.noVisibleActive.activeSelf;
+            _attackRootActive = view.attackRootActive.activeSelf;
+            _imageWhiteActive = view.ImageWhiteActive.activeSelf;
+            _imageWhiteSize = view.ImageWhiteSize.sizeDelta;
+            _imageWhiteColor = view.ImageWhiteColor.color;
+            _imageRedActive = view.ImageRedActive.activeSelf;
+            _imageRedSize = view.ImageRedSize.sizeDelta;
+            _imageRedColor = view.ImageRedColor.color;
+		}
+
+
+		void SaveOriData(CommonCrossHairView view)
+		{
+            view.oricrossHariRootActive = _crossHariRootActive;
+            view.orinormalActive = _normalActive;
+            view.oricountDownActive = _countDownActive;
+            view.orinumBgFillAmount = _numBgFillAmount;
+            view.oricountNumText = _countNumText;
+            view.oriaddBloodActive = _addBloodActive;
+            view.orinoVisibleActive = _noVisibleActive;
+            view.oriattackRootActive = _attackRootActive;
+            view.oriImageWhiteActive = _imageWhiteActive;
+            view.oriImageWhiteSize = _imageWhiteSize;
+            view.oriImageWhiteColor = _imageWhiteColor;
+            view.oriImageRedActive = _imageRedActive;
+            view.oriImageRedSize = _imageRedSize;
+            view.oriImageRedColor = _imageRedColor;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			crossHariRootActive = _view.oricrossHariRootActive;
 			normalActive = _view.orinormalActive;
 			countDownActive = _view.oricountDownActive;
@@ -325,7 +361,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonCrossHair"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

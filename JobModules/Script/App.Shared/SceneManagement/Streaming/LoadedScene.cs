@@ -18,8 +18,9 @@ namespace App.Shared.SceneManagement.Streaming
         {
             Scene = scene;
             _sceneDesc = sceneDesc;
-            StreamingRoot = new GameObject("StreamingRoot");
-            SceneManager.MoveGameObjectToScene(StreamingRoot, Scene);
+//            StreamingRoot = new GameObject("StreamingRoot");
+//            SceneManager.MoveGameObjectToScene(StreamingRoot, Scene);
+            StreamingRoot = DefaultGo.StreamingRoot;
         }
     }
 }

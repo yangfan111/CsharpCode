@@ -87,7 +87,8 @@ namespace App.Shared.GameModules.Weapon
          var ejectTrans = controller.RelatedBones.GetLocation(SpecialLocation.EjectionLocation, controller.RelatedAppearence.IsFirstPerson ? CharacterView.FirstPerson : CharacterView.ThirdPerson);
             if (null != ejectTrans)
             {
-                ClientEffectFactory.CreateBulletDrop(_context, _idGenerator, controller.Owner, ejectTrans.position, controller.RelatedOrient.Yaw, controller.RelatedOrient.Pitch, DefaultCfg.BulletDrop);
+                ClientEffectFactory.CreateBulletDrop(_context, _idGenerator, controller.Owner, ejectTrans.position, controller.RelatedOrient.Yaw, 
+                    controller.RelatedOrient.Pitch, DefaultCfg.BulletDrop,controller.HeldConfigId,AudioGrp_FootMatType.Concrete);
             }
             else
             {

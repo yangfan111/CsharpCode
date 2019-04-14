@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 using UnityEngine.EventSystems;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
@@ -126,32 +127,26 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonMaxMapView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.GenerateTrigger();
-				EventTriggerBind(view);
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonMaxMapView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonMaxMapView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonMaxMapView, CommonMaxMapViewModel> bindingSet =
-                view.CreateBindingSet<CommonMaxMapView, CommonMaxMapViewModel>();
-
-            view.orirootLocation = _rootLocation = view.rootLocation.anchoredPosition;
-            bindingSet.Bind(view.rootLocation).For(v => v.anchoredPosition).To(vm => vm.rootLocation).OneWay();
-            view.GenerateTrigger();
-            EventTriggerBind(view);
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
+			view.GenerateTrigger();
+			EventTriggerBind(view);
         }
 		private void EventTriggerBind(CommonMaxMapView view)
 		{
@@ -161,7 +156,6 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_onOnmaskBgETMouseUpChanged = (val) => view.OnmaskBgETMouseUp = val;
 			_onOnmaskBgETHoverExitChanged = (val) => view.OnmaskBgETHoverExit = val;
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -185,12 +179,39 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonMaxMapView view)
+		{
+		     BindingSet<CommonMaxMapView, CommonMaxMapViewModel> bindingSet =
+                view.CreateBindingSet<CommonMaxMapView, CommonMaxMapViewModel>();
+            bindingSet.Bind(view.rootLocation).For(v => v.anchoredPosition).To(vm => vm.rootLocation).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonMaxMapView view)
+		{
+            _rootLocation = view.rootLocation.anchoredPosition;
+		}
+
+
+		void SaveOriData(CommonMaxMapView view)
+		{
+            view.orirootLocation = _rootLocation;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			rootLocation = _view.orirootLocation;
 			SpriteReset();
 		}
@@ -218,7 +239,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonMaxMap"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

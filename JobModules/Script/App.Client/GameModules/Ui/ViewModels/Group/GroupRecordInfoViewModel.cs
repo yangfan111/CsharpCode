@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Group
 {
@@ -265,79 +266,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<GroupRecordInfoView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<GroupRecordInfoView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<GroupRecordInfoView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<GroupRecordInfoView, GroupRecordInfoViewModel> bindingSet =
-                view.CreateBindingSet<GroupRecordInfoView, GroupRecordInfoViewModel>();
-
-            view.oriImgGroupShow = _imgGroupShow = view.ImgGroupShow.activeSelf;
-            bindingSet.Bind(view.ImgGroupShow).For(v => v.activeSelf).To(vm => vm.ImgGroupShow).OneWay();
-            view.oriTextGroupShow = _textGroupShow = view.TextGroupShow.activeSelf;
-            bindingSet.Bind(view.TextGroupShow).For(v => v.activeSelf).To(vm => vm.TextGroupShow).OneWay();
-            view.oriIconGroupShow = _iconGroupShow = view.IconGroupShow.activeSelf;
-            bindingSet.Bind(view.IconGroupShow).For(v => v.activeSelf).To(vm => vm.IconGroupShow).OneWay();
-            view.oriMySelfMaskShow = _mySelfMaskShow = view.MySelfMaskShow.enabled;
-            bindingSet.Bind(view.MySelfMaskShow).For(v => v.enabled).To(vm => vm.MySelfMaskShow).OneWay();
-            view.oriDeathMaskShow = _deathMaskShow = view.DeathMaskShow.enabled;
-            bindingSet.Bind(view.DeathMaskShow).For(v => v.enabled).To(vm => vm.DeathMaskShow).OneWay();
-            view.oriDeadIconShow = _deadIconShow = view.DeadIconShow.enabled;
-            bindingSet.Bind(view.DeadIconShow).For(v => v.enabled).To(vm => vm.DeadIconShow).OneWay();
-            view.oriRankText = _rankText = view.RankText.text;
-            bindingSet.Bind(view.RankText).For(v => v.text).To(vm => vm.RankText).OneWay();
-            view.oriRankColor = _rankColor = view.RankColor.color;
-            bindingSet.Bind(view.RankColor).For(v => v.color).To(vm => vm.RankColor).OneWay();
-            view.oriPlayerNameText = _playerNameText = view.PlayerNameText.text;
-            bindingSet.Bind(view.PlayerNameText).For(v => v.text).To(vm => vm.PlayerNameText).OneWay();
-            view.oriPlayerNameColor = _playerNameColor = view.PlayerNameColor.color;
-            bindingSet.Bind(view.PlayerNameColor).For(v => v.color).To(vm => vm.PlayerNameColor).OneWay();
-            view.oriCorpsText = _corpsText = view.CorpsText.text;
-            bindingSet.Bind(view.CorpsText).For(v => v.text).To(vm => vm.CorpsText).OneWay();
-            view.oriCorpsColor = _corpsColor = view.CorpsColor.color;
-            bindingSet.Bind(view.CorpsColor).For(v => v.color).To(vm => vm.CorpsColor).OneWay();
-            view.oriKillText = _killText = view.KillText.text;
-            bindingSet.Bind(view.KillText).For(v => v.text).To(vm => vm.KillText).OneWay();
-            view.oriKillColor = _killColor = view.KillColor.color;
-            bindingSet.Bind(view.KillColor).For(v => v.color).To(vm => vm.KillColor).OneWay();
-            view.oriDamageText = _damageText = view.DamageText.text;
-            bindingSet.Bind(view.DamageText).For(v => v.text).To(vm => vm.DamageText).OneWay();
-            view.oriDamageColor = _damageColor = view.DamageColor.color;
-            bindingSet.Bind(view.DamageColor).For(v => v.color).To(vm => vm.DamageColor).OneWay();
-            view.oriDeadText = _deadText = view.DeadText.text;
-            bindingSet.Bind(view.DeadText).For(v => v.text).To(vm => vm.DeadText).OneWay();
-            view.oriDeadColor = _deadColor = view.DeadColor.color;
-            bindingSet.Bind(view.DeadColor).For(v => v.color).To(vm => vm.DeadColor).OneWay();
-            view.oriAssistText = _assistText = view.AssistText.text;
-            bindingSet.Bind(view.AssistText).For(v => v.text).To(vm => vm.AssistText).OneWay();
-            view.oriAssistColor = _assistColor = view.AssistColor.color;
-            bindingSet.Bind(view.AssistColor).For(v => v.color).To(vm => vm.AssistColor).OneWay();
-            view.oriPingText = _pingText = view.PingText.text;
-            bindingSet.Bind(view.PingText).For(v => v.text).To(vm => vm.PingText).OneWay();
-            view.oriPingColor = _pingColor = view.PingColor.color;
-            bindingSet.Bind(view.PingColor).For(v => v.color).To(vm => vm.PingColor).OneWay();
-            bindingSet.Bind(view.TitleIconShow1).For(v => v.activeSelf).To(vm => vm.TitleIconShow1).OneWay();
-            bindingSet.Bind(view.TitleIconShow2).For(v => v.activeSelf).To(vm => vm.TitleIconShow2).OneWay();
-            bindingSet.Bind(view.TitleIconShow3).For(v => v.activeSelf).To(vm => vm.TitleIconShow3).OneWay();
-            bindingSet.Bind(view.TitleIconShow4).For(v => v.activeSelf).To(vm => vm.TitleIconShow4).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(GroupRecordInfoView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -361,12 +311,106 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
             }
         }
 
+		void ViewBind(GroupRecordInfoView view)
+		{
+		     BindingSet<GroupRecordInfoView, GroupRecordInfoViewModel> bindingSet =
+                view.CreateBindingSet<GroupRecordInfoView, GroupRecordInfoViewModel>();
+            bindingSet.Bind(view.ImgGroupShow).For(v => v.activeSelf).To(vm => vm.ImgGroupShow).OneWay();
+            bindingSet.Bind(view.TextGroupShow).For(v => v.activeSelf).To(vm => vm.TextGroupShow).OneWay();
+            bindingSet.Bind(view.IconGroupShow).For(v => v.activeSelf).To(vm => vm.IconGroupShow).OneWay();
+            bindingSet.Bind(view.MySelfMaskShow).For(v => v.enabled).To(vm => vm.MySelfMaskShow).OneWay();
+            bindingSet.Bind(view.DeathMaskShow).For(v => v.enabled).To(vm => vm.DeathMaskShow).OneWay();
+            bindingSet.Bind(view.DeadIconShow).For(v => v.enabled).To(vm => vm.DeadIconShow).OneWay();
+            bindingSet.Bind(view.RankText).For(v => v.text).To(vm => vm.RankText).OneWay();
+            bindingSet.Bind(view.RankColor).For(v => v.color).To(vm => vm.RankColor).OneWay();
+            bindingSet.Bind(view.PlayerNameText).For(v => v.text).To(vm => vm.PlayerNameText).OneWay();
+            bindingSet.Bind(view.PlayerNameColor).For(v => v.color).To(vm => vm.PlayerNameColor).OneWay();
+            bindingSet.Bind(view.CorpsText).For(v => v.text).To(vm => vm.CorpsText).OneWay();
+            bindingSet.Bind(view.CorpsColor).For(v => v.color).To(vm => vm.CorpsColor).OneWay();
+            bindingSet.Bind(view.KillText).For(v => v.text).To(vm => vm.KillText).OneWay();
+            bindingSet.Bind(view.KillColor).For(v => v.color).To(vm => vm.KillColor).OneWay();
+            bindingSet.Bind(view.DamageText).For(v => v.text).To(vm => vm.DamageText).OneWay();
+            bindingSet.Bind(view.DamageColor).For(v => v.color).To(vm => vm.DamageColor).OneWay();
+            bindingSet.Bind(view.DeadText).For(v => v.text).To(vm => vm.DeadText).OneWay();
+            bindingSet.Bind(view.DeadColor).For(v => v.color).To(vm => vm.DeadColor).OneWay();
+            bindingSet.Bind(view.AssistText).For(v => v.text).To(vm => vm.AssistText).OneWay();
+            bindingSet.Bind(view.AssistColor).For(v => v.color).To(vm => vm.AssistColor).OneWay();
+            bindingSet.Bind(view.PingText).For(v => v.text).To(vm => vm.PingText).OneWay();
+            bindingSet.Bind(view.PingColor).For(v => v.color).To(vm => vm.PingColor).OneWay();
+            bindingSet.Bind(view.TitleIconShow1).For(v => v.activeSelf).To(vm => vm.TitleIconShow1).OneWay();
+            bindingSet.Bind(view.TitleIconShow2).For(v => v.activeSelf).To(vm => vm.TitleIconShow2).OneWay();
+            bindingSet.Bind(view.TitleIconShow3).For(v => v.activeSelf).To(vm => vm.TitleIconShow3).OneWay();
+            bindingSet.Bind(view.TitleIconShow4).For(v => v.activeSelf).To(vm => vm.TitleIconShow4).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(GroupRecordInfoView view)
+		{
+            _imgGroupShow = view.ImgGroupShow.activeSelf;
+            _textGroupShow = view.TextGroupShow.activeSelf;
+            _iconGroupShow = view.IconGroupShow.activeSelf;
+            _mySelfMaskShow = view.MySelfMaskShow.enabled;
+            _deathMaskShow = view.DeathMaskShow.enabled;
+            _deadIconShow = view.DeadIconShow.enabled;
+            _rankText = view.RankText.text;
+            _rankColor = view.RankColor.color;
+            _playerNameText = view.PlayerNameText.text;
+            _playerNameColor = view.PlayerNameColor.color;
+            _corpsText = view.CorpsText.text;
+            _corpsColor = view.CorpsColor.color;
+            _killText = view.KillText.text;
+            _killColor = view.KillColor.color;
+            _damageText = view.DamageText.text;
+            _damageColor = view.DamageColor.color;
+            _deadText = view.DeadText.text;
+            _deadColor = view.DeadColor.color;
+            _assistText = view.AssistText.text;
+            _assistColor = view.AssistColor.color;
+            _pingText = view.PingText.text;
+            _pingColor = view.PingColor.color;
+		}
+
+
+		void SaveOriData(GroupRecordInfoView view)
+		{
+            view.oriImgGroupShow = _imgGroupShow;
+            view.oriTextGroupShow = _textGroupShow;
+            view.oriIconGroupShow = _iconGroupShow;
+            view.oriMySelfMaskShow = _mySelfMaskShow;
+            view.oriDeathMaskShow = _deathMaskShow;
+            view.oriDeadIconShow = _deadIconShow;
+            view.oriRankText = _rankText;
+            view.oriRankColor = _rankColor;
+            view.oriPlayerNameText = _playerNameText;
+            view.oriPlayerNameColor = _playerNameColor;
+            view.oriCorpsText = _corpsText;
+            view.oriCorpsColor = _corpsColor;
+            view.oriKillText = _killText;
+            view.oriKillColor = _killColor;
+            view.oriDamageText = _damageText;
+            view.oriDamageColor = _damageColor;
+            view.oriDeadText = _deadText;
+            view.oriDeadColor = _deadColor;
+            view.oriAssistText = _assistText;
+            view.oriAssistColor = _assistColor;
+            view.oriPingText = _pingText;
+            view.oriPingColor = _pingColor;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			ImgGroupShow = _view.oriImgGroupShow;
 			TextGroupShow = _view.oriTextGroupShow;
 			IconGroupShow = _view.oriIconGroupShow;
@@ -454,7 +498,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
         		return default(bool);
         	}
         }
-        public string ResourceBundleName { get { return "uiprefabs/group"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/group"; } }
         public string ResourceAssetName { get { return "GroupRecordInfo"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

@@ -36,7 +36,7 @@ namespace  App.Shared.GameModules.Weapon.Behavior
     /// <summary>
     /// 计算Spread
     /// </summary>
-    public interface ISpreadProcessor : IBeforeFireProcess
+    public interface ISpreadProcessor : IBeforeFireProcess,IIdleProcess
     {
     }
 

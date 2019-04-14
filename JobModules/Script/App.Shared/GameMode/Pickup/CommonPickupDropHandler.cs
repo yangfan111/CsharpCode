@@ -23,14 +23,13 @@ namespace App.Shared.GameMode
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CommonPickupDropHandler));
 
-        private int sceneWeaponLifeTime;
+     //   private int sceneWeaponLifeTime;
 
-        private readonly RuntimeGameConfig runtimeGameConfig;
+        //private readonly RuntimeGameConfig runtimeGameConfig;
 
-        public CommonPickupDropHandler(Contexts contexts,int modelId) : base(contexts)
+        public CommonPickupDropHandler(Contexts contexts,int modelId) : base(contexts,modelId)
         {
-            sceneWeaponLifeTime = SingletonManager.Get<GameModeConfigManager>().GetWepaonStayTime(modelId);
-            runtimeGameConfig = contexts.session.commonSession.RuntimeGameConfig;
+         //   sceneWeaponLifeTime = SingletonManager.Get<GameModeConfigManager>().GetWepaonStayTime(modelId);
         }
 
         public override void DoPickup(PlayerEntity player, int sceneKey)
@@ -65,6 +64,7 @@ namespace App.Shared.GameMode
             sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(lastWeaponScan, player.position.Value, sceneWeaponLifeTime) ;
             if (null != args)
             {
+                
                 TriggerArgs ta = new TriggerArgs();
                 ta.AddPara(new IntPara("weaponId", lastWeaponScan.ConfigId));
                 ta.AddUnit("current", (FreeData)player.freeData.FreeData);
@@ -74,69 +74,6 @@ namespace App.Shared.GameMode
                 args.Trigger(FreeTriggerConstant.WEAPON_DROP, ta);
             }
         }
-
-        protected virtual void DoDropGrenade(PlayerEntity playerEntity)
-        {
-        }
-
-        public override void Drop(PlayerEntity player, EWeaponSlotType slot, IUserCmd cmd)
-        {
-            switch (slot)
-            {
-                case EWeaponSlotType.ThrowingWeapon:
-                    DoDropGrenade(player);
-                    return;
-            }
-            var heldAgent = player.WeaponController().HeldWeaponAgent;
-            if (heldAgent.IsValid())
-            {
-                var dropPos = player.GetHandWeaponPosition();
-                var playerTrans = player.characterContoller.Value.transform;
-                var forward = playerTrans.forward;
-                var pos = dropPos + forward * runtimeGameConfig.WeaponDropOffset;
-                var weaponScacn = heldAgent.ComponentScan;
-                bool generateSceneObj = player.WeaponController().DropWeapon(slot);
-                if (!generateSceneObj || weaponScacn.IsUnSafeOrEmpty()) return;
-           //     DebugUtil.LogInUnity(weaponScacn.ToString(), DebugUtil.DebugColor.Black);
-                RaycastHit hhit;
-                SceneObjectEntity sceneObjectEntity;
-                if (Physics.Raycast(dropPos, forward, out hhit, runtimeGameConfig.WeaponDropOffset, UnityLayers.SceneCollidableLayerMask))
-                {
-                    RaycastHit vhit;
-                    if (Physics.Raycast(hhit.point, Vector3.down, out vhit, 100, UnityLayers.SceneCollidableLayerMask))
-                    {
-                        sceneObjectEntity = sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScacn, vhit.point, sceneWeaponLifeTime) as SceneObjectEntity;
-                    }
-                    else
-                    {
-                        sceneObjectEntity = sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScacn, playerTrans.position, sceneWeaponLifeTime) as SceneObjectEntity;
-                    }
-                }
-                else
-                {
-                    RaycastHit vhit;
-                    if (Physics.Raycast(pos, Vector3.down, out vhit, 100, UnityLayers.SceneCollidableLayerMask))
-                    {
-                        sceneObjectEntity = sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScacn, vhit.point, sceneWeaponLifeTime) as SceneObjectEntity;
-                    }
-                    else
-                    {
-                        sceneObjectEntity = sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScacn, playerTrans.position, sceneWeaponLifeTime) as SceneObjectEntity;
-                    }
-                }
-        
-                IEventArgs args = commonSession.FreeArgs as IEventArgs;
-                if (null != args && null != sceneObjectEntity)
-                {
-                    TriggerArgs ta = new TriggerArgs();
-                    ta.AddPara(new IntPara("weaponId", weaponScacn.ConfigId));
-                    ta.AddPara(new FloatPara("weaponx", sceneObjectEntity.position.Value.x));
-                    ta.AddPara(new FloatPara("weapony", sceneObjectEntity.position.Value.y));
-                    ta.AddPara(new FloatPara("weaponz", sceneObjectEntity.position.Value.z));
-                    ta.AddUnit("current", (FreeData)player.freeData.FreeData);
-                    args.Trigger(FreeTriggerConstant.WEAPON_DROP, ta);
-                }
-            }
-        }
+      
     }
 }

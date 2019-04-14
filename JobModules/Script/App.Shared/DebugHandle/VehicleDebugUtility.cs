@@ -5,6 +5,7 @@ using System.Text;
 using App.Shared.Components;
 using App.Shared.Components.Vehicle;
 using App.Shared.GameModules.Vehicle;
+using Core.Components;
 using Core.EntityComponent;
 using Core.Utils;
 using Shared.Scripts.Vehicles;
@@ -84,7 +85,7 @@ namespace App.Shared.DebugHandle
                     continue;
                 }
 
-                var sqrDist = (vehicle.GetDynamicData().Position - position).sqrMagnitude;
+                var sqrDist = (vehicle.GetDynamicData().Position.ShiftedVector3() - position).sqrMagnitude;
                 if (sqrDist < minSqrDist)
                 {
                     nearestVehicle = vehicle;
@@ -96,7 +97,7 @@ namespace App.Shared.DebugHandle
             {
                 var dragPosition = position + new Vector3(0.0f, 5.0f, 0.0f);
                 var dynamicData = nearestVehicle.GetDynamicData();
-                dynamicData.Position = dragPosition;
+                dynamicData.Position = dragPosition.ShiftedToFixedVector3();
                 var go = nearestVehicle.gameObject.UnityObject.AsGameObject;
                 go.transform.position = dragPosition;
             }

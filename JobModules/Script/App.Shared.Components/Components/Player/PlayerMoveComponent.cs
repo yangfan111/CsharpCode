@@ -27,7 +27,7 @@ namespace App.Shared.Components.Player
     
     public class PlayerMoveByAnimUpdateComponent : IUpdateComponent
     {
-        [NetworkProperty] [DontInitilize] public Vector3 Position;
+        [NetworkProperty] [DontInitilize] public FixedVector3 Position;
         [NetworkProperty] [DontInitilize] public float ModelPitch;
         [NetworkProperty] [DontInitilize] public float ModelYaw;
         [NetworkProperty] [DontInitilize] public bool NeedUpdate;
@@ -61,7 +61,7 @@ namespace App.Shared.Components.Player
 
         [NetworkProperty] [DontInitilize] public int SkyMoveStage;
         [NetworkProperty] [DontInitilize] public int GameState;
-        [NetworkProperty] [DontInitilize] public Vector3 SkyPosition;
+        [NetworkProperty] [DontInitilize] public FixedVector3 SkyPosition;
         [NetworkProperty] [DontInitilize] public Quaternion SkyRotation;
         [NetworkProperty] [DontInitilize] public Vector3 SkyLocalPlayerPosition;
         [NetworkProperty] [DontInitilize] public Quaternion SkyLocalPlayerRotation;
@@ -94,14 +94,14 @@ namespace App.Shared.Components.Player
     public class MoveUpdateComponent : IUpdateComponent
     {
         [NetworkProperty] [DontInitilize] public Vector3 Velocity;
-        [NetworkProperty] [DontInitilize] public Vector3 LastPosition;
+        [NetworkProperty] [DontInitilize] public FixedVector3 LastPosition;
         [NetworkProperty] [DontInitilize] public Vector3 Rotation;
         [NetworkProperty] [DontInitilize] public Vector3 Dist;
         [NetworkProperty] [DontInitilize] public Vector3 VehicleRideOffOffset;
         
         [NetworkProperty] [DontInitilize] public bool IsGround;
         [NetworkProperty] [DontInitilize] public bool IsCollided;
-        [NetworkProperty] [DontInitilize] public bool ExceedSteepLimit; //因坡度过大，人物减速
+        [NetworkProperty] [DontInitilize] public float TanSteepAngle; //因坡度过大，人物减速
         [NetworkProperty] [DontInitilize] public bool MoveInWater; //涉水状态
         [NetworkProperty] [DontInitilize] public bool BeginDive; //由游泳状态转为潜水状态
         [NetworkProperty] [DontInitilize] public bool NeedUpdate;
@@ -123,7 +123,7 @@ namespace App.Shared.Components.Player
             LastPosition = r.LastPosition;
             IsGround = r.IsGround;
             IsCollided = r.IsCollided;
-            ExceedSteepLimit = r.ExceedSteepLimit;
+            TanSteepAngle = r.TanSteepAngle;
             MoveInWater = r.MoveInWater;
             BeginDive = r.BeginDive;
             NeedUpdate = r.NeedUpdate;
@@ -163,6 +163,7 @@ namespace App.Shared.Components.Player
 
         public Vector3 Velocity;
         public float SpeedAffect;
+        public float JumpAffect;
         public bool IsGround;
         public bool IsAutoRun;
         public float SpeedRatio;
@@ -182,15 +183,16 @@ namespace App.Shared.Components.Player
         public override string ToString()
         {
             return string.Format(
-                "Velocity: {0}, SpeedAffect: {1}, IsGround: {2}, IsAutoRun: {3}, SpeedRatio: {4}, Steep: {5}, SteepAverage: {6}, UpDownValue: {7}, MoveSpeedRatio:{8}, MoveVel:{9}",
+                "Velocity: {0}, SpeedAffect: {1}, IsGround: {2}, IsAutoRun: {3}, SpeedRatio: {4}, Steep: {5}, SteepAverage: {6}, UpDownValue: {7}, MoveSpeedRatio:{8}, MoveVel:{9}, JumpAffect: {10}",
                 Velocity, SpeedAffect, IsGround, IsAutoRun, SpeedRatio, Steep, SteepAverage, UpDownValue,
-                MoveSpeedRatio, MoveVel);
+                MoveSpeedRatio, MoveVel, JumpAffect);
         }
 
         public void Reset()
         {
             Velocity = Vector3.zero;
             SpeedAffect = 0f;
+            JumpAffect = 0f;
             IsGround = true;
             IsAutoRun = false;
             SpeedRatio = 1.0f;

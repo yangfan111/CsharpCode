@@ -8,6 +8,8 @@ using Entitas;
 using Entitas.CodeGeneration.Attributes;
 using UnityEngine;
 using XmlConfig;
+using System;
+using System.Collections.Generic;
 
 namespace App.Shared.Components.ClientEffect
 {
@@ -42,7 +44,12 @@ namespace App.Shared.Components.ClientEffect
     public class AudioComponent: IComponent
     {
         public int AudioClientEffectType;
-        public int AudioClientEffectArg;
+        [DontInitilize]
+        public int AudioClientEffectArg1;
+        [DontInitilize]
+        public int AudioClientEffectArg2;
+        [DontInitilize]
+        public int AudioClientEffectArg3;
     }
 
     [ClientEffect]
@@ -185,5 +192,62 @@ namespace App.Shared.Components.ClientEffect
             PlayerPos = InterpolateUtility.Interpolate(l.PlayerPos,
                 r.PlayerPos, interpolationInfo);
         }
+    }
+
+    [ClientEffect]
+    public class SprayPaintComponent : IPlaybackComponent 
+    {
+        [DontInitilize] [NetworkProperty] public Vector3 SprayPaintPos; /*起始位置*/
+        [DontInitilize] [NetworkProperty] public Vector3 SprayPaintForward; /*朝向*/
+        [DontInitilize] [NetworkProperty] public int SprayPrintMask; /*掩码*/
+        [DontInitilize] [NetworkProperty] public Vector3 SprayPrintSize; /*大小*/
+        [DontInitilize] [NetworkProperty] public int SprayPrintType; /*类型*/
+        [DontInitilize] [NetworkProperty] public int SprayPrintSpriteId; /*贴图*/
+
+        public void CopyFrom(object rightComponent) {
+            var r = rightComponent as SprayPaintComponent;
+            SprayPaintPos = r.SprayPaintPos;
+            SprayPaintForward = r.SprayPaintForward;
+            SprayPrintMask = r.SprayPrintMask;
+            SprayPrintSize = r.SprayPrintSize;
+            SprayPrintType = r.SprayPrintType;
+            SprayPrintSpriteId = r.SprayPrintSpriteId;
+        }
+
+        public int GetComponentId() {
+            return (int)EComponentIds.SprayPaint;
+        }
+
+        public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo) {
+            CopyFrom(left);
+        }
+
+        public bool IsInterpolateEveryFrame() {
+            return true;
+        }
+
+        T[] FindObjectsOfType<T>() where T : UnityEngine.Object {
+            return UnityEngine.Object.FindObjectsOfType<T>();
+        }
+
+        public GameObject[] GetAffectedObjects(Bounds bounds, LayerMask affectedLayers)
+        {
+            MeshRenderer[] renderers = FindObjectsOfType<MeshRenderer>();
+            List<GameObject> objects = new List<GameObject>();
+            foreach (Renderer r in renderers)
+            {
+                if (!r.enabled) continue;
+                // 过滤
+                if ((1 << r.gameObject.layer & affectedLayers.value) == 0) continue; 
+                /*if (r.GetComponent<Decal>() != null) continue;*/
+
+                if (bounds.Intersects(r.bounds))
+                {
+                    objects.Add(r.gameObject);
+                }
+            }
+            return objects.ToArray();
+        }
+
     }
 }

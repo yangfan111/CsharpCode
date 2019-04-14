@@ -1,13 +1,13 @@
-﻿using Assets.Sources.Free;
-using System.Collections.Generic;
-using Free.framework;
-using Core.Free;
-using Assets.Sources.Free.UI;
+﻿using App.Client.GameModules.Ui.UiAdapter;
 using App.Shared.Components.Ui;
-using App.Client.GameModules.Ui.UiAdapter;
 using Assets.App.Client.GameModules.Ui;
+using Assets.Sources.Free;
+using Assets.Sources.Free.UI;
 using Core.Enums;
+using Core.Free;
 using Core.Room;
+using Free.framework;
+using System.Collections.Generic;
 using Utils.Singleton;
 
 namespace App.Client.GameModules.GamePlay.Free.App
@@ -17,7 +17,7 @@ namespace App.Client.GameModules.GamePlay.Free.App
         public bool CanHandle(int key)
         {
             return key == FreeMessageConstant.GroupScoreUI || key == FreeMessageConstant.GroupTechStatUI
-                || key == FreeMessageConstant.GroupGameOverUI;
+                || key == FreeMessageConstant.GroupGameOverUI || key == FreeMessageConstant.PlayerTipHide;
         }
 
         public void Handle(SimpleProto data)
@@ -92,6 +92,14 @@ namespace App.Client.GameModules.GamePlay.Free.App
                 ui.GroupBattleDataDict[EUICampType.T] = team1;
                 ui.GroupBattleDataDict[EUICampType.CT] = team2;
                 ui.GroupBattleDataChanged = true;
+            }
+
+            if (data.Key == FreeMessageConstant.PlayerTipHide)
+            {
+                if (contexts.player.flagSelfEntity != null)
+                {
+                    contexts.player.flagSelfEntity.gamePlay.TipHideStatus = data.Bs[0];
+                }
             }
         }
 

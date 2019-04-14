@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Core.Components;
+using Core.Ui.Map;
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
 using UnityEngine;
@@ -35,8 +37,8 @@ namespace App.Shared.Components.Ui
 
 
         [DontInitilize] public bool IsShowRouteLine;  //是否显示航线
-        [DontInitilize] public Vector2 RouteLineStartPoint;    //跳伞开始位置
-        [DontInitilize] public Vector2 RouteLineEndPoint;      //跳伞结束位置
+        [DontInitilize] public MapFixedVector2 RouteLineStartPoint;    //跳伞开始位置
+        [DontInitilize] public MapFixedVector2 RouteLineEndPoint;      //跳伞结束位置
 
 
         [DontInitilize] public int OffLineLevel; //离线模式下的一个level

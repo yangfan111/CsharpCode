@@ -1,4 +1,5 @@
-﻿using Core.ObjectPool;
+﻿using Core.Components;
+using Core.ObjectPool;
 using Core.Utils;
 using UnityEngine;
 
@@ -69,7 +70,7 @@ namespace Core.Prediction.VehiclePrediction.Cmd
 
     public struct VehicleBody
     {
-        public Vector3 Position;
+        public FixedVector3 Position;
         public Quaternion Rotation;
 //        public Vector3 Body2WorldPosition;
 //        public Quaternion Body2WorldRotation;

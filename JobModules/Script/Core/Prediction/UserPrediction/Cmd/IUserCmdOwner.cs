@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Core.EntityComponent;
-using Core.GameInputFilter;
+using Core;
 using Core.UpdateLatest;
 
 namespace Core.Prediction.UserPrediction.Cmd
@@ -14,6 +14,6 @@ namespace Core.Prediction.UserPrediction.Cmd
         object OwnerEntity { get; }
         EntityKey OwnerEntityKey { get; }
         IUserCmd LastTempCmd { get;  }
-        IFilteredInput Filter(IUserCmd userCmd);
+        IFilteredInput GetFiltedInput(IUserCmd userCmd);
     }
 }

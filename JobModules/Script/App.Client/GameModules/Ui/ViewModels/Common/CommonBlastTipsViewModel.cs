@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -177,55 +178,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonBlastTipsView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonBlastTipsView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonBlastTipsView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonBlastTipsView, CommonBlastTipsViewModel> bindingSet =
-                view.CreateBindingSet<CommonBlastTipsView, CommonBlastTipsViewModel>();
-
-            view.orirootActiveSelf = _rootActiveSelf = view.rootActiveSelf.activeSelf;
-            bindingSet.Bind(view.rootActiveSelf).For(v => v.activeSelf).To(vm => vm.rootActiveSelf).OneWay();
-            view.oriAactiveSelf = _aactiveSelf = view.AactiveSelf.activeSelf;
-            bindingSet.Bind(view.AactiveSelf).For(v => v.activeSelf).To(vm => vm.AactiveSelf).OneWay();
-            view.oriAUIPos = _aUIPos = view.AUIPos.anchoredPosition3D;
-            bindingSet.Bind(view.AUIPos).For(v => v.anchoredPosition3D).To(vm => vm.AUIPos).OneWay();
-            view.oriBactiveSelf = _bactiveSelf = view.BactiveSelf.activeSelf;
-            bindingSet.Bind(view.BactiveSelf).For(v => v.activeSelf).To(vm => vm.BactiveSelf).OneWay();
-            view.oriBUIPos = _bUIPos = view.BUIPos.anchoredPosition3D;
-            bindingSet.Bind(view.BUIPos).For(v => v.anchoredPosition3D).To(vm => vm.BUIPos).OneWay();
-            view.oriC4activeSelf = _c4activeSelf = view.C4activeSelf.activeSelf;
-            bindingSet.Bind(view.C4activeSelf).For(v => v.activeSelf).To(vm => vm.C4activeSelf).OneWay();
-            view.oriC4UIPos = _c4UIPos = view.C4UIPos.anchoredPosition3D;
-            bindingSet.Bind(view.C4UIPos).For(v => v.anchoredPosition3D).To(vm => vm.C4UIPos).OneWay();
-            view.oriAtitleText = _atitleText = view.AtitleText.text;
-            bindingSet.Bind(view.AtitleText).For(v => v.text).To(vm => vm.AtitleText).OneWay();
-            view.oriBtitleText = _btitleText = view.BtitleText.text;
-            bindingSet.Bind(view.BtitleText).For(v => v.text).To(vm => vm.BtitleText).OneWay();
-            view.oriC4titleText = _c4titleText = view.C4titleText.text;
-            bindingSet.Bind(view.C4titleText).For(v => v.text).To(vm => vm.C4titleText).OneWay();
-            view.oriiconredA = _iconredA = view.iconredA.activeSelf;
-            bindingSet.Bind(view.iconredA).For(v => v.activeSelf).To(vm => vm.iconredA).OneWay();
-            view.oriiconredB = _iconredB = view.iconredB.activeSelf;
-            bindingSet.Bind(view.iconredB).For(v => v.activeSelf).To(vm => vm.iconredB).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonBlastTipsView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -249,12 +223,72 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonBlastTipsView view)
+		{
+		     BindingSet<CommonBlastTipsView, CommonBlastTipsViewModel> bindingSet =
+                view.CreateBindingSet<CommonBlastTipsView, CommonBlastTipsViewModel>();
+            bindingSet.Bind(view.rootActiveSelf).For(v => v.activeSelf).To(vm => vm.rootActiveSelf).OneWay();
+            bindingSet.Bind(view.AactiveSelf).For(v => v.activeSelf).To(vm => vm.AactiveSelf).OneWay();
+            bindingSet.Bind(view.AUIPos).For(v => v.anchoredPosition3D).To(vm => vm.AUIPos).OneWay();
+            bindingSet.Bind(view.BactiveSelf).For(v => v.activeSelf).To(vm => vm.BactiveSelf).OneWay();
+            bindingSet.Bind(view.BUIPos).For(v => v.anchoredPosition3D).To(vm => vm.BUIPos).OneWay();
+            bindingSet.Bind(view.C4activeSelf).For(v => v.activeSelf).To(vm => vm.C4activeSelf).OneWay();
+            bindingSet.Bind(view.C4UIPos).For(v => v.anchoredPosition3D).To(vm => vm.C4UIPos).OneWay();
+            bindingSet.Bind(view.AtitleText).For(v => v.text).To(vm => vm.AtitleText).OneWay();
+            bindingSet.Bind(view.BtitleText).For(v => v.text).To(vm => vm.BtitleText).OneWay();
+            bindingSet.Bind(view.C4titleText).For(v => v.text).To(vm => vm.C4titleText).OneWay();
+            bindingSet.Bind(view.iconredA).For(v => v.activeSelf).To(vm => vm.iconredA).OneWay();
+            bindingSet.Bind(view.iconredB).For(v => v.activeSelf).To(vm => vm.iconredB).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonBlastTipsView view)
+		{
+            _rootActiveSelf = view.rootActiveSelf.activeSelf;
+            _aactiveSelf = view.AactiveSelf.activeSelf;
+            _aUIPos = view.AUIPos.anchoredPosition3D;
+            _bactiveSelf = view.BactiveSelf.activeSelf;
+            _bUIPos = view.BUIPos.anchoredPosition3D;
+            _c4activeSelf = view.C4activeSelf.activeSelf;
+            _c4UIPos = view.C4UIPos.anchoredPosition3D;
+            _atitleText = view.AtitleText.text;
+            _btitleText = view.BtitleText.text;
+            _c4titleText = view.C4titleText.text;
+            _iconredA = view.iconredA.activeSelf;
+            _iconredB = view.iconredB.activeSelf;
+		}
+
+
+		void SaveOriData(CommonBlastTipsView view)
+		{
+            view.orirootActiveSelf = _rootActiveSelf;
+            view.oriAactiveSelf = _aactiveSelf;
+            view.oriAUIPos = _aUIPos;
+            view.oriBactiveSelf = _bactiveSelf;
+            view.oriBUIPos = _bUIPos;
+            view.oriC4activeSelf = _c4activeSelf;
+            view.oriC4UIPos = _c4UIPos;
+            view.oriAtitleText = _atitleText;
+            view.oriBtitleText = _btitleText;
+            view.oriC4titleText = _c4titleText;
+            view.oriiconredA = _iconredA;
+            view.oriiconredB = _iconredB;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			rootActiveSelf = _view.orirootActiveSelf;
 			AactiveSelf = _view.oriAactiveSelf;
 			AUIPos = _view.oriAUIPos;
@@ -293,7 +327,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonBlastTips"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

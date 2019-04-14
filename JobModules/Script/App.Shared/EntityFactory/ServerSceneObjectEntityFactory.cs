@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using App.Shared.Components;
+using App.Shared.GameModules.Player;
 using App.Shared.Player;
 using Assets.App.Server.GameModules.GamePlay.Free;
 using Assets.Utils.Configuration;
@@ -62,8 +63,16 @@ namespace App.Shared.EntityFactory
             var entity = _sceneObjectContext.CreateEntity();
             entity.AddEntityKey(new EntityKey(_equipGenerator.GetNextEntityId(), (short) EEntityType.SceneObject));
             entity.isFlagSyncNonSelf = true;
-            entity.AddPosition(position);
+            
+            entity.AddPosition();
+            entity.position.Value = position;
             entity.AddSimpleEquipment(id, count, (int) category);
+            if (category == ECategory.Weapon)
+            {
+                entity.AddWeaponObject();
+                entity.weaponObject.ConfigId = id;
+            }
+       
             entity.AddFlagImmutability(_currentTime.CurrentTime);
             return entity;
         }
@@ -73,7 +82,8 @@ namespace App.Shared.EntityFactory
             var entity = _sceneObjectContext.CreateEntity();
             entity.AddEntityKey(new EntityKey(_equipGenerator.GetNextEntityId(), (short) EEntityType.SceneObject));
             entity.isFlagSyncNonSelf = true;
-            entity.AddPosition(position);
+            entity.AddPosition();
+            entity.position.Value = position;
             entity.AddWeaponObject();
             entity.weaponObject.GameCopyFrom(weaponScan); 
             entity.AddFlagImmutability(_currentTime.CurrentTime);
@@ -108,7 +118,8 @@ namespace App.Shared.EntityFactory
             var entity = _sceneObjectContext.CreateEntity();
             entity.AddEntityKey(new EntityKey(_equipGenerator.GetNextEntityId(), (short) EEntityType.SceneObject));
             entity.AddSimpleCastTarget(key, size, tip);
-            entity.AddPosition(position);
+            entity.AddPosition();
+            entity.position.Value = position;
             entity.isFlagSyncNonSelf = true;
             entity.AddFlagImmutability(_currentTime.CurrentTime);
             return entity;

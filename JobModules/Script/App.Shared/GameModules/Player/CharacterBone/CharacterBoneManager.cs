@@ -82,6 +82,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
         public CharacterBoneManager()
         {
+            _boneRigging.EnableSightMove = EnableSightMove;
             _playerIkController = new PlayerIkController();
             CacheChangeCacheAction = () =>
             {
@@ -217,6 +218,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
         public void Execute(Action<FsmOutput> addOutput)
         {
             _playerIkController.Execute();
+            _directOutputs.Apply(addOutput);
         }
 
         public void PreUpdate(FollowRotParam param, ICharacterBone characterBone)
@@ -293,9 +295,31 @@ namespace App.Shared.GameModules.Player.CharacterBone
             _playerIkController.SyncTo(boneComponent);
         }
 
+        private void EnableSightMove(bool enable)
+        {
+            _directOutputs.CacheFsmOutput(AnimatorParametersHash.Instance.EnableSightMoveHash,
+                AnimatorParametersHash.Instance.EnableSightMoveName,
+                enable,
+                CharacterView.FirstPerson);
+        }
+
         // 包括枪配件的改变
         public void CurrentWeaponChanged(GameObject objP1, GameObject objP3)
         {
+            if (null == objP1 && null == objP3)
+            {
+                _directOutputs.CacheFsmOutput(AnimatorParametersHash.Instance.HandPoseHash,
+                    AnimatorParametersHash.Instance.HandPoseName,
+                    AnimatorParametersHash.Instance.HandPoseDisableValue,
+                    CharacterView.FirstPerson | CharacterView.ThirdPerson);
+                return;
+            }
+            
+            _directOutputs.CacheFsmOutput(AnimatorParametersHash.Instance.HandPoseHash,
+                AnimatorParametersHash.Instance.HandPoseName,
+                AnimatorParametersHash.Instance.HandPoseEnableValue,
+                CharacterView.FirstPerson | CharacterView.ThirdPerson);
+                
             if (_boneRigging.SetIKTarget(objP1, objP3, ref _weaponHasIK))
             {
                 var lowRailInCurrentWeapon = _weaponController.GetCurrentLowRailId();
@@ -321,6 +345,8 @@ namespace App.Shared.GameModules.Player.CharacterBone
                     CharacterView.FirstPerson | CharacterView.ThirdPerson);
                 _attachmentNeedIK = false;
             }
+            
+            
         }
 
         private bool UpdateSightData(ref CodeRigBoneParam param)
@@ -432,7 +458,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 }
 
                 _cacheP3.Clear();
-                _characterP3.GetComponentsInChildren<TransformCache>(_cacheP1);
+                _characterP3.GetComponentsInChildren<TransformCache>(_cacheP3);
                 
                 for (int location = 0; location < (int) SpecialLocation.EndOfTheWorld; ++location)
                 {

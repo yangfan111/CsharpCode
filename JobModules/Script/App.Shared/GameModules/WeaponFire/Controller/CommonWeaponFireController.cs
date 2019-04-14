@@ -1,9 +1,11 @@
-﻿using Core.Utils;
+﻿using App.Server.GameModules.GamePlay;
+using Core.EntityComponent;
+using Core.Utils;
 using System.Collections.Generic;
 
 namespace App.Shared.GameModules.Weapon.Behavior
 {
-   
+
     /// <summary>
     /// Defines the <see cref="CommonWeaponFireController" />
     /// </summary>
@@ -83,31 +85,27 @@ namespace App.Shared.GameModules.Weapon.Behavior
             _bulletFires.Clear();
         }
 
-        public void OnUpdate(PlayerWeaponController controller, IWeaponCmd cmd)
+        public void OnUpdate(PlayerWeaponController controller, IWeaponCmd cmd, Contexts contexts)
         {
             bool isFire = false;
-//#if UNITY_EDITOR
-//            controller.SyncDebugInfo();
-//#endif
-            //判断是否有开火触发
+            
             foreach (var fireTrigger in _fireTrigggers)
             {
                 isFire |= fireTrigger.IsTrigger(controller, cmd);
             }
             if (isFire)
             {
-          //     DebugUtil.LogInUnity("controller:"+ controller.ToString(), DebugUtil.DebugColor.Blue);
-                //判断是否有开火限制
                 foreach (var fireCheck in _fireCheckers)
                 {
                     isFire &= fireCheck.IsCanFire(controller, cmd);
                 }
 
             }
-            if (isFire)
+            if (isFire && controller.RelatedThrowAction.ThrowingEntityKey == EntityKey.Default
+                && (controller.LastFireWeaponId == controller.HeldWeaponAgent.WeaponKey.EntityId || controller.LastFireWeaponId == 0))
             {
-               // DebugUtil.LogInUnity("Fire checker enabled ", DebugUtil.DebugColor.Blue);
-                Fire(controller, cmd);
+                Fire(controller, cmd, contexts);
+                controller.LastFireWeaponId = controller.HeldWeaponAgent.WeaponKey.EntityId;
             }
             else
             {
@@ -115,20 +113,31 @@ namespace App.Shared.GameModules.Weapon.Behavior
             }
 
             CallOnFrame(controller, cmd);
+            if (!cmd.IsFire)
+            {
+                controller.RelatedThrowAction.ThrowingEntityKey = EntityKey.Default;
+                controller.LastFireWeaponId = 0;
+            }
         }
 
-        private void Fire(PlayerWeaponController controller, IWeaponCmd cmd)
+        private void Fire(PlayerWeaponController controller, IWeaponCmd cmd, Contexts contexts)
         {
             CallBeforeFires(controller, cmd);
-            CallBulletFires(controller, cmd);
+            CallBulletFires(controller, cmd, contexts);
             CallAfterFires(controller, cmd);
         }
 
-        private void CallBulletFires(PlayerWeaponController controller, IWeaponCmd cmd)
+        private void CallBulletFires(PlayerWeaponController controller, IWeaponCmd cmd, Contexts contexts)
         {
             foreach (var bulletfire in _bulletFires)
             {
                 bulletfire.OnBulletFire(controller, cmd);
+            }
+
+            if (SharedConfig.IsServer)
+            {
+                FreeRuleEventArgs args = contexts.session.commonSession.FreeArgs as FreeRuleEventArgs;
+                (args.Rule as IGameRule).HandleWeaponFire(contexts, contexts.player.GetEntityWithEntityKey(controller.Owner), controller.GetWeaponAgent().ResConfig);
             }
         }
 

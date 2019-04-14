@@ -33,6 +33,7 @@
         public const string EnableDrawBullet = "ShowBullet";
         public const string DisableDrawBullet = "HideBullet";
         public const string KillMe = "Kill";
+        public const string DyingMe = "Dying";
         public const string ChangeHp = "hp";
         public const string TestFrame = "testFrame";
         public const string ChangeBag = "sbg";
@@ -146,10 +147,24 @@
         public const string GetQualitySettings = "getqualitysettings";
 
         public const string ShowVideoSetting = "video";
+        public const string ShiftWorld = "shift";
+        public const string DetailToggle = "detailtoggle";
+        public const string TreeToggle = "treetoggle";
+        public const string TerrainToggle = "terraintoggle";
+        public const string MeshRendererToggle = "meshrenderertoggle";
+        public const string WaterToggle = "watertoggle";
+        public const string PostFxToggle = "postfxtoggle";
+        public const string GetProfilerTime = "getprofilertime";
+        public const string GetTrees = "gettrees";
+
+        public const string SetShadow = "setshadow";
 
         public const string EnableAnimator = "enableanimator";
         public const string DisableAnimator = "disableanimator";
         public const string UpdateRender = "updaterender";
+
+        public const string OnlyDirLight = "onlydirlight";
+        public const string PostFxOpt = "postfxopt";
     }
 
     public interface IDebugCommandHandler

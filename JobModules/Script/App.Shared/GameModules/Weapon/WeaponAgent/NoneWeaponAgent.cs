@@ -11,7 +11,7 @@ namespace App.Shared.GameModules.Weapon
 
     public class NoneWeaponAgent : WeaponBaseAgent
     {
-        public NoneWeaponAgent(Func<EntityKey> in_holdExtractor, Func<EntityKey> in_emptyExtractor, EWeaponSlotType slot, GrenadeCacheHelper grenadeHelper) : base(in_holdExtractor, in_emptyExtractor, slot, grenadeHelper)
+        public NoneWeaponAgent(Func<EntityKey> in_holdExtractor, Func<EntityKey> in_emptyExtractor, EWeaponSlotType slot, GrenadeCacheHandler grenadeHandler) : base(in_holdExtractor, in_emptyExtractor, slot, grenadeHandler)
         {
         }
 

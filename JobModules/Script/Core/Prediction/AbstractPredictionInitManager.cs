@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Core.EntityComponent;
 using Core.Prediction.UserPrediction;
+using Core.Replicaton;
 using Core.SnapshotReplication.Serialization.Patch;
 using Core.Utils;
 using Entitas.Utils;
@@ -97,7 +98,7 @@ namespace Core.Prediction
             EntityMapComparator.Diff(localEntityMapClone, remoteEntityMap, rewindHandler, "predicateRewind");
            
             
-            localEntityMapClone.ReleaseReference();
+            RefCounterRecycler.Instance.ReleaseReference(localEntityMapClone);
         }
 
         private bool IsHistoryDifferentFrom(EntityMap remoteEntityMap)
@@ -155,13 +156,13 @@ namespace Core.Prediction
             else
             {
                 _logger.DebugFormat("Recplce SavePredictionCompoments  {0}", historyId);
-                history.EntityMap.ReleaseReference();
+                RefCounterRecycler.Instance.ReleaseReference(history.EntityMap);
                 history.EntityMap = remoteEntities;
             }
             if (_histories.Count > MaxHistory)
             {
                 var tdhistory = _histories[0];
-                tdhistory.EntityMap.ReleaseReference();
+                RefCounterRecycler.Instance.ReleaseReference(tdhistory.EntityMap);
                 _histories.RemoveAt(0);
             }
         }

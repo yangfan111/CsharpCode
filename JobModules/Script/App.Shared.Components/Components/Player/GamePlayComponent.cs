@@ -1,11 +1,11 @@
-﻿using System;
-using Core.Components;
+﻿using Core.Components;
 using Core.EntityComponent;
+using Core.Playback;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
 using Core.SyncLatest;
 using Core.Utils;
 using Entitas.CodeGeneration.Attributes;
-using Core.Playback;
+using System;
 
 namespace App.Shared.Components.Player
 {
@@ -23,9 +23,7 @@ namespace App.Shared.Components.Player
         Stay = 2,
     }
     
-
     [Player]
-    
     public class GamePlayComponent : ISelfLatestComponent, IPlaybackComponent
     {
         public static string[] LifeStateString = new[]
@@ -59,7 +57,8 @@ namespace App.Shared.Components.Player
         [DontInitilize] public int ClientState;
 
         [DontInitilize] [NetworkProperty] public int PlayerState;
-        [DontInitilize] [NetworkProperty] public int UIState;
+        [DontInitilize] public int UIState;
+        [DontInitilize] public bool UIStateUpdate;
         [DontInitilize] [NetworkProperty] public int CastState;
 
         [DontInitilize] [NetworkProperty] public int CameraEntityId;
@@ -81,8 +80,16 @@ namespace App.Shared.Components.Player
         [DontInitilize] [NetworkProperty] public EntityKey SavePlayerKey;
         [DontInitilize] [NetworkProperty] public int SaveEnterState;
         [DontInitilize] [NetworkProperty] public bool IsInteruptSave;
+        
+        [DontInitilize] [NetworkProperty] public bool CoverInit;                    //是否开始执行用户指令
        
         [DontInitilize] public short LastViewModeByCmd;                         //LastViewMode: 记录由指令驱动的人称转换，用于人物复活时恢复人称状态
+
+        [DontInitilize] public bool Invisible;
+        [DontInitilize] public bool VisibleToTeammate;
+
+        [DontInitilize] public bool TipHideStatus;
+
 
         public void ChangeLifeState(EPlayerLifeState state, int time)
         {
@@ -120,6 +127,11 @@ namespace App.Shared.Components.Player
         public bool IsLifeState(EPlayerLifeState state)
         {
             return LifeState == (int) state;
+        }
+
+        public bool IsAlive()
+        {
+            return LifeState != (int)EPlayerLifeState.Dead;
         }
 
         public bool IsLastLifeState(EPlayerLifeState state)
@@ -176,7 +188,6 @@ namespace App.Shared.Components.Player
             InHurtedCount = hp.InHurtedCount;
             BuffRemainTime = hp.BuffRemainTime;
             PlayerState = hp.PlayerState;
-            UIState = hp.UIState;
             CastState = hp.CastState;
             Energy = hp.Energy;
             CameraEntityId = hp.CameraEntityId;
@@ -195,6 +206,7 @@ namespace App.Shared.Components.Player
             SaveEnterState = hp.SaveEnterState;
             IsInteruptSave = hp.IsInteruptSave;
 
+            CoverInit = hp.CoverInit;
         }
 
         public float DecreaseHp(float damage, int time = 0)

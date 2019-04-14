@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
 using App.Protobuf;
-using Core.ObjectPool;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using UnityEngine;
 
 namespace App.Shared.Network
 {
@@ -32,7 +30,8 @@ namespace App.Shared.Network
                 cmd.ChangeChannel = item.ChangeChannel;
                 cmd.SnapshotId = item.SnapshotId;
                 cmd.CurWeapon = item.CurWeapon;
-                cmd.PickUpEquip = item.PickUpEquip;
+                cmd.ManualPickUpEquip = item.ManualPickUpEquip;
+                cmd.AutoPickUpEquip = item.AutoPickUpEquip.ToList();
                 cmd.UseEntityId = item.UseVehicleId;
                 cmd.UseVehicleSeat = item.UseVehicleSeat;
                 cmd.UseType = item.UseType;
@@ -62,7 +61,15 @@ namespace App.Shared.Network
 	                cmd.ChangeChannel = item.ChangeChannel;
 					cmd.SnapshotId = item.SnapshotId;
 	                cmd.CurWeapon = item.CurWeapon;
-	                cmd.PickUpEquip = item.PickUpEquip;
+                    cmd.ManualPickUpEquip = item.ManualPickUpEquip;
+                    cmd.AutoPickUpEquip.Clear();
+                    if (item.AutoPickUpEquip != null && item.AutoPickUpEquip.Count > 0)
+                    {
+                        foreach (var equip in item.AutoPickUpEquip)
+                        {
+                            cmd.AutoPickUpEquip.Add(equip);
+                        }
+                    }
                     cmd.UseVehicleId = item.UseEntityId;
                     cmd.UseVehicleSeat = item.UseVehicleSeat;
                     cmd.UseType = item.UseType;

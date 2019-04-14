@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -131,41 +132,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonParachuteView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonParachuteView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonParachuteView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonParachuteView, CommonParachuteViewModel> bindingSet =
-                view.CreateBindingSet<CommonParachuteView, CommonParachuteViewModel>();
-
-            view.oriShow = _show = view.Show.activeSelf;
-            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
-            view.oriHeightSliderValue = _heightSliderValue = view.HeightSliderValue.value;
-            bindingSet.Bind(view.HeightSliderValue).For(v => v.value).To(vm => vm.HeightSliderValue).OneWay();
-            view.oriHandleScale = _handleScale = view.HandleScale.localScale;
-            bindingSet.Bind(view.HandleScale).For(v => v.localScale).To(vm => vm.HandleScale).OneWay();
-            view.oriHeightTipGroupPosition = _heightTipGroupPosition = view.HeightTipGroupPosition.localPosition;
-            bindingSet.Bind(view.HeightTipGroupPosition).For(v => v.localPosition).To(vm => vm.HeightTipGroupPosition).OneWay();
-            view.oriSpeedString = _speedString = view.SpeedString.text;
-            bindingSet.Bind(view.SpeedString).For(v => v.text).To(vm => vm.SpeedString).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonParachuteView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -189,12 +177,51 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonParachuteView view)
+		{
+		     BindingSet<CommonParachuteView, CommonParachuteViewModel> bindingSet =
+                view.CreateBindingSet<CommonParachuteView, CommonParachuteViewModel>();
+            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
+            bindingSet.Bind(view.HeightSliderValue).For(v => v.value).To(vm => vm.HeightSliderValue).OneWay();
+            bindingSet.Bind(view.HandleScale).For(v => v.localScale).To(vm => vm.HandleScale).OneWay();
+            bindingSet.Bind(view.HeightTipGroupPosition).For(v => v.localPosition).To(vm => vm.HeightTipGroupPosition).OneWay();
+            bindingSet.Bind(view.SpeedString).For(v => v.text).To(vm => vm.SpeedString).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonParachuteView view)
+		{
+            _show = view.Show.activeSelf;
+            _heightSliderValue = view.HeightSliderValue.value;
+            _handleScale = view.HandleScale.localScale;
+            _heightTipGroupPosition = view.HeightTipGroupPosition.localPosition;
+            _speedString = view.SpeedString.text;
+		}
+
+
+		void SaveOriData(CommonParachuteView view)
+		{
+            view.oriShow = _show;
+            view.oriHeightSliderValue = _heightSliderValue;
+            view.oriHandleScale = _handleScale;
+            view.oriHeightTipGroupPosition = _heightTipGroupPosition;
+            view.oriSpeedString = _speedString;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			Show = _view.oriShow;
 			HeightSliderValue = _view.oriHeightSliderValue;
 			HandleScale = _view.oriHandleScale;
@@ -226,7 +253,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonParachute"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

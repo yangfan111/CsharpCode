@@ -2,6 +2,7 @@
 using App.Protobuf;
 using Core.Network;
 using Core.SceneTriggerObject;
+using RpcNetwork.RpcNetwork;
 
 namespace App.Shared.Network
 {

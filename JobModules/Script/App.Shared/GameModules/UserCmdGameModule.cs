@@ -1,4 +1,5 @@
 ﻿using App.Client.GameModules.Player;
+using App.Shared.FreeFramework.Free.Chicken;
 using App.Shared.GameModules.Attack;
 using App.Shared.GameModules.Bullet;
 using App.Shared.GameModules.Camera;
@@ -59,7 +60,8 @@ namespace App.Shared.GameModules
 
             AddSystem(new PlayerWeaponSwitchSystem(contexts));
             AddSystem(new PlayerWeaponDrawSystem(contexts));
-            AddSystem(new PlayerWeapnStateUpdateSystem(contexts));
+            AddSystem(new PlayerInterruptUpdateSystem(contexts));
+            AddSystem(new PlayerWeaponUpdateSystem(contexts));
      
             if (!SharedConfig.IsServer)
             {
@@ -151,10 +153,9 @@ namespace App.Shared.GameModules
             }
             AddSystem(new PlayerStateTipSystem(contexts));
            
-            AddSystem(new PlayerActionInterruptSystem());
             AddSystem(new PlayerBagSwitchSystem(commonSessionObjects));
             if (!SharedConfig.IsServer)
-                AddSystem(new CameraPostUpdateSystem(contexts.player, contexts.vehicle, contexts.freeMove));
+                AddSystem(new CameraPostUpdateSystem(contexts));
             else AddSystem(new ServerPostCameraUpdateSystem(contexts));
             AddSystem(new PlayerSoundPlaySystem(contexts));
             

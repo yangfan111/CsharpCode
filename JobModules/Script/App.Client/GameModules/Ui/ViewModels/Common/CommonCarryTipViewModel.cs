@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -132,41 +133,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonCarryTipView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonCarryTipView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonCarryTipView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonCarryTipView, CommonCarryTipViewModel> bindingSet =
-                view.CreateBindingSet<CommonCarryTipView, CommonCarryTipViewModel>();
-
-            view.oriShow = _show = view.Show.activeSelf;
-            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
-            view.oriHpBarValue = _hpBarValue = view.HpBarValue.value;
-            bindingSet.Bind(view.HpBarValue).For(v => v.value).To(vm => vm.HpBarValue).OneWay();
-            view.oriHpFillColor = _hpFillColor = view.HpFillColor.color;
-            bindingSet.Bind(view.HpFillColor).For(v => v.color).To(vm => vm.HpFillColor).OneWay();
-            view.oriOilBarValue = _oilBarValue = view.OilBarValue.value;
-            bindingSet.Bind(view.OilBarValue).For(v => v.value).To(vm => vm.OilBarValue).OneWay();
-            view.oriSpeedString = _speedString = view.SpeedString.text;
-            bindingSet.Bind(view.SpeedString).For(v => v.text).To(vm => vm.SpeedString).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonCarryTipView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -190,12 +178,51 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonCarryTipView view)
+		{
+		     BindingSet<CommonCarryTipView, CommonCarryTipViewModel> bindingSet =
+                view.CreateBindingSet<CommonCarryTipView, CommonCarryTipViewModel>();
+            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
+            bindingSet.Bind(view.HpBarValue).For(v => v.value).To(vm => vm.HpBarValue).OneWay();
+            bindingSet.Bind(view.HpFillColor).For(v => v.color).To(vm => vm.HpFillColor).OneWay();
+            bindingSet.Bind(view.OilBarValue).For(v => v.value).To(vm => vm.OilBarValue).OneWay();
+            bindingSet.Bind(view.SpeedString).For(v => v.text).To(vm => vm.SpeedString).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonCarryTipView view)
+		{
+            _show = view.Show.activeSelf;
+            _hpBarValue = view.HpBarValue.value;
+            _hpFillColor = view.HpFillColor.color;
+            _oilBarValue = view.OilBarValue.value;
+            _speedString = view.SpeedString.text;
+		}
+
+
+		void SaveOriData(CommonCarryTipView view)
+		{
+            view.oriShow = _show;
+            view.oriHpBarValue = _hpBarValue;
+            view.oriHpFillColor = _hpFillColor;
+            view.oriOilBarValue = _oilBarValue;
+            view.oriSpeedString = _speedString;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			Show = _view.oriShow;
 			HpBarValue = _view.oriHpBarValue;
 			HpFillColor = _view.oriHpFillColor;
@@ -227,7 +254,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonCarryTip"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

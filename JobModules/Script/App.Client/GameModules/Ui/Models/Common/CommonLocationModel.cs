@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using System.Collections.Generic;
 using App.Client.GameModules.Ui.UiAdapter;
+using Assets.App.Client.GameModules.Ui;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {
@@ -13,7 +14,6 @@ namespace App.Client.GameModules.Ui.Models.Common
     {
         ILocationUiAdapter adapter;
         private bool isGameObjectCreated = false;
-        private const string uiIconsBundleName = "ui/icons";
         private struct LocationItem
         {
             Transform trans;
@@ -106,12 +106,12 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void PreparedSprite()
         {
             spriteDic.Clear();
-            Loader.RetriveSpriteAsync(uiIconsBundleName, "guid_1", (sprite) =>
+            Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_UiIcons, "guid_1", (sprite) =>
             {
                 spriteDic.Add("guid_1", sprite);
             });
 
-            Loader.RetriveSpriteAsync(uiIconsBundleName, "guid_2", (sprite) =>
+            Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_UiIcons, "guid_2", (sprite) =>
             {
                 spriteDic.Add("guid_2", sprite);
             });

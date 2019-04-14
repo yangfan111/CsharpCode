@@ -1,7 +1,6 @@
 using App.Server.GameModules.GamePlay.free.player;
 using App.Shared.Components;
 using App.Shared.Components.Player;
-using App.Shared.GameInputFilter;
 using App.Shared.GameModules.Player;
 using App.Shared.GameModules.Player.Actions;
 using App.Shared.GameModules.Player.CharacterState;
@@ -19,7 +18,7 @@ using Core.CharacterState.Posture;
 using Core.Configuration;
 using Core.EntityComponent;
 using Core.Event;
-using Core.GameInputFilter;
+using Core;
 using Core.GameModule.System;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Room;
@@ -33,6 +32,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using Utils.Configuration;
 using Utils.Singleton;
+
 
 namespace App.Shared.EntityFactory
 {
@@ -77,7 +77,8 @@ namespace App.Shared.EntityFactory
             playerEntity.AddLatestAdjustCmd(-1, -1);
             playerEntity.AddUserCmdOwner(new UserCmdOwnerAdapter(playerEntity));
             playerEntity.AddEntityKey(new EntityKey(playerInfo.EntityId, (int)EEntityType.Player));
-            playerEntity.AddPosition(position);
+            playerEntity.AddPosition();
+            playerEntity.position.Value = position;
 
             playerEntity.AddVehicleCmdSeq(0);
             playerEntity.isFlagSyncSelf = true;
@@ -92,7 +93,7 @@ namespace App.Shared.EntityFactory
             playerEntity.isFlagSelf = prediction;
             playerEntity.AddOrientation(0, 0, 0, 0, 0);
             playerEntity.AddPlayerRotateLimit(false);
-            playerEntity.AddPlayerMove(Vector3.zero, 0, true, false, 0);
+            playerEntity.AddPlayerMove(Vector3.zero, 0, 0, true, false, 0);
             playerEntity.AddPlayerSkyMove(false, -1);
             playerEntity.AddPlayerSkyMoveInterVar();
             playerEntity.AddTime(0);
@@ -132,13 +133,15 @@ namespace App.Shared.EntityFactory
 
             playerEntity.AddStatisticsData(false, new BattleData(), new StatisticsData());
             playerEntity.AddPlayerMask((byte)(EPlayerMask.TeamA | EPlayerMask.TeamB), (byte)(EPlayerMask.TeamA | EPlayerMask.TeamB));
-            playerEntity.AddPlayerWeaponUpdate(0);
+            playerEntity.AddPlayerClientEventsUpdate();
+        
+
             playerEntity.AttachPlayerAux();
 #if UNITY_EDITOR
-            if (SharedConfig.IsOffline)
-            {
-                playerEntity.playerWeaponAuxiliary.BagOpenLimitTime = 50000;
-            }
+            //if (SharedConfig.IsOffline)
+            //{
+            //    playerEntity.playerWeaponAuxiliary.BagOpenLimitTime = 50000;
+            //}
 #endif
 
             playerEntity.AddTriggerEvent();
@@ -241,7 +244,7 @@ namespace App.Shared.EntityFactory
                 player.AddPlayerSkyMoveInterVar();
 
             if (!player.hasCharacterBone)
-                player.AddCharacterBone(0, 0, 0, -1, true);
+                player.AddCharacterBone(0, 0, false, 0, -1, true);
 
             if (!player.hasNetworkWeaponAnimation)
                 player.AddNetworkWeaponAnimation(string.Empty, 0, string.Empty, 0);
@@ -253,7 +256,7 @@ namespace App.Shared.EntityFactory
             
             AddCameraStateNew(player);
             player.AddLocalEvents(new PlayerEvents());
-            InitFiltedInput(player, sessionObjects.GameStateProcessorFactory); 
+            
 
             if (!player.hasPingStatistics)
             {
@@ -272,11 +275,13 @@ namespace App.Shared.EntityFactory
             player.AddTip();
             AttachAudioComponents(contexts,player);
             AttachWeaponComponents(contexts,player);
-            
+            AttachStateInteract(player); 
             player.AddPlayerHitMaskController(new CommonHitMaskController(contexts.player, player));
             player.AddThrowingUpdate(false);
             player.AddThrowingAction();
             player.throwingAction.ActionInfo = new ThrowingActionInfo();
+            Logger.Info("posted player initialize finish!!!!!!!!!!!!!!");
+            DebugUtil.MyLog("posted player initialize finish",DebugUtil.DebugColor.Green);
         
         }
 
@@ -286,10 +291,18 @@ namespace App.Shared.EntityFactory
             playerEntity.AddPlayerAudio();
             GameModuleManagement.ForceAllocate(playerEntity.entityKey.Value.EntityId, (PlayerAudioController audioController) =>
             {
-                var audioPlayerAgent = new AudioPlayerComponentsAgent(playerEntity);
-                audioController.Initialize(playerEntity.entityKey.Value,audioPlayerAgent);
+                audioController.Initialize(playerEntity);
             });
         }
+        public static void AttachStateInteract(PlayerEntity player)
+        {
+            
+            GameModuleManagement.ForceAllocate(player.entityKey.Value.EntityId, (PlayerStateInteractController controller) =>
+            {
+                controller.Initialize(player);
+            });
+        }
+
         public static void AttachWeaponComponents(Contexts contexts, PlayerEntity playerEntity)
         {
             WeaponEntityFactory.EntityIdGenerator = contexts.session.commonSession.EntityIdGenerator;
@@ -300,13 +313,14 @@ namespace App.Shared.EntityFactory
             var greandeIds = WeaponUtil.ForeachFilterGreandeIds();
      //       WeaponUtil.EmptyWeapon = WeaponEntityFactory.CreateEmpty(emptyScan);
             playerEntity.AttachPlayerWeaponBags();
-            playerEntity.AttachPlayerAux();
+           // playerEntity.AttachPlayerAux();
             playerEntity.AttachGrenadeCacheData(greandeIds);
             playerEntity.AttachPlayerAmmu();
             playerEntity.playerWeaponAuxiliary.HasAutoAction = true;
             playerEntity.AttachPlayerCustomize();
+            playerEntity.AddPlayerWeaponServerUpdate();
             playerEntity.AttachWeaponComponentBehavior(contexts, greandeIds);
-            DebugUtil.MyLog("Weapon Initialize finish",DebugUtil.DebugColor.Green);
+         
        //     var entityId = contexts.session.commonSession.EntityIdGenerator.GetNextEntityId();
 
             //       playerEntity.AddEmptyHand();
@@ -397,25 +411,7 @@ namespace App.Shared.EntityFactory
             };
         }
 
-        public static void InitFiltedInput(PlayerEntity player, IGameStateProcessorFactory gameStateProcessorFactory)
-        {
-            var stateProviderPool = gameStateProcessorFactory.GetProviderPool() as StateProviderPool;
-            var statePool = gameStateProcessorFactory.GetStatePool();
-            if(null != stateProviderPool)
-            {
-                stateProviderPool.AddStateProvider(player, statePool); 
-            }
-            else
-            {
-                Logger.Error("state provider pool is null !!");
-            }
-            var gameInputProcessor = new GameInputProcessor(new UserCommandMapper(), 
-                new StateProvider(new PlayerStateAdapter(player), statePool),  
-                new FilteredInput(),
-                new DummyFilteredInput());
-            player.AddUserCmdFilter(gameInputProcessor);
-        }
-
+     
         public static void AddCameraStateNew(PlayerEntity playerEntity)
         {
             if (!playerEntity.hasCameraStateNew)

@@ -12,10 +12,12 @@ using Assets.Sources.Free.Effect;
 using Assets.Sources.Free.Render;
 using Assets.Sources.Free.UI;
 using Assets.UiFramework.Libs;
+using Core.Components;
 using Core.Enums;
 using Core.GameModule.Interface;
 using Core.SessionState;
 using Core.Ui;
+using Core.Ui.Map;
 using Core.Utils;
 using Loxodon.Framework.Binding;
 using Loxodon.Framework.Contexts;
@@ -143,8 +145,8 @@ namespace App.Client.GameModules.Ui.System
             contexts.ui.uIEntity.uI.NoticeInfoItem = new NoticeInfoItem();
 
 
-            contexts.ui.map.RouteLineStartPoint = new Vector2(100, 60);
-            contexts.ui.map.RouteLineEndPoint = new Vector2(300, 140);
+            contexts.ui.map.RouteLineStartPoint = new MapFixedVector2(100, 60);
+            contexts.ui.map.RouteLineEndPoint = new MapFixedVector2(300, 140);
 
 
 #if !UNITY_EDITOR
@@ -154,9 +156,9 @@ namespace App.Client.GameModules.Ui.System
             contexts.ui.map.OffLineLevel = 0;
             contexts.ui.map.CurPlayer = new MiniMapTeamPlayInfo();
             contexts.ui.map.TeamInfos = new List<MiniMapTeamPlayInfo>();
-            contexts.ui.map.CurDuquan = new DuQuanInfo(contexts.ui.map.OffLineLevel, new Vector2(200, 200), 100, 5, 60);
-            contexts.ui.map.NextDuquan = new DuQuanInfo(contexts.ui.map.OffLineLevel, new Vector2(200, 200), 10, 10, 140);
-            contexts.ui.map.BombArea = new BombAreaInfo(new Vector3(100, 0, 100), 1f, contexts.ui.map.OffLineLevel);
+            contexts.ui.map.CurDuquan = new DuQuanInfo(contexts.ui.map.OffLineLevel, new MapFixedVector2(200, 200), 100, 5, 60);
+            contexts.ui.map.NextDuquan = new DuQuanInfo(contexts.ui.map.OffLineLevel, new MapFixedVector2(200, 200), 10, 10, 140);
+            contexts.ui.map.BombArea = new BombAreaInfo(new MapFixedVector2(100, 100), 1f, contexts.ui.map.OffLineLevel);
             contexts.ui.map.PlaneData = new AirPlaneData();
             contexts.ui.map.TeamPlayerMarkInfos = new List<TeamPlayerMarkInfo>();
             contexts.ui.map.MapMarks = new Dictionary<long, MiniMapPlayMarkInfo>();
@@ -179,8 +181,20 @@ namespace App.Client.GameModules.Ui.System
 
             contexts.ui.uI.LoadingRate = 0;
             contexts.ui.uI.LoadingText = "";
+            contexts.ui.uI.PaintIdList = new List<int>();
 
+            //TestPaintData(contexts.ui.uI.PaintIdList);
 //            TestMapData(contexts);
+        }
+
+        private void TestPaintData(List<int> list)
+        {
+            list.Add(3001);
+            list.Add(0);
+            list.Add(3003);
+            list.Add(2001);
+            list.Add(0);
+            list.Add(3008);
         }
 
         private static void InitLoxodon()
@@ -204,37 +218,41 @@ namespace App.Client.GameModules.Ui.System
 
         private void TestMapData(Contexts contexts)
         {
-            contexts.ui.map.RouteLineStartPoint = new Vector2(10, 6);
-            contexts.ui.map.RouteLineEndPoint = new Vector2(50, 30);
+            contexts.ui.map.RouteLineStartPoint = new MapFixedVector2(10, 6);
+            contexts.ui.map.RouteLineEndPoint = new MapFixedVector2(50, 30);
 
             contexts.ui.map.OffLineLevel = 1;
             contexts.ui.map.CurPlayer = new MiniMapTeamPlayInfo();
             contexts.ui.map.TeamInfos = new List<MiniMapTeamPlayInfo>();
 
-            contexts.ui.map.CurDuquan = new DuQuanInfo(contexts.ui.map.OffLineLevel, new Vector2(28, 28), 5, 5, 60);
-            contexts.ui.map.NextDuquan = new DuQuanInfo(contexts.ui.map.OffLineLevel, new Vector2(28, 28), 3, 10, 140);
-            contexts.ui.map.BombArea = new BombAreaInfo(new Vector3(10, 0, 10), 5, contexts.ui.map.OffLineLevel);
-            contexts.ui.map.PlaneData = new AirPlaneData(){Type = 1, Pos = new Vector2(28, 28), Direction = 90f};
+            contexts.ui.map.CurDuquan = new DuQuanInfo(contexts.ui.map.OffLineLevel, new MapFixedVector2(28, 28), 5, 5, 60);
+            contexts.ui.map.NextDuquan = new DuQuanInfo(contexts.ui.map.OffLineLevel, new MapFixedVector2(28, 28), 3, 10, 140);
+            contexts.ui.map.BombArea = new BombAreaInfo(new MapFixedVector2(10, 10), 5, contexts.ui.map.OffLineLevel);
+            contexts.ui.map.PlaneData = new AirPlaneData(){Type = 1, Pos = new MapFixedVector2(28, 28), Direction = 90f};
             contexts.ui.map.TeamPlayerMarkInfos = new List<TeamPlayerMarkInfo>();
             contexts.ui.map.MapMarks = new Dictionary<long, MiniMapPlayMarkInfo>();
+
+            var go = new GameObject("plane");
+            var plane = go.AddComponent<FreeRenderObject>();
+            plane.raderImage = new RaderImage();
+            plane.key = "plane";
+            plane.model3D.x = 14;
+            plane.model3D.z = 14;
+            plane.AddEffect(FreeUIUtil.GetInstance().GetEffect(1));
+            SingletonManager.Get<FreeEffectManager>().AddEffect(plane);
 
 //            var go = new GameObject("plane");
 //            var plane = go.AddComponent<FreeRenderObject>();
 //            plane.raderImage = new RaderImage();
-//            plane.key = "plane";
+//            plane.key = "plane1";
+//            plane.model3D.x = 14;
+//            plane.model3D.z = 14;
 //            plane.AddEffect(FreeUIUtil.GetInstance().GetEffect(1));
 //            SingletonManager.Get<FreeEffectManager>().AddEffect(plane);
 
-            var go = new GameObject("plane1");
-            var plane = go.AddComponent<FreeRenderObject>();
-            plane.raderImage = new RaderImage();
-            plane.key = "plane1";
-            plane.AddEffect(FreeUIUtil.GetInstance().GetEffect(1));
-            SingletonManager.Get<FreeEffectManager>().AddEffect(plane);
-
             contexts.ui.map.IsShowRouteLine = true;
-            contexts.ui.map.RouteLineStartPoint = new Vector2(0,0);
-            contexts.ui.map.RouteLineEndPoint = new Vector2(28,28);
+            contexts.ui.map.RouteLineStartPoint = new MapFixedVector2(0,0);
+            contexts.ui.map.RouteLineEndPoint = new MapFixedVector2(28,28);
 
         }
 

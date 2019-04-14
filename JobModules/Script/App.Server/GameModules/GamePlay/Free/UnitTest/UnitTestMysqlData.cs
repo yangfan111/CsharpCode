@@ -108,6 +108,9 @@ namespace App.Server.GameModules.GamePlay.Free.UnitTest
             dr.AddField("case", key.caseName);
             dr.AddField("field", tvs[0].Name);
             dr.AddField("value", TestValue.ToRecords(tvs));
+            DateTime dt = DateTime.Now;
+            string currentime = dt.ToString("yyyy-MM-dd HH:mm:ss");
+            dr.AddField("time", currentime);
 
             Debug.LogFormat("table:{0}, dr:{1}", table, dr);
 

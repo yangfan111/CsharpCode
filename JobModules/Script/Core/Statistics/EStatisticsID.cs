@@ -263,9 +263,9 @@
         /// </summary>
         C4ProtectKill = 65,
         /// <summary>
-        /// 小队人数
+        /// 小队数
         /// </summary>
-        TeammateCount = 66,
+        TeamCount = 66,
 
         /// <summary>
         /// 存活毒圈数

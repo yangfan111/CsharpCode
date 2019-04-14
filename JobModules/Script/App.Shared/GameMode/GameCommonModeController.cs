@@ -1,5 +1,6 @@
 ﻿
 using Core;
+using Core.Utils;
 
 namespace App.Shared.GameMode
 {
@@ -35,10 +36,12 @@ namespace App.Shared.GameMode
                     return (EWeaponSlotType)index;
             }
         }
-
+        private LoggerAdapter logger = new LoggerAdapter("RecoverPlayerWeapon");
         public override void RecoverPlayerWeapon(PlayerEntity player, int index=-1)
         {
-            if (index == -1)
+            if (player == null)
+                return;
+            if (index == -1 )
             {
                 if(!player.hasPlayerInfo)
                     index = 0;

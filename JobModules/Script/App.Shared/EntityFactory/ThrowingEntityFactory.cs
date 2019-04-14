@@ -40,7 +40,8 @@ namespace App.Shared.EntityFactory
                 newWeaponConfig.SubType
             );
 
-            throwingEntity.AddPosition(emitPost);
+            throwingEntity.AddPosition();
+            throwingEntity.position.Value = emitPost;
             throwingEntity.AddOwnerId(controller.Owner);
             throwingEntity.isFlagSyncNonSelf = true;
             throwingEntity.AddLifeTime(DateTime.Now, throwingConfig.CountdownTime + 2000);

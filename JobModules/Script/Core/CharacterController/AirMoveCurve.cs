@@ -21,6 +21,9 @@ namespace Core.CharacterController
             });
         
         public List<MovementCurveInfo> MovementCurve = new List<MovementCurveInfo>();
+        public List<PostureCurveInfo> PostureCurve = new List<PostureCurveInfo>();
+        
+        
 
 #if UNITY_EDITOR
         void Update()
@@ -34,7 +37,7 @@ namespace Core.CharacterController
                     "xml");
                 if (path.Length > 0)
                 {
-                    CurveSerializerTool.GenerateConfig(path, new SpeedCurveConfig(AireMoveCurve, MovementCurve));
+                    CurveSerializerTool.GenerateConfig(path, new SpeedCurveConfig(AireMoveCurve, MovementCurve, PostureCurve));
                     UnityEditor.EditorUtility.DisplayDialog("success", "save file to path " + path, "ok");
                 }
                 SaveFile = false;

@@ -25,6 +25,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
         private float _weaponPitchPercent;
         private float _weaponRot;
+        private bool _isWeaponRotState;
 
         public void SetWeaponPitch(Action<FsmOutput> addOutput, float pitch)
         {
@@ -107,6 +108,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 rightHand.rotation =
                 Quaternion.AngleAxis(angle, _characterP3.transform.right) * rightHand.rotation;
                 _weaponRot = angle;
+                _isWeaponRotState = true;
             }
         }
 
@@ -136,6 +138,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 handMuzzleDistance, UnityLayers.SceneCollidableLayerMask))
             {
                 _weaponPitchPercent = 1;
+                _isWeaponRotState = true;
             }
         }
 
@@ -143,6 +146,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
         {
             _weaponPitchPercent = 0;
             _weaponRot = 0;
+            _isWeaponRotState = false;
         }
 
         public static Vector3 RotateRound(Vector3 position, Vector3 center, Vector3 axis, float angle)
@@ -170,6 +174,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
         {
             value.WeaponPitch = _weaponPitchPercent;
             value.WeaponRot = _weaponRot;
+            value.IsWeaponRotState = _isWeaponRotState;
         }
     }
 }

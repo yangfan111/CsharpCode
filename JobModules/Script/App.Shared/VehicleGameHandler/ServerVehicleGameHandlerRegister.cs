@@ -18,6 +18,7 @@ namespace App.Shared.VehicleGameHandler
             RegisterUpdateHandler(new ShipHitBoxUpdateHandler());
             RegisterUpdateHandler(new ShipSleepingStateUpdateHandler());
             RegisterUpdateHandler(new VehicleSoundUpdateHandler());
+            RegisterUpdateHandler(new VehicleFireHpChangeHandler());
 
             RegisterEventHandler(GameEvent.VehicleSeatOccupationChange, new VehicleSeatOccupationChangeHandler(contexts.player, false, true));
             RegisterEventHandler(GameEvent.VehicleHpChange, new CarHpChangeHandler(false, true));

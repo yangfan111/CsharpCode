@@ -1,4 +1,7 @@
-﻿using Core.EntityComponent;
+﻿using System.Collections.Generic;
+using Core.EntityComponent;
+using Core.Prediction.UserPrediction.Cmd;
+using XmlConfig;
 
 namespace Core
 {
@@ -12,5 +15,35 @@ namespace Core
     public interface IGameWeapon
     {
         EntityKey Owner { get; }
+    }
+    public interface IFilteredInput 
+    {
+        bool IsInput(EPlayerInput input);
+        /// <summary>
+        /// 设置输入值
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="val"></param>
+        void SetInput(EPlayerInput input, bool val);
+    }
+    public interface IPlayerStateInterrupter
+    {
+        void DoRunTimeInterrupt(IUserCmd cmd);
+        void InterruptCharactor();
+    }
+
+   
+    public interface IPlayerStateColltector
+    {
+        HashSet<EPlayerState> GetCurrStates(EPlayerStateCollectType collectType = EPlayerStateCollectType.UseCache);
+
+
+    }
+    public interface IPlayerStateFiltedInputMgr
+    {
+        IFilteredInput EmptyInput { get; }
+        IFilteredInput UserInput  { get; }
+
+        IFilteredInput ApplyUserCmd(IUserCmd userCmd);
     }
 }

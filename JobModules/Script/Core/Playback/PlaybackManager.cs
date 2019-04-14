@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Core.EntityComponent;
+using Core.Replicaton;
 using Core.Utils;
 using Utils.Singleton;
 
@@ -98,7 +99,7 @@ namespace Core.Playback
                 EntityMapComparator.Diff(localEntityMapClone, remoteEntityMapLeft, diffDiffHandler,
                     "playbackInit",
                     _diffComparator.Init(diffDiffHandler, _infoProvider.InterpolationInfo, localEntityMap));
-                localEntityMapClone.ReleaseReference();
+                 RefCounterRecycler.Instance.ReleaseReference(localEntityMapClone);
             }
             finally
             {

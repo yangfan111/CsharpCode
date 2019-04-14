@@ -6,7 +6,7 @@ using App.Protobuf;
 using App.Shared;
 using App.Shared.Components;
 using App.Shared.Components.ClientSession;
-
+using App.Shared.Components.Serializer;
 using Core;
 using Core.GameModule.Interface;
 using Core.Network;
@@ -95,6 +95,7 @@ namespace App.Client.GameModules.ClientInit
                     var message = LoginMessage.Allocate();
                     message.Token = token;
                     message.LoginStage = ELoginStage.PreLogin;
+                    message.ComponentSerializerVersion = ComponentSerializerManager.HashMd5;
                     channel.SendReliable((int)EClient2ServerMessage.Login, message);
 
                     _logger.InfoFormat("Sending Login Message {0}", message);

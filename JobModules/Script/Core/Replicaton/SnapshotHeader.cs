@@ -14,6 +14,7 @@ namespace Core.Replicaton
         public int LastUserCmdSeq;
         public EntityKey Self;
 
+
         public SnapshotHeader()
         {
             ServerTime = -1;
@@ -21,8 +22,10 @@ namespace Core.Replicaton
             VehicleSimulationTime = -1;
             LastUserCmdSeq = -1;
         }
-        public void Serialize(MyBinaryWriter writer)
+
+        public void Serialize(MyBinaryWriter writer, string version)
         {
+            writer.Write(version);
             writer.Write(VehicleSimulationTime);
             writer.Write(ServerTime);
             writer.Write(SnapshotSeq);
@@ -31,15 +34,17 @@ namespace Core.Replicaton
             writer.Write(Self.EntityType);
         }
 
-        public void DeSerialize(BinaryReader reader)
+        public string DeSerialize(BinaryReader reader)
         {
+            var version = reader.ReadString();
             VehicleSimulationTime = reader.ReadInt32();
             ServerTime = reader.ReadInt32();
             SnapshotSeq = reader.ReadInt32();
             LastUserCmdSeq = reader.ReadInt32();
             int entityId = reader.ReadInt32();
             short entityType = reader.ReadInt16();
-            Self = new EntityKey(entityId:entityId, entityType:entityType);
+            Self = new EntityKey(entityId: entityId, entityType: entityType);
+            return version;
         }
 
         public void CopyFrom(SnapshotHeader src)

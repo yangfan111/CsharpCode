@@ -35,7 +35,7 @@ namespace Core.GameModule.Module
             
         }
 
-        public void AddSystem(object system)
+        public void AddSystem(IUserSystem system)
         {
             if (system is IEntityInitSystem) _entityInitSystems.Add(system as IEntityInitSystem);
             if (system is IModuleInitSystem) _clientModuleInitSystems.Add(system as IModuleInitSystem);

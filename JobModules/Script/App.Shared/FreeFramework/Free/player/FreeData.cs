@@ -1,5 +1,6 @@
 ﻿using App.Server.GameModules.GamePlay.Free.player;
 using App.Shared;
+using App.Shared.FreeFramework.framework.buf;
 using com.wd.free.buf;
 using com.wd.free.item;
 using com.wd.free.para;
@@ -19,6 +20,8 @@ namespace App.Server.GameModules.GamePlay.free.player
 
         public PlayerBuf Bufs;
 
+        public PlayerEffectBuf EffectBufs;
+
         public PlayerStateTimer StateTimer;
 
         public FreeData(Contexts context, PlayerEntity player)
@@ -34,6 +37,8 @@ namespace App.Server.GameModules.GamePlay.free.player
 
             this.Bufs = new PlayerBuf(player);
 
+            EffectBufs = new PlayerEffectBuf(player);
+
             this.paras = new SimpleParaList();
 
             this.StateTimer = new PlayerStateTimer(player);
@@ -41,7 +46,7 @@ namespace App.Server.GameModules.GamePlay.free.player
             AddFields(new ObjectFields(player.playerInfo));
             AddFields(new ObjectFields(player.gamePlay));
             AddFields(new ObjectFields(player.orientation));
-        //    AddFields(new ObjectFields(player.weaponState));
+            //    AddFields(new ObjectFields(player.weaponState));
             AddFields(new PlayerFields(AllContexts, player));
             if (player.hasPlayerMask)
             {

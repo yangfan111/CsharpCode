@@ -11,7 +11,7 @@ using App.Shared.Components.ServerSession;
 using App.Shared.Components.Vehicle;
 using App.Shared.ContextInfos;
 using App.Shared.EntityFactory;
-using App.Shared.GameInputFilter;
+using Core;
 using App.Shared.UserPhysics;
 using App.Shared.GameModules.Weapon;
 using Core;
@@ -144,7 +144,7 @@ namespace App.Client
             commonSession.EquipmentEntityIdGenerator = equipmentEntityIdGenerator;
             commonSession.RoomInfo = new Core.Room.RoomInfo();
             commonSession.RuntimeGameConfig = new RuntimeGameConfig();
-            commonSession.GameStateProcessorFactory = new GameStateProcessFactory();
+            //commonSession.PlayerStateCollectorPool = new PlayerStateCollectorPool();
             commonSession.FreeArgs = new FreeRuleEventArgs(_contexts);
             commonSession.FreeArgs.Rule = new ClientRule(commonSession.FreeArgs);
             commonSession.InitPosition = Vector3.zero;

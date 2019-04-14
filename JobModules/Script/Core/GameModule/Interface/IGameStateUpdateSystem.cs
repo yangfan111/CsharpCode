@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Core.GameModule.Interface
 {
-    public interface IGameStateUpdateSystem
+    public interface IGameStateUpdateSystem:IUserSystem
     {
         void Update();
         void SendGameEvents();

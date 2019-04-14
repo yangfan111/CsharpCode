@@ -10,28 +10,33 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
         public void OnBeforeFire(PlayerWeaponController weaponController, IWeaponCmd cmd)
         {
+            UpdateAccurcy(weaponController);
+        }
+
+ 
+        public void OnIdle(PlayerWeaponController weaponController, IWeaponCmd cmd)
+        {
+            //静止状态accurcy会影响到准星扩散
+            UpdateAccurcy(weaponController);
+
+        }
+        private void UpdateAccurcy(PlayerWeaponController weaponController)
+        {
             var config = weaponController.HeldWeaponAgent.BaseAccuracyLogicCfg;
             if (config == null)
                 return;
-            Components.Weapon.WeaponRuntimeDataComponent weaponState = weaponController.HeldWeaponAgent.RunTimeComponent;
+            var runTimeComponent = weaponController.HeldWeaponAgent.RunTimeComponent;
                 
-            int accuracyDivisor = config.AccuracyDivisor;//除数因子
+            int accuracyDivisor = config.AccuracyDivisor; //除数因子
             if (accuracyDivisor != -1)
             {
-                int shootCount = weaponState.ContinuesShootCount;
-                float maxInaccuracy = config.MaxInaccuracy;//最高精确度
-                float accuracyOffset = config.AccuracyOffset;
-                float accuracy = shootCount * shootCount * shootCount / accuracyDivisor + accuracyOffset;
-                weaponState.Accuracy = Math.Min(accuracy,maxInaccuracy) ;
+                runTimeComponent.Accuracy = AccuracyFormula.GetCommonAccuracy(config.MaxInaccuracy, runTimeComponent.ContinuesShootCount,
+                    config.AccuracyDivisor, config.AccuracyOffset);
             }
             else
             {
-                weaponState.Accuracy = 0;
+                runTimeComponent.Accuracy = 0;
             }
-        }
-
-        public void OnIdle(PlayerWeaponController weaponController, IWeaponCmd cmd)
-        {
         }
     }
 }

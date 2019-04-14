@@ -18,6 +18,7 @@ using App.Shared.FreeFramework.Free;
 using App.Shared.FreeFramework.Free.Chicken;
 using App.Shared.Player;
 using App.Server.GameModules.GamePlay.Free.player;
+using App.Shared.GameModules.Player;
 
 namespace com.wd.free.item
 {

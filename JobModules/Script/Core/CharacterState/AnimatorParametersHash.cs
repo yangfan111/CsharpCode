@@ -126,10 +126,12 @@ namespace Core.CharacterState
             ClimbStateName = "ClimbState";
             Vault50CmValue = 0;
             Vault1MValue = 1;
-            Vault2MValue = 2;
-            Climb50CmValue = 3;
-            Climb1MValue = 4;
-            Climb2MValue = 5;
+            Vault150CmValue = 2;
+            Vault2MValue = 3;
+            Climb50CmValue = 4;
+            Climb1MValue = 5;
+            Climb150CmValue = 6;
+            Climb2MValue = 7;
 
             SightsFireName = "SightsFire";
             SightsFireEnableValue = true;
@@ -262,15 +264,19 @@ namespace Core.CharacterState
             ParachuteEnableValue = true;
             ParachuteDisableValue = false;
 
-            GripHandPoseStateName = "GripHandPoseState";
-
             GlidingName = "Gliding";
             GlidingEnableValue = true;
             GlidingDisableValue = false;
 
+            HandPoseName = "HandPose";
+            HandPoseEnableValue = true;
+            HandPoseDisableValue = false;
+
             GripHandPoseName = "GripHandPose";
             GripHandPoseEnableValue = true;
             GripHandPoseDisableValue = false;
+            
+            GripHandPoseStateName = "GripHandPoseState";
 
             UseName = "Use";
             UseEnableValue = true;
@@ -279,6 +285,10 @@ namespace Core.CharacterState
             DismantleName = "Dismantle";
             DismantleEnableValue = true;
             DismantleDisableValue = false;
+
+            InjuredMoveName = "InjuredMove";
+            InjuredMoveEnableValue = true;
+            InjuredMoveDisableValue = false;
 
             ADSLayer = 6;
             ADSLayerP1 = 2;
@@ -581,9 +591,11 @@ namespace Core.CharacterState
         public int ClimbStateHash { get; private set; }
         public float Vault50CmValue { get; private set; }
         public float Vault1MValue { get; private set; }
+        public float Vault150CmValue { get; private set; }
         public float Vault2MValue { get; private set; }
         public float Climb50CmValue { get; private set; }
         public float Climb1MValue { get; private set; }
+        public float Climb150CmValue { get; private set; }
         public float Climb2MValue { get; private set; }
         #endregion
 
@@ -1004,6 +1016,18 @@ namespace Core.CharacterState
         public bool DismantleEnableValue { get; private set; }
         public bool DismantleDisableValue { get; private set; }
         #endregion
+        
+        #region HandPose
+        private string _handPoseName = string.Empty;
+        public string HandPoseName
+        {
+            get { return _handPoseName; }
+            set { _handPoseName = value; HandPoseHash = StringToHash(value); }
+        }
+        public int HandPoseHash { get; private set; }
+        public bool HandPoseEnableValue { get; private set; }
+        public bool HandPoseDisableValue { get; private set; }
+        #endregion
 
         #region GripHandPose
         private string _gripHandPoseName = string.Empty;
@@ -1025,6 +1049,24 @@ namespace Core.CharacterState
             set { _gripHandPoseStateName = value; GripHandPoseStateHash = StringToHash(value); }
         }
         public int GripHandPoseStateHash { get; private set; }
+        #endregion
+
+        #region InjuredMove
+
+        private string _injuredMoveName = string.Empty;
+
+        public string InjuredMoveName
+        {
+            get { return _injuredMoveName; }
+            set
+            {
+                _injuredMoveName = value;
+                InjuredMoveHash = StringToHash(value);
+            }
+        }
+        public int InjuredMoveHash { get; private set; }
+        public bool InjuredMoveEnableValue { get; private set; }
+        public bool InjuredMoveDisableValue { get; private set; }
         #endregion
 
         #region Interrupt

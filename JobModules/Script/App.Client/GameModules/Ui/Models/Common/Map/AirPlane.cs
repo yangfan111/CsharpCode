@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using App.Client.GameModules.Ui.Utils;
 using App.Shared.Components.Ui;
+using Assets.App.Client.GameModules.Ui;
 using Assets.UiFramework.Libs;
+using Core.Ui.Map;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +14,6 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private IUiResourcesLoader loader;
         //空投点 通用
         private Dictionary<string, Sprite> dropAnimSpriteDic = new Dictionary<string, Sprite>();
-        private const string uiIconsBundleName = "ui/icons";
         public int spriteSum = 13;
 
         private Transform tran;
@@ -43,7 +44,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             for (int i = 1; i <= spriteSum; i++)
             {
                 var name = GetSpriteNameByNum(i);
-                loader.RetriveSpriteAsync(uiIconsBundleName, name,
+                loader.RetriveSpriteAsync(AssetBundleConstant.Icon_UiIcons, name,
                     (sprite) =>
                     {
                         dropAnimSpriteDic.Add(name, sprite);
@@ -61,7 +62,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             }
         }
 
-        public void ShowAirDrop(List<Vector2> dropList, float rate)
+        public void ShowAirDrop(List<MapFixedVector2> dropList, float rate)
         {
             if (isNeedChangeSprite) return;
             isNeedChangeSprite = true;
@@ -81,7 +82,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                 }
                 // 设置空投点的位置
                 UIUtils.SetActive(dropTf, true);
-                Vector2 kTouPosByPixel = (dropList[i]) * rate;
+                Vector2 kTouPosByPixel = (dropList[i].ShiftedUIVector2()) * rate;
                 dropTf.GetComponent<RectTransform>().anchoredPosition = kTouPosByPixel;
             }
             for (; i < airDropList.Count; i++)
@@ -91,7 +92,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             }
         }
 
-        public void Update(float interval, float rate, List<Vector2> airDropList, AirPlaneData planeData)
+        public void Update(float interval, float rate, List<MapFixedVector2> airDropList, AirPlaneData planeData)
         {
             if (planeData.Type == 0)  //目前无飞机
             {
@@ -111,7 +112,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                 }
 
                 //更新飞机位置
-                Vector2 planePosByPixel = (planeData.Pos) * rate;
+                Vector2 planePosByPixel = (planeData.Pos.ShiftedUIVector2()) * rate;
                 airPlane.GetComponent<RectTransform>().anchoredPosition = planePosByPixel;
 
                 //更新飞机方向
@@ -132,7 +133,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                 }
 
                 //更新飞机位置
-                Vector2 planePosByPixel = (planeData.Pos) * rate;
+                Vector2 planePosByPixel = (planeData.Pos.ShiftedUIVector2()) * rate;
                 airPlane.GetComponent<RectTransform>().anchoredPosition = planePosByPixel;
 
                 //更新飞机方向

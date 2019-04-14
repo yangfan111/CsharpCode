@@ -10,8 +10,8 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
         public void OnBeforeFire(PlayerWeaponController weaponController, IWeaponCmd cmd)
         {
-            var weaponState = weaponController.HeldWeaponAgent.RunTimeComponent;
-            if (weaponState.LastFireTime == 0)
+            var runTimeComponent = weaponController.HeldWeaponAgent.RunTimeComponent;
+            if (runTimeComponent.LastAttackTimestamp == 0)
             {
             }
             else
@@ -19,9 +19,8 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 var config = weaponController.HeldWeaponAgent.PistolAccuracyLogicCfg;
                 if (config == null)
                     return;
-                var accuracy = weaponState.Accuracy;
-                accuracy -= config.AccuracyFactor * (0.3f - (cmd.RenderTime - weaponState.LastFireTime) / 1000.0f);
-                weaponState.Accuracy = CompareUtility.LimitBetween(accuracy,config.MinAccuracy,config.MaxAccuracy);
+                runTimeComponent.Accuracy = AccuracyFormula.GetPistolAccuracy(cmd.RenderTime - runTimeComponent.LastAttackTimestamp,
+                    config.AccuracyFactor, config.MinAccuracy, config.MaxAccuracy);
             }
         }
 

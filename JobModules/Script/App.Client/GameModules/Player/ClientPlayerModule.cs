@@ -60,9 +60,7 @@ namespace App.Client.GameModules.Player
             AddSystem(new PlayerRaycastInitSystem(contexts));
             AddSystem(new PingSystem(contexts));
             AddSystem(new RaycastTestSystem(contexts));
-            AddSystem(new ClientSoundPlaybackSystem(contexts.player,
-                contexts.session.entityFactoryObject.SoundEntityFactory,
-                SingletonManager.Get<SoundConfigManager>()));
+            AddSystem(new ClientPlayerWeaponSystem(contexts));
             AddSystem(new PlayerUpdateRotationRenderSystem(contexts));
             AddSystem(new ClientPlayerEntityInitSystem(contexts.player));
             AddSystem(new ClientPlayerTipShowSystem(contexts));

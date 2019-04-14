@@ -58,7 +58,7 @@ namespace App.Shared.GameModules.Player
                 if (moveUpdateData.BeginDive) 
 					player.stateInterface.State.Dive();
                 player.stateInterface.State.SetMoveInWater(moveUpdateData.MoveInWater);
-                player.stateInterface.State.SetSteepSlope(moveUpdateData.ExceedSteepLimit);
+                player.stateInterface.State.SetSteepAngle(moveUpdateData.TanSteepAngle);
                 player.orientation.ModelPitch = moveUpdateData.ModelPitch;
                 player.orientation.ModelYaw = moveUpdateData.ModelYaw;
                 localMoveComponent.SpeedRatio = player.moveUpdate.SpeedRatio;
@@ -76,7 +76,7 @@ namespace App.Shared.GameModules.Player
 
         private void UpdatePosition(PlayerEntity player, MoveUpdateComponent moveUpdateData)
         {
-            player.position.Value = moveUpdateData.LastPosition;
+            player.position.Value = moveUpdateData.LastPosition.ShiftedVector3();
             player.position.Value += moveUpdateData.Dist;
             var obj = player.RootGo().transform;
             obj.position = player.position.Value;

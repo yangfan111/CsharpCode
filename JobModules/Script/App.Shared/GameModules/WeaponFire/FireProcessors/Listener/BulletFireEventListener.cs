@@ -39,7 +39,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 controller.AddAuxBullet(bulletData);
             }
             controller.AutoFire =0;
-            controller.ExpendAfterAttack();
+            controller.AfterAttack();
         }
     }
 }

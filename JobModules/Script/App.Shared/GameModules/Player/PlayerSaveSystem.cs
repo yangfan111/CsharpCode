@@ -56,7 +56,7 @@ namespace App.Shared.GameModules.Player
                 }
                 if (myEntity.gamePlay.IsSave)
                 {
-                    if (myEntity.stateInterface.State.NeedInterruptRescue((PostureInConfig) myEntity.gamePlay.SaveEnterState)
+                    if (!cmd.IsF || myEntity.stateInterface.State.NeedInterruptRescue((PostureInConfig) myEntity.gamePlay.SaveEnterState)
                         || !myEntity.gamePlay.IsLifeState(EPlayerLifeState.Alive) || GetAngle(myEntity, teamEntity) > SharedConfig.MaxSaveAngle)
                     {
                         StopSave(myEntity, true);
@@ -74,7 +74,9 @@ namespace App.Shared.GameModules.Player
                     }
                 }
             }
-            if (cmd.IsUseAction && cmd.UseType == (int) EUseActionType.Player)
+            if (cmd.IsUseAction && cmd.UseType == (int) EUseActionType.Player && myEntity.gamePlay.IsSave == false
+                && myEntity.stateInterface.State.GetCurrentMovementState() == MovementInConfig.Idle
+                && myEntity.stateInterface.State.GetCurrentPostureState() != PostureInConfig.Land)
             {
                 PlayerEntity saveEntity = _contexts.player.GetEntityWithEntityKey(new EntityKey(cmd.UseEntityId, (int)EEntityType.Player));
                 if (saveEntity != null && SharedConfig.IsServer)
@@ -106,10 +108,13 @@ namespace App.Shared.GameModules.Player
                     if (!isInterrupted)
                     {
                         PlayerAnimationAction.DoAnimation(_contexts, PlayerAnimationAction.Revive, playerEntity, true);
-                        playerEntity.stateInterface.State.SetPostureCrouch();
                     }
                     playerEntity.gamePlay.IsBeSave = false;
                 }
+            }
+            if (playerEntity.gamePlay.IsSave || !isInterrupted)
+            {
+                playerEntity.stateInterface.State.SetPostureCrouch();
             }
             playerEntity.gamePlay.IsInteruptSave = isInterrupted;
         }

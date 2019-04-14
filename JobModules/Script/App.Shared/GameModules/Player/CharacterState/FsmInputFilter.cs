@@ -54,7 +54,7 @@ namespace App.Shared.GameModules.Player.CharacterState
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(DiveStateFilter));
         private static readonly FilterState _keyState = new FilterState { Posture = PostureInConfig.Dive };
 
-        private static Dictionary<FsmInput, FsmInput> SimpleMap = new Dictionary<FsmInput, FsmInput>(CommonIntEnumEqualityComparer<FsmInput>.Instance)
+        private static Dictionary<FsmInput, FsmInput> SimpleMap = new Dictionary<FsmInput, FsmInput>(CommonEnumEqualityComparer<FsmInput>.Instance)
         {
             { FsmInput.Sprint,              FsmInput.None },
             { FsmInput.Run,                FsmInput.None },
@@ -65,7 +65,7 @@ namespace App.Shared.GameModules.Player.CharacterState
         /// <summary>
         /// 如果满足1,把2设为none
         /// </summary>
-        private static Dictionary<FsmInput, FsmInput> TransferMap = new Dictionary<FsmInput, FsmInput>(CommonIntEnumEqualityComparer<FsmInput>.Instance)
+        private static Dictionary<FsmInput, FsmInput> TransferMap = new Dictionary<FsmInput, FsmInput>(CommonEnumEqualityComparer<FsmInput>.Instance)
         {
             {FsmInput.DiveIdle, FsmInput.Idle }
         }; 
@@ -121,7 +121,7 @@ namespace App.Shared.GameModules.Player.CharacterState
             }
         }
 
-        private static Dictionary<FsmInput, FsmInput> SimpleMap = new Dictionary<FsmInput, FsmInput>(CommonIntEnumEqualityComparer<FsmInput>.Instance)
+        private static Dictionary<FsmInput, FsmInput> SimpleMap = new Dictionary<FsmInput, FsmInput>(CommonEnumEqualityComparer<FsmInput>.Instance)
         {
             { FsmInput.Sprint,              FsmInput.Run },
             { FsmInput.Walk,                FsmInput.Run },

@@ -62,15 +62,15 @@ namespace App.Shared.GameModules.Player
         {
             _logger.InfoFormat("{0} play die", player.entityKey);
                     
-            player.WeaponController().ForceUnArmHeldWeapon();
-            player.characterControllerInterface.CharacterController.PlayerDead();
+            player.WeaponController().UnArmWeapon(false);
+            player.characterControllerInterface.CharacterController.PlayerDead(player.isFlagSelf);
             _logger.InfoFormat("PlayerDeadAnimDead");
         }
 
         private void Dying(PlayerEntity player)
         {
             _logger.InfoFormat("{0} play dying", player.entityKey);
-            player.WeaponController().ForceUnArmHeldWeapon();
+            player.WeaponController().UnArmWeapon(false);
         }
 
         private void Revive(PlayerEntity player)

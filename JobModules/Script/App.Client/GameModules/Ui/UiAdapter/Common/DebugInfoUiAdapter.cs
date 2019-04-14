@@ -4,6 +4,8 @@ using Core.GameModule.Step;
 using Core.Utils;
 using System.Text;
 using App.Shared;
+using Core.Components;
+using Core.OC;
 using Sharpen;
 using Utils.Singleton;
 
@@ -28,17 +30,22 @@ namespace App.Client.GameModules.Ui.UiAdapter.Common
                 sb.AppendLine(string.Format("server :{0} asset;{1}", Core.Utils.Version.Instance.RemoteVersion,
                     Core.Utils.Version.Instance.RemoteAsset));
                 sb.AppendLine(SingletonManager.Get<DurationHelp>().LastAvg);
-                sb.AppendLine(string.Format("cpuMax: {0}     Rewind:{1} time:{2}  pos:{3:N2} {4:N2} {5:N2}",
-                    SingletonManager.Get<DurationHelp>().LastMax, SingletonManager.Get<DurationHelp>().RewindCount,
+                sb.AppendLine(string.Format(" Rewind:{0} time:{1}  pos:{2:N2} {3:N2} {4:N2} origin:{5:N2} {6:N2} {7:N2} ",
+                    SingletonManager.Get<DurationHelp>().RewindCount,
                     SingletonManager.Get<DurationHelp>().DriveTime,
-                    SingletonManager.Get<DurationHelp>().Position.x,
-                    SingletonManager.Get<DurationHelp>().Position.y,
-                    SingletonManager.Get<DurationHelp>().Position.z
+                    SingletonManager.Get<DurationHelp>().Position.x + WorldOrigin.Origin.x,
+                    SingletonManager.Get<DurationHelp>().Position.y + WorldOrigin.Origin.y,
+                    SingletonManager.Get<DurationHelp>().Position.z + WorldOrigin.Origin.z,
+                    WorldOrigin.Origin.x,
+                    WorldOrigin.Origin.y,
+                    WorldOrigin.Origin.z
                 ));
                 sb.AppendLine(string.Format("{0}   Interval:{1} , Delta:{2} rTime:{3} sTime:{4} d:{5}",
                     StepExecuteManager.Instance.FpsString(), SingletonManager.Get<DurationHelp>().LastAvgInterpolateInterval,
                     SingletonManager.Get<DurationHelp>().ServerClientDelta, SingletonManager.Get<DurationHelp>().RenderTime, SingletonManager.Get<DurationHelp>().LastServerTime, SingletonManager.Get<DurationHelp>().LastServerTime - SingletonManager.Get<DurationHelp>().RenderTime));
                 sb.AppendLine(string.Format("serverip: {0}, serverId:{1}", SingletonManager.Get<DurationHelp>().ServerInfo, SingletonManager.Get<Core.Utils.ServerInfo>().ServerId));
+                sb.AppendLine(string.Format("ocpvs: {0} ocen: {1}", OcclusionRunningState.HasPVSData ? "T" : "F",
+                    OcclusionRunningState.OcclusionEnabled ? "T" : "F"));
                 return sb.ToString();
             }
         }

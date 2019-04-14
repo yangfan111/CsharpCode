@@ -13,6 +13,7 @@ namespace App.Server.GameModules.GamePlay.Free.condition
     {
         public const int InCar = 101;
         public const int Jump = 102;
+        public const int Stand = 103;
 
         private string player;
         private string state;
@@ -32,6 +33,8 @@ namespace App.Server.GameModules.GamePlay.Free.condition
                             return p.IsOnVehicle();
                         case Jump:
                             return p.stateInterface.State.GetCurrentPostureState() == PostureInConfig.Jump;
+                        case Stand:
+                            return p.stateInterface.State.GetCurrentMovementState() == MovementInConfig.Idle;
                         default:
                             return false;
                     }

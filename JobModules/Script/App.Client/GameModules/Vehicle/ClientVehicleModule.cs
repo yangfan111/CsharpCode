@@ -33,7 +33,7 @@ namespace App.Client.GameModules.Vehicle
             AddSystem(new VehicleSyncPositionSystem(contexts));
             AddSystem(new ClientVehiclePlaybackSystem(contexts.player, contexts.vehicle));
 
-            AddSystem(new ClientVehicleOwnerIdActiveSystem(contexts));
+            
         }
 
     }

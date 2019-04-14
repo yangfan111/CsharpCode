@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.Interpolate;
-using Core.ObjectPool;
-using UnityEngine;
-using Utils.Appearance;
+﻿using System.Collections.Generic;
 using XmlConfig;
 
 namespace Core.CameraControl.NewMotor
@@ -29,8 +24,8 @@ namespace Core.CameraControl.NewMotor
         float ArchorYaw { get; set; }
         float ArchorPitch { get; set; }
         bool IsParachuteAttached { get; set; }
-        bool ForceChangeGunSight { get; set; }
-        bool ForceInterruptGunSight { get; set; }
+        bool IsObservingFreemove { get; set; }
+        bool InterruptCameraFocus { get; set; }
         bool IsChange(ICameraMotorInput r);
         short LastViewByOrder { get; set; }
     }

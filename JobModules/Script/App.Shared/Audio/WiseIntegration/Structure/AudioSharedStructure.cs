@@ -190,6 +190,7 @@ namespace App.Shared
     public enum AudioClientEffectType
     {
         BulletHit=1,
+        BulletDrop=2,
     }
     public enum AudioGrp_Magazine
     {
@@ -249,7 +250,7 @@ namespace App.Shared
 
 
 
-    public enum AudioGrp_MatIndex
+    public enum AudioGrp_FootMatType
     {
         Default = 0,
         Grass = 0,
@@ -261,6 +262,14 @@ namespace App.Shared
         Rug = 6,
         Wetland = 7,
         Id = 121,
+    }
+    public enum AudioGrp_BulletType
+    {
+        Default =0,
+        Lv1  = 0,
+        Lv2    = 1,
+        Lv3 = 2,
+        Id       = 142,
     }
 
     [System.Obsolete]

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using App.Shared.Components.Player;
 using Core.EntitasAdpater;
 using Core.EntityComponent;
@@ -10,7 +11,7 @@ namespace App.Shared.UpdateLatest
 {
     public class SyncUpdateLatestMsgHandler:ISyncUpdateLatestMsgHandler
     {
-        public static void CopyForm( UserCmd cmd, SendUserCmdComponent right)
+        public static void CopyForm(UserCmd cmd, SendUserCmdComponent right)
         {
             //cmd.Seq = right.Seq;
             cmd.FrameInterval = right.FrameInterval;
@@ -29,12 +30,17 @@ namespace App.Shared.UpdateLatest
 
             cmd.CurWeapon = right.CurWeapon;
             cmd.UseEntityId = right.UseEntityId;
-            cmd.PickUpEquip = right.PickUpEquip;
+            cmd.ManualPickUpEquip = right.ManualPickUpEquip;
+            
+            cmd.AutoPickUpEquip = UserCmd.CopyList(cmd.AutoPickUpEquip, right.AutoPickUpEquip);
             cmd.UseVehicleSeat = right.UseVehicleSeat;
             cmd.UseType = right.UseType;
             cmd.ChangeChannel = right.ChangeChannel;
             cmd.BagIndex = right.BagIndex;
         }
+
+        
+
         public void SyncToEntity(IUserCmdOwner owner, UpdateLatestPacakge package)
         {
             PlayerEntity playerEntity = owner.OwnerEntity as PlayerEntity;

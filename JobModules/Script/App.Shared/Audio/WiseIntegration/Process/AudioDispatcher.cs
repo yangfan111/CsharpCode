@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
-using Utils.Configuration;
-using Utils.Singleton;
 using XmlConfig;
 
 
@@ -49,13 +47,17 @@ namespace App.Shared.Audio
         {
             SetSwitch(target, (int)AudioGrp_ShotMode.Id, (int)shotModelGrpIndex);
         }
+        public void SetSwitch(GameObject target, AudioGrp_BulletType bulletType)
+        {
+            SetSwitch(target, (int)AudioGrp_BulletType.Id, (int)bulletType);
+        }
         public void SetSwitch(GameObject target, AudioGrp_HitMatType hitMatType)
         {
             SetSwitch(target, (int)AudioGrp_HitMatType.Id, (int)hitMatType);
         }
-        public void SetSwitch(GameObject target,AudioGrp_MatIndex matIndex)
+        public void SetSwitch(GameObject target,AudioGrp_FootMatType footMatType)
         {
-            SetSwitch(target, (int)AudioGrp_MatIndex.Id, (int)matIndex);
+            SetSwitch(target, (int)AudioGrp_FootMatType.Id, (int)footMatType);
         }
         public void SetSwitch(GameObject target,AudioGrp_Magazine magIndex)
         {
@@ -69,8 +71,6 @@ namespace App.Shared.Audio
 
         private void SetSwitch(GameObject target,int grpId,int index)
         {
-            if (SingletonManager.Get<AudioGroupManager>().FindById(grpId) == null)
-                return;
             AKSwitchAtom switchAtom = typesController.RegisterGetSwitch(target, grpId, index);
             switchAtom.SetSwitch(index, target);
         }

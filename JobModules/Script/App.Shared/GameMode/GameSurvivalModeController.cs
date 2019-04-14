@@ -15,7 +15,7 @@ namespace App.Shared.GameMode
             SetMode(modeId);
             ProcessListener = new ModeProcessListener();
             ReservedBulletHandler = new SharedReservedBulletHandler();
-            PickupHandler = new SurvivalPickupDropHandler(contexts);
+            PickupHandler = new SurvivalPickupDropHandler(contexts,modeId);
             SlotLibary = WeaponSlotsLibrary.Allocate(EWeaponSlotsGroupType.Default);
         }
 

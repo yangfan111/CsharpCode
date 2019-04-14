@@ -22,10 +22,9 @@ namespace App.Client.SessionStates
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(ClientSessionStateProgress));
 
         private static readonly string UiRootName = "ClientUIRoot";
-        private static readonly string LoadingUiBundleName = "uiprefabs/common";
+        private static readonly string LoadingUiBundleName = "ui/client/prefab/common";
         private static readonly string LoadingUiAssetName = "CommonLoading";
 
-        private static readonly string MapIconBundleName = "icon/map";
         private static readonly string MapIconAssetName = "Map_0";
 
         private Contexts _contexts;
@@ -125,7 +124,7 @@ namespace App.Client.SessionStates
                 var bgAsset = SingletonManager.Get<MapConfigManager>().MapIconAsset;
                 if (string.IsNullOrEmpty(bgBundle) || string.IsNullOrEmpty(bgAsset))
                 {
-                    bgBundle = MapIconBundleName;
+                    bgBundle = AssetBundleConstant.Icon_Map;
                     bgAsset = MapIconAssetName;
                 }
                 _assetManager.LoadAssetAsync(GetType().ToString(), new AssetInfo(bgBundle, bgAsset),

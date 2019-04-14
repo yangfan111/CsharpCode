@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Core.Components;
 using UnityEngine;
 
 namespace Core.SpatialPartition
@@ -65,6 +66,10 @@ namespace Core.SpatialPartition
         public static Vector2 To2D(this Vector3 v3)
         {
             return new Vector2(v3.x, v3.z);
+        }
+        public static FixedVector2 To2D(this FixedVector3 v3)
+        {
+            return new FixedVector2(v3.x, v3.z);
         }
     }
 }

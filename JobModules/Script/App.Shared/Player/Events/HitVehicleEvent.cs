@@ -12,36 +12,40 @@ namespace App.Shared.Player.Events
 {
     public class HitVehicleEvent : IEvent
     {
-        
         public EntityKey Target;
         public Vector3 Offset;
         public Vector3 Normal;
         public Vector3 HitPoint;
-        public class ObjcetFactory :CustomAbstractObjectFactory
+
+        public class ObjcetFactory : CustomAbstractObjectFactory
         {
-            public ObjcetFactory() : base(typeof(HitVehicleEvent)){}
+            public ObjcetFactory() : base(typeof(HitVehicleEvent))
+            {
+            }
+
             public override object MakeObject()
             {
                 return new HitVehicleEvent();
             }
-
         }
-       public HitVehicleEvent()
+
+        public HitVehicleEvent()
         {
         }
 
-        public  EEventType EventType
+        public EEventType EventType
         {
             get { return EEventType.HitVehicle; }
         }
 
         public bool IsRemote { get; set; }
+
         public void ReadBody(BinaryReader reader)
         {
-            Target= FieldSerializeUtil.Deserialize(Target, reader);
-            Offset=FieldSerializeUtil.Deserialize(Offset, reader);
-            Normal=FieldSerializeUtil.Deserialize(Normal, reader);
-            HitPoint=FieldSerializeUtil.Deserialize(HitPoint, reader);
+            Target = FieldSerializeUtil.Deserialize(Target, reader);
+            Offset = FieldSerializeUtil.Deserialize(Offset, reader);
+            Normal = FieldSerializeUtil.Deserialize(Normal, reader);
+            HitPoint = FieldSerializeUtil.Deserialize(HitPoint, reader);
         }
 
         public void WriteBody(MyBinaryWriter writer)
@@ -61,24 +65,23 @@ namespace App.Shared.Player.Events
             HitPoint = right.HitPoint;
         }
     }
-    
-    public class HitVehicleEventHandler:DefaultEventHandler
+
+    public class HitVehicleEventHandler : DefaultEventHandler
     {
         public override EEventType EventType
         {
             get { return EEventType.HitVehicle; }
         }
 
-      
-        public override void DoEventClient( Entitas.IContexts contexts, IEntity entity, IEvent e)
+
+        public override void DoEventClient(Entitas.IContexts contexts, IEntity entity, IEvent e)
         {
             var playerEntity = entity as PlayerEntity;
-            Contexts c =contexts as Contexts;
+            Contexts c = contexts as Contexts;
             HitVehicleEvent ev = e as HitVehicleEvent;
             if (playerEntity != null)
             {
-             
-                ClientEffectFactory.CreateHitVehicleEffect(c.clientEffect, 
+                ClientEffectFactory.CreateHitVehicleEffect(c.clientEffect,
                     c.session.commonSession.EntityIdGenerator,
                     ev.HitPoint,
                     playerEntity.entityKey.Value,
@@ -88,13 +91,11 @@ namespace App.Shared.Player.Events
             }
         }
 
-      
 
         public override bool ClientFilter(IEntity entity, IEvent e)
         {
             var playerEntity = entity as PlayerEntity;
             return playerEntity != null;
         }
-     
     }
 }

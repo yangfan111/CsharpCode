@@ -3,46 +3,19 @@
 namespace App.Shared.GameModules.Weapon.Behavior
 {
     /// <summary>
-    /// Defines the <see cref="RifleSpreadProcessor" />
+    /// 最终改变WeaponRuntimeDataComponent.LastSpreadX/LastSpreadY
     /// </summary>
-    public class RifleSpreadProcessor : ISpreadProcessor
+    public class RifleSpreadProcessor : AbstractSpreadProcessor
     {
-        public RifleSpreadProcessor()
-        {
-        }
 
-        public void OnBeforeFire(PlayerWeaponController controller, IWeaponCmd cmd)
+        protected override void Update(PlayerWeaponController controller, IWeaponCmd cmd)
+
         {
             RifleSpreadLogicConfig config = controller.HeldWeaponAgent.RifleSpreadLogicCfg;
-            var weaponState = controller.HeldWeaponAgent.RunTimeComponent;
-            float spread = UpdateSpread(controller, weaponState.Accuracy);
-            weaponState.LastSpreadX = spread * config.SpreadScale.ScaleX;
-            weaponState.LastSpreadY = spread * config.SpreadScale.ScaleY;
+            var weaponRuntime = controller.HeldWeaponAgent.RunTimeComponent;
+            float spreadScaleFactor = FireSpreadProvider.GetSpreadScaleFactor(config, controller);
+            FireSpreadFormula.ApplyRifleFinalSpread(spreadScaleFactor, config.SpreadScale,weaponRuntime);
         }
 
-        protected float UpdateSpread(PlayerWeaponController controller, float accuracy)
-        {
-            RifleSpreadLogicConfig config = controller.HeldWeaponAgent.RifleSpreadLogicCfg;
-            float spread = 0;
-            var spreadCfg = controller.RelatedCameraSNew.IsAiming() ? config.Aiming : config.Default;
-            var posture = controller.RelatedStateInterface.GetCurrentPostureState();
-            if (!controller.RelatedPlayerMove.IsGround)
-            {
-                spread = spreadCfg.Base * spreadCfg.Air;
-            }
-            else if (controller.RelatedPlayerMove.HorizontalVelocity > config.FastMoveSpeed)
-            {
-                spread = spreadCfg.Base * spreadCfg.FastMove;
-            }
-            else if (posture == XmlConfig.PostureInConfig.Prone)
-            {
-                spread = spreadCfg.Base * spreadCfg.Prone;
-            }
-            else
-            {
-                spread = spreadCfg.Base;
-            }
-            return spread * accuracy;
-        }
     }
 }

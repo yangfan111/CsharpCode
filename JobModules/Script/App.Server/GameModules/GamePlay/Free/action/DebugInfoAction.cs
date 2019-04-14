@@ -7,6 +7,7 @@ using com.wd.free.@event;
 using com.wd.free.para;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.util;
+using Shared.Scripts.MapConfigPoint;
 
 namespace App.Server.GameModules.GamePlay.Free.action
 {

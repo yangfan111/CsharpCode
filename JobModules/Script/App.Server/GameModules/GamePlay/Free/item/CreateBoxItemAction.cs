@@ -6,7 +6,6 @@ using App.Shared;
 using App.Shared.GameModules.GamePlay.Free;
 using App.Shared.GameModules.GamePlay.Free.Map;
 using Assets.XmlConfig;
-using com.cpkf.yyjd.tools.util.math;
 using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.item;
@@ -15,8 +14,6 @@ using com.wd.free.util;
 using Core.EntityComponent;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using Utils.Singleton;
 
@@ -39,7 +36,8 @@ namespace App.Server.GameModules.GamePlay.Free.item
             string realName = FreeUtil.ReplaceVar(name, args);
             var groupEntity = args.GameContext.freeMove.CreateEntity();
             groupEntity.AddEntityKey(new EntityKey(args.GameContext.session.commonSession.EntityIdGenerator.GetNextEntityId(), (short)EEntityType.FreeMove));
-            groupEntity.AddPosition(new Vector3(p.x, p.y, p.z));
+            groupEntity.AddPosition();
+            groupEntity.position.Value = new Vector3(p.x, p.y, p.z);
             groupEntity.AddFreeData("", null);
             groupEntity.AddPositionFilter(Core.Components.PositionFilterType.Filter2D, 1000);
             groupEntity.freeData.Value = "";
@@ -55,7 +53,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
             if (string.IsNullOrEmpty(id))
             {
-                ItemDrop[] list = FreeItemDrop.GetDropItems(FreeUtil.ReplaceVar(cat, args), FreeUtil.ReplaceInt(count, args));
+                ItemDrop[] list = FreeItemDrop.GetDropItems(FreeUtil.ReplaceVar(cat, args), FreeUtil.ReplaceInt(count, args), args.GameContext.session.commonSession.RoomInfo.MapId);
                 foreach (ItemDrop drop in list)
                 {
                     CreateItemFromItemDrop(args, p, drop, realName);
@@ -72,6 +70,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
                 if (player != null)
                 {
                     groupEntity.freeData.IntValue = player.entityKey.Value.EntityId;
+                    groupEntity.freeData.Value = realName;
                     realName = player.playerInfo.PlayerName;
                     FreeData fd = ((FreeData)player.freeData.FreeData);
                     foreach (string inv in fd.GetFreeInventory().GetInventoryManager().GetInventoryNames())
@@ -95,7 +94,8 @@ namespace App.Server.GameModules.GamePlay.Free.item
                 {
                     FreeMoveEntity en = fr.GameContext.freeMove.CreateEntity();
                     en.AddEntityKey(new EntityKey(fr.GameContext.session.commonSession.EntityIdGenerator.GetNextEntityId(), (short)EEntityType.FreeMove));
-                    en.AddPosition(new Vector3(p.x, p.y, p.z));
+                    en.AddPosition();
+                    en.position.Value = new Vector3(p.x, p.y, p.z);
 
                     en.AddFreeData(FreeUtil.ReplaceVar(name, fr), null);
                     en.AddPositionFilter(Core.Components.PositionFilterType.Filter2D, 1000);
@@ -133,7 +133,8 @@ namespace App.Server.GameModules.GamePlay.Free.item
         {
             FreeMoveEntity en = fr.GameContext.freeMove.CreateEntity();
             en.AddEntityKey(new EntityKey(fr.GameContext.session.commonSession.EntityIdGenerator.GetNextEntityId(), (short)EEntityType.FreeMove));
-            en.AddPosition(new Vector3(p.x, p.y, p.z));
+            en.AddPosition();
+            en.position.Value = new Vector3(p.x, p.y, p.z);
 
             en.AddFreeData(FreeUtil.ReplaceVar(name, fr), null);
             en.AddPositionFilter(Core.Components.PositionFilterType.Filter2D, 1000);

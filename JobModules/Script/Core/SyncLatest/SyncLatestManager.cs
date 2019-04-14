@@ -104,8 +104,8 @@ namespace Core.SyncLatest
                 SyncLatestRewindHandler rewindHandler = new SyncLatestRewindHandler(_handler);
                 EntityMapComparator.Diff(localEntityMap, remoteEntityMap, rewindHandler, "syncLatest", _latestComparator.Init(rewindHandler,_handler.LatestSnapshot.ServerTime));
 
-                remoteEntityMap.ReleaseReference();
-                localEntityMap.ReleaseReference();
+                RefCounterRecycler.Instance.ReleaseReference(remoteEntityMap);
+                RefCounterRecycler.Instance.ReleaseReference(localEntityMap);
             }
         }
     }

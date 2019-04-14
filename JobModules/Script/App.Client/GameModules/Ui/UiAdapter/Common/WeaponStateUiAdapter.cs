@@ -93,8 +93,10 @@ namespace App.Client.GameModules.Ui.UiAdapter
                     {
                         return 0;
                     }
+
+                    var agent = Archive.GetWeaponAgent(EWeaponSlotType.ThrowingWeapon);
                     var greandeId = Archive.GetWeaponAgent(EWeaponSlotType.ThrowingWeapon).ConfigId;
-                    return Archive.GrenadeHelper.ShowCount(greandeId);
+                    return Archive.GrenadeHandler.ShowCount(greandeId);
                 }
             }
             return Archive.GetWeaponAgent(Index2Slot(index)).BaseComponent.Bullet;
@@ -221,7 +223,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
             {
                 return 0;
             }
-            var helper = Archive.GrenadeHelper;
+            var helper = Archive.GrenadeHandler;
             var _grenadeList = helper.GetOwnedIds();
 
             var realIndex = grenadeIndex - 1;
@@ -237,7 +239,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                int index = Archive.GrenadeHelper.GetHoldGrenadeIndex();
+                int index = Archive.GrenadeHandler.GetHoldGrenadeIndex();
                 if (index > 0) index += 1;
                 return Math.Max(index, 1);
             }

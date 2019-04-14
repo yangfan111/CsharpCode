@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using App.Shared.GameModules.Common;
+using App.Shared.GameModules.Player;
 using App.Shared.Player;
 using Core.EntityComponent;
 using Core.SceneTriggerObject;
@@ -36,7 +37,7 @@ namespace App.Shared.Util
             var entityReference = gameObject.GetComponent<EntityReference>();
             if (entityReference == null)
             {
-                entityReference = gameObject.AddComponent<EntityReference>();
+                entityReference = gameObject.AddComponentUncheckRequireAndDisallowMulti<EntityReference>();
             }
             entityReference.Init(sceneObject.entityAdapter);
         }

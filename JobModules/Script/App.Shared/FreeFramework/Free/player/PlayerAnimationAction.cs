@@ -9,6 +9,8 @@ using Assets.App.Server.GameModules.GamePlay.Free;
 using App.Shared.Player;
 using App.Shared;
 using App.Shared.GameModules.Weapon;
+using Core;
+using Core.EntityComponent;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
@@ -80,6 +82,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
                             player.stateInterface.State.Dive();
                             break;
                         case Crouch:
+                   
                             player.stateInterface.State.Crouch();
                             break;
                         case Ashore:
@@ -115,7 +118,12 @@ namespace App.Server.GameModules.GamePlay.Free.player
                             break;
                         case PlantBomb:
                             player.appearanceInterface.Appearance.MountWeaponOnAlternativeLocator();
-                            player.stateInterface.State.BuriedBomb(null);
+                            player.stateInterface.State.BuriedBomb(() =>
+                                {
+                                    
+                                    player.WeaponController().RelatedThrowAction.ThrowingEntityKey = new EntityKey(0, (short) EEntityType.End);
+                                    player.WeaponController().LastFireWeaponId = 46;
+                                });
                             break;
                         case DefuseBomb:
                             if (!server)
@@ -126,6 +134,8 @@ namespace App.Server.GameModules.GamePlay.Free.player
                         case InterPlantBomb:
                             player.stateInterface.State.InterruptAction();
                             player.appearanceInterface.Appearance.RemountWeaponOnRightHand();
+                            player.WeaponController().RelatedThrowAction.ThrowingEntityKey = new EntityKey(0, (short) EEntityType.End);
+                            player.WeaponController().LastFireWeaponId = 46;
                             break;
                         case RescueEnd:
                             player.stateInterface.State.RescueEnd();
@@ -137,7 +147,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 else
                 {
                     player.stateInterface.State.UseProps(ani);
-                    player.WeaponController().ForceUnArmHeldWeapon();
+                    player.WeaponController().UnArmWeapon(false);
                     player.autoMoveInterface.PlayerAutoMove.StopAutoMove();
                 }
 

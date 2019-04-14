@@ -9,6 +9,7 @@ using Assets.Sources.Free;
 using Assets.Sources.Free.UI;
 using Core;
 using Core.Free;
+using Core.Ui.Map;
 using Free.framework;
 using UnityEngine;
 using Utils.Singleton;
@@ -65,18 +66,18 @@ namespace App.Client.GameModules.GamePlay.Free.App
                 var blast = contexts.ui.blast;
                 if (data.Ks[0] == 0)
                 {
-                    blast.BlastAPosition = new Vector3(data.Fs[0], data.Fs[1] + 2.0f, data.Fs[2]);
+                    blast.BlastAPosition = new MapFixedVector3(data.Fs[0], data.Fs[1] + 2.0f, data.Fs[2]);
                 }
                 if (data.Ks[0] == 1)
                 {
-                    blast.BlastBPosition = new Vector3(data.Fs[0], data.Fs[1] + 2.0f, data.Fs[2]);
+                    blast.BlastBPosition = new MapFixedVector3(data.Fs[0], data.Fs[1] + 2.0f, data.Fs[2]);
                 }
                 if (data.Ks[0] == 2)
                 {
                     blast.IsC4Droped = data.Bs[0];
                     if (data.Bs[0])
                     {
-                        blast.C4DropPosition = new Vector3(data.Fs[0], data.Fs[1], data.Fs[2]);
+                        blast.C4DropPosition = new MapFixedVector3(data.Fs[0], data.Fs[1], data.Fs[2]);
                     }
                 }
                 if (data.Ks[0] == 3)

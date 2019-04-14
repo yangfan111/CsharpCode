@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Server.GameModules.GamePlay.free.player;
-using App.Server.GameModules.GamePlay.Free.entity;
-using App.Shared.Components.Player;
+﻿using App.Shared.GameModules.Player;
+using com.cpkf.yyjd.tools.util.math;
 using com.wd.free.@event;
 using com.wd.free.map.position;
-using com.wd.free.para.exp;
 using com.wd.free.unit;
 using com.wd.free.util;
+using Shared.Scripts.MapConfigPoint;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
-using com.cpkf.yyjd.tools.util.math;
-using System.Collections;
-using App.Shared.GameModules.Player;
 
 namespace App.Server.GameModules.GamePlay.Free.map.position
 {
@@ -22,9 +16,7 @@ namespace App.Server.GameModules.GamePlay.Free.map.position
     {
         public string type;
         public string index;
-
         private bool notSame;
-
         private bool birth;
 
         private UnitPosition tempPosition;
@@ -58,15 +50,15 @@ namespace App.Server.GameModules.GamePlay.Free.map.position
                         Vector3 v = Vector3.zero;
                         if (realIndex == 0)
                         {
-                            v = p.points[Random(p.ID, p.points.Count)];
+                            v = p.points[Random(p.ID, p.points.Count)].pos;
                             if (birth)
                             {
                                 if (HasPlayerNearBy(v, args))
                                 {
                                     for (int i = 0; i < p.points.Count; i++)
                                     {
-                                        int index = Random(p.ID, p.points.Count);
-                                        v = p.points[index];
+                                        realIndex = Random(p.ID, p.points.Count);
+                                        v = p.points[realIndex].pos;
                                         if (!HasPlayerNearBy(v, args))
                                         {
                                             break;
@@ -81,12 +73,14 @@ namespace App.Server.GameModules.GamePlay.Free.map.position
                             {
                                 realIndex = Math.Min(0, p.points.Count - 1);
                             }
-                            v = p.points[realIndex];
+                            v = p.points[realIndex].pos;
                         }
                         tempPosition.SetX(v.x);
                         tempPosition.SetY(v.y);
                         tempPosition.SetZ(v.z);
-                        tempPosition.SetYaw(p.Yaw);
+                        tempPosition.SetYaw(p.points[realIndex].dir);
+                        tempPosition.SetCylinderVolR(p.points[realIndex].cylinderVolR);
+                        tempPosition.SetCylinderVolH(p.points[realIndex].cylinderVolH);
                         break;
                     }
                 }

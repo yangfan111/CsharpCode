@@ -23,7 +23,7 @@ namespace App.Server.GameModules.GamePlay
             AddSystem(new MapObjectDebugInfoSystem(contexts));
             AddSystem(new LocalEventPlaySystem(contexts, true));
             AddSystem(new FreePredictCmdSystem(contexts));
-            AddSystem(new WeaponCleanupSystem(contexts));
+           
             AddSystem(new ObserveSystem(contexts));
         }
     }

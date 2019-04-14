@@ -1,6 +1,6 @@
 namespace Core.GameModule.Interface
 {
-    public interface IEntityInitSystem
+    public interface IEntityInitSystem:IUserSystem
     {
         void OnEntityInit(); 
     }

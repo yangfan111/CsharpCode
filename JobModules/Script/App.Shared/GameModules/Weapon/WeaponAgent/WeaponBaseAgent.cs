@@ -65,7 +65,7 @@ namespace App.Shared.GameModules.Weapon
             ref WeaponPartsRefreshStruct refreshParams);
 
         public WeaponBaseAgent(Func<EntityKey> in_holdExtractor, Func<EntityKey> in_emptyExtractor,
-            EWeaponSlotType slot, GrenadeCacheHelper grenadeHelper)
+            EWeaponSlotType slot, GrenadeCacheHandler grenadeHandler)
         {
             weaponKeyExtractor = in_holdExtractor;
             emptyKeyExtractor = in_emptyExtractor;
@@ -104,6 +104,29 @@ namespace App.Shared.GameModules.Weapon
         {
             get { return Entity != null ? entityCache.weaponRuntimeData : WeaponRuntimeDataComponent.Empty; }
         }
+        public WeaponClientSyncComponent ClientSyncComponent
+        {
+            get
+            {
+                if(Entity == null  )return WeaponClientSyncComponent.Empty;
+                if(!entityCache.hasWeaponClientSync)
+                    entityCache.AddWeaponClientSync();
+                return entityCache.weaponClientSync;
+            }
+        }
+       
+        public void ResetDynamic()
+        {
+            if (IsValid())
+            {
+                if(!entityCache.hasWeaponClientSync)
+                    entityCache.AddWeaponClientSync();
+                entityCache.weaponClientSync.IsPullingBolt = false;
+//                entityCache.weaponClientSync.IsInterruptSightView = false;
+//                entityCache.weaponClientSync.IsRecoverSightView = false;
+
+            }
+        }
 
         public int FireModeCount
         {
@@ -133,7 +156,7 @@ namespace App.Shared.GameModules.Weapon
         {
             get
             {
-                
+
                 if (IsValid())
                     return entityCache.weaponBasicData.ConfigId;
                 return WeaponUtil.EmptyHandId;
@@ -186,15 +209,16 @@ namespace App.Shared.GameModules.Weapon
                 .GetPartAchiveAttachedAttributeByType(partsAchiveCache, attributeType);
         }
 
+      
         public bool HasSilencerPart
         {
             get
             {
                 return GlobalConst.SilencerWeapons.Contains(ConfigId) || SingletonManager.Get<WeaponPartsConfigManager>().GetPartAchiveAttachedAttributeByType
-                    (BaseComponent.Muzzle, WeaponAttributeType.FireSound)>0;
+                    (BaseComponent.Muzzle, WeaponAttributeType.FireSound) > 0;
             }
         }
-   
+
         public bool IsWeaponConfigStuffed(int weaponId)
         {
             if (!IsValid()) return false;
@@ -215,15 +239,15 @@ namespace App.Shared.GameModules.Weapon
             entityCache.weaponRuntimeData.Accuracy = 0;
             entityCache.weaponRuntimeData.BurstShootCount = 0;
             entityCache.weaponRuntimeData.ContinuesShootCount = 0;
-            entityCache.weaponRuntimeData.ContinuesShootDecreaseNeeded = false;
-            entityCache.weaponRuntimeData.ContinuesShootDecreaseTimer = 0;
+            entityCache.weaponRuntimeData.ContinuesShootReduceTimestamp = 0;
             entityCache.weaponRuntimeData.ContinueAttackEndStamp = 0;
             entityCache.weaponRuntimeData.ContinueAttackStartStamp = 0;
             entityCache.weaponRuntimeData.NextAttackPeriodStamp = 0;
             entityCache.weaponRuntimeData.LastBulletDir = UnityEngine.Vector3.zero;
-            entityCache.weaponRuntimeData.LastFireTime = 0;
+            entityCache.weaponRuntimeData.LastAttackTimestamp = 0;
             entityCache.weaponRuntimeData.LastSpreadX = 0;
             entityCache.weaponRuntimeData.LastSpreadY = 0;
+            ResetDynamic();
         }
 
         public void ResetParts()
@@ -374,12 +398,12 @@ namespace App.Shared.GameModules.Weapon
         {
             get
             {
-                if(FixedShakeCfg != null )return FixedShakeCfg.FallbackOffsetFactor ;
+                if (FixedShakeCfg != null) return FixedShakeCfg.FallbackOffsetFactor;
                 return 0f;
             }
         }
 
-        public float FocusSpeed
+        public float CmrFocusSpeed
         {
             get { return WeaponConfigAssy != null ? WeaponConfigAssy.GetFocusSpeed() : 0f; }
         }
@@ -390,7 +414,7 @@ namespace App.Shared.GameModules.Weapon
             get
             {
                 return WeaponConfigAssy != null
-                    ? (EBulletCaliber) WeaponConfigAssy.NewWeaponCfg.Caliber
+                    ? (EBulletCaliber)WeaponConfigAssy.NewWeaponCfg.Caliber
                     : EBulletCaliber.Length;
             }
         }

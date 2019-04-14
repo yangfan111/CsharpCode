@@ -47,6 +47,7 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Free
             output.ArchorEulerAngle = Vector3.zero;
             if (last.ModeId == (short)ECameraFreeMode.On)
             {
+                _transitionTime = CameraUtility.GetPostureTransitionTime(_motorType, subState);
                 var elapsedPercent = ElapsedPercent( clientTime,subState.ModeTime,_transitionTime );
 
                 if (elapsedPercent < 1)

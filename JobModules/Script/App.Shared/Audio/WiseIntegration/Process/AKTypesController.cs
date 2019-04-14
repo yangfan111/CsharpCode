@@ -1,9 +1,8 @@
 ﻿using App.Shared.Util;
+using Core;
 using Core.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using Utils.Configuration;
-using Utils.Singleton;
 using XmlConfig;
 
 namespace App.Shared.Audio
@@ -38,12 +37,13 @@ namespace App.Shared.Audio
             {
                 foreach (int grp in atom.attachedGrps)
                 {
-                    if(SingletonManager.Get<AudioGroupManager>().FindById(grp) == null)
-                        continue;
                     RegisterGetSwitch(target, grp);
                 }
             }
-        //    DebugUtil.MyLog("Real Post Event!!!");
+#if UNITY_EDITOR
+            if(GlobalConst.EnableAudioLog)
+                DebugUtil.MyLog("Real Post Event:"+atom.evtName);
+#endif
             AkSoundEngine.PostEvent(atom.evtName, target);
         }
         /// <summary>
@@ -75,7 +75,6 @@ namespace App.Shared.Audio
         public AKSwitchAtom RegisterGetSwitch(GameObject target, int grpId, int stateIndex = -1)
         {
             AssertUtility.Assert(target != null);
-          
             HashSet<AKSwitchAtom> switchAtoms;
             AKSwitchAtom ret;
             if (gameobjectSwitchGrps.TryGetValue(target, out switchAtoms))

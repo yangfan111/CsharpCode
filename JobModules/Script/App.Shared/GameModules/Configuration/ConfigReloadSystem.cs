@@ -8,8 +8,6 @@ using Core.Configuration.Sound;
 using System.Collections.Generic;
 using Utils.Singleton;
 using App.Shared.GameModules.Weapon;
-using App.Shared.GameModules.Weapon;
-using Assets.Utils.Configuration;
 
 namespace App.Shared.GameModules.Configuration
 {
@@ -35,7 +33,7 @@ namespace App.Shared.GameModules.Configuration
             var weaponData= new ConfigReloadItem
             {
                 Asset = "WeaponData",
-                OnReload = (text) => WeaponReload(contexts, text),
+                OnReload = (text) => WeaponReload(text),
             };
             _configs.Add(weaponData);
             var weaponPart = new ConfigReloadItem
@@ -62,28 +60,26 @@ namespace App.Shared.GameModules.Configuration
                 OnReload = StateTransitionReload,
             };
             _configs.Add(stateTrans);
+
             _playerContext = contexts.player;
             _contexts = contexts;
         }
 
-        public void OnLoadResources(IUnityAssetManager assetManager)
+        public void OnLoadResources(ILoadRequestManager loadRequestManager)
         {
             if(Reload)
             {
                 foreach(var cfg in _configs)
                 {
-                    assetManager.LoadAssetAsync("ConfigReloadSystem", new AssetInfo("tables", cfg.Asset), OnLoadSucc);
+                    loadRequestManager.AppendLoadRequest(null, new AssetInfo("tables", cfg.Asset), OnLoadSucc);
                 }
                 Reload = false;
             }
         }
 
-        public void OnLoadSucc(string source, UnityObject unityObj)
+        public void OnLoadSucc(object source, AssetInfo assetInfo, UnityEngine.Object obj)
         {
-            var assetInfo = unityObj.Address;
-            var obj = unityObj.As<TextAsset>();
-
-            foreach (var cfg in _configs)
+            foreach(var cfg in _configs)
             {
                 if(assetInfo.AssetName.Equals(cfg.Asset))
                 {
@@ -105,12 +101,13 @@ namespace App.Shared.GameModules.Configuration
             parser.ParseConfig(xmlContent);
         }
 
-        public void WeaponReload(Contexts contexts, TextAsset textAsset)
+        public void WeaponReload(TextAsset textAsset)
         {
-            SingletonManager.Get<WeaponConfigManagement>().ParseConfig(textAsset.text);
+            SingletonManager.Get<WeaponDataConfigManager>().ParseConfig(textAsset.text);
             foreach(var player in _playerContext.GetEntities())
             {
-                player.WeaponController().TryArmWeapon(Core.EWeaponSlotType.Pointer);
+                player.weaponFactory.Factory.ClearCache();
+                player.GetController<PlayerWeaponController>().TryMountSlotWeapon(player.GetController<PlayerWeaponController>().CurrSlotType);
             }
         }
 

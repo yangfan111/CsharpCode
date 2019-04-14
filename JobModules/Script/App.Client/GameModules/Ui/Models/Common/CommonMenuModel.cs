@@ -7,6 +7,8 @@ using UnityEngine.EventSystems;
 using App.Shared.Components.Player;
 using App.Client.Utility;
 using App.Client.GameModules.Ui.UiAdapter;
+using App.Shared.GameModules.Player;
+using App.Shared.Player;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {
@@ -83,6 +85,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         {
             if (visible && !_viewModel.rootActiveSelf)
             {
+                PlayerStateUtil.AddUIState(EPlayerUIState.ExitOpen, menuUiAdapter.gamePlay);
                 menuUiAdapter.SetCrossVisible(false);
                 _viewModel.rootActiveSelf = true;
                 menuUiAdapter.RegisterKeyReceive(keyReceive);
@@ -90,6 +93,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
             else if (!visible && _viewModel.rootActiveSelf)
             {
+                PlayerStateUtil.RemoveUIState(EPlayerUIState.ExitOpen, menuUiAdapter.gamePlay);
                 menuUiAdapter.SetCrossVisible(true);
                 _viewModel.rootActiveSelf = false;
                 menuUiAdapter.UnRegisterKeyReceive(keyReceive);

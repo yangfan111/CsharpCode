@@ -104,6 +104,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 OverlayAnimationWeight = animator.GetLayerWeight(NetworkAnimatorLayer.PlayerUpperBodyOverlayLayer),
                 PostureWhenOverlay = postureType,
                 IsSight = state.GetActionKeepState() == ActionKeepInConfig.Sight || state.GetNextActionKeepState() == ActionKeepInConfig.Sight,
+                IsIntoSight = state.GetNextActionKeepState() == ActionKeepInConfig.Sight,
                 SightHorizontalShift = appearanceP1.SightShift.Buff * player.firstPersonAppearance.SightHorizontalShift,
                 SightVerticalShift = appearanceP1.SightShift.Buff * player.firstPersonAppearance.SightVerticalShift,
                 SightShiftBuff = player.oxygenEnergyInterface.Oxygen.SightShiftBuff,

@@ -8,6 +8,7 @@ using DG.Tweening;
 using UIComponent.UI;
 using Utils.Configuration;
 using Utils.Singleton;
+using Assets.App.Client.GameModules.Ui;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {
@@ -76,7 +77,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
         }
 
-        private string bundle = "effect/common";
+        private string bundle = AssetBundleConstant.Effect;
         private Transform groupRoot,animeRoot;
         private List<int> killFeedList = new List<int>();
         private bool isNeedUpdate;

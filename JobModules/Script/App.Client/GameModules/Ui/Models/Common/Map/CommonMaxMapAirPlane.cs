@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using App.Client.GameModules.Ui.Common.MaxMap;
 using App.Client.GameModules.Ui.Utils;
+using Core.Ui.Map;
 
 namespace App.Client.GameModules.Ui.Models.Common.Map
 {
@@ -56,7 +57,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                 }
 
                 //更新飞机位置
-                Vector2 planePosByPixel = (planeData.Pos - maskCenterPInMapByRice) * rate;
+                Vector2 planePosByPixel = (planeData.Pos.ShiftedUIVector2() - maskCenterPInMapByRice) * rate;
                 airPlaneRT.anchoredPosition = planePosByPixel;
 
                 //更新飞机方向
@@ -66,12 +67,12 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
                 airPlanePool.DespawnAllGo();
 
-                List<Vector2> list = adapter.KongTouList();
+                List<MapFixedVector2> list = adapter.KongTouList();
                 foreach (var item in list)                      //更新空投点
                 {
                     var tran = airPlanePool.SpawnGo();
                     //设置空投点的位置
-                    Vector2 kTouPosByPixel = (item - maskCenterPInMapByRice) * rate;
+                    Vector2 kTouPosByPixel = (item.ShiftedUIVector2() - maskCenterPInMapByRice) * rate;
                     tran.GetComponent<RectTransform>().anchoredPosition = kTouPosByPixel;
                 }
                 isNeedChangeSprite = true;
@@ -86,7 +87,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                 }
 
                 //更新飞机位置
-                Vector2 planePosByPixel = (planeData.Pos - maskCenterPInMapByRice) * rate;
+                Vector2 planePosByPixel = (planeData.Pos.ShiftedUIVector2() - maskCenterPInMapByRice) * rate;
                 airPlaneRT.anchoredPosition = planePosByPixel;
 
                 //更新飞机方向

@@ -60,7 +60,7 @@ namespace App.Server.GameModules.Vehicle
                 var data = vehicle.GetDynamicData();
 
                 var go = unityObj.AsGameObject;
-                go.transform.position = data.Position;
+                go.transform.position = data.Position.ShiftedVector3();
                 go.transform.rotation = data.Rotation;
 
                 vehicle.AddVehicleComponentsPostInit((EVehicleType) vehicle.vehicleAssetInfo.VType, unityObj, _contexts.player, true);

@@ -1,4 +1,4 @@
-﻿using Core.GameInputFilter;
+﻿using Core;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
@@ -10,16 +10,13 @@ namespace Core.Prediction.UserPrediction.Parallel
         private static LoggerAdapter _logger =
             new LoggerAdapter(typeof(UserCmdPreExecuteSystem));
 
-        private IGameStateProcessorFactory _gameStateProcessorFactory;
-        private IStateProviderPool _stateProviderPool;
-
-
-        public UserCmdPreExecuteSystem(IGameStateProcessorFactory gameStateProcessorFactory
-        )
-        {
-            _gameStateProcessorFactory = gameStateProcessorFactory;
-            _stateProviderPool = gameStateProcessorFactory.GetProviderPool();
-        }
+//        private PlayerStateCollectorPool _stateCollectorPool;
+//
+//        public UserCmdPreExecuteSystem(
+//        )
+//        {
+//            _stateCollectorPool = gameStateProcessorFactory;
+//        }
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd userCmd)
         {
@@ -34,12 +31,12 @@ namespace Core.Prediction.UserPrediction.Parallel
                 _logger.DebugFormat("processing user cmd {0}", userCmd);
             }
 
-            userCmd.FilteredInput = owner.Filter(userCmd);
+            userCmd.FilteredInput = owner.GetFiltedInput(userCmd);
         }
 
         public ISimpleParallelUserCmdExecuteSystem CreateCopy()
         {
-            return new UserCmdPreExecuteSystem(_gameStateProcessorFactory);
+            return new UserCmdPreExecuteSystem();
         }
     }
 }

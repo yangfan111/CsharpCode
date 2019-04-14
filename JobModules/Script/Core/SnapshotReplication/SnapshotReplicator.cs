@@ -14,10 +14,10 @@ namespace Core.SnapshotReplication
         private SnapshotRecvChannel _recvChannel;
         private SnapshotSendChannel _sendChannel;
         
-        public SnapshotReplicator(INetworkObjectSerializerManager manager)
+        public SnapshotReplicator(INetworkObjectSerializerManager manager, string version)
         {
             
-            var serializer = new SnapshotSerializer(manager);
+            var serializer = new SnapshotSerializer(manager, version);
             _recvChannel = new SnapshotRecvChannel(serializer);
             _sendChannel = new SnapshotSendChannel(serializer);
         }

@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
 using App.Shared;
-using App.Shared.Components.Ui;
+using App.Shared.Components.Weapon;
 using App.Shared.GameModules.Weapon;
-using Core.CameraControl.NewMotor;
+using Core;
+using Core.Utils;
 using Utils.Configuration;
 using Utils.Singleton;
 using WeaponConfigNs;
@@ -11,34 +11,41 @@ using XmlConfig;
 
 namespace App.Client.GameModules.Ui.UiAdapter
 {
-    public class CrossHairUiAdapter : UIAdapter,ICrossHairUiAdapter
+    public class CrossHairUiAdapter : UIAdapter, ICrossHairUiAdapter
     {
-        private Contexts _contexts;
+        private Contexts      _contexts;
         private PlayerContext _playerContext;
-        private UiContext _uiContext;
+        private UiContext     _uiContext;
+
         public CrossHairUiAdapter(Contexts contexts)
         {
-            _contexts = contexts;
+            _contexts      = contexts;
             _playerContext = contexts.player;
-            _uiContext = contexts.ui;
+            _uiContext     = contexts.ui;
+        }
+
+        private WeaponBaseAgent HeldWeaponAgent
+        {
+            get { return _playerContext.flagSelfEntity.WeaponController().HeldWeaponAgent; }
         }
 
         //准心组
         private CrossHairType type;
-        private bool isOpenCrossHairMotion = true;      //常态类型准心 是否开启了准心运动
+        private bool          isOpenCrossHairMotion = true; //常态类型准心 是否开启了准心运动
+
         public CrossHairType Type //准心类型
         {
             get
             {
                 var type = CrossHairType.Normal;
-                if(null != _playerContext.flagSelfEntity)
+                if (null != _playerContext.flagSelfEntity)
                 {
                     var player = _playerContext.flagSelfEntity;
                     if (CrossShouldBeHidden(player))
                     {
                         type = CrossHairType.Novisible;
                     }
-                    else if(FocusTargetIsTeammate())
+                    else if (FocusTargetIsTeammate())
                     {
                         type = CrossHairType.AddBlood;
                     }
@@ -50,18 +57,20 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         private bool CrossShouldBeHidden(PlayerEntity player)
         {
-            if(!player.hasCameraStateNew)
+            if (!player.hasCameraStateNew)
             {
                 return false;
             }
-            switch((ECameraViewMode)player.cameraStateNew.ViewNowMode)
+
+            switch ((ECameraViewMode) player.cameraStateNew.ViewNowMode)
             {
                 case ECameraViewMode.GunSight:
                     return true;
                 default:
                     break;
             }
-            switch((ECameraPoseMode)player.cameraStateNew.MainNowMode)
+
+            switch ((ECameraPoseMode) player.cameraStateNew.MainNowMode)
             {
                 case ECameraPoseMode.AirPlane:
                 case ECameraPoseMode.DriveCar:
@@ -73,6 +82,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 default:
                     break;
             }
+
             return false;
         }
 
@@ -80,52 +90,79 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             return false;
         }
+        
 
-        public CrossHairNormalTypeStatue Statue //常态类型准心 当前状态
-        {   get
-            {
-                var player = _playerContext.flagSelfEntity;
-                if(null == player)
-                {
-                    return CrossHairNormalTypeStatue.None;
-                }
-                if(PlayerIsFiring(player))
-                {
-                    return CrossHairNormalTypeStatue.Shot;
-                }
-                else if(PlayerIsMoving(player))
-                {
-                    return CrossHairNormalTypeStatue.Move;
-                }
-                else
-                {
-                    return CrossHairNormalTypeStatue.StopShot;
-                }
-            }
-        }
+//        public CrossHairNormalTypeStatue Statue //常态类型准心 当前状态
+//        {
+//            get
+//            {
+//                XSpread = HeldWeaponAgent.RunTimeComponent.LastSpreadX;
+//                YSpread = HeldWeaponAgent.RunTimeComponent.LastSpreadY;
+////                var player = _playerContext.flagSelfEntity;
+////
+////                if (null == player)
+////                {
+////                    return CrossHairNormalTypeStatue.None;
+////                }
+////
+////                if (PlayerIsFiring(player))
+////                {
+////                    return CrossHairNormalTypeStatue.Shot;
+////                }
+////                else if (PlayerIsMoving(player))
+////                {
+////                    return CrossHairNormalTypeStatue.Move;
+////                }
+////                else
+////                {
+////                    return CrossHairNormalTypeStatue.StopShot;
+////                }
+//  //                       }
+//        }
 
-        private bool PlayerIsFiring(PlayerEntity player)
+        public float XSpread
         {
-            if(!player.hasPlayerStateProvider)
-            {
-                return false;
-            }
-            var states = player.playerStateProvider.Provider.GetCurrentStates();
-            return states.Contains(XmlConfig.EPlayerState.MeleeAttacking) ||
-                states.Contains(XmlConfig.EPlayerState.Firing);
+            get { return HeldWeaponAgent.RunTimeComponent.LastSpreadX; }
         }
 
-        private bool PlayerIsMoving(PlayerEntity player)
+        public float YSpread
         {
-            if(!player.hasPlayerMove)
-            {
-                return false;
-            }
-
-            var velocity = player.playerMove.Velocity;
-            return Math.Abs(velocity.y) > 0.15f ||
-                   velocity.x * velocity.x + velocity.z * velocity.z > 0.01f;
+            get { return HeldWeaponAgent.RunTimeComponent.LastSpreadY; }
         }
+
+        public float SpreadDuration
+        {
+            get
+            {
+                float duration      = 1f;
+                var   currStates = _playerContext.flagSelfEntity.StateInteractController().GetCurrStates();
+                if (currStates.Contains(EPlayerState.Firing))
+                {
+                    duration = GlobalConst.FireSpreadDuration;
+                }
+
+                if (currStates.Contains(EPlayerState.Move))
+                {
+                    duration *= GlobalConst.MotionSpreadDuration;
+                }
+
+                return duration;
+            }
+        }
+
+   
+
+//        private bool PlayerIsMoving(PlayerEntity player)
+//        {
+//            if (!player.hasPlayerMove)
+//            {
+//                return false;
+//            }
+//
+//            var velocity = player.playerMove.Velocity;
+//            return Math.Abs(velocity.y) > 0.15f ||
+//                   velocity.x * velocity.x + velocity.z * velocity.z > 0.01f;
+//        }
 
 
         //攻击组
@@ -134,62 +171,68 @@ namespace App.Client.GameModules.Ui.UiAdapter
             get
             {
                 var player = _playerContext.flagSelfEntity;
-                if(null == player)
+                if (null == player)
                 {
                     return 0;
                 }
-                return player.WeaponController().HeldWeaponAgent.RunTimeComponent.ContinuesShootCount;
+
+                return HeldWeaponAgent.RunTimeComponent.ContinuesShootCount;
             }
         }
+
+        public WeaponRuntimeDataComponent RuntimeDataComponent
+        {
+            get { return HeldWeaponAgent.RunTimeComponent; }
+        }
+
         public float AttackNum
         {
-            get    
+            get
             {
                 var player = _playerContext.flagSelfEntity;
                 if (null == player)
                 {
                     return 0;
                 }
+
                 if (!player.hasAttackDamage)
                 {
                     return 0;
                 }
+
                 var damage = player.attackDamage.GetAndResetDamage();
                 return damage;
-            }            
+            }
         }
 
-        private bool isBurstHeart;  //爆头
+        private bool isBurstHeart; //爆头
+
         public bool IsBurstHeart
         {
             get
             {
                 var player = _playerContext.flagSelfEntity;
-                if(null == player)
+                if (null == player)
                 {
                     return false;
                 }
-                if(!player.hasAttackDamage)
+
+                if (!player.hasAttackDamage)
                 {
                     return false;
                 }
-                var part = player.attackDamage.GetAndResetHitPart();
-                var critical = (EBodyPart)part == EBodyPart.Head;
+
+                var part     = player.attackDamage.GetAndResetHitPart();
+                var critical = (EBodyPart) part == EBodyPart.Head;
                 return critical;
             }
         }
-      
+
         public bool IsOpenCrossHairMotion
         {
-            get
-            {
-                return isOpenCrossHairMotion;
-            }
+            get { return isOpenCrossHairMotion; }
 
-            set
-            {
-                isOpenCrossHairMotion = value;
-            }
+            set { isOpenCrossHairMotion = value; }
         }
 
         public int WeaponAvatarId
@@ -199,25 +242,26 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 var player = _contexts.player.flagSelfEntity;
                 if (player.hasPlayerWeaponBagSet)
                 {
-                    var weaponInfo = player.WeaponController().HeldWeaponAgent.BaseComponent; 
-                    if(weaponInfo != null)
+                    var weaponInfo = player.WeaponController().HeldWeaponAgent.BaseComponent;
+                    if (weaponInfo != null)
                     {
                         var avatarId = weaponInfo.WeaponAvatarId;
                         if (weaponInfo.WeaponAvatarId > 0)
                         {
                             return weaponInfo.WeaponAvatarId;
                         }
+
                         var defaultAvatar = weaponInfo.ConfigId;
                         if (defaultAvatar > 0)
                         {
                             return defaultAvatar;
                         }
                     }
-                    
                 }
+
                 return SingletonManager.Get<WeaponAvatarConfigManager>().GetEmptyHandId();
             }
-        }      
+        }
 
         public bool IsShowCrossHair
         {

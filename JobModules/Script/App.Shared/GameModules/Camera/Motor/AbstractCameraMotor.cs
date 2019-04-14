@@ -70,7 +70,6 @@ namespace Core.CameraControl.NewMotor
     {
         protected CameraConfigItem _config;
 
-        
         public CameraConfigItem Config
         {
             get { return _config; }
@@ -129,7 +128,7 @@ namespace Core.CameraControl.NewMotor
 
         }
 
-        
+
         public abstract void CalcOutput(PlayerEntity player, ICameraMotorInput input, ICameraMotorState state,
             SubCameraMotorState subState,
             DummyCameraMotorOutput output, ICameraNewMotor last, int clientTime);
@@ -187,7 +186,6 @@ namespace Core.CameraControl.NewMotor
 
         protected static float ElapsedPercent(int clientTime, int enterTime, float tTime)
         {
-            if (tTime == 0f) return 1f;
             var elapsedPercent = tTime > 0f ? (clientTime - enterTime) / tTime : 0f;
             elapsedPercent = elapsedPercent > 1f ? 1 : elapsedPercent;
             elapsedPercent = elapsedPercent < 0f ? 0 : elapsedPercent;

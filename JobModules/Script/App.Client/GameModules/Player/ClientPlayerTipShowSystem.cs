@@ -1,6 +1,5 @@
 ﻿using App.Client.GameModules.GamePlay.Free.App;
 using App.Shared;
-using App.Shared.GameModules.Weapon;
 using Assets.Utils.Configuration;
 using Core.Common;
 using Core.GameModule.Interface;
@@ -29,7 +28,7 @@ namespace App.Client.GameModules.Player
         {
             foreach(var player in _selfPlayerGroup)
             {
-                if(!player.hasTip)
+                if(!player.hasTip || player.gamePlay.TipHideStatus)
                 {
                     continue;
                 }
@@ -112,6 +111,8 @@ namespace App.Client.GameModules.Player
                     return ScriptLocalization.client_actiontip.canNotProne;
                 case ETipType.CanNotStand:
                     return ScriptLocalization.client_actiontip.canNotStand;
+                case ETipType.CanNotToCrouch:
+                    return ScriptLocalization.client_actiontip.canNotToCrouch;
                 case ETipType.OutOfOxygen:
                     return ScriptLocalization.client_actiontip.outOfOxygen;
                 case ETipType.FireModeLocked:
@@ -123,7 +124,8 @@ namespace App.Client.GameModules.Player
                 case ETipType.FireModeToManual:
                     return string.Format(ScriptLocalization.client_commontip.firemodetomanual, weaponName);
                 case ETipType.FireWithNoBullet:
-                    return string.Format(ScriptLocalization.client_commontip.firewithnobullet, weaponName, reloadKey);
+                    if (weaponName.Equals("空手")) return "";
+                    return string.Format(ScriptLocalization.client_commontip.firewithnobullet, weaponName,reloadKey);
                 case ETipType.NoWeaponInSlot:
                     return ScriptLocalization.client_commontip.noweaponinslot;
                 case ETipType.CantSwithGrenade:

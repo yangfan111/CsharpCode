@@ -58,7 +58,7 @@ namespace App.Client.GameModules.Vehicle
             {
                 var dataComp = vehicle.GetDynamicData();
                 go.transform.rotation = dataComp.Rotation;
-                go.transform.position = dataComp.Position;
+                go.transform.position = dataComp.Position.ShiftedVector3();
             }
             else
             {

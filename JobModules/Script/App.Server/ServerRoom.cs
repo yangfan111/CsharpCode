@@ -3,6 +3,7 @@ using App.Client.GameModules.Room;
 using App.Protobuf;
 using App.Server.Bullet;
 using App.Server.GameModules.GamePlay;
+using App.Server.GameModules.GamePlay.Free.map;
 using App.Server.GameModules.GamePlay.Free.player;
 using App.Server.MessageHandler;
 using App.Server.Scripts.Config;
@@ -14,9 +15,11 @@ using App.Shared.Configuration;
 using App.Shared.ContextInfos;
 using App.Shared.DebugSystem;
 using App.Shared.EntityFactory;
+using App.Shared.FreeFramework.framework.trigger;
+using App.Shared.FreeFramework.framework.unit;
 using App.Shared.FreeFramework.Free.Weapon;
-using App.Shared.GameInputFilter;
-
+using Core;
+using App.Shared.GameMode;
 using App.Shared.GameModules.Bullet;
 using App.Shared.GameModules.Vehicle;
 using App.Shared.GameModules.Weapon;
@@ -25,11 +28,11 @@ using App.Shared.Network;
 using App.Shared.Player;
 using com.wd.free.para;
 using com.wd.free.trigger;
-using Core;
 using Core.Components;
 using Core.Configuration;
 using Core.Configuration.Sound;
 using Core.EntitasAdpater;
+using Core.Free;
 using Core.GameModule.System;
 using Core.MyProfiler;
 using Core.Network;
@@ -51,11 +54,6 @@ using Utils.Configuration;
 using Utils.Singleton;
 using VehicleCommon;
 using Vector3 = UnityEngine.Vector3;
-
-using Core.Free;
-using App.Shared.FreeFramework.framework.trigger;
-using App.Shared.FreeFramework.framework.unit;
-using App.Shared.GameMode;
 
 namespace App.Server
 {
@@ -109,6 +107,7 @@ namespace App.Server
             _state = RoomState.Running;
             _rule.GameStart(_contexts);
             _contexts.session.commonSession.SessionMode = ModeUtil.CreateSharedPlayerMode(_contexts, _contexts.session.commonSession.RoomInfo.ModeId);
+            FreeMapPosition.Init(_contexts);
             DebugUtil.LogInUnity("Server Room Initialize Completed");
         }
 
@@ -312,7 +311,6 @@ namespace App.Server
                 MapId = SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.MapId,
                 ModeId = ruleId
             };
-            commonSession.GameStateProcessorFactory = new GameStateProcessFactory();
             commonSession.RuntimeGameConfig = new RuntimeGameConfig();
             commonSession.BulletInfoCollector = new ServerBulletInfoCollector();
 
@@ -468,13 +466,13 @@ namespace App.Server
                 channel.MessageReceived += ChannelOnMessageReceived;
                 channel.Disconnected += ChannelOnDisonnected;
 
-                var info = new AppMessageTypeInfo();
+               // var info = new AppMessageTypeInfo();
                 if (!player.hasUpdateMessagePool)
                     player.AddUpdateMessagePool();
-                player.updateMessagePool.UpdateMessagePool = new UpdateMessagePool();
                 player.updateMessagePool.LastestExecuteUserCmdSeq = -1;
-                channel.Serializer = new NetworkMessageSerializer(info);
-
+               
+                //channel.Serializer = new NetworkMessageSerializer(info);
+               
                 NoticeHallPlayerLoginSucc(player);
                 player.ReplaceStage(EPlayerLoginStage.CreateEntity);
                 var msg = App.Protobuf.PlayerInfoMessage.Allocate();
@@ -551,7 +549,9 @@ namespace App.Server
 
         public void ChannelOnDisonnected(INetworkChannel channel)
         {
+            
             MessageDispatcher.SaveDispatch(channel, (int)EClient2ServerMessage.LocalDisconnect, null);
+            channel.Serializer.Dispose();
         }
 
         public void OnDisconnect(INetworkChannel channel, int messageType, object messageBody)
@@ -828,11 +828,9 @@ namespace App.Server
             {
                 _sendSnapshotManager.Dispose();
             }
-
-            if (_compensationSnapshotPool != null)
-            {
-                _compensationSnapshotPool.Dispose();
-            }
+            _contexts.session.commonSession.Dispose();
+            _contexts.session.serverSessionObjects.Dispose();
+           
             GameModuleManagement.Dispose();
             try
             {
@@ -976,11 +974,9 @@ namespace App.Server
             _contexts.session.commonSession.RoomInfo.ModeId = mode;
             FreeRuleEventArgs args = new FreeRuleEventArgs(_contexts);
             _contexts.session.commonSession.FreeArgs = args;
-
             _rule = new FreeGameRule(this);
 
             RoomInfo info = _contexts.session.commonSession.RoomInfo;
-
 
             SimpleParaList spl = (SimpleParaList)args.GetDefault().GetParameters();
             spl.AddFields(new ObjectFields(info));

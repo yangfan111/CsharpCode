@@ -1,5 +1,6 @@
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Camera.Utils;
+using Core.Components;
 using UnityEngine;
 using Utils.Appearance;
 
@@ -19,12 +20,12 @@ namespace App.Shared.GameModules.Player.CharacterBone
             if (pos == null)
             {
                 component.MuzzleP3Valid = false;
-                component.MuzzleP3Position = Vector3.zero;
+                component.MuzzleP3Position = FixedVector3.zero;
             }
             else
             {
                 component.MuzzleP3Valid = true;
-                component.MuzzleP3Position = pos.position;
+                component.MuzzleP3Position = pos.position.ShiftedToFixedVector3();
             }
         }
 
@@ -34,12 +35,12 @@ namespace App.Shared.GameModules.Player.CharacterBone
             if (fireTrans == null)
             {
                 component.SightValid = false;
-                component.SightPosition = Vector3.zero;
+                component.SightPosition = FixedVector3.zero;
             }
             else
             {
                 component.SightValid = true;
-                component.SightPosition = fireTrans.position;
+                component.SightPosition =fireTrans.position.ShiftedToFixedVector3();
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿using Core;
-using Core.EntityComponent;
 using Core.Prediction.UserPrediction.Cmd;
+using System.Collections.Generic;
 using WeaponConfigNs;
 
 namespace App.Shared.GameMode
@@ -20,7 +20,12 @@ namespace App.Shared.GameMode
     /// <summary>
     /// Defines the <see cref="IModeProcessListener" />
     /// </summary>
-    public interface IModeProcessListener
+    public interface IModeProcessListener:IWeaponProcessListener
+    {
+      
+    }
+
+    public interface IWeaponProcessListener
     {
         void OnPickup(IPlayerWeaponProcessor controller, EWeaponSlotType slot);
 
@@ -28,7 +33,7 @@ namespace App.Shared.GameMode
 
         void OnDrop(IPlayerWeaponProcessor controller, EWeaponSlotType slot);
 
-        void OnSwitch(IPlayerWeaponProcessor controller,int weaponId,InOrOff op);
+        void OnSwitch(IPlayerWeaponProcessor controller, int weaponId, EInOrOff op);
     }
 
     /// <summary>
@@ -52,7 +57,7 @@ namespace App.Shared.GameMode
 
         void SendAutoPickupWeapon(int entityId);
 
-        void AutoPickupWeapon(PlayerEntity player, int sceneEntity);
+        void AutoPickupWeapon(PlayerEntity player, List<int> sceneEntities);
 
         void DoPickup(PlayerEntity player, int sceneEntity);
 

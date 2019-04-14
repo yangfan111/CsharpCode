@@ -11,6 +11,7 @@ using UnityEngine.Profiling;
 using App.Client.GameModules.Ui.Utils.MiniMaxMapCommon;
 using App.Shared.Components.Ui;
 using App.Shared.Configuration;
+using Core.Components;
 using DG.Tweening;
 using UnityEngine.UI;
 using Utils.Singleton;
@@ -141,7 +142,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void GetSelfPosition()
         {
             var data = adapter.TeamInfos.Find((info=>info.IsPlayer == true));
-            selfPlayPos = data.Pos;
+            selfPlayPos = data.Pos.ShiftedUIVector2();
         }
 
         private void InitSetting()

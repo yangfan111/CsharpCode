@@ -46,13 +46,14 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             Vector2 curPlayPos = adapter.CurPlayerPos;
             var safeDuquan = duquanUtil.safeDuquan;
 
-            if (Vector2.Distance(curPlayPos, safeDuquan.Center) > safeDuquan.Radius) //安全区外
+            var centerPos = safeDuquan.Center.ShiftedUIVector2();
+            if (Vector2.Distance(curPlayPos, centerPos) > safeDuquan.Radius) //安全区外
             {
                 UIUtils.SetActive(miniDisTran, true);
 
                 //计算当前玩家 +  安全区中心点  相对于lineRoot 控件中心的像素位置
                 var curPlayPosByPixel = (curPlayPos - duquanRefePosByRice ) * rate;
-                var safePosByPixel = (safeDuquan.Center - duquanRefePosByRice) * rate;
+                var safePosByPixel = (centerPos - duquanRefePosByRice) * rate;
                
                 //设置方向
                 Vector2 from = new Vector2(0, 1);

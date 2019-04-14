@@ -74,7 +74,7 @@ namespace App.Shared.GameModules.GamePlay
 
             observedPlayer.observeCamera.Fov = observedPlayer.cameraFinalOutputNew.Fov;
             observedPlayer.observeCamera.CameraPosition =
-                observedPlayer.cameraStateUpload.ThirdPersonCameraPostion;
+                observedPlayer.cameraStateUpload.ThirdPersonCameraPostion.ShiftedToFixedVector3();
             observedPlayer.observeCamera.CameraEularAngle = observedPlayer.cameraFinalOutputNew.EulerAngle;
             observedPlayer.observeCamera.PlayerPosition = observedPlayer.position.Value; 
         }

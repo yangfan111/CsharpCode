@@ -24,12 +24,12 @@ namespace Core.CharacterState.Posture
         {
             if (id <= (short) PostureStateId.EnumEnd)
             {
-                return  ((PostureStateId) id).ToString();
+                return ((PostureStateId) id).ToString();
             }
 
             return base.GetStateName(id);
         }
-        
+
         public static PostureState CreateStandState()
         {
             PostureState state = new CustomPostureState(PostureStateId.Stand,
@@ -65,7 +65,7 @@ namespace Core.CharacterState.Posture
             #endregion
 
             #region stand to prone
-            
+
             state.AddTransition(
                 (command, addOutput) =>
                 {
@@ -82,13 +82,13 @@ namespace Core.CharacterState.Posture
                             AnimatorParametersHash.Instance.ProneValue,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
-                        
+
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ForceToProneHash,
                             AnimatorParametersHash.Instance.ForceToProneName,
                             AnimatorParametersHash.Instance.ForceToProneEnable,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
-                        
+
                         command.Handled = true;
                         return true;
                     }
@@ -117,7 +117,7 @@ namespace Core.CharacterState.Posture
                                 AnimatorParametersHash.Instance.ProneValue,
                                 CharacterView.FirstPerson | CharacterView.ThirdPerson);
                             addOutput(FsmOutput.Cache);
-                            
+
                             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FrontPostureHash,
                                 AnimatorParametersHash.Instance.FrontPostureName,
                                 AnimatorParametersHash.Instance.FrontStand,
@@ -167,7 +167,7 @@ namespace Core.CharacterState.Posture
                             command.AdditioanlValue,
                             CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
-                        
+
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MoveJumpStateHash,
                             AnimatorParametersHash.Instance.MoveJumpStateName,
                             command.AlternativeAdditionalValue,
@@ -198,19 +198,19 @@ namespace Core.CharacterState.Posture
                             AnimatorParametersHash.Instance.FreeFallEnable,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
-                        
+
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.JumpStateHash,
                             AnimatorParametersHash.Instance.JumpStateName,
                             AnimatorParametersHash.Instance.JumpStateNormal,
                             CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
-                        
+
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MoveJumpStateHash,
                             AnimatorParametersHash.Instance.MoveJumpStateName,
                             AnimatorParametersHash.Instance.MoveJumpStateNormal,
                             CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
-                        
+
                         Logger.InfoFormat("stand to freefall transition, set jumploop to true!");
                         command.Handled = true;
                     }
@@ -235,7 +235,7 @@ namespace Core.CharacterState.Posture
                             AnimatorParametersHash.Instance.SlideEnable,
                             CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
-                        
+
                         command.Handled = true;
                     }
 
@@ -307,9 +307,7 @@ namespace Core.CharacterState.Posture
                             CharacterView.ThirdPerson | CharacterView.FirstPerson);
                         addOutput(FsmOutput.Cache);
 
-                        if (CompareUtility.IsApproximatelyEqual(command.AdditioanlValue,
-                                AnimatorParametersHash.Instance.Vault1MValue) ||CompareUtility.IsApproximatelyEqual(command.AdditioanlValue,
-                                AnimatorParametersHash.Instance.Vault2MValue))
+                        if (IsVault(command.AdditioanlValue))
                         {
                             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ClimbEndHash,
                                 AnimatorParametersHash.Instance.ClimbEndName,
@@ -325,7 +323,7 @@ namespace Core.CharacterState.Posture
                                 CharacterView.ThirdPerson, false);
                             addOutput(FsmOutput.Cache);
                         }
-                        
+
                         command.Handled = true;
                         return true;
                     }
@@ -376,7 +374,7 @@ namespace Core.CharacterState.Posture
             #endregion
 
             #region crouch to prone
-            
+
             state.AddTransition(
                 (command, addOutput) =>
                 {
@@ -393,13 +391,13 @@ namespace Core.CharacterState.Posture
                             AnimatorParametersHash.Instance.ProneValue,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
-                        
+
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ForceToProneHash,
                             AnimatorParametersHash.Instance.ForceToProneName,
                             AnimatorParametersHash.Instance.ForceToProneEnable,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
-                        
+
                         command.Handled = true;
                         return true;
                     }
@@ -428,7 +426,7 @@ namespace Core.CharacterState.Posture
                                 AnimatorParametersHash.Instance.ProneValue,
                                 CharacterView.FirstPerson | CharacterView.ThirdPerson);
                             addOutput(FsmOutput.Cache);
-                            
+
                             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FrontPostureHash,
                                 AnimatorParametersHash.Instance.FrontPostureName,
                                 AnimatorParametersHash.Instance.FrontCrouch,
@@ -481,7 +479,7 @@ namespace Core.CharacterState.Posture
                 null, (int) PostureStateId.Freefall, null, 0, new[] {FsmInput.Freefall});
 
             #endregion
-            
+
             #region crouch to slide
 
             state.AddTransition(
@@ -526,7 +524,7 @@ namespace Core.CharacterState.Posture
                     .Radius);
 
             #region prone to crouch
-            
+
             state.AddTransition(
                 (command, addOutput) =>
                 {
@@ -543,13 +541,13 @@ namespace Core.CharacterState.Posture
                             AnimatorParametersHash.Instance.CrouchValue,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
-                        
+
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ForceEndProneHash,
                             AnimatorParametersHash.Instance.ForceEndProneName,
                             AnimatorParametersHash.Instance.ForceEndProneEnable,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
-                        
+
                         command.Handled = true;
                         return true;
                     }
@@ -578,7 +576,7 @@ namespace Core.CharacterState.Posture
                                 AnimatorParametersHash.Instance.CrouchValue,
                                 CharacterView.FirstPerson | CharacterView.ThirdPerson);
                             addOutput(FsmOutput.Cache);
-                            
+
                             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FrontPostureHash,
                                 AnimatorParametersHash.Instance.FrontPostureName,
                                 AnimatorParametersHash.Instance.FrontCrouch,
@@ -609,7 +607,7 @@ namespace Core.CharacterState.Posture
             #endregion
 
             #region prone to stand
-            
+
             state.AddTransition(
                 (command, addOutput) =>
                 {
@@ -626,13 +624,13 @@ namespace Core.CharacterState.Posture
                             AnimatorParametersHash.Instance.StandValue,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
-                        
+
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ForceEndProneHash,
                             AnimatorParametersHash.Instance.ForceEndProneName,
                             AnimatorParametersHash.Instance.ForceEndProneEnable,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
-                        
+
                         command.Handled = true;
                         return true;
                     }
@@ -661,7 +659,7 @@ namespace Core.CharacterState.Posture
                                 AnimatorParametersHash.Instance.StandValue,
                                 CharacterView.FirstPerson | CharacterView.ThirdPerson);
                             addOutput(FsmOutput.Cache);
-                            
+
                             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FrontPostureHash,
                                 AnimatorParametersHash.Instance.FrontPostureName,
                                 AnimatorParametersHash.Instance.FrontStand,
@@ -719,10 +717,10 @@ namespace Core.CharacterState.Posture
 
                     return ret;
                 },
-                null, (int) PostureStateId.Freefall, null, 0, new[] {FsmInput.Freefall});
+                null, (int) PostureStateId.Freefall, null, SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Prone, PostureInConfig.Jump), new[] {FsmInput.Freefall});
 
             #endregion
-            
+
             #region prone to slide
 
             state.AddTransition(
@@ -833,11 +831,6 @@ namespace Core.CharacterState.Posture
 
                     if (ret)
                     {
-                        FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.DyingLayer,
-                            AnimatorParametersHash.Instance.DyingDisableValue,
-                            CharacterView.ThirdPerson);
-                        addOutput(FsmOutput.Cache);
-
                         command.Handled = true;
                     }
 
@@ -848,6 +841,12 @@ namespace Core.CharacterState.Posture
 
             #endregion
 
+            return state;
+        }
+        
+        public static FsmState CreateDyingTransition()
+        {
+            PostureState state = new DyingTransitionState(PostureStateId.DyingTransition);
             return state;
         }
 
@@ -941,23 +940,26 @@ namespace Core.CharacterState.Posture
 
                     if (ret)
                     {
-                        FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.DyingLayer,
-                            AnimatorParametersHash.Instance.DyingEnableValue,
-                            CharacterView.ThirdPerson);
-                        addOutput(FsmOutput.Cache);
-
+                        
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ProneHash,
                             AnimatorParametersHash.Instance.ProneName,
                             AnimatorParametersHash.Instance.ProneDisable,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.InjuredMoveHash,
+                            AnimatorParametersHash.Instance.InjuredMoveName,
+                            AnimatorParametersHash.Instance.InjuredMoveEnableValue,
+                            CharacterView.ThirdPerson,
+                            false);
+						addOutput(FsmOutput.Cache);
 
                         command.Handled = true;
                     }
 
                     return ret;
                 },
-                null, (int) PostureStateId.Dying, null, 0, new[] {FsmInput.Dying});
+                null, (int) PostureStateId.DyingTransition, null, 0, new[] {FsmInput.Dying});
         }
 
         private static void AddTransitionFromWaterToStand(PostureState state, int duration)
@@ -1030,22 +1032,34 @@ namespace Core.CharacterState.Posture
                             AnimatorParametersHash.Instance.JumpStateNormal,
                             CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
-                        
+
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MoveJumpStateHash,
                             AnimatorParametersHash.Instance.MoveJumpStateName,
                             AnimatorParametersHash.Instance.MoveJumpStateNormal,
                             CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
 
-                        FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.DyingLayer,
-                            AnimatorParametersHash.Instance.DyingEnableValue,
-                            CharacterView.ThirdPerson);
-                        addOutput(FsmOutput.Cache);
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.InjuredMoveHash,
+                            AnimatorParametersHash.Instance.InjuredMoveName,
+                            AnimatorParametersHash.Instance.InjuredMoveEnableValue,
+                            CharacterView.ThirdPerson,
+                            false);
+						addOutput(FsmOutput.Cache);
                     }
 
                     return ret;
                 },
-                null, (int) PostureStateId.Dying, null, 0, new[] {FsmInput.Dying});
+                null, (int) PostureStateId.DyingTransition, null, 0, new[] {FsmInput.Dying});
+        }
+
+        private static bool IsVault(float kind)
+        {
+            var ret = CompareUtility.IsApproximatelyEqual(kind,
+                          AnimatorParametersHash.Instance.Vault50CmValue) || CompareUtility.IsApproximatelyEqual(kind,
+                          AnimatorParametersHash.Instance.Vault1MValue) || CompareUtility.IsApproximatelyEqual(kind,
+                          AnimatorParametersHash.Instance.Vault150CmValue) || CompareUtility.IsApproximatelyEqual(kind,
+                          AnimatorParametersHash.Instance.Vault2MValue);
+            return ret;
         }
 
         public PostureState(PostureStateId id) : base((short) id)

@@ -36,7 +36,7 @@ namespace Assets.App.Client.GameModules.Ui
         public const string CommonDeadModel = "CommonDeadModel";
         public const string CommonDebugInfoModel = "CommonDebugInfoModel";
         public const string CommonVideoSettingModel = "CommonVideoSettingModel";
-
+        public const string CommonPaintDiscModel = "CommonPaintDiscModel";
         #endregion
         #region team
         public const string GroupScoreModel = "GroupScoreModel";

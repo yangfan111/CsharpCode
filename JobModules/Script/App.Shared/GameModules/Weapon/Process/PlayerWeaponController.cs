@@ -3,17 +3,16 @@ using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using Core;
 using Core.Attack;
-using Core.CharacterState;
 using Core.Room;
 using Core.Utils;
 using System;
 using System.Collections.Generic;
-using App.Shared.Util;
+using App.Shared.Components.Player;
 using Utils.Appearance;
 using Utils.Configuration;
 using Utils.Singleton;
 using WeaponConfigNs;
-using Random = UnityEngine.Random;
+using XmlConfig;
 
 namespace App.Shared.GameModules.Weapon
 {
@@ -31,89 +30,75 @@ namespace App.Shared.GameModules.Weapon
 
         public void SetProcessListener(IModeProcessListener processListener)
         {
-            onWeaponDropEvt += processListener.OnDrop;
+            onWeaponDropEvt   += processListener.OnDrop;
+            onWeaponPickEvt   += processListener.OnPickup;
             onWeaponExpendEvt += processListener.OnExpend;
             onWeaponSwitchEvt += processListener.OnSwitch;
-            onWeaponPickEvt += processListener.OnPickup;
         }
 
-        public void DrawWeapon(EWeaponSlotType slot, bool includeAction = true)
+        #region arrangement
+
+        public void TryArmWeaponImmediately(EWeaponSlotType slotType)
         {
-            if (HeldSlotType == slot)
+            if (!IsHeldSlotEmpty)
                 return;
-            WeaponScanStruct lastWeapon = HeldWeaponAgent.ComponentScan;
-            if (!GetWeaponAgent(slot).IsValid()) return;
-            var destWeapon = GetWeaponAgent(slot).ComponentScan;
-            AppearanceSpecific();
+            ArmWeapon(slotType, false);
+        }
+
+
+        public void ArmWeapon(EWeaponSlotType slot, bool includeAction)
+        {
+            slot = processHelper.GetRealSlotType(slot);
+            if (!processHelper.FilterSameSpecies(slot) || !processHelper.FilterSlotValied(slot))
+                return;
+            //把当前的一些枪械状态重置掉
+            HeldWeaponAgent.ResetDynamic();
+            var lastWeapon       = HeldWeaponAgent.ComponentScan;
+            var destWeapon       = GetWeaponAgent(slot).ComponentScan;
+            var appearanceStruct = processHelper.GetDrawAppearanceStruct(slot);
+
+            DoSpecialAppearance();
             DoDrawInterrupt();
-            bool armOnLeft = slot == EWeaponSlotType.SecondaryWeapon;
-            float holsterParam = WeaponUtil.GetHolsterParam(HeldSlotType == EWeaponSlotType.SecondaryWeapon);
-            float drawParam = armOnLeft
-                ? AnimatorParametersHash.Instance.DrawLeftValue
-                : AnimatorParametersHash.Instance.DrawRightValue;
             if (includeAction)
             {
-                float switchParam = holsterParam * 10 + drawParam;
                 if (IsHeldSlotEmpty)
                 {
-                    WeaponToHand(destWeapon.ConfigId, lastWeapon.ConfigId, slot, armOnLeft);
-                    OnSlotArmFinish(destWeapon, slot);
-                    RelatedStateInterface.Draw(RelatedAppearence.RemountP3WeaponOnRightHand, drawParam);
-                  
+                    DoDrawArmWeaponWithActionFromEmpty(destWeapon, lastWeapon.ConfigId, appearanceStruct);
                 }
                 else
                 {
-                    RelatedStateInterface.SwitchWeapon(
-                        () =>
-                        {
-                            WeaponToHand(destWeapon.ConfigId, lastWeapon.ConfigId, slot, armOnLeft);
-                            if (onWeaponSwitchEvt != null)
-                                onWeaponSwitchEvt(this, destWeapon.ConfigId, InOrOff.Off);
-                            },
-                        () => OnDrawWeaponCallback(destWeapon, slot), switchParam);
+                    DoDrawArmWeaponWithActionFromOtherWeapon(destWeapon, lastWeapon.ConfigId, appearanceStruct);
                 }
             }
             else
             {
                 //CharacterState控制动作相关
-                WeaponToHand(destWeapon.ConfigId, lastWeapon.ConfigId, slot, armOnLeft);
-                OnDrawWeaponCallback(destWeapon, slot);
-                OnSlotArmFinish(destWeapon, slot);
-                RelatedAppearence.RemountP3WeaponOnRightHand();
+                DoDrawArmWeaponWithoutAction(destWeapon, lastWeapon.ConfigId, appearanceStruct);
             }
-            if (onWeaponSwitchEvt != null)
-                onWeaponSwitchEvt(this,HeldConfigId,InOrOff.In);
+
+            onWeaponSwitchEvt(this, HeldConfigId, EInOrOff.In);
         }
 
-        public void TryArmWeapon(EWeaponSlotType slot)
+        public EWeaponSlotType UnArmWeapon(bool includeAction)
         {
-            if (HeldSlotType != EWeaponSlotType.None)
-                return;
-            var agent = GetWeaponAgent(slot);
-            if (!agent.IsValid()) return;
-            // if (!currWeapon.IsSafeVailed) return;
-            WeaponToHand(agent.ConfigId, HeldConfigId, slot);
-            OnSlotArmFinish(agent.ComponentScan, slot);
+             return UnArmWeapon(includeAction, null);
         }
 
-        public void UnArmHeldWeapon(Action onfinish)
+        public EWeaponSlotType UnArmWeapon(bool includeAction, Action callback)
         {
-            WeaponScanStruct weaponInfo = HeldWeaponAgent.ComponentScan;
-            AppearanceSpecific();
-            float holsterParam = WeaponUtil.GetHolsterParam(HeldSlotType);
-            RelatedStateInterface.CharacterUnmount(() => OnUnArmWeaponCallback(weaponInfo.ConfigId, onfinish),
-                holsterParam);
-            if (onWeaponSwitchEvt != null)
-                onWeaponSwitchEvt(this, weaponInfo.ConfigId, InOrOff.Off);
-        }
-
-     
-
-        public void ForceUnArmHeldWeapon()
-        {
-            RelatedAppearence.UnmountWeaponFromHand();
-            SetHeldSlotTypeProcess(EWeaponSlotType.None);
-            weaponPlayerAgent.ThrowActionExecute();
+            if (IsHeldSlotEmpty)
+                return EWeaponSlotType.None;
+            HeldWeaponAgent.ResetDynamic();
+            var holdSlot = HeldSlotType;
+            if (includeAction)
+            {
+                DoDrawUnarmWeaponWithAction(callback);
+            }
+            else
+            {
+                DoDrawUnarmWeaponWithoutAction(null, callback);
+            }
+            return holdSlot;
         }
 
         public bool DropWeapon(EWeaponSlotType slotType = EWeaponSlotType.Pointer)
@@ -124,48 +109,40 @@ namespace App.Shared.GameModules.Weapon
 
         public bool DropWeapon(EWeaponSlotType slotType, int bagIndex)
         {
-            if (!weaponProcessor.FilterDrop(slotType)) return false;
+            if (!processHelper.FilterDrop(slotType)) return false;
             var ret = DestroyWeapon(slotType, bagIndex, true);
-            if (onWeaponDropEvt != null)
-                onWeaponDropEvt(this, slotType);
+            onWeaponDropEvt(this, slotType);
             return ret;
         }
 
         public bool DestroyWeapon(EWeaponSlotType slotType, int bagIndex, bool interrupt = true)
         {
-            var weaponAgent = GetWeaponAgent(slotType);
-            if (!weaponAgent.IsValid()) return false;
+            var weaponAgent = processHelper.FilterNoneAgent(slotType);
+            if (weaponAgent == null)
+                return false;
             if (WeaponUtil.IsC4p(weaponAgent.ConfigId))
                 RelatedAppearence.RemoveC4();
             weaponAgent.ReleaseWeapon();
             //移除武器背包操作
-            weaponPlayerAgent.RemoveBagWeapon(slotType);
+            RemoveBagWeapon(slotType);
             if (IsHeldBagSlotType(slotType))
             {
-                SetHeldSlotTypeProcess(EWeaponSlotType.None);
+                SetHeldSlotType(EWeaponSlotType.None);
             }
 
-            if (bagIndex == -1 || bagIndex == HeldBagPointer)
-            {
-                WeaponInPackage pos = slotType.ToWeaponInPackage();
-                RelatedAppearence.UnmountWeaponInPackage(pos);
-                if (interrupt)
-                    Interrupt();
-            }
-
+            DoDrawEmptyWeaponInPackage(slotType, interrupt);
             return true;
         }
 
         public bool AutoPickUpWeapon(WeaponScanStruct orient)
         {
-            var slotType = weaponProcessor.GetMatchedSlot(orient.ConfigId);
-            if (!weaponProcessor.FilterVailed(orient, slotType)) return false;
-            if (!weaponProcessor.FilterAutoPickup(slotType)) return false;
+            var slotType = processHelper.GetMatchedSlotType(orient.ConfigId);
+            if (!processHelper.FilterVailed(orient, slotType)) return false;
+            if (!processHelper.FilterAutoPickup(slotType)) return false;
             if (ReplaceWeaponToSlot(slotType, orient))
             {
-                TryArmWeapon(slotType);
-                if (onWeaponPickEvt != null)
-                    onWeaponPickEvt(this, slotType);
+                TryArmWeaponImmediately(slotType);
+                onWeaponPickEvt(this, slotType);
                 return true;
             }
 
@@ -174,49 +151,110 @@ namespace App.Shared.GameModules.Weapon
 
         public bool PickUpWeapon(WeaponScanStruct orient, bool arm = true)
         {
-            var slotType = weaponProcessor.GetMatchedSlot(orient.ConfigId);
-            if (!weaponProcessor.FilterVailed(orient, slotType)) return false;
-            if (!weaponProcessor.FilterPickup(slotType)) return false;
+            bool pickupSuccess = false;
+            return PickUpWeapon(orient, ref pickupSuccess, arm);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="orient"></param>
+        /// <param name="pickupSuccess"></param>
+        /// <param name="arm"></param>
+        /// <returns>generate scene object</returns>
+        public bool PickUpWeapon(WeaponScanStruct orient, ref bool pickupSuccess, bool arm = true)
+        {
+            var slotType = processHelper.GetMatchedSlotType(orient.ConfigId);
+            if (!processHelper.FilterVailed(orient, slotType)) return false;
+            if (!processHelper.FilterPickup(slotType)) return false;
             if (ReplaceWeaponToSlot(slotType, orient))
             {
                 if (arm)
-                    TryArmWeapon(slotType);
-                if (onWeaponPickEvt != null)
-                    onWeaponPickEvt(this, slotType);
+                    TryArmWeaponImmediately(slotType);
+                onWeaponPickEvt(this, slotType);
+                pickupSuccess = true;
                 return slotType != EWeaponSlotType.ThrowingWeapon;
             }
 
             return false;
         }
 
-        public bool PickUpWeapon(WeaponScanStruct orient, ref bool pickupSuccess, bool arm = true)
+        //有动作版移除
+        private void DoDrawUnarmWeaponWithAction(Action callback)
         {
-            var slotType = weaponProcessor.GetMatchedSlot(orient.ConfigId);
-            if (!weaponProcessor.FilterVailed(orient, slotType)) return false;
-            if (!weaponProcessor.FilterPickup(slotType)) return false;
-            if (ReplaceWeaponToSlot(slotType, orient))
+            DoSpecialAppearance();
+            int   heldConfigId = HeldConfigId;
+            float holsterParam = WeaponUtil.GetHolsterParam(HeldSlotType);
+            RelatedCharState.CharacterUnmount(() => DoDrawUnarmWeaponWithoutAction(heldConfigId, callback),
+                holsterParam);
+            onWeaponSwitchEvt(this, heldConfigId, EInOrOff.Off);
+        }
+
+        //直接放回装备
+        private void DoDrawUnarmWeaponWithoutAction(int? weaponId, Action callback)
+        {
+            RelatedAppearence.UnmountWeaponFromHand();
+            SetHeldSlotType(EWeaponSlotType.None);
+            if (weaponId.HasValue && WeaponUtil.IsC4p(weaponId.Value))
             {
-                if (arm)
-                    TryArmWeapon(slotType);
-                if (onWeaponPickEvt != null)
-                    onWeaponPickEvt(this, slotType);
-                pickupSuccess = slotType != EWeaponSlotType.ThrowingWeapon;
-                return pickupSuccess;
+                UnArmC4();
             }
 
-            return false;
+            ThrowActionExecute();
+            if (callback != null)
+                callback();
         }
 
-        public void ShowTip(Core.Common.ETipType tip)
+        private void DoDrawArmWeaponWithActionFromEmpty(WeaponScanStruct           destWeapon, int lastWeaponId,
+                                                        WeaponDrawAppearanceStruct appearanceStruct)
         {
-            weaponPlayerAgent.ShowTip(tip);
+            WeaponToHand(destWeapon.ConfigId, lastWeaponId, appearanceStruct.targetSlot,
+                appearanceStruct.isSecondWeapon);
+            OnSlotArmFinish(destWeapon, appearanceStruct.targetSlot);
+            RelatedCharState.Draw(RelatedAppearence.RemountP3WeaponOnRightHand, appearanceStruct.drawParam);
         }
+
+        /// 有动作，从旧装备上画新装备
+        private void DoDrawArmWeaponWithActionFromOtherWeapon(WeaponScanStruct           destWeapon, int lastWeaponId,
+                                                              WeaponDrawAppearanceStruct appearanceStruct)
+        {
+            RelatedCharState.SwitchWeapon(
+                () =>
+                {
+                    WeaponToHand(destWeapon.ConfigId, lastWeaponId, appearanceStruct.targetSlot,
+                        appearanceStruct.isSecondWeapon);
+                    onWeaponSwitchEvt(this, destWeapon.ConfigId, EInOrOff.Off);
+                },
+                () => OnDrawWeaponCallback(destWeapon, appearanceStruct.targetSlot), appearanceStruct.switchParam);
+        }
+
+        /// 没动作，直接刷新装备
+        private void DoDrawArmWeaponWithoutAction(WeaponScanStruct           destWeapon, int lastWeaponId,
+                                                  WeaponDrawAppearanceStruct appearanceStruct)
+        {
+            WeaponToHand(destWeapon.ConfigId, lastWeaponId, appearanceStruct.targetSlot,
+                appearanceStruct.isSecondWeapon);
+            OnDrawWeaponCallback(destWeapon, appearanceStruct.targetSlot);
+            OnSlotArmFinish(destWeapon, appearanceStruct.targetSlot);
+            RelatedAppearence.RemountP3WeaponOnRightHand();
+        }
+
+        private void DoDrawEmptyWeaponInPackage(EWeaponSlotType slotType, bool interrupt)
+        {
+            WeaponInPackage pos = slotType.ToWeaponInPackage();
+            RelatedAppearence.UnmountWeaponInPackage(pos);
+            if (interrupt)
+                InteractController.InterruptCharactor();
+        }
+
+
+     
 
         public void SwitchIn(EWeaponSlotType in_slot)
         {
-            if (!weaponProcessor.FilterSwitchIn(in_slot))
+            if (!processHelper.FilterSwitchIn(in_slot))
             {
-                weaponPlayerAgent.ShowTip(Core.Common.ETipType.NoWeaponInSlot);
+                ShowTip(Core.Common.ETipType.NoWeaponInSlot);
                 return;
             }
 
@@ -227,9 +265,7 @@ namespace App.Shared.GameModules.Weapon
             else
             {
                 int lastWeapon = HeldConfigId;
-                DrawWeapon(in_slot);
-              
-              
+                ArmWeapon(in_slot, true);
             }
         }
 
@@ -243,27 +279,30 @@ namespace App.Shared.GameModules.Weapon
 
             if (IsWeaponSlotEmpty(in_slot))
             {
-                weaponPlayerAgent.ShowTip(Core.Common.ETipType.NoWeaponInSlot);
+                ShowTip(Core.Common.ETipType.NoWeaponInSlot);
                 return;
             }
 
             if (!IsHeldBagSlotType(in_slot))
             {
-                DrawWeapon(in_slot, false);
+                ArmWeapon(in_slot, false);
             }
         }
 
-        public void ExpendAfterAttack()
+        public void AfterAttack()
         {
             if (HeldSlotType == EWeaponSlotType.None || IsHeldSlotEmpty)
                 return;
-  
+
             //var handler = slotsAux.FindHandler(slot);
             bool destroyAndStuffNew = HeldWeaponAgent.ExpendWeapon();
             if (destroyAndStuffNew)
                 AutoStuffHeldWeapon();
-            if (onWeaponExpendEvt != null) onWeaponExpendEvt(this, HeldSlotType);
+            onWeaponExpendEvt(this, HeldSlotType);
         }
+
+        #endregion
+
 
         public void SwitchBag(int index)
         {
@@ -292,22 +331,22 @@ namespace App.Shared.GameModules.Weapon
 
             DestroyWeapon(EWeaponSlotType.ThrowingWeapon, 0);
             RefreshWeaponAppearance(EWeaponSlotType.ThrowingWeapon);
-            GrenadeHelper.ClearCache();
+            GrenadeHandler.ClearCache();
             foreach (var weapon in tarBag.weaponList)
             {
                 var slot = PlayerWeaponBagData.Index2Slot(weapon.Index);
 
                 var weaponAllConfig = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(weapon.WeaponTplId);
-                var weaponType = (EWeaponType_Config) weaponAllConfig.NewWeaponCfg.Type;
+                var weaponType      = (EWeaponType_Config) weaponAllConfig.NewWeaponCfg.Type;
                 if (slot != EWeaponSlotType.ThrowingWeapon && slot != EWeaponSlotType.TacticWeapon)
                 {
                     var orient = WeaponUtil.CreateScan(weapon);
-                    orient.Bullet = weaponAllConfig.PropertyCfg.Bullet;
+                    orient.Bullet         = weaponAllConfig.PropertyCfg.Bullet;
                     orient.ReservedBullet = weaponAllConfig.PropertyCfg.Bulletmax;
                     if (orient.Magazine > 0)
                     {
                         orient.Bullet += SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(orient.Magazine)
-                            .Bullet;
+                                                         .Bullet;
                     }
 
                     ReplaceWeaponToSlot(slot, 0, orient);
@@ -315,7 +354,7 @@ namespace App.Shared.GameModules.Weapon
                 else if (slot == EWeaponSlotType.ThrowingWeapon)
                 {
                     //     controller.GrenadeHelper.ClearEntityCache();
-                    GrenadeHelper.AddCache(weapon.WeaponTplId);
+                    GrenadeHandler.AddCache(weapon.WeaponTplId);
                 }
 
                 removedList.Remove(slot);
@@ -331,7 +370,7 @@ namespace App.Shared.GameModules.Weapon
 
             EWeaponSlotType newSlot = PollGetLastSlotType();
             TryHoldGrenade(true, false);
-            TryArmWeapon(newSlot);
+            TryArmWeaponImmediately(newSlot);
         }
 
         [System.Obsolete]
@@ -346,7 +385,7 @@ namespace App.Shared.GameModules.Weapon
 
         public void InitBag(int pointer)
         {
-            weaponPlayerAgent.ClearBagPointer();
+            ClearBagPointer();
             HeldBagPointer2 = pointer;
         }
 
@@ -368,14 +407,14 @@ namespace App.Shared.GameModules.Weapon
         {
             //  if (vertify)
             bagIndex = 0;
-            if (!weaponProcessor.FilterVailed(orient, slotType)) return false;
+            if (!processHelper.FilterVailed(orient, slotType)) return false;
             bool refreshAppearance = (bagIndex == HeldBagPointer || bagIndex < 0);
             //特殊全局性武器只取武器背包第0个索引值
-            var weaponAgent = GetWeaponAgent(slotType);
+            var                      weaponAgent   = GetWeaponAgent(slotType);
             WeaponPartsRefreshStruct refreshParams = new WeaponPartsRefreshStruct();
-            WeaponEntity newEntity = weaponAgent.ReplaceWeapon(Owner, orient, ref refreshParams);
+            WeaponEntity             newEntity     = weaponAgent.ReplaceWeapon(Owner, orient, ref refreshParams);
             if (newEntity == null) return false;
-            weaponPlayerAgent.SyncBagWeapon(slotType, newEntity.entityKey.Value);
+            SyncBagWeapon(slotType, newEntity.entityKey.Value);
             if (refreshAppearance)
                 RefreshModelWeaponParts(refreshParams);
             return true;
@@ -387,10 +426,10 @@ namespace App.Shared.GameModules.Weapon
             if (weaponAgent.IsValid())
             {
                 WeaponPartsRefreshStruct refreshParams = new WeaponPartsRefreshStruct();
-                refreshParams.slot = slot;
+                refreshParams.slot       = slot;
                 refreshParams.weaponInfo = weaponAgent.ComponentScan;
                 // refreshParams.oldParts = new WeaponPartsStruct();
-                refreshParams.newParts = weaponAgent.PartsScan;
+                refreshParams.newParts     = weaponAgent.PartsScan;
                 refreshParams.armInPackage = true;
                 RefreshModelWeaponParts(refreshParams);
             }
@@ -399,13 +438,13 @@ namespace App.Shared.GameModules.Weapon
                 //不移除C4 RelatedAppearence.RemoveC4();
                 WeaponInPackage pos = slot.ToWeaponInPackage();
                 RelatedAppearence.UnmountWeaponInPackage(pos);
-                Interrupt();
+                InteractController.InterruptCharactor();
             }
         }
 
         public bool TryHoldGrenade(int greandeId)
         {
-            if (grenadeHelper.AddCache(greandeId))
+            if (_grenadeHandler.AddCache(greandeId))
             {
                 TryHoldGrenade();
                 return true;
@@ -418,19 +457,20 @@ namespace App.Shared.GameModules.Weapon
         {
             var weaponAgent = this[EWeaponSlotType.ThrowingWeapon];
             if (autoStuff && weaponAgent.IsValid()) return;
-            int nextId = grenadeHelper.FindUsable(autoStuff);
+            int nextId = _grenadeHandler.FindUsable(autoStuff);
             if (nextId < 0 || weaponAgent.ConfigId == nextId) return;
             WeaponPartsRefreshStruct refreshParams = new WeaponPartsRefreshStruct();
-            WeaponEntity newEntity = weaponAgent.ReplaceWeapon(Owner, WeaponUtil.CreateScan(nextId), ref refreshParams);
-            weaponPlayerAgent.SyncBagWeapon(EWeaponSlotType.ThrowingWeapon, newEntity.entityKey.Value);
+            WeaponEntity newEntity =
+                weaponAgent.ReplaceWeapon(Owner, WeaponUtil.CreateScan(nextId), ref refreshParams);
+            SyncBagWeapon(EWeaponSlotType.ThrowingWeapon, newEntity.entityKey.Value);
             RefreshModelWeaponParts(refreshParams);
             if (tryArm)
-                TryArmWeapon(EWeaponSlotType.ThrowingWeapon);
+                TryArmWeaponImmediately(EWeaponSlotType.ThrowingWeapon);
         }
 
         public void RemoveGreande(int id)
         {
-            int leftCount = grenadeHelper.RemoveCache(id);
+            int leftCount = _grenadeHandler.RemoveCache(id);
             //其他行为通过回调来做
             if (leftCount < 0) return;
             var weaponAgent = this[EWeaponSlotType.ThrowingWeapon];
@@ -445,7 +485,6 @@ namespace App.Shared.GameModules.Weapon
 
         public void Interrupt()
         {
-            weaponPlayerAgent.CharacterInterrupt();
         }
 
         public void SetReservedBullet(int count)
@@ -468,7 +507,7 @@ namespace App.Shared.GameModules.Weapon
 
         private void SameSpeciesSwitchIn(EWeaponSlotType slot)
         {
-            if (!weaponProcessor.FilterSameSepeciesSwitchIn(slot)) return;
+            if (!processHelper.FilterSameSepeciesSwitchIn(slot)) return;
             int nextId = GetWeaponAgent(slot).FindNextWeapon(false);
             if (nextId > 0 && slot == EWeaponSlotType.ThrowingWeapon)
             {
@@ -476,19 +515,11 @@ namespace App.Shared.GameModules.Weapon
             }
         }
 
-        public void CreateSetMeleeAttackInfoSync(int in_Sync)
-        {
-            weaponPlayerAgent.CreateSetMeleeAttackInfoSync(in_Sync);
-        }
+    
 
-        public void CreateSetMeleeAttackInfo(MeleeAttackInfo attackInfo, MeleeFireLogicConfig config)
+        private void SetHeldSlotType(EWeaponSlotType slotType)
         {
-            weaponPlayerAgent.CreateSetMeleeAttackInfo(attackInfo, config);
-        }
-
-        private void SetHeldSlotTypeProcess(EWeaponSlotType slotType)
-        {
-            weaponPlayerAgent.SetBagHeldSlotType(slotType);
+            SetBagHeldSlotType(slotType);
             RefreshHeldWeaponDetail();
         }
 
@@ -501,10 +532,10 @@ namespace App.Shared.GameModules.Weapon
         private void OnUnArmWeaponCallback(int weaponId, Action onfinish)
         {
             RelatedAppearence.UnmountWeaponFromHand();
-            SetHeldSlotTypeProcess(EWeaponSlotType.None);
+            SetHeldSlotType(EWeaponSlotType.None);
             if (WeaponUtil.IsC4p(weaponId))
             {
-                weaponPlayerAgent.UnArmC4();
+                UnArmC4();
             }
 
             if (onfinish != null)
@@ -513,12 +544,12 @@ namespace App.Shared.GameModules.Weapon
 
         private void RefreshHeldWeaponAttachment()
         {
-            if (!weaponProcessor.FilterRefreshWeapon()) return;
-            var baseComp = HeldWeaponAgent.ComponentScan;
+            if (!processHelper.FilterRefreshWeapon()) return;
+            var baseComp    = HeldWeaponAgent.ComponentScan;
             var attachments = WeaponPartUtil.CreateParts(baseComp);
-            weaponPlayerAgent.ApperanceRefreshABreath(HeldWeaponAgent.BreathFactor);
+            ApperanceRefreshABreath(HeldWeaponAgent.BreathFactor);
             // 添加到背包的时候会执行刷新模型逻辑
-            weaponPlayerAgent.ModelRefreshWeaponModel(baseComp.ConfigId, HeldSlotType, attachments);
+            ModelRefreshWeaponModel(baseComp.ConfigId, HeldSlotType, attachments);
         }
 
         private void RefreshModelWeaponParts(WeaponPartsRefreshStruct refreshData)
@@ -528,11 +559,11 @@ namespace App.Shared.GameModules.Weapon
                 var avatarId = refreshData.weaponInfo.AvatarId;
                 if (avatarId < 1)
                     avatarId = SingletonManager.Get<WeaponResourceConfigManager>()
-                        .GetConfigById(refreshData.weaponInfo.ConfigId).AvatorId;
+                                               .GetConfigById(refreshData.weaponInfo.ConfigId).AvatorId;
                 if (WeaponUtil.IsC4p(refreshData.weaponInfo.ConfigId))
                 {
                     OverrideBagTactic = refreshData.weaponInfo.ConfigId;
-                    weaponPlayerAgent.UnArmC4();
+                    UnArmC4();
                 }
                 else
                 {
@@ -561,7 +592,7 @@ namespace App.Shared.GameModules.Weapon
             RefreshHeldWeaponAttachment();
         }
 
-        private void AppearanceSpecific()
+        private void DoSpecialAppearance()
         {
             if (HeldSlotType == EWeaponSlotType.SecondaryWeapon)
                 RelatedAppearence.MountP3WeaponOnAlternativeLocator();
@@ -569,14 +600,14 @@ namespace App.Shared.GameModules.Weapon
 
         private void DoDrawInterrupt()
         {
-            weaponPlayerAgent.CharacterDrawInterrupt();
+            CharacterDrawInterrupt();
         }
 
         private void WeaponToHand(int weaponId, int lastWeaponId, EWeaponSlotType slot, bool armOnLeft = false)
         {
             if (WeaponUtil.IsC4p(lastWeaponId))
             {
-                weaponPlayerAgent.UnArmC4();
+                UnArmC4();
             }
 
             if (WeaponUtil.IsC4p(weaponId))
@@ -588,19 +619,18 @@ namespace App.Shared.GameModules.Weapon
             RelatedAppearence.MountWeaponToHand(pos);
             if (armOnLeft)
                 RelatedAppearence.MountP3WeaponOnAlternativeLocator();
-         
         }
 
         private void OnSlotArmFinish(WeaponScanStruct weapon, EWeaponSlotType slot)
         {
             //TODO:
-            SetHeldSlotTypeProcess(slot);
+            SetHeldSlotType(slot);
             if (weapon.Bullet <= 0)
             {
                 if (SharedConfig.CurrentGameMode == EGameMode.Normal)
                 {
                     //TODO 判断弹药数量是否足够，如果弹药不足，弹提示框
-                    RelatedStateInterface.ReloadEmpty(() => { });
+                    RelatedCharState.ReloadEmpty(() => { });
                 }
             }
             else
@@ -615,7 +645,7 @@ namespace App.Shared.GameModules.Weapon
         private void AutoStuffHeldWeapon()
         {
             var lastSlotType = HeldSlotType;
-            var nextId = HeldWeaponAgent.FindNextWeapon(true);
+            var nextId       = HeldWeaponAgent.FindNextWeapon(true);
             //消耗掉当前武器
             DestroyWeapon(HeldSlotType, -1, false);
             //自动填充下一项武器
@@ -633,14 +663,38 @@ namespace App.Shared.GameModules.Weapon
         }
 
         private LoggerAdapter logger = new LoggerAdapter(typeof(PlayerWeaponController));
-        public void LateUpdate(PlayerEntity player)
+
+
+
+        internal void RecoverLastHeldWeapon()
         {
+            EWeaponSlotType lastSlot = PollGetLastSlotType(false);
+            if (lastSlot != EWeaponSlotType.None)
+                ArmWeapon(lastSlot, true);
+        }
+
+        #region Update
+
+
+        public void InternalUpdate(PlayerEntity player)
+        {
+          
+//          if (player.characterBone.IsWeaponRotState && RelatedCameraSNew.IsAiming())
+//          {
+//              AddRotStateInterrupt();
+//          }
+//
+//          if (RelatedCharState.IsProneMovement() && RelatedCameraSNew.IsAiming())
+//          {
+//              AddProneMoveStateInterrupt();
+//          }
+          //DebugUtil.MyLog("PullBoltEnd:"+HeldWeaponAgent.ClientSyncComponent.PullBoltEnd+"IsPullingBolt:"+HeldWeaponAgent.ClientSyncComponent.IsPullingBolt);
             if (!HeldWeaponAgent.IsValid() && HeldSlotType != EWeaponSlotType.None)
-                SetHeldSlotTypeProcess(EWeaponSlotType.None);
-            if (weaponPlayerAgent.WeaponUpdate.UpdateHeldAppearance)
+                SetHeldSlotType(EWeaponSlotType.None);
+            if (WeaponServerUpdate.UpdateHeldAppearance)
             {
-                logger.Info("WeaponPlayerAgent.WeaponUpdate.UpdateHeldAppearance Come in ");
-                weaponPlayerAgent.WeaponUpdate.UpdateHeldAppearance = false;
+                logger.Info("WeaponUpdate.UpdateHeldAppearance Come in ");
+                WeaponServerUpdate.UpdateHeldAppearance = false;
                 //率先刷新手雷物品
                 TryHoldGrenade(true, false);
                 RefreshWeaponAppearance(EWeaponSlotType.ThrowingWeapon);
@@ -648,26 +702,12 @@ namespace App.Shared.GameModules.Weapon
                 if (newSlot == HeldSlotType)
                     RefreshWeaponAppearance();
                 else
-                    TryArmWeapon(newSlot);
+                    TryArmWeaponImmediately(newSlot);
             }
-
-            //      if(player.playerWeaponUpdateComponent2.WaitUpdateBagIndex)
-            //      {
-            ////          DebugUtil.MyLog("update in",DebugUtil.DebugColor.Green);
-            //          //  TryHoldGrenade();
-            //          player.playerWeaponUpdateComponent2.WaitUpdateBagIndex = false;
-            //          for (EWeaponSlotType j = EWeaponSlotType.None + 1; j < EWeaponSlotType.Length; j++)
-            //          {
-            //              if(j == EWeaponSlotType.ThrowingWeapon || j == EWeaponSlotType.TacticWeapon)
-            //                  RefreshWeaponAppearance(j);
-            //          }
-            //          EWeaponSlotType newSlot = PollGetLastSlotType();
-            //          TryArmWeapon(newSlot);
-            //      }
         }
 
-        #region Patched
-
         #endregion
+
+       
     }
 }

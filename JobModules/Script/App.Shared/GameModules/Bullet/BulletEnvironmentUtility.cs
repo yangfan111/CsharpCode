@@ -27,7 +27,7 @@ namespace App.Shared.GameModules.Bullet
         {
             var go = hit.transform.gameObject;
 
-            if(go.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.Water) || go.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.WaterTrigger))
+            if(go.layer == UnityLayers.WaterLayer || go.layer == UnityLayers.WaterTriggerLayer)
             {
                 thicknessInfo = new ThicknessInfo
                 {

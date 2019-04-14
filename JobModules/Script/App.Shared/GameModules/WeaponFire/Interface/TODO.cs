@@ -9,11 +9,11 @@ namespace  App.Shared.GameModules.Weapon.Behavior
   
     public interface IWeaponFireUpdate
     {
-        void Update(PlayerWeaponController controller, IUserCmd cmd);
+        void Update(PlayerWeaponController controller, IUserCmd cmd, Contexts contexts);
     }
     public interface IWeaponFireController
     {
-        void OnUpdate(PlayerWeaponController controller, IWeaponCmd cmd);
+        void OnUpdate(PlayerWeaponController controller, IWeaponCmd cmd, Contexts contexts);
     }
     /// <summary>
     /// 创建投掷物对象

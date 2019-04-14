@@ -39,6 +39,8 @@ namespace App.Server.GameModules.GamePlay.free.player
         public const int PageUp = 25;
         public const int Z = 26;
         public const int EQUAL = 27;
+        public const int SHIFT = 28;
+        public const int CTRL = 29;
 
         private const int NumberDelta = 1000;
 
@@ -126,6 +128,18 @@ namespace App.Server.GameModules.GamePlay.free.player
                 case EQUAL:
                     cmd.IsSwitchAutoRun = value;
                     break;
+                case SHIFT:
+                    cmd.IsRun = value;
+                    break;
+                case CTRL:
+                    cmd.IsSlightWalk = value;
+                    break;
+                case SHOWGUN:
+                    cmd.ChangeCamera = value;
+                    break;
+                case B:
+                    cmd.IsSwitchFireMode = value;
+                    break;
                 default:
                     break;
             }
@@ -177,7 +191,15 @@ namespace App.Server.GameModules.GamePlay.free.player
                     return _cmd.IsProne;
                 case EQUAL:
                     return _cmd.IsSwitchAutoRun;
-                default:
+                case SHIFT:
+                    return _cmd.IsRun;
+                case CTRL:
+                    return _cmd.IsSlightWalk;
+                case SHOWGUN:
+                    return _cmd.ChangeCamera;
+                case B:
+                    return _cmd.IsSwitchFireMode;
+;                default:
                     return false;
             }
         }

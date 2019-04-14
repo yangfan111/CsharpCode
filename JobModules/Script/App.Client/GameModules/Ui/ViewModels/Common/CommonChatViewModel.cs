@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -152,44 +153,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonChatView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonChatView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonChatView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonChatView, CommonChatViewModel> bindingSet =
-                view.CreateBindingSet<CommonChatView, CommonChatViewModel>();
-
-            view.oriShow = _show = view.Show.activeSelf;
-            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
-            view.oriAlpha = _alpha = view.Alpha.alpha;
-            bindingSet.Bind(view.Alpha).For(v => v.alpha).To(vm => vm.Alpha).OneWay();
-            view.oriChatListBgShow = _chatListBgShow = view.ChatListBgShow.enabled;
-            bindingSet.Bind(view.ChatListBgShow).For(v => v.enabled).To(vm => vm.ChatListBgShow).OneWay();
-            view.oriSendMessageGroupShow = _sendMessageGroupShow = view.SendMessageGroupShow.activeSelf;
-            bindingSet.Bind(view.SendMessageGroupShow).For(v => v.activeSelf).To(vm => vm.SendMessageGroupShow).OneWay();
-            view.oriChannelTipText = _channelTipText = view.ChannelTipText.text;
-            bindingSet.Bind(view.ChannelTipText).For(v => v.text).To(vm => vm.ChannelTipText).OneWay();
-            view.oriChannelTipColor = _channelTipColor = view.ChannelTipColor.color;
-            bindingSet.Bind(view.ChannelTipColor).For(v => v.color).To(vm => vm.ChannelTipColor).OneWay();
-            bindingSet.Bind(view.InputValueChanged).For(v => v.onValueChanged).To(vm => vm.InputValueChanged).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonChatView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -213,12 +198,55 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonChatView view)
+		{
+		     BindingSet<CommonChatView, CommonChatViewModel> bindingSet =
+                view.CreateBindingSet<CommonChatView, CommonChatViewModel>();
+            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
+            bindingSet.Bind(view.Alpha).For(v => v.alpha).To(vm => vm.Alpha).OneWay();
+            bindingSet.Bind(view.ChatListBgShow).For(v => v.enabled).To(vm => vm.ChatListBgShow).OneWay();
+            bindingSet.Bind(view.SendMessageGroupShow).For(v => v.activeSelf).To(vm => vm.SendMessageGroupShow).OneWay();
+            bindingSet.Bind(view.ChannelTipText).For(v => v.text).To(vm => vm.ChannelTipText).OneWay();
+            bindingSet.Bind(view.ChannelTipColor).For(v => v.color).To(vm => vm.ChannelTipColor).OneWay();
+            bindingSet.Bind(view.InputValueChanged).For(v => v.onValueChanged).To(vm => vm.InputValueChanged).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonChatView view)
+		{
+            _show = view.Show.activeSelf;
+            _alpha = view.Alpha.alpha;
+            _chatListBgShow = view.ChatListBgShow.enabled;
+            _sendMessageGroupShow = view.SendMessageGroupShow.activeSelf;
+            _channelTipText = view.ChannelTipText.text;
+            _channelTipColor = view.ChannelTipColor.color;
+		}
+
+
+		void SaveOriData(CommonChatView view)
+		{
+            view.oriShow = _show;
+            view.oriAlpha = _alpha;
+            view.oriChatListBgShow = _chatListBgShow;
+            view.oriSendMessageGroupShow = _sendMessageGroupShow;
+            view.oriChannelTipText = _channelTipText;
+            view.oriChannelTipColor = _channelTipColor;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			Show = _view.oriShow;
 			Alpha = _view.oriAlpha;
 			ChatListBgShow = _view.oriChatListBgShow;
@@ -251,7 +279,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonChat"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

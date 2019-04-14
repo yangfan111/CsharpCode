@@ -185,6 +185,8 @@ namespace App.Shared.Components.Player
         [DontInitilize] public float Far { get; set; }
         [DontInitilize] public float Near { get; set; }
         
+        [DontInitilize] public bool NeedLag { get; set; }
+        
     }
 
     [Player]
@@ -247,7 +249,7 @@ namespace App.Shared.Components.Player
     [Serializable]
     public class ObserveCameraComponent : IPlaybackComponent
     {
-        [NetworkProperty] [DontInitilize] public Vector3 CameraPosition;
+        [NetworkProperty] [DontInitilize] public FixedVector3 CameraPosition;
         [NetworkProperty] [DontInitilize] public Vector3 CameraEularAngle;
 //        [NetworkProperty] [DontInitilize] public bool IsFirstAppearance;
         [NetworkProperty] [DontInitilize] public float Fov;
@@ -291,9 +293,9 @@ namespace App.Shared.Components.Player
     [Serializable]
     public class CameraStateUploadComponent: IUpdateComponent
     {
-        [NetworkProperty] [DontInitilize] public Vector3 Position;
+        [NetworkProperty] [DontInitilize] public FixedVector3 Position;
         [NetworkProperty] [DontInitilize] public Vector3 EulerAngle;
-        [NetworkProperty] [DontInitilize] public Vector3 PlayerFocusPosition;
+        [NetworkProperty] [DontInitilize] public FixedVector3 PlayerFocusPosition;
         [NetworkProperty] [DontInitilize] public float Fov;
         [NetworkProperty] [DontInitilize] public float Far;
         [NetworkProperty] [DontInitilize] public float Near;

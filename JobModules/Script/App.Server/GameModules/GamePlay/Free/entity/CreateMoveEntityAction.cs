@@ -46,7 +46,7 @@ namespace App.Server.GameModules.GamePlay.Free.entity
         {
             FreeMoveEntity en = args.GameContext.freeMove.CreateEntity();
             en.AddEntityKey(new EntityKey(args.GameContext.session.commonSession.EntityIdGenerator.GetNextEntityId(), (short)EEntityType.FreeMove));
-            en.AddPosition(new Vector3());
+            en.AddPosition();
             en.AddFreeData(FreeUtil.ReplaceVar(name, args), new FreeEntityData(en));
             en.freeData.Cat = "";
             en.freeData.Value = "";

@@ -7,11 +7,9 @@ using Core.GameModule.Interface;
 using Core.Utils;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Profiling;
 using Utils.Utils;
-using WeaponConfigNs;
-using AssetInfo = Utils.AssetManager.AssetInfo;
 using UnityEngine.UI;
+using WeaponConfigNs;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {

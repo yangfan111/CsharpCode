@@ -107,6 +107,7 @@ namespace Core.CharacterState.Action
         public void SetPostureCrouch()
         {
             SetNewCommandFromFunctionCall(FsmInput.PostureCrouch);
+            Logger.InfoFormat("set FsmInput.PostureCrouch!!!");
         }
 
         public void SetPostureProne()

@@ -20,16 +20,16 @@ namespace com.wd.free.@event
 
         void SetPara(string key, IParable paras);
 
-        // 临时使用对象
+        // 涓存椂浣跨敤瀵硅薄
         void TempUse(string key, IParable paras);
 
-        // 释放临时使用对象
+        // 閲婃斁涓存椂浣跨敤瀵硅薄
         void Resume(string key);
 
-        // 临时使用全局变量
+        // 涓存椂浣跨敤鍏ㄥ眬鍙橀噺
         void TempUsePara(IPara para);
 
-        // 释放全局临时使用变量
+        // 閲婃斁鍏ㄥ眬涓存椂浣跨敤鍙橀噺
         void ResumePara(string paraName);
 
         IParable RemovePara(string key);

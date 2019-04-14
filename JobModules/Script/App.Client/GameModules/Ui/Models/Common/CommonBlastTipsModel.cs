@@ -68,11 +68,11 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
 
             var comp = adapter.GetBlastData();
-            UpdateAB(comp.BlastAPosition, ABType.A );
-            UpdateAB(comp.BlastBPosition, ABType.B);
+            UpdateAB(comp.BlastAPosition.ShiftedVector3(), ABType.A );
+            UpdateAB(comp.BlastBPosition.ShiftedVector3(), ABType.B);
             if (adapter.IsCampPass() && comp.IsC4Droped)
 
-                UpdateAB(comp.C4DropPosition, ABType.C4);
+                UpdateAB(comp.C4DropPosition.ShiftedVector3(), ABType.C4);
             else
                 _viewModel.C4activeSelf = false;
 

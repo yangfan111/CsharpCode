@@ -26,12 +26,12 @@ namespace App.Shared.GameModules.Vehicle
         {
             foreach (var car in _carContext.GetEntities())
             {
-                car.position.Value = car.carRewindData.Position;
+                car.position.FixedVector3 = car.carRewindData.Position;
             }
 
             foreach (var ship in _shipContext.GetEntities())
             {
-                ship.position.Value = ship.shipDynamicData.Position;
+                ship.position.FixedVector3 = ship.shipDynamicData.Position;
             }
         }
     }

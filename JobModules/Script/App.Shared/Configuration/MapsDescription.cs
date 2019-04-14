@@ -22,7 +22,7 @@ namespace App.Shared.Configuration
             BigMapParameters = null;
             SmallMapParameters = null;
 
-            foreach (var levelInfo in Data.MapInfos)
+            foreach (var levelInfo in Data.Items)
             {
                 if (levelInfo.Id == mapId)
                 {

@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Group
 {
@@ -96,37 +97,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<GroupRecordView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<GroupRecordView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<GroupRecordView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<GroupRecordView, GroupRecordViewModel> bindingSet =
-                view.CreateBindingSet<GroupRecordView, GroupRecordViewModel>();
-
-            view.oriShow = _show = view.Show.activeSelf;
-            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
-            view.oriRoomInfoText = _roomInfoText = view.RoomInfoText.text;
-            bindingSet.Bind(view.RoomInfoText).For(v => v.text).To(vm => vm.RoomInfoText).OneWay();
-            view.oriPlayerCountText = _playerCountText = view.PlayerCountText.text;
-            bindingSet.Bind(view.PlayerCountText).For(v => v.text).To(vm => vm.PlayerCountText).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(GroupRecordView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -150,12 +142,45 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
             }
         }
 
+		void ViewBind(GroupRecordView view)
+		{
+		     BindingSet<GroupRecordView, GroupRecordViewModel> bindingSet =
+                view.CreateBindingSet<GroupRecordView, GroupRecordViewModel>();
+            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
+            bindingSet.Bind(view.RoomInfoText).For(v => v.text).To(vm => vm.RoomInfoText).OneWay();
+            bindingSet.Bind(view.PlayerCountText).For(v => v.text).To(vm => vm.PlayerCountText).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(GroupRecordView view)
+		{
+            _show = view.Show.activeSelf;
+            _roomInfoText = view.RoomInfoText.text;
+            _playerCountText = view.PlayerCountText.text;
+		}
+
+
+		void SaveOriData(GroupRecordView view)
+		{
+            view.oriShow = _show;
+            view.oriRoomInfoText = _roomInfoText;
+            view.oriPlayerCountText = _playerCountText;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			Show = _view.oriShow;
 			RoomInfoText = _view.oriRoomInfoText;
 			PlayerCountText = _view.oriPlayerCountText;
@@ -185,7 +210,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/group"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/group"; } }
         public string ResourceAssetName { get { return "GroupRecord"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

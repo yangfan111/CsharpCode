@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -94,36 +95,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonGameOverView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonGameOverView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonGameOverView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonGameOverView, CommonGameOverViewModel> bindingSet =
-                view.CreateBindingSet<CommonGameOverView, CommonGameOverViewModel>();
-
-            view.oriShow = _show = view.Show.activeSelf;
-            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
-            bindingSet.Bind(view.ContinueBtnClick).For(v => v.onClick).To(vm => vm.ContinueBtnClick).OneWay();
-            view.oriContinueBtnShow = _continueBtnShow = view.ContinueBtnShow.activeSelf;
-            bindingSet.Bind(view.ContinueBtnShow).For(v => v.activeSelf).To(vm => vm.ContinueBtnShow).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonGameOverView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -147,12 +140,43 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonGameOverView view)
+		{
+		     BindingSet<CommonGameOverView, CommonGameOverViewModel> bindingSet =
+                view.CreateBindingSet<CommonGameOverView, CommonGameOverViewModel>();
+            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
+            bindingSet.Bind(view.ContinueBtnClick).For(v => v.onClick).To(vm => vm.ContinueBtnClick).OneWay();
+            bindingSet.Bind(view.ContinueBtnShow).For(v => v.activeSelf).To(vm => vm.ContinueBtnShow).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonGameOverView view)
+		{
+            _show = view.Show.activeSelf;
+            _continueBtnShow = view.ContinueBtnShow.activeSelf;
+		}
+
+
+		void SaveOriData(CommonGameOverView view)
+		{
+            view.oriShow = _show;
+            view.oriContinueBtnShow = _continueBtnShow;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			Show = _view.oriShow;
 			ContinueBtnShow = _view.oriContinueBtnShow;
 			SpriteReset();
@@ -181,7 +205,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonGameOver"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

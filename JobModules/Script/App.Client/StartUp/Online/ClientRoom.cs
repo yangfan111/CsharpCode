@@ -32,11 +32,11 @@ using Utils.Singleton;
 
 namespace App.Client.Console
 {
-    public class ClientRoom : IClientRoom, IDebugCommandHandler,IEcsDebugHelper
+    public class ClientRoom : IClientRoom, IDebugCommandHandler, IEcsDebugHelper
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(ClientRoom));
-        
-        
+
+
         private Contexts _contexts;
         private SessionStateMachine _clientSessionStateMachine;
         private ClientDebugCommandHandler _clientDebugCommandHandler;
@@ -55,7 +55,6 @@ namespace App.Client.Console
 
         public ClientRoom(IClientContextInitilizer clientContextInitializer)
         {
-          
             _logger.InfoFormat("Platform Endianness is little = {0}", BitConverter.IsLittleEndian);
 
             _contexts = clientContextInitializer.CreateContexts();
@@ -67,12 +66,12 @@ namespace App.Client.Console
             SingletonManager.Get<MyProfilerManager>().Contexts = _contexts;
 
             InitNetworMessageHandlers();
-            
         }
 
         public void OnNetworkConnected(INetworkChannel networkChannel)
         {
-            networkChannel.Serializer = new NetworkMessageSerializer(new AppMessageTypeInfo()); ;
+            networkChannel.Serializer = new NetworkMessageSerializer(new AppMessageTypeInfo());
+            ;
             networkChannel.MessageReceived += NetworkChannelOnMessageReceived;
             _contexts.session.clientSessionObjects.NetworkChannel = networkChannel;
 
@@ -83,7 +82,10 @@ namespace App.Client.Console
         {
             var sessionObjects = _contexts.session.commonSession;
             sessionObjects.BulletInfoCollector = new ClientBulletInfoCollector(networkChannel);
-            _contexts.session.clientSessionObjects.MessageDispatcher.RegisterLater((int)EServer2ClientMessage.FireInfoAck, new FireInfoAckMessageHandler(_contexts.player, (ClientBulletInfoCollector)sessionObjects.BulletInfoCollector));
+            _contexts.session.clientSessionObjects.MessageDispatcher.RegisterLater(
+                (int) EServer2ClientMessage.FireInfoAck,
+                new FireInfoAckMessageHandler(_contexts.player,
+                    (ClientBulletInfoCollector) sessionObjects.BulletInfoCollector));
         }
 
         public void OnNetworkDisconnected()
@@ -92,14 +94,14 @@ namespace App.Client.Console
             _isDisconnected = true;
         }
 
-        public string LoginToken {  set { _contexts.session.clientSessionObjects.LoginToken = value; } }
+        public string LoginToken
+        {
+            set { _contexts.session.clientSessionObjects.LoginToken = value; }
+        }
 
 
-       
-        
         public void Update()
         {
-          
             try
             {
                 if (_isDisposed)
@@ -118,8 +120,6 @@ namespace App.Client.Console
                     StepExecuteManager.Instance.Update();
                     _clientSessionStateMachine.Update();
                 }
-
-               
             }
             finally
             {
@@ -131,14 +131,21 @@ namespace App.Client.Console
         {
             _clientSessionStateMachine.LateUpdate();
         }
-        
+
         public void Dispose()
         {
             if (_isDisposed) return;
             _isDisposed = true;
             _clientSessionStateMachine.Dispose();
             FreePrefabLoader.Destroy();
-            ICommonSessionObjects _sessionObjects = _contexts.session.commonSession;
+            var _sessionObjects = _contexts.session.commonSession;
+            _contexts.session.commonSession.Dispose();
+            _contexts.session.clientSessionObjects.Dispose();
+
+            if (_contexts.session.clientSessionObjects.NetworkChannel != null)
+            {
+                _contexts.session.clientSessionObjects.NetworkChannel.Dispose();
+            }
 
             foreach (var info in _sessionObjects.GameContexts.AllContexts)
             {
@@ -148,9 +155,10 @@ namespace App.Client.Console
                     {
                         if (comp is IAssetComponent)
                         {
-                            ((IAssetComponent)comp).Recycle(_sessionObjects.AssetManager);
+                            ((IAssetComponent) comp).Recycle(_sessionObjects.AssetManager);
                         }
                     }
+
                     if (_sessionObjects.AssetManager != null)
                         _sessionObjects.AssetManager.LoadCancel(entity.RealEntity);
                     entity.Destroy();
@@ -162,7 +170,7 @@ namespace App.Client.Console
                 DestroyEntity(_sessionObjects, entity);
             }
 
-          
+
             foreach (Entity entity in _contexts.sceneObject.GetEntities())
             {
                 DestroyEntity(_sessionObjects, entity);
@@ -177,7 +185,7 @@ namespace App.Client.Console
             {
                 _logger.ErrorFormat("contexts.Reset error:{0}", ex.Message);
             }
-            
+
             UiModule.DestroyAll();
             FreeUILoader.Destroy();
         }
@@ -188,9 +196,10 @@ namespace App.Client.Console
             {
                 if (comp is IAssetComponent)
                 {
-                    ((IAssetComponent)comp).Recycle(sessionObjects.AssetManager);
+                    ((IAssetComponent) comp).Recycle(sessionObjects.AssetManager);
                 }
             }
+
             if (sessionObjects.AssetManager != null)
                 sessionObjects.AssetManager.LoadCancel(entity);
             entity.Destroy();
@@ -202,30 +211,38 @@ namespace App.Client.Console
             var sessionObjects = _contexts.session.clientSessionObjects;
 
             var messageDispatcher = sessionObjects.MessageDispatcher;
-            messageDispatcher.RegisterLater((int)EServer2ClientMessage.Snapshot, new SnapshotMessageHandler(sessionObjects.SnapshotPool, sessionObjects.UpdateLatestHandler, sessionObjects.TimeManager));
-            messageDispatcher.RegisterLater((int)EServer2ClientMessage.UdpId, new UdpIdMessageHandler());
-            messageDispatcher.RegisterImmediate((int)EServer2ClientMessage.Snapshot, new SnapshotSyncTimeHandler(sessionObjects.TimeManager));
-            messageDispatcher.RegisterLater((int)EServer2ClientMessage.FreeData, SimpleMessageManager.Instance);
-            messageDispatcher.RegisterLater((int)EServer2ClientMessage.Statistics, new StatisticsMessageHandler(_contexts));
+            messageDispatcher.RegisterLater((int) EServer2ClientMessage.Snapshot,
+                new SnapshotMessageHandler(sessionObjects.SnapshotPool, sessionObjects.UpdateLatestHandler,
+                    sessionObjects.TimeManager));
+            messageDispatcher.RegisterLater((int) EServer2ClientMessage.UdpId, new UdpIdMessageHandler());
+            messageDispatcher.RegisterImmediate((int) EServer2ClientMessage.Snapshot,
+                new SnapshotSyncTimeHandler(sessionObjects.TimeManager));
+            messageDispatcher.RegisterLater((int) EServer2ClientMessage.FreeData, SimpleMessageManager.Instance);
+            messageDispatcher.RegisterLater((int) EServer2ClientMessage.Statistics,
+                new StatisticsMessageHandler(_contexts));
             //messageDispatcher.RegisterLater((int)EServer2ClientMessage.Ping, new PingRespMessageHandler(_contexts));
-            messageDispatcher.RegisterLater((int)EServer2ClientMessage.DamageInfo, new DamageInfoMessageHandler(_contexts.player, _contexts.ui));
-            messageDispatcher.RegisterImmediate((int)EServer2ClientMessage.Ping, new PingRespMessageHandler(_contexts));
-            messageDispatcher.RegisterImmediate((int)EServer2ClientMessage.UpdateAck, new UpdateMessageAckMessageHandler(sessionObjects.UpdateLatestHandler));
-            messageDispatcher.RegisterLater((int)EServer2ClientMessage.DebugMessage, new ServerDebugMessageHandler(_contexts));
-            messageDispatcher.RegisterLater((int)EServer2ClientMessage.ClearScene, new ClearSceneMessageHandler(_contexts));
-            messageDispatcher.RegisterLater((int)EServer2ClientMessage.GameOver, new ClientGameOverMessageHandler());
-            messageDispatcher.RegisterLater((int)EServer2ClientMessage.HeartBeat, new ClientHeartBeatMessageHandler());
+            messageDispatcher.RegisterLater((int) EServer2ClientMessage.DamageInfo,
+                new DamageInfoMessageHandler(_contexts.player, _contexts.ui));
+            messageDispatcher.RegisterImmediate((int) EServer2ClientMessage.Ping,
+                new PingRespMessageHandler(_contexts));
+            messageDispatcher.RegisterImmediate((int) EServer2ClientMessage.UpdateAck,
+                new UpdateMessageAckMessageHandler(sessionObjects.UpdateLatestHandler));
+            messageDispatcher.RegisterLater((int) EServer2ClientMessage.DebugMessage,
+                new ServerDebugMessageHandler(_contexts));
+            messageDispatcher.RegisterLater((int) EServer2ClientMessage.ClearScene,
+                new ClearSceneMessageHandler(_contexts));
+            messageDispatcher.RegisterLater((int) EServer2ClientMessage.GameOver, new ClientGameOverMessageHandler());
+            messageDispatcher.RegisterLater((int) EServer2ClientMessage.HeartBeat, new ClientHeartBeatMessageHandler());
         }
 
         public void NetworkChannelOnMessageReceived(INetworkChannel networkChannel, int messageType, object messageBody)
         {
-            if(RegisterCommandHandler.canHandle(messageBody))
+            if (RegisterCommandHandler.canHandle(messageBody))
             {
                 RegisterCommandHandler.Handle(this, messageBody);
             }
             else
             {
-               
                 var messageDispatcher = _contexts.session.clientSessionObjects.MessageDispatcher;
                 messageDispatcher.SaveDispatch(networkChannel, messageType, messageBody);
             }
@@ -233,7 +250,7 @@ namespace App.Client.Console
 
         public void RegisterCommand(string command, string desc, string usage)
         {
-            if(AddCommand != null)
+            if (AddCommand != null)
             {
                 AddCommand(command, desc, usage);
             }
@@ -250,7 +267,7 @@ namespace App.Client.Console
                     if (channel != null)
                     {
                         var msg = GameOverMesssage.Allocate();
-                        channel.SendReliable((int)EClient2ServerMessage.GameOver, msg);
+                        channel.SendReliable((int) EClient2ServerMessage.GameOver, msg);
                         msg.ReleaseReference();
 
                         _logger.InfoFormat("Send GameOver Message to Server");
@@ -275,7 +292,7 @@ namespace App.Client.Console
                     {
                         var msg = DebugScriptInfo.Allocate();
                         msg.Info = info;
-                        channel.SendReliable((int)EClient2ServerMessage.DebugScriptInfo, msg);
+                        channel.SendReliable((int) EClient2ServerMessage.DebugScriptInfo, msg);
                         msg.ReleaseReference();
 
                         _logger.DebugFormat("Send Debug Script Message {0}", info);
@@ -286,12 +303,10 @@ namespace App.Client.Console
             {
                 _logger.Error("Fail to Send DebugScriptInfo", e);
             }
-           
         }
 
         public void OnDrawGizmos()
         {
-           
             _clientSessionStateMachine.OnDrawGizmos();
         }
 
@@ -307,22 +322,22 @@ namespace App.Client.Console
             {
                 var msg = DebugCommandMessage.Allocate();
                 msg.Command = message.Command;
-                if (message.Args != null && message.Command != DebugCommands.TestMap && message.Command != DebugCommands.ClientMove)
+                if (message.Args != null && message.Command != DebugCommands.TestMap &&
+                    message.Command != DebugCommands.ClientMove)
                 {
                     msg.Args.AddRange(message.Args);
                 }
-               
-                channel.SendReliable((int)EClient2ServerMessage.DebugCommand, msg);
+
+                channel.SendReliable((int) EClient2ServerMessage.DebugCommand, msg);
                 msg.ReleaseReference();
             }
-            return _clientDebugCommandHandler.OnDebugMessage(message,_clientSessionStateMachine);
+
+            return _clientDebugCommandHandler.OnDebugMessage(message, _clientSessionStateMachine);
         }
 
         public SessionStateMachine GetSessionStateMachine()
         {
             return _clientSessionStateMachine;
         }
-
-        
     }
 }

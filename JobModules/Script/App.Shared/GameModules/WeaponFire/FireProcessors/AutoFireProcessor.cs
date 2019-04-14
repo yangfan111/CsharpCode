@@ -24,12 +24,12 @@ namespace App.Shared.GameModules.Weapon.Behavior
             heldAgent.RunTimeComponent.BurstShootCount += 1;
             if (heldAgent.RunTimeComponent.BurstShootCount < config.BurstCount)
             {
-                heldAgent.RunTimeComponent.NextAttackTimer = (cmd.RenderTime + config.BurstAttackInnerInterval);
+                heldAgent.RunTimeComponent.NextAttackTimestamp = (cmd.RenderTime + config.BurstAttackInnerInterval);
                 EnableAutoFire(controller, true);
             }
             else
             {
-                heldAgent.RunTimeComponent.NextAttackTimer = (cmd.RenderTime + config.BurstAttackInterval);
+                heldAgent.RunTimeComponent.NextAttackTimestamp = (cmd.RenderTime + config.BurstAttackInterval);
                 heldAgent.RunTimeComponent.BurstShootCount = 0;
                 EnableAutoFire(controller, false);
             }

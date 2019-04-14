@@ -23,6 +23,7 @@ namespace App.Shared.GameModules.Player
         {
             playerEntity.stage.Value = EPlayerLoginStage.Running;
             playerEntity.isInitialized = true;
+            playerEntity.gamePlay.CoverInit = true;
             FreeRuleEventArgs args = (FreeRuleEventArgs)contexts.session.commonSession.FreeArgs;
             IGameRule rule = (IGameRule)args.Rule;
             rule.PlayerEnter(contexts, playerEntity);

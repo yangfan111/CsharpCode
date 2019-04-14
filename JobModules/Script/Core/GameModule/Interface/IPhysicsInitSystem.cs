@@ -1,6 +1,6 @@
 ﻿namespace Core.GameModule.Interface
 {
-    public interface IPhysicsInitSystem
+    public interface IPhysicsInitSystem:IUserSystem
     {
         void OnInit();
     }

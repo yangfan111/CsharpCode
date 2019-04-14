@@ -38,10 +38,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Entitas.VisualDebugging.Unity">
-      <HintPath>..\CommonLibs\Entitas.VisualDebugging.Unity.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -49,6 +45,9 @@
     <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="Entitas.VisualDebugging.Unity">
+      <HintPath>..\CommonLibs\Entitas.VisualDebugging.Unity.dll</HintPath>
+    </Reference>
     <Reference Include="Entitas">
       <HintPath>..\CommonLibs\Entitas.dll</HintPath>
     </Reference>
@@ -61,15 +60,13 @@
     <Reference Include="log4net">
       <HintPath>..\CommonLibs\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEditor">
-      <HintPath>..\ThirdParty\Unity\5_6\UnityEditor.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.dll</HintPath>
     </Reference>
     <Analyzer Include="../ThirdParty/RefCounterAnalyzer/RefCounterAnalyzer.dll">
       <HintPath>..\ThirdParty\RefCounterAnalyzer\RefCounterAnalyzer.dll</HintPath>
     </Analyzer>
+    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Animation\AnimatorPoseReplayer.cs" />
@@ -181,6 +178,7 @@
     <Compile Include="CharacterState\Posture\StateIdAdapter.cs" />
     <Compile Include="CharacterState\Posture\States\ClimbState.cs" />
     <Compile Include="CharacterState\Posture\States\DiveState.cs" />
+    <Compile Include="CharacterState\Posture\States\DyingTransitionState.cs" />
     <Compile Include="CharacterState\Posture\States\FreefallState.cs" />
     <Compile Include="CharacterState\Posture\States\JumpEndState.cs" />
     <Compile Include="CharacterState\Posture\States\JumpStartState.cs" />
@@ -218,6 +216,7 @@
     <Compile Include="Components\EComponentIds.cs" />
     <Compile Include="Components\EntityAdapterComponent.cs" />
     <Compile Include="Components\EntityKeyComponent.cs" />
+    <Compile Include="Components\FixedVector3.cs" />
     <Compile Include="Components\FlagCompensationComponent.cs" />
     <Compile Include="Components\FlagDestroyComponent.cs" />
     <Compile Include="Components\FlagImmutabilityComponent.cs" />
@@ -241,6 +240,9 @@
     <Compile Include="Configuration\ClientEffectFactoryConfig.cs" />
     <Compile Include="Configuration\ClipDropConfigManager.cs" />
     <Compile Include="Configuration\ConfigSet.cs" />
+    <Compile Include="Configuration\DropAreaConfigManager.cs" />
+    <Compile Include="Configuration\DropItemConfigManager.cs" />
+    <Compile Include="Configuration\DropPoolConfigManager.cs" />
     <Compile Include="Configuration\DynamicPredictionErrorCorrectionConfigManager.cs" />
     <Compile Include="Configuration\Equipment\BasisParser.cs" />
     <Compile Include="Configuration\Equipment\Combination.cs" />
@@ -322,6 +324,7 @@
     <Compile Include="Fsm\IFsmUpdate.cs" />
     <Compile Include="GameGlobal\Composition\AudioHitEffectData.cs" />
     <Compile Include="GameGlobal\Composition\GrenadeCacheData.cs" />
+    <Compile Include="GameGlobal\Composition\InterruptData.cs" />
     <Compile Include="GameGlobal\Composition\WeaponBagContainer.cs" />
     <Compile Include="GameGlobal\Composition\WeaponBagSlotData.cs" />
     <Compile Include="GameGlobal\GlobalConst.cs" />
@@ -336,13 +339,6 @@
     <Compile Include="GameHandler\GameEventComponent.cs" />
     <Compile Include="GameHandler\IGameEventHandler.cs" />
     <Compile Include="GameHandler\IGameStateUpdateHandler.cs" />
-    <Compile Include="GameInputFilter\IFilteredInput.cs" />
-    <Compile Include="GameInputFilter\IGameInputProcessor.cs" />
-    <Compile Include="GameInputFilter\IGameState.cs" />
-    <Compile Include="GameInputFilter\IGameStateProcessFactory.cs" />
-    <Compile Include="GameInputFilter\IStatePool.cs" />
-    <Compile Include="GameInputFilter\IStateProvider.cs" />
-    <Compile Include="GameInputFilter\IStateProviderPool.cs" />
     <Compile Include="GameModule\Common\CommoTickImmutabblitySystem.cs" />
     <Compile Include="GameModule\Common\CommonDestroySystem.cs" />
     <Compile Include="GameModule\Common\CommonLifeTimeSystem.cs" />
@@ -359,6 +355,7 @@
     <Compile Include="GameModule\Interface\IResourceLoadSystem.cs" />
     <Compile Include="GameModule\Interface\IUiSystem.cs" />
     <Compile Include="GameModule\Interface\IUserCmdExecuteSystem.cs" />
+    <Compile Include="GameModule\Interface\IUserSystem.cs" />
     <Compile Include="GameModule\Module\CompositeGameModule.cs" />
     <Compile Include="GameModule\Module\GameModule.cs" />
     <Compile Include="GameModule\Module\IGameModule.cs" />
@@ -408,6 +405,7 @@
     <Compile Include="IFactory\ISceneObjectEntityFactory.cs" />
     <Compile Include="IFactory\ISoundEntityFactory.cs" />
     <Compile Include="Interpolate\InterpolateUtility.cs" />
+    <Compile Include="OC\IOcclusionCullingController.cs" />
     <Compile Include="Playback\IInterpolatableComponent.cs" />
     <Compile Include="Playback\IInterpolationInfo.cs" />
     <Compile Include="Playback\IPlaybackComponent.cs" />
@@ -550,6 +548,8 @@
     <Compile Include="SyncLatest\SyncLatestManager.cs" />
     <Compile Include="ThreadUtils\Task.cs" />
     <Compile Include="Ui\IUiGroupController.cs" />
+    <Compile Include="Ui\Map\MapFixedVector3.cs" />
+    <Compile Include="Ui\Map\MapOrigin.cs" />
     <Compile Include="Ui\UiGroup.cs" />
     <Compile Include="UpdateLatest\IUpdateComponent.cs" />
     <Compile Include="UpdateLatest\IUpdateLatestHandler.cs" />
@@ -558,6 +558,7 @@
     <Compile Include="UpdateLatest\UpdateLatestHead.cs" />
     <Compile Include="UpdateLatest\UpdateLatestManager.cs" />
     <Compile Include="UpdateLatest\UpdateLatestPacakge.cs" />
+    <Compile Include="Utils\BackroundloadSettings.cs" />
     <Compile Include="Utils\BitUtility.cs" />
     <Compile Include="Utils\DumpEntatis.cs" />
     <Compile Include="Utils\IEcsDebugHelper.cs" />

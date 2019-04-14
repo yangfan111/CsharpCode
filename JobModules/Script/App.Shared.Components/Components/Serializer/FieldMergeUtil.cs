@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using App.Shared.Components.Player;
+using Core;
 using Core.Animation;
 using Core.CharacterState;
 using Core.CharacterState.Posture;
+using Core.Components;
 using Core.EntityComponent;
 using Core.Event;
 using Core.UpdateLatest;
@@ -115,6 +117,14 @@ namespace App.Shared.Components.Serializer
             return patchvalue;
         }
 
+        public static FixedVector3 Merge(FixedVector3 basevalue, FixedVector3 patchvalue)
+        {
+            return patchvalue;
+        }
+        public static InterruptData Merge(InterruptData basevalue, InterruptData patchvalue)
+        {
+            return patchvalue;
+        }
         public static Quaternion Merge(Quaternion basevalue, Quaternion patchvalue)
         {
             return patchvalue;
@@ -145,5 +155,7 @@ namespace App.Shared.Components.Serializer
             basevalue.CopyFrom(patchvalue);
             return basevalue;
         }
+
+      
     }
 }

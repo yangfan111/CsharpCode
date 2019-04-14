@@ -304,7 +304,7 @@ ComponentTypeMap(ComponentsIdList,ComponentsIdNameMap) ::= <<
 
 
 
-SerializerManager(NameSpace,ComponentsIdList,ComponentsIdNameMap,ComponentsIdSerializerNameMap,ComponentsIdListMaxId) ::= <<
+SerializerManager(NameSpace,ComponentsIdList,ComponentsIdNameMap,ComponentsIdSerializerNameMap,ComponentsIdListMaxId,Hash) ::= <<
 using System;
 using System.Collections.Generic;
 using Core.EntityComponent;
@@ -321,6 +321,7 @@ namespace <NameSpace>
         private const int MaxId = <ComponentsIdListMaxId>;
         private static INetworkObjectSerializer[]  serializerMap= new INetworkObjectSerializer[MaxId] ;
         private static Type[] componentTypeMap = new Type[MaxId];
+        public static String HashMd5 = "<Hash>";
         static ComponentSerializerManager()
         {
            

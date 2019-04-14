@@ -73,8 +73,31 @@ namespace Core.Configuration
                 _config.ObserveConfig.ObserveDistance = 2;
             }
             
+            if (_config.ViewConfig == null)
+            {
+                _config.ViewConfig = new ViewCameraConfig()
+                {
+                    DefaltFovTransitionTime = 100,
+                    OnHoldBreathTransitionTime = 100,
+                    OffHoldBreathTransitionTime = 100
+                };
+            }
+
+            if (_config.SpecialZoneConfig == null)
+            {
+                _config.SpecialZoneConfig = new SpecialZoneCameraConfig()
+                {
+                    FloorTestHeight = 4f,
+                    FocusPositionLerpTime = 200f,
+                    OffsetLengthInBuilding = 1.5f,
+                    OffsetLengthWhenClimbing = 1.2f,
+                    ArchorOffsetLengthWhenClimbing = 1.3f
+                };
+            }
+            
             DefaultTranstionTime = _config.DefaultTransitionTime;
             PostTransitionTime = _config.PostTransitionTime;
+
         }
 
         public int GetTransitionTime(SubCameraMotorType type, SubCameraMotorState state)

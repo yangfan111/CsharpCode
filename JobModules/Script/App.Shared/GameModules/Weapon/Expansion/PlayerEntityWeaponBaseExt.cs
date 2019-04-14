@@ -5,6 +5,7 @@ using Core;
 using Core.EntityComponent;
 using Core.Utils;
 using System.Collections.Generic;
+using App.Shared.Components.Weapon;
 using XmlConfig;
 
 namespace App.Shared
@@ -26,10 +27,9 @@ namespace App.Shared
             //    GameModuleManagement.Dispose();
             GameModuleManagement.ForceAllocate(player.entityKey.Value.EntityId, (PlayerWeaponController controller) =>
               {
-                  var greandeHelper     = new GrenadeCacheHelper(() => { return FindGrenadeCacheData(player); }, () => { return FindGrenadeWeaponEntity(player); }, greandeIds, contexts.session.commonSession.FreeArgs);
-                  var weaponPlayerAgent = new WeaponPlayerComponentsAgent(player);
-                  controller.Initialize(player.entityKey.Value, weaponPlayerAgent, greandeHelper);
-
+                  var greandeHelper     = new GrenadeCacheHandler(() => { return FindGrenadeCacheData(player); }, () => { return FindGrenadeWeaponEntity(player); }, greandeIds, contexts.session.commonSession.FreeArgs);
+                  controller.Initialize(player, greandeHelper);
+                  
                   //controller.SetWeaponContext(contexts.weapon);
 
                   // controller.SetConfigManager(contexts.session.commonSession.PlayerWeaponResourceConfigManager);
@@ -153,25 +153,6 @@ namespace App.Shared
             return player.playerWeaponBagSet;
         }
 
-        /// <summary>
-        /// 获取后坐力
-        /// </summary>
-        /// <param name="player"></param>
-        /// <returns></returns>
-        private static PlayerWeaponUpdateComponent FindOverrideBagComponent(this PlayerEntity player)
-        {
-            return player.playerWeaponUpdate;
-        }
-
-        /// <summary>
-        /// 获取本地缓存
-        /// </summary>
-        /// <param name="player"></param>
-        /// <returns></returns>
-        private static PlayerWeaponAuxiliaryComponent FindWeaponAuxiliaryComponent(this PlayerEntity player)
-        {
-            return player.playerWeaponAuxiliary;
-        }
 
         /// <summary>
         /// 获取手雷信息
@@ -190,10 +171,6 @@ namespace App.Shared
             return player.grenadeCacheData;
         }
 
-        private static PlayerWeaponCustomizeComponent FindCustomizeData(this PlayerEntity player)
-        {
-            return player.playerWeaponCustomize;
-        }
         private static WeaponEntity FindGrenadeWeaponEntity(this PlayerEntity player)
         {
             return WeaponEntityFactory.GetWeaponEntity(player.playerWeaponCustomize.GrenadeConstWeaponKey);

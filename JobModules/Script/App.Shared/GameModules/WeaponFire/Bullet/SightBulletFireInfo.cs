@@ -1,4 +1,5 @@
-﻿using Core.Utils;
+﻿using Core.Components;
+using Core.Utils;
 using UnityEngine;
 
 namespace App.Shared.GameModules.Weapon.Behavior
@@ -23,10 +24,10 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
         public override Vector3 GetFireViewPosition(PlayerWeaponController controller)
         {
-            var gunSightFireViewPosition = controller.RelatedFirePos.SightValid ? controller.RelatedFirePos.SightPosition : (Vector3?)null;
-            if (gunSightFireViewPosition.HasValue)
+           
+            if (controller.RelatedFirePos.SightValid )
             {
-                return gunSightFireViewPosition.Value;
+                return controller.RelatedFirePos.SightPosition.ShiftedVector3();
             }
             else
             {

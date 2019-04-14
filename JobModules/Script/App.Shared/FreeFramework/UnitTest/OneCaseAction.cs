@@ -17,9 +17,21 @@ namespace App.Shared.FreeFramework.UnitTest
 
         public IGameAction order;
         public IGameAction frame;
+        public IGameAction clean;
+        public IGameAction prepare;
+
+        private bool initialed;
 
         public override void DoAction(IEventArgs args)
         {
+            if (!initialed)
+            {
+                if (prepare != null)
+                {
+                    prepare.Act(args);
+                }
+                initialed = true;
+            }
             FreeLog.SetTrigger(trigger);
             order.Act(args);
             if (frame != null)
@@ -32,6 +44,11 @@ namespace App.Shared.FreeFramework.UnitTest
                 {
                     ((TestCaseMultiAction)frame).Record(args);
                 }
+
+                if (clean != null)
+                {
+                    clean.Act(args);
+                }
             }
         }
 
@@ -42,6 +59,7 @@ namespace App.Shared.FreeFramework.UnitTest
             {
                 frame.Act(args);
             }
+            initialed = false;
         }
     }
 }

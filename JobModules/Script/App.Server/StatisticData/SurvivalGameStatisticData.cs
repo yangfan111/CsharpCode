@@ -83,33 +83,11 @@ namespace App.Server.StatisticData
             gameOverPlayer.Statistics[(int) EStatisticsID.GameCount] = playerInfo.StatisticsData.IsRunaway ? 0 : 1;
             gameOverPlayer.Statistics[(int) EStatisticsID.CritKillCount] = playerInfo.StatisticsData.CritKillCount;
             gameOverPlayer.Statistics[(int) EStatisticsID.GetFirstBlood] = playerInfo.StatisticsData.GetFirstBlood ? 1 : 0;
+            gameOverPlayer.Statistics[(int) EStatisticsID.TeamCount] = _dictTeams.Count;
             if(((PlayerEntity) playerInfo.PlayerEntity).gamePlay.LifeState != (int) EPlayerLifeState.Alive)
             {
                 playerInfo.StatisticsData.DeadTime += (int) System.DateTime.Now.Ticks / 10000 - playerInfo.StatisticsData.LastDeadTime;
             }
-            IEventArgs args = freeArgs as IEventArgs;
-            if (args != null)
-            {
-                switch (args.GameContext.session.commonSession.RoomInfo.ModeId)
-                {
-                    case GameRules.DoubleSurvival:
-                    case GameRules.LadderDoubleSurvival:
-                        gameOverPlayer.Statistics[(int) EStatisticsID.TeammateCount] = 2;
-                        break;
-                    case GameRules.FourGroupSurvival:
-                    case GameRules.LadderFourGroupSurvival:
-                        gameOverPlayer.Statistics[(int) EStatisticsID.TeammateCount] = 4;
-                        break;
-                    case GameRules.FiveGroupSurvival:
-                    case GameRules.LadderFiveGroupSurvival:
-                        gameOverPlayer.Statistics[(int) EStatisticsID.TeammateCount] = 5;
-                        break;
-                    default:
-                        gameOverPlayer.Statistics[(int) EStatisticsID.TeammateCount] = 1;
-                        break;
-                }
-            }
-
             gameOverPlayer.Statistics[(int) EStatisticsID.DeadTime] = playerInfo.StatisticsData.DeadTime;
             AddHonorData(gameOverPlayer, playerInfo);
             PlayerReportTrigger(gameOverPlayer, playerInfo, freeArgs);

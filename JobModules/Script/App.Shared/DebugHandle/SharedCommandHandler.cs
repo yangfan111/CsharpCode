@@ -24,6 +24,7 @@ using Utils.SettingManager;
 using Utils.Singleton;
 using QualityLevel = Utils.SettingManager.QualityLevel;
 using App.Shared.GameModules.Weapon;
+using Core.Components;
 using UnityEngine.Profiling;
 
 namespace App.Shared.DebugHandle
@@ -221,7 +222,7 @@ namespace App.Shared.DebugHandle
             switch (message.Command)
             {
                 case DebugCommands.ClientMove:
-                    var pos = new Vector3(0, 1000, 0);
+                    var pos = new Vector3(0, 1000, 0).ShiftedPosition();
                     var yaw = 0f;
                     switch (message.Args.Length)
                     {
@@ -262,6 +263,7 @@ namespace App.Shared.DebugHandle
                             pos.z = z;
                         }
                     }
+                    pos = pos.ShiftedPosition();
                     var ray = new Ray(pos, Vector3.down);
                     RaycastHit hit;
                     if (Physics.Raycast(ray, out hit))
@@ -280,6 +282,11 @@ namespace App.Shared.DebugHandle
                     player.gamePlay.CurHp = 0;
                     player.gamePlay.ChangeLifeState(Components.Player.EPlayerLifeState.Dead, currentTime.CurrentTime);
                     break;
+                
+                case DebugCommands.DyingMe:
+                    player.gamePlay.ChangeLifeState(Components.Player.EPlayerLifeState.Dying, currentTime.CurrentTime);
+                    break;
+                
                 case DebugCommands.ShowAniInfo:
                     result = string.Format("{0}\n{1}", player.state, player.thirdPersonAnimator.DebugJumpInfo());       
                     break;

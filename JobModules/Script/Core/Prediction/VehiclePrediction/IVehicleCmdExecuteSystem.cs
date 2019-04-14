@@ -1,4 +1,5 @@
-﻿using Core.Prediction.VehiclePrediction.Cmd;
+﻿using Core.GameModule.Interface;
+using Core.Prediction.VehiclePrediction.Cmd;
 using Entitas;
 
 namespace Core.Prediction.VehiclePrediction
@@ -9,7 +10,7 @@ namespace Core.Prediction.VehiclePrediction
     /// - 调用插件Update
     /// - 从底层同步到网络
     /// </summary>
-    public interface IVehicleCmdExecuteSystem
+    public interface IVehicleCmdExecuteSystem:IUserSystem
     {
         bool IsEntityValid(Entity entity);
         void UpdateSimulationTime(int simulationTime);

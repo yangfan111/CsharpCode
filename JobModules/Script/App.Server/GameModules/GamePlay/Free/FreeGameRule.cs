@@ -22,6 +22,8 @@ using Utils.Singleton;
 using App.Shared.GameModules.Player;
 using Core.Free;
 using App.Shared.FreeFramework.Free.player;
+using App.Shared.FreeFramework.framework.buf;
+using App.Shared.FreeFramework.framework.unit;
 
 namespace App.Server.GameModules.GamePlay
 {
@@ -94,6 +96,9 @@ namespace App.Server.GameModules.GamePlay
         private void AddCommonTrigger()
         {
             args.Triggers.AddTrigger(FreeTriggerConstant.PRELOAD_RESOURCE, new PlayerPreloadAction());
+
+            PlayerEffectBuf.RegisterEffectBuf(new EffectBuf(PlayerRigidityAction.RigidityEffect, EffectType.SlowDown));
+            args.Triggers.AddTrigger(FreeTriggerConstant.DAMAGE, new PlayerRigidityAction());
         }
 
         public bool GameOver
@@ -267,6 +272,7 @@ namespace App.Server.GameModules.GamePlay
             {
                 FreeData freeData = (FreeData)players[i].freeData.FreeData;
                 freeData.Bufs.Frame(args);
+                freeData.EffectBufs.Update(args);
                 if (!args.Triggers.IsEmpty(FreeTriggerConstant.FRAME_PLAYER))
                 {
                     args.Trigger(FreeTriggerConstant.FRAME_PLAYER, new TempUnit("player", freeData));

@@ -28,7 +28,6 @@ namespace Core.GameModule.System
         public virtual void OnLoadResources(IUnityAssetManager assetManager)
         {
             AssetManager = assetManager;
-            
             Execute();
         }
         public abstract void SingleExecute(T entity);

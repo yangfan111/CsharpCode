@@ -64,7 +64,7 @@ namespace App.Client.GameModules.GamePlay.Free.Entity
                         weaponController.ReplaceWeaponToSlot( (EWeaponSlotType)data.Ins[1], scanVal);
                         if (playerEntity.stateInterface.State.CanDraw()&& weaponController.HeldSlotType == EWeaponSlotType.None)
                         { 
-                            weaponController.TryArmWeapon( (EWeaponSlotType)data.Ins[1]);
+                            weaponController.TryArmWeaponImmediately( (EWeaponSlotType)data.Ins[1]);
                         }
                     }
                 }
@@ -112,7 +112,7 @@ namespace App.Client.GameModules.GamePlay.Free.Entity
                     else
                     {
                         playerEntity.stateInterface.State.UseProps(ani);
-                        weaponController.ForceUnArmHeldWeapon();
+                        weaponController.UnArmWeapon(false);
                         playerEntity.autoMoveInterface.PlayerAutoMove.StopAutoMove();
                     }
                 }

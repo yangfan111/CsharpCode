@@ -4,6 +4,8 @@ using UnityEngine;
 using App.Shared.Configuration;
 using App.Shared.Terrains;
 using Assets.Sources.Free.Effect;
+using Core.Components;
+using Core.Ui.Map;
 using Core.Utils;
 using Utils.Configuration;
 using Utils.Singleton;
@@ -70,7 +72,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
                 if (hited)
                 {
-                    _curTerrainHeight = hitInfo.point.y - TerrainCommonData.leftMinPos.y;
+                    _curTerrainHeight = hitInfo.point.y - MapOrigin.Origin.y;
                 }
                 else
                 {
@@ -98,7 +100,8 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                float height = contexts.player.flagSelfEntity.characterContoller.Value.transform.position.y - TerrainCommonData.leftMinPos.y;
+                var pos = contexts.player.flagSelfEntity.characterContoller.Value.transform.position;
+                float height = new MapFixedVector3(WorldOrigin.WorldPosition(pos)).ShiftedUIVector3().y;
                 if (_DEBUGTRACE)
                     Debug.LogFormat("CurHeight.....{0}", height);
                 return height;
@@ -112,7 +115,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 float height = 0;
                 if (SharedConfig.IsOffline)
                 {
-                    height = SingletonManager.Get<MapConfigManager>().SceneParameters.PlayerBirthPosition.y - TerrainCommonData.leftMinPos.y;
+                    height = SingletonManager.Get<MapConfigManager>().SceneParameters.PlayerBirthPosition.y - MapOrigin.Origin.y;
                 }
                 else
                 {
@@ -122,7 +125,9 @@ namespace App.Client.GameModules.Ui.UiAdapter
                     }
                     if (null != _plane)
                     {
-                        height = -_plane.model3D.y - TerrainCommonData.leftMinPos.y;
+//                        height = -_plane.model3D.y - MapOrigin.Origin.y;
+                        height = new MapFixedVector3(WorldOrigin.WorldPosition(new Vector3(_plane.model3D.x, _plane.model3D.y,
+                            _plane.model3D.z))).ShiftedUIVector3().y;
                     }
                 }
                 

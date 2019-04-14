@@ -1,30 +1,34 @@
 ﻿using Core;
 using Core.Prediction.UserPrediction.Cmd;
+using System.Collections.Generic;
 
 namespace App.Shared.GameMode
 {
-    /// <summary>
-    /// Defines the <see cref="PickupDropHandlerAdapter" />
-    /// </summary>
-
-    /// <summary>
-    /// Defines the <see cref="SurvivalPickupDropHandler" />
-    /// </summary>
     public class SurvivalPickupDropHandler : PickupDropHandlerAdapter
     {
  
-        public SurvivalPickupDropHandler(Contexts context) : base(context)
+        public SurvivalPickupDropHandler(Contexts context,int modeId) : base(context,modeId)
         {
         }
 
-        public override void Drop(PlayerEntity player, EWeaponSlotType slot, IUserCmd cmd)
+        protected override void DoDropGrenade(PlayerEntity playerEntity, EWeaponSlotType slot, IUserCmd cmd)
         {
             if (slot == EWeaponSlotType.ThrowingWeapon)
             {
                 cmd.IsThrowing = true;
+                return;
             }
         }
-        //使用服务器操作
+
+        public override void Drop(PlayerEntity player, EWeaponSlotType slot, IUserCmd cmd)
+        {
+            
+        }
+
+        public override void AutoPickupWeapon(PlayerEntity player, List<int> sceneKeys)
+        {
+        }
+//使用服务器操作
             //var player = _playerContext.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(playerEntityId, (short)EEntityType.Player));
             //player.WeaponController().HeldWeaponAgent.SetFlagWaitDestroy();
            

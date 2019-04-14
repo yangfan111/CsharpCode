@@ -1,15 +1,8 @@
-using Core.GameModule.Interface;
 using Core.Utils;
 using Entitas;
-using System;
 using App.Client.GameModules.Player;
 using App.Shared.GameModules.Player;
 using App.Shared.Player;
-using UnityEngine;
-using Core.Configuration;
-using Core;
-using Utils.Appearance;
-using WeaponConfigNs;
 
 namespace App.Client.GameModules.ClientPlayer
 {
@@ -63,7 +56,7 @@ namespace App.Client.GameModules.ClientPlayer
                                 }
                                 else
                                 {
-                                    playerSkyMove.Parachute.transform.position = playerSkyMove.Position;
+                                    playerSkyMove.Parachute.transform.position = playerSkyMove.Position.ShiftedVector3();
                                     playerSkyMove.Parachute.transform.rotation = playerSkyMove.Rotation;
                                 }
 

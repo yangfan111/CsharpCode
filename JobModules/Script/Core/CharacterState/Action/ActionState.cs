@@ -433,11 +433,11 @@ namespace Core.CharacterState.Action
                     
                     command.Handled = true;
                     
-                    TurnOnUpperBodyOverlay(addOutput);
+                    //TurnOnUpperBodyOverlay(addOutput);
                     
                     return true;
                 },
-                null, (int) ActionStateId.MeleeAttack, null, 0, new[] { FsmInput.LightMeleeAttackOne, FsmInput.MeleeSpecialAttack, FsmInput.LightMeleeAttackTwo });
+                null, (int) ActionStateId.MeleeAttack, (normalizedTime, addOutput) => { LerpOpenUpperBodyLayer(addOutput, normalizedTime); }, (int)SingletonManager.Get<CharacterStateConfigManager>().AttackTransitionTime, new[] { FsmInput.LightMeleeAttackOne, FsmInput.MeleeSpecialAttack, FsmInput.LightMeleeAttackTwo });
             
             #endregion
             

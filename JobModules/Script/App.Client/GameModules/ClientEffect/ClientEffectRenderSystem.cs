@@ -38,8 +38,12 @@ namespace App.Client.GameModules.ClientEffect
                     var audioEfcType = (AudioClientEffectType) entity.audio.AudioClientEffectType;
                     switch (audioEfcType)
                     {
-                        case AudioClientEffectType.BulletHit:
-                            GameAudioMedia.PlayBulletHitEnvironmentAudio((AudioGrp_HitMatType)entity.audio.AudioClientEffectArg,entity.position.Value);
+                        case AudioClientEffectType.BulletHit: 
+                            GameAudioMedia.PlayHitEnvironmentAudio((AudioGrp_HitMatType)entity.audio.AudioClientEffectArg1,entity.position.Value);
+                            break;
+                        case AudioClientEffectType.BulletDrop:
+                            GameAudioMedia.PlayBulletDropAudio(entity.audio.AudioClientEffectArg1,
+                                (AudioGrp_FootMatType)entity.audio.AudioClientEffectArg2,entity.position.Value);
                             break;
                     }
                 }

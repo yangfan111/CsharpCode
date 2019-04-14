@@ -38,7 +38,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -69,16 +68,12 @@
     <Reference Include="UnityEngine">
       <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEditor">
-      <HintPath>..\ThirdParty\Unity\5_6\UnityEditor.dll</HintPath>
-    </Reference>
+    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssetConfig.cs" />
     <Compile Include="Audio\AudioObjectGenerator.cs" />
-    <Compile Include="Audio\AudioPlayerComponentsAgent.cs" />
     <Compile Include="Audio\AudioUtil.cs" />
-    <Compile Include="Audio\PlayerAudioComponentsReference.cs" />
     <Compile Include="Audio\PlayerAudioController.cs" />
     <Compile Include="Audio\PlayerEntityAudioExt.cs" />
     <Compile Include="Audio\WiseIntegration\AudioPluginsDriver.cs" />
@@ -169,6 +164,7 @@
     <Compile Include="FreeFramework\Free\Weapon\WeaponSkillFactory.cs" />
     <Compile Include="FreeFramework\Free\condition\AndCondition.cs" />
     <Compile Include="FreeFramework\Free\condition\HasWeaponCondition.cs" />
+    <Compile Include="FreeFramework\Free\condition\PlayerAngleDistanceCondition.cs" />
     <Compile Include="FreeFramework\Free\condition\PlayerRaycastCondition.cs" />
     <Compile Include="FreeFramework\Free\condition\RegionCondition.cs" />
     <Compile Include="FreeFramework\Free\condition\TestMoveCondition.cs" />
@@ -182,7 +178,9 @@
     <Compile Include="FreeFramework\Free\player\PlayerHonorAction.cs" />
     <Compile Include="FreeFramework\Free\player\PlayerObserveAction.cs" />
     <Compile Include="FreeFramework\Free\player\PlayerPreloadAction.cs" />
+    <Compile Include="FreeFramework\Free\player\PlayerRigidityAction.cs" />
     <Compile Include="FreeFramework\Free\player\PlayerStateTimer.cs" />
+    <Compile Include="FreeFramework\Free\player\PlayerVisibilityAction.cs" />
     <Compile Include="FreeFramework\Sharpen\AList.cs" />
     <Compile Include="FreeFramework\Sharpen\AbstractCollection.cs" />
     <Compile Include="FreeFramework\Sharpen\AbstractList.cs" />
@@ -452,8 +450,11 @@
     <Compile Include="FreeFramework\framework\ai\player\PlayerInterceptUtil.cs" />
     <Compile Include="FreeFramework\framework\ai\player\PlayerKeyCmdHandler.cs" />
     <Compile Include="FreeFramework\framework\ai\player\PlayerMoveCmdHandler.cs" />
+    <Compile Include="FreeFramework\framework\buf\AddEffectBufAction.cs" />
+    <Compile Include="FreeFramework\framework\buf\DefineEffectBufAction.cs" />
     <Compile Include="FreeFramework\framework\buf\DefinePlayerBufAction.cs" />
     <Compile Include="FreeFramework\framework\buf\PlayerBuf.cs" />
+    <Compile Include="FreeFramework\framework\buf\PlayerEffectBuf.cs" />
     <Compile Include="FreeFramework\framework\camera\CameraFollowAction.cs" />
     <Compile Include="FreeFramework\framework\camera\CameraResetAction.cs" />
     <Compile Include="FreeFramework\framework\component\ComponentAction.cs" />
@@ -504,6 +505,7 @@
     <Compile Include="FreeFramework\framework\map\position\IMapRegion.cs" />
     <Compile Include="FreeFramework\framework\map\position\IPosSelector.cs" />
     <Compile Include="FreeFramework\framework\map\position\MapCircleRegion.cs" />
+    <Compile Include="FreeFramework\framework\map\position\MapPointRegion.cs" />
     <Compile Include="FreeFramework\framework\map\position\PosAdjustSelector.cs" />
     <Compile Include="FreeFramework\framework\map\position\PosAssignSelector.cs" />
     <Compile Include="FreeFramework\framework\map\position\PosDirectionSelector.cs" />
@@ -738,17 +740,6 @@
     <Compile Include="GameContexts\ThrowingGameContext.cs" />
     <Compile Include="GameContexts\VehicleGameContext.cs" />
     <Compile Include="GameContexts\WeaponGameContext.cs" />
-    <Compile Include="GameInputFilter\DummyFilteredInput.cs" />
-    <Compile Include="GameInputFilter\FilteredInput.cs" />
-    <Compile Include="GameInputFilter\GameInputProcessor.cs" />
-    <Compile Include="GameInputFilter\GameState.cs" />
-    <Compile Include="GameInputFilter\GameStateProcessFactory.cs" />
-    <Compile Include="GameInputFilter\PlayerStateAdapter..cs" />
-    <Compile Include="GameInputFilter\PlayerStateMatrix.cs" />
-    <Compile Include="GameInputFilter\StatePool.cs" />
-    <Compile Include="GameInputFilter\StateProvider.cs" />
-    <Compile Include="GameInputFilter\StateProviderPool.cs" />
-    <Compile Include="GameInputFilter\UserCommandMapper.cs" />
     <Compile Include="GameMode\GameCommonModeController.cs" />
     <Compile Include="GameMode\GameModeControllerBase.cs" />
     <Compile Include="GameMode\GameSurvivalModeController.cs" />
@@ -776,11 +767,11 @@
     <Compile Include="GameModules\Bullet\IDamageInfoCollector.cs" />
     <Compile Include="GameModules\Bullet\IPlayerDamage.cs" />
     <Compile Include="GameModules\Bullet\PlayerDamageInfo.cs" />
+    <Compile Include="GameModules\Camera\AbstractCameraUpdateSystem.cs" />
     <Compile Include="GameModules\Camera\CameraPostUpdateSystem.cs" />
     <Compile Include="GameModules\Camera\CameraPreUpdateSystem.cs" />
     <Compile Include="GameModules\Camera\CameraUpdateArchorSystem.cs" />
     <Compile Include="GameModules\Camera\CameraUpdateSystem.cs" />
-    <Compile Include="GameModules\Camera\ClientCameraPreUpdateSystem.cs" />
     <Compile Include="GameModules\Camera\Motor\AbstractCameraMotor.cs" />
     <Compile Include="GameModules\Camera\Motor\CameraActionManager.cs" />
     <Compile Include="GameModules\Camera\Motor\Free\FreeOffMotor.cs" />
@@ -819,6 +810,7 @@
     <Compile Include="GameModules\Configuration\ConfigurationRefreshModule.cs" />
     <Compile Include="GameModules\Configuration\DefaultConfigInitSystem.cs" />
     <Compile Include="GameModules\Configuration\ISubResourceLoadSystem.cs" />
+    <Compile Include="GameModules\Configuration\MapConfigInitModule.cs" />
     <Compile Include="GameModules\Configuration\SceneConfigManager.cs" />
     <Compile Include="GameModules\Configuration\SubResourceConfigurationInitModule.cs" />
     <Compile Include="GameModules\Configuration\SubResourceLoadSystem.cs" />
@@ -827,26 +819,22 @@
     <Compile Include="GameModules\GamePlay\ObserveSystem.cs" />
     <Compile Include="GameModules\GamePlay\PlayerOnPlaneSystem.cs" />
     <Compile Include="GameModules\GamePlay\PubgRuleModule.cs" />
-    <Compile Include="GameModules\GamePlay\SimpleTest\SimpleLoadBulletSystem.cs" />
     <Compile Include="GameModules\GamePlay\SimpleTest\SimplePlayerLifeSystem.cs" />
     <Compile Include="GameModules\HitBox\ClientPlayerHitBoxContext.cs" />
     <Compile Include="GameModules\HitBox\HitBoxComponentUtility.cs" />
     <Compile Include="GameModules\HitBox\HitBoxEntityManager.cs" />
     <Compile Include="GameModules\HitBox\ServerPlayerHitBoxContext.cs" />
     <Compile Include="GameModules\HitBox\VehicleHitBoxContext.cs" />
-    <Compile Include="GameModules\Player\Actions\ClimbPackage\ClimbUp1M.cs" />
-    <Compile Include="GameModules\Player\Actions\ClimbPackage\ClimbUp2M.cs" />
-    <Compile Include="GameModules\Player\Actions\ClimbPackage\ClimbUp50Cm.cs" />
+    <Compile Include="GameModules\Player\Actions\ClimbPackage\ClimbUp.cs" />
     <Compile Include="GameModules\Player\Actions\ClimbUpCollisionTest.cs" />
     <Compile Include="GameModules\Player\Actions\GenericAction.cs" />
     <Compile Include="GameModules\Player\Actions\IAction.cs" />
     <Compile Include="GameModules\Player\Actions\PlayerClimbActionSystem.cs" />
     <Compile Include="GameModules\Player\Actions\PlayerMoveByRootMotionSystem.cs" />
     <Compile Include="GameModules\Player\Actions\ServerMoveByRootMotionSystem.cs" />
-    <Compile Include="GameModules\Player\Actions\VaultPackage\VaultUp1M.cs" />
-    <Compile Include="GameModules\Player\Actions\VaultPackage\VaultUp2M.cs" />
-    <Compile Include="GameModules\Player\Actions\VaultPackage\VaultUp50Cm.cs" />
+    <Compile Include="GameModules\Player\Actions\VaultPackage\VaultUp.cs" />
     <Compile Include="GameModules\Player\Animation\AnimationClipNameMatcher.cs" />
+    <Compile Include="GameModules\Player\Animation\AnimationHelper.cs" />
     <Compile Include="GameModules\Player\Animation\AnimationMonitor.cs" />
     <Compile Include="GameModules\Player\Appearance\AnimationEvent\AddMagazine.cs" />
     <Compile Include="GameModules\Player\Appearance\AnimationEvent\AddProp.cs" />
@@ -918,7 +906,6 @@
     <Compile Include="GameModules\Player\Oxygen\OxygenEnergy.cs" />
     <Compile Include="GameModules\Player\Oxygen\PlayerOxygenEnergySystem.cs" />
     <Compile Include="GameModules\Player\Oxygen\SightEnergy.cs" />
-    <Compile Include="GameModules\Player\PlayerActionInterruptSystem.cs" />
     <Compile Include="GameModules\Player\PlayerAttackSystem.cs" />
     <Compile Include="GameModules\Player\PlayerAvatarSystem.cs" />
     <Compile Include="GameModules\Player\PlayerBagSwitchSystem.cs" />
@@ -939,6 +926,7 @@
     <Compile Include="GameModules\Player\PlayerFallDamageSystem.cs" />
     <Compile Include="GameModules\Player\PlayerGrenadeInventorySyncSystem.cs" />
     <Compile Include="GameModules\Player\PlayerHoldBreathSystem.cs" />
+    <Compile Include="GameModules\Player\PlayerInterruptUpdateSystem.cs" />
     <Compile Include="GameModules\Player\PlayerMoveUtility.cs" />
     <Compile Include="GameModules\Player\PlayerResourceLoadSystem.cs" />
     <Compile Include="GameModules\Player\PlayerSaveSystem.cs" />
@@ -979,6 +967,22 @@
     <Compile Include="GameModules\Player\Robot\SharedVariables\SharedVariables.cs" />
     <Compile Include="GameModules\Player\Robot\Utility\RobotUtility.cs" />
     <Compile Include="GameModules\Player\ServerPlayerSkyMoveStateUpdateSystem.cs" />
+    <Compile Include="GameModules\Player\StateInteract\PlayerEntityStateInteractBaseExt.cs" />
+    <Compile Include="GameModules\Player\StateInteract\PlayerStateCollector.cs" />
+    <Compile Include="GameModules\Player\StateInteract\PlayerStateInteractController.cs" />
+    <Compile Include="GameModules\Player\StateInteract\PlayerStateUtil.cs" />
+    <Compile Include="GameModules\Player\StateInteract\StateFiltedInput\EmptyFilteredInput.cs" />
+    <Compile Include="GameModules\Player\StateInteract\StateFiltedInput\InputBlockGroup.cs" />
+    <Compile Include="GameModules\Player\StateInteract\StateFiltedInput\PlayerStateCollectorPool.cs" />
+    <Compile Include="GameModules\Player\StateInteract\StateFiltedInput\PlayerStateFiltedInputMgr.cs" />
+    <Compile Include="GameModules\Player\StateInteract\StateFiltedInput\PlayerStateInputData.cs" />
+    <Compile Include="GameModules\Player\StateInteract\StateFiltedInput\PlayerStateInputsDataMap.cs" />
+    <Compile Include="GameModules\Player\StateInteract\StateFiltedInput\UserCmdInputConverter.cs" />
+    <Compile Include="GameModules\Player\StateInteract\StateFiltedInput\ValuableFilteredInput.cs" />
+    <Compile Include="GameModules\Player\StateInteract\StateInterrupt\InterruptEmitter.cs" />
+    <Compile Include="GameModules\Player\StateInteract\StateInterrupt\InterruptEventHandler.cs" />
+    <Compile Include="GameModules\Player\StateInteract\StateInterrupt\PlayerStateRuntimeInterrupter.cs" />
+    <Compile Include="GameModules\Player\StateInteract\todestroy.cs" />
     <Compile Include="GameModules\Preparation\InitMapIdSystem.cs" />
     <Compile Include="GameModules\Preparation\InitTriggerObjectManagerSystem.cs" />
     <Compile Include="GameModules\Preparation\InitialSceneLoadingSystem.cs" />
@@ -1034,34 +1038,32 @@
     <Compile Include="GameModules\Vehicle\WheelCarrier\WheelEntityMoveUtility.cs" />
     <Compile Include="GameModules\Vehicle\WheelCarrier\WheelEntityStateUtility.cs" />
     <Compile Include="GameModules\Vehicle\WheelCarrier\WheelEntityUtility.cs" />
-    <Compile Include="GameModules\Weapon\Definition\IGrenadeCacheHelper.cs" />
-    <Compile Include="GameModules\Weapon\Definition\IPlayerWeaponProcessor.cs" />
-    <Compile Include="GameModules\Weapon\Definition\IPlayerWeaponSharedGetter.cs" />
-    <Compile Include="GameModules\Weapon\Definition\WeaponStructs.cs" />
+    <Compile Include="GameModules\Weapon\Composition\IGrenadeCacheHandler.cs" />
+    <Compile Include="GameModules\Weapon\Composition\IPlayerWeaponProcessor.cs" />
+    <Compile Include="GameModules\Weapon\Composition\IPlayerWeaponSharedGetter.cs" />
+    <Compile Include="GameModules\Weapon\Composition\WeaponStructs.cs" />
     <Compile Include="GameModules\Weapon\Expansion\PlayerEntityWeaponBaseExt.cs" />
     <Compile Include="GameModules\Weapon\Expansion\WeaponCompositionExt.cs" />
     <Compile Include="GameModules\Weapon\Expansion\WeaponEntityExt.cs" />
     <Compile Include="GameModules\Weapon\Expansion\WeaponRelatedCompositionExt.cs" />
-    <Compile Include="GameModules\Weapon\GrenadeCacheHelper.cs" />
-    <Compile Include="GameModules\Weapon\PlayerWeapnStateUpdateSystem.cs" />
-    <Compile Include="GameModules\Weapon\Process\Lower\AbstractPlayerComponentsReference.cs" />
-    <Compile Include="GameModules\Weapon\Process\Lower\PlayerBasicComponentsReference.cs" />
-    <Compile Include="GameModules\Weapon\Process\Lower\PlayerWeaponComponentsReference.cs" />
+    <Compile Include="GameModules\Weapon\Process\GrenadeCacheHandler.cs" />
+    <Compile Include="GameModules\Weapon\Process\Lower\PlayerComponentsWeaponReference.cs" />
     <Compile Include="GameModules\Weapon\Process\Lower\PlayerWeaponControllerBasic.cs" />
     <Compile Include="GameModules\Weapon\Process\PlayerWeaponController.Parts.cs" />
     <Compile Include="GameModules\Weapon\Process\PlayerWeaponController.cs" />
-    <Compile Include="GameModules\Weapon\Process\WeaponCleanupSystem.cs" />
-    <Compile Include="GameModules\Weapon\Process\WeaponPlayerComponentsAgent.Bag.cs" />
-    <Compile Include="GameModules\Weapon\Process\WeaponPlayerComponentsAgent.cs" />
-    <Compile Include="GameModules\Weapon\Process\WeaponProcessUtil.cs" />
+    <Compile Include="GameModules\Weapon\Process\WeaponProcessHelper.cs" />
+    <Compile Include="GameModules\Weapon\System\PlayerWeaponUpdateSystem.cs" />
+    <Compile Include="GameModules\Weapon\System\SimpleLoadBulletSystem.cs" />
+    <Compile Include="GameModules\Weapon\Util\WeaponInterruptUtil.cs" />
+    <Compile Include="GameModules\Weapon\Util\WeaponPartUtil.cs" />
+    <Compile Include="GameModules\Weapon\Util\WeaponSystemCmdUtil.cs" />
+    <Compile Include="GameModules\Weapon\Util\WeaponUtil.cs" />
     <Compile Include="GameModules\Weapon\WeaponAgent\CommonWeaponAgent.cs" />
     <Compile Include="GameModules\Weapon\WeaponAgent\GrenadeWeaponAgent.cs" />
     <Compile Include="GameModules\Weapon\WeaponAgent\MeleeWeaponAgent.cs" />
     <Compile Include="GameModules\Weapon\WeaponAgent\NoneWeaponAgent.cs" />
     <Compile Include="GameModules\Weapon\WeaponAgent\TacticWeaponAgent.cs" />
     <Compile Include="GameModules\Weapon\WeaponAgent\WeaponBaseAgent.cs" />
-    <Compile Include="GameModules\Weapon\WeaponPartUtil.cs" />
-    <Compile Include="GameModules\Weapon\WeaponUtil.cs" />
     <Compile Include="GameModules\WeaponFire\Bullet\BulletFireInfoProvider.cs" />
     <Compile Include="GameModules\WeaponFire\Bullet\DefaultBulletFireInfo.cs" />
     <Compile Include="GameModules\WeaponFire\Bullet\SightBulletFireInfo.cs" />
@@ -1071,22 +1073,25 @@
     <Compile Include="GameModules\WeaponFire\Controller\ThrowingWeaponFireController.cs" />
     <Compile Include="GameModules\WeaponFire\FireLogic\FireUtil.cs" />
     <Compile Include="GameModules\WeaponFire\FireLogic\ShowFireInMap.cs" />
+    <Compile Include="GameModules\WeaponFire\FireProcessors\Accuracy\AccuracyUtil.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Accuracy\CommonAccuracyCalculator.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Accuracy\PistolAccuracyCalculator.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\AutoFireProcessor.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Checker\CameraChecker.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Checker\DefaultFireCmdTrigger.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Checker\SpecialReloadChecker.cs" />
+    <Compile Include="GameModules\WeaponFire\FireProcessors\ContinueFire\ContinueFireCounter.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\FireBulletModeProcessor.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\IdleAndAfter\CommonIdleAndAfterFireProcessor.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\IdleAndAfter\SpecialIdleAndAfterFireProcessor.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Listener\AfterFireEventListener.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Listener\BulletFireEventListener.cs" />
-    <Compile Include="GameModules\WeaponFire\FireProcessors\RifleFireCounter.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Shake\AbstractFireShakeProcessor.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Shake\FireShakeUtil.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Shake\FixedFireShakeProcessor.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Shake\RifleFireShakeProcessor.cs" />
+    <Compile Include="GameModules\WeaponFire\FireProcessors\Spread\AbstractSpreadProcessor.cs" />
+    <Compile Include="GameModules\WeaponFire\FireProcessors\Spread\FireSpreadUtil.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Spread\FixedSpreadProcessor.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Spread\PistolSpreadProcessor.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Spread\RifleSpreadProcessor.cs" />
@@ -1104,13 +1109,11 @@
     <Compile Include="GameModules\WeaponFire\WeaponFireScriptsProvider.cs" />
     <Compile Include="GameModules\WeaponFire\WeaponFireScriptsUtil.cs" />
     <Compile Include="GameModules\WeaponFire\WeaponFireUpdateManagaer.cs" />
-    <Compile Include="Log4ConfigManager.cs" />
     <Compile Include="MyHttpServer.cs" />
     <Compile Include="Network\AppMessageTypeInfo.cs" />
     <Compile Include="Network\RpcNetworkMessage.cs" />
     <Compile Include="Network\SerializeInfo\AbstractSnapshotSerializeInfo.cs" />
     <Compile Include="Network\SerializeInfo\BinarySnapshotSerializeInfo.cs" />
-    <Compile Include="Network\SerializeInfo\ProtoBufSerializeInfo.cs" />
     <Compile Include="Network\SerializeInfo\ReplicatedSnapshotSerializeInfo.cs" />
     <Compile Include="Network\SerializeInfo\ReplicatedUpdateEntitySerializeInfo.cs" />
     <Compile Include="Network\SerializeInfo\SimpleProtoBuf.cs" />
@@ -1137,7 +1140,6 @@
     <Compile Include="Player\PlayerEntityAnimationEx.cs" />
     <Compile Include="Player\PlayerEntityEx.cs" />
     <Compile Include="Player\PlayerInfoExtensions.cs" />
-    <Compile Include="Player\PlayerStateUtil.cs" />
     <Compile Include="Room\RoomInfoEx.cs" />
     <Compile Include="RpcMessageType.cs" />
     <Compile Include="SceneManagement\Basic\FixedScenesManager.cs" />
@@ -1211,6 +1213,7 @@
     <Compile Include="VehicleGameHandler\VehicleBrokenFlagChangeHandler.cs" />
     <Compile Include="VehicleGameHandler\VehicleCollisionDamageHandler.cs" />
     <Compile Include="VehicleGameHandler\VehicleCrashedHandler.cs" />
+    <Compile Include="VehicleGameHandler\VehicleFireHpChangeHandler.cs" />
     <Compile Include="VehicleGameHandler\VehicleFuelChangeHandler.cs" />
     <Compile Include="VehicleGameHandler\VehicleFuelUpdateHandler.cs" />
     <Compile Include="VehicleGameHandler\VehicleGameStateUpdateSystem.cs" />
@@ -1292,6 +1295,10 @@
     <ProjectReference Include="..\Fracturing\Fracturing.csproj">
       <Project>{FAF4CE90-E6AC-10DE-4FB4-E9393B8BABCE}</Project>
       <Name>Fracturing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\App.Localization\App.Localization.csproj">
+      <Project>{5D1781E6-4910-A038-7242-85BD5E9A7F44}</Project>
+      <Name>App.Localization</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

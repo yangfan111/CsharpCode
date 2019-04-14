@@ -5,6 +5,7 @@ using App.Shared.GameModules.Vehicle;
 using App.Shared.GameModules.Weapon;
 using App.Shared.Player;
 using App.Shared.Util;
+using Core;
 using Core.Utils;
 using UnityEngine;
 using Utils.Appearance;
@@ -234,9 +235,8 @@ namespace App.Shared.GameModules.Player
             playerEntity.stateInterface.State.ForceFinishGrenadeThrow();
             playerEntity.stateInterface.State.DriveStart(actionSeatId, postureId);
             //if (playerEntity.IsVehicleDriver())    //主驾驶位置
-            {
-                playerEntity.WeaponController().ForceUnArmHeldWeapon();
-            }
+           // playerEntity.WeaponController().UnArmWeapon(false);
+      //      playerEntity.ModeController().CallBeforeAction(playerEntity.WeaponController(),EPlayerActionType.Drive);
         }
     }
 }

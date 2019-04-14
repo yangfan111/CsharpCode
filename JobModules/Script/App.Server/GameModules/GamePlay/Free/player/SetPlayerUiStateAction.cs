@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using com.wd.free.@event;
 using App.Server.GameModules.GamePlay.free.player;
+using App.Shared.GameModules.Player;
 using App.Shared.Player;
 using com.wd.free.util;
 

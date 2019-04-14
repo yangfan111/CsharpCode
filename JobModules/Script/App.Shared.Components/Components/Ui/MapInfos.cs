@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Core.Ui.Map;
 using UnityEngine;
 
 namespace App.Shared.Components.Ui
@@ -68,7 +69,7 @@ namespace App.Shared.Components.Ui
             this.Num = num;
             this.Color = color;
             this.Statue = statue;
-            this.Pos = pos;
+            this.Pos = new MapFixedVector2(pos);
             this.FaceDirection = faceDirection;
             this.MarkList = markList;
             this.IsShooting = isShooting;
@@ -91,7 +92,7 @@ namespace App.Shared.Components.Ui
         public int Num;                             //0 就是不现实编号
         public Color Color;                         //小队颜色
         public MiniMapPlayStatue Statue;            // 1 常态 2跳伞 3载具 4受伤 5死亡
-        public Vector2 Pos;                         //只用到  真实世界的 x和z的坐标
+        public MapFixedVector2 Pos;                         //只用到  真实世界的 x和z的坐标
         public float FaceDirection;                 //0 到 360 
         public List<MiniMapPlayMarkInfo> MarkList;  //标记列表
         public bool IsShooting;                     //是否在开枪
@@ -121,10 +122,10 @@ namespace App.Shared.Components.Ui
     public class BombAreaInfo   //轰炸区数据
     {
         private float num;
-        private Vector3 center;
+        private MapFixedVector2 center;
         private float radius;
 
-        public Vector3 Center
+        public MapFixedVector2 Center
         {
             get
             {
@@ -163,7 +164,7 @@ namespace App.Shared.Components.Ui
             }
         }
 
-        public BombAreaInfo(Vector3 center, float radius, float num)
+        public BombAreaInfo(MapFixedVector2 center, float radius, float num)
         {
             this.center = center;
             this.radius = radius;
@@ -174,11 +175,11 @@ namespace App.Shared.Components.Ui
     public class AirPlaneData
     {
         private int type;  //0 无飞机 //1 空投机  2运输机
-        private Vector2 pos;  //3d世界的x和z 坐标值
+        private MapFixedVector2 pos;  //3d世界的x和z 坐标值
         private float direction; //飞机的朝向
 
         public AirPlaneData() { }
-        public AirPlaneData(int type, Vector2 pos, float direction)
+        public AirPlaneData(int type, MapFixedVector2 pos, float direction)
         {
             this.type = type;
             this.pos = pos;
@@ -198,7 +199,7 @@ namespace App.Shared.Components.Ui
             }
         }
 
-        public Vector2 Pos
+        public MapFixedVector2 Pos
         {
             get
             {
@@ -228,12 +229,12 @@ namespace App.Shared.Components.Ui
     public class DuQuanInfo     //毒圈 数据
     {
         private int level;
-        Vector2 center;
+        MapFixedVector2 center;
         float radius;
         float waitTime;      //毒圈等待时间
         float moveTime;      //毒圈移动时间
 
-        public Vector2 Center
+        public MapFixedVector2 Center
         {
             get
             {
@@ -299,7 +300,7 @@ namespace App.Shared.Components.Ui
         }
 
         // centerX radius 是实际的长  米单位
-        public DuQuanInfo(int level, UnityEngine.Vector2 pos, float radius, float waitTime, float moveTime)
+        public DuQuanInfo(int level, MapFixedVector2 pos, float radius, float waitTime, float moveTime)
         {
             this.level = level;
             this.center = pos;
@@ -308,7 +309,7 @@ namespace App.Shared.Components.Ui
             this.moveTime = moveTime;
         }
 
-        public void SetValue(int _level, Vector2 _center, float _radius, float _waitTime, float _moveTime)
+        public void SetValue(int _level, MapFixedVector2 _center, float _radius, float _waitTime, float _moveTime)
         {
             this.level = _level;
             this.center = _center;

@@ -20,7 +20,7 @@ namespace App.Shared.FreeFramework.UnitTest
         public TestCase()
         {
             this.order = new OrderAiAction();
-            this.order.repeat = 1;
+            this.order.repeat = "1";
             this.order.actions = new List<IGameAction>();
         }
 

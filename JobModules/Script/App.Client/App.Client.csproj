@@ -60,9 +60,6 @@
     <Reference Include="protobuf3">
       <HintPath>..\CommonLibs\protobuf3.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEditor">
-      <HintPath>..\ThirdParty\Unity\5_6\UnityEditor.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.dll</HintPath>
     </Reference>
@@ -81,12 +78,12 @@
     <Reference Include="Loxodon.Log">
       <HintPath>..\UiFramework\Libs\Loxodon\Loxodon.Log.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArtModule\ArtModule.cs" />
@@ -105,9 +102,12 @@
     <Compile Include="CastObjectUtil\SceneObjectGoAssemble.cs" />
     <Compile Include="CastObjectUtil\VehicleCastData.cs" />
     <Compile Include="ClientDebugCommandHandler.cs" />
+    <Compile Include="ClientSystems\DecalBuilder.cs" />
+    <Compile Include="ClientSystems\DecalPolygon.cs" />
     <Compile Include="ClientSystems\DriveTimeSystem.cs" />
     <Compile Include="ClientSystems\MouseLockSystem.cs" />
     <Compile Include="ClientSystems\PingSystem.cs" />
+    <Compile Include="ClientSystems\PlayerSprayPaintUtility.cs" />
     <Compile Include="ClientSystems\RaycastTestSystem.cs" />
     <Compile Include="ClientSystems\UserCmdCollectSystem.cs" />
     <Compile Include="ClientSystems\UserCmdMergeSystem.cs" />
@@ -234,6 +234,7 @@
     <Compile Include="GameModules\GamePlay\Free\Player\PlayerCmdHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\Player\PlayerMoveHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\Player\PlayerMoveSpeedHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Player\PlayerVisibilityHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\Render\IEffectModel3D.cs" />
     <Compile Include="GameModules\GamePlay\Free\Render\IObject3D.cs" />
     <Compile Include="GameModules\GamePlay\Free\Render\IScreenManage.cs" />
@@ -305,6 +306,11 @@
     <Compile Include="GameModules\GamePlay\InputIniSystem.cs" />
     <Compile Include="GameModules\GamePlay\Offline\OfflineGamePlay.cs" />
     <Compile Include="GameModules\GamePlay\TestFrameSystem.cs" />
+    <Compile Include="GameModules\OC\FixedSceneOCController.cs" />
+    <Compile Include="GameModules\OC\InitOcclusionCullingControllerSystem.cs" />
+    <Compile Include="GameModules\OC\OcclusionCullingControllerFactory.cs" />
+    <Compile Include="GameModules\OC\OcclusionCullingSystem.cs" />
+    <Compile Include="GameModules\OC\StreamSceneOCController.cs" />
     <Compile Include="GameModules\Player\AbstractPlayerBackSystem.cs" />
     <Compile Include="GameModules\Player\AbstractRenderSystem.cs" />
     <Compile Include="GameModules\Player\AbstractSelfPlayerRenderSystem.cs" />
@@ -318,7 +324,7 @@
     <Compile Include="GameModules\Player\ClientPlayerResourceLoadSystem.cs" />
     <Compile Include="GameModules\Player\ClientPlayerSaveSystem.cs" />
     <Compile Include="GameModules\Player\ClientPlayerTipShowSystem.cs" />
-    <Compile Include="GameModules\Player\ClientSoundPlaybackSystem.cs" />
+    <Compile Include="GameModules\Player\ClientPlayerWeaponSystem.cs" />
     <Compile Include="GameModules\Player\InputSchemeUpdateSystem.cs" />
     <Compile Include="GameModules\Player\PlayerAutoMoveSystem.cs" />
     <Compile Include="GameModules\Player\PlayerFirstPersonHandRotationSystem.cs" />
@@ -337,8 +343,11 @@
     <Compile Include="GameModules\Player\Robot\ClientRobotModule.cs" />
     <Compile Include="GameModules\Player\Robot\RobotBehaviorLoadSystem.cs" />
     <Compile Include="GameModules\Player\Robot\RobotUserCmdProviderInitSystem.cs" />
+    <Compile Include="GameModules\SceneManagement\ClientAutoWorldShiftRenderSystem.cs" />
     <Compile Include="GameModules\SceneManagement\ClientScenePostprocessorSystem.cs" />
+    <Compile Include="GameModules\SceneManagement\ClientWorldShiftPostProcessSystem.cs" />
     <Compile Include="GameModules\SceneManagement\VisionCenterUpdateSystem.cs" />
+    <Compile Include="GameModules\SceneManagement\WorldShiftManager.cs" />
     <Compile Include="GameModules\SceneObject\ClientAbstractTriggerObjectListener.cs" />
     <Compile Include="GameModules\SceneObject\ClientDebugSystem.cs" />
     <Compile Include="GameModules\SceneObject\ClientDestructibleObjectListener.cs" />
@@ -371,6 +380,7 @@
     <Compile Include="GameModules\Throwing\ThrowingLineSystem.cs" />
     <Compile Include="GameModules\Throwing\ThrowingModule.cs" />
     <Compile Include="GameModules\Throwing\ThrowingRenderSystem.cs" />
+    <Compile Include="GameModules\Ui\AssetBundleConstant.cs" />
     <Compile Include="GameModules\Ui\Logic\AbstractCastLogic.cs" />
     <Compile Include="GameModules\Ui\Logic\CommonCastLogic.cs" />
     <Compile Include="GameModules\Ui\Logic\DoorCastLogic.cs" />
@@ -392,7 +402,6 @@
     <Compile Include="GameModules\Ui\Models\Common\CommonChatModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonCountdownTipModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonCrossHairModel.cs" />
-    <Compile Include="GameModules\Ui\Models\Common\CommonCrossModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonDeadModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonDebugInfoModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonFocusMaskModel.cs" />
@@ -409,6 +418,7 @@
     <Compile Include="GameModules\Ui\Models\Common\CommonMenuModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonMiniMap.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonNoticeModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\CommonPaintDiscModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonParachuteModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonPickUpModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonPlayerInfo.cs" />
@@ -421,14 +431,12 @@
     <Compile Include="GameModules\Ui\Models\Common\CommonTaskTipModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonTeam.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonTechStatModel.cs" />
-    <Compile Include="GameModules\Ui\Models\Common\CommonTestModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonTipModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonVehicleTipModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonVideoSettingModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonWeaponBagModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonWeaponBagTipModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonWeaponHudModel.cs" />
-    <Compile Include="GameModules\Ui\Models\Common\MainGuiModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\Map\AirPlane.cs" />
     <Compile Include="GameModules\Ui\Models\Common\Map\BaneCircle.cs" />
     <Compile Include="GameModules\Ui\Models\Common\Map\BombArea.cs" />
@@ -456,6 +464,7 @@
     <Compile Include="GameModules\Ui\Models\Group\GroupScoreModel.cs" />
     <Compile Include="GameModules\Ui\System\PlayerAddMarkSystem.cs" />
     <Compile Include="GameModules\Ui\System\PlayerAddMarkUtility.cs" />
+    <Compile Include="GameModules\Ui\System\PlayerSprayPaintSystem.cs" />
     <Compile Include="GameModules\Ui\System\UISessionSystem.cs" />
     <Compile Include="GameModules\Ui\System\UiLoadSystem.cs" />
     <Compile Include="GameModules\Ui\System\UiPlayerDataInitSystem.cs" />
@@ -485,6 +494,7 @@
     <Compile Include="GameModules\Ui\UiAdapter\Common\MenuUIAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Common\MiniMapAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Common\NoticeUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Common\PaintUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Common\ParachuteStateUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Common\PickUpUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Common\PlayerInfoUIAdapter.cs" />
@@ -526,6 +536,7 @@
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IMenuUIAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IMiniMapUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\INoticeUIAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IPaintUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IPickUpUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IPlayerInfoUIAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IPlayerStateUIAdapter.cs" />
@@ -555,13 +566,11 @@
     <Compile Include="GameModules\Ui\ViewModels\Blast\BlastRecordInfoViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Blast\BlastScoreViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Chicken\ChickenScoreViewModel.cs" />
-    <Compile Include="GameModules\Ui\ViewModels\Common\CommonBagViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonBlastTipsViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonCarryTipViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonChatViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonCountdownTipViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonCrossHairViewModel.cs" />
-    <Compile Include="GameModules\Ui\ViewModels\Common\CommonCrossViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonDeadViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonDebugInfoViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonFocusMaskViewModel.cs" />
@@ -584,6 +593,7 @@
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonPlayerInfoViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonRangingViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonRevengeTagViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Common\CommonRoleDiskViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonRoundOverViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonScreenFlashViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonSimpleTipViewModel.cs" />
@@ -592,17 +602,14 @@
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonTaskTipViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonTeamViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonTechStatViewModel.cs" />
-    <Compile Include="GameModules\Ui\ViewModels\Common\CommonTestViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonTipViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonVideoSettingViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonWeaponBagTipViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonWeaponBagViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonWeaponHudViewModel.cs" />
-    <Compile Include="GameModules\Ui\ViewModels\Common\MainGuiViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Group\GroupRecordInfoViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Group\GroupRecordViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Group\GroupScoreViewModel.cs" />
-    <Compile Include="GameModules\Ui\ViewModels\Group\GroupTechStatViewModel.cs" />
     <Compile Include="GameModules\UserInput\InputCollectSystem.cs" />
     <Compile Include="GameModules\UserInput\InputConfigInitSystem.cs" />
     <Compile Include="GameModules\UserInput\InputManagerConfigInitSystem.cs" />
@@ -611,7 +618,6 @@
     <Compile Include="GameModules\UserPhysics\SimulationTimeSyncClientSystem.cs" />
     <Compile Include="GameModules\Vehicle\ClientVehicleEntityInitSystem.cs" />
     <Compile Include="GameModules\Vehicle\ClientVehicleModule.cs" />
-    <Compile Include="GameModules\Vehicle\ClientVehicleOwnerIdActiveSystem.cs" />
     <Compile Include="GameModules\Vehicle\ClientVehiclePlaybackSystem.cs" />
     <Compile Include="GameModules\Vehicle\ClientVehicleSoundUpdateSystem.cs" />
     <Compile Include="MessageHandler\AbstractClientMessageHandler.cs" />
@@ -649,8 +655,10 @@
     <Compile Include="SessionStates\GameModuleFactory.cs" />
     <Compile Include="SessionStates\InitUiModuleState.cs" />
     <Compile Include="SessionStates\LoadBaseConfigureState.cs" />
+    <Compile Include="SessionStates\LoadOCConfigState.cs" />
     <Compile Include="SessionStates\LoadSceneMapConfig.cs" />
     <Compile Include="SessionStates\LoadSubResourceConfigureState.cs" />
+    <Compile Include="SessionStates\LocalizeSessionSystem.cs" />
     <Compile Include="SessionStates\LoginSuccState.cs" />
     <Compile Include="SessionStates\PreparingPlayerState.cs" />
     <Compile Include="SessionStates\ProfilePreparationState.cs" />
@@ -709,6 +717,10 @@
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}</Project>
       <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OC\OC.csproj">
+      <Project>{B7745900-A300-880B-0CAF-880BF859880B}</Project>
+      <Name>OC</Name>
     </ProjectReference>
     <ProjectReference Include="..\DWP\DWP.csproj">
       <Project>{B0DF870B-1CE9-877C-A564-9E7C116D937C}</Project>

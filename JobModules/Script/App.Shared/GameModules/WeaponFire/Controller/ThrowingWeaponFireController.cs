@@ -1,4 +1,6 @@
-﻿using Core.Utils;
+﻿using App.Server.GameModules.GamePlay;
+using Core.EntityComponent;
+using Core.Utils;
 using WeaponConfigNs;
 using XmlConfig;
 
@@ -25,7 +27,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
             _throwingFactory = factory;//componentsFactory.CreateThrowingFactory(newWeaponConfig, config.Throwing);
         }
 
-        public void OnUpdate(PlayerWeaponController controller, IWeaponCmd cmd)
+        public void OnUpdate(PlayerWeaponController controller, IWeaponCmd cmd, Contexts contexts)
         {
             if (!_initialized)
             {
@@ -49,9 +51,14 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
             if (cmd.IsThrowing && cmd.FilteredInput.IsInput(EPlayerInput.IsThrowing))
             {
-                DoThrowing(controller, cmd);
+                DoThrowing(controller, cmd, contexts);
             }
 
+            if (!cmd.IsFire && !cmd.IsThrowing)
+            {
+                controller.RelatedThrowAction.ThrowingEntityKey = EntityKey.Default;
+                controller.LastFireWeaponId = 0;
+            }
             //判断打断
             CheckBrokeThrow(controller, cmd);
         }
@@ -59,29 +66,31 @@ namespace App.Shared.GameModules.Weapon.Behavior
         //准备
         private void DoReady(PlayerWeaponController controller, IWeaponCmd cmd)
         {
-            if (!controller.RelatedThrowActionInfo.IsReady)
+            if (!controller.RelatedThrowAction.IsReady && controller.RelatedThrowAction.ThrowingEntityKey == EntityKey.Default
+                && controller.LastFireWeaponId == 0)
             {
-                controller.RelatedThrowActionInfo.IsReady = true;
-                controller.RelatedThrowActionInfo.ReadyTime = controller.RelatedTime;
-                controller.RelatedThrowActionInfo.Config = _throwingFactory.ThrowingConfig;
+                controller.RelatedThrowAction.IsReady = true;
+                controller.RelatedThrowAction.ReadyTime = controller.RelatedTime;
+                controller.RelatedThrowAction.Config = _throwingFactory.ThrowingConfig;
                 //准备动作
-                controller.RelatedStateInterface.InterruptAction();
-                controller.RelatedStateInterface.StartFarGrenadeThrow();
+                controller.RelatedCharState.InterruptAction();
+                controller.RelatedCharState.StartFarGrenadeThrow();
+                controller.LastFireWeaponId = controller.HeldWeaponAgent.WeaponKey.EntityId;
             }
         }
 
         //投掷/抛投切换
         private void DoSwitchMode(PlayerWeaponController controller, IWeaponCmd cmd)
         {
-            if (controller.RelatedThrowActionInfo.IsReady && !controller.RelatedThrowActionInfo.IsThrow)
+            if (controller.RelatedThrowAction.IsReady && !controller.RelatedThrowAction.IsThrow)
             {
-                if ((controller.RelatedTime - controller.RelatedThrowActionInfo.LastSwitchTime) < _switchCdTime)
+                if ((controller.RelatedTime - controller.RelatedThrowAction.LastSwitchTime) < _switchCdTime)
                 {
                     return;
                 }
-                controller.RelatedThrowActionInfo.LastSwitchTime = controller.RelatedTime;
-                controller.RelatedThrowActionInfo.IsNearThrow = !controller.RelatedThrowActionInfo.IsNearThrow;
-                SwitchThrowingMode(controller, controller.RelatedThrowActionInfo.IsNearThrow);
+                controller.RelatedThrowAction.LastSwitchTime = controller.RelatedTime;
+                controller.RelatedThrowAction.IsNearThrow = !controller.RelatedThrowAction.IsNearThrow;
+                SwitchThrowingMode(controller, controller.RelatedThrowAction.IsNearThrow);
             }
         }
 
@@ -89,82 +98,88 @@ namespace App.Shared.GameModules.Weapon.Behavior
         {
             if (isNearThrow)
             {
-                controller.RelatedStateInterface.ChangeThrowDistance(0);
+                controller.RelatedCharState.ChangeThrowDistance(0);
             }
             else
             {
-                controller.RelatedStateInterface.ChangeThrowDistance(1);
+                controller.RelatedCharState.ChangeThrowDistance(1);
             }
         }
 
         //拉栓
         private void DoPull(PlayerWeaponController controller, IWeaponCmd cmd)
         {
-            if (controller.RelatedThrowActionInfo.IsReady && !controller.RelatedThrowActionInfo.IsPull)
+            if (controller.RelatedThrowAction.IsReady && !controller.RelatedThrowAction.IsPull)
             {
-                controller.RelatedThrowActionInfo.IsPull = true;
-                controller.RelatedThrowActionInfo.LastPullTime = controller.RelatedTime;
-                controller.RelatedThrowActionInfo.ShowCountdownUI = true;
-                controller.RelatedThrowActionInfo.IsInterrupt = false;
+                controller.RelatedThrowAction.IsPull = true;
+                controller.RelatedThrowAction.LastPullTime = controller.RelatedTime;
+                controller.RelatedThrowAction.ShowCountdownUI = true;
+                controller.RelatedThrowAction.IsInterrupt = false;
                 //生成Entity
                 int renderTime = cmd.RenderTime;
                 var dir = BulletDirUtility.GetThrowingDir(controller);
-                controller.RelatedThrowActionInfo.ThrowingEntityKey = _throwingFactory.CreateThrowing(controller, dir, renderTime, GetInitVel(controller));
+                controller.RelatedThrowAction.ThrowingEntityKey = _throwingFactory.CreateThrowing(controller, dir, renderTime, GetInitVel(controller));
                 controller.HeldWeaponAgent.RunTimeComponent.LastBulletDir = dir;
                 //弹片特效
                 if (cmd.IsReload)
                 {
                     controller.AddAuxEffect(EClientEffectType.PullBolt);
-
                 }
                 //     controller.weaponState.BagLocked = true;
             }
         }
 
         //投掷
-        private void DoThrowing(PlayerWeaponController controller, IWeaponCmd cmd)
+        private void DoThrowing(PlayerWeaponController controller, IWeaponCmd cmd, Contexts contexts)
         {
-            if (controller.RelatedThrowActionInfo.IsReady && !controller.RelatedThrowActionInfo.IsThrow)
+            if (controller.RelatedThrowAction.IsReady && !controller.RelatedThrowAction.IsThrow)
             {
-                if (!controller.RelatedThrowActionInfo.IsPull)
+                if (!controller.RelatedThrowAction.IsPull)
                 {
                     DoPull(controller, cmd);
                 }
-                controller.RelatedThrowActionInfo.IsThrow = true;
-                controller.RelatedThrowActionInfo.ShowCountdownUI = false;
+                controller.RelatedThrowAction.IsThrow = true;
+                controller.RelatedThrowAction.ShowCountdownUI = false;
                 //投掷时间
-                controller.RelatedThrowActionInfo.LastFireTime = controller.RelatedTime;
-                _throwingFactory.UpdateThrowing(controller.RelatedThrowActionInfo.ThrowingEntityKey, true, GetInitVel(controller));
+                controller.RelatedThrowAction.LastFireTime = controller.RelatedTime;
+                _throwingFactory.UpdateThrowing(controller.RelatedThrowAction.ThrowingEntityKey, true, GetInitVel(controller));
                 //投掷动作
-                controller.RelatedStateInterface.FinishGrenadeThrow();
+                controller.RelatedCharState.FinishGrenadeThrow();
                 //状态重置
                 if (controller.RelatedThrowUpdate != null)
                     controller.RelatedThrowUpdate.ReadyFly = false;
                 //投掷型物品使用数量
-                controller.RelatedStatics.UseThrowingCount++;
+                controller.RelatedStatisticsData.UseThrowingCount++;
+                if (SharedConfig.IsServer)
+                {
+                    FreeRuleEventArgs args = contexts.session.commonSession.FreeArgs as FreeRuleEventArgs;
+                    (args.Rule as IGameRule).HandleWeaponFire(contexts, contexts.player.GetEntityWithEntityKey(controller.Owner), controller.GetWeaponAgent().ResConfig);
+                }
+
+                controller.RelatedThrowAction.ThrowingEntityKey = EntityKey.Default;
             }
         }
 
         private void CheckBrokeThrow(PlayerWeaponController controller, IWeaponCmd cmd)
         {
-            if (controller.RelatedThrowActionInfo.IsReady && cmd.FilteredInput.IsInputBlocked(EPlayerInput.IsThrowing))
+            if (controller.RelatedThrowAction.IsReady && !cmd.FilteredInput.IsInput(EPlayerInput.IsThrowing))
             {
                 //收回手雷
-                controller.ForceUnArmHeldWeapon();
-                if (controller.RelatedThrowActionInfo.IsPull)
+                controller.UnArmWeapon(false);
+                if (controller.RelatedThrowAction.IsPull)
                 {
                     //若已拉栓，销毁ThrowingEntity
-                    _throwingFactory.DestroyThrowing(controller.RelatedThrowActionInfo.ThrowingEntityKey);
+                    _throwingFactory.DestroyThrowing(controller.RelatedThrowAction.ThrowingEntityKey);
                 }
                 //拉栓未投掷，打断投掷动作
-                controller.RelatedStateInterface.ForceFinishGrenadeThrow();
-                controller.RelatedThrowActionInfo.ClearState();
+                controller.RelatedCharState.ForceFinishGrenadeThrow();
+                controller.RelatedThrowAction.ClearState();
             }
         }
 
         private float GetInitVel(PlayerWeaponController controller)
         {
-            return _throwingFactory.ThrowingInitSpeed(controller.RelatedThrowActionInfo.IsNearThrow);
+            return _throwingFactory.ThrowingInitSpeed(controller.RelatedThrowAction.IsNearThrow);
         }
     }
 }

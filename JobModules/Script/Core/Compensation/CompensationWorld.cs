@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
+using System.Runtime.Remoting.Contexts;
 using Core.Components;
 using Core.EntityComponent;
 using Core.ObjectPool;
 using Core.Replicaton;
 using Core.Utils;
+using Entitas;
 using UnityEngine;
 using Utils.Singleton;
 
@@ -68,7 +71,7 @@ namespace Core.Compensation
 
         public EntityKey Self { get; set; }
         public List<int> ExcludePlayerList { get; set; }
-
+        
         public bool BoxCast(BoxInfo box, out RaycastHit hitInfo, int hitboxLayerMask)
         {
             for (int i = 0; i < _entities.Length; i++)
@@ -110,6 +113,7 @@ namespace Core.Compensation
                             try
                             {
                                 _enableHitBox.BeginProfileOnlyEnableProfile();
+                                _hitboxHandler.SetRigidBodyCollision(entity,true);
                                 _hitboxHandler.EnableHitBox(entity, true);
                                 _hitboxHandler.UpdateHitBox(entity);
                                 _hitboxHandler.DrawHitBoxOnBullet(entity);
@@ -154,6 +158,8 @@ namespace Core.Compensation
                     _hitboxHandler.EnableHitBox(entity, false);
                     continue;
                 }
+
+                
                 if (!_updateAndEnabled[i]) // 同一个serverTime，hitbox只需要计算一次
                 {
                     Vector3 position;
@@ -166,10 +172,12 @@ namespace Core.Compensation
                             try
                             {
                                 _enableHitBox.BeginProfileOnlyEnableProfile();
+                                _hitboxHandler.SetRigidBodyCollision(entity,true);
                                 _hitboxHandler.EnableHitBox(entity, true);
                                 _hitboxHandler.UpdateHitBox(entity);
                                 _hitboxHandler.DrawHitBoxOnBullet(entity);
                                 _updateAndEnabled[i] = true;
+                                
                             }
                             finally
                             {
@@ -184,9 +192,7 @@ namespace Core.Compensation
                     }
                 }
             }
-
-           
-
+            
             return _hitboxHandler.Raycast(ray.Ray, out hitInfo, ray.Length, hitboxLayerMask);
         }
 

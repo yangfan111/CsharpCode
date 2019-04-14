@@ -58,14 +58,12 @@ namespace App.Shared.GameModules
             Add(new VehicleCmdExecuteManagerSystem(vehicleExecutionSelector, topLevelGameModule, vehicleCmdExecuteSystemHandler, simulationTimer,false, SharedConfig.ServerAuthorative).WithExecFrameStep(EEcecuteStep.CmdFrameStep));
             Add(new UserPrePredictionSystem(topLevelGameModule, 
                 predicatoinInfoProvider, 
-                userPredictionInitManager, 
-                commonSessionObjects.GameStateProcessorFactory).WithExecFrameStep(EEcecuteStep.NormalFrameStep)); //每帧执行的cmd要放在回滚之前，不然会导致多执行帧
+                userPredictionInitManager).WithExecFrameStep(EEcecuteStep.NormalFrameStep)); //每帧执行的cmd要放在回滚之前，不然会导致多执行帧
             Add(new PhysicsPostUpdateSystem(topLevelGameModule).WithExecFrameStep(EEcecuteStep.CmdFrameStep));
             Add(new PredictionInitSystem(userPredictionInitManager).WithExecFrameStep(EEcecuteStep.CmdFrameStep));           
             Add(new UserPredictionSystem(topLevelGameModule, 
                 predicatoinInfoProvider, 
-                userPredictionInitManager, 
-                commonSessionObjects.GameStateProcessorFactory).WithExecFrameStep(EEcecuteStep.CmdFrameStep));
+                userPredictionInitManager).WithExecFrameStep(EEcecuteStep.CmdFrameStep));
             
           
             Add(new ResourceLoadSystem(topLevelGameModule, commonSessionObjects.AssetManager).WithExecFrameStep(EEcecuteStep.NormalFrameStep));

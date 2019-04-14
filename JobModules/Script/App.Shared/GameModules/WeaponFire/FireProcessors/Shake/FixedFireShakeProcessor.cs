@@ -6,7 +6,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
     /// <summary>
     /// Defines the <see cref="FixedFireShakeProcessor" />
     /// </summary>
-    public class FixedFireShakeProcessor : AbstractFireShakeProcessor<FixedShakeConfig>
+    public class FixedFireShakeProcessor : AbstractFireShakeProcessor
     {
         private static LoggerAdapter Logger = new LoggerAdapter(typeof(FixedFireShakeProcessor));
 
@@ -17,7 +17,6 @@ namespace App.Shared.GameModules.Weapon.Behavior
             {
                 return;
             }
-
             controller.RelatedOrient.NegPunchPitch += config.PunchPitch;
             controller.RelatedOrient.WeaponPunchPitch += config.PunchPitch * config.PunchOffsetFactor;
         }

@@ -7,6 +7,7 @@ using Core.EntityComponent;
 using Core.Event;
 using Core.Utils;
 using UnityEngine;
+using Utils.Configuration;
 using Utils.Singleton;
 using XmlConfig;
 
@@ -33,16 +34,17 @@ namespace App.Shared.EntityFactory
             var effectEntity = context.CreateEntity();
             var nextId = entityIdGenerator.GetNextEntityId();
             effectEntity.AddEntityKey(new EntityKey(nextId, (int) EEntityType.ClientEffect));
-            effectEntity.AddPosition(pos);
+            effectEntity.AddPosition();
+            effectEntity.position.Value = pos;
             effectEntity.AddEffectType(type);
-            
+            effectEntity.AddAssets(false,false);
             effectEntity.AddLifeTime(DateTime.Now, 6000);
             effectEntity.isFlagSyncNonSelf = true;
             return effectEntity;
         }
 
         public static void CreateBulletDrop(ClientEffectContext context, IEntityIdGenerator idGenerator,
-            EntityKey owner, Vector3 position, float Yaw, float pitch, int effectId)
+            EntityKey owner, Vector3 position, float Yaw, float pitch, int effectId,int weaponId,AudioGrp_FootMatType dropMatType)
         {
             while (_bulletDropEntities.Count >= SingletonManager.Get<ClientEffectCommonConfigManager>().GetBulletDropMaxCount(SharedConfig.IsServer))
             {
@@ -60,6 +62,10 @@ namespace App.Shared.EntityFactory
             entity.AddEffectId(effectId);
             entity.AddOwnerId(owner);
             entity.lifeTime.LifeTime = SingletonManager.Get<ClientEffectCommonConfigManager>().BulletDropLifeTime;
+
+            entity.AddAudio((int)AudioClientEffectType.BulletDrop);
+            entity.audio.AudioClientEffectArg1 = SingletonManager.Get<AudioWeaponManager>().FindById(weaponId).BulletDrop;
+            entity.audio.AudioClientEffectArg2 = (int) dropMatType;
             entity.AddEffectRotation(Yaw, pitch);
             entity.AddFlagImmutability(0);
             _bulletDropEntities.AddLast(entity);
@@ -74,7 +80,6 @@ namespace App.Shared.EntityFactory
             e.Offset = offset;
           
             e.HitPoint = hitPoint;
-          //  Logger.Info("===>Effet Event AdHitEnvironmentEffectEvent");
             srcPlayer.localEvents.Events.AddEvent(e);
         }
         public static void CreateHitEnvironmentEffect(
@@ -85,11 +90,11 @@ namespace App.Shared.EntityFactory
             EntityKey owner,
             EEnvironmentType environmentType)
         {
-            //Logger.InfoFormat("Effet Exe Occur: Once :BulletHitEnvironment", environmentType);
+            Logger.InfoFormat("===>CreateBulletHitEnvironmentEffet ", environmentType);
 
             CreateHitEmitEffect(context, entityIdGenerator, hitPoint, normal, owner, environmentType);
 
-           // Logger.InfoFormat("<===Effect Exe End: EnvType {0} ", environmentType);
+            Logger.InfoFormat("EnvType {0} ", environmentType);
             
         }
 
@@ -157,12 +162,11 @@ namespace App.Shared.EntityFactory
             effectEntity.AddOwnerId(owner);
             effectEntity.AddNormal(normal);
             
-            effectEntity.AddAudio((int)AudioClientEffectType.BulletHit,(int)audioGrpHitMatType);
+            effectEntity.AddAudio((int)AudioClientEffectType.BulletHit);
+            effectEntity.audio.AudioClientEffectArg1 =  (int) audioGrpHitMatType;
             effectEntity.lifeTime.LifeTime = SingletonManager.Get<ClientEffectCommonConfigManager>().DecayLifeTime;
-            
             effectEntity.AddFlagImmutability(0);
             effectEntity.isFlagSyncNonSelf = false;
-            Logger.InfoFormat("*** Effect LifeTime:", effectEntity.lifeTime.LifeTime);
         }
 
         public static void AddBeenHitEvent(PlayerEntity srcPlayer, EntityKey target, int damageId, int triggerTime)
@@ -197,7 +201,7 @@ namespace App.Shared.EntityFactory
             effectEntity.AddOwnerId(owner);
             effectEntity.AddAttachParent(target, offset);
             effectEntity.isFlagSyncNonSelf = false;
-            Logger.InfoFormat("CreateHitPlayerEffect {0} {1}", effectEntity.entityKey.Value,effectEntity.isFlagSyncNonSelf );
+            Logger.DebugFormat("CreateHitPlayerEffect {0} {1}", effectEntity.entityKey.Value,effectEntity.isFlagSyncNonSelf );
         }
 
        
@@ -263,6 +267,51 @@ namespace App.Shared.EntityFactory
             entity.AddEffectId(effectId);
             entity.AddEffectRotation(yaw, pitch);
             entity.AddFlagImmutability(0);
+        }
+
+        /// <summary>
+        /// create spray paint
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="entityIdGenerator"></param>
+        /// <param name="sprayPaintPos">起始位置</param>
+        /// <param name="sprayPaintForward">朝向</param>
+        /// <param name="sprayPrintMask">掩码</param>
+        /// <param name="sprayPrintSize">大小</param>
+        /// <param name="sprayPrintType">类型</param>
+        /// <param name="sprayPrintSpriteId">贴图</param>
+        public static void CreateSprayPaint(ClientEffectContext context,
+            IEntityIdGenerator entityIdGenerator,
+            Vector3 sprayPaintPos, 
+            Vector3 sprayPaintForward,
+            int sprayPrintMask,
+            Vector3 sprayPrintSize,
+            ESprayPrintType sprayPrintType,
+            int sprayPrintSpriteId
+            )
+        {
+            int type = (int)EClientEffectType.SprayPrint;
+            var effectEntity = context.CreateEntity();
+            var nextId = entityIdGenerator.GetNextEntityId();
+            effectEntity.AddEntityKey(new EntityKey(nextId, (int)EEntityType.ClientEffect));
+            effectEntity.AddPosition();
+            effectEntity.position.Value = sprayPaintPos;
+            effectEntity.AddSprayPaint();
+            effectEntity.sprayPaint.SprayPaintPos = sprayPaintPos;
+            effectEntity.sprayPaint.SprayPaintForward = sprayPaintForward;
+            effectEntity.sprayPaint.SprayPrintMask = sprayPrintMask;
+            effectEntity.sprayPaint.SprayPrintSize = sprayPrintSize;
+            effectEntity.sprayPaint.SprayPrintType = (int)sprayPrintType;
+            effectEntity.sprayPaint.SprayPrintSpriteId = sprayPrintSpriteId;
+
+            effectEntity.AddEffectType(type);
+
+            effectEntity.AddLifeTime(DateTime.Now, 600000);
+            effectEntity.isFlagSyncNonSelf = true;
+
+
+            effectEntity.lifeTime.LifeTime = SingletonManager.Get<ClientEffectCommonConfigManager>().DecayLifeTime;
+            effectEntity.AddFlagImmutability(0);
         }
     }
 }

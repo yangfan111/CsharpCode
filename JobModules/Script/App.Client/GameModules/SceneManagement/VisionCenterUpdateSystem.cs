@@ -3,6 +3,7 @@ using App.Client.GameModules.Player;
 using App.Client.SceneManagement;
 using App.Client.SceneManagement.DistanceCulling;
 using App.Shared;
+using Core.Components;
 using Core.GameModule.Interface;
 using Core.SceneManagement;
 using Core.Utils;
@@ -29,7 +30,7 @@ namespace App.Client.GameModules.SceneManagement
 
         public void OnRender()
         {
-            var status = _levelManager.UpdateOrigin(Camera.main.transform.position);
+            var status = _levelManager.UpdateOrigin(Camera.main.transform.position.WorldPosition());
             if (SharedConfig.EnableDC)
             {
                 if (SharedConfig.EnableOC && Camera.main.useOcclusionCulling != status.CloseToBuilding)

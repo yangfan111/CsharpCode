@@ -14,6 +14,8 @@ namespace Core.CharacterState.Posture
         /// 只有对同步使用
         /// </summary>
         bool IsNeedJumpForSync { get; set; }
+
+        bool IsFreefallState();
     }
 
     public interface ICharacterPostureInConfig

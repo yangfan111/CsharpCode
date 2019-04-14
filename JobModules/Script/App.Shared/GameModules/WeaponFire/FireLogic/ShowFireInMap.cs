@@ -19,7 +19,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
         public void OnBulletFire(PlayerWeaponController controller, IWeaponCmd cmd)
         {
-            controller.RelatedStatics.ShootingCount += 1;
+            controller.RelatedStatisticsData.ShootingCount += 1;
             //服务端不需要处理,uicontext为null
             if (null != _uiContext && _uiContext.hasMap)
             {

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using App.Client.Cmd;
 using App.Client.GameModules.Vehicle;
 using App.Protobuf;
@@ -154,7 +155,8 @@ namespace App.Client.ClientSystems
                 last.ChangedSeat = cmd.ChangedSeat > 0 ? cmd.ChangedSeat : last.ChangedSeat;
                 last.ChangeChannel = cmd.ChangeChannel > 0 ? cmd.ChangeChannel : last.ChangeChannel;
                 last.CurWeapon = cmd.CurWeapon == 0 ? last.CurWeapon : cmd.CurWeapon;
-                last.PickUpEquip = cmd.PickUpEquip > 0 ? cmd.PickUpEquip : last.PickUpEquip;
+                last.ManualPickUpEquip = cmd.ManualPickUpEquip > 0 ? cmd.ManualPickUpEquip : last.ManualPickUpEquip;
+                last.AutoPickUpEquip = UserCmd.CopyList(last.AutoPickUpEquip, cmd.AutoPickUpEquip);
                 last.UseEntityId = cmd.UseEntityId > 0 ? cmd.UseEntityId : last.UseEntityId;
                 last.UseVehicleSeat = cmd.UseVehicleSeat > 0 ? cmd.UseVehicleSeat : last.UseVehicleSeat;
                 last.UseType = cmd.UseType > 0 ? cmd.UseType : last.UseType;

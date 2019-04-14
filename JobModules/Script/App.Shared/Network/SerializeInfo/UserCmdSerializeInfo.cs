@@ -3,6 +3,7 @@ using App.Protobuf;
 using Core.Network;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
+using RpcNetwork.RpcNetwork;
 
 namespace App.Shared.Network.SerializeInfo
 {

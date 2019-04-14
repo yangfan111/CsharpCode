@@ -1,4 +1,5 @@
 ﻿using App.Client.GameModules.Ui.UiAdapter.Common;
+using App.Client.GameModules.Ui.UiAdapter.Interface.Common;
 using App.Client.GameModules.Ui.ViewModels.Common;
 using Assets.App.Client.GameModules.Ui;
 using Assets.UiFramework.Libs;
@@ -11,7 +12,7 @@ namespace App.Client.GameModules.Ui.Models.Common
     public class CommonRevengeTagModel : ClientAbstractModel, IUiHfrSystem
     {
         private CommonRevengeTagViewModel _viewModel = new CommonRevengeTagViewModel();
-        RevengeTagUiAdapter adapter;
+        IRevengeTagUiAdapter adapter;
 
 
         public CommonRevengeTagModel(RevengeTagUiAdapter adapter) : base(adapter)
@@ -52,7 +53,8 @@ namespace App.Client.GameModules.Ui.Models.Common
                 needShow = true;
                 adapter.KillerChanged = false;
             }
-            if (Time.time - _beginTime > 8f)
+            
+            if (Time.time - _beginTime > 8f || adapter.IsKillerDead)
             {
                 needShow = false;
             }

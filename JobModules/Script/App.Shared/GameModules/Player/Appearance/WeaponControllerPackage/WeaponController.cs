@@ -10,12 +10,10 @@ using App.Shared.Components.Player;
 using Core.Utils;
 using XmlConfig;
 using Utils.Appearance;
-using Utils.Appearance.Weapon;
-using Utils.AssetManager;
 
 namespace App.Shared.GameModules.Player.Appearance.WeaponControllerPackage
 {
-    public class WeaponController : HallWeaponController, ICharacterLoadResource
+    public class WeaponController : WeaponControllerBase, ICharacterLoadResource
     {
         public WeaponController()
         {
@@ -32,11 +30,6 @@ namespace App.Shared.GameModules.Player.Appearance.WeaponControllerPackage
         {
             CopyFromPredictedWeaponComponent(value);
         }
-        
-        public void SyncFromClientComponent(ClientAppearanceComponent value)
-        {
-            CopyFromClientWeaponComponent(value);
-        }
 
         public void SyncToLatestComponent(LatestAppearanceComponent value)
         {
@@ -46,11 +39,6 @@ namespace App.Shared.GameModules.Player.Appearance.WeaponControllerPackage
         public void SyncToPredictedComponent(PredictedAppearanceComponent value)
         {
             CopyToPredictedWeaponComponent(value);
-        }
-        
-        public void SyncToClientComponent(ClientAppearanceComponent value)
-        {
-            CopyToClientWeaponComponent(value);
         }
         
         #endregion
@@ -92,18 +80,13 @@ namespace App.Shared.GameModules.Player.Appearance.WeaponControllerPackage
             SetLatestWeaponValue(LatestWeaponStateIndex.ThrownWeapon, value.ThrownWeapon);
             SetLatestWeaponValue(LatestWeaponStateIndex.TacticWeapon, value.TacticWeapon);
         }
-        
-        private void CopyFromClientWeaponComponent(ClientAppearanceComponent value)
-        {
-            if(null == value) return;
-            SetClientWeaponValue(ClientWeaponStateIndex.AlternativeWeaponLocator, value.AlternativeWeaponLocator);
-            SetClientWeaponValue(ClientWeaponStateIndex.AlternativeP3WeaponLocator, value.AlternativeP3WeaponLocator);
-        }
 
         private void CopyFromPredictedWeaponComponent(PredictedAppearanceComponent value)
         {
             if(null == value) return;
             SetPredictedWeaponValue(PredictedWeaponStateIndex.WeaponInHand, value.WeaponInHand);
+            SetPredictedWeaponValue(PredictedWeaponStateIndex.AlternativeWeaponLocator, value.AlternativeWeaponLocator);
+            SetPredictedWeaponValue(PredictedWeaponStateIndex.AlternativeP3WeaponLocator, value.AlternativeP3WeaponLocator);
             SetPredictedWeaponValue(PredictedWeaponStateIndex.ReloadState, value.ReloadState);
         }
 
@@ -137,19 +120,9 @@ namespace App.Shared.GameModules.Player.Appearance.WeaponControllerPackage
         {
             if(null == value) return;
             value.WeaponInHand = GetPredictedWeaponValue(PredictedWeaponStateIndex.WeaponInHand);
+            value.AlternativeWeaponLocator = GetPredictedWeaponValue(PredictedWeaponStateIndex.AlternativeWeaponLocator);
+            value.AlternativeP3WeaponLocator = GetPredictedWeaponValue(PredictedWeaponStateIndex.AlternativeP3WeaponLocator);
             value.ReloadState = GetPredictedWeaponValue(PredictedWeaponStateIndex.ReloadState);
-        }
-        
-        private void CopyToClientWeaponComponent(ClientAppearanceComponent value)
-        {
-            if(null == value) return;
-            value.AlternativeWeaponLocator = GetClientWeaponValue(ClientWeaponStateIndex.AlternativeWeaponLocator);
-            value.AlternativeP3WeaponLocator = GetClientWeaponValue(ClientWeaponStateIndex.AlternativeP3WeaponLocator);
-        }
-
-        protected override AbstractLoadRequest CreateLoadRequest(AssetInfo assetInfo, ILoadedHandler loadedHanlder)
-        {
-            return LoadRequestFactory.Create<PlayerEntity>(assetInfo, loadedHanlder.OnLoadSucc);
         }
 
         #endregion

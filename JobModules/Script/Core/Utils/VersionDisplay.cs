@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Core.GameModule.Step;
+using Core.OC;
 using UnityEngine;
 using Utils.Singleton;
 
@@ -23,7 +24,7 @@ namespace Core.Utils
             SingletonManager.Get<DurationHelp>().Update();
         }
 
-        string[] _labels = new string[6];
+        string[] _labels = new string[7];
 
         void OnGUI()
         {
@@ -60,6 +61,8 @@ namespace Core.Utils
                         StepExecuteManager.Instance.FpsString(), SingletonManager.Get<DurationHelp>().LastAvgInterpolateInterval, 
                         SingletonManager.Get<DurationHelp>().ServerClientDelta, SingletonManager.Get<DurationHelp>().RenderTime, SingletonManager.Get<DurationHelp>().LastServerTime, SingletonManager.Get<DurationHelp>().LastServerTime-SingletonManager.Get<DurationHelp>().RenderTime) ;
                     _labels[5] = string.Format("serverip: {0} ServerId: {1}",SingletonManager.Get<DurationHelp>().ServerInfo, SingletonManager.Get<Core.Utils.ServerInfo>().ServerId);
+                    _labels[6] = string.Format("ocpvs: {0} ocen: {1}", OcclusionRunningState.HasPVSData ? "T" : "F",
+                        OcclusionRunningState.OcclusionEnabled ? "T" : "F");
                     _bb.normal.background = null; //这是设置背景填充的
                     _bb.normal.textColor = new Color(1.0f, 1f, 1.0f); //设置字体颜色的
                     _bb.fontSize = 10; //当然，这是字体大小

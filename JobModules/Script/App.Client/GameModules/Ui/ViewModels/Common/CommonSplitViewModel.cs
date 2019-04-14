@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -174,49 +175,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonSplitView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonSplitView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonSplitView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonSplitView, CommonSplitViewModel> bindingSet =
-                view.CreateBindingSet<CommonSplitView, CommonSplitViewModel>();
-
-            view.orirootActiveSelf = _rootActiveSelf = view.rootActiveSelf.activeSelf;
-            bindingSet.Bind(view.rootActiveSelf).For(v => v.activeSelf).To(vm => vm.rootActiveSelf).OneWay();
-            view.orititleText = _titleText = view.titleText.text;
-            bindingSet.Bind(view.titleText).For(v => v.text).To(vm => vm.titleText).OneWay();
-            view.orileftText = _leftText = view.leftText.text;
-            bindingSet.Bind(view.leftText).For(v => v.text).To(vm => vm.leftText).OneWay();
-            view.orirightText = _rightText = view.rightText.text;
-            bindingSet.Bind(view.rightText).For(v => v.text).To(vm => vm.rightText).OneWay();
-            view.oriSliderValue = _sliderValue = view.SliderValue.value;
-            bindingSet.Bind(view.SliderValue).For(v => v.value).To(vm => vm.SliderValue).OneWay();
-            bindingSet.Bind(view.SliderValueChanged).For(v => v.onValueChanged).To(vm => vm.SliderValueChanged).OneWay();
-            bindingSet.Bind(view.splitBtnClick).For(v => v.onClick).To(vm => vm.splitBtnClick).OneWay();
-            view.orisplitBtnInteractable = _splitBtnInteractable = view.splitBtnInteractable.interactable;
-            bindingSet.Bind(view.splitBtnInteractable).For(v => v.interactable).To(vm => vm.splitBtnInteractable).OneWay();
-            bindingSet.Bind(view.cancelBtnClick).For(v => v.onClick).To(vm => vm.cancelBtnClick).OneWay();
-            bindingSet.Bind(view.splitNumChanged).For(v => v.onValueChanged).To(vm => vm.splitNumChanged).OneWay();
-            view.orisplitNumName = _splitNumName = view.splitNumName.text;
-            bindingSet.Bind(view.splitNumName).For(v => v.text).To(vm => vm.splitNumName).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonSplitView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -240,12 +220,61 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonSplitView view)
+		{
+		     BindingSet<CommonSplitView, CommonSplitViewModel> bindingSet =
+                view.CreateBindingSet<CommonSplitView, CommonSplitViewModel>();
+            bindingSet.Bind(view.rootActiveSelf).For(v => v.activeSelf).To(vm => vm.rootActiveSelf).OneWay();
+            bindingSet.Bind(view.titleText).For(v => v.text).To(vm => vm.titleText).OneWay();
+            bindingSet.Bind(view.leftText).For(v => v.text).To(vm => vm.leftText).OneWay();
+            bindingSet.Bind(view.rightText).For(v => v.text).To(vm => vm.rightText).OneWay();
+            bindingSet.Bind(view.SliderValue).For(v => v.value).To(vm => vm.SliderValue).OneWay();
+            bindingSet.Bind(view.SliderValueChanged).For(v => v.onValueChanged).To(vm => vm.SliderValueChanged).OneWay();
+            bindingSet.Bind(view.splitBtnClick).For(v => v.onClick).To(vm => vm.splitBtnClick).OneWay();
+            bindingSet.Bind(view.splitBtnInteractable).For(v => v.interactable).To(vm => vm.splitBtnInteractable).OneWay();
+            bindingSet.Bind(view.cancelBtnClick).For(v => v.onClick).To(vm => vm.cancelBtnClick).OneWay();
+            bindingSet.Bind(view.splitNumChanged).For(v => v.onValueChanged).To(vm => vm.splitNumChanged).OneWay();
+            bindingSet.Bind(view.splitNumName).For(v => v.text).To(vm => vm.splitNumName).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonSplitView view)
+		{
+            _rootActiveSelf = view.rootActiveSelf.activeSelf;
+            _titleText = view.titleText.text;
+            _leftText = view.leftText.text;
+            _rightText = view.rightText.text;
+            _sliderValue = view.SliderValue.value;
+            _splitBtnInteractable = view.splitBtnInteractable.interactable;
+            _splitNumName = view.splitNumName.text;
+		}
+
+
+		void SaveOriData(CommonSplitView view)
+		{
+            view.orirootActiveSelf = _rootActiveSelf;
+            view.orititleText = _titleText;
+            view.orileftText = _leftText;
+            view.orirightText = _rightText;
+            view.oriSliderValue = _sliderValue;
+            view.orisplitBtnInteractable = _splitBtnInteractable;
+            view.orisplitNumName = _splitNumName;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			rootActiveSelf = _view.orirootActiveSelf;
 			titleText = _view.orititleText;
 			leftText = _view.orileftText;
@@ -279,7 +308,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonSplit"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

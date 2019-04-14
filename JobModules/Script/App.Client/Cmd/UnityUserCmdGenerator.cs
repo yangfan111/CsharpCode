@@ -109,6 +109,7 @@ namespace Assets.Sources
             _keyReceiver.AddAction(UserInputKey.IsCDown, data => _userCmd.IsCDown = true);
             _keyReceiver.AddAction(UserInputKey.IsSpaceDown, data => _userCmd.IsSpaceDown = true);
             _keyReceiver.AddAction(UserInputKey.HoldF, data => _userCmd.IsF = true);
+            _keyReceiver.AddAction(UserInputKey.SprayPaint, data => _userCmd.IsSprayPaint = true);
             _userInputManager.RegisterKeyReceiver(_keyReceiver);
 
             #endregion

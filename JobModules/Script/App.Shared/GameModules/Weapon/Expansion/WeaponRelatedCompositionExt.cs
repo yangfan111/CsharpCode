@@ -30,7 +30,7 @@ namespace App.Shared
             component.WeaponPunchPitch = 0;
             component.WeaponPunchYaw = 0;
         }
-    
+      
         /// <summary>
         /// ChangeC4ToBag
         /// </summary>

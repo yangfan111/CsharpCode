@@ -131,7 +131,7 @@ namespace ECM.Components
         /// 特殊情况，当站在角色上时候，需要下滑
         /// </summary>
         /// <returns></returns>
-        private bool IsOnPlayer()
+        public bool IsOnPlayer()
         {
             bool ret = false;
             if (groundCollider != null)

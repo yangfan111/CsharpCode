@@ -126,6 +126,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             item.gameObject.SetActive(false);
             inputField = FindChildGo("InputField").GetComponent<InputField>();
             _viewModel.InputValueChanged = InputValueOnChanged;
+            //new UIInputValid(inputField, new SenesitiveWord(), replaceStr: "*");
         }
 
         private void InitAnim()
@@ -442,6 +443,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         BroadcastMessageData GetNewBroadcastMessageData(string str)
         {
             var data = BroadcastMessageData.Allocate();
+            data.SendRoleName = string.Empty;
             data.ChatMessage = ChatMessageData.Allocate();
             data.ChatMessage.Message = str;
             data.ChatMessage.Type = 1;
@@ -453,6 +455,12 @@ namespace App.Client.GameModules.Ui.Models.Common
             string str = inputField.text;
             if (string.IsNullOrEmpty(str))
             {
+                return;
+            }
+            var targetStrWithOutBlack = str.Trim();
+            if (string.IsNullOrEmpty(targetStrWithOutBlack))
+            {
+                inputField.text = string.Empty;
                 return;
             }
             if (CheckPersonalOnlineStatusAndSendPrivateChat())//私聊状态

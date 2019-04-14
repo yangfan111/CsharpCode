@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Blast
 {
@@ -144,47 +145,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Blast
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<BlastScoreView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<BlastScoreView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<BlastScoreView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<BlastScoreView, BlastScoreViewModel> bindingSet =
-                view.CreateBindingSet<BlastScoreView, BlastScoreViewModel>();
-
-            view.oriShow = _show = view.Show.activeSelf;
-            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
-            view.oriTimeText = _timeText = view.TimeText.text;
-            bindingSet.Bind(view.TimeText).For(v => v.text).To(vm => vm.TimeText).OneWay();
-            view.oriTimeColor = _timeColor = view.TimeColor.color;
-            bindingSet.Bind(view.TimeColor).For(v => v.color).To(vm => vm.TimeColor).OneWay();
-            view.oriScoreText = _scoreText = view.ScoreText.text;
-            bindingSet.Bind(view.ScoreText).For(v => v.text).To(vm => vm.ScoreText).OneWay();
-            view.oriCampKillCountText1 = _campKillCountText1 = view.CampKillCountText1.text;
-            bindingSet.Bind(view.CampKillCountText1).For(v => v.text).To(vm => vm.CampKillCountText1).OneWay();
-            view.oriCampKillCountText2 = _campKillCountText2 = view.CampKillCountText2.text;
-            bindingSet.Bind(view.CampKillCountText2).For(v => v.text).To(vm => vm.CampKillCountText2).OneWay();
-            view.oriC4TipGroupShow = _c4TipGroupShow = view.C4TipGroupShow.activeSelf;
-            bindingSet.Bind(view.C4TipGroupShow).For(v => v.activeSelf).To(vm => vm.C4TipGroupShow).OneWay();
-            view.oriC4TipValue = _c4TipValue = view.C4TipValue.fillAmount;
-            bindingSet.Bind(view.C4TipValue).For(v => v.fillAmount).To(vm => vm.C4TipValue).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(BlastScoreView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -208,12 +190,60 @@ namespace App.Client.GameModules.Ui.ViewModels.Blast
             }
         }
 
+		void ViewBind(BlastScoreView view)
+		{
+		     BindingSet<BlastScoreView, BlastScoreViewModel> bindingSet =
+                view.CreateBindingSet<BlastScoreView, BlastScoreViewModel>();
+            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
+            bindingSet.Bind(view.TimeText).For(v => v.text).To(vm => vm.TimeText).OneWay();
+            bindingSet.Bind(view.TimeColor).For(v => v.color).To(vm => vm.TimeColor).OneWay();
+            bindingSet.Bind(view.ScoreText).For(v => v.text).To(vm => vm.ScoreText).OneWay();
+            bindingSet.Bind(view.CampKillCountText1).For(v => v.text).To(vm => vm.CampKillCountText1).OneWay();
+            bindingSet.Bind(view.CampKillCountText2).For(v => v.text).To(vm => vm.CampKillCountText2).OneWay();
+            bindingSet.Bind(view.C4TipGroupShow).For(v => v.activeSelf).To(vm => vm.C4TipGroupShow).OneWay();
+            bindingSet.Bind(view.C4TipValue).For(v => v.fillAmount).To(vm => vm.C4TipValue).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(BlastScoreView view)
+		{
+            _show = view.Show.activeSelf;
+            _timeText = view.TimeText.text;
+            _timeColor = view.TimeColor.color;
+            _scoreText = view.ScoreText.text;
+            _campKillCountText1 = view.CampKillCountText1.text;
+            _campKillCountText2 = view.CampKillCountText2.text;
+            _c4TipGroupShow = view.C4TipGroupShow.activeSelf;
+            _c4TipValue = view.C4TipValue.fillAmount;
+		}
+
+
+		void SaveOriData(BlastScoreView view)
+		{
+            view.oriShow = _show;
+            view.oriTimeText = _timeText;
+            view.oriTimeColor = _timeColor;
+            view.oriScoreText = _scoreText;
+            view.oriCampKillCountText1 = _campKillCountText1;
+            view.oriCampKillCountText2 = _campKillCountText2;
+            view.oriC4TipGroupShow = _c4TipGroupShow;
+            view.oriC4TipValue = _c4TipValue;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			Show = _view.oriShow;
 			TimeText = _view.oriTimeText;
 			TimeColor = _view.oriTimeColor;
@@ -248,7 +278,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Blast
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/blast"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/blast"; } }
         public string ResourceAssetName { get { return "BlastScore"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

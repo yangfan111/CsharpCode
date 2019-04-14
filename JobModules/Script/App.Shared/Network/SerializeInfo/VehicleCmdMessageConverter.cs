@@ -1,5 +1,6 @@
 ﻿using App.Protobuf;
 using App.Shared.Components.Vehicle;
+using Core.Components;
 using Core.Prediction.VehiclePrediction.Cmd;
 using Core.Utils;
 using XmlConfig;
@@ -35,7 +36,7 @@ namespace App.Shared.Network
 
                     cmd.CmdSeq = item.CmdSeq;
 
-                    cmd.Body.Position = Vector3Converter.ProtobufToUnityVector3(item.Body.Position);
+                    cmd.Body.Position = Vector3Converter.ProtobufToUnityVector3(item.Body.Position).ShiftedToFixedVector3();
                     cmd.Body.Rotation = Vector3Converter.ProtobufToUnityQuaternion(item.Body.Rotation);
 //                    cmd.Body.Body2WorldPosition = Vector3Converter.ProtobufToUnityVector3(item.Body.Body2WorldPosition);
 //                    cmd.Body.Body2WorldRotation = Vector3Converter.ProtobufToUnityQuaternion(item.Body.Body2WorldRotation);
@@ -146,7 +147,7 @@ namespace App.Shared.Network
                 
                 var vehicleCmd = (VehicleCmd) cmd;
                 item.Body = VehicleBodyItem.Allocate();
-                item.Body.Position = Vector3Converter.UnityToProtobufVector3(vehicleCmd.Body.Position);
+                item.Body.Position = Vector3Converter.UnityToProtobufVector3(vehicleCmd.Body.Position.WorldVector3());
                 item.Body.Rotation = Vector3Converter.UnityToProtobufQuaternion(vehicleCmd.Body.Rotation);
                 item.Body.LinearVelocity = Vector3Converter.UnityToProtobufVector3(vehicleCmd.Body.LinearVelocity);
                 item.Body.AngularVelocity = Vector3Converter.UnityToProtobufVector3(vehicleCmd.Body.AngularVelocity);

@@ -51,7 +51,8 @@ namespace App.Shared.EntityFactory
                 bulletConfig.VelocityDecay,
                 caliber,
                 weaponId);
-            bulletEntity.AddPosition(viewPosition);
+            bulletEntity.AddPosition();
+            bulletEntity.position.Value = viewPosition;
             bulletEntity.AddOwnerId(entityKey);
             bulletEntity.bulletData.CmdSeq = cmdSeq;
             bulletEntity.bulletData.StartPoint = viewPosition;

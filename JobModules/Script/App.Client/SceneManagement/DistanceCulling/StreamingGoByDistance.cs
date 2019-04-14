@@ -75,9 +75,10 @@ namespace App.Client.SceneManagement.DistanceCulling
             _sceneNameToIndex.Add(sceneName, sceneIndex);
             _sceneDesc.Add(sceneIndex, sceneStruct);
                 
-            var go = new GameObject("StreamingRoot");
-            SceneManager.MoveGameObjectToScene(go, scene);
-            _goRoot.Add(sceneIndex, go);
+//            var go = new GameObject("StreamingRoot");
+//            SceneManager.MoveGameObjectToScene(go, scene);
+//            _goRoot.Add(sceneIndex, go);
+            _goRoot.Add(sceneIndex, DefaultGo.StreamingRoot);
                 
             if (_asap)
             {

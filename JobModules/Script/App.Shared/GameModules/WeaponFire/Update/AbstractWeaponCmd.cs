@@ -2,7 +2,7 @@
 using App.Shared.GameModules.Weapon.Behavior;
 using WeaponConfigNs;
 using XmlConfig;
-using Core.GameInputFilter;
+using Core;
 using System;
 using App.Shared.GameModules.Weapon;
 

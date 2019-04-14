@@ -27,6 +27,9 @@ namespace Core.CharacterState.Posture
                 case PostureStateId.Prone:
                     ret = PostureInConfig.Prone;
                     break;
+                case PostureStateId.DyingTransition:
+                    ret = PostureInConfig.DyingTransition;
+                    break;
                 case PostureStateId.Dying:
                     ret = PostureInConfig.Dying;
                     break;
@@ -111,6 +114,8 @@ namespace Core.CharacterState.Posture
             { ActionStateId.Parachuting,            ActionInConfig.Parachuting },
 			{ ActionStateId.OpenDoor,               ActionInConfig.OpenDoor},
             { ActionStateId.Props,                  ActionInConfig.Props},
+            { ActionStateId.BuriedBomb,             ActionInConfig.BuriedBomb},
+            { ActionStateId.DismantleBomb,          ActionInConfig.DismantleBomb},
         };
 
         internal static ActionInConfig GetActionStateId(ActionStateId stateId)

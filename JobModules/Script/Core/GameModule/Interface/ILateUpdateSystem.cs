@@ -1,6 +1,6 @@
 ﻿namespace Core.GameModule.Interface
 {
-    public interface ILateUpdateSystem
+    public interface ILateUpdateSystem:IUserSystem
     {
         void OnLateUpdate();
     }

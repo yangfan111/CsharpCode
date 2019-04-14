@@ -33,6 +33,7 @@ namespace App.Client.SessionStates
 
             _gameModule = CreateCompositeGameModule(_contexts);
             var systems = new Entitas.Systems();
+            systems.Add(new LocalizeSessionSystem(this, _contexts.session.commonSession.AssetManager));
             systems.Add(new BaseConfigurationInitModule(this, _contexts.session.commonSession.AssetManager));
             systems.Add(new ClientPreLoginFeature(
                 "BasePreparing",

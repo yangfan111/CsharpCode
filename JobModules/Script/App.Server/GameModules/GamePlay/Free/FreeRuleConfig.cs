@@ -1,52 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Xml;
-using App.Server.GameModules.GamePlay.free;
+﻿using App.Server.GameModules.GamePlay.framework.ui;
 using App.Server.GameModules.GamePlay.Free.action;
+using App.Server.GameModules.GamePlay.Free.action.ui;
+using App.Server.GameModules.GamePlay.Free.app;
+using App.Server.GameModules.GamePlay.Free.chicken;
+using App.Server.GameModules.GamePlay.Free.condition;
 using App.Server.GameModules.GamePlay.Free.entity;
+using App.Server.GameModules.GamePlay.Free.hall;
+using App.Server.GameModules.GamePlay.Free.item;
+using App.Server.GameModules.GamePlay.Free.item.config;
+using App.Server.GameModules.GamePlay.Free.map;
 using App.Server.GameModules.GamePlay.Free.map.position;
-using com.cpkf.yyjd.tools.util;
-using com.graphbuilder.struc;
+using App.Server.GameModules.GamePlay.Free.player;
+using App.Server.GameModules.GamePlay.Free.replacer;
+using App.Server.GameModules.GamePlay.Free.ui;
+using App.Server.GameModules.GamePlay.Free.weapon;
+using App.Shared.FreeFramework.Free.Action;
+using App.Shared.FreeFramework.Free.Map;
+using App.Shared.FreeFramework.UnitTest;
+using Assets.App.Server.GameModules.GamePlay.Free.UnitTest;
 using com.wd.free.action;
 using com.wd.free.config;
 using com.wd.free.map.position;
 using com.wd.free.trigger;
+using com.wd.free.util;
 using com.wd.free.xml;
 using commons.data;
 using commons.data.mysql;
 using commons.util;
 using gameplay.gamerule.free.action;
+using gameplay.gamerule.free.component;
 using gameplay.gamerule.free.item;
 using gameplay.gamerule.free.map;
+using gameplay.gamerule.free.player;
 using gameplay.gamerule.free.ui;
 using gameplay.gamerule.free.ui.component;
 using MySql.Data.MySqlClient;
 using Sharpen;
-using StringUtil = com.cpkf.yyjd.tools.util.StringUtil;
-using App.Server.GameModules.GamePlay.Free.condition;
-using App.Server.GameModules.GamePlay.Free.player;
-using gameplay.gamerule.free.player;
-using App.Server.GameModules.GamePlay.Free.action.ui;
-using App.Server.GameModules.GamePlay.Free.item;
-using App.Server.GameModules.GamePlay.framework.ui;
-using App.Server.GameModules.GamePlay.Free.map;
-using App.Server.GameModules.GamePlay.Free.weapon;
-using App.Server.GameModules.GamePlay.Free.ui;
-using App.Server.GameModules.GamePlay.Free.item.config;
-using com.wd.free.util;
-using App.Server.GameModules.GamePlay.Free.replacer;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Xml;
 using UnityEngine;
-using App.Shared.FreeFramework.Free.Map;
-using App.Server.GameModules.GamePlay.Free.chicken;
-using gameplay.gamerule.free.component;
-using App.Server.GameModules.GamePlay.Free.app;
-using App.Server.GameModules.GamePlay.Free.hall;
-using App.Shared.FreeFramework.UnitTest;
-using Assets.App.Server.GameModules.GamePlay.Free.UnitTest;
 
 namespace App.Server.GameModules.GamePlay
 {
@@ -169,7 +165,7 @@ namespace App.Server.GameModules.GamePlay
             }
             else
             {
-                return RemoveComment(GetFileContent(Application.dataPath + "/GameData/Server/Rule/" + name + ".xml", Encoding.UTF8));
+                return RemoveComment(GetFileContent(Application.dataPath + "/Config/Server/Rule/" + name + ".xml", Encoding.UTF8));
             }
 
             return "";
@@ -177,7 +173,7 @@ namespace App.Server.GameModules.GamePlay
 
         public static string GetXmlContent(string fileName)
         {
-            return RemoveComment(GetFileContent(Application.dataPath + "/GameData/Server/GameConfig/" + fileName + ".xml", Encoding.UTF8));
+            return RemoveComment(GetFileContent(Application.dataPath + "/Config/Server/GameConfig/" + fileName + ".xml", Encoding.UTF8));
         }
 
         private static string GetFileContent(string filename, Encoding enconding)
@@ -233,7 +229,7 @@ namespace App.Server.GameModules.GamePlay
                     //config.UserID = "root";
                     //config.Password = "@wan5d.com@";
 
-                    XMLParser parser = new XMLParser(Application.dataPath + "/GameData/Server/connection.xml");
+                    XMLParser parser = new XMLParser(Application.dataPath + "/Config/Server/connection.xml");
 
                     config.Server = parser.GetNodeValue("//host");
                     config.Database = parser.GetNodeValue("//db-name");
@@ -363,6 +359,7 @@ namespace App.Server.GameModules.GamePlay
             aliasOne(alias, new ChangeWeaponAction());
             aliasOne(alias, new ServerShutdownAction());
             aliasOne(alias, new SetUnitTestDataAction());
+            aliasOne(alias, new ConsoleCommandAction());
         }
 
         // 会把父类的字段也会加入，需要注意当以前的代码中父类的字段没有按照这样的命名规范时会有问题
@@ -450,6 +447,8 @@ namespace App.Server.GameModules.GamePlay
             alias.AddAttribue("circle-region", "radius", "radius");
             alias.AddAttribue("circle-region", "change", "change");
             alias.AddAttribue("circle-region", "zRange", "z-range");
+            alias.AddClass("point-region", new MapPointRegion());
+            alias.AddAttribue("point-region", "type", "type");
 
             alias.AddClass("entity-position", new PosEntitySelector());
             alias.AddAttribue("entity-position", "condition", "condition");

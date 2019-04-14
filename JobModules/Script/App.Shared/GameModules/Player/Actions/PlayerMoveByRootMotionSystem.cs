@@ -3,12 +3,22 @@ using App.Shared.Player;
 using Core.CameraControl;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
+using Core.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using UnityEngine;
+using XmlConfig;
 
 namespace App.Shared.GameModules.Player.Actions
 {
     public class PlayerMoveByRootMotionSystem : IUserCmdExecuteSystem
     {
+        public PlayerMoveByRootMotionSystem()
+        {
+        }
+
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             var player = (PlayerEntity)owner.OwnerEntity;
@@ -44,11 +54,6 @@ namespace App.Shared.GameModules.Player.Actions
             player.playerMoveByAnimUpdate.Position = player.position.Value = parent.position;
             player.playerMoveByAnimUpdate.ModelPitch = player.orientation.ModelPitch = YawPitchUtility.Normalize(parent.rotation.eulerAngles.x);
             player.playerMoveByAnimUpdate.ModelYaw = player.orientation.ModelYaw = YawPitchUtility.Normalize(parent.rotation.eulerAngles.y);
-            
-            if(player.hasPlayerMove)
-                player.playerMove.Velocity = Vector3.zero;
-            if(player.hasMoveUpdate)
-                player.moveUpdate.Velocity = Vector3.zero;
         }
     }
 }

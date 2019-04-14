@@ -20,7 +20,7 @@ using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using Utils.Configuration;
 using XmlConfig;
-using App.Shared.GameInputFilter;
+using Core;
 using Utils.Singleton;
 
 namespace App.Client.GameModules.GamePlay.Offline

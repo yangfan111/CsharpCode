@@ -12,7 +12,7 @@ namespace com.wd.free.ai
     [Serializable]
     public class OrderAiAction : AbstractGameAction
     {
-        public int repeat;
+        public string repeat;
         public List<IGameAction> actions;
         // 每帧都做的动作，如收集数据
         public IGameAction frame;
@@ -51,7 +51,7 @@ namespace com.wd.free.ai
                 {
                     currentCount++;
 
-                    if (currentCount >= repeat && repeat > 0)
+                    if (currentCount >= args.GetInt(repeat) && args.GetInt(repeat) > 0)
                     {
                         args.FreeContext.AiSuccess = true;
                     }

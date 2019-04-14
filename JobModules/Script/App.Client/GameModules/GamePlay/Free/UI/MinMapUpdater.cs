@@ -12,6 +12,10 @@ using App.Client.GameModules.Terrain;
 using App.Shared;
 using App.Shared.Components.Ui;
 using App.Shared.GameModules.Player;
+using Assets.Sources.Free.Effect;
+using Core.Components;
+using Core.SpatialPartition;
+using Core.Ui.Map;
 using Utils.Singleton;
 using Utils.Utils;
 using XmlConfig;
@@ -34,6 +38,8 @@ namespace App.Client.GameModules.GamePlay.Free.UI
             {
                 return;
             }
+
+            UpdatePlaine();
 
             PlayerEntity selfEntity = SingletonManager.Get<FreeUiManager>().Contexts1.player.flagSelfEntity;
 
@@ -64,7 +70,7 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                             infoMap[playerEntity.playerInfo.PlayerId] = info;
                         }
 
-                        Vector3 leftMinPos = TerrainCommonData.leftMinPos;
+//                        Vector3 leftMinPos = TerrainCommonData.leftMinPos;
 
                         MiniMapTeamPlayInfo oneInfo = infoMap[playerEntity.playerInfo.PlayerId];
 
@@ -97,15 +103,16 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                         {
                             //飞机上（位置已做过偏移，这里不再偏移）
                             AirPlaneData planeData = data.PlaneData;
-                            oneInfo.Pos = new Vector2(planeData.Pos.x, planeData.Pos.y);
+                            oneInfo.Pos = new MapFixedVector2(planeData.Pos.WorldVector2());
                             oneInfo.FaceDirection = planeData.Direction;
                         }
                         else
                         {
-                            oneInfo.Pos = new Vector2(playerEntity.position.Value.x - leftMinPos.x, playerEntity.position.Value.z - leftMinPos.z);
+//                            oneInfo.Pos = new Vector2(playerEntity.position.Value.x - leftMinPos.x, playerEntity.position.Value.z - leftMinPos.z);
+                            oneInfo.Pos = new MapFixedVector2(playerEntity.position.FixedVector3.To2D());
                             oneInfo.FaceDirection = playerEntity.orientation.Yaw;
                         }
-
+                        
                         //Test Trace
                         if (oneInfo.IsPlayer)
                         {
@@ -155,7 +162,7 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                                 oneInfo.MarkList.Add(mark);
 
                                 TeamPlayerMarkInfo lmark = new TeamPlayerMarkInfo();
-                                lmark.Angel = CommonMathUtil.GetAngle(mark.Pos, oneInfo.Pos);
+                                lmark.Angel = CommonMathUtil.GetAngle(mark.Pos, oneInfo.Pos.ShiftedUIVector2());
                                 lmark.MarkColor = TeamColor(mark.Num);
                                 map.TeamPlayerMarkInfos.Add(lmark);
                             }
@@ -181,6 +188,46 @@ namespace App.Client.GameModules.GamePlay.Free.UI
 
             TerrainTestSystem.teamCnt = data.TeamInfos.Count;
             TerrainTestSystem.teamNum = _teamNums;
+        }
+
+        private void UpdatePlaine()
+        {
+            AirPlaneData planeData = SingletonManager.Get<FreeUiManager>().Contexts1.ui.map.PlaneData;
+            if (planeData == null)
+            {
+                planeData = new AirPlaneData(1, new MapFixedVector2(0, 0), 0);
+                SingletonManager.Get<FreeUiManager>().Contexts1.ui.map.PlaneData = planeData;
+            }
+
+
+            FreeRenderObject plane = SingletonManager.Get<FreeEffectManager>().GetEffect("plane");
+            if (plane == null)
+            {                   
+                plane = SingletonManager.Get<FreeEffectManager>().GetEffect("plane1");
+                if (plane != null)
+                {
+                    planeData.Type = 1;
+//                        planeData.Pos = new Vector2(plane.model3D.x - leftMinPos.x, plane.model3D.z - leftMinPos.z);
+                    var worldPos = WorldOrigin.WorldPosition(new Vector3(plane.model3D.x, plane.model3D.y, plane.model3D.z));
+                    planeData.Pos = new MapFixedVector2(worldPos.To2D());
+                    planeData.Direction = -plane.GetEffect(0).EffectModel3D.model3D.rotationY;
+                }
+            }
+            else
+            {
+                planeData.Type = 2;
+//                    planeData.Pos = new Vector2(plane.model3D.x - leftMinPos.x, plane.model3D.z - leftMinPos.z);
+                var worldPos = WorldOrigin.WorldPosition(new Vector3(plane.model3D.x, plane.model3D.y, plane.model3D.z));
+                planeData.Pos = new MapFixedVector2(worldPos.To2D());
+                planeData.Direction = -plane.GetEffect(0).EffectModel3D.model3D.rotationY;
+            }
+
+            if (plane == null)
+            {
+                planeData.Type = 0;
+                planeData.Pos = new MapFixedVector2(0, 0);
+                planeData.Direction = 0;
+            }
         }
 
         private Color TeamColor(int num)

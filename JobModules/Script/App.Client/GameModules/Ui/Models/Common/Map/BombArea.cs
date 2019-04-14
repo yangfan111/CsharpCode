@@ -25,7 +25,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         {
             Vector2 referPosByPixel = Vector2.zero;
 
-            var temperVec = new Vector2(curBombAreaInfo.Center.x, curBombAreaInfo.Center.z);
+            var temperVec = curBombAreaInfo.Center.ShiftedUIVector2();
             if (curBombAreaInfo.Radius.Equals(0) && curBombAreaInfo.Num.Equals(-1) && Vector2.Distance(selfPlayPos, temperVec) > 1.414f * windowWidthByRice / 2 + curBombAreaInfo.Radius) //不在地图视野内
             {
                 UIUtils.SetActive(tran, false);

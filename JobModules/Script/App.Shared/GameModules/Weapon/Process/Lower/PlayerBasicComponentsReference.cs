@@ -1,4 +1,5 @@
 ﻿using App.Shared.Components.Player;
+using App.Shared.Components.Weapon;
 using Core.Appearance;
 using Core.Attack;
 using Core.CharacterBone;
@@ -19,7 +20,7 @@ namespace App.Shared.GameModules
         public PlayerComponentsReference(PlayerEntity in_entity) : base(in_entity)
         {
         }
-
+    
         public FirePosition RelatedFirePos
         {
             get { return entity.firePosition; }
@@ -29,7 +30,10 @@ namespace App.Shared.GameModules
         {
             get { return entity.time.ClientTime; }
         }
-
+        public GamePlayComponent RelatedGamePlay
+        {
+            get { return entity.gamePlay; }
+        }
         public CameraFinalOutputNewComponent RelatedCameraFinal
         {
             get { return entity.cameraFinalOutputNew; }
@@ -71,7 +75,12 @@ namespace App.Shared.GameModules
 
         public ThrowingActionInfo RelatedThrowAction
         {
-            get { return entity.throwingAction.ActionInfo; }
+            get
+            {
+                if(entity.hasThrowingAction)
+                    return entity.throwingAction.ActionInfo;
+                return null;
+            }
         }
 
         public OrientationComponent RelatedOrient

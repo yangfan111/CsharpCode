@@ -1,8 +1,4 @@
 ﻿using Core.Fsm;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Utils.CharacterState;
 
 namespace Core.CharacterState.Action.Transitions
@@ -39,6 +35,12 @@ namespace Core.CharacterState.Action.Transitions
             {
                 if (command.IsMatch(FsmInput.CancelSight))
                 {
+                    FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.EnableSightMoveHash,
+                        AnimatorParametersHash.Instance.EnableSightMoveName,
+                        AnimatorParametersHash.Instance.EnableSightMoveDisableValue,
+                        CharacterView.FirstPerson, true);
+                    addOutput(FsmOutput.Cache);
+                    
                     command.AdditioanlValue = NormalizedTime;
                     return FsmTransitionResponseType.ForceEnd;
                 }

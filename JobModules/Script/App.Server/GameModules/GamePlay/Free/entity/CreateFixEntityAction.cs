@@ -37,12 +37,15 @@ namespace App.Server.GameModules.GamePlay.Free.entity
             en.AddEntityKey(new EntityKey(args.GameContext.session.commonSession.EntityIdGenerator.GetNextEntityId(), (short)EEntityType.FreeMove));
             if(pos == null)
             {
-                en.AddPosition(new Vector3(FreeUtil.ReplaceFloat(x, args), FreeUtil.ReplaceFloat(y, args), FreeUtil.ReplaceFloat(z, args)));
+                en.AddPosition();
+                en.position.Value = new Vector3(FreeUtil.ReplaceFloat(x, args), FreeUtil.ReplaceFloat(y, args),
+                    FreeUtil.ReplaceFloat(z, args));
             }
             else
             {
                 UnitPosition up = pos.Select(args);
-                en.AddPosition(new Vector3(up.GetX(), up.GetY(), up.GetZ()));
+                en.AddPosition();
+                en.position.Value = new Vector3(up.GetX(), up.GetY(), up.GetZ());
             }
             
             string realCat = FreeUtil.ReplaceVar(cat, args);

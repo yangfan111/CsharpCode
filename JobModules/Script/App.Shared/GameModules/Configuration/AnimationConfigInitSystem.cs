@@ -29,9 +29,9 @@ namespace App.Shared.GameModules.Configuration
         /// 客户端加载
         /// </summary>
         /// <param name="manager"></param>
-        public void OnInitModule(IUnityAssetManager assetManager)
+        public void OnInitModule(ILoadRequestManager loadRequestManager)
         {
-            assetManager.LoadAssetAsync(GetType().ToString(), AssetConfig.GetAnimationConfigAssetInfo(), OnLoadSucc);
+            loadRequestManager.AppendLoadRequest(null, AssetConfig.GetAnimationConfigAssetInfo(), OnLoadSucc);
         }
 
         private void ParseComplete()
@@ -44,10 +44,10 @@ namespace App.Shared.GameModules.Configuration
 //            StateMachineSpeedConfig.ParseFromString(configText);
         }
 
-        public void OnLoadSucc(string source, UnityObject unityObj)
+        public void OnLoadSucc(object source, AssetInfo assetInfo, Object obj)
         {
-            _logger.DebugFormat("OnLoadSucc {0} ", unityObj.Address);
-            TextAsset asset = unityObj.As<TextAsset>();
+            _logger.DebugFormat("OnLoadSucc {0} ", assetInfo);
+            TextAsset asset = obj as TextAsset;
             if (asset == null)
             {
                 _logger.Error("Null animation config for equipment");

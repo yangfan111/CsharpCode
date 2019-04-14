@@ -172,6 +172,14 @@ namespace App.Shared.Components.Player
 
         public void Reset()
         {
+            foreach (var cmd in _tempUserCmdList)
+            {
+                cmd.ReleaseReference();
+            }
+            foreach (var cmd in _userCmdList)
+            {
+                cmd.ReleaseReference();
+            }
             _tempUserCmdList.Clear();
             _userCmdList.Clear();
         }

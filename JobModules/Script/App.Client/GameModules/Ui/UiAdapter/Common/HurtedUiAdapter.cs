@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using App.Shared.Components.Ui;
-using Core.CameraControl.NewMotor;
-using Utils.Configuration;
-using WeaponConfigNs;
 
 namespace App.Client.GameModules.Ui.UiAdapter
 {

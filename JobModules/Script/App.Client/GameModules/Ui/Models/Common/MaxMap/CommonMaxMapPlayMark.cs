@@ -61,7 +61,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                 var tranRT = tran.GetComponent<RectTransform>();
 
                 var offset = new Vector2(tranRT.sizeDelta.y + directRT.sizeDelta.y, tranRT.sizeDelta.y + directRT.sizeDelta.y) / (2 * rate);
-                var result = UIUtils.MathUtil.IsInSquare(PlayRefePosByRice, MaxMapRepresentWHByRice, MaxMapRepresentWHByRice, offset, true, data.Pos);
+                var result = UIUtils.MathUtil.IsInSquare(PlayRefePosByRice, MaxMapRepresentWHByRice, MaxMapRepresentWHByRice, offset, true, data.Pos.ShiftedUIVector2());
                 tran.GetComponent<RectTransform>().anchoredPosition = playRefePosByPixel + result.ContactPoint * rate;
 
                 if (!result.IsContact)

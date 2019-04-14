@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Core.GameInputFilter;
 using Core.GameModule.Interface;
 using Core.GameModule.Module;
 using Core.GameModule.System;
@@ -19,21 +18,17 @@ namespace Core.Prediction.UserPrediction
         private IUserCmd _currentCmd;
         private IPredictionInitManager _predictionInitManager;
         private IUserPredictionInfoProvider _predicatoinInfoProvider;
-        private IGameStateProcessorFactory _gameStateProcessorFactory;
-        private IStateProviderPool _stateProviderPool;
-        private IStatePool _statePool;
 
         public UserPrePredictionSystem(IGameModule gameModule, 
             IUserPredictionInfoProvider handler, 
-            IPredictionInitManager predictionInitManager,
-            IGameStateProcessorFactory gameStateProcessorFactory)
+            IPredictionInitManager predictionInitManager)
         {
             _logger.Info("start");
             _predicatoinInfoProvider = handler;
             _predictionInitManager = predictionInitManager;
-            _gameStateProcessorFactory = gameStateProcessorFactory;
-            _stateProviderPool = gameStateProcessorFactory.GetProviderPool();
-            _statePool = gameStateProcessorFactory.GetStatePool();
+            //_gameStateProcessorFactory = gameStateProcessorFactory;
+            //_stateProviderPool = gameStateProcessorFactory.GetProviderPool();
+            //_playerStateMap = gameStateProcessorFactory.GetStatePool();
             _systems = gameModule.BeforeUserCmdExecuteSystems;
             Init();
         }
@@ -67,7 +62,7 @@ namespace Core.Prediction.UserPrediction
                 if (cmd == null) return;
                 _currentCmd = cmd;
                 //过滤输入状态
-                cmd.FilteredInput = owner.Filter(cmd);
+                cmd.FilteredInput = owner.GetFiltedInput(cmd);
                 ExecuteSystems();
                 cmd.FilteredInput = null;
                 //cmd.PredicatedOnce = true;

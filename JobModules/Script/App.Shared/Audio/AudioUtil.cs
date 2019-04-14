@@ -109,21 +109,21 @@ namespace App.Shared
             return null;
 
         }
-       public static AudioGrp_MatIndex ToAudioMatGrp(this TerrainMatOriginType matType)
+       public static AudioGrp_FootMatType ToAudioMatGrp(this TerrainMatOriginType matType)
         {
             switch(matType)
             {
           
                 case TerrainMatOriginType.Dirt:
-                    return AudioGrp_MatIndex.Concrete;
+                    return AudioGrp_FootMatType.Concrete;
                 case TerrainMatOriginType.Grass:
-                    return AudioGrp_MatIndex.Grass;
+                    return AudioGrp_FootMatType.Grass;
                 case TerrainMatOriginType.Rock:
-                    return AudioGrp_MatIndex.Rock;
+                    return AudioGrp_FootMatType.Rock;
                 case TerrainMatOriginType.Sand:
-                    return AudioGrp_MatIndex.Sand;
+                    return AudioGrp_FootMatType.Sand;
                 default:
-                    return AudioGrp_MatIndex.Default;
+                    return AudioGrp_FootMatType.Default;
             }
         }
 

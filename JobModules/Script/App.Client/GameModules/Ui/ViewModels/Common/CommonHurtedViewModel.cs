@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -71,33 +72,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonHurtedView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonHurtedView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonHurtedView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonHurtedView, CommonHurtedViewModel> bindingSet =
-                view.CreateBindingSet<CommonHurtedView, CommonHurtedViewModel>();
-
-            view.orihurtedRootActive = _hurtedRootActive = view.hurtedRootActive.activeSelf;
-            bindingSet.Bind(view.hurtedRootActive).For(v => v.activeSelf).To(vm => vm.hurtedRootActive).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonHurtedView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -121,12 +117,39 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonHurtedView view)
+		{
+		     BindingSet<CommonHurtedView, CommonHurtedViewModel> bindingSet =
+                view.CreateBindingSet<CommonHurtedView, CommonHurtedViewModel>();
+            bindingSet.Bind(view.hurtedRootActive).For(v => v.activeSelf).To(vm => vm.hurtedRootActive).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonHurtedView view)
+		{
+            _hurtedRootActive = view.hurtedRootActive.activeSelf;
+		}
+
+
+		void SaveOriData(CommonHurtedView view)
+		{
+            view.orihurtedRootActive = _hurtedRootActive;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			hurtedRootActive = _view.orihurtedRootActive;
 			SpriteReset();
 		}
@@ -154,7 +177,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonHurted"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

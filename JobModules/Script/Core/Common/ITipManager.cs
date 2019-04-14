@@ -17,6 +17,7 @@ namespace Core.Common
         CanNotRescure,
         CanNotStand,
         CanNotCrouch,
+        CanNotToCrouch,
         CanNotProne,
         OutOfOxygen,
         FireModeToAuto,

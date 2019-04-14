@@ -11,16 +11,14 @@ namespace App.Shared.GameInputFilter
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(GameInputProcessor));
         private List<IGameState> _gameStates = new List<IGameState>();
         private IFilteredInput _userInput;
-        private IFilteredInput _dummyUserInput;
         private UserCommandMapper _userCmdMapper;
         private IStateProvider _stateProvider;
 
-        public GameInputProcessor(UserCommandMapper mapper, IStateProvider provider, IFilteredInput input, IFilteredInput dummyInput)
+        public GameInputProcessor(UserCommandMapper mapper, IStateProvider provider, IFilteredInput input)
         {
             _userCmdMapper = mapper;
             _userInput = input;
             _stateProvider = provider;
-            _dummyUserInput = dummyInput;
         }
 
         public void Init()
@@ -80,11 +78,6 @@ namespace App.Shared.GameInputFilter
         public IFilteredInput GetFilteredInput()
         {
             return _userInput;
-        }
-
-        public IFilteredInput DummyInput()
-        {
-            return _dummyUserInput;
         }
     }
 }

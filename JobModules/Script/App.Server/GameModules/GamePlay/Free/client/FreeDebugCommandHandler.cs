@@ -1,6 +1,7 @@
 ﻿using App.Server.GameModules.GamePlay.free.player;
 using App.Shared.DebugHandle;
 using com.wd.free.action;
+using com.wd.free.@event;
 using com.wd.free.para;
 using Sharpen;
 
@@ -18,7 +19,7 @@ namespace App.Server.GameModules.GamePlay.Free.client
 
         private static StringPara commandPara;
 
-        public static void Handle(ServerRoom room, DebugCommand message, PlayerEntity player)
+        public static void Handle(IEventArgs args, DebugCommand message, PlayerEntity player)
         {
             if (commandDic.ContainsKey(message.Command.ToLower()))
             {
@@ -40,29 +41,29 @@ namespace App.Server.GameModules.GamePlay.Free.client
                 {
                     for (int i = 1; i <= message.Args.Length; i++)
                     {
-                        room.FreeArgs.TempUsePara(new StringPara("arg" + i, message.Args[i - 1]));
+                        args.TempUsePara(new StringPara("arg" + i, message.Args[i - 1]));
                     }
                 }
 
 
-                room.FreeArgs.TempUsePara(commandPara);
-                room.FreeArgs.TempUse("current", (FreeData)player.freeData.FreeData);
+                args.TempUsePara(commandPara);
+                args.TempUse("current", (FreeData)player.freeData.FreeData);
 
-                action.Act(room.FreeArgs);
+                action.Act(args);
 
                 if (message.Command == "relive")
                 {
                     player.isFlagCompensation = true;
                 }
 
-                room.FreeArgs.Resume("current");
-                room.FreeArgs.ResumePara("command");
+                args.Resume("current");
+                args.ResumePara("command");
 
                 if (message.Args != null)
                 {
                     for (int i = 1; i <= message.Args.Length; i++)
                     {
-                        room.FreeArgs.ResumePara("arg" + i);
+                        args.ResumePara("arg" + i);
                     }
                 }
 

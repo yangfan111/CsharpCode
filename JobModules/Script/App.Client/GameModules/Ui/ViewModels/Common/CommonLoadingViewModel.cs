@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -106,37 +107,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonLoadingView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonLoadingView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonLoadingView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonLoadingView, CommonLoadingViewModel> bindingSet =
-                view.CreateBindingSet<CommonLoadingView, CommonLoadingViewModel>();
-
-            view.orishowActive = _showActive = view.showActive.activeSelf;
-            bindingSet.Bind(view.showActive).For(v => v.activeSelf).To(vm => vm.showActive).OneWay();
-            view.orisliderValue = _sliderValue = view.sliderValue.value;
-            bindingSet.Bind(view.sliderValue).For(v => v.value).To(vm => vm.sliderValue).OneWay();
-            view.oricurText = _curText = view.curText.text;
-            bindingSet.Bind(view.curText).For(v => v.text).To(vm => vm.curText).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonLoadingView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -160,12 +152,45 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonLoadingView view)
+		{
+		     BindingSet<CommonLoadingView, CommonLoadingViewModel> bindingSet =
+                view.CreateBindingSet<CommonLoadingView, CommonLoadingViewModel>();
+            bindingSet.Bind(view.showActive).For(v => v.activeSelf).To(vm => vm.showActive).OneWay();
+            bindingSet.Bind(view.sliderValue).For(v => v.value).To(vm => vm.sliderValue).OneWay();
+            bindingSet.Bind(view.curText).For(v => v.text).To(vm => vm.curText).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonLoadingView view)
+		{
+            _showActive = view.showActive.activeSelf;
+            _sliderValue = view.sliderValue.value;
+            _curText = view.curText.text;
+		}
+
+
+		void SaveOriData(CommonLoadingView view)
+		{
+            view.orishowActive = _showActive;
+            view.orisliderValue = _sliderValue;
+            view.oricurText = _curText;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			showActive = _view.orishowActive;
 			sliderValue = _view.orisliderValue;
 			curText = _view.oricurText;
@@ -195,7 +220,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonLoading"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }

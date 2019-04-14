@@ -35,7 +35,7 @@ namespace App.Server.MessageHandler.Hall
 
             _dispatcher.AddEvent(e);
 
-            _logger.InfoFormat("Receive Join Room Message Hall Room Id {0} Map Id {1}", roomId, player.Id);
+            _logger.InfoFormat("Receive Join Room Message Hall Room Id {0} Map Id {1}", roomId, player);
         }
     }
 }

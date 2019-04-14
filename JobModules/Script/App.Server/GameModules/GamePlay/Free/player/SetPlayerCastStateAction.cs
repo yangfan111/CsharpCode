@@ -4,6 +4,7 @@ using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.util;
 using System;
+using App.Shared.GameModules.Player;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {

@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Core.Appearance;
 using Core.CharacterController;
 using Core.Utils;
@@ -13,8 +12,6 @@ namespace App.Shared.GameModules.Player.Appearance
     {
         private GameObject _characterRoot;
         private ICharacterControllerContext _controller;
-        private Transform _attachedHead;
-        private readonly Regex _attachedHeadNameRegex = new Regex(@"FHead\d*\(Clone\)");
         
         public void SetCharacterRoot(GameObject characterRoot)
         {
@@ -28,51 +25,14 @@ namespace App.Shared.GameModules.Player.Appearance
         
         public void PlayerDead()
         {
-            SetLayer(_characterRoot, UnityLayerManager.GetLayerIndex(EUnityLayerName.NoCollisionWithEntity));
-            closeEye();
-            //_controller.enabled = false;
+            SetLayer(_characterRoot, UnityLayers.NoCollisionWithEntityLayer);
+            _controller.enabled = false;
         }
 
         public void PlayerReborn()
         {
-            SetLayer(_characterRoot, UnityLayerManager.GetLayerIndex(EUnityLayerName.Player));
-            openEye();
+            SetLayer(_characterRoot, UnityLayers.PlayerLayer);
             _controller.enabled = true;
-        }
-
-        private void openEye()
-        {
-            if(_attachedHead==null)
-                return;
-            HandleOpenEye();
-        }
-
-        private void closeEye()
-        {
-            if (_attachedHead != null)
-            {
-                HandleOpenEye();
-                return;
-            }
-            var trans = _characterRoot.GetComponentsInChildren<Transform>(true);
-            foreach (var transform in trans)
-            {  
-                if (_attachedHeadNameRegex.IsMatch(transform.name))
-                {
-                    _attachedHead = transform;
-                    HandleCloseEye();
-                }
-            }
-        }
-        
-        private void HandleCloseEye()
-        {
-            _attachedHead.SendMessage("PlayerDead");
-        }
-
-        private void HandleOpenEye()
-        {
-            _attachedHead.SendMessage("PlayerRelive");
         }
         
         /// <summary>

@@ -13,12 +13,12 @@ namespace App.Shared.GameModules.Weapon.Behavior
         }
 
 
-        public void Update(PlayerWeaponController controller, IUserCmd cmd)
+        public void Update(PlayerWeaponController controller, IUserCmd cmd, Contexts contexts)
         {
             _cmd.SetCurrentCmd(cmd);
             if(null != _weaponFireController)
             {
-                _weaponFireController.OnUpdate(controller, _cmd);
+                _weaponFireController.OnUpdate(controller, _cmd, contexts);
             }
         }
 

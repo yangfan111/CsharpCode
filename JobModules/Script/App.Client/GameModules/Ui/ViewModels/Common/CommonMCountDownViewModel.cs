@@ -8,6 +8,7 @@ using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
@@ -106,37 +107,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
 
+			bool bFirst = false;
 			var view = obj.GetComponent<CommonMCountDownView>();
-			if(view != null)
+			if(view == null)
 			{
-				_view = view;
-				Reset();        //回滚初始值
-				view.BindingContext().DataContext = this; 
-				return;
+				bFirst = true;
+				view = obj.AddComponent<CommonMCountDownView>();
+				view.FillField();
 			}
-
-            view = obj.AddComponent<CommonMCountDownView>();
-			_view = view;
-            view.FillField();
-            view.BindingContext().DataContext = this;
-
-            BindingSet<CommonMCountDownView, CommonMCountDownViewModel> bindingSet =
-                view.CreateBindingSet<CommonMCountDownView, CommonMCountDownViewModel>();
-
-            view.orirootActive = _rootActive = view.rootActive.activeSelf;
-            bindingSet.Bind(view.rootActive).For(v => v.activeSelf).To(vm => vm.rootActive).OneWay();
-            view.oricountNumText = _countNumText = view.countNumText.text;
-            bindingSet.Bind(view.countNumText).For(v => v.text).To(vm => vm.countNumText).OneWay();
-            view.orinumBgFillAmount = _numBgFillAmount = view.numBgFillAmount.fillAmount;
-            bindingSet.Bind(view.numBgFillAmount).For(v => v.fillAmount).To(vm => vm.numBgFillAmount).OneWay();
-            bindingSet.Build();
-
+			DataInit(view);
 			SpriteReset();
+			view.BindingContext().DataContext = this;
+			if(bFirst)
+			{
+				SaveOriData(view);
+				ViewBind(view);
+			}
+			_view = view;
+
         }
 		private void EventTriggerBind(CommonMCountDownView view)
 		{
 		}
-
 
         private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
         private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
@@ -160,12 +152,45 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
         }
 
+		void ViewBind(CommonMCountDownView view)
+		{
+		     BindingSet<CommonMCountDownView, CommonMCountDownViewModel> bindingSet =
+                view.CreateBindingSet<CommonMCountDownView, CommonMCountDownViewModel>();
+            bindingSet.Bind(view.rootActive).For(v => v.activeSelf).To(vm => vm.rootActive).OneWay();
+            bindingSet.Bind(view.countNumText).For(v => v.text).To(vm => vm.countNumText).OneWay();
+            bindingSet.Bind(view.numBgFillAmount).For(v => v.fillAmount).To(vm => vm.numBgFillAmount).OneWay();
+		
+			bindingSet.Build();
+		}
+
+		void DataInit(CommonMCountDownView view)
+		{
+            _rootActive = view.rootActive.activeSelf;
+            _countNumText = view.countNumText.text;
+            _numBgFillAmount = view.numBgFillAmount.fillAmount;
+		}
+
+
+		void SaveOriData(CommonMCountDownView view)
+		{
+            view.orirootActive = _rootActive;
+            view.oricountNumText = _countNumText;
+            view.orinumBgFillAmount = _numBgFillAmount;
+		}
+
+
+
+
 		private void SpriteReset()
 		{
 		}
 
 		public void Reset()
 		{
+			if(_viewGameObject == null)
+			{
+				return;
+			}
 			rootActive = _view.orirootActive;
 			countNumText = _view.oricountNumText;
 			numBgFillAmount = _view.orinumBgFillAmount;
@@ -195,7 +220,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "uiprefabs/common"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonMCountDown"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }
