@@ -1,17 +1,19 @@
-﻿using System;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System;
 using System.IO;
 ///序列化namespace
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization.Formatters.Soap;
 using Newtonsoft.Json;
-namespace YF.FileUtil.Serialize
+namespace YF.FileUtil
 {
     /// <summary>
     /// 具体见Xmind
     /// </summary>
 
-    public static class NormalSerialize
+    public static class Seri
     {
         ///*.bin
         public static void SerializableObj(System.Object s_object, string outPath, SerializableType type = SerializableType.Bin)
@@ -62,7 +64,7 @@ namespace YF.FileUtil.Serialize
             return null;
         }
         ///new Stream,new IFormatter
-        ///IFormatter.Serialize(Stream) IFormatter.Serialize===>Stream
+        ///IFormatter.Serialize(Stream)
         /// stream.Close()
         private static void Serializable_BinHandler(System.Object s_object, string outPath)
         {
@@ -125,8 +127,61 @@ namespace YF.FileUtil.Serialize
             Console.WriteLine("DeSerializable snoap sucess");
             return obj;
         }
+        ///stage1:
+        ///new XMLDoc() 
+        ///XMLDoc.load(xmlStream)
+        ///XMLDoc.Save(path)
+        ///******************************
+        ///stage2:
+        ///var xmlStream = new System.IO.MemoryStream()
+        ///var streamWriter = new System.IO.StreamWriter(xmlStream, System.Text.Encoding.UTF8);
+        public static void SerializeXML(System.Object s_object, string savePath)
+        {
 
-     
+            System.Type T = s_object.GetType();
+            var xmlDoc = new System.Xml.XmlDocument();
+            var xmlSerializer = new System.Xml.Serialization.XmlSerializer(T);
+            //创建内存流
+            using (var xmlStream = new System.IO.MemoryStream())
+            {
+                //创建流写入者
+                var streamWriter = new System.IO.StreamWriter(xmlStream, System.Text.Encoding.UTF8);
+                //写入流
+                xmlSerializer.Serialize(streamWriter, s_object);
+                xmlStream.Position = 0;
+                //加载流 
+                xmlDoc.Load(xmlStream);
+                savePath = FS.GetPath_PlatformStream(savePath);
+                xmlDoc.Save(System.IO.Path.Combine(UnityEngine.Application.dataPath, savePath));
+
+            }
+
+        }
+
+        public static void DeSerializeXML(System.Object s_object, string tarFileName)
+        {
+            try
+            {
+                if (FS.SeekAppDataDirTargetFile(tarFileName))
+                {
+                    System.Type T = s_object.GetType();
+                    var xmlSerializer = new System.Xml.Serialization.XmlSerializer(T);
+                    //创建文件流
+                    var xmlFileStream = new System.IO.FileStream(FS.GetPath_PlatformStream(tarFileName),
+                        System.IO.FileMode.Open, System.IO.FileAccess.Read);
+                    //加载流
+                    var Settings = (WwiseSettings)xmlSerializer.Deserialize(xmlFileStream);
+                    xmlFileStream.Close();
+                }
+                else
+                {
+                    //do sth
+                }
+            }
+            catch (System.Exception e) { Console.Write(e); }
+
+        }
+
 
     }
 }

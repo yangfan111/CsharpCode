@@ -1,11 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using UnityEditor;
 namespace YF
 {
-    public class UnityEditorLib
+    public class EditorLib
     {
         /// <summary>
         /// 开始python应用
@@ -20,20 +19,20 @@ namespace YF
         ///   (process.ExitCode == 0)
         /// </summary>
         /// <returns></returns>
-        public static bool StartPythonProgram(string entryPath, object arg)
+        public static bool StartPythonProgram(string entryPath,object arg)
         {
             var start = new ProcessStartInfo();
             start.FileName = "python";
-            if (arg.GetType() == typeof(string))
+            if(arg.GetType()== typeof(string))
             {
-                //  string s = (string)arg;
+              //  string s = (string)arg;
                 start.Arguments = (string)arg;
             }
-            else if (arg.GetType() == typeof(List<string>))
+            else if(arg.GetType() == typeof(List<string>))
             {
                 string acc = "";
-                List<string> argList = (List<string>)arg;
-                foreach (var s in argList)
+                List<string>  argList = (List<string>)arg;
+                foreach(var s in argList)
                 {
                     acc += s;
                     acc += ",";
@@ -53,7 +52,7 @@ namespace YF
                     if (process.ExitCode == 0)
                     {
                         return true;
-                        //     EditorUtility.DisplayProgressBar(s_progTitle, progMsg, 1.0f);
+                   //     EditorUtility.DisplayProgressBar(s_progTitle, progMsg, 1.0f);
                         //UnityEngine.Debug.Log(string.Format(
                         //    "WwiseUnity: SoundBank ID conversion succeeded. Find generated Unity script under {0}.", s_bankDir));
                     }
@@ -64,19 +63,17 @@ namespace YF
                 }
                 catch (System.Exception ex)
                 {
-                    // AssetDatabase.Refresh();
+                   // AssetDatabase.Refresh();
 
                     //EditorUtility.ClearProgressBar();
                     //UnityEngine.Debug.LogError(string.Format(
-                    //"WwiseUnity: SoundBank ID conversion process failed with exception: {}. Check detailed logs under the folder: Assets/Wwise/Logs.",
-                    //    ex));
+                        //"WwiseUnity: SoundBank ID conversion process failed with exception: {}. Check detailed logs under the folder: Assets/Wwise/Logs.",
+                   //    ex));
                 }
                 //移除bar
                 return false;
             }
         }
-
-        #region// platform
         ///**********************************************platformName******************************************
         ///UNITY_STANDALONE_WIN,
         ///UNITY_ANDROID
@@ -124,7 +121,7 @@ namespace YF
         public static string GetPlatformNameByBuildTarget(BuildTarget target)
         {
             var platformSubDir = string.Empty;
-            //        GetCustomPlatformName(ref platformSubDir, target);
+    //        GetCustomPlatformName(ref platformSubDir, target);
             if (!string.IsNullOrEmpty(platformSubDir))
                 return platformSubDir;
 
@@ -145,9 +142,9 @@ namespace YF
 #if UNITY_2017_3_OR_NEWER
 			case BuildTarget.StandaloneOSX:
 #else
-                    //case BuildTarget.StandaloneOSXIntel:
-                    //case BuildTarget.StandaloneOSXIntel64:
-                    //case BuildTarget.StandaloneOSXUniversal:
+                //case BuildTarget.StandaloneOSXIntel:
+                //case BuildTarget.StandaloneOSXIntel64:
+                //case BuildTarget.StandaloneOSXUniversal:
 #endif
                     return "Mac";
 
@@ -175,20 +172,37 @@ namespace YF
             return target.ToString();
         }
     }
-    #endregion
     #region//scene 
     public class SceneLib
     {
         /// <summary>
         /// editor下代码创建场景
-        /// UnityEditor.SceneManagement ==> EditorSceneManager
-        ///                             ==> OtherThings
+        /// UnityEditor.SceneManagement下
+        /// EditorSceneManager.NewScene 
         /// 
         /// Engine下代码访问场景
         /// UnityEngine.SceneManagement
         /// SceneManager.GetActiveScene();
         /// </summary>
         /// <returns> UnityEngine.SceneManagement.Scene</returns>
+        public static UnityEngine.SceneManagement.Scene CreateNewScene()
+        {
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.DefaultGameObjects);
+            return scene;
+        }
+        /// <summary>
+        /// 打开场景文件
+        /// </summary>
+        /// <param name="scene"></param>
+        /// <returns></returns>
+        public static UnityEngine.SceneManagement.Scene OpenExistingScene(string scene)
+        {
+            return UnityEditor.SceneManagement.EditorSceneManager.OpenScene(scene);
+        }
+        /// <summary>
+        /// 通用编译器，非编译器环境下
+        /// </summary>
+        /// <returns></returns>
         public static UnityEngine.SceneManagement.Scene GetCurrentScene()
         {
             return UnityEngine.SceneManagement.SceneManager.GetActiveScene();
@@ -199,7 +213,7 @@ namespace YF
         /// <param name="destSceneName">目标拷贝场景名</param>
         /// <param name="saveAsCopy">作为备份使用</param>
         /// <returns></returns>
-        public static bool SaveCurrentScene(string destSceneName, bool saveAsCopy = false)
+        public static bool SaveCurrentScene(string destSceneName,bool saveAsCopy = false)
         {
             bool ret;
             if (destSceneName == null)
@@ -208,40 +222,8 @@ namespace YF
                 ret = UnityEditor.SceneManagement.EditorSceneManager.SaveScene(GetCurrentScene(), destSceneName, saveAsCopy);
             return ret;
         }
-
-        #endregion
-        #region//scriptableObject
-        /// <summary>
-        /// 通过scriptobject 来创建各种.Asset
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="className"></param>
-        /// <param name="assetRelativeFilePath"></param>
-        /// <returns></returns>
-        public static T GetOrCreateAsset<T>(string className, string assetRelativeFilePath) where T : UnityEngine.Object
-        {
-            string relativeDirPath = Path.GetDirectoryName(assetRelativeFilePath);
-            T asset = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(assetRelativeFilePath) ;
-            if (!asset)
-            {
-                var fullPath = System.IO.Path.Combine(UnityEngine.Application.dataPath, relativeDirPath);
-                if (!System.IO.Directory.Exists(fullPath))
-                    System.IO.Directory.CreateDirectory(fullPath);
-
-                asset = UnityEngine.ScriptableObject.CreateInstance(className) as T;
-                UnityEditor.AssetDatabase.CreateAsset(asset, assetRelativeFilePath);
-            }
-
-            return asset;
-        }
-
-
     }
-
-
- 
-
-
+    #endregion
 }
 
 //    #region//editor uses---------------------------------------------------------------------------
