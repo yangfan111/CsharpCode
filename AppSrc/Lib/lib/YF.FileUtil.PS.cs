@@ -6,12 +6,14 @@ namespace YF.FileUtil
 {
     /// 获取某一特定路径字符串的前后层级关系信息 Path静态方法
     /*
-     ChangeExtension
+    ChangeExtension
+    HasExtension 
     Combine
     GetDirectoryName
     GetExtension
     GetFileName
     GetFileNameWithoutExtension 
+    GetRelativePath (string relativeTo, string path);
     GetFullPath(String)
         Output is based on your current directory, except
         in the last case, where it is based on the root drive
@@ -21,18 +23,9 @@ namespace YF.FileUtil
         // GetPathRoot('\mydir\') returns '\'
         // GetPathRoot('myfile.ext') returns ''
         // GetPathRoot('C:\mydir\myfile.ext') returns 'C:\'
+    Path.Combine 与Path.Join
+        Join方法串联两个字符串并保留重复路径分隔符。 Combine方法放弃该驱动器，并返回当前驱动器上取得 root 权限的目录
     */
-
-
-    /// <summary>
-    /// badPath做路径替换
-    /// URI用法：1.配合Path.GetFullPath使用
-    ///         Path.GetFullPath(==>(new System.Uri(tmp)).LocalPath)
-    ///          2.计算相对路径
-    ///             1-fromUri,toUri = new URI(fromPath/toPath)
-    ///             2-relativeUri = fromUri.MakeRelativeUri(toUri);
-    ///             3-relativePath = System.Uri.UnescapeDataString(relativeUri.ToString())
-    /// </summary>
     public static class PS
     {
         public static readonly char wrongSeparatorChar = System.IO.Path.DirectorySeparatorChar == '/' ? '\\' : '/';

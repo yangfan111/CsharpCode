@@ -4,6 +4,9 @@ using System.Diagnostics;
 using UnityEditor;
 namespace YF
 {
+    /// <summary>
+    /// 编译宏，buildtarget转换到目标平台
+    /// </summary>
     public class EditorLib
     {
         /// <summary>
@@ -74,11 +77,7 @@ namespace YF
                 return false;
             }
         }
-        ///**********************************************platformName******************************************
-        ///UNITY_STANDALONE_WIN,
-        ///UNITY_ANDROID
-        ///UNITY_IOS
-        ///UNITY_EDITOR_WIN
+       
         public static string GetPlatformNameByCompile()
         {
             string platformSubDir = string.Empty;
