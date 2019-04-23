@@ -62,6 +62,8 @@ namespace Core.CharacterController
 
         Collider GetCollider();
 
+        void ClearGroundInfo();
+
     }
 
     public interface ICharacterDebugDraw

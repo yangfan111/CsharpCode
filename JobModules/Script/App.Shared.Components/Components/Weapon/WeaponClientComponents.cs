@@ -64,19 +64,21 @@ namespace App.Shared.Components.Weapon
 
  
     [Weapon]
-    public class WeaponClientSyncComponent : IUpdateComponent
+    public class WeaponClientUpdateComponent : IUpdateComponent
     {
-        [DontInitilize, NetworkProperty] public bool                      PullBoltEnd;   //是否拉过栓了
-        [DontInitilize, NetworkProperty] public bool                      IsPullingBolt; //是否在拉栓中
+         //[DontInitilize, NetworkProperty] public bool                      PullBoltEnd;   //是否拉过栓了
+         //[DontInitilize, NetworkProperty] public bool                      IsPullingBolt; //是否在拉栓中
+         //[DontInitilize, NetworkProperty] public bool PullBoltInterrupt; 
+
       //  [DontInitilize, NetworkProperty] public bool                      IsInterruptSightView;
     //    [DontInitilize, NetworkProperty] public bool                      IsRecoverSightView;
-        public static readonly                  WeaponClientSyncComponent Empty = new WeaponClientSyncComponent();
+        public static readonly                  WeaponClientUpdateComponent Empty = new WeaponClientUpdateComponent();
 
         public void CopyFrom(object rightComponent)
         {
-            var remote = rightComponent as WeaponClientSyncComponent;
-            PullBoltEnd          = remote.PullBoltEnd;
-            IsPullingBolt        = remote.IsPullingBolt;
+            var remote = rightComponent as WeaponClientUpdateComponent;
+          //  PullBoltEnd          = remote.PullBoltEnd;
+          //IsPullingBolt        = remote.IsPullingBolt;
       //      IsRecoverSightView   = remote.IsRecoverSightView;
        //     IsInterruptSightView = remote.IsInterruptSightView;
         }

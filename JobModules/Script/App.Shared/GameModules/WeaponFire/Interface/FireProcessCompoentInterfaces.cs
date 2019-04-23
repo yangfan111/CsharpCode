@@ -21,7 +21,7 @@ namespace  App.Shared.GameModules.Weapon.Behavior
     /// <summary>
     /// PunchYaw, PunchPitch, PunchYawDirection, RunUpMax, PunchDecayCD
     /// </summary>
-    public interface IFireShakeProcess : IFrameProcess, IAfterFireProcess
+    public interface IFireShakeProcessor : IFrameProcess, IAfterFireProcess
     {
     }
 

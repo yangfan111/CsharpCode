@@ -23,11 +23,12 @@ namespace App.Shared.GameModules.Player
             {
                     
                 case EPlayerStateCollectType.UseCacheAddation:
-                    if (_playerEntity.playerClientEventsUpdate.OpenUIFrame)
+                    if (_playerEntity.playerClientUpdate.OpenUIFrame)
                         playerStates.Add(EPlayerState.OpenUI);
-                    if(_playerEntity.characterBone.IsWeaponRotState )
-                        playerStates.Add(EPlayerState.WeaponRotState);
-
+                   
+                    var filteredInput = _playerEntity.StateInteractController().UserInput;
+                    if (filteredInput.IsInput(EPlayerInput.IsPullboltInterrupt))
+                        playerStates.Add(EPlayerState.PullBoltInterrupt);
                     break;
                 case EPlayerStateCollectType.UseMoment:
                     Update();
@@ -70,13 +71,13 @@ namespace App.Shared.GameModules.Player
 //            if (PlayerStateUtil.HasUIState(gamePlay))
 //                _playerStates.Add(EPlayerState.OpenUI);
             var playerStateSource = _playerEntity.stateInterface.State;
+         
             playerStates.Add(ActionToState(playerStateSource.GetActionState()));
             playerStates.Add(ActionToState(playerStateSource.GetNextActionState()));
             playerStates.Add(KeepActionToState(playerStateSource.GetActionKeepState()));
             playerStates.Add(LeanToState(playerStateSource.GetCurrentLeanState()));
             playerStates.Add(MoveToState(playerStateSource.GetCurrentMovementState()));
             playerStates.Add(MoveToState(playerStateSource.GetNextMovementState()));
-
             var poseState     = playerStateSource.GetCurrentPostureState();
             var nextPoseState = playerStateSource.GetNextPostureState();
             playerStates.Add(PostureToState(poseState));
@@ -114,6 +115,8 @@ namespace App.Shared.GameModules.Player
             }
             if(playerStates.Contains(EPlayerState.MeleeAttacking))
                 playerStates.Add(EPlayerState.Firing);
+             if(_playerEntity.characterBone.IsWeaponRotState)
+                playerStates.Add(EPlayerState.WeaponRotState);
             playerStates.Remove(EPlayerState.None);
         }
 
@@ -243,9 +246,10 @@ namespace App.Shared.GameModules.Player
 
         private bool LegalTransition(PostureInConfig from, PostureInConfig to)
         {
-            var exculde = from == PostureInConfig.Land
+          
+            var exculde = (from == PostureInConfig.Land
                        || to == PostureInConfig.Land
-                       || from == PostureInConfig.Crouch && to == PostureInConfig.Stand;
+                       || from == PostureInConfig.Crouch && to == PostureInConfig.Stand) ||(from == PostureInConfig.Stand && to == PostureInConfig.Crouch);
             // 站到蹲算到切换防止趴下切枪动作异常
             //|| from == PostureInConfig.Stand && to == PostureInConfig.Crouch;
             return !exculde;

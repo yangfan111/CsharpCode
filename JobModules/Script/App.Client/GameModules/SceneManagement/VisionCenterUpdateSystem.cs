@@ -12,30 +12,31 @@ using Utils.AssetManager;
 
 namespace App.Client.GameModules.SceneManagement
 {
+    
     public class VisionCenterUpdateSystem : IRenderSystem, IResourceLoadSystem
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(VisionCenterUpdateSystem));
 
         private readonly ILevelManager _levelManager;
-        private Contexts _contexts;
+        private readonly ITerrainRenderer _terrainRenderer;
         private List<AssetInfo> _sceneRequests = new List<AssetInfo>();
         private List<AssetInfo> _goRequests = new List<AssetInfo>();
 
         public VisionCenterUpdateSystem(Contexts contexts)
         {
-            _contexts = contexts;
             _levelManager = contexts.session.commonSession.LevelManager;
-            Camera.main.transform.position = contexts.player.flagSelfEntity.position.Value;
+            if (contexts.session.clientSessionObjects.TerrainRenderer != null)
+            {
+                _terrainRenderer = contexts.session.clientSessionObjects.TerrainRenderer;
+                _terrainRenderer.SetCamera(Camera.main);
+            }
         }
 
         public void OnRender()
         {
-            var status = _levelManager.UpdateOrigin(Camera.main.transform.position.WorldPosition());
-            if (SharedConfig.EnableDC)
-            {
-                if (SharedConfig.EnableOC && Camera.main.useOcclusionCulling != status.CloseToBuilding)
-                    Camera.main.useOcclusionCulling = status.CloseToBuilding;
-            }
+            _levelManager.UpdateOrigin(Camera.main.transform.position.WorldPosition());
+            if (_terrainRenderer != null)
+                _terrainRenderer.Draw();
         }
 
         public void OnLoadResources(IUnityAssetManager assetManager)
@@ -50,7 +51,8 @@ namespace App.Client.GameModules.SceneManagement
 
             foreach (var request in _goRequests)
             {
-                assetManager.LoadAssetAsync("VisionCenterUpdateSystem", request, _levelManager.GoLoadedWrapper);
+                _levelManager.LoadResource("VisionCenterUpdateSystem", assetManager, request);
+               
             }
             
             _sceneRequests.Clear();

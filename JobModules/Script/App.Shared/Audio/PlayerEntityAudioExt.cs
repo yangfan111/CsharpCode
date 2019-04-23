@@ -58,7 +58,7 @@ namespace App.Shared
 
         public static PlayerAudioController AudioController(this PlayerEntity playerEntity)
         {
-            return GameModuleManagement.Get<PlayerAudioController>(playerEntity.entityKey.Value.EntityId); }
+            return GameModuleManagement.Get<PlayerAudioController>(playerEntity.entityKey.Value.EntityId).Value; }
         }
 
 

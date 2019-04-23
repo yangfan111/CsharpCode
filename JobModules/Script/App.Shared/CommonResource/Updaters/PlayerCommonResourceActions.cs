@@ -60,8 +60,7 @@ namespace App.Shared.CommonResource.Updaters
             PlayerEntityUtility.DisableCollider(obj.transform);
             var go = obj;
 
-
-            player.AddFirstPersonModel(go);
+            player.AddFirstPersonModel(go, status.Object);
 
             player.appearanceInterface.FirstPersonAppearance = new FirstPersonAppearanceManager(player.firstPersonAppearance);
 
@@ -146,7 +145,7 @@ namespace App.Shared.CommonResource.Updaters
             RemoveRagdollOnServerSide(go);
 
 
-            player.AddThirdPersonModel(go);
+            player.AddThirdPersonModel(go, status.Object);
 
             go.name = go.name.Replace("(Clone)", "");
             go.transform.SetParent(player.RootGo().transform);

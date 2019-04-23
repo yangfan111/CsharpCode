@@ -32,40 +32,23 @@ namespace App.Shared.GameModules.Bullet
             {
                 return entity.hitBox;
             }
+            return null;
+        }
 
+        public HitBoxTransformProvider GetHitBoxProvider(EntityKey entityKey)
+        {
+            var entity = _playerContext.GetEntityWithEntityKey(entityKey);
+            if (entity != null && entity.hasPosition && entity.hasHitBox)
+            {
+                var provider = SingletonManager.Get<HitBoxTransformProviderCache>().GetProvider(entity.thirdPersonModel.Value);
+                if (provider != null) return provider;
+            }
             return null;
         }
 
         public void UpdateHitBox(IGameEntity gameEntity)
         {
-            var position = gameEntity.Position.Value;
-            var rotation = gameEntity.GetComponent<Orientation>().RotationYaw;
-            var hitBoxComponent = GetHitBoxComponent(gameEntity.EntityKey);
-
-            if (hitBoxComponent != null)
-            {
-                hitBoxComponent.HitBoxGameObject.transform.position = position;
-                hitBoxComponent.HitBoxGameObject.transform.rotation = rotation;
-
-                var playerEntity = GetPlayerEntity(gameEntity);
-				
-                playerEntity.thirdPersonAnimator.UnityAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
-                var provider = SingletonManager.Get<HitBoxTransformProviderCache>().GetProvider(playerEntity.thirdPersonModel.Value);
-                provider.Update(position, rotation);
-                HitBoxGameObjectUpdater.Update(hitBoxComponent.HitBoxGameObject.transform, provider);
-                playerEntity.thirdPersonAnimator.UnityAnimator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
-
-                if (_logger.IsDebugEnabled)
-                {
-                    _logger.DebugFormat("client animator {0}", playerEntity.networkAnimator.ToStringExt());
-                    StringBuilder s = new StringBuilder();
-                    hitBoxComponent.HitBoxGameObject.transform.Recursively(t => s.Append("[n " + t.name + ", p " + t.position.ToStringExt() + ", r " + t.rotation.ToStringExt() + "]"));
-                    _logger.DebugFormat("hitbox pos {0}, rot {1}, transforms {2}, ", position, rotation, s);
-                }
-            }
         }
-
-      
       
         private PlayerEntity GetPlayerEntity(IGameEntity gameEntity)
         {

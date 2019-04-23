@@ -6,48 +6,82 @@ using Core.Utils;
 using Utils.Singleton;
 using Utils.Utils;
 using XmlConfig;
+using App.Shared;
+using Core;
+using UnityEngine;
 
 namespace App.Shared.GameModules.Player.Appearance.AnimationEvent
 {
     public class OnStep : IAnimationEventCallback
     {
-        private const int StepInterval = 300;
-        private float _lastTime = 0f;
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(OnStep));
+        private int lastFrameCount;
         public void AnimationEventCallback(PlayerEntity player, string param, UnityEngine.AnimationEvent eventParam)
         {
-            if(player.time.ClientTime - _lastTime < StepInterval)
-            {
+           if (lastFrameCount == Time.frameCount)
+               return;
+          // DebugUtil.MyLog("Step In："+Time.frameCount+"||"+Time.time);
+        //    Logger.Info("Step in");
+            if (!player.IsStepAudioValied())
                 return;
-            }
-            _lastTime = player.time.ClientTime;
-            if(player.gamePlay.LifeState == (int)EPlayerLifeState.Dead)
-            {
-                //死亡时不播放行走音效
+            
+            AudioGrp_Footstep stepState = player.GetFootStepState();
+            if (stepState == AudioGrp_Footstep.None)
                 return;
-            }
-            if(player.IsOnVehicle())
-            {
-                //在车上不播放行走音效
-                return;
-            }
-            switch(player.gamePlay.GameState)
-            {
-                case GameState.AirPlane:
-                case GameState.Gliding:
-                case GameState.Invisible:
-                case GameState.JumpPlane:
-                    //以上状态不播放行走音效
-                    return;
-                case GameState.Normal:
-                case GameState.Poison:
-                case GameState.Visible:
-                    break;
-            }
-            var myTerrain = SingletonManager.Get<TerrainManager>().GetTerrain(SingletonManager.Get<MapConfigManager>().SceneParameters.Id);
-            var curPosture = player.stateInterface.State.GetCurrentPostureState();
-            var id = UniversalConsts.InvalidIntId;
-            var inWater = SingletonManager.Get<MapConfigManager>().InWater(player.position.Value);
+            lastFrameCount = Time.frameCount;
+            if(player.AudioController() != null)
+            player.AudioController().PlayStepEnvironmentAudio(stepState);
+           
+//            if (!AudioUtil.IsStepAudioValied(player))
+//            {
+//                return;
+//            }
+//            switch(player.gamePlay.GameState)
+//            {
+//                case GameState.AirPlane:
+//                case GameState.Gliding:
+//                case GameState.Invisible:
+//                case GameState.JumpPlane:
+//                    //以上状态不播放行走音效
+//                    return;
+//                case GameState.Normal:
+//                case GameState.Poison:
+//                case GameState.Visible:
+//                    break;
+//            }
+           
+//   //         var myTerrain = SingletonManager.Get<TerrainManager>().GetTerrain(SingletonManager.Get<MapConfigManager>().SceneParameters.Id);
+//            PostureInConfig curPosture = player.stateInterface.State.GetCurrentPostureState();
+//            var id = UniversalConsts.InvalidIntId;
+//            var inWater = false;// SingletonManager.Get<MapConfigManager>().InWater(player.position.Value);
+//            AudioGrp_Footstep step = AudioGrp_Footstep.None;
+//            switch (curPosture)
+//            {
+//                case PostureInConfig.Crouch:
+//                    if (!inWater)
+//                        step = AudioGrp_Footstep.Squat;
+//                    break;
+//                case PostureInConfig.Prone:
+//                    if (!inWater)
+//                        step = AudioGrp_Footstep.Crawl;
+//                    break;
+//                case PostureInConfig.Stand:
+//                    if (!inWater)
+//                        step = AudioGrp_Footstep.Walk;
+//                    
+//                    break;
+//                case PostureInConfig.Swim:
+//                    player.soundManager.Value.PlayOnce(EPlayerSoundType.Swim);
+//                    break;
+//                case PostureInConfig.Dive:
+//                    player.soundManager.Value.PlayOnce(EPlayerSoundType.Dive);
+//                    break;
+//            }
+         
+          
+//                GameAudioMedia.PlayEnvironmentAudio(stepState, player.position.Value, player.appearanceInterface.Appearance.CharacterP1);
+//                player.playerAudio.LastFootPrintPlayStamp = player.time.ClientTime;
+            
             //switch (curPosture)
             //{
             //    case PostureInConfig.Crouch:

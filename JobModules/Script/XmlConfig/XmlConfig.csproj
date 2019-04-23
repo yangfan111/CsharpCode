@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CCFBDCB2-3866-9129-81A4-42CFED4D6F7E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>XmlConfig</RootNamespace>
+    <AssemblyName>XmlConfig</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Dll.Temp\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\build_obj_dir\Release\XmlConfig\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Dll.Temp\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\build_obj_dir\Debug\XmlConfig\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AttachedAttributeConfig.cs" />
+    <Compile Include="Audio\AduioParamsConfig.cs" />
+    <Compile Include="Audio\AudioEventConfig.cs" />
+    <Compile Include="Audio\AudioGroupConfig.cs" />
+    <Compile Include="Audio\AudioWeaponConfig.cs" />
+    <Compile Include="AvatarAssetConfig.cs" />
+    <Compile Include="BootConfig\AbstractBootConfig.cs" />
+    <Compile Include="BootConfig\ClientBootConfig.cs" />
+    <Compile Include="BootConfig\ResourceConfig.cs" />
+    <Compile Include="BootConfig\ServerBootConfig.cs" />
+    <Compile Include="BootConfig\TerrainSampleConfig.cs" />
+    <Compile Include="BulletDropConfig.cs" />
+    <Compile Include="CameraConfig.cs" />
+    <Compile Include="CardConfig.cs" />
+    <Compile Include="CharacterConfig.cs" />
+    <Compile Include="CharacterInfoConfig.cs" />
+    <Compile Include="CharacterStateConfig.cs" />
+    <Compile Include="ChatConfig.cs" />
+    <Compile Include="ClientEffectCommon.cs" />
+    <Compile Include="ClientEffectConfig.cs" />
+    <Compile Include="ClipDropConfig.cs" />
+    <Compile Include="ConfigEnum.cs" />
+    <Compile Include="CreateConfig.cs" />
+    <Compile Include="DropAreaConfig.cs" />
+    <Compile Include="DropItemConfig.cs" />
+    <Compile Include="DropPoolConfig.cs" />
+    <Compile Include="DynamicPredictionErrorCorrectionConfig.cs" />
+    <Compile Include="EnvironmentTypeConfig.cs" />
+    <Compile Include="FirstPersonOffsetConfig.cs" />
+    <Compile Include="GameItemConfig.cs" />
+    <Compile Include="GameModeConfig.cs" />
+    <Compile Include="GameRuleConfig.cs" />
+    <Compile Include="GlobalDataConfig.cs" />
+    <Compile Include="GloryItemConfig.cs" />
+    <Compile Include="HitBox\HitBox.cs" />
+    <Compile Include="HitBox\HitBoxConfigParser.cs" />
+    <Compile Include="HitBox\HitBoxConstants.cs" />
+    <Compile Include="HitBox\HitBoxInfo.cs" />
+    <Compile Include="IndividuationConfig.cs" />
+    <Compile Include="InputBlockConfig.cs" />
+    <Compile Include="ItemBaseConfig.cs" />
+    <Compile Include="ItemConfig.cs" />
+    <Compile Include="ItemtimelimitConfig.cs" />
+    <Compile Include="KillFeedBackConfig.cs" />
+    <Compile Include="LadderDanConfig.cs" />
+    <Compile Include="LadderInfoConfig.cs" />
+    <Compile Include="LadderKingConfig.cs" />
+    <Compile Include="LadderRankConfig.cs" />
+    <Compile Include="LadderTimeConfig.cs" />
+    <Compile Include="LoadingTipConfig.cs" />
+    <Compile Include="MapConfig.cs" />
+    <Compile Include="MatchPoolConfig.cs" />
+    <Compile Include="MedalConfig.cs" />
+    <Compile Include="MeleeAttackCDConfig.cs" />
+    <Compile Include="MoneyConfig.cs" />
+    <Compile Include="PackConfig.cs" />
+    <Compile Include="PlayerSoundConfig.cs" />
+    <Compile Include="PlayerStatisticConfig.cs" />
+    <Compile Include="PlayerStatisticShowConfig.cs" />
+    <Compile Include="PreLoadingConfig.cs" />
+    <Compile Include="PreloadAnimationConfig.cs" />
+    <Compile Include="PropConfig.cs" />
+    <Compile Include="RankConfig.cs" />
+    <Compile Include="RayCastActionConfig.cs" />
+    <Compile Include="RoleAvatarConfig.cs" />
+    <Compile Include="RoleAvatarResConfig.cs" />
+    <Compile Include="RoleConfig.cs" />
+    <Compile Include="RoleExpConfig.cs" />
+    <Compile Include="ServerTipCodeConfig.cs" />
+    <Compile Include="SettingConfig.cs" />
+    <Compile Include="ShopConfig.cs" />
+    <Compile Include="SoundConfig.cs" />
+    <Compile Include="SoundHallConfig.cs" />
+    <Compile Include="SpeedCurveConfig.cs" />
+    <Compile Include="StateTransitionConfig.cs" />
+    <Compile Include="TableLanguageConfig.cs" />
+    <Compile Include="TableLanguageMapConfig.cs" />
+    <Compile Include="TaskdailyConfig.cs" />
+    <Compile Include="TaskweeklyConfig.cs" />
+    <Compile Include="TerrainEffectConfig.cs" />
+    <Compile Include="TerrainMaterialConfig.cs" />
+    <Compile Include="TerrainSoundConfig.cs" />
+    <Compile Include="TerrainVehicleFrictionConfig.cs" />
+    <Compile Include="TypeForDeathConfig.cs" />
+    <Compile Include="Utils\TransformUtility.cs" />
+    <Compile Include="VehicleAssetConfig.cs" />
+    <Compile Include="VehicleSoundConfig.cs" />
+    <Compile Include="VideoSettingConfig.cs" />
+    <Compile Include="WeaponAssetConfig.cs" />
+    <Compile Include="WeaponCommonConfig.cs" />
+    <Compile Include="WeaponConfig.cs" />
+    <Compile Include="WeaponPartSurvivalConfig.cs" />
+    <Compile Include="WeaponPartsConfig.cs" />
+    <Compile Include="WeaponPropertyConfig.cs" />
+    <Compile Include="WeaponUnlockConfig.cs" />
+    <Compile Include="WeaponWorkshopConfig.cs" />
+    <Compile Include="XmlConfigParser.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shared.Scripts\Shared.Scripts.csproj">
+      <Project>{D2164AE1-BEE4-3DE7-A778-AE0D93E5194C}</Project>
+      <Name>Shared.Scripts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

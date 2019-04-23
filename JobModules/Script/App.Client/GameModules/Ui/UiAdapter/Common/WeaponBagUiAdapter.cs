@@ -208,7 +208,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 }
 
                 //Debug.Log("CurBagIndex" + (WeaponController.HeldBagPointer2 + 1));
-                return WeaponController.HeldBagPointer2+ 1;
+                return WeaponController.HeldBagPointer+ 1;
             }
             set
             {

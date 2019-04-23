@@ -31,12 +31,6 @@ namespace App.Shared.GameModules.Player.Appearance.CharacterDebugPackage
                 EnableAnimator(false, players);
                 SharedConfig.DisableAnimator = false;
             }
-
-            if (SharedConfig.UpdateRender)
-            {
-                UpdateRender(players);
-                SharedConfig.UpdateRender = false;
-            }
         }
 
         private void EnableAnimator(bool enable, PlayerEntity[] players)

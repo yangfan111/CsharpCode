@@ -30,14 +30,17 @@ namespace App.Server.GameModules.GamePlay.Free.item
                 rangeDic = new MyDictionary<int, DropRange>();
                 dropCache = new Dictionary<int, List<ItemDrop>>();
 
+                int loaded = 0;
                 foreach (var item in DropAreaConfig.current.Items)
                 {
                     if (item.MapId == mapId)
                     {
                         rangeDic[item.AwardId] = new DropRange(item.Range, item.Count);
                         dropDic[item.AwardId] = new CatPriority(item.Drop);
+                        loaded++;
                     }
                 }
+                Logger.InfoFormat("drop_area data loaded, {0}", loaded); loaded = 0;
                 MyDictionary<string, List<DropPool>> catMap = new MyDictionary<string, List<DropPool>>();
                 foreach (var item in DropPoolConfig.current.Items)
                 {
@@ -47,7 +50,9 @@ namespace App.Server.GameModules.GamePlay.Free.item
                         catMap[cat] = new List<DropPool>();
                     }
                     catMap[cat].Add(item);
+                    loaded++;
                 }
+                Logger.InfoFormat("drop_pool data loaded, {0}", loaded); loaded = 0;
                 foreach (string key in catMap.Keys)
                 {
                     List<DropPool> list = catMap[key];
@@ -75,8 +80,9 @@ namespace App.Server.GameModules.GamePlay.Free.item
                         extraDic.Add(cat, new MyDictionary<int, CatPriority>());
                     }
                     extraDic[cat][index] = new CatPriority(drop);
+                    loaded++;
                 }
-                
+                Logger.InfoFormat("drop_item data loaded, {0}", loaded);
                 InitialPoints(mapId);
             }
         }
@@ -90,6 +96,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
                     dropCache.Add(point.ID, GetDropItems(point.ID, mapId));
                 }
             }
+            Logger.InfoFormat("dropCache loaded, {0}", dropCache.Count);
         }
 
         public static ItemDrop[] GetDropItems(string cat, int count, int mapId)
@@ -208,7 +215,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
             for (int i = 0; i < ss.Length; i++)
             {
-                string[] vs = ss[i].Split("=");
+                string[] vs = ss[i].Split(new string[]{"="}, StringSplitOptions.RemoveEmptyEntries);
                 if (vs.Length == 1)
                 {
                     cats[i] = vs[0].Trim();
@@ -303,7 +310,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
         public DropRange(string range, string count)
         {
-            string[] ss = range.Split(",");
+            string[] ss = range.Split(new string[]{",", "，"}, StringSplitOptions.RemoveEmptyEntries);
             if (ss.Length == 2)
             {
                 this.posFromCount = int.Parse(ss[0]);
@@ -315,7 +322,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
                 this.posToCount = int.Parse(ss[0]);
             }
 
-            ss = count.Split(",");
+            ss = count.Split(new string[]{",", "，"}, StringSplitOptions.RemoveEmptyEntries);
             if (ss.Length == 2)
             {
                 this.dropFromCount = int.Parse(ss[0]);

@@ -34,17 +34,26 @@ namespace App.Shared.GameModules.Bullet
 
             return null;
         }
+        
+        public HitBoxTransformProvider GetHitBoxProvider(EntityKey entityKey)
+        {
+            var entity = _playerContext.GetEntityWithEntityKey(entityKey);
+            if (entity != null && entity.hasPosition && entity.hasHitBox)
+            {
+                var provider = SingletonManager.Get<HitBoxTransformProviderCache>().GetProvider(entity.thirdPersonModel.Value);
+                if (provider != null) return provider;
+            }
+            return null;
+        }
 
         public void UpdateHitBox(IGameEntity gameEntity)
         {
             var position = gameEntity.Position.Value;
-            var rotation = gameEntity.GetComponent<Orientation>().RotationYaw;
+            var rotation = gameEntity.GetComponent<OrientationComponent>().RotationYaw;
             var hitBoxComponent = GetHitBoxComponent(gameEntity.EntityKey);
 
             if (hitBoxComponent != null)
             {
-                hitBoxComponent.HitBoxGameObject.transform.position = position;
-                hitBoxComponent.HitBoxGameObject.transform.rotation = rotation;
 
                 var playerEntity = GetPlayerEntity(gameEntity);
 				
@@ -53,12 +62,8 @@ namespace App.Shared.GameModules.Bullet
                 PlayerEntityUtility.UpdateTransform(playerEntity,
                         gameEntity.GetComponent<NetworkAnimatorComponent>(),
                         gameEntity.GetComponent<PredictedAppearanceComponent>(),
-                        gameEntity.GetComponent<Orientation>());
+                        gameEntity.GetComponent<OrientationComponent>());
                 //_logger.DebugFormat("server animator {0}", gameEntity.GetComponent<NetworkAnimatorComponent>().ToStringExt());
-                
-                var provider = SingletonManager.Get<HitBoxTransformProviderCache>().GetProvider(playerEntity.thirdPersonModel.Value);
-                provider.Update(position, rotation);
-                HitBoxGameObjectUpdater.Update(hitBoxComponent.HitBoxGameObject.transform, provider);
                 
                 PlayerEntityUtility.UpdateTransform(playerEntity,
                                                     playerEntity.networkAnimator,

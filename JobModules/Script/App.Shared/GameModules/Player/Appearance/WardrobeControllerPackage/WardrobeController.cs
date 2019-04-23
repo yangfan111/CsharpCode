@@ -1,7 +1,9 @@
 using System;
 using App.Shared.Components.Player;
+using Shared.Scripts;
 using Utils.Appearance;
-using Utils.CharacterState;
+using Utils.Appearance.WardrobePackage;
+using Utils.AssetManager;
 
 namespace App.Shared.GameModules.Player.Appearance.WardrobeControllerPackage
 {
@@ -18,6 +20,11 @@ namespace App.Shared.GameModules.Player.Appearance.WardrobeControllerPackage
         public void SyncToLatestComponent(LatestAppearanceComponent value)
         {
             CopyToLatestWardrobeComponent(value);
+        }
+
+        protected override AbstractLoadRequest CreateLoadRequest(AssetInfo assetInfo, ILoadedHandler mountHandler)
+        {
+            return LoadRequestFactory.Create<PlayerEntity>(assetInfo, mountHandler.OnLoadSucc);
         }
 
         #region Helper
@@ -37,6 +44,7 @@ namespace App.Shared.GameModules.Player.Appearance.WardrobeControllerPackage
             SetLatestWardrobeValue(Wardrobe.Bag, value.Bag);
             SetLatestWardrobeValue(Wardrobe.Entirety, value.Entirety);
             SetLatestWardrobeValue(Wardrobe.CharacterHair, value.CharacterHair);
+            SetLatestWardrobeValue(Wardrobe.CharacterHairContainer, value.CharacterHairContainer);
             SetLatestWardrobeValue(Wardrobe.CharacterHead, value.CharacterHead);
             SetLatestWardrobeValue(Wardrobe.CharacterGlove, value.CharacterGlove);
             SetLatestWardrobeValue(Wardrobe.CharacterInner, value.CharacterInner);
@@ -59,6 +67,7 @@ namespace App.Shared.GameModules.Player.Appearance.WardrobeControllerPackage
             value.Bag = GetLatestWardrobeValue(Wardrobe.Bag);
             value.Entirety = GetLatestWardrobeValue(Wardrobe.Entirety);
             value.CharacterHair = GetLatestWardrobeValue(Wardrobe.CharacterHair);
+            value.CharacterHairContainer = GetLatestWardrobeValue(Wardrobe.CharacterHairContainer);
             value.CharacterHead = GetLatestWardrobeValue(Wardrobe.CharacterHead);
             value.CharacterGlove = GetLatestWardrobeValue(Wardrobe.CharacterGlove);
             value.CharacterInner = GetLatestWardrobeValue(Wardrobe.CharacterInner);

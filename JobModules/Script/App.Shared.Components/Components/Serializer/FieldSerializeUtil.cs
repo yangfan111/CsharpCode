@@ -45,7 +45,6 @@ namespace App.Shared.Components.Serializer
         private static StateInterCommandsSerializer _stateInterCommandsSerializer = new StateInterCommandsSerializer();
         private static UnityAnimationEventCommandsSerializer _unityAnimationEventCommandsSerializer = new UnityAnimationEventCommandsSerializer();
         private static EventsSerializer _eventsSerializer = new EventsSerializer();
-        private static InterruptSerializer _interruptSerializer = new InterruptSerializer();
 
         private static void SendCompressedData(int sendTime, uint toSend, Core.Utils.MyBinaryWriter writer)
         {
@@ -736,18 +735,18 @@ namespace App.Shared.Components.Serializer
         {
             return _entityKeySerializer.Read(reader);
         }
-        public static InterruptData Deserialize(InterruptData typeTag, BinaryReader reader)
-        {
-            return _interruptSerializer.Read(reader);
-        }
+//        public static InterruptData Deserialize(InterruptData typeTag, BinaryReader reader)
+//        {
+//            return _interruptSerializer.Read(reader);
+//        }
         public static PlayerEvents Deserialize(PlayerEvents typeTag, BinaryReader reader)
         {
             return _eventsSerializer.Read(reader, typeTag);
         }
-        public static void Serialize(InterruptData data, MyBinaryWriter writer , InterruptData last = default(InterruptData), bool weiteAll = false)
-        {
-            _interruptSerializer.Write(data, writer);
-        }
+//        public static void Serialize(InterruptData data, MyBinaryWriter writer , InterruptData last = default(InterruptData), bool weiteAll = false)
+//        {
+//            _interruptSerializer.Write(data, writer);
+//        }
         public static void Serialize(FixedVector3 typeTag, MyBinaryWriter writer, FixedVector3 last = default(FixedVector3), bool weiteAll = false)
         {
             _fixedVector3Serializer.Write(typeTag, writer);

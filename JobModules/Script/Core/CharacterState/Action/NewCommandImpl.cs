@@ -295,6 +295,7 @@ namespace Core.CharacterState.Action
         private void ClearAction(IAdaptiveContainer<IFsmInputCommand> commands)
         {
             ClearActionByCmd(commands, FsmInput.Climb, FsmInput.Jump);
+            ClearActionByCmd(commands, FsmInput.LadderSpeed, FsmInput.Freefall);
         }
 
         private void ClearActionByCmd(IAdaptiveContainer<IFsmInputCommand> commands, FsmInput cmd, FsmInput clearAction)

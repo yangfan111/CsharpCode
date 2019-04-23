@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
     {
 
         private Contexts _contexts;
+        private LoggerAdapter _logger = new LoggerAdapter(typeof(PaintUiAdapter));
         public PaintUiAdapter(Contexts contexts)
         {
             _contexts = contexts;
@@ -44,7 +46,13 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public void Paint()
         {
-            Debug.Log("Paint" + SelectedPaintIndex);
+            var paintIdList = PaintIdList;
+            if (paintIdList.Count <= SelectedPaintIndex) {
+                _logger.ErrorFormat("Give me an error SelectedPaintIndex, Please check it !");
+                return;
+            }
+            int id = paintIdList[SelectedPaintIndex];
+            _logger.DebugFormat("id : " + id);
         }
 
         public override bool Enable

@@ -36,8 +36,10 @@ namespace App.Shared.Components.Player
 
         //最大血量有需求再同步
         [NetworkProperty] public int MaxHp;
-
         [NetworkProperty] public float CurHp;
+        
+        public int LastNewRoleId = -1;
+        [NetworkProperty] public int NewRoleId = -1;
 
         [DontInitilize] [NetworkProperty] public float InHurtedHp;
         [DontInitilize] [NetworkProperty] public int RecoverHp;
@@ -45,7 +47,6 @@ namespace App.Shared.Components.Player
         [DontInitilize] [NetworkProperty] public int BuffRemainTime;
 
         [DontInitilize] public int LastLifeState; // PlayerLifeState
-
         [DontInitilize] [NetworkProperty] public int LifeState; // PlayerLifeState
 
         [DontInitilize] [NetworkProperty] public int LifeStateChangeTime; // ServerTime
@@ -78,7 +79,7 @@ namespace App.Shared.Components.Player
         [DontInitilize] [NetworkProperty] public bool IsBeSave;
         [DontInitilize] [NetworkProperty] public int SaveTime;
         [DontInitilize] [NetworkProperty] public EntityKey SavePlayerKey;
-        [DontInitilize] [NetworkProperty] public int SaveEnterState;
+        //[DontInitilize] [NetworkProperty] public int SaveEnterState;
         [DontInitilize] [NetworkProperty] public bool IsInteruptSave;
         
         [DontInitilize] [NetworkProperty] public bool CoverInit;                    //是否开始执行用户指令
@@ -105,6 +106,23 @@ namespace App.Shared.Components.Player
                     BuffRemainTime = 0;
                 }
             }
+        }
+
+        public void ChangeNewRoleId(int roleId)
+        {
+            if(NewRoleId == roleId) return;
+            LastNewRoleId = NewRoleId;
+            NewRoleId = roleId;
+        }
+
+        public bool HasNewRoleIdChangedFlag()
+        {
+            return NewRoleId != LastNewRoleId;
+        }
+
+        public void ClearNewRoleIdChangedFlag()
+        {
+            LastNewRoleId = NewRoleId;
         }
 
         public string GetLifeStateString()
@@ -179,6 +197,7 @@ namespace App.Shared.Components.Player
         {
             var hp = target as GamePlayComponent;
             CurHp = hp.CurHp;
+            NewRoleId = hp.NewRoleId;
             LifeState = hp.LifeState;
             LifeStateChangeTime = hp.LifeStateChangeTime;
             MaxHp = hp.MaxHp;
@@ -203,7 +222,7 @@ namespace App.Shared.Components.Player
             IsBeSave = hp.IsBeSave;
             SaveTime = hp.SaveTime;
             SavePlayerKey = hp.SavePlayerKey;
-            SaveEnterState = hp.SaveEnterState;
+            //SaveEnterState = hp.SaveEnterState;
             IsInteruptSave = hp.IsInteruptSave;
 
             CoverInit = hp.CoverInit;

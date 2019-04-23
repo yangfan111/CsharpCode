@@ -21,7 +21,6 @@ namespace Core
     {
         GunSight,   //开镜
         HoldWeapon, //收枪
-        Pullbolt,   //拉栓
         Count,
 
     }

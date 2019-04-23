@@ -3,7 +3,6 @@ using Entitas.CodeGeneration.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace App.Shared.Components.Player
@@ -15,23 +14,23 @@ namespace App.Shared.Components.Player
         [DontInitilize] public Vector3 MovePos;
         [DontInitilize] public Vector3 FacePos;
         [DontInitilize] public Vector3 AimPos;
-        [DontInitilize] public KeyTime PresssKeys;
+        [DontInitilize] public KeyTime PressKeys;
         [DontInitilize] public KeyTime InterceptKeys;
+        [DontInitilize] public KeyTime RealPressKeys;
         [DontInitilize] public int AttackPlayerId;
     }
 
     public class KeyTime
     {
-        private Dictionary<int, long> startDic;
+        private Dictionary<int, int> startDic;
         private Dictionary<int, int> lastDic;
-
-        private Dictionary<int, int> remove;
+        private List<int> remove;
 
         public KeyTime()
         {
-            startDic = new Dictionary<int, long>();
+            startDic = new Dictionary<int, int>();
             lastDic = new Dictionary<int, int>();
-            remove = new Dictionary<int, int>();
+            remove = new List<int>();
         }
 
         public bool Empty
@@ -51,29 +50,25 @@ namespace App.Shared.Components.Player
             get { return lastDic.Keys.ToArray(); }
         }
 
-        public void Frame()
+        public List<int> Frame()
         {
-            if (lastDic.Count == 0)
-            {
-                return;
-            }
-
             remove.Clear();
-
-            long now = DateTime.Now.Ticks / 10000;
-            foreach (var key in lastDic)
+            if (lastDic.Count == 0) return remove;
+            foreach (var key in lastDic.Keys)
             {
-                remove.Add(key.Key, (int)(key.Value - now + startDic[key.Key]));
-            }
-
-            foreach (var key in remove)
-            {
-                if (key.Value <= 0)
+                if (startDic[key] + lastDic[key] - (int) DateTime.Now.Ticks / 10000 <= 0)
                 {
-                    lastDic.Remove(key.Key);
-                    startDic.Remove(key.Key);
+                    remove.Add(key);
                 }
             }
+
+            if (remove.Count == 0) return remove;
+            foreach (int key in remove)
+            {
+                lastDic.Remove(key);
+                startDic.Remove(key);
+            }
+            return remove;
         }
 
         public void AddKeyTime(int key, int time)
@@ -82,7 +77,7 @@ namespace App.Shared.Components.Player
             {
                 startDic.Remove(key);
             }
-            startDic.Add(key, DateTime.Now.Ticks / 10000);
+            startDic.Add(key, (int) DateTime.Now.Ticks / 10000);
 
             if (lastDic.ContainsKey(key))
             {
@@ -92,7 +87,6 @@ namespace App.Shared.Components.Player
                 }
                 lastDic.Remove(key);
             }
-
             lastDic.Add(key, time);
         }
     }

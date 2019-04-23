@@ -88,9 +88,8 @@ namespace App.Shared.GameModules.Player
             //manual
             input.SetInput(EPlayerInput.IsRun, cmd.MoveHorizontal != 0 || cmd.MoveVertical != 0);
             input.SetInput(EPlayerInput.MeleeAttack, input.IsInput(EPlayerInput.IsLeftAttack) | input.IsInput(EPlayerInput.IsRightAttack));
-
-            //拉栓为自动触发，这里的true只表示可以执行
-            input.SetInput(EPlayerInput.IsPullbolting, true);
+//          
+        
         }
 
         /// <summary>

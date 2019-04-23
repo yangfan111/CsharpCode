@@ -215,6 +215,11 @@ namespace Core.CharacterController
             return _motor.Capsule;
         }
 
+        public void ClearGroundInfo()
+        {
+            _motor.GroundingStatus.Reset();
+        }
+
         public virtual void DrawBoundingBox()
         {
             var characterTransformToCapsuleBottom = _motor.CharacterTransformToCapsuleBottom;

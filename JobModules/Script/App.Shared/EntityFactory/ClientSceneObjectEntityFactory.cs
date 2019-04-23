@@ -1,6 +1,7 @@
 ﻿using System;
 using App.Shared.Components;
 using Assets.XmlConfig;
+using com.cpkf.yyjd.tools.util.math;
 using Core;
 using Core.EntityComponent;
 using Core.GameTime;
@@ -11,14 +12,16 @@ namespace App.Shared.EntityFactory
 {
     public class ClientSceneObjectEntityFactory : ServerSceneObjectEntityFactory
     {
-        public ClientSceneObjectEntityFactory(SceneObjectContext sceneObjectContext, PlayerContext playerContext,
-            IEntityIdGenerator entityIdGenerator, IEntityIdGenerator equipGenerator, ICurrentTime currentTime) : base(
+        public ClientSceneObjectEntityFactory(SceneObjectContext sceneObjectContext, PlayerContext      playerContext,
+                                              IEntityIdGenerator entityIdGenerator,  IEntityIdGenerator equipGenerator,
+                                              ICurrentTime       currentTime) : base(
             sceneObjectContext, playerContext, entityIdGenerator, equipGenerator, currentTime)
         {
-
         }
 
-        public override IEntity CreateSimpleEquipmentEntity(ECategory category, int id, int count, Vector3 position)
+      
+
+        public override IEntity CreateSimpleEquipmentEntity(ECategory category, int id, int count, Vector3 p)
         {
             return null;
         }
@@ -32,13 +35,19 @@ namespace App.Shared.EntityFactory
             return null;
         }
 
-        public override IEntity CreateDropSceneWeaponObjectEntity(WeaponScanStruct weaponKey, Vector3 position, int lifeTime)
+        public override IEntity CreateDropSceneWeaponObjectEntity(WeaponScanStruct weaponKey, Vector3 position,
+                                                                  int              lifeTime)
         {
             return null;
         }
 
         public override IEntity CreateCastEntity(Vector3 position, float size, int key, string tip)
         {
+            if (SharedConfig.IsOffline)
+            {
+                base.CreateCastEntity(position, size, key, tip);
+            }
+
             return null;
         }
     }

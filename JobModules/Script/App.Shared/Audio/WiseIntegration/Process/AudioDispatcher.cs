@@ -42,7 +42,10 @@ namespace App.Shared.Audio
             bankLoader.LoadAtom(econfig.BankRef, LoadResultHandler, target, econfig);
            
         }
-       
+        public void StopEvent(AudioEventItem econfig, GameObject target)
+        {
+            var result = AkSoundEngine.ExecuteActionOnEvent(econfig.Event, AkActionOnEventType.AkActionOnEventType_Stop, target, 0, AkCurveInterpolation.AkCurveInterpolation_Linear);
+        }
         public void SetSwitch(GameObject target, AudioGrp_ShotMode shotModelGrpIndex)
         {
             SetSwitch(target, (int)AudioGrp_ShotMode.Id, (int)shotModelGrpIndex);

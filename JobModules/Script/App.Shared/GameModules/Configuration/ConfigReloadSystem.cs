@@ -6,8 +6,13 @@ using UnityEngine;
 using Utils.Configuration;
 using Core.Configuration.Sound;
 using System.Collections.Generic;
+using App.Shared.GameModules.Player;
 using Utils.Singleton;
 using App.Shared.GameModules.Weapon;
+using App.Shared.GameModules.Weapon;
+using App.Shared.Player;
+using Assets.Utils.Configuration;
+using Core;
 
 namespace App.Shared.GameModules.Configuration
 {
@@ -33,7 +38,7 @@ namespace App.Shared.GameModules.Configuration
             var weaponData= new ConfigReloadItem
             {
                 Asset = "WeaponData",
-                OnReload = (text) => WeaponReload(text),
+                OnReload = (text) => WeaponReload(contexts, text),
             };
             _configs.Add(weaponData);
             var weaponPart = new ConfigReloadItem
@@ -60,26 +65,28 @@ namespace App.Shared.GameModules.Configuration
                 OnReload = StateTransitionReload,
             };
             _configs.Add(stateTrans);
-
             _playerContext = contexts.player;
             _contexts = contexts;
         }
 
-        public void OnLoadResources(ILoadRequestManager loadRequestManager)
+        public void OnLoadResources(IUnityAssetManager assetManager)
         {
             if(Reload)
             {
                 foreach(var cfg in _configs)
                 {
-                    loadRequestManager.AppendLoadRequest(null, new AssetInfo("tables", cfg.Asset), OnLoadSucc);
+                    assetManager.LoadAssetAsync("ConfigReloadSystem", new AssetInfo("tables", cfg.Asset), OnLoadSucc);
                 }
                 Reload = false;
             }
         }
 
-        public void OnLoadSucc(object source, AssetInfo assetInfo, UnityEngine.Object obj)
+        public void OnLoadSucc(string source, UnityObject unityObj)
         {
-            foreach(var cfg in _configs)
+            var assetInfo = unityObj.Address;
+            var obj = unityObj.As<TextAsset>();
+
+            foreach (var cfg in _configs)
             {
                 if(assetInfo.AssetName.Equals(cfg.Asset))
                 {
@@ -101,20 +108,19 @@ namespace App.Shared.GameModules.Configuration
             parser.ParseConfig(xmlContent);
         }
 
-        public void WeaponReload(TextAsset textAsset)
+        public void WeaponReload(Contexts contexts, TextAsset textAsset)
         {
-            SingletonManager.Get<WeaponDataConfigManager>().ParseConfig(textAsset.text);
+            SingletonManager.Get<WeaponConfigManagement>().ParseConfig(textAsset.text);
             foreach(var player in _playerContext.GetEntities())
             {
-                player.weaponFactory.Factory.ClearCache();
-                player.GetController<PlayerWeaponController>().TryMountSlotWeapon(player.GetController<PlayerWeaponController>().CurrSlotType);
+                player.WeaponController().TryArmWeaponImmediately(Core.EWeaponSlotType.Pointer);
             }
         }
 
         public void StateTransitionReload(TextAsset textAsset)
         {
             SingletonManager.Get<StateTransitionConfigManager>().ParseConfig(textAsset.text);
-            _contexts.session.commonSession.GameStateProcessorFactory.GetStatePool().Reload(
+            PlayerStateInputsDataMap.Instance.Reload(
                 SingletonManager.Get<StateTransitionConfigManager>().GetTransitons());
         }
     }

@@ -18,43 +18,46 @@ namespace Core.CharacterState.Action
 
         private Action<Action<FsmOutput>> _resetParam;
 
-        public void InitCommon(IFsmTransitionHelper infoProvider)
+        public void InitCommon(IFsmTransitionHelper infoProvider, ICharacterInfoProvider characterInfo)
         {
-            AddState(ActionState.CreateCommonNullState(), infoProvider);
+            AddState(ActionState.CreateCommonNullState(), infoProvider, characterInfo);
 
-            AddState(ActionState.CreateFireState(), infoProvider);
-            AddState(ActionState.CreateSpecialFireState(), infoProvider);
-            AddState(ActionState.CreateSpecialFireHold(), infoProvider);
-            AddState(ActionState.CreateSpecialFireEnd(), infoProvider);
-            AddState(ActionState.CreateInjuryState(), infoProvider);
-            AddState(ActionState.CreateReloadState(), infoProvider);
-            AddState(ActionState.CreateSpecialReloadState(), infoProvider);
+            AddState(ActionState.CreateFireState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateSpecialFireState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateSpecialFireHold(), infoProvider, characterInfo);
+            AddState(ActionState.CreateSpecialFireEnd(), infoProvider, characterInfo);
+            AddState(ActionState.CreateInjuryState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateReloadState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateSpecialReloadState(), infoProvider, characterInfo);
 
-            AddState(ActionState.CreateUnarmState(), infoProvider);
-            AddState(ActionState.CreateDrawState(), infoProvider);
-            AddState(ActionState.CreateSwitchWeaponState(), infoProvider);
-            AddState(ActionState.CreatePickUpState(), infoProvider);
-            AddState(ActionState.CreateMeleeAttackState(), infoProvider);
-            AddState(ActionState.CreateGrenadeState(), infoProvider);
-            AddState(ActionState.CreateOpenDoorState(), infoProvider);
-            AddState(ActionState.CreatePropsState(), infoProvider);
+            AddState(ActionState.CreateUnarmState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateDrawState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateSwitchWeaponState(), infoProvider, characterInfo);
+            AddState(ActionState.CreatePickUpState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateMeleeAttackState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateGrenadeState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateOpenDoorState(), infoProvider, characterInfo);
+            AddState(ActionState.CreatePropsState(), infoProvider, characterInfo);
 
-            AddState(ActionState.CreateGlidingState(), infoProvider);
-            AddState(ActionState.CreateParachutingState(), infoProvider);
+            AddState(ActionState.CreateGlidingState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateParachutingState(), infoProvider, characterInfo);
 
-            AddState(ActionState.CreateBuriedBombState(), infoProvider);
-            AddState(ActionState.CreateDismantleBombState(), infoProvider);
+            AddState(ActionState.CreateBuriedBombState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateDismantleBombState(), infoProvider, characterInfo);
+            
+            AddState(ActionState.CreateTransfigurationStartState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateTransfigurationFinishState(), infoProvider, characterInfo);
 
             _resetParam = ResetCommon;
         }
 
-        public void InitKeep(IFsmTransitionHelper infoProvider)
+        public void InitKeep(IFsmTransitionHelper infoProvider, ICharacterInfoProvider characterInfo)
         {
-            AddState(ActionState.CreateKeepNullState(), infoProvider);
+            AddState(ActionState.CreateKeepNullState(), infoProvider, characterInfo);
 
-            AddState(ActionState.CreateVehiclesAnimState(), infoProvider);
-            AddState(ActionState.CreateSightP3State(), infoProvider);
-            AddState(ActionState.CreateRescueState(), infoProvider);
+            AddState(ActionState.CreateVehiclesAnimState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateSightP3State(), infoProvider, characterInfo);
+            AddState(ActionState.CreateRescueState(), infoProvider, characterInfo);
 
             _resetParam = ResetKeep;
         }
@@ -199,6 +202,18 @@ namespace Core.CharacterState.Action
                 AnimatorParametersHash.Instance.DismantleName,
                 AnimatorParametersHash.Instance.DismantleDisableValue,
                 CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+            addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.TransfigurationStartHash,
+                AnimatorParametersHash.Instance.TransfigurationStartName,
+                AnimatorParametersHash.Instance.TransfigurationStartDisable,
+                CharacterView.ThirdPerson, false);
+            addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.TransfigurationFinishHash,
+                AnimatorParametersHash.Instance.TransfigurationFinishName,
+                AnimatorParametersHash.Instance.TransfigurationFinishDisable,
+                CharacterView.ThirdPerson, false);
             addOutput(FsmOutput.Cache);
 
             FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.ADSLayer,

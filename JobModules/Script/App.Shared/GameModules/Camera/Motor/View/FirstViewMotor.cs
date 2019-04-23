@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using App.Shared.GameModules.Camera.Utils;
 using Assets.App.Shared.GameModules.Camera;
+using Core.Utils;
 using UnityEngine;
 using XmlConfig;
 
@@ -15,6 +17,7 @@ namespace Core.CameraControl.NewMotor.View
                 {
                     player.appearanceInterface.Appearance.SetFirstPerson();
                     player.characterBoneInterface.CharacterBone.SetFirstPerson();
+                    player.UpdateCameraArchorPostion();
                 }
             });
         }
@@ -36,31 +39,34 @@ namespace Core.CameraControl.NewMotor.View
         {
             if (state.IsFree()) return false;
             if (!state.GetMainConfig().CanSwitchView) return false;
-            //if (state.ViewMode.Equals(ECameraViewMode.FirstPerson) && (input.ChangeCamera))
+
             if (state.ViewMode == ECameraViewMode.FirstPerson && input.FilteredChangeCamera)
             {
                 return false;
             }
-            //if (state.ViewMode.Equals(ECameraViewMode.ThirdPerson) &&  input.ChangeCamera)
+
             if (state.ViewMode  == ECameraViewMode.ThirdPerson &&  input.FilteredChangeCamera)
             {
                 return true;
             }
 
-            //if (state.ViewMode.Equals(ECameraViewMode.GunSight) && input.IsCameraFocus && state.LastViewMode.Equals(ECameraViewMode.FirstPerson))
-            if (state.ViewMode == ECameraViewMode.GunSight && (input.FilteredCameraFocus || input.ForceChangeGunSight || input.ForceInterruptGunSight) && state.LastViewMode == ECameraViewMode.FirstPerson)
+            if (state.ViewMode == ECameraViewMode.GunSight && (input.FilteredCameraFocus || input.InterruptCameraFocus) && state.LastViewMode == ECameraViewMode.FirstPerson)
             {
                 return true;
             }
 
+            if (input.LastViewByOrder == (short) ECameraViewMode.FirstPerson)
+            {
+                return true;
+
+            }
             return state.ViewMode == ECameraViewMode.FirstPerson;
         }
 
         public override void CalcOutput(PlayerEntity player, ICameraMotorInput input, ICameraMotorState state, SubCameraMotorState subState,
             DummyCameraMotorOutput output, ICameraNewMotor last, int clientTime)
         {
-            //output.Rotation = Quaternion.EulerAngles(player.orientation.Pitch,0,0);
-            return;
+
         }
 
         public override HashSet<short> ExcludeNextMotor()

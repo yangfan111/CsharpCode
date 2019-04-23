@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -61,6 +61,9 @@ namespace Core.CharacterState.Posture
                     break;
                 case PostureStateId.Slide:
                     ret = PostureInConfig.Slide;
+                    break;
+                case PostureStateId.Ladder:
+                    ret = PostureInConfig.Ladder;
                     break;
                 default:
                     ret = PostureInConfig.Null;
@@ -179,6 +182,13 @@ namespace Core.CharacterState.Posture
                     break;
                 case MovementStateId.DiveMove:
                     ret = MovementInConfig.DiveMove;
+                    break;
+                case MovementStateId.EnterLadder:
+                case MovementStateId.ExitLadder:
+                    ret = MovementInConfig.EnterLadder;
+                    break;
+                case MovementStateId.Ladder:
+                    ret = MovementInConfig.Ladder;
                     break;
                 // 以下暂时没有用到
                 //case MovementStateId.Swim:

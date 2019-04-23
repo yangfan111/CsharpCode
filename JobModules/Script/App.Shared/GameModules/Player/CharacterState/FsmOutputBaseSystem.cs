@@ -7,6 +7,7 @@ using System.Text;
 using App.Shared.Components.Player;
 using Core.Animation;
 using Core.Appearance;
+using Core.CharacterController;
 using Core.EntityComponent;
 using Sharpen;
 using UnityEngine;
@@ -57,11 +58,11 @@ namespace App.Shared.GameModules.Player.CharacterState
             //CharacterControllerHeight
             _FsmOutputAction[(short) FsmOutputType.CharacterControllerHeight].ServerAction = (entity, output) =>
             {
-                entity.characterControllerInterface.CharacterController.SetCharacterControllerHeight(output.FloatValue);
+                entity.characterControllerInterface.CharacterController.SetCharacterControllerHeight(output.FloatValue,  entity.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController, entity.characterInfo.CharacterInfoProviderContext.GetStandCapsule().Height);
             };
             _FsmOutputAction[(short) FsmOutputType.CharacterControllerHeight].ClientAction = (entity, output) =>
             {
-                entity.characterControllerInterface.CharacterController.SetCharacterControllerHeight(output.FloatValue);
+                entity.characterControllerInterface.CharacterController.SetCharacterControllerHeight(output.FloatValue, entity.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController, entity.characterInfo.CharacterInfoProviderContext.GetStandCapsule().Height);
                 entity.stateInterVar.StateInterCommands.Commands.Add(
                     new KeyValuePair<short, float>((short) FsmOutputType.CharacterControllerHeight, output.FloatValue));
             };
@@ -69,12 +70,12 @@ namespace App.Shared.GameModules.Player.CharacterState
             //CharacterControllerJumpHeight
             _FsmOutputAction[(short) FsmOutputType.CharacterControllerJumpHeight].ServerAction = (entity, output) =>
             {
-                entity.characterControllerInterface.CharacterController.SetCharacterControllerHeight(output.FloatValue, false);
+                entity.characterControllerInterface.CharacterController.SetCharacterControllerHeight(output.FloatValue, entity.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController, entity.characterInfo.CharacterInfoProviderContext.GetStandCapsule().Height, false);
             };
 
             _FsmOutputAction[(short) FsmOutputType.CharacterControllerJumpHeight].ClientAction = (entity, output) =>
             {
-                entity.characterControllerInterface.CharacterController.SetCharacterControllerHeight(output.FloatValue, false);
+                entity.characterControllerInterface.CharacterController.SetCharacterControllerHeight(output.FloatValue, entity.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController, entity.characterInfo.CharacterInfoProviderContext.GetStandCapsule().Height, false);
                 entity.stateInterVar.StateInterCommands.Commands.Add(
                     new KeyValuePair<short, float>((short) FsmOutputType.CharacterControllerJumpHeight,
                         output.FloatValue));
@@ -83,12 +84,12 @@ namespace App.Shared.GameModules.Player.CharacterState
             //CharacterControllerRadius
             _FsmOutputAction[(short) FsmOutputType.CharacterControllerRadius].ServerAction = (entity, output) =>
             {
-                entity.characterControllerInterface.CharacterController.SetCharacterControllerRadius(output.FloatValue);
+                entity.characterControllerInterface.CharacterController.SetCharacterControllerRadius(output.FloatValue, entity.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController);
             };
                 
             _FsmOutputAction[(short) FsmOutputType.CharacterControllerRadius].ClientAction = (entity, output) =>
             {
-                entity.characterControllerInterface.CharacterController.SetCharacterControllerRadius(output.FloatValue);
+                entity.characterControllerInterface.CharacterController.SetCharacterControllerRadius(output.FloatValue, entity.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController);
                 entity.stateInterVar.StateInterCommands.Commands.Add(new KeyValuePair<short, float>((short)FsmOutputType.CharacterControllerRadius, output.FloatValue));
             };
             
@@ -316,6 +317,11 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         private static void SetAnimatorParameterP1(Animator animator, FsmOutput output, FpAnimStatusComponent latestValue)
         {
+            if(!latestValue.AnimatorParameterIndex.ContainsKey(output.TargetHash))
+            {
+                Logger.WarnFormat("animator param is not found:{0}!!!", output.Target);
+                return;
+            }
             var index = latestValue.AnimatorParameterIndex[output.TargetHash];
             var latestParam = latestValue.AnimatorParameters[index];
 
@@ -326,6 +332,11 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         private static void SetAnimatorParameterP3(Animator animator, FsmOutput output, NetworkAnimatorComponent latestValue)
         {
+            if(!latestValue.AnimatorParameterIndex.ContainsKey(output.TargetHash))
+            {
+                Logger.WarnFormat("animator param is not found:{0}!!!", output.Target);
+                return;
+            }
             var index = latestValue.AnimatorParameterIndex[output.TargetHash];
             var latestParam = latestValue.AnimatorParameters[index];
 

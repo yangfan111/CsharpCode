@@ -42,6 +42,8 @@ namespace Core.Prediction.UserPrediction.Cmd
         /// </summary>
         public const int IsInInterruptState = /*1 <<*/ (int)UserCmdEnum.IsInterrupt;
         public const int IsSprayPaint = /*1 <<*/ (int)UserCmdEnum.IsSprayPaint;
+        public const int IsScopeIn = (int)UserCmdEnum.IsScopeIn;
+        public const int IsScopeOut = (int)UserCmdEnum.IsScopeOut;
     }
 
     public class UserCmd : BaseRefCounter, IUserCmd
@@ -277,6 +279,14 @@ namespace Core.Prediction.UserPrediction.Cmd
             get { return HasEnum((int)EUserCmdFlags.IsUseAction); }
             set { AddEnum((int)EUserCmdFlags.IsUseAction, value); }
         }
+        public bool IsScopeIn {
+            get { return HasEnum((int)EUserCmdFlags.IsScopeIn); }
+            set { AddEnum((int)EUserCmdFlags.IsScopeIn, value); }
+        }
+        public bool IsScopeOut {
+            get { return HasEnum((int)EUserCmdFlags.IsScopeOut); }
+            set { AddEnum((int)EUserCmdFlags.IsScopeOut, value); }
+        }
 
         public float DeltaYaw { get; set; }
         public float DeltaPitch { get; set; }
@@ -361,7 +371,8 @@ namespace Core.Prediction.UserPrediction.Cmd
             cmd.IsSprayPaint = IsSprayPaint; /*喷漆*/
             cmd.IsUseAction = IsUseAction;
             cmd.IsForceUnmountWeapon = IsForceUnmountWeapon;
-
+            cmd.IsScopeIn = IsScopeIn;
+            cmd.IsScopeOut = IsScopeOut;
         }
 
         public void Reset()
@@ -422,6 +433,8 @@ namespace Core.Prediction.UserPrediction.Cmd
             IsSprayPaint = false;
             IsUseAction = false;
             IsForceUnmountWeapon = false;
+            IsScopeIn = false;
+            IsScopeOut = false;
         }
 
         protected override void OnCleanUp()

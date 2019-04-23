@@ -31,7 +31,7 @@ namespace App.Shared.GameModules.Player
                 PlayerEntity teamEntity = _contexts.player.GetEntityWithEntityKey(myEntity.gamePlay.SavePlayerKey);
                 if (null == teamEntity)
                 {
-                    StopSave(myEntity, true);
+                    StopSave(myEntity, true, cmd);
                     return;
                 }
 
@@ -45,22 +45,22 @@ namespace App.Shared.GameModules.Player
                         myEntity.gamePlay.CurHp = myEntity.gamePlay.MaxHp * 0.1f;
                         myEntity.gamePlay.ChangeLifeState(EPlayerLifeState.Alive, myEntity.time.ClientTime);
                     }
-                    StopSave(myEntity, false);
+                    StopSave(myEntity, false, cmd);
                     return;
                 }
                 if (Vector3.Distance(myEntity.position.Value, teamEntity.position.Value) > SharedConfig.MaxSaveDistance)
                 {
-                    StopSave(myEntity, true);
-                    StopSave(teamEntity, true);
+                    StopSave(myEntity, true, cmd);
+                    StopSave(teamEntity, true, cmd);
                     return;
                 }
                 if (myEntity.gamePlay.IsSave)
                 {
-                    if (!cmd.IsF || myEntity.stateInterface.State.NeedInterruptRescue((PostureInConfig) myEntity.gamePlay.SaveEnterState)
-                        || !myEntity.gamePlay.IsLifeState(EPlayerLifeState.Alive) || GetAngle(myEntity, teamEntity) > SharedConfig.MaxSaveAngle)
+                    if (!cmd.IsF || myEntity.stateInterface.State.NeedInterruptRescue() || !myEntity.gamePlay.IsLifeState(EPlayerLifeState.Alive)
+                        || GetAngle(myEntity, teamEntity) > SharedConfig.MaxSaveAngle)
                     {
-                        StopSave(myEntity, true);
-                        StopSave(teamEntity, true);
+                        StopSave(myEntity, true, cmd);
+                        StopSave(teamEntity, true, cmd);
                         return;
                     }
                 }
@@ -68,8 +68,8 @@ namespace App.Shared.GameModules.Player
                 {
                     if (myEntity.gamePlay.IsDead())
                     {
-                        StopSave(myEntity, true);
-                        StopSave(teamEntity, true);
+                        StopSave(myEntity, true, cmd);
+                        StopSave(teamEntity, true, cmd);
                         return;
                     }
                 }
@@ -83,7 +83,7 @@ namespace App.Shared.GameModules.Player
                 {
                     PlayerAnimationAction.DoAnimation(_contexts, PlayerAnimationAction.Rescue, myEntity, true);
                     myEntity.gamePlay.IsSave = true;
-                    myEntity.gamePlay.SaveEnterState = (int) myEntity.stateInterface.State.GetCurrentPostureState();
+                    //myEntity.gamePlay.SaveEnterState = (int) PostureInConfig.Crouch;
                     myEntity.gamePlay.SaveTime = myEntity.time.ClientTime;
                     myEntity.gamePlay.SavePlayerKey = saveEntity.entityKey.Value;
                     saveEntity.gamePlay.IsBeSave = true;
@@ -93,7 +93,7 @@ namespace App.Shared.GameModules.Player
             }
         }
 
-        private void StopSave(PlayerEntity playerEntity, bool isInterrupted)
+        private void StopSave(PlayerEntity playerEntity, bool isInterrupted, IUserCmd cmd)
         {
             if (SharedConfig.IsServer)
             {
@@ -112,7 +112,7 @@ namespace App.Shared.GameModules.Player
                     playerEntity.gamePlay.IsBeSave = false;
                 }
             }
-            if (playerEntity.gamePlay.IsSave || !isInterrupted)
+            if (playerEntity.gamePlay.IsBeSave && !isInterrupted)
             {
                 playerEntity.stateInterface.State.SetPostureCrouch();
             }

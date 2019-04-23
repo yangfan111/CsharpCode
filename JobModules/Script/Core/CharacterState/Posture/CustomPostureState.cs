@@ -8,17 +8,31 @@ namespace Core.CharacterState.Posture
     {
         private float _height;
         private float _forward;
-        private float _controllerHeight;
-        private float _controllerRadius;
+        private Func<float> _controllerHeight;
+        private Func<float> _controllerRadius;
         private PostureStateId _stateId;
         
-        public CustomPostureState(PostureStateId id, float height, float forward, float controllerHeight, float controllerRadius) : base(id)
+        public CustomPostureState(PostureStateId id, float height, float forward) : base(id)
         {
             _stateId = id;
             _height = height;
             _forward = forward;
-            _controllerHeight = controllerHeight;
-            _controllerRadius = controllerRadius;
+            if (PostureStateId.Prone == id)
+            {
+                _controllerHeight = () => _characterInfo.GetProneCapsule().Height;
+                _controllerRadius = () => _characterInfo.GetProneCapsule().Radius;
+            }
+            else if (PostureStateId.Crouch == id)
+            {
+                _controllerHeight = () => _characterInfo.GetCrouchCapsule().Height;
+                _controllerRadius = () => _characterInfo.GetCrouchCapsule().Radius;
+            }
+            else
+            {
+                _controllerHeight = () => _characterInfo.GetStandCapsule().Height;
+                _controllerRadius = () => _characterInfo.GetStandCapsule().Radius;
+            }
+            
         }
 
         public override void DoBeforeEntering(IFsmInputCommand command, Action<FsmOutput> addOutput)
@@ -32,10 +46,10 @@ namespace Core.CharacterState.Posture
                 _forward);
             addOutput(FsmOutput.Cache);
 
-            FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerHeight, _controllerHeight);
+            FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerHeight, _controllerHeight.Invoke());
             addOutput(FsmOutput.Cache);
             
-            FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerRadius, _controllerRadius);
+            FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerRadius, _controllerRadius.Invoke());
             addOutput(FsmOutput.Cache);
 
             switch (_stateId)

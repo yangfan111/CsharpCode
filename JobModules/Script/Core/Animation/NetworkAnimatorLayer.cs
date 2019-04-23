@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.IO;
 using Core.Compare;
 using Core.SnapshotReplication.Serialization.Serializer;
@@ -12,11 +12,12 @@ namespace Core.Animation
         public const float NotInTransition = -1;
 
         private BitArrayWrapper _bitArray;
-        public const int PlayerSyncLayer = 1;
-        public const int PlayerUpperBodyOverlayLayer = 4;
-        public const int PlayerUpperBodyAddLayer = 5;
+        public const int LadderLayer = 1;
+        public const int PlayerSyncLayer = 2;
+        public const int PlayerUpperBodyOverlayLayer = 5;
+        public const int PlayerUpperBodyAddLayer = 6;
         public const int FirstPersonIKPassLayer = 3;
-        public const int ThirdPersonIKPassLayer = 8;
+        public const int ThirdPersonIKPassLayer = 9;
 
         public int LayerIndex;
         public float Weight;

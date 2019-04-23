@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using App.Client.GameModules.Ui.UiAdapter.Interface;
+using App.Client.GameModules.Ui.Utils;
 using App.Client.GameModules.Ui.ViewModels.Blast;
 using Assets.UiFramework.Libs;
 using Core.Enums;
@@ -218,30 +219,30 @@ namespace App.Client.GameModules.Ui.Models.Blast
             for (; index < data.PlayerCount - data.DeadPlayerCount && index < MaxPlayerCount; index++)
             {
                 var item = itemList[index];
-                item.Normal.SetActive(true);
-                item.Dead.SetActive(false);
-                item.Root.SetActive(true);
+                UIUtils.SetActive(item.Normal, true);
+                UIUtils.SetActive(item.Dead, false);
+                UIUtils.SetActive(item.Root, true);
             }
             for (; index < data.PlayerCount && index < MaxPlayerCount; index++)
             {
                 var item = itemList[index];
-                item.Normal.SetActive(false);
-                item.Dead.SetActive(true);
-                item.Root.SetActive(true);
+                UIUtils.SetActive(item.Normal, false);
+                UIUtils.SetActive(item.Dead, true);
+                UIUtils.SetActive(item.Root, true);
             }
 
             for (; index < _adapter.PlayerCapacityPerCamp && index < MaxPlayerCount; index++)
             {
                 var item = itemList[index];
-                item.Dead.SetActive(false);
-                item.Normal.SetActive(false);
-                item.Root.SetActive(true);
+                UIUtils.SetActive(item.Dead, false);
+                UIUtils.SetActive(item.Normal, false);
+                UIUtils.SetActive(item.Root, true);
             }
 
             for (; index < MaxPlayerCount; index++)
             {
                 var item = itemList[index];
-                item.Root.SetActive(false);
+                UIUtils.SetActive(item.Root, false);
             }
         }
     }

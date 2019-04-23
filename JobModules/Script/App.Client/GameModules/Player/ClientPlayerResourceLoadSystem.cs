@@ -31,7 +31,7 @@ namespace App.Shared.GameModules.Player
         {
            
             AssetManager.LoadAssetAsync(player,
-                AssetConfig.GetCharacterModelAssetInfo(player.playerInfo.ModelName),
+                AssetConfig.GetCharacterModelAssetInfo(player.playerInfo.RoleModelId),
                 (new ModelLoadResponseHandler()).OnLoadSucc);
             _logger.InfoFormat("created client player entity {0}", player.entityKey);
         }

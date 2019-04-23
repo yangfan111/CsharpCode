@@ -60,7 +60,7 @@ namespace App.Client.ClientSystems
 
         public void OnGUI()
         {
-            if (Input.GetKey(KeyCode.T))
+            if (Input.GetKey(KeyCode.K))
             {
                 if (!_lastButtonStat)
                     _display = !_display;

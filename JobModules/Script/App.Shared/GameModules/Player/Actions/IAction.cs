@@ -1,9 +1,4 @@
-﻿using Core.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace App.Shared.GameModules.Player.Actions
 {
@@ -11,11 +6,15 @@ namespace App.Shared.GameModules.Player.Actions
     {
         void Update();
         void ActionInput(PlayerEntity player);
-        void TriggerAnimation();
         void AnimationBehaviour();
         void ResetConcretAction();
         bool PlayingAnimation { get; }
+        
+        float ModelYTranslateOffset { set; get; }
+        float ModelYRotationOffset { set; get; }
+        
         Vector3 MatchTarget { set; get; }
+        Quaternion MatchQuaternion { set; get; }
         bool CanTriggerAction { set; get; }
     }
 }

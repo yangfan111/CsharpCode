@@ -33,7 +33,6 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
         {
             
             _finalRotation = _config.Roatation;
-            _transitionTime = _config.TransitionTime;
             base.CalcOutput(player, input, state, subState, output, last, clientTime);
         }
     }

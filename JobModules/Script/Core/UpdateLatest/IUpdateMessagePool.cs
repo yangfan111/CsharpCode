@@ -19,10 +19,10 @@ namespace Core.UpdateLatest
     public class UpdateMessagePool : IUpdateMessagePool
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(UpdateMessagePool));
-        private List<UpdateLatestPacakge> _list = new List<UpdateLatestPacakge>(16);
+        private List<UpdateLatestPacakge> _list = new List<UpdateLatestPacakge>(512);
         private Dictionary<int, UpdateLatestPacakge> dict = new Dictionary<int, UpdateLatestPacakge>();
         public UpdateLatestPacakge LatestMessage { get; private set; }
-        private const int MaxHistoryCount = 200;
+        private const int MaxHistoryCount = 400;
         private int _lastSeq = -1;
 
         public void AddMessage(UpdateLatestPacakge message)

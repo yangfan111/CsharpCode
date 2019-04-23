@@ -21,10 +21,19 @@ namespace App.Server.GameModules.GamePlay.Free.chicken
             Vector2 start = ChickenRuleVars.GetAirLineStartPos(args);
             Vector2 stop = ChickenRuleVars.GetAirLineStopPos(args);
 
-            builder.Fs.Add(start.x);
-            builder.Fs.Add(start.y);
-            builder.Fs.Add(stop.x);
-            builder.Fs.Add(stop.y);
+            int totalTime = args.GetInt("{waitFlyTime}");
+            int startTime = args.GetInt("{canJumpTime}") / 1000;
+            int forceTime = args.GetInt("{forceJumpTime}") / 1000;
+
+            Vector2 from = start + (stop - start) * startTime / totalTime;
+            Vector2 to = start + (stop - start) * forceTime / totalTime;
+
+            Debug.LogFormat("{0} to {1}, {2} {3} {4}", from, to, totalTime, startTime, forceTime);
+
+            builder.Fs.Add(from.x);
+            builder.Fs.Add(from.y);
+            builder.Fs.Add(to.x);
+            builder.Fs.Add(to.y);
         }
     }
 }

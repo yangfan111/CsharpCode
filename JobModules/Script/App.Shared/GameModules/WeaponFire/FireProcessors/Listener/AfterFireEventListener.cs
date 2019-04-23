@@ -60,7 +60,9 @@ namespace App.Shared.GameModules.Weapon
             else
                 shotMode = ((EFireMode)controller.HeldWeaponAgent.BaseComponent.RealFireModel).ToAudioGrpShotMode();
                 var position = controller.RelatedAppearence.WeaponHandObject().transform.position ;
-                controller.AudioController.PlayFireAudio(controller.HeldConfigId, shotMode, position);
+                if(controller.AudioController != null)
+                    controller.AudioController.PlayFireAudio(controller.HeldConfigId, shotMode, position);
+                
                 
              
             
@@ -87,8 +89,8 @@ namespace App.Shared.GameModules.Weapon
          var ejectTrans = controller.RelatedBones.GetLocation(SpecialLocation.EjectionLocation, controller.RelatedAppearence.IsFirstPerson ? CharacterView.FirstPerson : CharacterView.ThirdPerson);
             if (null != ejectTrans)
             {
-                ClientEffectFactory.CreateBulletDrop(_context, _idGenerator, controller.Owner, ejectTrans.position, controller.RelatedOrient.Yaw, 
-                    controller.RelatedOrient.Pitch, DefaultCfg.BulletDrop,controller.HeldConfigId,AudioGrp_FootMatType.Concrete);
+                ClientEffectFactory.CreateBulletDrop(_context, _idGenerator, controller.Owner, ejectTrans.position, controller.RelatedOrientation.Yaw, 
+                    controller.RelatedOrientation.Pitch, DefaultCfg.BulletDrop,controller.HeldConfigId,AudioGrp_FootMatType.Concrete);
             }
             else
             {
@@ -105,7 +107,7 @@ namespace App.Shared.GameModules.Weapon
             if (null != muzzleTrans)
             {
              //   Logger.Info("CreateMuzzleSparkEffct Once");
-                ClientEffectFactory.CreateMuzzleSparkEffct(_context, _idGenerator, controller.Owner, muzzleTrans, controller.RelatedOrient.Pitch, controller.RelatedOrient.Yaw, DefaultCfg.Spark);
+                ClientEffectFactory.CreateMuzzleSparkEffct(_context, _idGenerator, controller.Owner, muzzleTrans, controller.RelatedOrientation.Pitch, controller.RelatedOrientation.Yaw, DefaultCfg.Spark);
             }
             else
             {
@@ -122,8 +124,8 @@ namespace App.Shared.GameModules.Weapon
             }
             
             var effectPos = PlayerEntityUtility.GetThrowingEmitPosition(controller);
-            float effectYaw = (controller.RelatedOrient.Yaw + 90) % 360;
-            float effectPitch = controller.RelatedOrient.Pitch;
+            float effectYaw = (controller.RelatedOrientation.Yaw + 90) % 360;
+            float effectPitch = controller.RelatedOrientation.Pitch;
             int effectId = 32;
             int effectTime = 3000;
 

@@ -19,7 +19,6 @@ namespace App.Shared.GameModules.Weapon.Behavior
             //狙击枪、霰弹枪：开火时精准值不变
             var currAccuracy = factor1 * (factor2 - lastInterval / 1000);
             return CompareUtility.LimitBetween(currAccuracy, min, max);
-//            //Min(精准数值上限 , (连续开枪数^3) / 固定值 + 补偿固定值)*固定参数
 //            float currAccuracy = (continueShootCount*continueShootCount*continueShootCount)/accuracyDivisor +accuracyOffset;
 //            return Math.Min(maxAccuracy, currAccuracy)*factor;
         }

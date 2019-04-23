@@ -59,6 +59,8 @@
         public const string SetReservedBullet = "srb";
 
         public const string SetWeapon = "sw";
+        public const string AudioEmitter = "ae";
+
         public const string SetGrenade = "sg";
         public const string DropWeapon = "dw";
         public const string TestWeaponAssemble = "twa";
@@ -86,6 +88,7 @@
         public const string DebugAnimation = "DebugAnimation";
         public const string ShowBox = "ShowBox";
         public const string ShowGround = "ShowGround";
+        public const string Speed = "speed";
         public const string SlideOff = "EnableSlide";
 
 
@@ -161,7 +164,7 @@
 
         public const string EnableAnimator = "enableanimator";
         public const string DisableAnimator = "disableanimator";
-        public const string UpdateRender = "updaterender";
+        public const string Monster = "monster";
 
         public const string OnlyDirLight = "onlydirlight";
         public const string PostFxOpt = "postfxopt";

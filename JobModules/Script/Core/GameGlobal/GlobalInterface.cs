@@ -30,6 +30,8 @@ namespace Core
     {
         void DoRunTimeInterrupt(IUserCmd cmd);
         void InterruptCharactor();
+
+        bool IsInterrupted(EInterruptType interruptType);
     }
 
    

@@ -32,6 +32,24 @@ namespace App.Client.GameModules.SceneObject
             {
                 SetPositionWithAnchor(entity.multiUnityObject.FirstAsset, entity.position.Value);
             }
+//#if UNITY_EDITOR
+//            if (entity.hasAudioTestEmitter)
+//            {
+//                var go = entity.unityObject.UnityObject.AsGameObject;
+//                var target = go.transform.Find("I004_LOD0");
+//                target.transform.SetParent(null);
+//                entity.audioTestEmitter.Self = target.gameObject;
+//                var emitter = go.GetComponent<AudioEmitterEditor>();
+//                if(!emitter)
+//                    emitter = go.AddComponent<AudioEmitterEditor>();
+//                go.name = "WS-AudioEmitter";
+//                go.transform.scal = Vector3.one * 3f;
+//                go.transform.position = entity.position.Value;
+//                emitter.SetListener(entity.audioTestEmitter.P1);
+//                SetPositionWithAnchor(entity.unityObject.UnityObject, new Vector3(-1,-1,-1));
+//
+//            }
+//            #endif
         }
 
         private void SetPositionWithAnchor(GameObject go, Vector3 position)

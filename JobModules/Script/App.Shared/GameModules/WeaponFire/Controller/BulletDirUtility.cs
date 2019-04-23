@@ -12,8 +12,8 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
         public static Vector3 GetThrowingDir(PlayerWeaponController controller)
         {
-            var yaw = controller.RelatedOrient.Yaw - controller.RelatedOrient.NegPunchYaw * 2;
-            var pitch = controller.RelatedOrient.Pitch - controller.RelatedOrient.NegPunchPitch * 2;
+            var yaw = controller.RelatedOrientation.Yaw - controller.RelatedOrientation.AccPunchYaw * 2;
+            var pitch = controller.RelatedOrientation.Pitch - controller.RelatedOrientation.AccPunchPitch * 2;
 
             Quaternion q = Quaternion.Euler(pitch, yaw, 0);
             Vector3 forward = q.Forward();

@@ -116,7 +116,7 @@ namespace App.Shared.GameModules.Player.ConcreteCharacterController
         public override void OnMovementHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint,
             ref HitStabilityReport hitStabilityReport)
         {
-            //DebugDraw.DrawArrow(hitPoint, hitNormal * 5.0f, Color.green);
+            // DebugDraw.DebugArrow(hitPoint, hitNormal * 5.0f, Color.green);
         }
 
         public override void ProcessHitStabilityReport(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, Vector3 atCharacterPosition,
@@ -125,10 +125,50 @@ namespace App.Shared.GameModules.Player.ConcreteCharacterController
 //            DebugDraw.DrawArrow(hitPoint, hitNormal, Color.yellow);
 //            if (hitStabilityReport.LedgeDetected)
 //            {
-//                DebugDraw.DrawArrow(hitPoint, hitStabilityReport.LedgeGroundNormal, Color.green);
-//                DebugDraw.DrawArrow(hitPoint, hitStabilityReport.LedgeRightDirection, Color.red);
-//                DebugDraw.DrawArrow(hitPoint, hitStabilityReport.LedgeFacingDirection, Color.blue);
+//                DebugDraw.DebugArrow(hitPoint, hitStabilityReport.LedgeGroundNormal, Color.green);
+//                DebugDraw.DebugArrow(hitPoint, hitStabilityReport.LedgeRightDirection, Color.red);
+//                DebugDraw.DebugArrow(hitPoint, hitStabilityReport.LedgeFacingDirection, Color.blue);
 //            }
+        }
+
+        public override void SortOverlap(int nums, Collider[] colliders)
+        {
+			return;
+            if (nums <= 1)
+            {
+                return;
+            }
+
+            int start = 0;
+            int end = nums - 1;
+            bool flag = false;
+            while (start < end)
+            {
+                if (colliders[end] is CharacterController)
+                {
+                    while ((colliders[start] is CharacterController) && start < end )
+                    {
+                        start++;
+                    }
+
+                    if (start != end)
+                    {
+                        var tmp = colliders[end];
+                        colliders[end] = colliders[start];
+                        colliders[start] = tmp;
+                        flag = true;
+                    }
+                }
+                
+                end--;
+            }
+
+            for (int i = 0; i < nums; i++)
+            {
+                Logger.InfoFormat("{0}, collider:{1}\n", i, colliders[i].name);
+            }
+            
+
         }
     }
 }

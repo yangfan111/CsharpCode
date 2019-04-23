@@ -24,7 +24,6 @@ namespace App.Shared.Components.Player
         [DontInitilize, NetworkProperty] public int BagOpenLimitTime;
         [DontInitilize, NetworkProperty] public bool BagLockState;
         [DontInitilize,NetworkProperty] public int TacticWeapon;
-        [DontInitilize, NetworkProperty] public int LastFireWeaponId;
 
         public void CopyFrom(object rightComponent)
         {
@@ -38,7 +37,6 @@ namespace App.Shared.Components.Player
             BagOpenLimitTime = comp.BagOpenLimitTime;
             BagLockState = comp.BagLockState;
             TacticWeapon = comp.TacticWeapon;
-            LastFireWeaponId = comp.LastFireWeaponId;
         }
 
         public int GetComponentId()
@@ -51,7 +49,7 @@ namespace App.Shared.Components.Player
             var cmp = right as PlayerWeaponCustomizeComponent;
             return GrenadeConstWeaponKey == cmp.GrenadeConstWeaponKey &&
                    EmptyConstWeaponkey == cmp.EmptyConstWeaponkey && BagOpenLimitTime == cmp.BagOpenLimitTime
-                    && BagLockState == cmp.BagLockState && TacticWeapon == cmp.TacticWeapon && LastFireWeaponId == cmp.LastFireWeaponId;
+                && BagLockState == cmp.BagLockState && TacticWeapon == cmp.TacticWeapon;
         }
 
         public void RewindTo(object rightComponent)

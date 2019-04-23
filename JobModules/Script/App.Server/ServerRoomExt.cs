@@ -50,9 +50,10 @@ namespace App.Server
             string token = _tokenGenerator.GenerateToken(roomPlayer.Id);
             int[] avatarIds = RepeatedField2IntArray(roomPlayer.AvatarIds);
             int[] weaponAvatarIds = RepeatedField2IntArray(roomPlayer.WeaponAvatarIds);
+            int[] sprayLacquers = RepeatedField2IntArray(roomPlayer.SprayLacquers);
             int num = _hallRoom.MaxNum(roomPlayer.TeamId);
 
-            PlayerInfo playerInfo = new PlayerInfo(token, RoomId, roomPlayer.Id, roomPlayer.Name, roomPlayer.RoleModelId, roomPlayer.TeamId, num, roomPlayer.Level, roomPlayer.BackId, roomPlayer.TitleId, roomPlayer.BadgeId, avatarIds, weaponAvatarIds, false);
+            PlayerInfo playerInfo = new PlayerInfo(token, RoomId, roomPlayer.Id, roomPlayer.Name, roomPlayer.RoleModelId, roomPlayer.TeamId, num, roomPlayer.Level, roomPlayer.BackId, roomPlayer.TitleId, roomPlayer.BadgeId, avatarIds, weaponAvatarIds, sprayLacquers, false);
             playerInfo.RankScore = roomPlayer.RankScore;
             playerInfo.IsKing = roomPlayer.IsKing;
             playerInfo.CreateTime = DateTime.Now.Ticks / 10000;

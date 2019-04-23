@@ -41,22 +41,7 @@ namespace App.Shared
         public const string PluginName = "Wise";//默认音频插件
         public static event System.Action<bool> onForbiddenOptionVary;
         public readonly static AudioBnk_LoadTactics LoadTactics = AudioBnk_LoadTactics.LoadEntirely;
-        /// <summary>
-        /// 全局音频禁用常量
-        /// </summary>
-        public static bool IsForbidden
-        {
-            get { return isForbidden; }
-            set
-            {
-                if (isForbidden != value)
-                {
-                    isForbidden = value;
-                    if (onForbiddenOptionVary != null)
-                        onForbiddenOptionVary(isForbidden);
-                }
-            }
-        }
+    
 
         private static bool isForbidden = false;
         //public const uint CustomPoolMaxNum = 1;

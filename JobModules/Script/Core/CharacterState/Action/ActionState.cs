@@ -13,6 +13,7 @@ using Core.CharacterState.Action.Transitions;
 using Utils.Configuration;
 using Random = UnityEngine.Random;
 using Core.CharacterState.Action.States.SpecialFire;
+using Core.CharacterState.Action.States.Transfiguration;
 using Utils.Singleton;
 
 namespace Core.CharacterState.Action
@@ -583,6 +584,54 @@ namespace Core.CharacterState.Action
             
             #endregion
             
+            #region CommonNull to TransfigurationStart
+            
+            state.AddTransition(
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.TransfigurationStart))
+                    {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.TransfigurationStartHash,
+                            AnimatorParametersHash.Instance.TransfigurationStartName,
+                            AnimatorParametersHash.Instance.TransfigurationStartEnable,
+                            CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+
+                        command.Handled = true;
+
+                        return true;
+                    }
+
+                    return false;
+                },
+                null, (int)ActionStateId.TransfigurationStart, null, 0, new[] { FsmInput.TransfigurationStart });
+            
+            #endregion
+            
+            #region CommonNull to TransfigurationFinish
+            
+            state.AddTransition(
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.TransfigurationFinish))
+                    {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.TransfigurationFinishHash,
+                            AnimatorParametersHash.Instance.TransfigurationFinishName,
+                            AnimatorParametersHash.Instance.TransfigurationFinishEnable,
+                            CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+
+                        command.Handled = true;
+
+                        return true;
+                    }
+
+                    return false;
+                },
+                null, (int)ActionStateId.TransfigurationFinish, null, 0, new[] { FsmInput.TransfigurationFinish });
+            
+            #endregion
+            
             #endregion
             
             return state;
@@ -906,6 +955,16 @@ namespace Core.CharacterState.Action
             #endregion
 
             return state;
+        }
+
+        public static ActionState CreateTransfigurationStartState()
+        {
+            return new TransfigurationStart(ActionStateId.TransfigurationStart);
+        }
+        
+        public static ActionState CreateTransfigurationFinishState()
+        {
+            return new TransfigurationFinish(ActionStateId.TransfigurationFinish);
         }
         
         #endregion

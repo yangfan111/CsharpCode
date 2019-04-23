@@ -14,6 +14,7 @@ using gameplay.gamerule.free.ui.component;
 using UnityEngine;
 using App.Shared.FreeFramework.framework.ui.component;
 using com.wd.free.map.position;
+using App.Server.GameModules.GamePlay.free.player;
 
 namespace App.Server.GameModules.GamePlay.Free.entity
 {
@@ -50,6 +51,8 @@ namespace App.Server.GameModules.GamePlay.Free.entity
 
         [NonSerialized]
         private int id;
+
+        public int CreatorId;
 
         private IntPara xPara;
         private IntPara yPara;
@@ -90,6 +93,12 @@ namespace App.Server.GameModules.GamePlay.Free.entity
             if (createAction != null)
             {
                 createAction.Act(args);
+            }
+
+            FreeData creator = (FreeData)args.GetUnit("creator");
+            if (creator != null)
+            {
+                CreatorId = creator.Player.playerInfo.EntityId;
             }
 
             if (skills != null && skills.Count > 0)
@@ -166,7 +175,7 @@ namespace App.Server.GameModules.GamePlay.Free.entity
                 //v.y = v.y + 20;
                 player.position.Value = v;
             }
-            if(gameObject != null)
+            if (gameObject != null)
             {
                 gameObject.transform.position = _entity.position.Value;
             }

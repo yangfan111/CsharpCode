@@ -10,16 +10,29 @@ using com.wd.free.unit;
 using com.wd.free.util;
 using UnityEngine;
 using com.wd.free.para;
+using Core.HitBox;
+using App.Shared.FreeFramework.framework.trigger;
+using App.Shared.FreeFramework.framework.unit;
+using App.Server.GameModules.GamePlay.free.player;
+using App.Shared;
+using App.Shared.GameModules.Common;
 
 namespace App.Server.GameModules.GamePlay.Free.entity
 {
     [Serializable]
     public class FreePositionMove : AbstractFreeMove
     {
+        public enum HitType
+        {
+            HitEnemy = 1, HitAll = 2, HitEnemyGone = 3, HitAnyGone = 4
+        }
+
         private IPosSelector targetPos;
         private bool dynamic;
         private bool stayTarget;
         private IGameAction action;
+        private int hitType;
+        private IGameAction hitAction;
 
         private string useTime;
 
@@ -107,10 +120,84 @@ namespace App.Server.GameModules.GamePlay.Free.entity
             }
             else
             {
+                Vector3 from = entity.position.Value;
                 UnitPosition ep = GetEntityPosition(entity);
                 UnityPositionUtil.Move(ep, tempPosition, dis);
 
                 entity.position.Value = new Vector3(ep.GetX(), ep.GetY(), ep.GetZ());
+
+                if (hitType > 0)
+                {
+                    bool hit = CheckHit(args, (FreeEntityData)entity.freeData.FreeData, from, entity.position.Value, dis);
+
+                    if (hit)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private bool CheckHit(IEventArgs args, FreeEntityData data, Vector3 fromV, Vector3 toV, float dis)
+        {
+            Ray r = new Ray(fromV, new Vector3(toV.x - fromV.x, toV.y - fromV.y, toV.z - fromV.z));
+
+            RaycastHit[] hits = Physics.RaycastAll(r, dis);
+
+            if (hits.Length > 0)
+            {
+                PlayerEntity player = args.GameContext.player.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(data.CreatorId, (short)EEntityType.Player));
+
+                int team = 0;
+                FreeData source = null;
+                if (player != null)
+                {
+                    team = player.playerInfo.Camp;
+                    source = (FreeData)player.freeData.FreeData;
+                }
+
+                foreach (RaycastHit hit in hits)
+                {
+                    var comp = hit.collider.transform.gameObject.GetComponent<EntityReference>();
+                    if (comp != null)
+                    {
+                        PlayerEntity hitPlayer = args.GameContext.player.GetEntityWithEntityKey(comp.EntityKey);
+
+                        if (hitPlayer != null && hitPlayer != player && !hitPlayer.gamePlay.IsDead())
+                        {
+                            bool sameTeam = hitPlayer.playerInfo.Camp == team;
+                            switch ((HitType)hitType)
+                            {
+                                case HitType.HitAll:
+                                    args.Act(hitAction, new TempUnit("source", source), new TempUnit("target", (FreeData)hitPlayer.freeData.FreeData),
+                                        new TempUnit("pos", new ObjectUnit(hit.point)));
+                                    break;
+                                case HitType.HitEnemy:
+                                    if (!sameTeam)
+                                    {
+                                        args.Act(hitAction, new TempUnit("source", source), new TempUnit("target", (FreeData)hitPlayer.freeData.FreeData),
+                                        new TempUnit("pos", new ObjectUnit(hit.point)));
+                                    }
+                                    break;
+                                case HitType.HitAnyGone:
+                                    args.Act(hitAction, new TempUnit("source", source), new TempUnit("target", (FreeData)hitPlayer.freeData.FreeData),
+                                        new TempUnit("pos", new ObjectUnit(hit.point)));
+                                    return true;
+                                case HitType.HitEnemyGone:
+                                    if (!sameTeam)
+                                    {
+                                        args.Act(hitAction, new TempUnit("source", source), new TempUnit("target", (FreeData)hitPlayer.freeData.FreeData),
+                                        new TempUnit("pos", new ObjectUnit(hit.point)));
+                                        return true;
+                                    }
+                                    break;
+                            }
+                        }
+                        Debug.LogFormat(hit.collider.gameObject.GetInstanceID().ToString() + " of " + hits.Length);
+                    }
+                }
             }
 
             return false;

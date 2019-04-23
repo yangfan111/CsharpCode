@@ -161,6 +161,7 @@ namespace App.Shared.Components.Player
         [DontInitilize] [NetworkProperty] public float CharacterHeight;
         [DontInitilize] [NetworkProperty] public Vector3 CharacterCenter;
         [DontInitilize] [NetworkProperty] public float CharacterRadius;
+        [DontInitilize] [NetworkProperty] public float CharacterStandHeight;
 
         [DontInitilize]
         public ThirdPersonPosture Posture
@@ -228,6 +229,7 @@ namespace App.Shared.Components.Player
                 CharacterHeight = right.CharacterHeight;
                 CharacterCenter = right.CharacterCenter;
                 CharacterRadius = right.CharacterRadius;
+                CharacterStandHeight = right.CharacterStandHeight;
             }
         }
 

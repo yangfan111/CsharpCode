@@ -30,10 +30,10 @@ namespace App.Shared.GameModules.Bullet
             KillType = 0;
             KillFeedbackType = 0;
 
-            NewWeaponConfigItem weapon = SingletonManager.Get<WeaponConfigManager>().GetConfigById(weaponId);
+            WeaponResConfigItem weapon = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(weaponId);
             if(weapon != null)
             {
-                IsKnife = weapon.Type == (int)EWeaponType.MeleeWeapon;
+                IsKnife = weapon.Type == (int)EWeaponType_Config.MeleeWeapon;
             }
             else
             {
@@ -47,7 +47,7 @@ namespace App.Shared.GameModules.Bullet
             {
                 if (type == (int)EUIDeadType.Weapon)
                 {
-                    var config = SingletonManager.Get<WeaponConfigManager>().GetConfigById(weaponId);
+                    var config = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(weaponId);
                     if (null != config)
                     {
                         return (EWeaponSubType)config.SubType;

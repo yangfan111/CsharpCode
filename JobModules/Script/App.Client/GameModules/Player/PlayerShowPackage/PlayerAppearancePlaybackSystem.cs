@@ -51,6 +51,7 @@ namespace App.Client.GameModules.Player.PlayerShowPackage
                 
                 CheckPlayerLifeState(player);
                 
+                appearanceInterface.Appearance.CheckP3HaveInit(!player.gamePlay.HasNewRoleIdChangedFlag());
                 appearanceInterface.Appearance.SyncLatestFrom(player.latestAppearance);
                 appearanceInterface.Appearance.SyncPredictedFrom(player.predictedAppearance);
                 appearanceInterface.Appearance.SyncClientFrom(player.clientAppearance);

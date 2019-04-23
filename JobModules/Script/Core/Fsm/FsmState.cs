@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.CharacterState;
 using Core.Utils;
 
 namespace Core.Fsm
@@ -10,6 +11,8 @@ namespace Core.Fsm
 
         public short StateId { get; private set; }
         public int ElapsedTime { get; private set; }
+
+        protected ICharacterInfoProvider _characterInfo;
 
         protected virtual string GetStateName(short id)
         {
@@ -193,6 +196,15 @@ namespace Core.Fsm
             foreach (var v in _transitions)
             {
                 v.SetTransitionHelper(infoProvider);
+            }
+        }
+
+        public void SetCharacterInfo(ICharacterInfoProvider characterInfo)
+        {
+            _characterInfo = characterInfo;
+            foreach (var v in _transitions)
+            {
+                v.SetCharacterInfo(characterInfo);
             }
         }
     }

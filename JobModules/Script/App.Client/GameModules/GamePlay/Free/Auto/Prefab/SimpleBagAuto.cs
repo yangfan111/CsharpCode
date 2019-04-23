@@ -23,6 +23,7 @@ using UnityEngine.UI;
 using UIComponent.UI.Manager;
 using App.Client.GameModules.GamePlay.Free.App;
 using Utils.Singleton;
+using Assets.Utils.Configuration;
 
 namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
 {
@@ -279,11 +280,11 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
 
         private bool HasNoObstacle(SceneObjectEntity item, PlayerEntity player)
         {
-            if(item.hasUnityObject)
+            if (item.hasUnityObject)
             {
                 return !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, item.unityObject.UnityObject);
             }
-            else if(item.hasMultiUnityObject)
+            else if (item.hasMultiUnityObject)
             {
                 return !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, item.multiUnityObject.FirstAsset);
             }
@@ -295,7 +296,7 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
 
         private bool HasNoObstacle(FreeMoveEntity item, PlayerEntity player)
         {
-            if(item.hasUnityGameObject)
+            if (item.hasUnityGameObject)
             {
                 var noObstacle = !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, item.unityGameObject.UnityObject);
                 return noObstacle;
@@ -303,7 +304,7 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
             else
             {
                 var noObstacle = !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, null);
-                return noObstacle; 
+                return noObstacle;
             }
         }
 
@@ -343,10 +344,10 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
                 Dictionary<string, List<FreeMoveEntity>> deadList = new Dictionary<string, List<FreeMoveEntity>>();
                 Dictionary<string, List<FreeMoveEntity>> dropList = new Dictionary<string, List<FreeMoveEntity>>();
 
-                foreach(var id in current)
+                foreach (var id in current)
                 {
                     var sceneEntity = context.sceneObject.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(id, (short)EEntityType.SceneObject));
-                    if(null != sceneEntity)
+                    if (null != sceneEntity)
                     {
                         list.Add(sceneEntity);
                         continue;
@@ -428,7 +429,11 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
                 {
                     if (item.simpleEquipment.Category == (int)ECategory.Weapon)
                     {
-                        item.simpleEquipment.Count = 0;
+                        WeaponConfigNs.WeaponResConfigItem weapon = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(item.simpleEquipment.Id);
+                        if (weapon.Type != (int)EWeaponType_Config.ThrowWeapon)
+                        {
+                            item.simpleEquipment.Count = 0;
+                        }
                     }
                     if (item.simpleEquipment.Category == (int)ECategory.Avatar)
                     {
@@ -436,7 +441,7 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
                     }
 
                     ItemBar prefab = AddChild(item.simpleEquipment.Category, item.simpleEquipment.Id, item.simpleEquipment.Count, item.entityKey.Value.EntityId);
-                    
+
                     if (prefab != null)
                     {
                         groundDic.Add(item.entityKey.Value.EntityId, prefab);
@@ -588,7 +593,7 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
             TipUtil.AddTip("ground,0," + entityId, new TipData(cat, id, count));
 
             ff.Initial(model.Ss[2], model.Ss[3]);
-            if(count > 0)
+            if (count > 0)
             {
                 ff.SetValues("TEXT_ItemNumber" + FreeMessageConstant.SpilterField + count);
             }
@@ -596,7 +601,7 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
             {
                 ff.SetValues("TEXT_ItemNumber" + FreeMessageConstant.SpilterField + " ");
             }
-            
+
             ff.SetEvents("");
             ff.SetAllEventKey("ground,0," + entityId);
 

@@ -38,5 +38,6 @@ namespace Core
         IEntity CreateDropSceneWeaponObjectEntity(WeaponScanStruct weaponInfo, Vector3 position, int lifeTime);
 
         IEntity GetSceneEntity(int value);
+        IEntity CreateSceneAudioEmitterEntity(Vector3 positionValue, EntityKey entityKey);
     }
 }

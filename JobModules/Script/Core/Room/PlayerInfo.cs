@@ -3,6 +3,7 @@ using Core.Statistics;
 using Core.Utils;
 using Entitas;
 using System.Collections.Generic;
+using System;
 
 namespace Core.Room
 {
@@ -18,9 +19,10 @@ namespace Core.Room
             WeaponBags = new PlayerWeaponBagData[PlayerWeaponBagCount];
             AvatarIds = new List<int>();
             WeaponAvatarIds = new List<int>();
+            SprayLacquers = new List<int>();
         }
 
-        public PlayerInfo(string token, IRoomId roomId, long playerId, string playerName, int roleModelId, long teamId, int num, int level, int backId, int titleId, int badgeId, int[] avatarIds, int[] weaponAvatarIds, bool hasTestWeapon) : this()
+        public PlayerInfo(string token, IRoomId roomId, long playerId, string playerName, int roleModelId, long teamId, int num, int level, int backId, int titleId, int badgeId, int[] avatarIds, int[] weaponAvatarIds, int[] sprayLacquers, bool hasTestWeapon) : this()
         {
 
             Token = token;
@@ -44,6 +46,10 @@ namespace Core.Room
             if (weaponAvatarIds != null)
             {
                 WeaponAvatarIds.AddRange(weaponAvatarIds);
+            }
+
+            if (sprayLacquers != null) {
+                SprayLacquers.AddRange(sprayLacquers);
             }
 
             if (hasTestWeapon)
@@ -91,6 +97,8 @@ namespace Core.Room
         public PlayerWeaponBagData[] WeaponBags { get; set; }
         public StatisticsData StatisticsData { get; set; }
         public Entity PlayerEntity { get; set; }
+
+        public List<int> SprayLacquers { get; set; }
     }
 
     public class PlayerWeaponData

@@ -23,14 +23,15 @@ namespace App.Client.GameModules.ClientEffect
                 assetManager.LoadAssetAsync("BatchLoadHandler", assetInfo, OnLoadSucc, new AssetLoadOption(dontAutoActive:true));
             }
         }
-    private LoggerAdapter _adapter = new LoggerAdapter("BatchAsset");
+
+        private LoggerAdapter _adapter = new LoggerAdapter("BatchAsset");
         public void OnLoadSucc(string source, UnityObject obj)
         {
             if (_entity.hasAssets)
             {
-            _entity.assets.LoadedAssets.Add(obj.Address, obj);
-            bool isFinish = _entity.assets.LoadedAssets.Count == _assetInfos.Length;
-            _entity.assets.IsLoadSucc = isFinish;
+                _entity.assets.LoadedAssets.Add(obj.Address, obj);
+                bool isFinish = _entity.assets.LoadedAssets.Count == _assetInfos.Length;
+                _entity.assets.IsLoadSucc = isFinish;
                 
             }
             else

@@ -89,10 +89,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
         private static bool CanPitchHand()
         {
-            var heldType = Player.WeaponController().HeldSlotType;
-            if (heldType != EWeaponSlotType.PrimeWeapon &&
-                heldType != EWeaponSlotType.SecondaryWeapon &&
-                heldType != EWeaponSlotType.PistolWeapon)
+            if (!Player.appearanceInterface.Appearance.IsPrimaryWeaponOrSideArm())
                 return false;
             var actionState = Player.stateInterface.State.GetActionState();
             var postureState = Player.stateInterface.State.GetCurrentPostureState();

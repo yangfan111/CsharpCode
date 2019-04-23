@@ -4,26 +4,41 @@ using Assets.Utils.Configuration;
 using Core.Configuration;
 using Core.Configuration.Sound;
 using Core.Configuration.Terrains;
-using Core.GameModule.Module;
 using Core.SessionState;
+using Entitas;
+using System.Collections.Generic;
 using Utils.AssetManager;
 using Utils.Configuration;
+using Utils.SettingManager;
 using Utils.Singleton;
 
 namespace App.Shared.GameModules.Configuration
 {
-    public class BaseConfigurationInitModule : GameModule
+    public class BaseConfigurationInitModule : Systems
     {
-      
+        private readonly IUnityAssetManager _assetManager;
 
-        public BaseConfigurationInitModule(Contexts context, ISessionState sessionState)
+        const string ASSETBUNDLENAME = "i18nprefab";
+        const string ASSETNAME = "ssjjLanguage";
+
+        private ISessionCondition _sessionState;
+        /// <summary>
+        ///
+        /// 注意：不能加载特定模式地图需要的配置文件
+        /// </summary>
+        /// <param name="sessionState"></param>
+        public BaseConfigurationInitModule(ISessionCondition sessionState, IUnityAssetManager assetManager)
         {
+            _assetManager = assetManager;
             AddConfigSystem<AssetConfigManager>(sessionState, "svn.version");
             AddConfigSystem<CharacterStateConfigManager>(sessionState, "SpeedConfig");
             AddConfigSystem<AvatarAssetConfigManager>(sessionState, "role_avator_res");
+            AddConfigSystem<AvatarSkinConfigManager>(sessionState, "AvatarSkin");
+            AddConfigSystem<MeleeAttackCDConfigManager>(sessionState, "MeleeAttackCDConfig");
 
             AddConfigSystem<FirstPersonOffsetConfigManager>(sessionState, "FirstPersonOffset");
             AddConfigSystem<RoleConfigManager>(sessionState, "role");
+            AddConfigSystem<CharacterInfoManager>(sessionState, "CharacterInfo");
             AddConfigSystem<KillFeedBackConfigManager>(sessionState, "killfeedback");
             
             AddConfigSystem<CameraConfigManager>(sessionState, "Camera");
@@ -32,17 +47,19 @@ namespace App.Shared.GameModules.Configuration
             AddConfigSystem<PlayerSoundConfigManager>(sessionState, "PlayerSound");
             AddConfigSystem<BulletDropConfigManager>(sessionState, "BulletDrop");
             AddConfigSystem<ClientEffectCommonConfigManager>(sessionState, "ClientEffectCommon");
-            AddConfigSystem<WeaponDataConfigManager>(sessionState, "WeaponData");
-            AddConfigSystem<WeaponConfigManager>(sessionState, "weapon");
+            AddConfigSystem<WeaponConfigManagement>(sessionState, "WeaponData");
+            AddConfigSystem<WeaponResourceConfigManager>(sessionState, "weapon");
             AddConfigSystem<ClipDropConfigManager>(sessionState, "ClipDrop");
             AddConfigSystem<WeaponPartsConfigManager>(sessionState, "weapon_parts");
-            AddConfigSystem<MapPositionConfigManager>(sessionState, "temp");
             AddConfigSystem<WeaponPartSurvivalConfigManager>(sessionState, "weapon_parts_survival");
             AddConfigSystem<GameItemConfigManager>(sessionState, "gameitem");
             AddConfigSystem<RoleAvatarConfigManager>(sessionState, "role_avator");
             AddConfigSystem<CardConfigManager>(sessionState, "card");
             AddConfigSystem<TypeForDeathConfigManager>(sessionState, "TypeForDeath");
             AddConfigSystem<ChatConfigManager>(sessionState, "chat");
+            AddConfigSystem<DropAreaConfigManager>(sessionState, "droparea");
+            AddConfigSystem<DropPoolConfigManager>(sessionState, "droppool");
+            AddConfigSystem<DropItemConfigManager>(sessionState, "dropitem");
 
             AddConfigSystem<TerrainSoundConfigManager>(sessionState, "TerrainSound");
             AddConfigSystem<TerrainEffectConfigManager>(sessionState, "TerrainEffect");
@@ -68,16 +85,35 @@ namespace App.Shared.GameModules.Configuration
             AddConfigSystem<WeaponAvatarConfigManager>(sessionState, "weapon_avator");
             AddConfigSystem<StreamingLevelStructure>(sessionState, "streaminglevel", "tablesfrombuilding");
             AddConfigSystem<MapsDescription>(sessionState, "mapConfig");
+            AddConfigSystem<AudioWeaponManager>(sessionState, "WeaponAudio");
+            AddConfigSystem<AudioEventManager>(sessionState, "AudioEvent");
+            AddConfigSystem<AudioGroupManager>(sessionState, "AudioGroup");
+            if (!SettingManager.GetInstance().IsInitialized())
+            {
+                AddConfigSystem<SettingManager>(sessionState, "setting");
+            }
+
+            AddConfigSystem<VideoSettingConfigManager>(sessionState, "video_setting");
+            AddConfigSystem<LoadingTipConfigManager>(sessionState, "loadingtips");
+            AddConfigSystem<IndividuationConfigManager>(sessionState, "individuation");
+            _sessionState = sessionState;
+           
+            
         }
 
-        private void AddConfigSystem<T>(ISessionState sessionState, string asset,
+     
+
+      
+
+        private void AddConfigSystem<T>(ISessionCondition sessionState, string asset,
             string bundleName = "tables")
             where T : AbstractConfigManager<T>, IConfigParser, new()
         {
            
-            AddSystem(new DefaultConfigInitSystem<T>(sessionState, new AssetInfo(bundleName, asset),
+            this.Add(new DefaultConfigInitSystem<T>(_assetManager, sessionState, new AssetInfo(bundleName, asset),
                 SingletonManager.Get<T>()));
         }
-        
+        List<IExecuteSystem> _systems = new List<IExecuteSystem>();
+       
     }
 }

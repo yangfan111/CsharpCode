@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using App.Shared.Components.Player;
 using App.Shared.Configuration;
+using App.Shared.GameModules.Player.Actions;
 using App.Shared.GameModules.Player.Animation;
 using Core.Animation;
 using Core.Appearance;
@@ -23,6 +24,12 @@ using Utils.Singleton;
 using Utils.Utils;
 using XmlConfig;
 using App.Shared.GameModules.Weapon;
+using Core;
+using Core.AnimatorClip;
+using Core.CharacterController;
+using Core.CharacterState.Posture;
+using ECM.Components;
+using Utils.Compare;
 
 namespace App.Shared.GameModules.Player.CharacterState
 {
@@ -45,20 +52,11 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
-            if (cmd.PredicatedOnce)
-            {
-                return;
-            }
-
-
-            PlayerEntity playerEntity = (PlayerEntity) owner.OwnerEntity;
-            
+            PlayerEntity playerEntity = (PlayerEntity)owner.OwnerEntity;
             CheckPlayerLifeState(playerEntity);
 
-            if (playerEntity.gamePlay.IsLifeState(EPlayerLifeState.Dead) ||
-                playerEntity.gamePlay.IsLastLifeState(EPlayerLifeState.Dead))
+            if (cmd.PredicatedOnce)
             {
-                // gamePlay有对应的处理，这里不需要
                 return;
             }
 
@@ -71,8 +69,10 @@ namespace App.Shared.GameModules.Player.CharacterState
 
             // cmd到FsmInput
             _inputCreator.CreateCommands(cmd, new FilterState {Posture = stateManager.GetCurrentPostureState()},
-                playerEntity);
+                playerEntity, _contexts);
             PostureInterruptAction(playerEntity, cmd);
+            // jump to prone or crouch disable
+            JumpTipTest(playerEntity, cmd);
 
             var commandsContainer = _inputCreator.CommandsContainer;
 
@@ -91,8 +91,11 @@ namespace App.Shared.GameModules.Player.CharacterState
 
             SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.Animator);
             // 播放动画
-            playerEntity.thirdPersonAnimator.UnityAnimator.Update(cmd.FrameInterval * 0.001f);
-            playerEntity.firstPersonAnimator.UnityAnimator.Update(cmd.FrameInterval * 0.001f);
+            if (!playerEntity.gamePlay.IsLifeState(EPlayerLifeState.Dead))
+            {
+                playerEntity.thirdPersonAnimator.UnityAnimator.Update(cmd.FrameInterval * 0.001f);
+                playerEntity.firstPersonAnimator.UnityAnimator.Update(cmd.FrameInterval * 0.001f);
+            }
             SingletonManager.Get<DurationHelp>().ProfileEnd(CustomProfilerStep.Animator);
 
             // 记录状态更新后动画状态，生成FsmInput
@@ -161,11 +164,10 @@ namespace App.Shared.GameModules.Player.CharacterState
                 // 更新状态机
                 stateManager.Update(commandsContainer, 0, _fsmOutputs.AddOutput, FsmUpdateType.ResponseToAnimation);
                 // 更新Clip速率
-                animatorClipManager.Update(commandsContainer, _fsmOutputs.AddOutput,
+                animatorClipManager.Update(_fsmOutputs.AddOutput,
                     playerEntity.thirdPersonAnimator.UnityAnimator,
                     playerEntity.firstPersonAnimator.UnityAnimator,
-                    playerEntity.GetController<PlayerWeaponController>().CurrSlotWeaponId,
-                    playerEntity.networkAnimator.NeedRewind);
+                    playerEntity.WeaponController().HeldWeaponAgent.ConfigId);
 
                 // 更新Animator的Param
                 _fsmOutputs.SetOutput(playerEntity);
@@ -194,7 +196,8 @@ namespace App.Shared.GameModules.Player.CharacterState
                 // 武器动画结束
                 _weaponAnim.WeaponAnimFinishedUpdate(commandsContainer,
                     playerEntity.appearanceInterface.Appearance.GetWeaponP1InHand(),
-                    playerEntity.appearanceInterface.Appearance.GetWeaponP3InHand());
+                    playerEntity.appearanceInterface.Appearance.GetWeaponP3InHand(),
+                    playerEntity.networkWeaponAnimation);
             }
             finally
             {
@@ -281,10 +284,10 @@ namespace App.Shared.GameModules.Player.CharacterState
                 var firstPersonEvent = playerEntity.firstPersonModel.Value.GetComponent<AnimationClipEvent>();
                 if (firstPersonEvent != null)
                 {
-                    foreach (KeyValuePair<short, string> keyValuePair in firstPersonEvent.EventParams)
+                    foreach (KeyValuePair<short, AnimationEventParam> keyValuePair in firstPersonEvent.EventParams)
                     {
                         playerEntity.stateInterVar.FirstPersonAnimationEventCallBack.Commands.Add(
-                            new KeyValuePair<short, float>(keyValuePair.Key, 0.0f));
+                            new KeyValuePair<short, AnimationEventParam>(keyValuePair.Key, keyValuePair.Value));
                     }
 
                     firstPersonEvent.EventParams.Clear();
@@ -293,10 +296,10 @@ namespace App.Shared.GameModules.Player.CharacterState
                 var thirdPersonEvent = playerEntity.thirdPersonModel.Value.GetComponent<AnimationClipEvent>();
                 if (thirdPersonEvent != null)
                 {
-                    foreach (KeyValuePair<short, string> keyValuePair in thirdPersonEvent.EventParams)
+                    foreach (KeyValuePair<short, AnimationEventParam> keyValuePair in thirdPersonEvent.EventParams)
                     {
                         playerEntity.stateInterVar.ThirdPersonAnimationEventCallBack.Commands.Add(
-                            new KeyValuePair<short, float>(keyValuePair.Key, 0.0f));
+                            new KeyValuePair<short, AnimationEventParam>(keyValuePair.Key, keyValuePair.Value));
                     }
 
                     thirdPersonEvent.EventParams.Clear();
@@ -321,6 +324,7 @@ namespace App.Shared.GameModules.Player.CharacterState
                 JumpDisableTest(playerEntity, commandsContainer);
                 LandJumpDisableTest(playerEntity, commandsContainer);
                 MoveJumpTest(playerEntity, commandsContainer);
+                SlideTest(playerEntity, commandsContainer);
             }
             finally
             {
@@ -328,11 +332,33 @@ namespace App.Shared.GameModules.Player.CharacterState
             }
         }
 
-        
+        private void SlideTest(PlayerEntity playerEntity, IAdaptiveContainer<IFsmInputCommand> commandsContainer)
+        {
+            var characterState = playerEntity.stateInterface.State;
+            
+            var state = characterState.GetNextPostureState();
+            if (state != PostureInConfig.Slide)
+            {
+                if (characterState.IsSlide())
+                {
+                    characterState.Slide();
+                }
+            }
+            else
+            {
+                if (!characterState.IsSlide() && playerEntity.playerMove.IsGround)
+                {
+                    characterState.SlideEnd();
+                }
+            }
+        }
+
+
         private void MoveJumpTest(PlayerEntity playerEntity, IAdaptiveContainer<IFsmInputCommand> commandsContainer)
         {
             var state = playerEntity.stateInterface.State.GetNextPostureState();
-            if (!(state == PostureInConfig.Land || state == PostureInConfig.Stand))
+            var moveState = playerEntity.stateInterface.State.GetNextMovementState();
+            if (!((state == PostureInConfig.Land || state == PostureInConfig.Stand) && moveState == MovementInConfig.Sprint))
             {
                 return;
             }
@@ -340,6 +366,8 @@ namespace App.Shared.GameModules.Player.CharacterState
             IFsmInputCommand jumpCommand = null;
 
             bool forthExist = false;
+            bool leftExist = false;
+            bool rightExist = false;
             
             for (int i = 0; i < commandsContainer.Length; i++)
             {
@@ -352,12 +380,40 @@ namespace App.Shared.GameModules.Player.CharacterState
                 {
                     forthExist = true;
                 }
+                else if (v.Type == FsmInput.Left)
+                {
+                    leftExist = true;
+                }
+                else if (v.Type == FsmInput.Right)
+                {
+                    rightExist = true;
+                }
             }
 
-            if (jumpCommand != null && forthExist)
+            if (jumpCommand != null && forthExist  && CheckJumpSpeed(playerEntity))
             {
                 jumpCommand.AdditioanlValue = AnimatorParametersHash.Instance.JumpStateMove;
+
+                if (leftExist)
+                {
+                    jumpCommand.AlternativeAdditionalValue = AnimatorParametersHash.Instance.MoveJumpStateLF;
+                }
+                else if (rightExist)
+                {
+                    jumpCommand.AlternativeAdditionalValue = AnimatorParametersHash.Instance.MoveJumpStateRF;
+                }
+                else
+                {
+                    jumpCommand.AlternativeAdditionalValue = AnimatorParametersHash.Instance.MoveJumpStateNormal;
+                }
             }
+        }
+
+        private static readonly float MinMoveJumpSpeed = 2f;
+        
+        private bool CheckJumpSpeed(PlayerEntity playerEntity)
+        {
+            return playerEntity.playerMove.MoveVel >= MinMoveJumpSpeed;
         }
 
         private void LandJumpDisableTest(PlayerEntity playerEntity,
@@ -445,19 +501,58 @@ namespace App.Shared.GameModules.Player.CharacterState
         {
             var gameObject = playerEntity.RootGo();
             var prevLayer = gameObject.layer;
-            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayers.TempPlayerLayer);
-            var startPoint = gameObject.transform.position;
-            //UnityLayers.
-            // a shift lift up
-            startPoint.y += CastRadius;
+            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayerManager.GetLayerIndex(EUnityLayerName.User));
+            var playerPosition = gameObject.transform.position;
+            var playerRotation = gameObject.transform.rotation;
+            var controller = playerEntity.characterContoller.Value;
+            var valueRadius = playerEntity.characterContoller.Value.radius;
+            var isHit = false;
             RaycastHit outHit;
+
+            if (UseSphereCast(controller))
+            {
+                //use sphere cast
+                var position = playerPosition + playerRotation * new Vector3(0f, valueRadius, 0f);
 
 //            DebugDraw.DebugWireSphere(startPoint, Color.red, CastRadius, 1f);
 //            DebugDraw.DebugWireSphere(startPoint + new Vector3(0,targetHeight - CastRadius - LiftUp,0), Color.magenta, CastRadius, 1f);
-            var isHit = Physics.SphereCast(startPoint, CastRadius, Vector3.down, out outHit, CastRadius + dist,
-                UnityLayers.AllCollidableLayerMask);
+                isHit = PhysicsCastHelper.SphereCast(position, CastRadius, Vector3.down, out outHit, dist,
+                    UnityLayers.AllCollidableLayerMask, QueryTriggerInteraction.Ignore, 0.1f);
+                if (!isHit)
+                {
+                    //DebugDraw.DebugWireSphere(position + (isHit ? Vector3.down * outHit.distance : Vector3.down * dist),isHit ? Color.green : (playerEntity.characterContoller.Value.isGrounded ? Color.magenta : Color.red) ,CastRadius, isHit ? 0f:60f);
+                }
+            }
+            else
+            {
+                Vector3 point1, point2;
+                float radius;
+                var height = controller.height;
+                radius = controller.radius;
+                var center = controller.center;
+                PhysicsCastHelper.GetCapsule(controller.transform.position, controller.transform.rotation, height, radius, center, controller.direction, out point1, out point2);
+                isHit = PhysicsCastHelper.CapsuleCast(point1, point2, radius,Vector3.down, out outHit, dist,
+                    UnityLayers.AllCollidableLayerMask, QueryTriggerInteraction.Ignore, 0.1f);
+                if (!isHit && false)
+                {
+                    PhysicsCastHelper.GetDebugDrawTypeCapsule(controller.transform.position, controller.transform.rotation, height, radius, center, controller.direction, out point1, out point2);
+                    DebugDraw.DebugCapsule(point1 + (isHit ? Vector3.down * outHit.distance : Vector3.down * dist), 
+                        point2 + (isHit ? Vector3.down * outHit.distance : Vector3.down * dist),
+                        isHit ? Color.green : (playerEntity.characterContoller.Value.isGrounded ? Color.magenta : Color.red),
+                        radius,
+                        isHit ? 0f:60f
+                        );
+                }
+            }
+            
+            
             IntersectionDetectTool.SetColliderLayer(gameObject, prevLayer);
             return isHit;
+        }
+
+        private static bool UseSphereCast(ICharacterControllerContext controller)
+        {
+            return CompareUtility.IsApproximatelyEqual(controller.direction, Vector3.up);
         }
 
         private void AnimatorChange(bool isChange, AbstractNetworkAnimator networkAnimator, IUserCmd cmd)
@@ -481,20 +576,43 @@ namespace App.Shared.GameModules.Player.CharacterState
                                 !(player.stateInterface.State.GetActionState() == ActionInConfig.Gliding ||
                                   player.stateInterface.State.GetActionState() == ActionInConfig.Parachuting)) &&
                                player.playerMove.Velocity.y < -SpeedManager.Gravity;
-
-            if (freeFallTest || (player.characterContoller.Value.collisionFlags == CollisionFlags.None &&
-                                 !IsHitGround(player, ProbeDist)))
+            if (NeedFreeFallTest(player) && (freeFallTest || StandToFreefallTest(player)))
             {
-                for (int i = 0; i < commands.Length; ++i)
-                {
-                    var v = commands[i];
-                    if (v.Type == FsmInput.None)
-                    {
-                        v.Type = FsmInput.Freefall;
-                        break;
-                    }
-                }
+                var item = commands.GetAvailableItem(command => { return command.Type == FsmInput.None; });
+                item.Type = FsmInput.Freefall;
+                _logger.DebugFormat("freefall test true, set FsmInput.None to Fsminput.Freefall, freeFallTest:{0}, state cur posture:{1}, next pos:{2},state movement:{3}", freeFallTest,
+                    player.stateInterface.State.GetCurrentPostureState(),
+                    player.stateInterface.State.GetNextPostureState(),
+                    player.stateInterface.State.GetCurrentMovementState());
+                return;
             }
+			ClimbUpCollisionTest.ClimbStateFreeFallTest(player, commands);
+        }
+
+        private static bool StandToFreefallTest(PlayerEntity player)
+        {
+//            return player.characterContoller.Value.collisionFlags == CollisionFlags.None &&
+//                    !IsHitGround(player, ProbeDist);
+            bool isHitGround = IsHitGround(player, ProbeDist);
+            bool isGrounded = player.characterContoller.Value.isGrounded;
+            var ret = !isGrounded &&
+                      !isHitGround && player.stateInterface.State.GetCurrentPostureState() != PostureInConfig.Jump;
+            {
+                //_logger.DebugFormat("isGrounded:{0}, isHitGround:{1}, ret:{2}",isGrounded, isHitGround, ret);
+            }
+            return ret;
+        }
+        
+        private static bool NeedFreeFallTest(PlayerEntity player)
+        {
+            return !IsLadderMove(player) &&
+                   player.stateInterface.State.GetCurrentPostureState() != PostureInConfig.Climb;
+        }
+
+        private static bool IsLadderMove(PlayerEntity player)
+        {
+            return player.stateInterface.State.GetCurrentMovementState() == MovementInConfig.Ladder ||
+                   player.stateInterface.State.GetCurrentMovementState() == MovementInConfig.EnterLadder;
         }
 
         /// <summary>
@@ -546,8 +664,23 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         private void SprintDisableTest(ICharacterState state, IAdaptiveContainer<IFsmInputCommand> commands)
         {
-            bool slowDown = false;
-            if (state.IsMoveInWater() || state.IsSteepSlope())
+            int slowDown = NoLimit;
+            int prevSlowDown = state.GetSteepSlowDown();
+
+            if (IsLimitRun(state.GetSteepAngle(), prevSlowDown))
+            {
+                for (int i = 0; i < commands.Length; ++i)
+                {
+                    var v = commands[i];
+                    if (v.Type == FsmInput.Sprint || v.Type == FsmInput.Run)
+                    {
+                        v.Type = FsmInput.Walk;
+                        _logger.DebugFormat("sprint to Walk due to move in water or is steep slope!, angle:{0}",state.GetSteepAngle());
+                        slowDown = LimitRun;
+                    }
+                }
+            }
+            else if (state.IsMoveInWater() || IsLimitSprint(state.GetSteepAngle(), prevSlowDown))
             {
                 for (int i = 0; i < commands.Length; ++i)
                 {
@@ -555,12 +688,42 @@ namespace App.Shared.GameModules.Player.CharacterState
                     if (v.Type == FsmInput.Sprint)
                     {
                         v.Type = FsmInput.Run;
-                        slowDown = true;
+                        _logger.DebugFormat("sprint to run due to move in water or is steep slope!, angle:{0}",state.GetSteepAngle());
+                        slowDown = LimitSprint;
                     }
                 }
             }
+            state.SetSteepSlowDown(slowDown);
+        }
+        
+        
 
-            state.SetBeenSlowDown(slowDown);
+        private bool IsLimitSprint(float tanAngle, int prevSlowDown)
+        {
+            bool ret = false;
+            var sprintbegin =
+                Mathf.Tan(Mathf.Deg2Rad * SingletonManager.Get<CharacterStateConfigManager>().SteepLimitSprintBegin);
+            var sprintstop =
+                Mathf.Tan(Mathf.Deg2Rad * SingletonManager.Get<CharacterStateConfigManager>().SteepLimitSprintStop);
+            if (tanAngle >= sprintbegin || (tanAngle >= sprintstop && prevSlowDown >= LimitSprint))
+            {
+                ret = true;
+            }
+            return ret;
+        }
+        
+        private bool IsLimitRun(float tanAngle, int prevSlowDown)
+        {
+            bool ret = false;
+            var runBegin =
+                Mathf.Tan(Mathf.Deg2Rad * SingletonManager.Get<CharacterStateConfigManager>().SteepLimitRunBegin);
+            var runStop =
+                Mathf.Tan(Mathf.Deg2Rad * SingletonManager.Get<CharacterStateConfigManager>().SteepLimitRunStop);
+            if (tanAngle >= runBegin || (tanAngle >= runStop && prevSlowDown >= LimitRun))
+            {
+                ret = true;
+            }
+            return ret;
         }
 
 
@@ -580,6 +743,7 @@ namespace App.Shared.GameModules.Player.CharacterState
             IAdaptiveContainer<IFsmInputCommand> commandsContainer)
         {
             var state = playerEntity.stateInterface.State.GetNextPostureState();
+            var characterInfo = playerEntity.characterInfo.CharacterInfoProviderContext;
             if (!(state == PostureInConfig.Crouch || state == PostureInConfig.Prone))
             {
                 return;
@@ -602,14 +766,14 @@ namespace App.Shared.GameModules.Player.CharacterState
                 testCondition.Add(FsmInput.Crouch);
             }
 
-
+            testCommand.Clear();
             for (int i = 0; i < commandsContainer.Length; i++)
             {
                 var v = commandsContainer[i];
                 if (testCondition.Contains(v.Type))
                 {
                     testCommand.Add(commandsContainer[i]);
-                    _logger.InfoFormat("match type:{0}, state:{1}", v.Type, state);
+                    _logger.DebugFormat("match type:{0}, state:{1}", v.Type, state);
                 }
             }
 
@@ -632,34 +796,32 @@ namespace App.Shared.GameModules.Player.CharacterState
             // to stand
             if (state == PostureInConfig.Crouch || (state == PostureInConfig.Prone && !containsCrouch))
             {
-                targetHeight = SingletonManager.Get<CharacterStateConfigManager>()
-                    .GetCharacterControllerCapsule(PostureInConfig.Stand)
-                    .Height;
+                targetHeight = characterInfo.GetStandCapsule().Height;   
                 toStand = true;
             }
             // to crouch
             else
             {
-                targetHeight = SingletonManager.Get<CharacterStateConfigManager>()
-                    .GetCharacterControllerCapsule(PostureInConfig.Crouch)
+                targetHeight = characterInfo.GetCrouchCapsule()
                     .Height;
                 toStand = false;
             }
 
             var gameObject = playerEntity.RootGo();
             var prevLayer = gameObject.layer;
-            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayers.TempPlayerLayer);
+            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayerManager.GetLayerIndex(EUnityLayerName.User));
             var startPoint = gameObject.transform.position;
             //UnityLayers.
             // a shift lift up
-            startPoint.y += LiftUp + CastRadius;
+            startPoint.y += CastRadius;
             RaycastHit outHit;
 
 //            DebugDraw.DebugWireSphere(startPoint, Color.red, CastRadius, 1f);
 //            DebugDraw.DebugWireSphere(startPoint + new Vector3(0,targetHeight - CastRadius - LiftUp,0), Color.magenta, CastRadius, 1f);
 
-            if (Physics.SphereCast(startPoint, CastRadius, Vector3.up, out outHit, targetHeight - CastRadius - LiftUp,
-                UnityLayers.AllCollidableLayerMask))
+            if (PhysicsCastHelper.SphereCast(startPoint, CastRadius, Vector3.up, out outHit, targetHeight - (2 
+            * CastRadius + LiftUp),
+                UnityLayers.AllCollidableLayerMask, QueryTriggerInteraction.Ignore, LiftUp))
             {
                 foreach (IFsmInputCommand command in testCommand)
                 {
@@ -677,6 +839,10 @@ namespace App.Shared.GameModules.Player.CharacterState
                 {
                     playerEntity.tip.TipType = ETipType.CanNotStand;
                 }
+                else
+                {
+                    playerEntity.tip.TipType = ETipType.CanNotToCrouch;
+                }
 
                 //Debug.DrawLine(outHit.point, outHit.normal, Color.red, 5000.0f);
             }
@@ -687,8 +853,30 @@ namespace App.Shared.GameModules.Player.CharacterState
         }
 
 
+        
+        private void JumpTipTest(PlayerEntity playerEntity, IUserCmd cmd)
+        {
+            var state = playerEntity.stateInterface.State.GetNextPostureState();
+            if (!(playerEntity.stateInterface.State.IsFreefallState() || state == PostureInConfig.Slide))
+            {
+                return;
+            }
+
+            if (cmd.IsCrouch)
+            {
+                playerEntity.tip.TipType = ETipType.CanNotToCrouch;
+            }
+            if (cmd.IsProne)
+            {
+                playerEntity.tip.TipType = ETipType.CanNotProne;
+            }
+        }
+        
         private static readonly float ProneOffset = 0.1f;
         private static readonly float RadiusOffset = -0.05f;
+        public static readonly int LimitSprint = 1;
+        public static readonly int LimitRun = 2;
+        public static readonly int NoLimit = 0;
 
         /// <summary>
         /// 距离过近不能趴下
@@ -698,6 +886,7 @@ namespace App.Shared.GameModules.Player.CharacterState
         private void ProneDisableTest(PlayerEntity playerEntity, IAdaptiveContainer<IFsmInputCommand> commandsContainer)
         {
             var state = playerEntity.stateInterface.State.GetNextPostureState();
+            var characterInfo = playerEntity.characterInfo.CharacterInfoProviderContext;
             if (!(state == PostureInConfig.Stand || state == PostureInConfig.Crouch))
             {
                 return;
@@ -706,14 +895,14 @@ namespace App.Shared.GameModules.Player.CharacterState
             // crouchDisable
             testCondition.Clear();
             testCondition.Add(FsmInput.Prone);
-
+            testCommand.Clear();
             for (int i = 0; i < commandsContainer.Length; i++)
             {
                 var v = commandsContainer[i];
                 if (testCondition.Contains(v.Type))
                 {
                     testCommand.Add(commandsContainer[i]);
-                    _logger.InfoFormat("match type:{0}, state:{1}, in ProneDisableTest", v.Type, state);
+                    _logger.DebugFormat("match type:{0}, state:{1}, in ProneDisableTest", v.Type, state);
                 }
             }
 
@@ -723,23 +912,21 @@ namespace App.Shared.GameModules.Player.CharacterState
             }
 
 
-            _logger.InfoFormat("prone test!!!");
+            _logger.DebugFormat("prone test!!!");
 
             var gameObject = playerEntity.RootGo();
             var prevLayer = gameObject.layer;
-            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayers.TempPlayerLayer);
+            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayerManager.GetLayerIndex(EUnityLayerName.User));
 
             var positionValue = playerEntity.position.Value;
 
             var crouchHeight =
-                SingletonManager.Get<CharacterStateConfigManager>()
-                    .GetCharacterControllerCapsule(PostureInConfig.Crouch).Height;
+                characterInfo.GetCrouchCapsule().Height;
             var radius =
-                SingletonManager.Get<CharacterStateConfigManager>()
-                    .GetCharacterControllerCapsule(PostureInConfig.Crouch).Radius + RadiusOffset;
+                characterInfo.GetCrouchCapsule().Radius + RadiusOffset;
             var newCenter = new Vector3(positionValue.x, positionValue.y + crouchHeight - radius, positionValue.z);
             var distHemi =
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand)
+                characterInfo.GetStandCapsule()
                     .Height * 0.5f - radius - ProneOffset;
             var topHemi = newCenter + playerEntity.orientation.RotationYaw.Forward().normalized * distHemi;
             var bottomHemi = newCenter - playerEntity.orientation.RotationYaw.Forward().normalized * distHemi;
@@ -775,35 +962,67 @@ namespace App.Shared.GameModules.Player.CharacterState
             // 打断当前动作
             if (cmd.IsProne)
             {
+          //      player.ModeController().CallBeforeAction(player.WeaponController(),EPlayerActionType.Prone);
                 player.stateInterface.State.InterruptAction();
             }
         }
 
+        #region LifeState
+
         private void CheckPlayerLifeState(PlayerEntity player)
         {
-            if(null == player || null == player.gamePlay) return;
-            
-            var gamePlay = player.gamePlay;
-            if(gamePlay.IsLifeState(EPlayerLifeState.Dead) &&
-               !gamePlay.IsLastLifeState(EPlayerLifeState.Dead))
-                Reborn(player);
-
-            if (gamePlay.IsLifeState(EPlayerLifeState.Alive) &&
-                !gamePlay.IsLastLifeState(EPlayerLifeState.Alive))
-                Dead(player);
+            if (null == player || null == player.playerGameState) return;
+            var gameState = player.playerGameState;
+            switch (gameState.CurrentPlayerLifeState)
+            {
+                case PlayerLifeStateEnum.Reborn:
+                    Reborn(player);
+                    break;
+                case PlayerLifeStateEnum.Revive:
+                    Revive(player);
+                    break;
+                case PlayerLifeStateEnum.Dying:
+                    Dying(player);
+                    break;
+                case PlayerLifeStateEnum.Dead:
+                    Dead(player);
+                    break;
+            }
         }
-
+        
         private void Reborn(PlayerEntity player)
         {
-            if(null == player) return;
+            if (null == player) return;
             var stateManager = player.stateInterface.State;
-            if(null == stateManager) return;
+            if (null == stateManager) return;
             stateManager.PlayerReborn();
+        }
+        
+        private void Revive(PlayerEntity player)
+        {
+            if (null == player) return;
+            var stateManager = player.stateInterface.State;
+            if (null == stateManager) return;
+            stateManager.Revive();
+        }
+
+        private void Dying(PlayerEntity player)
+        {
+            if (null == player) return;
+            var stateManager = player.stateInterface.State;
+            if (null == stateManager) return;
+            stateManager.Dying();
         }
 
         private void Dead(PlayerEntity player)
         {
-            
+            if (null == player) return;
+            var stateManager = player.stateInterface.State;
+            if (null == stateManager) return;
+            stateManager.PlayerReborn();
+            _logger.InfoFormat("PlayerUpdateSystemDead");
         }
+
+        #endregion
     }
 }

@@ -1,4 +1,4 @@
-﻿using Core.Fsm;
+﻿﻿using Core.Fsm;
 
 namespace Core.CharacterState.Action
 {
@@ -57,6 +57,7 @@ namespace Core.CharacterState.Action
 
         public void Dying()
         {
+            Logger.InfoFormat("fsminput dying!!!!!!!!");
             SetNewCommandFromFunctionCall(FsmInput.Dying);
         }
 
@@ -91,6 +92,7 @@ namespace Core.CharacterState.Action
 
         public void Rescue()
         {
+            SetPostureCrouch();
             SetNewCommandFromFunctionCall(FsmInput.Rescue);
         }
 
@@ -285,24 +287,69 @@ namespace Core.CharacterState.Action
             SetNewCallbackFromFunctionCall(FsmInput.GenericActionFinished, FsmInput.GenericActionFinished, callBack);
         }
 
+        public void EnterLadder(float enterKind, System.Action callBack)
+        {
+            Logger.InfoFormat("EnterLadder  kind:  {0}", enterKind);
+            SetNewCommandFromFunctionCall(FsmInput.EnterLadder, enterKind);
+            SetNewCallbackFromFunctionCall(FsmInput.EnterLadderFinished, FsmInput.EnterLadderFinished, callBack);
+        }
+        
+        public void ExitLadder(float exitKind, System.Action callBack)
+        {
+            Logger.InfoFormat("ExitLadder  kind:  {0}", exitKind);
+            SetNewCommandFromFunctionCall(FsmInput.ExitLadder, exitKind);
+            SetNewCallbackFromFunctionCall(FsmInput.ExitLadderFinished, FsmInput.ExitLadderFinished, callBack);
+        }
+
+        public void InterruptLadder()
+        {
+            Logger.InfoFormat("InterruptLadder");
+            SetNewCommandFromFunctionCall(FsmInput.InterruptLadder);
+        }
+
+        public void MiddleEnterLadder()
+        {
+            Logger.InfoFormat("MiddleEnterLadder");
+            SetNewCommandFromFunctionCall(FsmInput.MiddleEnterLadder);
+        }
+
+        public void SetLadderSpeed(float num)
+        {
+            SetNewCommandFromFunctionCall(FsmInput.LadderSpeed, num);
+        }
+
+        public void TransfigurationStart(System.Action callBack)
+        {
+            Logger.InfoFormat("TransfigurationStart");
+            SetNewCommandFromFunctionCall(FsmInput.TransfigurationStart);
+            SetNewCallbackFromFunctionCall(FsmInput.TransfigurationStartEnd, FsmInput.TransfigurationStartEnd, callBack);
+        }
+
+        public void TransfigurationFinish(System.Action callBack)
+        {
+            Logger.InfoFormat("TransfigurationFinish");
+            SetNewCommandFromFunctionCall(FsmInput.TransfigurationFinish);
+            SetNewCallbackFromFunctionCall(FsmInput.TransfigurationFinishEnd, FsmInput.TransfigurationFinishEnd, callBack);
+        }
+
         // 滑翔
         public void Gliding()
         {
-            //Logger.InfoFormat("gliding !!!!!!!!!!!!!");
+            Logger.InfoFormat("gliding !!!!!!!!!!!!!");
             SetNewCommandFromFunctionCall(FsmInput.Gliding);
         }
 
         // 伞降
         public void Parachuting(System.Action callBack)
         {
-            //Logger.InfoFormat("Parachuting !!!!!!!!!!!!!");
+            Logger.InfoFormat("Parachuting !!!!!!!!!!!!!");
             SetNewCommandFromFunctionCall(FsmInput.Parachuting);
             SetNewCallbackFromFunctionCall(FsmInput.ParachuteOpen1Finished, FsmInput.ParachuteOpen1Finished, callBack);
         }
 
         public void ParachutingEnd()
         {
-            //Logger.InfoFormat("ParachutingEnd !!!!!!!!!!!!!");
+            Logger.InfoFormat("ParachutingEnd !!!!!!!!!!!!!");
 
             SetNewCommandFromFunctionCall(FsmInput.ParachutingEnd);
         }

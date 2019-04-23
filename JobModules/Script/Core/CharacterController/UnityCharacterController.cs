@@ -243,6 +243,12 @@ namespace Core.CharacterController
             return _controller;
         }
 
+        public void ClearGroundInfo()
+        {
+            ClearHitInfos();
+            ResetGroundInfo();
+        }
+
         public void DrawBoundingBox()
         {
             var characterTransformToCapsuleBottom = center + (-direction * (height * 0.5f));

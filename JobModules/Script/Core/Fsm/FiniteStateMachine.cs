@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Core.Animation;
+using Core.CharacterState;
 using Core.Utils;
 using Utils.Appearance;
 
@@ -59,7 +60,7 @@ namespace Core.Fsm
             }
         }
 
-        public void AddState(FsmState state, IFsmTransitionHelper infoProvider)
+        public void AddState(FsmState state, IFsmTransitionHelper infoProvider, ICharacterInfoProvider characterInfo)
         {
             if (!_states.ContainsKey(state.StateId))
             {
@@ -72,6 +73,7 @@ namespace Core.Fsm
                 // set callback to change current state
                 state.SetTransitionCallback(SetCurrentState);
                 state.SetTransitionHelper(infoProvider);
+                state.SetCharacterInfo(characterInfo);
                 // add state to FSM
                 _states.Add(state.StateId, state);
             }

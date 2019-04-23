@@ -121,10 +121,6 @@ namespace App.Shared.Components.Serializer
         {
             return patchvalue;
         }
-        public static InterruptData Merge(InterruptData basevalue, InterruptData patchvalue)
-        {
-            return patchvalue;
-        }
         public static Quaternion Merge(Quaternion basevalue, Quaternion patchvalue)
         {
             return patchvalue;

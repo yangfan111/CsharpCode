@@ -81,13 +81,7 @@ namespace App.Shared
             initFunc(val);
             return val;
         }
-        public static InterruptData CreateInterrupt(EInterruptCmdType cmdType)
-        {
-            var data = new InterruptData();
-            data.hasValue = true;
-            data.cmdType = (byte)cmdType;
-            return data;
-        }
+   
         public static WeaponScanStruct CreateScan(PlayerWeaponData weaponData)
         {
             WeaponScanStruct val = new WeaponScanStruct();

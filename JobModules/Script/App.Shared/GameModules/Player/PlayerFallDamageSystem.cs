@@ -10,9 +10,14 @@ namespace App.Shared.GameModules.Player
     public class PlayerFallDamageSystem : IUserCmdExecuteSystem
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerFallDamageSystem));
+        private Contexts _contexts;
 
-        public PlayerFallDamageSystem()
+        public const float SpeedHorizontal = 8.5f;
+        public const float SpeedVertical = 14f;
+
+        public PlayerFallDamageSystem(Contexts contexts)
         {
+            _contexts = contexts;
         }
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
@@ -31,22 +36,34 @@ namespace App.Shared.GameModules.Player
                 Vector2 inVel = new Vector2(player.playerMove.LastVelocity.x, player.playerMove.LastVelocity.z);
                 Vector2 outVel = new Vector2(0, 0);//(player.playerMove.Velocity.x, player.playerMove.Velocity.z);
                 float xzSpeed = (inVel - outVel).magnitude;
-                if (xzSpeed >= 8.5)
+
+                float hurtSpeedHorizontal = SpeedHorizontal;
+                if (player.playerMove.SpeedAffect > 0 && !player.IsOnVehicle())//有加速buff且不在载具内
+                {
+                    hurtSpeedHorizontal *= player.playerMove.SpeedAffect + 1;
+                }
+                if (xzSpeed >= hurtSpeedHorizontal)
                 {
                     damage += (xzSpeed * 3.6f - 30) * 2;
                 }
                 
                 //垂直伤害
                 float ySpeed = -player.playerMove.LastVelocity.y;
-                if (ySpeed >= 14)
+
+                float hurtSpeedVertical = SpeedVertical;
+                if (player.playerMove.JumpAffect > 0 && !player.IsOnVehicle())
                 {
-                    damage += (ySpeed - 14) * 14;
+                    hurtSpeedVertical *= player.playerMove.JumpAffect + 1;
+                }
+                if (ySpeed >= hurtSpeedVertical)
+                {
+                    //damage += (ySpeed - hurtSpeedVertical) * 14; 伤害取二者大值而非相加
+                    damage = Mathf.Max(damage, (ySpeed - hurtSpeedVertical) * 14);
                 }
 
-                if ((damage > 0) && (SharedConfig.HaveFallDamage ==true ))
+                if (damage > 0 && SharedConfig.HaveFallDamage)
                 {
-                    VehicleDamageUtility.DoPlayerDamage(null, player, damage, EUIDeadType.Fall);
-//                    Debug.LogFormat("IsCollided ... xzSpeed:{0}, ySpeed:{1}, damage:{2}", xzSpeed, ySpeed, damage);
+                    VehicleDamageUtility.DoPlayerDamage(_contexts, null, player, damage, EUIDeadType.Fall);
                 }
             }
 

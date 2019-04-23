@@ -15,14 +15,14 @@ namespace Core.CharacterState.Posture
         private FsmUpdateType _commonUpdateType = FsmUpdateType.ResponseToInput | FsmUpdateType.ResponseToAnimation;
         private FsmUpdateType _leanUpdateType = FsmUpdateType.ResponseToInput;
 
-        public PostureManager(IFsmTransitionHelper infoProvider)
+        public PostureManager(IFsmTransitionHelper infoProvider, ICharacterInfoProvider characterInfo)
         {
             _commonFsm = new PostureFsm("StandCrouchProne");
-            _commonFsm.InitAsCommonState(infoProvider);
+            _commonFsm.InitAsCommonState(infoProvider, characterInfo);
             AddFsm(_commonFsm);
 
             _leanFsm = new PostureFsm("Lean");
-            _leanFsm.InitAsLeanState(infoProvider);
+            _leanFsm.InitAsLeanState(infoProvider, characterInfo);
             AddFsm(_leanFsm);
         }
 

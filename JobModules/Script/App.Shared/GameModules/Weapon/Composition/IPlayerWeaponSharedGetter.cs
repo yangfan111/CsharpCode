@@ -28,8 +28,6 @@ namespace App.Shared
 
         bool BagLockState { get; set; }
 
-        int LastFireWeaponId { get; set; }
-
       //  void AddSightViewInterrupt();
 
 //        void AddC4Interrupt();

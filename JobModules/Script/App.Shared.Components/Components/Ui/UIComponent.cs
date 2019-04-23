@@ -92,5 +92,9 @@ namespace App.Shared.Components.Ui
         [DontInitilize] public bool IsPause;//游戏是否暂停
         [DontInitilize] public List<int> PaintIdList;
         [DontInitilize] public int SelectedPaintIndex;
+        [DontInitilize] public List<IBaseChickenBagItemData> ChickenBagItemDataList;
+
+        [DontInitilize] public int CurPlayerCountInPlane;
+        [DontInitilize] public int TotalPlayerCountInPlane;
     }
 }

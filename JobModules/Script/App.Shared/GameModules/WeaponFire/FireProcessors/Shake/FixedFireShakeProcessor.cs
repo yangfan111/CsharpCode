@@ -1,4 +1,5 @@
 ﻿using Core.Utils;
+using UnityEngine;
 using WeaponConfigNs;
 
 namespace App.Shared.GameModules.Weapon.Behavior
@@ -17,11 +18,17 @@ namespace App.Shared.GameModules.Weapon.Behavior
             {
                 return;
             }
-            controller.RelatedOrient.NegPunchPitch += config.PunchPitch;
-            controller.RelatedOrient.WeaponPunchPitch += config.PunchPitch * config.PunchOffsetFactor;
+            controller.RelatedOrientation.AccPunchPitch += config.PunchPitch;
+            controller.RelatedOrientation.AccPunchPitchValue += config.PunchPitch * config.PunchOffsetFactor;
         }
 
-        protected override float GetWeaponPunchYawFactor(PlayerWeaponController controller)
+        public override void OnFrame(PlayerWeaponController controller, IWeaponCmd cmd)
+        {
+            UpdateOrientationAttenuation(controller, cmd);
+            base.OnFrame(controller,cmd);
+        }
+
+        protected override float GePuntchFallbackFactor(PlayerWeaponController controller)
         {
             return controller.HeldWeaponAgent.FallbackOffsetFactor;
         }

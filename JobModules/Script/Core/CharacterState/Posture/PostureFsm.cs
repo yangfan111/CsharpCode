@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -58,33 +58,34 @@ namespace Core.CharacterState.Posture
 
         #endregion
 
-        public void InitAsLeanState(IFsmTransitionHelper infoProvider)
+        public void InitAsLeanState(IFsmTransitionHelper infoProvider, ICharacterInfoProvider characterInfo)
         {
-            AddState(PostureState.CreateNoPeekState(), infoProvider);
-            AddState(PostureState.CreatePeekLeftState(), infoProvider);
-            AddState(PostureState.CreatePeekRightState(), infoProvider);
+            AddState(PostureState.CreateNoPeekState(), infoProvider, characterInfo);
+            AddState(PostureState.CreatePeekLeftState(), infoProvider, characterInfo);
+            AddState(PostureState.CreatePeekRightState(), infoProvider, characterInfo);
             _resetParam = ResetLeanStateParam;
         }
 
-        public void InitAsCommonState(IFsmTransitionHelper infoProvider)
+        public void InitAsCommonState(IFsmTransitionHelper infoProvider, ICharacterInfoProvider characterInfo)
         {
-            AddState(PostureState.CreateStandState(), infoProvider);
-            AddState(PostureState.CreateCrouchState(), infoProvider);
-            AddState(PostureState.CreateProneState(), infoProvider);
-            AddState(PostureState.CreateJumpStartState(), infoProvider);
-            AddState(PostureState.CreateProneTransitState(), infoProvider);
-            AddState(PostureState.CreateProneToStandState(), infoProvider);
-            AddState(PostureState.CreateProneToCrouchState(), infoProvider);
-            AddState(PostureState.CreateJumpEndState(), infoProvider);
-            AddState(PostureState.CreateFreefallState(), infoProvider);
-            AddState(PostureState.CreateSwimState(), infoProvider);
-            AddState(PostureState.CreateDiveState(), infoProvider);
-            AddState(PostureState.CreateDyingTransition(), infoProvider);
-            AddState(PostureState.CreateDyingState(), infoProvider);
+            AddState(PostureState.CreateStandState(), infoProvider, characterInfo);
+            AddState(PostureState.CreateCrouchState(), infoProvider, characterInfo);
+            AddState(PostureState.CreateProneState(), infoProvider, characterInfo);
+            AddState(PostureState.CreateJumpStartState(), infoProvider, characterInfo);
+            AddState(PostureState.CreateProneTransitState(), infoProvider, characterInfo);
+            AddState(PostureState.CreateProneToStandState(), infoProvider, characterInfo);
+            AddState(PostureState.CreateProneToCrouchState(), infoProvider, characterInfo);
+            AddState(PostureState.CreateJumpEndState(), infoProvider, characterInfo);
+            AddState(PostureState.CreateFreefallState(), infoProvider, characterInfo);
+            AddState(PostureState.CreateSwimState(), infoProvider, characterInfo);
+            AddState(PostureState.CreateDiveState(), infoProvider, characterInfo);
+            AddState(PostureState.CreateDyingTransition(), infoProvider, characterInfo);
+            AddState(PostureState.CreateDyingState(), infoProvider, characterInfo);
 
-            AddState(PostureState.CreateClimbState(), infoProvider);
+            AddState(PostureState.CreateClimbState(), infoProvider, characterInfo);
+            AddState(PostureState.CreatePostureLadderState(), infoProvider, characterInfo);
             
-            AddState(PostureState.CreateSlideState(), infoProvider);
+            AddState(PostureState.CreateSlideState(), infoProvider, characterInfo);
 
             _resetParam = ResetCommonStateParam;
         }
@@ -169,6 +170,29 @@ namespace Core.CharacterState.Posture
                 AnimatorParametersHash.Instance.ClimbEndName,
                 AnimatorParametersHash.Instance.ClimbEndDisableValue,
                 CharacterView.ThirdPerson, false);
+            addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.LadderHash,
+                AnimatorParametersHash.Instance.LadderName,
+                AnimatorParametersHash.Instance.LadderDisableValue,
+                CharacterView.ThirdPerson, false);
+            addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.LadderSpeedHash,
+                AnimatorParametersHash.Instance.LadderSpeedName, 0.0f,
+                CharacterView.ThirdPerson);
+            addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.LadderEnterStateHash,
+                AnimatorParametersHash.Instance.LadderEnterStateName, 
+                AnimatorParametersHash.Instance.LadderEnterStateTop,
+                CharacterView.ThirdPerson);
+            addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.LadderExitStateHash,
+                AnimatorParametersHash.Instance.LadderExitStateName, 
+                AnimatorParametersHash.Instance.LadderExitStateTop,
+                CharacterView.ThirdPerson);
             addOutput(FsmOutput.Cache);
             
             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.InjuredMoveHash,

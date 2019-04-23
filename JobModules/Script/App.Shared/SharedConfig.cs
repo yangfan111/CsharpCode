@@ -122,7 +122,8 @@ namespace App.Shared
 
         public static bool EnableAnimator = false;
         public static bool DisableAnimator = false;
-        public static bool UpdateRender = false;
+
+        public static bool ChangeRole = false;
 
         public static UnityEngine.Vector3 GetPlayerBirthPosition(int entityId)
         {

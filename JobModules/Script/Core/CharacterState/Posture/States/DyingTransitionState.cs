@@ -18,12 +18,6 @@ namespace Core.CharacterState.Posture.States
         public override void DoBeforeLeaving(Action<FsmOutput> addOutput)
         {
             base.DoBeforeLeaving(addOutput);
-            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.InjuredMoveHash,
-                AnimatorParametersHash.Instance.InjuredMoveName,
-                AnimatorParametersHash.Instance.InjuredMoveDisableValue,
-                CharacterView.ThirdPerson,
-                false);
-            addOutput(FsmOutput.Cache);
         }
     }
 }

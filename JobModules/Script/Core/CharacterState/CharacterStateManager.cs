@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.CharacterState.Action;
+﻿using Core.CharacterState.Action;
 using Core.CharacterState.Movement;
 using Core.CharacterState.Posture;
 using Core.Fsm;
-using UnityEngine;
-using XmlConfig;
 using Core.Utils;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 using Utils.Appearance;
 using Utils.CharacterState;
+using XmlConfig;
 
 namespace Core.CharacterState
 {
@@ -23,17 +23,18 @@ namespace Core.CharacterState
         private ICharacterSpeed _speed;
         private bool _needReset;
 
-        public CharacterStateManager()
+        public CharacterStateManager(ICharacterInfoProvider characterInfo)
         {
+            AssertUtility.Assert(characterInfo != null);
             int snapshotCount = 0;
 
-            _posture = new PostureManager(this);
+            _posture = new PostureManager(this, characterInfo);
             snapshotCount += _posture.SnapshotCount();
 
-            _movement = new MovementManager(this);
+            _movement = new MovementManager(this, characterInfo);
             snapshotCount += _movement.SnapshotCount();
 
-            _action = new ActionManager(this);
+            _action = new ActionManager(this, characterInfo);
             snapshotCount += _action.SnapshotCount();
 
             _snapshotsCache = new List<FsmSnapshot>(snapshotCount);
@@ -403,12 +404,10 @@ namespace Core.CharacterState
         }
 
         // 是否需要因人物动作改变打断救援
-        public bool NeedInterruptRescue(PostureInConfig posture)
+        public bool NeedInterruptRescue()
         {
-            return ActionKeepInConfig.Rescue == GetActionKeepState() &&
-                   (ActionInConfig.Null != GetActionState() ||
-                    posture != GetCurrentPostureState() ||
-                    MovementInConfig.Idle != GetCurrentMovementState());
+            return ActionKeepInConfig.Rescue == GetActionKeepState() && (ActionInConfig.Null != GetActionState() ||
+                   PostureInConfig.Crouch != GetCurrentPostureState() || MovementInConfig.Idle != GetCurrentMovementState());
         }
 
         // 是否可以进入受击状态

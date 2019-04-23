@@ -34,11 +34,7 @@ namespace Core.CharacterState.Posture
         {
             PostureState state = new CustomPostureState(PostureStateId.Stand,
                 AnimatorParametersHash.FirstPersonStandCameraHeight,
-                AnimatorParametersHash.FirstPersonStandCameraForwardOffset,
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand)
-                    .Height,
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand)
-                    .Radius);
+                AnimatorParametersHash.FirstPersonStandCameraForwardOffset);
 
             #region stand to crouch
 
@@ -56,10 +52,8 @@ namespace Core.CharacterState.Posture
                     AnimatorParametersHash.FirstPersonCrouchCameraForwardOffset,
                     AnimatorParametersHash.Instance.StandValue,
                     AnimatorParametersHash.Instance.CrouchValue,
-                    SingletonManager.Get<CharacterStateConfigManager>()
-                        .GetCharacterControllerCapsule(PostureInConfig.Stand),
-                    SingletonManager.Get<CharacterStateConfigManager>()
-                        .GetCharacterControllerCapsule(PostureInConfig.Crouch)),
+                    PostureInConfig.Stand,
+                    PostureInConfig.Crouch),
                 new[] {FsmInput.Crouch, FsmInput.PostureCrouch});
 
             #endregion
@@ -139,10 +133,8 @@ namespace Core.CharacterState.Posture
                     AnimatorParametersHash.FirstPersonProneCameraForwardOffset,
                     AnimatorParametersHash.Instance.StandValue,
                     AnimatorParametersHash.Instance.ProneValue,
-                    SingletonManager.Get<CharacterStateConfigManager>()
-                        .GetCharacterControllerCapsule(PostureInConfig.Stand),
-                    SingletonManager.Get<CharacterStateConfigManager>()
-                        .GetCharacterControllerCapsule(PostureInConfig.Prone), false),
+                    PostureInConfig.Stand,
+                    PostureInConfig.Prone, false),
                 new[] {FsmInput.Prone});
 
             #endregion
@@ -342,11 +334,7 @@ namespace Core.CharacterState.Posture
         {
             PostureState state = new CustomPostureState(PostureStateId.Crouch,
                 AnimatorParametersHash.FirstPersonCrouchCameraHeight,
-                AnimatorParametersHash.FirstPersonCrouchCameraForwardOffset,
-                SingletonManager.Get<CharacterStateConfigManager>()
-                    .GetCharacterControllerCapsule(PostureInConfig.Crouch).Height,
-                SingletonManager.Get<CharacterStateConfigManager>()
-                    .GetCharacterControllerCapsule(PostureInConfig.Crouch).Radius);
+                AnimatorParametersHash.FirstPersonCrouchCameraForwardOffset);
 
             #region crouch to stand
 
@@ -365,10 +353,8 @@ namespace Core.CharacterState.Posture
                     AnimatorParametersHash.FirstPersonStandCameraForwardOffset,
                     AnimatorParametersHash.Instance.CrouchValue,
                     AnimatorParametersHash.Instance.StandValue,
-                    SingletonManager.Get<CharacterStateConfigManager>()
-                        .GetCharacterControllerCapsule(PostureInConfig.Crouch),
-                    SingletonManager.Get<CharacterStateConfigManager>()
-                        .GetCharacterControllerCapsule(PostureInConfig.Stand)),
+                    PostureInConfig.Crouch,
+                    PostureInConfig.Stand),
                 new[] {FsmInput.Crouch, FsmInput.Jump, FsmInput.PostureStand});
 
             #endregion
@@ -448,10 +434,8 @@ namespace Core.CharacterState.Posture
                     AnimatorParametersHash.FirstPersonProneCameraForwardOffset,
                     AnimatorParametersHash.Instance.CrouchValue,
                     AnimatorParametersHash.Instance.ProneValue,
-                    SingletonManager.Get<CharacterStateConfigManager>()
-                        .GetCharacterControllerCapsule(PostureInConfig.Crouch),
-                    SingletonManager.Get<CharacterStateConfigManager>()
-                        .GetCharacterControllerCapsule(PostureInConfig.Prone), false),
+                    PostureInConfig.Crouch,
+                    PostureInConfig.Prone, false),
                 new[] {FsmInput.Prone});
 
             #endregion
@@ -517,11 +501,7 @@ namespace Core.CharacterState.Posture
         {
             PostureState state = new CustomPostureState(PostureStateId.Prone,
                 AnimatorParametersHash.FirstPersonProneCameraHeight,
-                AnimatorParametersHash.FirstPersonProneCameraForwardOffset,
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Prone)
-                    .Height,
-                SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Prone)
-                    .Radius);
+                AnimatorParametersHash.FirstPersonProneCameraForwardOffset);
 
             #region prone to crouch
 
@@ -598,10 +578,8 @@ namespace Core.CharacterState.Posture
                     AnimatorParametersHash.FirstPersonCrouchCameraForwardOffset,
                     AnimatorParametersHash.Instance.ProneValue,
                     AnimatorParametersHash.Instance.CrouchValue,
-                    SingletonManager.Get<CharacterStateConfigManager>()
-                        .GetCharacterControllerCapsule(PostureInConfig.Prone),
-                    SingletonManager.Get<CharacterStateConfigManager>()
-                        .GetCharacterControllerCapsule(PostureInConfig.Crouch), false),
+                    PostureInConfig.Prone,
+                    PostureInConfig.Crouch, false),
                 new[] {FsmInput.Crouch});
 
             #endregion
@@ -683,10 +661,8 @@ namespace Core.CharacterState.Posture
                     AnimatorParametersHash.FirstPersonStandCameraForwardOffset,
                     AnimatorParametersHash.Instance.ProneValue,
                     AnimatorParametersHash.Instance.StandValue,
-                    SingletonManager.Get<CharacterStateConfigManager>()
-                        .GetCharacterControllerCapsule(PostureInConfig.Prone),
-                    SingletonManager.Get<CharacterStateConfigManager>()
-                        .GetCharacterControllerCapsule(PostureInConfig.Stand), false),
+                    PostureInConfig.Prone,
+                    PostureInConfig.Stand, false),
                 new[] {FsmInput.Jump, FsmInput.Prone});
 
             #endregion
@@ -820,26 +796,9 @@ namespace Core.CharacterState.Posture
 
         public static PostureState CreateDyingState()
         {
-            PostureState state = new PostureState(PostureStateId.Dying);
+            PostureState state = new DyingState(PostureStateId.Dying);
 
-            #region dying to crouch
-
-            state.AddTransition(
-                (command, addOutput) =>
-                {
-                    var ret = command.IsMatch(FsmInput.Revive);
-
-                    if (ret)
-                    {
-                        command.Handled = true;
-                    }
-
-                    return ret;
-                },
-                (command, addOutput) => FsmTransitionResponseType.NoResponse,
-                (int) PostureStateId.Stand, null, 0, new[] {FsmInput.Revive});
-
-            #endregion
+            
 
             return state;
         }
@@ -860,6 +819,11 @@ namespace Core.CharacterState.Posture
         public static PostureState CreateClimbState()
         {
             return new ClimbState(PostureStateId.Climb);
+        }
+
+        public static PostureState CreatePostureLadderState()
+        {
+            return new PostureLadderState(PostureStateId.Ladder);
         }
 
         public static PostureState CreateProneTransitState()

@@ -1,0 +1,119 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+#pragma enable_d3d11_debug_symbols
+
+AppendStructuredBuffer<int> DrawInstanceDataLod0;
+AppendStructuredBuffer<int> DrawInstanceDataLod1;
+AppendStructuredBuffer<int> DrawInstanceDataLod2;
+AppendStructuredBuffer<int> DrawInstanceDataLod3;
+
+RWStructuredBuffer<float4x4> InputData;
+RWStructuredBuffer<int> RealCountInBlockData;
+
+uniform uint InputDataCount;
+uniform uint BlockCount;
+uniform uint BlockSize;
+uniform float CullingDistance;
+
+uniform float TanHalfFov;
+uniform float3 CameraWorldPosition;
+uniform float4 CamLeftPlaneWorld;
+uniform float4 CamRightPlaneWorld;
+uniform float4 CamTopPlaneWorld;
+uniform float4 CamBottomPlaneWorld;
+uniform float4 CamFarPlaneWorld;
+uniform float CamFarClipDistance;
+
+uniform float4 LodRatios;
+uniform float LodSize;
+uniform float3 SphereCenter;
+uniform float SphereRadius;
+
+bool IsVisible(float4x4 instancedMatrix, float scale)
+{
+    float3 worldCenter = mul(instancedMatrix, float4(SphereCenter, 1)).xyz - CameraWorldPosition;
+    float distMargin = scale * SphereRadius;
+
+    if (dot(CamLeftPlaneWorld.xyz, worldCenter) < -distMargin)
+        return false;
+
+    if (dot(CamRightPlaneWorld.xyz, worldCenter) < -distMargin)
+        return false;
+
+    if (dot(CamTopPlaneWorld.xyz, worldCenter) < -distMargin)
+        return false;
+
+    if (dot(CamBottomPlaneWorld.xyz, worldCenter) < -distMargin)
+        return false;
+
+    if (dot(CamFarPlaneWorld.xyz, worldCenter) - CamFarClipDistance < -distMargin)
+        return false;
+
+    return true;
+}
+
+void CalculateLod(float ratio, int index)
+{
+    if (ratio > LodRatios[0])
+    {
+        DrawInstanceDataLod0.Append(index);
+    }
+    else if (ratio > LodRatios[1])
+    {
+        DrawInstanceDataLod1.Append(index);
+    }
+    else if (ratio > LodRatios[2])
+    {
+        DrawInstanceDataLod2.Append(index);
+    }
+    else if (ratio > LodRatios[3])
+    {
+        DrawInstanceDataLod3.Append(index);
+    }
+}
+
+[numthreads(1024, 1, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    int index = id.x;
+    uint blockIndex = 0;
+
+    for (; blockIndex < BlockCount; ++blockIndex)
+    {
+        if (index >= RealCountInBlockData[blockIndex])
+        {
+            index -= RealCountInBlockData[blockIndex];
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    if (blockIndex == BlockCount)
+        return;
+
+    index = blockIndex * BlockSize + index;
+    float4x4 instancedMatrix = InputData[index];
+
+    float dist = distance(float3(instancedMatrix._14, 0, instancedMatrix._34), float3(CameraWorldPosition.x, 0, CameraWorldPosition.z));
+    if (dist > CullingDistance)
+        return;
+
+    float3 scale = float3(length(instancedMatrix._11_21_31), length(instancedMatrix._12_22_32), length(instancedMatrix._13_23_33));
+    float maxScale = max(scale.x, max(scale.y, scale.z));
+
+    if (!IsVisible(instancedMatrix, maxScale))
+        return;
+
+    if (LodSize > 0)
+    {
+        float lodRatio = maxScale * LodSize / (dist * TanHalfFov);
+        CalculateLod(lodRatio, index);
+    }
+    else
+    {
+        DrawInstanceDataLod0.Append(index);
+    }
+}
+

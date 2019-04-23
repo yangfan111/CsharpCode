@@ -40,7 +40,7 @@ namespace App.Client.SceneManagement.DistanceCulling
             _resourceHandler = handler;
         }
 
-        public void UpdateOrigin(Vector3 pos, OriginStatus status)
+        public void UpdateOrigin(Vector3 pos)
         {
             if (_asap)
                 _asapPosition = pos;
@@ -56,7 +56,6 @@ namespace App.Client.SceneManagement.DistanceCulling
             for (int i = 0; i < count; i++)
             {
                 _sceneOctreesCache[i].OnCameraMovement(pos, 1, _resourceHandler);
-                _sceneOctreesCache[i].Traverse(pos, status);
             }
             
             Debug();

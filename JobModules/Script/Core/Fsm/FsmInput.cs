@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -258,8 +258,21 @@ namespace Core.Fsm
 
         // 
         Climb,
-        Step,
         GenericActionFinished,
+        
+        EnterLadder,
+        EnterLadderFinished,
+        ExitLadder,
+        ExitLadderFinished,
+        InterruptLadder,
+        MiddleEnterLadder,
+        LadderSpeed,
+        
+        TransfigurationStart,
+        TransfigurationStartEnd,
+        TransfigurationFinish,
+        TransfigurationFinishEnd,
+        
         DyingTransitionFinished,
         None
         

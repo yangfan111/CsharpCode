@@ -7,7 +7,7 @@ namespace Core.WeaponLogic.Throwing
     public class ThrowingActionInfo
     {
         public EntityKey ThrowingEntityKey;
-        public bool IsReady;
+        public bool      IsReady;
 
         public bool IsPull;
         public bool IsThrow;
@@ -20,24 +20,28 @@ namespace Core.WeaponLogic.Throwing
 
         public Vector3 Pos;
         public Vector3 Vel;
-        public float Gravity;
-        public float Decay;
-        public int CountdownTime;
+        public float   Gravity;
+        public float   Decay;
+        public int     CountdownTime;
 
         public bool ShowCountdownUI;
         public bool IsInterrupt;
+        public int LastFireWeaponKey;
 
         //Draw throwing line
         public ThrowingConfig Config;
 
-        public void ClearState()
+        public void ClearState(bool interrupt = false)
         {
-            IsReady = false;
-            IsPull = false;
-            IsThrow = false;
-            IsNearThrow = false;
-            LastSwitchTime = 0;
-            ShowCountdownUI = false;
+            if (!interrupt || IsReady || ShowCountdownUI)
+            {
+                IsReady         = false;
+                IsPull          = false;
+                IsThrow         = false;
+                IsNearThrow     = false;
+                LastSwitchTime  = 0;
+                ShowCountdownUI = false;
+            }
         }
     }
 }

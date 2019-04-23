@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,13 +35,16 @@ namespace Core.CharacterState.Movement
 
         #endregion
 
-        public void Init(IFsmTransitionHelper infoProvider)
+        public void Init(IFsmTransitionHelper infoProvider, ICharacterInfoProvider characterInfo)
         {
-            AddState(MovementState.CreateIdleState(), infoProvider);
-            AddState(MovementState.CreateWalkState(), infoProvider);
-            AddState(MovementState.CreateRunState(), infoProvider);
-            AddState(MovementState.CreateSprintState(), infoProvider);
-            AddState(MovementState.CreateDiveMoveState(), infoProvider);
+            AddState(MovementState.CreateIdleState(), infoProvider, characterInfo);
+            AddState(MovementState.CreateWalkState(), infoProvider, characterInfo);
+            AddState(MovementState.CreateRunState(), infoProvider, characterInfo);
+            AddState(MovementState.CreateSprintState(), infoProvider, characterInfo);
+            AddState(MovementState.CreateDiveMoveState(), infoProvider, characterInfo);
+            AddState(MovementState.CreateEnterLadderState(), infoProvider, characterInfo);
+            AddState(MovementState.CreateLadderMoveState(), infoProvider, characterInfo);
+            AddState(MovementState.CreateExitLadderState(), infoProvider, characterInfo);
             _resetParam = ResetMovement;
         }
 

@@ -60,6 +60,12 @@ namespace App.Shared.GameModules.Weapon.Behavior
         {
             return (punchPitch - negPunchPitch) / cdTime;
         }
+        public static float EaseOutCubic(float start, float end, float value)
+        {
+            value--;
+            end -= start;
+            return end * (value * value * value + 1) + start;
+        }
     }
 
 
@@ -67,11 +73,16 @@ namespace App.Shared.GameModules.Weapon.Behavior
     {
         public static LoggerAdapter logger = new LoggerAdapter(typeof(FireShakeProvider));
         
-        public static int GetDecayInterval(PlayerWeaponController controller)
+        public static float GetDecayInterval(PlayerWeaponController controller)
         {
-            return (int) (controller.HeldWeaponAgent.CommonFireCfg.AttackInterval *
+            return (controller.HeldWeaponAgent.CommonFireCfg.AttackInterval *
                           controller.HeldWeaponAgent.RifleShakeCfg.DecaytimeFactor);
         }
+        
+        
+        
+        
+        
         
         public static ShakeGroup GetShakeGroup(RifleShakeConfig shakeConfig, PlayerWeaponController controller)
         {
@@ -102,7 +113,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
             }
             return shakeInfo;
         }
-
+       
         
         public static ShakeInfoStruct GetFireUpDirShakeArgs(WeaponBaseAgent heldAgent, ShakeInfo shakeInfo)
         {

@@ -20,7 +20,7 @@
     <OutputPath>..\..\Dll.Temp\</OutputPath>
     <BaseIntermediateOutputPath>..\..\build_obj_dir\Release\Core\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>TRACE;DEBUG;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -32,12 +32,13 @@
     <OutputPath>..\..\Dll.Temp\</OutputPath>
     <BaseIntermediateOutputPath>..\..\build_obj_dir\Debug\Core\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>TRACE;DEBUG;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -66,7 +67,9 @@
     <Analyzer Include="../ThirdParty/RefCounterAnalyzer/RefCounterAnalyzer.dll">
       <HintPath>..\ThirdParty\RefCounterAnalyzer\RefCounterAnalyzer.dll</HintPath>
     </Analyzer>
-    <Reference Include="System" />
+    <Reference Include="UnityEditor">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEditor.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Animation\AnimatorPoseReplayer.cs" />
@@ -151,12 +154,15 @@
     <Compile Include="CharacterState\Action\States\SpecialFire\SpecialFireState.cs" />
     <Compile Include="CharacterState\Action\States\SpecialReloadState.cs" />
     <Compile Include="CharacterState\Action\States\SwitchWeaponState.cs" />
+    <Compile Include="CharacterState\Action\States\Transfiguration\TransfigurationFinish.cs" />
+    <Compile Include="CharacterState\Action\States\Transfiguration\TransfigurationStart.cs" />
     <Compile Include="CharacterState\Action\States\UnarmState.cs" />
     <Compile Include="CharacterState\Action\Transitions\OverlayNullToSightTransition.cs" />
     <Compile Include="CharacterState\Action\Transitions\SightToOverlayNullTransition.cs" />
     <Compile Include="CharacterState\AnimatorParametersHash.cs" />
     <Compile Include="CharacterState\CharacterStateManager.cs" />
     <Compile Include="CharacterState\FsmManager.cs" />
+    <Compile Include="CharacterState\ICharacterInfoProvider.cs" />
     <Compile Include="CharacterState\ICharacterSpeed.cs" />
     <Compile Include="CharacterState\ICharacterState.cs" />
     <Compile Include="CharacterState\ISyncFsmSnapshot.cs" />
@@ -167,6 +173,9 @@
     <Compile Include="CharacterState\Movement\MovementManager.cs" />
     <Compile Include="CharacterState\Movement\MovementState.cs" />
     <Compile Include="CharacterState\Movement\MovementStateId.cs" />
+    <Compile Include="CharacterState\Movement\States\EnterLadderState.cs" />
+    <Compile Include="CharacterState\Movement\States\ExitLadderState.cs" />
+    <Compile Include="CharacterState\Movement\States\LadderState.cs" />
     <Compile Include="CharacterState\Posture\CustomPostureState.cs" />
     <Compile Include="CharacterState\Posture\ICharacterPosture.cs" />
     <Compile Include="CharacterState\Posture\IGetActionState.cs" />
@@ -178,12 +187,14 @@
     <Compile Include="CharacterState\Posture\StateIdAdapter.cs" />
     <Compile Include="CharacterState\Posture\States\ClimbState.cs" />
     <Compile Include="CharacterState\Posture\States\DiveState.cs" />
+    <Compile Include="CharacterState\Posture\States\DyingState.cs" />
     <Compile Include="CharacterState\Posture\States\DyingTransitionState.cs" />
     <Compile Include="CharacterState\Posture\States\FreefallState.cs" />
     <Compile Include="CharacterState\Posture\States\JumpEndState.cs" />
     <Compile Include="CharacterState\Posture\States\JumpStartState.cs" />
     <Compile Include="CharacterState\Posture\States\PeekLeftState.cs" />
     <Compile Include="CharacterState\Posture\States\PeekRightState.cs" />
+    <Compile Include="CharacterState\Posture\States\PostureLadderState.cs" />
     <Compile Include="CharacterState\Posture\States\ProneToCrouchState.cs" />
     <Compile Include="CharacterState\Posture\States\ProneToStandState.cs" />
     <Compile Include="CharacterState\Posture\States\ProneTransitState.cs" />
@@ -324,7 +335,6 @@
     <Compile Include="Fsm\IFsmUpdate.cs" />
     <Compile Include="GameGlobal\Composition\AudioHitEffectData.cs" />
     <Compile Include="GameGlobal\Composition\GrenadeCacheData.cs" />
-    <Compile Include="GameGlobal\Composition\InterruptData.cs" />
     <Compile Include="GameGlobal\Composition\WeaponBagContainer.cs" />
     <Compile Include="GameGlobal\Composition\WeaponBagSlotData.cs" />
     <Compile Include="GameGlobal\GlobalConst.cs" />
@@ -496,6 +506,7 @@
     <Compile Include="Room\RoomInfo.cs" />
     <Compile Include="Room\RoomManager.cs" />
     <Compile Include="SceneManagement\ILevelManager.cs" />
+    <Compile Include="SceneManagement\ITerrainRenderer.cs" />
     <Compile Include="SceneManagement\OriginStatus.cs" />
     <Compile Include="SceneTriggerObject\TriggerObjectSyncEvent.cs" />
     <Compile Include="SessionState\AbstractSessionState.cs" />

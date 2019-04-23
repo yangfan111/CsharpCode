@@ -26,8 +26,8 @@ namespace Core.CharacterState.Posture.Transitions
 
         private readonly float _firstPersonForwardOffsetToValue;
 
-        private readonly CharacterControllerCapsule _fromCharacterControllerConfig;
-        private readonly CharacterControllerCapsule _toCharacterControllerConfig;
+        private readonly Func<CharacterControllerCapsule> _fromCharacterControllerConfig;
+        private readonly Func<CharacterControllerCapsule> _toCharacterControllerConfig;
         private bool _updateP3;
 
         /// <summary>
@@ -56,8 +56,8 @@ namespace Core.CharacterState.Posture.Transitions
             float firstPersonForwardOffsetToValue,
             float thirdPersonFromValue,
             float thirdPersonToValue,
-            CharacterControllerCapsule fromCharacterControllerConfig,
-            CharacterControllerCapsule toCharacterControllerConfig,
+            PostureInConfig fromCharacterControllerConfig,
+            PostureInConfig toCharacterControllerConfig,
             bool updateP3 = true) : base(id, (short) target, duration)
         {
             _fromValueP1 = firstPersonFromValue;
@@ -66,13 +66,33 @@ namespace Core.CharacterState.Posture.Transitions
             _firstPersonForwardOffsetToValue = firstPersonForwardOffsetToValue;
             _fromValueP3 = thirdPersonFromValue;
             _toValueP3 = thirdPersonToValue;
-            _fromCharacterControllerConfig = fromCharacterControllerConfig;
-            _toCharacterControllerConfig = toCharacterControllerConfig;
+            _fromCharacterControllerConfig = GetFunc(fromCharacterControllerConfig);
+            _toCharacterControllerConfig = GetFunc(toCharacterControllerConfig);
 
             _simpleTransferCondition = transfer;
             _interruptCondition = interrupt;
 
             _updateP3 = updateP3;
+        }
+
+        private Func<CharacterControllerCapsule> GetFunc(PostureInConfig config)
+        {
+            if (config == PostureInConfig.Stand)
+            {
+                return () => _characterInfo.GetStandCapsule();
+            }
+            else if (config == PostureInConfig.Crouch)
+            {
+                return () => _characterInfo.GetCrouchCapsule();
+            }
+            else if (config == PostureInConfig.Prone)
+            {
+                return () => _characterInfo.GetProneCapsule();
+            }
+            else
+            {
+                return () => _characterInfo.GetStandCapsule();
+            }
         }
 
         public override bool Update(int frameInterval, Action<FsmOutput> addOutput)
@@ -98,7 +118,7 @@ namespace Core.CharacterState.Posture.Transitions
                     : _firstPersonForwardOffsetToValue);
             addOutput(FsmOutput.Cache);
 
-            LerpCharacterControllerCapsule(_fromCharacterControllerConfig, _toCharacterControllerConfig, NormalizedTime,
+            LerpCharacterControllerCapsule(_fromCharacterControllerConfig.Invoke(), _toCharacterControllerConfig.Invoke(), NormalizedTime,
                 addOutput);
 
             return ret;

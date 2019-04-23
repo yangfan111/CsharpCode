@@ -85,7 +85,11 @@ namespace App.Shared.Player.Events
             FireEvent evt = e as FireEvent;
             if (evt != null)
             {
-               // var weaponGo = (entity as PlayerEntity).appearanceInterface.Appearance.GetWeaponP1InHand();
+                if ((entity as PlayerEntity).isFlagSelf)
+                {
+                    return;
+                }
+                // var weaponGo = (entity as PlayerEntity).appearanceInterface.Appearance.GetWeaponP1InHand();
                 GameAudioMedia.PlayWeaponFireAudio(evt.fireWeaponId, evt.audioFirePos, (AudioGrp_ShotMode)evt.audioFireMode);
 
             }

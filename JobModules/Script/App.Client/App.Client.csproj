@@ -20,7 +20,7 @@
     <OutputPath>..\..\Dll.Temp\</OutputPath>
     <BaseIntermediateOutputPath>..\..\build_obj_dir\Release\App.Client\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>TRACE;DEBUG;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -31,7 +31,7 @@
     <OutputPath>..\..\Dll.Temp\</OutputPath>
     <BaseIntermediateOutputPath>..\..\build_obj_dir\Debug\App.Client\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>TRACE;DEBUG;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -78,12 +78,15 @@
     <Reference Include="Loxodon.Log">
       <HintPath>..\UiFramework\Libs\Loxodon\Loxodon.Log.dll</HintPath>
     </Reference>
+    <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System" />
+    <Reference Include="UnityEditor">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEditor.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArtModule\ArtModule.cs" />
@@ -102,8 +105,10 @@
     <Compile Include="CastObjectUtil\SceneObjectGoAssemble.cs" />
     <Compile Include="CastObjectUtil\VehicleCastData.cs" />
     <Compile Include="ClientDebugCommandHandler.cs" />
+    <Compile Include="ClientSystems\Decal.cs" />
     <Compile Include="ClientSystems\DecalBuilder.cs" />
     <Compile Include="ClientSystems\DecalPolygon.cs" />
+    <Compile Include="ClientSystems\DecaliciousRenderer.cs" />
     <Compile Include="ClientSystems\DriveTimeSystem.cs" />
     <Compile Include="ClientSystems\MouseLockSystem.cs" />
     <Compile Include="ClientSystems\PingSystem.cs" />
@@ -117,6 +122,23 @@
     <Compile Include="Cmd\UnityUserCmdGenerator.cs" />
     <Compile Include="Cmd\UnityVehicleCmdGenerator.cs" />
     <Compile Include="FileSystemConfig\ClientFileSystemConfigManager.cs" />
+    <Compile Include="GPUInstancing\Core\Data\CameraFrustum.cs" />
+    <Compile Include="GPUInstancing\Core\Data\GpuInstancingCamera.cs" />
+    <Compile Include="GPUInstancing\Core\Data\InstancingDraw.cs" />
+    <Compile Include="GPUInstancing\Core\Data\InstancingRenderer.cs" />
+    <Compile Include="GPUInstancing\Core\Data\ShaderProperty.cs" />
+    <Compile Include="GPUInstancing\Core\GpuInstancingDetailOnTerrain.cs" />
+    <Compile Include="GPUInstancing\Core\GpuInstancingPipeline.cs" />
+    <Compile Include="GPUInstancing\Core\GpuInstancingTerrain.cs" />
+    <Compile Include="GPUInstancing\Core\GpuInstancingTreeOnTerrain.cs" />
+    <Compile Include="GPUInstancing\Core\Spatial\GpuInstancingDetailNode.cs" />
+    <Compile Include="GPUInstancing\Core\Spatial\GpuInstancingNode.cs" />
+    <Compile Include="GPUInstancing\Core\Spatial\GpuInstancingSpatialPartition.cs" />
+    <Compile Include="GPUInstancing\Core\Terrain\DetailInstancingDraw.cs" />
+    <Compile Include="GPUInstancing\Core\Terrain\DetailInstancingPrototype.cs" />
+    <Compile Include="GPUInstancing\Core\Utils\Constants.cs" />
+    <Compile Include="GPUInstancing\Core\Utils\Helper.cs" />
+    <Compile Include="GPUInstancing\Core\Utils\MergeKernel.cs" />
     <Compile Include="GameMode\ClientGameCommonModeController.cs" />
     <Compile Include="GameMode\ClientGameSurviveModeController.cs" />
     <Compile Include="GameMode\GameModeUtil.cs" />
@@ -346,6 +368,7 @@
     <Compile Include="GameModules\SceneManagement\ClientAutoWorldShiftRenderSystem.cs" />
     <Compile Include="GameModules\SceneManagement\ClientScenePostprocessorSystem.cs" />
     <Compile Include="GameModules\SceneManagement\ClientWorldShiftPostProcessSystem.cs" />
+    <Compile Include="GameModules\SceneManagement\TerrainRendererInitSystem.cs" />
     <Compile Include="GameModules\SceneManagement\VisionCenterUpdateSystem.cs" />
     <Compile Include="GameModules\SceneManagement\WorldShiftManager.cs" />
     <Compile Include="GameModules\SceneObject\ClientAbstractTriggerObjectListener.cs" />
@@ -396,6 +419,9 @@
     <Compile Include="GameModules\Ui\Models\Blast\BlastRecordModel.cs" />
     <Compile Include="GameModules\Ui\Models\Blast\BlastScoreModel.cs" />
     <Compile Include="GameModules\Ui\Models\Blast\BlastWeaponHudModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Chicken\ChickenBagItem.cs" />
+    <Compile Include="GameModules\Ui\Models\Chicken\ChickenBagModel.cs" />
+    <Compile Include="GameModules\Ui\Models\Chicken\ChickenPlaneModel.cs" />
     <Compile Include="GameModules\Ui\Models\Chicken\ChickenScoreModel.cs" />
     <Compile Include="GameModules\Ui\Models\ClientAbstractModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonBlastTipsModel.cs" />
@@ -473,7 +499,9 @@
     <Compile Include="GameModules\Ui\UINameConstant.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Blast\BlastScoreUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Blast\BlastWeaponStateUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Chicken\ChickenBagUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Chicken\ChickenScoreUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Chicken\PlaneUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Chicken\SplitUIAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Chicken\SuoDuUIAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Common\BlastTipsAdapter.cs" />
@@ -514,8 +542,10 @@
     <Compile Include="GameModules\Ui\UiAdapter\Group\GroupRecordUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Group\GroupScoreUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Blast\IBlastScoreUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Chicken\IChickenBagUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Chicken\IChickenScoreUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Chicken\IParachuteStateUiAdapter.cs" />
+    <Compile Include="GameModules\Ui\UiAdapter\Interface\Chicken\IPlaneUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Chicken\ISplitUIAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Chicken\ISuoDuUIAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IBlastTipsUiAdapter.cs" />
@@ -565,6 +595,9 @@
     <Compile Include="GameModules\Ui\Utils\UIUtils.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Blast\BlastRecordInfoViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Blast\BlastScoreViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Chicken\ChickenBagItemViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Chicken\ChickenBagViewModel.cs" />
+    <Compile Include="GameModules\Ui\ViewModels\Chicken\ChickenPlaneViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Chicken\ChickenScoreViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonBlastTipsViewModel.cs" />
     <Compile Include="GameModules\Ui\ViewModels\Common\CommonCarryTipViewModel.cs" />
@@ -647,6 +680,7 @@
     <Compile Include="SceneManagement\DistanceCulling\StreamingGo.cs" />
     <Compile Include="SceneManagement\DistanceCulling\StreamingGoBuilder.cs" />
     <Compile Include="SceneManagement\DistanceCulling\StreamingGoByDistance.cs" />
+    <Compile Include="SceneManagement\Vegetation\TerrainRenderer.cs" />
     <Compile Include="SessionStates\ClientPreLoadState.cs" />
     <Compile Include="SessionStates\ClientProfileSessionStateMachine.cs" />
     <Compile Include="SessionStates\ClientSessionStateMachine.cs" />

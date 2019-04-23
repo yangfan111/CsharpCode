@@ -26,7 +26,6 @@ namespace Assets.App.Shared.GameModules.Camera
         private float _near;
 
 
-
         public float Far
         {
             get { return _far; }
@@ -50,7 +49,8 @@ namespace Assets.App.Shared.GameModules.Camera
         public bool IsSetFov { get; set; }
         public bool IsSetFar { get; set; }
         public bool IsSetNear { get; set; }
-
+        public bool ForbidDetect { get; set; }
+        
         public float Near
         {
             get { return _near; }
@@ -76,10 +76,12 @@ namespace Assets.App.Shared.GameModules.Camera
             IsSetFar = false;
             IsSetFov = false;
             IsSetNear = false;
+            ForbidDetect = false;
         }
 
         public DummyCameraMotorOutput Append(DummyCameraMotorOutput append)
         {
+            ArchorEulerAngle += append.ArchorEulerAngle;
             ArchorOffset.x += append.ArchorOffset.x;
             ArchorOffset.y += append.ArchorOffset.y;
             ArchorOffset.z += append.ArchorOffset.z;
@@ -95,12 +97,16 @@ namespace Assets.App.Shared.GameModules.Camera
             PostOffset.x += append.PostOffset.x;
             PostOffset.y += append.PostOffset.y;
             PostOffset.z += append.PostOffset.z;
+
+            ForbidDetect |= append.ForbidDetect;
+            
             if (append.IsSetFov)
                 Fov = append.Fov;
             if (append.IsSetFar)
                 Far = append.Far;
             if (append.IsSetNear)
                 Near = append.Near;
+                
             return this;
         }
     }

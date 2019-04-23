@@ -24,7 +24,6 @@ namespace App.Shared.Components.Player
         [NetworkProperty]public long PlayerId { get; set; }
         [NetworkProperty]public string PlayerName{ get; set; }
         [NetworkProperty]public int RoleModelId{ get; set; }
-        [NetworkProperty] public string ModelName { get; set; }
         [NetworkProperty][EntityIndex]public long TeamId{ get; set; }
         [NetworkProperty]public int Num{ get; set; }
         [NetworkProperty]public int Level{ get; set; }
@@ -34,6 +33,7 @@ namespace App.Shared.Components.Player
         [NetworkProperty]public List<int> AvatarIds{ get; set; }
         [NetworkProperty]public List<int> WeaponAvatarIds{ get; set; }
         [NetworkProperty]public int Camp { get; set; }
+        [NetworkProperty]public List<int> SprayLacquers { get; set; } /*喷漆*/
         [DontInitilize] public PlayerWeaponBagData[] WeaponBags { get; set; }
         [DontInitilize] public Transform FirstPersonRightHand;
         [DontInitilize] public Transform ThirdPersonRightHand;
@@ -57,7 +57,6 @@ namespace App.Shared.Components.Player
             PlayerName = right.PlayerName;
             RoleModelId = right.RoleModelId;
             TeamId = right.TeamId;
-            ModelName = right.ModelName;
             Num = right.Num;
             Level = right.Level;
             BackId = right.BackId;
@@ -76,6 +75,13 @@ namespace App.Shared.Components.Player
             }
             WeaponAvatarIds.Clear();
             WeaponAvatarIds.AddRange(right.WeaponAvatarIds);
+
+            if (SprayLacquers == null) {
+                SprayLacquers = new List<int>();
+            }
+            SprayLacquers.Clear();
+            SprayLacquers.AddRange(right.SprayLacquers);
+
             Camp = right.Camp;
         }
         public bool IsInterpolateEveryFrame(){ return false; }
@@ -96,11 +102,21 @@ namespace App.Shared.Components.Player
                 WeaponAvatarIds = new List<int>();
             }
             WeaponAvatarIds.Clear();
+            if (SprayLacquers == null) {
+                SprayLacquers = new List<int>();
+            }
+            SprayLacquers.Clear();
+        }
+
+        public void ChangeNewRole(int roleId)
+        {
+            RoleModelId = roleId;
+            AvatarIds.Clear();
         }
 
         public override string ToString()
         {
-            return string.Format("EntityId: {0}, PlayerId: {1}, PlayerName: {2}, RoleModelId: {3}, ModelName: {4}, AvatarIds: {5}", EntityId, PlayerId, PlayerName, RoleModelId, ModelName, AvatarIds);
+            return string.Format("EntityId: {0}, PlayerId: {1}, PlayerName: {2}, RoleModelId: {3}, AvatarIds: {4}", EntityId, PlayerId, PlayerName, RoleModelId, AvatarIds);
         }
     }
 }

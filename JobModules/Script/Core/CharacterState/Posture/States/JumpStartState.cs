@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -46,14 +46,56 @@ namespace Core.CharacterState.Posture.States
             #region jumpstart to freefall
 
             AddTransition(
-                (command, addOutput) => FsmTransition.SimpleCommandHandler(command, FsmInput.Freefall),
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.Freefall))
+                    {
+                        return true;
+                    }
+
+                    return false;
+                },
                 (command, addOutput) => FsmTransitionResponseType.NoResponse,
                 (int)PostureStateId.Freefall, null, 0, new[] { FsmInput.Freefall });
+            
+//            AddTransition(
+//                (command, addOutput) => FsmTransition.SimpleCommandHandler(command, FsmInput.Freefall),
+//                (command, addOutput) => FsmTransitionResponseType.NoResponse,
+//                (int)PostureStateId.Freefall, null, 0, new[] { FsmInput.Freefall });
 
             #endregion
 
             #region jumpStart to dying
             AddTransitionFromJumpToDying(this);
+            #endregion
+            
+            #region jumpstart to stand
+
+            AddTransition(
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.MiddleEnterLadder) || 
+                        command.IsMatch(FsmInput.EnterLadder))
+                    {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.JumpStartHash,
+                            AnimatorParametersHash.Instance.JumpStartName,
+                            AnimatorParametersHash.Instance.JumpStartDisable,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FreeFallHash,
+                            AnimatorParametersHash.Instance.FreeFallName,
+                            AnimatorParametersHash.Instance.FreeFallDisable,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+
+                        return true;
+                    }
+                    return false;
+                },
+                (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                (int)PostureStateId.Ladder, null, 0, new[] { FsmInput.MiddleEnterLadder, FsmInput.EnterLadder });
+
             #endregion
         }
 
@@ -65,7 +107,7 @@ namespace Core.CharacterState.Posture.States
 
         public override void DoBeforeLeaving(Action<FsmOutput> addOutput)
         {
-            FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerHeight, SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand).Height);
+            FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerHeight, _characterInfo.GetStandCapsule().Height);
             addOutput(FsmOutput.Cache);
             base.DoBeforeLeaving(addOutput);
         }
@@ -75,7 +117,7 @@ namespace Core.CharacterState.Posture.States
             if (command.IsMatch(FsmInput.Crouch) && !isBigJump)
             {
                 isBigJump = true;
-                FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerJumpHeight, SingletonManager.Get<CharacterStateConfigManager>().CharacterControllerJumpHeight);
+                FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerJumpHeight, _characterInfo.GetBigJumpHeight());
                 addOutput(FsmOutput.Cache);
             }
 

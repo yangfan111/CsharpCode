@@ -20,7 +20,7 @@
     <OutputPath>..\..\Dll.Temp\</OutputPath>
     <BaseIntermediateOutputPath>..\..\build_obj_dir\Release\Wwise\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>TRACE;DEBUG;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -31,11 +31,12 @@
     <OutputPath>..\..\Dll.Temp\</OutputPath>
     <BaseIntermediateOutputPath>..\..\build_obj_dir\Debug\Wwise\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>TRACE;DEBUG;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -44,7 +45,9 @@
     <Reference Include="UnityEngine">
       <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
+    <Reference Include="UnityEditor">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEditor.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AKShared.cs" />
@@ -245,6 +248,59 @@
     <Compile Include="Deployment\Components\AkTriggerMouseExit.cs" />
     <Compile Include="Deployment\Components\AkTriggerMouseUp.cs" />
     <Compile Include="Deployment\Components\AkUnityEventHandler.cs" />
+    <Compile Include="Editor\WwiseComponents\AkAmbientInspector.cs" />
+    <Compile Include="Editor\WwiseComponents\AkAudioListenerInspector.cs" />
+    <Compile Include="Editor\WwiseComponents\AkBankInspector.cs" />
+    <Compile Include="Editor\WwiseComponents\AkBaseInspector.cs" />
+    <Compile Include="Editor\WwiseComponents\AkEnvironmentInspector.cs" />
+    <Compile Include="Editor\WwiseComponents\AkEnvironmentPortalInspector.cs" />
+    <Compile Include="Editor\WwiseComponents\AkEventCallbackDataDrawer.cs" />
+    <Compile Include="Editor\WwiseComponents\AkEventInspector.cs" />
+    <Compile Include="Editor\WwiseComponents\AkEventPlayableInspector.cs" />
+    <Compile Include="Editor\WwiseComponents\AkGameObjListenerListDrawer.cs" />
+    <Compile Include="Editor\WwiseComponents\AkGameObjectInspector.cs" />
+    <Compile Include="Editor\WwiseComponents\AkPortalManager.cs" />
+    <Compile Include="Editor\WwiseComponents\AkRTPCPlayableInspector.cs" />
+    <Compile Include="Editor\WwiseComponents\AkRTPCTrackInspector.cs" />
+    <Compile Include="Editor\WwiseComponents\AkRoomInspector.cs" />
+    <Compile Include="Editor\WwiseComponents\AkRoomPortalInspector.cs" />
+    <Compile Include="Editor\WwiseComponents\AkSpatialAudioListenerInspector.cs" />
+    <Compile Include="Editor\WwiseComponents\AkStateInspector.cs" />
+    <Compile Include="Editor\WwiseComponents\AkSwitchInspector.cs" />
+    <Compile Include="Editor\WwiseComponents\AkUnityEventHandlerInspector.cs" />
+    <Compile Include="Editor\WwiseMenu\Common\AkUnityBuilderBase.cs" />
+    <Compile Include="Editor\WwiseMenu\Common\AkUnityPluginInstallerBase.cs" />
+    <Compile Include="Editor\WwiseMenu\Common\AkWwiseIdConverter.cs" />
+    <Compile Include="Editor\WwiseMenu\Mac\AkWwiseMenu_Mac.cs" />
+    <Compile Include="Editor\WwiseMenu\Windows\AkWwiseMenu_Windows.cs" />
+    <Compile Include="Editor\WwiseSetupWizard\AkBuildPreprocessor.cs" />
+    <Compile Include="Editor\WwiseSetupWizard\AkPluginActivator.cs" />
+    <Compile Include="Editor\WwiseSetupWizard\AkSceneUtils.cs" />
+    <Compile Include="Editor\WwiseSetupWizard\AkUnitySettingsParser.cs" />
+    <Compile Include="Editor\WwiseSetupWizard\AkWSAUtils.cs" />
+    <Compile Include="Editor\WwiseSetupWizard\AkWwisePostImportCallbackSetup.cs" />
+    <Compile Include="Editor\WwiseSetupWizard\AkWwiseSettingsWindow.cs" />
+    <Compile Include="Editor\WwiseSetupWizard\AkWwiseSetupWizard.cs" />
+    <Compile Include="Editor\WwiseSetupWizard\AkXboxOneUtils.cs" />
+    <Compile Include="Editor\WwiseTypes\AcousticTextureDrawer.cs" />
+    <Compile Include="Editor\WwiseTypes\AuxBusDrawer.cs" />
+    <Compile Include="Editor\WwiseTypes\BankDrawer.cs" />
+    <Compile Include="Editor\WwiseTypes\BaseTypeDrawer.cs" />
+    <Compile Include="Editor\WwiseTypes\CallbackFlagsDrawer.cs" />
+    <Compile Include="Editor\WwiseTypes\EventDrawer.cs" />
+    <Compile Include="Editor\WwiseTypes\RTPCDrawer.cs" />
+    <Compile Include="Editor\WwiseTypes\StateDrawer.cs" />
+    <Compile Include="Editor\WwiseTypes\SwitchDrawer.cs" />
+    <Compile Include="Editor\WwiseTypes\TriggerDrawer.cs" />
+    <Compile Include="Editor\WwiseWindows\AkWwiseComponentPicker.cs" />
+    <Compile Include="Editor\WwiseWindows\AkWwisePicker.cs" />
+    <Compile Include="Editor\WwiseWindows\AkWwiseProjectData.cs" />
+    <Compile Include="Editor\WwiseWindows\AkWwiseProjectInfo.cs" />
+    <Compile Include="Editor\WwiseWindows\AkWwiseTreeView.cs" />
+    <Compile Include="Editor\WwiseWindows\AkWwiseWWUBuilder.cs" />
+    <Compile Include="Editor\WwiseWindows\AkWwiseXMLBuilder.cs" />
+    <Compile Include="Editor\WwiseWindows\TreeViewControl\TreeViewControl.cs" />
+    <Compile Include="Editor\WwiseWindows\TreeViewControl\TreeViewItem.cs" />
     <Compile Include="Extensions\AkSoundEngine.extensions.cs" />
   </ItemGroup>
   <ItemGroup>

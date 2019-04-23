@@ -51,7 +51,7 @@ public class AkUnityEventHandlerInspector
 		using (new UnityEditor.EditorGUILayout.VerticalScope("box"))
 		{
 			var currentTriggers = GetCurrentTriggers();
-			var oldMask = BuildCurrentMaskValue(currentTriggers);
+			int oldMask= BuildCurrentMaskValue(currentTriggers);
 
 			var newMask = UnityEditor.EditorGUILayout.MaskField(m_label, oldMask, m_triggerTypeNames);
 

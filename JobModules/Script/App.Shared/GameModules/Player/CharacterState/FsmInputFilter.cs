@@ -54,7 +54,7 @@ namespace App.Shared.GameModules.Player.CharacterState
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(DiveStateFilter));
         private static readonly FilterState _keyState = new FilterState { Posture = PostureInConfig.Dive };
 
-        private static Dictionary<FsmInput, FsmInput> SimpleMap = new Dictionary<FsmInput, FsmInput>(CommonEnumEqualityComparer<FsmInput>.Instance)
+        private static Dictionary<FsmInput, FsmInput> SimpleMap = new Dictionary<FsmInput, FsmInput>(CommonIntEnumEqualityComparer<FsmInput>.Instance)
         {
             { FsmInput.Sprint,              FsmInput.None },
             { FsmInput.Run,                FsmInput.None },
@@ -65,7 +65,7 @@ namespace App.Shared.GameModules.Player.CharacterState
         /// <summary>
         /// 如果满足1,把2设为none
         /// </summary>
-        private static Dictionary<FsmInput, FsmInput> TransferMap = new Dictionary<FsmInput, FsmInput>(CommonEnumEqualityComparer<FsmInput>.Instance)
+        private static Dictionary<FsmInput, FsmInput> TransferMap = new Dictionary<FsmInput, FsmInput>(CommonIntEnumEqualityComparer<FsmInput>.Instance)
         {
             {FsmInput.DiveIdle, FsmInput.Idle }
         }; 
@@ -121,7 +121,7 @@ namespace App.Shared.GameModules.Player.CharacterState
             }
         }
 
-        private static Dictionary<FsmInput, FsmInput> SimpleMap = new Dictionary<FsmInput, FsmInput>(CommonEnumEqualityComparer<FsmInput>.Instance)
+        private static Dictionary<FsmInput, FsmInput> SimpleMap = new Dictionary<FsmInput, FsmInput>(CommonIntEnumEqualityComparer<FsmInput>.Instance)
         {
             { FsmInput.Sprint,              FsmInput.Run },
             { FsmInput.Walk,                FsmInput.Run },
@@ -137,5 +137,81 @@ namespace App.Shared.GameModules.Player.CharacterState
                 command.Type = mappedType;
             }
         }
+    }
+
+    abstract class AbstractBlockMoveStateFilter:AbstractStateFilter
+    {
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(AbstractBlockMoveStateFilter));
+        public override void Filter(IAdaptiveContainer<IFsmInputCommand> commands)
+        {
+            bool isFilter = false;
+            for (int i = 0; i < commands.Length; ++i)
+            {
+                isFilter |= Filter(commands[i]);
+            }
+
+            if (!isFilter)
+            {
+                var item = commands.GetAvailableItem();
+                item.Type = FsmInput.Idle;
+                //Logger.InfoFormat("create Idle because no idle");
+            }
+        }
+        
+        private static Dictionary<FsmInput, FsmInput> SimpleMap = new Dictionary<FsmInput, FsmInput>(CommonIntEnumEqualityComparer<FsmInput>.Instance)
+        {
+            { FsmInput.Sprint,              FsmInput.Idle },
+            { FsmInput.Walk,                FsmInput.Idle },
+            { FsmInput.Run,            FsmInput.Idle },
+            { FsmInput.Idle,            FsmInput.Idle },
+        };
+
+        private bool Filter(IFsmInputCommand command)
+        {
+            FsmInput mappedType;
+            if (SimpleMap.TryGetValue(command.Type, out mappedType))
+            {
+                //Logger.InfoFormat("convert from:{0} to:{1}", command.Type, mappedType);
+                command.Type = mappedType;
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    class JumpStateFilter:AbstractBlockMoveStateFilter
+    {
+        private static readonly FilterState _key = new FilterState { Posture = PostureInConfig.Jump };
+
+        protected override FilterState KeyState { get { return _key; } }
+    }
+
+    class ClimbStateFilter:AbstractBlockMoveStateFilter
+    {
+        private static readonly FilterState _key = new FilterState { Posture = PostureInConfig.Climb };
+
+        protected override FilterState KeyState { get { return _key; } }
+    }
+    
+    class ProneToCrouchStateFilter:AbstractBlockMoveStateFilter
+    {
+        private static readonly FilterState _key = new FilterState { Posture = PostureInConfig.ProneToCrouch };
+
+        protected override FilterState KeyState { get { return _key; } }
+    }
+    
+    class ProneToStandStateFilter:AbstractBlockMoveStateFilter
+    {
+        private static readonly FilterState _key = new FilterState { Posture = PostureInConfig.ProneToStand };
+
+        protected override FilterState KeyState { get { return _key; } }
+    }
+    
+    class ProneTransitStateFilter:AbstractBlockMoveStateFilter
+    {
+        private static readonly FilterState _key = new FilterState { Posture = PostureInConfig.ProneTransit };
+
+        protected override FilterState KeyState { get { return _key; } }
     }
 }

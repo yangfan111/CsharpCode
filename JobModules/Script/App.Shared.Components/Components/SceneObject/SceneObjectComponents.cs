@@ -225,7 +225,14 @@ namespace App.Shared.Components.SceneObject
         }
        
     }
+    [SceneObject]
+    public class AudioTestEmitterComponent : IComponent
+    {
+        public GameObject P1;
+        public GameObject P3;
+        [DontInitilize]public GameObject Self;
 
+    }
     [SceneObject,MapObject]
     public class RawGameObjectComponent : IComponent
     {

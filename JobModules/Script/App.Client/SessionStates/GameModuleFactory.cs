@@ -85,9 +85,9 @@ namespace App.Client.SessionStates
                 gameModule.AddModule(new ClientRobotModule(contexts));
             }
 
+            gameModule.AddSystem(new VisionCenterUpdateSystem(contexts));
             if (SingletonManager.Get<MapConfigManager>().SceneParameters is SceneConfig)
             {
-                gameModule.AddSystem(new VisionCenterUpdateSystem(contexts));
                 gameModule.AddSystem(new ClientAutoWorldShiftRenderSystem(contexts));
             }
 

@@ -75,10 +75,10 @@ namespace App.Shared.SceneManagement.Streaming
 
         #region ISceneResourceManager
 
-        public void UpdateOrigin(Vector3 value, OriginStatus status)
+        public void UpdateOrigin(Vector3 value)
         {
             _worldComposition.UpdateOrigin(value);
-            _streamingGo.UpdateOrigin(value, status);
+            _streamingGo.UpdateOrigin(value);
         }
 
         public void SetAsapMode(bool value)

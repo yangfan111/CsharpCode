@@ -115,6 +115,12 @@ namespace Core.CameraControl.NewMotor
             }
         }
 
+        public static bool TestChangeCurFrame(ICameraMotorState state, SubCameraMotorType type, int modeId)
+        {
+            var index = CalcuMotorNum(type, modeId);
+            return EnterAction[EnumToMask(index)];
+        }
+
         private static bool JudgeAction(CameraActionType type, int id)
         {
             if (type == CameraActionType.Enter)

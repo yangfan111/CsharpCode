@@ -5,25 +5,48 @@ public class DecalPolygon {
 	
 	public List<Vector3> vertices = new List<Vector3>(9);
 
-	public DecalPolygon(params Vector3[] vts) {
+    private const int POSITIVE_NUM = 9;
+    private static bool[] positive = new bool[POSITIVE_NUM];
+    private static DecalPolygon tempPolygon = new DecalPolygon();
+
+    public DecalPolygon(params Vector3[] vts) {
 		vertices.AddRange( vts );
 	}
 
-	public static DecalPolygon ClipPolygon (DecalPolygon polygon, Plane plane) {
-		bool[] positive = new bool[9];
-		int positiveCount = 0;
+    public void SetVts(params Vector3[] vts) {
+        vertices.AddRange(vts);
+    }
+
+    public void CopyFrom(DecalPolygon value) {
+        Clear();
+        vertices.AddRange(value.vertices);
+    }
+
+    public void Clear() {
+        vertices.Clear();
+    }
+
+    private static void ResetPositive() {
+        for (int i = 0; i < POSITIVE_NUM; i++) {
+            positive[i] = false;
+        }
+    }
+
+
+    public static bool ClipPolygon (ref DecalPolygon polygon, Plane plane) {
+        ResetPositive();
+        int positiveCount = 0;
 
 		for(int i = 0; i < polygon.vertices.Count; i++) {
 			positive[i] = !plane.GetSide( polygon.vertices[i] );
 			if(positive[i]) positiveCount++;
 		}
 		
-		if(positiveCount == 0) return null; // полностью за плоскостью
-		if(positiveCount == polygon.vertices.Count) return polygon; // полностью перед плоскостью
+		if(positiveCount == 0) return false;
+		if(positiveCount == polygon.vertices.Count) return true;
 
-		DecalPolygon tempPolygon = new DecalPolygon();
-
-		for(int i = 0; i < polygon.vertices.Count; i++) {
+        tempPolygon.Clear();
+        for (int i = 0; i < polygon.vertices.Count; i++) {
 			int next = i + 1;
 			 next %= polygon.vertices.Count;
 
@@ -39,8 +62,8 @@ public class DecalPolygon {
 				tempPolygon.vertices.Add( v );
 			}
 		}
-		
-		return tempPolygon;
+        polygon.CopyFrom(tempPolygon);
+        return true;
 	}
 
 	private static Vector3 LineCast(Plane plane, Vector3 a, Vector3 b) {

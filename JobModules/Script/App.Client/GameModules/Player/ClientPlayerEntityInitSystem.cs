@@ -1,4 +1,5 @@
 ﻿using App.Shared;
+using App.Shared.Components.Player;
 using Core.GameModule.System;
 using Core.Utils;
 using Entitas;
@@ -34,8 +35,9 @@ namespace App.Client.GameModules.Player
             player.WeaponController().AddAuxEffect();
 
             player.AddPlayerIntercept();
-            player.playerIntercept.InterceptKeys = new Shared.Components.Player.KeyTime();
-            player.playerIntercept.PresssKeys = new Shared.Components.Player.KeyTime();
+            player.playerIntercept.InterceptKeys = new KeyTime();
+            player.playerIntercept.PressKeys = new KeyTime();
+            player.playerIntercept.RealPressKeys = new KeyTime();
         }
     }
 }

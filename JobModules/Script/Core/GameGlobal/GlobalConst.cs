@@ -1,5 +1,6 @@
 ﻿using Assets.XmlConfig;
 using System;
+using UnityEngine;
 using XmlConfig;
 
 namespace Core
@@ -25,19 +26,32 @@ namespace Core
         public const int AudioEvt_BulletHit = 3039;
         public const int AudioEvt_BulletFly = 3038;
 
-        public  static float FireSpreadDuration = 0.5f;
+        public  static float FireSpreadDuration = 0.4f;
 
         public static bool EnableAudioLog = false;
         public static bool EnableWeaponLog = false;
+        //RTPC
+        public static float ModelCarEngine = 0f;
+        public static float NormalAttenuation = 1f;
+        public static float DifferentPlayerEffect = 0f;
+        public static float PlayerCamera = 0f;
+        public static float GunMagazineSpeed = 0f;
+        
+        
+        
+        
 
-
-        public static float MotionSpreadDuration = 0.5f;
+        public static float MotionSpreadDuration = 0.3f;
 
         public const int AimDefaultFov = 80;
 
         public static readonly int[] SilencerWeapons = new int[] {6, 8};
 
         public const float DefaultAudioFootstepInterval = 10f;
+
+
+        public static Vector3 ThrdEmitterDistanceDelta = new Vector3(0,0,5);
+        public static Vector3 FstEmitterDistanceDelta = new Vector3(0,0,3);
 
 //        //开镜打断
 //        public static readonly EPlayerState[] SightInterruptSimpleTypes =
@@ -51,5 +65,7 @@ namespace Core
 ////            EPlayerState.SwitchWeapon,
 //        };
 
+        public static Quaternion ThrdEmitterRotationDelta;
+        public static Quaternion FstEmitterRotationDelta;
     }
 }

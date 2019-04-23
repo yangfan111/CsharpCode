@@ -7,22 +7,33 @@ public class DecalBuilder {
 	private static List<Vector3> bufNormals = new List<Vector3>();
 	private static List<Vector2> bufTexCoords = new List<Vector2>();
 	private static List<int> bufIndices = new List<int>();
+    private static Plane right = new Plane(Vector3.right, Vector3.right / 2f);
+    private static Plane left = new Plane(-Vector3.right, -Vector3.right / 2f);
+    private static Plane top = new Plane(Vector3.up, Vector3.up / 2f);
+    private static Plane bottom = new Plane(-Vector3.up, -Vector3.up / 2f);
+    private static Plane front = new Plane(Vector3.forward, Vector3.forward / 2f);
+    private static Plane back = new Plane(-Vector3.forward, -Vector3.forward / 2f);
+    private static DecalPolygon poly = new DecalPolygon();
 
+    public static void BuildDecalForObject(GameObject decal, GameObject affectedObject, Texture2D texture) {
+        Mesh affectedMesh = null;
+        MeshCollider mc = affectedObject.GetComponent<MeshCollider>();
+        if (mc != null) {
+            affectedMesh = mc.sharedMesh;
+        }
+        if (affectedMesh == null) {
+            affectedMesh = GenarateTerrainMesh(affectedObject);
+         }
 
-	public static void BuildDecalForObject(GameObject decal, GameObject affectedObject, Texture2D texture) {
-		Mesh affectedMesh = affectedObject.GetComponent<MeshCollider>().sharedMesh;
-		if(affectedMesh == null) return;
+        if (affectedMesh == null) {
+            MeshFilter mf = affectedObject.GetComponent<MeshFilter>();
+            if (mf) {
+                affectedMesh = mf.sharedMesh;
+            }
+        }
+        if (affectedMesh == null) return;
 
 		float maxAngle = /*decal.maxAngle*/90.0f;
-
-		Plane right = new Plane( Vector3.right, Vector3.right/2f );
-		Plane left = new Plane( -Vector3.right, -Vector3.right/2f );
-
-		Plane top = new Plane( Vector3.up, Vector3.up/2f );
-		Plane bottom = new Plane( -Vector3.up, -Vector3.up/2f );
-
-		Plane front = new Plane( Vector3.forward, Vector3.forward/2f );
-		Plane back = new Plane( -Vector3.forward, -Vector3.forward/2f );
 
 		Vector3[] vertices = affectedMesh.vertices;
 		int[] triangles = affectedMesh.triangles;
@@ -45,27 +56,29 @@ public class DecalBuilder {
 
 			if( Vector3.Angle(-Vector3.forward, normal) >= maxAngle ) continue;
 
+            poly.Clear();
+            poly.SetVts(v1, v2, v3);
 
-			DecalPolygon poly = new DecalPolygon( v1, v2, v3 );
+            //DecalPolygon poly = new DecalPolygon();
+            //poly.SetVts(v1, v2, v3);
 
-			poly = DecalPolygon.ClipPolygon(poly, right);
-			if(poly == null) continue;
-			poly = DecalPolygon.ClipPolygon(poly, left);
-			if(poly == null) continue;
+            if (!DecalPolygon.ClipPolygon(ref poly, right))
+                continue;
+            if (!DecalPolygon.ClipPolygon(ref poly, left))
+                continue;
 
-			poly = DecalPolygon.ClipPolygon(poly, top);
-			if(poly == null) continue;
-			poly = DecalPolygon.ClipPolygon(poly, bottom);
-			if(poly == null) continue;
+            if (!DecalPolygon.ClipPolygon(ref poly, top)) {
+                continue;
+            }
+			if (!DecalPolygon.ClipPolygon(ref poly, bottom))
+                continue;
 
-			poly = DecalPolygon.ClipPolygon(poly, front);
-			if(poly == null) continue;
-			poly = DecalPolygon.ClipPolygon(poly, back);
-			if(poly == null) continue;
-
+            if (!DecalPolygon.ClipPolygon(ref poly, front))
+                continue;
+            if (!DecalPolygon.ClipPolygon(ref poly, back))
+                continue;
 			AddPolygon( poly, normal );
 		}
-
 		GenerateTexCoords(startVertexCount, texture);
 	}
 
@@ -127,9 +140,88 @@ public class DecalBuilder {
 			bufVertices[i] += normal * distance;
 		}
 	}
+    protected static Mesh GenarateTerrainMesh(GameObject terrainObj)
+    {
+        var terrain = terrainObj.GetComponent<Terrain>();
+        if (terrain == null)
+        {
+            return null;
+        }
 
+        var terrainData = terrain.terrainData;
+        if (terrainData == null)
+        {
+            return null;
+        }
 
-	public static Mesh CreateMesh() {
+        int vertexCountScale = 4;       // [dev] 将顶点数稀释 vertexCountScale*vertexCountScale 倍
+        int w = terrainData.heightmapWidth;
+        int h = terrainData.heightmapHeight;
+        Vector3 size = terrainData.size;
+        float[,,] alphaMapData = terrainData.GetAlphamaps(0, 0, terrainData.alphamapWidth, terrainData.alphamapHeight);
+        Vector3 meshScale = new Vector3(size.x / (w - 1f) * vertexCountScale, 1, size.z / (h - 1f) * vertexCountScale);
+        Vector2 uvScale = new Vector2(1f / (w - 1f), 1f / (h - 1f)) * vertexCountScale * (size.x / terrainData.splatPrototypes[0].tileSize.x);     // [dev] 此处有问题，若每个图片大小不一，则出问题。日后改善
+
+        w = (w - 1) / vertexCountScale + 1;
+        h = (h - 1) / vertexCountScale + 1;
+        Vector3[] vertices = new Vector3[w * h];
+        Vector2[] uvs = new Vector2[w * h];
+        Vector4[] alphasWeight = new Vector4[w * h];            // [dev] 只支持4张图片
+
+        // 顶点，uv，每个顶点每个图片所占比重
+        for (int i = 0; i < w; i++)
+        {
+            for (int j = 0; j < h; j++)
+            {
+                int index = j * w + i;
+                float z = terrainData.GetHeight(i * vertexCountScale, j * vertexCountScale);
+                vertices[index] = Vector3.Scale(new Vector3(i, z, j), meshScale);
+                uvs[index] = Vector2.Scale(new Vector2(i, j), uvScale);
+
+                // alpha map
+                int i2 = (int)(i * terrainData.alphamapWidth / (w - 1f));
+                int j2 = (int)(j * terrainData.alphamapHeight / (h - 1f));
+                i2 = Mathf.Min(terrainData.alphamapWidth - 1, i2);
+                j2 = Mathf.Min(terrainData.alphamapHeight - 1, j2);
+                var alpha0 = alphaMapData[j2, i2, 0];
+                var alpha1 = alphaMapData[j2, i2, 1];
+                var alpha2 = alphaMapData[j2, i2, 2];
+                var alpha3 = alphaMapData[j2, i2, 3];
+                alphasWeight[index] = new Vector4(alpha0, alpha1, alpha2, alpha3);
+            }
+        }
+
+        int[] triangles = new int[(w - 1) * (h - 1) * 6];
+        int triangleIndex = 0;
+        for (int i = 0; i < w - 1; i++)
+        {
+            for (int j = 0; j < h - 1; j++)
+            {
+                int a = j * w + i;
+                int b = (j + 1) * w + i;
+                int c = (j + 1) * w + i + 1;
+                int d = j * w + i + 1;
+
+                triangles[triangleIndex++] = a;
+                triangles[triangleIndex++] = b;
+                triangles[triangleIndex++] = c;
+
+                triangles[triangleIndex++] = a;
+                triangles[triangleIndex++] = c;
+                triangles[triangleIndex++] = d;
+            }
+        }
+
+        Mesh mesh = new Mesh();
+        mesh.vertices = vertices;
+        mesh.uv = uvs;
+        mesh.triangles = triangles;
+        mesh.tangents = alphasWeight;       // 将地形纹理的比重写入到切线中
+
+        return mesh;
+    }
+
+    public static Mesh CreateMesh() {
 		if(bufIndices.Count == 0) {
 			return null;
 		}

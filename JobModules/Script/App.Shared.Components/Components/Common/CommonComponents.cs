@@ -207,6 +207,7 @@ namespace App.Shared.Components.Common
     {
         public BoundingSphere HitPreliminaryGeo;
         public GameObject HitBoxGameObject;
+        public bool Enabled;
         public void Recycle(IUnityAssetManager assetManager)
         {
             UnityEngine.Object.Destroy(HitBoxGameObject);

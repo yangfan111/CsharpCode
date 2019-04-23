@@ -16,7 +16,6 @@ namespace App.Shared.Components.Weapon
     {
         [NetworkProperty] public List<WeaponBagContainer> WeaponBags;
         [NetworkProperty, DontInitilize] public int HeldBagPointer;
-        [NetworkProperty, DontInitilize] public int HeldBagPointer2;
 
 
         public WeaponBagContainer this[int bagIndex]
@@ -25,7 +24,7 @@ namespace App.Shared.Components.Weapon
             {
                 AssertUtility.Assert(bagIndex < WeaponBags.Count);
                 if (bagIndex < 0)
-                    bagIndex = HeldBagPointer;
+                    bagIndex = 0;
                 return WeaponBags[bagIndex];
             }
         }
@@ -110,7 +109,7 @@ namespace App.Shared.Components.Weapon
         //}
         public void ClearPointer()
         {
-            HeldBagPointer2 = 0;
+            HeldBagPointer = 0;
             WeaponBags[0].ClearPointer();
         }
 
@@ -119,17 +118,17 @@ namespace App.Shared.Components.Weapon
 
         public int HeldSlotIndex
         {
-            get { return WeaponBags[HeldBagPointer].HeldSlotPointer; }
+            get { return WeaponBags[0].HeldSlotPointer; }
         }
 
         public int LastSlotIndex
         {
-            get { return WeaponBags[HeldBagPointer].LastSlotPointer; }
+            get { return WeaponBags[0].LastSlotPointer; }
         }
 
         public WeaponBagContainer HeldBagContainer
         {
-            get { return WeaponBags[HeldBagPointer]; }
+            get { return WeaponBags[0]; }
         }
 
         #endregion

@@ -34,6 +34,10 @@ namespace App.Shared.Player
             {
                 message.WeaponAvatarIds.Add(id);
             }
+            foreach (var id in info.SprayLacquers)
+            {
+                message.SprayLacquers.Add(id);
+            }
           
             foreach (var bag in info.WeaponBags)
             {
@@ -73,6 +77,8 @@ namespace App.Shared.Player
             info.AvatarIds.AddRange(message.AvatarIds);
             info.WeaponAvatarIds =new List<int>();
             info.WeaponAvatarIds.AddRange(message.WeaponAvatarIds);
+            info.SprayLacquers = new List<int>();
+            info.SprayLacquers.AddRange(message.SprayLacquers);
             info.WeaponBags = new Core.Room.PlayerWeaponBagData[message.WeaponBags.Count];
             for (var i = message.WeaponBags.Count - 1; i >= 0; i--)
             {

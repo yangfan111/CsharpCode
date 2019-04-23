@@ -64,6 +64,9 @@ namespace Core.CharacterState.Action
         Drive,                          // 21
         Sight,                          // 22
         Rescue,                         // 23
+        
+        TransfigurationStart,
+        TransfigurationFinish,
 
         EnumEnd
     }

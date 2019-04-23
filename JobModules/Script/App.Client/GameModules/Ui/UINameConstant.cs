@@ -51,6 +51,8 @@ namespace Assets.App.Client.GameModules.Ui
         public const string CommonTeam = "CommonTeam";
         public const string CommonSplitModel = "CommonSplitModel";
         public const string CommonSuoDuModel = "CommonSuoDuModel";
+        public const string ChickenBagModel = "ChickenBagModel";
+        public const string ChickenPlaneModel = "ChickenPlaneModel";
         #endregion
         #region Blast
         public const string BlastScoreModel = "BlastScoreModel";

@@ -123,6 +123,7 @@ namespace App.Shared
             int ret = 0;
             foreach (var bagData in playerInfoComponent.WeaponBags)
             {
+                if(bagData == null ||bagData.weaponList == null) continue;
                 if (bagData.weaponList != null && bagData.weaponList.Count > 0)
                     ret = Math.Min(ret, bagData.BagIndex);
             }

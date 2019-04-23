@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +18,35 @@ namespace Core.CharacterState.Posture.States
         {
 			InitSpecial();
             InitCommon();
+            
+            #region jumpstart to stand
+
+            AddTransition(
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.MiddleEnterLadder) || 
+                        command.IsMatch(FsmInput.EnterLadder))
+                    {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.JumpStartHash,
+                            AnimatorParametersHash.Instance.JumpStartName,
+                            AnimatorParametersHash.Instance.JumpStartDisable,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FreeFallHash,
+                            AnimatorParametersHash.Instance.FreeFallName,
+                            AnimatorParametersHash.Instance.FreeFallDisable,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+
+                        return true;
+                    }
+                    return false;
+                },
+                (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                (int)PostureStateId.Ladder, null, 0, new[] { FsmInput.MiddleEnterLadder, FsmInput.EnterLadder });
+
+            #endregion
         }
 
         private void InitSpecial()
@@ -136,7 +165,7 @@ namespace Core.CharacterState.Posture.States
 
         public override void DoBeforeEntering(IFsmInputCommand command, Action<FsmOutput> addOutput)
         {
-            FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerJumpHeight, SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand).Height);
+            FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerJumpHeight, _characterInfo.GetStandCapsule().Height);
             addOutput(FsmOutput.Cache);
             base.DoBeforeEntering(command, addOutput);
         }

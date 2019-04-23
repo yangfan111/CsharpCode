@@ -1,16 +1,7 @@
 ﻿using App.Client.GameModules.GamePlay.Free.Player;
-using App.Shared.FreeFramework.framework.ai.move;
-using Core.GameModule.Interface;
-using Core.Prediction.UserPrediction.Cmd;
-using Core.SessionState;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using com.wd.free.ai;
-using App.Shared;
 using App.Shared.FreeFramework.framework.ai.player;
+using Core.SessionState;
+using System.Collections.Generic;
 
 namespace App.Client.GameModules.GamePlay.Free.Entitas
 {

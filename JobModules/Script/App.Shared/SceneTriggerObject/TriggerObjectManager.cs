@@ -57,7 +57,6 @@ namespace App.Shared.SceneTriggerObject
     {
         private ITriggerObjectInternalManger[] _managers = new ITriggerObjectInternalManger[(int)ETriggerObjectType.MaxCount];
         private List<ITriggerObjectListener>[] _gameObjectListener = new List<ITriggerObjectListener>[(int)ETriggerObjectType.MaxCount];
-
         
         public TriggerObjectManager()
         {

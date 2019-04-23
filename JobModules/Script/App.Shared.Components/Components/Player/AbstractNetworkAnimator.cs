@@ -24,8 +24,21 @@ namespace App.Shared.Components.Player
         [NetworkProperty]
         public List<NetworkAnimatorLayer> AnimatorLayers;
 
+        private List<NetworkAnimatorParameter> _animatorParameters;
         [NetworkProperty]
-        public List<NetworkAnimatorParameter> AnimatorParameters;
+        public List<NetworkAnimatorParameter> AnimatorParameters
+        {
+            set
+            {
+                _animatorParameters = value;
+                _animatorParameterIndex = null;
+            }
+
+            get
+            {
+                return _animatorParameters;
+            }
+        }
         
         private Dictionary<int, int> _animatorParameterIndex;
         public Dictionary<int, int> AnimatorParameterIndex

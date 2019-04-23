@@ -72,6 +72,7 @@
     <Compile Include="Components\FreeMove\UnityGameObjectComponent.cs" />
     <Compile Include="Components\GameRules.cs" />
     <Compile Include="Components\GenericActions\IGenericAction.cs" />
+    <Compile Include="Components\GenericActions\ILadderAction.cs" />
     <Compile Include="Components\Oxygen\IOxygenEnergy.cs" />
     <Compile Include="Components\Oxygen\IPredictedOxygenState.cs" />
     <Compile Include="Components\Player\AbstractNetworkAnimator.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Components\Player\CameraComponent.cs" />
     <Compile Include="Components\Player\CharacterBoneComponent.cs" />
     <Compile Include="Components\Player\CharacterContollerComponent.cs" />
+    <Compile Include="Components\Player\CharacterInfoComponent.cs" />
     <Compile Include="Components\Player\CommonResourceComponent.cs" />
     <Compile Include="Components\Player\ControlledVehicleComponent.cs" />
     <Compile Include="Components\Player\FirePosition.cs" />
@@ -139,7 +141,6 @@
     <Compile Include="Components\Serializer\FieldSerializer\FloatSerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\IFieldSerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\IntSerializer.cs" />
-    <Compile Include="Components\Serializer\FieldSerializer\InterruptSerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\LongSerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\QuaternionSerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\ShortSerialize.cs" />
@@ -169,6 +170,7 @@
     <Compile Include="Components\Ui\CrossHairHurtedData.cs" />
     <Compile Include="Components\Ui\FrontComponent.cs" />
     <Compile Include="Components\Ui\GroupComponent.cs" />
+    <Compile Include="Components\Ui\IChickenBagItemData.cs" />
     <Compile Include="Components\Ui\ICountdownTipData.cs" />
     <Compile Include="Components\Ui\IGroupBattleData.cs" />
     <Compile Include="Components\Ui\IKillInfoItem.cs" />
@@ -205,7 +207,7 @@
     <Compile Include="Components\Vehicle\VehicleSyncEventComponent.cs" />
     <Compile Include="Components\Vehicle\VehicleTypeComponent.cs" />
     <Compile Include="Components\Weapon\PlayerWeapon\GrenadeCacheDataComponent.cs" />
-    <Compile Include="Components\Weapon\PlayerWeapon\PlayerClientEventsUpdateComponent.cs" />
+    <Compile Include="Components\Weapon\PlayerWeapon\PlayerClientUpdateComponent.cs" />
     <Compile Include="Components\Weapon\PlayerWeapon\PlayerWeaponAmmunitionComponent.cs" />
     <Compile Include="Components\Weapon\PlayerWeapon\PlayerWeaponBagSetComponent.cs" />
     <Compile Include="Components\Weapon\PlayerWeapon\PlayerWeaponCustomizeComponent.cs" />

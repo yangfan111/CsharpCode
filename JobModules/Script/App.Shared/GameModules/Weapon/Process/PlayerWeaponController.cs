@@ -6,11 +6,13 @@ using Core.Attack;
 using Core.Room;
 using Core.Utils;
 using System;
+using System.ArrayExtensions;
 using System.Collections.Generic;
 using App.Shared.Components.Player;
 using Utils.Appearance;
 using Utils.Configuration;
 using Utils.Singleton;
+using Utils.Utils;
 using WeaponConfigNs;
 using XmlConfig;
 
@@ -52,7 +54,7 @@ namespace App.Shared.GameModules.Weapon
             if (!processHelper.FilterSameSpecies(slot) || !processHelper.FilterSlotValied(slot))
                 return;
             //把当前的一些枪械状态重置掉
-            HeldWeaponAgent.ResetDynamic();
+            HeldWeaponAgent.StoreDynamic();
             var lastWeapon       = HeldWeaponAgent.ComponentScan;
             var destWeapon       = GetWeaponAgent(slot).ComponentScan;
             var appearanceStruct = processHelper.GetDrawAppearanceStruct(slot);
@@ -88,7 +90,7 @@ namespace App.Shared.GameModules.Weapon
         {
             if (IsHeldSlotEmpty)
                 return EWeaponSlotType.None;
-            HeldWeaponAgent.ResetDynamic();
+            HeldWeaponAgent.StoreDynamic();
             var holdSlot = HeldSlotType;
             if (includeAction)
             {
@@ -100,6 +102,8 @@ namespace App.Shared.GameModules.Weapon
             }
             return holdSlot;
         }
+
+     
 
         public bool DropWeapon(EWeaponSlotType slotType = EWeaponSlotType.Pointer)
         {
@@ -264,7 +268,6 @@ namespace App.Shared.GameModules.Weapon
             }
             else
             {
-                int lastWeapon = HeldConfigId;
                 ArmWeapon(in_slot, true);
             }
         }
@@ -301,33 +304,19 @@ namespace App.Shared.GameModules.Weapon
             onWeaponExpendEvt(this, HeldSlotType);
         }
 
-        #endregion
+      
 
 
         public void SwitchBag(int index)
         {
             int length = ModeController.GetUsableWeapnBagLength(RelatedPlayerInfo);
-            if (index == HeldBagPointer2) return;
-            HeldBagPointer2 = index;
+            if (index == HeldBagPointer) return;
             List<PlayerWeaponBagData> bagDatas = ModeController.FilterSortedWeaponBagDatas(RelatedPlayerInfo);
             if (bagDatas == null || bagDatas.Count <= index) return;
-            PlayerWeaponBagData tarBag = null;
-            foreach (var bagData in bagDatas)
-            {
-                if (bagData.BagIndex == index)
-                {
-                    tarBag = bagData;
-                    break;
-                }
-            }
-
+            PlayerWeaponBagData tarBag = bagDatas.Find(bag=>bag.BagIndex == index);
             if (tarBag == null) return;
-            var removedList = new List<EWeaponSlotType>();
-            for (EWeaponSlotType j = EWeaponSlotType.None + 1; j < EWeaponSlotType.Length; j++)
-            {
-                if (j != EWeaponSlotType.ThrowingWeapon && j != EWeaponSlotType.TacticWeapon)
-                    removedList.Add(j);
-            }
+            HeldBagPointer = index;
+            var removedSlotList = new Byte[(int) EWeaponSlotType.Length];
 
             DestroyWeapon(EWeaponSlotType.ThrowingWeapon, 0);
             RefreshWeaponAppearance(EWeaponSlotType.ThrowingWeapon);
@@ -337,7 +326,6 @@ namespace App.Shared.GameModules.Weapon
                 var slot = PlayerWeaponBagData.Index2Slot(weapon.Index);
 
                 var weaponAllConfig = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(weapon.WeaponTplId);
-                var weaponType      = (EWeaponType_Config) weaponAllConfig.NewWeaponCfg.Type;
                 if (slot != EWeaponSlotType.ThrowingWeapon && slot != EWeaponSlotType.TacticWeapon)
                 {
                     var orient = WeaponUtil.CreateScan(weapon);
@@ -357,17 +345,15 @@ namespace App.Shared.GameModules.Weapon
                     GrenadeHandler.AddCache(weapon.WeaponTplId);
                 }
 
-                removedList.Remove(slot);
+                removedSlotList[(int)slot] =1;
             }
-
-            removedList.Remove(EWeaponSlotType.TacticWeapon);
-            removedList.Remove(EWeaponSlotType.ThrowingWeapon);
-
-            foreach (var i in removedList)
+            removedSlotList[(int)EWeaponSlotType.TacticWeapon]=1;
+            removedSlotList[(int)EWeaponSlotType.ThrowingWeapon] = 1;
+            for (int i = 1; i < removedSlotList.Length; i++)
             {
-                DestroyWeapon(i, 0);
+                if(removedSlotList[i]==0)
+                    DestroyWeapon((EWeaponSlotType)i, 0);
             }
-
             EWeaponSlotType newSlot = PollGetLastSlotType();
             TryHoldGrenade(true, false);
             TryArmWeaponImmediately(newSlot);
@@ -379,21 +365,21 @@ namespace App.Shared.GameModules.Weapon
             if (CanSwitchWeaponBag)
             {
                 int length = ModeController.GetUsableWeapnBagLength(RelatedPlayerInfo);
-                SwitchBag((HeldBagPointer2 + 1) % length);
+                SwitchBag((HeldBagPointer + 1) % length);
             }
         }
 
         public void InitBag(int pointer)
         {
             ClearBagPointer();
-            HeldBagPointer2 = pointer;
+            HeldBagPointer = pointer;
         }
-
+        #endregion
         public bool ReplaceWeaponToSlot(EWeaponSlotType slotType, WeaponScanStruct orient)
         {
             if (TryHoldGrenade(orient.ConfigId))
                 return true;
-            return ReplaceCommonWeapon(slotType, orient, HeldBagPointer);
+            return ReplaceCommonWeapon(slotType, orient, 0);
         }
 
         public bool ReplaceWeaponToSlot(EWeaponSlotType slotType, int bagIndex, WeaponScanStruct orient)
@@ -406,9 +392,8 @@ namespace App.Shared.GameModules.Weapon
         private bool ReplaceCommonWeapon(EWeaponSlotType slotType, WeaponScanStruct orient, int bagIndex)
         {
             //  if (vertify)
-            bagIndex = 0;
             if (!processHelper.FilterVailed(orient, slotType)) return false;
-            bool refreshAppearance = (bagIndex == HeldBagPointer || bagIndex < 0);
+            bool refreshAppearance = true;
             //特殊全局性武器只取武器背包第0个索引值
             var                      weaponAgent   = GetWeaponAgent(slotType);
             WeaponPartsRefreshStruct refreshParams = new WeaponPartsRefreshStruct();
@@ -656,7 +641,7 @@ namespace App.Shared.GameModules.Weapon
 
         private void RefreshHeldWeapon()
         {
-            RelatedOrient.Reset();
+            RelatedOrientation.Reset();
 
             if (IsHeldSlotEmpty)
                 return;
@@ -679,16 +664,6 @@ namespace App.Shared.GameModules.Weapon
         public void InternalUpdate(PlayerEntity player)
         {
           
-//          if (player.characterBone.IsWeaponRotState && RelatedCameraSNew.IsAiming())
-//          {
-//              AddRotStateInterrupt();
-//          }
-//
-//          if (RelatedCharState.IsProneMovement() && RelatedCameraSNew.IsAiming())
-//          {
-//              AddProneMoveStateInterrupt();
-//          }
-          //DebugUtil.MyLog("PullBoltEnd:"+HeldWeaponAgent.ClientSyncComponent.PullBoltEnd+"IsPullingBolt:"+HeldWeaponAgent.ClientSyncComponent.IsPullingBolt);
             if (!HeldWeaponAgent.IsValid() && HeldSlotType != EWeaponSlotType.None)
                 SetHeldSlotType(EWeaponSlotType.None);
             if (WeaponServerUpdate.UpdateHeldAppearance)

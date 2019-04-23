@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F68B420E-62A0-6ABF-2B22-0E1F97F566F0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Utils</RootNamespace>
+    <AssemblyName>Utils</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Dll.Temp\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\build_obj_dir\Release\Utils\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Dll.Temp\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\build_obj_dir\Debug\Utils\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Entitas">
+      <HintPath>..\CommonLibs\Entitas.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\CommonLibs\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEditor.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Appearance\AdaptiveContainerImpl.cs" />
+    <Compile Include="Appearance\AppearanceSpecification.cs" />
+    <Compile Include="Appearance\AppearanceUtils.cs" />
+    <Compile Include="Appearance\Bone\BoneMount.cs" />
+    <Compile Include="Appearance\Bone\BoneName.cs" />
+    <Compile Include="Appearance\Bone\BoneRigging.cs" />
+    <Compile Include="Appearance\Bone\BoneTool.cs" />
+    <Compile Include="Appearance\Bone\IBoneRigging.cs" />
+    <Compile Include="Appearance\CharacterSpecification.cs" />
+    <Compile Include="Appearance\HallReplaceMaterialShader.cs" />
+    <Compile Include="Appearance\IAdaptiveContainer.cs" />
+    <Compile Include="Appearance\IAppearanceState.cs" />
+    <Compile Include="Appearance\ICharacterLoadResource.cs" />
+    <Compile Include="Appearance\IFirstPersonSight.cs" />
+    <Compile Include="Appearance\ManagerPackage\AppearanceManagerBase.cs" />
+    <Compile Include="Appearance\ManagerPackage\HallAppearanceManager.cs" />
+    <Compile Include="Appearance\OverrideAnimator.cs" />
+    <Compile Include="Appearance\PropItem\HallPropController.cs" />
+    <Compile Include="Appearance\PropItem\PropControllerBase.cs" />
+    <Compile Include="Appearance\ReplaceMaterialShaderBase.cs" />
+    <Compile Include="Appearance\Script\HitBoxCache.cs" />
+    <Compile Include="Appearance\Script\PlayerIK.cs" />
+    <Compile Include="Appearance\Script\TransformCache.cs" />
+    <Compile Include="Appearance\ThirdPersonAppearance.cs" />
+    <Compile Include="Appearance\WardrobePackage\CharacterAvatar.cs" />
+    <Compile Include="Appearance\WardrobePackage\HallWardrobeController.cs" />
+    <Compile Include="Appearance\WardrobePackage\MaterialHelper.cs" />
+    <Compile Include="Appearance\WardrobePackage\WardrobeControllerBase.cs" />
+    <Compile Include="Appearance\WardrobePackage\WardrobeParam.cs" />
+    <Compile Include="Appearance\Weapon\HallWeaponController.cs" />
+    <Compile Include="Appearance\Weapon\IWeaponModelAssemblyController.cs" />
+    <Compile Include="Appearance\Weapon\IWeaponModelController.cs" />
+    <Compile Include="Appearance\Weapon\IWeaponModelLoadController.cs" />
+    <Compile Include="Appearance\Weapon\IWeaponModelLoader.cs" />
+    <Compile Include="Appearance\Weapon\WeaponControllerBase.cs" />
+    <Compile Include="Appearance\Weapon\WeaponModelAssemblyController.cs" />
+    <Compile Include="Appearance\Weapon\WeaponModelController.cs" />
+    <Compile Include="Appearance\Weapon\WeaponModelControllerFactory.cs" />
+    <Compile Include="Appearance\Weapon\WeaponModelLoadController.cs" />
+    <Compile Include="Appearance\Weapon\WeaponModelLoader.cs" />
+    <Compile Include="Appearance\Weapon\WeaponTypeConvertUtil.cs" />
+    <Compile Include="AssetManager\AssetBundleStat.cs" />
+    <Compile Include="AssetManager\AssetInfo.cs" />
+    <Compile Include="AssetManager\Converter\ILoadRequestConverter.cs" />
+    <Compile Include="AssetManager\Converter\SpriteConverter.cs" />
+    <Compile Include="AssetManager\Converter\UnityObjectWrapperConverter.cs" />
+    <Compile Include="AssetManager\Converter\XmlConverter.cs" />
+    <Compile Include="AssetManager\DefaultGo.cs" />
+    <Compile Include="AssetManager\LoadRequest.cs" />
+    <Compile Include="AssetManager\LoadRequestProfile.cs" />
+    <Compile Include="AssetManager\SceneRequest.cs" />
+    <Compile Include="AssetManager\UnityAssetManager.cs" />
+    <Compile Include="AssetManager\UnityObject.cs" />
+    <Compile Include="AssetManager\UnityObjectPool.cs" />
+    <Compile Include="AssetManager\UnityObjectWrapper.cs" />
+    <Compile Include="Compare\CompareUtility.cs" />
+    <Compile Include="Compare\IComparableComponent.cs" />
+    <Compile Include="Concurrent\BlockingQueue.cs" />
+    <Compile Include="Configuration\AbstractConfigManager.cs" />
+    <Compile Include="Configuration\AudioConfigManagers.cs" />
+    <Compile Include="Configuration\AvatarAssetConfigManager.cs" />
+    <Compile Include="Configuration\AvatarSkinConfigManager.cs" />
+    <Compile Include="Configuration\CardConfigManager.cs" />
+    <Compile Include="Configuration\CharacterInfoManager.cs" />
+    <Compile Include="Configuration\CharacterStateConfigManager.cs" />
+    <Compile Include="Configuration\ChatConfigManager.cs" />
+    <Compile Include="Configuration\EnvironmentTypeConfigManager.cs" />
+    <Compile Include="Configuration\FirstPersonOffsetConfigManager.cs" />
+    <Compile Include="Configuration\GameItemConfigManager.cs" />
+    <Compile Include="Configuration\GameModeConfigManager.cs" />
+    <Compile Include="Configuration\IndividuationConfigManager.cs" />
+    <Compile Include="Configuration\InputBlockConfigManager.cs" />
+    <Compile Include="Configuration\ItemBaseConfigManager.cs" />
+    <Compile Include="Configuration\KillFeedBackConfigManager.cs" />
+    <Compile Include="Configuration\LoadingTipConfigManager.cs" />
+    <Compile Include="Configuration\MeleeAttackCDConfigManager.cs" />
+    <Compile Include="Configuration\PropConfigManager.cs" />
+    <Compile Include="Configuration\RaycastActionConfigManager.cs" />
+    <Compile Include="Configuration\RoleAvatarConfigManager.cs" />
+    <Compile Include="Configuration\RoleConfigManager.cs" />
+    <Compile Include="Configuration\StateTransitionConfigManager.cs" />
+    <Compile Include="Configuration\TypeForDeathConfigManager.cs" />
+    <Compile Include="Configuration\VideoSettingConfigManager.cs" />
+    <Compile Include="Configuration\WeaponAvatarConfigManager.cs" />
+    <Compile Include="Configuration\WeaponConfigManagement.cs" />
+    <Compile Include="Configuration\WeaponPartSurvivalConfigManager.cs" />
+    <Compile Include="Configuration\WeaponPartsConfigManager.cs" />
+    <Compile Include="Configuration\WeaponPropertyConfigManager.cs" />
+    <Compile Include="Configuration\WeaponResourceConfigManager.cs" />
+    <Compile Include="GameObjectPool\DictionaryExtension.cs" />
+    <Compile Include="GameObjectPool\MonoBehaviourSingleton.cs" />
+    <Compile Include="GameObjectPool\ObjectPool.cs" />
+    <Compile Include="ICoRoutineManager.cs" />
+    <Compile Include="MyProfiler\MyProfilerManager.cs" />
+    <Compile Include="Network\AbstractNetowrkChannel.cs" />
+    <Compile Include="Network\AbstractNetworkService.cs" />
+    <Compile Include="Network\Binary.cs" />
+    <Compile Include="Network\ChannelWorker.cs" />
+    <Compile Include="Network\DeserializeThread.cs" />
+    <Compile Include="Network\IMessageTypeInfo.cs" />
+    <Compile Include="Network\INetworkChannel.cs" />
+    <Compile Include="Network\INetworkClient.cs" />
+    <Compile Include="Network\INetworkClientFactory.cs" />
+    <Compile Include="Network\INetworkMessageSerializer.cs" />
+    <Compile Include="Network\INetworkServer.cs" />
+    <Compile Include="Network\INetworkServerFactory.cs" />
+    <Compile Include="Network\ISerializeInfo.cs" />
+    <Compile Include="Network\NetworkClient.cs" />
+    <Compile Include="Network\NetworkMessageDispatcher.cs" />
+    <Compile Include="Network\NetworkMessageItem.cs" />
+    <Compile Include="Network\NetworkMessageSerializer.cs" />
+    <Compile Include="Network\PollServiceThread.cs" />
+    <Compile Include="Network\SerializeAndDeserializeThread.cs" />
+    <Compile Include="Network\SerializeThread.cs" />
+    <Compile Include="Network\VNet\Base\Interface\IRealTimeConnector.cs" />
+    <Compile Include="Network\VNet\Base\Interface\IVNetClient.cs" />
+    <Compile Include="Network\VNet\Base\Interface\IVNetPeer.cs" />
+    <Compile Include="Network\VNet\Base\Interface\IVNetServer.cs" />
+    <Compile Include="Network\VNet\Base\LiteNet\LiteNetClient.cs" />
+    <Compile Include="Network\VNet\Base\LiteNet\LiteNetPeer.cs" />
+    <Compile Include="Network\VNet\Base\LiteNet\LiteNetServer.cs" />
+    <Compile Include="Network\VNet\Base\Tcp\TcpClient.cs" />
+    <Compile Include="Network\VNet\Base\Tcp\TcpConnection.cs" />
+    <Compile Include="Network\VNet\Base\Tcp\TcpServer.cs" />
+    <Compile Include="Network\VNet\Base\Tcp\TcpService.cs" />
+    <Compile Include="Network\VNet\Base\Udp\UdpClient.cs" />
+    <Compile Include="Network\VNet\Base\Udp\UdpPeer.cs" />
+    <Compile Include="Network\VNet\Base\Udp\UdpServer.cs" />
+    <Compile Include="Network\VNet\Base\Udp\UdpService.cs" />
+    <Compile Include="Network\VNet\VNetPacket.cs" />
+    <Compile Include="Network\VNet\VNetPacketMemSteam.cs" />
+    <Compile Include="Network\VNet\VNetworkChannel.cs" />
+    <Compile Include="Network\VNet\VNetworkClient.cs" />
+    <Compile Include="Network\VNet\VNetworkClientFactory.cs" />
+    <Compile Include="Network\VNet\VNetworkMessageItem.cs" />
+    <Compile Include="Network\VNet\VNetworkServer.cs" />
+    <Compile Include="Network\VNet\VNetworkServerFactory.cs" />
+    <Compile Include="Network\VNet\VNetworkService.cs" />
+    <Compile Include="ObjectPool\AbstractObjectFactory.cs" />
+    <Compile Include="ObjectPool\AbstractReferenceCountedObject.cs" />
+    <Compile Include="ObjectPool\DefaultObjectFactory.cs" />
+    <Compile Include="ObjectPool\IObjectAllocator.cs" />
+    <Compile Include="ObjectPool\IObjectFactory.cs" />
+    <Compile Include="ObjectPool\IRefCounter.cs" />
+    <Compile Include="ObjectPool\IReusableObject.cs" />
+    <Compile Include="ObjectPool\ObjectActivatorFactory.cs" />
+    <Compile Include="ObjectPool\ObjectAllocatorHolder.cs" />
+    <Compile Include="ObjectPool\ObjectAllocators.cs" />
+    <Compile Include="ObjectPool\RefCounter.cs" />
+    <Compile Include="ObjectPool\RingBufferObjectAllocator.cs" />
+    <Compile Include="SettingManager\AllVideoSettingHelper.cs" />
+    <Compile Include="SettingManager\SettingManager.cs" />
+    <Compile Include="SettingManager\VideoSettingManager.cs" />
+    <Compile Include="Singleton\SingletonManager.cs" />
+    <Compile Include="Utils\AbstractThread.cs" />
+    <Compile Include="Utils\ArrayUtility.cs" />
+    <Compile Include="Utils\BitArrayWrapper.cs" />
+    <Compile Include="Utils\BitSet32.cs" />
+    <Compile Include="Utils\Buildin\HashHelpers.cs" />
+    <Compile Include="Utils\Buildin\MyBinaryReader.cs" />
+    <Compile Include="Utils\Buildin\MyBinaryWriter.cs" />
+    <Compile Include="Utils\Buildin\MyDictionary.cs" />
+    <Compile Include="Utils\Buildin\MyLinkedList.cs" />
+    <Compile Include="Utils\Buildin\SpinWait.cs" />
+    <Compile Include="Utils\Buildin\ThrowHelper.cs" />
+    <Compile Include="Utils\CSharpRandom.cs" />
+    <Compile Include="Utils\CmdParser.cs" />
+    <Compile Include="Utils\CommonEnumEqualityComparer.cs" />
+    <Compile Include="Utils\CommonMathUtil.cs" />
+    <Compile Include="Utils\ConsumerThread.cs" />
+    <Compile Include="Utils\CopyUtil.cs" />
+    <Compile Include="Utils\DebugConfig.cs" />
+    <Compile Include="Utils\DebugDraw.cs" />
+    <Compile Include="Utils\DebugUtil.cs" />
+    <Compile Include="Utils\DurationHelp.cs" />
+    <Compile Include="Utils\EulerUtility.cs" />
+    <Compile Include="Utils\ExtDeubg.cs" />
+    <Compile Include="Utils\IEnumerableExt.cs" />
+    <Compile Include="Utils\IntersectionDetectTool.cs" />
+    <Compile Include="Utils\MatrixExt.cs" />
+    <Compile Include="Utils\ObjectExtensions.cs" />
+    <Compile Include="Utils\QuaternionExt.cs" />
+    <Compile Include="Utils\RaycastUtility.cs" />
+    <Compile Include="Utils\ReadWriteList.cs" />
+    <Compile Include="Utils\ReusableList.cs" />
+    <Compile Include="Utils\RingBuffer.cs" />
+    <Compile Include="Utils\RuntimeDebugDraw.cs" />
+    <Compile Include="Utils\StringExt.cs" />
+    <Compile Include="Utils\TransformExtension.cs" />
+    <Compile Include="Utils\Tuple.cs" />
+    <Compile Include="Utils\UniformRandom.cs" />
+    <Compile Include="Utils\UnityDebugAppender.cs" />
+    <Compile Include="Utils\UnityLogCapturer.cs" />
+    <Compile Include="Utils\UniversalConsts.cs" />
+    <Compile Include="Utils\Vector3Ext.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LiteNetLib\LiteNetLib.csproj">
+      <Project>{B1B5C059-9D6D-02A7-0675-DB02F24B9D97}</Project>
+      <Name>LiteNetLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shared.Scripts\Shared.Scripts.csproj">
+      <Project>{D2164AE1-BEE4-3DE7-A778-AE0D93E5194C}</Project>
+      <Name>Shared.Scripts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XmlConfig\XmlConfig.csproj">
+      <Project>{CCFBDCB2-3866-9129-81A4-42CFED4D6F7E}</Project>
+      <Name>XmlConfig</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AssetBundleManager\AssetBundleManager.csproj">
+      <Project>{BA76FEAD-A65A-BF03-0FBB-B956FBBDA985}</Project>
+      <Name>AssetBundleManager</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

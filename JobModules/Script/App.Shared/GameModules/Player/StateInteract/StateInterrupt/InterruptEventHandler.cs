@@ -21,6 +21,11 @@ namespace App.Shared.GameModules.Player
         {
             interruptState = EInterruptState.Closed;
         }
+
+        public bool IsInterrupted()
+        {
+            return interruptState == EInterruptState.WaitRecover;
+        }
         public void ResisterEmitter(InterruptEmitter emitter)
         {
             emitter.SetHanlder(this);
@@ -82,7 +87,7 @@ namespace App.Shared.GameModules.Player
         {
             DebugUtil.MyLog("Recover");
 
-            if (!filterFunc())
+            if (!filterFunc() && recoverAction != null)
                 recoverAction();
         }
     }
@@ -112,4 +117,31 @@ namespace App.Shared.GameModules.Player
 
        
     }
+//    public class PullboltHandler : InterruptEventHandler
+//    {
+//        public PullboltHandler (PlayerEntity playerEntity) : base(playerEntity)
+//        {
+//            var weaponController = playerEntity.WeaponController();
+//            interruptAction = () =>  weaponController.HeldWeaponAgent.InterruptPullBolt();
+////            recoverAction   = () => playerEntity.StateInteractController().UserInput.SetInput(EPlayerInput.IsCameraFocus, true);
+//            filterFunc = () => weaponController.HeldWeaponAgent.RunTimeComponent.IsPullingBolt;
+//        }
+//
+//       
+//    }
+//    
+    
+//    public class PullBoltHandler : InterruptEventHandler
+//    {
+//        private EWeaponSlotType recoveredSlotType;
+//        public PullBoltHandler (PlayerEntity playerEntity) : base(playerEntity)
+//        {
+//            var weaponController = playerEntity.WeaponController();
+//            interruptAction = () =>  recoveredSlotType = weaponController.UnArmWeapon(false);
+//            recoverAction   = () =>  weaponController.ArmWeapon(recoveredSlotType,true);
+//            filterFunc      = () =>  !weaponController.IsHeldSlotEmpty;
+//        }
+//
+//       
+//    }
 }

@@ -61,7 +61,7 @@ namespace App.Client.GameModules.ClientInit
                 Vector3 position = new Vector3();
                 var playerEntity = PlayerEntityFactory.CreateNewPlayerEntity(_contexts.player, position, info, true, false);
                 playerEntity.ReplaceNetwork(networkChannel);
-
+                _contexts.session.commonSession.InitPosition = playerEntity.position.Value;
             }
 
         }

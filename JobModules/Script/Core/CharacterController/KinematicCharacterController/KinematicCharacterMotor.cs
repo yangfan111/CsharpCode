@@ -142,6 +142,22 @@ namespace KinematicCharacterController
             
             return _groundHit;
         }
+
+        public void Reset()
+        {
+            IsOnGround = false;
+            IsStableOnGround = false;
+            IsOnLedgeSolidSide = false;
+            IsOnEmptySideOfLedge = false;
+            DistanceFromLedge = 0f;
+            ValidStepDetected = false;
+            StepHeight = 0f;
+            GroundPoint = Vector3.zero;
+            GroundNormal = Vector3.up;
+            GroundCollider = null;
+            
+            
+        }
     }
 
     /// <summary>

@@ -42,4 +42,10 @@ namespace App.Shared.Components.Player
     {
         public IGenericAction GenericAction;
     }
+    
+    [Player]
+    public class LadderActionInterfaceComponent : IComponent
+    {
+        public ILadderAction LadderAction;
+    }
 }

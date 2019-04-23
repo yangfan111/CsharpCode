@@ -567,7 +567,10 @@ namespace App.Server
 
                     if (player.hasFreeData)
                     {
-                        _rule.PlayerLeave(_contexts, player);
+                        if(player.isInitialized)
+                        {
+                            _rule.PlayerLeave(_contexts, player);
+                        }
                     }
                     else
                     {

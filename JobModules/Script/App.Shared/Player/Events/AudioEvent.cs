@@ -12,8 +12,8 @@ namespace App.Shared.Player.Events
     {
         public AudioGrp_Footstep    footstepState;
         public AudioGrp_FootMatType footMatType;
-
         public Vector3 relatedPos;
+        public Vector3 relatedRocation;
 
         public class ObjcetFactory : CustomAbstractObjectFactory
         {

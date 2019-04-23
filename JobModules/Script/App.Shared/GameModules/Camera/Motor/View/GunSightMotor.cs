@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
+using App.Shared;
 using App.Shared.GameModules.Camera.Utils;
+using App.Shared.GameModules.Weapon;
 using Assets.App.Shared.GameModules.Camera;
 using Core.Utils;
 using UnityEngine;
+using Utils.CharacterState;
 using XmlConfig;
 
 namespace Core.CameraControl.NewMotor.View
@@ -10,9 +13,11 @@ namespace Core.CameraControl.NewMotor.View
     public class GunSightMotor:AbstractCameraMotor
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(GunSightMotor));
-        public GunSightMotor()
-        {
+        private Contexts _contexts;
 
+        public GunSightMotor(Contexts contexts)
+        {
+            _contexts = contexts;
             CameraActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.View, (int)ModeId, (player, state) =>
             {
 
@@ -22,8 +27,9 @@ namespace Core.CameraControl.NewMotor.View
                     {
                         player.appearanceInterface.Appearance.SetFirstPerson();
                         player.characterBoneInterface.CharacterBone.SetFirstPerson();
+                        player.UpdateCameraArchorPostion();
                     }
-                    var speed = player.weaponLogic.Weapon.GetFocusSpeed();
+                    var speed = player.WeaponController().HeldWeaponAgent.CmrFocusSpeed;
                     player.stateInterface.State.SetSight(speed);
                 }
 
@@ -32,7 +38,7 @@ namespace Core.CameraControl.NewMotor.View
             CameraActionManager.AddAction(CameraActionType.Leave, SubCameraMotorType.View, (int)ModeId,
                 (player, state) =>
                 {
-                    var speed = player.weaponLogic.Weapon.GetFocusSpeed();
+                    var speed = player.WeaponController().HeldWeaponAgent.CmrFocusSpeed;
                     player.stateInterface.State.CancelSight(speed);
                 });
         }
@@ -57,9 +63,11 @@ namespace Core.CameraControl.NewMotor.View
             if (!state.GetMainConfig().CanSwitchView) return false;
 
             if (state.ViewMode == ECameraViewMode.GunSight &&
-                (input.FilteredCameraFocus || input.ForceChangeGunSight || input.ForceInterruptGunSight))
+                (input.FilteredCameraFocus || input.InterruptCameraFocus))
             {
-                if(input.ForceInterruptGunSight)
+                DebugUtil.MyLog("Change back");
+                DebugUtil.MyLog(input.FilteredCameraFocus +"_"+ input.InterruptCameraFocus);
+                if(input.InterruptCameraFocus)
                 {
                     if(Logger.IsDebugEnabled)
                     {
@@ -68,34 +76,30 @@ namespace Core.CameraControl.NewMotor.View
                 }
                 return false;
             }
-
-            //if (state.ViewMode.Equals(ECameraViewMode.ThirdPerson) &&  input.IsCameraFocus)
-            if (state.ViewMode==ECameraViewMode.ThirdPerson && !input.ForceInterruptGunSight &&  (input.FilteredCameraFocus || input.ForceChangeGunSight))
+            if (state.ViewMode==ECameraViewMode.ThirdPerson && !input.InterruptCameraFocus &&  (input.FilteredCameraFocus ))
             {
+                DebugUtil.MyLog("Change cmr to gunsight");
                 return true;
             }
 
-            //if (state.ViewMode.Equals(ECameraViewMode.FirstPerson) && input.IsCameraFocus)
-            if (state.ViewMode==ECameraViewMode.FirstPerson && !input.ForceInterruptGunSight && (input.FilteredCameraFocus || input.ForceChangeGunSight))
+            if (state.ViewMode==ECameraViewMode.FirstPerson && !input.InterruptCameraFocus && (input.FilteredCameraFocus ))
             {
                 return true;
             }
 
             return state.ViewMode == ECameraViewMode.GunSight;
-
         }
 
         public override void CalcOutput(PlayerEntity player, ICameraMotorInput input, ICameraMotorState state, SubCameraMotorState subState,
             DummyCameraMotorOutput output, ICameraNewMotor last, int clientTime)
         {
-            //  output.Rotation = Quaternion.EulerAngles(player.orientation.Pitch,0,player.orientation.Roll);
             if (input.ChangeCamera)
             {
                 subState.LastMode = (byte)(subState.LastMode==(int)ECameraViewMode.FirstPerson
                     ? ECameraViewMode.ThirdPerson
                     : ECameraViewMode.FirstPerson);
             }
-            var fov = player.GetWeaponFov();
+            var fov = player.WeaponController().HeldWeaponAgent.GetGameFov(player.oxygenEnergyInterface.Oxygen.InShiftState);
             if(fov <= 0)
             {
                 Logger.ErrorFormat("Illegal fov value {0}", fov);

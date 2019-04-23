@@ -19,7 +19,7 @@ namespace App.Shared.SceneManagement.Streaming
             _streamingResourceHandler = handler;
         }
 
-        public void UpdateOrigin(Vector3 pos, OriginStatus status)
+        public void UpdateOrigin(Vector3 pos)
         {
         }
 

@@ -26,7 +26,7 @@ namespace App.Shared.GameModules.Preparation
         private List<AssetInfo> _sceneRequests = new List<AssetInfo>();
         private List<AssetInfo> _goRequests = new List<AssetInfo>();
         
-        public bool IsServer { get; protected set; }
+        public bool IsServer { get; private set; }
         public bool AsapMode { get; set; }
         private readonly Vector3 _initPosition;
         public InitialSceneLoadingSystem(ISessionState sessionState, Contexts ctx, IStreamingGoManager streamingGo, bool isServer)
@@ -111,7 +111,8 @@ namespace App.Shared.GameModules.Preparation
             
             foreach (var request in _goRequests)
             {
-                assetManager.LoadAssetAsync("InitialSceneLoadingSystem",  request, _levelManager.GoLoadedWrapper);
+                _levelManager.LoadResource("InitialSceneLoadingSystem", assetManager, request);
+                
             }
             
             _sceneRequests.Clear();

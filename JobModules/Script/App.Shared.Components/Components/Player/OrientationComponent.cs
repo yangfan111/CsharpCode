@@ -14,6 +14,7 @@ using Core;
 using Core.Components;
 using Core;
 using Core.UpdateLatest;
+using UnityEngine.Serialization;
 
 namespace App.Shared.Components.Player
 {
@@ -44,19 +45,19 @@ namespace App.Shared.Components.Player
         /// <summary>
         /// WeaponPunchYaw 为 NegPunchYaw的缩放，作用于角色
         /// </summary>
-        [NetworkProperty, DontInitilize] public float WeaponPunchYaw;
-        [NetworkProperty, DontInitilize] public float WeaponPunchPitch;
+        [FormerlySerializedAs("WeaponPunchYaw")] [NetworkProperty, DontInitilize] public float AccPunchYawValue;
+        [FormerlySerializedAs("WeaponPunchPitch")] [NetworkProperty, DontInitilize] public float AccPunchPitchValue;
         [NetworkProperty, DontInitilize] public float ModelPitch;
         [NetworkProperty, DontInitilize] public float ModelYaw;
 
         [DontInitilize]
-        public float NegPunchYaw
+        public float AccPunchYaw
         {
             get { return -PunchYaw; }
             set { PunchYaw = -value; }
         }
         [DontInitilize]
-        public float NegPunchPitch
+        public float AccPunchPitch
         {
             get { return -PunchPitch; }
             set { PunchPitch = -value; }
@@ -145,12 +146,12 @@ namespace App.Shared.Components.Player
         public Quaternion RotationYaw
         {
             //get { return Quaternion.Euler(0, Yaw + PunchYaw, 0); }
-            get { return Quaternion.Euler(0, Yaw - WeaponPunchYaw, 0); }
+            get { return Quaternion.Euler(0, Yaw - AccPunchYawValue, 0); }
         }
 
         public override string ToString()
         {
-            return string.Format("AlwaysEqual: {0}, Yaw: {1}, Pitch: {2}, Roll: {3}, PunchYaw: {4}, PunchPitch: {5}, WeaponPunchYaw: {6}, WeaponPunchPitch: {7}, ModelPitch: {8}, ModelYaw: {9}", AlwaysEqual, _yaw, Pitch, Roll, PunchYaw, PunchPitch, WeaponPunchYaw, WeaponPunchPitch, ModelPitch, ModelYaw);
+            return string.Format("AlwaysEqual: {0}, Yaw: {1}, Pitch: {2}, Roll: {3}, PunchYaw: {4}, PunchPitch: {5}, WeaponPunchYaw: {6}, WeaponPunchPitch: {7}, ModelPitch: {8}, ModelYaw: {9}", AlwaysEqual, _yaw, Pitch, Roll, PunchYaw, PunchPitch, AccPunchYawValue, AccPunchPitchValue, ModelPitch, ModelYaw);
         }
 
         public void RewindTo(object rightComponent)

@@ -116,7 +116,7 @@ namespace App.Shared.GameModules.Weapon
             return null;
         }
 
-        public IFireShakeProcess CreateShakeProcessor(ShakeConfig config)
+        public IFireShakeProcessor CreateShakeProcessor(ShakeConfig config)
         {
             if (config is RifleShakeConfig)
             {
@@ -151,8 +151,8 @@ namespace App.Shared.GameModules.Weapon
         public IIdleAndAfterFireProcess CreateFireActionLogic(WeaponAllConfigs configs)
         {
             if (configs.NewWeaponCfg.IsSnipperType)
-                return new SpecialIdleAndAfterFireProcessor();
-            return new CommonIdleAndAfterFireProcessor();
+                return new SpecialFireAppearanceUpdater();
+            return new CommonFireAppearanceUpdater();
         }
 
         public AfterFireEventListener  CreateEffectManager(WeaponEffectConfig config)

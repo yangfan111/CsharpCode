@@ -10,12 +10,12 @@ namespace App.Client.GameModules.Player
 
         public override void OnRender(PlayerEntity playerEntity)
         {
-            if (!playerEntity.hasPlayerClientEventsUpdate || !playerEntity.gamePlay.UIStateUpdate)
+            if (!playerEntity.hasPlayerClientUpdate || !playerEntity.gamePlay.UIStateUpdate)
                 return;
             playerEntity.gamePlay.UIStateUpdate = false;
 
             var hasUIState = PlayerStateUtil.HasUIState(playerEntity.gamePlay);
-            playerEntity.playerClientEventsUpdate.OpenUIFrame = hasUIState;
+            playerEntity.playerClientUpdate.OpenUIFrame = hasUIState;
             if (hasUIState)
             {
                 //playerEntity.ModeController().CallBeforeAction(playerEntity.WeaponController(), EPlayerState..UIOpen);

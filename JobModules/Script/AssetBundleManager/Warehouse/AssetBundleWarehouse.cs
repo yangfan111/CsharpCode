@@ -1,0 +1,128 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using AssetBundleManagement;
+using AssetBundleManager.Operation;
+using AssetBundles;
+using Core.Utils;
+using UnityEngine;
+
+
+namespace AssetBundleManager.Warehouse
+{
+    abstract class AssetBundleWarehouse
+    {
+        private readonly string _manifestBundleName;
+        private Dictionary<string, HashSet<string>> _bundlesWithVariant = new Dictionary<string, HashSet<string>>();
+        private string[] _activeVariants = { };
+        private readonly bool _isSceneQuantityLevel;
+        private static LoggerAdapter _logger = new LoggerAdapter(typeof(AssetBundleWarehouse));
+        private Dictionary<string, string> _bundlesEndofLQ = new Dictionary<string, string>();
+
+        protected AssetBundleWarehouse(string manifestBundleName, bool isLow)
+        {
+            _manifestBundleName = manifestBundleName;
+            _isSceneQuantityLevel = isLow;
+        }
+
+        public virtual InitRetValue Init()
+        {
+            return new InitRetValue()
+            {
+                AssetBundleLoadingOperation = LoadAssetBundle(_manifestBundleName),
+                ManifestLoadingOperation =
+                    OperationFactory.CreateManifestLoading(_manifestBundleName, "AssetBundleManifest")
+            };
+        }
+
+        public virtual void SetManifest(AssetBundleManifest obj)
+        {
+            foreach (var v in obj.GetAllAssetBundlesWithVariant())
+            {
+                var splits = v.Split('.');
+                if (!_bundlesWithVariant.ContainsKey(splits[0]))
+                    _bundlesWithVariant.Add(splits[0], new HashSet<string>());
+
+                _bundlesWithVariant[splits[0]].Add(splits[1]);
+            }
+
+            var _allAssetBundle = obj.GetAllAssetBundles();
+            if (_allAssetBundle.Length == 0)
+            {
+                _logger.InfoFormat("!!!!!!!!!!!! the _allAssetBundle is null !!!!!!!!!!!!!");
+            }
+            else
+            {
+                _logger.InfoFormat("!*!*!*!*!*!*!*!* _allAssetBundle.Length={0} ********", _allAssetBundle.Length);
+            }
+
+            HashSet<string> bundles = new HashSet<string>();
+            for (int i = 0; i < _allAssetBundle.Length; i++)
+            {
+                bundles.Add(_allAssetBundle[i]);
+            }
+
+
+            for (int j = 0; j < _allAssetBundle.Length; j++)
+            {
+                var temp = _allAssetBundle[j];
+                //_logger.InfoFormat("!*!*!*!*!*!*!*!* {0}   {1} !!!!!!!!",temp,temp1);
+                if (bundles.Contains(string.Format("{0}_lq", temp)))
+                {
+                    if (!_bundlesEndofLQ.ContainsKey(temp))
+                    {
+                        _bundlesEndofLQ.Add(temp, string.Format("{0}_lq", temp));
+                        _logger.InfoFormat("********{0}******{1}", temp, string.Format("{0}_lq", temp));
+                    }
+                }
+            }
+
+            if (_bundlesEndofLQ.ContainsKey("level"))
+            {
+                _bundlesEndofLQ.Remove("level");
+            }
+        }
+
+        public static FailLoading LoadFailed(bool isSceneLoading, string bundleName, string name)
+        {
+            return new FailLoading(isSceneLoading, bundleName, name);
+        }
+
+        public abstract AssetBundleLoading LoadAssetBundle(string name);
+
+        public abstract AssetLoading LoadAsset(string bundleName, string name);
+
+        public abstract SceneLoading LoadScene(string bundleName, string name, bool isAdditive);
+
+        public virtual string RemapBundleName(string name)
+        {
+            var baseName = Utility.GetNameWithoutVariant(name);
+
+            if (_bundlesWithVariant.ContainsKey(baseName))
+            {
+                for (int i = 0; i < _activeVariants.Length; i++)
+                {
+                    if (_bundlesWithVariant[baseName].Contains(_activeVariants[i]))
+                        return string.Format("{0}.{1}", baseName, _activeVariants[i]);
+                }
+
+                // If there is no active variant found. We still want to use the first
+                return string.Format("{0}.{1}", baseName, _bundlesWithVariant[baseName].First());
+            }
+
+
+            if (_isSceneQuantityLevel && _bundlesEndofLQ.ContainsKey(name))
+            {
+                _logger.InfoFormat("********* low qulityasset {0} load  ********* ", name);
+                return _bundlesEndofLQ[name];
+            }
+
+            return name;
+        }
+
+        public void SetActiveVariants(string[] activeVariants)
+        {
+            _activeVariants = activeVariants;
+        }
+    }
+}

@@ -77,6 +77,50 @@ namespace App.Server.GameModules.GamePlay.Free.item
             return can;
         }
 
+        public static int CanAddToBagCount(IEventArgs args, FreeData fd, int cat, int id, int count)
+        {
+            if (count > 1)
+            {
+                int canCount = 0;
+                float capacity = GetCapacity(fd);
+                float weight = GetWeight(fd);
+                FreeItemInfo info = FreeItemConfig.GetItemInfo(cat, id);
+
+                if (cat == (int)ECategory.GameItem || cat == (int)ECategory.WeaponPart)
+                {
+                    canCount = (int)(Math.Round(capacity - weight, 3) / info.weight);
+                }
+
+                if (cat == (int)ECategory.Weapon)
+                {
+
+                    WeaponResConfigItem item = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(id);
+                    if (item.Type == (int)EWeaponType_Config.ThrowWeapon)
+                    {
+                        canCount = (int)(Math.Round(capacity - weight, 3) / info.weight);
+                    }
+                }
+
+                int realCount = Math.Min(count, canCount);
+
+                if (realCount == 0)
+                {
+                    UseCommonAction use = new UseCommonAction();
+                    use.key = "showBottomTip";
+                    use.values = new List<ArgValue>();
+                    use.values.Add(new ArgValue("msg", "{desc:10073}"));
+
+                    args.TempUse("current", fd);
+                    use.Act(args);
+                    args.Resume("current");
+                }
+
+                return realCount;
+            }
+
+            return CanAddToBag(args, fd, cat, id, count) ? 1 : 0;
+        }
+
         public static bool CanAddToBag(IEventArgs args, FreeData fd, int cat, int id, int count)
         {
             bool can = true;
@@ -97,7 +141,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
             if (cat == (int)ECategory.Weapon)
             {
-                
+
                 WeaponResConfigItem item = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(id);
                 if (item.Type == (int)EWeaponType_Config.ThrowWeapon)
                 {

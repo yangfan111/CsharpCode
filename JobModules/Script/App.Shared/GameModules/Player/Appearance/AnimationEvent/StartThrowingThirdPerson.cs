@@ -7,9 +7,9 @@
             if (!player.appearanceInterface.Appearance.IsFirstPerson 
                 && player.hasThrowingAction
                 && player.hasThrowingUpdate
-                && player.throwingAction.ActionInfo.IsReady)
+                )
             {
-                player.throwingUpdate.IsStartFly = true;
+                player.throwingUpdate.ReadyFly = true;
             }
         }
     }

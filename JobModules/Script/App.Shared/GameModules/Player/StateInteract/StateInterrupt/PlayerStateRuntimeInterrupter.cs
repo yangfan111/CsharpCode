@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
-using App.Shared.FreeFramework.Free.Chicken;
 using Core;
+using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using Entitas.Utils;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Player
@@ -21,6 +19,7 @@ namespace App.Shared.GameModules.Player
             this.playerEntity = playerEntity;
             interruptHandlers = new InterruptEventHandler[(int)EInterruptType.Count];
             ResisterGunSight();
+           // ResisterPullBolt();
             ResisterHoldWeapon();
         }
         private void ResisterHoldWeapon()
@@ -34,17 +33,30 @@ namespace App.Shared.GameModules.Player
 
             interruptHandlers[(int)EInterruptType.HoldWeapon] = handler;
         }
+
+        private void ResisterPullBolt()
+        {
+//            var handler = new PullboltHandler(playerEntity);
+//            handler.ResisterEmitter(new InterruptEmitter(EPlayerState.PullBoltInterrupt, EInterruptCmdType.InterruptSimple));
+//            interruptHandlers[(int)EInterruptType.Pullbolt] = handler;
+        }
         private void ResisterGunSight()
         {
             var handler = new SightInterruptHandler(playerEntity);
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.OpenUI, EInterruptCmdType.InterruptSimple));
+            handler.ResisterEmitter(new InterruptEmitter(EPlayerState.Reload, EInterruptCmdType.InterruptSimple));
+            handler.ResisterEmitter(new InterruptEmitter(EPlayerState.SpecialReload, EInterruptCmdType.InterruptSimple));
+            handler.ResisterEmitter(new InterruptEmitter(EPlayerState.SwitchWeapon, EInterruptCmdType.InterruptSimple));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.WeaponRotState, EInterruptCmdType.InterruptAndRollback));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.ProneMove, EInterruptCmdType.InterruptAndRollback));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.PostureTrans, EInterruptCmdType.InterruptAndRollback));
+            handler.ResisterEmitter(new InterruptEmitter(EPlayerState.PullBolt, EInterruptCmdType.InterruptAndRollback));
+
+            
             interruptHandlers[(int)EInterruptType.GunSight] = handler;
         }
         LoggerAdapter logger = new LoggerAdapter("State");
-        public void DoRunTimeInterrupt(HashSet<EPlayerState> states, bool cmdIsInterrupt)
+        public void DoRunTimeInterrupt(HashSet<EPlayerState> states, IUserCmd cmd)
         {
         
             foreach (var handler in interruptHandlers)
@@ -54,12 +66,16 @@ namespace App.Shared.GameModules.Player
                     handler.Update(states);
             }
 
-            if (cmdIsInterrupt)
+            if (cmd.IsInterrupt)
             {
                 InterruptCharactor();
             }
         }
 
+        public bool IsInterrupted(EInterruptType interruptType)
+        {
+          return  interruptHandlers[(int)interruptType].IsInterrupted();
+        }
 
         public void InterruptCharactor()
         {

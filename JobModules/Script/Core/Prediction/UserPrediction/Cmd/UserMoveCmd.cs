@@ -60,5 +60,8 @@ namespace Core.Prediction.UserPrediction.Cmd
         IsSureSprint,
         IsSwim,
         IsDying,
+
+        IsScopeIn,
+        IsScopeOut,
     }
 }

@@ -6,6 +6,7 @@ using App.Shared.Player;
 using Assets.App.Server.GameModules.GamePlay.Free;
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
+using com.cpkf.yyjd.tools.util.math;
 using Core;
 using Core.EntityComponent;
 using Core.Enums;
@@ -16,6 +17,7 @@ using Entitas;
 using Free.framework;
 using UnityEngine;
 using Utils.Singleton;
+using Object = UnityEngine.Object;
 
 namespace App.Shared.EntityFactory
 {
@@ -30,14 +32,14 @@ namespace App.Shared.EntityFactory
 
         public List<int> FreeCastEntityToDestoryList
         {
-            get 
+            get
             {
                 return _freeCastEntityToDestroyList;
             }
         }
         private readonly List<int> _freeCastEntityToDestroyList = new List<int>();
 
-        public ServerSceneObjectEntityFactory(SceneObjectContext sceneObjectContext,  PlayerContext playerContext,
+        public ServerSceneObjectEntityFactory(SceneObjectContext sceneObjectContext, PlayerContext playerContext,
             IEntityIdGenerator entityIdGenerator,
             IEntityIdGenerator equipGenerator, ICurrentTime currentTime)
         {
@@ -53,7 +55,23 @@ namespace App.Shared.EntityFactory
             var entity = _sceneObjectContext.CreateEntity();
             return entity;
         }
-
+        public virtual IEntity CreateSceneAudioEmitterEntity(Vector3 p, EntityKey entityKey)
+        {
+            if (SharedConfig.IsOffline)
+            {
+                #if UNITY_EDITOR
+                var playerEntity = _playerContext.GetEntityWithEntityKey(entityKey);
+                
+                Object res = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>("Assets/Assets/CoreRes/Sound/TestModel/AudioEmitter.prefab");
+                var clone = GameObject.Instantiate(res) as GameObject;
+                var  emitter = clone.AddComponent<AudioEmitterEditor>();
+                emitter.transform.position = new Vector3(p.x,p.y+2f,p.z);
+                emitter.LookAtListener = true;
+                emitter.SetListener(playerEntity.appearanceInterface.Appearance.CharacterP3);
+                #endif
+            }
+            return null;
+        }
         public virtual IEntity CreateSimpleEquipmentEntity(
             ECategory category,
             int id,
@@ -61,18 +79,18 @@ namespace App.Shared.EntityFactory
             Vector3 position)
         {
             var entity = _sceneObjectContext.CreateEntity();
-            entity.AddEntityKey(new EntityKey(_equipGenerator.GetNextEntityId(), (short) EEntityType.SceneObject));
+            entity.AddEntityKey(new EntityKey(_equipGenerator.GetNextEntityId(), (short)EEntityType.SceneObject));
             entity.isFlagSyncNonSelf = true;
-            
+
             entity.AddPosition();
             entity.position.Value = position;
-            entity.AddSimpleEquipment(id, count, (int) category);
+            entity.AddSimpleEquipment(id, count, (int)category);
             if (category == ECategory.Weapon)
             {
                 entity.AddWeaponObject();
                 entity.weaponObject.ConfigId = id;
             }
-       
+
             entity.AddFlagImmutability(_currentTime.CurrentTime);
             return entity;
         }
@@ -80,24 +98,24 @@ namespace App.Shared.EntityFactory
         public virtual IEntity CreateSceneWeaponObjectEntity(WeaponScanStruct weaponScan, Vector3 position)
         {
             var entity = _sceneObjectContext.CreateEntity();
-            entity.AddEntityKey(new EntityKey(_equipGenerator.GetNextEntityId(), (short) EEntityType.SceneObject));
+            entity.AddEntityKey(new EntityKey(_equipGenerator.GetNextEntityId(), (short)EEntityType.SceneObject));
             entity.isFlagSyncNonSelf = true;
             entity.AddPosition();
             entity.position.Value = position;
             entity.AddWeaponObject();
-            entity.weaponObject.GameCopyFrom(weaponScan); 
+            entity.weaponObject.GameCopyFrom(weaponScan);
             entity.AddFlagImmutability(_currentTime.CurrentTime);
             return entity;
         }
 
-   
+
         public virtual IEntity CreateDropSceneWeaponObjectEntity(WeaponScanStruct weaponScan, Vector3 position, int lifeTime)
         {
             var entity = CreateSceneWeaponObjectEntity(weaponScan, position);
-            if(lifeTime > 0)
+            if (lifeTime > 0)
             {
                 var sceneObjectEntity = entity as SceneObjectEntity;
-                if(null != sceneObjectEntity)
+                if (null != sceneObjectEntity)
                 {
                     sceneObjectEntity.AddLifeTime(DateTime.Now, lifeTime);
                 }
@@ -116,7 +134,7 @@ namespace App.Shared.EntityFactory
         public virtual IEntity CreateCastEntity(Vector3 position, float size, int key, string tip)
         {
             var entity = _sceneObjectContext.CreateEntity();
-            entity.AddEntityKey(new EntityKey(_equipGenerator.GetNextEntityId(), (short) EEntityType.SceneObject));
+            entity.AddEntityKey(new EntityKey(_equipGenerator.GetNextEntityId(), (short)EEntityType.SceneObject));
             entity.AddSimpleCastTarget(key, size, tip);
             entity.AddPosition();
             entity.position.Value = position;

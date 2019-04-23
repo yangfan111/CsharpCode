@@ -180,7 +180,7 @@ namespace App.Client.GameModules.SceneObject
             if (!sceneObjectEntity.hasMultiUnityObject || !sceneObjectEntity.hasWeaponAttachment)
             {
                 alreadyInitializedBefore = false;
-                
+
                 sceneObjectEntity.AddMultiUnityObject();
                 sceneObjectEntity.AddWeaponAttachment(
                     new Dictionary<AssetInfo, int>(AssetInfo.AssetInfoComparer.Instance), new List<AssetInfo>());

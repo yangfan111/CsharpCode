@@ -48,6 +48,7 @@ namespace Core.Configuration
                         case ECameraPoseMode.Rescue:
                         case ECameraPoseMode.Dying:
                         case ECameraPoseMode.Dead:
+                        case ECameraPoseMode.Climb:
                             cameraConfigItem.Far = 1500;
                             break;
                         case ECameraPoseMode.AirPlane:
@@ -89,7 +90,7 @@ namespace Core.Configuration
                 {
                     FloorTestHeight = 4f,
                     FocusPositionLerpTime = 200f,
-                    OffsetLengthInBuilding = 1.5f,
+                    OffsetLengthInBuilding = 0.8f,
                     OffsetLengthWhenClimbing = 1.2f,
                     ArchorOffsetLengthWhenClimbing = 1.3f
                 };

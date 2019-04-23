@@ -1,4 +1,4 @@
-﻿using Core;
+﻿﻿using Core;
 using Core.Fsm;
 using System;
 using XmlConfig;
@@ -82,8 +82,17 @@ namespace Core.CharacterState.Action
 
         // Action
         void StartClimb(float kind, System.Action callBack);
+        void EnterLadder(float enterKind, System.Action callBack);
+        void ExitLadder(float exitKind, System.Action callBack);
+        void MiddleEnterLadder();
+        void InterruptLadder();
+
+        void SetLadderSpeed(float num);
+
+        void TransfigurationStart(System.Action callBack);
+        void TransfigurationFinish(System.Action callBack);
 
         void InterruptAction();
-        bool NeedInterruptRescue(PostureInConfig posture);
+        bool NeedInterruptRescue();
     }
 }

@@ -1,11 +1,6 @@
-﻿using Core.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Entitas;
+﻿using Entitas;
 using UnityEngine;
-using Entitas.CodeGeneration.Attributes;
+using Utils.AssetManager;
 
 namespace App.Shared.Components.Player
 {
@@ -13,5 +8,6 @@ namespace App.Shared.Components.Player
     public class FirstPersonModelComponent : IComponent
     {
         public GameObject Value;
+        public UnityObject UnityObjectValue;
     }
 }

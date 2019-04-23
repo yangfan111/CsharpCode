@@ -9,7 +9,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
     /// <summary>
     /// Defines the <see cref="CommonWeaponFireController" />
     /// </summary>
-    public class CommonWeaponFireController :IWeaponFireController
+    public class CommonWeaponFireController :AbstractFireController
     {
         public static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CommonWeaponFireController));
 
@@ -85,7 +85,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
             _bulletFires.Clear();
         }
 
-        public void OnUpdate(PlayerWeaponController controller, IWeaponCmd cmd, Contexts contexts)
+        protected override void UpdateFire(PlayerWeaponController controller, IWeaponCmd cmd,Contexts contexts)
         {
             bool isFire = false;
             
@@ -102,10 +102,10 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
             }
             if (isFire && controller.RelatedThrowAction.ThrowingEntityKey == EntityKey.Default
-                && (controller.LastFireWeaponId == controller.HeldWeaponAgent.WeaponKey.EntityId || controller.LastFireWeaponId == 0))
+                && (controller.RelatedThrowAction.LastFireWeaponKey == controller.HeldWeaponAgent.WeaponKey.EntityId || controller.RelatedThrowAction.LastFireWeaponKey == 0))
             {
-                Fire(controller, cmd, contexts);
-                controller.LastFireWeaponId = controller.HeldWeaponAgent.WeaponKey.EntityId;
+                Fire(controller, cmd,contexts);
+                controller.RelatedThrowAction.LastFireWeaponKey = controller.HeldWeaponAgent.WeaponKey.EntityId;
             }
             else
             {
@@ -113,17 +113,13 @@ namespace App.Shared.GameModules.Weapon.Behavior
             }
 
             CallOnFrame(controller, cmd);
-            if (!cmd.IsFire)
-            {
-                controller.RelatedThrowAction.ThrowingEntityKey = EntityKey.Default;
-                controller.LastFireWeaponId = 0;
-            }
         }
+
 
         private void Fire(PlayerWeaponController controller, IWeaponCmd cmd, Contexts contexts)
         {
             CallBeforeFires(controller, cmd);
-            CallBulletFires(controller, cmd, contexts);
+            CallBulletFires(controller, cmd,contexts);
             CallAfterFires(controller, cmd);
         }
 

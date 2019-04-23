@@ -4,8 +4,10 @@ using App.Shared.Components.Vehicle;
 using App.Shared.GameModules.Vehicle;
 using Core.Components;
 using Core.EntityComponent;
+using Core.HitBox;
 using EVP;
 using UnityEngine;
+using Utils.Singleton;
 
 namespace App.Shared.GameModules.Bullet
 {
@@ -41,7 +43,10 @@ namespace App.Shared.GameModules.Bullet
             vehicle.UpdateHitBoxes(gameEntity);
         }
 
-      
+        public HitBoxTransformProvider GetHitBoxProvider(EntityKey entityKey)
+        {
+            return null;
+        }
 
         private VehicleEntity GetVehicleEntity(IGameEntity gameEntity)
         {

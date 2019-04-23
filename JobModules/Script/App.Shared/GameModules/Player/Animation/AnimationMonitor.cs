@@ -103,6 +103,11 @@ namespace App.Shared.GameModules.Player.Animation
                 Core.Utils.Tuple.Create("Climb",           new StateChange { Value = false, Command = FsmInput.GenericActionFinished } ),
 			    Core.Utils.Tuple.Create("Use",             new StateChange { Value = false, Command = FsmInput.BuriedBombFinished } ),
 			    Core.Utils.Tuple.Create("Dismantle",       new StateChange { Value = false, Command = FsmInput.DismantleBombFinished } ),
+			    Core.Utils.Tuple.Create("2InjuredMove",       new StateChange { Value = false, Command = FsmInput.DyingTransitionFinished } ),
+			    Core.Utils.Tuple.Create("EnterLadder",     new StateChange { Value = false, Command = FsmInput.EnterLadderFinished } ),
+                Core.Utils.Tuple.Create("ExitLadder",      new StateChange { Value = false, Command = FsmInput.ExitLadderFinished } ),
+			    Core.Utils.Tuple.Create("TransfigurationStart",      new StateChange { Value = false, Command = FsmInput.TransfigurationStartEnd } ),
+			    Core.Utils.Tuple.Create("TransfigurationFinish",      new StateChange { Value = false, Command = FsmInput.TransfigurationFinishEnd } ),
             };
 
             // 只播放一遍的动画，依赖它们的结束触发命令

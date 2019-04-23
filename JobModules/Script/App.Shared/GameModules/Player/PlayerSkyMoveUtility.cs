@@ -1,9 +1,6 @@
 ﻿using Utils.AssetManager;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using App.Server.GameModules.GamePlay.free.player;
+using App.Shared.GameModules.Player.ResourceLoad;
 using App.Shared.Player;
 using com.wd.free.item;
 using com.wd.free.skill;
@@ -23,7 +20,7 @@ namespace App.Shared.GameModules.Player
             var parachuteAssetInfo = new AssetInfo("equipment/parachute", "I002");
             var assetManager = contexts.session.commonSession.AssetManager;
             assetManager.LoadAssetAsync(player, parachuteAssetInfo,
-                new PlayerResourceLoadSystem.ParachuteLoadResponseHandler().OnLoadSucc);
+                new ParachuteLoadResponseHandler().OnLoadSucc);
         }
 
 

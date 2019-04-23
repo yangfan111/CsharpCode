@@ -21,14 +21,18 @@ namespace App.Shared
         {
             return component.ViewNowMode == (short)ECameraViewMode.GunSight;
         }
+        public static bool IsThird(this CameraStateNewComponent component)
+        {
+            return component.ViewNowMode == (short)ECameraViewMode.ThirdPerson;
+        }
         public static void Reset(this OrientationComponent component)
         {
 
             // 更新枪械时，后坐力重置
             component.PunchPitch = 0;
             component.PunchYaw = 0;
-            component.WeaponPunchPitch = 0;
-            component.WeaponPunchYaw = 0;
+            component.AccPunchPitchValue = 0;
+            component.AccPunchYawValue = 0;
         }
       
         /// <summary>

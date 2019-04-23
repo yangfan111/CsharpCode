@@ -20,12 +20,8 @@ namespace App.Shared.GameModules.Weapon
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(GrenadeCacheHandler));
 
-        private Dictionary<int, int> heldGrenades;
 
-        public Dictionary<int, int> HeldGrenades
-        {
-            get { return heldGrenades; }
-        }
+        public Dictionary<int, int> HeldGrenades { get; private set; }
 
         private Func<GrenadeCacheDataComponent> grenadeDataExtractor;
 
@@ -54,7 +50,7 @@ namespace App.Shared.GameModules.Weapon
             grenadeConfigIds       = grenadeIds;
             grenadeEntityExtractor = in_grenadeEntiyExtractor;
             grenadeValuedIds       = new List<int>();
-            heldGrenades           = new Dictionary<int, int>();
+            HeldGrenades = new Dictionary<int, int>();
             FreeArgs               = freeArgs;
         }
 
@@ -62,9 +58,9 @@ namespace App.Shared.GameModules.Weapon
         {
             if (!grenadeConfigIds.Contains(id)) return false;
             int value = 0;
-            heldGrenades.TryGetValue(id, out value);
+            HeldGrenades.TryGetValue(id, out value);
             value            += 1;
-            heldGrenades[id] =  value;
+            HeldGrenades[id] =  value;
             Sync();
             return true;
         }
@@ -79,11 +75,11 @@ namespace App.Shared.GameModules.Weapon
         public int RemoveCache(int id)
         {
             int value;
-            if (heldGrenades.TryGetValue(id, out value))
+            if (HeldGrenades.TryGetValue(id, out value))
             {
                 value -= 1;
-                if (value < 1) heldGrenades.Remove(id);
-                else heldGrenades[id] = value;
+                if (value < 1) HeldGrenades.Remove(id);
+                else HeldGrenades[id] = value;
                 Sync();
                 return value;
             }
@@ -101,7 +97,7 @@ namespace App.Shared.GameModules.Weapon
             if (includeCurrent)
                 grenadeEntityExtractor().weaponBasicData.Reset();
             grenadeEntityExtractor().weaponRuntimeData.Reset();
-            heldGrenades.Clear();
+            HeldGrenades.Clear();
             Sync();
         }
 
@@ -112,7 +108,7 @@ namespace App.Shared.GameModules.Weapon
 
         public int GetCount(int id)
         {
-            return heldGrenades.ContainsKey(id) ? heldGrenades[id] : 0;
+            return HeldGrenades.ContainsKey(id) ? HeldGrenades[id] : 0;
         }
 
         public List<int> GetOwnedIds()
@@ -134,7 +130,7 @@ namespace App.Shared.GameModules.Weapon
 
         public int FindUsable(bool autoStuff)
         {
-            if (heldGrenades.Count == 0) return -1;
+            if (HeldGrenades.Count == 0) return -1;
             int lastIndex = GrandeCache.LastId > 0 ? grenadeConfigIds.IndexOf(GrandeCache.LastId) : 0;
             int beginIndx = autoStuff ? lastIndex : lastIndex + 1;
             for (int i = beginIndx; i < grenadeConfigIds.Count + beginIndx; i++)
@@ -156,7 +152,7 @@ namespace App.Shared.GameModules.Weapon
         private void SetCache(int id, int count)
         {
             if (!grenadeConfigIds.Contains(id)) return;
-            heldGrenades[id] = count;
+            HeldGrenades[id] = count;
         }
 
         private void Sync()

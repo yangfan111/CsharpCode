@@ -10,12 +10,15 @@ namespace App.Shared.Components.Weapon
     public class WeaponRuntimeDataComponent : IUserPredictionComponent
     {
         //枪械震动相关
-        [DontInitilize, NetworkProperty] public int   PunchDecayCdTime; // 开火后坐力效果时间, 在这个时间内，不回落
-        [DontInitilize, NetworkProperty] public bool  PunchYawLeftSide; // PunchYaw随机的方向
+        
+        // 开火后坐力衰减时间,, 在这个时间内，不回落，初始值=FireShakeProvider.GetDecayInterval(controller);
+        [DontInitilize, NetworkProperty] public int PunchDecayLeftInterval; 
+        [DontInitilize, NetworkProperty] public bool PunchYawLeftSide; // PunchYaw随机的方向
         [DontInitilize, NetworkProperty] public float PunchYawSpeed;
-        [DontInitilize, NetworkProperty] public float PunchPitchSpeed;
-        [DontInitilize, NetworkProperty] public int   LastRenderTime;
-
+        //开火后坐力最终到达的强度增量
+        [DontInitilize, NetworkProperty] public float TargetPunchPitchDelta;
+        [DontInitilize, NetworkProperty] public int LastRenderTime;
+        [DontInitilize, NetworkProperty] public float CameraRotationSpeed;
 
         //精准
         [DontInitilize, NetworkProperty] public float Accuracy;
@@ -28,15 +31,15 @@ namespace App.Shared.Components.Weapon
         [DontInitilize, NetworkProperty] public int ContinuesShootCount;
         //子弹连射衰减时间戳
         [DontInitilize, NetworkProperty] public int ContinuesShootReduceTimestamp;
-//        [DontInitilize, NetworkProperty] public bool PullBoltEnd;//是否拉过栓了
-//        [DontInitilize, NetworkProperty] public bool IsPullingBolt;//是否在拉栓中
-//        [DontInitilize, NetworkProperty] public bool IsInterruptSightView;
-//        [DontInitilize, NetworkProperty] public bool IsRecoverSightView;
+        //        [DontInitilize, NetworkProperty] public bool PullBoltEnd;//是否拉过栓了
+        //        [DontInitilize, NetworkProperty] public bool IsPullingBolt;//是否在拉栓中
+        //        [DontInitilize, NetworkProperty] public bool IsInterruptSightView;
+        //        [DontInitilize, NetworkProperty] public bool IsRecoverSightView;
 
 
-//        [System.Obsolete]
-//        [DontInitilize, NetworkProperty] public bool    NeedReduceContinuesShootCD;
-                    
+        //        [System.Obsolete]
+        //        [DontInitilize, NetworkProperty] public bool    NeedReduceContinuesShootCD;
+
         [DontInitilize, NetworkProperty] public int BurstShootCount;
 
         [DontInitilize, NetworkProperty] public Vector3 LastBulletDir;
@@ -44,64 +47,72 @@ namespace App.Shared.Components.Weapon
         //准星扩散
         [DontInitilize, NetworkProperty] public float LastSpreadX;
         [DontInitilize, NetworkProperty] public float LastSpreadY;
-        [DontInitilize, NetworkProperty] public int   ContinueAttackEndStamp;
-        [DontInitilize, NetworkProperty] public int   ContinueAttackStartStamp;
-        [DontInitilize, NetworkProperty] public int   NextAttackPeriodStamp;
-        [DontInitilize, NetworkProperty] public bool  MeleeAttacking;
-        [DontInitilize, NetworkProperty] public bool  IsPrevCmdFire;
+        [DontInitilize, NetworkProperty] public int ContinueAttackEndStamp;
+        [DontInitilize, NetworkProperty] public int ContinueAttackStartStamp;
+        [DontInitilize, NetworkProperty] public int NextAttackPeriodStamp;
+        [DontInitilize, NetworkProperty] public bool MeleeAttacking;
+        [DontInitilize, NetworkProperty] public bool IsPrevCmdFire;
+
+        //拉栓相关
+        [DontInitilize, NetworkProperty] public bool IsPullingBolt; //是否在拉栓中
+        [DontInitilize, NetworkProperty] public bool PullBoltInterrupt;
+
+
 
         public void CopyFrom(object rightComponent)
         {
             var remote = rightComponent as WeaponRuntimeDataComponent;
-            PunchDecayCdTime = remote.PunchDecayCdTime;
+            PunchDecayLeftInterval = remote.PunchDecayLeftInterval;
             PunchYawLeftSide = remote.PunchYawLeftSide;
-            PunchYawSpeed    = remote.PunchYawSpeed;
-            PunchPitchSpeed  = remote.PunchPitchSpeed;
+            PunchYawSpeed = remote.PunchYawSpeed;
+            TargetPunchPitchDelta = remote.TargetPunchPitchDelta;
 
-            Accuracy            = remote.Accuracy;
-            LastRenderTime      = remote.LastRenderTime;
+            Accuracy = remote.Accuracy;
+            LastRenderTime = remote.LastRenderTime;
             NextAttackTimestamp = remote.NextAttackTimestamp;
             LastAttackTimestamp = remote.LastAttackTimestamp;
-//            PullBoltEnd = remote.PullBoltEnd;
-//            IsPullingBolt = remote.IsPullingBolt;
-//            IsRecoverSightView = remote.IsRecoverSightView;
-//            IsInterruptSightView = remote.IsInterruptSightView;
-            ContinuesShootCount           = remote.ContinuesShootCount;
+            //            PullBoltEnd = remote.PullBoltEnd;
+            //            IsPullingBolt = remote.IsPullingBolt;
+            //            IsRecoverSightView = remote.IsRecoverSightView;
+            //            IsInterruptSightView = remote.IsInterruptSightView;
+            ContinuesShootCount = remote.ContinuesShootCount;
             ContinuesShootReduceTimestamp = remote.ContinuesShootReduceTimestamp;
-            BurstShootCount               = remote.BurstShootCount;
-            LastBulletDir                 = remote.LastBulletDir;
-            LastSpreadX                   = remote.LastSpreadX;
-            LastSpreadY                   = remote.LastSpreadY;
-            ContinueAttackEndStamp        = remote.ContinueAttackEndStamp;
-            ContinueAttackStartStamp      = remote.ContinueAttackStartStamp;
+            BurstShootCount = remote.BurstShootCount;
+            LastBulletDir = remote.LastBulletDir;
+            LastSpreadX = remote.LastSpreadX;
+            LastSpreadY = remote.LastSpreadY;
+            ContinueAttackEndStamp = remote.ContinueAttackEndStamp;
+            ContinueAttackStartStamp = remote.ContinueAttackStartStamp;
 
             NextAttackPeriodStamp = remote.NextAttackPeriodStamp;
-            MeleeAttacking        = remote.MeleeAttacking;
-            IsPrevCmdFire         = remote.IsPrevCmdFire;
+            MeleeAttacking = remote.MeleeAttacking;
+            IsPrevCmdFire = remote.IsPrevCmdFire;
+            IsPullingBolt = remote.IsPullingBolt;
+            PullBoltInterrupt = remote.PullBoltInterrupt;
         }
 
         public int GetComponentId()
         {
-            return (int) EComponentIds.WeaponRuntimeData;
+            return (int)EComponentIds.WeaponRuntimeData;
         }
 
         public bool IsApproximatelyEqual(object right)
         {
             var remote = right as WeaponRuntimeDataComponent;
-            return PunchDecayCdTime == remote.PunchDecayCdTime
+            return PunchDecayLeftInterval == remote.PunchDecayLeftInterval
                 && PunchYawLeftSide == remote.PunchYawLeftSide
                 && PunchYawSpeed == remote.PunchYawSpeed
-                && PunchPitchSpeed == remote.PunchPitchSpeed
+                && TargetPunchPitchDelta == remote.TargetPunchPitchDelta
                 && Accuracy == remote.Accuracy
                 && LastRenderTime == remote.LastRenderTime
                 && NextAttackTimestamp == remote.NextAttackTimestamp
                 && LastAttackTimestamp == remote.LastAttackTimestamp
-//                && PullBoltEnd == remote.PullBoltEnd
-//                && IsPullingBolt == remote.IsPullingBolt
-//                && IsInterruptSightView == remote.IsInterruptSightView
+                //                && PullBoltEnd == remote.PullBoltEnd
+                //                && IsPullingBolt == remote.IsPullingBolt
+                //                && IsInterruptSightView == remote.IsInterruptSightView
                 && ContinuesShootCount == remote.ContinuesShootCount
                 && ContinuesShootReduceTimestamp == remote.ContinuesShootReduceTimestamp
-                   //        && IsRecoverSightView == remote.IsRecoverSightView
+                //        && IsRecoverSightView == remote.IsRecoverSightView
                 && BurstShootCount == remote.BurstShootCount
                 && LastBulletDir == remote.LastBulletDir
                 && LastSpreadX == remote.LastSpreadX
@@ -110,7 +121,9 @@ namespace App.Shared.Components.Weapon
                 && ContinueAttackStartStamp == remote.ContinueAttackStartStamp
                 && NextAttackPeriodStamp == remote.NextAttackPeriodStamp
                 && MeleeAttacking == remote.MeleeAttacking
-                && IsPrevCmdFire == remote.IsPrevCmdFire;
+                && IsPrevCmdFire == remote.IsPrevCmdFire
+                && IsPullingBolt == remote.IsPullingBolt
+                && PullBoltInterrupt == remote.PullBoltInterrupt;
         }
 
         public void RewindTo(object rightComponent)

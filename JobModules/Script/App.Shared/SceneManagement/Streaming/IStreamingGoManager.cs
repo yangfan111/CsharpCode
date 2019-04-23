@@ -9,7 +9,7 @@ namespace App.Shared.SceneManagement.Streaming
     public interface IStreamingGoManager
     {
         void SetResourceHandler(IStreamingResourceHandler handler);
-        void UpdateOrigin(Vector3 pos, OriginStatus status);
+        void UpdateOrigin(Vector3 pos);
 
         void SetAsapMode(bool value);
         

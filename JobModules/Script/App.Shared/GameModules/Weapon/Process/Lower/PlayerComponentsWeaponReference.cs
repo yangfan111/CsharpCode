@@ -45,6 +45,7 @@ namespace App.Shared.GameModules.Weapon
         {
             get { return entity.time.ClientTime; }
         }
+       
         public GamePlayComponent RelatedGamePlay
         {
             get { return entity.gamePlay; }
@@ -98,7 +99,7 @@ namespace App.Shared.GameModules.Weapon
             }
         }
 
-        public OrientationComponent RelatedOrient
+        public OrientationComponent RelatedOrientation
         {
             get { return entity.orientation; }
         }
@@ -145,9 +146,9 @@ namespace App.Shared.GameModules.Weapon
         {
             get { return entity.playerWeaponBagSet; }
         }
-        public PlayerClientEventsUpdateComponent RelatedClientEvents
+        public PlayerClientUpdateComponent RelatedClient
         {
-            get { return entity.playerClientEventsUpdate; }
+            get { return entity.playerClientUpdate; }
         }
         public PlayerWeaponServerUpdateComponent WeaponServerUpdate
         {
@@ -170,6 +171,15 @@ namespace App.Shared.GameModules.Weapon
         public GrenadeCacheDataComponent RelatedGrenadeCache
         {
             get { return entity.grenadeCacheData; }
+        }
+        public PlayerClientUpdateComponent RelatedClientUpdate
+        {
+            get
+            {
+                if(!entity.hasPlayerClientUpdate)
+                    entity.AddPlayerClientUpdate();
+                return entity.playerClientUpdate;
+            }
         }
         #endregion
 

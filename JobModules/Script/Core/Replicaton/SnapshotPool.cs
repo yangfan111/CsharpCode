@@ -5,7 +5,7 @@ namespace Core.Replicaton
 {
     public class SnapshotPool : ISnapshotPool
     {
-        public const int MaxSnapshotSize = 64;
+        public const int MaxSnapshotSize = 128;
 
         List<ISnapshot> _list = new List<ISnapshot>();
 

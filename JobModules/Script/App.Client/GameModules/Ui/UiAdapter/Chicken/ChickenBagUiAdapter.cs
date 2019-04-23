@@ -1,0 +1,292 @@
+﻿using System;
+using App.Shared.Components.Ui;
+using System.Collections.Generic;
+using App.Client.CastObjectUtil;
+using App.Client.GameModules.GamePlay.Free.Auto.Prefab;
+using App.Client.GameModules.Ui.Models.Chicken;
+using App.Shared;
+using App.Shared.GameModules.GamePlay.Free;
+using App.Shared.GameModules.GamePlay.Free.Map;
+using Assets.XmlConfig;
+using Shared.Scripts;
+using UnityEngine;
+using Utils.Singleton;
+using XmlConfig;
+
+namespace App.Client.GameModules.Ui.UiAdapter
+{
+    public class ChickenBagUiAdapter : UIAdapter, IChickenBagUiAdapter
+    {
+        private Contexts _contexts;
+
+        public ChickenBagUiAdapter(Contexts contexts)
+        {
+            this._contexts = contexts;
+        }
+
+        public int GetWeaponIdBySlotIndex(int index)
+        {
+            return 13;
+        }
+
+        public int GetWeaponPartIdBySlotIndexAndWeaponPartType(int index, EWeaponPartType type)
+        {
+            return 1;
+        }
+
+        public int GetEquipmentIdByWardrobeType(Wardrobe type,out int count)
+        {
+            count = 0;
+            return 1;
+        }
+
+        #region refreshGround
+        private int radius = 3;
+        private bool IsNear(Vector3 v1, Vector3 v2)
+        {
+            return Math.Abs(v1.x - v2.x) < radius && Math.Abs(v1.z - v2.z) < radius && Math.Abs(v1.y - v2.y) < 2;
+        }
+
+        private bool HasNoObstacle(FreeMoveEntity item, PlayerEntity player)
+        {
+            if (item.hasUnityGameObject)
+            {
+                var noObstacle = !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, item.unityGameObject.UnityObject);
+                return noObstacle;
+            }
+            else
+            {
+                var noObstacle = !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, null);
+                return noObstacle;
+            }
+        }
+
+        private bool HasNoObstacle(SceneObjectEntity item, PlayerEntity player)
+        {
+            if (item.hasUnityObject)
+            {
+                return !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, item.unityObject.UnityObject);
+            }
+            else if (item.hasMultiUnityObject)
+            {
+                return !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, item.multiUnityObject.FirstAsset);
+            }
+            else
+            {
+                return !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, null);
+            }
+        }
+        private HashSet<int> groundEntitySet = new HashSet<int>();
+
+        public bool RefreshGround()
+        {
+            HashSet<int> current = new HashSet<int>();
+            foreach (var item in _contexts.sceneObject.GetEntities())
+            {
+                if (item.hasPosition
+                    && IsNear(item.position.Value, Player.position.Value)
+                    && item.hasSimpleEquipment && item.simpleEquipment.Category > 0
+                    && HasNoObstacle(item, Player))
+                {
+                    current.Add(item.entityKey.Value.EntityId);
+                }
+            }
+
+            foreach (var item in _contexts.freeMove.GetEntities())
+            {
+                if (item.hasPosition
+                    && item.hasFreeData
+                    && IsNear(item.position.Value, Player.position.Value)
+                    && HasNoObstacle(item, Player))
+                {
+                    current.Add(item.entityKey.Value.EntityId);
+                }
+            }
+
+            if (current.SetEquals(groundEntitySet))
+            {
+                return false;
+            }
+
+            List<SceneObjectEntity> list = new List<SceneObjectEntity>();
+            Dictionary<string, List<FreeMoveEntity>> deadList = new Dictionary<string, List<FreeMoveEntity>>();
+            Dictionary<string, List<FreeMoveEntity>> dropList = new Dictionary<string, List<FreeMoveEntity>>();
+
+            foreach (var id in current)
+            {
+                var sceneEntity =
+                    _contexts.sceneObject.GetEntityWithEntityKey(
+                        new Core.EntityComponent.EntityKey(id, (short)EEntityType.SceneObject));
+                if (null != sceneEntity)
+                {
+                    list.Add(sceneEntity);
+                    continue;
+                }
+
+                var freeMoveEntity =
+                    _contexts.freeMove.GetEntityWithEntityKey(
+                        new Core.EntityComponent.EntityKey(id, (short)EEntityType.FreeMove));
+                {
+                    if (freeMoveEntity.freeData.Cat == FreeEntityConstant.DeadBox)
+                    {
+                        if (!deadList.ContainsKey(freeMoveEntity.freeData.Key))
+                        {
+                            deadList.Add(freeMoveEntity.freeData.Key, new List<FreeMoveEntity>());
+                        }
+
+                        deadList[freeMoveEntity.freeData.Key].Add(freeMoveEntity);
+                    }
+
+                    if (freeMoveEntity.freeData.Cat == FreeEntityConstant.DropBox)
+                    {
+                        if (!dropList.ContainsKey(freeMoveEntity.freeData.Key))
+                        {
+                            dropList.Add(freeMoveEntity.freeData.Key, new List<FreeMoveEntity>());
+                        }
+
+                        dropList[freeMoveEntity.freeData.Key].Add(freeMoveEntity);
+                    }
+                }
+            }
+
+            _groundItemDataList.Clear();
+            FillBox(dropList, false);
+            FillBox(deadList, true);
+            list.Sort(new SceneObjectSorter());
+            if (list.Count > 0)
+            {
+                var titleData = new ChickenBagItemUiData { isBagTitle = true, title = "地面" };
+                _groundItemDataList.Add(titleData);
+
+            }
+            foreach (var item in list)
+            {
+                if (item.simpleEquipment.Category == (int)ECategory.Weapon)
+                {
+                    item.simpleEquipment.Count = 0;
+                }
+                if (item.simpleEquipment.Category == (int)ECategory.Avatar)
+                {
+                    item.simpleEquipment.Count = 0;
+                }
+                var data = new ChickenBagItemUiData
+                {
+                    cat = item.simpleEquipment.Category,
+                    id = item.simpleEquipment.Id,
+                    count = item.simpleEquipment.Count,
+                    key = "1|" + item.entityKey.Value.EntityId
+                };
+                _groundItemDataList.Add(data);
+
+            }
+            groundEntitySet = current;
+
+            return true;
+        }
+
+        public void SendRightClickUseItem(string key)
+        {
+            Debug.Log("SendRightClickUseItem" + key);
+        }
+
+        public void SetCrossVisible(bool isVisible)
+        {
+            _contexts.ui.uI.IsShowCrossHair = isVisible;
+        }
+
+        public void SendDragItem(string beginKey, string endKey)
+        {
+            Debug.Log("SendDragItem" + beginKey + endKey);
+        }
+
+        public void SendSplitItem(string splitKey)
+        {
+            Debug.Log("SendSplitItem" + splitKey);
+        }
+
+        public int CurWeight
+        {
+            get { return 111; }
+        }
+
+        public int TotalWeight
+        {
+            get { return 222; }
+        }
+
+
+        private void FillBox(Dictionary<string, List<FreeMoveEntity>> dic, bool dead)
+        {
+            int index = 0;
+            foreach (var name in dic.Keys)
+            {
+                var titleData = new ChickenBagItemUiData {isBagTitle = true, title = name};
+                _groundItemDataList.Add(titleData);
+                List<SimpleItemInfo> infos = new List<SimpleItemInfo>();
+                foreach (var item in dic[name])
+                {
+                    object obj = SingletonManager.Get<DeadBoxParser>().FromString(item.freeData.Value);
+                    if (obj == null)
+                    {
+                        continue;
+                    }
+
+                    SimpleItemInfo info = (SimpleItemInfo)obj;
+                    info.entityId = item.entityKey.Value.EntityId;
+
+                    infos.Add(info);
+                }
+
+                infos.Sort(new ItemInfoSorter());
+
+                foreach (SimpleItemInfo info in infos)
+                {
+                    int count = info.count;
+                    if (info.cat == (int)ECategory.Weapon)
+                    {
+                        count = 0;
+                    }
+                    if (info.cat == (int)ECategory.Avatar)
+                    {
+                        count = 0;
+                    }
+
+                    var data = new ChickenBagItemUiData
+                    {
+                        cat = info.cat, id = info.id, count = count, key =  "1|" + info.entityId
+                    };
+                    _groundItemDataList.Add(data);
+                }
+            }
+        }
+        #endregion
+
+        public List<IBaseChickenBagItemData> BagItemDataList
+        {
+            get { return _contexts.ui.uI.ChickenBagItemDataList; }
+        }
+
+        HashSet<int> current = new HashSet<int>();
+
+        private PlayerEntity _player;
+        public PlayerEntity Player
+        {
+            get { return _player ?? (_player = _contexts.player.flagSelfEntity); }
+        }
+
+        private List<IChickenBagItemUiData> _groundItemDataList = new List<IChickenBagItemUiData>();
+        public List<IChickenBagItemUiData> GroundItemDataList
+        {
+            get { return _groundItemDataList; }
+        }
+    }
+
+    public class ChickenBagItemData : IChickenBagItemData
+    {
+        public int cat { get; set; }
+        public int id { get; set; }
+        public string eventKey { get; set; }
+        public string key { get; set; }
+        public string count { get; set; }
+    }
+}

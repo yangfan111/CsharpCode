@@ -39,7 +39,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 p.statisticsData.Statistics.EvenKillCount = 0;
                 if (FreeUtil.ReplaceBool(resetWeapon, args))
                 {
-                    p.ModeController().RecoverPlayerWeapon(p, p.WeaponController().HeldBagPointer2);
+                    p.ModeController().RecoverPlayerWeapon(p, p.WeaponController().HeldBagPointer);
                 }
                 PlayerAnimationAction.DoAnimation(args.GameContext, PlayerAnimationAction.PlayerReborn, p);
             }

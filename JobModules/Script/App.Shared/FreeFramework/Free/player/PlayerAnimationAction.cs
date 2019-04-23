@@ -82,7 +82,6 @@ namespace App.Server.GameModules.GamePlay.Free.player
                             player.stateInterface.State.Dive();
                             break;
                         case Crouch:
-                   
                             player.stateInterface.State.Crouch();
                             break;
                         case Ashore:
@@ -120,9 +119,8 @@ namespace App.Server.GameModules.GamePlay.Free.player
                             player.appearanceInterface.Appearance.MountWeaponOnAlternativeLocator();
                             player.stateInterface.State.BuriedBomb(() =>
                                 {
-                                    
                                     player.WeaponController().RelatedThrowAction.ThrowingEntityKey = new EntityKey(0, (short) EEntityType.End);
-                                    player.WeaponController().LastFireWeaponId = 46;
+                                    player.WeaponController().RelatedThrowAction.LastFireWeaponKey = -1;
                                 });
                             break;
                         case DefuseBomb:
@@ -135,7 +133,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
                             player.stateInterface.State.InterruptAction();
                             player.appearanceInterface.Appearance.RemountWeaponOnRightHand();
                             player.WeaponController().RelatedThrowAction.ThrowingEntityKey = new EntityKey(0, (short) EEntityType.End);
-                            player.WeaponController().LastFireWeaponId = 46;
+                            player.WeaponController().RelatedThrowAction.LastFireWeaponKey = -1;
                             break;
                         case RescueEnd:
                             player.stateInterface.State.RescueEnd();

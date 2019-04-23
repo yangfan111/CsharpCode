@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.CharacterController;
 using Core.Utils;
+using Sharpen;
 using UnityEngine;
 using Utils.AssetManager;
 using Utils.Configuration;
@@ -25,13 +26,25 @@ namespace App.Shared.GameModules.Configuration
             return true;
         }
 
-        protected override void OnLoadSuccImpl(AssetInfo assetInfo, Object obj)
+        protected override void OnLoadSuccImpl(UnityObject unityObj)
         {
-            var asset = obj as TextAsset;
+            var asset = unityObj.As<TextAsset>();
             if (null != asset)
             {
-                var config = XmlConfigParser<SerializableCurve>.Load(asset.text);
-                SingletonManager.Get<CharacterStateConfigManager>().AirMoveCurve = config.toCurve();
+                var config = XmlConfigParser<SpeedCurveConfig>.Load(asset.text);
+                SingletonManager.Get<CharacterStateConfigManager>().AirMoveCurve = config.AirMoveCurve.toCurve();
+                List<MovementCurveInfo> movementCurve = new List<MovementCurveInfo>();
+                foreach (var info in config.MovementCurveInfos)
+                {
+                    movementCurve.Add(info.ToMovementCurveInfo());
+                }
+                List<PostureCurveInfo> postureCurve = new List<PostureCurveInfo>();
+                foreach (var info in config.PostureCurveInfos)
+                {
+                    postureCurve.Add(info.ToPostureCurveInfo());
+                }
+                SingletonManager.Get<CharacterStateConfigManager>().MovementCurve = movementCurve;
+                SingletonManager.Get<CharacterStateConfigManager>().PostureCurve = postureCurve;
             }
         }
     }

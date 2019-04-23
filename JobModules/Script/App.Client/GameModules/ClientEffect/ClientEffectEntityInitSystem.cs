@@ -8,6 +8,8 @@ using Entitas;
 using Object = UnityEngine.Object;
 using UnityEngine;
 using App.Client.ClientSystems;
+using App.Shared.FreeFramework.framework.buf;
+using XmlConfig;
 
 namespace App.Client.GameModules.ClientEffect
 {
@@ -46,9 +48,10 @@ namespace App.Client.GameModules.ClientEffect
             {
                 /*喷漆*/
                 Vector3 position = entity.sprayPaint.SprayPaintPos;
+                Vector3 head = entity.sprayPaint.SprayPrintSize;
                 Vector3 forward = entity.sprayPaint.SprayPaintForward;
-                Vector3 debugSize = entity.sprayPaint.SprayPrintSize;
-                PlayerSprayPaintUtility.CreateSprayPaint(_contexts, debugSize, position, forward);
+                Logger.DebugFormat("PlayerSprayPaintUtility.CreateBasicDecal");
+                PlayerSprayPaintUtility.CreateBasicDecal(_contexts, position, forward, head);
                 return;
             }
             else
@@ -63,12 +66,26 @@ namespace App.Client.GameModules.ClientEffect
             }
            
             entity.AddLogic(effectLogic);
-            //entity.AddAssets(false, false);
 
             if (null == effectLogic.AssetInfos)
             {
                 Logger.ErrorFormat("AssetInfos for Logic of {0} is null !", entity.effectType.Value);
                 return;
+            }
+
+            switch ((EClientEffectType) entity.effectType.Value)
+            {
+                case EClientEffectType.GrenadeExplosion:
+                case EClientEffectType.BurnBomb:
+                case EClientEffectType.FlashBomb:
+                case EClientEffectType.FogBomb:
+                    if (!entity.hasAssets)
+                    {
+                        entity.AddAssets(false, false);
+                    }
+                    break;
+                default:
+                    break;
             }
 
             BatchLoadHandler handler = new BatchLoadHandler(entity, effectLogic.AssetInfos);

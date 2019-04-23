@@ -184,8 +184,7 @@ namespace App.Shared.Components.Player
         [DontInitilize] public float FreePitch { get; set; }
         [DontInitilize] public float Far { get; set; }
         [DontInitilize] public float Near { get; set; }
-        
-        [DontInitilize] public bool NeedLag { get; set; }
+        [DontInitilize] public bool NeedDetectDistance { get; set; }
         
     }
 

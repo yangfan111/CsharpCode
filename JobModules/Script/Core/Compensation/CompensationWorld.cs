@@ -87,13 +87,12 @@ namespace Core.Compensation
                     continue;
                 }
                 
-
                 if (entity.EntityKey == Self)
                 {
                     _hitboxHandler.EnableHitBox(entity, false);
                     continue;
                 }
-
+                
                 if (entity.EntityType == Self.EntityType && ExcludePlayerList.Contains(entity.EntityId))
                 {
                     _hitboxHandler.EnableHitBox(entity, false);
@@ -113,7 +112,7 @@ namespace Core.Compensation
                             try
                             {
                                 _enableHitBox.BeginProfileOnlyEnableProfile();
-                                _hitboxHandler.SetRigidBodyCollision(entity,true);
+//                                _hitboxHandler.SetRigidBodyCollision(entity,true);
                                 _hitboxHandler.EnableHitBox(entity, true);
                                 _hitboxHandler.UpdateHitBox(entity);
                                 _hitboxHandler.DrawHitBoxOnBullet(entity);
@@ -136,7 +135,7 @@ namespace Core.Compensation
 
             return _hitboxHandler.BoxCast(box, out hitInfo, hitboxLayerMask);
         }
-
+        
         public bool Raycast(RaySegment ray, out RaycastHit hitInfo, int hitboxLayerMask)
         {
             for (int i = 0; i < _entities.Length; i++)
@@ -148,17 +147,18 @@ namespace Core.Compensation
                 {
                     continue;
                 }
+
                 if (entity.EntityKey == Self)
                 {
                     _hitboxHandler.EnableHitBox(entity, false);
                     continue;
                 }
+                
                 if (entity.EntityType == Self.EntityType && ExcludePlayerList.Contains(entity.EntityId))
                 {
                     _hitboxHandler.EnableHitBox(entity, false);
                     continue;
                 }
-
                 
                 if (!_updateAndEnabled[i]) // 同一个serverTime，hitbox只需要计算一次
                 {
@@ -172,7 +172,7 @@ namespace Core.Compensation
                             try
                             {
                                 _enableHitBox.BeginProfileOnlyEnableProfile();
-                                _hitboxHandler.SetRigidBodyCollision(entity,true);
+//                                _hitboxHandler.SetRigidBodyCollision(entity,true);
                                 _hitboxHandler.EnableHitBox(entity, true);
                                 _hitboxHandler.UpdateHitBox(entity);
                                 _hitboxHandler.DrawHitBoxOnBullet(entity);
@@ -192,7 +192,7 @@ namespace Core.Compensation
                     }
                 }
             }
-            
+
             return _hitboxHandler.Raycast(ray.Ray, out hitInfo, ray.Length, hitboxLayerMask);
         }
 

@@ -28,6 +28,7 @@ using Core.WeaponLogic.Throwing;
 using System.Collections.Generic;
 using App.Shared.Audio;
 using App.Shared.GameModules;
+using App.Shared.GameModules.Player.Actions.LadderPackage;
 using UnityEngine;
 using UnityEngine.AI;
 using Utils.Configuration;
@@ -64,12 +65,10 @@ namespace App.Shared.EntityFactory
             bool prediction,
             bool autoMove)
         {
-            PlayerEntity playerEntity = playerContext.CreateEntity();
-            var sex = SingletonManager.Get<RoleConfigManager>().GetRoleItemById(playerInfo.RoleModelId).Sex;
-            var modelName = sex == 1 ? SharedConfig.maleModelName : SharedConfig.femaleModelName;
+            var playerEntity = playerContext.CreateEntity();
 
-            playerEntity.AddPlayerInfo(playerInfo.EntityId, playerInfo.PlayerId, playerInfo.PlayerName, playerInfo.RoleModelId,modelName,
-                playerInfo.TeamId, playerInfo.Num, playerInfo.Level, playerInfo.BackId, playerInfo.TitleId, playerInfo.BadgeId, playerInfo.AvatarIds, playerInfo.WeaponAvatarIds,playerInfo.Camp);
+            playerEntity.AddPlayerInfo(playerInfo.EntityId, playerInfo.PlayerId, playerInfo.PlayerName, playerInfo.RoleModelId,
+                playerInfo.TeamId, playerInfo.Num, playerInfo.Level, playerInfo.BackId, playerInfo.TitleId, playerInfo.BadgeId, playerInfo.AvatarIds, playerInfo.WeaponAvatarIds,playerInfo.Camp, playerInfo.SprayLacquers);
           
             playerEntity.playerInfo.WeaponBags = playerInfo.WeaponBags;
             playerEntity.AddUserCmd();
@@ -97,7 +96,7 @@ namespace App.Shared.EntityFactory
             playerEntity.AddPlayerSkyMove(false, -1);
             playerEntity.AddPlayerSkyMoveInterVar();
             playerEntity.AddTime(0);
-            playerEntity.AddGamePlay(100, 100);
+            playerEntity.AddGamePlay(100, 100, -1, -1);
 
             //            playerEntity.AddWeaponState();
 
@@ -133,7 +132,7 @@ namespace App.Shared.EntityFactory
 
             playerEntity.AddStatisticsData(false, new BattleData(), new StatisticsData());
             playerEntity.AddPlayerMask((byte)(EPlayerMask.TeamA | EPlayerMask.TeamB), (byte)(EPlayerMask.TeamA | EPlayerMask.TeamB));
-            playerEntity.AddPlayerClientEventsUpdate();
+            playerEntity.AddPlayerClientUpdate();
         
 
             playerEntity.AttachPlayerAux();
@@ -185,7 +184,14 @@ namespace App.Shared.EntityFactory
             var sceneObjectFactory = contexts.session.entityFactoryObject.SceneObjectEntityFactory;
             player.AttachModeController(sessionObjects.SessionMode);
 
-             var stateManager = new CharacterStateManager();
+            var characterInfo = new CharacterInfoProviderContext();
+
+            if (!player.hasCharacterInfo)
+            {
+                player.AddCharacterInfo(characterInfo);
+            }
+            
+            var stateManager = new CharacterStateManager(characterInfo);
 
             if(!player.hasStatisticsData)
             {
@@ -196,7 +202,7 @@ namespace App.Shared.EntityFactory
                 player.AddAutoMoveInterface(new GameModules.Player.Move.PlayerAutoMove(player));
 
             var speed = new SpeedManager(player, contexts, stateManager, stateManager, stateManager.GetIPostureInConfig(),
-                stateManager.GetIMovementInConfig());
+                stateManager.GetIMovementInConfig(), characterInfo);
             stateManager.SetSpeedInterface(speed);
             player.AddStateInterface(stateManager);
 
@@ -205,6 +211,7 @@ namespace App.Shared.EntityFactory
 
             var genericAction = new GenericAction();
             player.AddGenericActionInterface(genericAction);
+            player.AddLadderActionInterface(new LadderAction());
 
             var clipManager = new AnimatorClipManager();
             player.AddAnimatorClip(clipManager);
@@ -291,7 +298,7 @@ namespace App.Shared.EntityFactory
             playerEntity.AddPlayerAudio();
             GameModuleManagement.ForceAllocate(playerEntity.entityKey.Value.EntityId, (PlayerAudioController audioController) =>
             {
-                audioController.Initialize(playerEntity);
+                  audioController.Initialize(playerEntity);
             });
         }
         public static void AttachStateInteract(PlayerEntity player)

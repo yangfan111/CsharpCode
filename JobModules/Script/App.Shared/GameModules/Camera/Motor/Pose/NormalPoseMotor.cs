@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Shared.Components.FreeMove;
-using App.Shared.GameModules.Camera.Utils;
+﻿using App.Shared.GameModules.Camera.Utils;
 using Assets.App.Shared.GameModules.Camera;
 using Assets.App.Shared.GameModules.Camera.Motor.Pose;
 using Core.CameraControl;
 using Core.CameraControl.NewMotor;
-using Core.Utils;
+using System.Collections.Generic;
 using UnityEngine;
-using Utils.Compare;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Camera.Motor.Pose
@@ -56,7 +50,8 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
     {
         public bool IsActive(ICameraMotorInput input, ICameraMotorState state)
         {
-            return input.NextPostureState == PostureInConfig.Dying;
+            return input.NextPostureState == PostureInConfig.Dying ||
+                   input.NextPostureState == PostureInConfig.DyingTransition;
         }
     }
 
@@ -90,6 +85,15 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
             return input.ActionState == ActionInConfig.Parachuting && !input.IsParachuteAttached;
         }
     }
+    
+    internal class ClimbActive : IMotorActive
+    {
+        public bool IsActive(ICameraMotorInput input, ICameraMotorState state)
+        {
+            return input.CurrentPostureState == PostureInConfig.Climb;
+        }
+    }
+    
     public class RescueActive : IMotorActive
     {
         public bool IsActive(ICameraMotorInput input, ICameraMotorState state)
@@ -106,6 +110,7 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
         private IMotorActive _active;
         private readonly float Epsilon = 0.01f;
         protected float _transitionTime ;
+        
 
         public NormalPoseMotor(ECameraPoseMode modeId,
             CameraConfig config,
@@ -124,7 +129,6 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
 
             _config = config.GetCameraConfigItem(modeId);
             _active = active;
-
         }
 
         public override short ModeId
@@ -163,7 +167,7 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
         {
             get { return _config.Order; }
         }
-
+        
         public override void CalcOutput(PlayerEntity player, ICameraMotorInput input, ICameraMotorState state,
             SubCameraMotorState subState,
             DummyCameraMotorOutput output,
@@ -172,10 +176,12 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
             
             output.Far = _config.Far;
             output.Near = _config.Near;
+            output.ForbidDetect = _config.ForbidDetect;
 
             _transitionTime = CameraUtility.GetPostureTransitionTime(_motorType, subState);
             var elapsedPercent = ElapsedPercent(clientTime, subState.ModeTime, _transitionTime);
             var realPercent = EaseInOutQuad(0, 1, elapsedPercent);
+
             if (state.IsFristPersion())
             {
                 //一人称和瞄准相机没有偏移
@@ -187,7 +193,7 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
                 {
                     realPercent = 1;
                 }
-                
+
                 output.ArchorOffset = Vector3.Lerp(last.FinalArchorOffset, FinalArchorOffset, realPercent);
                 output.ArchorPostOffset =
                     Vector3.Lerp(last.FinalArchorPostOffset, FinalArchorPostOffset, realPercent);
@@ -195,19 +201,19 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
                 output.ArchorEulerAngle = Vector3.Lerp(last.FinalEulerAngle, FinalEulerAngle, realPercent);
                 output.Fov = Mathf.Lerp(last.FinalFov, FinalFov, realPercent);
             }
+
         }
 
 
         private bool CanRotatePlayer(ICameraMotorState state)
         {
             if (state.IsFree()) return false;
-
             return true;
         }
 
         public override void UpdatePlayerRotation(ICameraMotorInput input, ICameraMotorState state, PlayerEntity player)
         {
-            if (!input.IsDead && CanRotatePlayer(state))
+            if ((!input.IsDead || input.IsDead && input.IsObservingFreemove) && CanRotatePlayer(state))
             {
                 float newDeltaAngle = input.DeltaYaw;
 
@@ -222,15 +228,7 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
                 {
                     player.orientation.Yaw = CalculateFrameVal(player.orientation.Yaw, newDeltaAngle, _config.YawLimit);
                 }
-                
- //               newDeltaAngle = player.characterContoller.Value.PreRotateAngle(player.orientation.ModelView, player.position.Value,input.DeltaYaw, input.FrameInterval * 0.001f);
-                
-//                Logger.DebugFormat("deltaAngle:{0},prevAngle:{1}, curYaw:{2}, input.DeltaYaw:{4},player.orientationLimit.LimitAngle:{5}",
-//                    newDeltaAngle, 
-//                    player.orientation.Yaw,
-//                    CalculateFrameVal(player.orientation.Yaw, newDeltaAngle, _config.YawLimit),
-//                    input.DeltaYaw
-//                );
+               
 
                 var deltaPitch = HandlePunchPitch(player, input);
                 player.orientation.Pitch =

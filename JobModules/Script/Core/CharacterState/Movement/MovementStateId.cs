@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +15,10 @@ namespace Core.CharacterState.Movement
         Dive,               // 5
         DiveMove,               // 6
         Injured,            // 7
+        
+        EnterLadder,
+        Ladder,
+        ExitLadder,
 
         EnumEnd
     }

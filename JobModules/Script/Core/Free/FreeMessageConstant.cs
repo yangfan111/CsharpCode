@@ -78,6 +78,7 @@ namespace Core.Free
         public const int PlayerJumpSpeedSet = 118;
         public const int PlayerTipHide = 119;
 		public const int PlayerSprayPaint = 120;
+        public const int PlayerPressKey = 121;
 
         private static Dictionary<int, string> MessageDesc = new Dictionary<int, string>();
 

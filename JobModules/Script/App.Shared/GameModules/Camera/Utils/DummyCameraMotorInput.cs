@@ -1,9 +1,13 @@
 ﻿using App.Shared.Components;
 using App.Shared.Components.Player;
+using App.Shared.GameModules.Camera.Utils;
 using App.Shared.GameModules.Player;
-using App.Shared.GameModules.Weapon;
+
 using Core.CameraControl;
+using Core.CameraControl.NewMotor;
+using Core.EntityComponent;
 using Core.Prediction.UserPrediction.Cmd;
+
 using XmlConfig;
 using ICameraMotorInput = Core.CameraControl.NewMotor.ICameraMotorInput;
 
@@ -11,17 +15,18 @@ namespace App.Shared.GameModules.Camera
 {
     class DummyCameraMotorInput : ICameraMotorInput
     {
-        public void Generate(PlayerEntity player, IUserCmd usercmd,float archorYaw,float archorPitch)
+        public void Generate(Contexts contexts, PlayerEntity player, IUserCmd usercmd, float archorYaw, float archorPitch, ICameraMotorState state)
         {
-            DeltaYaw = usercmd.DeltaYaw;
-            DeltaPitch = usercmd.DeltaPitch;
+            var speedRatio = CameraUtility.GetGunSightSpeed(player, state);
+            DeltaYaw = usercmd.DeltaYaw * speedRatio;
+            DeltaPitch = usercmd.DeltaPitch * speedRatio;
             if (usercmd.FilteredInput != null)
             {
                 IsCameraFree = usercmd.FilteredInput.IsInput(EPlayerInput.IsCameraFree);
                 FilteredChangeCamera = usercmd.FilteredInput.IsInput(EPlayerInput.ChangeCamera);
                 FilteredCameraFocus = usercmd.FilteredInput.IsInput(EPlayerInput.IsCameraFocus);
             }
-
+            var controller = player.WeaponController();
             FrameInterval = usercmd.FrameInterval;
             ChangeCamera = usercmd.ChangeCamera;
           
@@ -37,27 +42,20 @@ namespace App.Shared.GameModules.Camera
             ActionKeepState = player.stateInterface.State.GetActionKeepState();
             IsDriveCar =  player.IsOnVehicle();            
             IsDead = player.gamePlay.IsLifeState(EPlayerLifeState.Dead);
-            CanWeaponGunSight = player.hasWeaponComponentAgent && player.GetController<PlayerWeaponController>().CurrSlotWeaponId >= 1 & player.weaponLogic.State.CanCameraFocus();
+            CanWeaponGunSight = controller.HeldWeaponAgent.CanWeaponSight;
             ArchorPitch = YawPitchUtility.Normalize(archorPitch);
             ArchorYaw = YawPitchUtility.Normalize(archorYaw);
             IsParachuteAttached = player.hasPlayerSkyMove && player.playerSkyMove.IsParachuteAttached;
-
-            ForceChangeGunSight = player.playerWeaponState.ForceChangeGunSight;
-            ForceInterruptGunSight = UseActionOrIsStateNoGunSight(usercmd, player);
-            player.playerWeaponState.ForceChangeGunSight = false;
-        }
-
-        private bool UseActionOrIsStateNoGunSight(IUserCmd userCmd, PlayerEntity playerEntity)
-        {
-            var interrupt = userCmd.IsUseAction || userCmd.IsTabDown || userCmd.FilteredInput.IsInputBlocked(EPlayerInput.IsCameraFocus);
-            if(!interrupt)
+            if (player.gamePlay.CameraEntityId == 0)
             {
-                if(playerEntity.hasPlayerInterruptState)
-                {
-                    interrupt |= playerEntity.playerInterruptState.ForceInterruptGunSight > 0;
-                }
+                IsObservingFreemove = false;
             }
-            return interrupt;
+            else
+            {
+                IsObservingFreemove = null != contexts.freeMove.GetEntityWithEntityKey(new EntityKey(player.gamePlay.CameraEntityId, (short) EEntityType.FreeMove));
+            }
+            InterruptCameraFocus = usercmd.IsUseAction || usercmd.IsTabDown;
+            LastViewByOrder = player.gamePlay.LastViewModeByCmd;
         }
 
         public float DeltaYaw { get; set; }
@@ -81,6 +79,7 @@ namespace App.Shared.GameModules.Camera
         public float ArchorYaw { get; set; }
         public float ArchorPitch { get; set; }
         public bool IsParachuteAttached { get; set; }
+        public bool IsObservingFreemove { get; set; }
 
         public bool FilteredChangeCamera
         {
@@ -89,9 +88,8 @@ namespace App.Shared.GameModules.Camera
         }
 
         public bool FilteredCameraFocus { get; set; }
-        public bool ForceChangeGunSight { get; set; }
-        public bool ForceInterruptGunSight { get; set; }
-
+        public bool InterruptCameraFocus { get; set; }
+        public short LastViewByOrder { get; set; }
         public override string ToString()
         {
             return string.Format("DeltaYaw: {0}, DeltaPitch: {1}, IsCameraFree: {2}, FrameInterval: {3}, ChangeCamera: {4}, IsCameraFocus: {5}, CanCameraFocus: {6}, NextPostureState: {7}, CurrentPostureState: {8}, LeanState: {9}, ActionState: {10}, IsDriveCar: {11}, IsAirPlane: {12}, IsDead: {13}, CanWeaponGunSight: {14}, IsCmdRun: {15}, IsCmdMoveVertical: {16}, ArchorYaw: {17}, ArchorPitch: {18}", 
@@ -118,10 +116,10 @@ namespace App.Shared.GameModules.Camera
                    || IsParachuteAttached!=r.IsParachuteAttached
                    || FilteredChangeCamera!=r.FilteredChangeCamera
                    || FilteredCameraFocus!=r.FilteredCameraFocus
-                   || ForceChangeGunSight!=r.ForceChangeGunSight
-                   || ForceInterruptGunSight!=r.ForceInterruptGunSight
-                   || ActionKeepState!=r.ActionKeepState;
-                  
+                   || InterruptCameraFocus!=r.InterruptCameraFocus
+                   || ActionKeepState!=r.ActionKeepState
+                   || LastViewByOrder != r.LastViewByOrder
+                || IsObservingFreemove != r.IsObservingFreemove;
         }
     }
 }

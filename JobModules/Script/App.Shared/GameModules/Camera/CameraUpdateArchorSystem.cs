@@ -5,22 +5,22 @@ using App.Shared.GameModules.Player;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
+using Entitas;
 using UnityEngine;
 using Utils.CharacterState;
 
 namespace App.Shared.GameModules.Camera
 {
-    public class CameraUpdateArchorSystem : IUserCmdExecuteSystem
+    public class CameraUpdateArchorSystem : AbstractCameraUpdateSystem,IUserCmdExecuteSystem
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CameraUtility));
-      
 
         private FreeMoveContext _freeMoveContext;
-        private int _cmdSeq = 0;
-        private float _transitionTime = 300;
         private PlayerContext _playerContext;
+        
+        private float _transitionTime = 300;
 
-        public CameraUpdateArchorSystem(Contexts _contexts)
+        public CameraUpdateArchorSystem(Contexts _contexts):base(_contexts)
         {
             _playerContext = _contexts.player;
             _freeMoveContext = _contexts.freeMove;
@@ -28,31 +28,35 @@ namespace App.Shared.GameModules.Camera
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
-            _cmdSeq = cmd.Seq;
-            PlayerEntity player = owner.OwnerEntity as PlayerEntity;
+            var player = owner.OwnerEntity as PlayerEntity;
+            if (player == null) return;
+            
+            CommonUpdate(player,cmd);
+        }
+        
+        protected override void ExecWhenObserving(PlayerEntity player, IUserCmd cmd)
+        {
+        }
 
+        protected override void ExecWhenBeingObserved(PlayerEntity player, IUserCmd cmd)
+        {
+            if (player.appearanceInterface.Appearance.IsFirstPerson)
+            {
+                player.thirdPersonDataForObserving.ThirdPersonArchorPosition =  player.position.Value;
+            }
+        }
+
+        protected override void ExecWhenNormal(PlayerEntity player, IUserCmd cmd)
+        {
             if (!player.hasCameraStateNew) return;
             if (!player.hasCameraStateOutputNew) return;
+
             player.cameraArchor.ArchorType = GetAnchorType(player);
             player.cameraArchor.ArchorPosition =
                 GetAnchorPosition(player, player.cameraArchor.ArchorType);
             player.cameraArchor.ArchorEulerAngle =
                 GetAnchorEulerAngle(player, player.cameraArchor.ArchorType);
             UpdareArchTransition(player);
-        }
-        public void BeforeExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
-        {
-            _cmdSeq = cmd.Seq;
-            PlayerEntity player = owner.OwnerEntity as PlayerEntity;
-
-            if (!player.hasCameraStateNew) return;
-            if (!player.hasCameraStateOutputNew) return;
-            player.cameraArchor.ArchorType = GetAnchorType(player);
-            player.cameraArchor.ArchorPosition =
-                GetAnchorPosition(player, player.cameraArchor.ArchorType);
-            player.cameraArchor.ArchorEulerAngle =
-                GetAnchorEulerAngle(player, player.cameraArchor.ArchorType);
-         
         }
 
         private void UpdareArchTransition(PlayerEntity player)
@@ -82,7 +86,6 @@ namespace App.Shared.GameModules.Camera
             player.cameraArchor.LastArchorType = player.cameraArchor.ArchorType;
         }
 
-
         public ECameraArchorType GetAnchorType(PlayerEntity player)
         {
             if (player.IsOnVehicle())
@@ -98,16 +101,14 @@ namespace App.Shared.GameModules.Camera
             {
                 return ECameraArchorType.AirPlane;
             }
-            else if(player.gamePlay.CameraEntityId != 0)
+            else if(player.gamePlay.IsObserving())
             {
                 var follow = _playerContext.GetEntityWithEntityKey(
                     new Core.EntityComponent.EntityKey(player.gamePlay.CameraEntityId, (short) EEntityType.Player));
                 if(follow!=null && follow.hasPosition)
                 return ECameraArchorType.FollowEntity;
             }
-            
-                return ECameraArchorType.Third;
-            
+            return ECameraArchorType.Third;
         }
 
         public Vector3 GetAnchorEulerAngle(PlayerEntity player, ECameraArchorType type)
@@ -140,9 +141,9 @@ namespace App.Shared.GameModules.Camera
             }
         }
 
-
         public Vector3 GetAnchorPosition(PlayerEntity player, ECameraArchorType type)
         {
+            player.cameraArchor.Active = true;
             switch (type)
             {
                 case ECameraArchorType.Car:
@@ -164,8 +165,8 @@ namespace App.Shared.GameModules.Camera
                     }
 
                 case ECameraArchorType.Parachuting:
-
-                    return player.playerSkyMove.Position;
+                    return player.playerSkyMove.Position.ShiftedVector3();
+                
                 default:
                     if (player.hasAppearanceInterface && player.appearanceInterface.Appearance.IsFirstPerson)
                     {
@@ -184,7 +185,5 @@ namespace App.Shared.GameModules.Camera
                     return player.position.Value;
             }
         }
-
-       
     }
 }

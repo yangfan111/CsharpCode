@@ -15,6 +15,8 @@ public class AkSoundEngineController
         }
     }
     public static event System.Action OnAudioPluginInitialized;
+    
+    public static  System.Action OnAudioPluginInitializedInEditor;
     private AkSoundEngineController()
     {
 #if UNITY_EDITOR
@@ -121,6 +123,7 @@ public class AkSoundEngineController
 #else
 			UnityEngine.Debug.LogError("WwiseUnity: Sound engine is already initialized.");
 #endif
+            DoInitializedEvent();
             return;
         }
 
@@ -131,12 +134,17 @@ public class AkSoundEngineController
 
         if (!AkWwiseInitializationSettings.InitializeSoundEngine())
             return;
+        DoInitializedEvent();
+    }
+
+    void DoInitializedEvent()
+    {
         if (OnAudioPluginInitialized != null && UnityEngine.Application.isPlaying)
             OnAudioPluginInitialized();
-//#if UNITY_EDITOR
-//        OnEnableEditorListener(akInitializer.gameObject);
-//        UnityEditor.EditorApplication.update += LateUpdate;
-//#endif
+#if UNITY_EDITOR
+        if (OnAudioPluginInitializedInEditor != null && !UnityEngine.Application.isPlaying)
+            OnAudioPluginInitializedInEditor();
+#endif
     }
 
     public void OnDisable()

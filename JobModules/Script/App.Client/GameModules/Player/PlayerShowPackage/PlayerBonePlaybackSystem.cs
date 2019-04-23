@@ -101,7 +101,7 @@ namespace App.Client.GameModules.Player.PlayerShowPackage
 
             if (thirdPersonAppearance.NeedUpdateController)
             {
-                characterControllerInterface.CharacterController.SetCharacterControllerHeight(thirdPersonAppearance.CharacterHeight, player.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController);
+                characterControllerInterface.CharacterController.SetCharacterControllerHeight(thirdPersonAppearance.CharacterHeight, player.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController, thirdPersonAppearance.CharacterStandHeight);
                 characterControllerInterface.CharacterController.SetCharacterControllerCenter(thirdPersonAppearance.CharacterCenter, player.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController);
                 characterControllerInterface.CharacterController.SetCharacterControllerRadius(thirdPersonAppearance.CharacterRadius, player.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController);
             }

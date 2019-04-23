@@ -87,27 +87,28 @@ namespace App.Shared.GameModules.Throwing
             _allThrowingSegments.Clear();
             foreach (ThrowingEntity throwing in _throwings.GetEntities())
             {
+                if (throwing.isFlagDestroy)
+                {
+                    continue;
+                }
+
                 if (throwing.ownerId.Value != ownerKey)
                 {
                     CheckVisible(throwing);
                     continue;
                 }
 
-                if (throwing.isFlagDestroy)
-                {
-                    continue;
-                }
 
                 PlayerEntity player = _contexts.player.GetEntityWithEntityKey(throwing.ownerId.Value);
 
                 //销毁被中断的手雷
-                if (null != player && player.throwingAction.ActionInfo.IsInterrupt
+                /*if (null != player && player.throwingAction.ActionInfo.IsInterrupt
                     && player.throwingAction.ActionInfo.ThrowingEntityKey == throwing.entityKey.Value)
                 {
                     player.throwingAction.ActionInfo.IsInterrupt = false;
                     throwing.isFlagDestroy = true;
                     continue;
-                }
+                }*/
 
                 if (throwing.hasLifeTime && (DateTime.Now - throwing.lifeTime.CreateTime).TotalMilliseconds > throwing.throwingData.Config.CountdownTime)
                 {
@@ -128,7 +129,7 @@ namespace App.Shared.GameModules.Throwing
                     {
                         player.WeaponController().RelatedStatisticsData.UseThrowingCount++;
                         player.stateInterface.State.ForceFinishGrenadeThrow();
-                        CastGrenade(_contexts, player);
+                        AfterAttack(_contexts, player);
                     }
                     continue;
                 }
@@ -178,12 +179,9 @@ namespace App.Shared.GameModules.Throwing
             }
         }
 
-        private void CastGrenade(Contexts contexts, PlayerEntity playerEntity)
+        private void AfterAttack(Contexts contexts, PlayerEntity playerEntity)
         {
-            if(!playerEntity.throwingAction.ActionInfo.IsReady)
-            {
-                return;
-            }
+          
             playerEntity.throwingAction.ActionInfo.ClearState();
             playerEntity.WeaponController().AfterAttack();
         }
@@ -290,7 +288,7 @@ namespace App.Shared.GameModules.Throwing
             }
 
             //清理状态
-            CastGrenade(_contexts, playerEntity);
+            AfterAttack(_contexts, playerEntity);
         }
 
         private void ExplosionEffect(ThrowingEntity throwing)

@@ -1,0 +1,58 @@
+﻿#ifndef _PERLIN_NOISE_COMPUTE_
+#define _PERLIN_NOISE_COMPUTE_
+
+StructuredBuffer<int> PerlinNoiseConstants;
+
+float fade(float t)
+{
+    return  t * t * t * (t * (t * 6 - 15) + 10);
+}
+
+float grad2(int hash, float x, float y)
+{
+    int h = hash & 15;
+    float u = h < 8 ? x : y;
+    float v = h < 4 ? y : h == 12 || h == 14 ? x : 0;
+    return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
+}
+
+float PerlinNoise(float x, float y)
+{
+    x = abs(x);
+    y = abs(y);
+
+    int floorX = floor(x);
+    int floorY = floor(y);
+
+    int X = floorX & 255;
+    int Y = floorY & 255;
+    x -= floorX;
+    y -= floorY;
+    float u = fade(min(x, 1));
+    float v = fade(min(y, 1));
+    int A = PerlinNoiseConstants[X] + Y;
+    int AA = PerlinNoiseConstants[A];
+    int AB = PerlinNoiseConstants[A + 1];
+    int B = PerlinNoiseConstants[X + 1] + Y;
+    int BA = PerlinNoiseConstants[B];
+    int BB = PerlinNoiseConstants[B + 1];
+
+    float res = lerp(
+        lerp(grad2(PerlinNoiseConstants[AA], x, y),
+             grad2(PerlinNoiseConstants[BA], x - 1, y),
+             u),
+        lerp(grad2(PerlinNoiseConstants[AB], x, y - 1),
+             grad2(PerlinNoiseConstants[BB], x - 1, y - 1),
+             u),
+        v);
+    return res;
+}
+
+float PerlinNoiseNormalized(float x, float y)
+{
+    float value = PerlinNoise(x, y);
+    value = (value + 0.69) / (0.793 + 0.69);
+    return value;
+}
+
+#endif

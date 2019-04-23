@@ -11,6 +11,7 @@ using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using com.cpkf.yyjd.tools.util;
 using com.cpkf.yyjd.tools.util.math;
+using com.wd.free.action.function;
 using com.wd.free.item;
 using com.wd.free.para;
 using Core.EntityComponent;
@@ -19,6 +20,7 @@ using Free.framework;
 using gameplay.gamerule.free.item;
 using gameplay.gamerule.free.rule;
 using Sharpen;
+using System.Collections.Generic;
 using UnityEngine;
 using Utils.Configuration;
 using Utils.Singleton;
@@ -235,26 +237,41 @@ namespace App.Server.GameModules.GamePlay.Free.client
 
             action.key = FreeItemConfig.GetItemKey(item.cat, item.id);
 
-            bool canAdd = true;
+            int canCount = 0;
+
             if (action.name == "default")
             {
-                canAdd = BagCapacityUtil.CanAddToBag(room.FreeArgs, fd, item.cat, item.id, count);
+                canCount = BagCapacityUtil.CanAddToBagCount(room.FreeArgs, fd, item.cat, item.id, count);
             }
 
-            if (canAdd)
+            if (canCount > 0)
             {
                 PlayerAnimationAction.DoAnimation(room.RoomContexts, PlayerAnimationAction.Interrupt, fd.Player, true);
                 PlayerAnimationAction.DoAnimation(room.RoomContexts, 101, fd.Player, true);
 
                 if (!string.IsNullOrEmpty(action.key))
                 {
-                    action.count = count.ToString();
+                    action.count = canCount.ToString();
                     action.SetPlayer("current");
                     room.FreeArgs.TempUse("current", fd);
 
                     action.Act(room.FreeArgs);
 
                     room.FreeArgs.Resume("current");
+
+                    if (count > canCount)
+                    {
+                        UseCommonAction use = new UseCommonAction();
+                        use.key = "showBottomTip";
+                        use.values = new List<ArgValue>();
+                        use.values.Add(new ArgValue("msg", "拾取了" + count + "个中的" + canCount + "个"));
+
+                        room.FreeArgs.TempUse("current", fd);
+                        use.Act(room.FreeArgs);
+                        room.FreeArgs.Resume("current");
+                        room.FreeArgs.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.
+                            CreateSimpleEquipmentEntity((ECategory)item.cat, item.id, (count - canCount), entity.position.Value);
+                    }
                 }
                 else
                 {

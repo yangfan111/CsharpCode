@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using com.wd.free.skill;
+﻿using com.wd.free.skill;
 using Core.Prediction.UserPrediction.Cmd;
 
 namespace App.Server.GameModules.GamePlay.free.player
@@ -140,6 +136,12 @@ namespace App.Server.GameModules.GamePlay.free.player
                 case B:
                     cmd.IsSwitchFireMode = value;
                     break;
+                case PageUp:
+                    cmd.IsScopeIn = value;
+                    break;
+                case PageDown:
+                    cmd.IsScopeOut = value;
+                    break;
                 default:
                     break;
             }
@@ -199,7 +201,11 @@ namespace App.Server.GameModules.GamePlay.free.player
                     return _cmd.ChangeCamera;
                 case B:
                     return _cmd.IsSwitchFireMode;
-;                default:
+                case PageUp:
+                    return _cmd.IsScopeIn;
+                case PageDown:
+                    return _cmd.IsScopeOut;
+;               default:
                     return false;
             }
         }

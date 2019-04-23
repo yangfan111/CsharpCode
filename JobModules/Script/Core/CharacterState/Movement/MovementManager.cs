@@ -24,10 +24,10 @@ namespace Core.CharacterState.Movement
         private FsmUpdateType _directionUpdateType = FsmUpdateType.ResponseToInput;
         private FsmUpdateType _movementUpdateType = FsmUpdateType.ResponseToInput | FsmUpdateType.ResponseToAnimation;
 
-        public MovementManager(IFsmTransitionHelper infoProvider)
+        public MovementManager(IFsmTransitionHelper infoProvider, ICharacterInfoProvider characterInfo)
         {
             _commonFsm = new MovementFsm("Movement");
-            _commonFsm.Init(infoProvider);
+            _commonFsm.Init(infoProvider, characterInfo);
             AddFsm(_commonFsm);
         }
 

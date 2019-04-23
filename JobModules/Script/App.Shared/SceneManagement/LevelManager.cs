@@ -7,16 +7,81 @@ using Core.SceneManagement;
 using Core.Utils;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Rendering;
 using Utils.AssetManager;
 using Utils.Singleton;
 using Object = System.Object;
 
 namespace App.Shared.SceneManagement
 {
+    internal class StreamSceneObjectAssetPostProcessor : IAssetPostProcessor
+    {
+        private static LoggerAdapter _logger = new LoggerAdapter(typeof(StreamSceneObjectAssetPostProcessor));
+        public readonly int i = 0;
+
+        private Dictionary<int, ShadowCastingMode> originShadows = new Dictionary<int, ShadowCastingMode>();
+        private Dictionary<int, LightProbeUsage> originLightProbes = new Dictionary<int, LightProbeUsage>();
+
+        public StreamSceneObjectAssetPostProcessor(UnityObject unityObject)
+        {
+            i = unityObject.AsGameObject.GetInstanceID();
+            _logger.DebugFormat("StreamSceneObjectAssetPostProcessor :{0}", i);
+
+            // record origin state info
+            GameObject go = unityObject.AsGameObject;
+            var mrs = go.GetComponentsInChildren<MeshRenderer>(true);
+            foreach (MeshRenderer mr in mrs)
+            {
+                if (mr != null)
+                {
+                    int id = mr.GetInstanceID();
+                    originShadows.Add(id, mr.shadowCastingMode);
+                    originLightProbes.Add(id, mr.lightProbeUsage);
+                }
+            }
+        }
+
+        public void LoadFromAsset(UnityObject unityObject)
+        {
+
+            _logger.DebugFormat("LoadFromAsset :{0} {1}", i, unityObject.AsGameObject);
+        }
+
+        public void LoadFromPool(UnityObject unityObject)
+        {
+
+            _logger.DebugFormat("LoadFromPool :{0} {1}", i, unityObject.AsGameObject);
+        }
+
+        public void Recyle(UnityObject unityObject)
+        {
+            _logger.DebugFormat("Recyle :{0} {1}", i, unityObject.AsGameObject);
+
+            // recover origin state info
+            GameObject go = unityObject.AsGameObject;
+            var mrs = go.GetComponentsInChildren<MeshRenderer>(true);
+            foreach (MeshRenderer mr in mrs)
+            {
+                if (mr != null)
+                {
+                    int id = mr.GetInstanceID();
+                    if (originShadows.ContainsKey(id)) mr.shadowCastingMode = originShadows[id];
+                    if (originLightProbes.ContainsKey(id)) mr.lightProbeUsage = originLightProbes[id];
+                }
+            }
+        }
+
+        public void OnDestory(UnityObject unityObject)
+        {
+
+            _logger.DebugFormat("OnDestory :{0} {1}", i, unityObject.AsGameObject);
+        }
+    }
     public class LevelManager : ILevelManager, ISceneResourceRequestHandler
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(LevelManager));
-
+        private AssetLoadOption _assetLoadOption =
+            new AssetLoadOption(false, null, false, (unityObject) => new StreamSceneObjectAssetPostProcessor(unityObject));
         private IUnityAssetManager _assetManager;
         public LevelManager(IUnityAssetManager assetManager)
         {
@@ -46,15 +111,13 @@ namespace App.Shared.SceneManagement
         public event Action<UnityObject> AfterGoLoaded;
         public event Action<UnityObject> BeforeGoUnloaded;
         public event Action<UnityObject> GoUnloaded;
-        
-        private OriginStatus _status = new OriginStatus();
-        public OriginStatus UpdateOrigin(Vector3 pos)
+
+        public void UpdateOrigin(Vector3 pos)
         {
-            _sceneManager.UpdateOrigin(pos, _status);
-            return _status;
+            _sceneManager.UpdateOrigin(pos);
         }
 
-        public void GoLoadedWrapper(string source, UnityObject unityObj)
+        private void GoLoadedWrapper(string source, UnityObject unityObj)
         {
             if (GoLoaded != null)
             {
@@ -87,7 +150,11 @@ namespace App.Shared.SceneManagement
         }
 
         public int NotFinishedRequests { get; private set; }
-        
+        public void LoadResource(string name, IUnityAssetManager assetManager, AssetInfo request)
+        {
+            assetManager.LoadAssetAsync(name, request, GoLoadedWrapper, _assetLoadOption);
+        }
+
         #endregion
 
         private ISceneResourceManager _sceneManager;
@@ -112,7 +179,7 @@ namespace App.Shared.SceneManagement
         {
             _fixedSceneNames = param.FixedScenes;
             _sceneManager = new FixedScenesManager(this, param);
-            
+
             RequestForFixedScenes(param.AssetBundleName);
         }
 
@@ -120,15 +187,15 @@ namespace App.Shared.SceneManagement
         {
             _sceneManager.SetAsapMode(value);
         }
-        
+
         #region ISceneResourceRequestHandler
-    
+
         public void AddUnloadSceneRequest(string sceneName)
         {
             _cachedUnloadSceneRequest.Enqueue(sceneName);
             ++NotFinishedRequests;
         }
-        
+
         public void AddLoadSceneRequest(AssetInfo addr)
         {
             _cachedLoadSceneRequest.Add(addr);
@@ -146,7 +213,7 @@ namespace App.Shared.SceneManagement
             _cachedUnloadGoRequest.Enqueue(unityObj);
             ++NotFinishedRequests;
         }
-        
+
         #endregion
 
         private void SceneLoadedWrapper(Scene scene, LoadSceneMode mode)
@@ -166,7 +233,7 @@ namespace App.Shared.SceneManagement
         {
             if (SceneUnloaded != null)
                 SceneUnloaded.Invoke(scene);
-            
+
             --NotFinishedRequests;
 
             _logger.InfoFormat("scene unloaded {0}", scene.name);

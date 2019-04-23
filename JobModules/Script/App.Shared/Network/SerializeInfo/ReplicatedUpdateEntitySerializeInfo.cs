@@ -43,7 +43,7 @@ namespace App.Shared.Network.SerializeInfo
         private List<MemoryStream> _sendHistoryStreams = new List<MemoryStream>();
         private List<int> _sendHistorySeqs = new List<int>();
         private string _version;
-        public const int SendCount = 5;
+        public const int SendCount = 3;
 
         public void Serialize(Stream outStream, object message)
         {

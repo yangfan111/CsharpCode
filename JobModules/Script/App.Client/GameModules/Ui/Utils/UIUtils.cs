@@ -235,10 +235,15 @@ namespace App.Client.GameModules.Ui.Utils
             }
         }
 
+        public static void SetActive(GameObject go, bool isActive)
+        {
+            if (go.activeSelf != isActive)
+                go.SetActive(isActive);
+        }
+
         public static void SetActive(Transform go, bool isActive)
         {
-            if (go.gameObject.activeSelf != isActive)
-                go.gameObject.SetActive(isActive);
+            SetActive(go.gameObject,isActive);
         }
 
         public static void SetEnable(Behaviour behaviour, bool isActive)

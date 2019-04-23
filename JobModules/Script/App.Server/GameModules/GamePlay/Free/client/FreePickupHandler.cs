@@ -35,7 +35,7 @@ namespace App.Server.GameModules.GamePlay.free.client
 
         public void Handle(ServerRoom room, PlayerEntity player, SimpleProto message)
         {
-            if (BagCapacityUtil.CanAddToBag(room.FreeArgs, (FreeData)player.freeData.FreeData, message.Ins[1], message.Ins[2], message.Ins[3]))
+            if (BagCapacityUtil.CanAddToBagCount(room.FreeArgs, (FreeData)player.freeData.FreeData, message.Ins[1], message.Ins[2], message.Ins[3]) > 0)
             {
                 PickupItemUtil.AddItemToPlayer(room, player, message.Ins[0], message.Ins[1], message.Ins[2], message.Ins[3]);
             }

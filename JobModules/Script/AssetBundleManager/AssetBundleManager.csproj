@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BA76FEAD-A65A-BF03-0FBB-B956FBBDA985}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AssetBundleManager</RootNamespace>
+    <AssemblyName>AssetBundleManager</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Dll.Temp\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\build_obj_dir\Release\AssetBundleManager\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Dll.Temp\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\build_obj_dir\Debug\AssetBundleManager\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="log4net">
+      <HintPath>..\CommonLibs\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEditor.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssetBundlePool.cs" />
+    <Compile Include="Editor\AssetbundlesMenuItems.cs" />
+    <Compile Include="Editor\BuildScript.cs" />
+    <Compile Include="Editor\LocalAssetsModeEditor.cs" />
+    <Compile Include="IAssetBundleStat.cs" />
+    <Compile Include="LoadedAssetBundle.cs" />
+    <Compile Include="Operation\AssetAsyncLoading.cs" />
+    <Compile Include="Operation\AssetBundleLoading.cs" />
+    <Compile Include="Operation\AssetBundleLoadingFromFile.cs" />
+    <Compile Include="Operation\AssetBundleLoadingFromWww.cs" />
+    <Compile Include="Operation\AssetBundleSimulatedLoading.cs" />
+    <Compile Include="Operation\AssetBundleSyncLoading.cs" />
+    <Compile Include="Operation\AssetGroup.cs" />
+    <Compile Include="Operation\AssetLoading.cs" />
+    <Compile Include="Operation\AssetSimulatedLoading.cs" />
+    <Compile Include="Operation\AssetSyncLoading.cs" />
+    <Compile Include="Operation\FailLoading.cs" />
+    <Compile Include="Operation\ManifestLoading.cs" />
+    <Compile Include="Operation\PollingOperation.cs" />
+    <Compile Include="Operation\SceneLoading.cs" />
+    <Compile Include="Operation\SynchronizationMode.cs" />
+    <Compile Include="OperationFactory.cs" />
+    <Compile Include="Utility.cs" />
+    <Compile Include="Warehouse\AssetBundleWarehouse.cs" />
+    <Compile Include="Warehouse\AssetBundleWarehouseAddr.cs" />
+    <Compile Include="Warehouse\AsyncLocalWarehouse.cs" />
+    <Compile Include="Warehouse\AsyncWebWarehouse.cs" />
+    <Compile Include="Warehouse\InitRetValue.cs" />
+    <Compile Include="Warehouse\SimulationWarehouse.cs" />
+    <Compile Include="Warehouse\SyncWarehouse.cs" />
+    <Compile Include="WarehouseFactory.cs" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

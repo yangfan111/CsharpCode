@@ -111,6 +111,8 @@ namespace Core.Prediction.UserPrediction.Cmd
         /// 卸载武器，无动作
         /// </summary>
         bool IsForceUnmountWeapon{ get; set; }
-       
+
+        bool IsScopeIn { get; set; }
+        bool IsScopeOut { get; set; }
     }
 }

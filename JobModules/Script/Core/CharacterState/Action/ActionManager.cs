@@ -17,14 +17,14 @@ namespace Core.CharacterState.Action
         private FsmUpdateType _commonUpdateType = FsmUpdateType.ResponseToInput | FsmUpdateType.ResponseToAnimation;
         private FsmUpdateType _keepUpdateType = FsmUpdateType.ResponseToInput;
 
-        public ActionManager(IFsmTransitionHelper infoProvider)
+        public ActionManager(IFsmTransitionHelper infoProvider, ICharacterInfoProvider characterInfo)
         {
             _commonFsm = new ActionFsm("CommonAction");
-            _commonFsm.InitCommon(infoProvider);
+            _commonFsm.InitCommon(infoProvider, characterInfo);
             AddFsm(_commonFsm);
 
             _keepFsm = new ActionFsm("KeepAction");
-            _keepFsm.InitKeep(infoProvider);
+            _keepFsm.InitKeep(infoProvider, characterInfo);
             AddFsm(_keepFsm);
         }
 

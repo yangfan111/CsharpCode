@@ -19,6 +19,7 @@ namespace Core.Room
         List<int> AvatarIds { get; set; }
         List<int> WeaponAvatarIds { get; set; }
         int Camp { get; set; }
+        List<int> SprayLacquers { get; set; }
         PlayerWeaponBagData[] WeaponBags { get; set; }
     }
     public interface IPlayerInfo:ICreatePlayerInfo

@@ -12,7 +12,7 @@ namespace Core.Appearance
         void PlayerDead(bool isSelf = true);
         void PlayerReborn();
         
-        void SetCharacterControllerHeight(float height, bool updateCapsule, bool baseOnFoot = true);
+        void SetCharacterControllerHeight(float height, bool updateCapsule, float standHeight, bool baseOnFoot = true);
         float GetCharacterControllerHeight { get; }
         void SetCharacterControllerCenter(Vector3 value, bool updateCapsule);
         Vector3 GetCharacterControllerCenter { get; }

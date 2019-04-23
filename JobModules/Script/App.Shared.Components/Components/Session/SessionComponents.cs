@@ -149,6 +149,7 @@ namespace App.Shared.Components
         [DontInitilize] public ServerStatus ServerFpsSatatus { get; set; }
 
         [DontInitilize] public IOcclusionCullingController OCController { get; set; }
+        [DontInitilize] public ITerrainRenderer TerrainRenderer { get; set; }
 
         public void Dispose()
         {

@@ -2,35 +2,36 @@ using System;
 using Assets.XmlConfig;
 using Utils.AssetManager;
 using Core.Enums;
+using Core.Utils;
+using Utils.Configuration;
+using Utils.Singleton;
 
 namespace App.Shared
 {
     public class AssetConfig
     {
-        public static AssetInfo GetCharacterModelAssetInfo(string modelName)
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(AssetConfig));
+        
+        public static AssetInfo GetCharacterModelAssetInfo(int roleId)
         {
-            return new AssetInfo("character/" + modelName, "model");
+            var item = SingletonManager.Get<RoleConfigManager>().GetRoleItemById(roleId);
+            if (null == item)
+            {
+                Logger.ErrorFormat("roleId:  {0}  not exit in roleXML", roleId);
+                return new AssetInfo();
+            }
+            return new AssetInfo(item.ThirdModelAssetBundle, item.ThirdModelAssetName);
         }
 
-        public static AssetInfo GetCharacterHandAssetInfo(string modelName)
+        public static AssetInfo GetCharacterHandAssetInfo(int roleId)
         {
-            return new AssetInfo("character/" + modelName, "Hand");
-        }
-
-        public static AssetInfo GetCharacterHitboxAssetInfo(string modelName)
-        {
-            return new AssetInfo("character/" + modelName, "hitbox");
-        }
-
-
-        public static AssetInfo GetMapAssetInfo()
-        {
-            return new AssetInfo("map/test", "map");
-        }
-
-        public static AssetInfo GetWeaponConfigAssetInfo()
-        {
-            return new AssetInfo("tables", "weapon");
+            var item = SingletonManager.Get<RoleConfigManager>().GetRoleItemById(roleId);
+            if (null == item)
+            {
+                Logger.ErrorFormat("roleId:  {0}  not exit in roleXML", roleId);
+                return new AssetInfo();
+            }
+            return new AssetInfo(item.FirstModelAssetBundle, item.FirstModelAssetName);
         }
 
         public static AssetInfo GetBulletAssetInfo(EBulletType type)
@@ -39,15 +40,9 @@ namespace App.Shared
             {
                 case EBulletType.Light:
                     return new AssetInfo("common/bullet", "dandao01");
-                case EBulletType.Normal:
                 default:
                     return new AssetInfo("common/bullet", "bolt");
             }
-        }
-
-        public static AssetInfo GetHitWallAssetInfo()
-        {
-            return new AssetInfo("effect/common", "explosion_asteroid");
         }
 		
 		public static AssetInfo GetVehicleAssetInfo(string assetBundleName, string modelName)
@@ -59,61 +54,10 @@ namespace App.Shared
         {
             return new AssetInfo(assetBundleName, "hitbox");
         }
-        
-
-        public static AssetInfo GetDamageHintAssetInfo()
-        {
-            return new AssetInfo("effect/common", "DamageHint");
-        }
-
-        public static AssetInfo GetHumanHitAssetInfo()
-        {
-            return new AssetInfo("effect/common", "explosion_player");
-        }
-
-        public static AssetInfo GetEquipmentBasisAssetInfo()
-        {
-            return new AssetInfo("configuration/equipment", "basis");
-        }
-
-        public static AssetInfo GetEquipmentLocationAssetInfo()
-        {
-            return new AssetInfo("configuration/equipment", "location");
-        }
-
-        public static AssetInfo GetSceneConfigAssetInfo()
-        {
-            return new AssetInfo("configuration/scene", "scene");
-        }
-
-        public static AssetInfo GetMapConfigInfo()
-        {
-            return new AssetInfo("configuration/scene", "mapConfig");
-        }
 
         public static AssetInfo GetAnimationConfigAssetInfo()
         {
             return new AssetInfo("configuration/animation", "animation");
-        }
-
-        public static AssetInfo GetFirstPersonFemaleEmptyHandedAnimation()
-        {
-            return new AssetInfo("configuration/animation", "HandNwOC");
-        }
-
-        public static AssetInfo GetThirdPersonFemaleEmptyHandedAnimation()
-        {
-            return new AssetInfo("configuration/animation", "FemaleNwOC");
-        }
-
-        public static AssetInfo GetFirstPersonMaleEmptyHandedAnimation()
-        {
-            return new AssetInfo();
-        }
-
-        public static AssetInfo GetThirdPersonMaleEmptyHandedAnimation()
-        {
-            return new AssetInfo();
         }
 
         public static AssetInfo GetCameraPoisonEffect()

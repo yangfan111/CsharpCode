@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Core.Components;
 using Core.GameModule.Interface;
 using Core.OC;
 using Core.Utils;
@@ -31,7 +32,7 @@ namespace App.Client.GameModules.OC
         public void OnRender()
         {
             SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.OC);
-            _ocController.DoCulling(Camera.main.transform.position);
+            _ocController.DoCulling(Camera.main.transform.position.WorldPosition());
             SingletonManager.Get<DurationHelp>().ProfileEnd(CustomProfilerStep.OC);
 
             var umbraTime1 = _dynamicObjectsUmbraSampler.GetRecorder().elapsedNanoseconds * 10e-6f;

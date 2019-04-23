@@ -1,0 +1,51 @@
+﻿#ifndef _RAND_COMPUTE_
+#define _RAND_COMPUTE_
+
+static const float DitherTable[64] =
+{
+    1, 49, 13, 61, 4, 52, 16, 64,
+    33, 17, 45, 29, 36, 20, 48, 32,
+    9, 57, 5, 53, 12, 60, 8, 56,
+    41, 25, 37, 21, 44, 28, 40, 24,
+    3, 51, 15, 63, 2, 50, 14, 62,
+    35, 19, 47, 31, 34, 18, 46, 30,
+    11, 59, 7, 55, 10, 58, 6, 54,
+    43, 27, 39, 23, 42, 26, 38, 22,
+};
+
+inline void RandSetSeed(uint seed, out uint randX, out uint randY, out uint randZ, out uint randW)
+{
+    randX = 0;
+    randY = 0;
+    randZ = 0;
+    randW = 0;
+
+    randX = seed;
+    randY = randX * 1812433253 + 1;
+    randZ = randY * 1812433253 + 1;
+    randW = randZ * 1812433253 + 1;
+}
+
+float RandGetFloatFromInt(uint value)
+{
+    return float(value & 0x007FFFFF) / 8388607;
+}
+
+uint RandGet(inout uint randX, inout uint randY, inout uint randZ, inout uint randW)
+{
+    uint t = randX ^ (randX << 11);
+    randX = randY;
+    randY = randZ;
+    randZ = randW;
+    randW = (randW ^ (randW >> 19)) ^ (t ^ (t >> 8));
+    return randW;
+}
+
+float RandGetFloat(inout uint randX, inout uint randY, inout uint randZ, inout uint randW)
+{
+    uint value = RandGet(randX, randY, randZ, randW);
+    return RandGetFloatFromInt(value);
+}
+
+
+#endif

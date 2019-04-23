@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using App.Client.GameModules.Free;
+using App.Client.GameModules.GamePlay.Free.Auto.Prefab;
+using App.Client.GameModules.Ui.Models.Chicken;
 using App.Client.GameModules.Ui.UiAdapter;
 using App.Shared;
 using App.Shared.Components.Ui;
@@ -114,6 +116,13 @@ namespace App.Client.GameModules.Ui.System
                     uiAdapter.Player = playerEntity;
                 }
             }
+
+            /*喷漆*/
+            var sprayLacquers = playerEntity.playerInfo.SprayLacquers;
+            _contexts.ui.uI.PaintIdList.Clear();
+            foreach (var id in sprayLacquers) {
+                _contexts.ui.uI.PaintIdList.Add(id);
+            }
         }
 
         private void CreateUIComponent(Contexts contexts)
@@ -182,9 +191,21 @@ namespace App.Client.GameModules.Ui.System
             contexts.ui.uI.LoadingRate = 0;
             contexts.ui.uI.LoadingText = "";
             contexts.ui.uI.PaintIdList = new List<int>();
+            contexts.ui.uI.ChickenBagItemDataList = new List<IBaseChickenBagItemData>();
 
+            //TestBagData(contexts.ui.uI.ChickenBagItemDataList);
             //TestPaintData(contexts.ui.uI.PaintIdList);
 //            TestMapData(contexts);
+        }
+
+        private void TestBagData(List<IBaseChickenBagItemData> chickenBagItemDataList)
+        {
+            var item1 = new BaseChickenBagItemData { id = 11, key = "4|2", cat = 2};
+            var item2 = new BaseChickenBagItemData { id = 11, key = "3|7", cat = 9,count = 11};
+            var item3 = new BaseChickenBagItemData { id = 11, key = "5|22", cat = 5,count = 15};
+            chickenBagItemDataList.Add(item1);
+            chickenBagItemDataList.Add(item2);
+            chickenBagItemDataList.Add(item3);
         }
 
         private void TestPaintData(List<int> list)

@@ -667,7 +667,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 	        {
 		        return;
 	        }
-            _viewModel.WeaponModeShow =  false;
+            //_viewModel.WeaponModeShow =  false;
 	        if (index != GrenadeSlotPos)
 	        {
 		        _viewModel.SetWeaponIconAlpha(index, _unSelectedAlpha);
@@ -694,9 +694,10 @@ namespace App.Client.GameModules.Ui.Models.Common
 	    {
 		    if (index <= 0)
 		    {
-			    return;
+		        _viewModel.WeaponModeShow = false;//未选中时关闭显示
+                return;
 		    }
-		    _viewModel.WeaponModeShow =  true;
+		    //_viewModel.WeaponModeShow =  true;
 		    if (index != GrenadeSlotPos)
 		    {
 			    _viewModel.SetWeaponIconAlpha(index, 1);

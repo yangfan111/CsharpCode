@@ -1,13 +1,16 @@
-﻿using Core.Utils;
+﻿using System;
+using com.wd.free.action.stage;
+using Core.Utils;
 using UnityEngine;
 
 namespace App.Shared.Audio
 {
     /// <summary>
-    /// Defines the <see cref="AKAudioEntry" />
+    /// Defines the <see cref="AudioEntry" />
     /// </summary>
-    public static class AKAudioEntry
+    public static class AudioEntry
     {
+
         /// <summary>
         /// 音频执行实例
         /// </summary>
@@ -32,34 +35,52 @@ namespace App.Shared.Audio
         {
             get
             {
-                if (SharedConfig.IsMute) return null;
+#if UNITY_EDITOR
+                if (ListenerManager == null)
+                    return null;
+#endif
+                if (SharedConfig.IsMute || SharedConfig.IsServer) return null;
                 if (dispatcher == null)
                 {
                     if (PrepareReady)
                     {
                         dispatcher = new AKAudioDispatcher(bankResLoader);
                     }
-                    else
-                    {
-                        AudioInfluence.IsForbidden = true;
-                        //AudioUtil.ELog("Dispather call in unexpected");
-                    }
+                 
                 }
                 return dispatcher;
             }
         }
 
-        public static readonly LoggerAdapter AudioLogger = new LoggerAdapter(typeof(AKAudioEntry));
+        public static readonly LoggerAdapter AudioLogger = new LoggerAdapter(typeof(AudioEntry));
 
-        public static void LaunchAppAudio(GameObject audioObject,AudioStepPlayInfo stepPlayInfo)
+        private static AudioListenerManager _listenerManager;
+        public static AudioListenerManager ListenerManager
+        {
+            get
+            {
+                if (_listenerManager != null && !_listenerManager.DefaultListenerTrans)
+                    _listenerManager = null;
+                return _listenerManager;
+            }
+            set { _listenerManager = value; }
+        }
+
+        public static void ReloadWiseBank()
+        {
+            bankResLoader = new AudioBankLoader();
+            AKRESULT result = bankResLoader.Initialize();
+            DebugUtil.MyLog("Wise Bank  reload :"+result);
+        }
+        public static void LaunchAppAudio(GameObject audioObject)
         {
 
 #if UNITY_EDITOR
-            AudioInfluence.IsForbidden = SharedConfig.IsMute;
+        
             if (SharedConfig.IsMute)
                 return;
 #endif
-            AudioInfluence.StepPlayInfo = stepPlayInfo;
+           // AudioInfluence.StepPlayInfo = stepPlayInfo;
             PluginsDriver = audioObject;
             bankResLoader = new AudioBankLoader();
             AKRESULT result = bankResLoader.Initialize();

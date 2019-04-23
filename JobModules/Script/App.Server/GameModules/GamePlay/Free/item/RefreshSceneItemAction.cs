@@ -2,9 +2,11 @@
 using Assets.XmlConfig;
 using com.wd.free.action;
 using com.wd.free.@event;
+using Core.Utils;
 using Shared.Scripts.MapConfigPoint;
 using System;
 using System.Collections.Generic;
+using gameplay.gamerule.free.item;
 using UnityEngine;
 
 namespace App.Server.GameModules.GamePlay.Free.item
@@ -12,6 +14,8 @@ namespace App.Server.GameModules.GamePlay.Free.item
     [Serializable]
     public class RefreshSceneItemAction : AbstractGameAction
     {
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(RefreshSceneItemAction));
+
         private bool remove;
 
         public override void DoAction(IEventArgs args)
@@ -24,10 +28,14 @@ namespace App.Server.GameModules.GamePlay.Free.item
             {
                 if (MapConfigPoints.current != null)
                 {
+                    if (MapConfigPoints.current.IDPints.Count == 0)
+                    {
+                        Logger.Error("地图点位（组）数量为0！");
+                    }
                     foreach (MapConfigPoints.ID_Point point in MapConfigPoints.current.IDPints)
                     {
                         List<ItemDrop> list = FreeItemDrop.GetDropItems(point.ID, args.GameContext.session.commonSession.RoomInfo.MapId);
-
+                        Logger.InfoFormat("地图点位 {0} 上，将会刷新 {1} 个（组）物品", point.ID, list.Count);
                         if (list.Count > 0)
                         {
                             TimerGameAction timer = new TimerGameAction();
@@ -37,6 +45,10 @@ namespace App.Server.GameModules.GamePlay.Free.item
                             timer.Act(args);
                         }
                     }
+                }
+                else
+                {
+                    Logger.Error("地图点位（组）不存在！");
                 }
             }
         }

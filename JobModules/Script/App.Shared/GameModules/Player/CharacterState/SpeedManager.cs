@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +16,7 @@ using Core.Compare;
 using Utils.Configuration;
 using Utils.Singleton;
 
+
 namespace App.Shared.GameModules.Player.CharacterState
 {
     public class SpeedManager : ICharacterSpeed
@@ -31,25 +32,30 @@ namespace App.Shared.GameModules.Player.CharacterState
         private readonly ICharacterMovement _movement;
         private readonly ICharacterPostureInConfig _postureInConfig;
         private readonly ICharacterMovementInConfig _movementInConfig;
-        private readonly ISpeedProvider _speedProvider;
 
         private Dictionary<int, Action> _speedConditionDictionary;
+        private ICharacterInfoProvider _characterInfoProvider;
         private PostureInConfig _currentPosture;
         private MovementInConfig _currentMovement;
+        private Contexts _contexts;
+        //至少需要把动画播放出来
+        private static readonly float FullbodySpeedRatioMin = 0.01f;
 
         public SpeedManager(PlayerEntity player,
+                            Contexts contexts,
                             ICharacterPosture posture,
                             ICharacterMovement movement,
                             ICharacterPostureInConfig postureInConfig,
                             ICharacterMovementInConfig movementInConfig,
-                            ISpeedProvider speedProvider)
+            ICharacterInfoProvider characterInfoProvider)
         {
+            _contexts = contexts;
             _player = player;
             _posture = posture;
             _movement = movement;
             _postureInConfig = postureInConfig;
             _movementInConfig = movementInConfig;
-            _speedProvider = speedProvider;
+            _characterInfoProvider = characterInfoProvider;
             _speedConditionDictionary = new Dictionary<int, Action>()
             {
                 // 落地
@@ -106,6 +112,11 @@ namespace App.Shared.GameModules.Player.CharacterState
                 {
                     CharacterStateConfigHelper.GenerateId(PostureInConfig.Dying, MovementInConfig.Null),
                     () => { SetCurrentState(PostureInConfig.Dying, MovementInConfig.Walk); }
+                },
+                // 受伤
+                {
+                    CharacterStateConfigHelper.GenerateId(PostureInConfig.Null, MovementInConfig.Ladder),
+                    () => { SetCurrentState(PostureInConfig.Null, MovementInConfig.Ladder); }
                 }
             };
         }
@@ -122,6 +133,11 @@ namespace App.Shared.GameModules.Player.CharacterState
             {
                 SetDefaultSpeeedRatio(buff);
                 CalcMoveSpeedReduce(deltaTime, true);
+            }
+            else if (_posture.GetNextPostureState() == PostureInConfig.Slide)
+            {
+                SetDefaultSpeeedRatio(buff);
+                CalcMoveSpeedReduce(deltaTime, false);
             }
             else
             {
@@ -145,8 +161,10 @@ namespace App.Shared.GameModules.Player.CharacterState
                 {
                     if (_postureInConfig.InTransition() || _movementInConfig.InTransition())
                     {
+                        var scale = Mathf.Abs(CalcTransitionSpeedScale(deltaTime));
                         var remainTime = Math.Max(_postureInConfig.TransitionRemainTime(), _movementInConfig.TransitionRemainTime()) * 0.001f;
-                        var acceleratedSpeed = lastSpeed + (maxSpeed - lastSpeed) * deltaTime / remainTime;
+                        var acceleratedSpeed = lastSpeed + (maxSpeed - lastSpeed) * deltaTime *  scale / remainTime;
+                        //_logger.InfoFormat("prev speed:{0}, nextspeed:{1}, maxSpeed:{2}", lastSpeed, acceleratedSpeed, maxSpeed);
                         if (lastSpeed <= maxSpeed)
                         {
                             acceleratedSpeed = Math.Min(acceleratedSpeed, maxSpeed);
@@ -168,7 +186,9 @@ namespace App.Shared.GameModules.Player.CharacterState
 
             if (_posture.IsNeedJumpSpeed())
             {
-                vel.y = 3.4f;
+                vel.y = _characterInfoProvider.GetJumpSpeed() * (1 + _player.playerMove.JumpAffect);
+                //_logger.InfoFormat("start jump!!!!!!vel.y:{0}, _player.playerMove.JumpAffect:{1}", vel.y,_player.playerMove.JumpAffect );
+
             }
             else if (_posture.GetNextPostureState() == PostureInConfig.Swim)
             {
@@ -177,9 +197,27 @@ namespace App.Shared.GameModules.Player.CharacterState
             else if (_posture.GetNextPostureState() != PostureInConfig.Dive)
             {
                 vel.y = lastVel.y - deltaTime * Gravity;
+                //_logger.InfoFormat("jumpTime:{0}, vel.y:{1}, expected:{2}", JumpTime, vel.y, 3.4 - JumpTime * Gravity);
             }
 
             return vel;
+        }
+
+
+        private float CalcTransitionSpeedScale(float deltaTime)
+        {
+            var ret = 1.0f;
+            if (_movementInConfig.InTransition())
+            {
+                var normalizeTime = 1 - _movementInConfig.TransitionRemainTime() / _movementInConfig.TransitionTime();
+                var target = Mathf.Clamp01(normalizeTime + deltaTime * 1000f / _movementInConfig.TransitionTime());
+                ret = SingletonManager.Get<CharacterStateConfigManager>()
+                    .GetMovementTransitionSpeedScale(_movementInConfig.CurrentMovement(),
+                        _movement.GetNextMovementState(),normalizeTime, target);
+                //_logger.InfoFormat("current:{0}, next:{1}, normalize time:{2},target:{3} ret:{4}",_movementInConfig.CurrentMovement(),
+                //    _movement.GetNextMovementState(), 1 - _movementInConfig.TransitionRemainTime()/_movementInConfig.TransitionTime(),target,ret);
+            }
+            return ret;
         }
 
         private void CalcMoveSpeedReduce(float deltaTime, bool isAir)
@@ -200,12 +238,14 @@ namespace App.Shared.GameModules.Player.CharacterState
         {
             //1-e^(-(1-x)*30)
             //return Mathf.Clamp01(1.0f - Mathf.Exp(-(1.5f - time) * 3.2f));
-//            return Mathf.Clamp01(Mathf.Cos(time));
-            var com = _player.RootGo().GetComponent<AirMoveCurve>();
+            //            return Mathf.Clamp01(Mathf.Cos(time));
+
+            AnimationCurve com = SingletonManager.Get<CharacterStateConfigManager>().AirMoveCurve;
+
             if (com != null)
             {
                 //_logger.InfoFormat("jump date:{0}", Mathf.Clamp(com.AireMoveCurve.Evaluate(time), 0f, float.MaxValue));
-                return Mathf.Clamp(com.AireMoveCurve.Evaluate(time), 0f, float.MaxValue);
+                return Mathf.Clamp(com.Evaluate(time), 0f, float.MaxValue);
             }
             else
             {
@@ -216,7 +256,7 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         private void SetDefaultSpeeedRatio(float buff)
         {
-            float weaponSpeed =_speedProvider.GetBaseSpeed();
+            float weaponSpeed = _player.WeaponController().HeldWeaponAgent.BaseSpeed ;
             var newSpeedRatio =  weaponSpeed * (1.0f + buff) / SingletonManager.Get<CharacterStateConfigManager>().GetStandardAnimationSpeed();
             _player.playerMove.SpeedRatio = newSpeedRatio;
         }
@@ -224,7 +264,15 @@ namespace App.Shared.GameModules.Player.CharacterState
         public Vector3 GetSpeedOffset(float buff)
         {
             Vector3 ret = Vector3.zero;
-            if (_posture.GetNextPostureState() == PostureInConfig.Jump)
+            if (_postureInConfig.InTransition() && _posture.GetNextPostureState() == PostureInConfig.Jump && _posture.GetCurrentPostureState() == PostureInConfig.Prone)
+            {
+                var normalizeTime = 1 - _postureInConfig.TransitionRemainTime() / _postureInConfig.TransitionTime();
+                ret.y += SingletonManager.Get<CharacterStateConfigManager>()
+                    .GetPostureTransitionSpeedScale(_posture.GetCurrentPostureState(), _posture.GetNextPostureState(),
+                        normalizeTime);
+                //_logger.InfoFormat("ret.y += {0}",ret.y);
+            }
+            else if (_posture.GetNextPostureState() == PostureInConfig.Jump)
             {
                 if (Mathf.Abs(_movement.HorizontalValue) > Epsilon)
                 {
@@ -264,6 +312,11 @@ namespace App.Shared.GameModules.Player.CharacterState
             _player.playerMove.SpeedAffect = affect;
         }
 
+        public void SetJumpAffect(float affect)
+        {
+            _player.playerMove.JumpAffect = affect;
+        }
+
         public float SpeedRatio()
         {
             return _player.playerMove.SpeedRatio;
@@ -280,9 +333,16 @@ namespace App.Shared.GameModules.Player.CharacterState
                  _movementInConfig.InTransition() ? _movementInConfig.NextMovement() : _movementInConfig.CurrentMovement());
             var candidateId2 = CharacterStateConfigHelper.GenerateId(_postureInConfig.NextPosture(), MovementInConfig.Null);
             var candidateId3 = CharacterStateConfigHelper.GenerateId(_postureInConfig.CurrentPosture(), MovementInConfig.Null);
+            var candidateId4 = CharacterStateConfigHelper.GenerateId(PostureInConfig.Null, _movementInConfig.CurrentMovement());
             //_logger.InfoFormat("posture in transition:{0}, next posture:{1}, cur posture:{2}, move in transition:{3}, next move:{4}, CURRENT MOVE:{5}",_postureInConfig.InTransition() , _postureInConfig.NextPosture() , _postureInConfig.CurrentPosture(),
-             //   _movementInConfig.InTransition() , _movementInConfig.NextMovement() , _movementInConfig.CurrentMovement());
-            if (_speedConditionDictionary.ContainsKey(candidateId3))
+            //   _movementInConfig.InTransition() , _movementInConfig.NextMovement() , _movementInConfig.CurrentMovement());
+
+            if (_speedConditionDictionary.ContainsKey(candidateId4))
+            {
+                valid = true;
+                _speedConditionDictionary[candidateId4].Invoke();
+            }
+            else if (_speedConditionDictionary.ContainsKey(candidateId3))
             {
                 valid = true;
                 _speedConditionDictionary[candidateId3].Invoke();
@@ -301,8 +361,8 @@ namespace App.Shared.GameModules.Player.CharacterState
 
             if (valid)
             {
-                float weaponSpeed = GetWeaponSpeed(_currentPosture, _currentMovement, _speedProvider.GetBaseSpeed(),
-                    _speedProvider.GetDefaultSpeed());
+                float weaponSpeed = GetWeaponSpeed(_currentPosture, _currentMovement, _player.WeaponController().HeldWeaponAgent.BaseSpeed,
+                    _player.WeaponController().HeldWeaponAgent.DefaultSpeed);
                 maxSpeed = SingletonManager.Get<CharacterStateConfigManager>().GetSpeed(_currentPosture,
                     _currentMovement,
                     _movement.IsForth,
@@ -333,11 +393,12 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         private void CalcSpeedRatio(float maxSpeed, float curSpeed, float buff)
         {
-            var scale = Math.Max(0.01f, maxSpeed != 0 ? curSpeed / maxSpeed : 1);
-            float weaponSpeed = GetWeaponSpeed(_currentPosture, _currentMovement, _speedProvider.GetBaseSpeed(),
-                _speedProvider.GetDefaultSpeed());
+            
+            var scale = maxSpeed > curSpeed ? curSpeed / maxSpeed:1.0f;
+            float weaponSpeed = GetWeaponSpeed(_currentPosture, _currentMovement, _player.WeaponController().HeldWeaponAgent.BaseSpeed,
+                    _player.WeaponController().HeldWeaponAgent.DefaultSpeed);
             var newSpeedRatio = scale * weaponSpeed * (1.0f + buff) / SingletonManager.Get<CharacterStateConfigManager>().GetStandardAnimationSpeed();
-            _player.playerMove.SpeedRatio = newSpeedRatio;
+            _player.playerMove.SpeedRatio = newSpeedRatio < FullbodySpeedRatioMin? FullbodySpeedRatioMin: newSpeedRatio;
             if (float.IsNaN(newSpeedRatio) || float.IsInfinity(newSpeedRatio))
             {
                 _logger.ErrorFormat("curspeed:{0}, maxSpeed:{1}, weaponSpeed:{2}, standAnimationSpeed:{3}, buff:{4}, scale:{5}",

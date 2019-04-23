@@ -1,0 +1,91 @@
+﻿#ifndef _HEIGHT_MAP_COMPUTE_
+#define _HEIGHT_MAP_COMPUTE_
+
+RWStructuredBuffer<float> HeightMapData;
+
+uniform float3 TerrainSize;
+uniform float HeightMapResolution;
+uniform float3 BasePosition;
+
+float GetHeight(int x, int y)
+{
+    x = clamp(x, 0, HeightMapResolution - 1);
+    y = clamp(y, 0, HeightMapResolution - 1);
+    return HeightMapData[y + x * HeightMapResolution];
+}
+
+float GetInterpolatedHeight(float x, float y)
+{
+    float fx = x * (HeightMapResolution - 1);
+    float fy = y * (HeightMapResolution - 1);
+
+    int lx = int(fx);
+    int ly = int(fy);
+    float u = frac(fx);
+    float v = frac(fy);
+
+    if (u > v)
+    {
+        float z00 = GetHeight(lx + 0, ly + 0);
+        float z01 = GetHeight(lx + 1, ly + 0);
+        float z11 = GetHeight(lx + 1, ly + 1);
+        return (z00 + (z01 - z00) * u + (z11 - z01) * v) * TerrainSize.y;
+    }
+    else
+    {
+        float z00 = GetHeight(lx + 0, ly + 0);
+        float z10 = GetHeight(lx + 0, ly + 1);
+        float z11 = GetHeight(lx + 1, ly + 1);
+        return (z00 + (z11 - z10) * u + (z10 - z00) * v) * TerrainSize.y;
+    }
+}
+
+float3 CalculateNormalSobel(int x, int y, float2 scale)
+{
+    float dY, dX;
+
+    dX = -GetHeight(x - 1, y - 1);
+    dX -= GetHeight(x - 1, y) * 2;
+    dX -= GetHeight(x - 1, y + 1);
+    dX += GetHeight(x + 1, y - 1);
+    dX += GetHeight(x + 1, y) * 2;
+    dX += GetHeight(x + 1, y + 1);
+
+    dX = dX * TerrainSize.y / scale.x;
+
+    dY = -GetHeight(x - 1, y - 1);
+    dY -= GetHeight(x, y - 1) * 2;
+    dY -= GetHeight(x + 1, y - 1);
+    dY += GetHeight(x - 1, y + 1);
+    dY += GetHeight(x, y + 1) * 2;
+    dY += GetHeight(x + 1, y + 1);
+
+    dY = dY * TerrainSize.y / scale.y;
+
+    return normalize(float3(-dX, 8, -dY));
+}
+
+float3 GetInterpolatedNormal(float x, float y)
+{
+    float fx = x * (HeightMapResolution - 1);
+    float fy = y * (HeightMapResolution - 1);
+
+    int lx = int(fx);
+    int ly = int(fy);
+    float u = frac(fx);
+    float v = frac(fy);
+
+    float2 scale = float2(TerrainSize.x / (HeightMapResolution - 1), TerrainSize.z / (HeightMapResolution - 1));
+
+    float3 n00 = CalculateNormalSobel(lx + 0, ly + 0, scale);
+    float3 n10 = CalculateNormalSobel(lx + 1, ly + 0, scale);
+    float3 n01 = CalculateNormalSobel(lx + 0, ly + 1, scale);
+    float3 n11 = CalculateNormalSobel(lx + 1, ly + 1, scale);
+
+    float3 s = lerp(n00, n10, u);
+    float3 t = lerp(n01, n11, u);
+
+    return normalize(lerp(s, t, v));
+}
+
+#endif

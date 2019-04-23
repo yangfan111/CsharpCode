@@ -1,10 +1,13 @@
-﻿using App.Client.GameModules.Player;
-using App.Shared.FreeFramework.Free.Chicken;
+﻿﻿using App.Client.GameModules.Player;
+ using App.Shared.Audio;
+ using App.Shared.FreeFramework.Free.Chicken;
 using App.Shared.GameModules.Attack;
 using App.Shared.GameModules.Bullet;
 using App.Shared.GameModules.Camera;
 using App.Shared.GameModules.Player;
 using App.Shared.GameModules.Player.Actions;
+using App.Shared.GameModules.Player.Actions.LadderPackage;
+using App.Shared.GameModules.Player.Actions.Move;
 using App.Shared.GameModules.Player.Appearance;
 using App.Shared.GameModules.Player.Appearance.CharacterDebugPackage;
 using App.Shared.GameModules.Player.CharacterBone;
@@ -105,6 +108,7 @@ namespace App.Shared.GameModules
             
             AddSystem(new PlayerAutoMoveSystem());
             AddSystem(new PlayerClimbActionSystem());
+            AddSystem(new PlayerLadderActionSystem());
             if(!SharedConfig.IsServer)
                 AddSystem(new PlayerStateUpdateSystem(contexts));
             else
@@ -146,6 +150,7 @@ namespace App.Shared.GameModules
             if (!SharedConfig.IsServer)
             {
                 AddSystem(new CameraUpdateSystem(contexts, motors));
+                AddSystem(new PlayerAudioUpdateSystem());
             }
             else
             {
@@ -157,7 +162,7 @@ namespace App.Shared.GameModules
             if (!SharedConfig.IsServer)
                 AddSystem(new CameraPostUpdateSystem(contexts));
             else AddSystem(new ServerPostCameraUpdateSystem(contexts));
-            AddSystem(new PlayerSoundPlaySystem(contexts));
+        
             
         }
     }

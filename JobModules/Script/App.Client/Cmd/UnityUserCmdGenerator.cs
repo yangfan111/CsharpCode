@@ -51,49 +51,31 @@ namespace Assets.Sources
             #region Env keyreceiver
 
             // 有UI打开的情况下，不能开枪, 不能瞄准
-
+            _specialKeyReceiver = new KeyReceiver(UiConstant.specicalCmdKeyLayer, BlockType.None);
+            for(int i = 0; i < _inputMapperList.Count; i++)
             {
-                _specialKeyReceiver = new KeyReceiver(UiConstant.specicalCmdKeyLayer, BlockType.None);
-                _specialKeyReceiver.AddAction(UserInputKey.Fire, (data) => _userCmd.IsLeftAttack = true);
-                _specialKeyReceiver.AddAction(UserInputKey.RightAttack, (data) =>
-                {
-                    _userCmd.IsRightAttack = true;
-                });
-                for(int i = 0; i < _inputMapperList.Count; i++)
-                {
-                    _inputMapperList[i].RegisterSpecialCmdKeyInput(_specialKeyReceiver, _userCmd);
-                }
-                _specialKeyReceiver.AddAction(UserInputKey.CameraFocus, (data) =>
-                {
-                    _userCmd.IsCameraFocus = true;
-                });
-                _userInputManager.RegisterKeyReceiver(_specialKeyReceiver);
+                _inputMapperList[i].RegisterSpecialCmdKeyInput(_specialKeyReceiver, _userCmd);
             }
+            _specialKeyReceiver.AddAction(UserInputKey.Fire, (data) => _userCmd.IsLeftAttack = true);
+            _specialKeyReceiver.AddAction(UserInputKey.RightAttack, (data) => _userCmd.IsRightAttack = true);
+            _specialKeyReceiver.AddAction(UserInputKey.CameraFocus, (data) => _userCmd.IsCameraFocus = true);
+            _userInputManager.RegisterKeyReceiver(_specialKeyReceiver);
 
             _keyReceiver = new KeyReceiver(UiConstant.userCmdKeyLayer, BlockType.None);
-            _keyReceiver.AddAction(UserInputKey.SwitchFireMode, (data) => _userCmd.IsSwitchFireMode = true);
             for(int i = 0; i < _inputMapperList.Count; i++)
             {
                 _inputMapperList[i].RegisterEnvKeyInput(_keyReceiver, _userCmd);
             }
-
+            _keyReceiver.AddAction(UserInputKey.SwitchFireMode, (data) => _userCmd.IsSwitchFireMode = true);
             _keyReceiver.AddAction(UserInputKey.DrawWeapon, (data) => _userCmd.IsDrawWeapon = true);
             _keyReceiver.AddAction(UserInputKey.Throwing, (data) => _userCmd.IsThrowing = true);
-;
-            _keyReceiver.AddAction(UserInputKey.FirstPerson,
-                (data) =>
-                {
-                    _userCmd.ChangeCamera = true;
-                });
-            _keyReceiver.AddAction(UserInputKey.FreeCamera, (data) =>
-            {
-                _userCmd.IsCameraFree = true;
-            });
+            _keyReceiver.AddAction(UserInputKey.FirstPerson, (data) => _userCmd.ChangeCamera = true);
+            _keyReceiver.AddAction(UserInputKey.FreeCamera, (data) => _userCmd.IsCameraFree = true);
             _keyReceiver.AddAction(UserInputKey.Jump, (data) => _userCmd.IsJump = true);
             _keyReceiver.AddAction(UserInputKey.Crouch, (data) => _userCmd.IsCrouch = true);
             _keyReceiver.AddAction(UserInputKey.Prone, (data) => _userCmd.IsProne = true);
-            _keyReceiver.AddAction(UserInputKey.Injured, (data) => _userCmd.BeState = 2);
-            _keyReceiver.AddAction(UserInputKey.Swim, (data) => _userCmd.BeState = 1);
+            //_keyReceiver.AddAction(UserInputKey.Injured, (data) => _userCmd.BeState = 2);
+            //_keyReceiver.AddAction(UserInputKey.Swim, (data) => _userCmd.BeState = 1);
             _keyReceiver.AddAction(UserInputKey.Reload, (data) => _userCmd.IsReload = true);
             _keyReceiver.AddAction(UserInputKey.PeekLeft, (data) => _userCmd.IsPeekLeft = true);
             _keyReceiver.AddAction(UserInputKey.PeekRight, (data) => _userCmd.IsPeekRight = true);
@@ -110,6 +92,8 @@ namespace Assets.Sources
             _keyReceiver.AddAction(UserInputKey.IsSpaceDown, data => _userCmd.IsSpaceDown = true);
             _keyReceiver.AddAction(UserInputKey.HoldF, data => _userCmd.IsF = true);
             _keyReceiver.AddAction(UserInputKey.SprayPaint, data => _userCmd.IsSprayPaint = true);
+            _keyReceiver.AddAction(UserInputKey.ScopeIn, data => _userCmd.IsScopeIn = true);
+            _keyReceiver.AddAction(UserInputKey.ScopeOut, data => _userCmd.IsScopeOut = true);
             _userInputManager.RegisterKeyReceiver(_keyReceiver);
 
             #endregion

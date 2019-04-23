@@ -388,9 +388,7 @@ namespace App.Shared.GameModules.Player
             var controller = player.characterContoller.Value;
             SlideDirection = GetDirectionWhenSlideAlongSteep(controller.transform.forward);
             var xzcomp = Mathf.Sqrt(SlideDirection.x * SlideDirection.x + SlideDirection.z * SlideDirection.z);
-            
             SlideDirectionTan = Math.Abs(xzcomp) < TOLERANCE ? 0 : SlideDirection.y / xzcomp;
-            
         }
 
         /// <summary>
@@ -489,16 +487,16 @@ namespace App.Shared.GameModules.Player
                 if (Mathf.Abs(CurrentVelocity.y) > SlideSlopeMinSpeed )
                 {
 					player.stateInterface.State.SetSlide(true);
-                    Logger.DebugFormat("set ani to slide, curvelocity:{0},IsSlideAloneSlope:{1}", CurrentVelocity.y, IsSlideAloneSlope(player.characterContoller.Value, SlideSlopeOffsetUp));
+                    Logger.DebugFormat("set ani to slide, curvelocity:{0},IsSlideAloneSlope:{1}", CurrentVelocity.ToStringExt(), IsSlideAloneSlope(player.characterContoller.Value, SlideSlopeOffsetUp));
                 }
-                Logger.DebugFormat("set to move slide, slide alone slope, vec:{0}, Angle:{1}, slopeVec:{2}", CurrentVelocity.y, Vector3.Angle(Vector3.up, GroundInfo.groundNormal), SlideDirection.ToVector4());
+                Logger.DebugFormat("set to move slide, slide alone slope, vec:{0}, Angle:{1}, slopeVec:{2}", CurrentVelocity.ToStringExt(), Vector3.Angle(Vector3.up, GroundInfo.groundNormal), SlideDirection.ToVector4());
             }
             else if (IsSlideFreefall(player))
             {
                 KeepSlide = true;
                 player.stateInterface.State.SetSlide(true);
                 CalcuSpeedIfNotSlide(player, DeltaTime, currentBuff, LastVelocity);
-                Logger.DebugFormat("freefall slide");
+                Logger.DebugFormat("freefall slide, curvelocity:{0}", CurrentVelocity.ToStringExt());
             }
             else
             {
@@ -517,6 +515,7 @@ namespace App.Shared.GameModules.Player
             if (IsJumpHitScene(player))
             {
                 CurrentVelocity = JumpSpeedProject(player.characterContoller.Value.transform, player.characterContoller.Value.GetCharacterControllerHitInfo(HitType.Forward).HitNormal, CurrentVelocity);
+                Logger.DebugFormat("project speed, curvelocity:{0}", CurrentVelocity.ToStringExt());
             }
             
             // debug
@@ -537,7 +536,7 @@ namespace App.Shared.GameModules.Player
         private static bool IsJumpHitScene(PlayerEntity player)
         {
             return player.stateInterface.State.GetNextPostureState() == PostureInConfig.Jump &&
-                   ((int) player.characterContoller.Value.collisionFlags & (int) UnityEngine.CollisionFlags.Sides) != 0;
+                   player.characterContoller.Value.GetCharacterControllerHitInfo(HitType.Forward).Valid;
         }
 
         /// <summary>

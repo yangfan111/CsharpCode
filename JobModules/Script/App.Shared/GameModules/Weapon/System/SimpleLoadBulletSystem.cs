@@ -152,7 +152,7 @@ namespace App.Shared.GameModules.Weapon
                     {
                         impStructVal.playerEntity.appearanceInterface.Appearance.MountWeaponOnAlternativeLocator();
                     }
-
+                    if(impStructVal.playerEntity.AudioController()!= null)
                     impStructVal.playerEntity.AudioController().PlayReloadAudio(impStructVal.playerEntity.WeaponController().HeldConfigId, false);
                     impStructVal.playerEntity.stateInterface.State.Reload(() =>
                     {
@@ -173,7 +173,7 @@ namespace App.Shared.GameModules.Weapon
                     {
                         impStructVal.playerEntity.appearanceInterface.Appearance.MountWeaponOnAlternativeLocator();
                     }
-
+                if(impStructVal.playerEntity.AudioController() != null)
                     impStructVal.playerEntity.AudioController().PlayReloadAudio(impStructVal.playerEntity.WeaponController().HeldConfigId, true);
                     impStructVal.playerEntity.stateInterface.State.ReloadEmpty(() =>
                     {
@@ -200,7 +200,8 @@ namespace App.Shared.GameModules.Weapon
             var target = clipSize - controller.HeldWeaponAgent.BaseComponent.Bullet;
             loadCount = Mathf.Min(loadCount, target);
             DoRealod(playerEntity, controller, loadCount);
-            playerEntity.AudioController().PlayReloadBulletAudio(controller.HeldConfigId);
+            if(playerEntity.AudioController() != null)
+                playerEntity.AudioController().PlayReloadBulletAudio(controller.HeldConfigId);
         }
 
         private void Reload(PlayerEntity playerEntity, PlayerWeaponController controller, int clipSize)

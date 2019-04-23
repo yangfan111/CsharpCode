@@ -13,6 +13,7 @@ using Utils.Utils;
 using XmlConfig;
 using App.Shared.Player;
 using Core.CharacterState.Posture;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Player.CharacterState
 {
@@ -32,7 +33,7 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         private List<IFsmInputFilter> _filters = new List<IFsmInputFilter>
         {
-            new ProneStateFilter(), new DiveStateFilter()
+            new ProneStateFilter(), new DiveStateFilter(), new JumpStateFilter(), new ClimbStateFilter(), new ProneToCrouchStateFilter(),new ProneToStandStateFilter(),new ProneTransitStateFilter()
         };
 
         private FsmInputContainer _commandsContainer = new FsmInputContainer(InitCommandLen);
@@ -44,10 +45,9 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         public IAdaptiveContainer<IFsmInputCommand> CommandsContainer { get { return _commandsContainer; } }
 
-        public void CreateCommands(IUserCmd cmd, FilterState state, PlayerEntity player) //,int curLeanState,int leanTimeCount)
+        public void CreateCommands(IUserCmd cmd, FilterState state, PlayerEntity player, Contexts contexts) //,int curLeanState,int leanTimeCount)
         {
-            PretreatCmd(player, cmd);
-            FromUserCmdToFsmInput(cmd, player);
+            FromUserCmdToFsmInput(cmd, player, contexts);
             foreach (var v in _filters)
             {
                 TryFilter(v, state);
@@ -64,7 +64,7 @@ namespace App.Shared.GameModules.Player.CharacterState
         {
             for (int i = 0; i < CommandsContainer.Length; ++i)
             {
-                if (FilterFsmInputByStateDict.ContainsKey(CommandsContainer[i].Type) && !FilterFsmInputByStateDict[CommandsContainer[i].Type].Contains(state.Posture, CommonEnumEqualityComparer<PostureInConfig>.Instance))
+                if (FilterFsmInputByStateDict.ContainsKey(CommandsContainer[i].Type) && !FilterFsmInputByStateDict[CommandsContainer[i].Type].Contains(state.Posture, CommonIntEnumEqualityComparer<PostureInConfig>.Instance))
                 {
                     CommandsContainer[i].Reset();
                 }
@@ -76,57 +76,9 @@ namespace App.Shared.GameModules.Player.CharacterState
             _commandsContainer.Reset();
         }
 
-        private void PretreatCmd(PlayerEntity player, IUserCmd cmd)
-        {
-            var actionState = player.stateInterface.State.GetActionState();
-            var curPostureState = player.stateInterface.State.GetCurrentPostureState();
-            var nextPostureState = player.stateInterface.State.GetNextPostureState();
-
-            if (cmd.MoveHorizontal != 0 ||
-                cmd.MoveVertical != 0)
-                player.playerMove.InterruptAutoRun();
-            else if ((cmd.IsPeekRight || cmd.IsPeekLeft) &&
-                     curPostureState != PostureInConfig.Prone &&
-                     curPostureState != PostureInConfig.Swim &&
-                     curPostureState != PostureInConfig.Dive)
-                player.playerMove.InterruptAutoRun();
-            else if (curPostureState != nextPostureState &&
-                    nextPostureState != PostureInConfig.Dive &&
-                    nextPostureState != PostureInConfig.Swim &&
-                    nextPostureState != PostureInConfig.Land &&
-                    nextPostureState != PostureInConfig.Jump &&
-                    nextPostureState != PostureInConfig.Stand)
-                player.playerMove.InterruptAutoRun();
-            else
-            {
-                switch (actionState)
-                {
-                    case ActionInConfig.MeleeAttack:
-                    case ActionInConfig.SwitchWeapon:
-                    case ActionInConfig.PickUp:
-                    case ActionInConfig.Reload:
-                    case ActionInConfig.SpecialReload:
-                        player.playerMove.InterruptAutoRun();
-                        break;
-                    default: break;
-                }
-            }
-
-            if (cmd.IsSwitchAutoRun)
-            {
-                player.playerMove.IsAutoRun = !player.playerMove.IsAutoRun;
-                if (player.playerMove.IsAutoRun)
-                {
-                    PlayerStateUtil.AddPlayerState(EPlayerGameState.InterruptItem, player.gamePlay);
-                }
-            }
-
-        }
-
-        private void FromUserCmdToFsmInput(IUserCmd cmd, PlayerEntity player)
+        private void FromUserCmdToFsmInput(IUserCmd cmd, PlayerEntity player, Contexts contexts)
         {
             //Logger.InfoFormat("horzontal val:{0}, vertical val:{1}", cmd.MoveHorizontal, cmd.MoveVertical);
-
             // 根据WSAD生成FsmInput
             if (CompareUtility.IsApproximatelyEqual(cmd.MoveHorizontal, 0, EPS) 
                 && CompareUtility.IsApproximatelyEqual(cmd.MoveVertical, 0, EPS)
@@ -150,7 +102,7 @@ namespace App.Shared.GameModules.Player.CharacterState
                     SetCommand(FsmInput.Forth, InputValueLimit.MaxAxisValue);
                 }
                 // 冲刺
-                if ((cmd.IsRun || player.playerMove.IsAutoRun) && IsCanSprint(cmd))
+                if ((cmd.IsRun || player.playerMove.IsAutoRun) && IsCanSprint(cmd, player))
                 {
                     if(player.playerMove.IsAutoRun)
                     {
@@ -176,7 +128,7 @@ namespace App.Shared.GameModules.Player.CharacterState
                     SetCommand(FsmInput.Run);
                 }
                 //不能冲刺跑步，就切换为静走
-                else if(!cmd.FilteredInput.IsInputBlocked(EPlayerInput.IsSlightWalk))
+                else if(cmd.FilteredInput.IsInput(EPlayerInput.IsSlightWalk))
                 {
                     SetCommand(FsmInput.Walk);
                 }
@@ -228,14 +180,17 @@ namespace App.Shared.GameModules.Player.CharacterState
             }
         }
 
-        private bool IsCanSprint(IUserCmd cmd)
+        private bool IsCanSprint(IUserCmd cmd, PlayerEntity playerEntity)
         {
-            return !cmd.FilteredInput.IsInputBlocked(EPlayerInput.IsSprint);
+            var stateBlock = !cmd.FilteredInput.IsInput(EPlayerInput.IsSprint);
+            var configAssy = playerEntity.WeaponController().HeldWeaponAgent.WeaponConfigAssy;
+            var weaponBlock = configAssy != null && configAssy.S_CantRun;
+            return !stateBlock && !weaponBlock;
         }
 
         private bool IsCanRun(IUserCmd cmd)
         {
-            return !cmd.FilteredInput.IsInputBlocked(EPlayerInput.IsRun);
+            return cmd.FilteredInput.IsInput(EPlayerInput.IsRun);
         }
 
         private void CheckConditionAndSetCommand(IUserCmd cmd, XmlConfig.EPlayerInput mappedInput, FsmInput fsmInput)

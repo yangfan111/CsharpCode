@@ -73,7 +73,7 @@ namespace Core.CharacterState.Posture.States
 
         public override void DoBeforeEntering(IFsmInputCommand command, Action<FsmOutput> addOutput)
         {
-            FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerJumpHeight, SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand).Height);
+            FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerJumpHeight, _characterInfo.GetStandCapsule().Height);
             addOutput(FsmOutput.Cache);
             base.DoBeforeEntering(command, addOutput);
         }

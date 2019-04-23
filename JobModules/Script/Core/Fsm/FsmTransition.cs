@@ -161,6 +161,7 @@ namespace Core.Fsm
         public int Duration { get; private set; }
 
         private IFsmTransitionHelper _infoProvider;
+        protected ICharacterInfoProvider _characterInfo;
         private int _baseDuration;
         private string _durationCoefficientId;
 
@@ -170,5 +171,10 @@ namespace Core.Fsm
         protected Func<IFsmInputCommand, Action<FsmOutput>, FsmStateResponseType> _responsiveTransferCondition;
         protected Func<IFsmInputCommand, Action<FsmOutput>, FsmTransitionResponseType> _interruptCondition;
         protected Action<float, Action<FsmOutput>> _update;
+
+        public void SetCharacterInfo(ICharacterInfoProvider characterInfo)
+        {
+            _characterInfo = characterInfo;
+        }
     }
 }

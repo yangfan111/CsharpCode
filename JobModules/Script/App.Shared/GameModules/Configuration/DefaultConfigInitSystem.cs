@@ -16,11 +16,12 @@ namespace App.Shared.GameModules.Configuration
         void ParseConfig();
     }
 
-    public class DefaultConfigInitSystem<T> : IResourceLoadSystem, IConfigInit where T : AbstractConfigManager<T>,  new()
+    public class DefaultConfigInitSystem<T> : IExecuteSystem, IConfigInit where T : AbstractConfigManager<T>,  new()
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter("App.Shared.GameModules.Configuration." + typeof(T).Namespace);
         private bool _isLoding;
-        private ISessionState _sessionState;
+        private readonly IUnityAssetManager _assetManager;
+        private ISessionCondition _sessionState;
         private AssetInfo _assetInfo;
         private IConfigParser _parser;
         private volatile bool _isDone = false;
@@ -32,12 +33,17 @@ namespace App.Shared.GameModules.Configuration
             return string.Format("DefaultConfigInitSystem-{0}-{1}", typeof(T).Name, _assetInfo);
         }
 
-        public DefaultConfigInitSystem(ISessionState sessionState, AssetInfo asset, IConfigParser parser)
+        public DefaultConfigInitSystem(IUnityAssetManager assetManager, ISessionCondition sessionState, AssetInfo asset, IConfigParser parser, bool reload = false)
         {
+            _assetManager = assetManager;
             _sessionState = sessionState;
             _assetInfo = asset;
             _sessionState.CreateExitCondition(GetConditionId());
             _parser = parser;
+            if (reload)
+            {
+                SingletonManager.Get<T>().IsInitialized = false;
+            }
 
             SingletonManager.Get<SubProgressBlackBoard>().Add();
         }
@@ -47,9 +53,9 @@ namespace App.Shared.GameModules.Configuration
             get { return _isDone; }
             set { _isDone = value; }
         }
-
-        public void OnLoadResources(ILoadRequestManager loadRequestManager)
+        public void Execute()
         {
+       
             if (SingletonManager.Get<T>().IsInitialized)
             {
                 IsDone = true;
@@ -57,7 +63,7 @@ namespace App.Shared.GameModules.Configuration
             else if (!_isLoding)
             {
                 _isLoding = true;
-                loadRequestManager.AppendLoadRequest(null, _assetInfo, OnLoadSucc);
+                _assetManager.LoadAssetAsync(typeof(T).ToString(), _assetInfo, OnLoadSucc);
             }
 
             if (IsDone && !_isExit)
@@ -68,10 +74,11 @@ namespace App.Shared.GameModules.Configuration
             }
         }
 
-        public void OnLoadSucc(object source, AssetInfo assetInfo, UnityEngine.Object obj)
+        public void OnLoadSucc(string source, UnityObject unityObj)
         {
-           
-            var asset = obj as TextAsset;
+
+            var assetInfo = unityObj.Address;
+            var asset = unityObj.As<TextAsset>();
             if (null == asset)
             {
                 Logger.ErrorFormat("Asset {0}:{1} Load Fialed ", assetInfo.BundleName, assetInfo.AssetName);
@@ -110,5 +117,7 @@ namespace App.Shared.GameModules.Configuration
             var system = o as IConfigInit;
             system.ParseConfig();
         }
+
+        
     }
 }

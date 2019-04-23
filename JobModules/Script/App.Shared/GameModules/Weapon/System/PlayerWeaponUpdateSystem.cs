@@ -20,9 +20,9 @@ namespace App.Shared.GameModules.Weapon
             PlayerEntity playerEntity     = owner.OwnerEntity as PlayerEntity;
             var          weaponController = playerEntity.WeaponController();
             weaponController.InternalUpdate(playerEntity);
-            if (playerEntity.playerClientEventsUpdate.OpenUIFrame)
+            if (playerEntity.playerClientUpdate.OpenUIFrame)
             {
-                playerEntity.playerClientEventsUpdate.OpenUIFrame = false;
+                playerEntity.playerClientUpdate.OpenUIFrame = false;
                 if (weaponController.RelatedThrowAction.IsReady && !weaponController.RelatedThrowAction.IsThrow)
                 {
                     if (weaponController.RelatedThrowAction.IsReady && !weaponController.RelatedThrowAction.IsThrow)

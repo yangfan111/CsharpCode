@@ -7,6 +7,7 @@ using App.Client.SceneManagement.DistanceCulling;
 using App.Shared;
 using App.Shared.Components;
 using App.Shared.Components.ClientSession;
+using App.Shared.Configuration;
 using App.Shared.EntityFactory;
 using App.Shared.GameModules;
 using App.Shared.GameModules.Configuration;
@@ -22,6 +23,7 @@ using Core.GameModule.System;
 using I2.Loc;
 using UnityEngine;
 using Utils.Singleton;
+using XmlConfig;
 
 namespace App.Client.SessionStates
 {
@@ -61,7 +63,12 @@ namespace App.Client.SessionStates
             
             gameModule.AddSystem(new ClientScenePostprocessorSystem(contexts.session.commonSession));
             gameModule.AddSystem(new ClientWorldShiftPostProcessSystem(contexts.session.commonSession));
-            
+
+            if (!(SingletonManager.Get<MapConfigManager>().SceneParameters is SceneConfig))
+            {
+                gameModule.AddSystem(new TerrainRendererInitSystem(contexts.session.commonSession,
+                    contexts.session.clientSessionObjects));
+            }
 
             return gameModule;
         }

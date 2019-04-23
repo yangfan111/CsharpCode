@@ -1,4 +1,5 @@
-﻿using App.Shared.Components.Weapon;
+﻿using App.Shared.Audio;
+using App.Shared.Components.Weapon;
 using Assets.App.Shared.EntityFactory;
 using Assets.Utils.Configuration;
 using Core;
@@ -63,6 +64,7 @@ namespace App.Shared.GameModules.Weapon
 
         public abstract WeaponEntity ReplaceWeapon(EntityKey Owner, WeaponScanStruct orient,
             ref WeaponPartsRefreshStruct refreshParams);
+        public EntityKey Owner { private get; set; }
 
         public WeaponBaseAgent(Func<EntityKey> in_holdExtractor, Func<EntityKey> in_emptyExtractor,
             EWeaponSlotType slot, GrenadeCacheHandler grenadeHandler)
@@ -104,29 +106,37 @@ namespace App.Shared.GameModules.Weapon
         {
             get { return Entity != null ? entityCache.weaponRuntimeData : WeaponRuntimeDataComponent.Empty; }
         }
-        public WeaponClientSyncComponent ClientSyncComponent
+//        public WeaponClientUpdateComponent ClientUpdateComponent
+//        {
+//            get
+//            {
+//                if (Entity == null) return WeaponClientUpdateComponent.Empty;
+//                if (!entityCache.hasWeaponClientUpdate)
+//                    entityCache.AddWeaponClientUpdate();
+//                return entityCache.weaponClientUpdate;
+//            }
+//        }
+        public void InterruptPullBolt()
         {
-            get
+            if (RunTimeComponent.IsPullingBolt)
             {
-                if(Entity == null  )return WeaponClientSyncComponent.Empty;
-                if(!entityCache.hasWeaponClientSync)
-                    entityCache.AddWeaponClientSync();
-                return entityCache.weaponClientSync;
+                DebugUtil.MyLog("Do Interrupt :" + ConfigId);
+                RunTimeComponent.IsPullingBolt     = false;
+                RunTimeComponent.PullBoltInterrupt = true;
+                var audioController = GameModuleManagement.Get<PlayerAudioController>(Owner.EntityId).Value;
+                if(audioController != null)
+                    audioController.StopPullBoltAudio(ConfigId);
             }
-        }
-       
-        public void ResetDynamic()
-        {
-            if (IsValid())
-            {
-                if(!entityCache.hasWeaponClientSync)
-                    entityCache.AddWeaponClientSync();
-                entityCache.weaponClientSync.IsPullingBolt = false;
-//                entityCache.weaponClientSync.IsInterruptSightView = false;
-//                entityCache.weaponClientSync.IsRecoverSightView = false;
 
-            }
+
         }
+
+        public void StoreDynamic()
+        {
+            InterruptPullBolt();
+        }
+        
+
 
         public int FireModeCount
         {
@@ -209,7 +219,7 @@ namespace App.Shared.GameModules.Weapon
                 .GetPartAchiveAttachedAttributeByType(partsAchiveCache, attributeType);
         }
 
-      
+
         public bool HasSilencerPart
         {
             get
@@ -247,7 +257,9 @@ namespace App.Shared.GameModules.Weapon
             entityCache.weaponRuntimeData.LastAttackTimestamp = 0;
             entityCache.weaponRuntimeData.LastSpreadX = 0;
             entityCache.weaponRuntimeData.LastSpreadY = 0;
-            ResetDynamic();
+            entityCache.weaponRuntimeData.PullBoltInterrupt = false;
+            entityCache.weaponRuntimeData.IsPullingBolt = false;
+
         }
 
         public void ResetParts()

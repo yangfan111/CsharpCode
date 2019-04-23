@@ -100,7 +100,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
             var param = new CodeRigBoneParam
             {
-                PitchAmplitude = player.orientation.Pitch - player.orientation.WeaponPunchPitch * 2,
+                PitchAmplitude = player.orientation.Pitch - player.orientation.AccPunchPitchValue * 2,
                 OverlayAnimationWeight = animator.GetLayerWeight(NetworkAnimatorLayer.PlayerUpperBodyOverlayLayer),
                 PostureWhenOverlay = postureType,
                 IsSight = state.GetActionKeepState() == ActionKeepInConfig.Sight || state.GetNextActionKeepState() == ActionKeepInConfig.Sight,

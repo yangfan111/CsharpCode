@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+using App.Shared.GameModules.HitBox;
 using Core.Appearance;
 using Core.CharacterController;
 using Core.Utils;
@@ -12,10 +14,18 @@ namespace App.Shared.GameModules.Player.Appearance
     {
         private GameObject _characterRoot;
         private ICharacterControllerContext _controller;
+        private Transform _attachedHead;
+        private GameObject _thirdModel;
+        private readonly Regex _attachedHeadNameRegex = new Regex(@"FHead\d*\(Clone\)");
         
         public void SetCharacterRoot(GameObject characterRoot)
         {
             _characterRoot = characterRoot;
+        }
+
+        public void SetThirdModel(GameObject model)
+        {
+            _thirdModel = model;
         }
         
         public void SetCharacterController(ICharacterControllerContext controller)
@@ -23,16 +33,57 @@ namespace App.Shared.GameModules.Player.Appearance
             _controller = controller;
         }
         
-        public void PlayerDead()
+        public void PlayerDead(bool isSelf = true)
         {
-            SetLayer(_characterRoot, UnityLayers.NoCollisionWithEntityLayer);
-            _controller.enabled = false;
+            SetLayer(_characterRoot, UnityLayerManager.GetLayerIndex(EUnityLayerName.NoCollisionWithEntity));
+            closeEye();
+            if (!isSelf)
+            {
+                _controller.enabled = false;
+            }
         }
 
         public void PlayerReborn()
         {
-            SetLayer(_characterRoot, UnityLayers.PlayerLayer);
+            SetLayer(_characterRoot, UnityLayerManager.GetLayerIndex(EUnityLayerName.Player));
+            HitBoxComponentUtility.FlashHitBoxLayer(_thirdModel);
+            openEye();
             _controller.enabled = true;
+        }
+
+        private void openEye()
+        {
+            if(_attachedHead==null)
+                return;
+            HandleOpenEye();
+        }
+
+        private void closeEye()
+        {
+            if (_attachedHead != null)
+            {
+                HandleOpenEye();
+                return;
+            }
+            var trans = _characterRoot.GetComponentsInChildren<Transform>(true);
+            foreach (var transform in trans)
+            {  
+                if (_attachedHeadNameRegex.IsMatch(transform.name))
+                {
+                    _attachedHead = transform;
+                    HandleCloseEye();
+                }
+            }
+        }
+        
+        private void HandleCloseEye()
+        {
+            _attachedHead.SendMessage("PlayerDead");
+        }
+
+        private void HandleOpenEye()
+        {
+            _attachedHead.SendMessage("PlayerRelive");
         }
         
         /// <summary>
@@ -40,7 +91,7 @@ namespace App.Shared.GameModules.Player.Appearance
         /// </summary>
         /// <param name="height"></param>
         /// <param name="baseOnFoot">true 脚底高度不变， false 头顶高度不变</param>
-        public void SetCharacterControllerHeight(float height, bool baseOnFoot)
+        public void SetCharacterControllerHeight(float height, bool updateCapsule, float standHeight, bool baseOnFoot)
         {
             var characterController = _characterRoot.GetComponent<CharacterController>();
             if (characterController != null)
@@ -55,8 +106,29 @@ namespace App.Shared.GameModules.Player.Appearance
                 else
                 {
                     var newCenter = characterController.center;
-                    newCenter.y = SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand).Height - 0.5f * height;
+                    newCenter.y = standHeight - 0.5f * height;
                     characterController.center = newCenter;
+                }
+            }
+            
+            if (updateCapsule)
+            {
+                var capsule = _characterRoot.GetComponent<CapsuleCollider>();
+                if (capsule != null)
+                {
+                    capsule.height = height;
+                    if (baseOnFoot)
+                    {
+                        var newCenter = capsule.center;
+                        newCenter.y = height * 0.5f;
+                        capsule.center = newCenter;
+                    }
+                    else
+                    {
+                        var newCenter = capsule.center;
+                        newCenter.y = standHeight - 0.5f * height;
+                        capsule.center = newCenter;
+                    }
                 }
             }
         }
@@ -71,16 +143,25 @@ namespace App.Shared.GameModules.Player.Appearance
                     return characterController.height;
                 }
 
-                return SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand).Height;
+                return SingletonManager.Get<CharacterInfoManager>().GetDefaultInfo().StandHeight;
             }
         }
 
-        public void SetCharacterControllerCenter(Vector3 value)
+        public void SetCharacterControllerCenter(Vector3 value, bool updateCapsule)
         {
             var characterController = _characterRoot.GetComponent<CharacterController>();
             if (characterController != null)
             {
                 characterController.center = value;
+            }
+            
+            if (updateCapsule)
+            {
+                var capsule = _characterRoot.GetComponent<CapsuleCollider>();
+                if (capsule != null)
+                {
+                    capsule.center = value;
+                }
             }
         }
 
@@ -95,17 +176,25 @@ namespace App.Shared.GameModules.Player.Appearance
                 }
 
                 return new Vector3(0,
-                    0.5f * SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand)
-                        .Height, 0);
+                    0.5f * SingletonManager.Get<CharacterInfoManager>().GetDefaultInfo().StandHeight, 0);
             }
         }
 
-        public void SetCharacterControllerRadius(float value)
+        public void SetCharacterControllerRadius(float value, bool updateCapsule)
         {
             var characterController = _characterRoot.GetComponent<CharacterController>();
             if (characterController != null)
             {
                 characterController.radius = value;
+            }
+
+            if (updateCapsule)
+            {
+                var capsule = _characterRoot.GetComponent<CapsuleCollider>();
+                if (capsule != null)
+                {
+                    capsule.radius = value;
+                }
             }
         }
 
@@ -119,12 +208,12 @@ namespace App.Shared.GameModules.Player.Appearance
                     return characterController.radius;
                 }
 
-                return SingletonManager.Get<CharacterStateConfigManager>().GetCharacterControllerCapsule(PostureInConfig.Stand).Radius;
+                return SingletonManager.Get<CharacterInfoManager>().GetDefaultInfo().StandRadius;
             }
         }
         
         private static void SetLayer(GameObject gameObject, int layer)
-        {
+        {   
             foreach (var v in gameObject.GetComponentsInChildren<Transform>())
             {
                 v.gameObject.layer = layer;

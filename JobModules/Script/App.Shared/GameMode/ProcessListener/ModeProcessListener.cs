@@ -27,7 +27,8 @@ namespace App.Shared.GameMode
       
         public void OnSwitch(IPlayerWeaponProcessor controller, int weaponId, EInOrOff op)
         {
-            controller.AudioController.PlaySwitchAuido(weaponId, op);
+            if(controller.AudioController != null)
+                controller.AudioController.PlaySwitchAuido(weaponId, op);
         }
     }
 }

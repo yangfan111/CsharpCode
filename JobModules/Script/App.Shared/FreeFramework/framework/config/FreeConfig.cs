@@ -417,6 +417,7 @@ namespace com.wd.free.config
             aliasOne(alias, new PlayerVisibilityAction());
             aliasOne(alias, new DefineEffectBufAction());
             aliasOne(alias, new AddEffectBufAction());
+            aliasOne(alias, new PlayerPressKeyAction());
         }
 
         // 会把父类的字段也会加入，需要注意当以前的代码中父类的字段没有按照这样的命名规范时会有问题

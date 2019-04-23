@@ -50,9 +50,7 @@ namespace App.Shared.GameModules.Player
 
         public static CharacterController InitCharacterController(GameObject go)
         {
-            var config = SingletonManager.Get<CharacterStateConfigManager>()
-                .GetCharacterControllerCapsule(PostureInConfig.Stand);
-            float height = config.Height;
+            float height = SingletonManager.Get<CharacterInfoManager>().GetDefaultInfo().StandHeight;
             CharacterController cc = go.GetComponent<CharacterController>();
             Object.DestroyImmediate(cc);
             cc = go.AddComponent<CharacterController>();
@@ -63,7 +61,7 @@ namespace App.Shared.GameModules.Player
             //Two colliders can penetrate each other as deep as their Skin Width. Larger Skin Widths reduce jitter. Low Skin Width can cause the character to get stuck. A good setting is to make this value 10% of the Radius.
             cc.skinWidth = CcSkinWidth;
             cc.minMoveDistance = 0.001f;
-            cc.radius = config.Radius;
+            cc.radius = SingletonManager.Get<CharacterInfoManager>().GetDefaultInfo().StandRadius;
             cc.height = height;
 
             go.AddComponent<PlayerScript>();
@@ -110,8 +108,8 @@ namespace App.Shared.GameModules.Player
                 return false;
             }
 
-            var yaw = playerEntity.orientation.Yaw - playerEntity.orientation.NegPunchYaw * 2;
-            var pitch = playerEntity.orientation.Pitch - playerEntity.orientation.NegPunchPitch * 2;
+            var yaw = playerEntity.orientation.Yaw - playerEntity.orientation.PunchYaw * 2;
+            var pitch = playerEntity.orientation.Pitch - playerEntity.orientation.AccPunchPitch * 2;
             rotation = Quaternion.Euler(pitch, yaw, 0);
             return true;
         }
@@ -358,7 +356,7 @@ namespace App.Shared.GameModules.Player
             if (thirdPersonAppearance.NeedUpdateController)
             {
                 characterControllerInterface.CharacterController.SetCharacterControllerHeight(thirdPersonAppearance
-                    .CharacterHeight, player.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController);
+                    .CharacterHeight,player.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController, thirdPersonAppearance.CharacterStandHeight);
                 characterControllerInterface.CharacterController.SetCharacterControllerCenter(thirdPersonAppearance
                     .CharacterCenter, player.characterContoller.Value.GetCurrentControllerType() == CharacterControllerType.UnityCharacterController);
                 characterControllerInterface.CharacterController.SetCharacterControllerRadius(thirdPersonAppearance

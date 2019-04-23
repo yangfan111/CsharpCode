@@ -151,6 +151,11 @@ namespace Core.CharacterController
             return _currentState.GetCollider();
         }
 
+        public void ClearGroundInfo()
+        {
+            _currentState.ClearGroundInfo();
+        }
+
         public void DrawBoundingBox()
         {
             _currentState.DrawBoundingBox();

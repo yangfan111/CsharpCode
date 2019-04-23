@@ -10,7 +10,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
     /// <summary>
     /// Defines the <see cref="MeleeWeaponFireController" />
     /// </summary>
-    public class MeleeWeaponFireController : IWeaponFireController
+    public class MeleeWeaponFireController : AbstractFireController
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(MeleeWeaponFireController));
 
@@ -23,9 +23,8 @@ namespace App.Shared.GameModules.Weapon.Behavior
             _config = config;
         }
 
-        public void OnUpdate(PlayerWeaponController controller, IWeaponCmd cmd, Contexts contexts)
+        protected override void UpdateFire(PlayerWeaponController controller, IWeaponCmd cmd, Contexts contexts)
         {
-
             var weaponId = controller.HeldWeaponAgent.ConfigId;
             var weaponState = controller.HeldWeaponAgent.RunTimeComponent;
             var nowTime = controller.RelatedTime;
@@ -34,7 +33,8 @@ namespace App.Shared.GameModules.Weapon.Behavior
             bool isProne = (controller.RelatedCharState.GetCurrentPostureState() == XmlConfig.PostureInConfig.Prone);
 
             if (cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsLeftAttack) && controller.RelatedThrowAction.ThrowingEntityKey == EntityKey.Default
-                && (controller.LastFireWeaponId == controller.HeldWeaponAgent.WeaponKey.EntityId || controller.LastFireWeaponId == 0) && !isProne)
+                && (controller.RelatedThrowAction.LastFireWeaponKey == controller.HeldWeaponAgent.WeaponKey.EntityId || controller.RelatedThrowAction.LastFireWeaponKey == 0)
+                && !isProne)
             {
                 if (nowTime > weaponState.NextAttackPeriodStamp)
                 {
@@ -54,7 +54,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
                     controller.RelatedCharState.LightMeleeAttackTwo(OnAttackAniFinish);
                     AfterAttack(controller, cmd);
                 }
-                controller.LastFireWeaponId = controller.HeldWeaponAgent.WeaponKey.EntityId;
+                controller.RelatedThrowAction.LastFireWeaponKey = controller.HeldWeaponAgent.WeaponKey.EntityId;
             }
             else if (cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsRightAttack) && nowTime >= weaponState.NextAttackPeriodStamp && !isProne)
             {
@@ -62,14 +62,9 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 weaponState.NextAttackPeriodStamp = nowTime + _config.SpecialDamageInterval;
                 AfterAttack(controller, cmd);
             }
-
-            if (!cmd.IsFire)
-            {
-                controller.RelatedThrowAction.ThrowingEntityKey = EntityKey.Default;
-                controller.LastFireWeaponId = 0;
-            }
         }
 
+       
         private void OnAttackAniFinish()
         {
         }

@@ -18,9 +18,9 @@ namespace App.Shared.GameModules.Weapon.Behavior
             var weaponState = controller.HeldWeaponAgent.RunTimeComponent;
 
 
-            var orientation = controller.RelatedOrient;
-            var yaw = orientation.Yaw - orientation.NegPunchYaw * 2;
-            var pitch = orientation.Pitch - orientation.NegPunchPitch * 2;
+            var orientation = controller.RelatedOrientation;
+            var yaw = orientation.Yaw - orientation.PunchYaw * 2;
+            var pitch = orientation.Pitch - orientation.AccPunchPitch * 2;
             var dir = CalculateShotingDir(seed, yaw, pitch, weaponState.LastSpreadX,
                 weaponState.LastSpreadY);
 

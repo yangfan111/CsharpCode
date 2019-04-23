@@ -24,6 +24,7 @@ using Utils.SettingManager;
 using Utils.Singleton;
 using QualityLevel = Utils.SettingManager.QualityLevel;
 using App.Shared.GameModules.Weapon;
+using Assets.XmlConfig;
 using Core.Components;
 using UnityEngine.Profiling;
 
@@ -290,6 +291,28 @@ namespace App.Shared.DebugHandle
                 case DebugCommands.ShowAniInfo:
                     result = string.Format("{0}\n{1}", player.state, player.thirdPersonAnimator.DebugJumpInfo());       
                     break;
+                case DebugCommands.Speed:
+                {
+                    if (message.Args.Length < 1)
+                    {
+                        return "Argument Error!";
+                    }
+
+                    float i;
+                    if (!float.TryParse(message.Args[0], out i))
+                    {
+                        return "Argument Error! speed should be float";
+                    }
+
+                    if (player != null && player.hasPlayerMove)
+                    {
+                        result = string.Format("change player:{0} speedAffect from:{1}, to:{2}", player.entityKey.Value.ToString(), player.playerMove.SpeedAffect, i);
+                        player.playerMove.SpeedAffect = i;
+                        return result;
+                    }
+                    break;
+                }
+                    
                 case DebugCommands.TestMap:
                     result =  BigMapDebug.HandleCommand(player,message.Args);
                     break;
@@ -324,6 +347,11 @@ namespace App.Shared.DebugHandle
                     //helper.AddCache(38);
                     //helper.AddCache(39);
                     player.WeaponController().PickUpWeapon(WeaponUtil.CreateScan(37));
+                    break;
+                case DebugCommands.AudioEmitter:
+                    var sceneObjectEntityFactory = contexts.session.entityFactoryObject.SceneObjectEntityFactory;
+                    sceneObjectEntityFactory.CreateSceneAudioEmitterEntity( player.position.Value, player.entityKey.Value);
+
                     break;
                 case DebugCommands.SetWeapon:
                     {

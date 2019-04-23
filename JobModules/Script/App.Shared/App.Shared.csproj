@@ -20,7 +20,7 @@
     <OutputPath>..\..\Dll.Temp\</OutputPath>
     <BaseIntermediateOutputPath>..\..\build_obj_dir\Release\App.Shared\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>TRACE;DEBUG;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -32,12 +32,13 @@
     <OutputPath>..\..\Dll.Temp\</OutputPath>
     <BaseIntermediateOutputPath>..\..\build_obj_dir\Debug\App.Shared\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>TRACE;DEBUG;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -68,15 +69,24 @@
     <Reference Include="UnityEngine">
       <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
+    <Reference Include="UnityEditor">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEditor.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssetConfig.cs" />
+    <Compile Include="Audio\AudioEditor\AudioEmitterEditor.cs" />
+    <Compile Include="Audio\AudioEditor\AudioEventActionEditorData.cs" />
+    <Compile Include="Audio\AudioEditor\AudioSourceEditorData.cs" />
+    <Compile Include="Audio\AudioEditor\InspectorBuildConst.cs" />
+    <Compile Include="Audio\AudioEditor\InspectorBuildHelper.cs" />
     <Compile Include="Audio\AudioObjectGenerator.cs" />
     <Compile Include="Audio\AudioUtil.cs" />
+    <Compile Include="Audio\Editor\AudioEmitterEditorInspector.cs" />
     <Compile Include="Audio\PlayerAudioController.cs" />
+    <Compile Include="Audio\PlayerAudioUpdateSystem.cs" />
     <Compile Include="Audio\PlayerEntityAudioExt.cs" />
-    <Compile Include="Audio\WiseIntegration\AudioPluginsDriver.cs" />
+    <Compile Include="Audio\WiseIntegration\AudioListenerManager.cs" />
     <Compile Include="Audio\WiseIntegration\Backup\AKAmbientAdapter.cs" />
     <Compile Include="Audio\WiseIntegration\Backup\AKAudioEngineDriver.cs" />
     <Compile Include="Audio\WiseIntegration\Backup\AudioInterface.cs" />
@@ -134,6 +144,7 @@
     <Compile Include="DebugSystem\ServerDebugInfoSystem.cs" />
     <Compile Include="EEntityType.cs" />
     <Compile Include="ENetworkMessages.cs" />
+    <Compile Include="Editor\ExitPlayModeOnScriptCompile.cs" />
     <Compile Include="EntityFactory\BulletEntityFactory.cs" />
     <Compile Include="EntityFactory\ClientEffectFactory.cs" />
     <Compile Include="EntityFactory\ClientMapObjectEntityFactory.cs" />
@@ -450,6 +461,7 @@
     <Compile Include="FreeFramework\framework\ai\player\PlayerInterceptUtil.cs" />
     <Compile Include="FreeFramework\framework\ai\player\PlayerKeyCmdHandler.cs" />
     <Compile Include="FreeFramework\framework\ai\player\PlayerMoveCmdHandler.cs" />
+    <Compile Include="FreeFramework\framework\ai\player\PlayerPressKeyAction.cs" />
     <Compile Include="FreeFramework\framework\buf\AddEffectBufAction.cs" />
     <Compile Include="FreeFramework\framework\buf\DefineEffectBufAction.cs" />
     <Compile Include="FreeFramework\framework\buf\DefinePlayerBufAction.cs" />
@@ -829,9 +841,15 @@
     <Compile Include="GameModules\Player\Actions\ClimbUpCollisionTest.cs" />
     <Compile Include="GameModules\Player\Actions\GenericAction.cs" />
     <Compile Include="GameModules\Player\Actions\IAction.cs" />
+    <Compile Include="GameModules\Player\Actions\LadderPackage\ClimbLadder.cs" />
+    <Compile Include="GameModules\Player\Actions\LadderPackage\LadderAction.cs" />
+    <Compile Include="GameModules\Player\Actions\LadderPackage\LadderCollisionTest.cs" />
+    <Compile Include="GameModules\Player\Actions\LadderPackage\PlayerLadderActionSystem.cs" />
+    <Compile Include="GameModules\Player\Actions\Move\GenericMove.cs" />
+    <Compile Include="GameModules\Player\Actions\Move\LadderMove.cs" />
+    <Compile Include="GameModules\Player\Actions\Move\PlayerMoveByRootMotionSystem.cs" />
+    <Compile Include="GameModules\Player\Actions\Move\ServerMoveByRootMotionSystem.cs" />
     <Compile Include="GameModules\Player\Actions\PlayerClimbActionSystem.cs" />
-    <Compile Include="GameModules\Player\Actions\PlayerMoveByRootMotionSystem.cs" />
-    <Compile Include="GameModules\Player\Actions\ServerMoveByRootMotionSystem.cs" />
     <Compile Include="GameModules\Player\Actions\VaultPackage\VaultUp.cs" />
     <Compile Include="GameModules\Player\Animation\AnimationClipNameMatcher.cs" />
     <Compile Include="GameModules\Player\Animation\AnimationHelper.cs" />
@@ -874,6 +892,7 @@
     <Compile Include="GameModules\Player\CharacterBone\PlayerCharacterBoneUpdateSystem.cs" />
     <Compile Include="GameModules\Player\CharacterBone\ServerCharacterBoneUpdateSystem.cs" />
     <Compile Include="GameModules\Player\CharacterBone\WeaponRot.cs" />
+    <Compile Include="GameModules\Player\CharacterState\CharacterInfoProviderContext.cs" />
     <Compile Include="GameModules\Player\CharacterState\ComponentSynchronizer.cs" />
     <Compile Include="GameModules\Player\CharacterState\FsmInputCommand.cs" />
     <Compile Include="GameModules\Player\CharacterState\FsmInputCreator.cs" />
@@ -928,12 +947,10 @@
     <Compile Include="GameModules\Player\PlayerHoldBreathSystem.cs" />
     <Compile Include="GameModules\Player\PlayerInterruptUpdateSystem.cs" />
     <Compile Include="GameModules\Player\PlayerMoveUtility.cs" />
-    <Compile Include="GameModules\Player\PlayerResourceLoadSystem.cs" />
     <Compile Include="GameModules\Player\PlayerSaveSystem.cs" />
     <Compile Include="GameModules\Player\PlayerSkyMoveStateMachine.cs" />
     <Compile Include="GameModules\Player\PlayerSkyMoveStateUpdateSystem.cs" />
     <Compile Include="GameModules\Player\PlayerSkyMoveUtility.cs" />
-    <Compile Include="GameModules\Player\PlayerSoundPlaySystem.cs" />
     <Compile Include="GameModules\Player\PlayerSpecialZoneEventSystem.cs" />
     <Compile Include="GameModules\Player\PlayerStateTipSystem.cs" />
     <Compile Include="GameModules\Player\PlayerStatisticsSystem.cs" />
@@ -941,6 +958,12 @@
     <Compile Include="GameModules\Player\PlayerVehicleInteractUtility.cs" />
     <Compile Include="GameModules\Player\PlayerWeaponDrawSystem.cs" />
     <Compile Include="GameModules\Player\PlayerWeaponSwitchSystem.cs" />
+    <Compile Include="GameModules\Player\ResourceLoad\FirstPersonModelLoadHandler.cs" />
+    <Compile Include="GameModules\Player\ResourceLoad\ModelLoadHandler.cs" />
+    <Compile Include="GameModules\Player\ResourceLoad\ParachuteLoadResponseHandler.cs" />
+    <Compile Include="GameModules\Player\ResourceLoad\PlayerChangeRoleSystem.cs" />
+    <Compile Include="GameModules\Player\ResourceLoad\PlayerResourceLoadSystem.cs" />
+    <Compile Include="GameModules\Player\ResourceLoad\ThirdPersonModelLoadHandler.cs" />
     <Compile Include="GameModules\Player\Robot\Action\Attack.cs" />
     <Compile Include="GameModules\Player\Robot\Action\AttackMovement.cs" />
     <Compile Include="GameModules\Player\Robot\Action\GetLastPosition.cs" />
@@ -982,7 +1005,6 @@
     <Compile Include="GameModules\Player\StateInteract\StateInterrupt\InterruptEmitter.cs" />
     <Compile Include="GameModules\Player\StateInteract\StateInterrupt\InterruptEventHandler.cs" />
     <Compile Include="GameModules\Player\StateInteract\StateInterrupt\PlayerStateRuntimeInterrupter.cs" />
-    <Compile Include="GameModules\Player\StateInteract\todestroy.cs" />
     <Compile Include="GameModules\Preparation\InitMapIdSystem.cs" />
     <Compile Include="GameModules\Preparation\InitTriggerObjectManagerSystem.cs" />
     <Compile Include="GameModules\Preparation\InitialSceneLoadingSystem.cs" />
@@ -992,6 +1014,7 @@
     <Compile Include="GameModules\ServerMainFeature.cs" />
     <Compile Include="GameModules\ServerPrepareFeature.cs" />
     <Compile Include="GameModules\ServerSpecialZoneEventSystem.cs" />
+    <Compile Include="GameModules\SpringArm.cs" />
     <Compile Include="GameModules\Throwing\IThrowingSegment.cs" />
     <Compile Include="GameModules\Throwing\ThrowingEntityAdapter.cs" />
     <Compile Include="GameModules\Throwing\ThrowingHitHandler.cs" />
@@ -1054,7 +1077,6 @@
     <Compile Include="GameModules\Weapon\Process\WeaponProcessHelper.cs" />
     <Compile Include="GameModules\Weapon\System\PlayerWeaponUpdateSystem.cs" />
     <Compile Include="GameModules\Weapon\System\SimpleLoadBulletSystem.cs" />
-    <Compile Include="GameModules\Weapon\Util\WeaponInterruptUtil.cs" />
     <Compile Include="GameModules\Weapon\Util\WeaponPartUtil.cs" />
     <Compile Include="GameModules\Weapon\Util\WeaponSystemCmdUtil.cs" />
     <Compile Include="GameModules\Weapon\Util\WeaponUtil.cs" />
@@ -1067,6 +1089,7 @@
     <Compile Include="GameModules\WeaponFire\Bullet\BulletFireInfoProvider.cs" />
     <Compile Include="GameModules\WeaponFire\Bullet\DefaultBulletFireInfo.cs" />
     <Compile Include="GameModules\WeaponFire\Bullet\SightBulletFireInfo.cs" />
+    <Compile Include="GameModules\WeaponFire\Controller\AbstractFireController.cs" />
     <Compile Include="GameModules\WeaponFire\Controller\BulletDirUtility.cs" />
     <Compile Include="GameModules\WeaponFire\Controller\CommonWeaponFireController.cs" />
     <Compile Include="GameModules\WeaponFire\Controller\MeleeWeaponFireController.cs" />
@@ -1076,14 +1099,14 @@
     <Compile Include="GameModules\WeaponFire\FireProcessors\Accuracy\AccuracyUtil.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Accuracy\CommonAccuracyCalculator.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Accuracy\PistolAccuracyCalculator.cs" />
+    <Compile Include="GameModules\WeaponFire\FireProcessors\Appearance\CommonFireAppearanceUpdater.cs" />
+    <Compile Include="GameModules\WeaponFire\FireProcessors\Appearance\SpecialFireAppearanceUpdater.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\AutoFireProcessor.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Checker\CameraChecker.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Checker\DefaultFireCmdTrigger.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Checker\SpecialReloadChecker.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\ContinueFire\ContinueFireCounter.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\FireBulletModeProcessor.cs" />
-    <Compile Include="GameModules\WeaponFire\FireProcessors\IdleAndAfter\CommonIdleAndAfterFireProcessor.cs" />
-    <Compile Include="GameModules\WeaponFire\FireProcessors\IdleAndAfter\SpecialIdleAndAfterFireProcessor.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Listener\AfterFireEventListener.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Listener\BulletFireEventListener.cs" />
     <Compile Include="GameModules\WeaponFire\FireProcessors\Shake\AbstractFireShakeProcessor.cs" />

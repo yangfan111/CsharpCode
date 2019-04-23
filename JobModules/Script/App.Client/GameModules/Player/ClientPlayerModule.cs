@@ -1,13 +1,12 @@
 ﻿using App.Client.ClientSystems;
 using App.Client.GameModules.ClientPlayer;
 using App.Client.GameModules.Player.PlayerShowPackage;
-using App.Shared.Components.ClientSession;
 using App.Shared.Configuration;
 using App.Shared.GameModules.Player;
+using App.Shared.GameModules.Player.ResourceLoad;
 using App.Shared.SceneManagement;
 using Assets.App.Client.GameModules.GamePlay.Free.Entitas;
 using Assets.App.Client.GameModules.Player;
-using Core.Configuration.Sound;
 using Core.GameModule.Module;
 using Utils.Singleton;
 using XmlConfig;
@@ -22,6 +21,7 @@ namespace App.Client.GameModules.Player
             AddSystem(new PlayerPlayBackFilterSystem(contexts));
             AddSystem(new PlayerEntityInitSystem(contexts));
 
+            AddSystem(new PlayerChangeRoleSystem(contexts));
             AddSystem(new PlayerResourceLoadSystem(contexts));
             AddSystem(new ClientPlayerCameraInitSystem(contexts.player));
 

@@ -40,18 +40,17 @@ namespace App.Shared.GameModules.Camera
             if (!playerEntity.hasCameraStateOutputNew) return;
 
             CopyClientOutputToComponent(playerEntity.cameraStateUpload, playerEntity.cameraFinalOutputNew);
-
         }
 
         private void CopyClientOutputToComponent(CameraStateUploadComponent input,
              CameraFinalOutputNewComponent output)
         {
-            output.Position = input.Position;
+            output.Position = input.Position.ShiftedVector3();
             output.EulerAngle = input.EulerAngle;
             output.Fov = input.Fov;
             output.Far = input.Far;
             output.Near = input.Near;
-            output.PlayerFocusPosition = input.PlayerFocusPosition;
+            output.PlayerFocusPosition = input.PlayerFocusPosition.ShiftedVector3();
         }
 
         public ISimpleParallelUserCmdExecuteSystem CreateCopy()

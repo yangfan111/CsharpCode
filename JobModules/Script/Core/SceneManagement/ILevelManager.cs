@@ -15,10 +15,11 @@ namespace Core.SceneManagement
         event Action<UnityObject> BeforeGoUnloaded;
         event Action<UnityObject> GoUnloaded;
 
-        OriginStatus UpdateOrigin(Vector3 pos);
-        void GoLoadedWrapper(string source, UnityObject go);
+        void UpdateOrigin(Vector3 pos);
+      
 
         void GetRequests(List<AssetInfo> sceneRequests, List<AssetInfo> goRequests);
         int NotFinishedRequests { get; }
+        void LoadResource(string visioncenterupdatesystem, IUnityAssetManager assetManager, AssetInfo request);
     }
 }

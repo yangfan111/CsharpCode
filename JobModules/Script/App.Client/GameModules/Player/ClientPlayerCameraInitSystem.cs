@@ -14,7 +14,7 @@ namespace App.Client.GameModules.Player
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(ClientPlayerCameraInitSystem));
         private IGroup<PlayerEntity> _iGroup;
-
+        private float lastLogTime;
 
         public ClientPlayerCameraInitSystem(
             PlayerContext playerContext)
@@ -31,7 +31,12 @@ namespace App.Client.GameModules.Player
                 var mainCamera = Camera.main;
                 if (null == mainCamera)
                 {
-                    Logger.Error("no init main camera in scene");
+                    if (Time.time - lastLogTime > 2000)
+                    {
+                        Logger.Error("no init main camera in scene");
+                        lastLogTime = Time.time;
+                    }
+
                     return;
                 }
                 try

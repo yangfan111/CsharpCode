@@ -1,8 +1,9 @@
 ﻿using System;
+using Core;
 using Core.Utils;
 using UnityEngine;
 using WeaponConfigNs;
-using XmlConfig;
+using Random = System.Random;
 
 namespace App.Shared.GameModules.Weapon.Behavior
 {
@@ -14,23 +15,61 @@ namespace App.Shared.GameModules.Weapon.Behavior
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(RifleFireShakeProcessor));
 
 
+        public override void OnFrame(PlayerWeaponController controller, IWeaponCmd cmd)
+
+        {
+            var        heldAgent        = controller.HeldWeaponAgent;
+            ShakeGroup shakeGroup       = FireShakeProvider.GetShakeGroup(heldAgent.RifleShakeCfg, controller);
+            var        runTimeComponent = heldAgent.RunTimeComponent;
+            int        frameInterval    = cmd.FrameInterval;
+            var        orient           = controller.RelatedOrientation;
+            //后坐力生效时间
+            if (runTimeComponent.PunchDecayLeftInterval > 0)
+            {
+                float totalInterval = FireShakeProvider.GetDecayInterval(controller);
+                float lastInterval  = runTimeComponent.PunchDecayLeftInterval;
+                runTimeComponent.PunchDecayLeftInterval -= frameInterval;
+                float newInterval = runTimeComponent.PunchDecayLeftInterval;
+
+                var lastPunchPitch = FireShakeFormula.EaseOutCubic(0, runTimeComponent.TargetPunchPitchDelta,
+                    (totalInterval - lastInterval) / totalInterval);
+                var newPunchPitch = FireShakeFormula.EaseOutCubic(0, runTimeComponent.TargetPunchPitchDelta,
+                    (totalInterval - newInterval) / totalInterval);
+
+                orient.AccPunchPitch      += newPunchPitch - lastPunchPitch;
+                orient.AccPunchPitchValue =  orient.AccPunchPitch * shakeGroup.VPunchOffsetFactor;
+
+
+                var deltaTime = cmd.RenderTime - runTimeComponent.LastRenderTime;
+
+                orient.AccPunchYaw      += runTimeComponent.PunchYawSpeed * deltaTime;
+                orient.AccPunchYawValue =  orient.AccPunchYaw * shakeGroup.HPunchOffsetFactor;
+                if (GlobalConst.EnableWeaponLog)
+                    DebugUtil.MyLog(("orient.AccPunchPitch:" + orient.AccPunchPitch));
+            }
+            else
+            {
+                UpdateOrientationAttenuation(controller, cmd);
+            }
+
+            base.OnFrame(controller, cmd);
+        }
+
+
         public override void OnAfterFire(PlayerWeaponController controller, IWeaponCmd cmd)
         {
             var config     = controller.HeldWeaponAgent.RifleShakeCfg;
             var shakeGroup = FireShakeProvider.GetShakeGroup(config, controller);
             var shakeInfo  = FireShakeProvider.GetShakeInfo(config, controller, shakeGroup);
 
-            CalcBaseShake(controller, cmd.CmdSeq,
-                shakeInfo,
-                shakeGroup.HPunchOffsetFactor,
-                shakeGroup.VPunchOffsetFactor);
+            CalcBaseShake(controller, cmd.CmdSeq, shakeInfo);
         }
 
-        private void CalcBaseShake(PlayerWeaponController controller,    int   seed, ShakeInfo shakeInfo,
-                                   float                  hOffsetFactor, float vOffsetFactor)
+        private void CalcBaseShake(PlayerWeaponController controller, int seed, ShakeInfo shakeInfo)
         {
             var heldAgent        = controller.HeldWeaponAgent;
             var runTimeComponent = heldAgent.RunTimeComponent;
+            var orient           = controller.RelatedOrientation;
             heldAgent.SyncParts();
             var             commonFireConfig = heldAgent.CommonFireCfg;
             ShakeInfoStruct dirShakeArgs     = FireShakeProvider.GetFireUpDirShakeArgs(heldAgent, shakeInfo);
@@ -42,26 +81,62 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 dirShakeArgs.LateralModifier, runTimeComponent.ContinuesShootCount);
             /*应用水平，垂直震动增量*/
             float punchYaw, punchPitch;
-            punchYaw   = controller.RelatedOrient.NegPunchYaw;
-            punchPitch = controller.RelatedOrient.NegPunchPitch;
+            punchYaw   = orient.AccPunchYaw;
+            punchPitch = orient.AccPunchPitch;
             //垂直震动增量应用于punchPitch
             punchPitch = FireShakeFormula.CalcPunchPitch(punchPitch, upDirShakeDelta, dirShakeArgs.UpMax,
                 commonFireConfig.AttackInterval * 0.01f);
-            //水平震动增量应用于punchYaw
+            runTimeComponent.TargetPunchPitchDelta = punchPitch - orient.AccPunchPitch;
+
+            //水平震动增量应用于punchYaw    
             punchYaw = FireShakeFormula.CaclPunchYaw(runTimeComponent.PunchYawLeftSide, punchYaw,
                 lateralDirShakeDelta, dirShakeArgs.LateralMax);
-            /*应用于WeaponRuntimeComponent*/
+            /*应用于WeaponRuntimeComponent*/    
             //apply PunchYawLeftSide 
             if (UniformRandom.RandomInt(seed, 0, (int) dirShakeArgs.LateralTurnback) == 0)
                 runTimeComponent.PunchYawLeftSide = !runTimeComponent.PunchYawLeftSide;
             //apply PunchDecayCdTime
-            runTimeComponent.PunchDecayCdTime = FireShakeProvider.GetDecayInterval(controller);
-            //PunchPitchSpeed 
-            //runTimeComponent.PunchPitchSpeed = FireShakeFormula.CalcPitchSpeed(punchPitch,controller.RelatedOrient.NegPunchPitch, runTimeComponent.PunchDecayCdTime);
+            runTimeComponent.PunchDecayLeftInterval = (int) FireShakeProvider.GetDecayInterval(controller);
             //PunchYawSpeed 
             runTimeComponent.PunchYawSpeed = FireShakeFormula.CalcPitchSpeed(punchYaw,
-                controller.RelatedOrient.NegPunchYaw, runTimeComponent.PunchDecayCdTime);
-			runTimeComponent.PunchPitchSpeed = punchPitch - controller.RelatedOrient.NegPunchPitch;
+                orient.AccPunchYaw, runTimeComponent.PunchDecayLeftInterval);
+            //PunchPitchSpeed(Not Speed) 
+            var rotation = orient.Roll;
+            var rotateYaw  = CalculateRotationDegree(controller, dirShakeArgs);
+            if (UnityEngine.Random.Range(0, 2) == 0) rotateYaw = -rotateYaw;
+            if (rotation + rotateYaw >= 3)
+            {
+                runTimeComponent.CameraRotationSpeed = (3 - rotation) / runTimeComponent.PunchDecayLeftInterval;
+            }
+            else if (rotation + rotateYaw <= -3)
+            {
+                runTimeComponent.CameraRotationSpeed = (-3 - rotation) / runTimeComponent.PunchDecayLeftInterval;
+            }
+            else
+            {
+                runTimeComponent.CameraRotationSpeed = rotateYaw / runTimeComponent.PunchDecayLeftInterval;
+            }
+        }
+
+        private float CalculateRotationDegree(PlayerWeaponController controller, ShakeInfoStruct dirShakeArgs)
+        {
+            switch (controller.HeldWeaponAgent.WeaponConfigAssy.NewWeaponCfg.Type)
+            {
+                case 1:
+                    return dirShakeArgs.UpBase * 1.5f;
+                case 2:
+                    return dirShakeArgs.UpBase * 2f;
+                case 3:
+                    return dirShakeArgs.UpBase * 1.3f;
+                case 4:
+                    return dirShakeArgs.UpBase * 1.5f;
+                case 5:
+                    return dirShakeArgs.UpBase * 2f;
+                case 6:
+                    return dirShakeArgs.UpBase;
+                default:
+                    return 0;
+            }
         }
 
         public override float UpdateLen(PlayerWeaponController controller, float len, float frameTime)
@@ -73,9 +148,10 @@ namespace App.Shared.GameModules.Weapon.Behavior
             return r;
         }
 
-        protected override float GetWeaponPunchYawFactor(PlayerWeaponController controller)
+        protected override float GePuntchFallbackFactor(PlayerWeaponController controller)
         {
-            return FireShakeProvider.GetShakeGroup(controller.HeldWeaponAgent.RifleShakeCfg,controller).WeaponFallbackFactor;
+            return FireShakeProvider.GetShakeGroup(controller.HeldWeaponAgent.RifleShakeCfg, controller)
+                                    .WeaponFallbackFactor;
         }
     }
 }

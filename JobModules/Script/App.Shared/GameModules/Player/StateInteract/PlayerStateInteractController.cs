@@ -25,12 +25,17 @@ namespace App.Shared.GameModules.Player
         public void DoRunTimeInterrupt(IUserCmd cmd)
         {
             var states = stateCollector.GetCurrStates(EPlayerStateCollectType.UseCacheAddation);
-            stateInterrupter.DoRunTimeInterrupt(states, cmd.IsInterrupt);
+            stateInterrupter.DoRunTimeInterrupt(states, cmd);
         }
 
         public void InterruptCharactor()
         {
             stateInterrupter.InterruptCharactor();
+        }
+
+        public bool IsInterrupted(EInterruptType interruptType)
+        {
+            return stateInterrupter.IsInterrupted(interruptType);
         }
 
         public HashSet<EPlayerState> GetCurrStates(

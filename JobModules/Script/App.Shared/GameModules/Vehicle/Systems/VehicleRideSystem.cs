@@ -233,6 +233,7 @@ namespace App.Shared.GameModules.Vehicle
             {
                 playerEntity.playerMove.Velocity = vehicle.GetLinearVelocity();
                 playerEntity.playerMove.IsGround = false;
+                playerEntity.characterContoller.Value.ClearGroundInfo();
                 playerEntity.stateInterface.State.Freefall();
             }
         }

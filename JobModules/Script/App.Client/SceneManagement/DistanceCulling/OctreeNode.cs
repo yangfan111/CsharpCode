@@ -45,9 +45,6 @@ namespace App.Client.SceneManagement.DistanceCulling
 
         private OctreeNode[] _recursiveStack;
 
-        // oc enable
-        private bool _isOcTestLevel;
-
         public OctreeNode(Action<OctreeNode> reuseHandler, Func<OctreeNode> getHandler)
         {
             _reuseHandler = reuseHandler;
@@ -218,8 +215,6 @@ namespace App.Client.SceneManagement.DistanceCulling
             SetExtremeDir(size);
 
             var minDimension = Math.Min(size.x, Math.Min(size.y, size.z));
-            _isOcTestLevel = minDimension <= Constants.CloseToArticlesStandard
-                && 2 * minDimension > Constants.CloseToArticlesStandard;
         }
 
         private void SetExtremeDir(Vector3 halfSize)
@@ -445,30 +440,6 @@ namespace App.Client.SceneManagement.DistanceCulling
 
         #endregion
 
-        public void Traverse(Vector3 cameraPos, OriginStatus status)
-        {
-            if (_parent == null && IsOutside(cameraPos))
-                return;
-
-            if (_isOcTestLevel)
-            {
-                var count = 0;
-                for (int i = 0; i < _cullingCountOverall.Length; i++)
-                {
-                    count += _cullingCountOverall[i];
-                }
-
-                status.CloseToBuilding = count > Constants.ArticlesCountStandard;
-                return;
-            }
-
-            var childIndex = GetChildIndex(cameraPos);
-            if (_children[childIndex] != null)
-                _children[childIndex].Traverse(cameraPos, status);
-            else
-                status.CloseToBuilding = false;
-        }
-        
         public void Log()
         {
             for (int i = 0; i < Constants.DistCullingCatCount; i++)

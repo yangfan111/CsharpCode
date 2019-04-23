@@ -19,5 +19,7 @@
 
         public const string Effect = "effect/client";
         public const string Effect_Common = "effect/common";
+
+        public const string Prefab_Spray = "decalicious/decal";
     }
 }

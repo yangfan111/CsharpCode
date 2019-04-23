@@ -19,7 +19,7 @@ namespace App.Shared.SceneManagement.Basic
             _sceneParam = param;
         }
         
-        public void UpdateOrigin(Vector3 value, OriginStatus status)
+        public void UpdateOrigin(Vector3 value)
         {
             // fixed scene move to levelmanager
         }

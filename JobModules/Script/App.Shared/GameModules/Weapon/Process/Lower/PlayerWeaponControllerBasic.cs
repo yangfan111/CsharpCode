@@ -30,7 +30,7 @@ namespace App.Shared.GameModules.Weapon
 
         public PlayerAudioController AudioController
         {
-            get { return GameModuleManagement.Get<PlayerAudioController>(Owner.EntityId); }
+            get { return GameModuleManagement.Get<PlayerAudioController>(Owner.EntityId).Value; }
         }
         public PlayerStateInteractController InteractController
         {
@@ -67,6 +67,7 @@ namespace App.Shared.GameModules.Weapon
                 var func2 = GenerateBagEmptyKeyExtractor();
                 var newAgent = (WeaponBaseAgent)Activator.CreateInstance(t,
                     func1, func2, slotType, _grenadeHandler);
+                newAgent.Owner = Owner;
                 slotWeaponAgents[(int)slotType] = newAgent;
             }
 
@@ -118,8 +119,8 @@ namespace App.Shared.GameModules.Weapon
 
         public void ResetAllComponents()
         {
-            if (RelatedOrient != null)
-                RelatedOrient.Reset();
+            if (RelatedOrientation != null)
+                RelatedOrientation.Reset();
         }
 
         public void ResetBagLockState()
@@ -181,15 +182,11 @@ namespace App.Shared.GameModules.Weapon
             get { return (EWeaponSlotType)RelatedBagSet.LastSlotIndex; }
         }
 
+
         public int HeldBagPointer
         {
-            get { return 0; }
-        }
-
-        public int HeldBagPointer2
-        {
-            get { return RelatedBagSet.HeldBagPointer2; }
-            set { RelatedBagSet.HeldBagPointer2 = value; }
+            get { return RelatedBagSet.HeldBagPointer; }
+            set { RelatedBagSet.HeldBagPointer = value; }
         }
 
 
@@ -241,11 +238,6 @@ namespace App.Shared.GameModules.Weapon
         {
             get { return RelatedCustomize.BagLockState; }
             set { RelatedCustomize.BagLockState = value; }
-        }
-        public int LastFireWeaponId
-        {
-            get { return RelatedCustomize.LastFireWeaponId; }
-            set { RelatedCustomize.LastFireWeaponId = value; }
         }
 
         public bool CanSwitchWeaponBag

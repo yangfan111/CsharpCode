@@ -18,7 +18,7 @@ namespace Assets.App.Shared.GameModules.Player
             {
                 return;
             }
-            if(cmd.IsHoldBreath && player.IsCameraGunSight()) 
+            if(cmd.IsHoldBreath && player.IsAiming()) 
             {
                 if(null == player)
                 {
@@ -32,6 +32,8 @@ namespace Assets.App.Shared.GameModules.Player
                 }
                 if(player.cameraStateNew.ViewNowMode == (int)ECameraViewMode.GunSight)
                 {
+                    if(!player.oxygenEnergyInterface.Oxygen.InShiftState)
+                        player.oxygenEnergyInterface.Oxygen.ShiftVeryTime = player.time.ClientTime;
                     player.oxygenEnergyInterface.Oxygen.InShiftState = true;
                 }
             }
@@ -41,6 +43,11 @@ namespace Assets.App.Shared.GameModules.Player
                 {
                     Logger.Error("player has no appearance interface ");
                     return;
+                }
+
+                if (player.oxygenEnergyInterface.Oxygen.InShiftState)
+                {
+                    player.oxygenEnergyInterface.Oxygen.ShiftVeryTime = player.time.ClientTime;
                 }
                 player.oxygenEnergyInterface.Oxygen.InShiftState = false;
             }

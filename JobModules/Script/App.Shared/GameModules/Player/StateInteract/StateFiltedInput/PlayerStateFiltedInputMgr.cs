@@ -9,7 +9,7 @@ namespace App.Shared.GameModules.Player
     /// <summary>
     /// Defines the <see cref="PlayerStateFiltedInputMgr" />
     /// </summary>
-    public class PlayerStateFiltedInputMgr:IPlayerStateFiltedInputMgr
+    public class PlayerStateFiltedInputMgr : IPlayerStateFiltedInputMgr
     {
         private static readonly LoggerAdapter Logger =
             new LoggerAdapter(typeof(PlayerStateFiltedInputMgr));
@@ -20,7 +20,7 @@ namespace App.Shared.GameModules.Player
 
         private IPlayerStateColltector playerStateCollector;
 
-         public IFilteredInput EmptyInput { get; private set; }
+        public IFilteredInput EmptyInput { get; private set; }
 
         public PlayerStateFiltedInputMgr(IPlayerStateColltector playerStateCollector) : this(playerStateCollector,
             new ValuableFilteredInput())
@@ -28,11 +28,11 @@ namespace App.Shared.GameModules.Player
         }
 
         public PlayerStateFiltedInputMgr(IPlayerStateColltector playerStateCollector,
-                                  ValuableFilteredInput valuableFilteredInput)
+                                         ValuableFilteredInput  valuableFilteredInput)
         {
             this.playerStateCollector = playerStateCollector;
-            UserInput = valuableFilteredInput;
-            EmptyInput = new EmptyFilteredInput();
+            UserInput                 = valuableFilteredInput;
+            EmptyInput                = new EmptyFilteredInput();
         }
 
 
@@ -47,11 +47,23 @@ namespace App.Shared.GameModules.Player
 
         private void BlockUserInput()
         {
+            var IsUserThrowing = UserInput.IsInput(EPlayerInput.IsThrowing);
+            UserInput.SetInput(EPlayerInput.IsThrowing, true);
+            //与逻辑标志位
+            var pullInterrupt = false;
             currStateInputItems.ForEach((state) =>
             {
                 if (state != null)
+                {
                     state.BlockUnavaliableInputs(UserInput);
+                    pullInterrupt = pullInterrupt || state.IsInputEnabled(EPlayerInput.IsPullboltInterrupt);
+                }
             });
+            if (!UserInput.IsInput(EPlayerInput.IsThrowing))
+                UserInput.SetInput(EPlayerInput.IsThrowingInterrupt, true);
+            else
+                UserInput.SetInput(EPlayerInput.IsThrowing, IsUserThrowing);
+            UserInput.SetInput(EPlayerInput.IsPullboltInterrupt, pullInterrupt);
         }
 
         public bool IsInputEnalbed(EPlayerInput input)
@@ -63,11 +75,7 @@ namespace App.Shared.GameModules.Player
         private void BlockStateInput()
         {
             UpdateStateInputItems();
-            currStateInputItems.ForEach((state) =>
-            {
-                if (state != null)
-                    state.BlockUnavaliableInputs(UserInput);
-            });
+            BlockUserInput();
         }
 
         public IFilteredInput ApplyUserCmd(IUserCmd cmd)

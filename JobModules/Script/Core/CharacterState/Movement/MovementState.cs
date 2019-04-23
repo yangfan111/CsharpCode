@@ -1,7 +1,8 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Core.CharacterState.Movement.States;
 using Core.Fsm;
 using UnityEngine;
 using Core.Configuration;
@@ -67,6 +68,13 @@ namespace Core.CharacterState.Movement
                     {
                         return FsmTransitionResponseType.ForceEnd;
                     }
+                    
+                    if (command.IsMatch(FsmInput.EnterLadder) ||
+                        command.IsMatch(FsmInput.MiddleEnterLadder))
+                    {
+                        return FsmTransitionResponseType.ChangeRoad;
+                    }
+                    
                     return FsmTransitionResponseType.NoResponse;
                 },
                 (int)MovementStateId.Walk,
@@ -107,6 +115,12 @@ namespace Core.CharacterState.Movement
 
             #endregion
 
+            #region idle to ladderMove
+
+            ToLadderMovement(state);
+
+            #endregion
+
             return state;
         }
 
@@ -125,6 +139,11 @@ namespace Core.CharacterState.Movement
                         return FsmTransitionResponseType.ForceEnd;
                     }
                     if (command.IsMatch(FsmInput.Run) || command.IsMatch(FsmInput.Sprint))
+                    {
+                        return FsmTransitionResponseType.ChangeRoad;
+                    }
+                    if (command.IsMatch(FsmInput.EnterLadder) ||
+                        command.IsMatch(FsmInput.MiddleEnterLadder))
                     {
                         return FsmTransitionResponseType.ChangeRoad;
                     }
@@ -161,6 +180,11 @@ namespace Core.CharacterState.Movement
                     {
                         return FsmTransitionResponseType.ChangeRoad;
                     }
+                    if (command.IsMatch(FsmInput.EnterLadder) ||
+                        command.IsMatch(FsmInput.MiddleEnterLadder))
+                    {
+                        return FsmTransitionResponseType.ChangeRoad;
+                    }
                     return FsmTransitionResponseType.NoResponse;
                 },
                 (int) MovementStateId.Run,
@@ -188,6 +212,11 @@ namespace Core.CharacterState.Movement
                     {
                         return FsmTransitionResponseType.ChangeRoad;
                     }
+                    if (command.IsMatch(FsmInput.EnterLadder) ||
+                        command.IsMatch(FsmInput.MiddleEnterLadder))
+                    {
+                        return FsmTransitionResponseType.ChangeRoad;
+                    }
                     return FsmTransitionResponseType.NoResponse;
                 },
                 (int) MovementStateId.Sprint,
@@ -204,6 +233,13 @@ namespace Core.CharacterState.Movement
             #region to divemovement
             AddTransitionToMovement(state);
             #endregion
+            
+            #region walk to ladderMove
+
+            ToLadderMovement(state);
+
+            #endregion
+            
             return state;
         }
 
@@ -222,6 +258,11 @@ namespace Core.CharacterState.Movement
                         return FsmTransitionResponseType.ForceEnd;
                     }
                     if (command.IsMatch(FsmInput.Walk) || command.IsMatch(FsmInput.Sprint))
+                    {
+                        return FsmTransitionResponseType.ChangeRoad;
+                    }
+                    if (command.IsMatch(FsmInput.EnterLadder) ||
+                        command.IsMatch(FsmInput.MiddleEnterLadder))
                     {
                         return FsmTransitionResponseType.ChangeRoad;
                     }
@@ -258,6 +299,11 @@ namespace Core.CharacterState.Movement
                     {
                         return FsmTransitionResponseType.ChangeRoad;
                     }
+                    if (command.IsMatch(FsmInput.EnterLadder) ||
+                        command.IsMatch(FsmInput.MiddleEnterLadder))
+                    {
+                        return FsmTransitionResponseType.ChangeRoad;
+                    }
                     return FsmTransitionResponseType.NoResponse;
                 },
                 (int)MovementStateId.Walk,
@@ -285,6 +331,11 @@ namespace Core.CharacterState.Movement
                     {
                         return FsmTransitionResponseType.ChangeRoad;
                     }
+                    if (command.IsMatch(FsmInput.EnterLadder) ||
+                        command.IsMatch(FsmInput.MiddleEnterLadder))
+                    {
+                        return FsmTransitionResponseType.ChangeRoad;
+                    }
                     return FsmTransitionResponseType.NoResponse;
                 },
                 (int)MovementStateId.Sprint,
@@ -301,6 +352,13 @@ namespace Core.CharacterState.Movement
             #region to divemovement
             AddTransitionToMovement(state);
             #endregion
+            
+            #region run to ladderMove
+
+            ToLadderMovement(state);
+
+            #endregion
+            
             return state;
         }
 
@@ -319,6 +377,11 @@ namespace Core.CharacterState.Movement
                         return FsmTransitionResponseType.ForceEnd;
                     }
                     if (command.IsMatch(FsmInput.Walk) || command.IsMatch(FsmInput.Run))
+                    {
+                        return FsmTransitionResponseType.ChangeRoad;
+                    }
+                    if (command.IsMatch(FsmInput.EnterLadder) ||
+                        command.IsMatch(FsmInput.MiddleEnterLadder))
                     {
                         return FsmTransitionResponseType.ChangeRoad;
                     }
@@ -355,6 +418,11 @@ namespace Core.CharacterState.Movement
                     {
                         return FsmTransitionResponseType.ChangeRoad;
                     }
+                    if (command.IsMatch(FsmInput.EnterLadder) ||
+                        command.IsMatch(FsmInput.MiddleEnterLadder))
+                    {
+                        return FsmTransitionResponseType.ChangeRoad;
+                    }
                     return FsmTransitionResponseType.NoResponse;
                 },
                 (int)MovementStateId.Walk,
@@ -382,6 +450,11 @@ namespace Core.CharacterState.Movement
                     {
                         return FsmTransitionResponseType.ChangeRoad;
                     }
+                    if (command.IsMatch(FsmInput.EnterLadder) ||
+                        command.IsMatch(FsmInput.MiddleEnterLadder))
+                    {
+                        return FsmTransitionResponseType.ChangeRoad;
+                    }
                     return FsmTransitionResponseType.NoResponse;
                 },
                 (int)MovementStateId.Run,
@@ -397,6 +470,12 @@ namespace Core.CharacterState.Movement
 
             #region to divemovement
             AddTransitionToMovement(state);
+            #endregion
+            
+            #region sprint to ladderMove
+
+            ToLadderMovement(state);
+
             #endregion
 
             return state;
@@ -484,7 +563,29 @@ namespace Core.CharacterState.Movement
                 0), new[] { FsmInput.Sprint });
 
             #endregion
+            
+            #region dive to ladderMove
+
+            ToLadderMovement(state);
+
+            #endregion
+            
             return state;
+        }
+
+        public static FsmState CreateEnterLadderState()
+        {
+            return new EnterLadderState(MovementStateId.EnterLadder);
+        }
+
+        public static FsmState CreateLadderMoveState()
+        {
+            return new LadderState(MovementStateId.Ladder);
+        }
+
+        public static FsmState CreateExitLadderState()
+        {
+            return new ExitLadderState(MovementStateId.ExitLadder);
         }
 
         protected static void AddTransitionToMovement(MovementState state)
@@ -507,6 +608,73 @@ namespace Core.CharacterState.Movement
                 },
                 null, (int)MovementStateId.DiveMove, null, 0, new[] { FsmInput.DiveMove });
         }
+
+        private static void ToLadderMovement(MovementState state)
+        {
+            state.AddTransition(
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.EnterLadder))
+                    {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.LadderHash,
+                            AnimatorParametersHash.Instance.LadderName,
+                            AnimatorParametersHash.Instance.LadderEnableValue,
+                            CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.LadderEnterStateHash,
+                            AnimatorParametersHash.Instance.LadderEnterStateName,
+                            (int)command.AdditioanlValue,
+                            CharacterView.ThirdPerson);
+                        addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MotionHash,
+                            AnimatorParametersHash.Instance.MotionName,
+                            AnimatorParametersHash.Instance.MotionlessValue,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson);
+                        addOutput(FsmOutput.Cache);
+
+                        command.Handled = true;
+                        return true;
+                    }
+
+                    return false;
+                },
+                (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                (int) MovementStateId.EnterLadder, null, 0, new[] {FsmInput.EnterLadder});
+
+            state.AddTransition(
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.MiddleEnterLadder))
+                    {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.LadderHash,
+                            AnimatorParametersHash.Instance.LadderName,
+                            AnimatorParametersHash.Instance.LadderEnableValue,
+                            CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.LadderEnterStateHash,
+                            AnimatorParametersHash.Instance.LadderEnterStateName,
+                            AnimatorParametersHash.Instance.LadderEnterStateMiddle,
+                            CharacterView.ThirdPerson);
+                        addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MotionHash,
+                            AnimatorParametersHash.Instance.MotionName,
+                            AnimatorParametersHash.Instance.MotionlessValue,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson);
+                        addOutput(FsmOutput.Cache);
+
+                        command.Handled = true;
+                        return true;
+                    }
+
+                    return false;
+                },
+                (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                (int) MovementStateId.Ladder, null, 0, new[] {FsmInput.MiddleEnterLadder});
+        } 
 
         public MovementState(MovementStateId id) : base((short) id)
         {

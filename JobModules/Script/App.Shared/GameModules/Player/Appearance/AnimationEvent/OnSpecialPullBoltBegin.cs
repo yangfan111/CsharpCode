@@ -10,6 +10,7 @@ namespace App.Shared.GameModules.Player.Appearance.AnimationEvent
         {
            // player.AudioController().PlayPullBoltAudio(player.WeaponController().HeldConfigId);
             //player.PlayWeaponSound(XmlConfig.EWeaponSoundType.PullBolt);
+            if(player.AudioController() != null)
             player.AudioController().PlayPullBoltAudio(player.WeaponController().HeldConfigId);
         }
     }

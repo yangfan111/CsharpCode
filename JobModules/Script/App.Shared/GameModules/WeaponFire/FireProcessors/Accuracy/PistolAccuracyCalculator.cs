@@ -26,15 +26,15 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
         public void OnIdle(PlayerWeaponController weaponController, IWeaponCmd cmd)
         {
-            var weaponState = weaponController.HeldWeaponAgent.RunTimeComponent;
-            if (weaponState.ContinuesShootCount == 0)
+            var runTimeComponent = weaponController.HeldWeaponAgent.RunTimeComponent;
+            if (runTimeComponent.ContinuesShootCount == 0)
             {
 
                 var config = weaponController.HeldWeaponAgent.PistolAccuracyLogicCfg;
                 if (config == null)
                     return;
 
-                weaponState.Accuracy = config.InitAccuracy;
+                runTimeComponent.Accuracy = config.InitAccuracy;
             }
         }
     }

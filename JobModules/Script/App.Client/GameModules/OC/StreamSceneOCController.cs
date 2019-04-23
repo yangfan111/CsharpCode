@@ -129,7 +129,10 @@ namespace App.Client.GameModules.OC
                             if (IsPVSShouldLoad(gridCoord, stat.Center))
                             {
                                 stat.Status = PVSStatus.Loading;
-                                _scene.Load(i, j, OnPVSLoaded, block);
+                                if (!_scene.Load(i, j, OnPVSLoaded, block))
+                                {
+                                    stat.Status = PVSStatus.UnLoaded;
+                                }
                             }
                             break;
                     }

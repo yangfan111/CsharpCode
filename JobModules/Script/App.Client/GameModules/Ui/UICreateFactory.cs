@@ -10,11 +10,9 @@ using App.Shared.Components;
 using App.Shared.Components.Ui;
 using Assets.App.Client.GameModules.Ui.UiAdapter.Common;
 using Assets.UiFramework.Libs;
-using Core.GameModule.Module;
 using Core.Ui;
 using Core.Utils;
 using UIComponent.UI;
-using UnityEngine;
 
 namespace Assets.App.Client.GameModules.Ui
 {
@@ -184,7 +182,7 @@ namespace Assets.App.Client.GameModules.Ui
             RegisterUi(UiNameConstant.CommonNoticeModel, typeof(CommonNoticeModel), typeof(NoticeUiAdapter), UILayer.Alert, new object[] { contexts },
                 new UiGroup[] { UiGroup.Alert });
             RegisterUi(UiNameConstant.CommonPaintDiscModel, typeof(CommonPaintDiscModel), typeof(PaintUiAdapter), UILayer.Pop, new object[] { contexts },
-                new UiGroup[] { UiGroup.Pop,UiGroup.MapHide,UiGroup.SurvivalBagHide });
+                new UiGroup[] { UiGroup.Pop,UiGroup.Singleton, UiGroup.SurvivalBagHide });
 
             //team
             RegisterUi(UiNameConstant.GroupScoreModel, typeof(GroupScoreModel), typeof(GroupScoreUiAdapter), UILayer.Base, new object[] { contexts }, 
@@ -197,12 +195,16 @@ namespace Assets.App.Client.GameModules.Ui
             RegisterUi(UiNameConstant.CommonGameTitleModel, typeof(CommonGameTitleModel), typeof(GameTitleUiAdapter), UILayer.Base, new object[] { contexts }, 
                 new UiGroup[] { UiGroup.Base, UiGroup.MapHide, UiGroup.SurvivalBagHide });
 
+            RegisterUi(UiNameConstant.ChickenBagModel, typeof(ChickenBagModel), typeof(ChickenBagUiAdapter), UILayer.Pop, new object[] { contexts },
+                new UiGroup[] { UiGroup.Base, UiGroup.Singleton});
             RegisterUi(UiNameConstant.ChickenScoreModel, typeof(ChickenScoreModel), typeof(ChickenScoreUiAdapter), UILayer.Base, new object[] { contexts }, 
                 new UiGroup[] { UiGroup.Base, UiGroup.MapHide, UiGroup.SurvivalBagHide });
             RegisterUi(UiNameConstant.CommonTeam, typeof(CommonTeam), typeof(TeamUiAdapter), UILayer.Base, new object[] { contexts },
                 new UiGroup[] { UiGroup.Base , UiGroup.MapHide, UiGroup.SurvivalBagHide });
             RegisterUi(UiNameConstant.CommonSplitModel, typeof(CommonSplitModel), typeof(SplitUiAdapter), UILayer.Alert, new object[] { contexts }, new UiGroup[] { UiGroup.Fix });
             RegisterUi(UiNameConstant.CommonSuoDuModel, typeof(CommonSuoDuModel), typeof(SuoDuUiAdapter), UILayer.Base, new object[] { contexts }, 
+                new UiGroup[] { UiGroup.Base, UiGroup.MapHide, UiGroup.SurvivalBagHide });
+            RegisterUi(UiNameConstant.ChickenPlaneModel, typeof(ChickenPlaneModel), typeof(PlaneUiAdapter), UILayer.Base, new object[] { contexts },
                 new UiGroup[] { UiGroup.Base, UiGroup.MapHide, UiGroup.SurvivalBagHide });
 
             RegisterUi(UiNameConstant.BlastScoreModel, typeof(BlastScoreModel), typeof(BlastScoreUiAdapter), UILayer.Base, new object[] { contexts }, 
@@ -249,6 +251,9 @@ namespace Assets.App.Client.GameModules.Ui
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonDebugInfoModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonVideoSettingModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonPaintDiscModel);
+            //contexts.ui.uISession.CreateUi.Add(UiNameConstant.ChickenBagModel);
+            //contexts.ui.uISession.CreateUi.Add(UiNameConstant.ChickenPlaneModel);
+
         }
 
         public static void CreateTeamUI(int gameRule)

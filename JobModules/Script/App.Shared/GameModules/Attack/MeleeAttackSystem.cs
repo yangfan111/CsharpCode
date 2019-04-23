@@ -53,7 +53,7 @@ namespace App.Shared.GameModules.Attack
             {
                 return;
             }
-
+        //    Logger.Info("Try Attack One Time, Interval:"+ (cmd.RenderTime - player.meleeAttackInfoSync.BeforeAttackTime));
             var config = player.meleeAttackInfo.AttackConfig;
             if(null == config)
             {
@@ -107,19 +107,20 @@ namespace App.Shared.GameModules.Attack
 
                 if (targetPlayer != null)
                 {
-                    _meleeHitHandler.OnHitPlayer(player, targetPlayer, hit, attackInfo, config);
+                    _meleeHitHandler.OnHitPlayer(_contexts, player, targetPlayer, hit, attackInfo, config, cmd.Seq);
                 }
                 else if (targetVehicle != null)
                 {
-                    _meleeHitHandler.OnHitVehicle(player, targetVehicle, hit, attackInfo, config);
+                    _meleeHitHandler.OnHitVehicle(_contexts, player, targetVehicle, hit, attackInfo, config);
                 }
                 else
                 {
-                    _meleeHitHandler.OnHitEnvrionment(player, hit, attackInfo, config);
+                    _meleeHitHandler.OnHitEnvrionment(_contexts, player, hit, attackInfo, config);
                 }
             }
 
             compensationWorld.Release();
+           // Logger.Info("Try Attack Finish");
         }
 
         private float GetDefaultHeight(PlayerEntity player)

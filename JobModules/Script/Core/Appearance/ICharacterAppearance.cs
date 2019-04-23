@@ -49,6 +49,7 @@ namespace Core.Appearance
         int GetScopeIdInCurrentWeapon();
         // 获取当前武器ID
         int GetWeaponIdInHand();
+        bool IsPrimaryWeaponOrSideArm();
         bool IsEmptyHand();
         //将武器挂载到替代绑点上
         void MountWeaponOnAlternativeLocator();
@@ -65,6 +66,9 @@ namespace Core.Appearance
 
         WardrobeControllerBase GetWardrobeController();
         WeaponControllerBase GetController<TPlayerWeaponController>();
+
+        void ClearThirdPersonCharacter();
+        void CheckP3HaveInit(bool value);
 
         void Execute();
 

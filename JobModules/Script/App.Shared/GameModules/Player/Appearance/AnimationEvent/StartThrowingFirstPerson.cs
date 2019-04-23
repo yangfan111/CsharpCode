@@ -6,10 +6,9 @@
         {
             if (player.appearanceInterface.Appearance.IsFirstPerson 
                 && player.hasThrowingAction
-                && player.hasThrowingUpdate
-                && player.throwingAction.ActionInfo.IsReady)
+                && player.hasThrowingUpdate)
             {
-                player.throwingUpdate.IsStartFly = true;
+                player.throwingUpdate.ReadyFly = true;
             }
         }
     }

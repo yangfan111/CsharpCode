@@ -1,4 +1,4 @@
-﻿using Core.Animation;
+﻿﻿using Core.Animation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +33,7 @@ namespace Core.CharacterState
         public const float FirstPersonStandCameraHeight = 1.55f;
         public const float FirstPersonCrouchCameraHeight = 1.0f;
         public const float FirstPersonProneCameraHeight = 0.25f;
-
+        
         public static readonly string InjureyStateString = "UpperBody Add Layer.Injury";
         public static readonly int InjureyStateHash = Animator.StringToHash(InjureyStateString);
         public static readonly float InjureyStateDuration = 0.333f;
@@ -115,6 +115,8 @@ namespace Core.CharacterState
             FireEnableValue = true;
             FireDisableValue = false;
 
+            #region Climb
+
             ClimbName = "Climb";
             ClimbEnableValue = true;
             ClimbDisableValue = false;
@@ -132,6 +134,28 @@ namespace Core.CharacterState
             Climb1MValue = 5;
             Climb150CmValue = 6;
             Climb2MValue = 7;
+
+            #endregion
+
+            #region Ladder
+            
+            LadderName = "Ladder";
+            LadderEnableValue = true;
+            LadderDisableValue = false;
+
+            LadderEnterStateName = "LadderEnterState";
+            LadderEnterStateTop = 0;
+            LadderEnterStateMiddle = 1;
+            LadderEnterStateBottom = 2;
+
+            LadderExitStateName = "LadderExitState";
+            LadderExitStateTop = 0;
+            LadderExitStateMiddle = 1;
+            LadderExitStateBottom = 2;
+
+            LadderSpeedName = "LadderSpeed";
+
+            #endregion
 
             SightsFireName = "SightsFire";
             SightsFireEnableValue = true;
@@ -290,16 +314,16 @@ namespace Core.CharacterState
             InjuredMoveEnableValue = true;
             InjuredMoveDisableValue = false;
 
-            ADSLayer = 6;
+            ADSLayer = 7;
             ADSLayerP1 = 2;
             ADSEnableValue = 1;
             ADSDisableValue = 0;
 
-            SwimLayer = 2;
+            SwimLayer = 3;
             SwimEnableValue = 1;
             SwimDisableValue = 0;
 
-            DyingLayer = 3;
+            DyingLayer = 4;
             DyingEnableValue = 1;
             DyingDisableValue = 0;
 
@@ -307,6 +331,14 @@ namespace Core.CharacterState
             InterruptEnable = true;
             InterruptDisable = false;
 
+            TransfigurationStartName = "TransfigurationStart";
+            TransfigurationStartEnable = true;
+            TransfigurationStartDisable = false;
+
+            TransfigurationFinishName = "TransfigurationFinish";
+            TransfigurationFinishEnable = true;
+            TransfigurationFinishDisable = false;
+            
             UpperBodyLayer = NetworkAnimatorLayer.PlayerUpperBodyOverlayLayer;
             UpperBodyEnableValue = 1;
             UpperBodyDisableValue = 0;
@@ -597,6 +629,62 @@ namespace Core.CharacterState
         public float Climb1MValue { get; private set; }
         public float Climb150CmValue { get; private set; }
         public float Climb2MValue { get; private set; }
+        #endregion
+
+        #region Ladder
+
+        private string _ladderName = string.Empty;
+        public string LadderName
+        {
+            get { return _ladderName; }
+            set { _ladderName = value; LadderHash = StringToHash(value); }
+        }
+        public int LadderHash { get; private set; }
+        public bool LadderEnableValue { get; private set; }
+        public bool LadderDisableValue { get; private set; }
+
+        #endregion
+        
+        #region LadderSpeed
+
+        private string _ladderSpeedName = string.Empty;
+        public string LadderSpeedName
+        {
+            get { return _ladderSpeedName; }
+            set { _ladderSpeedName = value; LadderSpeedHash = StringToHash(value); }
+        }
+        public int LadderSpeedHash { get; private set; }
+
+        #endregion
+
+        #region LadderEnterState
+
+        private string _ladderEnterStateName = string.Empty;
+        public string LadderEnterStateName
+        {
+            get { return _ladderEnterStateName; }
+            set { _ladderEnterStateName = value; LadderEnterStateHash = StringToHash(value); }
+        }
+        public int LadderEnterStateHash { get; private set; }
+        public int LadderEnterStateTop { get; private set; }
+        public int LadderEnterStateMiddle { get; private set; }
+        public int LadderEnterStateBottom { get; private set; }
+
+        #endregion
+
+        #region LadderExitState
+
+        private string _ladderExitStateName = string.Empty;
+        public string LadderExitStateName
+        {
+            get { return _ladderExitStateName; }
+            set { _ladderExitStateName = value; LadderExitStateHash = StringToHash(value); }
+        }
+        public int LadderExitStateHash { get; private set; }
+        public int LadderExitStateTop { get; private set; }
+        public int LadderExitStateMiddle { get; private set; }
+        public int LadderExitStateBottom { get; private set; }
+
         #endregion
 
         #region SightsFire
@@ -1079,6 +1167,30 @@ namespace Core.CharacterState
         public int InterruptHash { get; private set; }
         public bool InterruptEnable;
         public bool InterruptDisable;
+        #endregion
+
+        #region Transfiguration
+
+        private string _transfigurationStartName = string.Empty;
+        public string TransfigurationStartName
+        {
+            get { return _transfigurationStartName; }
+            set { _transfigurationStartName = value; TransfigurationStartHash = StringToHash(value); }
+        }
+        public int TransfigurationStartHash { get; private set; }
+        public bool TransfigurationStartEnable;
+        public bool TransfigurationStartDisable;
+        
+        private string _transfigurationFinishName = string.Empty;
+        public string TransfigurationFinishName
+        {
+            get { return _transfigurationFinishName; }
+            set { _transfigurationFinishName = value; TransfigurationFinishHash = StringToHash(value); }
+        }
+        public int TransfigurationFinishHash { get; private set; }
+        public bool TransfigurationFinishEnable;
+        public bool TransfigurationFinishDisable;
+
         #endregion
 
         public int ADSLayer { get; private set; }
