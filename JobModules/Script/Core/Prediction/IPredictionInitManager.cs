@@ -17,7 +17,7 @@ namespace Core.Prediction
     }
     public interface IPredictionInitManager
     {
-        
+        void RewindFirstSnapshot(EntityKey self);
         void PredictionInit();
         void SavePredictionCompoments(int historyId);
         SavedHistory GetTargetHistory(int cmdSeq);

@@ -2,10 +2,6 @@
 using com.wd.free.action;
 using com.wd.free.action.stage;
 using com.wd.free.map;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace App.Shared.FreeFramework.framework.@event
 {

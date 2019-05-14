@@ -33,6 +33,7 @@ namespace App.Client.SessionStates
         private GameObject _loadingUi;
 //        private Slider _loadingSlider;
         private Image _bg;
+        private RawImage _bgRawImg;
         private Text _loadingProgressTxt;
         private Text _loadingTipTxt;
         private float _tipUpdateLastTime = 5;
@@ -133,14 +134,22 @@ namespace App.Client.SessionStates
                         if (data.AsObject is Texture2D)
                         {
                             var tex = data.As<Texture2D>();
+                            if(_bg != null)
                             _bg.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.zero);
+                            if (_bgRawImg != null)
+                                _bgRawImg.texture = tex;
                         }
                         else
                         {
+                            if(_bg != null)
                             _bg.sprite = data.As<Sprite>();
                         }
-                        
+                        if(_bg != null)
                         _bg.color = Color.white;
+                        if (_bgRawImg != null)
+                        {
+                            _bgRawImg.color = Color.white;
+                        }
                     });
 
 
@@ -182,6 +191,17 @@ namespace App.Client.SessionStates
                         break;
                     case "tipText":
                         _loadingTipTxt = v;
+                        break;
+                }
+            }
+            RawImage[] rawImgs = _loadingUi.GetComponentsInChildren<RawImage>(true);
+            foreach (var v in rawImgs)
+            {
+                var realName = v.gameObject.name.Replace("(Clone)", "");
+                switch (realName)
+                {
+                    case "bg":
+                        _bgRawImg = v;
                         break;
                 }
             }

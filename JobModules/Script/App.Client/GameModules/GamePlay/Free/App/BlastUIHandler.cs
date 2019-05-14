@@ -35,12 +35,12 @@ namespace App.Client.GameModules.GamePlay.Free.App
                 {
                     ui.PlayerCapacity = data.Ins[0];
                     ui.ScoreForWin = data.Ins[1];
-                    ui.ScoreByCampTypeDict[Core.Enums.EUICampType.T] = data.Ins[2];
-                    ui.ScoreByCampTypeDict[Core.Enums.EUICampType.CT] = data.Ins[3];
-                    ui.PlayerCountByCampTypeDict[Core.Enums.EUICampType.T].PlayerCount = data.Ins[4];
-                    ui.PlayerCountByCampTypeDict[Core.Enums.EUICampType.CT].PlayerCount = data.Ins[5];
-                    ui.PlayerCountByCampTypeDict[Core.Enums.EUICampType.T].DeadPlayerCount = data.Ins[6];
-                    ui.PlayerCountByCampTypeDict[Core.Enums.EUICampType.CT].DeadPlayerCount = data.Ins[7];
+                    ui.ScoreByCampTypeDict[(int)Core.Enums.EUICampType.T] = data.Ins[2];
+                    ui.ScoreByCampTypeDict[(int)Core.Enums.EUICampType.CT] = data.Ins[3];
+                    ui.PlayerCountByCampTypeDict[(int)Core.Enums.EUICampType.T].PlayerCount = data.Ins[4];
+                    ui.PlayerCountByCampTypeDict[(int)Core.Enums.EUICampType.CT].PlayerCount = data.Ins[5];
+                    ui.PlayerCountByCampTypeDict[(int)Core.Enums.EUICampType.T].DeadPlayerCount = data.Ins[6];
+                    ui.PlayerCountByCampTypeDict[(int)Core.Enums.EUICampType.CT].DeadPlayerCount = data.Ins[7];
                 }
                 if (data.Ks[0] == -2)
                 {

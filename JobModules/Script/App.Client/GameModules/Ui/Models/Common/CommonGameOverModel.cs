@@ -112,15 +112,19 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         protected override void OnCanvasEnabledUpdate(bool enable)
         {
-            base.SetCanvasEnabled(enable);
+            base.OnCanvasEnabledUpdate(enable);
             if (!enable)
             {
                 haveRegister = false;
                 _adapter.UnRegisterPointerReceive(pointerReceiver);
+                _adapter.CanOpenUiByKey = true;
             }
             if (enable)
             {
                 baseTime = Time.time;
+                _adapter.CanOpenUiByKey = false;
+                _adapter.HideUiGroup(Core.Ui.UiGroup.Singleton);
+                _adapter.HideUiGroup(Core.Ui.UiGroup.GameOverHide);
             }
         }
 

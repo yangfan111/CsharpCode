@@ -234,6 +234,7 @@
     <Compile Include="GameModules\GamePlay\Free\player\PlayerReliveAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\player\PlayerResetAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\player\PlayerSpeedAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\PlayerVisibilityAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\player\PlayerWeaponDropAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\player\SelectPlayerAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\player\SetPlayerCastStateAction.cs" />
@@ -263,6 +264,7 @@
     <Compile Include="GameModules\Player\ServerRemoteEventInitSystem.cs" />
     <Compile Include="GameModules\Player\ServerTimeWriterSystem.cs" />
     <Compile Include="GameModules\SceneManagement\ServerScenePostprocessorSystem.cs" />
+    <Compile Include="GameModules\SceneObject\CreateMapObjByEventSystem.cs" />
     <Compile Include="GameModules\SceneObject\ServerAbstractTriggerObjectListener.cs" />
     <Compile Include="GameModules\SceneObject\ServerDebugSystem.cs" />
     <Compile Include="GameModules\SceneObject\ServerDestructibleObjectListener.cs" />

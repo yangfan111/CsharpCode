@@ -80,7 +80,7 @@ namespace App.Shared.GameModules.Player.Actions.LadderPackage
             if (player.hasThirdPersonModel)
             {
                 player.thirdPersonModel.Value.transform.localPosition =
-                    new Vector3(0, -PlayerEntityUtility.CcSkinWidth, 0);
+                    new Vector3(0, 0, 0);
                 player.thirdPersonModel.Value.transform.localRotation = Quaternion.identity;
             }
 

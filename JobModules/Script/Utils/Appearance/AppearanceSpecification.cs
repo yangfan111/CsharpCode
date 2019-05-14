@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Utils.Appearance
+﻿namespace Utils.Appearance
 {
     public enum WeaponInPackage
     {
@@ -15,6 +10,13 @@ namespace Utils.Appearance
         MeleeWeapon,
         ThrownWeapon,
         TacticWeapon,
+        EndOfTheWorld
+    }
+
+    public enum OverrideControllerState
+    {
+        EmptyHanded,
+        WeaponInHand,
         EndOfTheWorld
     }
 }

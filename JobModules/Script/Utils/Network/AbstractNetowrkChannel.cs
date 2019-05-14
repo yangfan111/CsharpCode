@@ -134,18 +134,27 @@ namespace Core.Network
         public void Dispose()
         {
             Logger.Info("AbstractNetowrkChannel.Dispose");
-            ProcessSerializeQueue();
-            ProcessSendQueue();
-            ProcessDeserializeQueue();
-            //_serializer 有可能是公共的，这里不调Dispose
-            //			if (_serializer != null)
-            //			{
-            //				_serializer.Dispose();
-            //			}
-            ObjectAllocatorHolder<MemoryStream>.Free(_receiveMemoryStream);
-            _receiveMemoryStream = null;
-            if(_serializer!=null)
-                _serializer.Dispose();
+            try
+            {
+                ProcessSerializeQueue();
+                ProcessSendQueue();
+                ProcessDeserializeQueue();
+                //_serializer 有可能是公共的，这里不调Dispose
+                //			if (_serializer != null)
+                //			{
+                //				_serializer.Dispose();
+                //			}
+                ObjectAllocatorHolder<MemoryStream>.Free(_receiveMemoryStream);
+                _receiveMemoryStream = null;
+                if(_serializer!=null)
+                    _serializer.Dispose();
+            }
+            catch (Exception e)
+            {
+                Logger.ErrorFormat("{0}",e);
+            }
+           
+           
         }
 
         public abstract int Id { get; }

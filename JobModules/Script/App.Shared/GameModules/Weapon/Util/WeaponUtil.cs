@@ -1,21 +1,11 @@
-﻿using System;
-using App.Shared;
-using App.Shared.Components.Weapon;
-using Assets.Utils.Configuration;
+﻿using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using Core;
 using Core.CharacterState;
-using Core.Configuration;
-using Core.EntityComponent;
 using Core.Room;
 using System.Collections.Generic;
-using App.Shared.GameModules.Weapon;
-using Core.Prediction.UserPrediction.Cmd;
-using Sharpen;
-using Utils.Configuration;
 using Utils.Singleton;
 using WeaponConfigNs;
-using XmlConfig;
 
 namespace App.Shared
 {
@@ -28,8 +18,11 @@ namespace App.Shared
         {
             get { return SingletonManager.Get<WeaponResourceConfigManager>().EmptyHandId; }
         }
+        public static int MeleeVariant
+        {
+            get { return SingletonManager.Get<WeaponResourceConfigManager>().MeleeVariant; }
+        }
 
-    
         //public static readonly WeaponEntity EmptyWeapon = new WeaponEntity();
         //public readonly static WeaponRuntimeDataComponent EmptyRun = new WeaponRuntimeDataComponent();
 
@@ -92,21 +85,14 @@ namespace App.Shared
             val.Magazine  = weaponData.Magazine;
             val.Muzzle    = weaponData.Muzzle;
             val.Stock     = weaponData.Stock;
+            val.SideRail = weaponData.SideRail;
+            val.Bore = weaponData.Bore;
+            val.Feed = weaponData.Feed;
+            val.Interlock = weaponData.Interlock;
+            val.Trigger = weaponData.Trigger;
+            val.Brake = weaponData.Brake;
             return val;
         }
-
-        //public static WeaponScanStruct CreateScan(Components.SceneObject.WeaponObjectComponent weaponObject)
-        //{
-        //    WeaponScanStruct val = new WeaponScanStruct();
-        //    val.Assign(weaponObject.ConfigId);
-        //    val.AvatarId = weaponObject.WeaponAvatarId;
-        //    val.UpperRail = weaponObject.UpperRail;
-        //    val.LowerRail = weaponObject.LowerRail;
-        //    val.Magazine = weaponObject.Magazine;
-        //    val.Muzzle = weaponObject.Muzzle;
-        //    val.Stock = weaponObject.Stock;
-        //    return val;
-        //}
 
         public static WeaponScanStruct CreateScan(int configId)
         {
@@ -183,38 +169,14 @@ namespace App.Shared
         }
 
 
-        public static float GetHolsterParam(EWeaponSlotType slot)
+        public static float GetUnArmHolsterParam(EWeaponSlotType slot)
         {
-            return GetHolsterParam(slot == EWeaponSlotType.SecondaryWeapon);
+            return GetHolsterParam(slot == EWeaponSlotType.SecondaryWeapon );
         }
 
         public static float GetHolsterParam(bool val)
         {
-            return val
-                ? AnimatorParametersHash.Instance.HolsterFromLeftValue
-                : AnimatorParametersHash.Instance.HolsterFromRightValue;
-        }
-        public static WeaponSystemImplStruct? FilterWeaponSystemCmd(IUserCmdOwner owner, IUserCmd cmd,
-                                                                    WeaponSystemCmdSpecificFilter specificFilter)
-        {
-            if (!cmd.IsReload)
-                return null;
-            PlayerEntity player = (PlayerEntity) owner.OwnerEntity;
-            if (player == null)
-                return null;
-            PlayerWeaponController controller = player.WeaponController();
-            if (controller == null) 
-                return null;
-            if (!specificFilter( player,controller, cmd))
-                return null;
-//            if (!cmd.FilteredInput.IsInput(EPlayerInput.IsReload) && !player.playerMove.IsAutoRun)
-//                return null;
-//            if (!controller.HeldWeaponAgent.IsValid())
-//                return null;
-            WeaponSystemImplStruct systemImplStruct = new WeaponSystemImplStruct();
-            systemImplStruct.playerEntity           = player;
-            systemImplStruct.weaponController = controller;
-            return systemImplStruct;
+            return val ? AnimatorParametersHash.Instance.HolsterFromLeftValue : AnimatorParametersHash.Instance.HolsterFromRightValue;
         }
     }
 }

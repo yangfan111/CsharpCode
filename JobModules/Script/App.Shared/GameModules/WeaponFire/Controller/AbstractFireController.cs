@@ -9,28 +9,29 @@ namespace App.Shared.GameModules.Weapon.Behavior
     {
         public AbstractFireController()
         {
-            CleanFireInspector = (IWeaponCmd cmd) => !cmd.IsFire;
+            CleanFireInspector = (WeaponSideCmd cmd) => !cmd.IsFire;
         }
-        public void OnUpdate(PlayerWeaponController controller, IWeaponCmd cmd, Contexts contexts)
+        public void OnUpdate(EntityKey entityKey, WeaponSideCmd cmd, Contexts contexts)
         {
-            if (CheckInterrupt(controller,cmd))
+            var weaponController = entityKey.WeaponController();
+            if (CheckInterrupt(weaponController,cmd))
                 return;
-            UpdateFire(controller, cmd,contexts);
+            UpdateFire(weaponController, cmd,contexts);
             if (CleanFireInspector(cmd))
             {
-                controller.RelatedThrowAction.ClearState();
-                controller.RelatedThrowAction.ThrowingEntityKey = EntityKey.Default;
-                controller.RelatedThrowAction.LastFireWeaponKey = 0;
+                weaponController.RelatedThrowAction.ClearState();
+                weaponController.RelatedThrowAction.ThrowingEntityKey = EntityKey.Default;
+                weaponController.RelatedThrowAction.LastFireWeaponKey = 0;
             }
         }
 
-        protected abstract void UpdateFire(PlayerWeaponController controller, IWeaponCmd cmd,Contexts contexts);
+        protected abstract void UpdateFire(PlayerWeaponController controller, WeaponSideCmd cmd,Contexts contexts);
 
-        protected virtual bool CheckInterrupt(PlayerWeaponController controller, IWeaponCmd cmd)
+        protected virtual bool CheckInterrupt(PlayerWeaponController controller, WeaponSideCmd cmd)
         {
             return false;
         }
-        protected   Func< IWeaponCmd,bool> CleanFireInspector;
+        protected   Func< WeaponSideCmd,bool> CleanFireInspector;
 
 
     }

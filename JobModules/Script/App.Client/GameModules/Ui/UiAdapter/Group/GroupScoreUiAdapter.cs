@@ -34,7 +34,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public int GetKillCountByCampType(EUICampType campType)
         {
-            return _contexts.ui.uI.ScoreByCampTypeDict[campType];
+            return _contexts.ui.uI.ScoreByCampTypeDict[(int)campType];
         }
 
         public bool NeedPause

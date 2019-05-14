@@ -56,18 +56,10 @@ namespace Core.BulletSimulation
             distance += raySegment.Length;
 
             _logger.DebugFormat("move bullet velocity {0}, direction {1}, distance {2}, total distance {3}, interval {4}, move {5} -> {6}, stepinterval {7}",
-                velocity,
-                direction,
-                raySegment.Length,
-                distance,
-                interval,
-                oldOrigin,
-                origin,
-                _stepInterval);
+                velocity, direction, raySegment.Length, distance, interval, oldOrigin, origin, _stepInterval);
                 
             DefaultBulletSegment segment =  DefaultBulletSegment.Allocate(renderTime, raySegment, bulletEntity);
             allBulletSegments.Add(segment);
-                
                 
             if (Mathf.Approximately(v.magnitude, 0))
             {

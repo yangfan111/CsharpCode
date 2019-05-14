@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using WindowsInput;
-using WindowsInput.Native;
-using App.Server.GameModules.GamePlay.free.player;
+﻿using App.Server.GameModules.GamePlay.free.player;
 using Core.Prediction.UserPrediction.Cmd;
 using UserInputManager.Lib;
 
@@ -36,26 +33,12 @@ namespace App.Shared.FreeFramework.framework.ai.player
 
             if (!player.playerIntercept.RealPressKeys.Empty)
             {
-                var simulator = new InputSimulator();
-                List<int> remove = player.playerIntercept.RealPressKeys.Frame();
-                if (remove.Count > 0)
+                int[] keys = player.playerIntercept.RealPressKeys.Keys;
+                foreach (int key in keys)
                 {
-                    foreach (int key in remove)
-                    {
-                        if (key == 1)
-                        {
-                            simulator.Mouse.LeftButtonUp();
-                        }
-                        else if(key == 2)
-                        {
-                            simulator.Mouse.RightButtonUp();
-                        }
-                        else
-                        {
-                            simulator.Keyboard.KeyUp((VirtualKeyCode) key);
-                        }
-                    }
+                    contexts.userInput.userInputManager.Instance.InsertKey(new KeyData((UserInputKey) key, player.playerIntercept.RealPressKeys.Axis(key)));
                 }
+                player.playerIntercept.RealPressKeys.Frame();
             }
         }
     }

@@ -48,7 +48,6 @@ namespace App.Shared
         public static AudioGrp_Footstep GetFootStepState(this PlayerEntity player)
         {
             PostureInConfig curPosture = player.stateInterface.State.GetCurrentPostureState();
-            var id = UniversalConsts.InvalidIntId;
             var inWater = SingletonManager.Get<MapConfigManager>().InWater(player.position.Value);
             if (inWater)
                 return AudioGrp_Footstep.None;

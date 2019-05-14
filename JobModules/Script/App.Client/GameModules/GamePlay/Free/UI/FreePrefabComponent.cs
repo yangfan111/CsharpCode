@@ -300,10 +300,10 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                 }
             }
 
-            if (TipUtil.HasTip(eventKey))
-            {
-                UiCommon.TipManager.RegisterTip<CommonTipModel>(currentObject.transform, TipUtil.GetTip(eventKey));
-            }
+            //if (TipUtil.HasTip(eventKey))
+            //{
+            //    UiCommon.TipManager.RegisterTip<CommonTipModel>(currentObject.transform, TipUtil.GetTip(eventKey));
+            //}
         }
 
         private void OnPointerExitDelegate(PointerEventData eventData)
@@ -319,10 +319,10 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                 }
             }
 
-            if (TipUtil.HasTip(eventKey))
-            {
-                UiCommon.TipManager.UnRegisterTip(currentObject.transform);
-            }
+            //if (TipUtil.HasTip(eventKey))
+            //{
+            //    UiCommon.TipManager.UnRegisterTip(currentObject.transform);
+            //}
         }
 
         private void OnEndCloneDelegate(PointerEventData eventData)

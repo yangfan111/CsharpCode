@@ -62,15 +62,6 @@ namespace Core.CharacterState.Action.States
                 addOutput(FsmOutput.Cache);
                 TurnOnUpperBodyOverlay(addOutput);
             }
-            else if (command.IsMatch(FsmInput.MeleeSpecialAttack))
-            {
-                FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MeleeStateHash,
-                    AnimatorParametersHash.Instance.MeleeAttackName,
-                    AnimatorParametersHash.Instance.ForceMelee,
-                    CharacterView.FirstPerson | CharacterView.ThirdPerson);
-                addOutput(FsmOutput.Cache);
-                TurnOnUpperBodyOverlay(addOutput);
-            }
             
             return base.HandleInput(command, addOutput);
         }

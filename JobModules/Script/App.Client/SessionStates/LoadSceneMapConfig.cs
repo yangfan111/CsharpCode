@@ -1,6 +1,7 @@
 ﻿using App.Client.ClientSystems;
 using App.Client.GameModules.ClientInit;
 using App.Client.GameModules.SceneManagement;
+using App.Client.GameModules.Terrain;
 using App.Client.GameModules.UserInput;
 using App.Client.SceneManagement;
 using App.Client.SceneManagement.DistanceCulling;
@@ -60,15 +61,13 @@ namespace App.Client.SessionStates
             loadSceneSystem.AsapMode = _loadSceneAsap;
             gameModule.AddSystem(loadSceneSystem);
             gameModule.AddSystem(new InitTriggerObjectManagerSystem(contexts));
-            
+            gameModule.AddSystem(new GameObjectRecordSystem(contexts));
             gameModule.AddSystem(new ClientScenePostprocessorSystem(contexts.session.commonSession));
+            gameModule.AddSystem(new TerrainRendererInitSystem(contexts.session.commonSession,
+                contexts.session.clientSessionObjects));
             gameModule.AddSystem(new ClientWorldShiftPostProcessSystem(contexts.session.commonSession));
 
-            if (!(SingletonManager.Get<MapConfigManager>().SceneParameters is SceneConfig))
-            {
-                gameModule.AddSystem(new TerrainRendererInitSystem(contexts.session.commonSession,
-                    contexts.session.clientSessionObjects));
-            }
+            gameModule.AddSystem(new TerrainDataLoadSystem(this, contexts));
 
             return gameModule;
         }

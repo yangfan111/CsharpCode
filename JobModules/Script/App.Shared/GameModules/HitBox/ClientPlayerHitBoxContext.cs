@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using App.Shared.Components.Common;
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Player;
@@ -25,35 +26,45 @@ namespace App.Shared.GameModules.Bullet
             _poseReplayer = new AnimatorPoseReplayer();
         }
 
-        public HitBoxComponent GetHitBoxComponent(EntityKey entityKey)
+
+        public Vector3 GetPosition(EntityKey entityKey)
         {
             var entity = _playerContext.GetEntityWithEntityKey(entityKey);
-            if ( entity!= null && entity.hasPosition && entity.hasHitBox)
-            {
-                return entity.hitBox;
-            }
-            return null;
+            if (entity == null) return Vector3.zero;
+            return entity.hitBox.HitPreliminaryGeo.position;
         }
 
-        public HitBoxTransformProvider GetHitBoxProvider(EntityKey entityKey)
+        public float GetRadius(EntityKey entityKey)
+        {
+            var entity = _playerContext.GetEntityWithEntityKey(entityKey);
+            if (entity == null) return -1;
+            return entity.hitBox.HitPreliminaryGeo.radius;
+        }
+
+        public void EnableHitBox(EntityKey entityKey, bool enable)
         {
             var entity = _playerContext.GetEntityWithEntityKey(entityKey);
             if (entity != null && entity.hasPosition && entity.hasHitBox)
             {
                 var provider = SingletonManager.Get<HitBoxTransformProviderCache>().GetProvider(entity.thirdPersonModel.Value);
-                if (provider != null) return provider;
+                if (provider != null)
+                    provider.SetActive(enable);
+            }
+        }
+
+        public List<Transform> GetCollidersTransform(EntityKey entityKey)
+        {
+            var entity = _playerContext.GetEntityWithEntityKey(entityKey);
+            if (entity != null && entity.hasPosition && entity.hasHitBox)
+            {
+                var provider = SingletonManager.Get<HitBoxTransformProviderCache>().GetProvider(entity.thirdPersonModel.Value);
+                if (provider != null) return provider.GetHitBoxTransforms().Values.ToList();
             }
             return null;
         }
-
+        
         public void UpdateHitBox(IGameEntity gameEntity)
         {
-        }
-      
-        private PlayerEntity GetPlayerEntity(IGameEntity gameEntity)
-        {
-            var playerEntity = _playerContext.GetEntityWithEntityKey(gameEntity.EntityKey);
-            return playerEntity;
         }
     }
 }

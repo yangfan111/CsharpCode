@@ -28,10 +28,9 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(NewAddWeaponAction));
 
         private string weaponKey;
-
         private string weaponId;
-
         private string fullAmmo;
+        private string replace;
 
         public override void DoAction(IEventArgs args)
         {
@@ -46,6 +45,16 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
                 int itemId = FreeUtil.ReplaceInt(weaponId, args);
                 int index = FreeUtil.ReplaceInt(weaponKey, args);
                 EWeaponSlotType st = FreeWeaponUtil.GetSlotType(index);
+
+                WeaponBaseAgent agent = null;
+                if (index == 0)
+                    agent = p.WeaponController().HeldWeaponAgent;
+                else
+                    agent = p.WeaponController().GetWeaponAgent(st);
+                if (agent != null && agent.IsValid() && !FreeUtil.ReplaceBool(replace, args))
+                {
+                    return;
+                }
 
                 SimpleProto message = new SimpleProto();
                 var scan = WeaponUtil.CreateScan(itemId);

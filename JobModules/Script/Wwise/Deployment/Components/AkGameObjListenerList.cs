@@ -42,7 +42,7 @@ public class AkGameObjListenerList : AkAudioListener.BaseListenerList
 
 		if (!useDefaultListeners)
 			AkSoundEngine.SetListeners(akGameObj.gameObject, null, 0);
-
+		//-添加监听者到指定实例
 		for (var ii = 0; ii < initialListenerList.Count; ++ii)
 			initialListenerList[ii].StartListeningToEmitter(akGameObj);
 	}

@@ -56,7 +56,7 @@ namespace App.Shared.GameMode
                 ta.AddUnit("current", (FreeData)player.freeData.FreeData);
                 args.Trigger(FreeTriggerConstant.WEAPON_PICKUP, ta);
             }
-            
+       
             if (!generateSceneObj || lastWeaponScan.IsUnSafeOrEmpty())
                 return;
             //  WeaponEntity lastEntity = WeaponEntityFactory.CreateEntity(lastWeaponScan);

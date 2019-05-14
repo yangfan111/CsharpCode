@@ -39,37 +39,34 @@ namespace App.Client.GameModules.SceneObject
                     MapObjectMatcher.DestructibleData)
                 .NoneOf(MapObjectMatcher.RawGameObject))
         {
-            _detachCallback = new ClientFracturedChunkDetachCallback(contexts);
+            _detachCallback = new ClientFracturedChunkDetachCallback();
         }
 
-        protected override void OnDeativeObjectActive(MapObjectEntity mapObject, GameObject gameObject)
+        protected override void OnDeativeObjectActive(int id, MapObjectEntity mapObject, GameObject gameObject)
         {
-            LinkGameObjectToSceneObject(mapObject, gameObject);
-        }
-
-        protected override void OfflineTriggerObjectLoad(string id, GameObject gameObject)
-        {
-            var target = AddRaycastTarget(id, gameObject);
-            var door = (MapObjectEntity)MapObjectEntityFactory.CreateDoor(id, gameObject, _detachCallback.OnDetach);
-            DoorCastData.Make(target, door.entityKey.Value.EntityId);
-        }
-
-        protected override void OnlineTriggerObjectLoad(MapObjectEntity mapObject, GameObject gameObject)
-        {
-            LinkGameObjectToSceneObject(mapObject, gameObject);
-        }
-
-        private void LinkGameObjectToSceneObject(MapObjectEntity mapObject, GameObject gameObject)
-        {
-            var target = gameObject.GetComponentInChildren<RayCastTarget>();
-            if (target == null)
-            {
-                target = AddRaycastTarget(mapObject.triggerObjectId.Id, gameObject);
-            }
-            MapObjectUtility.AddRawGameObject<FracturedObject>(mapObject, gameObject, _detachCallback.OnDetach);
-            DoorCastData.Make(target, mapObject.entityKey.Value.EntityId);
-
+            MapObjectUtility.AddRawGameObject<FracturedObject>(mapObject, gameObject);
+            MapObjectUtility.RecordMapObj(id, (int) ETriggerObjectType.Door, mapObject);
+            MapObjectUtility.SendLastEvent(mapObject);
             InitRotation(mapObject, gameObject);
+        }
+
+
+        protected override void LoadTriggerObject(int id, GameObject gameObject)
+        {
+            var target = AddRaycastTarget(gameObject);
+            DoorCastData.Make(target, id);
+            MapObjectUtility.RecordGameObjId(gameObject, (int)ETriggerObjectType.Door, id);
+            MapObjectUtility.AttachRawObjToFracture(gameObject);
+            MapObjectUtility.AddCallBack<FracturedObject>(gameObject, _detachCallback.OnDetach);
+        }
+
+        public override IEntity CreateMapObj(int id)
+        {
+            var gameObj = _objectManager.Get(id);
+            if (gameObj == null) return null;
+            var door = (MapObjectEntity)MapObjectEntityFactory.CreateDoor(id, gameObj);
+            MapObjectUtility.RecordMapObj(id, (int) _triggerType, door);
+            return door;
         }
 
         private void InitRotation(MapObjectEntity mapObject, GameObject gameObject)
@@ -83,8 +80,7 @@ namespace App.Client.GameModules.SceneObject
             }
         }
 
-
-        protected  RayCastTarget AddRaycastTarget(string id, GameObject gameObject)
+        protected  RayCastTarget AddRaycastTarget(GameObject gameObject)
         {
             var colliders = gameObject.GetComponentsInChildren<Collider>();
             var colliderCount = colliders.Length;
@@ -99,7 +95,7 @@ namespace App.Client.GameModules.SceneObject
                     noInputCastCollider = false;
                 }
             }
-
+            
             if (noInputCastCollider)
             {
                 _logger.ErrorFormat("Door {0} has no inputraycast collider.", gameObject.name);

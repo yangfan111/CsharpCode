@@ -14,7 +14,7 @@ namespace App.Shared.GameContexts
 
         protected override WeaponEntity GetEntityWithEntityKey(EntityKey entitykey)
         {
-            return null;
+            return ((WeaponContext)EntitasContext).GetEntityWithEntityKey(entitykey);
         }
 
         public override short EntityType

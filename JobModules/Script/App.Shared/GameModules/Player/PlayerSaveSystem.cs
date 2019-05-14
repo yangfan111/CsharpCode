@@ -26,6 +26,7 @@ namespace App.Shared.GameModules.Player
         {
             PlayerEntity myEntity = owner.OwnerEntity as PlayerEntity;
             if (null == myEntity) return;
+            var myState = myEntity.stateInterface.State;
             if (myEntity.gamePlay.IsSave || myEntity.gamePlay.IsBeSave)
             {
                 PlayerEntity teamEntity = _contexts.player.GetEntityWithEntityKey(myEntity.gamePlay.SavePlayerKey);
@@ -56,7 +57,7 @@ namespace App.Shared.GameModules.Player
                 }
                 if (myEntity.gamePlay.IsSave)
                 {
-                    if (!cmd.IsF || myEntity.stateInterface.State.NeedInterruptRescue() || !myEntity.gamePlay.IsLifeState(EPlayerLifeState.Alive)
+                    if (!cmd.IsF || myState.NeedInterruptRescue() || !myEntity.gamePlay.IsLifeState(EPlayerLifeState.Alive)
                         || GetAngle(myEntity, teamEntity) > SharedConfig.MaxSaveAngle)
                     {
                         StopSave(myEntity, true, cmd);
@@ -75,8 +76,8 @@ namespace App.Shared.GameModules.Player
                 }
             }
             if (cmd.IsUseAction && cmd.UseType == (int) EUseActionType.Player && myEntity.gamePlay.IsSave == false
-                && myEntity.stateInterface.State.GetCurrentMovementState() == MovementInConfig.Idle
-                && myEntity.stateInterface.State.GetCurrentPostureState() != PostureInConfig.Land)
+                && myState.GetCurrentMovementState() == MovementInConfig.Idle
+                && myState.GetCurrentPostureState() != PostureInConfig.Land && myState.GetCurrentPostureState() != PostureInConfig.Prone)
             {
                 PlayerEntity saveEntity = _contexts.player.GetEntityWithEntityKey(new EntityKey(cmd.UseEntityId, (int)EEntityType.Player));
                 if (saveEntity != null && SharedConfig.IsServer)

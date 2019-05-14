@@ -1,6 +1,7 @@
 ﻿using App.Client.GameModules.Ui.Utils;
 using App.Shared.Components.Ui;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace App.Client.GameModules.Ui.Models.Common.Map
 {
@@ -10,6 +11,10 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private RectTransform rectTransform;
         private Transform line;
         private RectTransform lineRT;
+        private RawImage lineImage;
+
+        private float lastWidth;
+
         public SafeMiniDis(Transform tran)
         {
             UIUtils.SetActive(tran, true);
@@ -17,6 +22,12 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             rectTransform = tran.GetComponent<RectTransform>();
             line = tran.Find("line");
             lineRT = line.GetComponent<RectTransform>();
+            lineImage = line.GetComponent<RawImage>();
+        }
+
+        public void Hide()
+        {
+            UIUtils.SetActive(tran, false);
         }
 
         public void Update(DuQuanInfo safeDuquan, Vector2 selfPlayPos, float playItemModelWidth, float rate, float miniMapRepresentWHByRice)
@@ -41,11 +52,32 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                     //控制连线的长度
                     var width = temper.magnitude * rate - safeDuquan.Radius * rate;
                     var showWidth = miniMapRepresentWHByRice * rate;
-                    if (width > showWidth) width = showWidth;
-                    lineRT.sizeDelta = new Vector2(2, width);
+                    var rect = lineImage.uvRect;
+                    if (width > showWidth)
+                    {
+                        if (lastWidth > width)
+                        {
+                            rect.y -= (lastWidth - width) / 16;
+                        }
+                        else if (lastWidth < width)
+                        {
+                            rect.y -= (lastWidth - width) / 16;
+                        }
 
+                        rect.y = rect.y % 1;
+                        lastWidth = width;
+                        width = showWidth;
+                    }
+                    else
+                    {
+                        rect.height = width / 16;
+                    }
+                    lineRT.sizeDelta = new Vector2(2, width);
+                    lineImage.uvRect = rect;
+
+                   
                     //控制pivot
-//                    lineRT.pivot = new Vector2(0.5f, - playItemModelWidth / (2 * width));
+                    //                    lineRT.pivot = new Vector2(0.5f, - playItemModelWidth / (2 * width));
                     lineRT.pivot = new Vector2(1f,1f);
                     lineRT.anchoredPosition = selfPlayPos * rate;
                 }

@@ -204,7 +204,6 @@
     <Compile Include="Deployment\API\Handwritten\WAAPI\AkWaapiClient.cs" />
     <Compile Include="Deployment\API\Handwritten\WAAPI\AkWaapiClient_PINVOKE.cs" />
     <Compile Include="Deployment\API\Handwritten\Windows\AkWindowsSettings.cs" />
-    <Compile Include="Deployment\Components\AkAmbient.cs" />
     <Compile Include="Deployment\Components\AkAudioListener.cs" />
     <Compile Include="Deployment\Components\AkBank.cs" />
     <Compile Include="Deployment\Components\AkDragDropHelper.cs" />
@@ -248,7 +247,6 @@
     <Compile Include="Deployment\Components\AkTriggerMouseExit.cs" />
     <Compile Include="Deployment\Components\AkTriggerMouseUp.cs" />
     <Compile Include="Deployment\Components\AkUnityEventHandler.cs" />
-    <Compile Include="Editor\WwiseComponents\AkAmbientInspector.cs" />
     <Compile Include="Editor\WwiseComponents\AkAudioListenerInspector.cs" />
     <Compile Include="Editor\WwiseComponents\AkBankInspector.cs" />
     <Compile Include="Editor\WwiseComponents\AkBaseInspector.cs" />

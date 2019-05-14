@@ -53,6 +53,27 @@ namespace Core.Prediction
             _handler = handler;
         }
 
+        public void RewindFirstSnapshot(EntityKey self)
+        {
+            var localEntityMapClone = PredictionEntityMap.Allocate(false);
+            _handler.SetSelf(self);
+            _handler.Update();
+            localEntityMapClone.AddAll(_handler.LocalEntityMap);
+            _logger.InfoFormat("{0}   {1}", _handler.LocalEntityMap.Count, localEntityMapClone.Count);
+            PredictionCompareHandler<TPredictionComponent> compareHandler = new PredictionCompareHandler<TPredictionComponent>(_handler.RemoteHistoryId);
+            EntityMapComparator.Diff(localEntityMapClone  , _handler.RemoteEntityMap, compareHandler, "RewindFirstSnapshotompare");
+            foreach (var gameEntity in _handler.RemoteEntityMap.ToArray())
+            {
+                foreach (var gameComponent in gameEntity.ComponentList)
+                {
+                    _logger.InfoFormat("{0}",gameComponent);
+                }
+            }
+            PredictionRewindHandler<TPredictionComponent> rewindHandler = new PredictionRewindHandler<TPredictionComponent>(_handler);
+            EntityMapComparator.Diff( localEntityMapClone  , _handler.RemoteEntityMap, rewindHandler, "rewindFirstSnapshot");
+            RefCounterRecycler.Instance.ReleaseReference(localEntityMapClone);
+        }
+
         public void PredictionInit()
         {
             _handler.Update();

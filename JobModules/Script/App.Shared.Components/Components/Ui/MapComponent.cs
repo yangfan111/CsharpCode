@@ -25,7 +25,7 @@ namespace App.Shared.Components.Ui
         public void AddMapMark(long playerId, int playerNum, float mx, float my)
         {
             RemoveMapMark(playerId);
-            MapMarks.Add(playerId, new MiniMapPlayMarkInfo(new Vector2(mx, my), playerNum));
+            MapMarks.Add(playerId, new MiniMapPlayMarkInfo(new Vector2(mx, my), playerNum, MapUtils.TeamColor(playerNum)));
         }
         public void RemoveMapMark(long playerId)
         {
@@ -42,5 +42,8 @@ namespace App.Shared.Components.Ui
 
 
         [DontInitilize] public int OffLineLevel; //离线模式下的一个level
+
+        [DontInitilize] public List<MapFixedVector3> SupplyPosList;
+
     }
 }

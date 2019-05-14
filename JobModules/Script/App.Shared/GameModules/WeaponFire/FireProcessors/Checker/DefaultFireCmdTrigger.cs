@@ -9,20 +9,10 @@ namespace App.Shared.GameModules.Weapon.Behavior
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(DefaultFireCmdTrigger));
 
-        public bool IsTrigger(PlayerWeaponController controller, IWeaponCmd cmd)
+        public bool IsTrigger(PlayerWeaponController controller, WeaponSideCmd cmd)
         {
-            if (null != cmd.FilteredInput && cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsLeftAttack))
-            {
-                return true;
-            }
-            else
-            {
-                if (null == cmd.FilteredInput)
-                {
-                    Logger.Error("FilteredInput in cmd should never be null !");
-                }
-            }
-            return controller.AutoFire.HasValue && controller.AutoFire.Value>0;
+            return cmd.FiltedInput(XmlConfig.EPlayerInput.IsLeftAttack)||
+                   cmd.UserCmd.IsAutoFire;
         }
     }
 }

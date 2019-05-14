@@ -3,6 +3,7 @@ using Core.GameModule.System;
 using Core.Utils;
 using Entitas;
 using UnityEngine;
+using XmlConfig;
 
 namespace App.Client.GameModules.ClientEffect
 {
@@ -25,6 +26,14 @@ namespace App.Client.GameModules.ClientEffect
                     continue;
                 }
                 go.transform.parent = null;
+
+                if (entity.hasEffectType) {
+                    switch ((EClientEffectType)entity.effectType.Value) {
+                        case EClientEffectType.SprayPrint:
+                            GameObject.DestroyObject(go);
+                            break;
+                    }
+                }
             }
         }
 

@@ -16,7 +16,7 @@ namespace Core.Animation
         public const int PlayerSyncLayer = 2;
         public const int PlayerUpperBodyOverlayLayer = 5;
         public const int PlayerUpperBodyAddLayer = 6;
-        public const int FirstPersonIKPassLayer = 3;
+        public const int FirstPersonIKPassLayer = 4;
         public const int ThirdPersonIKPassLayer = 9;
 
         public int LayerIndex;

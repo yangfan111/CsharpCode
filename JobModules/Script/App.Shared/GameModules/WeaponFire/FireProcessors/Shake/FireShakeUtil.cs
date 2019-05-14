@@ -73,10 +73,10 @@ namespace App.Shared.GameModules.Weapon.Behavior
     {
         public static LoggerAdapter logger = new LoggerAdapter(typeof(FireShakeProvider));
         
-        public static float GetDecayInterval(PlayerWeaponController controller)
+        public static float GetDecayInterval(WeaponBaseAgent agent)
         {
-            return (controller.HeldWeaponAgent.CommonFireCfg.AttackInterval *
-                          controller.HeldWeaponAgent.RifleShakeCfg.DecaytimeFactor);
+            return (agent.CommonFireCfg.AttackInterval *
+                    agent.RifleShakeCfg.DecaytimeFactor);
         }
         
         

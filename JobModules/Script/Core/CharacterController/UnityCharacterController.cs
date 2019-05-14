@@ -15,6 +15,7 @@ namespace Core.CharacterController
         protected UnityEngine.CharacterController _controller;
         protected CapsuleCollider _capsuleCollider;
         private BaseGroundDetection _groundDetection;
+        private Action<Transform> _initAction;
         private float _referenceCastDistance;
         private bool _slideOnSteepSlope = true;
         private bool _isUseCapsuleCollider = false;
@@ -24,11 +25,12 @@ namespace Core.CharacterController
 
         public bool isSliding { get; private set; }
 
-        public UnityCharacterController(UnityEngine.CharacterController controller, bool isUseCapsuleCollider = false)
+        public UnityCharacterController(UnityEngine.CharacterController controller, Action<Transform> initAction = null,bool isUseCapsuleCollider = false)
         {
             _controller = controller;
             _capsuleCollider = controller.gameObject.GetComponent<CapsuleCollider>();
             _isUseCapsuleCollider = isUseCapsuleCollider;
+            _initAction = initAction;
             AssertUtility.Assert(_capsuleCollider != null);
             InitGroundDetection();
         }
@@ -184,6 +186,10 @@ namespace Core.CharacterController
 
         public virtual void Init()
         {
+            if (_initAction != null)
+            {
+                _initAction.Invoke(_controller.transform);
+            }
             _groundDetection.groundLimit = slopeLimit;
             _groundDetection.stepOffset = _controller.stepOffset;
             _groundDetection.ledgeOffset = 0.0f;

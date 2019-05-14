@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using App.Shared.Components.Player;
 
 namespace App.Client.GameModules.Ui.UiAdapter
 {
@@ -36,6 +37,18 @@ namespace App.Client.GameModules.Ui.UiAdapter
             }
         }
 
+        public bool FreshSelectedPaintIndex
+        {
+            get
+            {
+                return _contexts.ui.uI.FreshSelectedPaintIndex;
+            }
+            set
+            {
+                _contexts.ui.uI.FreshSelectedPaintIndex = value;
+            }
+        }
+
         public bool CanOpen
         {
             get
@@ -65,6 +78,29 @@ namespace App.Client.GameModules.Ui.UiAdapter
             _contexts.ui.uI.IsShowCrossHair = isVisible;
         }
 
+        public void Select()
+        {
+            if (!FreshSelectedPaintIndex)
+                return;
+            var paintIdList = PaintIdList;
+            for (int i = 0, maxi = paintIdList.Count; i < maxi; i++)
+            {
+                if (paintIdList[i] > 0)
+                {
+                    SelectedPaintIndex = i;
+                    break;
+                }
+            }
+            FreshSelectedPaintIndex = false;
+        }
+
+        public GamePlayComponent gamePlay
+        {
+            get
+            {
+                return _contexts.player.flagSelfEntity.gamePlay;
+            }
+        }
     }
 
 }

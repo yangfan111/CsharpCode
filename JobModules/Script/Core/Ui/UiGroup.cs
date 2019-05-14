@@ -9,7 +9,8 @@
 
         MapHide = 4,
         SurvivalBagHide = 5,
-        TimeCountDownHide = 6,  
+        TimeCountDownHide = 6,
+        GameOverHide = 7,
 
         Singleton = 99,//次组UI只能同时显示一个，
     }

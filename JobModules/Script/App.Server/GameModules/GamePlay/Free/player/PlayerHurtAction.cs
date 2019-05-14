@@ -15,6 +15,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
         private string part;
         private string source;
         private string target;
+        private string dead;
 
         public override void DoAction(IEventArgs args)
         {
@@ -39,7 +40,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 }
 
                 PlayerDamageInfo damageInfo = new PlayerDamageInfo(FreeUtil.ReplaceFloat(damage, args),
-                    FreeUtil.ReplaceInt(type, args), FreeUtil.ReplaceInt(part, args), 0);
+                    FreeUtil.ReplaceInt(type, args), FreeUtil.ReplaceInt(part, args), 0, false, false, FreeUtil.ReplaceBool(dead, args));
 
                 BulletPlayerUtility.DoProcessPlayerHealthDamage(args.GameContext, (IGameRule)fr.Rule, sourcePlayer, player, damageInfo, null);
             }

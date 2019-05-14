@@ -178,9 +178,14 @@ namespace App.Shared.GameModules.Player.CharacterBone
             _attachmentNeedIK = false;
         }
 
-        public void SetStablePelvisRotation()
+        public void SetStableStandPelvisRotation()
         {
-            _boneRigging.SetStablePelvisRotation();
+            _boneRigging.SetStableStandPelvisRotation();
+        }
+        
+        public void SetStableCrouchPelvisRotation()
+        {
+            _boneRigging.SetStableCrouchPelvisRotation();
         }
 
         public void Peek(float amplitude)

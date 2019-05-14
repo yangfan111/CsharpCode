@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Text;
 using App.Shared.Components.Player;
 using Core;
 using Core.Prediction.UserPrediction.Cmd;
+using Core.Utils;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Player
@@ -34,7 +36,8 @@ namespace App.Shared.GameModules.Player
                     Update();
                     break;
             }
-
+          
+           
             return playerStates;
         }
 
@@ -85,7 +88,7 @@ namespace App.Shared.GameModules.Player
             {
                 playerStates.Add(EPlayerState.PostureTrans);
             }
-
+          
             if (_playerEntity.hasOxygenEnergyInterface && _playerEntity.oxygenEnergyInterface.Oxygen.InSightDebuffState)
             {
                 playerStates.Add(EPlayerState.RunDebuff);
@@ -101,6 +104,11 @@ namespace App.Shared.GameModules.Player
                 playerStates.Add(EPlayerState.OnAir);
             }
 
+            if (_playerEntity.gamePlay.IsSave)
+            {
+                playerStates.Add(EPlayerState.Rescue);
+            }
+
             var move = (playerStates.Contains(EPlayerState.Run)
                      || playerStates.Contains(EPlayerState.Sprint)
                      || playerStates.Contains(EPlayerState.Walk));
@@ -114,9 +122,14 @@ namespace App.Shared.GameModules.Player
                 playerStates.Add(EPlayerState.ProneMove);
             }
             if(playerStates.Contains(EPlayerState.MeleeAttacking))
-                playerStates.Add(EPlayerState.Firing);
+                playerStates.Add(EPlayerState.MeleeAttacking);
              if(_playerEntity.characterBone.IsWeaponRotState)
                 playerStates.Add(EPlayerState.WeaponRotState);
+
+            if (PlayerStateUtil.HasUIState(EPlayerUIState.PaintOpen, gamePlay)) {
+                playerStates.Add(EPlayerState.PaintDisc);
+            }
+
             playerStates.Remove(EPlayerState.None);
         }
 
@@ -135,6 +148,10 @@ namespace App.Shared.GameModules.Player
             {
                 case PostureInConfig.Crouch:
                     return EPlayerState.Crouch;
+                case PostureInConfig.Dying :
+                case PostureInConfig.DyingTransition:
+                    return EPlayerState.Dying;
+                    break;
                 case PostureInConfig.Climb:
                     return EPlayerState.Climb;
                 case PostureInConfig.Dive:
@@ -175,7 +192,9 @@ namespace App.Shared.GameModules.Player
                     return EPlayerState.Swim;
                 case MovementInConfig.Dive:
                     return EPlayerState.Swim;
-                ////return EPlayerState.Dive;
+                case MovementInConfig.Ladder:
+                case MovementInConfig.EnterLadder:
+                    return EPlayerState.Ladder;
                 default:
                     return EPlayerState.None;
             }

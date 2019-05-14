@@ -9,8 +9,10 @@ using App.Shared.GameModules.SceneObject;
 using Core;
 using Core.GameModule.Interface;
 using App.Shared.SceneTriggerObject;
+using App.Shared.Util;
 using Core.Utils;
 using Entitas;
+using UltimateFracturing;
 using UnityEngine;
 
 namespace App.Server.GameModules.SceneObject
@@ -30,10 +32,24 @@ namespace App.Server.GameModules.SceneObject
             _detachCallback = new ServerFracturedChunkDetachCallback(contexts);
         }
 
-        public override void OnTriggerObjectLoaded(string id, GameObject gameObject)
+        public override IEntity CreateMapObj(int id)
+        {
+            var gameObj = _objectManager.Get(id);
+            if (gameObj == null) return null;
+            var door = (MapObjectEntity)MapObjectEntityFactory.CreateDoor(id, gameObj);
+            MapObjectUtility.RecordMapObj(id, (int) _triggerType, door);
+            MapObjectUtility.FetchFractruedState(gameObj);
+            return door;
+        }
+
+        public override void OnTriggerObjectLoaded(int id, GameObject gameObject)
         {
             _logger.DebugFormat("Door Loaded {0}", id);
-            MapObjectEntityFactory.CreateDoor(id, gameObject, _detachCallback.OnDetach);
+
+            MapObjectUtility.RecordGameObjId(gameObject, (int)_triggerType, id);
+            MapObjectUtility.AttachRawObjToFracture(gameObject);
+            MapObjectUtility.AddCallBack<FracturedObject>(gameObject, _detachCallback.OnDetach);
+            MapObjectUtility.AddFracturedRecorder(gameObject);
         }
     }
 }

@@ -31,6 +31,8 @@ namespace Core.CameraControl.NewMotor.View
                     }
                     var speed = player.WeaponController().HeldWeaponAgent.CmrFocusSpeed;
                     player.stateInterface.State.SetSight(speed);
+                    if (player.AudioController() != null)
+                        player.AudioController().PlaySimpleAudio(EAudioUniqueId.SightOpen,true);
                 }
 
             });
@@ -40,6 +42,9 @@ namespace Core.CameraControl.NewMotor.View
                 {
                     var speed = player.WeaponController().HeldWeaponAgent.CmrFocusSpeed;
                     player.stateInterface.State.CancelSight(speed);
+                    if (player.AudioController() != null)
+                        player.AudioController().PlaySimpleAudio(EAudioUniqueId.SightClose,true);
+
                 });
         }
 
@@ -65,8 +70,7 @@ namespace Core.CameraControl.NewMotor.View
             if (state.ViewMode == ECameraViewMode.GunSight &&
                 (input.FilteredCameraFocus || input.InterruptCameraFocus))
             {
-                DebugUtil.MyLog("Change back");
-                DebugUtil.MyLog(input.FilteredCameraFocus +"_"+ input.InterruptCameraFocus);
+             //   DebugUtil.MyLog(input.FilteredCameraFocus +"_"+ input.InterruptCameraFocus);
                 if(input.InterruptCameraFocus)
                 {
                     if(Logger.IsDebugEnabled)
@@ -78,7 +82,7 @@ namespace Core.CameraControl.NewMotor.View
             }
             if (state.ViewMode==ECameraViewMode.ThirdPerson && !input.InterruptCameraFocus &&  (input.FilteredCameraFocus ))
             {
-                DebugUtil.MyLog("Change cmr to gunsight");
+               // DebugUtil.MyLog("Change cmr to gunsight");
                 return true;
             }
 

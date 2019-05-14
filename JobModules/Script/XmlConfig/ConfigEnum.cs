@@ -42,7 +42,7 @@ namespace Assets.XmlConfig
         /// <summary>
         /// 道具
         /// </summary>
-        Item = 10,
+        Prop = 10,
         /// <summary>
         /// 礼包
         /// </summary>
@@ -85,5 +85,10 @@ namespace Assets.XmlConfig
         Hand,
         AccurateRifle,
         C4,
+    }
+
+    public enum EWeaponIdType
+    {
+        MeleeVariant = 47, /*变异体空手*/
     }
 }

@@ -17,7 +17,7 @@ namespace App.Shared.GameModules.Player
         
         private static readonly int DefaultLayerIndex = 0;
 
-        protected override bool filter(PlayerEntity playerEntity)
+        protected override bool Filter(PlayerEntity playerEntity)
         {
             return SharedConfig.DebugAnimation && playerEntity.hasThirdPersonAnimator;
         }

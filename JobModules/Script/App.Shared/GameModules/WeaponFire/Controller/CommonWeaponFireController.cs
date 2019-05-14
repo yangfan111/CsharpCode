@@ -34,9 +34,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
         public void RegisterProcessor<T>(T logic) where T : IFireProcess
         {
             if (null == logic)
-            {
                 return;
-            }
             var beforeLogic = logic as IBeforeFireProcess;
             if (null != beforeLogic)
             {
@@ -85,7 +83,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
             _bulletFires.Clear();
         }
 
-        protected override void UpdateFire(PlayerWeaponController controller, IWeaponCmd cmd,Contexts contexts)
+        protected override void UpdateFire(PlayerWeaponController controller, WeaponSideCmd cmd,Contexts contexts)
         {
             bool isFire = false;
             
@@ -109,21 +107,21 @@ namespace App.Shared.GameModules.Weapon.Behavior
             }
             else
             {
-                CallOnIdle(controller, cmd);
+                CallOnIdle(controller.HeldWeaponAgent, cmd);
             }
 
-            CallOnFrame(controller, cmd);
+            CallOnFrame(controller.HeldWeaponAgent, cmd);
         }
 
 
-        private void Fire(PlayerWeaponController controller, IWeaponCmd cmd, Contexts contexts)
+        private void Fire(PlayerWeaponController controller, WeaponSideCmd cmd, Contexts contexts)
         {
-            CallBeforeFires(controller, cmd);
+            CallBeforeFires(controller.HeldWeaponAgent, cmd);
             CallBulletFires(controller, cmd,contexts);
-            CallAfterFires(controller, cmd);
+            CallAfterFires(controller.HeldWeaponAgent, cmd);
         }
 
-        private void CallBulletFires(PlayerWeaponController controller, IWeaponCmd cmd, Contexts contexts)
+        private void CallBulletFires(PlayerWeaponController controller, WeaponSideCmd cmd, Contexts contexts)
         {
             foreach (var bulletfire in _bulletFires)
             {
@@ -137,35 +135,35 @@ namespace App.Shared.GameModules.Weapon.Behavior
             }
         }
 
-        private void CallAfterFires(PlayerWeaponController controller, IWeaponCmd cmd)
+        private void CallAfterFires(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
         {
             foreach (var afterfire in _afterFireProcessors)
             {
-                afterfire.OnAfterFire(controller, cmd);
+                afterfire.OnAfterFire(weaponBaseAgent, cmd);
             }
         }
 
-        private void CallBeforeFires(PlayerWeaponController controller, IWeaponCmd cmd)
+        private void CallBeforeFires(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
         {
             foreach (var beforeFire in _beforeFireProcessors)
             {
-                beforeFire.OnBeforeFire(controller, cmd);
+                beforeFire.OnBeforeFire(weaponBaseAgent, cmd);
             }
         }
 
-        private void CallOnIdle(PlayerWeaponController controller, IWeaponCmd cmd)
+        private void CallOnIdle(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
         {
             foreach (var fireIdle in _idles)
             {
-                fireIdle.OnIdle(controller, cmd);
+                fireIdle.OnIdle(weaponBaseAgent, cmd);
             }
         }
 
-        private void CallOnFrame(PlayerWeaponController controller, IWeaponCmd cmd)
+        private void CallOnFrame(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
         {
             foreach (var frame in _frames)
             {
-                frame.OnFrame(controller, cmd);
+                frame.OnFrame(weaponBaseAgent, cmd);
             }
         }
     }

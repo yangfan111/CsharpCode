@@ -12,6 +12,7 @@ namespace Assets.Core.Configuration
             try
             {
                 DropAreaConfig.current = XmlConfigParser<DropAreaConfig>.Load(xml);
+                Logger.Info("load DropArea succeeded.");
             }catch(Exception e)
             {
                 Debug.LogErrorFormat("load DropArea failed.{0}", e.Message);

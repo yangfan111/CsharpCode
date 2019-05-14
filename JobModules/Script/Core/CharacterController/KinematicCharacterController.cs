@@ -137,7 +137,7 @@ namespace Core.CharacterController
             _motor.GroundDetectionExtraDistance = 0;
             _motor.MaxStepHeight = 0.5f;
             _motor.MinRequiredStepDepth = 0.1f;
-            _motor.MaxStableSlopeAngle = 45f;
+            _motor.MaxStableSlopeAngle = CharacterControllerConst.SlopeLimit;
             _motor.MaxStableDistanceFromLedge = 0.5f;
             _motor.PreventSnappingOnLedges = false;
             _motor.MaxStableDenivelationAngle = 180f;

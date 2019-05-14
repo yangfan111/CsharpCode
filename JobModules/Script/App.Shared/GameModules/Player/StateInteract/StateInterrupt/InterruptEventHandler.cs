@@ -56,7 +56,7 @@ namespace App.Shared.GameModules.Player
             switch (interruptState)
             {
                 case EInterruptState.WaitInterrupt:
-                    interruptAction();
+                    Interrupt();
                     if (recoverFunc == null)
                         interruptState = EInterruptState.Closed;
                     else

@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using App.Shared.GameModules.HitBox;
 using Core.Appearance;
 using Core.CharacterController;
+using Core.HitBox;
 using Core.Utils;
 using UnityEngine;
 using Utils.Configuration;
@@ -12,10 +13,11 @@ namespace App.Shared.GameModules.Player.Appearance
 {
     public class CharacterControllerManager : ICharacterControllerAppearance
     {
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CharacterController));
         private GameObject _characterRoot;
         private ICharacterControllerContext _controller;
         private Transform _attachedHead;
-        private GameObject _thirdModel;
+        private static GameObject _thirdModel;
         private readonly Regex _attachedHeadNameRegex = new Regex(@"FHead\d*\(Clone\)");
         
         public void SetCharacterRoot(GameObject characterRoot)
@@ -41,14 +43,16 @@ namespace App.Shared.GameModules.Player.Appearance
             {
                 _controller.enabled = false;
             }
+
+            Logger.InfoFormat("PlayerDead :{0}", _characterRoot);
         }
 
         public void PlayerReborn()
         {
             SetLayer(_characterRoot, UnityLayerManager.GetLayerIndex(EUnityLayerName.Player));
-            HitBoxComponentUtility.FlashHitBoxLayer(_thirdModel);
             openEye();
             _controller.enabled = true;
+            Logger.InfoFormat("PlayerReborn: {0}", _characterRoot);
         }
 
         private void openEye()
@@ -96,6 +100,8 @@ namespace App.Shared.GameModules.Player.Appearance
             var characterController = _characterRoot.GetComponent<CharacterController>();
             if (characterController != null)
             {
+                //Logger.InfoFormat("change height from:{0} to:{1}, baseOnFoot:{2}", characterController.height, height, baseOnFoot);
+
                 characterController.height = height;
                 if (baseOnFoot)
                 {
@@ -213,10 +219,12 @@ namespace App.Shared.GameModules.Player.Appearance
         }
         
         private static void SetLayer(GameObject gameObject, int layer)
-        {   
+        {
+            var hitBoxTransforms = HitBoxComponentUtility.GetHitBoxTransforms(_thirdModel);
             foreach (var v in gameObject.GetComponentsInChildren<Transform>())
             {
-                v.gameObject.layer = layer;
+                if(!hitBoxTransforms.Contains(v))
+                    v.gameObject.layer = layer;
             }
         }
     }

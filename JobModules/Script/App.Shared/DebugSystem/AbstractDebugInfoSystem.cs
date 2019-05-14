@@ -17,7 +17,6 @@ namespace App.Shared.DebugSystem
 
         private static void Start()
         {
-
             Interlocked.Add(ref _startKey, 1);
         }
 

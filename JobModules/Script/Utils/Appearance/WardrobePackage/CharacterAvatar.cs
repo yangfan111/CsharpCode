@@ -2,12 +2,10 @@
 using Shared.Scripts;
 using System;
 using System.Collections.Generic;
-using System.Security.Policy;
 using UnityEngine;
 using Utils.AssetManager;
 using Utils.Configuration;
 using Utils.Singleton;
-using XmlConfig;
 
 namespace Utils.Appearance.WardrobePackage
 {
@@ -308,6 +306,7 @@ namespace Utils.Appearance.WardrobePackage
         private bool _enabled;
         private const int AlternativeStartNum = 1000;
         private const int DefaultAvatarId = 1;
+        private const Wardrobe StandardPart = Wardrobe.CharacterHead;
 
         public CharacterAvatar(GameObject character)
         {
@@ -533,6 +532,22 @@ namespace Utils.Appearance.WardrobePackage
                                 mapping.CharacterBone.rotation);
                     }
                 }
+            }
+
+            CalcCurrentLod();
+        }
+
+        private void CalcCurrentLod()
+        {
+            var head = _wardrobes[(int)StandardPart];
+            if(null == head) return;
+            var lodLevel = MyLodGroup.GetLogLevel(head.DefaultGameObject);
+            
+            foreach (var value in _wardrobes)
+            {
+                if(null == value) continue;
+                MyLodGroup.SetLogLevel(value.DefaultGameObject, lodLevel);
+                MyLodGroup.SetLogLevel(value.AlternativeGameObject, lodLevel);
             }
         }
 

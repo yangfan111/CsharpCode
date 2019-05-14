@@ -1,3 +1,4 @@
+using System;
 using KinematicCharacterController;
 using UnityEngine;
 using Utils.Compare;
@@ -7,18 +8,24 @@ namespace Core.CharacterController.ConcreteController
     public class SwimCharacterController:KinematicCharacterController
     {
         private BaseCharacterController _controller;
+        private Action<Transform> _initAction;
         
         public static readonly float SwimFowrard = 89.0f;
         public static readonly float SwimBack = -35f;
         public static readonly float FlyModePosYOffset = 0.3f;
         
-        public SwimCharacterController(KinematicCharacterMotor motor, BaseCharacterController controller) : base(motor)
+        public SwimCharacterController(KinematicCharacterMotor motor, BaseCharacterController controller, Action<Transform> initAction = null) : base(motor)
         {
             _controller = controller;
+            _initAction = initAction;
         }
 
         public override void Init()
         {
+            if (_initAction != null)
+            {
+                _initAction.Invoke(_motor.transform);
+            }
             _motor.ChangeCharacterController(_controller);
             DefaultInit();
             _motor.CapsuleDirection = 1;

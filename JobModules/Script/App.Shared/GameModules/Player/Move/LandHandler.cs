@@ -641,7 +641,12 @@ namespace App.Shared.GameModules.Player
             var tmpVec = new Vector3(vel.x, 0, vel.z);
             var newVelocity = GetDirectionTangentToSurfaceCustom(tmpVec, surfaceNormal, transform.forward) *
                               tmpVec.magnitude;
+            //DebugDraw.DebugArrow(transform.position, surfaceNormal, Color.red, 20f);
+            //DebugDraw.DebugArrow(transform.position, tmpVec, Color.green, 20f);
+            //DebugDraw.DebugArrow(transform.position, newVelocity, Color.blue, 20f);
             newVelocity = Vector3.ProjectOnPlane(newVelocity, Vector3.up);
+            newVelocity = tmpVec.normalized * newVelocity.magnitude;
+            //DebugDraw.DebugArrow(transform.position, newVelocity, Color.magenta, 20f);
             vel.x = newVelocity.x;
             vel.z = newVelocity.z;
             return vel;

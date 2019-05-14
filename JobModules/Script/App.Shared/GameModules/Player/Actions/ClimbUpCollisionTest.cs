@@ -289,8 +289,7 @@ namespace App.Shared.GameModules.Player.Actions
         {
             var gameObject = playerEntity.RootGo();
             var prevLayer = gameObject.layer;
-
-            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayerManager.GetLayerIndex(EUnityLayerName.User));
+            var prev = IntersectionDetectTool.SetColliderDisable(gameObject);
 
             var overlapPos = gameObject.transform.position;
             PlayerEntityUtility.GetCapsule(playerEntity, overlapPos, out _capsuleBottom, out _capsuleUp,
@@ -298,7 +297,7 @@ namespace App.Shared.GameModules.Player.Actions
             var casts = Physics.OverlapCapsule(_capsuleBottom, _capsuleUp, _capsuleRadius,
                 UnityLayers.AllCollidableLayerMask);
 
-            IntersectionDetectTool.SetColliderLayer(gameObject, prevLayer);
+            IntersectionDetectTool.RestoreCollider(gameObject, prev);
 
             return casts.Length > 0;
         }
@@ -307,7 +306,7 @@ namespace App.Shared.GameModules.Player.Actions
         {
             var gameObject = playerEntity.RootGo();
             var prevLayer = gameObject.layer;
-            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayerManager.GetLayerIndex(EUnityLayerName.User));
+            var prev = IntersectionDetectTool.SetColliderDisable(gameObject);
 
             var startPoint = gameObject.transform.position;
             startPoint.y += _capsuleRadius;
@@ -318,7 +317,7 @@ namespace App.Shared.GameModules.Player.Actions
             var isHit = Physics.SphereCast(startPoint, _capsuleRadius, Vector3.down, out outHit, hitYDistance,
                 UnityLayers.AllCollidableLayerMask);
 
-            IntersectionDetectTool.SetColliderLayer(gameObject, prevLayer);
+            IntersectionDetectTool.RestoreCollider(gameObject, prev);
 
             // dist高度没碰到，直接返回false
             // dist高度碰到了，但是碰撞点距离手扶点高度小于dist - VerticalDistanceDeviation 或大于dist + VerticalDistanceDeviation

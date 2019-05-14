@@ -1,4 +1,5 @@
-﻿using App.Client.GameModules.GamePlay.Free.UI;
+﻿using App.Client.GameModules.ClientInit;
+using App.Client.GameModules.GamePlay.Free.UI;
 using App.Client.GameModules.GamePlay.Offline;
 using App.Shared.Components;
 using App.Shared.DebugSystem;
@@ -15,12 +16,17 @@ namespace App.Client.GameModules.GamePlay
         public ClientGamePlayModule(Contexts contexts)
         {
             var gameRule = contexts.session.clientSessionObjects.GameRule;
+           
             if (gameRule == GameRules.Offline)
             {
                 AddSystem(new OfflineGamePlay(contexts,  contexts.session.commonSession));
               //  AddSystem(new SimplePlayerLifeSystem(contexts, contexts.clientSession.sessionObjects));
             }
-            AddSystem(new SimpleLoadBulletSystem(contexts, contexts.session.commonSession));
+            else
+            {
+                AddSystem(new RewindFirstSnapshotInitSystem(contexts));
+            }
+            AddSystem(new BulletReloadSystem(contexts, contexts.session.commonSession));
 
             AddSystem(new TestFrameSystem(contexts));
             AddSystem(new FreeUiSystem());

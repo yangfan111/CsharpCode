@@ -250,7 +250,6 @@ namespace App.Shared.Components.Player
     {
         [NetworkProperty] [DontInitilize] public FixedVector3 CameraPosition;
         [NetworkProperty] [DontInitilize] public Vector3 CameraEularAngle;
-//        [NetworkProperty] [DontInitilize] public bool IsFirstAppearance;
         [NetworkProperty] [DontInitilize] public float Fov;
         
         [DontInitilize] public Vector3 PlayerPosition;
@@ -266,7 +265,6 @@ namespace App.Shared.Components.Player
 
             CameraPosition = r.CameraPosition;
             CameraEularAngle = r.CameraEularAngle;
-//            IsFirstAppearance = r.IsFirstAppearance;
             Fov = r.Fov;
         }
 
@@ -275,7 +273,6 @@ namespace App.Shared.Components.Player
             var l = left as ObserveCameraComponent;
             var r = right as ObserveCameraComponent;
 
-//            IsFirstAppearance = r.IsFirstAppearance;
             Fov = InterpolateUtility.Interpolate(l.Fov, r.Fov, interpolationInfo);
             CameraPosition = InterpolateUtility.Interpolate(l.CameraPosition, r.CameraPosition, interpolationInfo);
             CameraEularAngle =

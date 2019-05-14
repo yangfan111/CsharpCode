@@ -9,16 +9,19 @@ namespace AssetBundleManager.Operation
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(AssetAsyncLoading));
         private AssetBundleRequest _request;
-        
-        public AssetAsyncLoading(string bundleName, string assetName)
-            : base(AssetLoadingPattern.Async, bundleName, assetName)
-        { }
+
+        public AssetAsyncLoading(string bundleName, string assetName, Type objectType)
+            : base(AssetLoadingPattern.Async, bundleName, assetName, objectType)
+        {
+        }
 
         public override void SetAssetBundle(LoadedAssetBundle assetBundle)
         {
             CreateTime = DateTime.Now;
-            
-            _request = assetBundle.Bundle.LoadAssetAsync(Name);
+
+            _request = ObjectType == null
+                ? assetBundle.Bundle.LoadAssetAsync(Name)
+                : assetBundle.Bundle.LoadAssetAsync(Name, ObjectType);
         }
 
         public DateTime CreateTime { get; set; }
@@ -28,11 +31,12 @@ namespace AssetBundleManager.Operation
             if (_request.isDone)
             {
                 var t = (DateTime.Now - CreateTime).Milliseconds;
-                if (t > 50)
+                if (t > 100)
                 {
-                    _logger.ErrorFormat("asset ;{0}:{1} take {2}", BundleName,Name, t);
+                    _logger.ErrorFormat("asset ;{0}:{1} take {2}", BundleName, Name, t);
                 }
             }
+
             return _request.isDone;
         }
 

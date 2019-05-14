@@ -1,4 +1,5 @@
-﻿using Assets.XmlConfig;
+﻿using Assets.Utils.Configuration;
+using Assets.XmlConfig;
 using Core;
 using Core.CharacterState;
 using WeaponConfigNs;
@@ -22,6 +23,7 @@ namespace App.Shared.GameModules.Weapon
         #region Filters
         internal bool FilterPickup(EWeaponSlotType slotType)
         {
+            
             return true;
             //return slotType != EWeaponSlotType.ThrowingWeapon ||
             //    Getter.IsWeaponSlotEmpty(slotType);
@@ -98,16 +100,18 @@ namespace App.Shared.GameModules.Weapon
         public WeaponDrawAppearanceStruct GetDrawAppearanceStruct(EWeaponSlotType slot)
         {
             var weaponDrawStruct = new WeaponDrawAppearanceStruct();
-            var secondWeapon     = FilterHoldSecondWeapon();
-            weaponDrawStruct.holsterParam = WeaponUtil.GetHolsterParam(secondWeapon);
+            var armOnLeft = FilterHoldSecondWeapon();
+            var drawOnLeft = armOnLeft && (slot != EWeaponSlotType.PistolWeapon &&
+                                              slot != EWeaponSlotType.MeleeWeapon &&
+                                             slot != EWeaponSlotType.ThrowingWeapon);
+            weaponDrawStruct.holsterParam = WeaponUtil.GetHolsterParam(armOnLeft);
             weaponDrawStruct.targetSlot = slot;
-            weaponDrawStruct.drawParam = secondWeapon
+            weaponDrawStruct.drawParam = drawOnLeft
                 ? AnimatorParametersHash.Instance.DrawLeftValue
                 : AnimatorParametersHash.Instance.DrawRightValue;
-            weaponDrawStruct.isSecondWeapon = secondWeapon;
+            weaponDrawStruct.armOnLeft = armOnLeft;
             return weaponDrawStruct;
         }
-
         public EWeaponSlotType GetRealSlotType(EWeaponSlotType slot)
         {
             return slot == EWeaponSlotType.Pointer ? Getter.HeldSlotType : slot;

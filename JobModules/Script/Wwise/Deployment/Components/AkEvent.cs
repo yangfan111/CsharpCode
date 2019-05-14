@@ -22,7 +22,7 @@ public class AkEventCallbackMsg
 }
 
 [UnityEngine.AddComponentMenu("Wwise/AkEvent")]
-[UnityEngine.RequireComponent(typeof(AkGameObj))]
+//[UnityEngine.RequireComponent(typeof(AkGameObj))]
 /// @brief Helper class that knows a Wwise Event and when to trigger it in Unity. As of 2017.2.0, the AkEvent inspector has buttons for play/stop, play multiple, stop multiple, and stop all.
 /// Play/Stop will play or stop the event such that it can be previewed both in edit mode and play mode. When multiple objects are selected, Play Multiple and Stop Multiple will play or stop the associated AkEvent for each object.
 /// \sa
@@ -31,15 +31,16 @@ public class AkEventCallbackMsg
 /// - <a href="https://www.audiokinetic.com/library/edge/?source=SDK&id=soundengine__events.html" target="_blank">Integration Details - Events</a> (Note: This is described in the Wwise SDK documentation.)
 public class AkEvent : AkUnityEventHandler, UnityEngine.ISerializationCallbackReceiver
 {
-	/// Replacement action.  See AK::SoundEngine::ExecuteEventOnAction()
+	
+	//- audio event 通用s模板
 	public AkActionOnEventType actionOnEventType = AkActionOnEventType.AkActionOnEventType_Stop;
-
-	/// Fade curve to use with the new Action.  See AK::SoundEngine::ExecuteEventOnAction()
 	public AkCurveInterpolation curveInterpolation = AkCurveInterpolation.AkCurveInterpolation_Linear;
-
-	/// Enables additional options to reuse existing events.  Use it to transform a Play event into a Stop event without having to define one in the Wwise Project.
 	public bool enableActionOnEvent = false;
+	public float transitionDuration = 0.0f;
 
+	
+	
+	
 	[System.Obsolete(AkSoundEngine.Deprecation_2018_1_2)]
 	public int eventID { get { return (int)(data == null ? AkSoundEngine.AK_INVALID_UNIQUE_ID : data.Id); } }
 
@@ -51,8 +52,6 @@ public class AkEvent : AkUnityEventHandler, UnityEngine.ISerializationCallbackRe
 	/// Game object onto which the Event will be posted.  By default, when empty, it is posted on the same object on which the component was added.
 	public UnityEngine.GameObject soundEmitterObject;
 
-	/// Duration of the fade.  See AK::SoundEngine::ExecuteEventOnAction()
-	public float transitionDuration = 0.0f;
 
 	private void Callback(object in_cookie, AkCallbackType in_type, AkCallbackInfo in_info)
 	{

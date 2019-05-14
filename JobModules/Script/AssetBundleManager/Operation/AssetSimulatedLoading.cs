@@ -1,12 +1,13 @@
+using System;
 using AssetBundleManagement;
-using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace AssetBundleManager.Operation
 {
     class AssetSimulatedLoading : AssetLoading
     {
-        public AssetSimulatedLoading(string bundleName, string assetName)
-            : base(AssetLoadingPattern.Simulation, bundleName, assetName)
+        public AssetSimulatedLoading(string bundleName, string assetName, Type objectType)
+            : base(AssetLoadingPattern.Simulation, bundleName, assetName, objectType)
         { }
 
         public override bool IsDone()
@@ -20,6 +21,7 @@ namespace AssetBundleManager.Operation
         public override void SetAssetBundle(LoadedAssetBundle assetBundle)
         { }
 
+   
         public void SetAsset(Object obj)
         {
             LoadedAsset = obj;

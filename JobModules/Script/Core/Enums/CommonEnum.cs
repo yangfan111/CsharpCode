@@ -29,7 +29,8 @@
     {
         None,
         T,
-        CT
+        CT,
+        Length
     }
 
     public enum EUIKillType
@@ -89,6 +90,8 @@
         //一血
         FirstBlood,
         //击倒
-        Hit
+        Hit,
+        //英雄击杀
+        HeroKO
     }
 }

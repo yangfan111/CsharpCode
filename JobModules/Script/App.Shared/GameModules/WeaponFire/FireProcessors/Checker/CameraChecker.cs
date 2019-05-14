@@ -6,7 +6,7 @@ namespace App.Shared.GameModules.Weapon.Behavior.FireCheck
     /// </summary>
     public class CameraChecker : IFireChecker
     {
-        public bool IsCanFire(PlayerWeaponController controller, IWeaponCmd cmd)
+        public bool IsCanFire(PlayerWeaponController controller, WeaponSideCmd cmd)
         {
             return controller.RelatedCameraSNew.CanFire;
         }

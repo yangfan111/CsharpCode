@@ -61,7 +61,9 @@ namespace Utils.Configuration
 
         public AudioGroupItem FindById(int id)
         {
-            return itemsMap[id];
+            AudioGroupItem item;
+            itemsMap.TryGetValue(id, out item);
+            return item;
         }
     }
 

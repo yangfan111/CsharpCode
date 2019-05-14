@@ -25,6 +25,7 @@ namespace App.Shared.GameModules.Player
         private void ResisterHoldWeapon()
         {
             var handler = new HoldWeaponHandler(playerEntity);
+            handler.ResisterEmitter(new InterruptEmitter(EPlayerState.Dying, EInterruptCmdType.InterruptSimple));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.Drive, EInterruptCmdType.InterruptAndRollback));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.Swim, EInterruptCmdType.InterruptAndRollback));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.Climb, EInterruptCmdType.InterruptAndRollback));
@@ -46,6 +47,7 @@ namespace App.Shared.GameModules.Player
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.OpenUI, EInterruptCmdType.InterruptSimple));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.Reload, EInterruptCmdType.InterruptSimple));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.SpecialReload, EInterruptCmdType.InterruptSimple));
+            handler.ResisterEmitter(new InterruptEmitter(EPlayerState.PaintDisc, EInterruptCmdType.InterruptSimple));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.SwitchWeapon, EInterruptCmdType.InterruptSimple));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.WeaponRotState, EInterruptCmdType.InterruptAndRollback));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.ProneMove, EInterruptCmdType.InterruptAndRollback));

@@ -13,7 +13,7 @@ using Utils.Singleton;
 
 namespace App.Client.GameModules.Ui.Models.Chicken
 {
-    public class ChickenBagItem: UILoopItem
+    public class ChickenBagItem: UIItem
     {
         private ChickenBagItemViewModel _viewModel = new ChickenBagItemViewModel();
         protected override void SetView()
@@ -34,12 +34,22 @@ namespace App.Client.GameModules.Ui.Models.Chicken
         {
             base.Init();
             InitEvent();
+            InitVariable();
+        }
+
+        private void InitVariable()
+        {
+            if (root == null)
+            {
+                root = FindChildGo(_viewModel.ResourceAssetName);
+            }
         }
 
         UIEventTriggerListener eventTrigger;
 
         UIDrag uiDrog;
         public Action<IBaseChickenBagItemData> DragCallback;
+        public Action<Transform,IBaseChickenBagItemData> EnterCallback;
 
         private void InitEvent()
         {
@@ -52,16 +62,34 @@ namespace App.Client.GameModules.Ui.Models.Chicken
                 }
             }
 
-            eventTrigger = FindComponent<UIEventTriggerListener>(_viewModel.ResourceAssetName);
+            eventTrigger = FindComponent<UIEventTriggerListener>("ItemGroup");
             if (eventTrigger != null)
             {
-                eventTrigger.onClick += RightClickAction;
+                eventTrigger.onClick = RightClickAction;
+                eventTrigger.onEnter = EnterAction;
             }
-            //uiDrog = FindComponent<UIDrag>(_viewModel.ResourceAssetName);
-            uiDrog = FindComponent<UIDrag>("ItemIcon");
+            uiDrog = FindComponent<UIDrag>("ItemGroup");
             if (uiDrog != null)
             {
-                uiDrog.OnEndDragCallback += DragCallbackAction;
+                uiDrog.DragItem = FindChildGo("ItemIcon").gameObject;
+                uiDrog.OnEndDragCallback = DragCallbackAction;
+            }
+        }
+
+        private void EnterAction(UIEventTriggerListener arg1, PointerEventData arg2)
+        {
+            if (EnterCallback != null)
+            {
+                if (Data is IChickenBagItemUiData)
+                {
+                    var data = Data as IChickenBagItemUiData;
+                    if (data.isBagTitle)
+                    {
+                        return;
+                    }
+                }
+
+                EnterCallback.Invoke(root,Data as IBaseChickenBagItemData);
             }
         }
 
@@ -74,6 +102,7 @@ namespace App.Client.GameModules.Ui.Models.Chicken
         }
 
         public Action<IBaseChickenBagItemData> RightClickCallback;
+        private Transform root;
 
         private void RightClickAction(UIEventTriggerListener arg1, PointerEventData eventData)
         {

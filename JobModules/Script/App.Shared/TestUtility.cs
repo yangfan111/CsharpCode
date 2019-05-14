@@ -18,12 +18,12 @@ namespace App.Shared
 
         public static IPlayerInfo CreateTestPlayer()
         {
-            return new PlayerInfo(TestToken,null, PlayerId, PlayerName, RoleModelId, TeamId,0,0,0,0,0,null,null,null,false);
+            return new PlayerInfo(TestToken,null, PlayerId, PlayerName, RoleModelId, TeamId,0,0,0,0,0,null,null,null,false, 0);
         }
 
         public static IPlayerInfo CreateTestPlayer(IRoomId roomId)
         {
-            return new PlayerInfo(TestToken, roomId, PlayerId, PlayerName, RoleModelId, TeamId,0,0,0,0,0,null,null,null,false);
+            return new PlayerInfo(TestToken, roomId, PlayerId, PlayerName, RoleModelId, TeamId,0,0,0,0,0,null,null,null,false, 0);
         }
 
         public static long NewPlayerId

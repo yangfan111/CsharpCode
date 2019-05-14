@@ -23,12 +23,14 @@ namespace XmlConfig
         Pistol,
         Melee,
         Grenade,
+
         Bullet,
         Muzzle,//枪口配件
         LowerRail,//枪把
         UpperRail,//瞄具
         Magazine,//弹夹
         Stock,//枪托
+        SideRail,
     }
 
     public class ItemAssetInfo

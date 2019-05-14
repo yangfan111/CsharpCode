@@ -40,11 +40,14 @@ namespace com.wd.free.item
             IniSkill();
         }
 
-        public void StopUseItem(IEventArgs args, FreeData fd)
+        public void StopUseItem(IEventArgs args, FreeData fd, bool inter)
         {
             startUse = false;
 
-            StartCounter(args, 0, fd, false);
+            if (inter)
+            {
+                StartCounter(args, 0, fd, false);
+            }
         }
 
         public void UsingItem(ISkillArgs args)
@@ -102,7 +105,7 @@ namespace com.wd.free.item
 
             FreeSoundUtil.Stop("use", args, fd);
 
-            if(sound > 0)
+            if (sound > 0)
             {
                 FreeSoundUtil.PlayOnce("use", sound, args, fd);
             }
@@ -239,7 +242,7 @@ namespace com.wd.free.item
             {
                 if (fd != null)
                 {
-                    fd.freeInventory.StopUseItem(args, fd);
+                    fd.freeInventory.StopUseItem(args, fd, inter);
                     UseCommonAction use = new UseCommonAction();
                     use.key = "showBottomTip";
                     use.values = new List<ArgValue>();
@@ -261,7 +264,7 @@ namespace com.wd.free.item
                 if (ip != null && fd != null)
                 {
                     UseItem(ip, fd, (ISkillArgs)args);
-                    fd.freeInventory.StopUseItem(args, fd);
+                    fd.freeInventory.StopUseItem(args, fd, inter);
                 }
             }
         }

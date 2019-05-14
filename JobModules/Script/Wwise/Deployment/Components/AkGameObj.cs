@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using UnityEngine;
+
 #if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.
 //////////////////////////////////////////////////////////////////////
 //
@@ -16,10 +19,16 @@
 /// - <a href="https://www.audiokinetic.com/library/edge/?source=SDK&id=soundengine__switch.html" target="_blank">Integration Details - Switches</a> (Note: This is described in the Wwise SDK documentation.)
 /// - <a href="https://www.audiokinetic.com/library/edge/?source=SDK&id=soundengine__states.html" target="_blank">Integration Details - States</a> (Note: This is described in the Wwise SDK documentation.)
 /// - <a href="https://www.audiokinetic.com/library/edge/?source=SDK&id=soundengine__environments.html" target="_blank">Integration Details - Environments and Game-defined Auxiliary Sends</a> (Note: This is described in the Wwise SDK documentation.)
-public class AkGameObj : UnityEngine.MonoBehaviour
-{
-	[UnityEngine.SerializeField] private AkGameObjListenerList m_listeners = new AkGameObjListenerList();
 
+public class AkGameObj : UnityEngine.MonoBehaviour,IComparer<AkGameObj>
+{
+	public class  InstanceObject
+	{
+		public int instanceId;
+	}
+	[UnityEngine.SerializeField] private AkGameObjListenerList m_listeners = new AkGameObjListenerList();
+	[HideInInspector]
+	public InstanceObject InstanceObj = new InstanceObject();
 	/// Is this object affected by Environment changes?  Set to false if not affected in order to save some useless calls.  Default is true.
 	public bool isEnvironmentAware = true;
 
@@ -171,14 +180,21 @@ public class AkGameObj : UnityEngine.MonoBehaviour
 		if (AkSoundEngine.IsInitialized())
 			AkSoundEngine.UnregisterGameObj(gameObject);
 	}
+	public long EndTimeSecStamp { get; set; }
+
+	public bool IsMute { get; set; }
+	public int SequenceIndex { get; set; }
 
 	private void Update()
 	{
+		if (IsMute)
+			return;
 #if UNITY_EDITOR
 		if (!AkSoundEngineController.Instance.IsSoundEngineLoaded || AkUtilities.IsMigrating ||
 		    !UnityEditor.EditorApplication.isPlaying)
 			return;
 #endif
+		
 
 		if (m_envData != null)
 			m_envData.UpdateAuxSend(gameObject, transform.position);
@@ -404,5 +420,10 @@ public class AkGameObj : UnityEngine.MonoBehaviour
 #endif
 
 	#endregion
+
+	public int Compare(AkGameObj x, AkGameObj y)
+	{
+		return x.SequenceIndex - y.SequenceIndex ;
+	}
 }
 #endif // #if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.

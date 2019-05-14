@@ -1,9 +1,7 @@
-﻿
-using System.Collections.Generic;
-using App.Shared.GameModules.Player;
-using Core.BulletSimulation;
+﻿using Core.BulletSimulation;
 using Core.EntityComponent;
 using Core.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 using WeaponConfigNs;
 
@@ -29,6 +27,7 @@ namespace App.Shared.GameModules.Bullet
         public int NextFrameTime { get { return _bulletEntity.bulletData.RemainFrameTime; } set { _bulletEntity.bulletData.RemainFrameTime = value; } }
         public int ServerTime { get { return _bulletEntity.bulletData.ServerTime; } set { _bulletEntity.bulletData.ServerTime = value; } }
         public bool IsValid { get { return !_bulletEntity.isFlagDestroy; } set { _bulletEntity.isFlagDestroy = !value; } }
+
         public List<int> ExcludePlayerList
         {
             get
@@ -55,8 +54,7 @@ namespace App.Shared.GameModules.Bullet
             }
         }
 
-
-        public float DistanceDecayFactor { get { return _bulletEntity.bulletData.DefaultBulletConfig.DistanceDecayFactor; } }
+        public float DistanceDecayFactor { get { return _bulletEntity.bulletData.DistanceDecay; } set { _bulletEntity.bulletData.DistanceDecay = value; }}
         public float BaseDamage { get { return _bulletEntity.bulletData.BaseDamage; } set { _bulletEntity.bulletData.BaseDamage = value; } }
         public float PenetrableThickness { get { return _bulletEntity.bulletData.PenetrableThickness; } set { _bulletEntity.bulletData.PenetrableThickness = value; } }
 
@@ -84,26 +82,8 @@ namespace App.Shared.GameModules.Bullet
         public int PenetrableLayerCount { get { return _bulletEntity.bulletData.PenetrableLayerCount; } set { _bulletEntity.bulletData.PenetrableLayerCount = value; } }
         public EBulletCaliber Caliber { get { return _bulletEntity.bulletData.Caliber; } }
         public int WeaponId { get { return _bulletEntity.bulletData.WeaponId; } }
-
-        public Vector3 GunEmitPosition
-        {
-            get
-            {
-                return _bulletEntity.emitPosition.Value;
-            }
-        }
-
-        public bool IsNew
-        {
-            get
-            {
-                return _bulletEntity.isNew;
-            }
-            set
-            {
-                _bulletEntity.isNew = value;
-            }
-        }
+        public Vector3 GunEmitPosition { get { return _bulletEntity.emitPosition.Value; }}
+        public bool IsNew { get { return _bulletEntity.isNew; } set { _bulletEntity.isNew = value; }}
 
         public bool IsOverWall
         {
@@ -124,28 +104,7 @@ namespace App.Shared.GameModules.Bullet
             }
         }
 
-        public Vector3 HitPoint
-        {
-            get
-            {
-                return _bulletEntity.bulletData.HitPoint;
-            }
-            set
-            {
-                _bulletEntity.bulletData.HitPoint = value;
-            }
-        }
-
-        public EHitType HitType
-        {
-            get
-            {
-                return _bulletEntity.bulletData.HitType;
-            }
-            set
-            {
-                _bulletEntity.bulletData.HitType = value;
-            }
-        } 
+        public Vector3 HitPoint { get { return _bulletEntity.bulletData.HitPoint; } set { _bulletEntity.bulletData.HitPoint = value; }}
+        public EHitType HitType { get { return _bulletEntity.bulletData.HitType; } set { _bulletEntity.bulletData.HitType = value; }} 
     }
 }

@@ -1,4 +1,5 @@
-﻿using App.Client.GameModules.Ui.Logic;
+﻿using App.Client.GameModules.SceneObject;
+using App.Client.GameModules.Ui.Logic;
 using UserInputManager.Lib;
 using Utils.Configuration;
 using Utils.Singleton;

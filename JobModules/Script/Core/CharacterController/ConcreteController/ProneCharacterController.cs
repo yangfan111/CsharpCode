@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using KinematicCharacterController;
 using UnityEngine;
 
@@ -12,15 +13,21 @@ namespace Core.CharacterController.ConcreteController
         }
 
         private BaseCharacterController _controller;
+        private Action<Transform> _initAction;
         
-        public ProneCharacterController(KinematicCharacterMotor motor, BaseCharacterController controller) : base(motor)
+        public ProneCharacterController(KinematicCharacterMotor motor, BaseCharacterController controller, Action<Transform> initAction = null) : base(motor)
         {
             _controller = controller;
+            _initAction = initAction;
         }
 
         public override void Init()
         {
             _motor.ChangeCharacterController(_controller);
+            if (_initAction != null)
+            {
+                _initAction.Invoke(_motor.transform);
+            }
             DefaultInit();
             _motor.CapsuleDirection = 2;
             _motor.UseSphereGroundDetection = false;

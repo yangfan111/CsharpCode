@@ -47,7 +47,7 @@ namespace App.Shared.Components.Player
 
         //Auto Fire
         [DontInitilize] public bool HasAutoAction;
-        [DontInitilize] public int  AutoFire;
+        [DontInitilize] public bool  AutoFire;
 
         [DontInitilize] public bool AutoThrowing;
 

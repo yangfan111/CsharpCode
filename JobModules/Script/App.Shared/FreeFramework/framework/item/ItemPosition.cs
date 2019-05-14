@@ -19,7 +19,7 @@ namespace com.wd.free.item
 
         public int count;
 
-        internal ItemInventory inventory;
+        public ItemInventory inventory;
 
         [System.NonSerialized]
         private ObjectFields keyFields;

@@ -90,7 +90,7 @@ namespace Core.Configuration
                 {
                     FloorTestHeight = 4f,
                     FocusPositionLerpTime = 200f,
-                    OffsetLengthInBuilding = 0.8f,
+                    OffsetLengthInBuilding = 1.2f,
                     OffsetLengthWhenClimbing = 1.2f,
                     ArchorOffsetLengthWhenClimbing = 1.3f
                 };

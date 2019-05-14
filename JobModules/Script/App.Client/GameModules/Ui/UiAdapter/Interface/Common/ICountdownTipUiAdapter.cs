@@ -7,6 +7,6 @@ namespace App.Client.GameModules.Ui.UiAdapter.Interface
 
     public interface ICountdownTipUiAdapter : IAbstractUiAdapter
     {
-        List<ICountdownTipData> CountdownTipDataList { get;}
+        List<ITipData> CountdownTipDataList { get;}
     }
 }

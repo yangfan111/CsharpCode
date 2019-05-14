@@ -8,24 +8,24 @@ namespace App.Shared.GameModules.Weapon.Behavior
     public class CommonAccuracyCalculator : IAccuracyCalculator
     {
 
-        public void OnBeforeFire(PlayerWeaponController weaponController, IWeaponCmd cmd)
+        public void OnBeforeFire(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
         {
-            UpdateAccurcy(weaponController);
+            UpdateAccurcy(weaponBaseAgent);
         }
 
  
-        public void OnIdle(PlayerWeaponController weaponController, IWeaponCmd cmd)
+        public void OnIdle(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
         {
             //静止状态accurcy会影响到准星扩散
-            UpdateAccurcy(weaponController);
+            UpdateAccurcy(weaponBaseAgent);
 
         }
-        private void UpdateAccurcy(PlayerWeaponController weaponController)
+        private void UpdateAccurcy(WeaponBaseAgent weaponBaseAgent)
         {
-            var config = weaponController.HeldWeaponAgent.BaseAccuracyLogicCfg;
+            var config = weaponBaseAgent.BaseAccuracyLogicCfg;
             if (config == null)
                 return;
-            var runTimeComponent = weaponController.HeldWeaponAgent.RunTimeComponent;
+            var runTimeComponent = weaponBaseAgent.RunTimeComponent;
                 
             int accuracyDivisor = config.AccuracyDivisor; //除数因子
             if (accuracyDivisor != -1)

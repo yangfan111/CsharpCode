@@ -66,23 +66,24 @@ namespace Core.CharacterState.Action
             SetNewCommandFromFunctionCall(FsmInput.Revive);
         }
 
-        public void Unarm(System.Action callBack, float holsterParam)
+        public void Holster(System.Action holsterStartCallBack, System.Action holsterEndCallBack, float holsterParam)
         {
             SetNewCommandFromFunctionCall(FsmInput.Unarm, holsterParam);
-            SetNewCallbackFromFunctionCall(FsmInput.HolsterFinished, FsmInput.HolsterFinished, callBack);
+            SetNewCallbackFromFunctionCall(FsmInput.HolsterStartFinished, FsmInput.HolsterStartFinished, holsterStartCallBack);
+            SetNewCallbackFromFunctionCall(FsmInput.HolsterEndFinished, FsmInput.HolsterEndFinished, holsterEndCallBack);
         }
 
-        public void Draw(System.Action callBack, float drawParam)
+        public void Select(System.Action callBack, float drawParam)
         {
             SetNewCommandFromFunctionCall(FsmInput.Draw, drawParam);
             SetNewCallbackFromFunctionCall(FsmInput.SelectFinished, FsmInput.SelectFinished, callBack);
         }
 
-        public void SwitchWeapon(System.Action unarmCallBack, System.Action drawCallBack, float switchType)
+        public void SwitchWeapon(System.Action holsterCallBack, System.Action selectCallBack, float switchType)
         {
             SetNewCommandFromFunctionCall(FsmInput.SwitchWeapon, switchType);
-            SetNewCallbackFromFunctionCall(FsmInput.HolsterFinished, FsmInput.HolsterFinished, unarmCallBack);
-            SetNewCallbackFromFunctionCall(FsmInput.SelectFinished, FsmInput.SelectFinished, drawCallBack);
+            SetNewCallbackFromFunctionCall(FsmInput.HolsterStartFinished, FsmInput.HolsterStartFinished, holsterCallBack);
+            SetNewCallbackFromFunctionCall(FsmInput.SelectFinished, FsmInput.SelectFinished, selectCallBack);
         }
 
         public void InterruptSwitchWeapon()
@@ -92,7 +93,6 @@ namespace Core.CharacterState.Action
 
         public void Rescue()
         {
-            SetPostureCrouch();
             SetNewCommandFromFunctionCall(FsmInput.Rescue);
         }
 
@@ -198,6 +198,7 @@ namespace Core.CharacterState.Action
         // 开门
         public void OpenDoor()
         {
+            
             SetNewCommandFromFunctionCall(FsmInput.OpenDoor);
         }
 
@@ -254,14 +255,16 @@ namespace Core.CharacterState.Action
         }
 
         //投掷动作
-        public void StartNearGrenadeThrow()
+        public void StartNearGrenadeThrow(System.Action callBack)
         {
             SetNewCommandFromFunctionCall(FsmInput.StartNearGrenade);
+            SetNewCallbackFromFunctionCall(FsmInput.GrenadeEndFinish, FsmInput.GrenadeEndFinish, callBack);
         }
 
-        public void StartFarGrenadeThrow()
+        public void StartFarGrenadeThrow(System.Action callBack)
         {
             SetNewCommandFromFunctionCall(FsmInput.StartFarGrenade);
+            SetNewCallbackFromFunctionCall(FsmInput.GrenadeEndFinish, FsmInput.GrenadeEndFinish, callBack);
         }
 
         public void ChangeThrowDistance(float weight)
@@ -330,6 +333,30 @@ namespace Core.CharacterState.Action
             Logger.InfoFormat("TransfigurationFinish");
             SetNewCommandFromFunctionCall(FsmInput.TransfigurationFinish);
             SetNewCallbackFromFunctionCall(FsmInput.TransfigurationFinishEnd, FsmInput.TransfigurationFinishEnd, callBack);
+        }
+
+        public void RageStart()
+        {
+            Logger.InfoFormat("RageStart");
+            SetNewCommandFromFunctionCall(FsmInput.RageStart);
+        }
+
+        public void RageEnd()
+        {
+            Logger.InfoFormat("RageEnd");
+            SetNewCommandFromFunctionCall(FsmInput.RageEnd);
+        }
+
+        public void StartSuccessPose(float poseState)
+        {
+            Logger.InfoFormat("StartSuccessPose");
+            SetNewCommandFromFunctionCall(FsmInput.StartSuccessPose, poseState);
+        }
+
+        public void EndSuccessPose()
+        {
+            Logger.InfoFormat("EndSuccessPose");
+            SetNewCommandFromFunctionCall(FsmInput.EndSuccessPose);
         }
 
         // 滑翔

@@ -66,6 +66,7 @@ namespace Utils.Appearance
 
     public enum ThirdPersonAction
     {
+        Null,
         Reload,
         SpecialReload,
         SwitchWeapon,

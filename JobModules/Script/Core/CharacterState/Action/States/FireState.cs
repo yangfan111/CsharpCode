@@ -59,6 +59,37 @@ namespace Core.CharacterState.Action.States
                 null, (int)ActionStateId.CommonNull, null, 0, new[] { FsmInput.SightsFire });
 
             #endregion
+
+            #region fire to reloadEmpty
+
+            AddTransition(
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.ReloadEmpty))
+                    {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireEndHash,
+                            AnimatorParametersHash.Instance.FireEndName,
+                            AnimatorParametersHash.Instance.FireEndEnableValue,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, true);
+                        addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ReloadEmptyHash,
+                            AnimatorParametersHash.Instance.ReloadEmptyName,
+                            AnimatorParametersHash.Instance.ReloadEmptyEnableValue,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+                        command.Handled = true;
+                        return true;
+                    }
+                    
+                    command.Handled = true;
+                    
+                    return false;
+                },
+                null, (int) ActionStateId.Reload, null, 0, new[] { FsmInput.ReloadEmpty });
+
+            #endregion
+            
         }
 
         public override void DoBeforeEntering(IFsmInputCommand command, Action<FsmOutput> addOutput)

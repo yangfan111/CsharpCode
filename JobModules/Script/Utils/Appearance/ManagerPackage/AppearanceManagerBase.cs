@@ -301,6 +301,16 @@ namespace Utils.Appearance.ManagerPackage
         {
             WeaponControllerBaseImpl.UnmountWeaponFromHand();
         }
+        
+        public void JustUnMountWeaponFromHand()
+        {
+            WeaponControllerBaseImpl.JustUnMountWeaponFromHand();
+        }
+
+        public void JustClearOverrideController()
+        {
+            WeaponControllerBaseImpl.JustClearOverrideController();
+        }
 
         public void UnmountWeaponFromHandAtOnce()        //仅人物死亡时使用
         {
@@ -441,7 +451,8 @@ namespace Utils.Appearance.ManagerPackage
             var hitboxList = _hitboxHandler.GetHitBox().Values;
             foreach (var v in RagDollColliderList)
             {
-                v.enabled = hitboxList.Contains(v) ? !enable : enable;
+                if(hitboxList.Contains(v)) continue;
+                v.enabled = enable;
             }
             
             if (!enable)

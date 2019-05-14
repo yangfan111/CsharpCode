@@ -458,8 +458,6 @@ namespace App.Shared.SceneManagement
                                 Logger.Error("ArtPlugins.GQS_Bind_Camera is null ??? !!!");
                             }
                         }
-                            
-                        v.useOcclusionCulling = SharedConfig.EnableOC;
                     }
                 }
                 _loadingScene--;

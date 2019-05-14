@@ -16,7 +16,8 @@ namespace Core.CharacterBone
         void Reborn();
         void Dead();
 
-        void SetStablePelvisRotation();
+        void SetStableStandPelvisRotation();
+        void SetStableCrouchPelvisRotation();
         void SetThirdPersonCharacter(GameObject obj);
         void SetFirstPersonCharacter(GameObject obj);
         void SetFirstPerson();

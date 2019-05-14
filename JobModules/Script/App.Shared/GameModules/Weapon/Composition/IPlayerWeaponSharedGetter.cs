@@ -16,8 +16,6 @@ namespace App.Shared
 
         bool? AutoThrowing { get; }
 
-        int? AutoFire { get; }
-
         bool CanSwitchWeaponBag { get; }
 
         int HeldConfigId { get; }

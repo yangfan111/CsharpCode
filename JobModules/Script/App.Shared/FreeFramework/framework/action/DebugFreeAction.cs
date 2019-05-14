@@ -1,9 +1,6 @@
 ﻿using com.wd.free.action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using com.wd.free.@event;
+using System;
 
 namespace App.Shared.FreeFramework.framework.action
 {
@@ -12,6 +9,7 @@ namespace App.Shared.FreeFramework.framework.action
     {
         public bool debug;
         public string fields;
+        public bool log;
 
         public override void DoAction(IEventArgs args)
         {
@@ -28,6 +26,8 @@ namespace App.Shared.FreeFramework.framework.action
             {
                 FreeLog.SetParas(fields);
             }
+
+            args.FreeContext.DebugMode = log;
         }
     }
 }

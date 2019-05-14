@@ -188,6 +188,8 @@ namespace App.Client.GameModules.Ui.UiAdapter
         public List<MapFixedVector2> KongTouList()
         {
             int planeId = 0;
+            kongTouList.Clear();
+
             FreeRenderObject plane = SingletonManager.Get<FreeEffectManager>().GetEffect("plane1");
             if (plane != null)
             {
@@ -195,28 +197,26 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 if (id != null && id is AutoConstValue)
                 {
                     planeId = int.Parse(((AutoConstValue) id).GetValue());
-                }
-            }
 
-            kongTouList.Clear();
-
-            foreach (FreeRenderObject drop in SingletonManager.Get<FreeEffectManager>().FreeEffects.Values)
-            {
-                if (drop.key.StartsWith("dropBox"))
-                {
-                    IAutoValue id = drop.GetAuto("id");
-                    if (id != null && id is AutoConstValue)
+                    foreach (FreeRenderObject drop in SingletonManager.Get<FreeEffectManager>().FreeEffects.Values)
                     {
-                        int realId = int.Parse(((AutoConstValue)id).GetValue());
-                        if (realId == planeId)
+                        if (drop.key.StartsWith("dropBox"))
                         {
-                            kongTouList.Add(new MapFixedVector2(WorldOrigin.WorldPosition(new Vector3(drop.model3D.x, drop.model3D.y, drop.model3D.z)).To2D()));
+                            IAutoValue dropBoxId = drop.GetAuto("id");
+                            if (dropBoxId != null && dropBoxId is AutoConstValue)
+                            {
+                                int realId = int.Parse(((AutoConstValue)dropBoxId).GetValue());
+                                if (realId == planeId)
+                                {
+                                    kongTouList.Add(new MapFixedVector2(WorldOrigin.WorldPosition(new Vector3(drop.model3D.x, drop.model3D.y, drop.model3D.z)).To2D()));
+                                }
+                                //                        Debug.LogFormat("********************************** planeId:{0} dropId:{1}", planeId, realId);
+                            }
                         }
-//                        Debug.LogFormat("********************************** planeId:{0} dropId:{1}", planeId, realId);
                     }
                 }
             }
-            
+
             return kongTouList;
         }
 
@@ -242,17 +242,12 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         #region Map Marks
 
-        public void AddMapMark(long playerId, int playerNum, float mx, float my)
+        public Dictionary<long, MiniMapPlayMarkInfo> MapMarks
         {
-            _contexts.ui.map.AddMapMark(playerId, playerNum, mx, my);
+            get { return _contexts.ui.map.MapMarks;}
         }
 
-        public void RemoveMapMark(long playerId)
-        {
-            _contexts.ui.map.RemoveMapMark(playerId);
-        }
 
-        public Dictionary<long, MiniMapPlayMarkInfo> MapMarks { get{return _contexts.ui.map.MapMarks;} }
 
         #endregion
 
@@ -304,6 +299,74 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get { return _contexts.player.flagSelfEntity.gamePlay; }
         }
+
+        #region Bio
+
+        private List<Vector3> _motherPosList = new List<Vector3>();
+        private HashSet<long> _lastMotherIdlIst = new HashSet<long>();
+        public List<Vector3> MotherPos
+        {
+            get
+            {
+                UpdatePlayerPos(_contexts.ui.uI.MotherIdList, ref _lastMotherIdlIst, ref _motherPosList);
+
+                return _motherPosList;
+            }
+        }
+        private List<Vector3> _heroPosList = new List<Vector3>();
+        private HashSet<long> _lastHeroIdlIst = new HashSet<long>();
+
+        private void UpdatePlayerPos(List<long> idList, ref HashSet<long> lastIdList, ref List<Vector3> posList)
+        {
+            if (!lastIdList.SetEquals(idList))
+            {
+                lastIdList = new HashSet<long>(idList);
+            }
+
+            posList.Clear();
+
+            foreach (PlayerEntity pe in _contexts.player.GetEntities())
+            {
+                if (lastIdList.Contains(pe.playerInfo.PlayerId))
+                {
+                    posList.Add(new MapFixedVector3(pe.position.FixedVector3).ShiftedUIVector3());
+                }
+            }
+
+        }
+
+        public List<Vector3> HeroPos
+        {
+            get
+            {
+                UpdatePlayerPos(_contexts.ui.uI.HeroIdList, ref _lastHeroIdlIst, ref _heroPosList);
+
+                return _heroPosList;
+            }
+        }
+
+        private List<Vector3> _humanPosList = new List<Vector3>();
+        private HashSet<long> _lastHumanIdlIst = new HashSet<long>();
+
+        public List<Vector3> HumanPos
+        {
+            get
+            {
+                UpdatePlayerPos(_contexts.ui.uI.HumanIdList, ref _lastHumanIdlIst, ref _humanPosList);
+
+                return _humanPosList;
+            }
+        }
+
+        public List<MapFixedVector3> SupplyPos
+        {
+            get
+            {
+                return _contexts.ui.map.SupplyPosList;
+            }
+        }
+
+        #endregion
     }
 }
 

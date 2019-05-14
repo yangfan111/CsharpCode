@@ -47,10 +47,12 @@ namespace App.Shared.GameModules.Player.CharacterBone
             ThirdPersonPosture.Climb
         };
 
-        public static bool FilterPlayerIK(ActionInConfig action, ActionKeepInConfig keepAction, PostureInConfig posture,
+        public static bool FilterPlayerIK(ActionInConfig action, ActionInConfig nextAction, 
+            ActionKeepInConfig keepAction, PostureInConfig posture,
             PostureInConfig nextPosture, MovementInConfig movement)
         {
             return !(IsStateInActionFilter(action) ||
+                     IsStateInActionFilter(action) ||
                      IsStateInKeepActionFilter(keepAction) ||
                      IsStateInPostureFilter(posture) ||
                      IsStateInPostureFilter(nextPosture) ||

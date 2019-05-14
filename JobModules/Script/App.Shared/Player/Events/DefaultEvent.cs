@@ -27,6 +27,7 @@ namespace App.Shared.Player.Events
     public abstract class DefaultEventHandler:IEventHandler
     {
         public abstract EEventType EventType { get; }
+        public virtual EEventType[] EventTypes { get; }
 
         public IEvent MergeEvent(IEvent self, IEvent other)
         {

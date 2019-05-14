@@ -46,10 +46,11 @@ namespace App.Server.GameModules.GamePlay.Free.item.config
             avatarMap.Add((int)Wardrobe.Waist, "belt");
             avatarMap.Add((int)Wardrobe.PendantFace, "mask");
             avatarMap.Add((int)Wardrobe.Inner, "vest");
-            avatarMap.Add((int)Wardrobe.Outer, "coat");
             avatarMap.Add((int)Wardrobe.Glove, "glov");
             avatarMap.Add((int)Wardrobe.Trouser, "pant");
             avatarMap.Add((int)Wardrobe.Foot, "shoe");
+            avatarMap.Add((int)Wardrobe.Entirety, "coat");
+            avatarMap.Add((int)Wardrobe.Outer, "coat");
         }
 
         public static FreeItemInfo GetItemInfo(string key)

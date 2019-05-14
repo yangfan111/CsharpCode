@@ -133,7 +133,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
 		private bool UpdateVisible()
 		{
-			for (int i = 1; i <= WeaponSlotNum; i++)
+			for (int i = 1; i <= TotalSlotNum; i++)
 			{
 				if (_adapter.HasWeaponByIndex(i))
 				{
@@ -143,14 +143,6 @@ namespace App.Client.GameModules.Ui.Models.Common
 			
 			}
 
-			for (int i = 1; i <= GrenadeSlotNum; i++)
-			{
-				if (_adapter.HasGrenadByIndex(i))
-				{
-				    _viewModel.Show = true;
-                    return true;
-				}
-			}
 		    _viewModel.Show = false;
             return false;
 		}
@@ -750,10 +742,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         /// <param name="index"></param>
         private void UpdateWeaponIconByIndex(int index)
         {
-            if (!_adapter.HasWeaponByIndex(index))
-            {
-                return;
-            }
+ 
             int weaponId = _adapter.WeaponIdByIndex(index);
 
             Sprite image;
@@ -779,7 +768,6 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void UpdateWeaponSlotShowByIndex(int index)
         {
-            //if ((WeaponHudWeaponType)_adapter.WeaponTypeByIndex(index) == WeaponHudWeaponType.Grenade && _adapter.WeaponBulletCountByIndex(index) == 0)
             if(index == GrenadeSlotPos && _adapter.WeaponBulletCountByIndex(index) == 0)
             {
                 _viewModel.SetWeaponSlotShow(index, false);//如果当前武器是投掷类且用完投掷数量，关闭显示

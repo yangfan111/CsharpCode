@@ -1,32 +1,28 @@
-﻿using System;
+﻿using App.Shared.Components.Player;
+using App.Shared.GameModules.Configuration;
+using App.Shared.SceneManagement;
+using App.Shared.Util;
 using Core;
+using Core.Components;
 using Core.Configuration;
 using Core.GameModule.System;
-using Core.Utils;
-using UnityEngine;
-using XmlConfig;
-using Utils.Configuration;
-using App.Shared.GameModules.Configuration;
-using Utils.Appearance.Weapon;
-using Assets.Utils.Configuration;
-using App.Shared.SceneManagement;
-using System.Collections.Generic;
-using System.Reflection;
-using Utils.Appearance;
-using System.Text;
-using App.Shared.Util;
 using Core.GameTime;
 using Core.MyProfiler;
 using Core.SessionState;
+using Core.Utils;
 using Entitas;
-//using UnityEditorInternal;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
+using UnityEngine;
+using Utils.Appearance;
+using Utils.Appearance.Weapon;
+using Utils.Configuration;
 using Utils.SettingManager;
 using Utils.Singleton;
+using XmlConfig;
 using QualityLevel = Utils.SettingManager.QualityLevel;
-using App.Shared.GameModules.Weapon;
-using Assets.XmlConfig;
-using Core.Components;
-using UnityEngine.Profiling;
 
 namespace App.Shared.DebugHandle
 {
@@ -281,18 +277,17 @@ namespace App.Shared.DebugHandle
                     break;
                 case DebugCommands.KillMe:
                     player.gamePlay.CurHp = 0;
-                    player.gamePlay.ChangeLifeState(Components.Player.EPlayerLifeState.Dead, currentTime.CurrentTime);
+                    player.gamePlay.ChangeLifeState(EPlayerLifeState.Dead, currentTime.CurrentTime);
                     break;
                 
                 case DebugCommands.DyingMe:
-                    player.gamePlay.ChangeLifeState(Components.Player.EPlayerLifeState.Dying, currentTime.CurrentTime);
+                    player.gamePlay.ChangeLifeState(EPlayerLifeState.Dying, currentTime.CurrentTime);
                     break;
                 
                 case DebugCommands.ShowAniInfo:
                     result = string.Format("{0}\n{1}", player.state, player.thirdPersonAnimator.DebugJumpInfo());       
                     break;
                 case DebugCommands.Speed:
-                {
                     if (message.Args.Length < 1)
                     {
                         return "Argument Error!";
@@ -308,11 +303,18 @@ namespace App.Shared.DebugHandle
                     {
                         result = string.Format("change player:{0} speedAffect from:{1}, to:{2}", player.entityKey.Value.ToString(), player.playerMove.SpeedAffect, i);
                         player.playerMove.SpeedAffect = i;
+                        if (message.Args.Length >= 2)
+                        {
+                            float j;
+                            if (!float.TryParse(message.Args[0], out j))
+                            {
+                                return "Argument Error! jump should be float";
+                            }
+                            player.playerMove.JumpAffect = j;
+                        }
                         return result;
                     }
                     break;
-                }
-                    
                 case DebugCommands.TestMap:
                     result =  BigMapDebug.HandleCommand(player,message.Args);
                     break;
@@ -353,35 +355,38 @@ namespace App.Shared.DebugHandle
                     sceneObjectEntityFactory.CreateSceneAudioEmitterEntity( player.position.Value, player.entityKey.Value);
 
                     break;
-                case DebugCommands.SetWeapon:
-                    {
-                        int weaponIdToSet = 0;
-                        int avatarId = 0;
-                        var weaponSlotToSet = 0;
-                        if (message.Args.Length > 0)
-                        {
-                            weaponIdToSet = int.Parse(message.Args[0].Trim());
-                        }
-                        if (message.Args.Length > 2)
-                        {
+                case DebugCommands.AudioBgm:
+                    var sceneObjectEntityFactory2 = contexts.session.entityFactoryObject.SceneObjectEntityFactory;
+                    sceneObjectEntityFactory2.CreateSceneAudioBgEmitterEntity( player.position.Value, player.entityKey.Value);
 
-                            avatarId = int.Parse(message.Args[1].Trim());
-                        }
-                        if (message.Args.Length > 3)
-                        {
-                            weaponSlotToSet = int.Parse(message.Args[2].Trim());
-                        }
-                        var weaponInfo = WeaponUtil.CreateScan(weaponIdToSet,(val)=> val.AvatarId = avatarId > 0 ? avatarId : 0);
-                        if (weaponSlotToSet != 0)
-                        {
-                            player.WeaponController().ReplaceWeaponToSlot((EWeaponSlotType)weaponSlotToSet, weaponInfo);
-                        }
-                        else
-                        {
-                            player.WeaponController().PickUpWeapon(weaponInfo);
-                        }
+                    break;
+                case DebugCommands.SetWeapon:
+                    int weaponIdToSet = 0;
+                    int avatarId = 0;
+                    var weaponSlotToSet = 0;
+                    if (message.Args.Length > 0)
+                    {
+                        weaponIdToSet = int.Parse(message.Args[0].Trim());
                     }
-                        break;
+                    if (message.Args.Length > 2)
+                    {
+
+                        avatarId = int.Parse(message.Args[1].Trim());
+                    }
+                    if (message.Args.Length > 3)
+                    {
+                        weaponSlotToSet = int.Parse(message.Args[2].Trim());
+                    }
+                    var weaponInfo = WeaponUtil.CreateScan(weaponIdToSet,(val)=> val.AvatarId = avatarId > 0 ? avatarId : 0);
+                    if (weaponSlotToSet != 0)
+                    {
+                        player.WeaponController().ReplaceWeaponToSlot((EWeaponSlotType)weaponSlotToSet, weaponInfo);
+                    }
+                    else
+                    {
+                        player.WeaponController().PickUpWeapon(weaponInfo);
+                    }
+                    break;
                 case DebugCommands.DropWeapon:
                     var dropSlot = int.Parse(message.Args[0]);
                     player.WeaponController().DropWeapon((EWeaponSlotType)dropSlot);
@@ -422,22 +427,48 @@ namespace App.Shared.DebugHandle
                     break;
                 case DebugCommands.SetAttachment:
                     var res = Core.Enums.EFuncResult.Failed;
+                    var apply = 0;
+                    if (message.Args.Length == 2)
+                    {
+                        var slot = int.Parse(message.Args[0]);
+                        apply = int.Parse(message.Args[1]);
+                        res = player.WeaponController().SetWeaponPart((EWeaponSlotType)slot, apply) ? Core.Enums.EFuncResult.Success : Core.Enums.EFuncResult.Failed;
+                    }
+                    else
+                    {
+                        apply = int.Parse(message.Args[0]);
+                        res = player.WeaponController().SetWeaponPart(apply) ? Core.Enums.EFuncResult.Success : Core.Enums.EFuncResult.Failed;
+                    }
+
+                    switch (res)
+                    {
+                        case Core.Enums.EFuncResult.Exception:
+                            result = "exception occurs";
+                            break;
+                        case Core.Enums.EFuncResult.Failed:
+                            result = "attachment doesn't match";
+                            break;
+                        case Core.Enums.EFuncResult.Success:
+                            result = "attach " + apply + " to weapon";
+                            break;
+                    }
+                    break;
+                case DebugCommands.SetWeaponAttachment:
+                    var resu = Core.Enums.EFuncResult.Failed;
                     var id = 0;
                     if (message.Args.Length == 2)
                     {
                         var slot = int.Parse(message.Args[0]);
                         id = int.Parse(message.Args[1]);
-                      
-
-                        res = player.WeaponController().SetWeaponPart((EWeaponSlotType)slot, id) ? Core.Enums.EFuncResult.Success : Core.Enums.EFuncResult.Failed;
+                        resu = player.WeaponController().SetWeaponPartByPartId((EWeaponSlotType)slot, id) ? Core.Enums.EFuncResult.Success : Core.Enums.EFuncResult.Failed;
                     }
                     else
                     {
                         id = int.Parse(message.Args[0]);
-                        res = player.WeaponController().SetWeaponPart(id) ? Core.Enums.EFuncResult.Success : Core.Enums.EFuncResult.Failed;
+                        resu = player.WeaponController().SetWeaponPartByPartId(id) ? Core.Enums.EFuncResult.Success : Core.Enums.EFuncResult.Failed;
                     }
 
-                    switch (res)
+                    switch (resu)
                     {
                         case Core.Enums.EFuncResult.Exception:
                             result = "exception occurs";
@@ -465,9 +496,9 @@ namespace App.Shared.DebugHandle
                     if (weaponId > 0)
                     {
                         var list = SingletonManager.Get<WeaponPartsConfigManager>().GetAvaliablePartTypes(weaponId);
-                        for (int i = 0; i < list.Count; i++)
+                        for (int j = 0; j < list.Count; j++)
                         {
-                            result += list[i] + ",";
+                            result += list[j] + ",";
                         }
                     }
                     break;
@@ -482,6 +513,11 @@ namespace App.Shared.DebugHandle
 
                 case DebugCommands.ShowTerrainTrace:
                     SharedConfig.IsShowTerrainTrace = !SharedConfig.IsShowTerrainTrace;
+                    break;
+                case DebugCommands.Revive:
+                    player.gamePlay.LifeState = (int) EPlayerLifeState.Alive;
+                    player.gamePlay.CurHp = player.gamePlay.MaxHp;
+                    player.gamePlay.InHurtedCount = 0;
                     break;
             }
             return result;
@@ -556,10 +592,13 @@ namespace App.Shared.DebugHandle
                     //profilegpu is only valid on client
                     profileGpu = !SharedConfig.IsServer && profileGpu;
 
+                    var isLog = TryGetArgs<int>(cmdargs, "l", out value);
+                    var enableLog = !isLog || value != 0;
+                    
                     if (isProfilePhysics)
                     {
 #if PHYSICS_PROFILER_STATISTICS
-                        Profiler.profilePhysics = profilePhysics;
+                        UnityEngine.Profiling.Profiler.profilePhysics = profilePhysics;
 #endif
                        result = "ok";
                         
@@ -570,7 +609,7 @@ namespace App.Shared.DebugHandle
                     {
                         if (enabled)
                         {
-                            UnityProfiler.EnableProfiler(profileGpu);
+                            UnityProfiler.EnableProfiler(profileGpu, enableLog);
                             result = String.Format("ok, start {0}", SharedConfig.IsServer ? "server" : "client") ;
                         }
                         else
@@ -590,7 +629,7 @@ namespace App.Shared.DebugHandle
                         profileGpu ? "enabled" : "disabled",
                         profilePhysics ? "enabled" : "disabled");
 
-                    if (!isServer && isProfileGpu)
+                    if (isServer && isProfileGpu)
                     {
                         result = "GPU Profile is not supported on Server!.";
                     }

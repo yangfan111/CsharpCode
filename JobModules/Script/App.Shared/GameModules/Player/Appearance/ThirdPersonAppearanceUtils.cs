@@ -59,6 +59,9 @@ namespace App.Shared.GameModules.Player.Appearance
             ThirdPersonAction ret;
             switch (action)
             {
+                case ActionInConfig.Null:
+                    ret = ThirdPersonAction.Null;
+                    break;
                 case ActionInConfig.SwitchWeapon:
                     ret = ThirdPersonAction.SwitchWeapon;
                     break;

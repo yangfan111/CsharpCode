@@ -1,5 +1,6 @@
 ﻿using App.Server.GameModules.GamePlay;
 using App.Server.GameModules.GamePlay.free.player;
+using App.Shared.Audio;
 using App.Shared.Configuration;
 using App.Shared.EntityFactory;
 using App.Shared.FreeFramework.framework.@event;
@@ -22,8 +23,10 @@ using Core.Utils;
 using Entitas;
 using System;
 using System.Collections.Generic;
+using App.Shared.Util;
 using UltimateFracturing;
 using UnityEngine;
+using UserInputManager.Lib;
 using Utils.Appearance;
 using Utils.Singleton;
 using Utils.Utils;
@@ -325,6 +328,7 @@ namespace App.Shared.GameModules.Throwing
 
             EClientEffectType effectType = EClientEffectType.GrenadeExplosion;
             int effectTime = _bombEffectTime;
+            var bombAudioId = Core.EAudioUniqueId.GrenadeExplosion;
             if (isBomb)
             {
                 //爆炸特效类型
@@ -335,6 +339,7 @@ namespace App.Shared.GameModules.Throwing
                         break;
                     case EWeaponSubType.FlashBomb:
                         effectType = EClientEffectType.FlashBomb;
+                        bombAudioId = Core.EAudioUniqueId.FlashBombExplosion;
                         break;
                     case EWeaponSubType.FogBomb:
                         effectType = EClientEffectType.FogBomb;
@@ -345,12 +350,17 @@ namespace App.Shared.GameModules.Throwing
                         break;
                 }
             }
-
             if (effectId > 0)
             {
                 float effectYaw = throwing.throwingData.IsFly ? 0 : 1;
-                ClientEffectFactory.CreateGrenadeExplosionEffect(_contexts.clientEffect, entityIdGenerator,
+                var effectEntity = ClientEffectFactory.CreateGrenadeExplosionEffect(_contexts.clientEffect, entityIdGenerator,
                                 throwing.ownerId.Value, effectPos, effectYaw, 0, effectId, effectTime, effectType);
+                if (effectEntity.hasAudio)
+                {
+                    effectEntity.RemoveAudio();
+                }
+                effectEntity.AddAudio((int)AudioClientEffectType.ThrowExplosion);
+                effectEntity.audio.AudioClientEffectArg1 = (int)bombAudioId;
             }
         }
 
@@ -456,6 +466,8 @@ namespace App.Shared.GameModules.Throwing
             var colliders = Physics.OverlapSphere(throwing.position.Value, throwing.throwingData.Config.DamageRadius, UnityLayerManager.GetLayerMask(EUnityLayerName.UserInputRaycast) | UnityLayerManager.GetLayerMask(EUnityLayerName.Glass));
             foreach (var collider in colliders)
             {
+                CreateMapObjWhenBomb(collider, sourcePlayer);
+
                 var distance = Vector3.Distance(collider.transform.position, throwing.position.Value);
                 float trueDamage = distance > throwing.throwingData.Config.DamageRadius ? 0f : Mathf.Max(0f, throwing.throwingData.Config.BaseDamage * (1 - distance / throwing.throwingData.Config.DamageRadius));
 
@@ -498,6 +510,29 @@ namespace App.Shared.GameModules.Throwing
                         }
                         parent = parent.parent;
                     }
+                }
+            }
+        }
+
+        private void CreateMapObjWhenBomb(Collider collider, PlayerEntity sourcePlayer)
+        {
+            _logger.InfoFormat("bomb effect: {0}", collider);
+            var fracturedHittable = collider.GetComponent<FracturedHittable>();
+            if (fracturedHittable != null)
+            {
+                MapObjectUtility.StoreCreateMapObjMsg(MapObjectUtility.GetGameObjType(fracturedHittable.Owner),
+                    MapObjectUtility.GetGameObjId(fracturedHittable.Owner), sourcePlayer);
+                _logger.InfoFormat("Create fractured mapObj when bomb, {0}", fracturedHittable.Owner);
+            }
+            else
+            {
+                var fracObj = collider.GetComponent<FractureObjRecorder>();
+                if (fracObj != null)
+                {
+                    var gameObj = fracObj.owner;
+                    MapObjectUtility.StoreCreateMapObjMsg(MapObjectUtility.GetGameObjType(gameObj),
+                        MapObjectUtility.GetGameObjId(gameObj), sourcePlayer);
+                    _logger.InfoFormat("Create door mapObj when bomb, {0}", gameObj);
                 }
             }
         }

@@ -8,6 +8,7 @@ using App.Client.GameModules.OC;
 using App.Client.GameModules.Player;
 using App.Client.GameModules.Player.Robot;
 using App.Client.GameModules.SceneManagement;
+using App.Client.GameModules.Terrain;
 using App.Client.GameModules.SceneObject;
 using App.Client.GameModules.Sound;
 using App.Client.GameModules.Throwing;
@@ -21,7 +22,9 @@ using App.Shared.GameModules;
 using App.Shared.GameModules.Attack;
 using App.Shared.GameModules.Bullet;
 using App.Shared.GameModules.Configuration;
+using App.Shared.GameModules.Player;
 using App.Shared.GameModules.Throwing;
+using App.Shared.GameModules.Weapon;
 using Assets.App.Shared.GameModules.Camera;
 using Assets.App.Shared.GameModules.Camera.Utils;
 using Assets.Sources.Free;
@@ -73,19 +76,23 @@ namespace App.Client.SessionStates
                 motors);
             cmdModule.AddSystem(new PlayerAddMarkSystem(contexts));
             cmdModule.AddSystem(new PlayerSprayPaintSystem(contexts));
-
+    
             gameModule.AddModule(cmdModule);
+          
             gameModule.AddModule(new BulletModule(contexts));
             gameModule.AddModule(new ThrowingModule(contexts));
             gameModule.AddModule(new ClientEffectModule(contexts));
             gameModule.AddModule(new ClientVehicleModule(contexts));
             gameModule.AddModule(new ClientPlayerModule(contexts));
+            
+
             if (SharedConfig.IsRobot)
             {
                 gameModule.AddModule(new ClientRobotModule(contexts));
             }
 
             gameModule.AddSystem(new VisionCenterUpdateSystem(contexts));
+            gameModule.AddSystem(new TerrainDataLoadSystem(contexts));
             if (SingletonManager.Get<MapConfigManager>().SceneParameters is SceneConfig)
             {
                 gameModule.AddSystem(new ClientAutoWorldShiftRenderSystem(contexts));
@@ -94,13 +101,12 @@ namespace App.Client.SessionStates
             gameModule.AddSystem(new OcclusionCullingSystem(contexts));
 
             gameModule.AddModule(new ClientSceneObjectModule(contexts, sessionObjects));
-            gameModule.AddModule(new ClientSoundModule(contexts));
+          //  gameModule.AddModule(new ClientSoundModule(contexts));
             gameModule.AddModule(new ClientGamePlayModule(contexts));
             gameModule.AddModule(new ClientFreeMoveModule(contexts));
             gameModule.AddModule(new UiModule(contexts));
 
             gameModule.AddModule(new ConfigurationRefreshModule(contexts));
-
             SingletonManager.Get<FreeUiManager>().Contexts1 = contexts;
             SimpleMessageManager.Instance.Init(contexts.session.entityFactoryObject.SoundEntityFactory);
             SingletonManager.Get<RealTimeCullingUpdater>().Initial(contexts);

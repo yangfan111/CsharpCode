@@ -18,16 +18,14 @@ using App.Shared.EntityFactory;
 using App.Shared.FreeFramework.framework.trigger;
 using App.Shared.FreeFramework.framework.unit;
 using App.Shared.FreeFramework.Free.Weapon;
-using Core;
 using App.Shared.GameMode;
 using App.Shared.GameModules.Bullet;
 using App.Shared.GameModules.Vehicle;
-using App.Shared.GameModules.Weapon;
 using App.Shared.GameModules.Weapon.Behavior;
-using App.Shared.Network;
 using App.Shared.Player;
 using com.wd.free.para;
 using com.wd.free.trigger;
+using Core;
 using Core.Components;
 using Core.Configuration;
 using Core.Configuration.Sound;
@@ -41,7 +39,6 @@ using Core.Replicaton;
 using Core.Room;
 using Core.SessionState;
 using Core.SpatialPartition;
-using Core.UpdateLatest;
 using Core.Utils;
 using Entitas;
 using System;
@@ -65,7 +62,7 @@ namespace App.Server
         private enum RoomState
         {
             Initialized,
-            Running,//is running game
+            Running, //is running game
             Disposing,
             Disposed,
         }
@@ -100,13 +97,15 @@ namespace App.Server
         private RoomState _state;
 
         private IRoomEventDispatchter _eventDispatcher;
+       
 
         public void OnInitializeCompleted()
         {
             _logger.Info("Server Room Initialize Completed");
             _state = RoomState.Running;
             _rule.GameStart(_contexts);
-            _contexts.session.commonSession.SessionMode = ModeUtil.CreateSharedPlayerMode(_contexts, _contexts.session.commonSession.RoomInfo.ModeId);
+            _contexts.session.commonSession.SessionMode =
+                ModeUtil.CreateSharedPlayerMode(_contexts, _contexts.session.commonSession.RoomInfo.ModeId);
             FreeMapPosition.Init(_contexts);
             DebugUtil.LogInUnity("Server Room Initialize Completed");
         }
@@ -128,9 +127,10 @@ namespace App.Server
 
         private SendSnapshotManager _sendSnapshotManager;
 
-        public ServerRoom(IRoomId roomId, Contexts contexts, IRoomEventDispatchter eventDispatcher, ICoRoutineManager coRoutineManager, IUnityAssetManager assetManager, IPlayerTokenGenerator tokenGenerator)
+        public ServerRoom(IRoomId roomId, Contexts contexts, IRoomEventDispatchter eventDispatcher,
+            ICoRoutineManager coRoutineManager, IUnityAssetManager assetManager, IPlayerTokenGenerator tokenGenerator)
         {
-            SingletonManager.Get<ServerFileSystemConfigManager>().Reload();
+            //SingletonManager.Get<ServerFileSystemConfigManager>().Reload();
             _state = RoomState.Initialized;
 
             _tokenGenerator = tokenGenerator;
@@ -141,6 +141,9 @@ namespace App.Server
             var ruleId = RuleMap.GetRuleId(SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.Rule);
             RoomId = roomId;
             _contexts = contexts;
+#if (!ENTITAS_DISABLE_VISUAL_DEBUGGING && UNITY_EDITOR)
+            _contexts.InitializeContexObservers();
+#endif
             SingletonManager.Get<MyProfilerManager>().Contexts = _contexts;
             _eventDispatcher = eventDispatcher;
             _bin2DManager = CreateBin2DManager();
@@ -149,6 +152,7 @@ namespace App.Server
 
             InitEntityFactorySession(entityIdGenerator, equipmentEntityIdGenerator);
             _assetManager = assetManager;
+          
 
             InitCommonSession(entityIdGenerator,
                 equipmentEntityIdGenerator, ruleId);
@@ -245,7 +249,8 @@ namespace App.Server
 
         private void InitialWeaponSkill()
         {
-            FreeRuleConfig config = FreeRuleConfig.GetRule("weaponSkill", SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.Mysql);
+            FreeRuleConfig config = FreeRuleConfig.GetRule("weaponSkill",
+                SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.Mysql);
             foreach (GameTrigger trigger in config.Triggers.GetTriggers())
             {
                 WeaponSkillFactory.RegisterSkill(FreeArgs, trigger);
@@ -324,9 +329,10 @@ namespace App.Server
             //    SingletonManager.Get<WeaponDataConfigManager>());
 
 //            var weaponComponentsFacoty = new WeaponFireScriptsInitializer(_contexts,
- //               _contexts.session.commonSession.EntityIdGenerator);
+            //               _contexts.session.commonSession.EntityIdGenerator);
             var fireScriptsProvider = new WeaponFireScriptsProvider(_contexts);
-            commonSession.WeaponFireUpdateManager= new WeaponFireUpdateManagaer(fireScriptsProvider, _contexts.session.commonSession.FreeArgs);
+            commonSession.WeaponFireUpdateManager =
+                new WeaponFireUpdateManagaer(fireScriptsProvider, _contexts.session.commonSession.FreeArgs);
         }
 
         private void InitEntityFactorySession(EntityIdGenerator entityIdGenerator,
@@ -339,7 +345,8 @@ namespace App.Server
                 entityIdGenerator,
                 _contexts.session.currentTimeObject,
                 SingletonManager.Get<SoundConfigManager>());
-            entityFactoryObject.SceneObjectEntityFactory = new ServerSceneObjectEntityFactory(_contexts.sceneObject, _contexts.player,
+            entityFactoryObject.SceneObjectEntityFactory = new ServerSceneObjectEntityFactory(_contexts.sceneObject,
+                _contexts.player,
                 entityIdGenerator, equipmentEntityIdGenerator, _contexts.session.currentTimeObject);
             entityFactoryObject.MapObjectEntityFactory =
                 new ServerMapObjectEntityFactory(_contexts.mapObject, entityIdGenerator);
@@ -355,6 +362,7 @@ namespace App.Server
             {
                 Debug.LogError("CurrentTimeObject already exist");
             }
+
             var currentTimeObject = _contexts.session.currentTimeObject;
             currentTimeObject.CurrentTime = 0;
         }
@@ -364,33 +372,35 @@ namespace App.Server
         private NetworkMessageDispatcher CreateNetworMessageHandlers()
         {
             var messageDispatcher = new NetworkMessageDispatcher();
-            messageDispatcher.RegisterLater((int)EClient2ServerMessage.UserCmd, new UserCmdMessageHandler(this));
-            messageDispatcher.RegisterLater((int)EClient2ServerMessage.LocalDisconnect,
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.UserCmd, new UserCmdMessageHandler(this));
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.LocalDisconnect,
                 new DelegateNetworkMessageHandler(OnDisconnect));
-            messageDispatcher.RegisterLater((int)EClient2ServerMessage.LocalLogin,
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.LocalLogin,
                 new DelegateNetworkMessageHandler(AsyncLoginPlayer));
-            messageDispatcher.RegisterLater((int)EClient2ServerMessage.VehicleCmd,
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.VehicleCmd,
                 new VehicleCmdMessageHandler(_contexts, this));
-            messageDispatcher.RegisterLater((int)EClient2ServerMessage.DebugCommand,
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.DebugCommand,
                 new DebugMessageHandler(_contexts, this));
-            messageDispatcher.RegisterLater((int)EClient2ServerMessage.SimulationTimeSync,
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.SimulationTimeSync,
                 new SimulationTimeServerSyncHandler(_contexts, this));
-            messageDispatcher.RegisterLater((int)EClient2ServerMessage.FreeEvent,
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.FreeEvent,
                 new FreeEventMessageHandler(_contexts, this));
-            messageDispatcher.RegisterLater((int)EClient2ServerMessage.VehicleEvent,
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.VehicleEvent,
                 new VehicleEventMessageHandler(_contexts, this));
-            messageDispatcher.RegisterLater((int)EClient2ServerMessage.TriggerObjectEvent,
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.TriggerObjectEvent,
                 new TriggerObejctEventMessageHandler(_contexts, this));
-            messageDispatcher.RegisterImmediate((int)EClient2ServerMessage.Ping,
+            messageDispatcher.RegisterImmediate((int) EClient2ServerMessage.Ping,
                 new PingReqMessageHandler(_contexts, this));
-            messageDispatcher.RegisterLater((int)EClient2ServerMessage.UpdateMsg,
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.UpdateMsg,
                 new UserUpdateMsgHandler(this, _contexts));
-            messageDispatcher.RegisterImmediate((int)EClient2ServerMessage.UpdateMsg,
+            messageDispatcher.RegisterImmediate((int) EClient2ServerMessage.UpdateMsg,
                 new UserUpdateAckMsgHandler(this));
-            messageDispatcher.RegisterLater((int)EClient2ServerMessage.FireInfo,
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.FireInfo,
                 new FireInfoMessageHandler(_contexts, this));
-            messageDispatcher.RegisterLater((int)EClient2ServerMessage.DebugScriptInfo, new DebugScriptInfoMessageHandler(this));
-            messageDispatcher.RegisterLater((int)EClient2ServerMessage.GameOver, new ServerGameOverMessageHandler(this));
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.DebugScriptInfo,
+                new DebugScriptInfoMessageHandler(this));
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.GameOver,
+                new ServerGameOverMessageHandler(this));
             return messageDispatcher;
         }
 
@@ -401,7 +411,7 @@ namespace App.Server
 
         public bool LoginPlayer(IPlayerInfo playerInfo, INetworkChannel channel)
         {
-            MessageDispatcher.SaveDispatch(channel, (int)EClient2ServerMessage.LocalLogin, playerInfo);
+            MessageDispatcher.SaveDispatch(channel, (int) EClient2ServerMessage.LocalLogin, playerInfo);
             return true;
         }
 
@@ -411,12 +421,13 @@ namespace App.Server
             {
                 var sessionObjects = _contexts.session.serverSessionObjects;
                 var msg = LoginSuccMessage.Allocate();
-                msg.GameRule = (int)sessionObjects.GameRule;
+                msg.GameRule = (int) sessionObjects.GameRule;
                 _contexts.session.commonSession.RoomInfo.ToLoginSuccMsg(msg);
                 msg.Camp = playerInfo.Camp;
-                FreeArgs.Trigger(FreeTriggerConstant.PRELOAD_RESOURCE, new TempUnit("roomInfo", new ObjectUnit(msg)), new TempUnit("playerInfo", new ObjectUnit(playerInfo)));
+                FreeArgs.Trigger(FreeTriggerConstant.PRELOAD_RESOURCE, new TempUnit("roomInfo", new ObjectUnit(msg)),
+                    new TempUnit("playerInfo", new ObjectUnit(playerInfo)));
 
-                channel.SendReliable((int)EServer2ClientMessage.LoginSucc, msg);
+                channel.SendReliable((int) EServer2ClientMessage.LoginSucc, msg);
                 msg.ReleaseReference();
                 _logger.InfoFormat("player SendLoginSucc with name {0}",
                     playerInfo.PlayerName);
@@ -438,10 +449,10 @@ namespace App.Server
 
         public void AsyncLoginPlayer(INetworkChannel channel, int messageType, object playerInfoObj)
         {
-            IPlayerInfo playerInfo = (IPlayerInfo)playerInfoObj;
+            IPlayerInfo playerInfo = (IPlayerInfo) playerInfoObj;
             _logger.InfoFormat("Received LocalLogin Message ... playerName:{0}", playerInfo.PlayerName);
 
-            if (_channelToPlayer.Count == 0)
+            if (_channelToPlayer.Count == 0 && _contexts.player.count == 0)
             {
                 ResetContexts(false);
                 _logger.InfoFormat("Reset All Entity Finish ...");
@@ -459,25 +470,25 @@ namespace App.Server
 
                 var player = CreateNewPlayerEntity(playerInfo);
                 playerInfo.PlayerEntity = player;
-                player.AddNetwork(channel);
+                player.ReplaceNetwork(channel);
 
                 playerInfo.StatisticsData = player.statisticsData.Statistics;
                 _channelToPlayer[channel] = player;
                 channel.MessageReceived += ChannelOnMessageReceived;
                 channel.Disconnected += ChannelOnDisonnected;
 
-               // var info = new AppMessageTypeInfo();
+
                 if (!player.hasUpdateMessagePool)
                     player.AddUpdateMessagePool();
                 player.updateMessagePool.LastestExecuteUserCmdSeq = -1;
-               
-                //channel.Serializer = new NetworkMessageSerializer(info);
-               
+
+                playerInfo.InitPosition = player.position.Value;
+
                 NoticeHallPlayerLoginSucc(player);
                 player.ReplaceStage(EPlayerLoginStage.CreateEntity);
                 var msg = App.Protobuf.PlayerInfoMessage.Allocate();
                 msg.ConvertFrom(playerInfo);
-                channel.SendReliable((int)EServer2ClientMessage.PlayerInfo, msg);
+                channel.SendReliable((int) EServer2ClientMessage.PlayerInfo, msg);
                 _logger.InfoFormat("player login with name {0}, key {1}, game rule {2}, msp id {3}",
                     playerInfo.PlayerName,
                     player.entityKey,
@@ -512,7 +523,7 @@ namespace App.Server
                 playerInfo.Num = ++_testPlayerNum;
                 playerInfo.Camp = _testPlayerNum % 2 == 0 ? 2 : 1;
                 playerInfo.TeamId = playerInfo.Camp;
-                playerInfo.AvatarIds = new List<int> { 1, 8 };
+                playerInfo.AvatarIds = new List<int> {1, 8};
                 playerInfo.WeaponBags = PlayerEntityFactory.MakeFakeWeaponBag();
             }
             else if (playerInfo.Token == TestUtility.RobotToken)
@@ -522,9 +533,8 @@ namespace App.Server
                 playerInfo.Num = ++_testPlayerNum;
                 playerInfo.Camp = _testPlayerNum % 2 == 0 ? 1 : 2;
                 playerInfo.TeamId = playerInfo.Camp;
-                playerInfo.AvatarIds = new List<int> { 1, 8 };
+                playerInfo.AvatarIds = new List<int> {1, 8};
                 playerInfo.WeaponBags = PlayerEntityFactory.MakeFakeWeaponBag();
-
             }
         }
 
@@ -534,7 +544,7 @@ namespace App.Server
                 _contexts.session.commonSession,
                 _contexts.session.commonSession.EntityIdGenerator,
                 SingletonManager.Get<MapConfigManager>().SceneParameters.PlayerBirthPosition,
-                playerInfo);
+                playerInfo, _hallRoom.AllowReConnect);
         }
 
         public PlayerEntity GetPlayerEntity(INetworkChannel channel)
@@ -549,10 +559,10 @@ namespace App.Server
 
         public void ChannelOnDisonnected(INetworkChannel channel)
         {
-            
-            MessageDispatcher.SaveDispatch(channel, (int)EClient2ServerMessage.LocalDisconnect, null);
+            MessageDispatcher.SaveDispatch(channel, (int) EClient2ServerMessage.LocalDisconnect, null);
             channel.Serializer.Dispose();
         }
+
 
         public void OnDisconnect(INetworkChannel channel, int messageType, object messageBody)
         {
@@ -563,24 +573,34 @@ namespace App.Server
                 try
                 {
                     _logger.InfoFormat("player disconnected id {0}", player.entityKey);
-                    player.isFlagDestroy = true;
-
-                    if (player.hasFreeData)
+                    if (_hallRoom.AllowReConnect)
                     {
-                        if(player.isInitialized)
-                        {
-                            _rule.PlayerLeave(_contexts, player);
-                        }
+                        player.stage.Value = EPlayerLoginStage.Offline;
+                        player.RemoveNetwork();
+                        player.RemoveUpdateMessagePool();
                     }
                     else
                     {
-                        _logger.ErrorFormat("Leave Player {0} Id {1} without Free Data ", player.playerInfo.PlayerName,
-                            player.playerInfo.PlayerId);
-                    }
+                        player.isFlagDestroy = true;
 
-                    if (_hallRoom != null)
-                    {
-                        _hallRoom.PlayerLeaveRoom(player.playerInfo.PlayerId);
+                        if (player.hasFreeData)
+                        {
+                            if (player.isInitialized)
+                            {
+                                _rule.PlayerLeave(_contexts, player);
+                            }
+                        }
+                        else
+                        {
+                            _logger.ErrorFormat("Leave Player {0} Id {1} without Free Data ",
+                                player.playerInfo.PlayerName,
+                                player.playerInfo.PlayerId);
+                        }
+
+                        if (_hallRoom != null)
+                        {
+                            _hallRoom.PlayerLeaveRoom(player.playerInfo.PlayerId);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -593,7 +613,7 @@ namespace App.Server
                 _channelToPlayer.Remove(channel);
                 channel.Dispose();
 
-                if (_channelToPlayer.Count == 0)
+                if (_channelToPlayer.Count == 0 && !_hallRoom.AllowReConnect)
                 {
                     GameOver(true);
                 }
@@ -606,7 +626,8 @@ namespace App.Server
 
         public void GameOver(bool forceExit)
         {
-            _logger.InfoFormat("ServerRoom GameOver ... Player Count:{0} GameExit {1}", _contexts.player.GetEntities().Length, forceExit);
+            _logger.InfoFormat("ServerRoom GameOver ... Player Count:{0} GameExit {1}",
+                _contexts.player.GetEntities().Length, forceExit);
             SetGameOverStatus(false);
 
             if (forceExit)
@@ -627,7 +648,7 @@ namespace App.Server
                     _hallRoom.GameOver(forceOver);
                     _hallRoom = null;
                 }
-            } 
+            }
         }
 
         private void GameExit()
@@ -641,7 +662,6 @@ namespace App.Server
                 _eventDispatcher.AddEvent(evt);
                 _isGameExit = true;
             }
-           
         }
 
         private void SendGameOverMessageToAllPlayers()
@@ -651,7 +671,7 @@ namespace App.Server
                 if (channel.IsConnected)
                 {
                     var msg = GameOverMesssage.Allocate();
-                    channel.SendReliable((int)EServer2ClientMessage.GameOver, msg);
+                    channel.SendReliable((int) EServer2ClientMessage.GameOver, msg);
                     msg.ReleaseReference();
                 }
             }
@@ -721,7 +741,7 @@ namespace App.Server
 
         public void SendSnapshot()
         {
-            _sendSnapshotManager.SendSnapshot(_interval, _snapshotFactory, _channelToPlayer);
+            _sendSnapshotManager.SendSnapshot(_interval, _snapshotFactory);
         }
 
         public void CompensationSnapshot()
@@ -759,8 +779,6 @@ namespace App.Server
                 {
                     entity.reset.ResetAction(entity);
                 }
-
-
             }
 
             foreach (var entity in _contexts.sceneObject.GetEntities())
@@ -805,7 +823,7 @@ namespace App.Server
             {
                 if (comp is IAssetComponent)
                 {
-                    ((IAssetComponent)comp).Recycle(sessionObjects.AssetManager);
+                    ((IAssetComponent) comp).Recycle(sessionObjects.AssetManager);
                 }
             }
 
@@ -816,7 +834,6 @@ namespace App.Server
         public void Dispose()
         {
 #if UNITY_SOURCE_MODIFIED && !UNITY_EDITOR
-       
             UnityProfiler.EnableProfiler(false);
         
 #endif
@@ -831,9 +848,10 @@ namespace App.Server
             {
                 _sendSnapshotManager.Dispose();
             }
+
             _contexts.session.commonSession.Dispose();
             _contexts.session.serverSessionObjects.Dispose();
-           
+
             GameModuleManagement.Dispose();
             try
             {
@@ -845,6 +863,7 @@ namespace App.Server
             {
                 _logger.ErrorFormat("Reset Contexts Error {0}", e);
             }
+
             _contexts = null;
 
             DestoryObjectUnderDefaultGoBattleServer();
@@ -913,7 +932,6 @@ namespace App.Server
                 var children = new List<GameObject>();
                 foreach (var go in rootObjects)
                 {
-
                     if (go.name.Equals("DefaultGoBattleServer"))
                     {
                         int childCount = go.transform.childCount;
@@ -933,7 +951,7 @@ namespace App.Server
 
         public FreeRuleEventArgs FreeArgs
         {
-            get { return (FreeRuleEventArgs)_contexts.session.commonSession.FreeArgs; }
+            get { return (FreeRuleEventArgs) _contexts.session.commonSession.FreeArgs; }
         }
 
         public IGameRule GameRule
@@ -971,17 +989,18 @@ namespace App.Server
             this._hallRoom = hallRoom;
         }
 
-        public void SetGameMode(int mode)
+        public void SetGameMode(int mode, int mapId)
         {
             _contexts.session.serverSessionObjects.GameRule = mode;
             _contexts.session.commonSession.RoomInfo.ModeId = mode;
+            _contexts.session.commonSession.RoomInfo.MapId = mapId;
             FreeRuleEventArgs args = new FreeRuleEventArgs(_contexts);
             _contexts.session.commonSession.FreeArgs = args;
             _rule = new FreeGameRule(this);
 
             RoomInfo info = _contexts.session.commonSession.RoomInfo;
 
-            SimpleParaList spl = (SimpleParaList)args.GetDefault().GetParameters();
+            SimpleParaList spl = (SimpleParaList) args.GetDefault().GetParameters();
             spl.AddFields(new ObjectFields(info));
         }
 
@@ -1010,14 +1029,14 @@ namespace App.Server
                 {
                     PlayerEntity player = _contexts.player.GetEntities()[0];
                     playerName = player.playerInfo.PlayerName;
-                    playerIp = player.network.NetworkChannel.IdInfo();
+                    playerIp = player.hasNetwork ? player.network.NetworkChannel.IdInfo() : "offline";
                 }
 
                 //update status
                 if (_hallRoom != null)
                 {
-                    _hallRoom.UpdateRoomGameStatus((ERoomGameStatus)_rule.GameStage,
-                        (ERoomEnterStatus)_rule.EnterStatus);
+                    _hallRoom.UpdateRoomGameStatus((ERoomGameStatus) _rule.GameStage,
+                        (ERoomEnterStatus) _rule.EnterStatus);
                 }
 
                 _logger.InfoFormat(

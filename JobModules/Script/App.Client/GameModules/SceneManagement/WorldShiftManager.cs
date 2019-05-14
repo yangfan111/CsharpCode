@@ -144,9 +144,9 @@ namespace App.Client.GameModules.SceneManagement
                                 transform.localPosition);
                         if(SharedConfig.WorldShiftDisableTerrainDetail)
                             DisableTerrainDetail(transform);
-#if false
+                       
                         Camera.worldShiftOrigin = -WorldOrigin.Origin;
-#endif
+
                     }
                 }
                 catch (Exception e)
@@ -170,6 +170,17 @@ namespace App.Client.GameModules.SceneManagement
             if (terrain != null)
             {
                 terrain.detailObjectDistance = SharedConfig.WorldShiftTerrainDetailDistance;
+                
+            }
+        }  
+        
+        private static void SetNewTerrainColliderPhysicMaterial(Transform transform)
+        {
+            var terrain = transform.GetComponent<UnityEngine.TerrainCollider>();
+            if (terrain != null)
+            {
+                terrain.material=new PhysicMaterial();
+                
             }
         }
 
@@ -219,6 +230,7 @@ namespace App.Client.GameModules.SceneManagement
                         _logger.DebugFormat("move scene {0} {3} from {1} to {1}", t.name, t.GetInstanceID(),
                             localPosition, t.localPosition);
                 }
+                SetNewTerrainColliderPhysicMaterial(t);
                 if(SharedConfig.WorldShiftDisableTerrainDetail)
                     DisableTerrainDetail(t);
             }

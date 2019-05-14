@@ -1,5 +1,6 @@
+using System;
 using AssetBundleManagement;
-using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace AssetBundleManager.Operation
 {
@@ -12,6 +13,7 @@ namespace AssetBundleManager.Operation
 
         public Object LoadedAsset { get; protected set; }
 
+        public Type ObjectType { get; protected set; }
         protected AssetGroup AssetGroup;
         public bool IsSceneLoading
         {
@@ -23,14 +25,16 @@ namespace AssetBundleManager.Operation
             get { return LoadedAsset == null; }
         }
 
-        protected AssetLoading(AssetLoadingPattern loadingPattern, string bundleName, string assetName)
+        protected AssetLoading(AssetLoadingPattern loadingPattern, string bundleName, string assetName, Type objectType)
         {
             LoadingPattern = loadingPattern;
             BundleName = bundleName;
             Name = assetName;
             AssetGroup = AssetGroup.Asset;
+            ObjectType = objectType;
         }
 
         public abstract void SetAssetBundle(LoadedAssetBundle assetBundle);
+       
     }
 }

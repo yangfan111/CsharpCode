@@ -1,10 +1,8 @@
-
-
-
-
 using System;
 using System.Collections.Generic;
+using App.Protobuf;
 using Com.Wooduan.Ssjj2.Common.Net.Proto;
+using Core.CameraControl;
 using Core.Room;
 using Sharpen;
 using Utils.Configuration;
@@ -13,7 +11,7 @@ namespace App.Shared.Player
 {
     public static class PlayerInfoExtensions
     {
-        public static void ConvertFrom(this App.Protobuf.PlayerInfoMessage message,  Core.Room.ICreatePlayerInfo info )
+        public static void ConvertFrom(this App.Protobuf.PlayerInfoMessage message, Core.Room.ICreatePlayerInfo info)
         {
             message.Camp = info.Camp;
             message.Level = info.Level;
@@ -30,21 +28,24 @@ namespace App.Shared.Player
             {
                 message.AvatarIds.Add(id);
             }
+
             foreach (var id in info.WeaponAvatarIds)
             {
                 message.WeaponAvatarIds.Add(id);
             }
+
             foreach (var id in info.SprayLacquers)
             {
                 message.SprayLacquers.Add(id);
             }
-          
+
             foreach (var bag in info.WeaponBags)
             {
                 if (null == bag)
                 {
                     continue;
                 }
+
                 var bagData = Protobuf.PlayerWeaponBagData.Allocate();
                 bagData.BagIndex = bag.BagIndex;
                 foreach (var weapon in bag.weaponList)
@@ -55,13 +56,19 @@ namespace App.Shared.Player
                     weaponData.WeaponAvatarTplId = weapon.WeaponAvatarTplId;
                     bagData.WeaponList.Add(weaponData);
                 }
+
                 message.WeaponBags.Add(bagData);
             }
-           
+
+            message.InitPosition = Vector3.Allocate();
+            message.InitPosition.X = info.InitPosition.x;
+            message.InitPosition.Y = info.InitPosition.y;
+            message.InitPosition.Z = info.InitPosition.z;
         }
 
-        public static void ConvertFrom(this Core.Room.ICreatePlayerInfo info , App.Protobuf.PlayerInfoMessage message )
+        public static void ConvertFrom(this Core.Room.ICreatePlayerInfo info, App.Protobuf.PlayerInfoMessage message)
         {
+            info.Token = "local";
             info.Camp = message.Camp;
             info.Level = message.Level;
             info.Num = message.Num;
@@ -73,16 +80,16 @@ namespace App.Shared.Player
             info.TeamId = message.TeamId;
             info.TitleId = message.TitleId;
             info.RoleModelId = message.RoleModelId;
-            info.AvatarIds=new List<int>();
+            info.AvatarIds = new List<int>();
             info.AvatarIds.AddRange(message.AvatarIds);
-            info.WeaponAvatarIds =new List<int>();
+            info.WeaponAvatarIds = new List<int>();
             info.WeaponAvatarIds.AddRange(message.WeaponAvatarIds);
             info.SprayLacquers = new List<int>();
             info.SprayLacquers.AddRange(message.SprayLacquers);
             info.WeaponBags = new Core.Room.PlayerWeaponBagData[message.WeaponBags.Count];
             for (var i = message.WeaponBags.Count - 1; i >= 0; i--)
             {
-                info.WeaponBags[i] = new  Core.Room.PlayerWeaponBagData();
+                info.WeaponBags[i] = new Core.Room.PlayerWeaponBagData();
                 info.WeaponBags[i].BagIndex = message.WeaponBags[i].BagIndex;
                 info.WeaponBags[i].weaponList = new List<Core.Room.PlayerWeaponData>();
                 foreach (var playerWeaponData in message.WeaponBags[i].WeaponList)
@@ -95,6 +102,7 @@ namespace App.Shared.Player
                     });
                 }
             }
+            info.InitPosition = new UnityEngine.Vector3(message.InitPosition.X, message.InitPosition.Y, message.InitPosition.Z);
         }
     }
 }

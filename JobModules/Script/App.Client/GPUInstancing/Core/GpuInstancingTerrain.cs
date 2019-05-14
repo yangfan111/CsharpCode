@@ -2,8 +2,10 @@
 
 namespace App.Client.GPUInstancing.Core
 {
-    public class GpuInstancingTerrain : MonoBehaviour
+    public class GpuInstancingTerrain : GpuInstancingPipeline
     {
-
+        public GpuInstancingTerrain(ComputeShader visibilityShader) : base(visibilityShader)
+        {
+        }
     }
 }

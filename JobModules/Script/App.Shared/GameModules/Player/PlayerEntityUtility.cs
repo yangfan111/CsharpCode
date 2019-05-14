@@ -50,20 +50,37 @@ namespace App.Shared.GameModules.Player
 
         public static CharacterController InitCharacterController(GameObject go)
         {
-            float height = SingletonManager.Get<CharacterInfoManager>().GetDefaultInfo().StandHeight;
+            CharacterController ret = InitCharacterController(go, SingletonManager.Get<CharacterInfoManager>().GetDefaultInfo().StandHeight,
+                SingletonManager.Get<CharacterInfoManager>().GetDefaultInfo().StandRadius, 
+                CharacterControllerConst.SlopeLimit, 
+                CharacterControllerConst.StepOffset);
+            return ret;
+        }
+
+        public static CharacterController InitCharacterController(GameObject go, float height, float radius,
+            float slopeLimit, float stepOffset)
+        {
             CharacterController cc = go.GetComponent<CharacterController>();
-            Object.DestroyImmediate(cc);
+            if (cc != null)
+            {
+                Object.DestroyImmediate(cc);
+            }
             cc = go.AddComponent<CharacterController>();
             cc.center = new Vector3(0, height / 2, 0);
-            cc.slopeLimit = 45f;
-            cc.stepOffset = 0.3f;
+            cc.slopeLimit = slopeLimit;
+            cc.stepOffset = stepOffset;
             //太小会导致跳跃角色卡主,Use it to avoid numerical precision issues.
             //Two colliders can penetrate each other as deep as their Skin Width. Larger Skin Widths reduce jitter. Low Skin Width can cause the character to get stuck. A good setting is to make this value 10% of the Radius.
             cc.skinWidth = CcSkinWidth;
             cc.minMoveDistance = 0.001f;
-            cc.radius = SingletonManager.Get<CharacterInfoManager>().GetDefaultInfo().StandRadius;
+            cc.radius = radius;
             cc.height = height;
 
+            var playerScript = go.GetComponent<PlayerScript>();
+            if (playerScript != null)
+            {
+                Object.DestroyImmediate(playerScript);
+            }
             go.AddComponent<PlayerScript>();
 
             return cc;

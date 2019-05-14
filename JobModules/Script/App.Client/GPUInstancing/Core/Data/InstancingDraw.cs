@@ -1,4 +1,5 @@
 ﻿using App.Client.GPUInstancing.Core.Utils;
+using Core.Components;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -17,7 +18,7 @@ namespace App.Client.GPUInstancing.Core.Data
         
         internal InstancingDrawState State { get; private set; }
         
-        private ComputeShader _visShader;
+        private readonly ComputeShader _visShader;
 
         private ComputeBuffer _transformData;
         private readonly ComputeBuffer[] _drawInstanceData;
@@ -107,7 +108,7 @@ namespace App.Client.GPUInstancing.Core.Data
             _blockCount = blockCount;
             _blockSize = blockSize;
 
-            if (_transformData != null && _transformData.count != blockCount)
+            if (_transformData != null && _transformData.count != blockCount * blockSize)
                 ReleaseBuffer();
 
             if (_transformData == null && blockCount != 0)
@@ -118,8 +119,11 @@ namespace App.Client.GPUInstancing.Core.Data
         {
             _totalCountInBlock = 0;
 
-            for (int i = 0; i < _realCountInBlockArray.Length; ++i)
-                _realCountInBlockArray[i] = 0;
+            if (_realCountInBlockArray != null)
+            {
+                for (int i = 0; i < _realCountInBlockArray.Length; ++i)
+                    _realCountInBlockArray[i] = 0;
+            }
         }
 
         public void SetRealBlockCount(int index, int realCount)
@@ -249,6 +253,9 @@ namespace App.Client.GPUInstancing.Core.Data
             return _transformData;
         }
 
-        protected virtual void SetMaterialPropertyBlock() { }
+        protected virtual void SetMaterialPropertyBlock()
+        {
+            _mbp.SetVector(Constants.ShaderVariable.WorldShift, WorldOrigin.Origin);
+        }
     }
 }

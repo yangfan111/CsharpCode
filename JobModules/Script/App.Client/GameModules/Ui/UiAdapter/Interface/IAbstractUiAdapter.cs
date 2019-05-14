@@ -9,5 +9,6 @@ namespace Assets.App.Client.GameModules.Ui.UiAdapter.Interface
         void UnRegisterKeyReceive(IKeyReceiver keyReceive);
         void RegisterPointerReceive(IPointerReceiver pointReceive);
         void UnRegisterPointerReceive(IPointerReceiver pointReceive);
+        void RegisterOpenKey(IKeyReceiver keyReceiver);
     }
 }

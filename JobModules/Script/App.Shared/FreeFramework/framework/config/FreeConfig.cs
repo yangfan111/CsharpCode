@@ -374,6 +374,7 @@ namespace com.wd.free.config
             aliasOne(alias, new AddPredictSkillAction());
             aliasOne(alias, new PlayerAnimationAction());
             aliasOne(alias, new NewRemoveWeaponAction());
+            aliasOne(alias, new AdjustWeaponAction());
             aliasOne(alias, new PlayerDisableAction());
             aliasOne(alias, new SimpleMessageAction());
             aliasOne(alias, new MessageField());
@@ -414,7 +415,6 @@ namespace com.wd.free.config
             aliasOne(alias, new PlayerObserveAction());
             aliasOne(alias, new SetWeaponBulletAction());
             aliasOne(alias, new PlayerAngleDistanceCondition());
-            aliasOne(alias, new PlayerVisibilityAction());
             aliasOne(alias, new DefineEffectBufAction());
             aliasOne(alias, new AddEffectBufAction());
             aliasOne(alias, new PlayerPressKeyAction());

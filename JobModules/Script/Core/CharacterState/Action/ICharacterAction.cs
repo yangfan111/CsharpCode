@@ -18,9 +18,9 @@ namespace Core.CharacterState.Action
         void BeenHit();
         bool CanBeenHit();
 
-        void Unarm(System.Action callBack, float unarmParam);
-        void Draw(System.Action callBack, float drawParam);
-        void SwitchWeapon(System.Action unarmCallback, System.Action drawCallBack, float switchParam);
+        void Holster(System.Action holsterStartCallBack, System.Action holsterEndCallBack, float holsterParam);
+        void Select(System.Action callBack, float selectParam);
+        void SwitchWeapon(System.Action holsterCallback, System.Action selectCallBack, float switchParam);
         void InterruptSwitchWeapon();
 
         void SetDiveUpDownValue(float value);
@@ -69,8 +69,8 @@ namespace Core.CharacterState.Action
         void Parachuting(System.Action callBack);
         void ParachutingEnd();
         //投掷动作
-        void StartNearGrenadeThrow();
-        void StartFarGrenadeThrow();
+        void StartNearGrenadeThrow(System.Action callBack);
+        void StartFarGrenadeThrow(System.Action callBack);
         //0--near  1--far
         void ChangeThrowDistance(float weight);
         void FinishGrenadeThrow();
@@ -91,6 +91,12 @@ namespace Core.CharacterState.Action
 
         void TransfigurationStart(System.Action callBack);
         void TransfigurationFinish(System.Action callBack);
+
+        void RageStart();
+        void RageEnd();
+
+        void StartSuccessPose(float poseState);
+        void EndSuccessPose();
 
         void InterruptAction();
         bool NeedInterruptRescue();

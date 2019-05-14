@@ -9,33 +9,32 @@ namespace App.Shared.GameModules.Weapon.Behavior
     public class ContinueFireCounter : IFireProcessCounter
     {
        
-        public void OnIdle(PlayerWeaponController controller, IWeaponCmd cmd)
+        public void OnIdle(WeaponBaseAgent heldAgent, WeaponSideCmd cmd)
         {
-            var heldAgent = controller.HeldWeaponAgent;
             if (heldAgent.RifleFireCounterCfg == null) return;
             if (heldAgent.RunTimeComponent.ContinuesShootCount < 1)
                 return;
-            if (heldAgent.RunTimeComponent.ContinuesShootReduceTimestamp < controller.RelatedTime)
+            if (heldAgent.RunTimeComponent.ContinuesShootReduceTimestamp < cmd.UserCmd.RenderTime )
             {
                 
       //          DebugUtil.MyLog("Count -- ||DecreaseStepInterval:"+heldAgent.RifleFireCounterCfg.DecreaseStepInterval+"||"+heldAgent.RifleFireCounterCfg.DecreaseStepInterval);
-                heldAgent.RunTimeComponent.ContinuesShootReduceTimestamp = controller.RelatedTime + 
+                heldAgent.RunTimeComponent.ContinuesShootReduceTimestamp = cmd.UserCmd.RenderTime + 
                                                                            heldAgent.RifleFireCounterCfg.DecreaseStepInterval;
                 --heldAgent.RunTimeComponent.ContinuesShootCount;
             }
 
         }
 
-        public void OnBeforeFire(PlayerWeaponController controller, IWeaponCmd cmd)
+        public void OnBeforeFire(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
         {
-            if (controller.HeldWeaponAgent.RifleFireCounterCfg == null)
+            if (weaponBaseAgent.RifleFireCounterCfg == null)
                 return;
             
-            var runTimeComponent = controller.HeldWeaponAgent.RunTimeComponent;
+            var runTimeComponent = weaponBaseAgent.RunTimeComponent;
          // runTimeComponent.NeedReduceContinuesShootCD = true;
             runTimeComponent.ContinuesShootCount = Mathf.Min(++runTimeComponent.ContinuesShootCount,
-                controller.HeldWeaponAgent.RifleFireCounterCfg.MaxCount);
-            runTimeComponent.ContinuesShootReduceTimestamp = controller.RelatedTime + controller.HeldWeaponAgent.RifleFireCounterCfg.DecreaseInitInterval;
+                weaponBaseAgent.RifleFireCounterCfg.MaxCount);
+            runTimeComponent.ContinuesShootReduceTimestamp = cmd.UserCmd.RenderTime + weaponBaseAgent.RifleFireCounterCfg.DecreaseInitInterval;
         }
 
     

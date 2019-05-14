@@ -126,9 +126,9 @@ namespace Core.SyncLatest
             _logger.DebugFormat("create entity {0}", entityKey);
             foreach (var rightComponent in rightEntity.ComponentList)
             {
-                if (rightComponent is ILatestComponent && localEntity.GetComponent(rightComponent.GetComponentId()) == null)
+                if (!IsExcludeComponent(rightComponent) && localEntity.GetComponent(rightComponent.GetComponentId()) == null)
                 {
-                    _logger.DebugFormat("add component {0}:{1}", entityKey, rightComponent.GetType());
+                    _logger.DebugFormat("{2}add component {0}:{1}", entityKey, rightComponent.GetType(), rightComponent);
                     var leftComponent = (ILatestComponent) localEntity.AddComponent(rightComponent.GetComponentId(), rightComponent);
                   
                 }

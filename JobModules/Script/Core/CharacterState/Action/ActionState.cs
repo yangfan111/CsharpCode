@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Core.CharacterState.Action.States;
+using Core.CharacterState.Action.States.Rage;
 using Core.Fsm;
 using Core.Utils;
 using UnityEngine;
@@ -30,7 +31,7 @@ namespace Core.CharacterState.Action
             return base.GetStateName(id);
         }
 
-        private static LoggerAdapter _logger = new LoggerAdapter(typeof(ActionState));
+        protected static LoggerAdapter _logger = new LoggerAdapter(typeof(ActionState));
 
         public static ActionState CreateCommonNullState()
         {
@@ -218,7 +219,7 @@ namespace Core.CharacterState.Action
                                                  CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
                         
-                        //TurnOnUpperBodyOverlay(addOutput);
+                        TurnOnUpperBodyOverlay(addOutput);
 
                         command.Handled = true;
                         
@@ -227,10 +228,7 @@ namespace Core.CharacterState.Action
 
                     return false;
                 }, 
-                null,
-                (int) ActionStateId.Unarm,
-                (normalizedTime, addOutput) => { LerpOpenUpperBodyLayer(addOutput, normalizedTime); }, 
-                (int)SingletonManager.Get<CharacterStateConfigManager>().HolsterTransitionTime, new[] { FsmInput.Unarm });
+                null, (int) ActionStateId.Unarm, null, 0, new[] { FsmInput.Unarm });
             
             #endregion
 
@@ -297,7 +295,7 @@ namespace Core.CharacterState.Action
                                                  CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
                         
-                        //TurnOnUpperBodyOverlay(addOutput);
+                        TurnOnUpperBodyOverlay(addOutput);
 
                         command.Handled = true;
 
@@ -306,7 +304,7 @@ namespace Core.CharacterState.Action
 
                     return false;
                 },
-                null, (int)ActionStateId.SwitchWeapon, (normalizedTime, addOutput) => { LerpOpenUpperBodyLayer(addOutput, normalizedTime); }, (int)SingletonManager.Get<CharacterStateConfigManager>().HolsterTransitionTime, new[] { FsmInput.SwitchWeapon });
+                null, (int)ActionStateId.SwitchWeapon, null, 0, new[] { FsmInput.SwitchWeapon });
             
             #endregion
             
@@ -738,6 +736,60 @@ namespace Core.CharacterState.Action
 
             #endregion
 
+            #region KeepNull to Rage
+
+            state.AddTransition(
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.RageStart))
+                    {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.RageStartHash,
+                            AnimatorParametersHash.Instance.RageStartName,
+                            AnimatorParametersHash.Instance.RageStartEnable,
+                            CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+
+                        command.Handled = true;
+
+                        return true;
+                    }
+
+                    return false;
+                },
+                null, (int)ActionStateId.RageStart, null, 0, new[] { FsmInput.RageStart });
+
+            #endregion
+            
+            #region KeepNull to SuccessPose
+
+            state.AddTransition(
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.StartSuccessPose))
+                    {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.SuccessHash,
+                            AnimatorParametersHash.Instance.SuccessName,
+                            AnimatorParametersHash.Instance.SuccessEnable,
+                            CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.SuccessStateHash,
+                            AnimatorParametersHash.Instance.SuccessStateName,
+                            command.AdditioanlValue,
+                            CharacterView.ThirdPerson);
+                        addOutput(FsmOutput.Cache);
+
+                        command.Handled = true;
+
+                        return true;
+                    }
+
+                    return false;
+                },
+                null, (int)ActionStateId.SuccessPose, null, 0, new[] { FsmInput.StartSuccessPose });
+
+            #endregion
+
             return state;
         }
         
@@ -761,6 +813,53 @@ namespace Core.CharacterState.Action
 
             return state;
         }
+
+        public static ActionState CreateRageStartState()
+        {
+            return new RageStart(ActionStateId.RageStart);
+        }
+        
+        public static ActionState CreateRageLoopState()
+        {
+            return new RageLoop(ActionStateId.RageLoop);
+        }
+        
+        public static ActionState CreateRageEndState()
+        {
+            return new RageEnd(ActionStateId.RageEnd);
+        }
+
+        public static ActionState CreateSuccessPoseState()
+        {
+            ActionState state = new ActionState(ActionStateId.SuccessPose);
+
+            #region SuccessPose To KeepNull
+
+            state.AddTransition(
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.EndSuccessPose))
+                    {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.SuccessHash,
+                            AnimatorParametersHash.Instance.SuccessName,
+                            AnimatorParametersHash.Instance.SuccessDisable,
+                            CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+
+                        command.Handled = true;
+
+                        return true;
+                    }
+
+                    return false;
+                },
+                null, (int)ActionStateId.KeepNull, null, 0, new[] { FsmInput.EndSuccessPose });
+
+            #endregion
+
+            return state;
+        }
+        
         #endregion
 
         #region UpperBody Additive Animation Layer

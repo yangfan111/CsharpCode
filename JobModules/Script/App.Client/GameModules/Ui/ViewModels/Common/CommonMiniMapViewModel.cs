@@ -1,46 +1,59 @@
 using System;
-using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
-using Loxodon.Framework.Binding;
-using Loxodon.Framework.Binding.Builder;
-using Loxodon.Framework.ViewModels;
-using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
 using UIComponent.UI;
+using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
-    public class CommonMiniMapViewModel : ViewModelBase, IUiViewModel
+    public class CommonMiniMapViewModel : IUiViewModel
     {
-        private class CommonMiniMapView : UIView
+        private class CommonMiniMapView : MonoBehaviour
         {
-            public RectTransform rootLocation;
-            [HideInInspector]
-            public Vector2 orirootLocation;
-            
-            public void FillField()
-            {
-                RectTransform[] recttransforms = gameObject.GetComponentsInChildren<RectTransform>(true);
-                foreach (var v in recttransforms)
-                {
-                    var realName = v.gameObject.name.Replace("(Clone)","");
-                    switch (realName)
-                    {
-                        case "root":
-                            rootLocation = v;
-                            break;
-                    }
-                }
+			public RectTransform rootRectTransform;
+			public UIEventTriggerListener BgUIEventTriggerListener;
+			public RectTransform BgRectTransform;
+			public RectTransform mapRectTransform;
 
+
+
+			public void FillField()
+			{
+				UIBind uibind = GetComponent<UIBind>();
+				rootRectTransform =  uibind.AllObjs[0] as RectTransform;
+				BgUIEventTriggerListener =  uibind.AllObjs[1] as UIEventTriggerListener;
+				BgRectTransform =  uibind.AllObjs[2] as RectTransform;
+				mapRectTransform =  uibind.AllObjs[3] as RectTransform;
             }
+
         }
 
 
-        private Vector2 _rootLocation;
-        public Vector2 rootLocation { get { return _rootLocation; } set {if(_rootLocation != value) Set(ref _rootLocation, value, "rootLocation"); } }
 
+			public RectTransform rootRectTransform { 
+			get { return _view.rootRectTransform;} 
+			}
+
+			public UIEventTriggerListener BgUIEventTriggerListener { 
+			get { return _view.BgUIEventTriggerListener;} 
+			}
+
+			public RectTransform BgRectTransform { 
+			get { return _view.BgRectTransform;} 
+			}
+
+			public RectTransform mapRectTransform { 
+			get { return _view.mapRectTransform;} 
+			}
+
+
+
+
+
+		
 		private GameObject _viewGameObject;
 		private Canvas _viewCanvas;
 		private CommonMiniMapView _view;
@@ -82,59 +95,35 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			}
 			DataInit(view);
 			SpriteReset();
-			view.BindingContext().DataContext = this;
+
 			if(bFirst)
 			{
 				SaveOriData(view);
-				ViewBind(view);
 			}
 			_view = view;
 
+			
         }
+		
 		private void EventTriggerBind(CommonMiniMapView view)
 		{
-		}
 
-        private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
-        private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
-
-        static CommonMiniMapViewModel()
-        {
-            Type type = typeof(CommonMiniMapViewModel);
-            foreach (var property in type.GetProperties())
-            {
-                if (property.CanWrite)
-                {
-                    PropertySetter.Add(property.Name, property);
-                }
-            }
-			foreach (var methodInfo in type.GetMethods())
-            {
-                if (methodInfo.IsPublic)
-                {
-                    MethodSetter.Add(methodInfo.Name, methodInfo);
-                }
-            }
-        }
-
-		void ViewBind(CommonMiniMapView view)
-		{
-		     BindingSet<CommonMiniMapView, CommonMiniMapViewModel> bindingSet =
-                view.CreateBindingSet<CommonMiniMapView, CommonMiniMapViewModel>();
-            bindingSet.Bind(view.rootLocation).For(v => v.anchoredPosition).To(vm => vm.rootLocation).OneWay();
 		
-			bindingSet.Build();
+
 		}
+		
+
+		
+		
 
 		void DataInit(CommonMiniMapView view)
 		{
-            _rootLocation = view.rootLocation.anchoredPosition;
 		}
 
 
 		void SaveOriData(CommonMiniMapView view)
 		{
-            view.orirootLocation = _rootLocation;
+        
 		}
 
 
@@ -142,6 +131,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 
 		private void SpriteReset()
 		{
+			
 		}
 
 		public void Reset()
@@ -150,32 +140,28 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			{
 				return;
 			}
-			rootLocation = _view.orirootLocation;
+			
 			SpriteReset();
 		}
 
-		public void CallFunction(string functionName)
+		public bool IsPropertyExist(string name)
         {
-            if (MethodSetter.ContainsKey(functionName))
-            {
-                MethodSetter[functionName].Invoke(this, null);
-            }
+            return false;
         }
 
-		public bool IsPropertyExist(string propertyId)
+        public Transform GetParentLinkNode()
         {
-            return PropertySetter.ContainsKey(propertyId);
+            return null;
         }
 
-		public Transform GetParentLinkNode()
-		{
-			return null;
-		}
+        public Transform GetChildLinkNode()
+        {
+            return null;
+        }
 
-		public Transform GetChildLinkNode()
-		{
-			return null;
-		}
+
+
+       
 
         public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
         public string ResourceAssetName { get { return "CommonMiniMap"; } }

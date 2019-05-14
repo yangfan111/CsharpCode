@@ -12,6 +12,7 @@ namespace Assets.Core.Configuration
             try
             {
                 DropItemConfig.current = XmlConfigParser<DropItemConfig>.Load(xml);
+                Logger.Info("load DropItem succeeded.");
             }catch(Exception e)
             {
                 Debug.LogErrorFormat("load DropItem failed.{0}", e.Message);

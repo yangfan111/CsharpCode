@@ -17,8 +17,8 @@ namespace Core.CharacterState.Action.States
             #region Unarm To CommonNull
 
             AddTransition(
-                (command, addOutput) => FsmTransition.SimpleCommandHandler(command, FsmInput.HolsterFinished),
-                null, (int) ActionStateId.CommonNull, null, 0, new[] { FsmInput.HolsterFinished });
+                (command, addOutput) => FsmTransition.SimpleCommandHandler(command, FsmInput.HolsterEndFinished),
+                null, (int) ActionStateId.CommonNull, null, 0, new[] { FsmInput.HolsterEndFinished });
 
             #endregion
             
@@ -30,7 +30,11 @@ namespace Core.CharacterState.Action.States
                     if (command.IsMatch(FsmInput.InterruptSwitchWeapon))
                     {
                         FsmOutput.Cache.SetValue(FsmOutputType.InterruptAction, 
-                            (int)FsmInput.HolsterFinished);
+                            (int)FsmInput.HolsterStartFinished);
+                        addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(FsmOutputType.InterruptAction, 
+                            (int)FsmInput.HolsterEndFinished);
                         addOutput(FsmOutput.Cache);
 
                         command.Handled = true;
@@ -49,7 +53,7 @@ namespace Core.CharacterState.Action.States
             if (command.IsMatch(FsmInput.HolsterProgressP3))
             {
                 LerpUpperBodyLayerWeight(command, addOutput,
-                    SingletonManager.Get<CharacterStateConfigManager>().ZeroLayerWeightTransitionTime);
+                    SingletonManager.Get<CharacterStateConfigManager>().LongLayerWeightTransitionTime);
             }
             return base.HandleInput(command, addOutput);
         }

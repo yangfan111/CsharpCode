@@ -1,4 +1,5 @@
-﻿using Core.Attack;
+﻿using Core;
+using Core.Attack;
 using Core.Components;
 using Core.Prediction.UserPrediction;
 using Core.SnapshotReplication.Serialization.NetworkProperty;

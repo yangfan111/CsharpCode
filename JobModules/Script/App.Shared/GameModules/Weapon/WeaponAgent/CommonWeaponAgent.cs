@@ -38,10 +38,13 @@ namespace App.Shared.GameModules.Weapon
         //{
         //    slotHelper = in_helper;
         //}
-        ///return needAutoSutff
-        public override bool ExpendWeapon()
+        /// return needAutoSutff
+        /// <param name="reservedBullet"></param>
+        public override bool ExpendWeapon(int reservedBullet)
         {
             BaseComponent.Bullet -= 1;
+            if (BaseComponent.Bullet < 1 && reservedBullet> 0)
+                RunTimeComponent.NeedAutoReload = true;
             return false;
         }
 

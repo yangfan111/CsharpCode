@@ -12,7 +12,7 @@ namespace AssetBundleManager.Operation
         private AsyncOperation _asyncLoadRequest;
 
         public SceneLoading(string bundleName, string assetName, SynchronizationMode mode, bool isAdditive)
-            : base(AssetLoadingPattern.Scene, bundleName, assetName)
+            : base(AssetLoadingPattern.Scene, bundleName, assetName, null)
         {
             _mode = mode;
             _isAdditive = isAdditive;

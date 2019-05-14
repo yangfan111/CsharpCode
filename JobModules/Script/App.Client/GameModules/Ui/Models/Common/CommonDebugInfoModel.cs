@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using App.Client.GameModules.Ui.UiAdapter.Interface.Common;
 using App.Client.GameModules.Ui.ViewModels.Common;
 using Assets.UiFramework.Libs;
 using Core.GameModule.Interface;
 using Core.Utils;
+using UnityEngine.Profiling;
 using UserInputManager.Lib;
 using Utils.Singleton;
 

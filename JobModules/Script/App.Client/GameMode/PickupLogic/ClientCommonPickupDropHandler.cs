@@ -30,7 +30,7 @@ namespace App.Client.GameMode
             _userCmdGenerator = contexts.session.clientSessionObjects.UserCmdGenerator;
         }
 
-        public override void SendPickup(int entityId, int itemId, int category, int count)
+        public override void SendPickup(IPlayerWeaponProcessor weaponProcessor, int entityId, int itemId, int category, int count)
         {
             _userCmdGenerator.SetUserCmd((cmd) =>
             {
@@ -55,7 +55,7 @@ namespace App.Client.GameMode
         {
             var target = _contexts.sceneObject.GetEntityWithEntityKey(new EntityKey(entityId, (short)EEntityType.SceneObject));
             var model = target.hasUnityObject ? target.unityObject.UnityObject : target.multiUnityObject.FirstAsset;
-            if (!CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(Player, target.position.Value, model))
+            if (!CommonObjectCastUtil.HasObstacleBetweenPlayerAndItem(Player, target.position.Value, model))
             {
                 _userCmdGenerator.SetUserCmd((cmd) => cmd.AutoPickUpEquip.Add(entityId));
             }

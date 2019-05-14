@@ -1,16 +1,12 @@
-﻿using System.Collections.Generic;
-using XmlConfig;
+﻿using Shared.Scripts;
 using System;
-using Shared.Scripts;
+using System.Collections.Generic;
 using WeaponConfigNs;
+using XmlConfig;
 using AssetInfo = Utils.AssetManager.AssetInfo;
-using Core.Utils;
 
 namespace Utils.Configuration
 {
-
-
-
     public class WeaponPartsConfigManager : AbstractConfigManager<WeaponPartsConfigManager>, IConfigParser
     {
         private readonly Dictionary<int, WeaponPartsConfigItem>
@@ -20,6 +16,7 @@ namespace Utils.Configuration
         /// 武器-可用配件Id列表
         /// </summary>
         private readonly Dictionary<int, List<int>> matchedWeaponPartIds = new Dictionary<int, List<int>>();
+      //  private readonly Dictionary<int, List<int>> matchedWeaponPartIdsAlt = new Dictionary<int, List<int>>();
 
         /// <summary>
         /// 武器-可用配件槽位列表
@@ -57,13 +54,9 @@ namespace Utils.Configuration
 
         public WeaponPartsConfigItem GetConfigById(int id)
         {
-            if (partItems.ContainsKey(id))
-            {
-                return partItems[id];
-            }
-
-            Logger.WarnFormat("config for id {0} does not exist ", id);
-            return null;
+            WeaponPartsConfigItem configItem;
+            partItems.TryGetValue(id, out configItem);
+            return configItem; 
         }
 
         public float GetSubType(int id)
@@ -178,35 +171,38 @@ namespace Utils.Configuration
                 type = (EWeaponPartType) cfg.Type;
                 switch (type)
                 {
-                    case XmlConfig.EWeaponPartType.Magazine:
-                    {
+                    case EWeaponPartType.Magazine:
                         result = "弹匣";
-                    }
                         break;
-                    case XmlConfig.EWeaponPartType.Muzzle:
-                    {
+                    case EWeaponPartType.Muzzle:
                         result = "枪口";
-                    }
                         break;
-                    case XmlConfig.EWeaponPartType.UpperRail:
-                    {
+                    case EWeaponPartType.UpperRail:
                         result = "导轨";
-                    }
                         break;
-                    case XmlConfig.EWeaponPartType.SideRail:
-                    {
+                    case EWeaponPartType.SideRail:
                         result = "侧导轨";
-                    }
                         break;
-                    case XmlConfig.EWeaponPartType.LowerRail:
-                    {
+                    case EWeaponPartType.LowerRail:
                         result = "握把";
-                    }
                         break;
-                    case XmlConfig.EWeaponPartType.Stock:
-                    {
+                    case EWeaponPartType.Stock:
                         result = "枪托";
-                    }
+                        break;
+                    case EWeaponPartType.Bore:
+                        result = "枪膛";
+                        break;
+                    case EWeaponPartType.Feed:
+                        result = "供弹";
+                        break;
+                    case EWeaponPartType.Trigger:
+                        result = "击发";
+                        break;
+                    case EWeaponPartType.Interlock:
+                        result = "闭锁";
+                        break;
+                    case EWeaponPartType.Brake:
+                        result = "制退";
                         break;
                 }
             }
@@ -222,9 +218,13 @@ namespace Utils.Configuration
             GetPartAchiveAttachedAttributeByType(achive.Magazine, attributeType, ref attachedVal);
             GetPartAchiveAttachedAttributeByType(achive.Muzzle, attributeType, ref attachedVal);
             GetPartAchiveAttachedAttributeByType(achive.LowerRail, attributeType, ref attachedVal);
-            GetPartAchiveAttachedAttributeByType(achive.Magazine, attributeType, ref attachedVal);
+            GetPartAchiveAttachedAttributeByType(achive.SideRail, attributeType, ref attachedVal);
+            GetPartAchiveAttachedAttributeByType(achive.Bore, attributeType, ref attachedVal);
+            GetPartAchiveAttachedAttributeByType(achive.Feed, attributeType, ref attachedVal);
+            GetPartAchiveAttachedAttributeByType(achive.Trigger, attributeType, ref attachedVal);
+            GetPartAchiveAttachedAttributeByType(achive.Interlock, attributeType, ref attachedVal);
+            GetPartAchiveAttachedAttributeByType(achive.Brake, attributeType, ref attachedVal);
             return attachedVal;
-
         }
 
         public const float AttributeInvalidConst = -999f;
@@ -239,8 +239,6 @@ namespace Utils.Configuration
                 {
                     attrVal = attrVal == 0f ? result : attrVal * result;
                 }
-
-
             }
         }
 
@@ -253,8 +251,9 @@ namespace Utils.Configuration
 
         public AttachedAttributeSet GetPartAttachedAttributes(int id)
         {
-            if (partItemAttributes.ContainsKey(id))
-                return partItemAttributes[id];
+            AttachedAttributeSet attributeSet;
+            if (partItemAttributes.TryGetValue(id,out attributeSet))
+                return attributeSet;
             var cfg = GetConfigById(id);
             if(cfg ==null )
                 return null;

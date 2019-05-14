@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Assets.Utils.Configuration;
+using Assets.XmlConfig;
 using Utils.Configuration;
 using Utils.Singleton;
 using XmlConfig;
@@ -19,28 +20,28 @@ namespace Utils.Configuration
 
         private void InitDict()
         {
-            _dict = new Dictionary<EItemCategory, Dictionary<int, ItemBaseConfig>>();
-            var list = Enum.GetValues(typeof(EItemCategory));
-            foreach (EItemCategory it in list)
+            _dict = new Dictionary<ECategory, Dictionary<int, ItemBaseConfig>>();
+            var list = Enum.GetValues(typeof(ECategory));
+            foreach (ECategory it in list)
             {
                 _dict.Add(it, new Dictionary<int, ItemBaseConfig>());
             }
         }
 
-        Dictionary<EItemCategory, Dictionary<int, ItemBaseConfig>> _dict;
+        Dictionary<ECategory, Dictionary<int, ItemBaseConfig>> _dict;
 
         public ItemBaseConfig GetConfigById(int cat, int id,bool isSurvivalMode = false)
         {
-            EItemCategory category = (EItemCategory)cat;
+            ECategory category = (ECategory)cat;
             ItemBaseConfig res = null;
             var dict = _dict[category];
             if (dict.TryGetValue(id, out res)) return res;
 
             switch (category)
             {
-                case EItemCategory.BattleProp:
+                case ECategory.GameItem:
                     res = SingletonManager.Get<GameItemConfigManager>().GetConfigById(id);break;
-                case EItemCategory.WeaponPart:
+                case ECategory.WeaponPart:
                     if (isSurvivalMode)
                     {
                         var config = SingletonManager.Get<WeaponPartSurvivalConfigManager>().FindConfigBySetId(id);
@@ -55,11 +56,11 @@ namespace Utils.Configuration
                         res = SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(id);
                     }
                     break;
-                case EItemCategory.Prop:
+                case ECategory.Prop:
                     res = SingletonManager.Get<PropConfigManager>().GetConfigById(id); break;
-                case EItemCategory.RoleAvatar:
+                case ECategory.Avatar:
                     res = SingletonManager.Get<RoleAvatarConfigManager>().GetConfigById(id); break;
-                case EItemCategory.Weapon:
+                case ECategory.Weapon:
                     var weaponConfig = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(id);
                     var weaponAvatarConfig = SingletonManager.Get<WeaponAvatarConfigManager>()
                         .GetConfigById(weaponConfig.AvatorId);
@@ -76,23 +77,6 @@ namespace Utils.Configuration
 
 
         }
-    }
-
-    public enum EItemCategory
-    {
-        None,
-        Resource = 1,
-        Weapon = 2,
-        WeaponAvatar = 3,
-        Role = 4,
-        WeaponPart = 5,
-        Carrier = 6,
-        CarrierAvatar = 7,
-        DogTag = 8,
-        RoleAvatar = 9,
-        Prop = 10,
-        Pack = 11,
-        BattleProp = 13   //局内道具
     }
 
 }

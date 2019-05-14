@@ -22,7 +22,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public int GetScoreByCamp(EUICampType type)
         {
-            return _ui.ScoreByCampTypeDict[type];
+            return _ui.ScoreByCampTypeDict[(int)type];
         }
 
         public override bool IsReady()

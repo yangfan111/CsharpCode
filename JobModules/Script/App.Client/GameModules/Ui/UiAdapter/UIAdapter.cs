@@ -40,6 +40,35 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 UiSessionComponent.HideGroup.Remove(group);
             }
         }
+        private bool _canOpenUiByKey = true;
+
+        public bool CanOpenUiByKey
+        {
+            get
+            {
+                return _canOpenUiByKey;
+            }
+            set
+            {
+                if (_canOpenUiByKey == value) return;
+                if (value)
+                {
+                    foreach (var it in UiSessionComponent.OpenUiKeyReceiverList)
+                    {
+                        RegisterKeyReceive(it);
+                    }
+                }
+                else
+                {
+                    foreach (var it in UiSessionComponent.OpenUiKeyReceiverList)
+                    {
+                        UnRegisterKeyReceive(it);
+                    }
+                }
+
+                _canOpenUiByKey = value;
+            }
+        }
 
 
         public void RegisterKeyReceive(IKeyReceiver keyReceive)
@@ -61,6 +90,16 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             UserInputManager.Instance.UnregisterPointerReceiver(pointReceive);
         }
+
+        public void RegisterOpenKey(IKeyReceiver keyReceiver)
+        {
+            if (CanOpenUiByKey)
+            {
+                RegisterKeyReceive(keyReceiver);
+            }
+            UiSessionComponent.OpenUiKeyReceiverList.Add(keyReceiver);
+        }
+
         public UISessionComponent UiSessionComponent
         {
             get

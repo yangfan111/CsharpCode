@@ -89,7 +89,7 @@ namespace App.Server
         private Contexts _contexts;
         private IGroup<FreeMoveEntity> _globalFreeMoveEntities;
         private IGroup<WeaponEntity> _globalWeaponEntities;
-
+        private IGroup<PlayerEntity> _playerEntities;
         public SendSnapshotManager(Contexts contexts)
         {
             _contexts = contexts;
@@ -97,6 +97,7 @@ namespace App.Server
                 _contexts.freeMove.GetGroup(FreeMoveMatcher.AllOf(FreeMoveMatcher.GlobalFlag,
                     FreeMoveMatcher.EntityAdapter));
             _globalWeaponEntities = _contexts.weapon.GetGroup(WeaponMatcher.AllOf(WeaponMatcher.EntityKey, WeaponMatcher.EntityAdapter));
+            _playerEntities = _contexts.player.GetGroup(PlayerMatcher.AllOf(PlayerMatcher.Network));
 #if ENABLE_NEW_SENDSNAPSHOT_THREAD
             InitThreads();
 #endif
@@ -122,8 +123,7 @@ namespace App.Server
 
         List<CreateSnapshotParams> _sendSnapshotTasks = new List<CreateSnapshotParams>();
 
-        public void SendSnapshot(int interval, SnapshotFactory snapshotFactory,
-            Dictionary<INetworkChannel, PlayerEntity> channelToPlayer)
+        public void SendSnapshot(int interval, SnapshotFactory snapshotFactory)
         {
             var sessionObjects = _contexts.session.serverSessionObjects;
             Bin2DConfig bin2DConfig = sessionObjects.Bin2DConfig;
@@ -134,31 +134,31 @@ namespace App.Server
             _sendSnapshotTasks.Clear();
             var freeMoveEntitys = _globalFreeMoveEntities.GetEntities();
             var weaponEntities = _globalWeaponEntities.GetEntities();
-            foreach (var entry in channelToPlayer)
+            foreach (var player in _playerEntities.GetEntities())
             {
-                INetworkChannel channel = entry.Key;
-                PlayerEntity player = entry.Value;
+              
                 if (player.hasStage &&
                     player.stage.CanSendSnapshot() &&
-                    channel.IsConnected &&
+                    player.network.NetworkChannel.IsConnected &&
                     !player.network.NetworkChannel.Serializer.MessageTypeInfo.SkipSendSnapShot(serverTime))
                 {
                     var p = ObjectAllocatorHolder<CreateSnapshotParams>.Allocate().Build(snapshotFactory, player,
                         bin2DConfig, bin, serverTime,
                         snapshotSeq,
-                        vehicleSimulationTime, channel);
+                        vehicleSimulationTime,  player.network.NetworkChannel);
                     var entitys = p.PreEnitys;
                     AddTeamPlayers(player, entitys, _contexts);
                     AddGlobalFreeMove(player, entitys, freeMoveEntitys);
                     AddWeapon(player, entitys, weaponEntities);
                     _sendSnapshotTasks.Add(p);
+                    //_logger.InfoFormat("SendSnapshot:{0} {1}",player.entityKey.Value, player.position.Value);
                 }
                 else
                 {
                     player.network.NetworkChannel.Serializer.MessageTypeInfo.IncSendSnapShot();
-                    _logger.DebugFormat("channel:{2} skip SendSnapshot :{0} {1}!", channel.IsConnected,
+                    _logger.DebugFormat("channel:{2} skip SendSnapshot :{0} {1}!",  player.network.NetworkChannel.IsConnected,
                         !player.network.NetworkChannel.Serializer.MessageTypeInfo.SkipSendSnapShot(serverTime),
-                        channel.IdInfo());
+                        player.network.NetworkChannel.IdInfo());
                 }
             }
 
@@ -283,6 +283,7 @@ namespace App.Server
             var preEntity = contexts.player.GetEntitiesWithPlayerInfo(player.playerInfo.TeamId);
             foreach (var playerEntity in preEntity)
             {
+                if(playerEntity.hasStage && playerEntity.stage.Value == EPlayerLoginStage.Running)
                 entitys.Add(playerEntity.entityAdapter.SelfAdapter);
             }
         }

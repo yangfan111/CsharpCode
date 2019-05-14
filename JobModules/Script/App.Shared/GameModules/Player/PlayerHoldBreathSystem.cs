@@ -1,10 +1,7 @@
 ﻿using App.Shared.GameModules.Camera.Utils;
-using Core.CameraControl.NewMotor;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using System;
-using XmlConfig;
 
 namespace Assets.App.Shared.GameModules.Player
 {
@@ -30,12 +27,12 @@ namespace Assets.App.Shared.GameModules.Player
                     Logger.Error("player has no appearance interface ");
                     return;
                 }
-                if(player.cameraStateNew.ViewNowMode == (int)ECameraViewMode.GunSight)
+
+                if (!player.oxygenEnergyInterface.Oxygen.InShiftState)
                 {
-                    if(!player.oxygenEnergyInterface.Oxygen.InShiftState)
-                        player.oxygenEnergyInterface.Oxygen.ShiftVeryTime = player.time.ClientTime;
-                    player.oxygenEnergyInterface.Oxygen.InShiftState = true;
+                    player.oxygenEnergyInterface.Oxygen.ShiftVeryTime = player.time.ClientTime;
                 }
+                player.oxygenEnergyInterface.Oxygen.InShiftState = true;
             }
             else
             {
@@ -50,6 +47,16 @@ namespace Assets.App.Shared.GameModules.Player
                     player.oxygenEnergyInterface.Oxygen.ShiftVeryTime = player.time.ClientTime;
                 }
                 player.oxygenEnergyInterface.Oxygen.InShiftState = false;
+                
+            }
+
+            if (player.oxygenEnergyInterface.Oxygen.InShiftState)
+            {
+                player.appearanceInterface.FirstPersonAppearance.SightShift.SetHoldBreath(true);
+            }
+            else
+            {
+                player.appearanceInterface.FirstPersonAppearance.SightShift.SetHoldBreath(false);
             }
         }
     }

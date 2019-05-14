@@ -35,7 +35,7 @@ namespace App.Shared.GameModules.Attack
             _meleeHitHandler = hitHandler;
         }
 
-        protected override bool filter(PlayerEntity player)
+        protected override bool Filter(PlayerEntity player)
         {
             if (!player.hasMeleeAttackInfoSync) return false;
             if (!player.hasMeleeAttackInfo) return false;

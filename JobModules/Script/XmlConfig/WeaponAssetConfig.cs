@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 using WeaponConfigNs;
 
@@ -10,11 +7,12 @@ namespace XmlConfig
     public enum WeaponPartLocation
     {
         None =-1,
-        Muzzle,
+        Muzzle,    
         LowRail,
         Magazine,
         Buttstock,
         Scope,
+        SideRail,
         EndOfTheWorld
     }
 

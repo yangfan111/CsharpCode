@@ -41,6 +41,11 @@ namespace App.Shared.GameModules.Weapon
             get { return entity.firePosition; }
         }
 
+        public int JobAttribute
+        {
+            get{ if (entity.hasPlayerInfo) return entity.playerInfo.JobAttribute; return 0; }
+        }
+
         public int RelatedTime
         {
             get { return entity.time.ClientTime; }
@@ -146,11 +151,7 @@ namespace App.Shared.GameModules.Weapon
         {
             get { return entity.playerWeaponBagSet; }
         }
-        public PlayerClientUpdateComponent RelatedClient
-        {
-            get { return entity.playerClientUpdate; }
-        }
-        public PlayerWeaponServerUpdateComponent WeaponServerUpdate
+        public PlayerWeaponServerUpdateComponent RelatedServerUpdate
         {
             get { return entity.playerWeaponServerUpdate; }
         }
@@ -184,17 +185,17 @@ namespace App.Shared.GameModules.Weapon
         #endregion
 
         #region//reference modify wrapper
-        public int? AutoFire
-        {
-            get
-            {
-
-                if (RelatedWeaponAux.HasAutoAction)
-                    return RelatedWeaponAux.AutoFire;
-                return null;
-            }
-            set { RelatedWeaponAux.AutoFire = value.Value; }
-        }
+//        public int? AutoFire
+//        {
+//            get
+//            {
+//
+//                if (RelatedWeaponAux.HasAutoAction)
+//                    return RelatedWeaponAux.AutoFire;
+//                return null;
+//            }
+//            set { RelatedWeaponAux.AutoFire = value.Value; }
+//        }
         public bool? AutoThrowing
         {
             get
@@ -303,7 +304,7 @@ namespace App.Shared.GameModules.Weapon
 
         public void CharacterDraw(System.Action drawCallback, float drawParam)
         {
-            RelatedCharState.Draw(drawCallback, drawParam);
+            RelatedCharState.Select(drawCallback, drawParam);
         }
 
         public void CharacterDrawInterrupt()
@@ -313,11 +314,11 @@ namespace App.Shared.GameModules.Weapon
             RelatedCharState.ForceFinishGrenadeThrow();
         }
 
-        public void CharacterUnarm(System.Action unarm, float unarmParam)
+        public void CharacterUnarm(System.Action holsterStartFinished, System.Action holsterEndFinished, float unarmParam)
         {
             RelatedCharState.InterruptAction();
             RelatedCharState.ForceFinishGrenadeThrow();
-            RelatedCharState.Unarm(unarm, unarmParam);
+            RelatedCharState.Holster(holsterStartFinished, holsterEndFinished, unarmParam);
         }
 
 

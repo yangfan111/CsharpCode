@@ -43,6 +43,8 @@ namespace App.Shared.GameModules.Configuration
             if (reload)
             {
                 SingletonManager.Get<T>().IsInitialized = false;
+                _isDone = false;
+                _isExit = false;
             }
 
             SingletonManager.Get<SubProgressBlackBoard>().Add();

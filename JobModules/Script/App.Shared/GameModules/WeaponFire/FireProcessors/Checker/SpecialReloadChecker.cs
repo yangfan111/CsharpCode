@@ -1,4 +1,5 @@
-﻿using Core.Utils;
+﻿using Core;
+using Core.Utils;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Weapon.Behavior
@@ -8,11 +9,8 @@ namespace App.Shared.GameModules.Weapon.Behavior
     /// </summary>
     public class SpecialReloadChecker : IFireChecker
     {
-        public SpecialReloadChecker()
-        {
-        }
 
-        public bool IsCanFire(PlayerWeaponController controller, IWeaponCmd cmd)
+        public bool IsCanFire(PlayerWeaponController controller, WeaponSideCmd cmd)
         {
             return CheckSpecialReload(controller);
         }
@@ -26,9 +24,10 @@ namespace App.Shared.GameModules.Weapon.Behavior
         private bool CheckSpecialReload(PlayerWeaponController controller)
         {
 
+            var specialReload = controller.RelatedCharState.GetActionState();
            // DebugUtil.MyLog("GetActionState:"+controller.RelatedCharState.GetActionState());
-            if (controller.RelatedCharState.GetActionState() != ActionInConfig.Reload &&
-                controller.RelatedCharState.GetActionState() != ActionInConfig.SpecialReload)
+            if (specialReload!= ActionInConfig.Reload &&
+                specialReload!= ActionInConfig.SpecialReload)
             {
                 return true;
             }
@@ -41,7 +40,6 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
             if (config.SpecialReloadCount > 0 && weaponBase.Bullet > 0)
             {
-                //TODO 特殊换弹打断逻辑
                 if (weaponBase.PullBolt)
                 {
                     //如果已经上膛，直接打断并开枪
@@ -53,12 +51,13 @@ namespace App.Shared.GameModules.Weapon.Behavior
                     //如果没有上膛，执行上膛，结束后开枪
                     controller.RelatedCharState.BreakSpecialReload();
                     weaponBase.PullBolt = true;
-                 
-                    if (controller.AutoFire.HasValue )
-                    {
-                        controller.AutoFire =(int)EAutoFireState.ReloadBreak;
-                    }
+                    weaponRunTIme.NeedAutoBurstShoot = false;
                 }
+            }
+            else
+            {
+                if(controller.AudioController != null)
+                    controller.AudioController.PlayEmptyFireAudio();
             }
             return false;
         }

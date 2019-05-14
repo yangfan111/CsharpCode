@@ -90,6 +90,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
             var animator = player.thirdPersonAnimator.UnityAnimator;
             var state = player.stateInterface.State;
             var action = player.stateInterface.State.GetActionState();
+            var nextAction = player.stateInterface.State.GetNextActionState();
             var keepAction = player.stateInterface.State.GetActionKeepState();
             var posture = player.stateInterface.State.GetCurrentPostureState();
             var nextPosture = player.stateInterface.State.GetNextPostureState();
@@ -105,10 +106,10 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 PostureWhenOverlay = postureType,
                 IsSight = state.GetActionKeepState() == ActionKeepInConfig.Sight || state.GetNextActionKeepState() == ActionKeepInConfig.Sight,
                 IsIntoSight = state.GetNextActionKeepState() == ActionKeepInConfig.Sight,
-                SightHorizontalShift = appearanceP1.SightShift.Buff * player.firstPersonAppearance.SightHorizontalShift,
-                SightVerticalShift = appearanceP1.SightShift.Buff * player.firstPersonAppearance.SightVerticalShift,
+                SightHorizontalShift = /*appearanceP1.SightShift.Buff * */player.firstPersonAppearance.SightHorizontalShift,
+                SightVerticalShift = /*appearanceP1.SightShift.Buff * */player.firstPersonAppearance.SightVerticalShift,
                 SightShiftBuff = player.oxygenEnergyInterface.Oxygen.SightShiftBuff,
-                IKActive = IKFilter.FilterPlayerIK(action, keepAction, posture, nextPosture, movement),
+                IKActive = IKFilter.FilterPlayerIK(action, nextAction, keepAction, posture, nextPosture, movement),
                 HeadPitch = player.characterBone.PitchHeadAngle,
                 HeadYaw = player.characterBone.RotHeadAngle,
                 HandPitch = player.characterBone.PitchHandAngle,

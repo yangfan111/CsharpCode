@@ -1,5 +1,6 @@
 ﻿using App.Client.GameModules.Player;
 using App.Shared;
+using App.Shared.Audio;
 using App.Shared.EntityFactory;
 using Core.GameModule.Interface;
 using Entitas;
@@ -44,6 +45,10 @@ namespace App.Client.GameModules.ClientEffect
                         case AudioClientEffectType.BulletDrop:
                             GameAudioMedia.PlayBulletDropAudio(entity.audio.AudioClientEffectArg1,
                                 (AudioGrp_FootMatType)entity.audio.AudioClientEffectArg2,entity.position.Value);
+                            break;
+                        case AudioClientEffectType.ThrowExplosion:
+                            GameAudioMedia.PlayEventAudio(entity.audio.AudioClientEffectArg1,
+                            entity.position.Value);
                             break;
                     }
                 }

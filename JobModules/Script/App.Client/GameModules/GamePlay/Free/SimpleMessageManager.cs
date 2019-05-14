@@ -99,6 +99,8 @@ namespace Assets.Sources.Free
             SingletonManager.Get<SimpleUIUpdater>().Add(new MinMapUpdater());
             SingletonManager.Get<SimpleUIUpdater>().Add(new DebugDataUpdater());
             _handlers.Add(new PlayerMoveSpeedHandler());
+            _handlers.Add(new PlayerScaleHandler());
+            _handlers.Add(new PlayerBiochemicalMarkHandler());
             _handlers.Add(new PlayerVisibilityHandler());
         }
 

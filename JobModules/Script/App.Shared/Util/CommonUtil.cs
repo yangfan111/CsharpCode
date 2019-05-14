@@ -9,18 +9,14 @@ namespace App.Shared.Util
 {
     public static class CommonUtil
     {
-        public static void ProcessEnumElements<T>(Action<string> process)
+        public static void ProcessEnumElements<T>(Action<T> process)
         {
             var typeT = typeof(T);
-            var names = Enum.GetNames(typeT);
-            if (names.Length == 0)
-                return;
-            for (int i = 0; i < names.Length; i++)
+            var enumValues = Enum.GetValues(typeT);
+            foreach (T enumValue in enumValues)
             {
-                if (process != null)
-                    process(names[i]);
+                process(enumValue);
             }
-
 
         }
         public static T GetAttribute<T>(MemberInfo t) where T : Attribute

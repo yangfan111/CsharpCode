@@ -87,7 +87,7 @@ namespace App.Shared.GameModules.Player.Actions
                 player.thirdPersonAnimator.UnityAnimator.applyRootMotion = false;
             if (player.hasThirdPersonModel)
             {
-                player.thirdPersonModel.Value.transform.localPosition = new Vector3(0, -PlayerEntityUtility.CcSkinWidth, 0);
+                player.thirdPersonModel.Value.transform.localPosition = new Vector3(0, 0, 0);
                 player.thirdPersonModel.Value.transform.localRotation = Quaternion.identity;
             }
                 

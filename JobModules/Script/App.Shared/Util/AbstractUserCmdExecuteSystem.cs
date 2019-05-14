@@ -9,14 +9,20 @@ namespace App.Shared.Util
     {
      
 
-        protected abstract bool filter(PlayerEntity playerEntity);
+        protected abstract bool Filter(PlayerEntity playerEntity);
+
+        protected virtual bool FilterCmd(IUserCmd cmd)
+        {
+            return true;
+        }
+
 
         protected abstract void ExecuteUserCmd(PlayerEntity playerEntity, IUserCmd cmd);
         
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             PlayerEntity player = owner.OwnerEntity as PlayerEntity;
-            if (player != null && filter(player))
+            if (player != null && Filter(player)&& FilterCmd(cmd))
             {
                 ExecuteUserCmd(player, cmd);
             }

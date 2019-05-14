@@ -164,7 +164,7 @@ namespace Core.Room
             if (RandomToken.Equals(token))
             {
                 System.Random rand = new System.Random();
-                return new PlayerInfo(token, GetNewRoom().RoomId,rand.Next(0, 1000) , "", 2, rand.Next(0, 1000),0,0,0,0,0,null,null,null,false);
+                return new PlayerInfo(token, GetNewRoom().RoomId,rand.Next(0, 1000) , "", 2, rand.Next(0, 1000),0,0,0,0,0,null,null,null,false, 0);
             }
             IPlayerInfo rc;
             

@@ -44,7 +44,7 @@ namespace App.Shared.GameMode
                 case EBulletCaliber.E57mm:
                     return DoSetReserveBullet(ref relatedAmmunition.ReservedBullet57, count);
                 default:
-                    Logger.ErrorFormat("Illegal caliber {0}", caliber);
+                    //Logger.ErrorFormat("Illegal caliber {0}", caliber);
                     return 0;
             }
         }
@@ -114,8 +114,8 @@ namespace App.Shared.GameMode
                 var cfg = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(weapon.ConfigId);
                 return (EBulletCaliber)cfg.Caliber;
             }
-            Logger.ErrorFormat("no weapon in slot {0} !!", slot);
-            return EBulletCaliber.Length;
+          //  Logger.ErrorFormat("no weapon in slot {0} !!", slot);
+            return EBulletCaliber.None;
         }
     }
 }

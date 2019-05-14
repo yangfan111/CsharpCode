@@ -40,7 +40,7 @@ namespace App.Client.GPUInstancing.Core.Data
 
         public Vector3 CameraWorldPosition
         {
-            get { return _renderingCamera.transform.position; }
+            get { return _frustum.ViewPoint; }
         }
 
         public Matrix4x4 VpMatrix

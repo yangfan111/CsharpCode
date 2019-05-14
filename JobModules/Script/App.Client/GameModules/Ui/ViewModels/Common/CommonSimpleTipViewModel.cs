@@ -202,6 +202,5 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
         public string ResourceAssetName { get { return "CommonSimpleTip"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }
-        public string UiConfigAssetName { get { return "CommonCross" ; } }
     }
 }

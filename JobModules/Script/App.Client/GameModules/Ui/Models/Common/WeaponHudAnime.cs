@@ -14,45 +14,27 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void InitSlotChangeAnime(int playAnimeCount)
         {
-            if (playAnimeCount == 1)
+            int absPlayAnimeCount = Mathf.Abs(playAnimeCount);
+            float absPlayAnime = SlotChangePosAnimeTime / absPlayAnimeCount;
+            bool isBackward = playAnimeCount > 0;
+            if (absPlayAnimeCount == 1)
             {
-                InitSlotChangeAnime(SlotChangePosAnimeTime / playAnimeCount);
+                InitSlotChangeAnime(absPlayAnime, isBackward);
             }
-            else if (playAnimeCount == 2)
+            else if (absPlayAnimeCount == 2)
             {
                 Sequence tmp = DOTween.Sequence();
-                InitSlotChangeAnime(SlotChangePosAnimeTime / playAnimeCount);
+                InitSlotChangeAnime(absPlayAnime, isBackward);
                 _slotChangeAnime.onComplete = () =>
                 {
-                    //var choice = _weaponSlotChoice + 1;
-                    var choice = StyleDict[(WeaponHudStyleType)GetSlotByIndex(_weaponSlotChoice)].index + 1;
+                    var offset = isBackward ? 1 : -1;
+                    var choice = StyleDict[(WeaponHudStyleType)GetSlotByIndex(_weaponSlotChoice)].index + offset;
                     ClipIndex(ref choice);
                     UpdateSlotPosIndex(choice);
                     UpdateStyle();
                 };
                 tmp.Append(_slotChangeAnime);
-                InitSlotChangeAnime(SlotChangePosAnimeTime / playAnimeCount);
-                tmp.Append(_slotChangeAnime);
-                _slotChangeAnime = tmp;
-            }
-            else if (playAnimeCount == -1)
-            {
-                InitSlotChangeAnime(-SlotChangePosAnimeTime / playAnimeCount, false);
-            }
-            else if (playAnimeCount == -2)
-            {
-                Sequence tmp = DOTween.Sequence();
-                InitSlotChangeAnime(-SlotChangePosAnimeTime / playAnimeCount,false);
-                _slotChangeAnime.onComplete = () =>
-                {
-                    //var choice = _weaponSlotChoice - 1;
-                    var choice = StyleDict[(WeaponHudStyleType) GetSlotByIndex(_weaponSlotChoice)].index - 1;
-                    ClipIndex(ref choice);
-                    UpdateSlotPosIndex(choice);
-                    UpdateStyle();
-                };
-                tmp.Append(_slotChangeAnime);
-                InitSlotChangeAnime(-SlotChangePosAnimeTime / playAnimeCount,false);
+                InitSlotChangeAnime(absPlayAnime, isBackward);
                 tmp.Append(_slotChangeAnime);
                 _slotChangeAnime = tmp;
             }
@@ -62,14 +44,8 @@ namespace App.Client.GameModules.Ui.Models.Common
         {
             _slotChangeAnime = DOTween.Sequence();
             int interval = 0;
-            if (isBackward)
-            {
-                interval = 1;
-            }
-            else
-            {
-                interval = -1;
-            }
+            interval = isBackward ? 1 : -1;
+
             foreach (WeaponHudStyleType type in Enum.GetValues(typeof(WeaponHudStyleType)))
             {
                 if ((type == WeaponHudStyleType.Bottom && isBackward) ||
@@ -155,8 +131,9 @@ namespace App.Client.GameModules.Ui.Models.Common
             {
                 return;
             }
-            //if (beforeChoice * afterChoice == 0)
-            if(afterChoice == 0 || (beforeChoice == 0 && !GetSlotTf(WeaponHudStyleType.Center).gameObject.activeSelf))
+            //if (afterChoice == 0 || (beforeChoice == 0 && !GetSlotTf(WeaponHudStyleType.Center).gameObject.activeSelf))
+
+            if(afterChoice == 0 || (beforeChoice == 0 && !GetSlotTf(WeaponHudStyleType.Center).gameObject.activeSelf && StyleDict[WeaponHudStyleType.Center].index == afterChoice))
             {           
                 UpdateSlotPosIndex(afterChoice);
                 return;//收枪、拔枪，武器槽实际上没改变，不播放动画

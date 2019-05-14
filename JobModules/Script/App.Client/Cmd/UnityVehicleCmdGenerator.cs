@@ -28,8 +28,7 @@ namespace App.Client.Cmd
             var keyReceiver = new KeyReceiver(Layer.Ui, BlockType.None);
             _inputManager.RegisterKeyReceiver(keyReceiver);
             keyReceiver.AddAction(UserInputKey.MoveVertical, data => _lastCmd.MoveVertical = data.Axis);
-            keyReceiver.AddAction(UserInputKey.MoveHorizontal, data =>
-                _lastCmd.MoveHorizontal = data.Axis);
+            keyReceiver.AddAction(UserInputKey.MoveHorizontal, data => _lastCmd.MoveHorizontal = data.Axis);
             keyReceiver.AddAction(UserInputKey.VehicleSpeedUp, data => _lastCmd.IsSpeedup = true);
             keyReceiver.AddAction(UserInputKey.VehicleBrake, data => _lastCmd.IsHandbrake = true);
             keyReceiver.AddAction(UserInputKey.VehicleHorn, data => _lastCmd.IsHornOn = true);

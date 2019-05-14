@@ -74,7 +74,8 @@ namespace App.Shared.GameModules.Weapon.Behavior
             fireLogic.RegisterProcessor(_scriptUtil.CreateSpreadProcessor(config.SpreadLogic));
             fireLogic.RegisterProcessor(_scriptUtil.CreateShakeProcessor(config.Shake));
             fireLogic.RegisterProcessor(_scriptUtil.CreateEffectManager(allConfigs.S_EffectConfig));
-            fireLogic.RegisterProcessor(_scriptUtil.CreateFireChecker(config.FireModeLogic));
+            fireLogic.RegisterProcessor(_scriptUtil.CreateFireModeChecker(allConfigs));
+            fireLogic.RegisterProcessor(_scriptUtil.CreateFireModeUpdater(config.FireModeLogic));
             fireLogic.RegisterProcessor(_scriptUtil.CreateFireActionLogic(allConfigs));
             fireLogic.RegisterProcessor(_scriptUtil.CreateFireBulletCounter(config.FireCounter));
             fireLogic.RegisterProcessor(_scriptUtil.CreateAutoFireProcessor(config.FireModeLogic));

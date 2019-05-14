@@ -4,7 +4,7 @@ using App.Shared.Components.Ui;
 
 namespace App.Client.GameModules.Ui.UiAdapter
 {
-    public class CountdownTipData : ICountdownTipData
+    public class BaseTipData : ITipData
     {
         public string Title { get; set; }
         public long DurationTime { get; set; }
@@ -19,7 +19,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
             _contexts = contexts;
             _ui = contexts.ui.uI;
         }
-        public List<ICountdownTipData> CountdownTipDataList
+        public List<ITipData> CountdownTipDataList
         {
             get { return _ui.CountdownTipDataList; }
         }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.ObjectPool;
 using Core.Prediction;
 using Core.Replicaton;
@@ -174,11 +175,27 @@ namespace App.Shared.Components.Player
         {
             foreach (var cmd in _tempUserCmdList)
             {
-                cmd.ReleaseReference();
+                try
+                {
+                    cmd.ReleaseReference();
+                }
+                catch (Exception e)
+                {
+                   _logger.InfoFormat("{0}",e);
+                }
+               
             }
             foreach (var cmd in _userCmdList)
             {
-                cmd.ReleaseReference();
+                try
+                {
+                    cmd.ReleaseReference();
+                }
+                catch (Exception e)
+                {
+                    _logger.InfoFormat("{0}",e);
+                }
+               
             }
             _tempUserCmdList.Clear();
             _userCmdList.Clear();

@@ -32,7 +32,10 @@ namespace App.Shared.GameMode
         {
             get { return false; }
         }
-
+        public override bool CanModeAutoReload
+        {
+            get { return false; }
+        }
         //public override void RecoverPlayerWeapon(PlayerEntity player)
         //{
         //}

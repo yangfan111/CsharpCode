@@ -56,6 +56,7 @@ namespace App.Client.GPUInstancing.Core.Utils
             public static readonly int RealCountInBlockData = Shader.PropertyToID("RealCountInBlockData");
 
             public static readonly int CullingDistance = Shader.PropertyToID("CullingDistance");
+            public static readonly int WorldShift = Shader.PropertyToID("WorldShift");
         }
 
         public static class CameraVariable

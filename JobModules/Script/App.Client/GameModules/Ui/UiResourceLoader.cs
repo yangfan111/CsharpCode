@@ -51,7 +51,7 @@ namespace App.Client.GameModules.Ui
                 {
                     callback(CreateSprite(obj));
                 }
-            });
+            },objectType: typeof(Sprite));
         }
 
         public void UnLoad(string bundleName, string assetName, object source)
@@ -59,21 +59,12 @@ namespace App.Client.GameModules.Ui
             _assetManager.LoadCancel(source);
         }
 
-        public void LoadToCache(AssetInfo info, int count)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                LoadAsync(info, null, null);
-            }
-           
-        }
-
         public void LoadAsync(string bundle, string name, Action<UnityEngine.Object> callback, GameObject parent = null)
         {
             LoadAsync(new AssetInfo(bundle, name), callback, parent);
         }
 
-        public void LoadAsync(AssetInfo assetInfo, Action<UnityEngine.Object> callback, GameObject parent = null)
+        public void LoadAsync(AssetInfo assetInfo, Action<UnityEngine.Object> callback, GameObject parent = null, Type objectType = null)
         {
             if (string.IsNullOrEmpty(assetInfo.BundleName) || string.IsNullOrEmpty(assetInfo.AssetName))
             {
@@ -97,7 +88,7 @@ namespace App.Client.GameModules.Ui
                 {
                     Logger.ErrorFormat("ui resource loaded failed: {0} {1}", e, assetInfo);
                 }
-            }, new AssetLoadOption(parent:_uiLoaderRoot,  recyclable:true));
+            }, new AssetLoadOption(parent:_uiLoaderRoot,  recyclable:true , objectType: objectType));
         }
 
         public void AddToGameObjectPool(Object obj)
@@ -132,17 +123,25 @@ namespace App.Client.GameModules.Ui
 
         private Sprite CreateSprite(object src)
         {
+            var sprite = src as Sprite;
+            
+            if (null != sprite)
+            {
+                if (sprite.texture != null)
+                {
+                    if (sprite.texture.width > 1024 && sprite.texture.height > 512)
+                    {
+                        Logger.WarnFormat("You Would Better Change {0} Mode From Sprite To Default", sprite.name);
+                    }
+                }
+                return sprite;
+            }
+        
 
             var tex = src as Texture2D;
             if (null != tex)
             {
                 return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.zero);
-            }
-
-            var sprite = src as Sprite;
-            if (null != sprite)
-            {
-                return sprite;
             }
 
             return null;

@@ -282,15 +282,15 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
         {
             if (item.hasUnityObject)
             {
-                return !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, item.unityObject.UnityObject);
+                return !CommonObjectCastUtil.HasObstacleBetweenPlayerAndItem(player, item.position.Value, item.unityObject.UnityObject);
             }
             else if (item.hasMultiUnityObject)
             {
-                return !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, item.multiUnityObject.FirstAsset);
+                return !CommonObjectCastUtil.HasObstacleBetweenPlayerAndItem(player, item.position.Value, item.multiUnityObject.FirstAsset);
             }
             else
             {
-                return !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, null);
+                return !CommonObjectCastUtil.HasObstacleBetweenPlayerAndItem(player, item.position.Value, null);
             }
         }
 
@@ -298,12 +298,12 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
         {
             if (item.hasUnityGameObject)
             {
-                var noObstacle = !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, item.unityGameObject.UnityObject);
+                var noObstacle = !CommonObjectCastUtil.HasObstacleBetweenPlayerAndItem(player, item.position.Value, item.unityGameObject.UnityObject);
                 return noObstacle;
             }
             else
             {
-                var noObstacle = !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, null);
+                var noObstacle = !CommonObjectCastUtil.HasObstacleBetweenPlayerAndItem(player, item.position.Value, null);
                 return noObstacle;
             }
         }

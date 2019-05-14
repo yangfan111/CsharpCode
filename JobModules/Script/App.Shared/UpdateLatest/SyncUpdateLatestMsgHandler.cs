@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using App.Shared.Components.Player;
-using Core.EntitasAdpater;
 using Core.EntityComponent;
 using Core.Prediction.UserPrediction;
 using Core.Prediction.UserPrediction.Cmd;

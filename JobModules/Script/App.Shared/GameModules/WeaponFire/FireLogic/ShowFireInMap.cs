@@ -17,7 +17,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
             _uiContext = uiContext;
         }
 
-        public void OnBulletFire(PlayerWeaponController controller, IWeaponCmd cmd)
+        public void OnBulletFire(PlayerWeaponController controller, WeaponSideCmd cmd)
         {
             controller.RelatedStatisticsData.ShootingCount += 1;
             //服务端不需要处理,uicontext为null

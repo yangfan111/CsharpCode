@@ -63,7 +63,8 @@ namespace App.Client.GameModules.Ui.Models.Common
             {
                 SwitchWeaponBagViewShow();
             });
-            _adapter.RegisterKeyReceive(openKeyReceiver);
+            _adapter.RegisterOpenKey(openKeyReceiver);
+            //_adapter.RegisterKeyReceive(openKeyReceiver);
         }
 
         private void InitKeyReveiver()
@@ -346,6 +347,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                 {
                     spritePool[assetInfo] = sprite;
                     weaponIcon.sprite = sprite;
+                    weaponIcon.enabled = true;
                     UIUtils.SetImageSuitable(weaponIcon);
                 });
             }           

@@ -35,6 +35,8 @@ namespace Core.Appearance
         // 所有武器要先挂载到1~5号位，再挂载到手上
         void MountWeaponToHand(WeaponInPackage pos);
         void UnmountWeaponFromHand();
+        void JustUnMountWeaponFromHand();
+        void JustClearOverrideController();
         void UnmountWeaponFromHandAtOnce();
         void MountWeaponInPackage(WeaponInPackage pos, int id);
         void UnmountWeaponInPackage(WeaponInPackage pos);

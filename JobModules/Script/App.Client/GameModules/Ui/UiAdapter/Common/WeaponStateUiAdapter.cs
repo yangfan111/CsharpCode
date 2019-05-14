@@ -1,4 +1,6 @@
 ﻿using App.Shared;
+using App.Shared.Components.Weapon;
+using App.Shared.GameModules.Weapon;
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using Core;
@@ -44,12 +46,8 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public int WeaponIdByIndex(int index)
         {
-            if (!Archive.IsWeaponSlotEmpty(Index2Slot(index)))
-            {
-                var weapon = GetWeaponInfoByIndex(index);
-                return weapon.ConfigId;
-            }
-            return 0;
+            var agent = Archive.GetWeaponAgent(Index2Slot(index));
+            return agent.BaseComponent.ConfigId;
         }
 
         public AssetInfo GetAssetInfoById(int weaponId)
@@ -83,7 +81,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 return 0;
             }
             var slot = Index2Slot(index);
-            var realIndex = index - 1;
             if (slot == EWeaponSlotType.ThrowingWeapon || slot == EWeaponSlotType.TacticWeapon)
             {
                 var player = Player;
@@ -95,7 +92,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
                     }
 
                     var agent = Archive.GetWeaponAgent(EWeaponSlotType.ThrowingWeapon);
-                    var greandeId = Archive.GetWeaponAgent(EWeaponSlotType.ThrowingWeapon).ConfigId;
+                    var greandeId = agent.BaseComponent.ConfigId;
                     return Archive.GrenadeHandler.ShowCount(greandeId);
                 }
             }
@@ -122,16 +119,14 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public int WeaponTypeByIndex(int index)
         {
-            if (Archive.IsWeaponSlotEmpty(Index2Slot(index)))
+
+            var configId = WeaponIdByIndex(index);
+
+            if(configId < 1)
             {
                 return 0;
             }
-            var weapon = GetWeaponInfoByIndex(index);
-            if (weapon.ConfigId < 1)
-            {
-                return 0;
-            }
-            var weaponCfg = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(weapon.ConfigId);
+            var weaponCfg = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(configId);
             if (null == weaponCfg)
             {
                 return 0;
@@ -174,7 +169,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
             }
         }
 
-
         public PlayerEntity Player
         {
             get
@@ -196,12 +190,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
         protected virtual int Slot2Index(EWeaponSlotType slot)
         {
             return (int)(slot - EWeaponSlotType.PrimeWeapon) + 1;
-        }
-
-        public WeaponScanStruct GetWeaponInfoByIndex(int index)
-        {
-            var baseScan = Archive.GetWeaponAgent(Index2Slot(index)).ComponentScan;
-            return baseScan;
         }
 
         private IPlayerWeaponSharedGetter _arhive;
@@ -243,34 +231,14 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 if (index > 0) index += 1;
                 return Math.Max(index, 1);
             }
-            //    var player = Player;
-            //    if (null == player)
-            //    {
-            //        return 1;
-            //    }
-            //    var weaponId = Archive.HeldWeaponAgent.ConfigId;
-            //    if (weaponId < 1)
-            //    {
-            //        return 1;
-            //    }
-            //    int index = Archive.GrenadeHelper.GetOwnedIds().IndexOf(Archive.GrenadeHelper.LastGrenadeId);
-            //    var helper = Archive.GrenadeHelper;
-            //    _grenadeList = helper.GetOwnedIds();
-            //    for (int i = 0; i < _grenadeList.Count; i++)
-            //    {
-            //        if (_grenadeList[i] == weaponId)
-            //        {
-            //            return i + 1;
-            //        }
-            //    }
-            //    return 1;
-            //}
+
         }
 
         public virtual List<int> SlotIndexList
         {
-            get { return new List<int> { 1, 2, 3, 4, 5 }; }
+            get { return _slotIndexList; }
         }
+        private List<int> _slotIndexList = new List<int> { 1, 2, 3, 4, 5 };
 
         public bool HasGrenadByIndex(int grenadeIndex)
         {
@@ -288,5 +256,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 return GrenadeIdByIndex(grenadeIndex) > 0;
             }
         }
+
     }
 }

@@ -13,5 +13,8 @@ namespace XmlConfig
     public class Individuation : ItemBaseConfig
     {
         public List<int> ApplyRoleList;
+        public int LifeTime;
+        public int IntervalCD;
+        public int PoseId;
     }
 }

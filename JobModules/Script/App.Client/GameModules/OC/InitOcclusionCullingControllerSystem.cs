@@ -54,8 +54,8 @@ namespace App.Client.GameModules.OC
                         TerrainSize = mapDesc.BigMapParameters.TerrainSize,
                         TerrainNamePattern = mapDesc.BigMapParameters.TerrainNamePattern,
 
-                        UnloadRadiusInGrid = 1.5f,
-                        LoadRadiusInGrid = 2.0f,
+                        UnloadRadiusInGrid = 2f,
+                        LoadRadiusInGrid = 1.5f,
 
                         LevelManager =  _contexts.session.commonSession.LevelManager,
                     };

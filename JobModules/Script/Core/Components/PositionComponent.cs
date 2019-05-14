@@ -31,25 +31,37 @@ namespace Core.Components
     [Serializable]
     public class PositionComponent : IPlaybackComponent, ICompensationComponent, IResetableComponent
     {
+        private FixedVector3 _fixedValue;
         [DontInitilize] [NetworkProperty] public bool AlwaysEqual;
 
 
         [DontInitilize] [NetworkProperty] public byte InterpolateType;
         [DontInitilize] [NetworkProperty] public int ServerTime;
-        [DontInitilize] [NetworkProperty] public FixedVector3 FixedVector3;
 
-        [DontInitilize] public Vector3 Value
+        [DontInitilize]
+        [NetworkProperty]
+        public FixedVector3 FixedVector3
+        {
+            get { return _fixedValue; }
+            set
+            {
+                var old = _fixedValue;
+                _fixedValue = value;
+                for (int i = 0; i < _positionListener.Count; i++)
+                {
+                    if (_positionListener[i] != null)
+                        _positionListener[i](_owner, old.WorldVector3(), value.WorldVector3());
+                }
+            }
+        }
+
+        [DontInitilize]
+        public Vector3 Value
         {
             get { return FixedVector3.ShiftedVector3(); }
             set
             {
-                var old = FixedVector3.ShiftedVector3();
                 FixedVector3 = value.ShiftedToFixedVector3();
-                for (int i = 0; i < _positionListener.Count; i++)
-                {
-                    if (_positionListener[i] != null)
-                        _positionListener[i](_owner, old, value);
-                }
             }
         }
 
@@ -57,7 +69,7 @@ namespace Core.Components
         private List<PositionChangedDelgate> _positionListener = new List<PositionChangedDelgate>();
 
         public void AddPositionListener(PositionChangedDelgate func)
-        { 
+        {
             _positionListener.Add(func);
         }
 

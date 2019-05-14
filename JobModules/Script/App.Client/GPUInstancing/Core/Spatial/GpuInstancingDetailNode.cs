@@ -11,7 +11,13 @@ namespace App.Client.GPUInstancing.Core.Spatial
 {
     class GpuInstancingDetailNode : GpuInstancingNode
     {
-        private List<int[]> _countInNode;
+        public string TerrainName;
+        public int X;
+        public int Z;
+
+        private List<ushort[]> _countInNode;
+        private OfflineDetailData _compactCountInNode;
+        
         private int[] _totalCountInLayer;
         private int _resolution;
         private int[] _index;
@@ -32,7 +38,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
         {
             var count = detail.Count;
 
-            _countInNode = new List<int[]>(count);
+            _countInNode = new List<ushort[]>(count);
             _totalCountInLayer = new int[count];
 
             _index = new[] { indexX, indexY };
@@ -47,22 +53,86 @@ namespace App.Client.GPUInstancing.Core.Spatial
             int pixelStartX = indexX * size;
             int pixelStartY = indexY * size;
 
+            ushort[] layer = null;
             for (int i = 0; i < count; ++i)
             {
                 var data = detail[i];
                 var countInLayer = 0;
-                int[] layer = new int[size * size];
+
+                if (layer == null)
+                    layer = new ushort[size * size];
+
                 for (int j = 0; j < size; ++j)
                 {
                     for (int k = 0; k < size; ++k)
                     {
-                        layer[k * size + j] = data[pixelStartY + k, pixelStartX + j];
+                        layer[k * size + j] = (ushort) data[pixelStartY + k, pixelStartX + j];
                         countInLayer += data[pixelStartY + k, pixelStartX + j];
                     }
                 }
 
-                _countInNode.Add(layer);
                 _totalCountInLayer[i] = countInLayer;
+                _countInCpu[i] = 0;
+
+                if (countInLayer != 0)
+                {
+                    _countInNode.Add(layer);
+                    layer = null;
+                }
+                else
+                    _countInNode.Add(null);
+            }
+        }
+
+        public void InitCountInUnit(int indexX, int indexY, int resolution, TextAsset rawData, List<int> maxCountInLayer,
+            int rawDataOffset, int layerOffset, int division)
+        {
+            _resolution = resolution;
+            _index = new[] { indexX, indexY };
+
+            var count = maxCountInLayer.Count;
+            _totalCountInLayer = new int[count];
+
+            _compactCountInNode = new OfflineDetailData
+            {
+                WholeData = rawData,
+                StartIndices = new List<int>(count),
+                Lengths = new List<int>(count)
+            };
+
+            var unitDataLength = _resolution * _resolution * 2;
+            var unitDataOffsetInLayer = (unitDataLength + 2) * (indexY * division + indexX);
+
+            var index = rawDataOffset + unitDataOffsetInLayer;
+
+            _transform = new ComputeBuffer[count];
+            _normal = new ComputeBuffer[count];
+            _color = new ComputeBuffer[count];
+            _count = new ComputeBuffer[count];
+            _countInCpu = new int[count];
+
+            for (int i = 0; i < count; ++i)
+            {
+                if (maxCountInLayer[i] != 0)
+                {
+                    unsafe
+                    {
+                        var head = new IntPtr(rawData.GetBytesIntPtr().ToInt64() + index);
+                        ushort* data = (ushort *) head.ToPointer();
+
+                        _totalCountInLayer[i] = *data;
+                        _compactCountInNode.StartIndices.Add(index + 2);
+                        _compactCountInNode.Lengths.Add(unitDataLength);
+                    }
+                    index += layerOffset;
+                }
+                else
+                {
+                    _compactCountInNode.StartIndices.Add(0);
+                    _compactCountInNode.Lengths.Add(0);
+                    _totalCountInLayer[i] = 0;
+                }
+
                 _countInCpu[i] = 0;
             }
         }
@@ -87,7 +157,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
         {
             var kernelId = _instantiationShader.FindKernel(Constants.CsKernel.Common);
 
-            ComputeBuffer countInUnit = new ComputeBuffer(_resolution * _resolution, Constants.StrideSizeInt);
+            ComputeBuffer countInUnit = new ComputeBuffer((_resolution * _resolution + 1) / 2, Constants.StrideSizeUint);
 
             int[] initialCounter = { 0 };
 
@@ -96,7 +166,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
 
             _terrainProperty.SetDetailInstantiationProperty(_instantiationShader);
 
-            var count = _countInNode.Count;
+            var count = _totalCountInLayer.Length;
             for (int i = 0; i < count; ++i)
             {
                 if (_totalCountInLayer[i] == 0)
@@ -118,7 +188,13 @@ namespace App.Client.GPUInstancing.Core.Spatial
                 _instantiationShader.SetBuffer(kernelId, Constants.DetailVariable.ColorData, _color[i]);
                 _instantiationShader.SetBuffer(kernelId, Constants.ShaderVariable.CounterData, _count[i]);
 
-                countInUnit.SetData(_countInNode[i]);
+                if (_countInNode != null)
+                    countInUnit.SetData(_countInNode[i]);
+                else
+                {
+                    IntPtr p = new IntPtr(_compactCountInNode.WholeData.GetBytesIntPtr().ToInt64() + _compactCountInNode.StartIndices[i]);
+                    countInUnit.SetDataWithIntPtr(p, _compactCountInNode.Lengths[i]);
+                }
 
                 _detailProperties[i].SetDetailInstantiationProperty(_instantiationShader, _index);
 
@@ -174,10 +250,6 @@ namespace App.Client.GPUInstancing.Core.Spatial
         public override MergeUnit[] GetMergeKernels(ComputeShader shader)
         {
             return MergeKernel.GetDetailMergeKernel(shader);
-        }
-
-        public override void Debug()
-        {
         }
     }
 }

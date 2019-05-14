@@ -61,7 +61,7 @@ namespace App.Shared.GameMode
                     Logger.Warn("pickupResult failed");
                     return;
                 }
-
+              
                 sceneObjectEntityFactory.DestroySceneWeaponObjectEntity(sceneEntity.entityKey.Value);
                 if(player.WeaponController().HeldConfigId == sceneEntity.weaponObject.ConfigId)
                 {
@@ -76,6 +76,7 @@ namespace App.Shared.GameMode
                     ta.AddUnit("current", (FreeData) player.freeData.FreeData);
                     args.Trigger(FreeTriggerConstant.WEAPON_PICKUP, ta);
                 }
+              
             }
         }
 
@@ -164,12 +165,14 @@ namespace App.Shared.GameMode
             }
         }
 
+        public virtual void SendPickup(IPlayerWeaponProcessor weaponProcessor, int entityId, int itemId, int category, int count)
+        {
+        }
+
         public virtual void SendAutoPickupWeapon(int entityId)
         {
         }
 
-        public virtual void SendPickup(int entityId, int itemId, int category, int count)
-        {
-        }
+       
     }
 }

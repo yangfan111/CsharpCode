@@ -26,6 +26,7 @@ using App.Shared.FreeFramework.framework.util;
 using App.Shared.Components;
 using App.Server.GameModules.GamePlay.Free.chicken;
 using Utils.Singleton;
+using com.wd.free.skill;
 
 namespace App.Server.GameModules.GamePlay.free.client
 {
@@ -99,7 +100,7 @@ namespace App.Server.GameModules.GamePlay.free.client
                 }
             }
             // 背包物品拖动到人身上
-            else if (from.StartsWith("default") && string.IsNullOrEmpty(to))
+            else if (PickupItemUtil.IsDefault(from) && string.IsNullOrEmpty(to))
             {
                 ItemPosition ip = FreeItemManager.GetItemPosition(room.FreeArgs, from, fd.freeInventory.GetInventoryManager());
                 if (ip != null)
@@ -115,6 +116,11 @@ namespace App.Server.GameModules.GamePlay.free.client
                     }
                 }
             }
+            else if ((from.StartsWith("w1,") && to.StartsWith("w2,"))
+                || (from.StartsWith("w2,") && to.StartsWith("w1,")))
+            {
+                ExchangeWeapon(room.FreeArgs, fd, from, to);
+            }
             else
             {
                 FreeItemManager.DragItem(message.Ss[0], fd, room.FreeArgs, message.Ss[1]);
@@ -122,6 +128,61 @@ namespace App.Server.GameModules.GamePlay.free.client
 
             room.FreeArgs.Resume(PARA_PLAYER_CURRENT);
             room.FreeArgs.GetDefault().GetParameters().Resume(PARA_EVENT_KEY);
+        }
+
+        private void ExchangeWeapon(ISkillArgs args, FreeData fd, string from, string to)
+        {
+            string fromWeapon = from.Split(',')[0].Trim();
+            string toWeapon = to.Split(',')[0].Trim();
+
+            if (fromWeapon != toWeapon)
+            {
+                ItemInventory fromInv = fd.freeInventory.GetInventoryManager().GetInventory(fromWeapon);
+                ItemInventory toInv = fd.freeInventory.GetInventoryManager().GetInventory(toWeapon);
+
+                ExchangeInv(args, fromInv, toInv);
+
+                string fromKey = fromWeapon.Substring(1, 1);
+                string toKey = toWeapon.Substring(1, 1);
+
+                for (int i = 1; i <= 5; i++)
+                {
+                    ExchangeInv(args, fd.freeInventory.GetInventoryManager().GetInventory("w" + fromKey + i),
+                        fd.freeInventory.GetInventoryManager().GetInventory("w" + toKey + i));
+                }
+            }
+        }
+
+        private void ExchangeInv(ISkillArgs args, ItemInventory fromInv, ItemInventory toInv)
+        {
+            ItemPosition temp = null;
+            if (toInv.posList.Count > 0)
+            {
+                temp = toInv.posList[0];
+            }
+            toInv.posList.Clear();
+
+            ItemPosition fromIp = null;
+            if (fromInv.posList.Count > 0)
+            {
+                fromIp = fromInv.posList[0];
+            }
+            fromInv.posList.Clear();
+
+            if (temp != null)
+            {
+                temp.inventory = fromInv;
+                fromInv.posList.Add(temp);
+            }
+
+            if (fromIp != null)
+            {
+                fromIp.inventory = toInv;
+                toInv.posList.Add(fromIp);
+            }
+
+            fromInv.ReDraw(args);
+            toInv.ReDraw(args);
         }
 
         private void MovePartToWeapon(ServerRoom room, FreeData fd, ItemPosition ip, string to, FreeItemInfo info)

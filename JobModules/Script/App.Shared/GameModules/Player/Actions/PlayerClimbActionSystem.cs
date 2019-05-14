@@ -4,6 +4,8 @@ using Core;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
+using Utils.Configuration;
+using Utils.Singleton;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Player.Actions
@@ -21,7 +23,8 @@ namespace App.Shared.GameModules.Player.Actions
             
             if (player.gamePlay.IsLifeState(EPlayerLifeState.Dead) ||
                 !player.hasGenericActionInterface ||
-                player.IsOnVehicle())
+                player.IsOnVehicle() ||
+                IsUnique(player))
                 return;
 
             _genericAction = player.genericActionInterface.GenericAction;
@@ -44,6 +47,14 @@ namespace App.Shared.GameModules.Player.Actions
         {
             var postureState = player.stateInterface.State.GetCurrentPostureState();
             return PostureInConfig.Jump != postureState && PostureInConfig.Climb != postureState;
+        }
+
+        private static bool IsUnique(PlayerEntity player)
+        {
+            if (null == player || !player.hasPlayerInfo) return false;
+
+            var roleId = player.playerInfo.RoleModelId;
+            return SingletonManager.Get<RoleConfigManager>().GetRoleItemById(roleId).Unique;
         }
         
         #region LifeState

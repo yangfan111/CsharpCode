@@ -4,14 +4,38 @@ using UnityEngine;
 
 namespace App.Shared.Components.Ui
 {
+    public class MapUtils
+    {
+        public static Color TeamColor(int num)
+        {
+            switch (num)
+            {
+                case 1:
+                    return new Color(0xff / 255f, 0xff / 255f, 0xff / 255f);
+                case 2:
+                    return new Color(0x3b / 255f, 0x80 / 255f, 0xe8 / 255f);
+                case 3:
+                    return new Color(0xe8 / 255f, 0x3f / 255f, 0x3b / 255f);
+                case 4:
+                    return new Color(0xe8 / 255f, 0xc9 / 255f, 0x3b / 255f);
+                case 5:
+                    return new Color(0xde / 255f, 0x3b / 255f, 0xe8 / 255f);
+                default:
+                    return new Color(0xff / 255f, 0xff / 255f, 0xff / 255f);
+            }
+        }
+    }
+
     public struct MiniMapPlayMarkInfo
     {
         private Vector2 pos;     //米   只用x 和 z
         private int num;         //对应的玩家编号 用来去颜色的
-        public MiniMapPlayMarkInfo(Vector2 pos, int num)
+        private Color color;
+        public MiniMapPlayMarkInfo(Vector2 pos, int num, Color color)
         {
             this.pos = pos;
             this.num = num;
+            this.color = color;
         }
         public Vector2 Pos
         {
@@ -36,6 +60,19 @@ namespace App.Shared.Components.Ui
             set
             {
                 num = value;
+            }
+        }
+
+        public Color Color
+        {
+            get
+            {
+                return color;
+            }
+
+            set
+            {
+                color = value;
             }
         }
     }

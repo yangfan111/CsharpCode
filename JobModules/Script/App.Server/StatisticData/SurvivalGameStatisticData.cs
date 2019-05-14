@@ -86,7 +86,7 @@ namespace App.Server.StatisticData
             gameOverPlayer.Statistics[(int) EStatisticsID.TeamCount] = _dictTeams.Count;
             if(((PlayerEntity) playerInfo.PlayerEntity).gamePlay.LifeState != (int) EPlayerLifeState.Alive)
             {
-                playerInfo.StatisticsData.DeadTime += (int) System.DateTime.Now.Ticks / 10000 - playerInfo.StatisticsData.LastDeadTime;
+                playerInfo.StatisticsData.DeadTime += (int) (System.DateTime.Now.Ticks / 10000L) - playerInfo.StatisticsData.LastDeadTime;
             }
             gameOverPlayer.Statistics[(int) EStatisticsID.DeadTime] = playerInfo.StatisticsData.DeadTime;
             AddHonorData(gameOverPlayer, playerInfo);

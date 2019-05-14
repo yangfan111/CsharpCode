@@ -1,9 +1,14 @@
-﻿using Core.GameModule.Interface;
+﻿using com.wd.free.unit;
+using Core.GameModule.Interface;
+using Core.Utils;
+using UnityEngine;
 
 namespace App.Client.GameModules.Player
 {
     public class ClientPlayerSaveSystem : AbstractSelfPlayerRenderSystem
     {
+        private static LoggerAdapter _logger = new LoggerAdapter(typeof(ClientPlayerSaveSystem));
+
         private bool _isShow;
         private float _saveTime = 10;
         private Contexts _contexts;
@@ -19,22 +24,37 @@ namespace App.Client.GameModules.Player
         }
 
         public override void OnRender(PlayerEntity playerEntity)
+        {
+            var gamePlay = playerEntity.gamePlay;
+            var ui = _contexts.ui.uI;
+            if (gamePlay.IsInteruptSave)
             {
-            if (playerEntity.gamePlay.IsSave || playerEntity.gamePlay.IsBeSave)
+                _logger.InfoFormat("save action interrupted. {0} {1}", gamePlay.IsSave, gamePlay.IsBeSave);
+                /*if (_isShow)
+                {*/
+                    gamePlay.IsInteruptSave = false;
+                    _isShow = false;
+                    ui.CountingDown = false;
+                    ui.CountDownNum = 0;
+                //}      
+            }
+            else
+            {
+                if ((gamePlay.IsBeSave || gamePlay.IsSave))
                 {
                     if (!_isShow)
                     {
                         _isShow = true;
-                        _contexts.ui.uI.CountingDown = true;
-                        _contexts.ui.uI.CountDownNum = _saveTime;
+                        ui.CountingDown = true;
+                        ui.CountDownNum = _saveTime;
                     }
                 }
-                else if (_isShow)
+                else
                 {
                     _isShow = false;
-                    _contexts.ui.uI.CountingDown = false;
-                    _contexts.ui.uI.CountDownNum = 0;
                 }
-            }
+            } 
+            
         }
+    }
 }

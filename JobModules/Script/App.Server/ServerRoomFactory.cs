@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Client.GameModules.GamePlay.Free;
+﻿using App.Client.GameModules.GamePlay.Free;
 using App.Server.Scripts.Config;
-using App.Shared;
 using Com.Wooduan.Ssjj2.Common.Net.Proto;
 using Core;
 using Core.Room;
@@ -40,6 +35,7 @@ namespace App.Server
         public ServerRoom Create(RequestCreateRoomMessage message)
         {
             _logger.InfoFormat("Handle CreateRoom Message");
+           
             var serverRoom = new ServerRoom(new RoomId(1), _contexts, _dispatcher, _coRouitneManager, _assetMananger, _tokenGenerator);
             ResetEventDispacther();
 
@@ -63,34 +59,28 @@ namespace App.Server
                 hallRoom.RoomName = message.CustomRoomName;
                 hallRoom.RoomCapacity = message.CustomRoomCapacity;
                 hallRoom.RoomDisplayId = (int)message.CustomRoomDisplayId;
-
+                hallRoom.AllowReConnect = message.AllowReConnect;
                 hallRoom.Init();
 
                 serverRoom.SetHallRoom(hallRoom);
                 serverRoom.SetRoomInfo(hallRoom);
-                serverRoom.SetGameMode(message.ModeId);
+                serverRoom.SetGameMode(message.ModeId, message.MapId);
                 
                 _logger.InfoFormat("Create Room {0}", message.MapId);
             }
             else
             {
-                //serverRoom.SetHallRoom(new DummyHallRoom(_dispatcher, _contexts));
                 HallRoom hallRoom = new DummyHallRoom(_dispatcher, _contexts);
-                hallRoom.Init();
+                //hallRoom.Init(); //本地测试无需发战报
                 serverRoom.SetHallRoom(hallRoom);
-                serverRoom.SetGameMode(RuleMap.GetRuleId(SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.Rule));
+                serverRoom.SetGameMode(RuleMap.GetRuleId(SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.Rule), SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.MapId);
             }
-
-            //serverRoom.Reset();
-
             return serverRoom;
         }
-
 
         private void ResetEventDispacther()
         {
             _contexts.session.serverSessionObjects.RoomEventDispatchter = _dispatcher;
         }
-        
     }
 }

@@ -15,7 +15,7 @@ namespace App.Shared.GameModules.Weapon
         {
         }
 
-        public override bool ExpendWeapon()
+        public override bool ExpendWeapon(int reservedBullet)
         {
             return false;
         }

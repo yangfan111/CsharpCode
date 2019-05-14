@@ -14,7 +14,7 @@ namespace App.Client.CastObjectUtil
 
         private static GameObject _startGo;
         private static GameObject _targetGo;
-        public static bool HasObstacleBeteenPlayerAndItem(PlayerEntity player, Vector3 targetCenter, GameObject item)
+        public static bool HasObstacleBetweenPlayerAndItem(PlayerEntity player, Vector3 targetCenter, GameObject item)
         {
             //  Logger.Debug("HasObstacleBeteenPlayerAndItem");
             if(null == player)
@@ -24,7 +24,9 @@ namespace App.Client.CastObjectUtil
             }
             _castCount = 0;
             var startPoint = player.cameraStateOutputNew.FinalArchorPosition;
-            int mask = ~(UnityLayerManager.GetLayerMask(EUnityLayerName.UserInputRaycast) | UnityLayerManager.GetLayerMask(EUnityLayerName.Player) | UnityLayerManager.GetLayerMask(EUnityLayerName.Vehicle) | UnityLayerManager.GetLayerMask(EUnityLayerName.NoCollisionWithBullet));
+            int mask = ~(UnityLayerManager.GetLayerMask(EUnityLayerName.UserInputRaycast) | UnityLayerManager.GetLayerMask(EUnityLayerName.Player)
+                       | UnityLayerManager.GetLayerMask(EUnityLayerName.Vehicle) | UnityLayerManager.GetLayerMask(EUnityLayerName.NoCollisionWithBullet)
+                       | UnityLayerManager.GetLayerMask(EUnityLayerName.NoCollisionWithEntity));
 #if DEBUG_OBSTACLE
             DebugDraw.DebugArrow(startPoint, targetCenter - startPoint);
             if(null == _startGo)

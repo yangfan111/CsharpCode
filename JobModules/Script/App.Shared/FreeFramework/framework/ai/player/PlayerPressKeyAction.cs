@@ -4,14 +4,13 @@ using com.wd.free.@event;
 using Core.Free;
 using Free.framework;
 using System;
-using UnityEngine;
-using WindowsInput.Native;
 
 namespace App.Shared.FreeFramework.framework.ai
 {
     [Serializable]
     public class PlayerPressKeyAction : AbstractPlayerAction
     {
+        private string press;
         private string key;
         private string time;
         
@@ -21,7 +20,8 @@ namespace App.Shared.FreeFramework.framework.ai
 
             SimpleProto msg = FreePool.Allocate();
             msg.Key = FreeMessageConstant.PlayerPressKey;
-            msg.Ins.Add(args.GetInt(key));
+            msg.Bs.Add(args.GetBool(press));
+            msg.Ss.Add(key);
             msg.Ins.Add(args.GetInt(time));
             FreeMessageSender.SendMessage(player, msg);
         }

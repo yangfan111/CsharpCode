@@ -40,7 +40,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
             return _vehicleContext.GetEntityWithEntityKey(_playerContext.flagSelfEntity.controlledVehicle.EntityKey);
         }
 
-        public bool IsTyreBrokeByIndex(VehiclePartIndex index, out VehicleUiWheelIndex uiIndex)
+        public bool IsWheelBrokeByIndex(VehiclePartIndex index, out VehicleUiWheelIndex uiIndex)
         {
             AssertUtility.Assert(IsOnVehicle);
 

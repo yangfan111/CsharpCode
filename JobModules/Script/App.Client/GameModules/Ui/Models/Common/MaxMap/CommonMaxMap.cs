@@ -95,7 +95,8 @@ namespace App.Client.GameModules.Ui.Models.Common
                     ShowMap(!adapter.Enable);
                 }
             });
-            adapter.RegisterKeyReceive(receiver);
+            //adapter.RegisterKeyReceive(receiver);
+            adapter.RegisterOpenKey(receiver);
 
             DynamicKeyReceive();
         }
@@ -106,7 +107,8 @@ namespace App.Client.GameModules.Ui.Models.Common
             keyReceive = new KeyReceiver(UiConstant.maxMapWindowKeyBlockLayer, BlockType.All);  
             keyReceive.AddAction(UserInputKey.ChangeMapRate, (data) =>
             {
-                if (isGameObjectCreated == true && MapLevel.Min.Equals(adapter.MapLevel) == false)
+                if (isGameObjectCreated == true)
+//                if (isGameObjectCreated == true && MapLevel.Min.Equals(adapter.MapLevel) == false)
                 {
                     Vector2 hitPoint = Vector2.zero;
                     if (RectTransformUtility.ScreenPointToLocalPointInRectangle(maxMapMaskControl.GetComponent<RectTransform>(), Input.mousePosition, uiCamera, out hitPoint))

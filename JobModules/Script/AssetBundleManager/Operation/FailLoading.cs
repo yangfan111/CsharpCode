@@ -1,11 +1,12 @@
 using AssetBundleManagement;
+using System;
 
 namespace AssetBundleManager.Operation
 {
     class FailLoading : AssetLoading
     {
-        public FailLoading(bool isSceneLoading, string bundleName, string assetName):
-            base(AssetLoadingPattern.Unkown, bundleName, assetName)
+        public FailLoading(AssetLoadingPattern LoadingPattern,bool isSceneLoading, string bundleName, string assetName, Type objectType):
+            base(LoadingPattern, bundleName, assetName, objectType)
         {
             AssetGroup = isSceneLoading ? AssetGroup.Scene : AssetGroup.Asset;
         }

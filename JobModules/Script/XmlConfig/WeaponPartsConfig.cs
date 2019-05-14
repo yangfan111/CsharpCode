@@ -2,7 +2,6 @@
 
 namespace XmlConfig
 {
-
     /// <summary>
     /// 配件的类型，顺序和策划的配置一致
     /// </summary>
@@ -14,15 +13,15 @@ namespace XmlConfig
         /// </summary>
         Magazine,
         /// <summary>
-        /// 枪口
+        /// 枪口：消焰器，补偿器，消音器
         /// </summary>
         Muzzle,
         /// <summary>
-        /// 导轨
+        /// 导轨:瞄具
         /// </summary>
         UpperRail,
         /// <summary>
-        /// 侧导轨
+        /// 侧导轨:S型激光辅助
         /// </summary>
         SideRail,
         /// <summary>
@@ -33,12 +32,18 @@ namespace XmlConfig
         /// 枪托
         /// </summary>
         Stock,
+        Bore,
+        Feed,
+        Trigger,
+        Interlock,
+        Brake,
         Length,
     }
+
     [XmlType("child")]
     public class WeaponPartsConfigItem : ItemBaseConfig
     {
-        public int Apply;
+        public int Apply;    //需要废弃的字段(大厅中已经废弃！！！)  现在配件的限制在武器表的 ApplyParts//
         public string Res;
         public string Bundle;
         public int UnlockLv;
@@ -67,6 +72,11 @@ namespace XmlConfig
         public int PickSound;
         public int Default;
         public float FovMove;
+        public int Workshop;
+        public float BaseDamage;
+        public float DistanceDecay;
+        public float EmitVelocity;
+        public float AttackInterval;
     }
 
     [XmlRoot("root")]

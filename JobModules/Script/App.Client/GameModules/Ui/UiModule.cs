@@ -1,25 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using App.Client.GameModules.Free;
-using App.Client.GameModules.Ui.Models.Common;
 using App.Client.Utility;
 using App.Shared;
 using App.Shared.DebugHandle;
 using Assets.UiFramework.Libs;
-using Utils.AssetManager;
 using Core.GameModule.Module;
 using Core.Utils;
-using Loxodon.Framework.Binding;
-using Loxodon.Framework.Contexts;
 using UnityEngine;
 using Assets.App.Client.GameModules.Ui;
-using Core.Enums;
 using Core.GameModule.Interface;
-using UIComponent.UI.Manager;
-using App.Shared.Components.Ui;
-using App.Client.GameModules.Ui.UiAdapter;
-using Core.Ui;
 
 namespace App.Client.GameModules.Ui
 {
@@ -50,8 +40,8 @@ namespace App.Client.GameModules.Ui
             AddModelSystems();
             AddSystem(new UiSessionSystem(contexts));
             AddSystem(new UiPlayerDataInitSystem(contexts));
+            AddSystem(this);
 
-//            contexts.ui.uI.UIState[UINameConstant.ChickenScoreModel] = false;
         }
 
         private void AddModelSystems()
@@ -62,20 +52,6 @@ namespace App.Client.GameModules.Ui
                     AddSystem(model as IUserSystem);
             }
         }
-
-        //        private void AddModels()
-        //        {
-        //            foreach (var model in _uiModels)
-        //            {
-        //                AddModel(model);
-        //            }
-        //        }
-        //
-        //        private void AddModel(AbstractModel model)
-        //        {
-        //            AddSystem(model);
-        //            _uiModelsDic.Add(model.GetType().Name, model);
-        //        }
 
         public void HideUI(string name)
         {

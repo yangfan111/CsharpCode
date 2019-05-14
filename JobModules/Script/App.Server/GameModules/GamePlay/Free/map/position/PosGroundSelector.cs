@@ -8,6 +8,7 @@ using com.wd.free.unit;
 using UnityEngine;
 using App.Shared.Configuration;
 using Utils.Singleton;
+using Core.Utils;
 
 namespace App.Server.GameModules.GamePlay.Free.map.position
 {
@@ -28,7 +29,7 @@ namespace App.Server.GameModules.GamePlay.Free.map.position
             Ray r = new Ray(fromV, new Vector3(toV.x - fromV.x, toV.y - fromV.y, toV.z - fromV.z));
 
             RaycastHit hitInfo;
-            bool hited = Physics.Raycast(r, out hitInfo);
+            bool hited = Physics.Raycast(r, out hitInfo, 100000, UnityLayers.SceneCollidableLayerMask);
 
             if (hited)
             {

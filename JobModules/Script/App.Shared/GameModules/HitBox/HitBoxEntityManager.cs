@@ -1,4 +1,5 @@
-﻿using App.Shared.Components.Common;
+﻿using System.Collections.Generic;
+using App.Shared.Components.Common;
 using App.Shared.Components.Player;
 using BehaviorDesigner.Runtime.Tasks.Basic.UnityTime;
 using Core.Compensation;
@@ -14,8 +15,11 @@ namespace App.Shared.GameModules.Bullet
 {
     public interface IHitBoxContext
     {
-        HitBoxComponent GetHitBoxComponent(EntityKey entityKey);
-        HitBoxTransformProvider GetHitBoxProvider(EntityKey entityKey);
+        Vector3 GetPosition(EntityKey entityKey);
+        float GetRadius(EntityKey entityKey);
+        void EnableHitBox(EntityKey entityKey, bool enalbe);
+        List<Transform> GetCollidersTransform(EntityKey entityKey);
+        
         void UpdateHitBox(IGameEntity gameEntity);
 
     }
@@ -39,48 +43,28 @@ namespace App.Shared.GameModules.Bullet
         private Vector3 GetPosition(IGameEntity gameEntity)
         {
             var pos = gameEntity.Position.Value;
-            
-            var provider = GetHitBoxProvider(gameEntity);
-            if (provider != null)
-                return provider.BoundSpherePosition() + pos;
-
-            var comp = GetHitBoxComponent(gameEntity);
-            if (comp != null)
-                return comp.HitPreliminaryGeo.position;
-            
+            var subManager = GetSubManager(gameEntity.EntityType);
+            if(subManager!=null)
+                return subManager.GetPosition(gameEntity.EntityKey);
             return pos;
         }
 
         private float GetRadius(IGameEntity gameEntity)
         {
-            var provider = GetHitBoxProvider(gameEntity);
-            if (provider != null)
-                return provider.BoundSphereRadius();
-
-            var comp = GetHitBoxComponent(gameEntity);
-            if (comp != null)
-                return comp.HitPreliminaryGeo.radius;
-                
+            var subManager = GetSubManager(gameEntity.EntityType);
+            if(subManager!=null)
+                return subManager.GetRadius(gameEntity.EntityKey);
             return 0;
         }
 
         public bool GetPositionAndRadius(IGameEntity gameEntity, out Vector3 position, out float radius)
         {
             var pos = gameEntity.Position.Value;
-            var provider = GetHitBoxProvider(gameEntity);
-            
-            if (provider != null)
+            var subManager = GetSubManager(gameEntity.EntityType);
+            if (subManager != null)
             {
-                position = provider.BoundSpherePosition() + pos;
-                radius = provider.BoundSphereRadius();
-                return true;
-            }
-
-            var comp = GetHitBoxComponent(gameEntity);
-            if (comp != null)
-            {
-                position = comp.HitPreliminaryGeo.position + pos;
-                radius = comp.HitPreliminaryGeo.radius;
+                position = subManager.GetPosition(gameEntity.EntityKey) + pos;
+                radius = subManager.GetRadius(gameEntity.EntityKey);
                 return true;
             }
 
@@ -97,23 +81,6 @@ namespace App.Shared.GameModules.Bullet
             {
                 return _subManagers[type];
             }
-
-            return null;
-        }
-
-        public HitBoxComponent GetHitBoxComponent(IGameEntity gameEntity)
-        {
-            var subManager = GetSubManager(gameEntity.EntityType);
-            if (subManager != null)
-                return subManager.GetHitBoxComponent(gameEntity.EntityKey);
-            return null;
-        }
-
-        public HitBoxTransformProvider GetHitBoxProvider(IGameEntity gameEntity)
-        {
-            var subManager = GetSubManager(gameEntity.EntityType);
-            if (subManager != null)
-                return subManager.GetHitBoxProvider(gameEntity.EntityKey);
             return null;
         }
         
@@ -123,30 +90,6 @@ namespace App.Shared.GameModules.Bullet
             if (subManager != null)
             {
                 subManager.UpdateHitBox(gameEntity);
-            }
-        }
-
-        public void WatchHitBoxes(IGameEntity gameEntity)
-        {
-            var subManager = GetSubManager(gameEntity.EntityType);
-            if (subManager != null)
-            {
-                var provider = subManager.GetHitBoxProvider(gameEntity.EntityKey);
-                _logger.ErrorFormat("WatchBoxes: ");
-                foreach (var item in provider.GetRigidBodies())
-                {
-                    _logger.ErrorFormat("Rigid: {0}:{1}",item.Key,item.Value.detectCollisions);
-                }
-
-                foreach (var item in provider.GetHitBoxTransforms())
-                {
-                    _logger.ErrorFormat("HitBoxTrans: {0}, layer:{1}", item.Key, item.Value.gameObject.layer);
-                }
-
-                foreach (var item in provider.GetHitBoxColliders())
-                {
-                    _logger.ErrorFormat("HitBoxCollider: {0}:{1}", item.Key, item.Value.enabled);
-                }
             }
         }
 
@@ -166,54 +109,26 @@ namespace App.Shared.GameModules.Bullet
             }
         }
 
-      
-
         public void DrawHitBox(IGameEntity gameEntity, float time)
         {
-            var hitBoxComponent = GetHitBoxComponent(gameEntity);
-            if (hitBoxComponent != null && hitBoxComponent.HitBoxGameObject!=null)
+            var subManager = GetSubManager(gameEntity.EntityType);
+            if (subManager != null)
             {
-                DebugDraw.DebugWireSphere(GetPosition(gameEntity),
-                    GetRadius(gameEntity), time);
-                HitBoxGameObjectUpdater.DrawBoundBox(hitBoxComponent.HitBoxGameObject.transform, time);
-                return;
-            }
-
-            {
-                var hitBoxProvider = GetHitBoxProvider(gameEntity);
-                if (hitBoxProvider != null)
+                DebugDraw.DebugWireSphere(GetPosition(gameEntity), GetRadius(gameEntity), time);
+                foreach (var item in subManager.GetCollidersTransform(gameEntity.EntityKey))
                 {
-                    DebugDraw.DebugWireSphere(GetPosition(gameEntity), GetRadius(gameEntity), time);
-                    foreach (var item in  hitBoxProvider.GetHitBoxColliders())
-                    {
-                        HitBoxGameObjectUpdater.DrawBoundBox(item.Value, time);
-                    }
+                    HitBoxGameObjectUpdater.DrawBoundBox(item, time);
                 }
             }
         }
 
         public void EnableHitBox(IGameEntity gameEntity, bool enable)
         {
-            var provider = GetHitBoxProvider(gameEntity);
-            var comp = GetHitBoxComponent(gameEntity);
-
-            if (comp == null || comp.Enabled == enable) return;
-
-            if (provider != null)
+            var subManager = GetSubManager(gameEntity.EntityType);
+            if (subManager != null)
             {
-                provider.SetActive(enable);
+                subManager.EnableHitBox(gameEntity.EntityKey, enable);
             }
-            else if (comp.HitBoxGameObject != null) 
-            {
-                comp.HitBoxGameObject.SetActive(enable);
-            }
-        }
-
-        public void SetRigidBodyCollision(IGameEntity gameEntity, bool enable)
-        {
-            var provider = GetHitBoxProvider(gameEntity);
-            if (provider != null)
-                provider.SetColliderInRigidBody(enable);
         }
 
         public bool Raycast(Ray rayRay, out RaycastHit hitInfo, float rayLength, int hitboxLayerMask)

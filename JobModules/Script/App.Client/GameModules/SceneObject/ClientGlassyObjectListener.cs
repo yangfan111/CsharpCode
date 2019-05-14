@@ -11,6 +11,7 @@ using Core.Utils;
 using UltimateFracturing;
 using UnityEngine;
 using Core.SceneTriggerObject;
+using Entitas;
 using Utils.Singleton;
 
 namespace App.Client.GameModules.SceneObject
@@ -32,24 +33,33 @@ namespace App.Client.GameModules.SceneObject
             
         }
 
-        protected override void OnDeativeObjectActive(MapObjectEntity mapObject, GameObject gameObject)
+        protected override void OnDeativeObjectActive(int id, MapObjectEntity mapObject, GameObject gameObject)
         {
             LinkGameObjectToSceneObject(mapObject, gameObject);
+            MapObjectUtility.RecordMapObj(id, (int) ETriggerObjectType.GlassyObject, mapObject);
+            MapObjectUtility.SendLastEvent(mapObject);
         }
 
-        protected override void OfflineTriggerObjectLoad(string id, GameObject gameObject)
+
+        protected override void LoadTriggerObject(int id, GameObject gameObject)
         {
-            MapObjectEntityFactory.CreateGlassyObject(id, gameObject, OnChunkBroken);
+            MapObjectUtility.RecordGameObjId(gameObject, (int)ETriggerObjectType.GlassyObject, id);
+            MapObjectUtility.AttachRawObjToFracture(gameObject);    
+            MapObjectUtility.AddCallBack<FracturedGlassyObject>(gameObject, OnChunkBroken);
         }
 
-        protected override void OnlineTriggerObjectLoad(MapObjectEntity mapObject, GameObject gameObject)
+        public override IEntity CreateMapObj(int id)
         {
-            LinkGameObjectToSceneObject(mapObject, gameObject);
+            var gameObj = _objectManager.Get(id);
+            if (gameObj == null) return null;
+            var glass = (MapObjectEntity) MapObjectEntityFactory.CreateGlassyObject(id, gameObj);
+            MapObjectUtility.RecordMapObj(id, (int) _triggerType, glass);
+            return glass;
         }
 
         protected void LinkGameObjectToSceneObject(MapObjectEntity mapObject, GameObject gameObject)
         {
-            MapObjectUtility.AddRawGameObject<FracturedGlassyObject>(mapObject, gameObject, OnChunkBroken);
+            MapObjectUtility.AddRawGameObject<FracturedGlassyObject>(mapObject, gameObject);
 
             var glassyData = mapObject.glassyData;
             var fo = gameObject.GetComponent<FracturedGlassyObject>();
@@ -68,6 +78,16 @@ namespace App.Client.GameModules.SceneObject
         {
             var chunk = (FracturedGlassyChunk) o;
             var mapObject = MapObjectUtility.GetMapObjectOfFracturedChunk(chunk);
+            if (mapObject == null)
+            {
+                var rawObj = chunk.FracturedObjectSource.gameObject;
+                MapObjectUtility.StoreCreateMapObjMsg(MapObjectUtility.GetGameObjType(rawObj),
+                    MapObjectUtility.GetGameObjId(rawObj));
+                var evt = ChunkSyncEvent.Allocate();
+                evt.EType = TriggerObjectSyncEventType.BreakChunk;
+                evt.ChunkId = chunk.ChunkId;
+                MapObjectUtility.StoreTriggerObjectEvent(rawObj, evt);
+            }
 
             if (mapObject != null && !SharedConfig.IsOffline)
             {
@@ -78,8 +98,8 @@ namespace App.Client.GameModules.SceneObject
                     evt.EType = TriggerObjectSyncEventType.BreakChunk;
                     evt.SourceObjectId = mapObject.entityKey.Value.EntityId;
                     evt.ChunkId = chunk.ChunkId;
-
-                    MapObjectUtility.SendTriggerObjectEventToServer(mapObject, evt);
+                    if(!SharedConfig.IsServer)
+                        MapObjectUtility.SendTriggerObjectEventToServer(mapObject, evt);
                 }
                 
             }

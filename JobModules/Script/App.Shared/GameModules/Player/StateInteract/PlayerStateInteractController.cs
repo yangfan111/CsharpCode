@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Text;
 using Core;
 using Core.Prediction.UserPrediction.Cmd;
+using Core.Utils;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Player
@@ -25,6 +27,18 @@ namespace App.Shared.GameModules.Player
         public void DoRunTimeInterrupt(IUserCmd cmd)
         {
             var states = stateCollector.GetCurrStates(EPlayerStateCollectType.UseCacheAddation);
+#if UNITY_EDITOR
+            if(GlobalConst.EnableStateLog)
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+                foreach (var s in states)
+                {
+                    stringBuilder.Append(s);
+                    stringBuilder.Append('|');
+                }
+                DebugUtil.MyLog(stringBuilder);
+            }
+#endif
             stateInterrupter.DoRunTimeInterrupt(states, cmd);
         }
 

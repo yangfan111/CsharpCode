@@ -68,7 +68,21 @@ namespace App.Client.GameModules.SceneObject
             {
                 LoadWeapon(sceneObjectEntity);
             }
+          //  LoadAudioEnvironment(sceneObjectEntity);
         }
+        private static LoggerAdapter _logger = new LoggerAdapter(typeof(SceneObjectLoadSystem));
+
+        //private bool bgmInit = false;
+        //private void LoadAudioEnvironment(SceneObjectEntity sceneObjectEntity)
+        //{
+        //    if (!bgmInit)
+        //    {
+        //        _logger.InfoFormat("Create Server Scene Audio");
+        //        bgmInit = true;
+        //        AssetInfo assetInfo = new AssetInfo("sound/common", "S003_Audio_Amb");
+        //        _assetManager.LoadAssetAsync(sceneObjectEntity, assetInfo, _simpleLoadHandler.OnLoadSucc);
+        //    }
+        //}
 
         private void LoadWeapon(SceneObjectEntity sceneObjectEntity)
         {
@@ -175,7 +189,7 @@ namespace App.Client.GameModules.SceneObject
             }
 
             AssetInfo asset =
-                SingletonManager.Get<WeaponAvatarConfigManager>().GetThirdPersonModel(avatarId);
+                SingletonManager.Get<WeaponAvatarConfigManager>().GetThirdPersonWeaponModel(avatarId);
             bool alreadyInitializedBefore = true;
             if (!sceneObjectEntity.hasMultiUnityObject || !sceneObjectEntity.hasWeaponAttachment)
             {
@@ -401,7 +415,7 @@ namespace App.Client.GameModules.SceneObject
                 {
                     var size = Mathf.Max(1f, entity.size.Value);
                     model.transform.localScale  = Vector3.one * entity.size.Value;
-                    target.transform.localScale = Vector3.one * size;
+                    target.transform.localScale = Vector3.one / size;
                 }
 
                 if (entity.hasEffects)
@@ -418,6 +432,14 @@ namespace App.Client.GameModules.SceneObject
                 }
                 else if (entity.hasWeaponObject)
                 {
+                    if (SingletonManager.Get<WeaponResourceConfigManager>().IsC4(entity.weaponObject.ConfigId))
+                    {
+                        target.transform.localPosition = new Vector3(0, 0.5f, 0);
+                    }
+                    else
+                    {
+                        target.transform.localPosition = new Vector3(-0.5f, 0, 0);
+                    }
                     ProcessWeapon(entity, target);
                 }
             }

@@ -1,19 +1,18 @@
-﻿using Core;
-using Core.Statistics;
+﻿using Core.Statistics;
 using Core.Utils;
 using Entitas;
 using System.Collections.Generic;
-using System;
+using UnityEngine;
 
 namespace Core.Room
 {
-
     public class PlayerInfo : IPlayerInfo
     {
         /// <summary>
         /// 战斗中的武器背包的总数,由1开始
         /// </summary>
         public static readonly int PlayerWeaponBagCount = 6;
+
         public PlayerInfo()
         {
             WeaponBags = new PlayerWeaponBagData[PlayerWeaponBagCount];
@@ -22,9 +21,10 @@ namespace Core.Room
             SprayLacquers = new List<int>();
         }
 
-        public PlayerInfo(string token, IRoomId roomId, long playerId, string playerName, int roleModelId, long teamId, int num, int level, int backId, int titleId, int badgeId, int[] avatarIds, int[] weaponAvatarIds, int[] sprayLacquers, bool hasTestWeapon) : this()
+        public PlayerInfo(string token, IRoomId roomId, long playerId, string playerName, int roleModelId, long teamId,
+            int num, int level, int backId, int titleId, int badgeId, int[] avatarIds, int[] weaponAvatarIds,
+            int[] sprayLacquers, bool hasTestWeapon, int jobAttrbute) : this()
         {
-
             Token = token;
             RoomId = roomId;
             PlayerId = playerId;
@@ -48,7 +48,8 @@ namespace Core.Room
                 WeaponAvatarIds.AddRange(weaponAvatarIds);
             }
 
-            if (sprayLacquers != null) {
+            if (sprayLacquers != null)
+            {
                 SprayLacquers.AddRange(sprayLacquers);
             }
 
@@ -68,8 +69,9 @@ namespace Core.Room
                     }
                 };
             }
-        }
 
+            JobAttribute = jobAttrbute;
+        }
 
 
         public int EntityId { get; set; }
@@ -95,9 +97,12 @@ namespace Core.Room
         public bool IsKing { get; set; }
         public int Camp { get; set; }
         public PlayerWeaponBagData[] WeaponBags { get; set; }
+        public Vector3 InitPosition { get; set; }
         public StatisticsData StatisticsData { get; set; }
         public Entity PlayerEntity { get; set; }
+        public int JobAttribute { get; set; }
 
+        public int SpecialFeedbackType { get; set; }
         public List<int> SprayLacquers { get; set; }
     }
 
@@ -108,20 +113,27 @@ namespace Core.Room
         public int WeaponAvatarTplId;
         public int LowerRail;
         public int UpperRail;
+        public int SideRail;
         public int Stock;
         public int Muzzle;
         public int Magazine;
+        public int Bore;
+        public int Feed;
+        public int Trigger;
+        public int Interlock;
+        public int Brake;
 
         public override string ToString()
         {
-            return string.Format("index {0}, weaponId {1}, avatarId {2}, lowerRail {3}, upRail {4}, stock {5}, muzzle {6} magazine {7}",
+            return string.Format(
+                "index {0}, weaponId {1}, avatarId {2}, lowerRail {3}, upRail {4}, stock {5}, muzzle {6} magazine {7}",
                 Index, WeaponTplId, WeaponAvatarTplId, LowerRail, UpperRail, Stock, Muzzle, Magazine);
         }
 
         public static WeaponScanStruct Explicit(PlayerWeaponData weaponData)
         {
             WeaponScanStruct scan = new WeaponScanStruct();
-            scan.ConfigId =weaponData.WeaponTplId;
+            scan.ConfigId = weaponData.WeaponTplId;
 
             scan.AvatarId = weaponData.WeaponAvatarTplId;
             scan.Muzzle = weaponData.Muzzle;
@@ -129,9 +141,14 @@ namespace Core.Room
             scan.Magazine = weaponData.Magazine;
             scan.UpperRail = weaponData.UpperRail;
             scan.LowerRail = weaponData.LowerRail;
+            scan.SideRail = weaponData.SideRail;
+            scan.Bore = weaponData.Bore;
+            scan.Feed = weaponData.Feed;
+            scan.Trigger = weaponData.Trigger;
+            scan.Interlock = weaponData.Interlock;
+            scan.Brake = weaponData.Brake;
             return scan;
         }
-
     }
 
     public class PlayerWeaponBagData
@@ -141,6 +158,7 @@ namespace Core.Room
         public List<PlayerWeaponData> weaponList;
 
         private static readonly System.Text.StringBuilder OuputStringBuilder = new System.Text.StringBuilder();
+
         public override string ToString()
         {
             OuputStringBuilder.Length = 0;
@@ -155,6 +173,7 @@ namespace Core.Room
                 OuputStringBuilder.Append(weaponList[i].WeaponAvatarTplId);
                 OuputStringBuilder.AppendLine();
             }
+
             return OuputStringBuilder.ToString();
         }
 
@@ -165,11 +184,13 @@ namespace Core.Room
                 Logger.Error("Target to copy is null");
                 return;
             }
+
             playerWeaponBagData.BagIndex = BagIndex;
             if (playerWeaponBagData.weaponList == null)
             {
                 playerWeaponBagData.weaponList = new List<PlayerWeaponData>();
             }
+
             playerWeaponBagData.weaponList.Clear();
             foreach (var weapon in weaponList)
             {

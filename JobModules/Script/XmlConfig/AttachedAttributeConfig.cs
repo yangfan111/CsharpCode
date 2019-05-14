@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using WeaponConfigNs;
 
 namespace XmlConfig
 {
@@ -20,8 +19,6 @@ namespace XmlConfig
         /// 换弹时间
         /// </summary>
         ReloadSpeed,
-        
-        
         /// <summary>
         /// 左右偏移概率
         /// </summary>
@@ -50,10 +47,6 @@ namespace XmlConfig
         /// 连射时递增高度
         /// </summary>
         UpModifier,
-        
-        
-        
-        
         /// <summary>
         /// 消除枪口火花
         /// </summary>
@@ -62,7 +55,6 @@ namespace XmlConfig
         /// 瞄准时间
         /// </summary>
         FocusSpeed,
-       
         /// <summary>
         /// 呼吸摇晃的幅度
         /// </summary>
@@ -83,15 +75,19 @@ namespace XmlConfig
         /// 瞄准后的fov变化
         /// </summary>
         Fov,
+        BaseDamage,
+        EmitVelocity,
+        AttackInterval,
+        DistanceDecay,
         Length,
     }
-
 
     public struct AttachedAttributeItem
     {
         public WeaponAttributeType Type;
         public float Val;
     }
+
     public class AttachedAttributeSet
     {
         public readonly List<AttachedAttributeItem> list;
@@ -115,8 +111,8 @@ namespace XmlConfig
                 return list[length - 1].Val;
             return -999f;
         }
-        
     }
+
     public class AttachmentConfigItem
     {
         public int Id;

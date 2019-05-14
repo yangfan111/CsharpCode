@@ -17,7 +17,8 @@ namespace App.Shared.GameModules.Configuration
         {
             AddSystem(new SubResourceLoadSystem(sessionState, new CharacterSpeedSubResourceHandler()));
             AddSystem(new SubResourceLoadSystem(sessionState, new WeaponAvatarAnimSubResourceHandler()));
-           // AddSystem(new SubResourceLoadSystem(sessionState, new ShaderWarmUpHandler()));
+            if(!SharedConfig.IsServer)
+                AddSystem(new SubResourceLoadSystem(sessionState, new ShaderWarmUpHandler()));
         }
     }
 
@@ -26,7 +27,9 @@ namespace App.Shared.GameModules.Configuration
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(ShaderWarmUpHandler));
 
         public readonly AssetInfo[] _toWarmUpShaderAssets = new[]
-            {new AssetInfo("shader", "Standard (MSAO)"), new AssetInfo("shader", "Standard (MSAO)_FirstPerson")};
+        {
+            new AssetInfo("shaders", "L001")
+        };
 
         protected override bool LoadSubResourcesImpl()
         {
@@ -43,12 +46,14 @@ namespace App.Shared.GameModules.Configuration
 
         protected override void OnLoadSuccImpl(UnityObject unityObj)
         {
-            var asset = unityObj.As<ShaderVariantCollection>();
-            _logger.InfoFormat("ShaderVariantCollection:{0}",asset);
-            if (null != asset)
+            if (unityObj.AsObject != null)
             {
-                asset.WarmUp();
-                
+                var asset = unityObj.As<ShaderVariantCollection>();
+                _logger.InfoFormat("ShaderVariantCollection:{0}, {1}", asset, unityObj.AsObject.GetType());
+                if (null != asset)
+                {
+                    asset.WarmUp();
+                }
             }
         }
     }

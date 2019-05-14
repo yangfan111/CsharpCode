@@ -7,12 +7,12 @@ namespace App.Shared.GameModules.Weapon.Behavior
     /// </summary>
     public class SniperSpreadProcessor : AbstractSpreadProcessor
     {
-        protected override void Update(PlayerWeaponController controller, IWeaponCmd cmd)
+        protected override void Update(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
 
         {
-            SniperSpreadLogicConfig config           = controller.HeldWeaponAgent.SniperSpreadLogicCfg;
-            var                     runTimeComponent = controller.HeldWeaponAgent.RunTimeComponent;
-            float                   spread           = FireSpreadProvider.GetSpreadScaleFactor(config, controller);
+            SniperSpreadLogicConfig config           = weaponBaseAgent.SniperSpreadLogicCfg;
+            var                     runTimeComponent = weaponBaseAgent.RunTimeComponent;
+            float                   spread           = FireSpreadProvider.GetSpreadScaleFactor(config, weaponBaseAgent.Owner.WeaponController());
             FireSpreadFormula.ApplyFixedFinalSpread(spread, config.SpreadScale, runTimeComponent);
         }
     }

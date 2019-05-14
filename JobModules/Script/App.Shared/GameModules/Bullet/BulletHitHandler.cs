@@ -1,34 +1,33 @@
-﻿using System;
-using App.Shared.Components;
+﻿using App.Shared.Components;
 using App.Shared.Components.Player;
 using App.Shared.EntityFactory;
-using App.Shared.GameModules.SceneObject;
 using App.Shared.GameModules.Vehicle;
+using App.Shared.SceneTriggerObject;
 using App.Shared.Util;
 using Core;
 using Core.BulletSimulation;
 using Core.Compensation;
 using Core.EntityComponent;
 using Core.Enums;
+using Core.Event;
 using Core.HitBox;
 using Core.IFactory;
 using Core.Prediction.VehiclePrediction.Cmd;
 using Core.Utils;
-using Entitas;
+using System;
 using UltimateFracturing;
 using UnityEngine;
 using Utils.Configuration;
 using Utils.Singleton;
 using WeaponConfigNs;
-using Random = System.Random;
 
 namespace App.Shared.GameModules.Bullet
 {
     public class BulletHitHandler : IBulletHitHandler
     {
-        private IEntityIdGenerator            _entityIdGenerator;
-        private IPlayerDamager                _damager;
-        private IDamageInfoCollector          _damageInfoCollector;
+        private IEntityIdGenerator _entityIdGenerator;
+        private IPlayerDamager _damager;
+        private IDamageInfoCollector _damageInfoCollector;
         private IEnvironmentTypeConfigManager _environmentTypeConfigManager;
 
         private CustomProfileInfo _OnHitPlayer =
@@ -38,74 +37,29 @@ namespace App.Shared.GameModules.Bullet
             SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("BulletHitHandler_OnHitVehicle");
 
         private CustomProfileInfo _OnHitEnvironment = SingletonManager.Get<DurationHelp>()
-                                                                      .GetCustomProfileInfo(
-                                                                          "BulletHitHandler_OnHitEnvironment");
+            .GetCustomProfileInfo("BulletHitHandler_OnHitEnvironment");
 
-        public BulletHitHandler(
-            Contexts                      contexts,
-            IEntityIdGenerator            entityIdGenerator,
-            IPlayerDamager                damager,
-            IDamageInfoCollector          damageInfoCollector,
-            ISoundEntityFactory           soundEntityFactory,
-            IEnvironmentTypeConfigManager environmentTypeConfigManager)
+        public BulletHitHandler(Contexts contexts, IEntityIdGenerator entityIdGenerator, IPlayerDamager damager,
+            IDamageInfoCollector damageInfoCollector, ISoundEntityFactory soundEntityFactory, IEnvironmentTypeConfigManager environmentTypeConfigManager)
         {
-            _contexts                     = contexts;
-            this._entityIdGenerator       = entityIdGenerator;
-            _damager                      = damager;
-            _damageInfoCollector          = damageInfoCollector;
-            _soundEntityFactory           = soundEntityFactory;
+            _contexts = contexts;
+            this._entityIdGenerator = entityIdGenerator;
+            _damager = damager;
+            _damageInfoCollector = damageInfoCollector;
+            _soundEntityFactory = soundEntityFactory;
             _environmentTypeConfigManager = environmentTypeConfigManager;
-            _sceneObjectEntityFactory     = _contexts.session.entityFactoryObject.SceneObjectEntityFactory;
+            _sceneObjectEntityFactory = _contexts.session.entityFactoryObject.SceneObjectEntityFactory;
+            _triggerObjectManager = SingletonManager.Get<TriggerObjectManager>();
         }
 
-        private        Contexts                  _contexts;
-        private static LoggerAdapter             _logger = new LoggerAdapter(typeof(BulletHitHandler));
-        private        ISoundEntityFactory       _soundEntityFactory;
-        private        int                       _hitLayerMask;
-        private        ISceneObjectEntityFactory _sceneObjectEntityFactory;
+        private Contexts _contexts;
+        private static LoggerAdapter _logger = new LoggerAdapter(typeof(BulletHitHandler));
+        private ISoundEntityFactory _soundEntityFactory;
+        private int _hitLayerMask;
+        private ISceneObjectEntityFactory _sceneObjectEntityFactory;
+        private TriggerObjectManager _triggerObjectManager;
 
-        public void OnHitVehicle(
-            PlayerEntity  srcPlayer,
-            VehicleEntity targetVehicle,
-            IBulletEntity bulletEntity,
-            RaycastHit    hit)
-        {
-            if (srcPlayer.gamePlay.IsDead())
-            {
-                return;
-            }
-
-            Collider         collider = hit.collider;
-            VehiclePartIndex partIndex;
-            var              hitBoxFactor = VehicleEntityUtility.GetHitFactor(targetVehicle, collider, out partIndex);
-
-            var totalDamage = GetBulletDamage(bulletEntity, hitBoxFactor,
-                Vector3.Distance(hit.point, bulletEntity.GunEmitPosition));
-            var gameData = targetVehicle.GetGameData();
-            gameData.DecreaseHp(partIndex, totalDamage, srcPlayer.entityKey.Value);
-            srcPlayer.statisticsData.Statistics.TotalDamage += totalDamage;
-
-            bulletEntity.IsValid = false;
-
-            srcPlayer.statisticsData.Statistics.ShootingSuccCount++;
-            _logger.DebugFormat(
-                "bullet from {0} hit vehicle {1}, part {2}",
-                bulletEntity.OwnerEntityKey,
-                targetVehicle.entityKey.Value,
-                collider.name);
-
-
-            ClientEffectFactory.AddHitVehicleEffectEvent(
-                srcPlayer,
-                targetVehicle.entityKey.Value,
-                hit.point,
-                hit.point - targetVehicle.position.Value,
-                hit.normal);
-        }
-
-        public void OnHitPlayer(Contexts      contexts, PlayerEntity srcPlayer, PlayerEntity targetPlayer,
-                                IBulletEntity bulletEntity,
-                                RaycastHit    hit, Vector3 targetPlayerPostion, int cmdSeq)
+        public void OnHitVehicle(PlayerEntity srcPlayer, VehicleEntity targetVehicle, IBulletEntity bulletEntity, RaycastHit hit)
         {
             if (srcPlayer.gamePlay.IsDead())
             {
@@ -113,15 +67,39 @@ namespace App.Shared.GameModules.Bullet
             }
 
             Collider collider = hit.collider;
+            VehiclePartIndex partIndex;
+            var hitBoxFactor = VehicleEntityUtility.GetHitFactor(targetVehicle, collider, out partIndex);
 
+            var totalDamage = GetBulletDamage(bulletEntity, hitBoxFactor, Vector3.Distance(hit.point, bulletEntity.GunEmitPosition));
+            var gameData = targetVehicle.GetGameData();
+            gameData.DecreaseHp(partIndex, totalDamage, srcPlayer.entityKey.Value);
+            srcPlayer.statisticsData.Statistics.TotalDamage += totalDamage;
+
+            bulletEntity.IsValid = false;
+
+            srcPlayer.statisticsData.Statistics.ShootingSuccCount++;
+            _logger.DebugFormat("bullet from {0} hit vehicle {1}, part {2}",
+                bulletEntity.OwnerEntityKey, targetVehicle.entityKey.Value, collider.name);
+
+            ClientEffectFactory.AddHitVehicleEffectEvent(srcPlayer, targetVehicle.entityKey.Value, hit.point,
+                hit.point - targetVehicle.position.Value, hit.normal);
+        }
+
+        public void OnHitPlayer(Contexts contexts, PlayerEntity srcPlayer, PlayerEntity targetPlayer,
+            IBulletEntity bulletEntity, RaycastHit hit, Vector3 targetPlayerPostion, int cmdSeq)
+        {
+            if (srcPlayer.gamePlay.IsDead())
+            {
+                return;
+            }
+
+            Collider collider = hit.collider;
             EBodyPart part = BulletPlayerUtility.GetBodyPartByHitBoxName(collider);
-
 
             _logger.InfoFormat("OnHitPlayer in {0}", part);
 
             float hitboxFactor = bulletEntity.GetDamageFactor(part);
-            float totalDamage = GetBulletDamage(bulletEntity, hitboxFactor,
-                Vector3.Distance(hit.point, bulletEntity.GunEmitPosition));
+            float totalDamage = GetBulletDamage(bulletEntity, hitboxFactor, Vector3.Distance(hit.point, bulletEntity.GunEmitPosition));
 
             bulletEntity.IsValid = false;
 
@@ -131,19 +109,11 @@ namespace App.Shared.GameModules.Bullet
 //                targetPlayer.stateInterface.State.BeenHit();
 //            }
 
-            ClientEffectFactory.AddBeenHitEvent(srcPlayer, targetPlayer.entityKey.Value,
-                GeneraterUniqueHitId(srcPlayer, cmdSeq), contexts.session.currentTimeObject.CurrentTime);
-            ClientEffectFactory.AddHitPlayerEffectEvent(srcPlayer, targetPlayer.entityKey.Value, hit.point,
-                hit.point - targetPlayer.position.Value);
+            ClientEffectFactory.AddBeenHitEvent(srcPlayer, targetPlayer, GeneraterUniqueHitId(srcPlayer, cmdSeq), contexts.session.currentTimeObject.CurrentTime);
+            ClientEffectFactory.AddHitPlayerEffectEvent(srcPlayer, targetPlayer.entityKey.Value, hit.point, hit.point - targetPlayer.position.Value);
 
-            _logger.InfoFormat(
-                "bullet from {0} hit player {1}, part {2}, hitbox factor {3}, result damage {4}",
-                bulletEntity.OwnerEntityKey,
-                targetPlayer.entityKey.Value,
-                collider,
-                hitboxFactor,
-                totalDamage);
-
+            _logger.InfoFormat("bullet from {0} hit player {1}, part {2}, hitbox factor {3}, result damage {4}",
+                bulletEntity.OwnerEntityKey, targetPlayer.entityKey.Value, collider, hitboxFactor, totalDamage);
 
             if (!targetPlayer.gamePlay.IsLastLifeState(EPlayerLifeState.Dead))
             {
@@ -152,17 +122,11 @@ namespace App.Shared.GameModules.Bullet
                 {
                     srcPlayer.statisticsData.Statistics.ShootingPlayerCount++;
                 }
-
                 srcPlayer.statisticsData.Statistics.ShootingSuccCount++;
             }
 
-            BulletPlayerUtility.ProcessPlayerHealthDamage(
-                contexts,
-                _damager,
-                srcPlayer,
-                targetPlayer,
-                new PlayerDamageInfo(totalDamage, (int) EUIDeadType.Weapon, (int) part, bulletEntity.WeaponId,
-                    bulletEntity.IsOverWall),
+            BulletPlayerUtility.ProcessPlayerHealthDamage(contexts, _damager, srcPlayer, targetPlayer,
+                new PlayerDamageInfo(totalDamage, (int) EUIDeadType.Weapon, (int) part, bulletEntity.WeaponId, bulletEntity.IsOverWall),
                 _damageInfoCollector);
         }
 
@@ -173,18 +137,13 @@ namespace App.Shared.GameModules.Bullet
 
         private float GetBulletDamage(IBulletEntity bulletEntity, float hitboxFactor, float distance)
         {
-            float baseHarm      = bulletEntity.BaseDamage;
+            float baseHarm = bulletEntity.BaseDamage;
             float distanceDecay = bulletEntity.DistanceDecayFactor;
             // 武器基础伤害 * (距离系数 ^ (实际命中距离 / 1270)) * hitbox系数 * 防弹装备系数 * 穿透系数
             float totalDamage = baseHarm * Mathf.Pow(distanceDecay, distance / 12.7f) * hitboxFactor;
 
-            _logger.InfoFormat(
-                "bullet damage baseHarm {0}, distance decay {1}, distance {2}, hitbox factor {3}, result damage {4}",
-                baseHarm,
-                distanceDecay,
-                distance,
-                hitboxFactor,
-                totalDamage);
+            _logger.InfoFormat("bullet damage baseHarm {0}, distance decay {1}, distance {2}, hitbox factor {3}, result damage {4}",
+                baseHarm, distanceDecay, distance, hitboxFactor, totalDamage);
 
             return totalDamage;
         }
@@ -195,9 +154,7 @@ namespace App.Shared.GameModules.Bullet
             return this;
         }
 
-
-        public virtual void OnHit(int                cmdSeq, IBulletEntity bulletEntity, RaycastHit hit,
-                                  ICompensationWorld compensationWorld)
+        public virtual void OnHit(int cmdSeq, IBulletEntity bulletEntity, RaycastHit hit, ICompensationWorld compensationWorld)
         {
             bulletEntity.HitPoint = hit.point;
             Collider collider = hit.collider;
@@ -211,18 +168,17 @@ namespace App.Shared.GameModules.Bullet
             if (srcPlayer == null)
             {
                 _logger.WarnFormat("bullet from unkown {0} hit environment {1}, collier {2}",
-                    bulletEntity.OwnerEntityKey,
-                    hit.point, collider.name);
+                    bulletEntity.OwnerEntityKey, hit.point, collider.name);
                 return;
             }
 
-            PlayerEntity  targetPlayer  = null;
+            PlayerEntity targetPlayer = null;
             VehicleEntity targetVehicle = null;
 
             var comp = hit.collider.transform.gameObject.GetComponent<HitBoxOwnerComponent>();
             if (comp != null)
             {
-                targetPlayer  = _contexts.player.GetEntityWithEntityKey(comp.OwnerEntityKey);
+                targetPlayer = _contexts.player.GetEntityWithEntityKey(comp.OwnerEntityKey);
                 targetVehicle = _contexts.vehicle.GetEntityWithEntityKey(comp.OwnerEntityKey);
             }
 
@@ -238,19 +194,15 @@ namespace App.Shared.GameModules.Bullet
                     }
                     else
                     {
-                        _logger.ErrorFormat("cant get player compensation position with key {0}",
-                            targetPlayer.entityKey.Value);
-                        OnHitPlayer(_contexts, srcPlayer, targetPlayer, bulletEntity, hit, targetPlayer.position.Value,
-                            cmdSeq);
+                        _logger.ErrorFormat("cant get player compensation position with key {0}", targetPlayer.entityKey.Value);
+                        OnHitPlayer(_contexts, srcPlayer, targetPlayer, bulletEntity, hit, targetPlayer.position.Value, cmdSeq);
                     }
-
                     bulletEntity.HitType = EHitType.Player;
                 }
                 finally
                 {
                     _OnHitPlayer.EndProfileOnlyEnableProfile();
                 }
-
                 return;
             }
 
@@ -266,7 +218,6 @@ namespace App.Shared.GameModules.Bullet
                 {
                     _OnHitVehicle.EndProfileOnlyEnableProfile();
                 }
-
                 return;
             }
 
@@ -291,14 +242,13 @@ namespace App.Shared.GameModules.Bullet
             }
 
             ThicknessInfo thicknessInfo;
-            EnvironmentInfo info =
-                BulletEnvironmentUtility.GetEnvironmentInfoByHitBoxName(hit, bulletEntity.Velocity, out thicknessInfo);
+            EnvironmentInfo info = BulletEnvironmentUtility.GetEnvironmentInfoByHitBoxName(hit, bulletEntity.Velocity, out thicknessInfo);
             float damageDecayFactor = _environmentTypeConfigManager.GetDamageDecayFactorByEnvironmentType(info.Type);
             float energyDecayFactor = _environmentTypeConfigManager.GetEnergyDecayFactorByEnvironmentType(info.Type);
-            float oldThickNess      = bulletEntity.PenetrableThickness;
-            float oldDamage         = bulletEntity.BaseDamage;
-            bulletEntity.BaseDamage           *= damageDecayFactor;
-            bulletEntity.PenetrableThickness  =  bulletEntity.PenetrableThickness * energyDecayFactor - info.Thickness;
+            float oldThickNess = bulletEntity.PenetrableThickness;
+            float oldDamage = bulletEntity.BaseDamage;
+            bulletEntity.BaseDamage *= damageDecayFactor;
+            bulletEntity.PenetrableThickness = bulletEntity.PenetrableThickness * energyDecayFactor - info.Thickness;
             bulletEntity.PenetrableLayerCount -= info.LayerCount;
 
             if (bulletEntity.PenetrableLayerCount <= 0 || bulletEntity.PenetrableThickness <= 0)
@@ -312,82 +262,58 @@ namespace App.Shared.GameModules.Bullet
 
             EBulletCaliber caliber = bulletEntity.Caliber; //根据口径
 
-            var collider          = hit.collider;
+            var collider = hit.collider;
             var fracturedHittable = collider.GetComponent<FracturedHittable>();
             if (fracturedHittable != null)
             {
-                //    DebugUtil.MyLog("Shoot fracturedHittable",DebugUtil.DebugColor.Blue);
                 EntityKey? hittedObjectKey = null;
 
-                var sceneObjectEntity = MapObjectUtility.GetMapObjectOfFracturedHittable(fracturedHittable);
-                if (sceneObjectEntity != null)
-                    hittedObjectKey = sceneObjectEntity.entityKey.Value;
-                else
+                var script = fracturedHittable.gameObject.GetComponent<FracturedHittable>();
+                if (script == null) return;
+
+                var objtype = MapObjectUtility.GetGameObjType(script.Owner);
+                if (objtype < 0) return;
+
+                var rawObjKey = MapObjectUtility.GetGameObjId(script.Owner);
+
+                if (rawObjKey != Int32.MinValue && !SharedConfig.IsServer &&
+                    MapObjectUtility.GetMapObjectByGameObject(script.Owner) == null)
                 {
-                    var mapObjectEntity = MapObjectUtility.GetMapObjectOfFracturedHittable(fracturedHittable);
-                    if (mapObjectEntity != null)
-                        hittedObjectKey = mapObjectEntity.entityKey.Value;
+                    MapObjectUtility.SendCreateMapObjMsg(objtype, rawObjKey);
+                    _logger.InfoFormat("CreateMapObjEvent: type:{0}, obj:{1}, num:{2}", (ETriggerObjectType) objtype,
+                        fracturedHittable.gameObject,
+                        srcPlayer.uploadEvents.Events.Events[EEventType.CreateMapObj].Count);
                 }
 
                 FracturedAbstractChunk fracturedChunk = null;
 
-                if (null != hittedObjectKey)
-                {
-                    fracturedChunk = fracturedHittable.Hit(hit.point, hit.normal);
-                    if (fracturedHittable.HasBulletHole && fracturedChunk != null)
-                        ClientEffectFactory.CreateHitFracturedChunkEffect(
-                            _contexts.clientEffect,
-                            _entityIdGenerator,
-                            hit.point,
-                            srcPlayer.entityKey.Value,
-                            hittedObjectKey.Value,
-                            fracturedChunk.ChunkId,
-                            hit.point - fracturedChunk.transform.position,
-                            hit.normal);
+                fracturedChunk = fracturedHittable.Hit(hit.point, hit.normal);
+                if (fracturedHittable.HasBulletHole && fracturedChunk != null)
+                    ClientEffectFactory.CreateHitFracturedChunkEffect(_contexts.clientEffect, _entityIdGenerator, hit.point,
+                        srcPlayer.entityKey.Value, hittedObjectKey.Value, fracturedChunk.ChunkId,
+                        hit.point - fracturedChunk.transform.position, hit.normal);
 
-                    srcPlayer.statisticsData.Statistics.ShootingSuccCount++;
-                }
-                else
-                {
-                    _logger.ErrorFormat("no entity reference attached to {0}", fracturedHittable.name);
-                }
+                srcPlayer.statisticsData.Statistics.ShootingSuccCount++;
 
-                if (fracturedHittable.HasBulletHole && fracturedChunk != null
-                                                    && bulletEntity.IsValid && thicknessInfo.Thickness > 0)
+                if (fracturedHittable.HasBulletHole && fracturedChunk != null && bulletEntity.IsValid && thicknessInfo.Thickness > 0)
                 {
-                    ClientEffectFactory.CreateHitFracturedChunkEffect(_contexts.clientEffect,
-                        _entityIdGenerator,
-                        thicknessInfo.OutPoint,
-                        srcPlayer.entityKey.Value,
-                        hittedObjectKey.Value,
-                        fracturedChunk.ChunkId,
-                        thicknessInfo.OutPoint - fracturedChunk.transform.position,
-                        thicknessInfo.Normal);
+                    ClientEffectFactory.CreateHitFracturedChunkEffect(_contexts.clientEffect, _entityIdGenerator, thicknessInfo.OutPoint, srcPlayer.entityKey.Value,
+                        hittedObjectKey.Value, fracturedChunk.ChunkId, thicknessInfo.OutPoint - fracturedChunk.transform.position, thicknessInfo.Normal);
                 }
             }
             else
             {
-//                _logger.Info("Shoot  unfracturedHittable");
-//                _logger.Info("Version1");
-                ClientEffectFactory.AdHitEnvironmentEffectEvent(srcPlayer, hit.point,
-                    hit.normal, info.Type);
+                ClientEffectFactory.AdHitEnvironmentEffectEvent(srcPlayer, hit.point, hit.normal, info.Type);
 
                 if (bulletEntity.IsValid && thicknessInfo.Thickness > 0)
                 {
-                    ClientEffectFactory.AdHitEnvironmentEffectEvent(srcPlayer, thicknessInfo.OutPoint,
-                        thicknessInfo.Normal, info.Type);
+                    ClientEffectFactory.AdHitEnvironmentEffectEvent(srcPlayer, thicknessInfo.OutPoint, thicknessInfo.Normal, info.Type);
                 }
             }
 
-
-            _logger.InfoFormat(
-                "[hit]bullet from {0} hit environment {1}, collier {2}, base damage {3}->{4}, penetrable thick {5}->{6}, env ({7}), remain layer {8}",
-                bulletEntity.OwnerEntityKey,
-                hit.point, hit.collider.name,
-                oldDamage, bulletEntity.BaseDamage,
-                oldThickNess, bulletEntity.PenetrableThickness,
-                info,
-                bulletEntity.PenetrableLayerCount);
+            _logger.InfoFormat("[hit]bullet from {0} hit environment {1}, collier {2}, base damage {3}->{4}, penetrable thick {5}->{6}, env ({7}), remain layer {8}",
+                bulletEntity.OwnerEntityKey, hit.point, hit.collider.name, oldDamage, bulletEntity.BaseDamage, oldThickNess, bulletEntity.PenetrableThickness,
+                info, bulletEntity.PenetrableLayerCount);
         }
     }
 }

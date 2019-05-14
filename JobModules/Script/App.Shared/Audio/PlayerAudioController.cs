@@ -3,13 +3,14 @@ using App.Shared.Player.Events;
 using App.Shared.Terrains;
 using Core;
 using Core.Event;
+using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using UnityEngine;
 using Utils.Singleton;
+using XmlConfig;
 
 namespace App.Shared.Audio
 {
-  
     public class PlayerAudioController : ModuleLogicActivator<PlayerAudioController>
     {
         private PlayerEntity entity;
@@ -17,7 +18,6 @@ namespace App.Shared.Audio
 
         public PlayerAudioController()
         {
-
         }
 
         public PlayerAudioController Value
@@ -36,33 +36,36 @@ namespace App.Shared.Audio
             this.entity = entity;
         }
 
-        public void Update()
+        public void Update(IUserCmd cmd)
         {
             var listenerMgr = AudioEntry.ListenerManager;
-            if (!PlayerObject || listenerMgr == null)
+            if (!PlayerObject || AudioEntry.ListenerManager == null)
                 return;
-            if (!listenerMgr.HasParent)
+            if (!listenerMgr.Initialized)
             {
                 listenerMgr.SetPartent(PlayerObject.transform);
             }
+
+            if (cmd.FilteredInput.IsInput(EPlayerInput.IsCrouch))
+            {
+                var states = entity.StateInteractController().GetCurrStates();
+                if (states.Contains(EPlayerState.Stand) || states.Contains(EPlayerState.Prone))
+                    PlaySimpleAudio(EAudioUniqueId.Crouch, true);
+                else
+                    PlaySimpleAudio(EAudioUniqueId.CrouchToStand, true);
+            }
+
 #if UNITY_EDITOR
-            listenerMgr.ThdViewEmitter.localPosition = GlobalConst.ThrdEmitterDistanceDelta;
-            listenerMgr.ThdViewEmitter.LookAt(listenerMgr.DefaultListenerTrans);// = Quaternion.LookRotation(listenerMgr.DefaultListenerTrans.position - listenerMgr.ThdViewEmitter.transform.position);
-      //      listenerMgr.ThdViewEmitter.localRotation = GlobalConst.ThrdEmitterRotationDelta;
-            listenerMgr.FstViewEmitter.localPosition = GlobalConst.FstEmitterDistanceDelta;
-            listenerMgr.FstViewEmitter.LookAt(listenerMgr.DefaultListenerTrans);
-         //   listenerMgr.FstViewEmitter.localRotation = Quaternion.LookRotation(listenerMgr.DefaultListenerTrans.position - listenerMgr.FstViewEmitter.transform.position);
-       //     listenerMgr.FstViewEmitter.localRotation = GlobalConst.FstEmitterRotationDelta;
+            listenerMgr.ThdViewEmitter.transform.localPosition = GlobalConst.ThrdEmitterDistanceDelta;
+            listenerMgr.ThdViewEmitter.transform.LookAt(listenerMgr.DefaultListenerObj.transform);
+            listenerMgr.FstViewEmitter.transform.localPosition = GlobalConst.FstEmitterDistanceDelta;
+            listenerMgr.FstViewEmitter.transform.LookAt(listenerMgr.DefaultListenerObj.transform);
 #endif
         }
 
-        private GameObject EmitterObject
+        private AkGameObj EmitterObject
         {
-            get
-            {
-                 return entity.cameraStateNew.IsThird()?AudioEntry.ListenerManager.ThdViewEmitter.gameObject
-                    : AudioEntry.ListenerManager.FstViewEmitter.gameObject;
-            }
+            get { return AudioEntry.ListenerManager.GetEmitterObject(entity.cameraStateNew.IsThird()); }
         }
 
         private IMyTerrain terrainConfig;
@@ -85,108 +88,129 @@ namespace App.Shared.Audio
             }
         }
 
-        public void PlayStepEnvironmentAudio(AudioGrp_Footstep stepState)
+        public void PlayJumpStepAudio()
+        {
+            var footMatType = FootMatType;
+            GameAudioMedia.PlayJumpstepAudio(footMatType, EmitterObject);
+            AudioJumpstepEvent audioEvent =
+                (AudioJumpstepEvent) EventInfos.Instance.Allocate(EEventType.AJumpstep, false);
+            audioEvent.Initialize(FootMatType,
+                new Vector3(PlayerObject.transform.position.x, 0, PlayerObject.transform.position.z),
+                PlayerObject.transform.eulerAngles);
+            entity.localEvents.Events.AddEvent(audioEvent);
+        }
+
+        public void PlayFootstepAudio(AudioGrp_Footstep stepState)
 
         {
             var footMatType = FootMatType;
-            GameAudioMedia.PlayStepEnvironmentAudio(stepState, footMatType, EmitterObject);
-            //     audioAgent.RefreshStepPlayTimestamp();
-            AudioEvent audioEvent = (AudioEvent) EventInfos.Instance.Allocate(EEventType.BroadcastAudio, false);
-            audioEvent.footstepState = stepState;
-            audioEvent.footMatType   = footMatType;
-            audioEvent.relatedPos    = entity.position.Value;
+            GameAudioMedia.PlayFootstepAudio(stepState, footMatType, EmitterObject);
+            AudioFootstepEvent audioEvent =
+                (AudioFootstepEvent) EventInfos.Instance.Allocate(EEventType.AFootstep, false);
+            audioEvent.Initialize(stepState, FootMatType,
+                new Vector3(PlayerObject.transform.position.x, 0, PlayerObject.transform.position.z),
+                PlayerObject.transform.eulerAngles);
             entity.localEvents.Events.AddEvent(audioEvent);
         }
 
         private static readonly LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerAudioController));
 
-        public void PlayStepEnvironmentAudio(AudioEvent e)
-        {
-            //     GameAudioMedia.PlayStepEnvironmentAudio(e.footstepState, e.relatedPos, PlayerObject);
-        }
-
-//        private GameObject WeaponObject
-//        {
-//            get { return entity.appearanceInterface.Appearance.WeaponHandObject(); }
-//        }
-//
         private GameObject PlayerObject
         {
             get { return entity.appearanceInterface.Appearance.CharacterP1; }
         }
 
-        public void PlaySwitchAuido(int weaponId, EInOrOff op)
+        private GameObject WeaponObject
         {
-           
-            if (op == EInOrOff.In)
+            get { return entity.appearanceInterface.Appearance.GetWeaponP1InHand() ?? PlayerObject; }
+        }
+
+        private bool IsOnTrigger;
+
+        public void PlayEmptyFireAudio()
+        {
+            if (!IsOnTrigger)
             {
-                GameAudioMedia.PlayWeaponSimpleAudio(weaponId, EmitterObject,
-                    (config) => config.SwitchIn);
-            }
-            else
-            {
-                GameAudioMedia.PlayWeaponSimpleAudio(weaponId, EmitterObject,
-                    (config) => config.SwitchOff);
+                IsOnTrigger = true;
+                GameAudioMedia.PlayEventAudio((int) EAudioUniqueId.EmptyFire, EmitterObject);
             }
         }
 
-        public void PlayFireAudio(int weaponId, AudioGrp_ShotMode shotMode, Vector3 position)
+        public void StopFireTrigger()
         {
- 
+            if (IsOnTrigger)
+                IsOnTrigger = false;
+        }
+
+        public void PlaySimpleAudio(EAudioUniqueId uniqueId, bool sync = false)
+        {
+            GameAudioMedia.PlayEventAudio((int) uniqueId, EmitterObject);
+            if (sync)
+            {
+                AudioDefaultEvent defaultEvent =
+                    EventInfos.Instance.Allocate(EEventType.ADefault, false) as AudioDefaultEvent;
+                defaultEvent.Initialize(uniqueId, WeaponObject.transform.position, WeaponObject.transform.eulerAngles);
+                entity.localEvents.Events.AddEvent(defaultEvent);
+            }
+        }
+
+        public void PlayFireAudio(int weaponId, AudioGrp_ShotMode shotMode)
+        {
             GameAudioMedia.PlayWeaponFireAudio(weaponId, EmitterObject, shotMode);
-            var fireEvent = EventInfos.Instance.Allocate(EEventType.Fire, false) as FireEvent;
-            fireEvent.fireWeaponId  = weaponId;
-            fireEvent.audioFireMode = (int) shotMode;
-            fireEvent.audioFirePos  = position;
+            AudioWeaponFireEvent fireEvent =
+                EventInfos.Instance.Allocate(EEventType.AWeaponFire, false) as AudioWeaponFireEvent;
+
+            fireEvent.Initialize(shotMode, weaponId, WeaponObject.transform.position,
+                WeaponObject.transform.eulerAngles);
             entity.localEvents.Events.AddEvent(fireEvent);
-            //  GameAudioMedia.PlayWeaponFireAudio(weaponId, WeaponObject, shotMode);
         }
 
-
-//        public void SwitchFireMode(EFireMode nextMode)
-//        {
-//            GameAudioMedia.SwitchFireModelAudio(nextMode, WeaponObject);
-//            
-//        }
-        public void PlayPullBoltAudio(int configId)
+        public void PlayMeleeAttackAudio(int weaponId, int attackType)
         {
-            GameAudioMedia.PlayWeaponReloadAudio(configId, AudioGrp_Magazine.PullboltOnly,
-                EmitterObject);
+            int audioEventId = 0;
+            GameAudioMedia.PlayMeleeAttack(weaponId, (AudioGrp_MeleeAttack) attackType, EmitterObject,
+                ref audioEventId);
+            if (audioEventId > 0)
+            {
+                AudioMeleeAtkEvent audioEvent =
+                    EventInfos.Instance.Allocate(EEventType.AMeleeAttack, false) as AudioMeleeAtkEvent;
+                audioEvent.Initialize(audioEventId, attackType, WeaponObject.transform.position,
+                    WeaponObject.transform.eulerAngles);
+                entity.localEvents.Events.AddEvent(audioEvent);
+            }
         }
+
+        public void PlayPullBoltAudio(int weaponId)
+        {
+            PlayReloadAuido(weaponId, AudioGrp_Magazine.PullboltOnly);
+        }
+
+        public void PlayReloadBulletAudio(int weaponId)
+        {
+            PlayReloadAuido(weaponId, AudioGrp_Magazine.FillBulletOnly);
+        }
+
+        public void PlayReloadAudio(int weaponId, bool emptyReload)
+        {
+            if (emptyReload)
+                PlayReloadAuido(weaponId, AudioGrp_Magazine.MagizineAndPull);
+            else
+                PlayReloadAuido(weaponId, AudioGrp_Magazine.MagizineOnly);
+        }
+
+        private void PlayReloadAuido(int weaponId, AudioGrp_Magazine magizine)
+        {
+            GameAudioMedia.PlayWeaponReloadAudio(weaponId, magizine, EmitterObject);
+            AudioPullboltEvent pullboltEvent =
+                EventInfos.Instance.Allocate(EEventType.APullbolt, false) as AudioPullboltEvent;
+            pullboltEvent.Initialize(magizine, weaponId, WeaponObject.transform.position,
+                WeaponObject.transform.eulerAngles);
+            entity.localEvents.Events.AddEvent(pullboltEvent);
+        }
+
         public void StopPullBoltAudio(int configId)
         {
-            GameAudioMedia.StopReloadAudio(configId,EmitterObject);
-        }
-        public void PlayReloadBulletAudio(int configId)
-        {
-//            if (audioAgent.RelatedAudio.ReloadedBulletLeft < 1)
-//                return;
-            //audioAgent.RelatedAudio.ReloadedBulletLeft -= 1;
-            GameAudioMedia.PlayWeaponReloadAudio(configId, AudioGrp_Magazine.FillBulletOnly,
-                EmitterObject);
-        }
-
-        public void SetReloadBulletAudioCount(int reloadedBulletCount)
-        {
-            //   audioAgent.RelatedAudio.ReloadedBulletLeft = reloadedBulletCount ;
-            //  PlayReloadBulletAudio(configId);
-        }
-
-        public void PlayReloadAudio(int configId, bool emptyReload)
-        {
-         
-            if (emptyReload)
-                GameAudioMedia.PlayWeaponReloadAudio(configId, AudioGrp_Magazine.MagizineAndPull,
-                    EmitterObject);
-            else
-                GameAudioMedia.PlayWeaponReloadAudio(configId, AudioGrp_Magazine.MagizineOnly,
-                    EmitterObject);
-            //if(reloadCount>0)
-//                GameAudioMedia.PlayWeaponReloadAudio(configId, AudioGrp_Magazine.MagizineAndPull,
-//                WeaponObject);
-//            else
-//                GameAudioMedia.PlayWeaponReloadAudio(configId, AudioGrp_Magazine.MagizineOnly,
-//                    WeaponObject);
+            GameAudioMedia.StopReloadAudio(configId, EmitterObject);
         }
     }
 }

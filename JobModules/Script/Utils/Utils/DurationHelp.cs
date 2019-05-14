@@ -46,6 +46,7 @@ namespace Core.Utils
         ResourceLoad,
         UnityAssetManager,
         UnityAssetManagerUpdateLoadRequest,
+        UnityAssetManagerUpdateLoadedRequest,
         UnityAssetManagerUpdateBundlePool,
         UnityAssetManagerFetchResult,
         LoadRequestManager,
@@ -368,7 +369,7 @@ namespace Core.Utils
             var stats = Profiler.GetPhysicsStats();
             sb.Append(" ndb: ")
                 .Append(stats.numDynamicBodies)
-                .Append(" nsb")
+                .Append(" nsb: ")
                 .Append(stats.numStaticBodies)
                 .Append(" adb: ")
                 .Append(stats.numActiveDynamicBodies)
@@ -381,6 +382,47 @@ namespace Core.Utils
                 .Append(" nsp: ")
                 .Append(stats.numShapePairs);
 #endif
+#if UNITY_EDITOR
+            //walk around bug of RuntimeStats in Editor Mode
+            if(!RuntimeStats.enabled)
+#else
+            if (RuntimeStats.enabled)
+#endif
+            { 
+             
+                sb.Append("\n")
+#if ENABLE_PROFILER && PROFILER_CPU_GPU_TIME
+                    .Append("gpu: ")
+                    .Append(Profiler.GPUTime * 0.001f)
+                    .Append(" cpu: ")
+                    .Append(Profiler.CPUTime * 0.001f)
+                    .Append(" ")
+#endif
+                    .Append("dc: ")
+                    .Append(RuntimeStats.drawCalls)
+                    .Append(" sdc: ")
+                    .Append(RuntimeStats.staticBatchedDrawCalls)
+                    .Append(" sdc: ")
+                    .Append(RuntimeStats.dynamicBatchedDrawCalls)
+                    .Append(" idc: ")
+                    .Append(RuntimeStats.instancedBatchedDrawCalls)
+                    .Append(" bc: ")
+                    .Append(RuntimeStats.batches)
+                    .Append(" sbc: ")
+                    .Append(RuntimeStats.staticBatches)
+                    .Append(" dbc: ")
+                    .Append(RuntimeStats.dynamicBatches)
+                    .Append(" ibc: ")
+                    .Append(RuntimeStats.instancedBatchedDrawCalls)
+                    .Append(" vrt: ")
+                    .Append(RuntimeStats.vertices)
+                    .Append(" tri: ")
+                    .Append(RuntimeStats.triangles)
+                    .Append(" sct: ")
+                    .Append(RuntimeStats.shadowCasters);
+            }
+
+
             return sb.ToString();
         }
 

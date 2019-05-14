@@ -35,6 +35,8 @@ namespace XmlConfig
         IsPullboltInterrupt,
         MeleeAttack,
         IsUseAction,
+        IsAutoReload,
+        IsAutoFire,
         Length,
     }
 
@@ -135,7 +137,8 @@ namespace XmlConfig
         OpenUI,
         WeaponRotState,
         PullBoltInterrupt,
-     
+        PaintDisc,
+        Ladder
     }
 
     public class StateTransitionConfig

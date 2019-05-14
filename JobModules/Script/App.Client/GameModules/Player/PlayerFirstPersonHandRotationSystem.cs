@@ -173,7 +173,7 @@ namespace App.Client.GameModules.Player
             };
         }
 
-        protected override bool filter(PlayerEntity playerEntity)
+        protected override bool Filter(PlayerEntity playerEntity)
         {
             return playerEntity.hasAppearanceInterface && playerEntity.hasCharacterBoneInterface && playerEntity.hasStateInterface;
         }

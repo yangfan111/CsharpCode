@@ -31,10 +31,9 @@ namespace App.Shared.GameModules.Player
             }
             
             // 打断救援
-            if (player.hasGamePlay && player.gamePlay.IsInteruptSave)
+            if (player.hasGamePlay && player.gamePlay.IsInteruptSave && player.tip.TipType != ETipType.CanNotRescure)
             {
                 player.tip.TipType = ETipType.CanNotRescure;
-                player.gamePlay.IsInteruptSave = false;
             }
         }
     }

@@ -40,6 +40,7 @@ namespace App.Client.GameModules.ClientInit
             {
                 SingletonManager.Get<SubProgressBlackBoard>().Step();
                 _loginSuccReceived = true;
+                
             }
         }
 

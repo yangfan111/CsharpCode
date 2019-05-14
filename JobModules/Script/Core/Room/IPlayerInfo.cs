@@ -1,11 +1,13 @@
 ﻿using Core.Statistics;
 using System.Collections.Generic;
 using Entitas;
+using UnityEngine;
 
 namespace Core.Room
 {
     public interface ICreatePlayerInfo
     {
+        string Token { get; set; }
         int EntityId { get; set; }
         long PlayerId { get; set; }
         string PlayerName { get; set; }
@@ -21,10 +23,11 @@ namespace Core.Room
         int Camp { get; set; }
         List<int> SprayLacquers { get; set; }
         PlayerWeaponBagData[] WeaponBags { get; set; }
+        Vector3 InitPosition { get; set; }
     }
     public interface IPlayerInfo:ICreatePlayerInfo
     {
-        string Token { get; set; }
+       
         IRoomId RoomId { get; set; }  
         bool IsRobot { get; set; }
         int RankScore { get; set; }

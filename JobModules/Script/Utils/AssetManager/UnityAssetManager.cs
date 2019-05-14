@@ -28,14 +28,16 @@ namespace Utils.AssetManager
         public bool DontAutoActive;
         public bool Recyclable;
         public Func<UnityObject, IAssetPostProcessor> PostProcessorFactory;
+        public Type ObjectType;
 
         public AssetLoadOption(bool dontAutoActive = false, GameObject parent = null, bool recyclable = false,
-            Func<UnityObject, IAssetPostProcessor> postProcessorFactory = null)
+            Func<UnityObject, IAssetPostProcessor> postProcessorFactory = null, Type objectType = null)
         {
             DontAutoActive = dontAutoActive;
             Parent = parent;
             Recyclable = recyclable;
             PostProcessorFactory = postProcessorFactory;
+            ObjectType = objectType;
         }
 
         public static AssetLoadOption Default = new AssetLoadOption();
@@ -43,7 +45,7 @@ namespace Utils.AssetManager
 
     public interface IUnityAssetManager
     {
-        IEnumerator Init(ResourceConfig config, ICoRoutineManager coRoutineManager, bool isLow=false);
+        IEnumerator Init(ResourceConfig config, ICoRoutineManager coRoutineManager, bool isLow = false);
 
         HashSet<string> AllAssetBundleNames { get; }
 
@@ -170,6 +172,12 @@ namespace Utils.AssetManager
 
         private class AssetLoadRequest<T> : AbstractAssetLoadRequest
         {
+            public AssetLoadRequest()
+            {
+                _invokeOnLoadedProfile = DurationHelp.Instance.GetCustomProfileInfo("AssetLoadRequest_invokeOnLoadedProfile");
+                _invokeOnLoadedProfile2 = DurationHelp.Instance.GetCustomProfileInfo("AssetLoadRequest_invokeOnLoadedProfile2");
+            }
+
             public override object SourceObject
             {
                 get { return Source; }
@@ -190,35 +198,53 @@ namespace Utils.AssetManager
             {
                 set { _requestBatch = value; }
             }
-
+            private CustomProfileInfo _invokeOnLoadedProfile;
+            private CustomProfileInfo _invokeOnLoadedProfile2;
 
             public override void InvokeOnLoaded(Action<AbstractAssetLoadRequest> disposeOperation)
             {
                 var loadedObject = LoadedObject;
-                if (loadedObject == null)
+                try
                 {
-                    loadedObject = new UnityObject(null, AssetInfo);
+                    _invokeOnLoadedProfile.BeginProfile();
+                    if (loadedObject == null)
+                    {
+                        loadedObject = new UnityObject(null, AssetInfo);
+                    }
+                    else if (IsDisposed)
+                    {
+                        disposeOperation(this);
+                    }
                 }
-                else if (IsDisposed)
+                finally
                 {
-                    disposeOperation(this);
+                    _invokeOnLoadedProfile.EndProfile();
                 }
-
+                
                 if (_requestBatch != null || _onLoaded != null)
                 {
-                    var profiler = SingletonManager.Get<LoadRequestProfileHelp>().GetProfile(AssetInfo);
-                    profiler.StartWatch();
-
-                    if (_requestBatch != null)
+                    try
                     {
-                        _requestBatch.UnpackRequest(this, loadedObject);
-                    }
-                    else if (_onLoaded != null && !IsDisposed)
-                    {
-                        _onLoaded(Source, loadedObject);
-                    }
+                        _invokeOnLoadedProfile2.BeginProfile();
+                        var profiler = SingletonManager.Get<LoadRequestProfileHelp>().GetProfile(AssetInfo);
+                        profiler.StartWatch();
 
-                    profiler.TotalHandlerTime += profiler.StopWatch();
+                        if (_requestBatch != null)
+                        {
+                            _requestBatch.UnpackRequest(this, loadedObject);
+                        }
+                        else if (_onLoaded != null && !IsDisposed)
+                        {
+                            _onLoaded(Source, loadedObject);
+                        }
+
+                        profiler.TotalHandlerTime += profiler.StopWatch();
+                    }
+                    finally
+                    {
+                        _invokeOnLoadedProfile2.EndProfile();
+                    }
+                    
                 }
             }
 
@@ -351,6 +377,8 @@ namespace Utils.AssetManager
         private CustomProfileInfo _sceneLoadProfile;
         private CustomProfileInfo _assetLoadProfile;
         private CustomProfileInfo _bundleLoadProfile;
+        private CustomProfileInfo _loadedProfile;
+        private CustomProfileInfo _disposeOperationProfile;
 
         public UnityAssetManager(IUnityObjectPool objectPool, int maxLoadingAssetNum = Int32.MaxValue,
             bool useAssetPool = true)
@@ -363,6 +391,9 @@ namespace Utils.AssetManager
             _sceneLoadProfile = DurationHelp.Instance.GetCustomProfileInfo("UpdateLoadRequests_Scene");
             _assetLoadProfile = DurationHelp.Instance.GetCustomProfileInfo("UpdateLoadRequests_Asset");
             _bundleLoadProfile = DurationHelp.Instance.GetCustomProfileInfo("UpdateLoadRequests_Bundle");
+            _loadedProfile = DurationHelp.Instance.GetCustomProfileInfo("UpdateLoadRequests_Loaded");
+            _disposeOperationProfile =
+                DurationHelp.Instance.GetCustomProfileInfo("UpdateLoadRequests_DisposeOperation");
         }
 
         public class SupplementaryWarehouse
@@ -371,10 +402,14 @@ namespace Utils.AssetManager
             public string[] Bundles;
         }
 
-        public IEnumerator Init(ResourceConfig config, ICoRoutineManager coRoutineManager, bool isServer= false)
+        public IEnumerator Init(ResourceConfig config, ICoRoutineManager coRoutineManager, bool isServer = false)
         {
+            _logger.InfoFormat("UnityAssetManager init:IsServer:{0} ,Quality:{1}", isServer,
+                SettingManager.SettingManager.GetInstance().GetQualityBeforeInit());
             coRoutineManager.StartCoRoutine(InitUpdate());
-            coRoutineManager.StartCoRoutine(Init(config, !isServer && SettingManager.SettingManager.GetInstance().GetQualityBeforeInit() == SettingManager.QualityLevel.Low));
+            coRoutineManager.StartCoRoutine(Init(config,
+                !isServer && SettingManager.SettingManager.GetInstance().GetQualityBeforeInit() ==
+                SettingManager.QualityLevel.Low));
 
             yield return new WaitUntil(() => _isInitialized);
         }
@@ -535,7 +570,16 @@ namespace Utils.AssetManager
             req.Option = option;
             if (assetInfo.BundleName == null || assetInfo.AssetName == null)
             {
-                _logger.ErrorFormat("Loading Asset {0} is Invalid from {1}", assetInfo, source);
+                try
+                {
+                    throw new ArgumentNullException(string.Format("Loading Asset {0} is Invalid", assetInfo));
+                }
+                catch (Exception e)
+                {
+                    _logger.ErrorFormat("Loading Asset {0} is Invalid from {1}", assetInfo, e);
+                }
+               
+                
                 req.IsDisposed = true;
                 return req;
             }
@@ -650,11 +694,14 @@ namespace Utils.AssetManager
         {
             UpdateBundlePool();
             SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.UnityAssetManagerUpdateLoadRequest);
-            UpdateLoadRequests();
+            UpdatePendingRequests();
             SingletonManager.Get<DurationHelp>().ProfileEnd(CustomProfilerStep.UnityAssetManagerUpdateLoadRequest);
+            SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.UnityAssetManagerUpdateLoadedRequest);
+            UpdateLoadedRequest();
+            SingletonManager.Get<DurationHelp>().ProfileEnd(CustomProfilerStep.UnityAssetManagerUpdateLoadedRequest);
         }
 
-        private void UpdateLoadRequests()
+        private void UpdatePendingRequests()
         {
             if (_lockCount <= 0 && _pendingRequests.Count > 0)
             {
@@ -728,7 +775,7 @@ namespace Utils.AssetManager
                                     }
                                     else
                                     {
-                                        _bundlePool.LoadAsset(assetInfo.BundleName, assetInfo.AssetName);
+                                        _bundlePool.LoadAsset(assetInfo.BundleName, assetInfo.AssetName, req.Option.ObjectType);
                                         var node = AssetLoadRequestNode.Alloc(req);
                                         AssetLoadRequestNode cachedNode;
                                         if (_loadingRequests.TryGetValue(req.AssetInfo, out cachedNode))
@@ -758,18 +805,25 @@ namespace Utils.AssetManager
                     pendingIt = next;
                 }
             }
+        }
 
-            ;
+        private void UpdateLoadedRequest()
+        {
             while (_loadedRequests.Count > 0)
             {
                 var req = _loadedRequests.Dequeue();
                 try
                 {
+                    _loadedProfile.BeginProfile();
                     req.InvokeOnLoaded(DisposeOperation);
                 }
                 catch (Exception e)
                 {
                     _logger.Error("OnLoaded Callback Error", e);
+                }
+                finally
+                {
+                    _loadedProfile.EndProfile();
                 }
 
                 AbstractAssetLoadRequest.Free(req);
@@ -785,15 +839,23 @@ namespace Utils.AssetManager
 
         private void DisposeOperation(AbstractAssetLoadRequest req)
         {
-            var loadedObject = req.LoadedObject;
-            if (req.Option.Recyclable)
+            try
             {
-                Recycle(loadedObject);
+                _disposeOperationProfile.BeginProfile();
+                var loadedObject = req.LoadedObject;
+                if (req.Option.Recyclable)
+                {
+                    Recycle(loadedObject);
+                }
+                else
+                {
+                    loadedObject.OnDestory();
+                    loadedObject.Destroy();
+                }
             }
-            else
+            finally
             {
-                loadedObject.OnDestory();
-                loadedObject.Destroy();
+                _disposeOperationProfile.EndProfile();
             }
         }
 

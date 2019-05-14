@@ -23,7 +23,7 @@ namespace App.Client.GameModules.Player
             HorizontalAction, VerticalAction
         };
 
-        protected override bool filter(PlayerEntity player)
+        protected override bool Filter(PlayerEntity player)
         {
             return player.hasAppearanceInterface && player.appearanceInterface.Appearance!=null;
         }

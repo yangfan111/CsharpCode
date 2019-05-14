@@ -41,7 +41,17 @@ namespace App.Shared.GameModules.Player
         /// <param name="BlockUnavaliableInputs"></param>
         public void BlockUnavaliableInputs(IFilteredInput filteredInput)
         {
-            unavaliableInputs.ForEach((input =>filteredInput.SetInput(input,false)));
+            unavaliableInputs.ForEach(
+                (input => {
+#if UNITY_EDITOR
+                    if(GlobalConst.EnableInputBlockLog && input == GlobalConst.serachedInput)
+                    {
+                        DebugUtil.MyLog("player state {0} block {1}", ownedState, input);
+                    }
+#endif
+                    filteredInput.SetInput(input, false);
+                    }
+                ));
         }
 
         public bool IsInputEnabled(EPlayerInput input)

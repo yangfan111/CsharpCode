@@ -3,7 +3,6 @@ using App.Shared.Components.Ui;
 using System.Collections.Generic;
 using App.Client.CastObjectUtil;
 using App.Client.GameModules.GamePlay.Free.Auto.Prefab;
-using App.Client.GameModules.Ui.Models.Chicken;
 using App.Shared;
 using App.Shared.GameModules.GamePlay.Free;
 using App.Shared.GameModules.GamePlay.Free.Map;
@@ -12,9 +11,40 @@ using Shared.Scripts;
 using UnityEngine;
 using Utils.Singleton;
 using XmlConfig;
+using App.Client.GameModules.GamePlay.Free.App;
 
 namespace App.Client.GameModules.Ui.UiAdapter
 {
+
+    public enum EChickenBagType
+    {
+        None,
+        Ground,
+        Bag,
+        Equipment,
+        Weapon,
+        WeaponPart
+    }
+
+    public class ChickenBagItemUiData : IChickenBagItemUiData
+    {
+        public int cat { get; set; }
+        public int id { get; set; }
+        public int count { get; set; }
+        public string key { get; set; }
+        public bool isBagTitle { get; set; }
+        public string title { get; set; }
+    }
+
+    public class BaseChickenBagItemData : IBaseChickenBagItemData
+    {
+        public int cat { get; set; }
+        public int id { get; set; }
+        public int count { get; set; }
+        public string key { get; set; }
+    }
+
+
     public class ChickenBagUiAdapter : UIAdapter, IChickenBagUiAdapter
     {
         private Contexts _contexts;
@@ -26,21 +56,33 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public int GetWeaponIdBySlotIndex(int index)
         {
-            return 13;
+            var list = _contexts.ui.uI.WeaponIdList;
+            return list[index];
         }
 
         public int GetWeaponPartIdBySlotIndexAndWeaponPartType(int index, EWeaponPartType type)
         {
-            return 1;
+            var list = _contexts.ui.uI.WeaponPartList;
+            return list[index, (int)type];
         }
 
-        public int GetEquipmentIdByWardrobeType(Wardrobe type,out int count)
+        public int GetEquipmentIdByWardrobeType(Wardrobe type, out int count)
         {
-            count = 0;
-            return 1;
+            var list = _contexts.ui.uI.EquipIdList;
+            var pair = list[(int)type];
+            count = pair.Value;
+            return pair.Key;
         }
 
         #region refreshGround
+        HashSet<int> current = new HashSet<int>();
+
+        private List<IChickenBagItemUiData> _groundItemDataList = new List<IChickenBagItemUiData>();
+        public List<IChickenBagItemUiData> GroundItemDataList
+        {
+            get { return _groundItemDataList; }
+        }
+
         private int radius = 3;
         private bool IsNear(Vector3 v1, Vector3 v2)
         {
@@ -51,12 +93,12 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             if (item.hasUnityGameObject)
             {
-                var noObstacle = !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, item.unityGameObject.UnityObject);
+                var noObstacle = !CommonObjectCastUtil.HasObstacleBetweenPlayerAndItem(player, item.position.Value, item.unityGameObject.UnityObject);
                 return noObstacle;
             }
             else
             {
-                var noObstacle = !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, null);
+                var noObstacle = !CommonObjectCastUtil.HasObstacleBetweenPlayerAndItem(player, item.position.Value, null);
                 return noObstacle;
             }
         }
@@ -65,15 +107,15 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             if (item.hasUnityObject)
             {
-                return !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, item.unityObject.UnityObject);
+                return !CommonObjectCastUtil.HasObstacleBetweenPlayerAndItem(player, item.position.Value, item.unityObject.UnityObject);
             }
             else if (item.hasMultiUnityObject)
             {
-                return !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, item.multiUnityObject.FirstAsset);
+                return !CommonObjectCastUtil.HasObstacleBetweenPlayerAndItem(player, item.position.Value, item.multiUnityObject.FirstAsset);
             }
             else
             {
-                return !CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, item.position.Value, null);
+                return !CommonObjectCastUtil.HasObstacleBetweenPlayerAndItem(player, item.position.Value, null);
             }
         }
         private HashSet<int> groundEntitySet = new HashSet<int>();
@@ -184,43 +226,12 @@ namespace App.Client.GameModules.Ui.UiAdapter
             return true;
         }
 
-        public void SendRightClickUseItem(string key)
-        {
-            Debug.Log("SendRightClickUseItem" + key);
-        }
-
-        public void SetCrossVisible(bool isVisible)
-        {
-            _contexts.ui.uI.IsShowCrossHair = isVisible;
-        }
-
-        public void SendDragItem(string beginKey, string endKey)
-        {
-            Debug.Log("SendDragItem" + beginKey + endKey);
-        }
-
-        public void SendSplitItem(string splitKey)
-        {
-            Debug.Log("SendSplitItem" + splitKey);
-        }
-
-        public int CurWeight
-        {
-            get { return 111; }
-        }
-
-        public int TotalWeight
-        {
-            get { return 222; }
-        }
-
-
         private void FillBox(Dictionary<string, List<FreeMoveEntity>> dic, bool dead)
         {
             int index = 0;
             foreach (var name in dic.Keys)
             {
-                var titleData = new ChickenBagItemUiData {isBagTitle = true, title = name};
+                var titleData = new ChickenBagItemUiData { isBagTitle = true, title = name };
                 _groundItemDataList.Add(titleData);
                 List<SimpleItemInfo> infos = new List<SimpleItemInfo>();
                 foreach (var item in dic[name])
@@ -253,7 +264,10 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
                     var data = new ChickenBagItemUiData
                     {
-                        cat = info.cat, id = info.id, count = count, key =  "1|" + info.entityId
+                        cat = info.cat,
+                        id = info.id,
+                        count = count,
+                        key = "1|" + info.entityId
                     };
                     _groundItemDataList.Add(data);
                 }
@@ -261,12 +275,52 @@ namespace App.Client.GameModules.Ui.UiAdapter
         }
         #endregion
 
+        #region keyEvent
+
+        public void SendRightClickUseItem(string key)
+        {
+            Debug.Log("SendRightClickUseItem" + key);
+            ChickenBagUtil.ClickItem(key, true);
+        }
+
+        public void SendDragItem(string beginKey, string endKey)
+        {
+            Debug.Log("SendDragItem beginKey:" + beginKey + "endKey: " + endKey);
+            ChickenBagUtil.DragItem(beginKey, endKey);
+        }
+
+        public void SendSplitItem(string splitKey)
+        {
+            Debug.Log("SendSplitItem" + splitKey);
+        }
+
+        #endregion
+
+        public int HoldWeaponSlotIndex
+        {
+            get { return _contexts.ui.uI.HoldWeaponSlotIndex; }
+        }
+
+        public void SetCrossVisible(bool isVisible)
+        {
+            _contexts.ui.uI.IsShowCrossHair = isVisible;
+        }
+
+        public int CurWeight
+        {
+            get { return _contexts.ui.uI.CurBagWeight; }
+        }
+
+        public int TotalWeight
+        {
+            get { return _contexts.ui.uI.TotalBagWeight; }
+        }
+
         public List<IBaseChickenBagItemData> BagItemDataList
         {
             get { return _contexts.ui.uI.ChickenBagItemDataList; }
         }
 
-        HashSet<int> current = new HashSet<int>();
 
         private PlayerEntity _player;
         public PlayerEntity Player
@@ -274,19 +328,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
             get { return _player ?? (_player = _contexts.player.flagSelfEntity); }
         }
 
-        private List<IChickenBagItemUiData> _groundItemDataList = new List<IChickenBagItemUiData>();
-        public List<IChickenBagItemUiData> GroundItemDataList
-        {
-            get { return _groundItemDataList; }
-        }
+
     }
 
-    public class ChickenBagItemData : IChickenBagItemData
-    {
-        public int cat { get; set; }
-        public int id { get; set; }
-        public string eventKey { get; set; }
-        public string key { get; set; }
-        public string count { get; set; }
-    }
 }

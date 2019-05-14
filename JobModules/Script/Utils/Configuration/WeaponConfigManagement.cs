@@ -137,6 +137,21 @@ namespace Assets.Utils.Configuration
             {
                 if (propertyCfgCache == null)
                     propertyCfgCache = SingletonManager.Get<WeaponPropertyConfigManager>().FindByWeaponId(S_Id);
+                if (propertyCfgCache == null)
+                {
+                    propertyCfgCache = new WeaponPropertyConfigItem() {
+                        Category = 2,
+                        Bullet = 0,
+                        Bulletmax = 0,
+                        Power = 60,
+                        Limitcycle = 60,
+                        Accurate = 0,
+                        Weight = 0,
+                        Stability = 0,
+                        Penetrate = 0,
+                        Scope = 35
+                    };
+                }
                 return propertyCfgCache;
             }
         }
@@ -176,6 +191,24 @@ namespace Assets.Utils.Configuration
                                 break;
                             case EWeaponPartType.Stock:
                                 defaultParts.Stock = part;
+                                break;
+                            case EWeaponPartType.SideRail:
+                                defaultParts.SideRail = part;
+                                break;
+                            case EWeaponPartType.Bore:
+                                defaultParts.Bore = part;
+                                break;
+                            case EWeaponPartType.Interlock:
+                                defaultParts.Interlock = part;
+                                break;
+                            case EWeaponPartType.Feed:
+                                defaultParts.Feed = part;
+                                break;
+                            case EWeaponPartType.Brake:
+                                defaultParts.Brake = part;
+                                break;
+                            case EWeaponPartType.Trigger:
+                                defaultParts.Trigger = part;
                                 break;
                         }
                     }

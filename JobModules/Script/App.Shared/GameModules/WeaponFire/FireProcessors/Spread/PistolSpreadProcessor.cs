@@ -9,11 +9,11 @@ namespace App.Shared.GameModules.Weapon.Behavior
     public class PistolSpreadProcessor : AbstractSpreadProcessor
     {
         
-        protected override void Update(PlayerWeaponController controller, IWeaponCmd cmd)
+        protected override void Update(WeaponBaseAgent heldBaseAgent, WeaponSideCmd cmd)
         {
-            var config = controller.HeldWeaponAgent.PistolSpreadLogicCfg;
-            var weaponRuntime = controller.HeldWeaponAgent.RunTimeComponent;
-            float spreadScaleFactor = FireSpreadProvider.GetSpreadScaleFactor(config, controller);
+            var config = heldBaseAgent.PistolSpreadLogicCfg;
+            var weaponRuntime = heldBaseAgent.RunTimeComponent;
+            float spreadScaleFactor = FireSpreadProvider.GetSpreadScaleFactor(config, heldBaseAgent.Owner.WeaponController());
             FireSpreadFormula.ApplyPistolFinalSpread(spreadScaleFactor,config.SpreadScale,weaponRuntime);
         }
 

@@ -105,10 +105,7 @@ namespace App.Shared
         // 是否关闭下滑
         public static bool EnableSlide = true;
         public static bool DebugAnimation = false;
-        // Disable Occlusion Culling
-        public static bool EnableOC = false;
-        // Disable Distance Culling
-        public static bool EnableDC = true;
+        public static bool EnableGpui = true;
 
         public static bool EnableCustomOC = false;
 
@@ -124,6 +121,7 @@ namespace App.Shared
         public static bool DisableAnimator = false;
 
         public static bool ChangeRole = false;
+        public static int ServerFrameRate = 20;
 
         public static UnityEngine.Vector3 GetPlayerBirthPosition(int entityId)
         {
@@ -184,14 +182,9 @@ namespace App.Shared
         	}
 
 
-            if (bootCmd.ContainsKey("DisableOC"))
+            if (bootCmd.ContainsKey("DisableProfileFile"))
             {
-                SharedConfig.EnableOC = false;
-            }
-
-            if (bootCmd.ContainsKey("DisableDC"))
-            {
-                SharedConfig.EnableDC = false;
+                SharedConfig.DisableProfileFile = true;
             }
 
             if (bootCmd.ContainsKey("ProfilerDebug"))
@@ -202,7 +195,25 @@ namespace App.Shared
             {
                 DurationHelp.Debug = false;
             }
+
+            if (bootCmd.ContainsKey("DisableGc"))
+            {
+                SharedConfig.DisableGc = true;
+            }
+            else
+            {
+                SharedConfig.DisableGc = false;
+            } 
+            if (bootCmd.ContainsKey("Token"))
+            {
+                TestUtility.TestToken = bootCmd["Token"];
+            }
+           
         }
+
+        public static bool DisableGc;
+
+        public static bool DisableProfileFile = false;
 
         public static bool ShowHitFeedBack;
         public static string RobotActionName = "test2";

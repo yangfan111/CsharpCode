@@ -8,29 +8,29 @@ namespace App.Shared.GameModules.Weapon.Behavior
     public class PistolAccuracyCalculator : IAccuracyCalculator
     {
 
-        public void OnBeforeFire(PlayerWeaponController weaponController, IWeaponCmd cmd)
+        public void OnBeforeFire(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
         {
-            var runTimeComponent = weaponController.HeldWeaponAgent.RunTimeComponent;
+            var runTimeComponent = weaponBaseAgent.RunTimeComponent;
             if (runTimeComponent.LastAttackTimestamp == 0)
             {
             }
             else
             {
-                var config = weaponController.HeldWeaponAgent.PistolAccuracyLogicCfg;
+                var config = weaponBaseAgent.PistolAccuracyLogicCfg;
                 if (config == null)
                     return;
-                runTimeComponent.Accuracy = AccuracyFormula.GetPistolAccuracy(cmd.RenderTime - runTimeComponent.LastAttackTimestamp,
+                runTimeComponent.Accuracy = AccuracyFormula.GetPistolAccuracy(cmd.UserCmd.RenderTime - runTimeComponent.LastAttackTimestamp,
                     config.AccuracyFactor, config.MinAccuracy, config.MaxAccuracy);
             }
         }
 
-        public void OnIdle(PlayerWeaponController weaponController, IWeaponCmd cmd)
+        public void OnIdle(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
         {
-            var runTimeComponent = weaponController.HeldWeaponAgent.RunTimeComponent;
+            var runTimeComponent = weaponBaseAgent.RunTimeComponent;
             if (runTimeComponent.ContinuesShootCount == 0)
             {
 
-                var config = weaponController.HeldWeaponAgent.PistolAccuracyLogicCfg;
+                var config = weaponBaseAgent.PistolAccuracyLogicCfg;
                 if (config == null)
                     return;
 

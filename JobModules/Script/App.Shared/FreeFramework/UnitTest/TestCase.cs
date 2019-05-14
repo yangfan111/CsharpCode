@@ -3,10 +3,7 @@ using com.wd.free.ai;
 using com.wd.free.@event;
 using com.wd.free.trigger;
 using Core.Free;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace App.Shared.FreeFramework.UnitTest
 {
@@ -16,6 +13,8 @@ namespace App.Shared.FreeFramework.UnitTest
         private bool started;
 
         public IUnitTestData data;
+
+        private bool ended;
 
         public TestCase()
         {
@@ -51,6 +50,7 @@ namespace App.Shared.FreeFramework.UnitTest
         public void Start(IEventArgs args)
         {
             started = true;
+            ended = false;
             this.order.Reset(args);
         }
 
@@ -69,6 +69,11 @@ namespace App.Shared.FreeFramework.UnitTest
             if (started && this.order.actions.Count > 0)
             {
                 this.order.Act(args);
+                if (args.FreeContext.AiSuccess && !ended)
+                {
+                    args.Trigger(FreeTriggerConstant.TEST_CASE_END);
+                    ended = true;
+                }
             }
         }
     }

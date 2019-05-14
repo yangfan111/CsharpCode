@@ -41,21 +41,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
             }
         }
 
-//        public bool PlayerIsDrop(PlayerEntity playerEntity)
-//        {
-//            if (null == playerEntity)
-//                return false;
-//            if (SharedConfig.IsOffline)
-//            {
-//                return playerEntity.hasStateInterface && (playerEntity.stateInterface.State.GetActionState() == ActionInConfig.Gliding
-//                    || playerEntity.stateInterface.State.GetActionState() == ActionInConfig.Parachuting);
-//            }
-//            else
-//            {
-//                return playerEntity.hasGamePlay && (playerEntity.gamePlay.GameState == GameState.Gliding
-//                    || playerEntity.gamePlay.GameState == GameState.JumpPlane);
-//            }
-//        }
 
         public float TerrainHeight
         {
@@ -126,7 +111,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
                     if (null != _plane)
                     {
 //                        height = -_plane.model3D.y - MapOrigin.Origin.y;
-                        height = new MapFixedVector3(WorldOrigin.WorldPosition(new Vector3(_plane.model3D.x, _plane.model3D.y,
+                        height = new MapFixedVector3(WorldOrigin.WorldPosition(new Vector3(_plane.model3D.x, -_plane.model3D.y,
                             _plane.model3D.z))).ShiftedUIVector3().y;
                     }
                 }

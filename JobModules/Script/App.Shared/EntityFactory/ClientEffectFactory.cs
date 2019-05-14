@@ -7,6 +7,7 @@ using Core.EntityComponent;
 using Core.Event;
 using Core.Utils;
 using UnityEngine;
+using Utils.Appearance;
 using Utils.Configuration;
 using Utils.Singleton;
 using XmlConfig;
@@ -169,14 +170,34 @@ namespace App.Shared.EntityFactory
             effectEntity.isFlagSyncNonSelf = false;
         }
 
-        public static void AddBeenHitEvent(PlayerEntity srcPlayer, EntityKey target, int damageId, int triggerTime)
+        public static void AddBeenHitEvent(PlayerEntity srcPlayer, PlayerEntity target, int damageId, int triggerTime)
         {
-            BeenHitEvent e = (BeenHitEvent) EventInfos.Instance.Allocate(EEventType.BeenHit, false);
-            e.Target = target;
-            e.UniqueId = damageId;
-            e.TriggerTime = triggerTime;
-            srcPlayer.localEvents.Events.AddEvent(e);
+            if (CanPlayBeenHit(target))
+            {
+                BeenHitEvent e = (BeenHitEvent) EventInfos.Instance.Allocate(EEventType.BeenHit, false);
+                e.Target = target.entityKey.Value;
+                e.UniqueId = damageId;
+                e.TriggerTime = triggerTime;
+                srcPlayer.localEvents.Events.AddEvent(e);
+            }
+           
         }
+
+        private static bool CanPlayBeenHit(PlayerEntity srcPlayer)
+        {
+            if (srcPlayer.isFlagSelf)
+            {
+                return true;
+            }
+            else
+            {
+                return srcPlayer.hasThirdPersonAppearance &&
+                       ((int) srcPlayer.thirdPersonAppearance.Posture >= (int) ThirdPersonPosture.Stand &&
+                        (int) srcPlayer.thirdPersonAppearance.Posture <= (int) ThirdPersonPosture.ProneToCrouch)
+                     && srcPlayer.thirdPersonAppearance.Action == ThirdPersonAction.Null;
+            }
+        }
+
 
         public static void AddHitPlayerEffectEvent(PlayerEntity srcPlayer, EntityKey target, Vector3 hitPoint, Vector3 offset)
         {
@@ -256,7 +277,7 @@ namespace App.Shared.EntityFactory
             effectEntity.AddFlagImmutability(0);
         }
 
-        public static void CreateGrenadeExplosionEffect(ClientEffectContext context,
+        public static ClientEffectEntity CreateGrenadeExplosionEffect(ClientEffectContext context,
             IEntityIdGenerator entityIdGenerator,
             EntityKey owner, Vector3 position, float yaw, float pitch, int effectId, int effectTime,
             EClientEffectType effectType)
@@ -267,6 +288,7 @@ namespace App.Shared.EntityFactory
             entity.AddEffectId(effectId);
             entity.AddEffectRotation(yaw, pitch);
             entity.AddFlagImmutability(0);
+            return entity;
         }
 
         /// <summary>
@@ -280,6 +302,7 @@ namespace App.Shared.EntityFactory
         /// <param name="sprayPrintSize">大小</param>
         /// <param name="sprayPrintType">类型</param>
         /// <param name="sprayPrintSpriteId">贴图</param>
+        /// <param name="lifeTime">生命周期</param>
         public static void CreateSprayPaint(ClientEffectContext context,
             IEntityIdGenerator entityIdGenerator,
             Vector3 sprayPaintPos, 
@@ -287,7 +310,8 @@ namespace App.Shared.EntityFactory
             int sprayPrintMask,
             Vector3 sprayPrintSize,
             ESprayPrintType sprayPrintType,
-            int sprayPrintSpriteId
+            int sprayPrintSpriteId,
+            int lifeTime
             )
         {
             int type = (int)EClientEffectType.SprayPrint;
@@ -305,12 +329,10 @@ namespace App.Shared.EntityFactory
             effectEntity.sprayPaint.SprayPrintSpriteId = sprayPrintSpriteId;
 
             effectEntity.AddEffectType(type);
-
-            effectEntity.AddLifeTime(DateTime.Now, 600000);
+            effectEntity.AddAssets(false, false);
+            effectEntity.AddLifeTime(DateTime.Now, lifeTime);
             effectEntity.isFlagSyncNonSelf = true;
-
-
-            effectEntity.lifeTime.LifeTime = SingletonManager.Get<ClientEffectCommonConfigManager>().DecayLifeTime;
+            /*effectEntity.lifeTime.LifeTime = SingletonManager.Get<ClientEffectCommonConfigManager>().DecayLifeTime;*/
             effectEntity.AddFlagImmutability(0);
         }
     }

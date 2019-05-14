@@ -28,7 +28,7 @@ namespace App.Client.GameModules.OC
             OcclusionRunningState.OcclusionEnabled = SharedConfig.EnableCustomOC;
 
             _param = param as FixedOCParam;
-            _scene = new SingleScene(String.Empty, _param.SceneName);
+            _scene = new SingleScene(String.Empty, _param.SceneName, Index.InValidIndex);
             _scene.Load(_param.OCData);
         }
 

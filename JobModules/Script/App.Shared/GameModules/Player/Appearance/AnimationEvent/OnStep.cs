@@ -1,13 +1,4 @@
-﻿using App.Shared.Components;
-using App.Shared.Components.Player;
-using App.Shared.Configuration;
-using App.Shared.Terrains;
-using Core.Utils;
-using Utils.Singleton;
-using Utils.Utils;
-using XmlConfig;
-using App.Shared;
-using Core;
+﻿using Core.Utils;
 using UnityEngine;
 
 namespace App.Shared.GameModules.Player.Appearance.AnimationEvent
@@ -18,10 +9,9 @@ namespace App.Shared.GameModules.Player.Appearance.AnimationEvent
         private int lastFrameCount;
         public void AnimationEventCallback(PlayerEntity player, string param, UnityEngine.AnimationEvent eventParam)
         {
+            if(SharedConfig.IsServer || eventParam == null  || eventParam.animatorClipInfo.weight <= 0.5f) return;
            if (lastFrameCount == Time.frameCount)
                return;
-          // DebugUtil.MyLog("Step In："+Time.frameCount+"||"+Time.time);
-        //    Logger.Info("Step in");
             if (!player.IsStepAudioValied())
                 return;
             
@@ -29,8 +19,7 @@ namespace App.Shared.GameModules.Player.Appearance.AnimationEvent
             if (stepState == AudioGrp_Footstep.None)
                 return;
             lastFrameCount = Time.frameCount;
-            if(player.AudioController() != null)
-            player.AudioController().PlayStepEnvironmentAudio(stepState);
+                player.AudioController().PlayFootstepAudio(stepState);
            
 //            if (!AudioUtil.IsStepAudioValied(player))
 //            {
@@ -52,7 +41,7 @@ namespace App.Shared.GameModules.Player.Appearance.AnimationEvent
            
 //   //         var myTerrain = SingletonManager.Get<TerrainManager>().GetTerrain(SingletonManager.Get<MapConfigManager>().SceneParameters.Id);
 //            PostureInConfig curPosture = player.stateInterface.State.GetCurrentPostureState();
-//            var id = UniversalConsts.InvalidIntId;
+//            var id = GlobalConst.InvalidIntId;
 //            var inWater = false;// SingletonManager.Get<MapConfigManager>().InWater(player.position.Value);
 //            AudioGrp_Footstep step = AudioGrp_Footstep.None;
 //            switch (curPosture)

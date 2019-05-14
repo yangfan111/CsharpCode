@@ -91,10 +91,27 @@ namespace Core.UpdateLatest
         {
             _logger.InfoFormat("Dispose {0}",_list.Count);
             LatestMessage = null;
-            foreach (var updateLatestPacakge in _list)
+            try
             {
-                _logger.InfoFormat("{0}",updateLatestPacakge.RefCount);
-                updateLatestPacakge.ReleaseReference();
+
+           
+            foreach (var updateLatestPacakge in _list.ToArray())
+            {
+                try
+                {
+                   // _logger.InfoFormat("{0}",updateLatestPacakge.RefCount);
+                    updateLatestPacakge.ReleaseReference();
+                }
+                catch (Exception e)
+                {
+                    _logger.ErrorFormat("Dispose :{0}", e);
+                }
+              
+            }
+            }
+            catch (Exception e)
+            {
+                _logger.ErrorFormat("Dispose :{0}", e);
             }
             _list.Clear();
             dict.Clear();

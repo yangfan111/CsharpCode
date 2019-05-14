@@ -72,8 +72,8 @@ namespace Utils.Appearance
             if (weapon != null && character != null)
             {
                 UnmountWeaponOnAlternativeLocator(character);
-                Transform anchor = FindChildBoneFromCache(weapon, BoneName.WeaponRightHand, false);
-                Transform target = FindChildBoneFromCache(character, BoneName.AlternativeWeaponLocator, false);
+                var anchor = FindChildBoneFromCache(weapon, BoneName.WeaponRightHand, false);
+                var target = FindChildBoneFromCache(character, BoneName.AlternativeWeaponLocator, false);
                 FixedObj2Bones(weapon, anchor, target);
             }
         }
@@ -83,8 +83,8 @@ namespace Utils.Appearance
             if (weapon != null && character != null)
             {
                 UnmountRightHandWeapon(character);
-                Transform anchor = FindChildBoneFromCache(weapon, BoneName.WeaponRightHand, false);
-                Transform target = FindChildBoneFromCache(character, BoneName.CharRightHand, false);
+                var anchor = FindChildBoneFromCache(weapon, BoneName.WeaponRightHand, false);
+                var target = FindChildBoneFromCache(character, BoneName.CharRightHand, false);
                 FixedObj2Bones(weapon, anchor, target);
             }
         }
@@ -94,10 +94,19 @@ namespace Utils.Appearance
             if (weapon != null && character != null)
             {
                 UnmountRightHandWeapon(character);
-                Transform anchor = FindChildBoneFromCache(weapon, BoneName.WeaponRightHand, false);
-                Transform target = FindChildBoneFromCache(character, BoneName.CharRightHand, false);
+                var anchor = FindChildBoneFromCache(weapon, BoneName.WeaponRightHand, false);
+                var target = FindChildBoneFromCache(character, BoneName.CharRightHand, false);
                 FixedObj2Bones(weapon, anchor, target);
             }
+        }
+
+        public void MountLeftHandWeapon(GameObject weapon, GameObject character)
+        {
+            if(null == weapon || null == character) return;
+            UnMountLeftHandWeapon(character);
+            var anchor = FindChildBoneFromCache(weapon, BoneName.WeaponLeftHand, false);
+            var target = FindChildBoneFromCache(character, BoneName.CharLeftHand, false);
+            FixedObj2Bones(weapon, anchor, target);
         }
 
         public void MountCharacterToVehicleSeat(GameObject character, Transform seat)
@@ -111,9 +120,8 @@ namespace Utils.Appearance
         {
             if (wardrobe != null && character != null)
             {
-                //todo
-                Transform anchor = FindChildBoneFromCache(wardrobe, BoneName.AttachmentLocator, false);
-                Transform target = FindChildBoneFromCache(character, BoneName.CharacterHeadBoneName, false);
+                var anchor = FindChildBoneFromCache(wardrobe, BoneName.AttachmentLocator, false);
+                var target = FindChildBoneFromCache(character, BoneName.CharacterHeadBoneName, false);
                 FixedObj2Bones(wardrobe, anchor, target);
             }
         }
@@ -124,8 +132,8 @@ namespace Utils.Appearance
             {
                 if (_attachmentLocator.ContainsKey(location))
                 {
-                    Transform anchor = FindChildBoneFromCache(attachment, BoneName.AttachmentLocator, false);
-                    Transform target = FindChildBoneFromCache(weapon, _attachmentLocator[location], false);
+                    var anchor = FindChildBoneFromCache(attachment, BoneName.AttachmentLocator, false);
+                    var target = FindChildBoneFromCache(weapon, _attachmentLocator[location], false);
                     FixedObj2Bones(attachment, anchor, target);
                 }
                 else
@@ -157,13 +165,18 @@ namespace Utils.Appearance
             UnmountTransform(FindChildBoneFromCache(character, BoneName.CharRightHand, false));
         }
 
+        public void UnMountLeftHandWeapon(GameObject character)
+        {
+            UnmountTransform(FindChildBoneFromCache(character, BoneName.CharLeftHand, false));
+        }
+
         public void UnmountWeaponOnAlternativeLocator(GameObject character)
         {
             UnmountTransform(
                 FindChildBoneFromCache(character, BoneName.AlternativeWeaponLocator, false));
         }
 
-        public void MountWeaponInPackage(GameObject weapon, GameObject character, WeaponInPackage pos)
+        public void MountWeaponInPackage(GameObject weapon, GameObject character, WeaponInPackage pos, bool unMount = true)
         {
             if (weapon != null && character != null)
             {
@@ -198,7 +211,9 @@ namespace Utils.Appearance
                         break;
                 }
 
-                UnmountTransform(target);
+                if(unMount)
+                    UnmountTransform(target);
+                
                 if (target != null)
                 {
                     weapon.transform.SetParent(target, false);

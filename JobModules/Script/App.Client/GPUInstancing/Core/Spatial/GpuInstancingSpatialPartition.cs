@@ -1,7 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using App.Client.GPUInstancing.Core.Data;
 using App.Client.GPUInstancing.Core.Utils;
+using App.Client.SceneManagement.Vegetation;
+using Core.Utils;
 using UnityEngine;
 
 namespace App.Client.GPUInstancing.Core.Spatial
@@ -11,393 +14,302 @@ namespace App.Client.GPUInstancing.Core.Spatial
     /// 2. Cull node
     /// 3. Merge node
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     class GpuInstancingSpatialPartition<T> where T : GpuInstancingNode
     {
-        enum NodeStatus
-        {
-            Invisible,
-            ToBeInsstantiated,
-            Instantiating,
-            Cached
-        }
+        static LoggerAdapter logger = new LoggerAdapter("GpuInstancingSpatialPartition");
 
-        class NodeIndicator
-        {
-            public NodeStatus Status;
-            public int BufferSlot;
+        private int _clusterDimensions = 8;
+        private GpuInstancingNodeCluster<T>[,] _nodeClusters;
+        private float _clusterSize;
+        private float _cullingDistance;
 
-            public bool InLastVisibleSet;
-            public bool InCurVisibleSet;
-
-            public bool IsBufferBuilded
-            {
-                get { return Status == NodeStatus.Cached; }
-            }
-
-            public void SetInvisible()
-            {
-                Status = NodeStatus.Invisible;
-                BufferSlot = -1;
-            }
-        }
-
-        private Vector3 _baseLocation;
-        private Vector2 _nodeSize;
-
-        private int _xCount;
-        private int _zCount;
-        private T[,] _nodes;
         private int[] _maxInstanceCountPerRenderInUnit;
-
-        private NodeIndicator[,] _nodeStatuses;
-        private Vector3[,] _aabbMins;
-        private Vector3[,] _aabbMaxs;
-
-        private Vector2 _lastVisibleStart = new Vector2(float.MinValue, float.MinValue);
-        private Vector2 _lastVisibleEnd = new Vector2(float.MinValue, float.MinValue);
-        private readonly Queue<int> _toBeInstantiatedNodes = new Queue<int>();
-        private readonly Queue<int> _instantiatingNodes = new Queue<int>();
-        private int[] _cachedNodeIndexes;
-
-        private Vector2 _enableGridDistance;
-        private Vector2 _minVisiblePos;
-        private Vector2 _maxVisiblePos;
-
-        private ComputeBuffer _heightMapBuffer;
-        private float[] _heightMapData;
+        private bool _newInstanceCountLimit;
 
         private ComputeShader _mergeShader;
 
-        public void InitDivision(Vector3 baseLocation, Vector2 nodeSize, int xCount, int zCount, float enableDistance)
+        private int _lastVisibleStartX = int.MinValue;
+        private int _lastVisibleEndX = int.MinValue;
+        private int _lastVisibleStartZ = int.MinValue;
+        private int _lastVisibleEndZ = int.MinValue;
+
+        private NodeIndicator _curInstantiatingNode;
+        private NodeIndicator _previousInstantiatingNode;
+        private NodeIndicator[] _cachedNodes;
+        
+        public GpuInstancingSpatialPartition()
         {
-            _baseLocation = baseLocation;
-            _nodeSize = nodeSize;
+            _nodeClusters = new GpuInstancingNodeCluster<T>[_clusterDimensions, _clusterDimensions];
+        }
 
-            _xCount = xCount;
-            _zCount = zCount;
-
-            _nodes = new T[_xCount, _zCount];
-            _nodeStatuses = new NodeIndicator[_xCount, _zCount];
-            for (int i = 0; i < _xCount; ++i)
+        public void SetGridParam(float clusterSize, float cullingDistance, Vector2 nodeSize)
+        {
+            if (_cachedNodes == null)
             {
-                for (int j = 0; j < _zCount; ++j)
-                {
-                    _nodeStatuses[i, j] = new NodeIndicator
-                    {
-                        Status = NodeStatus.Invisible,
-                        BufferSlot = -1,
-                        InLastVisibleSet = false,
-                        InCurVisibleSet = false
-                    };
-                }
-            }
+                _clusterSize = clusterSize;
+                _cullingDistance = cullingDistance + Constants.DetailDisableBufferLength;
 
-            _minVisiblePos = new Vector2(
-                baseLocation.x - enableDistance,
-                baseLocation.z - enableDistance);
-            _maxVisiblePos = new Vector2(
-                baseLocation.x + nodeSize.x * _xCount + enableDistance,
-                baseLocation.z + nodeSize.y * _zCount + enableDistance);
-
-            _enableGridDistance = new Vector2(
-                enableDistance / nodeSize.x,
-                enableDistance / nodeSize.y);
-
-            var count = Mathf.CeilToInt(_enableGridDistance.x * 2 + 1) * Mathf.CeilToInt(_enableGridDistance.y * 2 + 1);
-                        
-            _cachedNodeIndexes = new int[count];
-            for (int i = 0; i < count; ++i)
-            {
-                _cachedNodeIndexes[i] = -1;
+                var cullingGridCountX = Mathf.CeilToInt(cullingDistance / nodeSize.x * 2 + 1);
+                var cullingGridCountZ = Mathf.CeilToInt(cullingDistance / nodeSize.y * 2 + 1);
+                _cachedNodes = new NodeIndicator[cullingGridCountX * cullingGridCountZ];
             }
         }
 
-        public void InitHeightMap(float[,] heightMapData, float fullHeight)
+        public void AddCluster(GpuInstancingNodeCluster<T> cluster)
         {
-            var xCount = heightMapData.GetLength(0);
-            var zCount = heightMapData.GetLength(1);
-
-            float[,] mins = new float[_xCount, _zCount];
-            float[,] maxs = new float[_xCount, _zCount];
-
-            for (int i = 0; i < _xCount; ++i)
+            while (true)
             {
-                for (int j = 0; j < _zCount; ++j)
+                var halfSize = _clusterDimensions / 2;
+                var xIndex = Mathf.RoundToInt(cluster.MinPosition.x / _clusterSize) + halfSize;
+                var zIndex = Mathf.RoundToInt(cluster.MinPosition.z / _clusterSize) + halfSize;
+
+                if (xIndex >= _clusterDimensions || zIndex >= _clusterDimensions)
+                    AdjustClusterSize();
+                else
                 {
-                    mins[i, j] = int.MaxValue;
-                    maxs[i, j] = int.MinValue;
-                }
-            }
+                    _nodeClusters[xIndex, zIndex] = cluster;
 
-            _heightMapData = new float[xCount * zCount];
-            var index = 0;
+                    var clusterMaxInstanceCount = cluster.MaxInstanceCountPerRenderInUnit;
+                    var count = clusterMaxInstanceCount.Length;
 
-            var xPixelsPerUnit = xCount / (float) _xCount;
-            var zPixelsPerUnit = zCount / (float) _zCount;
+                    if (_maxInstanceCountPerRenderInUnit == null)
+                        _maxInstanceCountPerRenderInUnit = new int[count];
 
-            for (int i = 0; i < xCount; ++i)
-            {
-                for (int j = 0; j < zCount; ++j)
-                {
-                    var height = heightMapData[j, i];
-
-                    var x = Mathf.FloorToInt(i / xPixelsPerUnit);
-                    var z = Mathf.FloorToInt(j / zPixelsPerUnit);
-
-                    if (x < _xCount && z < _zCount)
+                    for (int i = 0; i < count; ++i)
                     {
-                        mins[x, z] = Mathf.Min(mins[x, z], height);
-                        maxs[x, z] = Mathf.Max(maxs[x, z], height);
+                        if (_maxInstanceCountPerRenderInUnit[i] < clusterMaxInstanceCount[i])
+                        {
+                            _newInstanceCountLimit = true;
+                            _maxInstanceCountPerRenderInUnit[i] = clusterMaxInstanceCount[i];
+                        }
                     }
 
-                    _heightMapData[index++] = height;
+                    break;
                 }
             }
-
-            for (int i = 0; i < _xCount; ++i)
-            {
-                for (int j = 0; j < _zCount; ++j)
-                {
-                    mins[i, j] *= fullHeight;
-                    maxs[i, j] *= fullHeight;
-                }
-            }
-
-            BuildAabb(mins, maxs);
         }
 
-        public void AddNode(int x, int z, T node)
+        public void RemoveCluster(Vector3 minPosition)
         {
-            _nodes[x, z] = node;
+            var halfSize = _clusterDimensions / 2;
+            var xIndex = Mathf.RoundToInt(minPosition.x / _clusterSize) + halfSize;
+            var zIndex = Mathf.RoundToInt(minPosition.z / _clusterSize) + halfSize;
 
-            var newInstanceCount = node.MaxInstanceCount;
-            var count = newInstanceCount.Length;
+            _nodeClusters[xIndex, zIndex].Clean();
+            _nodeClusters[xIndex, zIndex] = null;
 
-            if (_maxInstanceCountPerRenderInUnit == null)
-                _maxInstanceCountPerRenderInUnit = new int[count];
-
+            var count = _cachedNodes.Length;
             for (int i = 0; i < count; ++i)
             {
-                _maxInstanceCountPerRenderInUnit[i] =
-                    Mathf.Max(_maxInstanceCountPerRenderInUnit[i], newInstanceCount[i]);
+                var node = _cachedNodes[i];
+                if (node != null)
+                {
+                    if (node.IsOutOfRange)
+                    {
+                        _cachedNodes[i] = null;
+                    }
+                }
             }
         }
+
+        public void DistanceAndFrustumCulling(CameraFrustum frustum)
+        {
+            var viewPoint = frustum.ViewPoint;
+            var halfSize = _clusterDimensions / 2;
+
+            var minVisiblePosX = viewPoint.x - _cullingDistance;
+            var minVisiblePosZ = viewPoint.z - _cullingDistance;
+            var maxVisiblePosX = minVisiblePosX + _cullingDistance * 2;
+            var maxVisiblePosZ = minVisiblePosZ + _cullingDistance * 2;
+
+            int curVisibleStartX = Mathf.FloorToInt(minVisiblePosX / _clusterSize) + halfSize;
+            int curVisibleStartZ = Mathf.FloorToInt(minVisiblePosZ / _clusterSize) + halfSize;
+            int curVisibleEndX = Mathf.CeilToInt(maxVisiblePosX / _clusterSize) + halfSize;
+            int curVisibleEndZ = Mathf.CeilToInt(maxVisiblePosZ / _clusterSize) + halfSize;
+
+            bool enoughRoom = true;
+            
+            for (int i = _lastVisibleStartX; i < _lastVisibleEndX; ++i)
+            {
+                for (int j = _lastVisibleStartZ; j < _lastVisibleEndZ; ++j)
+                {
+                    if (i >= 0 && i < _clusterDimensions && j >= 0 && j < _clusterDimensions)
+                    {
+                        var cluster = _nodeClusters[i, j];
+                        if (cluster == null)
+                            continue;
+
+                        var node = cluster.DistanceAndFrustumCulling(viewPoint, enoughRoom);
+                        if (node != null && enoughRoom)
+                        {
+                            _curInstantiatingNode = node;
+                            enoughRoom = false;
+                        }
+                    }
+                }
+            }
+
+            if (_lastVisibleStartX != curVisibleStartX || _lastVisibleEndX != curVisibleEndX ||
+                _lastVisibleStartZ != curVisibleStartZ || _lastVisibleEndZ != curVisibleEndZ)
+            {
+                for (int i = curVisibleStartX; i < curVisibleEndX; ++i)
+                {
+                    for (int j = curVisibleStartZ; j < curVisibleEndZ; ++j)
+                    {
+                        if (i >= 0 && i < _clusterDimensions && j >= 0 && j < _clusterDimensions)
+                        {
+                            var cluster = _nodeClusters[i, j];
+                            if (cluster == null)
+                                continue;
+
+                            var node = cluster.DistanceAndFrustumCulling(viewPoint, enoughRoom);
+                            if (node != null && enoughRoom)
+                            {
+                                _curInstantiatingNode = node;
+                                enoughRoom = false;
+                            }
+                        }
+                    }
+                }
+                
+                _lastVisibleStartX = curVisibleStartX;
+                _lastVisibleEndX = curVisibleEndX;
+                _lastVisibleStartZ = curVisibleStartZ;
+                _lastVisibleEndZ = curVisibleEndZ;
+            }
+
+            if (!enoughRoom)
+            {
+                _curInstantiatingNode.SetInstantiating();
+                _curInstantiatingNode.Node.BuildBuffer(_curInstantiatingNode.HeightBuffer());
+            }
+
+            var count = _cachedNodes.Length;
+            for (int i = 0; i < count; ++i)
+            {
+                var node = _cachedNodes[i];
+                if (node != null && node.IsInstantiated)
+                    node.IsActive = frustum.IsDetailNodeVisible(node.Mins, node.Maxs);
+            }
+        }
+
+        public void CreateUnitedInstance(InstancingDraw[] instancingData)
+        {
+            if (instancingData[0].State == InstancingDrawState.NotInitialized || _newInstanceCountLimit)
+            {
+                var dataLength = instancingData.Length;
+                for (int i = 0; i < dataLength; ++i)
+                {
+                    instancingData[i].SetInstancingCount(_cachedNodes.Length, _maxInstanceCountPerRenderInUnit[i]);
+                }
+            }
+
+            if (_previousInstantiatingNode != null)
+            {
+                if (_previousInstantiatingNode.IsDuringInstantiation)
+                {
+                    _previousInstantiatingNode.SetInstantiated();
+                    var count = _cachedNodes.Length;
+                    var index = 0;
+                    for (; index < count; ++index)
+                    {
+                        if (_cachedNodes[index] == null)
+                        {
+                            _cachedNodes[index] = _previousInstantiatingNode;
+                            break;
+                        }
+                    }
+
+                    if (index == count)
+                    {
+                        logger.InfoFormat("Full Exception, mins: {0}, maxs: {1}",
+                            _previousInstantiatingNode.Mins.ToStringExt(), _previousInstantiatingNode.Maxs.ToStringExt());
+                    }
+
+                    if (!_newInstanceCountLimit)
+                        ReplaceBuffer(_previousInstantiatingNode.Node, index, instancingData);
+                }
+                else
+                    _previousInstantiatingNode.Node.ReleaseBuffer();
+
+                _previousInstantiatingNode = null;
+            }
+
+            if (_newInstanceCountLimit)
+            {
+                var count = _cachedNodes.Length;
+                for (int i = 0; i < count; ++i)
+                {
+                    if (_cachedNodes[i] != null)
+                        ReplaceBuffer(_cachedNodes[i].Node, i, instancingData);
+                }
+
+                _newInstanceCountLimit = false;
+            }
+
+            if (_curInstantiatingNode != null)
+            {
+                _previousInstantiatingNode = _curInstantiatingNode;
+                _curInstantiatingNode = null;
+            }
+
+            var drawCount = instancingData.Length;
+            for (int i = 0; i < drawCount; ++i)
+            {
+                if (instancingData[i].State == InstancingDrawState.Enable)
+                {
+                    instancingData[i].ClearRealBlockCount();
+
+                    var count = _cachedNodes.Length;
+                    for (int j = 0; j < count; ++j)
+                    {
+                        var node = _cachedNodes[j];
+                        if (node != null)
+                        {
+                            if (node.IsOutOfRange)
+                            {
+                                _cachedNodes[j] = null;
+                                continue;
+                            }
+
+                            if (node.IsActive)
+                            {
+                                var realCount = node.Node.GetInstancingDataCount(i);
+                                instancingData[i].SetRealBlockCount(j, realCount);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void AdjustClusterSize()
+        {
+            var newClusterDimensions = _clusterDimensions * 2;
+            var offset = _clusterDimensions / 2;
+            var newClusters = new GpuInstancingNodeCluster<T>[newClusterDimensions, newClusterDimensions];
+
+            for (int i = 0; i < _clusterDimensions; ++i)
+            {
+                for (int j = 0; j < _clusterDimensions; ++j)
+                {
+                    newClusters[i + offset, j + offset] = _nodeClusters[i, j];
+                }
+            }
+
+            _clusterDimensions = newClusterDimensions;
+            _nodeClusters = newClusters;
+        }
+
 
         public void SetMergeShader(ComputeShader shader)
         {
             _mergeShader = shader;
         }
 
-        public void FrustumCullingByGrid(CameraFrustum frustum)
-        {
-            var viewPoint = frustum.ViewPoint - _baseLocation;
-
-            if (viewPoint.x >= _minVisiblePos.x && viewPoint.x <= _maxVisiblePos.x &&
-                viewPoint.z >= _minVisiblePos.y && viewPoint.z <= _maxVisiblePos.y)
-            {
-                if (_heightMapBuffer == null)
-                {
-                    _heightMapBuffer = new ComputeBuffer(_heightMapData.Length, Constants.StrideSizeInt);
-                    _heightMapBuffer.SetData(_heightMapData);
-                }
-
-                CullNodesByDistance(viewPoint);
-
-                for (int i = (int) _lastVisibleStart.x; i < _lastVisibleEnd.x; ++i)
-                {
-                    for (int j = (int) _lastVisibleStart.y; j < _lastVisibleEnd.y; ++j)
-                    {
-                        if (i >= 0 && i < _xCount && j >= 0 && j < _zCount && _nodeStatuses[i, j].IsBufferBuilded)
-                            _nodes[i, j].IsActive = frustum.IsDetailNodeVisible(_aabbMins[i, j], _aabbMaxs[i, j]);
-                    }
-                }
-            }
-            else if (viewPoint.x < _minVisiblePos.x - Constants.DetailDisableBufferLength ||
-                     viewPoint.x > _maxVisiblePos.x + Constants.DetailDisableBufferLength ||
-                     viewPoint.z < _minVisiblePos.y - Constants.DetailDisableBufferLength ||
-                     viewPoint.z > _maxVisiblePos.y + Constants.DetailDisableBufferLength)
-            {
-                if (_heightMapBuffer != null)
-                {
-                    _heightMapBuffer.Release();
-                    _heightMapBuffer = null;
-                }
-            }
-        }
-
-        public void CreateUnitedInstance(InstancingDraw[] instancingData)
-        {
-            if (instancingData[0].State == InstancingDrawState.NotInitialized)
-            {
-                var dataLength = instancingData.Length;
-                for (int i = 0; i < dataLength; ++i)
-                {
-                    instancingData[i].SetInstancingCount(_cachedNodeIndexes.Length, _maxInstanceCountPerRenderInUnit[i]);
-                }
-            }
-
-            if (_instantiatingNodes.Count != 0)
-            {
-                var index = _instantiatingNodes.Dequeue();
-                var zIndex = index / _xCount;
-                var xIndex = index - zIndex * _xCount;
-
-                if (_nodeStatuses[xIndex, zIndex].Status == NodeStatus.Instantiating)
-                {
-                    _nodeStatuses[xIndex, zIndex].Status = NodeStatus.Cached;
-                    var count = _cachedNodeIndexes.Length;
-                    for (int i = 0; i < count; ++i)
-                    {
-                        if (_cachedNodeIndexes[i] == -1)
-                        {
-                            _cachedNodeIndexes[i] = index;
-                            _nodeStatuses[xIndex, zIndex].BufferSlot = i;
-
-                            ReplaceBuffer(xIndex, zIndex, instancingData);
-
-                            break;
-                        }
-                    }
-                }
-                else
-                    _nodes[xIndex, zIndex].ReleaseBuffer();
-            }
-
-            if (_toBeInstantiatedNodes.Count != 0)
-                _instantiatingNodes.Enqueue(_toBeInstantiatedNodes.Dequeue());
-
-            var drawCount = instancingData.Length;
-            for (int i = 0; i < drawCount; ++i)
-            {
-                instancingData[i].ClearRealBlockCount();
-
-                var maxCachedNodeCount = _cachedNodeIndexes.Length;
-                for (int j = 0; j < maxCachedNodeCount; ++j)
-                {
-                    if (_cachedNodeIndexes[j] >= 0)
-                    {
-                        var z = _cachedNodeIndexes[j] / _xCount;
-                        var x = _cachedNodeIndexes[j] - z * _xCount;
-
-                        if (_nodes[x, z].IsActive)
-                        {
-                            var realCount = _nodes[x, z].GetInstancingDataCount(i);
-                            instancingData[i].SetRealBlockCount(j, realCount);
-                        }
-                    }
-                }
-            }
-        }
-
-        private void BuildAabb(float[,] mins, float[,] maxs)
-        {
-            _aabbMins = new Vector3[_xCount, _zCount];
-            _aabbMaxs = new Vector3[_xCount, _zCount];
-
-            for (int i = 0; i < _xCount; ++i)
-            {
-                for (int j = 0; j < _zCount; ++j)
-                {
-                    _aabbMins[i, j] = new Vector3(_nodeSize.x * i, mins[i, j], _nodeSize.y * j);
-                    _aabbMaxs[i, j] = new Vector3(_nodeSize.x * (i + 1), maxs[i, j], _nodeSize.y * (j + 1));
-                }
-            }
-        }
-
-        private void CullNodesByDistance(Vector3 viewPoint)
-        {
-            Vector2 visibleStart = new Vector2(
-                Mathf.FloorToInt(viewPoint.x / _nodeSize.x - _enableGridDistance.x),
-                Mathf.FloorToInt(viewPoint.z / _nodeSize.y - _enableGridDistance.y));
-            Vector2 visibleEnd = new Vector2(
-                Mathf.CeilToInt(viewPoint.x / _nodeSize.x + _enableGridDistance.x),
-                Mathf.CeilToInt(viewPoint.z / _nodeSize.y + _enableGridDistance.y));
-
-            if (!Helper.AlmostEqual(visibleStart, _lastVisibleStart) ||
-                !Helper.AlmostEqual(visibleEnd, _lastVisibleEnd))
-            {
-                _toBeInstantiatedNodes.Clear();
-
-                HashSet<int> allRelatedNode = new HashSet<int>();
-
-                for (int i = (int) _lastVisibleStart.x; i < _lastVisibleEnd.x; ++i)
-                {
-                    for (int j = (int) _lastVisibleStart.y; j < _lastVisibleEnd.y; ++j)
-                    {
-                        if (i >= 0 && i < _xCount && j >= 0 && j < _zCount)
-                        {
-                            _nodeStatuses[i, j].InLastVisibleSet = true;
-                            allRelatedNode.Add(j * _xCount + i);
-                        }
-                    }
-                }
-
-                for (int i = (int) visibleStart.x; i < visibleEnd.x; ++i)
-                {
-                    for (int j = (int) visibleStart.y; j < visibleEnd.y; ++j)
-                    {
-                        if (i >= 0 && i < _xCount && j >= 0 && j < _zCount)
-                        {
-                            _nodeStatuses[i, j].InCurVisibleSet = true;
-                            allRelatedNode.Add(j * _xCount + i);
-                        }
-                    }
-                }
-
-                foreach (var index in allRelatedNode)
-                {
-                    var z = index / _xCount;
-                    var x = index - z * _xCount;
-
-                    if (_nodeStatuses[x, z].InLastVisibleSet &&
-                        !_nodeStatuses[x, z].InCurVisibleSet)
-                    {
-                        if (_nodeStatuses[x, z].Status == NodeStatus.Cached)
-                        {
-                            _nodes[x, z].ReleaseBuffer();
-                            _cachedNodeIndexes[_nodeStatuses[x, z].BufferSlot] = -1;
-                        }
-                        _nodeStatuses[x, z].SetInvisible();
-                    }
-                    else if (_nodeStatuses[x, z].InLastVisibleSet &&
-                             _nodeStatuses[x, z].InCurVisibleSet)
-                    {
-                        if (_nodeStatuses[x, z].Status == NodeStatus.ToBeInsstantiated)
-                            _toBeInstantiatedNodes.Enqueue(index);
-                    }
-                    else if (!_nodeStatuses[x, z].InLastVisibleSet &&
-                             _nodeStatuses[x, z].InCurVisibleSet)
-                    {
-                        _nodeStatuses[x, z].Status = NodeStatus.ToBeInsstantiated;
-                        _toBeInstantiatedNodes.Enqueue(index);
-                    }
-
-                    _nodeStatuses[x, z].InLastVisibleSet = false;
-                    _nodeStatuses[x, z].InCurVisibleSet = false;
-                }
-
-                _lastVisibleStart = visibleStart;
-                _lastVisibleEnd = visibleEnd;
-            }
-
-            if (_toBeInstantiatedNodes.Count != 0)
-            {
-                var index = _toBeInstantiatedNodes.Peek();
-                var z = index / _xCount;
-                var x = index - z * _xCount;
-
-                _nodeStatuses[x, z].Status = NodeStatus.Instantiating;
-                _nodes[x, z].BuildBuffer(_heightMapBuffer);
-            }
-        }
-
-        private void ReplaceBuffer(int row, int column, InstancingDraw[] instancingData)
+        private void ReplaceBuffer(GpuInstancingNode node, int slot, InstancingDraw[] instancingData)
         {
             var count = instancingData.Length;
-
-            var node = _nodes[row, column];
-            var status = _nodeStatuses[row, column];
             var kernels = node.GetMergeKernels(_mergeShader);
 
             for (int i = 0; i < count; ++i)
@@ -413,7 +325,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
                     _mergeShader.SetBuffer(kernels[j].Kernel, kernels[j].Input, inputs[j]);
                     _mergeShader.SetBuffer(kernels[j].Kernel, kernels[j].Output, instancingData[i].GetMergedTargetBuffer(j));
                     _mergeShader.SetInt(Constants.ShaderVariable.InputDataCount, dataLength);
-                    _mergeShader.SetInt(Constants.ShaderVariable.OutputDataOffset, status.BufferSlot * _maxInstanceCountPerRenderInUnit[i]);
+                    _mergeShader.SetInt(Constants.ShaderVariable.OutputDataOffset, slot * _maxInstanceCountPerRenderInUnit[i]);
 
                     _mergeShader.Dispatch(kernels[j].Kernel, Mathf.CeilToInt(dataLength / (float)Constants.MergeThreadCount), 1, 1);
                 }

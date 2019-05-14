@@ -5,14 +5,6 @@ using System.Text;
 
 namespace App.Shared.Components.Ui
 {
-    public interface IChickenBagItemData
-    {
-        int cat { get; set; }
-        int id { get; set; }
-        string eventKey { get; set; }
-        string key { get; set; }
-        string count { get; set; }
-    }
 
     public interface IChickenBagItemUiData : IBaseChickenBagItemData
     {

@@ -13,9 +13,9 @@ namespace App.Shared.GameModules.Weapon.Behavior
     {
 
 
-        public abstract void OnAfterFire(PlayerWeaponController controller, IWeaponCmd cmd);
+        public abstract void OnAfterFire(WeaponBaseAgent agent, WeaponSideCmd cmd);
         //以当前0.5X+10速度衰减
-        public virtual float UpdateLen(PlayerWeaponController controller, float len, float frameSec)
+        public virtual float UpdateLen(WeaponBaseAgent agent, float len, float frameSec)
         {
             var r = len;
             r -= (10f + r * 0.5f) * frameSec;
@@ -23,20 +23,20 @@ namespace App.Shared.GameModules.Weapon.Behavior
             return r;
         }
 
-        protected abstract float GePuntchFallbackFactor(PlayerWeaponController controller);
+        protected abstract float GePuntchFallbackFactor(PlayerWeaponController weaponController);
 
-        public virtual void OnFrame(PlayerWeaponController controller, IWeaponCmd cmd)
+        public virtual void OnFrame(WeaponBaseAgent agent, WeaponSideCmd cmd)
         {
-            controller.HeldWeaponAgent.RunTimeComponent.LastRenderTime = cmd.RenderTime;
+            agent.RunTimeComponent.LastRenderTimestamp = cmd.UserCmd.RenderTime;
         }
 
-        protected void UpdateOrientationAttenuation(PlayerWeaponController controller, IWeaponCmd cmd)
+        protected void UpdateOrientationAttenuation(WeaponBaseAgent agent, WeaponSideCmd cmd)
         {
-            var orientation     = controller.RelatedOrientation;
+            var orientation     = agent.Owner.WeaponController().RelatedOrientation;
             var punchYaw   = orientation.AccPunchYaw;
             var punchPitch = orientation.AccPunchPitch;
 
-            var frameSec  = cmd.FrameInterval / 1000f;
+            var frameSec  = cmd.UserCmd.FrameInterval / 1000f;
             //获取向量长度
             var puntchLength        = Mathf.Sqrt(punchYaw * punchYaw + punchPitch * punchPitch);
             if (puntchLength > 0)
@@ -44,23 +44,23 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 punchYaw   = punchYaw / puntchLength;
                 punchPitch = punchPitch / puntchLength;
                    
-                puntchLength        = UpdateLen(controller, puntchLength, frameSec);
+                puntchLength        = UpdateLen(agent, puntchLength, frameSec);
                 //UpdateLen: AccPunchYaw  =>AccPunchYaw   
                 orientation.AccPunchYaw   = punchYaw * puntchLength;
                 orientation.AccPunchPitch = punchPitch * puntchLength;
         
-                var factor = GePuntchFallbackFactor(controller);
+                var factor = GePuntchFallbackFactor(agent.Owner.WeaponController());
                 //GePuntchFallbackFactor : AccPunchYaw => AccPunchPitch     
                 orientation.AccPunchYawValue   = orientation.AccPunchYaw * factor;
                 orientation.AccPunchPitchValue = orientation.AccPunchPitch * factor;
             }
-            var rotateYaw = orientation.Roll;
+            var rotateYaw = orientation.FireRoll;
             if (rotateYaw != 0)
             {
                 var rotatePos = rotateYaw >= 0;
-                rotateYaw -= rotateYaw * cmd.FrameInterval  / FireShakeProvider.GetDecayInterval(controller);
+                rotateYaw -= rotateYaw * cmd.UserCmd.FrameInterval  / FireShakeProvider.GetDecayInterval(agent);
                 if ((rotatePos && rotateYaw < 0) || (!rotatePos && rotateYaw > 0)) rotateYaw = 0;
-                orientation.Roll = rotateYaw;
+                orientation.FireRoll = rotateYaw;
             }
 
 

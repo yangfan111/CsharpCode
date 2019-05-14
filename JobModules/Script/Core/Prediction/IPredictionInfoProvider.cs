@@ -15,6 +15,7 @@ namespace Core.Prediction
     }
     public interface IPredictionRewindInfoProvider:IPredictionBaseInfoProvider
     {
+        void SetSelf(EntityKey self);
         IGameEntity GetLocalEntity(EntityKey entityKey);
         ISnapshot LatestSnapshot { get; }
         void DestroyLocalEntity(IGameEntity entity);

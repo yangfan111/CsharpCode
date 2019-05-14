@@ -1,4 +1,5 @@
 ﻿using App.Client.GameModules.SceneManagement;
+using App.Client.GameModules.Terrain;
 using App.Client.Tools;
 using App.Shared.Components;
 using App.Shared.Components.ClientSession;
@@ -32,6 +33,7 @@ namespace App.Client.SessionStates
             
             CompositeGameModule module = new CompositeGameModule();
             module.AddSystem(new VisionCenterUpdateSystem(ctx));
+            module.AddSystem(new TerrainDataLoadSystem(ctx));
             
             systems.Add(new AutoTerrainNavigatorSystem((Contexts) contexts));
             systems.Add(new ProfileFeature(module, ctx.session.commonSession));

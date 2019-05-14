@@ -315,7 +315,7 @@ namespace Core.CharacterState
             InjuredMoveDisableValue = false;
 
             ADSLayer = 7;
-            ADSLayerP1 = 2;
+            ADSLayerP1 = 3;
             ADSEnableValue = 1;
             ADSDisableValue = 0;
 
@@ -338,6 +338,20 @@ namespace Core.CharacterState
             TransfigurationFinishName = "TransfigurationFinish";
             TransfigurationFinishEnable = true;
             TransfigurationFinishDisable = false;
+
+            RageStartName = "RageStart";
+            RageStartEnable = true;
+            RageStartDisable = false;
+
+            RageEndName = "RageEnd";
+            RageEndEnable = true;
+            RageEndDisable = false;
+
+            SuccessName = "Success";
+            SuccessEnable = true;
+            SuccessDisable = false;
+
+            SuccessStateName = "SuccessState";
             
             UpperBodyLayer = NetworkAnimatorLayer.PlayerUpperBodyOverlayLayer;
             UpperBodyEnableValue = 1;
@@ -1190,6 +1204,56 @@ namespace Core.CharacterState
         public int TransfigurationFinishHash { get; private set; }
         public bool TransfigurationFinishEnable;
         public bool TransfigurationFinishDisable;
+
+        #endregion
+        
+        #region Rage
+
+        private string _rageStartName = string.Empty;
+        public string RageStartName
+        {
+            get { return _rageStartName; }
+            set { _rageStartName = value; RageStartHash = StringToHash(value); }
+        }
+        public int RageStartHash { get; private set; }
+        public bool RageStartEnable;
+        public bool RageStartDisable;
+        
+        private string _rageEndName = string.Empty;
+        public string RageEndName
+        {
+            get { return _rageEndName; }
+            set { _rageEndName = value; RageEndHash = StringToHash(value); }
+        }
+        public int RageEndHash { get; private set; }
+        public bool RageEndEnable;
+        public bool RageEndDisable;
+
+        #endregion
+
+        #region Success
+
+        public string _successName = String.Empty;
+        public string SuccessName
+        {
+            get { return _successName; }
+            set { _successName = value; SuccessHash = StringToHash(value); }
+        }
+        public int SuccessHash { get; private set; }
+        public bool SuccessEnable;
+        public bool SuccessDisable;
+
+        #endregion
+        
+        #region SuccessState
+
+        public string _successStateName = String.Empty;
+        public string SuccessStateName
+        {
+            get { return _successStateName; }
+            set { _successStateName = value; SuccessStateHash = StringToHash(value); }
+        }
+        public int SuccessStateHash { get; private set; }
 
         #endregion
 

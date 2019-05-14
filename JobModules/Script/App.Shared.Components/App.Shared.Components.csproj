@@ -82,6 +82,7 @@
     <Compile Include="Components\Player\AttackDamageComponent.cs" />
     <Compile Include="Components\Player\BonesComponents.cs" />
     <Compile Include="Components\Player\CameraComponent.cs" />
+    <Compile Include="Components\Player\ChangeRoleComponent.cs" />
     <Compile Include="Components\Player\CharacterBoneComponent.cs" />
     <Compile Include="Components\Player\CharacterContollerComponent.cs" />
     <Compile Include="Components\Player\CharacterInfoComponent.cs" />
@@ -108,6 +109,7 @@
     <Compile Include="Components\Player\PlayerMoveComponent.cs" />
     <Compile Include="Components\Player\PlayerSkyMoveComponent.cs" />
     <Compile Include="Components\Player\PlayerSoundComponent.cs" />
+    <Compile Include="Components\Player\PlayerSprayComponent.cs" />
     <Compile Include="Components\Player\RaycastComponent.cs" />
     <Compile Include="Components\Player\RaycastTestComponent.cs" />
     <Compile Include="Components\Player\RecycleableAssetComponent.cs" />
@@ -164,6 +166,7 @@
     <Compile Include="Components\Sound\TimeInfoComponent.cs" />
     <Compile Include="Components\Sound\UnityObjComponent.cs" />
     <Compile Include="Components\Throwing\ThrowingComponents.cs" />
+    <Compile Include="Components\Ui\BiochemicalComponent.cs" />
     <Compile Include="Components\Ui\BlastComponent.cs" />
     <Compile Include="Components\Ui\ChatComponent.cs" />
     <Compile Include="Components\Ui\ChickenComponent.cs" />
@@ -350,6 +353,7 @@
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerCameraStateNewComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerCameraStateOutputNewComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerCameraStateUploadComponent.cs" />
+    <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerChangeRoleComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerCharacterBoneComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerCharacterBoneInterfaceComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerCharacterContollerComponent.cs" />
@@ -413,6 +417,8 @@
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerPlayerRotateLimitComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerPlayerSkyMoveComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerPlayerSkyMoveInterVarComponent.cs" />
+    <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerPlayerSprayComponent.cs" />
+    <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerPlayerTokenComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerPlayerWeaponAmmunitionComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerPlayerWeaponAuxiliaryComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerPlayerWeaponBagSetComponent.cs" />
@@ -451,6 +457,7 @@
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerTipComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerTriggerEventComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerUpdateMessagePoolComponent.cs" />
+    <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerUploadEventsComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerUserCmdComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerUserCmdOwnerComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerUserCmdSeqComponent.cs" />
@@ -461,6 +468,7 @@
     <Compile Include="Generated\Entitas\Generated\Player\PlayerContext.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\PlayerEntity.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\PlayerMatcher.cs" />
+    <Compile Include="Generated\Entitas\Generated\SceneObject\Components\SceneObjectAudioComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\SceneObject\Components\SceneObjectAudioTestEmitterComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\SceneObject\Components\SceneObjectCastFlagComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\SceneObject\Components\SceneObjectEffectsComponent.cs" />
@@ -544,6 +552,7 @@
     <Compile Include="Generated\Entitas\Generated\Throwing\ThrowingContext.cs" />
     <Compile Include="Generated\Entitas\Generated\Throwing\ThrowingEntity.cs" />
     <Compile Include="Generated\Entitas\Generated\Throwing\ThrowingMatcher.cs" />
+    <Compile Include="Generated\Entitas\Generated\Ui\Components\UiBiochemicalComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Ui\Components\UiBlastComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Ui\Components\UiChatComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Ui\Components\UiChickenComponent.cs" />
@@ -629,6 +638,8 @@
     <Compile Include="Generated\Serializer\AssetsComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\AttachParentComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\AttachParentComponentSerializer.cs" />
+    <Compile Include="Generated\Serializer\AudioComponentObjcetFactory.cs" />
+    <Compile Include="Generated\Serializer\AudioComponentSerializer.cs" />
     <Compile Include="Generated\Serializer\BulletDataComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\BulletDataComponentSerializer.cs" />
     <Compile Include="Generated\Serializer\BulletGameObjectComponentObjcetFactory.cs" />
@@ -651,6 +662,8 @@
     <Compile Include="Generated\Serializer\CarThirdRewnWheelComponentSerializer.cs" />
     <Compile Include="Generated\Serializer\CastFlagComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\CastFlagComponentSerializer.cs" />
+    <Compile Include="Generated\Serializer\ChangeRoleComponentObjcetFactory.cs" />
+    <Compile Include="Generated\Serializer\ChangeRoleComponentSerializer.cs" />
     <Compile Include="Generated\Serializer\CharacterBoneComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\CharacterBoneComponentSerializer.cs" />
     <Compile Include="Generated\Serializer\ClientAppearanceComponentObjcetFactory.cs" />
@@ -756,6 +769,7 @@
     <Compile Include="Generated\Serializer\PlayerSkyMoveComponentSerializer.cs" />
     <Compile Include="Generated\Serializer\PlayerSkyMoveInterVarComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\PlayerSkyMoveInterVarComponentSerializer.cs" />
+    <Compile Include="Generated\Serializer\PlayerSprayComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\PlayerWeaponAmmunitionComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\PlayerWeaponAmmunitionComponentSerializer.cs" />
     <Compile Include="Generated\Serializer\PlayerWeaponAuxiliaryComponentObjcetFactory.cs" />
@@ -826,6 +840,8 @@
     <Compile Include="Generated\Serializer\UnityGameObjectComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\UnityObjComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\UnityObjectComponentObjcetFactory.cs" />
+    <Compile Include="Generated\Serializer\UploadEventsComponentObjcetFactory.cs" />
+    <Compile Include="Generated\Serializer\UploadEventsComponentSerializer.cs" />
     <Compile Include="Generated\Serializer\UserCmdSeqComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\UserCmdSeqComponentSerializer.cs" />
     <Compile Include="Generated\Serializer\VehicleAssetInfoComponentObjcetFactory.cs" />

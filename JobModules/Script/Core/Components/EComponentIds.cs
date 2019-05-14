@@ -93,6 +93,7 @@
         PlayerLatestAppearance,
         PlayerPredictedAppearance,
         PlayerClientAppearance,
+        PlayerChangeRole,
         PlayerFsmMotor,
         PlayerHitbox,
         PlayerGamePlay,
@@ -157,6 +158,8 @@
         DummyObject,
 
         SceneObjectGameObject,
+        SceneObjectAudioObject,
+
         SceneObjectFlashGameObject,
         SceneObjectEquip,
         SceneObjectWeapon,
@@ -184,6 +187,7 @@
         ThrowingGameObject,
         LocalEvents,
         RemoteEvents,
+        UploadEvents,
         Statistics,
         WeaponBasicInfo,
         WeaponActiveFlag,
@@ -196,6 +200,7 @@
         Effects,
         // 喷漆
         SprayPaint,
+        PlayerSpray,
         End,
 
        

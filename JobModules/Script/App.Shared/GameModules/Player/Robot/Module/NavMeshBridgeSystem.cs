@@ -66,7 +66,7 @@ namespace App.Shared.GameModules.Player.Robot.Module
 
        
 
-        protected override bool filter(PlayerEntity playerEntity)
+        protected override bool Filter(PlayerEntity playerEntity)
         {
             return playerEntity.hasRobot && playerEntity.robot.Wapper != null;
         }

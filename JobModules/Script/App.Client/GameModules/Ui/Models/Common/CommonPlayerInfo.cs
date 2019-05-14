@@ -187,7 +187,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
         }
 
-        public void UpdateInfo(int index, Color color, string name,int playerID,int selectId, List<ICountdownTipData> countdownTipDataList, int rule,int percent)
+        public void UpdateInfo(int index, Color color, string name,int playerID,int selectId, List<ITipData> countdownTipDataList, int rule,int percent)
         {
 
             

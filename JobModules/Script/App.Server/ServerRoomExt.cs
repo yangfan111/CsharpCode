@@ -52,8 +52,8 @@ namespace App.Server
             int[] weaponAvatarIds = RepeatedField2IntArray(roomPlayer.WeaponAvatarIds);
             int[] sprayLacquers = RepeatedField2IntArray(roomPlayer.SprayLacquers);
             int num = _hallRoom.MaxNum(roomPlayer.TeamId);
-
-            PlayerInfo playerInfo = new PlayerInfo(token, RoomId, roomPlayer.Id, roomPlayer.Name, roomPlayer.RoleModelId, roomPlayer.TeamId, num, roomPlayer.Level, roomPlayer.BackId, roomPlayer.TitleId, roomPlayer.BadgeId, avatarIds, weaponAvatarIds, sprayLacquers, false);
+            /*JobAttrbute默认人类，其他职业根据模式，在房间里设置*/
+            PlayerInfo playerInfo = new PlayerInfo(token, RoomId, roomPlayer.Id, roomPlayer.Name, roomPlayer.RoleModelId, roomPlayer.TeamId, num, roomPlayer.Level, roomPlayer.BackId, roomPlayer.TitleId, roomPlayer.BadgeId, avatarIds, weaponAvatarIds, sprayLacquers, false, 0);
             playerInfo.RankScore = roomPlayer.RankScore;
             playerInfo.IsKing = roomPlayer.IsKing;
             playerInfo.CreateTime = DateTime.Now.Ticks / 10000;

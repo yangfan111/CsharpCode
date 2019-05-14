@@ -24,6 +24,8 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private bool isNeedChangeSprite;
         private float lastKongTouDirection;
 
+        private float lastRate;
+
         private List<Transform> airDropList = null;
 
 
@@ -60,12 +62,31 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             {
                 UIUtils.SetActive(dropTf, false);
             }
+            _dropList = null;
+        }
+
+        private List<MapFixedVector2> _dropList;
+        private void UpdateAirDrop(float rate)
+        {
+            if (_dropList == null) return;
+            if (lastRate.Equals(rate)) return;
+            for (int i = 0; i < _dropList.Count; i++)
+            {
+                Transform dropTf = airDropList[i];
+                if (dropTf != null)
+                {
+                    // 设置空投点的位置
+                    Vector2 kTouPosByPixel = (_dropList[i].ShiftedUIVector2()) * rate;
+                    dropTf.GetComponent<RectTransform>().anchoredPosition = kTouPosByPixel;
+                }
+            }
         }
 
         public void ShowAirDrop(List<MapFixedVector2> dropList, float rate)
         {
-            if (isNeedChangeSprite) return;
+            if (isNeedChangeSprite || dropList == null || dropList.Count == 0) return;
             isNeedChangeSprite = true;
+            _dropList = dropList;
             if (airDropList == null) airDropList = new List<Transform>();
             int i = 0;
             for (; i < dropList.Count; i++)
@@ -122,6 +143,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
                 //更新空投点
                 ShowAirDrop(airDropList, rate);
+                UpdateAirDrop(rate);
             }
             else if (planeData.Type == 2)  //运输机
             {
@@ -143,6 +165,8 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             }
 
             UpdateKTouImg(interval);
+
+            lastRate = rate;
         }
 
         public float intervalTime = 0.03f;

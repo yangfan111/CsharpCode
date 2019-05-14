@@ -19,8 +19,11 @@ namespace App.Shared.EntityFactory
         {
         }
 
-      
 
+        public override IEntity CreateSceneAudioBgEmitterEntity(Vector3 p, EntityKey entityKey)
+        {
+            return null;
+        }
         public override IEntity CreateSimpleEquipmentEntity(ECategory category, int id, int count, Vector3 p)
         {
             return null;

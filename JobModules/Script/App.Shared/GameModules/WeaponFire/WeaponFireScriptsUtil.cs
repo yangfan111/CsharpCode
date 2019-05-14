@@ -109,7 +109,7 @@ namespace App.Shared.GameModules.Weapon
                 {
                     if (mode == EFireMode.Burst)
                     {
-                        return new AutoFireProcessor();
+                        return new BurstFireModeUpdater();
                     }
                 }
             }
@@ -131,13 +131,21 @@ namespace App.Shared.GameModules.Weapon
             return null;
         }
 
-        public IFireChecker CreateFireChecker(FireModeLogicConfig config)
+        public IFireChecker CreateFireModeChecker(WeaponAllConfigs configs)
+        {
+            if (configs.S_DefaultFireModeLogicCfg == null)
+                return null;
+            if (configs.NewWeaponCfg.IsSnipperType)
+                return new SpecialFireModeChecker();
+            return new FireModeChecker();
+       
+        }
+        public IAfterFireProcess CreateFireModeUpdater(FireModeLogicConfig config)
         {
             if (config is DefaultFireModeLogicConfig)
-                return new FireBulletModeProcessor();
+                return new CommonFireModeUpdater();
             return null;
         }
-
         public IFireProcessCounter CreateFireBulletCounter(FireCounterConfig config)
         {
             if (config is RifleFireCounterConfig)

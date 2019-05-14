@@ -8,6 +8,9 @@ using UserInputManager.Lib;
 using UnityEngine.UI;
 using System;
 using System.Text.RegularExpressions;
+using App.Shared.Components.Player;
+using Core.Free;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {
@@ -26,7 +29,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         private string itemKey = "";
         
         //界面变量
-        private InputField inputFieldCom = null;
+        private UIInputField inputFieldCom = null;
         private int lastInputValue = 0;
         private Slider sliderCom = null;
         private float lastSliderValue = 0;
@@ -49,10 +52,11 @@ namespace App.Client.GameModules.Ui.Models.Common
         }
         private void InitGui()
         {
-            inputFieldCom = FindComponent<InputField>("InputField");
+            inputFieldCom = FindComponent<UIInputField>("InputField");
             sliderCom = FindComponent<Slider>("Slider");
             _viewModel.rootActiveSelf = false;
             _viewModel.leftText = minValue.ToString();
+            //inputFieldCom.onValidateFailed = () => { splitUIAdapter.ShowIllegalTip(); };
         }
         public override void Update(float interval)
         {
@@ -95,6 +99,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                         inputFieldCom.text = inputTemperValue.ToString();
                         if (inputTemperValue > maxValue || inputTemperValue < minValue)
                         {
+                            splitUIAdapter.ShowIllegalTip();
                             _viewModel.splitBtnInteractable = false;
                         }
                         else

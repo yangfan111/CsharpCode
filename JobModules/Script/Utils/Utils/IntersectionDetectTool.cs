@@ -66,5 +66,31 @@ namespace Utils.Utils
             }
             _colliderList.Clear();
         }
+        
+        public static List<bool> SetColliderDisable(GameObject gameObject)
+        {
+            List<bool> ret = new List<bool>();
+            _colliderList.Clear();
+            gameObject.GetComponentsInChildren<Collider>(_colliderList);
+            foreach (var v in _colliderList)
+            {
+                ret.Add(v.enabled);
+                v.enabled = false;
+            }
+            _colliderList.Clear();
+            return ret;
+        }
+        
+        public static void RestoreCollider(GameObject gameObject, List<bool> restoreValue)
+        {
+            _colliderList.Clear();
+            gameObject.GetComponentsInChildren<Collider>(_colliderList);
+            AssertUtility.Assert(restoreValue.Count == _colliderList.Count);
+            for (int i = 0; i < restoreValue.Count; ++i)
+            {
+                _colliderList[i].enabled = restoreValue[i];
+            }
+            _colliderList.Clear();
+        }
     }
 }

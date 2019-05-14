@@ -10,5 +10,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
         SplitPropInfo Info { get; set; }
         void SendSplitMessage(int number, string itemKey);
         void SetCrossActive(bool isActive);
+        void ShowIllegalTip();
     }
 }

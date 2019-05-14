@@ -187,16 +187,16 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void InitKeyBinding()
         {
-            var receiver = new KeyReceiver(Layer.Ui, BlockType.None);
+            //var receiver = new KeyReceiver(Layer.Ui, BlockType.None);
             
-            receiver.AddAction(UserInputKey.F1, (data) =>
-            {
-              if (GetCanvasEnabled())
-                  SetUiState(false);
-              else
-                  SetUiState(true);
-            });
-            adapter.RegisterKeyReceive(receiver);
+            //receiver.AddAction(UserInputKey.F1, (data) =>
+            //{
+            //  if (GetCanvasEnabled())
+            //      SetUiState(false);
+            //  else
+            //      SetUiState(true);
+            //});
+            //adapter.RegisterKeyReceive(receiver);
         }
 
         void HideAll()

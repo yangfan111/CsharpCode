@@ -21,5 +21,7 @@ namespace XmlConfig
         public float CrouchRadius;
         public float ProneHeight;
         public float ProneRadius;
+        public float StepOffset;
+        public float SlopeLimit;
     }
 }

@@ -38,8 +38,12 @@ namespace Utils.Appearance
                 ChangeThirdPersonAnimation(sex, weaponId);
             }
         }
-
-
+        
+        public void ChangeTransition(Sex sex, int weaponId)
+        {
+            if (_firstPerson) return;
+            ChangeThirdPersonTransitionAnimation(sex, weaponId);
+        }
 
         private void ChangeFirstPersonAnimation(Sex sex, int weaponId)
         {
@@ -85,6 +89,15 @@ namespace Utils.Appearance
                 {
                     ProcessAsset(assetAddr);
                 }
+            }
+        }
+        
+        private void ChangeThirdPersonTransitionAnimation(Sex sex, int weaponId)
+        {
+            var assetInfo = SingletonManager.Get<WeaponAvatarConfigManager>().GetThirdPersonAnimationTransition(weaponId, sex);
+            if (!string.IsNullOrEmpty(assetInfo.BundleName) && !string.IsNullOrEmpty(assetInfo.AssetName))
+            {
+                ProcessAsset(assetInfo);
             }
         }
 

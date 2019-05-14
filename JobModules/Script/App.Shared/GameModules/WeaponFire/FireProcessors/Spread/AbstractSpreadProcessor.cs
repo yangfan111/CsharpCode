@@ -2,17 +2,17 @@ namespace App.Shared.GameModules.Weapon.Behavior
 {
     public abstract class AbstractSpreadProcessor:ISpreadProcessor
     {
-        public void OnBeforeFire(PlayerWeaponController controller, IWeaponCmd cmd)
+        public void OnBeforeFire(WeaponBaseAgent agent, WeaponSideCmd cmd)
         {
-            Update(controller, cmd);
+            Update(agent, cmd);
         }            
            
 
 
-        public void OnIdle(PlayerWeaponController controller, IWeaponCmd cmd)
+        public void OnIdle(WeaponBaseAgent agent, WeaponSideCmd cmd)
         {
-            Update(controller, cmd);
+            Update(agent, cmd);
         }
-        protected abstract void Update(PlayerWeaponController controller, IWeaponCmd cmd);
+        protected abstract void Update(WeaponBaseAgent agent, WeaponSideCmd cmd);
     }
 }

@@ -25,8 +25,8 @@ namespace App.Shared.GameModules.Preparation
         
         private List<AssetInfo> _sceneRequests = new List<AssetInfo>();
         private List<AssetInfo> _goRequests = new List<AssetInfo>();
-        
-        public bool IsServer { get; private set; }
+
+        private readonly bool _isServer;
         public bool AsapMode { get; set; }
         private readonly Vector3 _initPosition;
         public InitialSceneLoadingSystem(ISessionState sessionState, Contexts ctx, IStreamingGoManager streamingGo, bool isServer)
@@ -36,11 +36,11 @@ namespace App.Shared.GameModules.Preparation
             
             _sessionState.CreateExitCondition(typeof(InitialSceneLoadingSystem));
 
-            _levelManager = new LevelManager(_contexts.session.commonSession.AssetManager);
+            _levelManager = new LevelManager(_contexts.session.commonSession.AssetManager, isServer);
             _contexts.session.commonSession.LevelManager = _levelManager;
             _initPosition = _contexts.session.commonSession.InitPosition;
 
-            IsServer = isServer;
+            _isServer = isServer;
 
             var allMaps = SingletonManager.Get<MapsDescription>();
             
@@ -58,7 +58,7 @@ namespace App.Shared.GameModules.Preparation
                         LoadRadiusInGrid = 1.0f,
                         UnloadRadiusInGrid = 1.5f
                     };
-                    if (IsServer)
+                    if (_isServer)
                     {
                         worldCompositionParam.LoadRadiusInGrid = float.MaxValue;
                         worldCompositionParam.UnloadRadiusInGrid = float.MaxValue;
@@ -84,7 +84,7 @@ namespace App.Shared.GameModules.Preparation
         
         public void OnInitModule(IUnityAssetManager assetManager)
         {
-            _levelManager.UpdateOrigin(IsServer ? Vector3.zero : _initPosition);
+            _levelManager.UpdateOrigin(_isServer ? Vector3.zero : _initPosition);
 
             RequestForResource(assetManager);
         }

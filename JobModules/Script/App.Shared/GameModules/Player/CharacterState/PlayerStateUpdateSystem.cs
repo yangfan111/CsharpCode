@@ -358,7 +358,7 @@ namespace App.Shared.GameModules.Player.CharacterState
         {
             var state = playerEntity.stateInterface.State.GetNextPostureState();
             var moveState = playerEntity.stateInterface.State.GetNextMovementState();
-            if (!((state == PostureInConfig.Land || state == PostureInConfig.Stand) && moveState == MovementInConfig.Sprint))
+            if (!((state == PostureInConfig.Land || state == PostureInConfig.Stand) && (moveState == MovementInConfig.Sprint || moveState == MovementInConfig.Run)))
             {
                 return;
             }
@@ -409,7 +409,7 @@ namespace App.Shared.GameModules.Player.CharacterState
             }
         }
 
-        private static readonly float MinMoveJumpSpeed = 2f;
+        private static readonly float MinMoveJumpSpeed = 4f;
         
         private bool CheckJumpSpeed(PlayerEntity playerEntity)
         {
@@ -501,7 +501,7 @@ namespace App.Shared.GameModules.Player.CharacterState
         {
             var gameObject = playerEntity.RootGo();
             var prevLayer = gameObject.layer;
-            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayerManager.GetLayerIndex(EUnityLayerName.User));
+            var prev = IntersectionDetectTool.SetColliderDisable(gameObject);
             var playerPosition = gameObject.transform.position;
             var playerRotation = gameObject.transform.rotation;
             var controller = playerEntity.characterContoller.Value;
@@ -546,7 +546,7 @@ namespace App.Shared.GameModules.Player.CharacterState
             }
             
             
-            IntersectionDetectTool.SetColliderLayer(gameObject, prevLayer);
+            IntersectionDetectTool.RestoreCollider(gameObject, prev);
             return isHit;
         }
 
@@ -809,7 +809,7 @@ namespace App.Shared.GameModules.Player.CharacterState
 
             var gameObject = playerEntity.RootGo();
             var prevLayer = gameObject.layer;
-            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayerManager.GetLayerIndex(EUnityLayerName.User));
+            var prev = IntersectionDetectTool.SetColliderDisable(gameObject);
             var startPoint = gameObject.transform.position;
             //UnityLayers.
             // a shift lift up
@@ -847,7 +847,7 @@ namespace App.Shared.GameModules.Player.CharacterState
                 //Debug.DrawLine(outHit.point, outHit.normal, Color.red, 5000.0f);
             }
 
-            IntersectionDetectTool.SetColliderLayer(gameObject, prevLayer);
+            IntersectionDetectTool.RestoreCollider(gameObject, prev);
             testCommand.Clear();
             testCondition.Clear();
         }
@@ -916,7 +916,7 @@ namespace App.Shared.GameModules.Player.CharacterState
 
             var gameObject = playerEntity.RootGo();
             var prevLayer = gameObject.layer;
-            IntersectionDetectTool.SetColliderLayer(gameObject, UnityLayerManager.GetLayerIndex(EUnityLayerName.User));
+            var prev = IntersectionDetectTool.SetColliderDisable(gameObject);
 
             var positionValue = playerEntity.position.Value;
 
@@ -952,7 +952,7 @@ namespace App.Shared.GameModules.Player.CharacterState
                 }
             }
 
-            IntersectionDetectTool.SetColliderLayer(gameObject, prevLayer);
+            IntersectionDetectTool.RestoreCollider(gameObject, prev);
             testCommand.Clear();
             testCondition.Clear();
         }

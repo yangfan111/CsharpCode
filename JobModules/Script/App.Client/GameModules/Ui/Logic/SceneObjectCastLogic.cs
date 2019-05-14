@@ -47,41 +47,9 @@ namespace App.Client.GameModules.Ui.Logic
             {
                 return;
             }
-            //var soundManager = player.soundManager.Value;
-            //switch ((ECategory)category)
-            //{
-            //    case ECategory.Weapon:
-            //        var weaponConfig = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(itemId);
-            //        if (null != weaponConfig)
-            //        {
-            //            soundManager.PlayOnce(weaponConfig.PickSound);
-            //        }
-            //        break;
-            //    case ECategory.WeaponPart:
-            //        var partConfig = SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(itemId);
-            //        if (null != partConfig)
-            //        {
-            //            soundManager.PlayOnce(partConfig.PickSound);
-            //        }
-            //        break;
-            //    case ECategory.GameItem:
-            //        var gameItemConfig = SingletonManager.Get<GameItemConfigManager>().GetConfigById(itemId);
-            //        if (null != gameItemConfig)
-            //        {
-            //            soundManager.PlayOnce(gameItemConfig.PickSound);
-            //        }
-            //        break;
-            //    case ECategory.Avatar:
-            //        var avatarConfig = SingletonManager.Get<RoleAvatarConfigManager>().GetConfigById(itemId);
-            //        if (null != avatarConfig)
-            //        {
-            //            soundManager.PlayOnce(avatarConfig.PickSound);
-            //        }
-            //        break;
-            //}
             player.stateInterface.State.InterruptAction();
             player.stateInterface.State.PickUp();
-            player.ModeController().SendPickup(entityId, itemId, category, count);
+            player.ModeController().SendPickup(player.WeaponController(),entityId, itemId, category, count);
         }
 
         protected override void DoSetData(PointerData data)

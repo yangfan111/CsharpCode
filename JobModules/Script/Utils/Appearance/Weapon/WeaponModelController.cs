@@ -155,7 +155,7 @@ namespace Utils.Appearance.Weapon
             int avId = SingletonManager.Get<WeaponResourceConfigManager>().GetAvatarByWeaponId(weaponId);
             var avarMgr = SingletonManager.Get<WeaponAvatarConfigManager>();
             
-            var asset = avarMgr.GetThirdPersonModel(avId);
+            var asset = avarMgr.GetThirdPersonWeaponModel(avId);
             _weapon.Id = weaponId;
             _weapon.Asset = asset;
             ClearLastPartsAndSetDefaultOnes(weaponId);

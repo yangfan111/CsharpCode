@@ -23,19 +23,14 @@ namespace App.Shared.Components.Player
     public class KeyTime
     {
         private Dictionary<int, int> startDic;
-        private Dictionary<int, int> lastDic;
+        private Dictionary<int, long> lastDic;
         private List<int> remove;
 
         public KeyTime()
         {
             startDic = new Dictionary<int, int>();
-            lastDic = new Dictionary<int, int>();
+            lastDic = new Dictionary<int, long>();
             remove = new List<int>();
-        }
-
-        public bool Empty
-        {
-            get { return lastDic.Count == 0; }
         }
 
         public void Clear()
@@ -45,49 +40,66 @@ namespace App.Shared.Components.Player
             remove.Clear();
         }
 
+        public bool Empty
+        {
+            get { return lastDic.Count == 0; }
+        }
+
         public int[] Keys
         {
             get { return lastDic.Keys.ToArray(); }
         }
 
-        public List<int> Frame()
+        public int Axis(int key)
         {
+            if (startDic.ContainsKey(key))
+                return startDic[key];
+            return 0;
+        }
+
+        public void Frame()
+        {
+            if (lastDic.Count == 0) return;
             remove.Clear();
-            if (lastDic.Count == 0) return remove;
             foreach (var key in lastDic.Keys)
             {
-                if (startDic[key] + lastDic[key] - (int) DateTime.Now.Ticks / 10000 <= 0)
+                if (lastDic[key] - DateTime.Now.Ticks / 10000L <= 0)
                 {
                     remove.Add(key);
                 }
             }
 
-            if (remove.Count == 0) return remove;
+            if (remove.Count == 0) return;
             foreach (int key in remove)
             {
                 lastDic.Remove(key);
                 startDic.Remove(key);
             }
-            return remove;
         }
 
-        public void AddKeyTime(int key, int time)
+        public void AddKeyTime(int key, long time, int axis = 0)
         {
             if (startDic.ContainsKey(key))
-            {
                 startDic.Remove(key);
-            }
-            startDic.Add(key, (int) DateTime.Now.Ticks / 10000);
+            startDic.Add(key, axis);
 
+            long now = DateTime.Now.Ticks / 10000L;
             if (lastDic.ContainsKey(key))
             {
-                if (time < lastDic[key])
-                {
-                    time = lastDic[key];
-                }
+                if (time < lastDic[key] - now)
+                    return;
                 lastDic.Remove(key);
             }
-            lastDic.Add(key, time);
+            lastDic.Add(key, time + now);
+        }
+
+        public void Release(int key)
+        {
+            if (lastDic.ContainsKey(key))
+            {
+                lastDic.Remove(key);
+                startDic.Remove(key);
+            }
         }
     }
 }

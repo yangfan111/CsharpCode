@@ -82,6 +82,7 @@
     <Compile Include="Components\Player\AttackDamageComponent.cs" />
     <Compile Include="Components\Player\BonesComponents.cs" />
     <Compile Include="Components\Player\CameraComponent.cs" />
+    <Compile Include="Components\Player\ChangeRoleComponent.cs" />
     <Compile Include="Components\Player\CharacterBoneComponent.cs" />
     <Compile Include="Components\Player\CharacterContollerComponent.cs" />
     <Compile Include="Components\Player\CharacterInfoComponent.cs" />
@@ -108,6 +109,7 @@
     <Compile Include="Components\Player\PlayerMoveComponent.cs" />
     <Compile Include="Components\Player\PlayerSkyMoveComponent.cs" />
     <Compile Include="Components\Player\PlayerSoundComponent.cs" />
+    <Compile Include="Components\Player\PlayerSprayComponent.cs" />
     <Compile Include="Components\Player\RaycastComponent.cs" />
     <Compile Include="Components\Player\RaycastTestComponent.cs" />
     <Compile Include="Components\Player\RecycleableAssetComponent.cs" />
@@ -164,6 +166,7 @@
     <Compile Include="Components\Sound\TimeInfoComponent.cs" />
     <Compile Include="Components\Sound\UnityObjComponent.cs" />
     <Compile Include="Components\Throwing\ThrowingComponents.cs" />
+    <Compile Include="Components\Ui\BiochemicalComponent.cs" />
     <Compile Include="Components\Ui\BlastComponent.cs" />
     <Compile Include="Components\Ui\ChatComponent.cs" />
     <Compile Include="Components\Ui\ChickenComponent.cs" />

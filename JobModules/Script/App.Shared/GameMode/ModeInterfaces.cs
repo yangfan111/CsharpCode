@@ -27,8 +27,9 @@ namespace App.Shared.GameMode
 
     public interface IWeaponProcessListener
     {
-        void OnPickup(IPlayerWeaponProcessor controller, EWeaponSlotType slot);
+        void OnWeaponPickup(IPlayerWeaponProcessor controller, EWeaponSlotType slot);
 
+        void OnItemPickup(IPlayerWeaponProcessor controller, int itemId, int category, int count);
         void OnExpend(IPlayerWeaponProcessor controller, EWeaponSlotType slot);
 
         void OnDrop(IPlayerWeaponProcessor controller, EWeaponSlotType slot);
@@ -53,7 +54,7 @@ namespace App.Shared.GameMode
     /// </summary>
     public interface IPickupHandler
     {
-        void SendPickup(int entityId , int itemId, int category, int count);
+        void SendPickup(IPlayerWeaponProcessor weaponProcessor, int entityId, int itemId, int category, int count);
 
         void SendAutoPickupWeapon(int entityId);
 

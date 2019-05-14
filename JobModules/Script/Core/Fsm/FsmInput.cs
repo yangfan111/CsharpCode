@@ -134,8 +134,10 @@ namespace Core.Fsm
         // 收枪过程
         HolsterProgressP3,
         HolsterProgressP1,
+        
         // 收枪动画结束
-        HolsterFinished,
+        HolsterStartFinished,
+        HolsterEndFinished,
         // 拔枪
         Draw,
         //拔枪过程
@@ -273,7 +275,16 @@ namespace Core.Fsm
         TransfigurationFinish,
         TransfigurationFinishEnd,
         
+        RageStart,
+        RageStartFinished,
+        RageEnd,
+        RageEndFinished,
+        
+        StartSuccessPose,
+        EndSuccessPose,
+        
         DyingTransitionFinished,
+        BigJump,
         None
         
     }

@@ -34,13 +34,13 @@ namespace App.Shared.Components.Ui
 
         [DontInitilize] public int GameTime;
         [DontInitilize] public int ScoreForWin;
-        [DontInitilize] public Dictionary<EUICampType, int> ScoreByCampTypeDict;
+        [DontInitilize] public int[] ScoreByCampTypeDict;
 
 //        [DontInitilize] public bool IsShowWeaponBag;
 
         #region GroupTechStat
         //[DontInitilize] public bool IsShowGroupTechStat;
-        [DontInitilize] public Dictionary<EUICampType, List<IGroupBattleData>> GroupBattleDataDict;
+        [DontInitilize] public List<IGroupBattleData>[] GroupBattleDataDict;
         [DontInitilize] public bool GroupBattleDataChanged;
         [DontInitilize] public string ChannelName;
         [DontInitilize] public string RoomName;
@@ -76,9 +76,11 @@ namespace App.Shared.Components.Ui
 
         [DontInitilize] public EUIBombInstallState C4InstallState;
         [DontInitilize] public int CurRoundCount;
-        [DontInitilize] public Dictionary<EUICampType, IPlayerCountData> PlayerCountByCampTypeDict;
+        [DontInitilize] public IPlayerCountData[] PlayerCountByCampTypeDict;
         //[DontInitilize] public bool IsRoundOver;
-        [DontInitilize] public List<ICountdownTipData> CountdownTipDataList;
+        [DontInitilize] public List<ITipData> CountdownTipDataList;
+        [DontInitilize] public Queue<ITipData> SystemTipDataQueue;
+        [DontInitilize] public ITipData OperationTipData;
         [DontInitilize] public List<ITaskTipData> TaskTipDataList;
 
         [DontInitilize] public float LoadingRate;   //预加载 当前比例
@@ -92,9 +94,24 @@ namespace App.Shared.Components.Ui
         [DontInitilize] public bool IsPause;//游戏是否暂停
         [DontInitilize] public List<int> PaintIdList;
         [DontInitilize] public int SelectedPaintIndex;
+        [DontInitilize] public bool FreshSelectedPaintIndex;
         [DontInitilize] public List<IBaseChickenBagItemData> ChickenBagItemDataList;
 
         [DontInitilize] public int CurPlayerCountInPlane;
         [DontInitilize] public int TotalPlayerCountInPlane;
+
+        [DontInitilize] public List<long> MotherIdList;
+        [DontInitilize] public List<long> HeroIdList;
+        [DontInitilize] public List<long> HumanIdList;
+
+        [DontInitilize] public int[] WeaponIdList;
+
+        [DontInitilize] public int[,] WeaponPartList;
+
+        [DontInitilize] public KeyValuePair<int, int>[] EquipIdList;
+
+        [DontInitilize] public int HoldWeaponSlotIndex;
+        [DontInitilize] public int CurBagWeight;
+        [DontInitilize] public int TotalBagWeight;
     }
 }

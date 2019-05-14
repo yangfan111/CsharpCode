@@ -37,7 +37,7 @@ namespace App.Shared
         public float           holsterParam;
         public EWeaponSlotType targetSlot;
         public float           drawParam;
-        public bool            isSecondWeapon;
+        public bool            armOnLeft;
 
         public float switchParam
         {
@@ -65,8 +65,12 @@ namespace App.Shared
         Rifle,
         Fixed,
     }
- 
 
+    public enum EWeaponSide
+    {
+        Left,
+        Right, 
+    }
 
     //public delegate void WeaponSlotUpdateEvent(EntityKey key);
 //    public delegate void WeaponHeldUpdateEvent();

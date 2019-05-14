@@ -4,8 +4,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using App.Shared.SceneManagement;
+using App.Shared.Util;
+using ArtPlugins;
+using Com.Wooduan.Ssjj2.Common.Net.Proto;
+using Core;
+using Core.GameTime;
 using Core.SceneManagement;
 using Core.Utils;
+using Entitas;
 using UltimateFracturing;
 using UnityEngine;
 using UnityEngine.Assertions.Must;
@@ -19,25 +25,29 @@ namespace App.Shared.SceneTriggerObject
 {
     public interface IGameObjectListener
     {
-        void OnMapObjLoaded(UnityObject unityObj);
+        void OnMapObjLoaded(UnityObject unityObj, int id);   //流式
         void OnMapObjUnloaded(UnityObject unityObj);
+        void OnMapObjSceneLoaded_BigMap(UnityObject unity);
+        void OnMapObjSceneLoaded_SmallMap(UnityObject unity);
     }
 
     public interface ITriggerObjectListener
     {
-        void OnTriggerObjectLoaded(string id, GameObject gameObject);
-        void OnTriggerObjectUnloaded(string id);
+        IEntity CreateMapObj(int id);
+        void OnTriggerObjectLoaded(int id, GameObject gameObject);
+        void OnTriggerObjectUnloaded(int id);
     }
 
     internal interface ILastTriggerObjectAccessor
     {
-        HashSet<string> LastLoadedIdSet { get; }
-        HashSet<string> LastUnloadedIdSet { get; }
+        HashSet<int> LastLoadedIdSet { get; }
+        HashSet<int> LastUnloadedIdSet { get; }
     }
 
     public interface ITriggerObjectManager : IGameObjectListener
     {
-        GameObject Get(string id);
+        GameObject Get(int id);
+        HashSet<int> GetAllId();
     }
 
     internal interface ITriggerObjectInternalManger : ITriggerObjectManager, ILastTriggerObjectAccessor, IDisposable
@@ -57,7 +67,6 @@ namespace App.Shared.SceneTriggerObject
     {
         private ITriggerObjectInternalManger[] _managers = new ITriggerObjectInternalManger[(int)ETriggerObjectType.MaxCount];
         private List<ITriggerObjectListener>[] _gameObjectListener = new List<ITriggerObjectListener>[(int)ETriggerObjectType.MaxCount];
-        
         public TriggerObjectManager()
         {
             if (SharedConfig.CollectTriggerObjectDynamic)
@@ -71,6 +80,7 @@ namespace App.Shared.SceneTriggerObject
             {
                 _gameObjectListener[i] = new List<ITriggerObjectListener>();
             }
+
         }
 
         protected override void OnDispose()
@@ -91,18 +101,35 @@ namespace App.Shared.SceneTriggerObject
             return _managers[(int)type];
         }
 
-        public GameObject Get(ETriggerObjectType type, string id)
+        public GameObject Get(ETriggerObjectType type, int id)
         {
             return _managers[(int)type].Get(id);
         }
 
-        public void OnMapObjLoaded(UnityObject gameObject)
+        public void OnMapObjLoaded(UnityObject gameObject, int id = Int32.MinValue)
         {
             foreach (var manager in _managers)
             {
-                manager.OnMapObjLoaded(gameObject);
+                manager.OnMapObjLoaded(gameObject, id);
             }
         }
+
+        public void OnMapObjSceneLoaded_SmallMap(UnityObject gameObject)
+        {
+            foreach (var manager in _managers)
+            {
+                manager.OnMapObjSceneLoaded_SmallMap(gameObject);
+            }
+        }
+        
+        public void OnMapObjSceneLoaded_BigMap(UnityObject gameObject)
+        {
+            foreach (var manager in _managers)
+            {
+                manager.OnMapObjSceneLoaded_BigMap(gameObject);
+            }
+        }
+
 
         public void Clear()
         {
@@ -175,12 +202,12 @@ namespace App.Shared.SceneTriggerObject
 
     internal class TriggerObjectPool
     {
-        private Dictionary<string, GameObject> _triggerObjects = new Dictionary<string, GameObject>();
+        private Dictionary<int, GameObject> _triggerObjects = new Dictionary<int, GameObject>();
 
-        private HashSet<string> _lastLoadedIdSet = new HashSet<string>();
-        private HashSet<string> _lastUnloadedIdSet = new HashSet<string>();
+        private HashSet<int> _lastLoadedIdSet = new HashSet<int>();
+        private HashSet<int> _lastUnloadedIdSet = new HashSet<int>();
 
-        public GameObject Get(string id)
+        public GameObject Get(int id)
         {
             if (_triggerObjects.ContainsKey(id))
             {
@@ -190,13 +217,13 @@ namespace App.Shared.SceneTriggerObject
         }
         
 
-        public void Put(string id, GameObject go)
+        public void Put(int id, GameObject go)
         {
             _triggerObjects[id] = go;
             CacheNewId(id);
         }
 
-        private void CacheNewId(string id)
+        private void CacheNewId(int id)
         {
             if (_lastUnloadedIdSet.Contains(id))
             {
@@ -206,7 +233,7 @@ namespace App.Shared.SceneTriggerObject
             _lastLoadedIdSet.Add(id);
         }
 
-        public void Remove(string id)
+        public void Remove(int id)
         {
             if(_triggerObjects.Remove(id))
                 CacheRemoveId(id);
@@ -224,7 +251,7 @@ namespace App.Shared.SceneTriggerObject
             _triggerObjects.Clear();
         }
 
-        private void CacheRemoveId(string id)
+        private void CacheRemoveId(int id)
         {
             if (_lastLoadedIdSet.Contains(id))
             {
@@ -234,8 +261,8 @@ namespace App.Shared.SceneTriggerObject
             _lastUnloadedIdSet.Add(id);
         }
 
-        public HashSet<string> LastLoadedIdSet { get { return _lastLoadedIdSet; } }
-        public HashSet<string> LastUnloadedIdSet { get { return _lastUnloadedIdSet; } }
+        public HashSet<int> LastLoadedIdSet { get { return _lastLoadedIdSet; } }
+        public HashSet<int> LastUnloadedIdSet { get { return _lastUnloadedIdSet; } }
 
     }
 
@@ -246,47 +273,114 @@ namespace App.Shared.SceneTriggerObject
         private int _typeValue;
         private TriggerObjectPool _pool = new TriggerObjectPool();
 
-        private List<string> _tempIdList = new List<string>();
+        
+        private List<int> _tempIdList = new List<int>();
         private List<GameObject> _tempGameObejctList = new List<GameObject>();
-
+        private Dictionary<int, int> _tempGameObjIdList = new Dictionary<int, int>();
         private Predicate<GameObject> _matcher;
-
+        
+        private List<TTriggerScript> _tempTriggerCompList = new List<TTriggerScript>();
+        
         public TriggerObjectInternalManager(ETriggerObjectType type, Predicate<GameObject> matcher = null)
         {
             _typeValue = (int)type;
             _matcher = matcher;
         }
         
-        private void FillTempGameObjectList(GameObject gameObject)
-        {
-            FillTempGameObjectList_dynamic(gameObject);
-        }
-
-        private List<TTriggerScript> _tempTriggerCompList = new List<TTriggerScript>();
-        private void FillTempGameObjectList_dynamic(GameObject gameObject)
+        private void FillTempGameObjectList(GameObject gameObject, int objId)
         {
             var rootObject = gameObject;
             _tempTriggerCompList.Clear();
             rootObject.GetComponentsInChildren(true, _tempTriggerCompList);
+            
             foreach (var comp in _tempTriggerCompList)
             {
                 var go = comp.gameObject;
+
                 if (_matcher != null && !_matcher(go))
                 {
                     continue;
                 }
 
-                var id = SceneTriggerObjectUtility.GetId(go);
-                _tempIdList.Add(id);
+                _logger.InfoFormat(" loadObj : {0} ,id:{1}", go, objId);
+                _tempIdList.Add(objId);
                 _tempGameObejctList.Add(go);
+                
+                int instacneid = gameObject.GetInstanceID();
+                if (!_tempGameObjIdList.ContainsKey(instacneid))
+                    _tempGameObjIdList.Add(instacneid, objId);
             }
 
             _tempTriggerCompList.Clear();
         }
 
+        private void FillTempGameObjectListByScene_SmallMap(GameObject gameObject)
+        {
+            var rootObject = gameObject;
+            _tempTriggerCompList.Clear();
+            rootObject.GetComponentsInChildren(true, _tempTriggerCompList);
+
+            foreach (var comp in _tempTriggerCompList)
+            {
+                var go = comp.gameObject;
+
+                if (_matcher != null && !_matcher(go))
+                {
+                    continue;
+                }
+
+                int objId = SceneTriggerObjectUtility.GetId(go);
+
+                _logger.InfoFormat(" loadObj : {0} ,id:{1}", go, objId);
+                _tempIdList.Add(objId);
+                _tempGameObejctList.Add(go);
+
+                int instacneid = gameObject.GetInstanceID();
+                if (!_tempGameObjIdList.ContainsKey(instacneid))
+                    _tempGameObjIdList.Add(instacneid, objId);
+            }
+
+            _tempTriggerCompList.Clear();
+        }
+        
+        private void FillTempGameObjectListByScene_BigMap(GameObject gameObject)
+        {
+            var rootObject = gameObject;
+            _tempTriggerCompList.Clear();
+            rootObject.GetComponentsInChildren(true, _tempTriggerCompList);
+
+            foreach (var comp in _tempTriggerCompList)
+            {
+                var go = comp.gameObject;
+
+                if (_matcher != null && !_matcher(go))
+                {
+                    continue;
+                }
+
+                var tag = go.GetComponent<MultiTagBase>();
+                if (tag == null) continue;
+                int objId = tag.id;   
+
+                _logger.InfoFormat(" loadObj : {0} ,id:{1}", go, objId);
+                _tempIdList.Add(objId);
+                _tempGameObejctList.Add(go);
+
+                int instacneid = gameObject.GetInstanceID();
+                if (!_tempGameObjIdList.ContainsKey(instacneid))
+                    _tempGameObjIdList.Add(instacneid, objId);
+            }
+
+            _tempTriggerCompList.Clear();
+        }
+        
         private void FillTempGameObjectIdList(GameObject gameObject)
         {
-            var sceneId = SceneTriggerObjectUtility.GetId(gameObject);
+            if (!_tempGameObjIdList.ContainsKey(gameObject.GetInstanceID()))
+            {
+                return;
+            }
+            var sceneId = _tempGameObjIdList[gameObject.GetInstanceID()];
             _tempIdList.Add(sceneId);
         }
 
@@ -313,24 +407,47 @@ namespace App.Shared.SceneTriggerObject
             }
         }
 
-        public GameObject Get(string id)
+        public GameObject Get(int id)
         {
             return _pool.Get(id);
         }
 
-        public HashSet<string> LastLoadedIdSet
+        public HashSet<int> GetAllId()
+        {
+            return _pool.LastLoadedIdSet;
+        }
+
+        public HashSet<int> LastLoadedIdSet
         {
             get { return _pool.LastLoadedIdSet; }
         }
 
-        public HashSet<string> LastUnloadedIdSet
+        public HashSet<int> LastUnloadedIdSet
         {
             get { return _pool.LastUnloadedIdSet; }
         }
 
-        public void OnMapObjLoaded(UnityObject unityObj)
+        public void OnMapObjLoaded(UnityObject unityObj, int id)
         {
-            FillTempGameObjectList(unityObj);
+            FillTempGameObjectList(unityObj, id);
+            AddTempGameObjectToPool();
+            ClearTempGameObjectList();
+            if(_logger.IsDebugEnabled)
+                _logger.DebugFormat("Load Scene Trigger Object Type {0} name{1}", _typeValue, unityObj.AsGameObject.name);
+        }
+
+        public void OnMapObjSceneLoaded_SmallMap(UnityObject unityObj)
+        {
+            FillTempGameObjectListByScene_SmallMap(unityObj);
+            AddTempGameObjectToPool();
+            ClearTempGameObjectList();
+            if(_logger.IsDebugEnabled)
+                _logger.DebugFormat("Load Scene Trigger Object Type {0} name{1}", _typeValue, unityObj.AsGameObject.name);
+        }
+        
+        public void OnMapObjSceneLoaded_BigMap(UnityObject unityObj)
+        {
+            FillTempGameObjectListByScene_BigMap(unityObj);
             AddTempGameObjectToPool();
             ClearTempGameObjectList();
             if(_logger.IsDebugEnabled)
@@ -355,27 +472,26 @@ namespace App.Shared.SceneTriggerObject
         {
             _pool = new TriggerObjectPool();
 
-            _tempIdList = new List<string>();
-            _tempGameObejctList = new List<GameObject>();
+            _tempIdList.Clear();
+            _tempGameObejctList.Clear();
+            _tempGameObjIdList.Clear();
         }
     }
 
     internal static class SceneTriggerObjectUtility
     {
-      
-        public static string GetId(GameObject gameObject)
+        public static int GetId(GameObject gameObject)
         {
-           
-           
             var pos = gameObject.transform.position;
-            long id = (int) (pos.x * 100) * 1000000L * 1000000L + (int) (pos.y * 100) * 1000000L + (int) (pos.z * 100);
-            return id.ToString();
+            int id = (int) (pos.x * 100) * 1000 * 1000 + (int) (pos.y * 100) * 1000 + (int) (pos.z * 100);
+            return id;
         }
     }
 
     interface ISceneListener
     {
-        void OnSceneLoaded(Scene scene);
+        void OnSceneLoaded_BigMap(Scene scene);
+        void OnSceneLoaded_SmallMap(Scene scene);
         void OnSceneUnloaded(Scene scene);
     }
     
@@ -389,15 +505,26 @@ namespace App.Shared.SceneTriggerObject
             _triggerObjectManager = triggerManager;
         }
         
-        public void OnSceneLoaded(Scene scene)
+        public void OnSceneLoaded_SmallMap(Scene scene)
         {
             var rootObjects = scene.GetRootGameObjects();
             foreach (var rootObject in rootObjects)
             {
-                var obj = new UnityObject(rootObject, AssetInfo.EmptyInstance);
-                _triggerObjectManager.OnMapObjLoaded(obj);
+                var unityObj = new UnityObject(rootObject,AssetInfo.EmptyInstance);
+                _triggerObjectManager.OnMapObjSceneLoaded_SmallMap(unityObj);
             }
         }
+        
+        public void OnSceneLoaded_BigMap(Scene scene)
+        {
+            var rootObjects = scene.GetRootGameObjects();
+            foreach (var rootObject in rootObjects)
+            {
+                var unityObj = new UnityObject(rootObject,AssetInfo.EmptyInstance);
+                _triggerObjectManager.OnMapObjSceneLoaded_BigMap(unityObj);
+            }
+        }
+
         public void OnSceneUnloaded(Scene scene)
         {
             _triggerObjectManager.Clear();

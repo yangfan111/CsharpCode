@@ -48,16 +48,6 @@ namespace Core.Utils
             return b;
         }
 
-        public static Vector3 Subtract(this Vector3 a, Vector3 b)
-        {
-            return new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
-        }
-
-        public static float Length(this Vector3 a)
-        {
-            return Mathf.Sqrt((float)(a.x * a.x + a.y * a.y + a.z * a.z));
-        }
-
         public static void ScaleBy(this Vector3 a, float scale)
         {
             a.x *= scale;

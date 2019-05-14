@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Core.Configuration;
 using Core.Fsm;
 using Utils.CharacterState;
 using Utils.Configuration;
@@ -34,7 +30,11 @@ namespace Core.CharacterState.Action.States
                         addOutput(FsmOutput.Cache);
                         
                         FsmOutput.Cache.SetValue(FsmOutputType.InterruptAction, 
-                            (int)FsmInput.HolsterFinished);
+                            (int)FsmInput.HolsterStartFinished);
+                        addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(FsmOutputType.InterruptAction, 
+                            (int)FsmInput.HolsterEndFinished);
                         addOutput(FsmOutput.Cache);
 
                         command.Handled = true;

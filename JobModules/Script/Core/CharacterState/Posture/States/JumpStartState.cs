@@ -114,7 +114,7 @@ namespace Core.CharacterState.Posture.States
 
         public override FsmStateResponseType HandleInput(IFsmInputCommand command, Action<FsmOutput> addOutput)
         {
-            if (command.IsMatch(FsmInput.Crouch) && !isBigJump)
+            if (command.IsMatch(FsmInput.BigJump) && !isBigJump)
             {
                 isBigJump = true;
                 FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerJumpHeight, _characterInfo.GetBigJumpHeight());

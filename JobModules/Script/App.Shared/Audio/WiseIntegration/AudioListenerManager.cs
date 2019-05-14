@@ -11,14 +11,15 @@ public class AudioListenerManager
 	
 	public AkAudioListener DefaultListener { get; private set; }
 
-	public Transform DefaultListenerTrans { get; private set; }
+	public AkGameObj DefaultListenerObj { get; private set; }
 	
 	
-	public Transform ThdViewEmitter { get; private set; }
+	public AkGameObj ThdViewEmitter { get; private set; }
 
-	public Transform FstViewEmitter { get; private set; }
+	public AkGameObj FstViewEmitter { get; private set; }
 
 	private Transform parentTrans;
+    public bool Initialized { get; private set; }
 
 	private Transform ParentTrans
 	{
@@ -26,21 +27,29 @@ public class AudioListenerManager
 		{
 			if (parentTrans)
 				return parentTrans;
-			if (!DefaultListenerTrans)
+			if (!DefaultListenerObj)
 				return null;
-			if (!DefaultListenerTrans.parent)
+			if (!DefaultListenerObj.transform.parent)
 				return null;
-			parentTrans = DefaultListenerTrans.parent;
+			parentTrans = DefaultListenerObj.transform.parent;
 			return parentTrans;
 		}
 	}
 
-	public AudioListenerManager(AkAudioListener listener, AkSpatialAudioListener spatialListener)
-	{
-		DefaultListener = listener;
-		SpatialListener = spatialListener;
-		DefaultListenerTrans = listener.transform;
-	}
+    public AudioListenerManager(AkAudioListener listener, AkSpatialAudioListener spatialListener)
+    {
+        DefaultListener = listener;
+        SpatialListener = spatialListener;
+        DefaultListenerObj = listener.GetComponent<AkGameObj>();
+    }
+    public AkGameObj GetEmitterObject(bool isThrd)
+    {
+        if (Initialized)
+        {
+            return isThrd ? ThdViewEmitter : FstViewEmitter;
+        }
+        return DefaultListenerObj;
+    }
 	
 	public bool HasParent
 	{
@@ -49,21 +58,23 @@ public class AudioListenerManager
 
 	public void SetPartent( Transform parentTrans)
 	{
-		DefaultListenerTrans.SetParent(parentTrans);
-		DefaultListenerTrans.localPosition =Vector3.zero;
-		ThdViewEmitter = new GameObject("thdViewEmitter").transform;
-		ThdViewEmitter.SetParent(parentTrans);
-		ThdViewEmitter.localPosition = GlobalConst.ThrdEmitterDistanceDelta;
-		ThdViewEmitter.transform.LookAt(DefaultListenerTrans);
-		//ThdViewEmitter.localRotation = Quaternion.LookRotation(DefaultListenerTrans.position - ThdViewEmitter.transform.position);
+		DefaultListenerObj.transform.transform.SetParent(parentTrans);
+		DefaultListenerObj.transform.localPosition =Vector3.zero;
+		var go = new GameObject("thdViewEmitter");
+		ThdViewEmitter = go.AddComponent<AkGameObj>();
+		ThdViewEmitter.transform.SetParent(parentTrans);
+		ThdViewEmitter.transform.localPosition = GlobalConst.ThrdEmitterDistanceDelta;
+		ThdViewEmitter.transform.LookAt(DefaultListenerObj.transform);
+		//ThdViewEmitter.localRotation = Quaternion.LookRotation(DefaultListenerTrans.transform.position - ThdViewEmitter.transform.position);
 	
 		
-		FstViewEmitter = new GameObject("fstViewEmitter").transform;
-		FstViewEmitter.SetParent(parentTrans);
-		FstViewEmitter.localPosition = GlobalConst.FstEmitterDistanceDelta;
-		FstViewEmitter.transform.LookAt(DefaultListenerTrans);
-
-		//FstViewEmitter.localRotation = Quaternion.LookRotation(DefaultListenerTrans.position - FstViewEmitter.transform.position);
-	}
+		 go = new GameObject("fstViewEmitter");
+		FstViewEmitter = go.AddComponent<AkGameObj>();
+		FstViewEmitter.transform.SetParent(parentTrans);
+		FstViewEmitter.transform.localPosition = GlobalConst.FstEmitterDistanceDelta;
+		FstViewEmitter.transform.LookAt(DefaultListenerObj.transform);
+        Initialized = true;
+        //FstViewEmitter.localRotation = Quaternion.LookRotation(DefaultListenerTrans.transform.position - FstViewEmitter.transform.position);
+    }
 
 }

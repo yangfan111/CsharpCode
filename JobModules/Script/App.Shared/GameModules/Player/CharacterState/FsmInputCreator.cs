@@ -14,6 +14,7 @@ using XmlConfig;
 using App.Shared.Player;
 using Core.CharacterState.Posture;
 using App.Shared.GameModules.Weapon;
+using App.Shared.Components.Player;
 
 namespace App.Shared.GameModules.Player.CharacterState
 {
@@ -33,7 +34,7 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         private List<IFsmInputFilter> _filters = new List<IFsmInputFilter>
         {
-            new ProneStateFilter(), new DiveStateFilter(), new JumpStateFilter(), new ClimbStateFilter(), new ProneToCrouchStateFilter(),new ProneToStandStateFilter(),new ProneTransitStateFilter()
+            new ProneStateFilter(), new DiveStateFilter(), /*new JumpStateFilter(),*/ new ClimbStateFilter(), new ProneToCrouchStateFilter(),new ProneToStandStateFilter(),new ProneTransitStateFilter()
         };
 
         private FsmInputContainer _commandsContainer = new FsmInputContainer(InitCommandLen);
@@ -169,15 +170,27 @@ namespace App.Shared.GameModules.Player.CharacterState
 				CheckConditionAndSetCommand(cmd, XmlConfig.EPlayerInput.IsJump, FsmInput.Jump);
             }
 
-            if (cmd.IsCrouch)
+            if (cmd.IsCrouch && !IsVariantFilter(player))
             {
                 CheckConditionAndSetCommand(cmd, XmlConfig.EPlayerInput.IsCrouch, FsmInput.Crouch);
             }
+
+            if (cmd.IsCDown)
+            {
+                SetCommand(FsmInput.BigJump);
+            }
             
-            if (cmd.IsProne)
+            if (cmd.IsProne && !IsVariantFilter(player))
             {
                 CheckConditionAndSetCommand(cmd, XmlConfig.EPlayerInput.IsProne, FsmInput.Prone);
             }
+        }
+
+        private bool IsVariantFilter(PlayerEntity player)
+        {
+            return (player.hasPlayerInfo &&
+                (player.playerInfo.JobAttribute == (int)EJobAttribute.EJob_Variant ||
+                player.playerInfo.JobAttribute == (int)EJobAttribute.EJob_Matrix));
         }
 
         private bool IsCanSprint(IUserCmd cmd, PlayerEntity playerEntity)

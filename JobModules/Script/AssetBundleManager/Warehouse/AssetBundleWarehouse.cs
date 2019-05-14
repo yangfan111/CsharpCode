@@ -83,14 +83,14 @@ namespace AssetBundleManager.Warehouse
             }
         }
 
-        public static FailLoading LoadFailed(bool isSceneLoading, string bundleName, string name)
+        public static FailLoading LoadFailed(AssetLoadingPattern LoadingPattern,bool isSceneLoading, string bundleName, string name, Type objectType)
         {
-            return new FailLoading(isSceneLoading, bundleName, name);
+            return new FailLoading(LoadingPattern,isSceneLoading, bundleName, name, objectType);
         }
 
         public abstract AssetBundleLoading LoadAssetBundle(string name);
 
-        public abstract AssetLoading LoadAsset(string bundleName, string name);
+        public abstract AssetLoading LoadAsset(string bundleName, string name, Type objectType);
 
         public abstract SceneLoading LoadScene(string bundleName, string name, bool isAdditive);
 

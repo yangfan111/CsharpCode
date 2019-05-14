@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using Utils.AssetManager;
 
@@ -10,6 +11,9 @@ namespace Core.SceneManagement
         void SceneUnloaded(Scene scene);
         void GoLoaded(UnityObject obj);
         void GoUnloaded(UnityObject obj);
+        void GetTerrainDataNames(List<string> names);
+        void LoadedTerrainData(Object obj, UnityObject asset);
+        bool IsLoadingEnd { get; }
 
         void SetCamera(Camera cam);
         void Draw();

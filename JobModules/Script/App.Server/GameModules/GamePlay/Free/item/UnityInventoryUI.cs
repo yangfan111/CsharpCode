@@ -88,29 +88,17 @@ namespace App.Server.GameModules.GamePlay.Free.item
             // 0 重绘，1 添加，2 删除, 3 更新
             sp.Ks.Add(0);
 
-            sp.Ins.Add(inventory.posList.Count);
-
-            sp.Ss.Add(parent);
+            sp.Ks.Add(inventory.posList.Count);
 
             foreach (ItemPosition ip in inventory.posList)
             {
-                sp.Ss.Add(ip.GetKey().GetKey() + "_itemUI");
-
                 FreeItemInfo info  = FreeItemConfig.GetItemInfo(ip.GetKey().GetKey());
 
                 sp.Ins.Add(info.cat);
                 sp.Ins.Add(info.id);
+                sp.Ins.Add(ip.GetCount());
 
                 sp.Ss.Add(inventory.GetName() + "," + ip.GetX() + "," + ip.GetY());
-
-                if (ip.GetKey().GetItemStack() > 1)
-                {
-                    sp.Ss.Add(ip.GetCount().ToString());
-                }
-                else
-                {
-                    sp.Ss.Add("");
-                }
             }
 
             FreeData fd = (FreeData)args.GetUnit("current");

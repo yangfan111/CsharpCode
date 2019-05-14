@@ -12,7 +12,7 @@ namespace Core.SceneTriggerObject
         DetachChunk = 1,
         BreakChunk = 2,
     }
-
+    
     public abstract class TriggerObjectSyncEvent : BaseRefCounter
     {
         public TriggerObjectSyncEventType EType;

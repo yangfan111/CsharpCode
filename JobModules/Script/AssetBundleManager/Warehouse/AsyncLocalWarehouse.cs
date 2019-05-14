@@ -1,3 +1,4 @@
+using System;
 using AssetBundleManagement;
 using AssetBundleManager.Operation;
 using UnityEngine;
@@ -24,9 +25,9 @@ namespace AssetBundleManager.Warehouse
                 AssetBundle.LoadFromFileAsync(url));
         }
 
-        public override AssetLoading LoadAsset(string bundleName, string name)
+        public override AssetLoading LoadAsset(string bundleName, string name, Type objectType)
         {
-            return OperationFactory.CreateAssetAsyncLoading(bundleName, name);
+            return OperationFactory.CreateAssetAsyncLoading(bundleName, name, objectType);
         }
 
         public override SceneLoading LoadScene(string bundleName, string name, bool isAdditive)

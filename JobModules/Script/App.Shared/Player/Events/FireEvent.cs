@@ -90,7 +90,7 @@ namespace App.Shared.Player.Events
                     return;
                 }
                 // var weaponGo = (entity as PlayerEntity).appearanceInterface.Appearance.GetWeaponP1InHand();
-                GameAudioMedia.PlayWeaponFireAudio(evt.fireWeaponId, evt.audioFirePos, (AudioGrp_ShotMode)evt.audioFireMode);
+       //        GameAudioMedia.PlayWeaponFireAudio(evt.fireWeaponId, evt.audioFirePos, (AudioGrp_ShotMode)evt.audioFireMode);
 
             }
 

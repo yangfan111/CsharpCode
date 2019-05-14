@@ -3,17 +3,19 @@ using App.Client.GameModules.Ui.UiAdapter;
 using Assets.UiFramework.Libs;
 using Core.GameModule.Interface;
 using UnityEngine;
+using System;
+using DG.Tweening;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {
-    public class CommonMCountDownModel : ClientAbstractModel, IUiSystem
+    public class CommonMCountDownModel : ClientAbstractModel, IUiHfrSystem
     {
         private ICountDownUiAdapter adapter;
         private CommonMCountDownViewModel _viewModel;
         private bool isCountingDown = false;
-        private float duringTime = 0;
-        private float curTime = 0;
-        private float lastTime = 0;
+        private long duringTime = 0;
+        private long curTime = 0;
+        private long lastTime = 0;
 
         public CommonMCountDownModel(ICountDownUiAdapter adapter):base(adapter)
         {
@@ -32,46 +34,87 @@ namespace App.Client.GameModules.Ui.Models.Common
             get { return _viewModel; }
         }
 
+        private bool isBackward;
+        private bool haveCompleted;
+
         public override void Update(float interval)
         {
-            if (!isVisible) return;
 
-            if (adapter.StartCountDown && adapter.CountDownNum != 0)
+            if (RootActive() && duringTime > 0 && !isBackward)
             {
-                SetRootActive(true);
-                duringTime = adapter.CountDownNum;
-                curTime = duringTime;
-                lastTime = Time.time;
-                adapter.CountDownNum = 0;
-            }
-            else if(adapter.StartCountDown == false)
-            {
-                if(RootActive())
-                {
-                    //SetCross(true);
-                    adapter.ShowUiGroup(Core.Ui.UiGroup.TimeCountDownHide);
-                    SetRootActive(false);
-                }
-            }
-
-            if (RootActive() && duringTime > 0)
-            {
-                var temperTime = Time.time - lastTime;
-                lastTime = Time.time;
+                var temperTime = DateTime.Now.Ticks / 10000 - lastTime;
+                lastTime = DateTime.Now.Ticks / 10000;
                 curTime = curTime - temperTime;
                 if (curTime <= 0)
                 {
                     adapter.ShowUiGroup(Core.Ui.UiGroup.TimeCountDownHide);
                     SetRootActive(false);
                     adapter.StartCountDown = false;
+                    adapter.CountDownNum = 0;
+                    duringTime = 0;
+                    haveCompleted = true;
                 }
                 else
                 {
                     adapter.HideUiGroup(Core.Ui.UiGroup.TimeCountDownHide);
-                    _viewModel.numBgFillAmount = curTime / duringTime;
-                    _viewModel.countNumText = curTime.ToString("0.#");
+                    _viewModel.numBgFillAmount = (float)curTime / duringTime;
+                    _viewModel.countNumText = ((float)curTime / 1000).ToString("0.0");
                 }
-            } 
+            }
+
+            if (adapter.StartCountDown && adapter.CountDownNum != 0)
+            {
+                isBackward = false;
+                haveCompleted = false;
+                SetRootActive(true);
+                duringTime = (long)adapter.CountDownNum * 1000;
+                curTime = duringTime;
+                lastTime = DateTime.Now.Ticks / 10000;
+                adapter.CountDownNum = 0;
+            }
+            else if (adapter.StartCountDown == false)
+            {
+                if (RootActive())
+                {
+                    //SetCross(true);
+                    if (!haveCompleted)
+                    {
+                        PlayBackwardAnim();
+                    }
+                    else
+                    {
+                        adapter.ShowUiGroup(Core.Ui.UiGroup.TimeCountDownHide);
+                        SetRootActive(false);
+                    }
+                }
+            }
+        }
+
+
+        private Tween _backwardAnime;
+
+        private void PlayBackwardAnim()
+        {
+            if (isBackward)
+            {
+                return;
+            }
+            if (_backwardAnime != null) _backwardAnime.Kill();
+            isBackward = true;
+            _backwardAnime = DOTween.To(() => _viewModel.numBgFillAmount, (x) => _viewModel.numBgFillAmount = x , 1, 0.3f);
+            _backwardAnime.onComplete = OnCompleteAnime;
+
+        }
+
+        private void OnCompleteAnime()
+        {
+            //Debug.Log("Anime done");
+            haveCompleted = true;
+            SetRootActive(false);
+            adapter.StartCountDown = false;
+            adapter.CountDownNum = 0;
+            duringTime = 0;
+            adapter.ShowUiGroup(Core.Ui.UiGroup.TimeCountDownHide);
         }
 
         private void SetCross(bool isActive)
@@ -89,6 +132,12 @@ namespace App.Client.GameModules.Ui.Models.Common
         private bool RootActive()
         {
             return _viewModel.rootActive;
+        }
+
+        public override void Destory()
+        {
+            base.Destory();
+            if (_backwardAnime != null) _backwardAnime.Kill();
         }
     }
 }

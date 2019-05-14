@@ -10,6 +10,7 @@ using UnityEngine;
 using App.Client.ClientSystems;
 using App.Shared.FreeFramework.framework.buf;
 using XmlConfig;
+using System;
 
 namespace App.Client.GameModules.ClientEffect
 {
@@ -38,6 +39,21 @@ namespace App.Client.GameModules.ClientEffect
         public override void SingleExecute(ClientEffectEntity entity)
         {
             IEffectLogic effectLogic;
+            switch ((EClientEffectType)entity.effectType.Value)
+            {
+                case EClientEffectType.GrenadeExplosion:
+                case EClientEffectType.BurnBomb:
+                case EClientEffectType.FlashBomb:
+                case EClientEffectType.FogBomb:
+                case EClientEffectType.SprayPrint:
+                    if (!entity.hasAssets)
+                    {
+                        entity.AddAssets(false, false);
+                    }
+                    break;
+                default:
+                    break;
+            }
             if (entity.hasEffectId)
             {
                 effectLogic =
@@ -51,8 +67,9 @@ namespace App.Client.GameModules.ClientEffect
                 Vector3 head = entity.sprayPaint.SprayPrintSize;
                 Vector3 forward = entity.sprayPaint.SprayPaintForward;
                 Logger.DebugFormat("PlayerSprayPaintUtility.CreateBasicDecal");
-                PlayerSprayPaintUtility.CreateBasicDecal(_contexts, position, forward, head);
-                return;
+                int sprayPrintSpriteId = entity.sprayPaint.SprayPrintSpriteId;
+                PlayerSprayPaintUtility.CreateDecalVolume(entity, _contexts, position, forward, head, sprayPrintSpriteId);
+                effectLogic = ClientEffectLogicFactory.CreateEffectLogic(entity.effectType.Value, _contexts);
             }
             else
             {
@@ -71,21 +88,6 @@ namespace App.Client.GameModules.ClientEffect
             {
                 Logger.ErrorFormat("AssetInfos for Logic of {0} is null !", entity.effectType.Value);
                 return;
-            }
-
-            switch ((EClientEffectType) entity.effectType.Value)
-            {
-                case EClientEffectType.GrenadeExplosion:
-                case EClientEffectType.BurnBomb:
-                case EClientEffectType.FlashBomb:
-                case EClientEffectType.FogBomb:
-                    if (!entity.hasAssets)
-                    {
-                        entity.AddAssets(false, false);
-                    }
-                    break;
-                default:
-                    break;
             }
 
             BatchLoadHandler handler = new BatchLoadHandler(entity, effectLogic.AssetInfos);

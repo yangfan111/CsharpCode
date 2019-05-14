@@ -18,16 +18,11 @@ namespace App.Shared.GameModules.SceneObject
         private IGroup<MapObjectEntity> _activeDoors;
         private List<MapObjectEntity> _deactiveDoors = new List<MapObjectEntity>();
         private DateTime _lastTime = DateTime.MinValue;
-        private ITriggerObjectListener _doorListener;
         private ICurrentTime _currentTime;
-        public DoorRotateSystem(Contexts contexts, ITriggerObjectListener listener = null)
+        public DoorRotateSystem(Contexts contexts)
         {
-            _doorListener = listener;
             _activeDoors = contexts.mapObject.GetGroup(MapObjectMatcher.DoorRotate);
-           
-                _currentTime = contexts.session.currentTimeObject;
-            
-
+            _currentTime = contexts.session.currentTimeObject;
         }
 
         public void OnGamePlay()

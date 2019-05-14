@@ -5,6 +5,7 @@ using System.Text;
 using UnityEngine;
 using System;
 using Core.Utils;
+using Utils.Appearance.Weapon;
 using Utils.AssetManager;
 using XmlConfig;
 using Utils.Compare;
@@ -184,6 +185,8 @@ namespace Utils.Appearance
 
         private const int ValidP1Index = 0;
         private const int ValidP3Index = 1;
+        private const int RightWeapon = 0;
+        private const int LeftWeapon = 1;
 
         private BoneMount _mount = new BoneMount();
 
@@ -195,9 +198,9 @@ namespace Utils.Appearance
         private OverrideAnimator _overrideP3;
 
         // 第一个始终为空
-        private GameObjectData[,] _weapons = new GameObjectData[(int) WeaponInPackage.EndOfTheWorld, 2];
+        private WeaponGameObjectData[,] _weapons = new WeaponGameObjectData[(int) WeaponInPackage.EndOfTheWorld, 2];
 
-        private GameObjectData[,,] _attachments = new GameObjectData[(int) WeaponInPackage.EndOfTheWorld, 2,
+        private WeaponGameObjectData[,,] _attachments = new WeaponGameObjectData[(int) WeaponInPackage.EndOfTheWorld, 2,
             (int) WeaponPartLocation.EndOfTheWorld];
 
         private MountWeaponHandler[,] _mountWeaponHandlers =
@@ -254,10 +257,10 @@ namespace Utils.Appearance
             {
                 for (var j = 0; j < 2; ++j)
                 {
-                    _weapons[i, j] = new GameObjectData();
+                    _weapons[i, j] = new WeaponGameObjectData();
                     for (var k = 0; k < (int) WeaponPartLocation.EndOfTheWorld; ++k)
                     {
-                        _attachments[i, j, k] = new GameObjectData();
+                        _attachments[i, j, k] = new WeaponGameObjectData();
                     }
                 }
             }
@@ -269,6 +272,11 @@ namespace Utils.Appearance
                 {
                     _initAttachments[i, j] = -1;
                 }
+            }
+            
+            for (var i = 0; i < (int)LatestWeaponStateIndex.EndOfTheWorld; ++i)
+            {
+                _latestWeaponValue[i] = UniversalConsts.InvalidIntId;
             }
 
             _rewindLatestWeapon = new Dictionary<int, Action<int>>
@@ -356,6 +364,7 @@ namespace Utils.Appearance
             {
                 {(int) PredictedWeaponStateIndex.WeaponInHand, x => RewindWeaponInHand((WeaponInPackage) x)},
                 {(int) PredictedWeaponStateIndex.ReloadState, RewindReloadState},
+                {(int) PredictedWeaponStateIndex.OverrideControllerState, x => RewindOverrideController((OverrideControllerState) x)},
             };
             _rewindClientWeapon = new Dictionary<int, Action<int>>
             {
@@ -444,13 +453,27 @@ namespace Utils.Appearance
         public void UnmountWeaponFromHand()
         {
             var cmd = GetAvailableCommand();
-            cmd.SetChangeWeaponInHand(UnmountWeaponFromHandImpl, WeaponInPackage.EmptyHanded);
+            cmd.SetChangeWeaponInHand(UnMountWeaponFromHandImpl, WeaponInPackage.EmptyHanded);
             Logger.DebugFormat("UnmountWeaponFromHand");
+        }
+
+        public void JustUnMountWeaponFromHand()
+        {
+            var cmd = GetAvailableCommand();
+            cmd.SetChangeWeaponInHand(JustUnMountWeaponFromHandImpl, WeaponInPackage.EmptyHanded);
+            Logger.InfoFormat("JustUnMountWeaponFromHand");
+        }
+
+        public void JustClearOverrideController()
+        {
+            var cmd = GetAvailableCommand();
+            cmd.SetChangeWeaponOnLocator(JustClearOverrideControllerImpl);
+            Logger.InfoFormat("JustClearOverrideController");
         }
 
         public void UnmountWeaponFromHandAtOnce()
         {
-            UnmountWeaponFromHandImpl(WeaponInPackage.EmptyHanded);
+            UnMountWeaponFromHandImpl(WeaponInPackage.EmptyHanded);
         }
 
         public void MountAttachment(WeaponInPackage pos, WeaponPartLocation location, int id)
@@ -551,7 +574,7 @@ namespace Utils.Appearance
         public void SetFirstPersonCharacter(GameObject obj)
         {
             _characterP1 = obj;
-            DisableRender(_characterP1);
+            AppearanceUtils.DisableRender(_characterP1);
             _p1Index = ValidP1Index;
             if (null != _cacheChangeAction)
                 _cacheChangeAction.Invoke();
@@ -561,14 +584,20 @@ namespace Utils.Appearance
         {
             _overrideP1 = new OverrideAnimator(animator, true);
             _overrideP1.Change(_sex, _unique, UniversalConsts.InvalidIntId);
-            _predictedWeaponValue[(int) PredictedWeaponStateIndex.WeaponInHand] = (int) WeaponInPackage.EmptyHanded;
+            ResetPredictedWeaponValue();
         }
 
         public void SetAnimatorP3(Animator animator)
         {
             _overrideP3 = new OverrideAnimator(animator, false);
             _overrideP3.Change(_sex, _unique, UniversalConsts.InvalidIntId);
+            ResetPredictedWeaponValue();
+        }
+
+        private void ResetPredictedWeaponValue()
+        {
             _predictedWeaponValue[(int) PredictedWeaponStateIndex.WeaponInHand] = (int) WeaponInPackage.EmptyHanded;
+            _predictedWeaponValue[(int) PredictedWeaponStateIndex.OverrideControllerState] = (int) OverrideControllerState.EmptyHanded;
         }
 
         public void SetSex(Sex sex)
@@ -658,19 +687,19 @@ namespace Utils.Appearance
 
         public void SetP1WeaponTopLayerShader()
         {
-            ChangeWeaponShader(GetWeaponP1ObjInHand(), _p1Index);
+            ChangeWeaponShader(_weapons[_predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand], _p1Index], _p1Index);
         }
 
         public void ResetP1WeaponShader()
         {
-            ResetWeaponShader(GetWeaponP1ObjInHand(), _p1Index);
+            ResetWeaponShader(_weapons[_predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand], _p1Index], _p1Index);
         }
 
         // 限定只能在已加载模型的前提下去获取
         public GameObject GetWeaponP1ObjInHand()
         {
             if (FirstPersonIncluded)
-                return _weapons[_predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand], _p1Index].AsGameObject;
+                return _weapons[_predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand], _p1Index].PrimaryAsGameObject;
 
             Logger.Warn("try to get p1 weapon while p1 model not loaded");
             return null;
@@ -679,7 +708,7 @@ namespace Utils.Appearance
         public GameObject GetWeaponP3ObjInHand()
         {
             if (ThirdPersonIncluded)
-                return _weapons[_predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand], _p3Index].AsGameObject;
+                return _weapons[_predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand], _p3Index].PrimaryAsGameObject;
 
             Logger.Warn("try to get p3 weapon while p3 model not loaded");
             return null;
@@ -688,7 +717,7 @@ namespace Utils.Appearance
         public GameObject GetP3CurrentAttachmentByType(int type)
         {
             if (ThirdPersonIncluded)
-                return _attachments[_predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand], _p3Index, type].AsGameObject;
+                return _attachments[_predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand], _p3Index, type].PrimaryAsGameObject;
 
             Logger.Warn("try to get p3 Attachment while p3 model not loaded");
             return null;
@@ -793,12 +822,18 @@ namespace Utils.Appearance
         {
             if (WeaponInPackage.EmptyHanded == pos)
             {
-                UnmountWeaponFromHandImpl(pos);
+                UnMountWeaponFromHandImpl(pos);
             }
             else
             {
                 MountWeaponToHandImpl(pos);
             }
+        }
+
+        private void RewindOverrideController(OverrideControllerState state)
+        {
+            if(OverrideControllerState.EmptyHanded == state)
+                ClearOverrideController();
         }
 
         private void RewindWeaponAttachment(WeaponInPackage pos, WeaponPartLocation location, int id)
@@ -862,21 +897,36 @@ namespace Utils.Appearance
 
         private void MountWeaponInPackageImpl(WeaponInPackage pos, int id)
         {
+            var weaponAvatarManager = SingletonManager.Get<WeaponAvatarConfigManager>();
             if (FirstPersonIncluded)
             {
                 _mountWeaponHandlers[(int) pos, ValidP1Index].SetInfo(id);
-                _loadRequestBatch.Add(CreateLoadRequest(
-                    SingletonManager.Get<WeaponAvatarConfigManager>().GetFirstPersonModel(id),
-                    _mountWeaponHandlers[(int) pos, ValidP1Index]));
+
+                var assetInfo = weaponAvatarManager.GetFirstPersonWeaponModel(id);
+                if ((null == assetInfo.AssetName || assetInfo.AssetName.Equals(String.Empty)) &&
+                    (null == assetInfo.BundleName || assetInfo.BundleName.Equals(String.Empty)))
+                    Logger.ErrorFormat("ErrorWeaponId Try To MountInPackage  id:  {0}", id);
+                else
+                    _loadRequestBatch.Add(CreateLoadRequest(
+                        assetInfo,
+                        _mountWeaponHandlers[(int) pos, ValidP1Index]));
+
                 ClearCacheData(pos, _p1Index);
             }
 
             if (ThirdPersonIncluded)
             {
                 _mountWeaponHandlers[(int) pos, ValidP3Index].SetInfo(id);
-                _loadRequestBatch.Add(CreateLoadRequest(
-                    SingletonManager.Get<WeaponAvatarConfigManager>().GetThirdPersonModel(id),
-                    _mountWeaponHandlers[(int) pos, ValidP3Index]));
+
+                var assetInfo = weaponAvatarManager.GetThirdPersonWeaponModel(id);
+                if ((null == assetInfo.AssetName || assetInfo.AssetName.Equals(String.Empty)) &&
+                    (null == assetInfo.BundleName || assetInfo.BundleName.Equals(String.Empty)))
+                    Logger.ErrorFormat("ErrorWeaponId Try To MountInPackage  id:  {0}", id);
+                else
+                    _loadRequestBatch.Add(CreateLoadRequest(
+                        weaponAvatarManager.GetThirdPersonWeaponModel(id),
+                        _mountWeaponHandlers[(int) pos, ValidP3Index]));
+
                 ClearCacheData(pos, _p3Index);
             }
 
@@ -889,7 +939,7 @@ namespace Utils.Appearance
         {
             if (_predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand] == (int) pos)
             {
-                UnmountWeaponFromHandImpl(pos);
+                UnMountWeaponFromHandImpl(pos);
             }
 
             if (ThirdPersonIncluded)
@@ -898,11 +948,16 @@ namespace Utils.Appearance
             }
 
             ClearWeaponAndAttachment(pos, id);
-
-            _mountWeaponHandlers[(int) pos, ValidP1Index].SetInfo(UniversalConsts.InvalidIntId);
-            _mountWeaponHandlers[(int) pos, ValidP3Index].SetInfo(UniversalConsts.InvalidIntId);
+            ClearWeaponHandlers(pos);
+            
             if (null != _cacheChangeAction)
                 _cacheChangeAction.Invoke();
+        }
+
+        private void ClearWeaponHandlers(WeaponInPackage pos)
+        {
+            _mountWeaponHandlers[(int) pos, ValidP1Index].SetInfo(UniversalConsts.InvalidIntId);
+            _mountWeaponHandlers[(int) pos, ValidP3Index].SetInfo(UniversalConsts.InvalidIntId);
         }
 
         private void ClearWeaponAndAttachment(WeaponInPackage pos, int id)
@@ -919,62 +974,105 @@ namespace Utils.Appearance
             UpdateAttachmentType(pos, WeaponPartLocation.LowRail, 0);
         }
 
-        protected abstract AbstractLoadRequest CreateLoadRequest(AssetInfo assetInfo, ILoadedHandler loadedHanlder);
+        protected abstract AbstractLoadRequest CreateLoadRequest(AssetInfo assetInfo, ILoadedHandler loadedHandler);
+
+        private void MountWeaponOnBackImpl(WeaponGameObjectData obj, GameObject character, WeaponInPackage pos)
+        {
+            if(null == obj) return;
+            _mount.MountWeaponInPackage(obj.PrimaryAsGameObject, character, pos);
+            _mount.MountWeaponInPackage(obj.DeputyAsGameObject, character, pos, false);
+        }
 
         private void MountWeaponToHandImpl(WeaponInPackage pos)
+        {
+            MountWeaponToRightHandImpl(pos);
+            MountWeaponToLeftHandImpl(pos);
+        }
+
+        private void MountWeaponToRightHandImpl(WeaponInPackage pos)
         {
             // 一三人称恢复背包武器状态，不区分是空手加载武器，还是替换武器
             RestoreWeaponInPackage();
             var index = GetIndexFromPos(pos);
 
-            if (FirstPersonIncluded && _weapons[(int) pos, _p1Index].Obj != null && _weapons[(int) pos, _p1Index].Valid)
+            if (FirstPersonIncluded && _weapons[(int) pos, _p1Index].PrimaryAsGameObject != null && _weapons[(int) pos, _p1Index].Valid)
             {
-                var weaponP1 = _weapons[(int) pos, _p1Index].AsGameObject;
+                var weaponP1 = _weapons[(int) pos, _p1Index].PrimaryAsGameObject;
                 _mount.MountRightHandWeapon(weaponP1, _characterP1);
                 if (IsFirstPerson)
                 {
-                    EnableRender(weaponP1);
+                    EnableRender(_weapons[(int) pos, _p1Index]);
                     // Enable整把枪后，机瞄与镜同时显示，再判断一下
                     if (weaponP1 != null)
                         RefreshRemovableAttachment(weaponP1,
-                            _attachments[(int) pos, _p1Index, (int) WeaponPartLocation.Scope].Obj != null);
+                            _attachments[(int) pos, _p1Index, (int) WeaponPartLocation.Scope].PrimaryAsGameObject != null);
                 }
 
                 _overrideP1.Change(_sex, _unique, _latestWeaponValue[index]);
             }
 
-            if (ThirdPersonIncluded && _weapons[(int) pos, _p3Index].Obj != null && _weapons[(int) pos, _p3Index].Valid)
+            if (ThirdPersonIncluded && _weapons[(int) pos, _p3Index].PrimaryAsGameObject != null && _weapons[(int) pos, _p3Index].Valid)
             {
-                var weaponP3 = _weapons[(int) pos, _p3Index].AsGameObject;
+                var weaponP3 = _weapons[(int) pos, _p3Index].PrimaryAsGameObject;
                 if (!IsFirstPerson)
-                    EnableRender(weaponP3);
+                    EnableRender(_weapons[(int) pos, _p3Index]);
                 _mount.UnmountWeaponInPackage(_characterP3, pos);
                 _mount.MountRightHandWeapon(weaponP3, _characterP3);
                 _overrideP3.Change(_sex, _unique, _latestWeaponValue[index]);
             }
 
             _predictedWeaponValue[(int) PredictedWeaponStateIndex.WeaponInHand] = (int) pos;
+            _predictedWeaponValue[(int) PredictedWeaponStateIndex.OverrideControllerState] = 
+                (int) OverrideControllerState.WeaponInHand;
+            
             if (null != _weaponChangedCallBack)
-                _weaponChangedCallBack.Invoke(FirstPersonIncluded ? _weapons[(int) pos, _p1Index].AsGameObject : null,
-                    ThirdPersonIncluded ? _weapons[(int) pos, _p3Index].AsGameObject : null);
+                _weaponChangedCallBack.Invoke(FirstPersonIncluded ? _weapons[(int) pos, _p1Index].PrimaryAsGameObject : null,
+                    ThirdPersonIncluded ? _weapons[(int) pos, _p3Index].PrimaryAsGameObject : null);
             if (null != _cacheChangeAction)
                 _cacheChangeAction.Invoke();
         }
+        
+        private void MountWeaponToLeftHandImpl(WeaponInPackage pos)
+        {
+            if (FirstPersonIncluded && _weapons[(int) pos, _p1Index].DeputyAsGameObject != null && _weapons[(int) pos, _p1Index].Valid)
+                _mount.MountLeftHandWeapon(_weapons[(int) pos, _p1Index].DeputyAsGameObject, _characterP1);
 
-        private void UnmountWeaponFromHandImpl(WeaponInPackage pos)
+            if (ThirdPersonIncluded && _weapons[(int) pos, _p3Index].DeputyAsGameObject != null && _weapons[(int) pos, _p3Index].Valid)
+                _mount.MountLeftHandWeapon(_weapons[(int) pos, _p3Index].DeputyAsGameObject, _characterP3);
+        }
+
+        private void JustUnMountWeaponFromHandImpl(WeaponInPackage pos)
+        {
+            // 切换过渡状态机
+            ChangeTransitionOverrideController();
+            UnMountWeaponFromRightHandImpl(pos);
+            UnMountWeaponFromLeftHandImpl(pos);
+        }
+
+        private void JustClearOverrideControllerImpl()
+        {
+            ClearOverrideController();
+        }
+
+        private void UnMountWeaponFromHandImpl(WeaponInPackage pos)
+        {
+            UnMountWeaponFromRightHandImpl(pos);
+            UnMountWeaponFromLeftHandImpl(pos);
+            ClearOverrideController();
+        }
+
+        private void UnMountWeaponFromRightHandImpl(WeaponInPackage pos)
         {
             if (FirstPersonIncluded)
             {
                 _mount.UnmountRightHandWeapon(_characterP1);
                 _mount.UnmountWeaponOnAlternativeLocator(_characterP1);
-                _overrideP1.Change(_sex, _unique, UniversalConsts.InvalidIntId);
             }
 
             if (ThirdPersonIncluded)
             {
                 _mount.UnmountRightHandWeapon(_characterP3);
                 _mount.UnmountWeaponOnAlternativeLocator(_characterP3);
-                _overrideP3.Change(_sex, _unique, UniversalConsts.InvalidIntId);
             }
 
             // 不去记载究竟是哪把武器从手上卸下
@@ -986,10 +1084,53 @@ namespace Utils.Appearance
                 _cacheChangeAction.Invoke();
         }
 
+        private void ChangeTransitionOverrideController()
+        {
+            if (ThirdPersonIncluded)
+                _overrideP3.ChangeTransition(_sex, GetWeaponIdInHand());
+        }
+
+        // 恢复空手状态机
+        private void ClearOverrideController()
+        {
+            if(FirstPersonIncluded)
+                _overrideP1.Change(_sex, _unique, UniversalConsts.InvalidIntId);
+            
+            if (ThirdPersonIncluded)
+                _overrideP3.Change(_sex, _unique, UniversalConsts.InvalidIntId);
+            
+            _predictedWeaponValue[(int) PredictedWeaponStateIndex.OverrideControllerState] = (int) OverrideControllerState.EmptyHanded;
+        }
+
+        private void UnMountWeaponFromLeftHandImpl(WeaponInPackage pos)
+        {
+            if (FirstPersonIncluded)
+            {
+                _mount.UnMountLeftHandWeapon(_characterP1);
+            }
+
+            if (ThirdPersonIncluded)
+            {
+                _mount.UnMountLeftHandWeapon(_characterP3);
+            }
+        }
+
         private void MountAttachmentImpl(WeaponInPackage pos, WeaponPartLocation location, int attachmentId)
         {
+            if(location >= WeaponPartLocation.EndOfTheWorld)
+            {
+                return;
+            }
+
             var weaponId = _latestWeaponValue[GetIndexFromPos(pos)];
             var addr = SingletonManager.Get<WeaponPartsConfigManager>().GetAsset(attachmentId);
+
+            if ((null == addr.AssetName || addr.AssetName.Equals(String.Empty)) &&
+                (null == addr.BundleName || addr.BundleName.Equals(String.Empty)))
+            {
+                Logger.ErrorFormat("ErrorAttachmentId Try To Mount  id:  {0}", attachmentId);
+                return;
+            }
 
             if (FirstPersonIncluded)
             {
@@ -1163,9 +1304,9 @@ namespace Utils.Appearance
         private void ShowOrHideAttachment(GameObject obj)
         {
             if (IsFirstPerson) // 当前一人称隐藏
-                DisableRender(obj);
+                AppearanceUtils.DisableRender(obj);
             else
-                EnableRender(obj);
+                AppearanceUtils.EnableRender(obj);
         }
 
         private void BoundAttachmentToHand(GameObject attachmentObj)
@@ -1186,25 +1327,25 @@ namespace Utils.Appearance
             {
                 if ((WeaponInPackage) _predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand] != WeaponInPackage.PrimaryWeaponOne)
                 {
-                    _mount.MountWeaponInPackage(_weapons[(int) WeaponInPackage.PrimaryWeaponOne, _p3Index].AsGameObject,
+                    _mount.MountWeaponInPackage(_weapons[(int) WeaponInPackage.PrimaryWeaponOne, _p3Index].PrimaryAsGameObject,
                         _characterP3,
                         WeaponInPackage.PrimaryWeaponOne);
                     if (!IsFirstPerson)
                     {
                         AppearanceUtils.ActiveGameobject(_weapons[(int) WeaponInPackage.PrimaryWeaponOne, _p3Index]
-                            .AsGameObject);
+                            .PrimaryAsGameObject);
                     }
                 }
 
                 if ((WeaponInPackage) _predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand] != WeaponInPackage.PrimaryWeaponTwo)
                 {
-                    _mount.MountWeaponInPackage(_weapons[(int) WeaponInPackage.PrimaryWeaponTwo, _p3Index].AsGameObject,
+                    _mount.MountWeaponInPackage(_weapons[(int) WeaponInPackage.PrimaryWeaponTwo, _p3Index].PrimaryAsGameObject,
                         _characterP3,
                         WeaponInPackage.PrimaryWeaponTwo);
                     if (!IsFirstPerson)
                     {
                         AppearanceUtils.ActiveGameobject(_weapons[(int) WeaponInPackage.PrimaryWeaponTwo, _p3Index]
-                            .AsGameObject);
+                            .PrimaryAsGameObject);
                     }
                 }
             }
@@ -1221,7 +1362,7 @@ namespace Utils.Appearance
                 for (var i = 0; i < (int) WeaponInPackage.EndOfTheWorld; ++i)
                 {
                     if (i >= _weapons.Length || !_weapons[i, _p3Index].Valid) continue;
-                    _mount.MountWeaponInPackage(_weapons[i, _p3Index].AsGameObject, _characterP3, (WeaponInPackage) i);
+                    MountWeaponOnBackImpl(_weapons[i, _p3Index], _characterP3, (WeaponInPackage)i);
                 }
             }
 
@@ -1256,7 +1397,9 @@ namespace Utils.Appearance
         // 清除attachment数据
         private void ClearWeapon(WeaponInPackage pos, int index)
         {
-            if (index >= 0 && _weapons[(int) pos, index].Obj != null)
+            if(index < 0) return;
+
+            if (_weapons[(int) pos, index].PrimaryAsGameObject != null)
             {
                 // 武器从背包中移除
                 OverrideAttachment(pos, index, WeaponPartLocation.Muzzle, null);
@@ -1281,78 +1424,77 @@ namespace Utils.Appearance
         private void OverrideWeapon(WeaponInPackage pos, int index, UnityObject unityObj)
         {
             if (index < 0) return;
-            if (_weapons[(int) pos, index].Obj != null)
+            if (_weapons[(int) pos, index].PrimaryAsGameObject != null)
             {
-                DisableRender(_weapons[(int) pos, index].AsGameObject);
-                EnableWeaponEffect(_weapons[(int) pos, index].AsGameObject, true);
-                ResetWeaponShader(_weapons[(int) pos, index].Obj, index);
-                AddRecycleObject(_weapons[(int) pos, index].Obj);
-                _weapons[(int) pos, index].Valid = false;
+                DisableRender(_weapons[(int) pos, index]);
+                EnableWeaponEffect(_weapons[(int) pos, index], true);
+                ResetWeaponShader(_weapons[(int) pos, index], index);
+                AddRecycleObject(_weapons[(int) pos, index].GetRecycleUnityObject());
             }
 
-            ChangeWeaponShader(unityObj, index);
             _weapons[(int) pos, index].Obj = unityObj;
+            ChangeWeaponShader(_weapons[(int) pos, index], index);
 
             // 枪和配件一起装备时，可能出现枪后于配件加载
             if (null == unityObj || unityObj.AsGameObject == null) return;
-            _mount.MountWeaponAttachment(_attachments[(int) pos, index, (int) WeaponPartLocation.Muzzle].AsGameObject, unityObj,
+            _mount.MountWeaponAttachment(_attachments[(int) pos, index, (int) WeaponPartLocation.Muzzle].PrimaryAsGameObject, unityObj,
                 WeaponPartLocation.Muzzle);
-            _mount.MountWeaponAttachment(_attachments[(int) pos, index, (int) WeaponPartLocation.LowRail].AsGameObject, unityObj,
+            _mount.MountWeaponAttachment(_attachments[(int) pos, index, (int) WeaponPartLocation.LowRail].PrimaryAsGameObject, unityObj,
                 WeaponPartLocation.LowRail);
-            _mount.MountWeaponAttachment(_attachments[(int) pos, index, (int) WeaponPartLocation.Magazine].AsGameObject, unityObj,
+            _mount.MountWeaponAttachment(_attachments[(int) pos, index, (int) WeaponPartLocation.Magazine].PrimaryAsGameObject, unityObj,
                 WeaponPartLocation.Magazine);
-            _mount.MountWeaponAttachment(_attachments[(int) pos, index, (int) WeaponPartLocation.Buttstock].AsGameObject, unityObj,
+            _mount.MountWeaponAttachment(_attachments[(int) pos, index, (int) WeaponPartLocation.Buttstock].PrimaryAsGameObject, unityObj,
                 WeaponPartLocation.Buttstock);
-            _mount.MountWeaponAttachment(_attachments[(int) pos, index, (int) WeaponPartLocation.Scope].AsGameObject, unityObj,
+            _mount.MountWeaponAttachment(_attachments[(int) pos, index, (int) WeaponPartLocation.Scope].PrimaryAsGameObject, unityObj,
                 WeaponPartLocation.Scope);
 
             // 新增枪械时，OverrideWeapon后有Enable/Disable，卸下枪械无需处理
-            RefreshRemovableAttachment(unityObj, _attachments[(int) pos, index, (int) WeaponPartLocation.Scope].Obj != null);
+            RefreshRemovableAttachment(unityObj, _attachments[(int) pos, index, (int) WeaponPartLocation.Scope].PrimaryAsGameObject != null);
         }
 
         private void OverrideAttachment(WeaponInPackage pos, int index, WeaponPartLocation location,
             UnityObject unityObj)
         {
-            if (index >= 0)
+            if (index >= 0 && location < WeaponPartLocation.EndOfTheWorld)
             {
-                var attachment = _attachments[(int) pos, index, (int) location].Obj;
-                if (attachment != null && null != attachment.AsGameObject)
+                var attachment = _attachments[(int) pos, index, (int) location].PrimaryAsGameObject;
+                if (attachment != null)
                 {
                     if (index == _p1Index)
                     {
-                        foreach (var render in attachment.AsGameObject.GetComponentsInChildren<Renderer>())
+                        foreach (var render in attachment.GetComponentsInChildren<Renderer>())
                         {
                             render.gameObject.layer = UnityLayerManager.GetLayerIndex(EUnityLayerName.Default);
                         }
                     }
 
-                    DisableRender(attachment);
-                    AddRecycleObject(attachment);
+                    DisableRender(_attachments[(int) pos, index, (int) location]);
+                    AddRecycleObject(_attachments[(int) pos, index, (int) location].GetRecycleUnityObject());
                     _attachments[(int) pos, index, (int) location].Valid = false;
-                    attachment.AsGameObject.transform.SetParent(null, false);
+                    attachment.transform.SetParent(null, false);
                 }
 
-                ChangeWeaponShader(unityObj, index);
                 _attachments[(int) pos, index, (int) location].Obj = unityObj;
+                ChangeWeaponShader(_attachments[(int) pos, index, (int) location], index);
 
                 if (unityObj != null && _weapons[(int) pos, index].Valid)
                 {
-                    _mount.MountWeaponAttachment(unityObj, _weapons[(int) pos, index].AsGameObject, location);
+                    _mount.MountWeaponAttachment(unityObj, _weapons[(int) pos, index].PrimaryAsGameObject, location);
                 }
 
                 if (pos == (WeaponInPackage) _predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand])
                 {
                     if (null != _weaponChangedCallBack)
-                        _weaponChangedCallBack.Invoke(FirstPersonIncluded ? _weapons[(int) pos, _p1Index].AsGameObject : null,
-                            ThirdPersonIncluded ? _weapons[(int) pos, _p3Index].AsGameObject : null);
+                        _weaponChangedCallBack.Invoke(FirstPersonIncluded ? _weapons[(int) pos, _p1Index].PrimaryAsGameObject : null,
+                            ThirdPersonIncluded ? _weapons[(int) pos, _p3Index].PrimaryAsGameObject : null);
                 }
 
                 // 一人称武器只操作 当前手上武器 (与三人称不同，一人称背上武器隐藏)
                 if ((!IsFirstPerson || (IsFirstPerson && pos == (WeaponInPackage) _predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand])) &&
-                    _weapons[(int) pos, index].Obj != null &&
+                    _weapons[(int) pos, index].PrimaryAsGameObject != null &&
                     location == WeaponPartLocation.Scope &&
                     IsFirstPerson == (index == _p1Index))
-                    RefreshRemovableAttachment(_weapons[(int) pos, index].AsGameObject, unityObj != null);
+                    RefreshRemovableAttachment(_weapons[(int) pos, index].PrimaryAsGameObject, unityObj != null);
 
                 if (null != _cacheChangeAction)
                     _cacheChangeAction.Invoke();
@@ -1363,7 +1505,7 @@ namespace Utils.Appearance
         {
             for (var i = 0; i < (int) WeaponInPackage.EndOfTheWorld; ++i)
             {
-                DisableRender(_weapons[i, personIndex].AsGameObject);
+                DisableRender(_weapons[i, personIndex]);
             }
         }
 
@@ -1373,42 +1515,61 @@ namespace Utils.Appearance
             {
                 if (!onlyShowWeaponInHand || i == _predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand])
                 {
-                    EnableRender(_weapons[i, personIndex].AsGameObject);
-                    RefreshRemovableAttachment(_weapons[i, personIndex].AsGameObject,
-                        _attachments[i, personIndex, (int) WeaponPartLocation.Scope].AsGameObject != null);
+                    EnableRender(_weapons[i, personIndex]);
+                    RefreshRemovableAttachment(_weapons[i, personIndex].PrimaryAsGameObject,
+                        _attachments[i, personIndex, (int) WeaponPartLocation.Scope].PrimaryAsGameObject != null);
                 }
             }
         }
         
-        private void EnableRender(GameObject obj)
+        private void EnableRender(WeaponGameObjectData obj)
         {
+            if(null == obj) return;
             EnableWeaponEffect(obj, true);
-            AppearanceUtils.EnableRender(obj);
+            AppearanceUtils.EnableRender(obj.PrimaryAsGameObject);
+            AppearanceUtils.EnableRender(obj.DeputyAsGameObject);
         }
 
-        private void DisableRender(GameObject obj)
+        private void DisableRender(WeaponGameObjectData obj)
         {
+            if(null == obj) return;
             EnableWeaponEffect(obj, false);
-            AppearanceUtils.DisableRender(obj);
+            AppearanceUtils.DisableRender(obj.PrimaryAsGameObject);
+            AppearanceUtils.DisableRender(obj.DeputyAsGameObject);
+        }
+
+        private void DisableShadow(WeaponGameObjectData obj)
+        {
+            if(null == obj) return;
+            AppearanceUtils.DisableShadow(obj.PrimaryAsGameObject);
+            AppearanceUtils.DisableShadow(obj.DeputyAsGameObject);
         }
         
-        private void EnableWeaponEffect(GameObject obj, bool enable)
+        private void EnableWeaponEffect(WeaponGameObjectData obj, bool enable)
         {
-            var location = _mount.GetLocation(obj, SpecialLocation.EffectLocation, true);
-            if(null == location) return;
-            location.gameObject.SetActive(enable);
+            if(null == obj) return;
+            
+            var location = _mount.GetLocation(obj.PrimaryAsGameObject, SpecialLocation.EffectLocation, true);
+            if(null != location)
+                location.gameObject.SetActive(enable);
+            
+            location = _mount.GetLocation(obj.DeputyAsGameObject, SpecialLocation.EffectLocation, true);
+            if(null != location)
+                location.gameObject.SetActive(enable);
         }
 
-        private void ChangeWeaponShader(GameObject obj, int index)
+        private void ChangeWeaponShader(WeaponGameObjectData obj, int index)
         {
             if (null == obj || index != _p1Index || !FirstPersonIncluded) return;
-            ReplaceMaterialShaderBase.ChangeShader(obj);
+            ReplaceMaterialShaderBase.ChangeShader(obj.PrimaryAsGameObject);
+            ReplaceMaterialShaderBase.ChangeShader(obj.DeputyAsGameObject);
         }
 
-        private void ResetWeaponShader(GameObject obj, int index)
+        private void ResetWeaponShader(WeaponGameObjectData obj, int index)
         {
             if (null == obj || index != _p1Index || !FirstPersonIncluded) return;
-            ReplaceMaterialShaderBase.ResetShader(obj);
+            ReplaceMaterialShaderBase.ResetShader(obj.PrimaryAsGameObject);
+            ReplaceMaterialShaderBase.ResetShader(obj.DeputyAsGameObject);
         }
 
         private void AddRecycleObject(UnityObject obj)
@@ -1476,17 +1637,17 @@ namespace Utils.Appearance
             if (ironSights != null)
             {
                 if (hasSights)
-                    DisableRender(ironSights.gameObject);
+                    AppearanceUtils.DisableRender(ironSights.gameObject);
                 else
-                    EnableRender(ironSights.gameObject);
+                    AppearanceUtils.EnableRender(ironSights.gameObject);
             }
 
             if (rail != null)
             {
                 if (hasSights)
-                    EnableRender(rail.gameObject);
+                    AppearanceUtils.EnableRender(rail.gameObject);
                 else
-                    DisableRender(rail.gameObject);
+                    AppearanceUtils.DisableRender(rail.gameObject);
             }
         }
 
@@ -1544,7 +1705,7 @@ namespace Utils.Appearance
                 }
                 
                 AppearanceUtils.EnableShadow(obj);
-                _dataSource.ResetWeaponShader(obj, _dataSource._p1Index);
+                ReplaceMaterialShaderBase.ResetShader(obj);
             }
 
             public void OnLoadSucc<T>(T source, UnityObject unityObj)
@@ -1574,14 +1735,17 @@ namespace Utils.Appearance
 
             private void OnLoadP1(UnityObject unityObj)
             {
-                var expectedAddr = SingletonManager.Get<WeaponAvatarConfigManager>().GetFirstPersonModel(_id);
+                var expectedAddr = SingletonManager.Get<WeaponAvatarConfigManager>().GetFirstPersonWeaponModel(_id);
+                
                 if (expectedAddr.Equals(unityObj.Address))
                 {
                     _dataSource.ClearInvaildAttachment(_pos, _dataSource._p1Index);
                     _dataSource.OverrideWeapon(_pos, _dataSource._p1Index, unityObj);
+                    
+                    var weapon = _dataSource._weapons[(int) _pos, _dataSource._p1Index];
 
-                    _dataSource.DisableRender(unityObj);
-                    AppearanceUtils.DisableShadow(unityObj);
+                    _dataSource.DisableRender(weapon);
+                    _dataSource.DisableShadow(weapon);
 
                     if (_dataSource._predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand] == (int) _pos)
                     {
@@ -1596,24 +1760,26 @@ namespace Utils.Appearance
 
             private void OnLoadP3(UnityObject unityObj)
             {
-                var expectedAddr = SingletonManager.Get<WeaponAvatarConfigManager>().GetThirdPersonModel(_id);
+                var expectedAddr = SingletonManager.Get<WeaponAvatarConfigManager>().GetThirdPersonWeaponModel(_id);
+                
                 if (expectedAddr.Equals(unityObj.Address))
                 {
                     _dataSource.ClearInvaildAttachment(_pos, _dataSource._p3Index);
                     _dataSource.OverrideWeapon(_pos, _dataSource._p3Index, unityObj);
 
-                    _dataSource.DisableRender(unityObj);
+                    var weapon = _dataSource._weapons[(int) _pos, _dataSource._p3Index];
+                    
+                    _dataSource.DisableRender(weapon);
 
                     if (_dataSource._predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand] == (int) _pos)
                     {
                         _dataSource.MountWeaponToHandImpl(_pos);
-                        //_dataSource.MountWeaponToHand(_pos);
                     }
                     else
                     {
                         if (!_dataSource.IsFirstPerson)
-                            _dataSource.EnableRender(unityObj);
-                        _dataSource._mount.MountWeaponInPackage(unityObj, _dataSource._characterP3, _pos);
+                            _dataSource.EnableRender(weapon);
+                        _dataSource.MountWeaponOnBackImpl(weapon, _dataSource._characterP3, _pos);
                     }
                 }
                 else
@@ -1664,7 +1830,7 @@ namespace Utils.Appearance
                 }
                 
                 AppearanceUtils.EnableShadow(obj);
-                _dataSource.ResetWeaponShader(obj, _dataSource._p1Index);
+                ReplaceMaterialShaderBase.ResetShader(obj);
             }
 
             public void OnLoadSucc<T>(T source, UnityObject unityObj)
@@ -1687,26 +1853,28 @@ namespace Utils.Appearance
                     // 只加载第三人称 -> IsFirstPerson为false, index == _dataSource.P1Index为false
                     bool mustHidden = _dataSource.IsFirstPerson != (_index == _dataSource._p1Index);
 
+                    var attachment = _dataSource._attachments[(int) _pos, _index, (int) _location];
+
                     if (mustHidden)
                     {
-                        _dataSource.DisableRender(unityObj);
+                        _dataSource.DisableRender(attachment);
                     }
                     else
                     {
                         if (_dataSource.IsFirstPerson)
                         {
                             if (_pos == (WeaponInPackage) _dataSource._predictedWeaponValue[(int)PredictedWeaponStateIndex.WeaponInHand])
-                                _dataSource.EnableRender(unityObj);
+                                _dataSource.EnableRender(attachment);
                             else
-                                _dataSource.DisableRender(unityObj);
+                                _dataSource.DisableRender(attachment);
                         }
                         else
-                            _dataSource.EnableRender(unityObj);
+                            _dataSource.EnableRender(attachment);
                     }
 
                     if (_index == _dataSource._p1Index)
                     {
-                        AppearanceUtils.DisableShadow(unityObj);
+                        _dataSource.DisableShadow(attachment);
                     }
                 }
                 else
@@ -1714,43 +1882,6 @@ namespace Utils.Appearance
                     _dataSource.AddRecycleObject(unityObj);
                 }
             }
-        }
-
-        private class GameObjectData
-        {
-            public GameObjectData()
-            {
-                Obj = null;
-                Valid = false;
-            }
-
-            private UnityObject _o;
-
-            public UnityObject Obj
-            {
-                get { return _o; }
-                set
-                {
-                    _o = value;
-                    if (null != value)
-                        Valid = true;
-                }
-            }
-
-            public GameObject AsGameObject
-            {
-                get
-                {
-                    if (_o != null)
-                    {
-                        return _o.AsGameObject;
-                    }
-
-                    return null;
-                }
-            }
-
-            public bool Valid;
         }
     }
 }

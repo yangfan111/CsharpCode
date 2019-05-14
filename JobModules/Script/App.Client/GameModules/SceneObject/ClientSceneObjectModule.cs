@@ -2,6 +2,7 @@
 using App.Shared.GameModules.SceneObject;
 using Core.GameModule.Module;
 using Core.GameModule.System;
+using UnityEngine;
 
 namespace App.Client.GameModules.SceneObject
 {
@@ -14,6 +15,7 @@ namespace App.Client.GameModules.SceneObject
             AddSystem(new SceneObjectCleanupSystem(contexts));
             AddSystem(new FreeObjectLoadSystem(contexts.freeMove));
             AddSystem(new FreeObjectCleanUpSystem(contexts.freeMove));
+            AddSystem(new CreateMapObjSystem(contexts));
             AddSystem(new FreeObjectPositionUpdateSystem(contexts));
             if (!SharedConfig.DisableDoor)
             {
@@ -21,15 +23,17 @@ namespace App.Client.GameModules.SceneObject
             }
 
             AddSystem(new DoorPlaybackSystem(contexts));
-           
+            
             AddSystem(new ClientDestructibleObjectUpdateSystem(contexts));
 
             if (SharedConfig.IsOffline)
             {
                 AddSystem(new DoorRotateSystem(contexts));
             }
-            AddSystem(new DoorTriggerSystem(contexts.mapObject));
+
+            AddSystem(new DoorTriggerSystem(contexts,new ClientDoorListener(contexts)));
             AddSystem(new ClientSceneObjectRenderSystem(contexts));
+            AddSystem(new ColliderCounterSystem(contexts));
         }
     }
 }

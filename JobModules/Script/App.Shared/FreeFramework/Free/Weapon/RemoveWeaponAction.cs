@@ -1,14 +1,11 @@
-﻿using App.Server.GameModules.GamePlay.free.player;
-using App.Shared;
+﻿using App.Shared;
+using Assets.XmlConfig;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.action;
 using com.wd.free.@event;
-using com.wd.free.unit;
 using com.wd.free.util;
 using Core;
 using System;
-using System.Collections.Generic;
-using Assets.XmlConfig;
 
 namespace App.Server.GameModules.GamePlay.Free.weapon
 {
@@ -20,19 +17,15 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
 
         public override void DoAction(IEventArgs args)
         {
-            FreeRuleEventArgs fr = (FreeRuleEventArgs)args;
+            PlayerEntity player = GetPlayerEntity(args);
 
-            IGameUnit unit = GetPlayer(args);
-
-            if (unit != null)
+            if (player != null)
             {
-                PlayerEntity p = ((FreeData)unit).Player;
-
                 if (!StringUtil.IsNullOrEmpty(weaponKey))
                 {
                     int index = FreeUtil.ReplaceInt(weaponKey, args);
-                    EWeaponSlotType currentSlot = index > 0 ? FreeWeaponUtil.GetSlotType(index) : p.WeaponController().HeldSlotType;
-                    p.WeaponController().DestroyWeapon(currentSlot, -1);
+                    EWeaponSlotType currentSlot = index > 0 ? FreeWeaponUtil.GetSlotType(index) : player.WeaponController().HeldSlotType;
+                    player.WeaponController().DestroyWeapon(currentSlot, -1);
                 }
                 else
                 {
@@ -41,7 +34,8 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
                     {
                         if (index == (int) EWeaponSubType.Throw)
                         {
-                            p.WeaponController().DestroyWeapon(EWeaponSlotType.ThrowingWeapon, -1);
+                            player.WeaponController().DestroyWeapon(EWeaponSlotType.ThrowingWeapon, -1);
+                            player.WeaponController().GrenadeHandler.ClearCache();
                             /*var helper = p.WeaponController().GrenadeHelper;
                             helper.ClearCache();
                             p.playerWeaponUpdate.UpdateHeldAppearance = true;*/
@@ -50,10 +44,17 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
                         {
                             for (int i = (int) EWeaponSlotType.PrimeWeapon; i < (int) EWeaponSlotType.Length; i++)
                             {
-                                var weaponAgent = p.WeaponController().GetWeaponAgent((EWeaponSlotType) i);
+                                var weaponAgent = player.WeaponController().GetWeaponAgent((EWeaponSlotType)i);
                                 if (weaponAgent.WeaponConfigAssy.NewWeaponCfg.SubType == index)
-                                    p.WeaponController().DestroyWeapon((EWeaponSlotType) i, -1);
+                                    player.WeaponController().DestroyWeapon((EWeaponSlotType) i, -1);
                             }
+                        }
+                    }
+                    else
+                    {
+                        for (int i = (int)EWeaponSlotType.PrimeWeapon; i < (int)EWeaponSlotType.Length; i++)
+                        {
+                            player.WeaponController().DestroyWeapon((EWeaponSlotType)i, -1);
                         }
                     }
                 }

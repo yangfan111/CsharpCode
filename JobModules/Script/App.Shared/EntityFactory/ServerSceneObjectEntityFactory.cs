@@ -62,7 +62,7 @@ namespace App.Shared.EntityFactory
                 #if UNITY_EDITOR
                 var playerEntity = _playerContext.GetEntityWithEntityKey(entityKey);
                 
-                Object res = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>("Assets/Assets/CoreRes/Sound/TestModel/AudioEmitter.prefab");
+                Object res = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>("Assets/Assets/CoreRes/Sound/Model/AudioEmitter.prefab");
                 var clone = GameObject.Instantiate(res) as GameObject;
                 var  emitter = clone.AddComponent<AudioEmitterEditor>();
                 emitter.transform.position = new Vector3(p.x,p.y+2f,p.z);
@@ -72,6 +72,22 @@ namespace App.Shared.EntityFactory
             }
             return null;
         }
+
+        public virtual IEntity CreateSceneAudioBgEmitterEntity(Vector3 p, EntityKey entityKey)
+        {
+            if (SharedConfig.IsOffline)
+            {
+#if UNITY_EDITOR
+                var playerEntity = _playerContext.GetEntityWithEntityKey(entityKey);
+                
+                Object res     = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>("Assets/Assets/CoreRes/Sound/Model/S003_Audio_Amb.prefab");
+                var    clone   = GameObject.Instantiate(res) as GameObject;
+                clone.transform.position = Vector3.zero;
+#endif
+            }
+            return null;
+        }
+
         public virtual IEntity CreateSimpleEquipmentEntity(
             ECategory category,
             int id,

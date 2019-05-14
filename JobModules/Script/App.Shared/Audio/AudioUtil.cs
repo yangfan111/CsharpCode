@@ -9,12 +9,16 @@ using Core;
 using UnityEngine;
 using WeaponConfigNs;
 using XmlConfig;
+using Assets.XmlConfig;
+using Utils.Singleton;
+using Utils.Configuration;
 
 namespace App.Shared
 {
     public static class AudioUtil
     {
-        public static readonly LoggerAdapter AudioLogger = new LoggerAdapter(typeof(AKAudioDispatcher));
+        public static readonly LoggerAdapter AudioLogger = new LoggerAdapter(typeof(AudioDispatcher));
+
         public static void AssertProcessResult(AKRESULT result, string s, params object[] args)
         {
             if (!SharedConfig.IsServer)
@@ -22,7 +26,7 @@ namespace App.Shared
                 s = string.Format(s, args);
                 if (result != AKRESULT.AK_Success && result != AKRESULT.AK_BankAlreadyLoaded)
                 {
-                 //   DebugUtil.MyLog(s + string.Format(" {0} ", result), DebugUtil.DebugColor.Grey);
+                    //   DebugUtil.MyLog(s + string.Format(" {0} ", result), DebugUtil.DebugColor.Grey);
                     AudioLogger.Info(string.Format("[Audio Result Exception]{0}  {1}", s, result));
                 }
                 else
@@ -31,6 +35,7 @@ namespace App.Shared
                 }
             }
         }
+
         public static bool Sucess(this AKRESULT result)
         {
             return result == AKRESULT.AK_Success || result == AKRESULT.AK_BankAlreadyLoaded;
@@ -38,7 +43,6 @@ namespace App.Shared
 
         public static AudioGrp_ShotMode ToAudioGrpShotMode(this EFireMode fireModel)
         {
-
             switch (fireModel)
             {
                 case EFireMode.Auto:
@@ -48,17 +52,16 @@ namespace App.Shared
                 default:
                     return AudioGrp_ShotMode.Single;
             }
-
         }
+
         public static AudioGrp_HitMatType ToAudioGrpHitMatType(this EEnvironmentType enviromentType)
         {
-
             switch (enviromentType)
             {
                 case EEnvironmentType.Wood:
                     return AudioGrp_HitMatType.Wood;
                 case EEnvironmentType.Glass:
-                    
+
                 case EEnvironmentType.Stone:
                 case EEnvironmentType.Concrete:
                 case EEnvironmentType.Soil:
@@ -67,28 +70,6 @@ namespace App.Shared
                     return AudioGrp_HitMatType.Water;
                 default:
                     return AudioGrp_HitMatType.Concrete;
-            }
-        }
-        
-       // [System.Diagnostics.Conditional("UNITY_EDITOR")]
-        public static void NLog(string s, params object[] args)
-        {
-            if (!SharedConfig.IsServer)
-            {
-                s = string.Format(s, args);
-        //       DebugUtil.MyLog(s, DebugUtil.DebugColor.Blue);
-                AudioLogger.Info("[Audio Log] " + s);
-            }
-
-        }
-        public static void ELog(string s, params object[] args)
-        {
-            if(!SharedConfig.IsServer)
-            {
-            s = string.Format(s, args);
-        //    DebugUtil.MyLog(s, DebugUtil.DebugColor.Grey);
-                AudioLogger.Info("[Audio Error] " + s);
-
             }
         }
 
@@ -104,16 +85,15 @@ namespace App.Shared
             }
             catch (System.Exception e)
             {
-
             }
-            return null;
 
+            return null;
         }
-       public static AudioGrp_FootMatType ToAudioMatGrp(this TerrainMatOriginType matType)
+
+        public static AudioGrp_FootMatType ToAudioMatGrp(this TerrainMatOriginType matType)
         {
-            switch(matType)
+            switch (matType)
             {
-          
                 case TerrainMatOriginType.Dirt:
                     return AudioGrp_FootMatType.Concrete;
                 case TerrainMatOriginType.Grass:
@@ -126,6 +106,69 @@ namespace App.Shared
                     return AudioGrp_FootMatType.Default;
             }
         }
+        public static EAudioUniqueId ToAudioUniqueId(ECategory itemCategory, int itemId)
+        {
+            EAudioUniqueId audioUniqueId = EAudioUniqueId.None;
+            switch (itemCategory)
+            {
+                case ECategory.Weapon:
+                    break;
+                case ECategory.WeaponPart:
+
+                    var partId = SingletonManager.Get<WeaponPartSurvivalConfigManager>().GetDefaultPartBySetId(itemId);
+                    var partCfg = SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(partId);
+                    switch ((EWeaponPartType)partCfg.Type)
+                    {
+                        case EWeaponPartType.UpperRail:
+                            audioUniqueId = EAudioUniqueId.PickupSightPart;
+                            break;
+                        case EWeaponPartType.Magazine:
+                            audioUniqueId = EAudioUniqueId.PicupMagazinePart;
+                            break;
+                        default:
+                            audioUniqueId = EAudioUniqueId.PickupWeaponPart;
+                            break;
+                    }
+                    break;
+                case ECategory.GameItem:
+                    var gameItemConfig = SingletonManager.Get<GameItemConfigManager>().GetConfigById(itemId);
+                    switch ((EItemAudioType)gameItemConfig.Type)
+                    {
+                        
+                        case EItemAudioType.Bullet:
+                              audioUniqueId = EAudioUniqueId.PickupBullet;
+                            break;
+                        case EItemAudioType.AidPackage:
+                            audioUniqueId = EAudioUniqueId.PickupAidPackage;
+                            break;
+                        case EItemAudioType.Bandage:
+                            audioUniqueId = EAudioUniqueId.PickupBandage;
+                            break;
+                        case EItemAudioType.Doping:
+                            audioUniqueId = EAudioUniqueId.PickupDoping;
+                            break;
+                        case EItemAudioType.EngeryDrink:
+                            audioUniqueId = EAudioUniqueId.PickupEngeryDrink;
+                            break;
+                        case EItemAudioType.Gasoline:
+                            audioUniqueId = EAudioUniqueId.PickupGasoline;
+                            break;
+                        case EItemAudioType.MedicalPackage:
+                            audioUniqueId = EAudioUniqueId.PickupMedicalPackage;
+                            break;
+                        case EItemAudioType.Pill:
+                            audioUniqueId = EAudioUniqueId.PickupPill;
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case ECategory.Avatar:
+                    audioUniqueId = EAudioUniqueId.PickupCloth;
+                    break;
+            }
+            return audioUniqueId;
+        }
 
         public static AudioGrp_Footstep ToAudioFootGrp(this PostureInConfig posture)
         {
@@ -133,44 +176,75 @@ namespace App.Shared
             switch (posture)
             {
                 case PostureInConfig.Crouch:
-                        step = AudioGrp_Footstep.Squat;
+                    step = AudioGrp_Footstep.Squat;
                     break;
                 case PostureInConfig.Prone:
-                        step = AudioGrp_Footstep.Crawl;
+                    step = AudioGrp_Footstep.Crawl;
                     break;
                 case PostureInConfig.Stand:
-                        step = AudioGrp_Footstep.Walk;
-                    
+                    step = AudioGrp_Footstep.Walk;
+
                     break;
                 case PostureInConfig.Swim:
-                  //  player.soundManager.Value.PlayOnce(EPlayerSoundType.Swim);
+                    //  player.soundManager.Value.PlayOnce(EPlayerSoundType.Swim);
                     break;
                 case PostureInConfig.Dive:
-                   // player.soundManager.Value.PlayOnce(EPlayerSoundType.Dive);
+                    // player.soundManager.Value.PlayOnce(EPlayerSoundType.Dive);
                     break;
             }
 
             return step;
         }
 
-        public static float GetFootstepPlayInterval(AudioGrp_Footstep stepState)
-        {
-            switch (stepState)
-            {
-               case AudioGrp_Footstep.Crawl:
-                   return AudioInfluence.StepPlayInfo.CrawlStepPlayInterval;
-               case AudioGrp_Footstep.Land:
-                   return AudioInfluence.StepPlayInfo.WalkStepPlayInterval;
-               case AudioGrp_Footstep.Squat:
-                   return AudioInfluence.StepPlayInfo.SquatStepPlayInterval;
-                case AudioGrp_Footstep.Walk:
-                    return AudioInfluence.StepPlayInfo.WalkStepPlayInterval;
-            }
+        //        public static float GetFootstepPlayInterval(AudioGrp_Footstep stepState)
+        //        {
+        //            switch (stepState)
+        //            {
+        //                case AudioGrp_Footstep.Crawl:
+        //                    return AudioInfluence.StepPlayInfo.CrawlStepPlayInterval;
+        //                case AudioGrp_Footstep.Land:
+        //                    return AudioInfluence.StepPlayInfo.WalkStepPlayInterval;
+        //                case AudioGrp_Footstep.Squat:
+        //                    return AudioInfluence.StepPlayInfo.SquatStepPlayInterval;
+        //                case AudioGrp_Footstep.Walk:
+        //                    return AudioInfluence.StepPlayInfo.WalkStepPlayInterval;
+        //            }
+        //
+        //            return GlobalConst.DefaultAudioFootstepInterval;
+        //        }
 
-            return GlobalConst.DefaultAudioFootstepInterval;
+
+        public static void LogPostEventResult(uint playingId, string atomEvtName)
+        {
+            if (playingId == AkSoundEngine.AK_INVALID_PLAYING_ID && AkSoundEngine.IsInitialized())
+            {
+                if (GlobalConst.EnableAudioLog)
+                    DebugUtil.MyLog("Audio Post event failed:{0}", atomEvtName);
+                AudioLogger.ErrorFormat("Audio Post event failed:{0}", atomEvtName);
+            }
+            else if (GlobalConst.EnableAudioLog)
+            {
+                DebugUtil.MyLog("Audio Post event {0} sucess", atomEvtName);
+            }
         }
 
+        public static bool VerifyAKResult(AKRESULT akresult, object contexts)
+        {
+            var result = akresult.Sucess();
+            if (!result)
+            {
+                AudioLogger.ErrorFormat("Audio process {1} failed:{0}", akresult, contexts);
+                if (GlobalConst.EnableAudioLog)
+                {
+                    DebugUtil.MyLog("Audio process {1} failed:{0}", akresult, contexts);
+                }
+            }
+            else if (GlobalConst.EnableAudioLog)
+            {
+                DebugUtil.MyLog("Audio process {0} sucess", contexts);
+            }
+            return result;
 
-   
+        }
     }
 }

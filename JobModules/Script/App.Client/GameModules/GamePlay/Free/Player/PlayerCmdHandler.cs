@@ -3,12 +3,13 @@ using Assets.Sources.Free;
 using Assets.Sources.Free.UI;
 using com.wd.free.ai;
 using Core.Free;
-using Core.Utils;
 using Free.framework;
+using Luminosity.IO;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UserInputManager.Lib;
 using Utils.Singleton;
-using WindowsInput;
-using WindowsInput.Native;
 
 namespace App.Client.GameModules.GamePlay.Free.Player
 {
@@ -21,15 +22,15 @@ namespace App.Client.GameModules.GamePlay.Free.Player
 
         public void Handle(SimpleProto data)
         {
+            Contexts contexts = SingletonManager.Get<FreeUiManager>().Contexts1;
+
             if (data.Key == FreeMessageConstant.PlayerCmd)
             {
                 int id = data.Ks[1];
-
-                PlayerEntity player = SingletonManager.Get<FreeUiManager>().Contexts1.player.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(id, (short)EEntityType.Player));
+                PlayerEntity player = contexts.player.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(id, (short)EEntityType.Player));
                 if (player != null)
                 {
                     player.playerIntercept.InterceptType = data.Ks[0];
-
                     PlayerActEnum.CmdType type = (PlayerActEnum.CmdType)data.Ks[0];
                     switch (type)
                     {
@@ -57,39 +58,123 @@ namespace App.Client.GameModules.GamePlay.Free.Player
 
             if (data.Key == FreeMessageConstant.PlayerPressKey)
             {
-                var simulator = new InputSimulator();
-                
-                if (data.Ins[1] == 0)
+                KeyCode code = KeyCode.None;
+                foreach (KeyCode kc in Enum.GetValues(typeof(KeyCode)))
                 {
-                    if (data.Ins[0] == 1)
+                    if (Enum.GetName(typeof(KeyCode), kc).ToLower().Equals(data.Ss[0].ToLower()))
                     {
-                        simulator.Mouse.LeftButtonClick();
+                        code = kc;
                     }
-                    else if(data.Ins[0] == 2)
+                }
+
+                if (code == KeyCode.None) return;
+
+                IUserInputManager manager = contexts.userInput.userInputManager.Instance;
+                Dictionary<UserInputKey, List<KeyConvertItem>> config = manager.GetInputDic();
+                PlayerEntity player = contexts.player.flagSelfEntity;
+
+                string keyName = "None";
+                bool positive = true, hold = false;
+                foreach (InputAction ia in Luminosity.IO.InputManager.GetControlScheme("normal").Actions)
+                {
+                    foreach (InputBinding ib in ia.Bindings)
                     {
-                        simulator.Mouse.RightButtonClick();
+                        if (ib.Positive == code || ib.Negative == code)
+                        {
+                            keyName = ia.Name;
+                            positive = ib.Positive == code;
+                            hold = ib.Type == InputType.DigitalAxis;
+                        }
                     }
-                    else
+                }
+
+                if (data.Bs[0])
+                {
+                    Dictionary<UserInputKey, int> PosDict = new Dictionary<UserInputKey, int>();
+                    Dictionary<UserInputKey, bool> HoldDict = new Dictionary<UserInputKey, bool>();
+                    foreach (UserInputKey uik in config.Keys)
                     {
-                        simulator.Keyboard.KeyPress((VirtualKeyCode) data.Ins[0]);
+                        foreach (KeyConvertItem item in config[uik])
+                        {
+                            if (item.Key == code && item.State == UserInputState.KeyDown)
+                            {
+                                PosDict.Add(uik, 0);
+                                HoldDict.Add(uik, false);
+                            }
+
+                            if (item.Key == code && item.State == UserInputState.KeyHold)
+                            {
+                                PosDict.Add(uik, 0);
+                                HoldDict.Add(uik, true);
+                            }
+
+                            if (keyName.Equals(item.InputKey))
+                            {
+                                PosDict.Add(uik, positive ? 1 : -1);
+                                HoldDict.Add(uik, hold);
+                            }
+                        }
+                    }
+
+                    if (PosDict.Count > 0)
+                    {
+                        foreach (UserInputKey uik in PosDict.Keys)
+                        {
+                            if (data.Ins[0] == 0 || !HoldDict[uik])
+                            {
+                                manager.InsertKey(new KeyData(uik, PosDict[uik]));
+                            }
+
+                            if (data.Ins[0] > 0 && HoldDict[uik])
+                            {
+                                player.playerIntercept.RealPressKeys.AddKeyTime((int) uik, data.Ins[0], PosDict[uik]);
+                            }
+                        }
                     }
                 }
                 else
                 {
-                    if (data.Ins[0] == 1)
+                    Dictionary<UserInputKey, int> UpDict = new Dictionary<UserInputKey, int>();
+                    Dictionary<UserInputKey, int> RealseDict = new Dictionary<UserInputKey, int>();
+
+                    foreach (UserInputKey uik in config.Keys)
                     {
-                        simulator.Mouse.LeftButtonDown();
-                    }
-                    else if(data.Ins[0] == 2)
-                    {
-                        simulator.Mouse.RightButtonDown();
-                    }
-                    else
-                    {
-                        simulator.Keyboard.KeyDown((VirtualKeyCode) data.Ins[0]);
+                        foreach (KeyConvertItem item in config[uik])
+                        {
+                            if (item.Key == code)
+                            {
+                                if (item.State == UserInputState.KeyUp)
+                                {
+                                    UpDict.Add(uik, 0);
+                                }
+                                else
+                                {
+                                    RealseDict.Add(uik, 0);
+                                }
+                            }
+
+                            if (keyName.Equals(item.InputKey))
+                            {
+                                RealseDict.Add(uik, 0);
+                            }
+                        }
                     }
 
-                    SingletonManager.Get<FreeUiManager>().Contexts1.player.flagSelfEntity.playerIntercept.RealPressKeys.AddKeyTime(data.Ins[0], data.Ins[1]);
+                    if (UpDict.Count > 0)
+                    {
+                        foreach (UserInputKey uik in UpDict.Keys)
+                        {
+                            manager.InsertKey(new KeyData(uik));
+                        }
+                    }
+
+                    if (RealseDict.Count > 0)
+                    {
+                        foreach (UserInputKey uik in RealseDict.Keys)
+                        {
+                            player.playerIntercept.RealPressKeys.Release((int) uik);
+                        }
+                    }
                 }
             }
         }

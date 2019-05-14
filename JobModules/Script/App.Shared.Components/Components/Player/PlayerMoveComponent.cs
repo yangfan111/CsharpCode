@@ -152,14 +152,6 @@ namespace App.Shared.Components.Player
 
     public class PlayerMoveComponent : IComponent
     {
-        private static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerMoveComponent));
-
-//        public int GetComponentId()
-//        {
-//            {
-//                return (int) EComponentIds.PlayerMove;
-//            }
-//        }
 
         public Vector3 Velocity;
         public float SpeedAffect;

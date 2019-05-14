@@ -1,14 +1,9 @@
 ﻿using App.Shared.Components;
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Vehicle;
-using App.Shared.Player;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Player.Oxygen
@@ -53,7 +48,7 @@ namespace App.Shared.GameModules.Player.Oxygen
 
             var vehicle = PlayerVehicleUtility.GetVehicle(player, _vehicleContext);
             if (null != vehicle)
-                ret = ret || vehicle.IsPassagerInWater();
+                ret = vehicle.IsPassagerInWater();
             return ret;
         }
 

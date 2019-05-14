@@ -4,6 +4,8 @@ using Core;
 using Core.Room;
 using Core.Utils;
 using System.Collections.Generic;
+using App.Shared.Components.Weapon;
+using Core.EntityComponent;
 using Utils.Configuration;
 using Utils.Singleton;
 
@@ -53,7 +55,7 @@ namespace App.Shared.GameMode
         }
 
         private readonly OverrideBagTaticsCacheData BagTaticsCache = new OverrideBagTaticsCacheData();*/
-
+        
 
         [System.Obsolete]
         private void TrashOldWeapons(PlayerEntity player)
@@ -64,6 +66,7 @@ namespace App.Shared.GameMode
                     controller.DestroyWeapon(j, 0);
         }
 
+       
         public void RecoverPlayerWeapon(PlayerEntity player, List<PlayerWeaponBagData> sortedWeaponList, int pointer)
         {
             if (sortedWeaponList == null)
@@ -116,19 +119,19 @@ namespace App.Shared.GameMode
             {
                 if (pointer == sortedWeaponList[i].BagIndex)
                 {
-                    GenerateBagWeaponByIndex(sortedWeaponList[i], player.WeaponController());
+                    GenerateBagWeaponByIndex(sortedWeaponList[i], player.WeaponController(), player.playerWeaponServerUpdate.ReservedWeaponSubType);
                     break;
                 }
             }
-            player.playerWeaponServerUpdate.UpdateHeldAppearance = true;
+            player.playerWeaponServerUpdate.UpdateCmdType = (byte)EWeaponUpdateCmdType.UpdateHoldAppearance;
              
             //defaultBagFstSlot =processor.PollGetLastSlotType();
             //DebugUtil.MyLog("defaultBagFstSlot:" + defaultBagFstSlot,DebugUtil.DebugColor.Blue);
             //processor.TryArmWeapon(defaultBagFstSlot);
         }
+        
 
-
-        private void GenerateBagWeaponByIndex(PlayerWeaponBagData srcBagData,IPlayerWeaponProcessor controller)
+        private void GenerateBagWeaponByIndex(PlayerWeaponBagData srcBagData, IPlayerWeaponProcessor controller, List<int> reservedSubType)
         {
             var removedList = new List<EWeaponSlotType>();
             for (EWeaponSlotType j = EWeaponSlotType.None + 1; j < EWeaponSlotType.Length; j++)
@@ -136,14 +139,23 @@ namespace App.Shared.GameMode
                 removedList.Add(j);
             }
             controller.GrenadeHandler.ClearCache();
-            
             foreach (PlayerWeaponData weapon in srcBagData.weaponList)
             {
                 Logger.InfoFormat("[[[[[ServerInitialize data]]]]] BagIndex:{0}|In:{1}" , srcBagData.BagIndex,weapon.ToString());
+                var weaponAllConfig =SingletonManager.Get<WeaponConfigManagement>().FindConfigById(weapon.WeaponTplId);
+                bool needReserved = true;
+                if (null != reservedSubType && reservedSubType.Count != 0)
+                {
+                    if (weaponAllConfig.NewWeaponCfg.Type == (int) EWeaponType_Config.ThrowWeapon)
+                        needReserved = reservedSubType.Contains((int) EWeaponSubType.Throw);
+                    else
+                        needReserved = reservedSubType.Contains(weaponAllConfig.NewWeaponCfg.SubType);
+                }
+                if(!needReserved)
+                    continue;
 
                 var slot = PlayerWeaponBagData.Index2Slot(weapon.Index);
           
-                var weaponAllConfig = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(weapon.WeaponTplId);
                 var weaponType = (EWeaponType_Config)weaponAllConfig.NewWeaponCfg.Type;
                 if (weaponType != EWeaponType_Config.ThrowWeapon)
                 {
@@ -155,10 +167,6 @@ namespace App.Shared.GameMode
                         orient.Bullet += SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(orient.Magazine).Bullet;
                     }
                     controller.ReplaceWeaponToSlot(slot, srcBagData.BagIndex, orient);
-                    //if(isdefaultBag)
-                    //    controller.PickUpWeapon(weaponInfo);
-                    //else
-                    //    controller.ReplaceWeaponToSlot(slot)
                 }
                 else
                 {

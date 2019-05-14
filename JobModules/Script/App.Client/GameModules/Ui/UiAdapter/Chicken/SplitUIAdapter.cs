@@ -1,10 +1,8 @@
-﻿using System;
-using App.Shared;
+﻿using App.Shared;
 using App.Shared.Components.Ui;
-using App.Client.GameModules.Ui.UiAdapter;
+using App.Shared.Components.Player;
 using Core.Free;
 using Free.framework;
-using UserInputManager.Lib;
 
 namespace App.Client.GameModules.Ui.UiAdapter
 {
@@ -42,6 +40,17 @@ namespace App.Client.GameModules.Ui.UiAdapter
         public void SetCrossActive(bool isActive)
         {
             _contexts.ui.uI.IsShowCrossHair = isActive;
+        }
+
+        private PlayerEntity _player;
+        private PlayerEntity Player
+        {
+            get { return _player ?? (_player = _contexts.player.flagSelfEntity); }
+        }
+
+        public void ShowIllegalTip()
+        {
+            Player.tip.TipType = Core.Common.ETipType.EnterNumError;
         }
     }
 }

@@ -58,10 +58,10 @@ namespace App.Client.GameModules.ClientInit
                 PlayerInfo info = new PlayerInfo();
                 info.ConvertFrom(msg);
                 _loginSuccReceived = true;
-                Vector3 position = new Vector3();
-                var playerEntity = PlayerEntityFactory.CreateNewPlayerEntity(_contexts.player, position, info, true, false);
+               
+                var playerEntity = PlayerEntityFactory.CreateNewPlayerEntity(_contexts.player, info.InitPosition, info, true, false);
                 playerEntity.ReplaceNetwork(networkChannel);
-                _contexts.session.commonSession.InitPosition = playerEntity.position.Value;
+                _contexts.session.commonSession.InitPosition = info.InitPosition;
             }
 
         }

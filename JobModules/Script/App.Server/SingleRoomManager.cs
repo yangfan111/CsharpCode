@@ -45,7 +45,7 @@ namespace App.Server
 
         //private Stopwatch _stopwatch;
 
-        public SingleRoomManager(ServerRoomFactory roomFactory, RoomEventDispatcher dispatcher, IRoomListener roomListener) : this(roomFactory, dispatcher, true, roomListener)
+        public SingleRoomManager(ServerRoomFactory roomFactory, RoomEventDispatcher dispatcher, IRoomListener roomListener) : this(roomFactory, dispatcher, false, roomListener)
         {
 
         }

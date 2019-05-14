@@ -1,3 +1,4 @@
+using System;
 using Core.CameraControl;
 using Core.Utils;
 using KinematicCharacterController;
@@ -10,6 +11,7 @@ namespace Core.CharacterController.ConcreteController
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(DiveCharacterController));
         private BaseCharacterController _controller;
+        private Action<Transform> _initAction;
         
         public static readonly float DiveFowrard = 90f;
         public static readonly float DiveBack = -35f;
@@ -21,13 +23,19 @@ namespace Core.CharacterController.ConcreteController
         public static readonly float DiveDown = 160f;
         public static readonly float FlyModePosYOffset = 0.5f;
         
-        public DiveCharacterController(KinematicCharacterMotor motor, BaseCharacterController controller) : base(motor)
+        public DiveCharacterController(KinematicCharacterMotor motor, BaseCharacterController controller,Action<Transform> initAction = null) : base(motor)
         {
             _controller = controller;
+            _initAction = initAction;
         }
 
         public override void Init()
         {
+            if (_initAction != null)
+            {
+                _initAction.Invoke(_motor.transform);
+            }
+            
             _motor.ChangeCharacterController(_controller);
             DefaultInit();
             _motor.CapsuleDirection = 1;

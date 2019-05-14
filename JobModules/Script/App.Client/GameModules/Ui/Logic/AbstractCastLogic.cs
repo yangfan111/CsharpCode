@@ -100,7 +100,7 @@ namespace App.Client.GameModules.Ui.Logic
 
         private bool HasObstacle(PlayerEntity player, Vector3 targetCenter, GameObject item)
         {
-            var hasObstacle = CommonObjectCastUtil.HasObstacleBeteenPlayerAndItem(player, targetCenter, item);
+            var hasObstacle = CommonObjectCastUtil.HasObstacleBetweenPlayerAndItem(player, targetCenter, item);
             return hasObstacle; 
         }
 

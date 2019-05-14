@@ -5,6 +5,7 @@ using Core.Utils;
 using Entitas;
 using Entitas.VisualDebugging.Unity;
 using UnityEngine;
+using Utils.Singleton;
 
 namespace Core.SessionState
 {
@@ -103,7 +104,7 @@ namespace Core.SessionState
                 }
                 
             }
-            GC.Collect();
+            SingletonManager.Get<gc_manager>().gc_collect();
         }
 
         public abstract Systems CreateUpdateSystems(IContexts contexts);

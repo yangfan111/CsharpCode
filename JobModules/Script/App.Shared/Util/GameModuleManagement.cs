@@ -63,12 +63,10 @@ namespace App.Shared
         {
             
             if (!SharedConfig.IsServer && s_Default != null && s_Default.cookie == cookie) return s_Default;
-            if (logics.ContainsKey(cookie))
-            {
-          //      DebugUtil.LogInUnity(logics[cookie].ToString());
-                return logics[cookie];
-            }
-            return default(T);
+            T t;
+            logics.TryGetValue(cookie, out t);
+            return t;
+          
         }
         internal static void Cache(T instance,int cookie)
         {

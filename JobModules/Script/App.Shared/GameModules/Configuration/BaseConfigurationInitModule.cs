@@ -40,9 +40,9 @@ namespace App.Shared.GameModules.Configuration
             AddConfigSystem<RoleConfigManager>(sessionState, "role");
             AddConfigSystem<CharacterInfoManager>(sessionState, "CharacterInfo");
             AddConfigSystem<KillFeedBackConfigManager>(sessionState, "killfeedback");
-            
+
             AddConfigSystem<CameraConfigManager>(sessionState, "Camera");
-            
+
             AddConfigSystem<SoundConfigManager>(sessionState, "Sound");
             AddConfigSystem<PlayerSoundConfigManager>(sessionState, "PlayerSound");
             AddConfigSystem<BulletDropConfigManager>(sessionState, "BulletDrop");
@@ -84,6 +84,8 @@ namespace App.Shared.GameModules.Configuration
 
             AddConfigSystem<WeaponAvatarConfigManager>(sessionState, "weapon_avator");
             AddConfigSystem<StreamingLevelStructure>(sessionState, "streaminglevel", "tablesfrombuilding");
+            AddConfigSystem<ScenesLightmapStructure>(sessionState, "AdditiveScene", "sceneslightmap_additivescene");
+            AddConfigSystem<ScenesIndoorCullStructure>(sessionState, "AdditiveScene", "scenesindoorcull_additivescene");
             AddConfigSystem<MapsDescription>(sessionState, "mapConfig");
             AddConfigSystem<AudioWeaponManager>(sessionState, "WeaponAudio");
             AddConfigSystem<AudioEventManager>(sessionState, "AudioEvent");
@@ -97,23 +99,22 @@ namespace App.Shared.GameModules.Configuration
             AddConfigSystem<LoadingTipConfigManager>(sessionState, "loadingtips");
             AddConfigSystem<IndividuationConfigManager>(sessionState, "individuation");
             _sessionState = sessionState;
-           
-            
+
         }
 
-     
 
-      
+
+
 
         private void AddConfigSystem<T>(ISessionCondition sessionState, string asset,
             string bundleName = "tables")
             where T : AbstractConfigManager<T>, IConfigParser, new()
         {
-           
+
             this.Add(new DefaultConfigInitSystem<T>(_assetManager, sessionState, new AssetInfo(bundleName, asset),
                 SingletonManager.Get<T>()));
         }
         List<IExecuteSystem> _systems = new List<IExecuteSystem>();
-       
+
     }
 }

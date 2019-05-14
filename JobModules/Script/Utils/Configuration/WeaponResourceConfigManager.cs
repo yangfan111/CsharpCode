@@ -17,6 +17,7 @@ namespace Assets.Utils.Configuration
         private readonly int[] _emptyIntArray = new int[0];
         private int? C4Id;
         public int EmptyHandId { get; private set; }
+        public int MeleeVariant { get; private set; }
 
         public override void ParseConfig(string xml)
         {
@@ -31,6 +32,13 @@ namespace Assets.Utils.Configuration
                         break;
                     case EWeaponSubType.Hand:
                         EmptyHandId = item.Id;
+                        break;
+                    case EWeaponSubType.Melee:
+                        switch (item.Id) {
+                            case (int)EWeaponIdType.MeleeVariant:
+                                MeleeVariant = item.Id;
+                                break;
+                        }
                         break;
                 }
             }

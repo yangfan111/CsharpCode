@@ -14,6 +14,8 @@ namespace Core.CharacterState
         CharacterControllerCapsule GetCrouchCapsule();
         CharacterControllerCapsule GetProneCapsule();
         float GetBigJumpHeight();
+        float GetSlopeLimit();
+        float GetStepOffset();
     }
     
     public interface ICharacterInfoProvider:ICharacterSpeedInfo,ICharacterBoundsInfo

@@ -1,3 +1,4 @@
+using System;
 using AssetBundleManagement;
 using AssetBundleManager.Operation;
 
@@ -20,24 +21,39 @@ namespace AssetBundleManager.Warehouse
             return OperationFactory.CreateAssetBundleSimulatedLoading(name, name);
         }
 
-        public override AssetLoading LoadAsset(string bundleName, string name)
+        public override AssetLoading LoadAsset(string bundleName, string name, Type objectType)
         {
             AssetSimulatedLoading operation = null;
 #if UNITY_EDITOR
             UnityEngine.Object asset = null;
             string[] assetPaths = UnityEditor.AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(bundleName, name);
 
-            if (assetPaths.Length == 0)
+
+
+            if (objectType == null)
             {
-                if (name.StartsWith("Assets/"))
-                    asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(name);
+                if (assetPaths.Length == 0)
+                {
+                    if (name.StartsWith("Assets/"))
+                        asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(name);
+                }
+                else
+                    asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPaths[0]);
             }
             else
-                asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPaths[0]);
+            {
+                if (assetPaths.Length == 0)
+                {
+                    if (name.StartsWith("Assets/"))
+                        asset = UnityEditor.AssetDatabase.LoadAssetAtPath(name, objectType);
+                }
+                else
+                    asset = UnityEditor.AssetDatabase.LoadAssetAtPath(assetPaths[0], objectType);
+            }
 
             if (asset != null)
             {
-                operation = OperationFactory.CreateAssetSimulationLoading(bundleName, name);
+                operation = OperationFactory.CreateAssetSimulationLoading(bundleName, name, objectType);
                 operation.SetAsset(asset);
             }
 #endif

@@ -34,11 +34,11 @@ public class AkDragDropHelper : UnityEngine.MonoBehaviour
 					AkEnvironment.data.ObjectReference = reference;
 				break;
 
-			case WwiseObjectType.Event:
-				var AkAmbient = UnityEditor.Undo.AddComponent<AkAmbient>(gameObject);
-				if (AkAmbient != null)
-					AkAmbient.data.ObjectReference = reference;
-				break;
+			//case WwiseObjectType.Event:
+			//	var AkAmbient = UnityEditor.Undo.AddComponent<AkAmbient>(gameObject);
+			//	if (AkAmbient != null)
+			//		AkAmbient.data.ObjectReference = reference;
+			//	break;
 
 			case WwiseObjectType.Soundbank:
 				var AkBank = UnityEditor.Undo.AddComponent<AkBank>(gameObject);

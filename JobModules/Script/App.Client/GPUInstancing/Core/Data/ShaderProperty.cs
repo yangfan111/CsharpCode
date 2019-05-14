@@ -18,12 +18,12 @@ namespace App.Client.GPUInstancing.Core.Data
         // for world shifting
         // public float[] Offset { get; private set; }
 
-        public TerrainProperty(UnityEngine.Terrain terrain, TerrainData data)
+        public TerrainProperty(UnityEngine.Terrain terrain, TerrainData data, float detailDistance)
         {
             _heightMapResolution = data.heightmapResolution;
 
             _detailDensity = terrain.detailObjectDensity;
-            _detailDistance = terrain.detailObjectDistance;
+            _detailDistance = detailDistance;
 
             var terrainSize = data.size;
             _terrainSize = new float[3];
@@ -39,7 +39,6 @@ namespace App.Client.GPUInstancing.Core.Data
 
             _detailResolution = data.detailResolution;
             _detailResolutionPerPatch = data.detailResolutionPerPatch;
-            _detailResolutionPerPatch = 8;
         }
 
         public void SetDetailInstantiationProperty(ComputeShader shader)

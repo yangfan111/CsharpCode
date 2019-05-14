@@ -10,6 +10,7 @@ using Core.ObjectPool;
 using Core.Playback;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
 using Core.SyncLatest;
+using Core.UpdateLatest;
 using Core.Utils;
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
@@ -29,6 +30,32 @@ namespace App.Shared.Components.Player
         {
             if (Events == null) Events = new PlayerEvents();
             Events.ReInit();
+        }
+    }
+
+    [Player]
+    [Serializable]
+    public class UploadEventsComponent : IReusableObject, IUpdateComponent
+    {
+        [NetworkProperty] public PlayerEvents Events;
+        public PlayerEvents StoreEvents;
+        
+        public void ReInit()
+        {
+            if (Events == null) Events = new PlayerEvents();
+            Events.ReInit();
+        }
+
+        public void CopyFrom(object rightComponent)
+        {
+            if (Events == null) Events = new PlayerEvents();
+            var right = (UploadEventsComponent) rightComponent;
+            Events.CopyFrom(right.Events);
+        }
+
+        public int GetComponentId()
+        {
+            return (int) EComponentIds.UploadEvents;
         }
     }
 

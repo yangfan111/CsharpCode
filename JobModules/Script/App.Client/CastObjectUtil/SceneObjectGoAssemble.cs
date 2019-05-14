@@ -38,7 +38,7 @@ namespace App.Client.CastObjectUtil
             {
                 model.transform.localRotation = Quaternion.identity;
             }
-            var root = BaseGoAssemble.Assemble(model, entity.position.Value, entity.entityKey.Value.ToString());
+            var root = BaseGoAssemble.Assemble(model, entity.position.Value, entity.entityKey.Value.ToString(), needRotate);
             model.transform.localScale = Vector3.one;
             return root;
         }

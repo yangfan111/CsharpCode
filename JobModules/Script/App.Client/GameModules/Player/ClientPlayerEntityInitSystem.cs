@@ -34,10 +34,13 @@ namespace App.Client.GameModules.Player
             //player.AddWeaponSound(new List<XmlConfig.EWeaponSoundType>());
             player.WeaponController().AddAuxEffect();
 
-            player.AddPlayerIntercept();
-            player.playerIntercept.InterceptKeys = new KeyTime();
-            player.playerIntercept.PressKeys = new KeyTime();
-            player.playerIntercept.RealPressKeys = new KeyTime();
+            if (!player.hasPlayerIntercept)
+            {
+                player.AddPlayerIntercept();
+                player.playerIntercept.InterceptKeys = new KeyTime();
+                player.playerIntercept.PressKeys = new KeyTime();
+                player.playerIntercept.RealPressKeys = new KeyTime();
+            }
         }
     }
 }

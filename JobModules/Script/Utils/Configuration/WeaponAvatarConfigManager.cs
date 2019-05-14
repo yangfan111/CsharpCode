@@ -1,12 +1,12 @@
 ﻿using Core.Utils;
 using System.Collections.Generic;
+using UnityEngine;
 using Utils.AssetManager;
 using Utils.CharacterState;
 using XmlConfig;
 
 namespace Utils.Configuration
 {
-
     public class WeaponAvatarConfigManager :  AbstractConfigManager<WeaponAvatarConfigManager>, IConfigParser
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(WeaponAvatarConfigManager));
@@ -16,6 +16,11 @@ namespace Utils.Configuration
         public HashSet<AssetInfo> AnimSubResourceAssetInfos = new HashSet<AssetInfo>(AssetInfo.AssetInfoComparer.Instance);
         public const int EmptyHand = 13;
         WeaponAvatarConfigItem _noWeaponItem;
+        
+        private const string DualWeaponSuffix = "D(Clone)";
+        private const string SubRightWeaponSuffix = "Right";
+        private const string SubLeftWeaponSuffix = "Left";
+        private const string OverrideControllerTransitionSuffix = "_Transition";
 
         public override void ParseConfig(string xml)
         {
@@ -28,11 +33,11 @@ namespace Utils.Configuration
                     _noWeaponItem = item;
                 }
             }
+            
             if(null == _noWeaponItem)
             {
                 Logger.Error("No hand config exist in weapon avatar config ");
             }
-
 
             foreach (var item in _config.Items)
             {
@@ -45,6 +50,7 @@ namespace Utils.Configuration
                     if (!string.IsNullOrEmpty(item.AnimFemaleP3))
                     {
                         AnimSubResourceAssetInfos.Add(new AssetInfo(item.AnimBundle, item.AnimFemaleP3));
+                        AnimSubResourceAssetInfos.Add(new AssetInfo(item.AnimBundle, item.AnimFemaleP3 + OverrideControllerTransitionSuffix));
                     }
                     if (!string.IsNullOrEmpty(item.AnimMaleP1))
                     {
@@ -53,6 +59,7 @@ namespace Utils.Configuration
                     if (!string.IsNullOrEmpty(item.AnimMaleP3))
                     {
                         AnimSubResourceAssetInfos.Add(new AssetInfo(item.AnimBundle, item.AnimMaleP3));
+                        AnimSubResourceAssetInfos.Add(new AssetInfo(item.AnimBundle, item.AnimMaleP3 + OverrideControllerTransitionSuffix));
                     }
                 }
             }
@@ -74,7 +81,6 @@ namespace Utils.Configuration
             }
         }
 
-
         public UnityEngine.Object GetOrNull(AssetInfo assetInfo)
         {
             UnityEngine.Object ret;
@@ -92,7 +98,54 @@ namespace Utils.Configuration
             return null;
         }
 
-        public AssetInfo GetThirdPersonModel(int id)
+        public bool HaveLeftWeapon(int id)
+        {
+            var cfg = GetConfigById(id);
+            if (null == cfg) return false;
+            
+            var suffixName = Match(cfg.ResP3);
+            return suffixName.Equals(DualWeaponSuffix);
+        }
+        
+        public bool HaveLeftWeapon(string name)
+        {
+            var suffixName = Match(name);
+            return suffixName.Equals(DualWeaponSuffix);
+        }
+        
+        public GameObject GetRightWeaponGameObject(UnityObject weapon)
+        {
+            if (null == weapon || null == weapon.AsGameObject) return null;
+            var weaponObj = weapon.AsGameObject;
+
+            for (var i = 0; i < weaponObj.transform.childCount; ++i)
+            {
+                var child = weaponObj.transform.GetChild(i);
+                if (child.gameObject.name.Contains(SubRightWeaponSuffix))
+                    return child.gameObject;
+            }
+
+            Logger.ErrorFormat("weapon  {0}  do not have rightWeapon", weapon.AsGameObject.name);
+            return null;
+        }
+
+        public GameObject GetLeftWeaponGameObject(UnityObject weapon)
+        {
+            if (null == weapon || null == weapon.AsGameObject) return null;
+            var weaponObj = weapon.AsGameObject;
+
+            for (var i = 0; i < weaponObj.transform.childCount; ++i)
+            {
+                var child = weaponObj.transform.GetChild(i);
+                if (child.gameObject.name.Contains(SubLeftWeaponSuffix))
+                    return child.gameObject;
+            }
+
+            Logger.ErrorFormat("weapon  {0}  do not have leftWeapon", weapon.AsGameObject.name);
+            return null;
+        }
+
+        public AssetInfo GetThirdPersonWeaponModel(int id)
         {
             var cfg = GetConfigById(id);
             if(null != cfg)
@@ -101,6 +154,17 @@ namespace Utils.Configuration
             }
             return new AssetInfo();
         }
+        
+        public AssetInfo GetFirstPersonWeaponModel(int id)
+        {
+            var cfg = GetConfigById(id);
+            if (null != cfg)
+            {
+                return new AssetInfo(cfg.ModelBundle, cfg.ResP1);
+            }
+            return new AssetInfo();
+        }
+        
         public List<AssetInfo> GetEffectAsset(int id)
         {
             List<AssetInfo> list = new List<AssetInfo>();
@@ -117,15 +181,6 @@ namespace Utils.Configuration
             }
             return list;
         }
-        public AssetInfo GetFirstPersonModel(int id)
-        {
-            var cfg = GetConfigById(id);
-            if (null != cfg)
-            {
-                return new AssetInfo(cfg.ModelBundle, cfg.ResP1);
-            }
-            return new AssetInfo();
-        }
 
         public AssetInfo GetThirdPersonAnimation(int id, Sex sex)
         {
@@ -138,6 +193,22 @@ namespace Utils.Configuration
                         return new AssetInfo(cfg.AnimBundle, cfg.AnimMaleP3);
                     case Sex.Female:
                         return new AssetInfo(cfg.AnimBundle, cfg.AnimFemaleP3);
+                }
+            }
+            return new AssetInfo();
+        }
+        
+        public AssetInfo GetThirdPersonAnimationTransition(int id, Sex sex)
+        {
+            var cfg = GetConfigById(id);
+            if(null != cfg)
+            {
+                switch (sex)
+                {
+                    case Sex.Male:
+                        return new AssetInfo(cfg.AnimBundle, cfg.AnimMaleP3 + OverrideControllerTransitionSuffix);
+                    case Sex.Female:
+                        return new AssetInfo(cfg.AnimBundle, cfg.AnimFemaleP3 + OverrideControllerTransitionSuffix);
                 }
             }
             return new AssetInfo();
@@ -210,7 +281,7 @@ namespace Utils.Configuration
                 case Sex.Male:
                     return new AssetInfo(_noWeaponItem.AnimBundle, _noWeaponItem.AnimMaleP3);
             }
-            return new AssetInfo(); ;
+            return new AssetInfo();
         }
 
         public AssetInfo GetIcon(int id)
@@ -233,6 +304,19 @@ namespace Utils.Configuration
             return new AssetInfo();   
         }
 
-        
+        private static readonly Dictionary<string,string> Cache = new Dictionary<string, string>();
+        private static string Match(string name)
+        {
+            if (Cache.ContainsKey(name)) return Cache[name];
+            var match = name.Split('_');
+            var ret = string.Empty;
+            if (match.Length > 0)
+            {
+                ret = match[match.Length - 1];
+            }
+
+            Cache[name] = ret;
+            return ret;
+        }
     }
 }

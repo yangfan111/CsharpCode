@@ -33,5 +33,6 @@
         public const int WEAPON_PICKUP = 43;
         public const int PRELOAD_RESOURCE = 44;
         public const int GRENADE_ROMOVE = 45;
+        public const int TEST_CASE_END = 46;
     }
 }

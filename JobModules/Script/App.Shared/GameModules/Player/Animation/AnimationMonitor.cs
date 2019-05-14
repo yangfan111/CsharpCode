@@ -1,25 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Shared.GameModules.Player.CharacterState;
 using Core.Fsm;
 using Core.Utils;
 using UnityEngine;
 using Utils.Appearance;
 using Tuple=Core.Utils.Tuple;
-using Utils.CharacterState;
 
 namespace App.Shared.GameModules.Player.Animation
 {
     public class AnimationMonitor
     {
-        private static LoggerAdapter _logger = new LoggerAdapter(typeof(AnimationMonitor));
-
         private readonly AnimationClipNameMatcher _matcher = new AnimationClipNameMatcher();
 
         private readonly Dictionary<string, StateChange> _animationFinished;
-        private readonly List<Core.Utils.Tuple<string, StateChange>> _animationFinishedSource;
+        private readonly List<Tuple<string, StateChange>> _animationFinishedSource;
         // 人物移动在人物状态更新之前，因此某些状态的触发要在Update之前
         private readonly Dictionary<string, FsmInput> _animationProgressBeforeUpdate;
         private readonly Dictionary<string, FsmInput> _p3AnimationProgressAfterUpdate;
@@ -49,7 +43,7 @@ namespace App.Shared.GameModules.Player.Animation
                 { "ReloadLoop",         FsmInput.ReloadLoopProgressP3 },
                 { "ReloadEnd",          FsmInput.ReloadEndProgressP3 },
                 { "Select",             FsmInput.SelectProgressP3},
-                { "Holster",            FsmInput.HolsterProgressP3},
+                { "HolsterEnd",         FsmInput.HolsterProgressP3},
                 { "Melee",              FsmInput.MeleeAttackProgressP3},
                 { "ThrowEnd",           FsmInput.ThrowEndProgressP3 },
                 { "PickUp",             FsmInput.PickUpProgressP3 },
@@ -82,32 +76,35 @@ namespace App.Shared.GameModules.Player.Animation
             // speed up _animationFinished
             _animationFinishedSource = new List<Tuple<string, StateChange>>
 			{
-			    Core.Utils.Tuple.Create("JumpStart",       new StateChange { Value = false, Command = FsmInput.Freefall } ),//有过渡
-			    Core.Utils.Tuple.Create("JumpEnd",         new StateChange { Value = false, Command = FsmInput.JumpEndFinished } ),//有过渡
-			    Core.Utils.Tuple.Create("Fire",            new StateChange { Value = false, Command = FsmInput.FireFinished } ),
-			    Core.Utils.Tuple.Create("FireEnd",         new StateChange { Value = false, Command = FsmInput.FireEndFinished } ),
-			    Core.Utils.Tuple.Create("Injury",          new StateChange { Value = false, Command = FsmInput.InjuryFinished } ),
-			    Core.Utils.Tuple.Create("Reload",          new StateChange { Value = false, Command = FsmInput.ReloadFinished } ),
-			    Core.Utils.Tuple.Create("ReloadEmpty",     new StateChange { Value = false, Command = FsmInput.ReloadFinished } ),
-			    Core.Utils.Tuple.Create("Holster",         new StateChange { Value = false, Command = FsmInput.HolsterFinished } ),
-			    Core.Utils.Tuple.Create("Select",          new StateChange { Value = false, Command = FsmInput.SelectFinished } ),
-			    Core.Utils.Tuple.Create("ReloadEnd",       new StateChange { Value = false, Command = FsmInput.ReloadFinished } ),//有过渡
-			    Core.Utils.Tuple.Create("PickUp",          new StateChange { Value = false, Command = FsmInput.PickUpEnd } ),
-			    Core.Utils.Tuple.Create("OpenDoor",        new StateChange { Value = false, Command = FsmInput.OpenDoorEnd } ),
-			    Core.Utils.Tuple.Create("Props",           new StateChange { Value = false, Command = FsmInput.PropsEnd } ),
-			    Core.Utils.Tuple.Create("Melee",           new StateChange { Value = false, Command = FsmInput.MeleeAttackFinished } ),
-			    Core.Utils.Tuple.Create("ThrowEnd",        new StateChange { Value = false, Command = FsmInput.GrenadeEndFinish } ),
-			    Core.Utils.Tuple.Create("ParachuteOpen1",  new StateChange { Value = false, Command = FsmInput.ParachuteOpen1Finished } ),
-			    Core.Utils.Tuple.Create("Enter",           new StateChange { Value = false, Command = FsmInput.ToProneTransitFinish } ),
-			    Core.Utils.Tuple.Create("Quit",            new StateChange { Value = false, Command = FsmInput.OutProneTransitFinish } ),
-                Core.Utils.Tuple.Create("Climb",           new StateChange { Value = false, Command = FsmInput.GenericActionFinished } ),
-			    Core.Utils.Tuple.Create("Use",             new StateChange { Value = false, Command = FsmInput.BuriedBombFinished } ),
-			    Core.Utils.Tuple.Create("Dismantle",       new StateChange { Value = false, Command = FsmInput.DismantleBombFinished } ),
-			    Core.Utils.Tuple.Create("2InjuredMove",       new StateChange { Value = false, Command = FsmInput.DyingTransitionFinished } ),
-			    Core.Utils.Tuple.Create("EnterLadder",     new StateChange { Value = false, Command = FsmInput.EnterLadderFinished } ),
-                Core.Utils.Tuple.Create("ExitLadder",      new StateChange { Value = false, Command = FsmInput.ExitLadderFinished } ),
-			    Core.Utils.Tuple.Create("TransfigurationStart",      new StateChange { Value = false, Command = FsmInput.TransfigurationStartEnd } ),
-			    Core.Utils.Tuple.Create("TransfigurationFinish",      new StateChange { Value = false, Command = FsmInput.TransfigurationFinishEnd } ),
+			    Tuple.Create("JumpStart",       new StateChange { Value = false, Command = FsmInput.Freefall } ),//有过渡
+			    Tuple.Create("JumpEnd",         new StateChange { Value = false, Command = FsmInput.JumpEndFinished } ),//有过渡
+			    Tuple.Create("Fire",            new StateChange { Value = false, Command = FsmInput.FireFinished } ),
+			    Tuple.Create("FireEnd",         new StateChange { Value = false, Command = FsmInput.FireEndFinished } ),
+			    Tuple.Create("Injury",          new StateChange { Value = false, Command = FsmInput.InjuryFinished } ),
+			    Tuple.Create("Reload",          new StateChange { Value = false, Command = FsmInput.ReloadFinished } ),
+			    Tuple.Create("ReloadEmpty",     new StateChange { Value = false, Command = FsmInput.ReloadFinished } ),
+			    Tuple.Create("HolsterStart",    new StateChange { Value = false, Command = FsmInput.HolsterStartFinished } ),
+			    Tuple.Create("HolsterEnd",      new StateChange { Value = false, Command = FsmInput.HolsterEndFinished } ),
+			    Tuple.Create("Select",          new StateChange { Value = false, Command = FsmInput.SelectFinished } ),
+			    Tuple.Create("ReloadEnd",       new StateChange { Value = false, Command = FsmInput.ReloadFinished } ),//有过渡
+			    Tuple.Create("PickUp",          new StateChange { Value = false, Command = FsmInput.PickUpEnd } ),
+			    Tuple.Create("OpenDoor",        new StateChange { Value = false, Command = FsmInput.OpenDoorEnd } ),
+			    Tuple.Create("Props",           new StateChange { Value = false, Command = FsmInput.PropsEnd } ),
+			    Tuple.Create("Melee",           new StateChange { Value = false, Command = FsmInput.MeleeAttackFinished } ),
+			    Tuple.Create("ThrowEnd",        new StateChange { Value = false, Command = FsmInput.GrenadeEndFinish } ),
+			    Tuple.Create("ParachuteOpen1",  new StateChange { Value = false, Command = FsmInput.ParachuteOpen1Finished } ),
+			    Tuple.Create("Enter",           new StateChange { Value = false, Command = FsmInput.ToProneTransitFinish } ),
+			    Tuple.Create("Quit",            new StateChange { Value = false, Command = FsmInput.OutProneTransitFinish } ),
+                Tuple.Create("Climb",           new StateChange { Value = false, Command = FsmInput.GenericActionFinished } ),
+			    Tuple.Create("Use",             new StateChange { Value = false, Command = FsmInput.BuriedBombFinished } ),
+			    Tuple.Create("Dismantle",       new StateChange { Value = false, Command = FsmInput.DismantleBombFinished } ),
+			    Tuple.Create("2InjuredMove",       new StateChange { Value = false, Command = FsmInput.DyingTransitionFinished } ),
+			    Tuple.Create("EnterLadder",     new StateChange { Value = false, Command = FsmInput.EnterLadderFinished } ),
+                Tuple.Create("ExitLadder",      new StateChange { Value = false, Command = FsmInput.ExitLadderFinished } ),
+			    Tuple.Create("TransfigurationStart",      new StateChange { Value = false, Command = FsmInput.TransfigurationStartEnd } ),
+			    Tuple.Create("TransfigurationFinish",      new StateChange { Value = false, Command = FsmInput.TransfigurationFinishEnd } ),
+			    Tuple.Create("RageStart",       new StateChange { Value = false, Command = FsmInput.RageStartFinished } ),
+			    Tuple.Create("RageEnd",         new StateChange { Value = false, Command = FsmInput.RageEndFinished } ),
             };
 
             // 只播放一遍的动画，依赖它们的结束触发命令

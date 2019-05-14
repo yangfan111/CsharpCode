@@ -12,6 +12,7 @@ namespace XmlConfig
         public int Script;
         public List<int> TidList;
         public List<int> PacksTypeList;
+        public int EffectVal;   //作用值
     }
 
     [XmlRoot("root")]

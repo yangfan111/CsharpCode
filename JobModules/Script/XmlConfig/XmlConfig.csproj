@@ -143,6 +143,7 @@
     <Compile Include="WeaponPartsConfig.cs" />
     <Compile Include="WeaponPropertyConfig.cs" />
     <Compile Include="WeaponUnlockConfig.cs" />
+    <Compile Include="WeaponUpdateConfig.cs" />
     <Compile Include="WeaponWorkshopConfig.cs" />
     <Compile Include="XmlConfigParser.cs" />
   </ItemGroup>

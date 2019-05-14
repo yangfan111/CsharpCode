@@ -10,7 +10,7 @@ namespace Utils.Appearance.Weapon
 #if !UnitTest
         private static LoggerAdapter Logger = new LoggerAdapter(typeof(WeaponModelAssemblyController));
 #endif
-        private GameObject _rootGo;
+        protected GameObject _rootGo;
         private BoneMount _boneMount = new BoneMount();
 
         public WeaponModelAssemblyController(object root)
@@ -18,7 +18,7 @@ namespace Utils.Appearance.Weapon
             _rootGo = root as GameObject;            
         }
 
-        public void ShowWeapon(object weaponObj)
+        public virtual void ShowWeapon(object weaponObj)
         {
             var weaponGo = weaponObj as GameObject;
             if(null != _rootGo)
@@ -37,6 +37,7 @@ namespace Utils.Appearance.Weapon
                 Logger.Error("root go is null ");
 #endif
             }
+
         }
 
         public void Attach(WeaponPartLocation partLocation, object partObj, object weaponObj)
@@ -63,7 +64,7 @@ namespace Utils.Appearance.Weapon
             }
         }
 
-        private Vector3 GetCenterOffset(GameObject go)
+        protected Vector3 GetCenterOffset(GameObject go)
         {
             var renderers = go.GetComponentsInChildren<Renderer>();
             if(renderers.Length < 1)

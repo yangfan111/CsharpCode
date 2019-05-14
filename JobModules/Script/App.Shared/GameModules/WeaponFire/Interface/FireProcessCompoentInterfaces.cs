@@ -10,7 +10,7 @@ namespace  App.Shared.GameModules.Weapon.Behavior
     /// </summary>
     public interface IBulletFireListener : IFireProcess
     {
-        void OnBulletFire(PlayerWeaponController controller, IWeaponCmd cmd);
+        void OnBulletFire(PlayerWeaponController controller, WeaponSideCmd cmd);
     }
 
     /// <summary>

@@ -55,8 +55,9 @@ namespace App.Shared.GameModules.Weapon
             return ret;
         }
 
-        ///need auto stuff
-        public override bool ExpendWeapon()
+        /// need auto stuff
+        /// <param name="reservedBullet"></param>
+        public override bool ExpendWeapon(int reservedBullet)
         {
             var expendId = ConfigId;
             if (expendId < 1) return false;

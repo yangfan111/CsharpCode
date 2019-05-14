@@ -1,5 +1,4 @@
-﻿using Core.Attack;
-using UnityEngine;
+﻿using UnityEngine;
 using WeaponConfigNs;
 using App.Shared.GameModules.Bullet;
 using Core.Utils;
@@ -11,12 +10,12 @@ using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using Core.Enums;
 using Core.IFactory;
-using App.Shared.Components.Player;
 using App.Shared.GameModules.Player;
 using Core.BulletSimulation;
 using Utils.Singleton;
 
 using App.Shared.GameModules.Weapon;
+using Core;
 
 namespace App.Shared.GameModules.Attack
 {
@@ -75,10 +74,10 @@ namespace App.Shared.GameModules.Attack
             var damage = 0;
             switch (attackInfo.AttackType)
             {
-                case MeleeAttckType.LeftMeleeAttack:
+                case EMeleeAttackType.Soft:
                     damage = config.LeftDamage;
                     break;
-                case MeleeAttckType.RightMeleeAttack:
+                case EMeleeAttackType.Hard:
                     damage = config.RightDamage;
                     break;
                 default:
@@ -142,7 +141,7 @@ namespace App.Shared.GameModules.Attack
 //                target.stateInterface.State.BeenHit();
 //            }
             
-            ClientEffectFactory.AddBeenHitEvent(src, target.entityKey.Value, BulletHitHandler.GeneraterUniqueHitId(src, seq), contexts.session.currentTimeObject.CurrentTime);
+            ClientEffectFactory.AddBeenHitEvent(src, target, BulletHitHandler.GeneraterUniqueHitId(src, seq), contexts.session.currentTimeObject.CurrentTime);
             ClientEffectFactory.AddHitPlayerEffectEvent(src, target.entityKey.Value, hit.point, hit.point - target.position.Value);
         }
 
@@ -190,4 +189,6 @@ namespace App.Shared.GameModules.Attack
             return false;
         }
     }
+
+    
 }

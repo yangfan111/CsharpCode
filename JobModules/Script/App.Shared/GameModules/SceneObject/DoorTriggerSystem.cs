@@ -1,11 +1,15 @@
 ﻿using App.Shared.Components.SceneObject;
 using App.Shared.Player;
+using App.Shared.SceneTriggerObject;
+using App.Shared.Util;
+using Core;
 using Core.CameraControl;
 using Core.Enums;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using UnityEngine;
+using Utils.Singleton;
 
 namespace App.Shared.GameModules.SceneObject
 {
@@ -16,21 +20,56 @@ namespace App.Shared.GameModules.SceneObject
         private const float OpenMinAngle = -90.0f;
         private const float OpenMaxAngle = 90.0f;
 
-        private MapObjectContext _context;
-        public DoorTriggerSystem(MapObjectContext context)
+        private Contexts _contexts;
+        private MapObjectContext _mapContext;
+        private IMapObjectEntityFactory _mapFactory;
+        private ITriggerObjectListener _listener;
+        protected ITriggerObjectManager _objectManager;
+        
+        public DoorTriggerSystem(Contexts context, ITriggerObjectListener listener = null)
         {
-            _context = context;
+            _listener = listener;
+            _contexts = context;
+            _mapContext = context.mapObject;
+            _mapFactory = _contexts.session.entityFactoryObject.MapObjectEntityFactory;
+            
+            var triggerObjectManager = SingletonManager.Get<TriggerObjectManager>();
+            _objectManager = triggerObjectManager.GetManager(ETriggerObjectType.Door);  
         }
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             if (cmd.IsUseAction && cmd.UseType == (int) EUseActionType.Door)
             {
-                var door = _context.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(cmd.UseEntityId, (short)EEntityType.MapObject));
+                var entity = MapObjectUtility.GetMapObjByRawId(cmd.UseEntityId, (int) ETriggerObjectType.Door);
+                if (entity == null && (SharedConfig.IsServer||SharedConfig.IsOffline))
+                {
+                    _listener.CreateMapObj(cmd.UseEntityId);
+                    entity = MapObjectUtility.GetMapObjByRawId(cmd.UseEntityId, (int) ETriggerObjectType.Door);
+                    
+                    if (entity == null)
+                    {
+                        _logger.ErrorFormat("Door Entity {0} does not exist!", cmd.UseEntityId);
+                        return;
+                    }
+                }
+
+                if (!SharedConfig.IsServer && !SharedConfig.IsOffline)
+                {
+                    var player = (PlayerEntity)owner.OwnerEntity;
+                    player.autoMoveInterface.PlayerAutoMove.StopAutoMove();
+                    player.stateInterface.State.OpenDoor();
+                    if(player.AudioController()!= null)
+                        player.AudioController().PlaySimpleAudio(EAudioUniqueId.OpenDoor);
+
+
+                    return;
+                }
+                
+                var door = entity as MapObjectEntity;
                 if (door == null)
                 {
-                    _logger.ErrorFormat("Door Entity {0} does not exist!", cmd.UseEntityId);
-                    return;
+                    _logger.ErrorFormat("entity {0} is not door", cmd.UseEntityId);
                 }
 
                 if (!door.hasDoorRotate && door.doorData.IsOpenable())
@@ -89,22 +128,15 @@ namespace App.Shared.GameModules.SceneObject
                     if (endState != state)
                     {
                         player.stateInterface.State.OpenDoor();
+                        if(player.AudioController()!= null)
+                            player.AudioController().PlaySimpleAudio(EAudioUniqueId.OpenDoor);
+
                         if(SharedConfig.IsServer || SharedConfig.IsOffline)
                         {
                             door.doorData.State = (int) DoorState.Rotating;
                             door.AddDoorRotate(from, from, to, endState);
                             _logger.DebugFormat("Trigger Door From {0} {1} To {2} {3}",
                                 state, from, endState, to);
-                            //switch((DoorState)endState)
-                            //{
-                            //    case DoorState.Closed:
-                            //        player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.CloseDoor);
-                            //        break;
-                            //    case DoorState.OpenMax:
-                            //    case DoorState.OpenMin:
-                            //        player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.OpenDoor);
-                            //        break;
-                            //}
                         }
                     }
                 }

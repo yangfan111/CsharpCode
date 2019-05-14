@@ -19,17 +19,27 @@ namespace App.Shared.SceneManagement
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(StreamSceneObjectAssetPostProcessor));
         public readonly int i = 0;
 
-        private Dictionary<int, ShadowCastingMode> originShadows = new Dictionary<int, ShadowCastingMode>();
-        private Dictionary<int, LightProbeUsage> originLightProbes = new Dictionary<int, LightProbeUsage>();
+        private readonly Dictionary<int, ShadowCastingMode> originShadows;
+        private readonly Dictionary<int, LightProbeUsage> originLightProbes;
+        private readonly Dictionary<int, bool> originStatus;
+        private static readonly List<MeshRenderer> mrs = new List<MeshRenderer>(64);
+        private static readonly List<Transform> trs = new List<Transform>(64);
 
         public StreamSceneObjectAssetPostProcessor(UnityObject unityObject)
         {
+            mrs.Clear();
+            trs.Clear();
             i = unityObject.AsGameObject.GetInstanceID();
             _logger.DebugFormat("StreamSceneObjectAssetPostProcessor :{0}", i);
 
             // record origin state info
             GameObject go = unityObject.AsGameObject;
-            var mrs = go.GetComponentsInChildren<MeshRenderer>(true);
+            go.GetComponentsInChildren<MeshRenderer>(true, mrs);
+
+            go.GetComponentsInChildren<Transform>(true, trs);
+            originShadows = new Dictionary<int, ShadowCastingMode>(mrs.Count);
+            originLightProbes = new Dictionary<int, LightProbeUsage>(mrs.Count);
+            originStatus = new Dictionary<int, bool>(trs.Count);
             foreach (MeshRenderer mr in mrs)
             {
                 if (mr != null)
@@ -39,27 +49,30 @@ namespace App.Shared.SceneManagement
                     originLightProbes.Add(id, mr.lightProbeUsage);
                 }
             }
+
+            foreach (Transform tr in trs)
+            {
+                if (tr != null)
+                {
+                    int id = tr.GetInstanceID();
+                    originStatus.Add(id, tr.gameObject.activeSelf);
+                }
+            }
         }
 
         public void LoadFromAsset(UnityObject unityObject)
         {
-
             _logger.DebugFormat("LoadFromAsset :{0} {1}", i, unityObject.AsGameObject);
         }
 
         public void LoadFromPool(UnityObject unityObject)
         {
-
             _logger.DebugFormat("LoadFromPool :{0} {1}", i, unityObject.AsGameObject);
-        }
-
-        public void Recyle(UnityObject unityObject)
-        {
-            _logger.DebugFormat("Recyle :{0} {1}", i, unityObject.AsGameObject);
-
+            mrs.Clear();
+            trs.Clear();
             // recover origin state info
             GameObject go = unityObject.AsGameObject;
-            var mrs = go.GetComponentsInChildren<MeshRenderer>(true);
+            go.GetComponentsInChildren<MeshRenderer>(true,mrs);
             foreach (MeshRenderer mr in mrs)
             {
                 if (mr != null)
@@ -67,28 +80,71 @@ namespace App.Shared.SceneManagement
                     int id = mr.GetInstanceID();
                     if (originShadows.ContainsKey(id)) mr.shadowCastingMode = originShadows[id];
                     if (originLightProbes.ContainsKey(id)) mr.lightProbeUsage = originLightProbes[id];
+
+                    // recover lightmap
+                    // (由于室内物件的烘焙贴图在运行时决定，室外物件不启用烘焙，在资源回收时取消烘焙信息以避免复用时出现物件贴图不正确的情况)
+                    mr.lightmapIndex = -1;
+                }
+            }
+
+            go.GetComponentsInChildren<Transform>(true,trs);
+            foreach (Transform tr in trs)
+            {
+                if (tr != null)
+                {
+                    int id = tr.GetInstanceID();
+                    if (originStatus.ContainsKey(id) && tr.gameObject.activeSelf != originStatus[id])
+                    {
+                        tr.gameObject.SetActive(originStatus[id]);
+                    }
                 }
             }
         }
 
+        public void Recyle(UnityObject unityObject)
+        {
+            _logger.DebugFormat("Recyle :{0} {1}", i, unityObject.AsGameObject);
+        }
+
         public void OnDestory(UnityObject unityObject)
         {
-
             _logger.DebugFormat("OnDestory :{0} {1}", i, unityObject.AsGameObject);
         }
     }
+
     public class LevelManager : ILevelManager, ISceneResourceRequestHandler
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(LevelManager));
-        private AssetLoadOption _assetLoadOption =
-            new AssetLoadOption(false, null, false, (unityObject) => new StreamSceneObjectAssetPostProcessor(unityObject));
+
+        private readonly AssetLoadOption _assetLoadOption;
+
         private IUnityAssetManager _assetManager;
-        public LevelManager(IUnityAssetManager assetManager)
+
+        public IUnityAssetManager assetManager
+        {
+            get { return _assetManager; }
+        }
+
+        public LevelManager(IUnityAssetManager assetManager, bool isServer)
         {
             _assetManager = assetManager;
+            if (isServer)
+            {
+                _assetLoadOption =
+                    new AssetLoadOption(false, null, false);
+            }
+            else
+            {
+                _assetLoadOption =
+                    new AssetLoadOption(false, null, false,
+                        (unityObject) => new StreamSceneObjectAssetPostProcessor(unityObject));
+            }
 
             SceneManager.sceneLoaded += SceneLoadedWrapper;
             SceneManager.sceneUnloaded += SceneUnloadedWrapper;
+            _goLoadedProfile = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("LevelManager_GoLoaded");
+            _afterGoLoadedProfile =
+                SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("LevelManager_AfterGoLoaded");
         }
 
         public void Dispose()
@@ -101,6 +157,7 @@ namespace App.Shared.SceneManagement
             AfterGoLoaded = null;
             BeforeGoUnloaded = null;
             GoUnloaded = null;
+            DefaultGo.DisposeStreamGo();
         }
 
         #region ILevelManager
@@ -121,12 +178,28 @@ namespace App.Shared.SceneManagement
         {
             if (GoLoaded != null)
             {
-                GoLoaded.Invoke(unityObj);
+                try
+                {
+                    _goLoadedProfile.BeginProfile();
+                    GoLoaded.Invoke(unityObj);
+                }
+                finally
+                {
+                    _goLoadedProfile.EndProfile();
+                }
             }
 
             if (AfterGoLoaded != null)
             {
-                AfterGoLoaded(unityObj);
+                try
+                {
+                    _afterGoLoadedProfile.BeginProfile();
+                    AfterGoLoaded(unityObj);
+                }
+                finally
+                {
+                    _afterGoLoadedProfile.EndProfile();
+                }
             }
 
             --NotFinishedRequests;
@@ -150,6 +223,7 @@ namespace App.Shared.SceneManagement
         }
 
         public int NotFinishedRequests { get; private set; }
+
         public void LoadResource(string name, IUnityAssetManager assetManager, AssetInfo request)
         {
             assetManager.LoadAssetAsync(name, request, GoLoadedWrapper, _assetLoadOption);
@@ -165,12 +239,14 @@ namespace App.Shared.SceneManagement
         private readonly Queue<UnityObject> _cachedUnloadGoRequest = new Queue<UnityObject>();
 
         private List<string> _fixedSceneNames;
+        private CustomProfileInfo _goLoadedProfile;
+        private CustomProfileInfo _afterGoLoadedProfile;
 
         public void SetToWorldCompositionLevel(WorldCompositionParam param, IStreamingGoManager streamingGo)
         {
             _fixedSceneNames = param.FixedScenes;
-            _sceneManager = new StreamingManager(this, streamingGo, SingletonManager.Get<StreamingLevelStructure>().Data,
-                param, _fixedSceneNames.Count);
+            _sceneManager = new StreamingManager(this, streamingGo, SingletonManager.Get<StreamingLevelStructure>().Data,               
+                SingletonManager.Get<ScenesLightmapStructure>().Data, SingletonManager.Get<ScenesIndoorCullStructure>().Data, param, _fixedSceneNames.Count);
 
             RequestForFixedScenes(param.AssetBundleName);
         }

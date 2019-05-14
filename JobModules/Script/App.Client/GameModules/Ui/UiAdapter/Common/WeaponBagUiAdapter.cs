@@ -6,9 +6,6 @@ using Core.Room;
 using Core.Utils;
 using System.Collections.Generic;
 using App.Shared.GameModules.Player;
-using App.Shared.Player;
-using UnityEngine;
-using UserInputManager.Lib;
 using Utils.Configuration;
 using Utils.Singleton;
 using WeaponConfigNs;
@@ -108,7 +105,8 @@ namespace App.Client.GameModules.Ui.UiAdapter
         private Contexts _contexts;
         public PlayerWeaponController Controller { get; set; }
         WeaponBagInfo[] _bagArray;
-        WeaponBagInfo[] BagArray
+
+        private WeaponBagInfo[] BagArray
         {
             get
             {
@@ -128,14 +126,12 @@ namespace App.Client.GameModules.Ui.UiAdapter
                     for(int i = 0; i < bags.Length; i++)
                     {
                         var bagInfo = bags[i];
-                        if (null == bagInfo)
+                        if (bagInfo != null)
                         {
-                            _bagArray[i] = null;
+                            var uiIndex = bagInfo.BagIndex + 1;
+                            _bagArray[uiIndex] = new WeaponBagInfo(bagInfo, playerEntity.WeaponController());
                         }
-                        else
-                        {
-                            _bagArray[i] = new WeaponBagInfo(bags[i], playerEntity.WeaponController());
-                        }
+                            
                     }
                 }
                 return _bagArray;
@@ -160,7 +156,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 if (!WeaponController.CanSwitchWeaponBag)
                 {
                     _enable = false;
-                    //if(IsReady()) WeaponController.InterruptGunSight = false ;
                 }
                 else
                 {
@@ -191,7 +186,8 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public IWeaponBagInfo GetWeaponBagInfoByBagIndex(int index)
         {
-            return BagArray[index - 1];
+            return BagArray[index];
+            //return BagArray[index - 1];
         }
         PlayerWeaponController WeaponController
         {
@@ -207,7 +203,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
                     return 0;
                 }
 
-                //Debug.Log("CurBagIndex" + (WeaponController.HeldBagPointer2 + 1));
                 return WeaponController.HeldBagPointer+ 1;
             }
             set
@@ -221,7 +216,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
                     return;
                 }
                 _contexts.session.clientSessionObjects.UserCmdGenerator.SetUserCmd((cmd) => cmd.BagIndex = value);
-                //Debug.Log("setBagIndex:" + value);
             }
         }
 

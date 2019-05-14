@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using AssetBundleManagement;
 using AssetBundleManager.Operation;
@@ -50,9 +51,9 @@ namespace AssetBundleManager.Warehouse
             return ret;
         }
         
-        public override AssetLoading LoadAsset(string bundleName, string name)
+        public override AssetLoading LoadAsset(string bundleName, string name, Type objectType)
         {
-            return OperationFactory.CreateAssetAsyncLoading(bundleName, name);
+            return OperationFactory.CreateAssetAsyncLoading(bundleName, name, objectType);
         }
 
         public override SceneLoading LoadScene(string bundleName, string name, bool isAdditive)

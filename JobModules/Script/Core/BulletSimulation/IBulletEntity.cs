@@ -22,7 +22,7 @@ namespace Core.BulletSimulation
         int NextFrameTime { get; set; }
         int ServerTime { get; set; }
         float Distance { get; set; } 
-        float DistanceDecayFactor { get; } // 距离衰减系数
+        float DistanceDecayFactor { get; set; } // 距离衰减系数
         float BaseDamage { get; set; } // 武器基础伤害 
         float PenetrableThickness { get; set; } // 穿透系数
         float GetDamageFactor(EBodyPart part); // hitbox系数 

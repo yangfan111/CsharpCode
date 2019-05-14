@@ -130,6 +130,9 @@ namespace App.Client.GameModules.Player
                     return ScriptLocalization.client_commontip.noweaponinslot;
                 case ETipType.CantSwithGrenade:
                     return ScriptLocalization.client_commontip.cannotswitchgrenade;
+                case ETipType.EnterNumError:
+                    return ScriptLocalization.client_commontip.enternumerror;
+
                 default:
                     return "";
             }

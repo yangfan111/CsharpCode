@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Core.Utils;
+using UnityEngine;
+using Random = System.Random;
 
 namespace Core.Room
 {
@@ -58,17 +60,13 @@ namespace Core.Room
         private const string RandomToken = "random";
         public IPlayerInfo GetUserInfoFromToken(IRoomId roomId, string token, bool isCheck)
         {
-            if (RandomToken.Equals(token))
-            {
-                System.Random rand = new System.Random();
-                return new PlayerInfo(token, roomId, rand.Next(0, 1000), "", 2, rand.Next(0, 1000), 0, 0, 0, 0, 0, null, null, null,false);
-            }
             IPlayerInfo rc;
 
             if (_token2UserInfo.TryGetValue(token, out rc) && _tokenOnce && !isCheck)
             {
                 _token2UserInfo.Remove(token);
             }
+            
 
             return rc;
         }

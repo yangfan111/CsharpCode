@@ -46,11 +46,9 @@ namespace Utils.Configuration
 
         public WeaponPartSurvivalConfigItem FindConfigBySetId(int id)
         {
-            if(!_configDic.ContainsKey(id))
-            {
-                return null;
-            }
-            return _configDic[id];
+            WeaponPartSurvivalConfigItem item;
+            _configDic.TryGetValue(id, out item);
+            return item;
         }
     }
 }

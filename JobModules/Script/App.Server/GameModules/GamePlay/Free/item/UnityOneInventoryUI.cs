@@ -98,69 +98,89 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
         public void ReDraw(ISkillArgs args, ItemInventory inventory, bool includeBack)
         {
-            if (update == null)
-            {
-                update = new FreeUIUpdateAction();
-            }
+            //if (update == null)
+            //{
+            //    update = new FreeUIUpdateAction();
+            //}
 
-            update.SetKey(FreeUtil.ReplaceVar(uiKey, args));
-            update.ClearValue();
+            //update.SetKey(FreeUtil.ReplaceVar(uiKey, args));
+            //update.ClearValue();
 
-            FreeData fd = (FreeData)args.GetUnit("current");
+            //FreeData fd = (FreeData)args.GetUnit("current");
 
-            FreePrefabValue v = new FreePrefabValue();
-            v.SetSeq("1");
-            update.AddValue(v);
-            v.AddOneValue(new OnePrefabValue(image, ""));
-            if (!string.IsNullOrEmpty(name))
-            {
-                v.AddOneValue(new OnePrefabValue(name, ""));
-            }
-            if (!string.IsNullOrEmpty(count))
-            {
-                v.AddOneValue(new OnePrefabValue(count, ""));
-            }
-            update.SetScope(1);
-            update.SetPlayer("current");
-            update.Act(args);
+            //FreePrefabValue v = new FreePrefabValue();
+            //v.SetSeq("1");
+            //update.AddValue(v);
+            //v.AddOneValue(new OnePrefabValue(image, ""));
+            //if (!string.IsNullOrEmpty(name))
+            //{
+            //    v.AddOneValue(new OnePrefabValue(name, ""));
+            //}
+            //if (!string.IsNullOrEmpty(count))
+            //{
+            //    v.AddOneValue(new OnePrefabValue(count, ""));
+            //}
+            //update.SetScope(1);
+            //update.SetPlayer("current");
+            //update.Act(args);
+
+            //if (inventory.posList.Count > 0)
+            //{
+            //    ItemPosition ip = inventory.posList[0];
+            //    v.Clear();
+            //    v.AddOneValue(new OnePrefabValue(image, ip.key.GetImg()));
+            //    if (!string.IsNullOrEmpty(name))
+            //    {
+            //        v.AddOneValue(new OnePrefabValue(name, ip.key.GetName()));
+            //    }
+            //    if (!string.IsNullOrEmpty(count))
+            //    {
+            //        if(ip.count != 1)
+            //        {
+            //            v.AddOneValue(new OnePrefabValue(count, ip.GetCount().ToString()));
+            //        }
+            //    }
+            //    else
+            //    {
+            //        v.AddOneValue(new OnePrefabValue(count, ""));
+            //    }
+            //    update.Act(args);
+
+            //    redrawPart(inventory, args, ip, fd);
+
+            //    SimpleProto itemInfo = FreePool.Allocate();
+            //    itemInfo.Key = FreeMessageConstant.ItemInfo;
+            //    itemInfo.Ss.Add(inventory.name);
+            //    FreeItemInfo info = FreeItemConfig.GetItemInfo(ip.key.GetKey());
+            //    itemInfo.Ins.Add(info.cat);
+            //    itemInfo.Ins.Add(info.id);
+            //    itemInfo.Ins.Add(ip.GetCount());
+            //    FreeMessageSender.SendMessage(args, "current", itemInfo);
+            //}
+            //else
+            //{
+            //    clearPart(inventory, args, fd);
+            //}
+
+            SimpleProto itemInfo = FreePool.Allocate();
+            itemInfo.Key = FreeMessageConstant.ItemInfo;
+            itemInfo.Ss.Add(inventory.name);
 
             if (inventory.posList.Count > 0)
             {
                 ItemPosition ip = inventory.posList[0];
-                v.Clear();
-                v.AddOneValue(new OnePrefabValue(image, ip.key.GetImg()));
-                if (!string.IsNullOrEmpty(name))
-                {
-                    v.AddOneValue(new OnePrefabValue(name, ip.key.GetName()));
-                }
-                if (!string.IsNullOrEmpty(count))
-                {
-                    if(ip.count != 1)
-                    {
-                        v.AddOneValue(new OnePrefabValue(count, ip.GetCount().ToString()));
-                    }
-                }
-                else
-                {
-                    v.AddOneValue(new OnePrefabValue(count, ""));
-                }
-                update.Act(args);
-
-                redrawPart(inventory, args, ip, fd);
-
-                SimpleProto itemInfo = FreePool.Allocate();
-                itemInfo.Key = FreeMessageConstant.ItemInfo;
-                itemInfo.Ss.Add(inventory.name);
+                itemInfo.Bs.Add(false);
                 FreeItemInfo info = FreeItemConfig.GetItemInfo(ip.key.GetKey());
                 itemInfo.Ins.Add(info.cat);
                 itemInfo.Ins.Add(info.id);
                 itemInfo.Ins.Add(ip.GetCount());
-                FreeMessageSender.SendMessage(args, "current", itemInfo);
             }
             else
             {
-                clearPart(inventory, args, fd);
+                itemInfo.Bs.Add(true);
             }
+
+            FreeMessageSender.SendMessage(args, "current", itemInfo);
         }
 
         private void clearPart(ItemInventory inventory, ISkillArgs args, FreeData fd)

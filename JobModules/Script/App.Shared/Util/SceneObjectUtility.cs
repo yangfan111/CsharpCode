@@ -18,30 +18,6 @@ namespace App.Shared.Util
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(SceneObjectUtility));
 
-        public static void AddRawGameObject<T>(IEntity obj, GameObject go,
-            Action<object> detachCallback) where T : FracturedBaseObject
-        {
-            AddRawGameObject(obj, go);
-
-            var fracturedObject = go.GetComponent<T>();
-            if (fracturedObject != null)
-            {
-                fracturedObject.EventDetachCallback = detachCallback;
-            }
-        }
-
-        private static void AddRawGameObject(IEntity obj, GameObject gameObject)
-        {
-            SceneObjectEntity sceneObject = obj as SceneObjectEntity;
-            sceneObject.AddRawGameObject(gameObject);
-            var entityReference = gameObject.GetComponent<EntityReference>();
-            if (entityReference == null)
-            {
-                entityReference = gameObject.AddComponentUncheckRequireAndDisallowMulti<EntityReference>();
-            }
-            entityReference.Init(sceneObject.entityAdapter);
-        }
-
         public static bool IsCanPickUpByPlayer(this SceneObjectEntity sceneObjectEntity, PlayerEntity playerEntity)
         {
             if (!sceneObjectEntity.hasCastFlag)

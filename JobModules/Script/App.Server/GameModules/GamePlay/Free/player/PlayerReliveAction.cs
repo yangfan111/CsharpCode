@@ -5,6 +5,7 @@ using com.wd.free.@event;
 using com.wd.free.util;
 using Core.Components;
 using System;
+using Core.EntityComponent;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
@@ -37,6 +38,8 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 p.position.ServerTime = args.GameContext.session.currentTimeObject.CurrentTime;
                 p.gamePlay.InHurtedCount = 0;
                 p.statisticsData.Statistics.EvenKillCount = 0;
+                p.WeaponController().RelatedThrowAction.ThrowingEntityKey = new EntityKey(0, (short) EEntityType.End);
+                p.WeaponController().RelatedThrowAction.LastFireWeaponKey = -1;
                 if (FreeUtil.ReplaceBool(resetWeapon, args))
                 {
                     p.ModeController().RecoverPlayerWeapon(p, p.WeaponController().HeldBagPointer);
@@ -53,7 +56,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
             }
             else if (playerEntity.gamePlay.LifeState != 1)
             {
-                playerEntity.statisticsData.Statistics.DeadTime += (int)System.DateTime.Now.Ticks / 10000 - playerEntity.statisticsData.Statistics.LastDeadTime;
+                playerEntity.statisticsData.Statistics.DeadTime += (int)(System.DateTime.Now.Ticks / 10000L) - playerEntity.statisticsData.Statistics.LastDeadTime;
             }
         }
     }

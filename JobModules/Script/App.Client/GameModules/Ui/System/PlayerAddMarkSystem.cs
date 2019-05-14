@@ -18,7 +18,7 @@ namespace App.Client.GameModules.Ui.System
             _contexts = contexts;
         }
 
-        protected override bool filter(PlayerEntity playerEntity)
+        protected override bool Filter(PlayerEntity playerEntity)
         {
             return true;
         }

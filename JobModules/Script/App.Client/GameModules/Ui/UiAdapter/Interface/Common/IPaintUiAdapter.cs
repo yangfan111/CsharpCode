@@ -1,4 +1,5 @@
-﻿using Assets.App.Client.GameModules.Ui.UiAdapter.Interface;
+﻿using App.Shared.Components.Player;
+using Assets.App.Client.GameModules.Ui.UiAdapter.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,10 @@ namespace App.Client.GameModules.Ui.UiAdapter
         bool CanOpen { get; }
 
         void SetCrossVisible(bool val);
+
+        void Select();
+
+        GamePlayComponent gamePlay { get; }
     }
 
 

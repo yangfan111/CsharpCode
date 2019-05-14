@@ -239,8 +239,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         int MapId { get; set; } //地图ID
 
-        void AddMapMark(long playerId, int playerNum, float mx, float my);
-        void RemoveMapMark(long playerId);
         Dictionary<long, MiniMapPlayMarkInfo> MapMarks { get; }
 
         bool IsShowRouteLine { get;}   //是否显示航线
@@ -263,5 +261,12 @@ namespace App.Client.GameModules.Ui.UiAdapter
         Vector3 C4DropPosition { get; }
 
         GamePlayComponent gamePlay { get; }
+
+#region Bio
+        List<Vector3> MotherPos { get; }
+        List<Vector3> HeroPos { get; }
+        List<Vector3> HumanPos { get; }
+        List<MapFixedVector3> SupplyPos { get; }
+        #endregion
     }
 }

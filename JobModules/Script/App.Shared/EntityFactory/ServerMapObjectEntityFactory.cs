@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using App.Shared.Components;
 using App.Shared.GameModules.Common;
+using App.Shared.Util;
 using Assets.XmlConfig;
 using Core;
 using Core;
@@ -29,52 +30,21 @@ namespace App.Shared.EntityFactory
             _idGenerator = entityIdGenerator;
         }
 
-        public virtual IEntity CreateDoor(string objectId, GameObject gameObject, Action<object> detachCallback)
+        public virtual IEntity CreateDoor(int objectId, GameObject gameObject)
         {
-            return CreateDoorInternal(objectId, gameObject, detachCallback, ResetDoor);
+            return CreateDoorInternal(objectId, gameObject, ResetDoor);
         }
         
-        protected IEntity CreateDoorInternal(string objectId,
-            GameObject gameObject, Action<object> detachCallback, Action<Entity> resetAction)
+        protected IEntity CreateDoorInternal(int objectId,
+            GameObject gameObject, Action<Entity> resetAction)
         {
-            var door = (MapObjectEntity)CreateDestructibleObjectInternal(objectId, gameObject, detachCallback, resetAction, false);
+            var door = (MapObjectEntity)CreateDestructibleObjectInternal(objectId, gameObject, resetAction, false);
             var initRotation = gameObject.transform.localEulerAngles.y;
             door.AddDoorData(initRotation, initRotation);
             return door;
         }
-        
-        
-        protected IEntity CreateDestructibleObjectInternal(string objectId,
-            GameObject gameObject, Action<object> detachCallback, Action<Entity> resetAction,
-            bool isDestructibleObject,bool isMapObject = false)
-        {
-            
-            var destructibleObject = CreateMapObject(_idGenerator.GetNextEntityId(), objectId, gameObject, resetAction);
-            AddEntityReference(destructibleObject, gameObject);
-            var fracturedObject = gameObject.GetComponent<FracturedObject>();
-            if (fracturedObject != null)
-            {
-                destructibleObject.AddDestructibleData(fracturedObject.StartAsWhole);
-                fracturedObject.EventDetachCallback = detachCallback;
-                fracturedObject.SetAsServerObject(SharedConfig.IsServer);
-            }
-            else
-            {
-                destructibleObject.AddDestructibleData(true);
-            }
 
-            destructibleObject.AddTriggerObjectEvent(new Queue<TriggerObjectSyncEvent>());
-
-            //distinguish door object from a simple destructible object.
-            if (isDestructibleObject)
-            {
-                destructibleObject.isDestructibleObjectFlag = true;
-            }
-
-            return destructibleObject;
-        }
-
-        protected MapObjectEntity CreateMapObject(int entityId, string objectId,
+        protected MapObjectEntity CreateMapObject(int entityId, int objectId,
             GameObject gameObject, Action<Entity> resetAction)
         {
             var obj = _mapObjectContext.CreateEntity();
@@ -156,14 +126,14 @@ namespace App.Shared.EntityFactory
             }
         }
  
-        public virtual IEntity CreateDestructibleObject(string objectId,
-            GameObject gameObject, Action<object> detachCallback)
+        public virtual IEntity CreateDestructibleObject(int objectId,
+            GameObject gameObject)
         {
-            return CreateDestructibleObjectInternal(objectId, gameObject.gameObject, detachCallback, ResetDestructibleObject, true);
+            return CreateDestructibleObjectInternal(objectId, gameObject.gameObject, ResetDestructibleObject, true);
         }
 
-        protected IEntity CreateDestructibleObjectInternal(string objectId,
-            GameObject gameObject, Action<object> detachCallback, Action<Entity> resetAction,
+        protected IEntity CreateDestructibleObjectInternal(int objectId,
+            GameObject gameObject, Action<Entity> resetAction,
             bool isDestructibleObject)
         {
             
@@ -173,7 +143,7 @@ namespace App.Shared.EntityFactory
             if (fracturedObject != null)
             {
                 destructibleObject.AddDestructibleData(fracturedObject.StartAsWhole);
-                fracturedObject.EventDetachCallback = detachCallback;
+                fracturedObject.Owner = gameObject;
                 fracturedObject.SetAsServerObject(SharedConfig.IsServer);
             }
             else
@@ -189,11 +159,13 @@ namespace App.Shared.EntityFactory
                 destructibleObject.isDestructibleObjectFlag = true;
             }
 
+            MapObjectUtility.AttachRawObjToFracture(gameObject);
+
             return destructibleObject;
         }
 
 
-        public IEntity CreateGlassyObject(string objectId, GameObject gameObject, Action<object> brokenCallback)
+        public IEntity CreateGlassyObject(int objectId, GameObject gameObject)
         {
             var glassyObject = CreateSceneObject(_idGenerator.GetNextEntityId(), objectId, gameObject, ResetGlassyObject);
             AddEntityReference(glassyObject, gameObject);
@@ -201,14 +173,16 @@ namespace App.Shared.EntityFactory
             if (fracturedGlassyObject != null)
             {
                 fracturedGlassyObject.SetAsServerObject(SharedConfig.IsServer);
-                fracturedGlassyObject.EventDetachCallback = brokenCallback;
+                fracturedGlassyObject.Owner = gameObject;
             }
             glassyObject.AddTriggerObjectEvent(new Queue<TriggerObjectSyncEvent>());
             glassyObject.AddGlassyData();
+
+            MapObjectUtility.AttachRawObjToFracture(gameObject);
             return glassyObject;
         }
 
-        private MapObjectEntity CreateSceneObject(int entityId, string objectId,
+        private MapObjectEntity CreateSceneObject(int entityId, int objectId,
             GameObject gameObject, Action<Entity> resetAction)
         {
             var obj = _mapObjectContext.CreateEntity();

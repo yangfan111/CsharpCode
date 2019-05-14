@@ -25,16 +25,27 @@ namespace App.Server.GameModules.SceneObject
             _currentTime = contexts.session.currentTimeObject;
         }
 
-        public override void OnTriggerObjectLoaded(string id, GameObject gameObject)
+        public override IEntity CreateMapObj(int id)
         {
-            MapObjectEntityFactory.CreateGlassyObject(id, gameObject, OnBroken);
+            var gameObj = _objectManager.Get(id);
+            if (gameObj == null) return null;
+            var glass = (MapObjectEntity)MapObjectEntityFactory.CreateGlassyObject(id, gameObj);
+            MapObjectUtility.RecordMapObj(id, (int)_triggerType, glass);
+            MapObjectUtility.FetchFractruedState(gameObj);
+            return glass;
+        }
+
+        public override void OnTriggerObjectLoaded(int id, GameObject gameObject)
+        {
+            MapObjectUtility.RecordGameObjId(gameObject, (int)_triggerType, id);
+            MapObjectUtility.AttachRawObjToFracture(gameObject);
+            MapObjectUtility.AddCallBack<FracturedGlassyObject>(gameObject, OnBroken);
         }
 
         private void OnBroken(object o)
         {
             var chunk = o as FracturedGlassyChunk;
             var mapObject = MapObjectUtility.GetMapObjectOfFracturedChunk(chunk);
-
             if (mapObject != null)
             {
                 mapObject.glassyData.SetBroken(chunk.ChunkId);

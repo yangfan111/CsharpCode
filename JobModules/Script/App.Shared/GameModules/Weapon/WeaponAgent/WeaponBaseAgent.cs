@@ -3,7 +3,6 @@ using App.Shared.Components.Weapon;
 using Assets.App.Shared.EntityFactory;
 using Assets.Utils.Configuration;
 using Core;
-using Core.Configuration;
 using Core.EntityComponent;
 using Core.Utils;
 using System;
@@ -27,11 +26,11 @@ namespace App.Shared.GameModules.Weapon
         {
             get
             {
-                entityCache = WeaponEntityFactory.GetWeaponEntity(WeaponKey);
+                if (entityCache == null || !entityCache.hasOwnerId || entityCache.ownerId.Value != WeaponKey)
+                    entityCache = WeaponEntityFactory.GetWeaponEntity(WeaponKey);
                 return entityCache;
             }
         }
-
         internal virtual EntityKey WeaponKey
         {
             get { return weaponKeyExtractor(); }
@@ -59,12 +58,12 @@ namespace App.Shared.GameModules.Weapon
         }
 
         public abstract int FindNextWeapon(bool autoStuff);
-        public abstract bool ExpendWeapon();
+        public abstract bool ExpendWeapon(int reservedBullet);
         public abstract void ReleaseWeapon();
 
         public abstract WeaponEntity ReplaceWeapon(EntityKey Owner, WeaponScanStruct orient,
             ref WeaponPartsRefreshStruct refreshParams);
-        public EntityKey Owner { private get; set; }
+        public EntityKey Owner { get; set; }
 
         public WeaponBaseAgent(Func<EntityKey> in_holdExtractor, Func<EntityKey> in_emptyExtractor,
             EWeaponSlotType slot, GrenadeCacheHandler grenadeHandler)
@@ -120,7 +119,8 @@ namespace App.Shared.GameModules.Weapon
         {
             if (RunTimeComponent.IsPullingBolt)
             {
-                DebugUtil.MyLog("Do Interrupt :" + ConfigId);
+                if (GlobalConst.EnableWeaponLog)
+                    DebugUtil.MyLog("Do Interrupt :" + ConfigId);
                 RunTimeComponent.IsPullingBolt     = false;
                 RunTimeComponent.PullBoltInterrupt = true;
                 var audioController = GameModuleManagement.Get<PlayerAudioController>(Owner.EntityId).Value;
@@ -215,8 +215,7 @@ namespace App.Shared.GameModules.Weapon
         /// <returns></returns>
         public float GetAttachedAttributeByType(WeaponAttributeType attributeType)
         {
-            return SingletonManager.Get<WeaponPartsConfigManager>()
-                .GetPartAchiveAttachedAttributeByType(partsAchiveCache, attributeType);
+            return SingletonManager.Get<WeaponPartsConfigManager>().GetPartAchiveAttachedAttributeByType(partsAchiveCache, attributeType);
         }
 
 
@@ -235,13 +234,6 @@ namespace App.Shared.GameModules.Weapon
             return entityCache.weaponBasicData.ConfigId == weaponId;
         }
 
-
-        //public void Reset()
-        //{
-        //    ResetRuntimeData();
-        //    ResetParts();
-        //}
-
         public void ResetRuntimeData()
         {
             if (!IsValid())
@@ -258,8 +250,9 @@ namespace App.Shared.GameModules.Weapon
             entityCache.weaponRuntimeData.LastSpreadX = 0;
             entityCache.weaponRuntimeData.LastSpreadY = 0;
             entityCache.weaponRuntimeData.PullBoltInterrupt = false;
+            entityCache.weaponRuntimeData.NeedAutoReload = false;
             entityCache.weaponRuntimeData.IsPullingBolt = false;
-
+            entityCache.weaponRuntimeData.PullBoltFinish = true;
         }
 
         public void ResetParts()
@@ -271,6 +264,12 @@ namespace App.Shared.GameModules.Weapon
             entityCache.weaponBasicData.Stock = 0;
             entityCache.weaponBasicData.Magazine = 0;
             entityCache.weaponBasicData.Muzzle = 0;
+            entityCache.weaponBasicData.SideRail = 0;
+            entityCache.weaponBasicData.Bore = 0;
+            entityCache.weaponBasicData.Feed = 0;
+            entityCache.weaponBasicData.Trigger = 0;
+            entityCache.weaponBasicData.Interlock = 0;
+            entityCache.weaponBasicData.Brake = 0;
         }
 
         public CommonFireConfig CommonFireCfg

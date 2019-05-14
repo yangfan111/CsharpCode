@@ -79,6 +79,8 @@ namespace Core.Free
         public const int PlayerTipHide = 119;
 		public const int PlayerSprayPaint = 120;
         public const int PlayerPressKey = 121;
+        public const int PlayerScale = 122;
+        public const int PlayerBiochemicalMark = 123;
 
         private static Dictionary<int, string> MessageDesc = new Dictionary<int, string>();
 

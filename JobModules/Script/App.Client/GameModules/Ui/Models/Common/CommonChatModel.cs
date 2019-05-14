@@ -196,8 +196,8 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void InitKeyReveiver()
         {
-            var keyReveiver = new KeyReceiver(UiConstant.chatWindowLayer, BlockType.None);
-            keyReveiver.AddAction(UserInputKey.SendChatMessage, (data) =>
+            var keyReceiver = new KeyReceiver(UiConstant.chatWindowLayer, BlockType.None);
+            keyReceiver.AddAction(UserInputKey.SendChatMessage, (data) =>
             {
                 if (ChatListState != EUIChatListState.Send)
                 {
@@ -212,7 +212,8 @@ namespace App.Client.GameModules.Ui.Models.Common
                 UpdateChannel();
             });
 
-            _chatState.RegisterKeyReceive(keyReveiver);
+            //_chatState.RegisterKeyReceive(keyReveiver);
+            _chatState.RegisterOpenKey(keyReceiver);
         }
 
         private void SwitchChannel()
@@ -436,6 +437,14 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void SendMessage()
         {
+            //Debug.Log("SendMessage" + inputField.text);
+            //if (string.IsNullOrEmpty(inputField.text)) return;
+            //UiModule.contexts.ui.uI.OperationTipData = new BaseTipData { Title = inputField.text, DurationTime = 10 * 1000 };
+            //UiModule.contexts.ui.uISession.UiState["CommonOperationTipModel"] = true;
+            //UiModule.contexts.ui.uI.SystemTipDataQueue.Enqueue(new BaseTipData { Title = inputField.text, DurationTime = 10 * 1000 });
+            //UiModule.contexts.ui.uISession.UiState["CommonSystemTipModel"] = true;
+            //UiModule.contexts.ui.uI.GameResult = Core.Enums.EUIGameResultType.Tie;
+            //UiModule.contexts.ui.uISession.UiState["CommonGameOverModel"] = true;
             SendMessageData();
             ResetInputMessage();
         }

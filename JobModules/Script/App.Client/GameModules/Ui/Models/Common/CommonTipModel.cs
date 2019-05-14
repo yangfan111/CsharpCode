@@ -11,6 +11,8 @@ using UIComponent.Interface;
 using System;
 using UIComponent.UI.Manager;
 using Utils.Singleton;
+using WeaponConfigNs;
+using XmlConfig;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {
@@ -92,22 +94,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
     public class CommonTipModel : AbstractModel, ITip
     {
-        public enum TipCategory
-        {
-            None,
-            Resource = 1,
-            Weapon = 2,
-            WeaponAvatar = 3,
-            Role = 4,
-            WeaponPart = 5,
-            Carrier = 6,
-            CarrierAvatar = 7,
-            DogTag = 8,
-            RoleAvatar = 9,
-            Prop = 10,
-            Pack = 11,
-            BattleProp = 13   //局内道具
-        }
+
         Contexts contexts;
         UiContext uiContext;
         private bool isGameObjectCreated = false;
@@ -116,7 +103,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         private CommonTipViewModel _viewModel = new CommonTipViewModel();
         private Transform targetTf = null;
         private Canvas canvas = null;
-
+        private RectTransform rootTf;
 
         protected override IUiViewModel ViewModel
         {
@@ -145,7 +132,8 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void InitGUI()
         {
-            this.SetVisible(false);
+            //this.SetVisible(false);
+            HideTip();
             _viewModel.rootActiveSelf = true;          
             for (int i = 1; i <= 10; i++)
             {
@@ -160,18 +148,20 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void RefreshWeaponTips()
         {
             _viewModel.attrGroupActiveSelf = true;
-            var weaponConfig = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(curShowTipData.TemID);
             var weapongProperConfig = SingletonManager.Get<WeaponPropertyConfigManager>().FindByWeaponId(curShowTipData.TemID);
-            var contrastWeaponProperConfig = SingletonManager.Get<WeaponPropertyConfigManager>().FindByWeaponId(curShowTipData.ContrastTemId);
-            var weaponAvatarConfig = SingletonManager.Get<WeaponAvatarConfigManager>().GetConfigById(weaponConfig.AvatorId);
+            WeaponPropertyConfigItem contrastWeaponProperConfig = null;
+            if(curShowTipData.ContrastTemId > 0)
+            contrastWeaponProperConfig = SingletonManager.Get<WeaponPropertyConfigManager>().FindByWeaponId(curShowTipData.ContrastTemId);
 
-            if (null == weaponAvatarConfig || weaponConfig == null || weapongProperConfig == null)
+            var weaponConfig = SingletonManager.Get<ItemBaseConfigManager>().GetConfigById((int)ECategory.Weapon,curShowTipData.TemID,true) as WeaponResConfigItem;
+
+            if (weaponConfig == null || weapongProperConfig == null)
                 return;
 
             //刷新topGroup        
             {
                 _viewModel.nameText = weaponConfig.Name;
-                Loader.RetriveSpriteAsync(weaponAvatarConfig.IconBundle, weaponAvatarConfig.Icon,
+                Loader.RetriveSpriteAsync(weaponConfig.IconBundle, weaponConfig.Icon,
                     (sprite) => { _viewModel.Icon = sprite; });
 
                 _viewModel.infoOneActiveSelf = false;
@@ -387,24 +377,24 @@ namespace App.Client.GameModules.Ui.Models.Common
             _viewModel.attrGroupActiveSelf = false;
             var category = curShowTipData.CategoryId;
             var temID = curShowTipData.TemID;
-            switch ((TipCategory)category)
+            switch ((ECategory)category)
             {
-                case TipCategory.BattleProp:     //子弹 消耗道具
+                case ECategory.GameItem:     //子弹 消耗道具
                     {
                         RefreshNoWeaponTipsBattleProp(temID);
                     }
                     break;
-                case TipCategory.WeaponPart:    //武器配件
+                case ECategory.WeaponPart:    //武器配件
                     {
                         RefreshNoWeaponTipsWeaponPart(temID);
                     }
                     break;
-                case TipCategory.RoleAvatar:    //装扮  （背包防具）
+                case ECategory.Avatar:    //装扮  （背包防具）
                     {
                         RefreshNoWeaponTipsRoleAvatar(temID);
                     }
                     break;
-                case TipCategory.Prop:       //道具 
+                case ECategory.Prop:       //道具 
                     {
                         RefreshNoWeaponTipsProp(temID);
                     }
@@ -419,7 +409,9 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void RefreshNoWeaponTipsBattleProp(int temID)
         {
-            var data = SingletonManager.Get<GameItemConfigManager>().GetConfigById(temID);
+            //var data = SingletonManager.Get<GameItemConfigManager>().GetConfigById(temID);
+            var data = GetConfig(ECategory.GameItem, temID) as GameItemConfigItem;
+
             if (data != null)
             {
                 _viewModel.nameText = data.Name;
@@ -436,9 +428,15 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
         }
 
+        ItemBaseConfig GetConfig(ECategory cat, int id,bool isSurvivalMode = false)
+        {
+            return SingletonManager.Get<ItemBaseConfigManager>().GetConfigById((int)cat,id, isSurvivalMode);
+        }
+
         private void RefreshNoWeaponTipsWeaponPart(int temID)
         {
-            var data = SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(temID);
+            var data = GetConfig(ECategory.WeaponPart, temID,true) as WeaponPartsConfigItem;
+            //var data = SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(temID);
             if (data != null)
             {
                 //刷新topGroup
@@ -460,7 +458,8 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void RefreshNoWeaponTipsRoleAvatar(int temID)
         {
-            var data = SingletonManager.Get<RoleAvatarConfigManager>().GetConfigById(temID);
+            //var data = SingletonManager.Get<RoleAvatarConfigManager>().GetConfigById(temID);
+            var data = GetConfig(ECategory.Avatar, temID) as RoleAvatarConfigItem;
             if (data != null)
             {
                 //刷新topGroup
@@ -491,7 +490,8 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void RefreshNoWeaponTipsProp(int temID)
         {
-            var data = SingletonManager.Get<PropConfigManager>().GetConfigById(temID);
+            //var data = SingletonManager.Get<PropConfigManager>().GetConfigById(temID);
+            var data = GetConfig(ECategory.Prop, temID) as PropConfigItem;
             if (data != null)
             {
                 //刷新topGroup
@@ -515,7 +515,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         #region Tips
         public void ShowTip(object data, Transform targetTf)
         {
-            this.SetVisible(false);  //暂时屏蔽
+            //this.SetVisible(false);  //暂时屏蔽
             if (canvas == null)
             {
                 var canvasArray = this.FindAllComponents<Canvas>();
@@ -535,21 +535,34 @@ namespace App.Client.GameModules.Ui.Models.Common
                 curShowTipData.ContrastTemId = showData.ContrastTemId;
                 curShowTipData.Num = showData.Num;
 
-                if (showData.CategoryId == (int)TipCategory.Weapon) //武器
+                if (showData.CategoryId == (int)ECategory.Weapon) //武器
                     RefreshWeaponTips();
                 else
                     RefreshNoWeaponTips();
             }
+            //HidePos();
+            this.SetVisible(true);
+        }
+
+        private void HidePos()
+        {
+            var tf = GetTipRt();
+            var pos = tf.anchoredPosition;
+            pos.x = -9999;
+            tf.anchoredPosition = pos;
         }
 
         public void HideTip()
         {
+            HidePos();
             this.SetVisible(false);
         }
 
+
+
         public RectTransform GetTipRt()
         {
-            return FindChildGo("root").gameObject.GetComponent<RectTransform>();
+            return rootTf ?? (rootTf = FindChildGo("root") as RectTransform);
         }
 
         public Vector2 GetOffset()

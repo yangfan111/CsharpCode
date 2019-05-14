@@ -23,7 +23,7 @@ namespace App.Shared.FreeFramework.Entitas
             this.contexts = contexts;
         }
 
-        protected override bool filter(PlayerEntity player)
+        protected override bool Filter(PlayerEntity player)
         {
             return player.hasGamePlay && player.hasFreeData;
         }

@@ -40,11 +40,12 @@ namespace Utils.AssetManager
             {
                 unchecked
                 {
-                    return ((obj.BundleName != null ? HashCodeProvider.GetHashCode(obj.BundleName) : 0) * 397) ^ (obj.AssetName != null ? HashCodeProvider.GetHashCode(obj.AssetName) : 0);
+                    return ((obj.BundleName != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.BundleName) : 0) * 397) ^ 
+                           (obj.AssetName != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.AssetName) : 0);
                 }
             }
 
-            private static readonly CaseInsensitiveHashCodeProvider HashCodeProvider = new CaseInsensitiveHashCodeProvider();
+           
             public static readonly AssetInfoIngoreCaseComparer Instance = new AssetInfoIngoreCaseComparer();
         }
 

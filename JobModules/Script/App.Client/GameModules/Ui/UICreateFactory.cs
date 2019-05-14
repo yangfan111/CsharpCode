@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using App.Client.GameModules.Ui.Models.Biochemical;
 using App.Client.GameModules.Ui.Models.Blast;
 using App.Client.GameModules.Ui.Models.Chicken;
 using App.Client.GameModules.Ui.Models.Common;
+using App.Client.GameModules.Ui.Models.Common.Map;
 using App.Client.GameModules.Ui.Models.Group;
 using App.Client.GameModules.Ui.UiAdapter;
 using App.Client.GameModules.Ui.UiAdapter.Common;
@@ -13,6 +15,7 @@ using Assets.UiFramework.Libs;
 using Core.Ui;
 using Core.Utils;
 using UIComponent.UI;
+using CommonMaxMap = App.Client.GameModules.Ui.Models.Common.CommonMaxMap;
 
 namespace Assets.App.Client.GameModules.Ui
 {
@@ -128,7 +131,7 @@ namespace Assets.App.Client.GameModules.Ui
             RegisterUi(UiNameConstant.CommonPlayerInfo, typeof(CommonPlayerInfo), typeof(PlayerInfoUIAdapter), UILayer.Base, new object[] { contexts },
                 new UiGroup[] { UiGroup.Fix });
             RegisterUi(UiNameConstant.CommonMenuModel, typeof(CommonMenuModel), typeof(MenuUiAdapter), UILayer.Alert, new object[] { contexts },
-                new UiGroup[] { UiGroup.Fix });
+                new UiGroup[] { UiGroup.Fix,UiGroup.Singleton });
             RegisterUi(UiNameConstant.CommonVideoSettingModel, typeof(CommonVideoSettingModel), typeof(VideoSettingUiAdapter), UILayer.Alert, new object[] { contexts },
                 new UiGroup[] { UiGroup.Fix });
             RegisterUi(UiNameConstant.CommonMCountDownModel, typeof(CommonMCountDownModel), typeof(CountDownUiAdapter), UILayer.Foreground, new object[] { contexts },
@@ -165,7 +168,7 @@ namespace Assets.App.Client.GameModules.Ui
             RegisterUi(UiNameConstant.CommonRangingModel, typeof(CommonRangingModel), typeof(RangingUiAdapter), UILayer.Base, new object[] { contexts }, 
                 new UiGroup[] { UiGroup.Base });
             RegisterUi(UiNameConstant.CommonTechStatModel, typeof(CommonTechStatModel), typeof(TechStatUiAdapter), UILayer.Tip, new object[] { contexts }, 
-                new UiGroup[] { UiGroup.Base });
+                new UiGroup[] { UiGroup.Alert });
             RegisterUi(UiNameConstant.CommonWeaponHudModel, typeof(CommonWeaponHudModel), typeof(WeaponStateUiAdapter), UILayer.Base, new object[] { contexts }, 
                 new UiGroup[] { UiGroup.Base, UiGroup.MapHide, UiGroup.SurvivalBagHide });
             RegisterUi(UiNameConstant.CommonVehicleTipModel, typeof(CommonVehicleTipModel), typeof(VehicleTipUiAdapter), UILayer.Base, new object[] { contexts }, 
@@ -173,14 +176,20 @@ namespace Assets.App.Client.GameModules.Ui
             RegisterUi(UiNameConstant.CommonChatModel, typeof(CommonChatModel), typeof(ChatUiAdapter), UILayer.Chat, new object[] { contexts }, 
                 new UiGroup[] { UiGroup.Base, UiGroup.MapHide, UiGroup .SurvivalBagHide});
             RegisterUi(UiNameConstant.CommonCountdownTipModel, typeof(CommonCountdownTipModel), typeof(CountdownTipUiAdapter), UILayer.Tip, new object[] { contexts }, 
-                new UiGroup[] { UiGroup.Base });
+                new UiGroup[] { UiGroup.Alert });
             RegisterUi(UiNameConstant.CommonTaskTipModel, typeof(CommonTaskTipModel), typeof(TaskTipUiAdapter), UILayer.Pop, new object[] { contexts }, 
                 new UiGroup[] { UiGroup.Base });
+            RegisterUi(UiNameConstant.CommonOperationTipModel, typeof(CommonOperationTipModel), typeof(OperationTipUiAdapter), UILayer.Tip, new object[] { contexts },
+                new UiGroup[] { UiGroup.Alert });
+            RegisterUi(UiNameConstant.CommonSystemTipModel, typeof(CommonSystemTipModel), typeof(SystemTipUiAdapter), UILayer.Tip, new object[] { contexts },
+                new UiGroup[] { UiGroup.Base });
             //pop
-            RegisterUi(UiNameConstant.CommonMaxMap, typeof(CommonMaxMap), typeof(MiniMapUiAdapter), UILayer.Pop, new object[] { contexts },
+//            RegisterUi(UiNameConstant.CommonMaxMap, typeof(CommonMaxMap), typeof(MiniMapUiAdapter), UILayer.Pop, new object[] { contexts },
+//                new UiGroup[] { UiGroup.Pop, UiGroup.Singleton });
+            RegisterUi(UiNameConstant.CommonMap, typeof(CommonMap), typeof(MiniMapUiAdapter), UILayer.Pop, new object[] { contexts },
                 new UiGroup[] { UiGroup.Pop, UiGroup.Singleton });
             RegisterUi(UiNameConstant.CommonNoticeModel, typeof(CommonNoticeModel), typeof(NoticeUiAdapter), UILayer.Alert, new object[] { contexts },
-                new UiGroup[] { UiGroup.Alert });
+                new UiGroup[] { UiGroup.Alert,UiGroup.GameOverHide });
             RegisterUi(UiNameConstant.CommonPaintDiscModel, typeof(CommonPaintDiscModel), typeof(PaintUiAdapter), UILayer.Pop, new object[] { contexts },
                 new UiGroup[] { UiGroup.Pop,UiGroup.Singleton, UiGroup.SurvivalBagHide });
 
@@ -191,7 +200,7 @@ namespace Assets.App.Client.GameModules.Ui
             RegisterUi(UiNameConstant.CommonWeaponBagTipModel, typeof(CommonWeaponBagTipModel), typeof(WeaponBagTipUiAdapter), UILayer.Base, new object[] { contexts }, 
                 new UiGroup[] { UiGroup.Base, UiGroup.MapHide, UiGroup.SurvivalBagHide });
             RegisterUi(UiNameConstant.CommonWeaponBagModel, typeof(CommonWeaponBagModel), typeof(WeaponBagUiAdapter), UILayer.Pop, new object[] { contexts }, new UiGroup[] { UiGroup.Pop, UiGroup.Singleton });
-            RegisterUi(UiNameConstant.CommonGameOverModel, typeof(CommonGameOverModel), typeof(GameOverUiAdapter), UILayer.Tip, new object[] { contexts }, new UiGroup[] { UiGroup.Base });
+            RegisterUi(UiNameConstant.CommonGameOverModel, typeof(CommonGameOverModel), typeof(GameOverUiAdapter), UILayer.Tip, new object[] { contexts }, new UiGroup[] { UiGroup.Fix });
             RegisterUi(UiNameConstant.CommonGameTitleModel, typeof(CommonGameTitleModel), typeof(GameTitleUiAdapter), UILayer.Base, new object[] { contexts }, 
                 new UiGroup[] { UiGroup.Base, UiGroup.MapHide, UiGroup.SurvivalBagHide });
 
@@ -215,6 +224,11 @@ namespace Assets.App.Client.GameModules.Ui
                 new UiGroup[] { UiGroup.Base });
             RegisterUi(UiNameConstant.BlastRecordModel, typeof(BlastRecordModel), typeof(GroupRecordUiAdapter), UILayer.Pop, new object[] { contexts }, new UiGroup[] { UiGroup.Pop, UiGroup.Singleton });
 
+            #region BiochemicalMark
+            RegisterUi(UiNameConstant.BiochemicalMarkModel, typeof(BiochemicalMarkModel), typeof(BiochemicalMarkUiAdapter), UILayer.Base, new object[] { contexts },
+                new UiGroup[] { UiGroup.Fix });
+            #endregion
+
         }
 
         private static void RegisterUi(string name, Type mdel, Type adapter, UILayer layer, object[] param, UiGroup[] groups)
@@ -230,7 +244,8 @@ namespace Assets.App.Client.GameModules.Ui
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonScreenFlashModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonPickUpModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonMiniMap);
-            contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonMaxMap);
+//            contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonMaxMap);
+            contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonMap);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonPlayerInfo);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonCrossHairModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonHurtedModel);
@@ -251,8 +266,11 @@ namespace Assets.App.Client.GameModules.Ui
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonDebugInfoModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonVideoSettingModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonPaintDiscModel);
+            contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonOperationTipModel);
+            contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonSystemTipModel);
             //contexts.ui.uISession.CreateUi.Add(UiNameConstant.ChickenBagModel);
             //contexts.ui.uISession.CreateUi.Add(UiNameConstant.ChickenPlaneModel);
+            //contexts.ui.uISession.CreateUi.Add(UiNameConstant.BiochemicalMarkModel);
 
         }
 

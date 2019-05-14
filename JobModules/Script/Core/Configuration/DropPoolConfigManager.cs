@@ -12,6 +12,7 @@ namespace Assets.Core.Configuration
             try
             {
                 DropPoolConfig.current = XmlConfigParser<DropPoolConfig>.Load(xml);
+                Logger.Info("load DropPool succeeded.");
             }catch(Exception e)
             {
                 Debug.LogErrorFormat("load DropPool failed.{0}", e.Message);

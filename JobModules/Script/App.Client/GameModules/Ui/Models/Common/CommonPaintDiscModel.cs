@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using UserInputManager.Lib;
 using Utils.Configuration;
 using XmlConfig;
+using App.Shared.GameModules.Player;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {
@@ -46,7 +47,8 @@ namespace App.Client.GameModules.Ui.Models.Common
         {
             openKeyReceiver = new KeyReceiver(UiConstant.paintWindowLayer, BlockType.None);
             openKeyReceiver.AddAction(UserInputKey.F1, (data) => { _adapter.Enable = true;});
-            _adapter.RegisterKeyReceive(openKeyReceiver);
+            //_adapter.RegisterKeyReceive(openKeyReceiver);
+            _adapter.RegisterOpenKey(openKeyReceiver);
 
             keyReveiver = new KeyReceiver(UiConstant.paintWindowKeyBlockLayer, BlockType.All);
             keyReveiver.AddAction(UserInputKey.F1, (data) => { _adapter.Enable = false; });
@@ -151,7 +153,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void UnRegisterKeyReceiver()
         {
             _adapter.SetCrossVisible(true);
-
+            PlayerStateUtil.RemoveUIState(EPlayerUIState.PaintOpen, _adapter.gamePlay);
             if (keyReveiver == null || pointerReceiver == null)
             {
                 return;
@@ -165,7 +167,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void RegisterKeyReceiver()
         {
             _adapter.SetCrossVisible(false);
-
+            PlayerStateUtil.AddUIState(EPlayerUIState.PaintOpen, _adapter.gamePlay);
             if (keyReveiver == null || pointerReceiver == null)
             {
                 return;
@@ -177,6 +179,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void SetSelect()
         {
+            _adapter.Select();
             var index = _adapter.SelectedPaintIndex;
             if (tab != null)
             {

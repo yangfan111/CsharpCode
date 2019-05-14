@@ -93,6 +93,7 @@ namespace App.Shared
         /// </summary>
         void Interrupt();
 
+        void SwitchFireMode();
      //   void InterruptSight();
 
         void SetReservedBullet(int count);

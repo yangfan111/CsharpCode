@@ -87,7 +87,6 @@
     <Compile Include="Appearance\ICharacterFirstPersonAppearance.cs" />
     <Compile Include="Appearance\IInputScheme.cs" />
     <Compile Include="Attack\IHitMaskController.cs" />
-    <Compile Include="Attack\MeleeAttack.cs" />
     <Compile Include="BulletSimulation\BulletHitSimulator.cs" />
     <Compile Include="BulletSimulation\BulletLayers.cs" />
     <Compile Include="BulletSimulation\BulletMoveSimulator.cs" />
@@ -109,6 +108,7 @@
     <Compile Include="CharacterBone\IFollowRot.cs" />
     <Compile Include="CharacterBone\IWeaponRot.cs" />
     <Compile Include="CharacterController\AirMoveCurve.cs" />
+    <Compile Include="CharacterController\CharacterControllerConst.cs" />
     <Compile Include="CharacterController\CharacterControllerContext.cs" />
     <Compile Include="CharacterController\ConcreteController\DiveCharacterController.cs" />
     <Compile Include="CharacterController\ConcreteController\ProneCharacterController.cs" />
@@ -148,6 +148,9 @@
     <Compile Include="CharacterState\Action\States\OpenDoorState.cs" />
     <Compile Include="CharacterState\Action\States\PickUpState.cs" />
     <Compile Include="CharacterState\Action\States\PropsState.cs" />
+    <Compile Include="CharacterState\Action\States\Rage\RageEnd.cs" />
+    <Compile Include="CharacterState\Action\States\Rage\RageLoop.cs" />
+    <Compile Include="CharacterState\Action\States\Rage\RageStart.cs" />
     <Compile Include="CharacterState\Action\States\ReloadState.cs" />
     <Compile Include="CharacterState\Action\States\SpecialFire\SpecialFireEndState.cs" />
     <Compile Include="CharacterState\Action\States\SpecialFire\SpecialFireHoldState.cs" />

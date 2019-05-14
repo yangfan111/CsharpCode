@@ -112,7 +112,6 @@ namespace Core.Compensation
                             try
                             {
                                 _enableHitBox.BeginProfileOnlyEnableProfile();
-//                                _hitboxHandler.SetRigidBodyCollision(entity,true);
                                 _hitboxHandler.EnableHitBox(entity, true);
                                 _hitboxHandler.UpdateHitBox(entity);
                                 _hitboxHandler.DrawHitBoxOnBullet(entity);
@@ -166,13 +165,11 @@ namespace Core.Compensation
                     float radius;
                     if (_hitboxHandler.GetPositionAndRadius(entity, out position, out radius))
                     {
-
                         if (IsLineInPointRadius(ray.Ray.origin, ray.Ray.GetPoint(ray.Length), position, radius))
                         {
                             try
                             {
                                 _enableHitBox.BeginProfileOnlyEnableProfile();
-//                                _hitboxHandler.SetRigidBodyCollision(entity,true);
                                 _hitboxHandler.EnableHitBox(entity, true);
                                 _hitboxHandler.UpdateHitBox(entity);
                                 _hitboxHandler.DrawHitBoxOnBullet(entity);

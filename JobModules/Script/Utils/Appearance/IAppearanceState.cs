@@ -39,6 +39,7 @@ namespace Utils.Appearance
     {
         WeaponInHand,
         ReloadState,
+        OverrideControllerState,
         EndOfTheWorld
     }
 

@@ -22,6 +22,8 @@ namespace Utils.AssetManager
             get { return Value; }
         }
 
+        public MonoBehaviour AudioMono { get; set; }
+
         public GameObject AsGameObject
         {
             get { return Value as GameObject; }

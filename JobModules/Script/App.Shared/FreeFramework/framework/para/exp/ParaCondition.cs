@@ -1,14 +1,12 @@
-using System;
-using Sharpen;
 using com.cpkf.yyjd.tools.condition;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.@event;
 using com.wd.free.exception;
-using com.wd.free.para;
+using System;
 
 namespace com.wd.free.para.exp
 {
-	public class ParaCondition : IClausable, ICondition<IEventArgs>
+    public class ParaCondition : IClausable, ICondition<IEventArgs>
 	{
 		private ParaExp para;
 
@@ -38,6 +36,10 @@ namespace com.wd.free.para.exp
 				}
 			}
 			IPara source = para.GetSourcePara(args);
+            if (source == null)
+            {
+                throw new GameConfigExpception(para.ToString() + " is null or not defined.");
+            }
 			if (source != null)
 			{
 				IPara target = value.GetTargetPara(args, source);
@@ -52,8 +54,8 @@ namespace com.wd.free.para.exp
 					throw new GameConfigExpception(para.ToString() + con + value.ToString() + " is not valid.\n" + ExceptionUtil.GetExceptionContent(e));
 				}
 			}
-			return false;
-		}
+            return false;
+        }
 
 		public virtual ParaExp GetPara()
 		{

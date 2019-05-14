@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -14,17 +13,29 @@ namespace WeaponConfigNs
     {
         public int UpperRail;
         public int LowerRail;
+        public int SideRail;
         public int Magazine;
         public int Stock;
         public int Muzzle;
+        public int Bore;
+        public int Feed;
+        public int Trigger;
+        public int Interlock;
+        public int Brake;
 
         public void CloneFrom(WeaponPartsAchive attach)
         {
             LowerRail = attach.LowerRail;
             UpperRail = attach.UpperRail;
+            SideRail = attach.SideRail;
             Muzzle = attach.Muzzle;
             Magazine = attach.Magazine;
             Stock = attach.Stock;
+            Bore = attach.Bore;
+            Feed = attach.Feed;
+            Trigger = attach.Trigger;
+            Interlock = attach.Interlock;
+            Brake = attach.Brake;
         }
         
     }
@@ -57,9 +68,9 @@ namespace WeaponConfigNs
         public float ShiftFov;
         public int PickSound;
         public float Weight;
-        public int MaxLv;
         public int Sort;
         public int Workshop; //厂牌
+        public List<int> ApplyParts;  //可解锁与装配配件
 
         public bool IsSnipperType
         {
@@ -431,6 +442,7 @@ namespace WeaponConfigNs
     public class Spread
     {
         [XmlAttribute()] public float Base { get; set; }
+        [XmlAttribute()] public float Duck { get; set; }
         [XmlAttribute()] public float Air { get; set; }
         [XmlAttribute()] public float FastMove { get; set; }
         [XmlAttribute()] public float Prone { get; set; }
@@ -438,6 +450,7 @@ namespace WeaponConfigNs
         public static Spread operator *(Spread spread, float percent)
         {
             spread.Base *= percent;
+            spread.Duck *= percent;
             spread.Air *= percent;
             spread.FastMove *= percent;
             spread.Prone *= percent;
@@ -619,6 +632,7 @@ namespace WeaponConfigNs
     // ReSharper disable InconsistentNaming
     public enum EBulletCaliber
     {
+        None,
         E556mm = 1,
         E762mm,
         E9mm,

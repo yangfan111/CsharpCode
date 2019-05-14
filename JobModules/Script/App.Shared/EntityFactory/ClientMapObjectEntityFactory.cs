@@ -13,16 +13,15 @@ namespace App.Shared.EntityFactory
         {
         }
 
-        public override IEntity CreateDoor(string objectId,
-            GameObject gameObject, Action<object> detachCallback)
+        public override IEntity CreateDoor(int objectId, GameObject gameObject)
         {
-            return CreateDoorInternal(objectId, gameObject, detachCallback, null);
+            return CreateDoorInternal(objectId, gameObject, null);
         }
         
-        public override IEntity CreateDestructibleObject(string objectId,
-            GameObject gameObject, Action<object> detachCallback)
+        public override IEntity CreateDestructibleObject(int objectId, GameObject gameObject)
         {
-            return CreateDestructibleObjectInternal(objectId, gameObject, detachCallback, null, true);
+            return CreateDestructibleObjectInternal(objectId, gameObject,null, true);
         }
+        
     }
 }

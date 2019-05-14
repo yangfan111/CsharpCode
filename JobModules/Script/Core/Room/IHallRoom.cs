@@ -24,7 +24,7 @@ namespace Core.Room
         string RoomName { get; set; }
         int RoomDisplayId { get; set; }
         int RoomCapacity { get; set; }
-
+        bool AllowReConnect { get; set; }
 
         bool IsValid { get; }
 

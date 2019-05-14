@@ -187,7 +187,6 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
             if(number.gameObject.activeSelf)
             {
-                number.gameObject.SetActive(true);
                 if (numberText)
                 {
                     if (data.IsPlayer)

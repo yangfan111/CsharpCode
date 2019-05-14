@@ -8,12 +8,12 @@ namespace App.Shared.GameModules.Weapon.Behavior
     public class RifleSpreadProcessor : AbstractSpreadProcessor
     {
 
-        protected override void Update(PlayerWeaponController controller, IWeaponCmd cmd)
+        protected override void Update(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
 
         {
-            RifleSpreadLogicConfig config = controller.HeldWeaponAgent.RifleSpreadLogicCfg;
-            var weaponRuntime = controller.HeldWeaponAgent.RunTimeComponent;
-            float spreadScaleFactor = FireSpreadProvider.GetSpreadScaleFactor(config, controller);
+            RifleSpreadLogicConfig config = weaponBaseAgent.RifleSpreadLogicCfg;
+            var weaponRuntime = weaponBaseAgent.RunTimeComponent;
+            float spreadScaleFactor = FireSpreadProvider.GetSpreadScaleFactor(config, weaponBaseAgent.Owner.WeaponController());
             FireSpreadFormula.ApplyRifleFinalSpread(spreadScaleFactor, config.SpreadScale,weaponRuntime);
         }
 

@@ -59,6 +59,7 @@
             float waveAmount = v.color.a * _WaveAndDistance.z;
 
             v.color = TerrainWaveGrass(v.vertex, waveAmount, v.color);
+            v.color.a = 1;
         }
 
 

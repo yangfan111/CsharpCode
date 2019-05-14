@@ -20,7 +20,9 @@ namespace App.Shared.FreeFramework.Free.player
             PlayerEntity player = GetPlayerEntity(args);
 
             var ids = player.playerInfo.AvatarIds;
-
+            if (0 == ids.Count) {
+                ids = player.playerInfo.CacheAvatarIds;
+            }
             for(int i = 0; i < ids.Count; i++)
             {
                 PutOn(player, ids[i]);

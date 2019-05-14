@@ -1,8 +1,12 @@
-﻿using App.Shared.Components.Player;
+﻿using App.Shared.Audio;
+using App.Shared.Components.Player;
+using App.Shared.GameModules.Player;
+using App.Shared.GameModules.Weapon;
 using App.Shared.Player;
 using Assets.Utils.Configuration;
 using Core.Appearance;
 using Core.CharacterState;
+using Core.EntityComponent;
 using Shared.Scripts;
 using UnityEngine;
 using Utils.Appearance;
@@ -66,15 +70,31 @@ namespace App.Shared
             Appearance.ClearAvatar(Wardrobe.Bag);
         }
      
-        public static void CharacterUnmount(this ICharacterState State, System.Action unarm, float unarmParam)
+        public static void CharacterUnmount(this ICharacterState State, System.Action holsterStart, System.Action holsterEnd, float unarmParam)
         {
             State.InterruptAction();
             State.ForceFinishGrenadeThrow();
-            State.Unarm(unarm, unarmParam);
+            State.Holster(holsterStart, holsterEnd, unarmParam);
         }
         public static GameObject WeaponHandObject(this ICharacterAppearance Appearance)
         {
             return Appearance.GetWeaponP1InHand(); 
+        }
+        public static PlayerWeaponController WeaponController( this EntityKey owner)
+        {
+           return  GameModuleManagement.Get<PlayerWeaponController>(owner.EntityId);
+        }
+        public static PlayerStateInteractController InteractController( this EntityKey owner)
+        {
+            return  GameModuleManagement.Get<PlayerStateInteractController>(owner.EntityId);
+        }
+        public static PlayerAudioController AudioController( this EntityKey owner)
+        {
+            return  GameModuleManagement.Get<PlayerAudioController>(owner.EntityId).Value;
+        }
+        public static GameModeControllerBase ModeController( this EntityKey owner)
+        {
+            return  GameModuleManagement.Get<GameModeControllerBase>(owner.EntityId);
         }
     }
 }

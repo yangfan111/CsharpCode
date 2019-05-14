@@ -9,6 +9,8 @@ using App.Shared.Player;
 using Utils.Appearance;
 using App.Client.ClientSystems;
 using Core.Utils;
+using XmlConfig;
+using Utils.Configuration;
 
 namespace App.Client.GameModules.Ui.System
 {
@@ -24,7 +26,7 @@ namespace App.Client.GameModules.Ui.System
             _contexts = contexts;
         }
 
-        private void SendMarkMessage(Vector3 position, Vector3 forward, Vector3 head) {
+        private void SendMarkMessage(Vector3 position, Vector3 forward, Vector3 head, int SprayPrintSpriteId) {
             SimpleProto sprayPaint = FreePool.Allocate();
             sprayPaint.Key = FreeMessageConstant.PlayerSprayPaint;
             /*位置*/
@@ -39,12 +41,22 @@ namespace App.Client.GameModules.Ui.System
             sprayPaint.Fs.Add(head.x);
             sprayPaint.Fs.Add(head.y);
             sprayPaint.Fs.Add(head.z);
+            /*ID*/
+            sprayPaint.Ins.Add(SprayPrintSpriteId);
+            var config = IndividuationConfigManager.GetInstance().GetConfigById(SprayPrintSpriteId);
+            int lifeTime;
+            if (null == config || 0 == config.LifeTime) {
+                lifeTime = int.MaxValue;
+            }
+            else {
+                lifeTime = config.LifeTime;
+            }
+            /*LifeTime*/
+            sprayPaint.Ins.Add(lifeTime);
             if (_contexts.session.clientSessionObjects.NetworkChannel != null) {
                 _contexts.session.clientSessionObjects.NetworkChannel.SendReliable((int)EClient2ServerMessage.FreeEvent, sprayPaint);
             }
         }
-
-        int i, j;
 
         protected override void ExecuteUserCmd(PlayerEntity playerEntity, IUserCmd cmd)
         {
@@ -68,16 +80,36 @@ namespace App.Client.GameModules.Ui.System
             Vector3 head = cameraTran.eulerAngles;
             Vector3 position = headTran.position + forward * debugSize.y * 0.6f + headTran.up * 0.2f;
 
-            /*PlayerSprayPaintUtility.CreateSprayPaint(_contexts, debugSize, position, forward);*/
-            _logger.DebugFormat("SendSprayMessage");
-            SendMarkMessage(position, forward, head);
+            RaycastHit raycastHit;
+            Ray ray = new Ray(cameraTran.position, cameraTran.forward);
+            if (Physics.Raycast(ray, out raycastHit)) {
+                var paintIdList = _contexts.ui.uI.PaintIdList;
+                var selectedPaintIndex = _contexts.ui.uI.SelectedPaintIndex;
+                if (paintIdList == null || paintIdList.Count <= selectedPaintIndex)
+                {
+                    _logger.DebugFormat("error paintIdList or selectedPaintIndex : " + selectedPaintIndex);
+                    return;
+                }
+
+                _logger.DebugFormat("SendSprayMessage");
+                /*SendMarkMessage(position, forward, head, paintIdList[selectedPaintIndex]);*/
+                SendMarkMessage(raycastHit.point, raycastHit.normal, head, paintIdList[selectedPaintIndex]);
+            }
         }
 
 
 
-        protected override bool filter(PlayerEntity playerEntity)
+        protected override bool Filter(PlayerEntity playerEntity)
         {
-            return true;
+            ActionKeepInConfig ac = playerEntity.stateInterface.State.GetActionKeepState();
+            PostureInConfig mc = playerEntity.stateInterface.State.GetCurrentPostureState();
+
+            return !(ac == ActionKeepInConfig.Drive ||
+                mc == PostureInConfig.Swim ||
+                mc == PostureInConfig.Dive ||
+                mc == PostureInConfig.DyingTransition ||
+                mc == PostureInConfig.Dying ||
+                mc == PostureInConfig.Climb);
         }
     }
 }

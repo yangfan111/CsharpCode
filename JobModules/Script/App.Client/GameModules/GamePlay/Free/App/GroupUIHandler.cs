@@ -34,8 +34,8 @@ namespace App.Client.GameModules.GamePlay.Free.App
                 var ui = contexts.ui.uI;
                 ui.GameTime = time;
                 ui.ScoreForWin = totalScore;
-                ui.ScoreByCampTypeDict[Core.Enums.EUICampType.T] = t1Score;
-                ui.ScoreByCampTypeDict[Core.Enums.EUICampType.CT] = t2Score;
+                ui.ScoreByCampTypeDict[(int)EUICampType.T] = t1Score;
+                ui.ScoreByCampTypeDict[(int)EUICampType.CT] = t2Score;
             }
 
             if (data.Key == FreeMessageConstant.GroupGameOverUI)
@@ -89,8 +89,8 @@ namespace App.Client.GameModules.GamePlay.Free.App
                     }
                 }
 
-                ui.GroupBattleDataDict[EUICampType.T] = team1;
-                ui.GroupBattleDataDict[EUICampType.CT] = team2;
+                ui.GroupBattleDataDict[(int)EUICampType.T] = team1;
+                ui.GroupBattleDataDict[(int)EUICampType.CT] = team2;
                 ui.GroupBattleDataChanged = true;
             }
 

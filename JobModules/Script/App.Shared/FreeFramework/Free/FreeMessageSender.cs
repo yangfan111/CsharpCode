@@ -21,6 +21,7 @@ namespace Assets.App.Server.GameModules.GamePlay.Free
 
         public static void SendMessage(PlayerEntity player, SimpleProto message)
         {
+            if(player.hasNetwork)
             player.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.FreeData, message);
         }
 
@@ -30,7 +31,8 @@ namespace Assets.App.Server.GameModules.GamePlay.Free
             if (unit != null)
             {
                 PlayerEntity p = ((FreeData)unit).Player;
-                p.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.FreeData, message);
+                if(p.hasNetwork)
+                    p.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.FreeData, message);
             }
         }
 
@@ -42,7 +44,8 @@ namespace Assets.App.Server.GameModules.GamePlay.Free
             {
                 foreach (PlayerEntity p in players)
                 {
-                    p.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.FreeData, message);
+                    if(p.hasNetwork)
+                        p.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.FreeData, message);
                 }
             }
             else if (scope == 1)
@@ -51,7 +54,8 @@ namespace Assets.App.Server.GameModules.GamePlay.Free
                 if(unit != null)
                 {
                     PlayerEntity p = ((FreeData)unit).Player;
-                    p.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.FreeData, message);
+                    if(p.hasNetwork)
+                        p.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.FreeData, message);
                 }
             }
 

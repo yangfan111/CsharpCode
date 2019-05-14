@@ -2,6 +2,7 @@
 using Core.Ui;
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
+using UserInputManager.Lib;
 
 
 namespace App.Shared.Components.Ui
@@ -28,5 +29,6 @@ namespace App.Shared.Components.Ui
 
         [DontInitilize] public Dictionary<UiGroup, List<IUiGroupController>> UiGroup;
         [DontInitilize] public List<UiGroup> HideGroup;
+        [DontInitilize] public List<IKeyReceiver> OpenUiKeyReceiverList;
     }
 }

@@ -21,39 +21,35 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             markItemDic = new Dictionary<long, MapMarkItem>();
         }
 
-        public void Update(List<MiniMapTeamPlayInfo> TeamInfos, float rate)
+        public void Update(Dictionary<long, MiniMapPlayMarkInfo>  markInfos, float rate)
         {
-            if (TeamInfos.Count > 0)
+            foreach (var markItem in markItemDic)
             {
-                for (int i = 0; i < TeamInfos.Count; i++)
+                if (markInfos == null || !markInfos.ContainsKey(markItem.Key))
                 {
-                    if (TeamInfos[i].MarkList != null && TeamInfos[i].MarkList.Count > 0)
-                    {
-                        foreach (var markInfo in TeamInfos[i].MarkList)//目前只能有一个标记点，如果有多个不能用palyerid作为key
-                        {
-                            RefreshMarkItem(TeamInfos[i], markInfo, rate);
-                        }
-                    }
-                    else
-                    {
-                        MapMarkItem markItem;
-                        markItemDic.TryGetValue(TeamInfos[i].PlayerId, out markItem);
-                        if (markItem != null) markItem.SetActive(false);
-                    }
+                    markItem.Value.SetActive(false);
+                    return;
                 }
             }
+            if (markInfos == null) return;
+
+            foreach (var markPair in markInfos)
+            {
+                var markInfo = markPair.Value;
+                RefreshMarkItem(markPair.Key, markInfo, rate);
+            }
         }
-        private void RefreshMarkItem(MiniMapTeamPlayInfo data, MiniMapPlayMarkInfo markData, float rate)
+        private void RefreshMarkItem(long playerId, MiniMapPlayMarkInfo markData, float rate)
         {
             MapMarkItem markItem;
-            markItemDic.TryGetValue(data.PlayerId, out markItem);
+            markItemDic.TryGetValue(playerId, out markItem);
             if (markItem == null)
             {
                 markItem = new MapMarkItem(GameObject.Instantiate(markModel, tran, true));
-                markItemDic[data.PlayerId] = markItem;
+                markItemDic[playerId] = markItem;
             }
             markItem.SetActive(true);
-            markItem.Update(data, rate, markData);
+            markItem.Update(rate, markData);
         }
     }
 
@@ -82,20 +78,20 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private Color _color;
         private float _rate;
         private Vector2 _pos;
-        public void Update(MiniMapTeamPlayInfo teamPlayInfo, float rate, MiniMapPlayMarkInfo data)
+        public void Update(float rate, MiniMapPlayMarkInfo data)
         {
-            if (teamPlayInfo.Statue.Equals(_statue) && teamPlayInfo.Color.Equals(_color) && rate.Equals(_rate) && data.Pos.Equals(_pos)) return;
-            _statue = teamPlayInfo.Statue;
-            _color = teamPlayInfo.Color;
+            if (data.Color.Equals(_color) && rate.Equals(_rate) && data.Pos.Equals(_pos)) return;
+//            _statue = teamPlayInfo.Statue;
+            _color = data.Color;
             _pos = data.Pos;
             _rate = rate;
 
-            if (_statue == MiniMapPlayStatue.DEAD) //死亡
-            {
-                UIUtils.SetActive(tran, false);
-            }
-            else
-            {
+//            if (_statue == MiniMapPlayStatue.DEAD) //死亡
+//            {
+//                UIUtils.SetActive(tran, false);
+//            }
+//            else
+//            {
                 UIUtils.SetActive(tran, true);
 //                var temperSprite = SpriteComon.GetInstance().GetSpriteByName("fix_00");
 //                if (temperSprite != null && temperSprite != img.sprite)
@@ -104,7 +100,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
                 var pos = data.Pos * rate;
                 rectTransform.anchoredPosition = pos;                  //更新标记位置
-            }
+//            }
         }
 
         

@@ -60,10 +60,10 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                         if (!infoMap.ContainsKey(playerEntity.playerInfo.PlayerId))
                         {
                             MiniMapTeamPlayInfo info = new MiniMapTeamPlayInfo(playerEntity.playerInfo.PlayerId, playerEntity.playerInfo.EntityId, true, 1,
-                                TeamColor(playerEntity.playerInfo.Num), MiniMapPlayStatue.NORMAL, new Vector2(500, 300), 45f,
+                                MapUtils.TeamColor(playerEntity.playerInfo.Num), MiniMapPlayStatue.NORMAL, new Vector2(500, 300), 45f,
                                 new List<MiniMapPlayMarkInfo>()
                                 {
-                                    new MiniMapPlayMarkInfo(new Vector3(500, 250), 1),
+                                    new MiniMapPlayMarkInfo(new Vector3(500, 250), 1, Color.black),
                                 }, false, 0,
                                 playerEntity.playerInfo.PlayerName, (int)playerEntity.gamePlay.CurHp, playerEntity.gamePlay.MaxHp, (int)playerEntity.gamePlay.InHurtedHp, false, playerEntity.position.Value);
                             
@@ -87,7 +87,8 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                         if (oneInfo.Num != playerEntity.playerInfo.Num)
                         {
                             oneInfo.Num = playerEntity.playerInfo.Num;
-                            oneInfo.Color = TeamColor(oneInfo.Num);
+                        oneInfo.PlayerName = playerEntity.playerInfo.PlayerName;
+                        oneInfo.Color = MapUtils.TeamColor(oneInfo.Num);
                         }
 
                         //pos,rot
@@ -163,7 +164,7 @@ namespace App.Client.GameModules.GamePlay.Free.UI
 
                                 TeamPlayerMarkInfo lmark = new TeamPlayerMarkInfo();
                                 lmark.Angel = CommonMathUtil.GetAngle(mark.Pos, oneInfo.Pos.ShiftedUIVector2());
-                                lmark.MarkColor = TeamColor(mark.Num);
+                                lmark.MarkColor = MapUtils.TeamColor(mark.Num);
                                 map.TeamPlayerMarkInfos.Add(lmark);
                             }
                             TerrainTestSystem.mark = map.TeamPlayerMarkInfos.Count;
@@ -230,24 +231,7 @@ namespace App.Client.GameModules.GamePlay.Free.UI
             }
         }
 
-        private Color TeamColor(int num)
-        {
-            switch (num)
-            {
-                case 1:
-                    return new Color(0xff / 255f, 0xff / 255f, 0xff / 255f);
-                case 2:
-                    return new Color(0x3b / 255f, 0x80 / 255f, 0xe8/ 255f);
-                case 3:
-                    return new Color(0xe8 / 255f, 0x3f / 255f, 0x3b / 255f);
-                case 4:
-                    return new Color(0xe8 / 255f, 0xc9 / 255f, 0x3b / 255f);
-                case 5:
-                    return new Color(0xde / 255f, 0x3b / 255f, 0xe8 / 255f);
-                default:
-                    return new Color(0xff / 255f, 0xff / 255f, 0xff / 255f);
-            }
-        }
+        
 
         public static bool PlayerIsDrop(PlayerEntity playerEntity)
         {

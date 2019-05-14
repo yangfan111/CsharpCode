@@ -29,7 +29,7 @@ namespace App.Server.GameModules.Player
             _contexts = contexts;
         }
 
-        protected override bool filter(PlayerEntity playerEntity)
+        protected override bool Filter(PlayerEntity playerEntity)
         {
             return playerEntity.hasNetworkAnimator && playerEntity.hasNetworkAnimatiorServerTime;
         }

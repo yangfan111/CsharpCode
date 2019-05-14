@@ -15,10 +15,16 @@ namespace Core.SessionState
             this.asyncUploadTimeSlice = asyncUploadTimeSlice;
         }
 
-        public static BackroundloadSettings GetCurrentSettings()
+        public static BackroundloadSettings GetClientCurrentSettings()
         {
            
-            return new BackroundloadSettings(Application.backgroundLoadingPriority, QualitySettings.asyncUploadTimeSlice,QualitySettings.asyncUploadBufferSize);
+            return new BackroundloadSettings(ThreadPriority.Low, QualitySettings.asyncUploadTimeSlice,QualitySettings.asyncUploadBufferSize);
+        }
+        
+        public static BackroundloadSettings GetServerCurrentSettings()
+        {
+           
+            return new BackroundloadSettings(ThreadPriority.Low, QualitySettings.asyncUploadTimeSlice,QualitySettings.asyncUploadBufferSize);
         }
 
         public static void SetCurrentSettings(BackroundloadSettings settings)

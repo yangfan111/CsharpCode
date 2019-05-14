@@ -56,16 +56,14 @@ namespace Core.HitBox
                 if(item.Value!=null)
                     item.Value.enabled = active;
             }
-        }
 
-        public void SetColliderInRigidBody(bool active)
-        {
             foreach (var item in _handler.GetRigidBobies())
             {
-                if(item.Value!=null)
+                if (item.Value != null)
                     item.Value.detectCollisions = active;
             }
         }
+
 
         public void FlushLayerOfHitBox()
         {
@@ -80,11 +78,6 @@ namespace Core.HitBox
             return _handler.GetHitBox();
         }
 
-        public Dictionary<string, Rigidbody> GetRigidBodies()
-        {
-            return _handler.GetRigidBobies();
-        }
-        
         public Dictionary<string, Transform> GetHitBoxTransforms()
         {
             return _handler.GetTransforms();

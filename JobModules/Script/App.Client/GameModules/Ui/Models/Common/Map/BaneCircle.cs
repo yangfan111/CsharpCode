@@ -66,7 +66,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                 var deltaY = (endPoint.y - startPoint.y) / (beishu * rectTransform.rect.width);
                 var safeDelat = new Vector2(deltaX, deltaY);
                 material.SetTextureOffset("_MainTex", safeDelat);
-                material.SetFloat("_BoundWidth", lineWidth * beishuDaosu);
+                material.SetFloat("_BoundWidth", lineWidth * beishuDaosu * 256 / rectTransform.rect.width);
             }
         }
     }

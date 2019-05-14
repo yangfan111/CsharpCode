@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Security.Policy;
+using Core.CharacterController;
 using Core.CharacterState;
 using Core.Utils;
 using Utils.Configuration;
@@ -17,6 +18,8 @@ namespace App.Shared.GameModules.Player.CharacterState
         public CharacterControllerCapsule CrouchCapsule;
         public CharacterControllerCapsule ProneCapsule;
         public float BigJumpHeight;
+        public float StepOffset;
+        public float SlopeLimit;
 
         #region ICharacterSpeedInfo
 
@@ -50,6 +53,16 @@ namespace App.Shared.GameModules.Player.CharacterState
             return BigJumpHeight;
         }
 
+        public float GetSlopeLimit()
+        {
+            return SlopeLimit;
+        }
+
+        public float GetStepOffset()
+        {
+            return StepOffset;
+        }
+
         #endregion
         
     }
@@ -62,6 +75,8 @@ namespace App.Shared.GameModules.Player.CharacterState
         {
             JumpSpeed = 3.4f,
             BigJumpHeight = 1.428f,
+            SlopeLimit = CharacterControllerConst.SlopeLimit,
+            StepOffset = CharacterControllerConst.StepOffset,
             StandCapsule = new CharacterControllerCapsule()
             {
                 Height = 1.75f,
@@ -118,6 +133,16 @@ namespace App.Shared.GameModules.Player.CharacterState
             return _currentInfo.GetBigJumpHeight();
         }
 
+        public float GetSlopeLimit()
+        {
+            return _currentInfo.GetSlopeLimit();
+        }
+
+        public float GetStepOffset()
+        {
+            return _currentInfo.GetStepOffset();
+        }
+
         public void SetCurrentType(int type)
         {
             if (type == _type)
@@ -157,6 +182,8 @@ namespace App.Shared.GameModules.Player.CharacterState
                         Posture = PostureInConfig.Prone
                     };
                     info.BigJumpHeight = item.BigJumpHeight;
+                    info.StepOffset = item.StepOffset;
+                    info.SlopeLimit = item.SlopeLimit;
                     _dict.Add(type, info);
                 }
             }

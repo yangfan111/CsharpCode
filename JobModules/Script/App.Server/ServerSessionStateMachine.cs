@@ -6,6 +6,7 @@ using App.Server.GameModules.Player;
 using App.Server.GameModules.SceneObject;
 using App.Server.GameModules.Vehicle;
 using App.Server.ServerInit;
+using App.Shared;
 using App.Shared.GameModules;
 using App.Shared.GameModules.Attack;
 using App.Shared.GameModules.Bullet;
@@ -22,7 +23,9 @@ using Core.GameModule.System;
 using Core.Prediction.UserPrediction;
 using Core.Prediction.VehiclePrediction;
 using Core.SessionState;
+using Core.Utils;
 using Entitas;
+using UnityEngine;
 using Utils.Configuration;
 using Utils.Singleton;
 
@@ -224,18 +227,30 @@ namespace App.Server
  
     public class ServerSessionStateMachine : SessionStateMachine
     {
+        private static LoggerAdapter _logger = new LoggerAdapter(typeof(ServerSessionStateMachine));
         public ServerSessionStateMachine(Contexts contexts, ServerRoom room):
             base(new ServerSessionStateMachineMonitor(room))
         {
-            BackroundloadSettings defaultSettings = BackroundloadSettings.GetCurrentSettings();
+            BackroundloadSettings defaultSettings = BackroundloadSettings.GetServerCurrentSettings();
             AddState(new ServerLoadConfigurationState(contexts, EServerSessionStates.LoadConfig, EServerSessionStates.LoadSubResourceConfig)
-                .WithEnterAction(() => { BackroundloadSettings.SetCurrentSettings(BackroundloadSettings.LoadSettsings);})
+                .WithEnterAction(() =>
+                {
+                    BackroundloadSettings.SetCurrentSettings(BackroundloadSettings.LoadSettsings);
+                    //Application.targetFrameRate = 1000;
+                    _logger.WarnFormat("LoadConfig backgroundLoadingPriority:{0}, targetFrameRate:{1}", Application.backgroundLoadingPriority, Application.targetFrameRate);
+                    
+                })
             );
             AddState(new ServerLoadSubResourceState(contexts, EServerSessionStates.LoadSubResourceConfig, EServerSessionStates.PreLoad));
             AddState(new ServerPreLoadState(contexts, EServerSessionStates.PreLoad, EServerSessionStates.LoadSceneMapConfig));
             AddState(new ServerLoadMapConfigState(contexts, EServerSessionStates.LoadSceneMapConfig, EServerSessionStates.Gaming));
             AddState(new GameSessionState(contexts, room, EServerSessionStates.Gaming, EServerSessionStates.Gaming)
-                .WithEnterAction(() => { BackroundloadSettings.SetCurrentSettings(defaultSettings);})
+                .WithEnterAction(() =>
+                {
+                    BackroundloadSettings.SetCurrentSettings(defaultSettings);
+                    //Application.targetFrameRate = SharedConfig.ServerFrameRate;
+                    _logger.WarnFormat("Gaming backgroundLoadingPriority:{0}, targetFrameRate:{1}", Application.backgroundLoadingPriority, Application.targetFrameRate);
+                })
             );
             Initialize((int) EServerSessionStates.LoadConfig);
         }

@@ -11,14 +11,14 @@ using UnityEngine;
 
 namespace Core.Event
 {
-    public class EventInfos:IEventInfos
+    public class EventInfos : IEventInfos
     {
-        private static LoggerAdapter _logger = new LoggerAdapter(typeof(EventInfos));
-        public static EventInfos Instance = new EventInfos();
-        IObjectAllocator[] _allocators = new IObjectAllocator[50];
-        IEventHandler[] _eventHandlers = new IEventHandler[50];
-        Type[] _types = new Type[50];
-        private int _maxId;
+        private static LoggerAdapter _logger        = new LoggerAdapter(typeof(EventInfos));
+        public static  EventInfos    Instance       = new EventInfos();
+        IObjectAllocator[]           _allocators    = new IObjectAllocator[50];
+        IEventHandler[]              _eventHandlers = new IEventHandler[50];
+        Type[]                       _types         = new Type[50];
+        private int                  _maxId;
 
         public EventInfos()
         {
@@ -34,28 +34,19 @@ namespace Core.Event
                 try
                 {
                     IEventHandler instance = (IEventHandler) Activator.CreateInstance(type);
-
-                    var id = (int)instance.EventType;
-                    if (ArrayUtility.SafeGet(_allocators, id) == null)
+                    if (instance.EventTypes != null)
                     {
-                        var msg = String.Format("_allocators id not exist id {0}, type {1}, type {2}", id, _types[id],
-                            instance.GetType());
-                        AssertUtility.Assert(false, msg);
-                        _logger.Error(msg);
-                    }else if (ArrayUtility.SafeGet(_eventHandlers, id) != null)
-                    {
-                        var msg = String.Format("IEventHandler id already exist id {0}, type {1}, type {2}", id, _types[id],
-                            instance.GetType());
-                        AssertUtility.Assert(false, msg);
-                        _logger.Error(msg);
+                        foreach (var etype in instance.EventTypes)
+                        {
+                            SafeSetHandler(etype,instance);
+                        }
                     }
                     else
                     {
-                        ArrayUtility.SafeSet(ref _eventHandlers, id, instance);
-                       
+                        SafeSetHandler(instance.EventType,instance);
+                        
                     }
-
-                    _maxId = Mathf.Max(id, _maxId);
+              
                 }
                 catch (Exception e)
                 {
@@ -64,7 +55,32 @@ namespace Core.Event
             }
         }
 
-        private void InitEventAllocator()
+        private void SafeSetHandler(EEventType eventType, IEventHandler handler)
+        {
+            var id = (int)eventType;
+           // DebugUtil.MyLog("Safe set eventtype:"+eventType);
+            if (ArrayUtility.SafeGet(_allocators, id) == null)
+            {
+                var msg = String.Format("_allocators id not exist id {0}, type {1}, type {2}", id, _types[id],
+                    handler.GetType());
+                AssertUtility.Assert(false, msg);
+                _logger.Error(msg);
+            }else if (ArrayUtility.SafeGet(_eventHandlers, id) != null)
+            {
+                var msg = String.Format("IEventHandler id already exist id {0}, type {1}, type {2}", id, _types[id],
+                    handler.GetType());
+                AssertUtility.Assert(false, msg);
+                _logger.Error(msg);
+            }
+            else
+            {
+                ArrayUtility.SafeSet(ref _eventHandlers, id, handler);
+                       
+            }
+            _maxId = Mathf.Max(id, _maxId);
+        }
+
+    private void InitEventAllocator()
         {
             var types = FindAllGameComponentType(typeof(IEvent));
             foreach (var type in types)

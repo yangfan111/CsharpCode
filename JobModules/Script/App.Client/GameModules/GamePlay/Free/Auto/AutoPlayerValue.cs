@@ -50,7 +50,7 @@ namespace Assets.Sources.Free.Auto
                 {
                     var speedVector3D = playerEntity.playerMove.Velocity;
                     speedVector3D.z = 0;
-                    return (int)speedVector3D.Length();
+                    return (int) speedVector3D.magnitude;
                 }
                 if ("ping" == _field)
                 {

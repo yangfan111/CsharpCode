@@ -43,7 +43,8 @@ namespace App.Client.GameModules.Ui.Models.Group
             KeyReceiver = new KeyReceiver(Layer.Env, BlockType.None);
             KeyReceiver.AddAction(UserInputKey.ShowRecord, (data) => { _adapter.Enable = true; });
             KeyReceiver.AddAction(UserInputKey.HideRecord, (data) => { _adapter.Enable = false; });
-            _adapter.RegisterKeyReceive(KeyReceiver);
+            //_adapter.RegisterKeyReceive(KeyReceiver);
+            _adapter.RegisterOpenKey(KeyReceiver);
         }
 
         private void InitInfoTitle()

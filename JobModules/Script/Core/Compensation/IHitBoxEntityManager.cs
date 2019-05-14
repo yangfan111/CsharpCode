@@ -14,6 +14,5 @@ namespace Core.Compensation
         void DrawHitBoxOnBullet(IGameEntity player);
         void DrawHitBoxOnFrame(IGameEntity player);
 
-        void WatchHitBoxes(IGameEntity gameEntity);
     }
 }

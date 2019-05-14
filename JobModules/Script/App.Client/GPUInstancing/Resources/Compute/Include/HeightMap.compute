@@ -1,7 +1,7 @@
 ﻿#ifndef _HEIGHT_MAP_COMPUTE_
 #define _HEIGHT_MAP_COMPUTE_
 
-RWStructuredBuffer<float> HeightMapData;
+RWStructuredBuffer<uint> HeightMapData;
 
 uniform float3 TerrainSize;
 uniform float HeightMapResolution;
@@ -11,7 +11,19 @@ float GetHeight(int x, int y)
 {
     x = clamp(x, 0, HeightMapResolution - 1);
     y = clamp(y, 0, HeightMapResolution - 1);
-    return HeightMapData[y + x * HeightMapResolution];
+
+    uint index = x + y * HeightMapResolution;
+    uint indexInData = index / 2;
+
+    uint height = HeightMapData[indexInData];
+    if (indexInData * 2 == index)
+        height = (height << 16) >> 16;
+    else
+        height = height >> 16;
+
+    float heightF = height;
+
+    return heightF / 32766.0f;
 }
 
 float GetInterpolatedHeight(float x, float y)

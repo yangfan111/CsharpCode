@@ -6,6 +6,7 @@ using App.Shared;
 using App.Shared.Components;
 using App.Shared.Components.ClientSession;
 using App.Shared.SceneTriggerObject;
+using App.Shared.Util;
 using Core.GameModule.Interface;
 using Core.Utils;
 using Entitas;

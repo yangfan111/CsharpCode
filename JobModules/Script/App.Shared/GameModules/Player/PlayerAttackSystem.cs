@@ -1,4 +1,5 @@
-﻿using App.Shared.GameModules.Weapon;
+﻿using App.Shared.Components.Player;
+using App.Shared.GameModules.Weapon;
 using App.Shared.GameModules.Weapon.Behavior;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
@@ -20,13 +21,18 @@ namespace App.Shared.GameModules.Player
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
-            var controller =  GameModuleManagement.Get<PlayerWeaponController>(owner.OwnerEntityKey.EntityId);
+            var controller = owner.OwnerEntityKey.WeaponController();
             var weaponId = controller.HeldWeaponAgent.ConfigId;
+            var jobAttribute = controller.JobAttribute;
             if (weaponId < 1) return;
+            if (jobAttribute == (int)EJobAttribute.EJob_Variant ||
+                jobAttribute == (int)EJobAttribute.EJob_Matrix) {
+                weaponId = WeaponUtil.MeleeVariant;
+            }
             var fireUpdater = _weaponFireUpdateManagaer.GetFireUpdater(weaponId);
             if(null != fireUpdater)
             {
-                fireUpdater.Update(controller, cmd, _contexts);
+                fireUpdater.Update(owner.OwnerEntityKey, cmd, _contexts);
             }
         }
     }

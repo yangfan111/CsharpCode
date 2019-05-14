@@ -1,19 +1,16 @@
 using App.Shared;
 using App.Shared.Components;
-using App.Shared.Components.ClientSession;
 using App.Shared.Components.Player;
-using Core.GameTime;
 using Core.Network;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Prediction.VehiclePrediction.Cmd;
-using Core.Prediction.VehiclePrediction.TimeSync;
 using Core.SessionState;
 using Core.UpdateLatest;
 using Core.Utils;
 
 namespace App.Client.ClientSystems
 {
- 
+
 
     public class UserCmdUpdateSystem : AbstractStepExecuteSystem
     {
@@ -57,6 +54,7 @@ namespace App.Client.ClientSystems
                 player.AddSendUserCmd();
             }
             if(player.userCmd.Latest!=null)
+
             player.sendUserCmd.CopyForm(player.userCmd.Latest);
         }
 

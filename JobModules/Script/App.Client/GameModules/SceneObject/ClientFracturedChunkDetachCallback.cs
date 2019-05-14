@@ -7,6 +7,7 @@ using App.Shared.GameModules.Common;
 using App.Shared.GameModules.Player;
 using App.Shared.GameModules.SceneObject;
 using App.Shared.GameModules.Vehicle;
+using App.Shared.SceneTriggerObject;
 using App.Shared.Util;
 using Core;
 using Core.SceneTriggerObject;
@@ -19,23 +20,19 @@ namespace App.Client.GameModules.SceneObject
     public class ClientFracturedChunkDetachCallback
     {
         private static readonly float SYNC_DELAY_TIME = 1f;
-
-        private PlayerContext _playerContext;
-        private SceneObjectContext _sceneObjectContext;
-        private ISceneObjectEntityFactory _sceneObjectEntityFactory;
-
-        public ClientFracturedChunkDetachCallback(Contexts contexts)
-        {
-            _playerContext = contexts.player;
-            _sceneObjectContext = contexts.sceneObject;
-            _sceneObjectEntityFactory = contexts.session.entityFactoryObject.SceneObjectEntityFactory;
-        }
+        private LoggerAdapter _logger = new LoggerAdapter(typeof(ClientFracturedChunkDetachCallback));
 
         public void OnDetach(object o)
         {
             FracturedChunk chunk = o as FracturedChunk;
             var destructibleObject = MapObjectUtility.GetMapObjectOfFracturedChunk(chunk);
-
+            if (destructibleObject == null)
+            {
+                var evt = ChunkSyncEvent.Allocate();
+                evt.EType = TriggerObjectSyncEventType.DetachChunk;
+                evt.ChunkId = chunk.ChunkId;
+                MapObjectUtility.StoreTriggerObjectEvent(chunk.FracturedObjectSource.gameObject, evt);
+            }
             if (destructibleObject != null)
             {
                 var data = destructibleObject.destructibleData;

@@ -96,6 +96,9 @@ namespace App.Shared.GameModules.Bullet
             if (playerEntity.gamePlay.IsDead())
                 return null;
 
+            if ((DateTime.Now.Ticks/10000L) - playerEntity.statisticsData.Statistics.LastHitDownTime <= 1000 && !damage.InstantDeath)
+                return null;
+
             float curHp = playerEntity.gamePlay.CurHp;
             float realDamage = damage.damage;
 
@@ -113,6 +116,7 @@ namespace App.Shared.GameModules.Bullet
             }
             
             float ret = playerEntity.gamePlay.DecreaseHp(realDamage);
+            _logger.InfoFormat("[hit] after CurrHp :"+playerEntity.gamePlay.CurHp);
             damage.damage = ret;
 
             //玩家状态
@@ -164,6 +168,7 @@ namespace App.Shared.GameModules.Bullet
 
                 if (playerEntity.gamePlay.IsHitDown())
                 {
+                    statisticsData.LastHitDownTime = (DateTime.Now.Ticks / 10000L);
                     SimpleProto message = FreePool.Allocate();
                     message.Key = FreeMessageConstant.ScoreInfo;
                     int feedbackType = 0;
@@ -202,6 +207,7 @@ namespace App.Shared.GameModules.Bullet
                         killType |= (int) EUIKillType.Crit;
                     }
                     damage.KillType = killType;
+                    playerEntity.playerInfo.SpecialFeedbackType = 0;
                     //UI击杀反馈
                     if (null != srcPlayer && srcPlayer.playerInfo.TeamId != playerEntity.playerInfo.TeamId)
                     {
@@ -227,16 +233,24 @@ namespace App.Shared.GameModules.Bullet
                             feedbackType |= 1 << (int) EUIKillFeedbackType.Revenge;
                             srcPlayer.statisticsData.Statistics.RevengeKillerId = 0L;
                         }
+                        if (srcPlayer.playerInfo.JobAttribute == (int)EJobAttribute.EJob_Hero) {
+                            //英雄击杀
+                            feedbackType |= 1 << (int)EUIKillFeedbackType.HeroKO;
+                            playerEntity.playerInfo.SpecialFeedbackType = (int)EUIKillFeedbackType.HeroKO;
+                        }
                         //武器
                         WeaponResConfigItem newConfig = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(damage.weaponId);
                         if (null != newConfig)
                         {
-                            if (newConfig.SubType == (int) EWeaponSubType.Melee)
-                                feedbackType |= 1 << (int) EUIKillFeedbackType.MeleeWeapon;
-                            else if (newConfig.SubType == (int) EWeaponSubType.BurnBomb)
-                                feedbackType |= 1 << (int) EUIKillFeedbackType.Burning;
-                            else if (newConfig.SubType == (int) EWeaponSubType.Grenade)
-                                feedbackType |= 1 << (int) EUIKillFeedbackType.Grenade;
+                            if (newConfig.SubType == (int)EWeaponSubType.Melee)
+                            {
+                                feedbackType |= 1 << (int)EUIKillFeedbackType.MeleeWeapon;
+                                playerEntity.playerInfo.SpecialFeedbackType = (int)EUIKillFeedbackType.MeleeWeapon;
+                            }
+                            else if (newConfig.SubType == (int)EWeaponSubType.BurnBomb)
+                                feedbackType |= 1 << (int)EUIKillFeedbackType.Burning;
+                            else if (newConfig.SubType == (int)EWeaponSubType.Grenade)
+                                feedbackType |= 1 << (int)EUIKillFeedbackType.Grenade;
                         }
                         if (feedbackType == 0)
                         {
@@ -270,6 +284,11 @@ namespace App.Shared.GameModules.Bullet
         private static List<PlayerEntity> CheckUpdatePlayerStatus(PlayerEntity player, PlayerDamageInfo damage, Contexts contexts)
         {
             GamePlayComponent gamePlay = player.gamePlay;
+            if (damage.InstantDeath)
+            {
+                gamePlay.ChangeLifeState(EPlayerLifeState.Dead, player.time.ClientTime);
+                return null;
+            }
             if (gamePlay.IsLifeState(EPlayerLifeState.Alive))
             {
                 if (gamePlay.CurHp <= 0)
@@ -449,7 +468,7 @@ namespace App.Shared.GameModules.Bullet
             {
                 //死亡次数
                 targetPlayer.statisticsData.Statistics.DeadCount++;
-                targetPlayer.statisticsData.Statistics.LastDeadTime = (int) DateTime.Now.Ticks / 10000;
+                targetPlayer.statisticsData.Statistics.LastDeadTime = (int) (DateTime.Now.Ticks / 10000L);
                 if (null == srcPlayer)
                 {
                     targetPlayer.statisticsData.SetDeadType(damage.type);

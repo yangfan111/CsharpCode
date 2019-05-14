@@ -45,7 +45,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        bool IsTyreBrokeByIndex(VehiclePartIndex index, out VehicleUiWheelIndex uiIndex);
+        bool IsWheelBrokeByIndex(VehiclePartIndex index, out VehicleUiWheelIndex uiIndex);
         /// <summary>
         /// 返回座位是否上有人，同时返回Seat UI Index 
         /// </summary>

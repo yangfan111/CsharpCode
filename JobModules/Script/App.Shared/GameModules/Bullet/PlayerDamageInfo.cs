@@ -19,14 +19,16 @@ namespace App.Shared.GameModules.Bullet
         public int KillType;
         //击杀反馈（多状态|） EUIKillFeedbackType
         public int KillFeedbackType;
+        public bool InstantDeath;
 
-        public PlayerDamageInfo(float damage, int type, int part, int weaponId, bool isOverWall = false, bool isKnife = false)
+        public PlayerDamageInfo(float damage, int type, int part, int weaponId, bool isOverWall = false, bool isKnife = false, bool instantDeath = false)
         {
             this.damage = damage;
             this.type = type;
             this.part = part;
             this.weaponId = weaponId;
             IsOverWall = isOverWall;
+            InstantDeath = instantDeath;
             KillType = 0;
             KillFeedbackType = 0;
 

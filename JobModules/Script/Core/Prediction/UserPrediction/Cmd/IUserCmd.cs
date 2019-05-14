@@ -114,5 +114,9 @@ namespace Core.Prediction.UserPrediction.Cmd
 
         bool IsScopeIn { get; set; }
         bool IsScopeOut { get; set; }
+
+        bool IsAutoFire{ get; set; }
+        bool IsAutoReload{ get; set; }
+     
     }
 }

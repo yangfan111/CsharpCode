@@ -328,9 +328,9 @@ namespace Assets.Sources.Free.Effect
         protected void UpdateScaleV(Vector3 viewOrg, IObject3D pos, int distanceSacle = 200)
         {
             dis.Set(pos.x + model3D.x, pos.y + model3D.y, pos.z + model3D.z);
-            dis = dis.Subtract(viewOrg);
+            dis = dis - viewOrg;
 
-            scale = dis.Length() / distanceSacle;
+            scale = dis.magnitude / distanceSacle;
         }
 
         protected void StartAuto()

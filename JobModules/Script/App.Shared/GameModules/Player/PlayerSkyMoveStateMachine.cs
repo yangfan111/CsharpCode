@@ -1038,6 +1038,7 @@ namespace App.Shared.GameModules.Player
                 _logger.DebugFormat("set stage to 0!!!------------------------");
             }
             player.gamePlay.GameState = GameState.Normal;
+            player.orientation.Roll = 0;
             _logger.DebugFormat("set normal to 0----------------------------------------");
         }
 

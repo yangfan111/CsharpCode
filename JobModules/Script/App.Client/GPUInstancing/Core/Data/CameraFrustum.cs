@@ -1,4 +1,5 @@
 ﻿using App.Client.GPUInstancing.Core.Utils;
+using Core.Components;
 using UnityEngine;
 
 namespace App.Client.GPUInstancing.Core.Data
@@ -23,7 +24,7 @@ namespace App.Client.GPUInstancing.Core.Data
         };
 
         private Vector3 _viewPoint;
-        public Vector3 ViewPoint { get { return _viewPoint; } }
+        public Vector3 ViewPoint { get { return _viewPoint + WorldOrigin.Origin; } }
         private Vector3 _eulerAngles = new Vector3(float.MinValue, float.MinValue, float.MinValue);
         private float _eulerYAngle = float.MinValue;
 
@@ -100,7 +101,8 @@ namespace App.Client.GPUInstancing.Core.Data
                     return true;
             }
 
-            if (_viewPoint.x >= min.x && _viewPoint.x <= max.x && _viewPoint.z >= min.z && _viewPoint.z <= max.z)
+            var viewPoint = ViewPoint;
+            if (viewPoint.x >= min.x && viewPoint.x <= max.x && viewPoint.z >= min.z && viewPoint.z <= max.z)
                 return true;
 
             // 2m为间隔检查离相机最近的一条/两条边
@@ -112,16 +114,16 @@ namespace App.Client.GPUInstancing.Core.Data
             float fixedZ = 0;
             float pointInterval = 2;
 
-            if (_viewPoint.x < min.x)
+            if (viewPoint.x < min.x)
                 fixedX = min.x;
-            else if (_viewPoint.x > max.x)
+            else if (viewPoint.x > max.x)
                 fixedX = max.x;
             else
                 startZ = endZ;
 
-            if (_viewPoint.z < min.z)
+            if (viewPoint.z < min.z)
                 fixedZ = min.z;
-            else if (_viewPoint.z > max.z)
+            else if (viewPoint.z > max.z)
                 fixedZ = max.z;
             else
                 startX = endX;
@@ -148,8 +150,9 @@ namespace App.Client.GPUInstancing.Core.Data
         public bool Is2DRectVisible(Vector2 basePos, Vector2 rectSize)
         {
             bool ret = false;
+            var viewPoint = ViewPoint;
 
-            Vector2 shiftedPos = new Vector2(basePos.x - _viewPoint.x, basePos.y - _viewPoint.z);
+            Vector2 shiftedPos = new Vector2(basePos.x - viewPoint.x, basePos.y - viewPoint.z);
             ret = Helper.FarthestDistance(_2DClipNormal[(int) Direction.Left], shiftedPos, rectSize) >= _clipDistance[(int) Direction.Left] || ret;
             ret = Helper.FarthestDistance(_2DClipNormal[(int) Direction.Right], shiftedPos, rectSize) >= _clipDistance[(int) Direction.Right] || ret;
             ret = Helper.FarthestDistance(_2DClipNormal[(int) Direction.Far], shiftedPos, rectSize) >= _clipDistance[(int) Direction.Far] || ret;
@@ -159,7 +162,7 @@ namespace App.Client.GPUInstancing.Core.Data
 
         private bool Inside3DFrustum(Vector3 p)
         {
-            p -= _viewPoint;
+            p -= ViewPoint;
             bool inside = _clipNormal[(int)Direction.Left].Dot(p) > _clipDistance[(int)Direction.Left];
             inside = inside && _clipNormal[(int)Direction.Right].Dot(p) > _clipDistance[(int)Direction.Right];
             inside = inside && _clipNormal[(int)Direction.Far].Dot(p) > _clipDistance[(int)Direction.Far];

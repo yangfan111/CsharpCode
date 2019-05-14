@@ -11,21 +11,23 @@ namespace App.Shared.GameModules.Weapon.Behavior
     {
         private static LoggerAdapter Logger = new LoggerAdapter(typeof(FixedFireShakeProcessor));
 
-        public override void OnAfterFire(PlayerWeaponController controller, IWeaponCmd cmd)
+        public override void OnAfterFire(WeaponBaseAgent agent, WeaponSideCmd cmd)
         {
-            var config = controller.HeldWeaponAgent.FixedShakeCfg;
+            var config = agent.FixedShakeCfg;
             if (null == config)
             {
                 return;
             }
-            controller.RelatedOrientation.AccPunchPitch += config.PunchPitch;
-            controller.RelatedOrientation.AccPunchPitchValue += config.PunchPitch * config.PunchOffsetFactor;
+
+            var orientation = agent.Owner.WeaponController().RelatedOrientation;
+            orientation.AccPunchPitch += config.PunchPitch;
+            orientation.AccPunchPitchValue += config.PunchPitch * config.PunchOffsetFactor;
         }
 
-        public override void OnFrame(PlayerWeaponController controller, IWeaponCmd cmd)
+        public override void OnFrame(WeaponBaseAgent agent, WeaponSideCmd cmd)
         {
-            UpdateOrientationAttenuation(controller, cmd);
-            base.OnFrame(controller,cmd);
+            UpdateOrientationAttenuation(agent, cmd);
+            base.OnFrame(agent,cmd);
         }
 
         protected override float GePuntchFallbackFactor(PlayerWeaponController controller)

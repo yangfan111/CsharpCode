@@ -1,7 +1,9 @@
 ﻿
 using App.Client.GameModules.GamePlay.Free.Auto.Prefab;
 using App.Client.GameModules.GamePlay.Free.UI;
+using App.Client.GameModules.Ui.UiAdapter;
 using App.Protobuf;
+using App.Shared.Components.Ui;
 using Assets.Sources.Free.Utility;
 using Core.Free;
 using Core.Utils;
@@ -9,6 +11,7 @@ using Free.framework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Utils.Singleton;
 
 namespace Assets.Sources.Free.UI
 {
@@ -27,7 +30,7 @@ namespace Assets.Sources.Free.UI
 
         public static void HandleNoeDone()
         {
-            if(notDone == null)
+            if (notDone == null)
             {
                 notDone = new List<SimpleProto>();
             }
@@ -52,23 +55,39 @@ namespace Assets.Sources.Free.UI
             }
         }
 
-        public void Handle(SimpleProto simpleUI)
+        public void Handle(SimpleProto sp)
         {
-            if (clearTime == null)
-            {
-                clearTime = new Dictionary<int, long>();
+            //if (clearTime == null)
+            //{
+            //    clearTime = new Dictionary<int, long>();
 
-                notDone = new List<SimpleProto>();
+            //    notDone = new List<SimpleProto>();
+            //}
+
+            //if (simpleUI.Ks.Count > 0 && simpleUI.Ks[0] == 5)
+            //{
+            //    HandleVisible(simpleUI, true);
+            //}
+            //else
+            //{
+            //    Handle(simpleUI, true);
+            //}
+
+            Contexts contexts = SingletonManager.Get<FreeUiManager>().Contexts1;
+            var ui = contexts.ui.uI;
+            ui.ChickenBagItemDataList = new List<IBaseChickenBagItemData>();
+            for (int i = 0; i < sp.Ks[1]; i++)
+            {
+                ChickenBagItemUiData data = new ChickenBagItemUiData();
+                data.cat = sp.Ins[i * 3];
+                data.id = sp.Ins[i * 3 + 1];
+                data.count = sp.Ins[i * 3 + 2];
+                ui.ChickenBagItemDataList.Add(data);
+                data.key = sp.Ss[i];
             }
 
-            if (simpleUI.Ks.Count > 0 && simpleUI.Ks[0] == 5)
-            {
-                HandleVisible(simpleUI, true);
-            }
-            else
-            {
-                Handle(simpleUI, true);
-            }
+            ui.TotalBagWeight = sp.Ks[2];
+            ui.CurBagWeight = sp.Ks[3];
         }
 
         private static GameObject GetGameObject(int key, string part)
@@ -105,7 +124,7 @@ namespace Assets.Sources.Free.UI
 
         private static bool Handle(SimpleProto simpleUI, bool addNotDone)
         {
-            if(simpleUI.Ss[0] == AutoSimpleBag.BagParentPath)
+            if (simpleUI.Ss[0] == AutoSimpleBag.BagParentPath)
             {
                 AutoSimpleBag.CurrentBag = simpleUI;
             }

@@ -100,7 +100,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
         }
 
-        private Dictionary<ICountdownTipData, long> _createTimeDict = new Dictionary<ICountdownTipData, long>();
+        private Dictionary<ITipData, long> _createTimeDict = new Dictionary<ITipData, long>();
 
     }
 

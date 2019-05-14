@@ -7,6 +7,7 @@ using App.Shared.GameModules.Player.Appearance;
 using App.Shared.GameModules.Player.Appearance.AnimationEvent;
 using App.Shared.Player;
 using Core.Animation;
+using Core.CharacterState;
 using Core.CommonResource;
 using Core.HitBox;
 using Core.Utils;
@@ -187,12 +188,14 @@ namespace App.Shared.CommonResource.Updaters
             
             player.characterControllerInterface.CharacterController.SetCharacterRoot(player.characterContoller.Value.gameObject);
             player.appearanceInterface.Appearance.SetThirdPersonCharacter(go);
-            player.thirdPersonAnimator.UnityAnimator.Update(0);
             player.characterControllerInterface.CharacterController.SetThirdModel(player.thirdPersonModel.Value);
 
             player.characterBoneInterface.CharacterBone.SetCharacterRoot(player.characterContoller.Value.gameObject);
             player.characterBoneInterface.CharacterBone.SetThirdPersonCharacter(go);
-            player.characterBoneInterface.CharacterBone.SetStablePelvisRotation();
+            ForceCrouch(player.thirdPersonAnimator.UnityAnimator);
+            player.characterBoneInterface.CharacterBone.SetStableCrouchPelvisRotation();
+            ForceStand(player.thirdPersonAnimator.UnityAnimator);
+            player.characterBoneInterface.CharacterBone.SetStableStandPelvisRotation();
 
             player.appearanceInterface.Appearance.SetAnimatorP3(player.thirdPersonAnimator.UnityAnimator);
 
@@ -220,6 +223,30 @@ namespace App.Shared.CommonResource.Updaters
         public bool CanInit(IEntity entity, AssetStatus status)
         {
             return true;
+        }
+
+        private static void ForceStand(UnityEngine.Animator animator)
+        {
+            SetPosture(animator, AnimatorParametersHash.Instance.StandValue);
+        }
+        
+        private static void ForceCrouch(UnityEngine.Animator animator)
+        {
+            SetPosture(animator, AnimatorParametersHash.Instance.CrouchValue);
+        }
+
+        private static void SetPosture(Animator animator, float value)
+        {
+            try
+            {
+                animator.SetFloat(AnimatorParametersHash.Instance.PostureHash, value);
+                animator.Update(0);
+            }
+            catch (Exception e)
+            {
+                _logger.ErrorFormat("there is no parameters of {0}, can not force set animator to stand or crouch!!!",
+                    AnimatorParametersHash.Instance.PostureName);
+            }
         }
 
         private void RemoveRagdollOnServerSide(GameObject go)

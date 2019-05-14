@@ -28,6 +28,7 @@ namespace App.Client.GameModules.SceneManagement
             if (contexts.session.clientSessionObjects.TerrainRenderer != null)
             {
                 _terrainRenderer = contexts.session.clientSessionObjects.TerrainRenderer;
+                Camera.main.gameObject.transform.position = contexts.session.commonSession.InitPosition;
                 _terrainRenderer.SetCamera(Camera.main);
             }
         }

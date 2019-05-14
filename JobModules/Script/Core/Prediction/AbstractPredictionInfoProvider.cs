@@ -70,6 +70,11 @@ namespace Core.Prediction
         }
 
 
+        public void SetSelf(EntityKey self)
+        {
+            _gameContexts.Self = self;
+        }
+
         public IGameEntity GetLocalEntity(EntityKey entityKey)
         {
             return _gameContexts.GetGameEntity(entityKey);

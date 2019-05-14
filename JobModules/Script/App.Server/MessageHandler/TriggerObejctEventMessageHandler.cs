@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using App.Server.GameModules.SceneObject;
 using App.Shared;
 using Core.EntityComponent;
 using Core.Network;
 using App.Shared.SceneTriggerObject;
+using App.Shared.Util;
+using Core;
 using Core.SceneTriggerObject;
 using Core.Utils;
+using Utils.Singleton;
 
 namespace App.Server.MessageHandler
 {
@@ -38,7 +42,6 @@ namespace App.Server.MessageHandler
             else
             {
                 _logger.InfoFormat("Can not found SceneObject {0} for trigger object sync event {1}", sourceKey.EntityId, messageBody.EType);
-
             }
         }
     }

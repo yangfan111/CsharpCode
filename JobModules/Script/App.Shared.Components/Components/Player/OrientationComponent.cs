@@ -50,6 +50,8 @@ namespace App.Shared.Components.Player
         [NetworkProperty, DontInitilize] public float ModelPitch;
         [NetworkProperty, DontInitilize] public float ModelYaw;
 
+        [DontInitilize] public float FireRoll;
+
         [DontInitilize]
         public float AccPunchYaw
         {

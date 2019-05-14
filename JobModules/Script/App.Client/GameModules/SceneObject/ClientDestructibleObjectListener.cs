@@ -33,27 +33,31 @@ namespace App.Client.GameModules.SceneObject
                     MapObjectMatcher.DestructibleData)
                 .NoneOf(MapObjectMatcher.RawGameObject))
         {
-            _detachCallback = new ClientFracturedChunkDetachCallback(contexts);
+            _detachCallback = new ClientFracturedChunkDetachCallback();
         }
 
-        protected override void OnDeativeObjectActive(MapObjectEntity mapObject, GameObject gameObject)
+        protected override void OnDeativeObjectActive(int id, MapObjectEntity mapObject, GameObject gameObject)
         {
-            LinkGameObjectToSceneObject(mapObject, gameObject);
+            MapObjectUtility.AddRawGameObject<FracturedObject>(mapObject, gameObject);
+            MapObjectUtility.RecordMapObj(id, (int) ETriggerObjectType.DestructibleObject, mapObject);
+            MapObjectUtility.SendLastEvent(mapObject);
         }
 
-        protected override void OfflineTriggerObjectLoad(string id, GameObject gameObject)
+
+        protected override void LoadTriggerObject(int id, GameObject gameObject)
         {
-            MapObjectEntityFactory.CreateDestructibleObject(id, gameObject, _detachCallback.OnDetach);
+            MapObjectUtility.RecordGameObjId(gameObject, (int) ETriggerObjectType.DestructibleObject, id);
+            MapObjectUtility.AttachRawObjToFracture(gameObject);
+            MapObjectUtility.AddCallBack<FracturedObject>(gameObject, _detachCallback.OnDetach);
         }
 
-        protected override void OnlineTriggerObjectLoad(MapObjectEntity mapObject, GameObject gameObject)
+        public override IEntity CreateMapObj(int id)
         {
-            LinkGameObjectToSceneObject(mapObject, gameObject);
-        }
-
-        private void LinkGameObjectToSceneObject(MapObjectEntity sceneObject, GameObject gameObject)
-        {
-            MapObjectUtility.AddRawGameObject<FracturedObject>(sceneObject, gameObject, _detachCallback.OnDetach);
+            var gameObj = _objectManager.Get(id);
+            if (gameObj == null) return null;
+            var dest = (MapObjectEntity) MapObjectEntityFactory.CreateDestructibleObject(id, gameObj);
+            MapObjectUtility.RecordMapObj(id, (int) _triggerType, dest);
+            return dest;
         }
     }
 }

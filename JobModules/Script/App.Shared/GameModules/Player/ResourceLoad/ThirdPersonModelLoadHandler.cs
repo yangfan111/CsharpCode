@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using App.Shared.GameModules.HitBox;
 using App.Shared.GameModules.Player.Appearance.AnimationEvent;
 using App.Shared.Player;
 using Core.Animation;
+using Core.CharacterState;
 using Core.HitBox;
+using Core.Utils;
 using UnityEngine;
 using Utils.Appearance;
 using Utils.AssetManager;
@@ -15,6 +18,8 @@ namespace App.Shared.GameModules.Player.ResourceLoad
     public class ThirdPersonModelLoadHandler : ModelLoadHandler
     {
         private IUnityAssetManager _assetManager;
+        private static readonly LoggerAdapter _logger = new LoggerAdapter(typeof(ThirdPersonModelLoadHandler));
+
 
         public ThirdPersonModelLoadHandler(Contexts contexts) : base(contexts)
         {
@@ -41,11 +46,14 @@ namespace App.Shared.GameModules.Player.ResourceLoad
 
             HandleLoadedModel(player, go);
 
+            InitCharacterControllerSetting(player);
+
             player.AddAsset(unityObj);
 
             go.name = go.name.Replace("(Clone)", "");
-            go.transform.SetParent(player.RootGo().transform);
-            go.transform.localPosition = new Vector3(0, -PlayerEntityUtility.CcSkinWidth, 0);
+
+            go.transform.SetParent(GetThirdModelParent(player.RootGo().transform));
+            go.transform.localPosition = new Vector3(0, 0, 0);
             go.transform.localRotation = Quaternion.identity;
             go.transform.localScale = Vector3.one;
             Logger.InfoFormat("P3 loaded: {0}", player.entityKey);
@@ -84,19 +92,24 @@ namespace App.Shared.GameModules.Player.ResourceLoad
             player.characterControllerInterface.CharacterController.SetCharacterRoot(player.characterContoller.Value
                 .gameObject);
             player.appearanceInterface.Appearance.SetThirdPersonCharacter(go);
-            player.thirdPersonAnimator.UnityAnimator.Update(0);
             player.characterControllerInterface.CharacterController.SetThirdModel(player.thirdPersonModel.Value);
 
             player.characterBoneInterface.CharacterBone.SetCharacterRoot(player.characterContoller.Value
                 .gameObject);
             player.characterBoneInterface.CharacterBone.SetThirdPersonCharacter(go);
-            player.characterBoneInterface.CharacterBone.SetStablePelvisRotation();
+            ForceCrouch(player.thirdPersonAnimator.UnityAnimator);
+            player.characterBoneInterface.CharacterBone.SetStableCrouchPelvisRotation();
+            ForceStand(player.thirdPersonAnimator.UnityAnimator);
+            player.characterBoneInterface.CharacterBone.SetStableStandPelvisRotation();
 
             player.appearanceInterface.Appearance.SetAnimatorP3(player.thirdPersonAnimator.UnityAnimator);
 
             player.appearanceInterface.Appearance.PlayerReborn();
-            player.stateInterface.State.PlayerReborn();
             player.characterControllerInterface.CharacterController.PlayerReborn();
+            if(player.hasStateInterface)
+                player.stateInterface.State.PlayerReborn();
+            if(player.hasPlayerInfo)
+                player.playerInfo.InitTransform();
 
             player.ReplaceNetworkAnimator(
                 NetworkAnimatorUtil.CreateAnimatorLayers(player.thirdPersonAnimator.UnityAnimator),
@@ -116,6 +129,68 @@ namespace App.Shared.GameModules.Player.ResourceLoad
                 player.thirdPersonAnimator.UnityAnimator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
             else
                 player.thirdPersonAnimator.UnityAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+        }
+
+        private void InitCharacterControllerSetting(PlayerEntity player)
+        {
+            var rootGo = player.RootGo();
+            var characterController = rootGo.GetComponent<CharacterController>();
+            if (characterController != null && player.hasCharacterInfo)
+            {
+                var info = player.characterInfo.CharacterInfoProviderContext;
+                characterController.stepOffset = info.GetStepOffset();
+                characterController.slopeLimit = info.GetSlopeLimit();
+                _logger.DebugFormat("characterController is :{0}, characterinfo:{1}, stepOffset:{2}, slopeLimit:{3}", characterController == null, 
+                    player.hasCharacterInfo,
+                    info.GetStepOffset(),
+                    info.GetSlopeLimit()
+                    );
+            }
+            else
+            {
+                _logger.DebugFormat("characterController is :{0}, characterinfo:{1}", characterController == null, player.hasCharacterInfo);
+            }
+        }
+
+        private static void ForceStand(UnityEngine.Animator animator)
+        {
+            SetPosture(animator, AnimatorParametersHash.Instance.StandValue);
+        }
+        
+        private static void ForceCrouch(UnityEngine.Animator animator)
+        {
+            SetPosture(animator, AnimatorParametersHash.Instance.CrouchValue);
+        }
+
+        private static void SetPosture(Animator animator, float value)
+        {
+            try
+            {
+                animator.SetFloat(AnimatorParametersHash.Instance.PostureHash, value);
+                animator.Update(0);
+            }
+            catch (Exception e)
+            {
+                _logger.ErrorFormat("there is no parameters of {0}, can not force set animator to stand or crouch!!!",
+                    AnimatorParametersHash.Instance.PostureName);
+            }
+        }
+
+        private static Transform GetThirdModelParent(Transform root)
+        {
+            Transform parent = root;
+
+            int childCount = root.childCount;
+            for (int i = 0; i < childCount; i++)
+            {
+                var tmp = root.GetChild(i);
+                if (tmp.name == ModeloffsetName)
+                {
+                    parent = tmp;
+                }
+            }
+
+            return parent;
         }
 
         private void RemoveRagdollOnServerSide(GameObject go, List<Collider> except)

@@ -167,7 +167,7 @@ namespace YF.FileUtil
         public static string GetStreamingPath_FstRoot(string examplePath)
         {
             string fullPath;
-            var fontPath = GetStreamingPath()；
+            var fontPath = GetStreamingPath();
             if (string.IsNullOrEmpty(fontPath))
                 fullPath = examplePath;
             else

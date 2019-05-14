@@ -73,6 +73,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
                             player.stateInterface.State.InterruptAction();
                             break;
                         case Rescue:
+                            player.stateInterface.State.SetPostureCrouch();
                             player.stateInterface.State.Rescue();
                             break;
                         case Dying:
@@ -101,13 +102,14 @@ namespace App.Server.GameModules.GamePlay.Free.player
                             break;
                         case OpenDoor:
                             player.stateInterface.State.OpenDoor();
+                            if(player.AudioController()!= null)
+                                player.AudioController().PlaySimpleAudio(EAudioUniqueId.OpenDoor);
+
                             break;
                         case PlayerReborn:
-                            {
-                                player.stateInterface.State.PlayerReborn();
-                                player.appearanceInterface.Appearance.PlayerReborn();
-                                player.genericActionInterface.GenericAction.PlayerReborn(player);
-                            }
+                            player.stateInterface.State.PlayerReborn();
+                            player.appearanceInterface.Appearance.PlayerReborn();
+                            player.genericActionInterface.GenericAction.PlayerReborn(player);
                             break;
                         case Revive:
                             player.stateInterface.State.Revive();
@@ -117,11 +119,9 @@ namespace App.Server.GameModules.GamePlay.Free.player
                             break;
                         case PlantBomb:
                             player.appearanceInterface.Appearance.MountWeaponOnAlternativeLocator();
-                            player.stateInterface.State.BuriedBomb(() =>
-                                {
-                                    player.WeaponController().RelatedThrowAction.ThrowingEntityKey = new EntityKey(0, (short) EEntityType.End);
-                                    player.WeaponController().RelatedThrowAction.LastFireWeaponKey = -1;
-                                });
+                            player.WeaponController().RelatedThrowAction.ThrowingEntityKey = new EntityKey(0, (short) EEntityType.End);
+                            player.WeaponController().RelatedThrowAction.LastFireWeaponKey = -1;
+                            player.stateInterface.State.BuriedBomb(null);
                             break;
                         case DefuseBomb:
                             if (!server)
@@ -132,8 +132,6 @@ namespace App.Server.GameModules.GamePlay.Free.player
                         case InterPlantBomb:
                             player.stateInterface.State.InterruptAction();
                             player.appearanceInterface.Appearance.RemountWeaponOnRightHand();
-                            player.WeaponController().RelatedThrowAction.ThrowingEntityKey = new EntityKey(0, (short) EEntityType.End);
-                            player.WeaponController().RelatedThrowAction.LastFireWeaponKey = -1;
                             break;
                         case RescueEnd:
                             player.stateInterface.State.RescueEnd();

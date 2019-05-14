@@ -13,7 +13,7 @@ namespace Core.CharacterState.Posture.States
 {
     class FreefallState : PostureState
     {
-        
+        private bool isBigJump = false;
         public FreefallState(PostureStateId id) : base(id)
         {
 			InitSpecial();
@@ -183,7 +183,23 @@ namespace Core.CharacterState.Posture.States
                                      AnimatorParametersHash.Instance.JumpStartDisable,
                                      CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
             addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerJumpHeight, _characterInfo.GetStandCapsule().Height);
+            addOutput(FsmOutput.Cache);
+            
+            isBigJump = false;
             base.DoBeforeLeaving(addOutput);
+        }
+        
+        public override FsmStateResponseType HandleInput(IFsmInputCommand command, Action<FsmOutput> addOutput)
+        {
+            if (command.IsMatch(FsmInput.BigJump) && !isBigJump)
+            {
+                isBigJump = true;
+                //FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerJumpHeight, _characterInfo.GetBigJumpHeight());
+                //addOutput(FsmOutput.Cache);
+            }
+            return base.HandleInput(command, addOutput);
         }
     }
 }

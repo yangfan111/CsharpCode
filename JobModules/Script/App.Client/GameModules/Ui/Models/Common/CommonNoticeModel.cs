@@ -56,12 +56,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                 {
                     if (_viewModel.rootActive)
                     {
-                        _viewModel.rootActive = false;
-//                        UiModule.HideSpecialModelAndShowALL(this.GetType().Name);
-//                        adapter.HideUiGroup(Core.Ui.UiGroup.Base);
-                        adapter.UnRegisterKeyReceive(keyReceive);
-                        adapter.UnRegisterPointerReceive(pointerReceiver);
-                        adapter.SetCrossVisible(true);
+                        HideMenu();
                     }
                 }
                 else 
@@ -86,6 +81,16 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
 
             CountDown(interval);
+        }
+
+        private void HideMenu()
+        {
+            _viewModel.rootActive = false;
+            //                        UiModule.HideSpecialModelAndShowALL(this.GetType().Name);
+            //                        adapter.HideUiGroup(Core.Ui.UiGroup.Base);
+            adapter.UnRegisterKeyReceive(keyReceive);
+            adapter.UnRegisterPointerReceive(pointerReceiver);
+            adapter.SetCrossVisible(true);
         }
 
         public void InitKeyBinding()
@@ -264,6 +269,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         {
             if (adapter != null)
                 adapter.Style = NoticeWindowStyle.NONE;
+            HideMenu();
         }
     }
 }    

@@ -60,6 +60,30 @@ namespace App.Server.GameModules.GamePlay.Free.client
             typeInvDic["w2"] = "w3";
         }
 
+        public static bool IsDefault(string key)
+        {
+            return !string.IsNullOrEmpty(key) && key.StartsWith(BagDefault);
+        }
+
+        public static bool IsGround(string key)
+        {
+            return !string.IsNullOrEmpty(key) && key.StartsWith(BagGround);
+        }
+
+        public static bool isWeapon(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+            {
+                string w = key.Split(',')[0].Trim();
+                if (w.Length == 2 && w.StartsWith("w"))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static SimpleItemInfo GetGroundItemInfo(ServerRoom room, FreeData fd, string key)
         {
             SimpleItemInfo freeItem = new SimpleItemInfo();
@@ -242,6 +266,10 @@ namespace App.Server.GameModules.GamePlay.Free.client
             if (action.name == "default")
             {
                 canCount = BagCapacityUtil.CanAddToBagCount(room.FreeArgs, fd, item.cat, item.id, count);
+            }
+            else
+            {
+                canCount = 1;
             }
 
             if (canCount > 0)
@@ -442,6 +470,7 @@ namespace App.Server.GameModules.GamePlay.Free.client
 
         private static void DropItem(string inv, FreeData fd, ServerRoom room)
         {
+            Debug.LogFormat("inv {0}", inv);
             int c3 = fd.freeInventory.GetInventoryManager().GetInventory(inv).posList.Count;
             ItemInventory w3 = fd.freeInventory.GetInventoryManager().GetInventory(inv);
             if (c3 > 0)

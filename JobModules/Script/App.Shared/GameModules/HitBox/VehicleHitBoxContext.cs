@@ -1,4 +1,5 @@
-﻿using App.Shared.Components.Common;
+﻿using System.Collections.Generic;
+using App.Shared.Components.Common;
 using App.Shared.Components.Player;
 using App.Shared.Components.Vehicle;
 using App.Shared.GameModules.Vehicle;
@@ -19,14 +20,53 @@ namespace App.Shared.GameModules.Bullet
             _vehicleContext = context;
         }
 
-        public HitBoxComponent GetHitBoxComponent(EntityKey entityKey)
+        public Vector3 GetPosition(EntityKey entityKey)
+        {
+            var entity = _vehicleContext.GetEntityWithEntityKey(entityKey);
+            if ( entity!= null && entity.hasPosition && entity.hasHitBox)
+            {
+                return entity.hitBox.HitPreliminaryGeo.position;
+            }
+            return Vector3.zero;
+        }
+
+        public float GetRadius(EntityKey entityKey)
+        {
+            var entity = _vehicleContext.GetEntityWithEntityKey(entityKey);
+            if ( entity!= null && entity.hasPosition && entity.hasHitBox)
+            {
+                return entity.hitBox.HitPreliminaryGeo.radius;
+            }
+            return -1;
+        }
+
+        public void EnableHitBox(EntityKey entityKey, bool enalbe)
+        {
+            var entity = _vehicleContext.GetEntityWithEntityKey(entityKey);
+            if ( entity!= null && entity.hasHitBox)
+            {
+                entity.hitBox.HitBoxGameObject.SetActive(enalbe);
+            }
+        }
+
+        public List<Transform> GetCollidersTransform(EntityKey entityKey)
+        {
+            var result = new List<Transform>();
+            var entity = _vehicleContext.GetEntityWithEntityKey(entityKey);
+            if ( entity!= null && entity.hasHitBox)
+            {
+                result.Add(entity.hitBox.HitBoxGameObject.transform);
+            }
+            return result;
+        }
+
+        private HitBoxComponent GetHitBoxComponent(EntityKey entityKey)
         {
             var entity = _vehicleContext.GetEntityWithEntityKey(entityKey);
             if ( entity!= null && entity.hasPosition && entity.hasHitBox)
             {
                 return entity.hitBox;
             }
-
             return null;
         }
 
@@ -41,11 +81,6 @@ namespace App.Shared.GameModules.Bullet
 
             var vehicle = GetVehicleEntity(gameEntity);
             vehicle.UpdateHitBoxes(gameEntity);
-        }
-
-        public HitBoxTransformProvider GetHitBoxProvider(EntityKey entityKey)
-        {
-            return null;
         }
 
         private VehicleEntity GetVehicleEntity(IGameEntity gameEntity)

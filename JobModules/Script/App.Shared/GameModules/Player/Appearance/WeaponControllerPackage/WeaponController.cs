@@ -105,6 +105,7 @@ namespace App.Shared.GameModules.Player.Appearance.WeaponControllerPackage
             if(null == value) return;
             SetPredictedWeaponValue(PredictedWeaponStateIndex.WeaponInHand, value.WeaponInHand);
             SetPredictedWeaponValue(PredictedWeaponStateIndex.ReloadState, value.ReloadState);
+            SetPredictedWeaponValue(PredictedWeaponStateIndex.OverrideControllerState, value.OverrideControllerState);
         }
 
         private void CopyToLatestWeaponComponent(LatestAppearanceComponent value)
@@ -138,6 +139,7 @@ namespace App.Shared.GameModules.Player.Appearance.WeaponControllerPackage
             if(null == value) return;
             value.WeaponInHand = GetPredictedWeaponValue(PredictedWeaponStateIndex.WeaponInHand);
             value.ReloadState = GetPredictedWeaponValue(PredictedWeaponStateIndex.ReloadState);
+            value.OverrideControllerState = GetPredictedWeaponValue(PredictedWeaponStateIndex.OverrideControllerState);
         }
         
         private void CopyToClientWeaponComponent(ClientAppearanceComponent value)

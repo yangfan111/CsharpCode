@@ -32,7 +32,14 @@ uniform float DetailResolutionPerPatch;
 [numthreads(32, 32, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID) 
 {
-	uint detailCount = DividedDetailData[id.x + id.y * DividedDetailResolution];
+    uint index = id.x + id.y * DividedDetailResolution;
+    uint indexInData = index / 2;
+
+	uint detailCount = DividedDetailData[indexInData];
+    if (indexInData * 2 == index)
+        detailCount = (detailCount << 16) >> 16;
+    else
+        detailCount = detailCount >> 16;
 
 	if (detailCount == 0)
 		return;

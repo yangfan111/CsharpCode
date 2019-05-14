@@ -12,9 +12,7 @@ namespace App.Shared.GameMode
 
         public override void OnExpend(IPlayerWeaponProcessor controller, EWeaponSlotType slot)
         {
-            //TODO:音频播放
-            //GameAudioMedium.PlayWeaponAudio(controller., RelatedAppearence.WeaponHandObject(), (item) => item.Fire);
-      
+            base.OnExpend(controller, slot);
             if (!slot.IsSlotChangeByCost())
             {
                 return;
@@ -29,12 +27,14 @@ namespace App.Shared.GameMode
         public override void OnDrop(IPlayerWeaponProcessor controller, EWeaponSlotType slot)
         {
             Logger.DebugFormat("{0} OnDrop", controller.Owner);
+            base.OnDrop(controller, slot);
             controller.BagLockState = true;
         }
 
-        public override void OnPickup(IPlayerWeaponProcessor controller, EWeaponSlotType slot)
+        public override void OnWeaponPickup(IPlayerWeaponProcessor controller, EWeaponSlotType slot)
         {
             Logger.DebugFormat("{0} OnPickup", controller.Owner);
+            base.OnWeaponPickup(controller,slot);
             controller.BagLockState = true;
         }
 

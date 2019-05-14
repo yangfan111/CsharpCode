@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using AssetBundleManager.Operation;
+﻿using AssetBundleManager.Operation;
 using AssetBundleManager.Warehouse;
 using AssetBundles;
 using Common;
 using Core.Utils;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -232,13 +232,18 @@ namespace AssetBundleManagement
             LoadAssetBundle(bundleName, out bundleNameWithVariant);
         }
 
-        public void LoadAsset(string bundleName, string assetName)
+        public void LoadAsset(string bundleName, string assetName, Type ObjectType)
         {
             string bundleNameWithVariant;
+            AssetLoadingPattern LoadingPattern = AssetLoadingPattern.Unkown;
             if (LoadAssetBundle(bundleName, out bundleNameWithVariant) != AssetBundleStatus.Failed)
             {
                 var warehouse = FindWarehouse(bundleName, _defaultWarehouse);
-                var assetLoading = warehouse.LoadAsset(bundleNameWithVariant, assetName);
+                var assetLoading = warehouse.LoadAsset(bundleNameWithVariant, assetName, ObjectType);
+                if(warehouse is SimulationWarehouse)
+                {
+                    LoadingPattern = AssetLoadingPattern.Simulation;
+                }
                 if (assetLoading != null)
                 {
                     _assetsWaitForBundle.AddLastExt(assetLoading);
@@ -246,7 +251,7 @@ namespace AssetBundleManagement
                 }
             }
 
-            _assetsWaitForBundle.AddLastExt(AssetBundleWarehouse.LoadFailed(false, bundleName, assetName));
+            _assetsWaitForBundle.AddLastExt(AssetBundleWarehouse.LoadFailed(LoadingPattern,false, bundleName, assetName, ObjectType));
         }
 
         public void LoadScene(string bundleName, string assetName, bool isAdditive)
@@ -259,7 +264,7 @@ namespace AssetBundleManagement
             }
             else
             {
-                _assetsWaitForBundle.AddLastExt(AssetBundleWarehouse.LoadFailed(true, bundleName, assetName));
+                _assetsWaitForBundle.AddLastExt(AssetBundleWarehouse.LoadFailed(AssetLoadingPattern.Unkown,true, bundleName, assetName,null));
             }
         }
 
@@ -312,17 +317,17 @@ namespace AssetBundleManagement
 
             if (_supplementaryWarehouses.ContainsKey(baseName))
                 warehouse = _supplementaryWarehouses[baseName];
-            else
-            {
-                foreach (var v in _supplementaryWarehouses)
-                {
-                    if (baseName.StartsWith(v.Key))
-                    {
-                        warehouse = v.Value;
-                        break;
-                    }
-                }
-            }
+//            else
+//            {
+//                foreach (var v in _supplementaryWarehouses)
+//                {
+//                    if (baseName.StartsWith(v.Key))
+//                    {
+//                        warehouse = v.Value;
+//                        break;
+//                    }
+//                }
+//            }
 
             return warehouse;
         }
@@ -471,11 +476,46 @@ namespace AssetBundleManagement
                         }
 
                         else
+                        {
                             _statRecorder.AssetNotFound(operation.LoadingPattern, operation.BundleName, operation.Name);
+                            IfUseErrorType(operation); //是否使用了错误的类型进行加载//
+                        }
                     }
                 }
-
                 assetItor = next;
+            }
+        }
+
+        void IfUseErrorType(AssetLoading operation)
+        {
+            bool needLog = false;
+            if (operation.LoadingPattern == AssetLoadingPattern.Simulation)
+            {
+#if UNITY_EDITOR
+                string[] assetPaths = UnityEditor.AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(operation.BundleName, operation.Name);
+                if (assetPaths != null && assetPaths.Length > 0)
+                {
+                    needLog = true;
+                }
+#endif
+            }
+            else
+            {
+                if (_loadedAssetBundles.ContainsKey(operation.BundleName))
+                {
+                    var loadedBundle = _loadedAssetBundles[operation.BundleName];
+                    if (loadedBundle.Bundle != null)
+                    {
+                        if (loadedBundle.Bundle.Contains(operation.Name))
+                        {
+                            needLog = true;
+                        }
+                    }
+                }
+            }
+            if (needLog)
+            {
+                _logger.WarnFormat("AssetBundles {0} Has {1} But You Use The Error Type {2} To Loader", operation.BundleName, operation.Name, operation.ObjectType);
             }
         }
 

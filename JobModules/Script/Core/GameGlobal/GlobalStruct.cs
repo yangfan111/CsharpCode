@@ -25,10 +25,13 @@ namespace Core
     public struct ItemInfo
     {
         public ECategory Category;
-
         public int ItemId;
-
         public int Count;
+    }
+
+    public struct MeleeAttackInfo
+    {
+        public EMeleeAttackType AttackType;
     }
 
     public struct WeaponPartsStruct
@@ -38,6 +41,12 @@ namespace Core
         public int Magazine;
         public int Stock;
         public int Muzzle;
+        public int SideRail;
+        public int Bore;
+        public int Feed;
+        public int Trigger;
+        public int Interlock;
+        public int Brake;
 
         public readonly static WeaponPartsStruct Default = new WeaponPartsStruct();
 
@@ -49,6 +58,12 @@ namespace Core
             result.Magazine = Magazine;
             result.Stock = Stock;
             result.Muzzle = Muzzle;
+            result.SideRail = SideRail;
+            result.Bore = Bore;
+            result.Feed = Feed;
+            result.Trigger = Trigger;
+            result.Interlock = Interlock;
+            result.Brake = Brake;
             return result;
         }
 
@@ -59,35 +74,35 @@ namespace Core
             Magazine = scanData.Magazine;
             Stock = scanData.Stock;
             Muzzle = scanData.Muzzle;
+            SideRail = scanData.SideRail;
+            Bore = scanData.Bore;
+            Feed = scanData.Feed;
+            Trigger = scanData.Trigger;
+            Interlock = scanData.Interlock;
+            Brake = scanData.Brake;
             return this;
         }
 
         public override string ToString()
         {
             return string.Format("Upper {0}, Lower {1}, Magazine {2}, Stock {3}, Muzzle {4}",
-                UpperRail,
-                LowerRail,
-                Magazine,
-                Stock,
-                Muzzle);
+                UpperRail, LowerRail, Magazine, Stock, Muzzle);
         }
 
         public static bool operator ==(WeaponPartsStruct x, WeaponPartsStruct y)
         {
-            return x.LowerRail == y.LowerRail
-                && x.UpperRail == y.UpperRail
-                && x.Stock == y.Stock
-                && x.Muzzle == y.Muzzle
-                && x.Magazine == y.Magazine;
+            return x.LowerRail == y.LowerRail && x.UpperRail == y.UpperRail && x.Stock == y.Stock
+                && x.Muzzle == y.Muzzle && x.Magazine == y.Magazine && x.SideRail == y.SideRail
+                && x.Bore == y.Bore && x.Feed == y.Feed && x.Trigger == y.Trigger
+                && x.Interlock == y.Interlock && x.Brake == y.Brake;
         }
 
         public static bool operator !=(WeaponPartsStruct x, WeaponPartsStruct y)
         {
-            return x.LowerRail != y.LowerRail
-            || x.UpperRail != y.UpperRail
-            || x.Stock != y.Stock
-            || x.Muzzle != y.Muzzle
-            || x.Magazine != y.Magazine;
+            return x.LowerRail != y.LowerRail || x.UpperRail != y.UpperRail || x.Stock != y.Stock
+                || x.Muzzle != y.Muzzle || x.Magazine != y.Magazine || x.SideRail != y.SideRail
+                || x.Bore != y.Bore || x.Feed != y.Feed || x.Trigger != y.Trigger
+                || x.Interlock != y.Interlock || x.Brake != y.Brake;
         }
     }
 
@@ -103,6 +118,12 @@ namespace Core
         public int Stock;
         public int UpperRail;
         public int LowerRail;
+        public int SideRail;
+        public int Bore;
+        public int Feed;
+        public int Trigger;
+        public int Interlock;
+        public int Brake;
         public int Bullet;
         public int ReservedBullet;
 
@@ -111,13 +132,11 @@ namespace Core
         public static bool operator ==(WeaponScanStruct x, WeaponScanStruct y)
         {
             return x.ConfigId == y.ConfigId;
-
         }
 
         public static bool operator !=(WeaponScanStruct x, WeaponScanStruct y)
         {
             return x.ConfigId != y.ConfigId;
-
         }
 
         public override string ToString()

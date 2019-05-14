@@ -1,8 +1,8 @@
-﻿using System;
-using App.Shared.Components;
+﻿using App.Shared.Components;
 using Core.EntityComponent;
 using Core.Utils;
 using Entitas;
+using System;
 using UnityEngine;
 using WeaponConfigNs;
 
@@ -19,16 +19,8 @@ namespace App.Shared.EntityFactory
             _entityIdGenerator = entityIdGenerator;
         }
 
-        public Entity CreateBulletEntity(
-            int cmdSeq,
-            EntityKey entityKey,
-            int serverTime,
-            Vector3 dir,
-            int weaponId,
-            EBulletCaliber caliber,
-            BulletConfig bulletConfig,
-            Vector3 viewPosition,
-            Vector3 emitPosition)
+        public Entity CreateBulletEntity(int cmdSeq, EntityKey entityKey, int serverTime, Vector3 dir, int weaponId, EBulletCaliber caliber,
+            BulletConfig bulletConfig, Vector3 viewPosition, Vector3 emitPosition)
         {
             int bulletEntityId = _entityIdGenerator.GetNextEntityId();
         
@@ -37,20 +29,9 @@ namespace App.Shared.EntityFactory
             float maxDistance = bulletConfig.MaxDistance;
             bulletEntity.AddEntityKey(new EntityKey(bulletEntityId, (int)EEntityType.Bullet));
 
-            bulletEntity.AddBulletData(
-                velocity, 
-                0,
-                bulletConfig.Gravity, 
-                0, 
-                serverTime, 
-                maxDistance, 
-                bulletConfig.PenetrableLayerCount, 
-                bulletConfig.BaseDamage, 
-                bulletConfig.PenetrableThickness, 
-                bulletConfig,
-                bulletConfig.VelocityDecay,
-                caliber,
-                weaponId);
+            bulletEntity.AddBulletData(velocity, 0, bulletConfig.Gravity, 0, serverTime, maxDistance, bulletConfig.PenetrableLayerCount, 
+                bulletConfig.BaseDamage, bulletConfig.PenetrableThickness, bulletConfig,bulletConfig.VelocityDecay,
+                caliber, weaponId, bulletConfig.DistanceDecayFactor);
             bulletEntity.AddPosition();
             bulletEntity.position.Value = viewPosition;
             bulletEntity.AddOwnerId(entityKey);

@@ -1,6 +1,6 @@
 ﻿namespace App.Shared.Components.Ui
 {
-    public interface ICountdownTipData 
+    public interface ITipData 
     {
         /// <summary>
         /// 倒计时标题

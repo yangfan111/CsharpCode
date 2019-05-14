@@ -9,7 +9,7 @@ namespace AssetBundleManager.Operation
         private bool _assetBundleReady;
 
         public ManifestLoading(string bundleName, string assetName)
-            : base(bundleName, assetName)
+            : base(bundleName, assetName, null)
         { }
 
         public bool MoveNext()

@@ -1,5 +1,6 @@
 ﻿using App.Client.GPUInstancing.Core.Data;
 using App.Client.GPUInstancing.Core.Utils;
+using Core.Components;
 using UnityEngine;
 
 namespace App.Client.GPUInstancing.Core.Terrain
@@ -56,15 +57,17 @@ namespace App.Client.GPUInstancing.Core.Terrain
 
         public void Update(Vector3 camPos)
         {
-            _cameraPosition.x = camPos.x - _basePos.x;
-            _cameraPosition.y = camPos.y - _basePos.y;
-            _cameraPosition.z = camPos.z - _basePos.z;
+            _cameraPosition.x = camPos.x - _basePos.x - WorldOrigin.Origin.x;
+            _cameraPosition.y = camPos.y - _basePos.y - WorldOrigin.Origin.y;
+            _cameraPosition.z = camPos.z - _basePos.z - WorldOrigin.Origin.z;
 
             _waveAndDistance.x += Time.deltaTime * _wavingGrassStrength * 0.05f;
         }
 
         protected override void SetMaterialPropertyBlock()
         {
+            base.SetMaterialPropertyBlock();
+
             Mbp.SetBuffer(Constants.DetailVariable.TransformData, TransformData);
             Mbp.SetBuffer(Constants.DetailVariable.NormalData, _normalData);
             Mbp.SetBuffer(Constants.DetailVariable.ColorData, _colorData);

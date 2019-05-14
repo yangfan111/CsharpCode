@@ -25,15 +25,15 @@ namespace App.Client.GameModules.GamePlay.Free.App
                 var ui = contexts.ui.uI;
                 contexts.ui.uISession.UiState[UiNameConstant.CommonRoundOverModel] = data.Bs[0];
                 ui.CurRoundCount = data.Ins[0];
-                ui.ScoreByCampTypeDict[Core.Enums.EUICampType.T] = data.Ins[1];
-                ui.ScoreByCampTypeDict[Core.Enums.EUICampType.CT] = data.Ins[2];
+                ui.ScoreByCampTypeDict[(int)Core.Enums.EUICampType.T] = data.Ins[1];
+                ui.ScoreByCampTypeDict[(int)Core.Enums.EUICampType.CT] = data.Ins[2];
             }
 
             if (data.Key == FreeMessageConstant.CountDownTipUI)
             {
                 var ui = contexts.ui.uI;
                 ui.CountdownTipDataList.Clear();
-                CountdownTipData cdTipData = new CountdownTipData
+                BaseTipData cdTipData = new BaseTipData
                 {
                     Title = data.Ss[0],
                     DurationTime = data.Ins[0]

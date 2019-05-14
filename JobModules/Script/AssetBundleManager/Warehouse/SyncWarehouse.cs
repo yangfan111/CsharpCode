@@ -1,3 +1,4 @@
+using System;
 using AssetBundleManagement;
 using AssetBundleManager.Operation;
 using UnityEngine;
@@ -26,9 +27,9 @@ namespace AssetBundleManager.Warehouse
             return operation;
         }
 
-        public override AssetLoading LoadAsset(string bundleName, string name)
+        public override AssetLoading LoadAsset(string bundleName, string name, Type objectType)
         {
-            return OperationFactory.CreateAssetSyncLoading(bundleName, name);
+            return OperationFactory.CreateAssetSyncLoading(bundleName, name, objectType);
         }
 
         public override SceneLoading LoadScene(string bundleName, string name, bool isAdditive)

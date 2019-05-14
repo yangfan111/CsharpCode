@@ -27,35 +27,43 @@ namespace App.Server.GameModules.GamePlay.Free.app
             List<TechStat> list = new List<TechStat>();
 
             int index = 0;
+            bool needSort = true;
             foreach (PlayerEntity p in args.GameContext.player.GetInitializedPlayerEntities())
             {
                 TechStat ts = new TechStat(p, index++);
                 builder.Ps.Add(ts.ToMessage());
                 list.Add(ts);
+                if (!p.statisticsData.Statistics.DataCollectSwitch)
+                {
+                    needSort = false;
+                }
             }
 
-            list.Sort(KillComparater);
-            if (list.Count > 0 && list[0].kill > 0)
+            if (needSort)
             {
-                TechStat ts = list[0];
-                builder.Ps[ts.index].Ins[2] |= (1 << (int)EUIGameTitleType.Ace);
-            }
-            if (list.Count > 1 && list[1].kill > 0)
-            {
-                TechStat ts = list[1];
-                builder.Ps[ts.index].Ins[2] |= (1 << (int)EUIGameTitleType.Second);
-            }
-            if (list.Count > 2 && list[2].kill > 0)
-            {
-                TechStat ts = list[2];
-                builder.Ps[ts.index].Ins[2] |= (1 << (int)EUIGameTitleType.Third);
-            }
+                list.Sort(KillComparater);
+                if (list.Count > 0 && list[0].kill > 0)
+                {
+                    TechStat ts = list[0];
+                    builder.Ps[ts.index].Ins[2] |= (1 << (int)EUIGameTitleType.Ace);
+                }
+                if (list.Count > 1 && list[1].kill > 0)
+                {
+                    TechStat ts = list[1];
+                    builder.Ps[ts.index].Ins[2] |= (1 << (int)EUIGameTitleType.Second);
+                }
+                if (list.Count > 2 && list[2].kill > 0)
+                {
+                    TechStat ts = list[2];
+                    builder.Ps[ts.index].Ins[2] |= (1 << (int)EUIGameTitleType.Third);
+                }
 
-            list.Sort(KdComparater);
-            if (list.Count > 0 && list[0].kd > 0)
-            {
-                TechStat ts = list[0];
-                builder.Ps[ts.index].Ins[2] |= (1 << (int)EUIGameTitleType.KdKing);
+                list.Sort(KdComparater);
+                if (list.Count > 0 && list[0].kd > 0)
+                {
+                    TechStat ts = list[0];
+                    builder.Ps[ts.index].Ins[2] |= (1 << (int)EUIGameTitleType.KdKing);
+                }
             }
 
             foreach (PlayerEntity p in args.GameContext.player.GetInitializedPlayerEntities())

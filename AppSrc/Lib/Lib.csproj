@@ -50,16 +50,18 @@
   <ItemGroup>
     <Compile Include="lib\Mics.cs" />
     <Compile Include="lib\TodoLib.cs" />
+    <Compile Include="lib\Utils\ShortIDGenerator.cs" />
+    <Compile Include="lib\Utils\VoyagerUtil.cs" />
+    <Compile Include="lib\Utils\WiseUtil.cs" />
     <Compile Include="lib\YF.EditorLib.cs" />
     <Compile Include="lib\YF.FileUtil.FS.cs" />
     <Compile Include="lib\YF.FileUtil.PS.cs" />
     <Compile Include="lib\YF.FileUtil.Seri.cs" />
     <Compile Include="lib\YF.RunLib.cs" />
-    <Compile Include="lib\YF.Structure.cs" />
+    <Compile Include="lib\YF.UtilsSet.cs" />
     <Compile Include="practice\_Serializable.cs" />
     <Compile Include="practice\_URI.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />

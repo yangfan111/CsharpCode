@@ -20,7 +20,7 @@ namespace Assets.App.Shared.EntityFactory
         {
             var weaponEntity = WeaponContxt.CreateEntity();
             weaponEntity.AddWeaponBasicData();
-            weaponEntity.AddWeaponRuntimeData();
+            weaponEntity.AddWeaponRuntimeData(true);
             weaponEntity.AddWeaponScan();
             weaponEntity.AddEntityKey(new EntityKey(EntityIdGenerator.GetNextEntityId(),
                 (short)EEntityType.Weapon));

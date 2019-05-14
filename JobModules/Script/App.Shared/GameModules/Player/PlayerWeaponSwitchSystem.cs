@@ -9,61 +9,24 @@ namespace App.Shared.GameModules.Player
     public class PlayerWeaponSwitchSystem : IUserCmdExecuteSystem
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerWeaponSwitchSystem));
-        private Contexts _contexts;
-        public PlayerWeaponSwitchSystem(Contexts contexts)
-        {
-            _contexts = contexts;
-        } 
-       /// <summary>
-       /// 切换槽位
-       /// </summary>
-       /// <param name="owner"></param>
-       /// <param name="cmd"></param>
+        /// <summary>
+        /// 槽位切换&模式切换
+        /// </summary>
+        /// <param name="owner"></param>
+        /// <param name="cmd"></param>
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
-        {
-        
-            if (cmd.CurWeapon == (int)EWeaponSlotType.None)
+        {    
+            if (cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsSwitchWeapon) && cmd.CurWeapon != (int) EWeaponSlotType.None)
             {
+                var newSlot = owner.OwnerEntityKey.ModeController().GetSlotByIndex(cmd.CurWeapon);
+                owner.OwnerEntityKey.WeaponController().SwitchIn(newSlot);
                 return;
             }
-
-            var playerEntity = owner.OwnerEntity as PlayerEntity;
-            if (null == playerEntity)
+            if (cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsSwitchFireMode))
             {
-                Logger.Error("Owner is not player");
+                owner.OwnerEntityKey.WeaponController().SwitchFireMode();
                 return;
             }
-
-            if(null != cmd.FilteredInput && !cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsSwitchWeapon))
-            {
-                return;
-            }
-            else
-            {
-                if(null == cmd.FilteredInput)
-                {
-                    Logger.Error("FilteredInput in cmd should never be null !");
-                }
-            }
-            var newSlot = playerEntity.ModeController().GetSlotByIndex(cmd.CurWeapon);
-            playerEntity.WeaponController().SwitchIn(newSlot);
-            //playerEntity.WeaponController().PureSwitchIn(newSlot);
-            //{
-            //    Logger.Error("No bag attached to player");
-            //    return;
-            //}
-            //
-
-            //    var weaponAchive = playerEntity.WeaponController();
-            //   var curSlot = playerEntity.WeaponController().CurrSlotType;
-
-            //   var newWeapon = weaponAchive.GetSlotWeaponInfo(newSlot);
-            //if(newWeapon.Id < 1)
-            //{
-            //    playerEntity.tip.TipType = ETipType.NoWeaponInSlot;
-            //    return;
-            //}
-
         }
     }
 }

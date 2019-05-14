@@ -1,5 +1,7 @@
 ﻿using App.Shared;
 using App.Client.GameModules.Ui.UiAdapter;
+using App.Shared.Audio;
+using Core;
 using Core.Enums;
 using Core.GameModule.System;
 using Entitas;
@@ -40,7 +42,12 @@ namespace App.Client.ClientGameModules.Bullet
             if(null != bullet)
             {
                 bullet.AddBulletGameObject(unityObj);
-                GameAudioMedia.PlayBulletFlyAudio(unityObj.AsGameObject);
+                if (unityObj.AudioMono == null)
+                {
+                    unityObj.AudioMono = unityObj.AsGameObject.AddComponent<AkGameObj>();
+                }
+                    
+                GameAudioMedia.PlayEventAudio((int)EAudioUniqueId.BulletFly,unityObj.AudioMono as AkGameObj,true);
             }
         }
     }

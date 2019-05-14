@@ -1,4 +1,5 @@
-﻿using AssetBundleManager.Operation;
+﻿using System;
+using AssetBundleManager.Operation;
 using UnityEngine;
 
 namespace AssetBundleManagement
@@ -27,19 +28,20 @@ namespace AssetBundleManagement
             return new AssetBundleSimulatedLoading(name, url);
         }
         
-        public static AssetSyncLoading CreateAssetSyncLoading(string bundleName, string name)
+        public static AssetSyncLoading CreateAssetSyncLoading(string bundleName, string name,Type objectType)
         {
-            return new AssetSyncLoading(bundleName, name);
+            return new AssetSyncLoading(bundleName, name, objectType);
         }
         
-        public static AssetAsyncLoading CreateAssetAsyncLoading(string bundleName, string name)
+        public static AssetAsyncLoading CreateAssetAsyncLoading(string bundleName, string name, Type objectType)
         {
-            return new AssetAsyncLoading(bundleName, name);
+            return new AssetAsyncLoading(bundleName, name, objectType);
         }
 
-        public static AssetSimulatedLoading CreateAssetSimulationLoading(string bundleName, string name)
+        public static AssetSimulatedLoading CreateAssetSimulationLoading(string bundleName, string name,
+            Type objectType)
         {
-            return new AssetSimulatedLoading(bundleName, name);
+            return new AssetSimulatedLoading(bundleName, name, objectType);
         }
 
         public static ManifestLoading CreateManifestLoading(string bundleName, string name)

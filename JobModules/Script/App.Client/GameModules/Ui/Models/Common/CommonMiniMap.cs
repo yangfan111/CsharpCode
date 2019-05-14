@@ -20,55 +20,62 @@ namespace App.Client.GameModules.Ui.Models.Common
 {
     public partial class CommonMiniMap : ClientAbstractModel, IUiHfrSystem
     {
-        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CommonMiniMap));
-        private IMiniMapUiAdapter adapter;
-        private bool isGameObjectCreated = false;
+        protected static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CommonMiniMap));
+        protected IMiniMapUiAdapter adapter;
+        protected bool isGameObjectCreated = false;
 
         private float rateControlSpeed = 54;// km/h
         private float rateIncreaseInterval = 10;// km/h
         private int rateIncreaseMaxPresent = 5;
 
-        float rate = 0;                                 // 像素/米
+        protected float rate = 0;                                 // 像素/米
         public float miniMapWByPixel = 0;               //像素
         public float miniMapHByPixel = 0;
-        private float OriginalMiniMapRepresentWHByRice = 400;   //米
-        private float MiniMapRepresentWHByRice = 400;   //米
-        private float MapRealWHByRice = 0;              //地图实际宽高
-        private float playItemModelWidth = 0;
+        protected float OriginalMiniMapRepresentWHByRice = 400;   //米
+        protected float MiniMapRepresentWHByRice = 400;   //米
+        protected float MapRealWHByRice = 0;              //地图实际宽高
+        protected float playItemModelWidth = 0;
 
-        private Transform root = null;
-        private Transform miniMap = null;
+        protected Transform root = null;
+        protected RectTransform rootRectTf = null;
+        protected Transform miniMap = null;
 
-        private Transform mapBg = null;
-        private Transform kTouRoot = null;
-        private Transform routeRoot = null;
-        private Transform curDuquanRoot = null;
-        private Transform safeDuquanRoot = null;
-        private Transform curBombAreaRoot = null;
-        private Transform miniDisRoot = null;
-        private Transform lineRoot = null;
-        private Transform labelRoot = null;
-        private Transform playItemRoot = null;
-        private Transform markRoot = null;
+        protected Transform mapBg = null;
+        protected Transform kTouRoot = null;
+        protected Transform routeRoot = null;
+        protected Transform curDuquanRoot = null;
+        protected Transform safeDuquanRoot = null;
+        protected Transform curBombAreaRoot = null;
+        protected Transform miniDisRoot = null;
+        protected Transform lineRoot = null;
+        protected Transform labelRoot = null;
+        protected Transform playItemRoot = null;
+        protected Transform markRoot = null;
+        protected Transform girdRoot = null;
+        protected Transform bioMarkRoot = null;
 
-        private BaneCircle _safeCircle;
-        private BaneCircle _duquanCircle;
-        private BombArea _bombArea;
-        private SafeMiniDis _safeMiniDis;
-        private AirPlane _airPlane;
-        private RouteLine _routeLine;
-        private MapGird _mapGird;
-        private MapLabel _mapLabel;
-        private MapPlayer _mapPlayer;
-        private MapMark _mapMark;
+        protected RawImage mapBgRawIamge;
+
+        protected BaneCircle _safeCircle;
+        protected BaneCircle _duquanCircle;
+        protected BombArea _bombArea;
+        protected SafeMiniDis _safeMiniDis;
+        protected AirPlane _airPlane;
+        protected RouteLine _routeLine;
+        protected MapGird _mapGird;
+        protected MapGird1 _mapGird1;
+        protected MapLabel _mapLabel;
+        protected MapPlayer _mapPlayer;
+        protected MapMark _mapMark;
+        protected BioMark _bioMark;
 
         private float targetRate = 0;
         private float increaseRate;
 
-        private Vector2 lastPos = Vector2.zero; //记录上一次的人物在 以地图左下角的 相对位置 米
-        private Vector2 selfPlayPos = Vector2.zero;
+        protected Vector2 lastPos = Vector2.zero; //记录上一次的人物在 以地图左下角的 相对位置 米
+        protected Vector2 selfPlayPos = Vector2.zero;
 
-        private CommonMiniMapViewModel _viewModel = new CommonMiniMapViewModel();
+        protected CommonMiniMapViewModel _viewModel = new CommonMiniMapViewModel();
         protected override IUiViewModel ViewModel
         {
             get { return _viewModel; }
@@ -83,6 +90,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             isGameObjectCreated = true;
 
             MapRealWHByRice = adapter.CurMapSize;
+            OriginalMiniMapRepresentWHByRice = MiniMapRepresentWHByRice = GetShowSize();
             Logger.InfoFormat("CurMapSize: \"{0}\" ", MapRealWHByRice);
             InitGui();
         }
@@ -96,50 +104,67 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void InitGui()
         {
             InitSetting();
-//            InitPlayerItemList();
-//            InitMarkItemList();
+            CalculateRate();
+            //            InitPlayerItemList();
+            //            InitMarkItemList();
             _safeCircle = new BaneCircle(safeDuquanRoot, false, true);
             _duquanCircle = new BaneCircle(curDuquanRoot, true, true);
             _bombArea = new BombArea(curBombAreaRoot);
             _safeMiniDis = new SafeMiniDis(miniDisRoot);
             if (!MapLevel.Min.Equals(adapter.MapLevel))
             {
-                _mapGird = new MapGird(lineRoot);
+//                _mapGird = new MapGird(lineRoot);
+//                _mapGird1 = new MapGird1(girdRoot);
             }
+            _mapGird1 = new MapGird1(girdRoot);
             InitMapBg();
             _airPlane = new AirPlane(kTouRoot, Loader);
             _routeLine = new RouteLine(routeRoot);
             _mapLabel = new MapLabel(labelRoot);
             _mapPlayer = new MapPlayer(playItemRoot);
             _mapMark = new MapMark(markRoot);
+            _bioMark = new BioMark(bioMarkRoot);
             PreparedSprite();
         }
 
+        protected virtual void UpdateMapBg(Vector2 centerPos)
+        {
+            var uvRect = mapBgRawIamge.uvRect;
+            var halfRect = MiniMapRepresentWHByRice * rate / 2;
+            var RealRect = MapRealWHByRice * rate;
+            uvRect.x = (centerPos.x * rate - halfRect)/ RealRect;
+            uvRect.y = (centerPos.y * rate - halfRect)/ RealRect;
+            uvRect.width = uvRect.height = halfRect * 2/ RealRect;
+            mapBgRawIamge.uvRect = uvRect;
+        }
 
-        private void RefreshGui(float interval)
+        protected virtual void RefreshGui(float interval)
         {
             if (!isGameObjectCreated)
                 return;
             GetSelfPosition();
             UpdateMapRate();
+            UpdateMapBg(selfPlayPos);
 //            UpdatePlayerItemList();
 
             _mapPlayer.Update(adapter.TeamInfos, selfPlayPos, rate, MiniMapRepresentWHByRice, adapter.MapLevel);
-            _mapMark.Update(adapter.TeamInfos, rate);
+            _mapMark.Update(adapter.MapMarks, rate);
             _safeCircle.Update(adapter.NextDuquan, selfPlayPos, rate, MiniMapRepresentWHByRice);
             _duquanCircle.Update(adapter.CurDuquan, selfPlayPos, rate, MiniMapRepresentWHByRice);
             _bombArea.Update(adapter.BombArea, selfPlayPos, rate, MiniMapRepresentWHByRice);
             _safeMiniDis.Update(adapter.NextDuquan, selfPlayPos, playItemModelWidth, rate, MiniMapRepresentWHByRice);
-            if (_mapGird != null) _mapGird.Update(rate, MapRealWHByRice, selfPlayPos, MiniMapRepresentWHByRice);
+//            if (_mapGird != null) _mapGird.Update(rate, MapRealWHByRice, selfPlayPos, MiniMapRepresentWHByRice);
+            if (_mapGird1 != null) _mapGird1.Update(rate, MapRealWHByRice, selfPlayPos, MiniMapRepresentWHByRice, 0);
 
             UpdataMapBg();
 
             _airPlane.Update(interval, rate, adapter.KongTouList(), adapter.PlaneData);
             _routeLine.Updata(adapter.IsShowRouteLine, adapter.RouteLineStartPoint, adapter.RouteLineEndPoint, rate);
             _mapLabel.UpdateC4(adapter.IsC4Drop, adapter.C4DropPosition, rate);
+            _bioMark.UpdateBioLabel(adapter.MotherPos, adapter.HeroPos,adapter.HumanPos, adapter.SupplyPos, rate);
         }
 
-        private void GetSelfPosition()
+        protected void GetSelfPosition()
         {
             var data = adapter.TeamInfos.Find((info=>info.IsPlayer == true));
             selfPlayPos = data.Pos.ShiftedUIVector2();
@@ -158,6 +183,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             miniDisRoot = FindChildGo("miniMumDisatance");
 //            lineModel = FindChildGo("lineModel");
             lineRoot = FindChildGo("lineRoot");
+            girdRoot = FindChildGo("girdRoot");
             mapBg = FindChildGo("mapBg");
 //            airPlane = FindChildGo("airPlane");
 //            kTouModel = FindChildGo("kongtouModel");
@@ -167,46 +193,63 @@ namespace App.Client.GameModules.Ui.Models.Common
 //            routeLineGo = FindComponent<RectTransform>("routeLine");
             routeRoot = FindChildGo("routeRoot");
             labelRoot = FindChildGo("LabelRoot");
-
-          
-            OriginalMiniMapRepresentWHByRice = MiniMapRepresentWHByRice = SingletonManager.Get<MapConfigManager>().SceneParameters.MiniMapShowSize;
-
-            //因为小地图是 miniMapW * miniMapH 像素的框框  而实际地图是以自己为中心的MiniMapWH * MiniMapWH米的正方形 所以目前设计的一像素对应于一米 1:1 比例
-            miniMapWByPixel = root.GetComponent<RectTransform>().sizeDelta.x;
-            miniMapHByPixel = root.GetComponent<RectTransform>().sizeDelta.y;
-            targetRate = rate = miniMapWByPixel / MiniMapRepresentWHByRice;
-
+            bioMarkRoot = FindChildGo("BioRoot");
+            rootRectTf = root.GetComponent<RectTransform>();
+            mapBgRawIamge = mapBg.GetComponent<RawImage>();
             //保证canvas的 推荐分辨率等于 实际分辨率 解决犹豫网格线只有一个像素的 导致的精度丢失问题
-//            var canvasScaleCom = root.parent.GetComponent<CanvasScaler>();
-//            canvasScaleCom.referenceResolution = new Vector2(Screen.width, Screen.height);
-//            Logger.InfoFormat("minimap Mask Width:{0}  Height:{1}", miniMapWByPixel, miniMapHByPixel);
+            //            var canvasScaleCom = root.parent.GetComponent<CanvasScaler>();
+            //            canvasScaleCom.referenceResolution = new Vector2(Screen.width, Screen.height);
+            //            Logger.InfoFormat("minimap Mask Width:{0}  Height:{1}", miniMapWByPixel, miniMapHByPixel);
         }
 
+        protected virtual void CalculateRate()
+        {
+            //因为小地图是 miniMapW * miniMapH 像素的框框  而实际地图是以自己为中心的MiniMapWH * MiniMapWH米的正方形 所以目前设计的一像素对应于一米 1:1 比例
+            miniMapWByPixel = rootRectTf.sizeDelta.x;
+            miniMapHByPixel = rootRectTf.sizeDelta.y;
+            targetRate = rate = miniMapWByPixel / MiniMapRepresentWHByRice;
+        }
+
+        protected virtual float GetShowSize()
+        {
+            return SingletonManager.Get<MapConfigManager>().SceneParameters.MiniMapShowSize;
+        }
+
+
+        private float targetRice;
         private void UpdateMapRate()
         {
 //          Debug.Log(adapter.MoveSpeed);
+            float rice;
             if (adapter.MoveSpeed > rateControlSpeed)
             {
                 var addSpeed = (int)((adapter.MoveSpeed - rateControlSpeed) / rateIncreaseInterval);
                 if (addSpeed > rateIncreaseMaxPresent) addSpeed = rateIncreaseMaxPresent;
-                 MiniMapRepresentWHByRice = OriginalMiniMapRepresentWHByRice + OriginalMiniMapRepresentWHByRice * addSpeed * 0.1f;
+                rice = OriginalMiniMapRepresentWHByRice + OriginalMiniMapRepresentWHByRice * addSpeed * 0.1f;
             }
             else
             {
-                MiniMapRepresentWHByRice = OriginalMiniMapRepresentWHByRice;
+                rice = OriginalMiniMapRepresentWHByRice;
             }
 
-            var newRate = miniMapWByPixel / MiniMapRepresentWHByRice;
-            if (targetRate.Equals(newRate) == false)
+            if (!targetRice.Equals(rice))
             {
-                targetRate = newRate;
-                increaseRate = (targetRate - rate) / 60;
+                targetRice = rice;
+                increaseRate = (targetRice - MiniMapRepresentWHByRice) / 10;
             }
 
-            if (targetRate.Equals(rate) == false)
+//            var newRate = miniMapWByPixel / MiniMapRepresentWHByRice;
+//            if (targetRate.Equals(newRate) == false)
+//            {
+//                targetRate = newRate;
+//                increaseRate = (targetRate - rate) / 60;
+//            }
+
+            if (targetRice.Equals(MiniMapRepresentWHByRice) == false)
             {
-                rate += increaseRate;
-                if(Mathf.Abs(targetRate - rate) < Mathf.Abs(increaseRate)) rate = targetRate;
+                MiniMapRepresentWHByRice += increaseRate;
+                if(Mathf.Abs(targetRice - MiniMapRepresentWHByRice) < Mathf.Abs(increaseRate)) MiniMapRepresentWHByRice = targetRice;
+                rate = miniMapWByPixel / MiniMapRepresentWHByRice;
                 SetMapRate();
             }
         }
@@ -222,7 +265,6 @@ namespace App.Client.GameModules.Ui.Models.Common
             SetMapRate();
 
             //根据地图Id 设置mapBg的图片
-            var mapBgImg = mapBg.GetComponent<Image>();
             if (adapter != null)
             {
                 var mapId = adapter.MapId;
@@ -230,9 +272,9 @@ namespace App.Client.GameModules.Ui.Models.Common
                 {
                     case 1:
                         {
-                            Loader.RetriveSpriteAsync(SingletonManager.Get<MapConfigManager>().SceneParameters.MapLargeBundlename, SingletonManager.Get<MapConfigManager>().SceneParameters.MapLarge, (sprite) =>
+                            Loader.LoadAsync(SingletonManager.Get<MapConfigManager>().SceneParameters.MapLargeBundlename, SingletonManager.Get<MapConfigManager>().SceneParameters.MapLarge, (data) =>
                             {
-                                mapBgImg.sprite = sprite;
+                                mapBgRawIamge.texture = data as Texture;
                             });
                         }
                         break;
@@ -242,7 +284,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void SetMapRate()
         {
-            var mapBgRectTran = miniMap.GetComponent<RectTransform>();
+            var mapBgRectTran = _viewModel.BgRectTransform;
             if (mapBgRectTran == null)
                 return;
             mapBgRectTran.sizeDelta = new Vector2(rate * MapRealWHByRice, rate * MapRealWHByRice);
@@ -257,7 +299,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                 return;
 
             //设置它的大小 因为小地图要显示400 * 400的范围的内容
-            var mapBgRectTran = miniMap.GetComponent<RectTransform>();
+            var mapBgRectTran = _viewModel.BgRectTransform;
             if (mapBgRectTran == null)
                 return;
             //            mapBgRectTran.sizeDelta = new Vector2(rate * MapRealWHByRice, rate * MapRealWHByRice);

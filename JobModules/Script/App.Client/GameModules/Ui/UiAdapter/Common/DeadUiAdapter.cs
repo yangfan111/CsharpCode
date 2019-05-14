@@ -5,7 +5,6 @@ using App.Shared.Components;
 using Assets.Sources.Free.UI;
 using Core.Free;
 using Free.framework;
-using UnityEngine;
 using Utils.Singleton;
 
 namespace App.Client.GameModules.Ui.UiAdapter.Common
@@ -19,12 +18,17 @@ namespace App.Client.GameModules.Ui.UiAdapter.Common
         {
             _contexts = contexts;
         }
+
+        public bool IsGameOver
+        {
+            get { return _contexts.ui.uI.GameResult != Core.Enums.EUIGameResultType.None; }
+        }
+
         public bool DeadButtonShow
         {
             get
             {
-                return GameRules.IsChicken(_contexts.session.commonSession.RoomInfo.ModeId);
-                //return _contexts.ui.uI.DeadButtonShow;
+                return GameRules.IsChicken(_contexts.session.commonSession.RoomInfo.ModeId ) && !IsGameOver;
             }
         }
 
@@ -48,13 +52,10 @@ namespace App.Client.GameModules.Ui.UiAdapter.Common
         public void BackToHall()
         {
             HallUtility.GameOver();
-            //Debug.Log("BackToHall");
         }
 
         public void Observe()
         {
-            Debug.Log("Observe");
-
             SimpleProto data = FreePool.Allocate();
             data.Key = FreeMessageConstant.ObservePlayer;
             data.Ins.Add(_contexts.player.flagSelfEntity.entityKey.Value.EntityId);

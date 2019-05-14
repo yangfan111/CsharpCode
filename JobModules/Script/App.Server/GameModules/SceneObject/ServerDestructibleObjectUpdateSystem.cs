@@ -41,7 +41,7 @@ namespace App.Server.GameModules.SceneObject
             for (int i = 0; i < objCount; ++i)
             {
                 var obj = objs[i];
-
+                
                 var syncEvents = obj.triggerObjectEvent.SyncEvents;
                 
                 while (syncEvents.Count > 0)

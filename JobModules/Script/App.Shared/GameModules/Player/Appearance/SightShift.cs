@@ -23,6 +23,8 @@ namespace App.Shared.GameModules.Player.Appearance
         private float _verticalPeriodTimeMax;
         private float _verticalPeriodTimeMin;
 
+        private float _roundTime;
+
         private RandomnessSimulator _generator = new RandomnessSimulator();
         private IPossibilityResult _horizontalPossibility;
 
@@ -81,6 +83,7 @@ namespace App.Shared.GameModules.Player.Appearance
                 {
                     // new shift period
                     VerticalShiftRange = Mathf.Lerp(_verticalLimitMin, _verticalLimitMax, (float)randomNumber);
+                    _roundTime = VerticalShiftRange / _verticalSpeed;
                 }
             }
             else
@@ -89,35 +92,43 @@ namespace App.Shared.GameModules.Player.Appearance
                 {
                     VerticalShiftRange = Mathf.Lerp(_verticalLimitMin, _verticalLimitMax, (float)randomNumber);
                 }
-                VerticalShift += _verticalSpeed * intervalInSecond * VerticalShiftDirection;
+                VerticalShift += _verticalSpeed * intervalInSecond * VerticalShiftDirection * Buff;
+                _roundTime -= intervalInSecond;
                 // shift period
                 if (VerticalShiftDirection > 0)
                 {
                     // reach up boundary
-                    if (VerticalShift >= VerticalShiftRange)
+                    if (VerticalShift >= VerticalShiftRange || _roundTime <= 0)
                     {
+                        if (VerticalShift >= VerticalShiftRange)
+                        {
+                            VerticalShift = VerticalShiftRange;
+                        }
                         VerticalShiftDirection = -1;
-                        VerticalShift = VerticalShiftRange;
+                        RemainVerticalPeriodTime = (int)Mathf.Ceil(Mathf.Lerp(_verticalPeriodTimeMin, _verticalPeriodTimeMax, (float)randomNumber));
                     }
                 }
                 else
                 {
                     // reach down boundary
-                    if (VerticalShift <= 0)
+                    if (VerticalShift <= 0 || _roundTime <= 0)
                     {
-                        VerticalShift = 0;
+                        if (VerticalShift <= 0)
+                        {
+                            VerticalShift = 0;
+                        }
 
-                        RemainVerticalPeriodTime = (int)Mathf.Ceil(Mathf.Lerp(_verticalPeriodTimeMin, _verticalPeriodTimeMax, (float)randomNumber));
-                        // ready for another period
-                        VerticalShiftRange = 0;
                         VerticalShiftDirection = 1;
+                        RemainVerticalPeriodTime = (int)Mathf.Ceil(Mathf.Lerp(_verticalPeriodTimeMin, _verticalPeriodTimeMax, (float)randomNumber));
+
+                        VerticalShiftRange = 0;
                     }
                 }
             }
 
             // Horizontal
             bool directionChanged = false;
-            HorizontalShift += _horizontalSpeed * intervalInSecond * HorizontalShiftDirection;
+            HorizontalShift += _horizontalSpeed * intervalInSecond * HorizontalShiftDirection * Buff;
             if (HorizontalShift >= _horizontalLimit)
             {
                 HorizontalShift = _horizontalLimit;

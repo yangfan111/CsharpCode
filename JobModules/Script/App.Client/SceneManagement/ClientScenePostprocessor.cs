@@ -24,7 +24,14 @@ namespace App.Client.SceneManagement
                     Type t = Type.GetType("ArtPlugins.TerrainProxy, Assembly-CSharp");
                     if (t != null)
                     {
+                        terrain.drawTreesAndFoliage = true;
+                        terrain.heightmapPixelError = 20;
+                        terrain.collectDetailPatches = true;
+                        terrain.detailObjectDistance = 120;
+                        terrain.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
+
                         terrain.gameObject.AddComponent(t);
+
                         _logger.Debug("ArtPlugins.TerrainProxy, Assembly-CSharp Founded");
                     }
                     else
@@ -45,7 +52,7 @@ namespace App.Client.SceneManagement
                         _logger.Error("ArtPlugins.GQS_Bind_Camera is null ??? !!!");
                     }
                             
-                    v.useOcclusionCulling = SharedConfig.EnableOC;
+                    v.useOcclusionCulling = false;
 //                    if (v.GetComponent<AudioListener>() == null)
 //                    {
 //                        v.gameObject.AddComponent<AudioListener>();

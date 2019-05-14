@@ -7,6 +7,7 @@ using App.Shared.GameModules.Player.Appearance;
 using App.Shared.GameModules.Player.Appearance.WeaponControllerPackage;
 using App.Shared.GameModules.Player.CharacterBone;
 using App.Shared.GameModules.Player.ConcreteCharacterController;
+using App.Shared.GameModules.Player.ResourceLoad;
 using App.Shared.GameModules.Vehicle;
 using App.Shared.GameModules.Weapon;
 using Core.CharacterController;
@@ -90,13 +91,13 @@ namespace App.Shared.CommonResource.Updaters
             var cc = PlayerEntityUtility.InitCharacterController(character);
             var kcc = PlayerEntityUtility.InitKinematicCharacterMotor(character);
             var characterControllerContext = new CharacterControllerContext(
-                new UnityCharacterController(cc, !player.isFlagSelf),
+                new UnityCharacterController(cc, ModelLoadHandler.InitActionWithOffset(),!player.isFlagSelf),
                 new ProneCharacterController(kcc,
-                    new ProneController()),
+                    new ProneController(), ModelLoadHandler.InitActionWithNoOffset()),
                 new DiveCharacterController(kcc,
-                    new DiveController()),
+                    new DiveController(), ModelLoadHandler.InitActionWithNoOffset()),
                 new SwimCharacterController(kcc,
-                    new SwimController())
+                    new SwimController(), ModelLoadHandler.InitActionWithNoOffset())
             );
 
 

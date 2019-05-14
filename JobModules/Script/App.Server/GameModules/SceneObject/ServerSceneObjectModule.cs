@@ -10,9 +10,10 @@ namespace App.Server.GameModules.SceneObject
         public ServerSceneObjectModule(Contexts contexts, ISessionState sessionState, IEntityIdGenerator equipmentIdGenerator)
         {
             //AddSystem(new EquipmentInitSystem(contexts, sessionState, equipmentIdGenerator));
+            AddSystem(new CreateMapObjByEventSystem(contexts));
             AddSystem(new TriggerObjectUpdateSystem(contexts));
-            AddSystem(new DoorRotateSystem(contexts, new ServerDoorListener(contexts)));
-            AddSystem(new DoorTriggerSystem(contexts.mapObject));
+            AddSystem(new DoorRotateSystem(contexts));
+            AddSystem(new DoorTriggerSystem(contexts,new ServerDoorListener(contexts)));
             AddSystem(new ServerDestructibleObjectUpdateSystem(contexts));
             AddSystem(new ServerFreeCastSceneEntityDestroySystem(contexts));
             AddSystem(new ServerSceneObjectThrowingSystem(contexts.sceneObject, 

@@ -87,6 +87,7 @@
     <Compile Include="Appearance\WardrobePackage\CharacterAvatar.cs" />
     <Compile Include="Appearance\WardrobePackage\HallWardrobeController.cs" />
     <Compile Include="Appearance\WardrobePackage\MaterialHelper.cs" />
+    <Compile Include="Appearance\WardrobePackage\MyLodGroup.cs" />
     <Compile Include="Appearance\WardrobePackage\WardrobeControllerBase.cs" />
     <Compile Include="Appearance\WardrobePackage\WardrobeParam.cs" />
     <Compile Include="Appearance\Weapon\HallWeaponController.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Appearance\Weapon\IWeaponModelLoadController.cs" />
     <Compile Include="Appearance\Weapon\IWeaponModelLoader.cs" />
     <Compile Include="Appearance\Weapon\WeaponControllerBase.cs" />
+    <Compile Include="Appearance\Weapon\WeaponGameObjectData.cs" />
     <Compile Include="Appearance\Weapon\WeaponModelAssemblyController.cs" />
     <Compile Include="Appearance\Weapon\WeaponModelController.cs" />
     <Compile Include="Appearance\Weapon\WeaponModelControllerFactory.cs" />
@@ -255,6 +257,7 @@
     <Compile Include="Utils\UnityLogCapturer.cs" />
     <Compile Include="Utils\UniversalConsts.cs" />
     <Compile Include="Utils\Vector3Ext.cs" />
+    <Compile Include="gc_manager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LiteNetLib\LiteNetLib.csproj">

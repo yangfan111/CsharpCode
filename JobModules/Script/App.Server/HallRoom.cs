@@ -6,8 +6,6 @@ using Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Core.Statistics;
-using MySql.Data.MySqlClient;
 using Utils.Configuration;
 using Utils.Singleton;
 
@@ -50,6 +48,7 @@ namespace App.Server
         public string RoomName { get; set; }
         public int RoomDisplayId { get; set; }
         public int RoomCapacity { get; set; }
+        public bool AllowReConnect { get; set; }
 
         public ERoomGameStatus GameStatus { get; set; }
         private long _createTime;
@@ -185,7 +184,7 @@ namespace App.Server
 
         public bool CanJoin()
         {
-            return _dictPlayers.Count < ROOM_MAX_PLAYER_COUNT;
+            return _dictPlayers.Count < RoomCapacity; //ROOM_MAX_PLAYER_COUNT;
         }
 
         public int MaxNum(long teamId)
@@ -341,6 +340,7 @@ namespace App.Server
             _dispatcher = dispatcher;
             _contexts = contexts;
             _dispatcher.OnRoomEvent += OnRoomEvent;
+            AllowReConnect = false;
         }
 
         private void OnRoomEvent(RoomEvent e)

@@ -21,6 +21,33 @@ namespace App.Shared.Components.SceneObject
     }
 
     [SceneObject]
+    public class AudioComponent : IPlaybackComponent
+    {
+        public EAudioUniqueId uniqueId;
+
+
+        public int GetComponentId()
+        {
+            return (int)EComponentIds.SceneObjectAudioObject;
+
+        }
+
+        public void CopyFrom(object rightComponent)
+        {
+            var remote = rightComponent as AudioComponent;
+            uniqueId = remote.uniqueId;
+
+        }
+
+        public bool IsInterpolateEveryFrame() { return false; }
+
+        public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
+        {
+            CopyFrom(left);
+        }
+    }
+
+    [SceneObject]
     public class UnityObjectComponent : SingleAssetComponent
     {
         public override int GetComponentId()
@@ -48,18 +75,21 @@ namespace App.Shared.Components.SceneObject
     [SceneObject, ]
     public class WeaponObjectComponent : IPlaybackComponent 
     {
-        //    [DontInitilize, NetworkProperty] public EntityKey WeaponKey;
         [DontInitilize, NetworkProperty] public int ConfigId;
         [DontInitilize, NetworkProperty] public int WeaponAvatarId;
         [DontInitilize, NetworkProperty] public int UpperRail;
         [DontInitilize, NetworkProperty] public int LowerRail;
+        [DontInitilize, NetworkProperty] public int SideRail;
         [DontInitilize, NetworkProperty] public int Stock;
         [DontInitilize, NetworkProperty] public int Muzzle;
         [DontInitilize, NetworkProperty] public int Magazine;
         [DontInitilize, NetworkProperty] public int Bullet;
-     //   [DontInitilize, NetworkProperty] public bool PullBolt;
-        //[DontInitilize, NetworkProperty] public int FireModel;
         [DontInitilize, NetworkProperty] public int ReservedBullet;
+        [DontInitilize, NetworkProperty] public int Bore;
+        [DontInitilize, NetworkProperty] public int Feed;
+        [DontInitilize, NetworkProperty] public int Trigger;
+        [DontInitilize, NetworkProperty] public int Interlock;
+        [DontInitilize, NetworkProperty] public int Brake;
 
         public void CopyFrom(object rightComponent)
         {
@@ -68,13 +98,17 @@ namespace App.Shared.Components.SceneObject
             WeaponAvatarId = remote.WeaponAvatarId;
             UpperRail = remote.UpperRail;
             LowerRail = remote.LowerRail;
+            SideRail = remote.SideRail;
             Stock = remote.Stock;
             Muzzle = remote.Muzzle;
             Magazine = remote.Magazine;
             Bullet = remote.Bullet;
             ReservedBullet = remote.ReservedBullet;
-            //PullBolt = remote.PullBolt;
-            //FireModel = remote.FireModel;
+            Bore = remote.Bore;
+            Feed = remote.Feed;
+            Trigger = remote.Trigger;
+            Interlock = remote.Interlock;
+            Brake = remote.Brake;
         }
         public void GameCopyFrom(WeaponScanStruct remote)
         {
@@ -82,11 +116,17 @@ namespace App.Shared.Components.SceneObject
             WeaponAvatarId = remote.AvatarId;
             UpperRail = remote.UpperRail;
             LowerRail = remote.LowerRail;
+            SideRail = remote.SideRail;
             Stock = remote.Stock;
             Muzzle = remote.Muzzle;
             Magazine = remote.Magazine;
             Bullet = remote.Bullet;
             ReservedBullet = remote.ReservedBullet;
+            Bore = remote.Bore;
+            Feed = remote.Feed;
+            Trigger = remote.Trigger;
+            Interlock = remote.Interlock;
+            Brake = remote.Brake;
         }
      
         public static explicit operator WeaponScanStruct(WeaponObjectComponent remote)
@@ -96,13 +136,17 @@ namespace App.Shared.Components.SceneObject
             newComp.AvatarId = remote.WeaponAvatarId;
             newComp.UpperRail = remote.UpperRail;
             newComp.LowerRail = remote.LowerRail;
+            newComp.SideRail = remote.SideRail;
             newComp.Stock = remote.Stock;
             newComp.Muzzle = remote.Muzzle;
             newComp.Magazine = remote.Magazine;
             newComp.Bullet = remote.Bullet;
             newComp.ReservedBullet = remote.ReservedBullet;
-            //newComp.PullBolt = remote.PullBolt;
-            //newComp.FireModel = remote.FireModel;
+            newComp.Bore = remote.Bore;
+            newComp.Feed = remote.Feed;
+            newComp.Trigger = remote.Trigger;
+            newComp.Interlock = remote.Interlock;
+            newComp.Brake = remote.Brake;
             return newComp;
         }
 
@@ -251,7 +295,7 @@ namespace App.Shared.Components.SceneObject
     public class TriggerObjectIdComponent : IPlaybackComponent
     {
         [NetworkProperty]
-        public string Id;
+        public int Id;
 
 
         public int GetComponentId()
@@ -476,7 +520,6 @@ namespace App.Shared.Components.SceneObject
         public bool IsInterpolateEveryFrame(){ return true; }
         public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
         {
-
             var l = (DoorDataComponent) left;
             var r = (DoorDataComponent) right;
             State = l.State;

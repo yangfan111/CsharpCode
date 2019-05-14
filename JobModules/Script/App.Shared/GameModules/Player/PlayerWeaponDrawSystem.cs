@@ -1,4 +1,4 @@
-﻿using Core.GameModule.Interface;
+﻿using App.Shared.Util;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using Core;
@@ -6,24 +6,24 @@ using Core;
 
 namespace App.Shared.GameModules.Player
 {
-    public class PlayerWeaponDrawSystem : IUserCmdExecuteSystem
+    public class PlayerWeaponDrawSystem : AbstractUserCmdExecuteSystem
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerWeaponDrawSystem));
-        private Contexts _contexts;
              
-        public PlayerWeaponDrawSystem(Contexts contexts)
+
+        protected override bool Filter(PlayerEntity playerEntity)
         {
-            _contexts = contexts; 
+            return true;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        protected override bool FilterCmd(IUserCmd cmd)
         {
-            if(!cmd.IsDrawWeapon && !cmd.IsForceUnmountWeapon)
-            {
-                return;
-            }
-            var player = owner.OwnerEntity as PlayerEntity;
-            var controller = player.WeaponController();
+            return cmd.IsDrawWeapon || cmd.IsForceUnmountWeapon;
+        }
+
+        protected override void ExecuteUserCmd(PlayerEntity playerEntity, IUserCmd cmd)
+        {
+            var controller = playerEntity.WeaponController();
 
             if (cmd.IsForceUnmountWeapon)
             {
@@ -32,7 +32,7 @@ namespace App.Shared.GameModules.Player
                 return;
             }
 
-            if(null != cmd.FilteredInput && !cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsDrawWeapon))
+            if(!cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsDrawWeapon))
             {
                 return;
             }
@@ -43,10 +43,10 @@ namespace App.Shared.GameModules.Player
                     Logger.Error("FilteredInput in cmd should never be null !");
                 }
             }
-            bool changeWeaponSucess= true;
+            bool changeWeaponSucess = true;
             if (controller.IsHeldSlotEmpty)
             {
-                EWeaponSlotType lastSlot = player.WeaponController().PollGetLastSlotType(false);
+                EWeaponSlotType lastSlot = controller.PollGetLastSlotType(false);
                 if (lastSlot != EWeaponSlotType.None)
                 {
                     //player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.ChangeWeapon);
@@ -67,10 +67,8 @@ namespace App.Shared.GameModules.Player
                 controller.UnArmWeapon(true); 
                  
             }
-//            if (changeWeaponSucess)
-//            {
-//                player.PlayWeaponSound(XmlConfig.EWeaponSoundType.SwitchIn);
-//            }
         }
+
+     
     }
 }

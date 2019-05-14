@@ -22,7 +22,15 @@ namespace App.Shared.Components.Player
         Enter = 1,
         Stay = 2,
     }
-    
+
+    public enum EJobAttribute {
+        EJob_EveryMan, /*普通人*/
+        EJob_Variant, /*变异体*/
+        EJob_Matrix, /*母体*/
+        EJob_Hero, /*英雄*/
+    }
+
+
     [Player]
     public class GamePlayComponent : ISelfLatestComponent, IPlaybackComponent
     {
@@ -80,14 +88,11 @@ namespace App.Shared.Components.Player
         [DontInitilize] [NetworkProperty] public int SaveTime;
         [DontInitilize] [NetworkProperty] public EntityKey SavePlayerKey;
         //[DontInitilize] [NetworkProperty] public int SaveEnterState;
-        [DontInitilize] [NetworkProperty] public bool IsInteruptSave;
+        [DontInitilize] /*[NetworkProperty] */public bool IsInteruptSave;
         
         [DontInitilize] [NetworkProperty] public bool CoverInit;                    //是否开始执行用户指令
        
         [DontInitilize] public short LastViewModeByCmd;                         //LastViewMode: 记录由指令驱动的人称转换，用于人物复活时恢复人称状态
-
-        [DontInitilize] public bool Invisible;
-        [DontInitilize] public bool VisibleToTeammate;
 
         [DontInitilize] public bool TipHideStatus;
 
@@ -223,7 +228,7 @@ namespace App.Shared.Components.Player
             SaveTime = hp.SaveTime;
             SavePlayerKey = hp.SavePlayerKey;
             //SaveEnterState = hp.SaveEnterState;
-            IsInteruptSave = hp.IsInteruptSave;
+            //IsInteruptSave = hp.IsInteruptSave;
 
             CoverInit = hp.CoverInit;
         }

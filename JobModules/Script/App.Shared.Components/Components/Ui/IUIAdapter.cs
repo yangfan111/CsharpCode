@@ -13,6 +13,7 @@ namespace App.Shared.Components.Ui
         UserInputManagerComponent UserInputManager { get; set; }
         void HideUiGroup(UiGroup group);
         void ShowUiGroup(UiGroup group);
+        bool CanOpenUiByKey { get; set; }
 
     }
 }

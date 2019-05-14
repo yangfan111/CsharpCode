@@ -27,5 +27,6 @@ namespace Core.Common
         FireWithNoBullet,
         NoWeaponInSlot,
         CantSwithGrenade,
+        EnterNumError,
     }
 }

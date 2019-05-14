@@ -15,7 +15,7 @@ namespace Core.CharacterState.Action
         private readonly ActionFsm _keepFsm;
 
         private FsmUpdateType _commonUpdateType = FsmUpdateType.ResponseToInput | FsmUpdateType.ResponseToAnimation;
-        private FsmUpdateType _keepUpdateType = FsmUpdateType.ResponseToInput;
+        private FsmUpdateType _keepUpdateType = FsmUpdateType.ResponseToInput | FsmUpdateType.ResponseToAnimation;
 
         public ActionManager(IFsmTransitionHelper infoProvider, ICharacterInfoProvider characterInfo)
         {

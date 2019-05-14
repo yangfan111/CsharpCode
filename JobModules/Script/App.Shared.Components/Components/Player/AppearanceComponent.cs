@@ -438,6 +438,7 @@ namespace App.Shared.Components.Player
     {
         [DontInitilize] [NetworkProperty] public int WeaponInHand;
         [DontInitilize] [NetworkProperty] public int ReloadState;
+        [DontInitilize] [NetworkProperty] public int OverrideControllerState;
 
         public int GetComponentId()
         {
@@ -457,10 +458,11 @@ namespace App.Shared.Components.Player
 
         public bool IsApproximatelyEqual(object right)
         {
-            var rightObj = (PredictedAppearanceComponent)right;
+            var rightObj = (PredictedAppearanceComponent) right;
             if (rightObj != null)
             {
-                return CompareUtility.IsApproximatelyEqual(WeaponInHand, rightObj.WeaponInHand);
+                return CompareUtility.IsApproximatelyEqual(WeaponInHand, rightObj.WeaponInHand) &&
+                       CompareUtility.IsApproximatelyEqual(OverrideControllerState, rightObj.OverrideControllerState);
             }
 
             return false;
@@ -473,12 +475,14 @@ namespace App.Shared.Components.Player
             {
                 WeaponInHand = right.WeaponInHand;
                 ReloadState = right.ReloadState;
+                OverrideControllerState = right.OverrideControllerState;
             }
         }
 
         public override string ToString()
         {
-            return string.Format("WeaponInHand: {0}, ReloadState: {1}", WeaponInHand, ReloadState);
+            return string.Format("WeaponInHand: {0}, ReloadState: {1}, OverrideControllerState:  {2}", 
+                WeaponInHand, ReloadState, OverrideControllerState);
         }
 
         public void RewindTo(object rightComponent)

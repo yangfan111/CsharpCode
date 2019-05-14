@@ -48,10 +48,10 @@ namespace Assets.Sources.Free.Auto
             if (ceT == null)
                 ceT = SingletonManager.Get<FreeUiManager>().Contexts1.player.flagSelfEntity;
 
-            var sub = ceT.position.Value.Subtract(ceS.position.Value);
+            var sub = ceT.position.Value - ceS.position.Value;
             if (toSource)
             {
-                sub = ceS.position.Value.Subtract(ceT.position.Value);
+                sub = ceS.position.Value - ceT.position.Value;
             }
             var av = new Vector3();
             FreeMathUtility.VectorToAngles(sub, ref av);

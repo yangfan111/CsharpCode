@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.BulletSimulation;
+﻿using Core.BulletSimulation;
 using Core.Components;
 using Core.Interpolate;
 using Core.Playback;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using WeaponConfigNs;
 
@@ -40,6 +40,7 @@ namespace App.Shared.Components.Bullet
         public float VelocityDecay;
         public EBulletCaliber Caliber;
         public int WeaponId;
+        public float DistanceDecay;
         [DontInitilize] public Vector3 StartPoint;
         [DontInitilize] public Vector3 EmitPoint;
         [DontInitilize] public Vector3 StartDir;

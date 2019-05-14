@@ -296,6 +296,7 @@ namespace App.Server.GameModules.GamePlay
             aliasOne(alias, new CommentAction());
             aliasOne(alias, new CreateFixEntityAction());
             aliasOne(alias, new PlayerHideAction());
+            aliasOne(alias, new PlayerVisibilityAction());
             aliasOne(alias, new OnlyDataItemUi());
             aliasOne(alias, new FreeUiDuplicateAction());
             aliasOne(alias, new CreateSceneObjectAction());
@@ -315,6 +316,7 @@ namespace App.Server.GameModules.GamePlay
             aliasOne(alias, new UnityOneInventoryUi());
             aliasOne(alias, new NewAddWeaponAction());
             aliasOne(alias, new NewRemoveWeaponAction());
+            aliasOne(alias, new AdjustWeaponAction());
             aliasOne(alias, new PlayerItemPartAction());
             aliasOne(alias, new RemoveSceneObjectAction());
             aliasOne(alias, new FindItemAction());

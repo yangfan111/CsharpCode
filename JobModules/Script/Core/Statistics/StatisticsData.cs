@@ -43,7 +43,7 @@ namespace Core.Statistics
         public int AliveTime;
 
         /// <summary>
-        /// 游戏时间（second）
+        /// 游戏时间（ms）
         /// </summary>
         public int GameTime;
 
@@ -235,6 +235,7 @@ namespace Core.Statistics
         public int LastHurtType;    //EUIDeadType
         public int LastHurtPart;
         public int LastHurtWeaponId;
+        public long LastHitDownTime;
 
         //统计变量
         public Vector3 LastPosition;

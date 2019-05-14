@@ -6,7 +6,9 @@ namespace App.Shared.Components.Player
     {
         CreateEntity,
         EnterRunning,
-        Running
+        Running,
+        Observer,
+        Offline
     }
     [Player]
     public class StageComponent:IComponent
@@ -15,7 +17,7 @@ namespace App.Shared.Components.Player
 
         public bool CanSendSnapshot()
         {
-            return Value == EPlayerLoginStage.EnterRunning || Value == EPlayerLoginStage.Running;
+            return Value == EPlayerLoginStage.EnterRunning || Value == EPlayerLoginStage.Running || Value == EPlayerLoginStage.Observer;
         }
     }
 

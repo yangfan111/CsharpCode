@@ -3,6 +3,8 @@ using App.Shared.GameModules.Player.CharacterState;
 using App.Shared.Player;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
+using Utils.Configuration;
+using Utils.Singleton;
 
 namespace App.Shared.GameModules.Player.Actions.LadderPackage
 {
@@ -12,7 +14,9 @@ namespace App.Shared.GameModules.Player.Actions.LadderPackage
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             var player = (PlayerEntity)owner.OwnerEntity;
-            if(null == player || null == player.RootGo() || !player.hasLadderActionInterface) return;
+            if(null == player || null == player.RootGo() || 
+               !player.hasLadderActionInterface ||
+               IsUnique(player)) return;
             
             CheckPlayerLifeState(player);
             
@@ -22,6 +26,14 @@ namespace App.Shared.GameModules.Player.Actions.LadderPackage
             _fsmOutputs.ResetOutput();
             ladderAction.Execute(player, _fsmOutputs.AddOutput);
             _fsmOutputs.SetOutput(player);
+        }
+        
+        private static bool IsUnique(PlayerEntity player)
+        {
+            if (null == player || !player.hasPlayerInfo) return false;
+
+            var roleId = player.playerInfo.RoleModelId;
+            return SingletonManager.Get<RoleConfigManager>().GetRoleItemById(roleId).Unique;
         }
         
         #region LifeState

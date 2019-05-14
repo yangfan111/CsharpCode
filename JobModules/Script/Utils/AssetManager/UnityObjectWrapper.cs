@@ -16,14 +16,21 @@ namespace Utils.AssetManager
 
         public int Id { get; private set; }
 
-        public SceneObjectAttribute SceneObjAttr;
+        private SceneObjectAttribute _sceneObjAttr;
+        public SceneObjectAttribute SceneObjAttr
+        {
+            get
+            {
+                if (_sceneObjAttr == null) _sceneObjAttr = new SceneObjectAttribute();
+                return _sceneObjAttr;
+            }
+        }
 
         public UnityObjectWrapper(T value, AssetInfo address, int id)
         {
             Value = value;
             Address = address;
             Id = id;
-            
         }
 
         public void Destroy()

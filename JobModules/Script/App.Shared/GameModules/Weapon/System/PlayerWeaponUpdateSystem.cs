@@ -1,11 +1,12 @@
-﻿using Core.GameModule.Interface;
+﻿using App.Shared.Util;
+using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 
 
 namespace App.Shared.GameModules.Weapon
 {
-    public class PlayerWeaponUpdateSystem : IUserCmdExecuteSystem
+    public class PlayerWeaponUpdateSystem : AbstractUserCmdExecuteSystem
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerWeaponUpdateSystem));
         private                 Contexts      _contexts;
@@ -15,27 +16,27 @@ namespace App.Shared.GameModules.Weapon
             _contexts = contexts;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        protected override bool Filter(PlayerEntity playerEntity)
         {
-            PlayerEntity playerEntity     = owner.OwnerEntity as PlayerEntity;
-            var          weaponController = playerEntity.WeaponController();
-            weaponController.InternalUpdate(playerEntity);
-            if (playerEntity.playerClientUpdate.OpenUIFrame)
-            {
-                playerEntity.playerClientUpdate.OpenUIFrame = false;
-                if (weaponController.RelatedThrowAction.IsReady && !weaponController.RelatedThrowAction.IsThrow)
-                {
-                    if (weaponController.RelatedThrowAction.IsReady && !weaponController.RelatedThrowAction.IsThrow)
-                    {
-                        var throwing =
-                            _contexts.throwing.GetEntityWithEntityKey(weaponController
-                                                                      .RelatedThrowAction.ThrowingEntityKey);
-                        if (null != throwing) throwing.isFlagDestroy = true;
+            return true;
+        }
 
-                        weaponController.RelatedCharState.ForceFinishGrenadeThrow();
-                        weaponController.RelatedThrowAction.ClearState();
-                    }
-                }
+        protected override void ExecuteUserCmd(PlayerEntity playerEntity, IUserCmd cmd)
+        {
+            var weaponController = playerEntity.WeaponController();
+            weaponController.InternalUpdate(playerEntity);
+            if (!playerEntity.playerClientUpdate.OpenUIFrame)
+                return;
+            playerEntity.playerClientUpdate.OpenUIFrame = false;
+            if (weaponController.RelatedThrowAction.IsReady && !weaponController.RelatedThrowAction.IsThrow)
+            {
+                var throwing =
+                    _contexts.throwing.GetEntityWithEntityKey(weaponController
+                                                              .RelatedThrowAction.ThrowingEntityKey);
+                if (null != throwing) throwing.isFlagDestroy = true;
+
+                weaponController.RelatedCharState.ForceFinishGrenadeThrow();
+                weaponController.RelatedThrowAction.ClearState();
             }
         }
     }

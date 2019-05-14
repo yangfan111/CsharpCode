@@ -37,11 +37,14 @@ namespace Core.Event
         HitPlayer,
         BeenHit,
         HitEnvironment,
-        BroadcastAudio,
+        ADefault, 
+        AFootstep ,
+        AJumpstep ,
+        APullbolt,
+        AMeleeAttack,
+        AWeaponFire ,
+		CreateMapObj,
         End,
-
-
-       
     }
     public interface IEvent
     {
@@ -64,6 +67,7 @@ namespace Core.Event
         /// 通过EventType和IEvent关联
         /// </summary>
         EEventType EventType { get; }
+        EEventType[] EventTypes { get; }
         IEvent MergeEvent(IEvent self, IEvent other);
 
         void DoEventClient( Entitas.IContexts contexts, IEntity entity, IEvent e);

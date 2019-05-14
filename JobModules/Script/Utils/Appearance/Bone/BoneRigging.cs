@@ -113,7 +113,8 @@ namespace Utils.Appearance
         private Transform _spine1P3;
         private Transform _pelvisP3;
 
-        private Quaternion _pelvisUntouchedRotationP3 = Quaternion.identity;
+        private Quaternion _pelvisUntouchedStandRotationP3 = Quaternion.identity;
+        private Quaternion _pelvisUntouchedCrouchRotationP3 = Quaternion.identity;
 
         private List<ThirdPersonPosture> ExcludePostures = new List<ThirdPersonPosture>()
         {
@@ -141,9 +142,16 @@ namespace Utils.Appearance
             GetP3Bones(obj);
         }
 
-        public void SetStablePelvisRotation()
+        public void SetStableStandPelvisRotation()
         {
-            _pelvisUntouchedRotationP3 = _pelvisP3.localRotation;
+            if(null == _pelvisP3) return;
+            _pelvisUntouchedStandRotationP3 = _pelvisP3.localRotation;
+        }
+        
+        public void SetStableCrouchPelvisRotation()
+        {
+            if(null == _pelvisP3) return;
+            _pelvisUntouchedCrouchRotationP3 = _pelvisP3.localRotation;
         }
 
         public bool SetIKTarget(GameObject objP1, GameObject objP3, ref bool weaponHasIk)
@@ -236,8 +244,8 @@ namespace Utils.Appearance
                 SightOffset = param.SightOffset,
                 PitchAmplitude = param.PitchAmplitude,
                 SightProgress = param.SightProgress,
-                SightHorizontalShift = param.SightHorizontalShift * param.SightShiftBuff,
-                SightVerticalShift = param.SightVerticalShift * param.SightShiftBuff,
+                SightHorizontalShift = param.SightHorizontalShift/* * param.SightShiftBuff*/,
+                SightVerticalShift = param.SightVerticalShift/* * param.SightShiftBuff*/,
                 FirstPersonSightOffset = param.FirstPersonSightOffset,
                 ScopeOffset = param.ScopeOffset,
                 SightModelOffset = param.SightModelOffset
@@ -305,12 +313,31 @@ namespace Utils.Appearance
         {
             if (upperBodyOverlayWeight > 0 && !ExcludePostures.Contains(type))
             {
+                Quaternion untouchedRotation = GetUntouchedRotation(type);
                 var rotation = Quaternion.Inverse(_pelvisP3.localRotation);
                 // spineP3父亲的旋转为 newPelvis = （1 - t) * (当前pelvis旋转) + t * (默认idle的pelvis旋转),t为上半身层的权重
-                rotation = rotation * SlerpRotation(_pelvisP3.localRotation, _pelvisUntouchedRotationP3,
+                rotation = rotation * SlerpRotation(_pelvisP3.localRotation, untouchedRotation,
                                upperBodyOverlayWeight);
                 _spineP3.localRotation = rotation * _spineP3.localRotation;
             }
+        }
+
+        private Quaternion GetUntouchedRotation(ThirdPersonPosture type)
+        {
+            Quaternion ret;
+            switch (type)
+            {
+                    case ThirdPersonPosture.Crouch:
+                        ret = _pelvisUntouchedCrouchRotationP3;
+                        break;
+                    case ThirdPersonPosture.Stand:
+                        ret = _pelvisUntouchedStandRotationP3;
+                        break;
+                    default:
+                        ret = _pelvisUntouchedStandRotationP3;
+                        break;   
+            }
+            return ret;
         }
 
         /// <summary>

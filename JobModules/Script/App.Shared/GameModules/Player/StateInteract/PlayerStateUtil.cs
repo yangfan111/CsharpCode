@@ -73,7 +73,8 @@ namespace App.Shared.GameModules.Player
     {
         BagOpen = 1,
         MapOpen = 2,
-        ExitOpen = 3
+        ExitOpen = 3,
+        PaintOpen = 4
     }
 
     public enum EPlayerGameState

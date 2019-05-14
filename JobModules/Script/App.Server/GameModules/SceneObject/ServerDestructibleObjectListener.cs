@@ -7,6 +7,7 @@ using App.Shared.Configuration;
 using App.Shared.GameModules.SceneObject;
 using Core;
 using App.Shared.SceneTriggerObject;
+using App.Shared.Util;
 using Core.Utils;
 using Entitas;
 using UltimateFracturing;
@@ -28,10 +29,23 @@ namespace App.Server.GameModules.SceneObject
             _detachCallback = new ServerFracturedChunkDetachCallback(contexts);
         }
 
-        public override void OnTriggerObjectLoaded(string id, GameObject gameObject)
+        public override IEntity CreateMapObj(int id)
+        {
+            var gameObj = _objectManager.Get(id);
+            if (gameObj == null) return null;
+            var obj = (MapObjectEntity)MapObjectEntityFactory.CreateDestructibleObject(id, gameObj);
+            MapObjectUtility.RecordMapObj(id, (int)_triggerType, obj);
+            MapObjectUtility.FetchFractruedState(gameObj);
+            return obj;
+        }
+
+        public override void OnTriggerObjectLoaded(int id, GameObject gameObject)
         {
             _logger.DebugFormat("Destructible Object Loaded {0} {1}", id, gameObject.name);
-            MapObjectEntityFactory.CreateDestructibleObject(id, gameObject, _detachCallback.OnDetach);
+            MapObjectUtility.RecordGameObjId(gameObject, (int)_triggerType, id);
+            MapObjectUtility.AttachRawObjToFracture(gameObject);
+            MapObjectUtility.AddCallBack<FracturedObject>(gameObject, _detachCallback.OnDetach);
+            MapObjectUtility.AddFracturedRecorder(gameObject);
         }
     }
 }

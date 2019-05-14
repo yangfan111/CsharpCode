@@ -16,7 +16,7 @@ namespace Core.Room
         void CompensationSnapshot();
         void RunFreeGameRule();
         void GameOver(bool forceExit);
-        void SetGameMode(int mode);
+        void SetGameMode(int mode, int mapId);
         bool SendLoginSucc(IPlayerInfo playerInfo, INetworkChannel channel);
         void SetPlayerStageRunning(IPlayerInfo playerInfo, INetworkChannel channel);
         PlayerInfo PlayerJoin(long hallRoomId, object roomPlayerInfo, out int errorCode);

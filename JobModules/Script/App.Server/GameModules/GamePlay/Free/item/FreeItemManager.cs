@@ -117,7 +117,8 @@ namespace gameplay.gamerule.free.item
                 }
                 else
                 {
-                    toInv = fd.freeInventory.GetInventoryManager().GetInventory(toKey);
+                    string[] ss = toKey.Split(',');
+                    toInv = fd.freeInventory.GetInventoryManager().GetInventory(ss[0].Trim());
                 }
 
                 int x = -1;
@@ -246,7 +247,7 @@ namespace gameplay.gamerule.free.item
 
         public static void UseItem(string key, FreeData fd, ISkillArgs args)
         {
-            if(fd.Player.stateInterface.State.GetCurrentPostureState() == PostureInConfig.Climb)
+            if (fd.Player.stateInterface.State.GetCurrentPostureState() == PostureInConfig.Climb)
             {
                 return;
             }

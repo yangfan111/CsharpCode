@@ -284,6 +284,12 @@ namespace App.Client.GameModules.Ui.Utils
             arf.aspectRatio = spriteWidth / spriteHeight;
         }
 
+        public static Vector2 WorldPosToRect(Vector3 targetPos, RectTransform rect)
+        {
+            var cam = Camera.main;
+            return WorldPosToRect(targetPos, cam, rect);
+        }
+
         public static Vector2 WorldPosToRect(Vector3 targetPos, Camera camera, RectTransform rect)
         {
             Vector2 position = camera.WorldToScreenPoint(targetPos);
@@ -299,6 +305,22 @@ namespace App.Client.GameModules.Ui.Utils
             }
 
             return result;
+        }
+
+        public static bool InView(Vector3 pos)
+        {
+            var cam = Camera.main;
+            Vector2 viewPos = cam.WorldToViewportPoint(pos);
+            Vector3 dir = (pos - cam.transform.position).normalized;
+            float dot = Vector3.Dot(cam.transform.forward, dir);
+            if (dot > 0 && viewPos.x >= 0 && viewPos.x <= 1 && viewPos.y >= 0 && viewPos.y <= 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

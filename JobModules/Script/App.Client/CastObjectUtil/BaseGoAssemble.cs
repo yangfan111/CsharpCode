@@ -9,7 +9,7 @@ namespace App.Client.CastObjectUtil
     public static class BaseGoAssemble
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(BaseGoAssemble));
-        public static RayCastTarget Assemble(GameObject model, Vector3 position, string name)
+        public static RayCastTarget Assemble(GameObject model, Vector3 position, string name, bool needRotation = false)
         {
             if(null == model)
             {
@@ -30,6 +30,11 @@ namespace App.Client.CastObjectUtil
                 var col = colGo.AddComponent<BoxCollider>();
                 col.isTrigger = true;
                 col.size = Vector3.one;
+            }
+
+            if (needRotation)
+            {
+                colTrans.Rotate(new Vector3(0, 0, 90));
             }
             var normalCollider = colTrans.GetComponent<BoxCollider>();
             if(null == normalCollider)

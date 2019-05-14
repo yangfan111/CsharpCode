@@ -32,24 +32,28 @@ namespace App.Client.GameModules.SceneObject
         private IGroup<MapObjectEntity> _activeMapObjects;
         protected IMapObjectEntityFactory MapObjectEntityFactory;     
         private ClientFracturedChunkDetachCallback _detachCallback;
+        protected TriggerObjectManager _triggerObjectManager;
         
         protected ClientAbstractTriggerObjectListener(Contexts contexts, ETriggerObjectType triggerType,
             IMatcher<MapObjectEntity> activeMapMatcher, IMatcher<MapObjectEntity> deactiveMapMatcher)
         {
             _triggerType = triggerType;
             _contexts = contexts;
-            var triggerObjectManager = SingletonManager.Get<TriggerObjectManager>();
-            triggerObjectManager.RegisterListener(triggerType, this);
-            _objectManager = triggerObjectManager.GetManager(triggerType);  
+            
+            _triggerObjectManager = SingletonManager.Get<TriggerObjectManager>();
+            _triggerObjectManager.RegisterListener(triggerType, this);
+            _objectManager = _triggerObjectManager.GetManager(triggerType);  
           
             var mapContext = contexts.mapObject;
             _activeMapObjects = mapContext.GetGroup(activeMapMatcher);
             _deactiveMapObjects = mapContext.GetGroup(deactiveMapMatcher);
+            
             MapObjectEntityFactory = contexts.session.entityFactoryObject.MapObjectEntityFactory;
-            _detachCallback = new ClientFracturedChunkDetachCallback(contexts);         
+            _detachCallback = new ClientFracturedChunkDetachCallback();   
+
         }
         
-        protected GameObject GetTriggerObject(string id)
+        protected GameObject GetTriggerObject(int id)
         {
             return _objectManager.Get(id);
         }
@@ -69,8 +73,7 @@ namespace App.Client.GameModules.SceneObject
                     {
                         _logger.DebugFormat("Trigger Object: Type {0} id {1} Loaded On Update Self Position {2}.", _triggerType, id, _contexts.player.flagSelfEntity.position.Value);
                     }
-
-                    OnDeativeObjectActive(obj, go);
+                    OnDeativeObjectActive(id, obj, go);
                 }
             }
 
@@ -80,33 +83,34 @@ namespace App.Client.GameModules.SceneObject
             }
         }
 
-        public void OnTriggerObjectLoaded(string id, GameObject gameObject)
+        public void OnTriggerObjectLoaded(int id, GameObject gameObject)
         {
             if (_logger.IsDebugEnabled)
             {
                 _logger.DebugFormat("Trigger Object: Type {0} id {1} Loaded Self Position {2}.", _triggerType, id, _contexts.player.flagSelfEntity.position.Value);
             }
-
+            
             if (SharedConfig.IsOffline)
             {
-                OfflineTriggerObjectLoad(id, gameObject);
+                LoadTriggerObject(id, gameObject);
             }
             else
             {
-                var objs = _deactiveMapObjects.GetEntities();
-                for (int i = 0; i < objs.Length; ++i)
+                for (int k = 0; k < (int)ETriggerObjectType.MaxCount; k++)
                 {
-                    var obj = objs[i];
-                    if (obj.triggerObjectId.Id == id)
+                    var idset =_objectManager.GetAllId();
+                    foreach (var item in idset)
                     {
-                        OnlineTriggerObjectLoad(obj, gameObject);
-                        break;
+                        if (item == id)
+                        {
+                            LoadTriggerObject(id, gameObject);
+                        }
                     }
                 }
             }
         }
 
-        public void OnTriggerObjectUnloaded(string id)
+        public void OnTriggerObjectUnloaded(int id)
         {
             if (_logger.IsDebugEnabled)
             {
@@ -124,9 +128,9 @@ namespace App.Client.GameModules.SceneObject
                 }
             }
         }
-        
-        protected abstract void OnDeativeObjectActive(MapObjectEntity mapObject, GameObject gameObject);
-        protected abstract void OfflineTriggerObjectLoad(string id, GameObject gameObject);
-        protected abstract void OnlineTriggerObjectLoad(MapObjectEntity mapObject, GameObject gameObject);
+
+        protected abstract void OnDeativeObjectActive(int id, MapObjectEntity mapObject, GameObject gameObject);
+        protected abstract void LoadTriggerObject(int id, GameObject gameObject);
+        public abstract IEntity CreateMapObj(int id);
     }
 }

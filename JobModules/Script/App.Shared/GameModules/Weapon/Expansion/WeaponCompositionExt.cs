@@ -5,7 +5,6 @@ using Core;
 using Core.EntityComponent;
 using System.Collections.Generic;
 using Utils.Appearance;
-using XmlConfig;
 
 namespace App.Shared
 {
@@ -46,6 +45,30 @@ namespace App.Shared
             {
                 partList.Add(component.Muzzle);
             }
+            if (component.SideRail > 0)
+            {
+                partList.Add(component.SideRail);
+            }
+            if (component.Bore > 0)
+            {
+                partList.Add(component.Bore);
+            }
+            if (component.Feed > 0)
+            {
+                partList.Add(component.Feed);
+            }
+            if (component.Trigger > 0)
+            {
+                partList.Add(component.Trigger);
+            }
+            if (component.Brake > 0)
+            {
+                partList.Add(component.Brake);
+            }
+            if (component.Interlock > 0)
+            {
+                partList.Add(component.Interlock);
+            }
         }
 
         /// <summary>
@@ -57,7 +80,6 @@ namespace App.Shared
         {
             weaponComp.ConfigId = weaponInfo.ConfigId;
             weaponComp.WeaponAvatarId = weaponInfo.AvatarId;
-            //    DebugUtil.MyLog("Bullet Sync" + weaponInfo.Bullet,DebugUtil.DebugColor.Black);
             weaponComp.Bullet = weaponInfo.Bullet;
             weaponComp.ReservedBullet = weaponInfo.ReservedBullet;
             weaponComp.UpperRail = weaponInfo.UpperRail;
@@ -65,6 +87,12 @@ namespace App.Shared
             weaponComp.Magazine = weaponInfo.Magazine;
             weaponComp.Muzzle = weaponInfo.Muzzle;
             weaponComp.Stock = weaponInfo.Stock;
+            weaponComp.SideRail = weaponInfo.SideRail;
+            weaponComp.Bore = weaponInfo.Bore;
+            weaponComp.Feed = weaponInfo.Feed;
+            weaponComp.Brake = weaponInfo.Brake;
+            weaponComp.Interlock = weaponInfo.Interlock;
+            weaponComp.Trigger = weaponInfo.Trigger;
         }
 
         /// <summary>
@@ -181,17 +209,6 @@ namespace App.Shared
             return slotType != EWeaponSlotType.ThrowingWeapon;
         }
 
-        //    switch (slotType)
-        //    {
-        //        case EWeaponSlotType.MeleeWeapon:
-        //        case EWeaponSlotType.PrimeWeapon:
-        //        case EWeaponSlotType.SubWeapon:
-        //        case EWeaponSlotType.TacticWeapon:
-        //            return true;
-        //        default:
-        //            return false;
-        //    }
-        //}
         public static bool IsValid(this EntityKey enittyKey)
         {
             return enittyKey != EntityKey.Default && enittyKey != default(EntityKey);

@@ -8,7 +8,7 @@ namespace App.Shared.GameModules.Player.Actions.Move
 {
     public static class LadderMove
     {
-        private static readonly Vector3 ModelInitPosition = new Vector3(0,-PlayerEntityUtility.CcSkinWidth,0);
+        private static readonly Vector3 ModelInitPosition = new Vector3(0,0,0);
         public static void UpdateTransform(PlayerEntity player, float deltaTime)
         {
             var parent = player.RootGo().transform;

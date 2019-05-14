@@ -54,7 +54,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public List<IGroupBattleData> GetBattleDataListByCampType(EUICampType type)
         {
-            var list = _contexts.ui.uI.GroupBattleDataDict[type];
+            var list = _contexts.ui.uI.GroupBattleDataDict[(int)type];
             return SortList(list);
         }
 

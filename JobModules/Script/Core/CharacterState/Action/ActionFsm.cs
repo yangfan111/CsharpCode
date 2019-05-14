@@ -58,6 +58,12 @@ namespace Core.CharacterState.Action
             AddState(ActionState.CreateVehiclesAnimState(), infoProvider, characterInfo);
             AddState(ActionState.CreateSightP3State(), infoProvider, characterInfo);
             AddState(ActionState.CreateRescueState(), infoProvider, characterInfo);
+            
+            AddState(ActionState.CreateRageStartState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateRageLoopState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateRageEndState(), infoProvider, characterInfo);
+            
+            AddState(ActionState.CreateSuccessPoseState(), infoProvider, characterInfo);
 
             _resetParam = ResetKeep;
         }
@@ -232,6 +238,24 @@ namespace Core.CharacterState.Action
             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.VehiclesAnimHash,
                 AnimatorParametersHash.Instance.VehiclesAnimName,
                 AnimatorParametersHash.Instance.VehiclesAnimDisableValue,
+                CharacterView.ThirdPerson, false);
+            addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.RageStartHash,
+                AnimatorParametersHash.Instance.RageStartName,
+                AnimatorParametersHash.Instance.RageStartDisable,
+                CharacterView.ThirdPerson, false);
+            addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.RageEndHash,
+                AnimatorParametersHash.Instance.RageEndName,
+                AnimatorParametersHash.Instance.RageEndDisable,
+                CharacterView.ThirdPerson, false);
+            addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.SuccessHash,
+                AnimatorParametersHash.Instance.SuccessName,
+                AnimatorParametersHash.Instance.SuccessDisable,
                 CharacterView.ThirdPerson, false);
             addOutput(FsmOutput.Cache);
         }

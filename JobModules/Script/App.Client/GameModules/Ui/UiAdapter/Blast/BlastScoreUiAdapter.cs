@@ -45,12 +45,12 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public int GetScoreByCamp(EUICampType type)
         {
-            return _ui.ScoreByCampTypeDict[type];
+            return _ui.ScoreByCampTypeDict[(int)type];
         }
 
         public IPlayerCountData GetDataByCampType(EUICampType campType)
         {
-            return _ui.PlayerCountByCampTypeDict[campType];
+            return _ui.PlayerCountByCampTypeDict[(int)campType];
         }
 
         public bool NeedPause

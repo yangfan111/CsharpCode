@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Core.EntityComponent;
 using Core.HitBox;
 using Core.Utils;
@@ -51,11 +53,10 @@ namespace App.Shared.GameModules.HitBox
             provider.FlushLayerOfHitBox();
         }
 
-        public static void FlashHitBoxLayer(GameObject model)
+        public static List<Transform> GetHitBoxTransforms(GameObject model)
         {
-            var provider = SingletonManager.Get<HitBoxTransformProviderCache>()
-                .GetProvider(model);
-            provider.FlushLayerOfHitBox();
+            var provider = SingletonManager.Get<HitBoxTransformProviderCache>().GetProvider(model);
+            return provider.GetHitBoxTransforms().Values.ToList();
         }
         
     }

@@ -5,11 +5,13 @@
 
 StructuredBuffer<float4x4> TransformData;
 StructuredBuffer<int4> DrawInstanceData;
+float3 WorldShift;
 
 void InstancingSetup()
 {
     int index = DrawInstanceData[unity_InstanceID];
     unity_ObjectToWorld = TransformData[index];
+    unity_ObjectToWorld._14_24_34 -= WorldShift.xyz;
 
     // inverse transform matrix
     // taken from richardkettlewell's post on

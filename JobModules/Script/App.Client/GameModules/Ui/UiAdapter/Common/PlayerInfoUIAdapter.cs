@@ -12,7 +12,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         private Shared.Components.Ui.UIComponent _ui;
 
        
-        public List<ICountdownTipData> CountdownTipDataList
+        public List<ITipData> CountdownTipDataList
         {
             get { return _contexts.ui.uI.CountdownTipDataList; }
         }

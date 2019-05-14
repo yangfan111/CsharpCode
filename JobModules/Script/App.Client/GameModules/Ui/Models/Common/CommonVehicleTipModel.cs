@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using App.Client.GameModules.Ui.ViewModels.Common;
 using App.Client.GameModules.Ui.UiAdapter;
+using App.Client.GameModules.Ui.Utils;
 using Assets.UiFramework.Libs;
 using Core.GameModule.Interface;
 using Core.Prediction.VehiclePrediction.Cmd;
@@ -16,11 +17,20 @@ namespace App.Client.GameModules.Ui.Models.Common
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CommonVehicleTipModel));
         private CommonCarryTipViewModel _viewModel = new CommonCarryTipViewModel();
-        private Dictionary<AssetInfo, GameObject> _vehicleTopViewDict = new Dictionary<AssetInfo, GameObject>(AssetInfo.AssetInfoComparer.Instance);
+        //private Dictionary<AssetInfo, GameObject> _vehicleTopViewDict = new Dictionary<AssetInfo, GameObject>(AssetInfo.AssetInfoComparer.Instance);
+        private Dictionary<AssetInfo, VehicleTipTopViewItem> _vehicleTopViewDict = new Dictionary<AssetInfo, VehicleTipTopViewItem>(AssetInfo.AssetInfoComparer.Instance);
         private AssetInfo _curCarryAssetInfo;
         private Transform _topViewRoot;
 
         private GameObject CurVehicleGo
+        {
+            get
+            {
+                return CurVehicle.Root;
+            }
+        }
+
+        private VehicleTipTopViewItem CurVehicle
         {
             get
             {
@@ -30,7 +40,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                 }
                 else
                 {
-                    return new GameObject();
+                    return new VehicleTipTopViewItem();
                 }
             }
         }
@@ -55,22 +65,22 @@ namespace App.Client.GameModules.Ui.Models.Common
        public override void Update(float interval)
         {
 
-            UpdateCurCarryTopView();
+            UpdateCurVehicleTopView();
 
-            UpdateCarrySeats();
-            UpdateCarryTyres();
-            UpdateCarryHp();
-            UpdateCarryOil();
-            UpdateCarrySpeed();
+            UpdateSeats();
+            UpdateWheels();
+            UpdateHp();
+            UpdateOil();
+            UpdateSpeed();
 
         }
 
-        private void UpdateCarryTyres()
+        private void UpdateWheels()
         {
             var wheelIndexArray = VehicleIndexHelper.GetWheelIndexArray();
             foreach(var index in wheelIndexArray)
             {
-                UpdateTyreStateByIndex(index);
+                UpdateWheelStateByIndex(index);
             }
         }
 
@@ -78,49 +88,25 @@ namespace App.Client.GameModules.Ui.Models.Common
         /// 刷新载具上对应位置轮胎爆胎情况
         /// </summary>
         /// <param name="index"></param>
-        private void UpdateTyreStateByIndex(VehiclePartIndex index)
+        private void UpdateWheelStateByIndex(VehiclePartIndex index)
         {
             VehicleUiWheelIndex uiIndex;
-            bool isTyreBroke = _adapter.IsTyreBrokeByIndex(index, out uiIndex);
-            SetTyreShow(uiIndex, isTyreBroke);
+            bool isWheelBroke = _adapter.IsWheelBrokeByIndex(index, out uiIndex);
+            SetWheelShow(uiIndex, isWheelBroke);
         }
 
-        private void SetTyreShow(VehicleUiWheelIndex uiIndex, bool isTyreBroke)
+        private void SetWheelShow(VehicleUiWheelIndex uiIndex, bool isWheelBroke)
         {
-            //Debug.Log("uiIndex:" + uiIndex);
-            //Debug.Log("isTyreBroke:" + isTyreBroke);
-            var groupTf = CurVehicleGo.transform.Find("Group");
-            if (groupTf == null)
+            Transform wheel = null;
+            wheel = CurVehicle.GetWheel(uiIndex);
+            if (wheel != null)
             {
-                return;
+                UIUtils.SetActive(wheel, isWheelBroke);
             }
-            Transform tyreTf = null;
-            switch (uiIndex)
-            {
-                case VehicleUiWheelIndex.FrontLeft:
-                    tyreTf = groupTf.Find("TyreFL");
-                    break;
-                case VehicleUiWheelIndex.FrontRight:
-                    tyreTf = groupTf.Find("TyreFR");
-                    break;
-                case VehicleUiWheelIndex.RearLeft:
-                    tyreTf = groupTf.Find("TyreRL");
-                    break;
-                case VehicleUiWheelIndex.RearRight:
-                    tyreTf = groupTf.Find("TyreRR");
-                    break;
-            }
-
-            if (tyreTf == null)
-            {
-                return;
-            }
-
-            tyreTf.gameObject.SetActive(isTyreBroke);
         }
 
 
-        private void UpdateCarrySeats()
+        private void UpdateSeats()
         {
             var seatIndexArray = VehicleIndexHelper.GetSeatIndexArray();
             foreach(var index in seatIndexArray)
@@ -142,47 +128,18 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void SetSeatState(VehicleSeatIndex uiIndex, bool isOccupied)
         {
-            //Debug.Log("uiIndex:" + uiIndex);
-            //Debug.Log("isOccupied:" + isOccupied);
-            var groupTf = CurVehicleGo.transform.Find("Group");
-            if (groupTf == null)
+            Transform seat = null;
+            seat = CurVehicle.GetSeat(uiIndex);
+            if (seat != null)
             {
-                return;
+                UIUtils.SetActive(seat, isOccupied);
             }
-            Transform seatTf = null;
-            switch (uiIndex)
-            {
-                case VehicleSeatIndex.Driver:
-                    seatTf = groupTf.Find("SeatDriver");
-                    break;
-                case VehicleSeatIndex.Codriver:
-                    seatTf = groupTf.Find("SeatCodriver");
-                    break;
-                case VehicleSeatIndex.BackDriver:
-                    seatTf = groupTf.Find("SeatBackDriver");
-                    break;
-                case VehicleSeatIndex.BackCodriver:
-                    seatTf = groupTf.Find("SeatBackCodriver");
-                    break;
-                case VehicleSeatIndex.BackDriver_1:
-                    seatTf = groupTf.Find("SeatBackDriver_1");
-                    break;
-                case VehicleSeatIndex.BackCodriver_1:
-                    seatTf = groupTf.Find("SeatBackCodriver_1");
-                    break;
-            }
-
-            if (seatTf == null)
-            {
-                return;
-            }
-            seatTf.gameObject.SetActive(isOccupied);
         }
 
         /// <summary>
         /// 刷新当前所坐载具缩略图
         /// </summary>
-        private void UpdateCurCarryTopView()
+        private void UpdateCurVehicleTopView()
         {
             AssetInfo assetInfo = _adapter.CurVehicleAssetInfo;
             if (_curCarryAssetInfo == assetInfo)
@@ -198,12 +155,12 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
             else
             {
-                _vehicleTopViewDict.Add(assetInfo, new GameObject());
+                _vehicleTopViewDict.Add(assetInfo, new VehicleTipTopViewItem());
                 Loader.LoadAsync(assetInfo.BundleName, assetInfo.AssetName,
                     (obj) =>
                     {
                         GameObject go = obj as GameObject;
-                        _vehicleTopViewDict[assetInfo] = go;
+                        _vehicleTopViewDict[assetInfo] = new VehicleTipTopViewItem(go);
                         go.transform.SetParent(_topViewRoot,false);
                         go.SetActive(true);
                     });
@@ -214,7 +171,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         /// <summary>
         /// 刷新载具速度
         /// </summary>
-        private void UpdateCarrySpeed()
+        private void UpdateSpeed()
         {
 	        var speed = _adapter.CurVehicleSpeed;
 
@@ -224,7 +181,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         /// <summary>
         /// 刷新载具油量条
         /// </summary>
-        private void UpdateCarryOil()
+        private void UpdateOil()
         {
             var curOil = _adapter.CurVehicleOil;
             var maxOil = _adapter.MaxVehicleOil;
@@ -235,24 +192,91 @@ namespace App.Client.GameModules.Ui.Models.Common
         /// <summary>
         /// 刷新载具血条
         /// </summary>
-        private void UpdateCarryHp()
+        private void UpdateHp()
         {
 
             var curHp = _adapter.CurVehicleHp;
             var maxHp = _adapter.MaxVehicleHp;
             var hpBarVal = curHp / maxHp;
             _viewModel.HpBarValue = hpBarVal;
-			if (hpBarVal < 0.3f)
-            {
-                _viewModel.HpFillColor = new Color(237f / 255f, 129f / 255f, 129f / 255f, 1.0f);
-            }
-            else
-			{
-				_viewModel.HpFillColor = new Color(247f / 255f, 238f / 255f, 201f / 255f, 1.0f);
-			}
+			_viewModel.HpFillColor = hpBarVal < 0.3f ? _lowColor : _highColor;
 
         }
 
-       
+        private readonly Color _lowColor = UiCommonColor.HpLowColor;
+        private readonly Color _highColor = UiCommonColor.HpHighColor;
+
+    }
+
+    public class VehicleTipTopViewItem
+    {
+        public GameObject Root;
+        public Dictionary<VehicleUiWheelIndex, Transform> Wheels = new Dictionary<VehicleUiWheelIndex, Transform>();
+        public Dictionary<VehicleSeatIndex, Transform> Seats = new Dictionary<VehicleSeatIndex, Transform>();
+
+
+        private readonly Dictionary<VehicleUiWheelIndex, string> wheelUiNames = new Dictionary<VehicleUiWheelIndex, string>
+        {
+            {VehicleUiWheelIndex.FrontLeft, "TyreFL"},
+            {VehicleUiWheelIndex.FrontRight, "TyreFR"},
+            {VehicleUiWheelIndex.RearLeft, "TyreRL"},
+            {VehicleUiWheelIndex.RearRight, "TyreRR"},
+        };
+    
+        private readonly Dictionary<VehicleSeatIndex,string> seatNames = new Dictionary<VehicleSeatIndex, string>
+        {
+            { VehicleSeatIndex.Driver,"SeatDriver"},
+            { VehicleSeatIndex.Codriver,"SeatCodriver"},
+            { VehicleSeatIndex.BackDriver,"SeatBackDriver"},
+            { VehicleSeatIndex.BackCodriver,"SeatBackCodriver"},
+            { VehicleSeatIndex.BackDriver_1,"SeatBackDriver_1"},
+            { VehicleSeatIndex.BackCodriver_1,"SeatBackCodriver_1"},
+        };
+
+        private string rootName = "Group";
+        public VehicleTipTopViewItem(GameObject orig)
+        {
+            Root = orig;
+            Transform origTf = orig.transform.Find(rootName);
+            InitWheels(origTf);
+            InitSeats(origTf);
+        }
+
+        private void InitSeats(Transform origTf)
+        {
+            if (origTf == null) return;
+            foreach (var pair in seatNames)
+            {
+                Seats.Add(pair.Key, origTf.Find(pair.Value));
+            }
+        }
+
+        private void InitWheels(Transform origTf)
+        {
+            if (origTf == null) return;
+            foreach(var pair in wheelUiNames)
+            {
+                Wheels.Add(pair.Key, origTf.Find(pair.Value));
+            }
+        }
+
+        public VehicleTipTopViewItem()
+        {
+            Root = new GameObject();
+        }
+
+        public Transform GetWheel(VehicleUiWheelIndex index)
+        {
+            Transform ret = null;
+            Wheels.TryGetValue(index, out ret);
+            return ret;
+        }
+
+        public Transform GetSeat(VehicleSeatIndex index)
+        {
+            Transform ret = null;
+            Seats.TryGetValue(index, out ret);
+            return ret;
+        }
     }
 }

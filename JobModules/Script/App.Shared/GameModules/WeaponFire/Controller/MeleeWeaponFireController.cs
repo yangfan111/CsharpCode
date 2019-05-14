@@ -2,6 +2,7 @@
 using Core.EntityComponent;
 using Core.Utils;
 using System;
+using Core;
 using Utils.Compare;
 using WeaponConfigNs;
 
@@ -23,44 +24,41 @@ namespace App.Shared.GameModules.Weapon.Behavior
             _config = config;
         }
 
-        protected override void UpdateFire(PlayerWeaponController controller, IWeaponCmd cmd, Contexts contexts)
+        protected override void UpdateFire(PlayerWeaponController controller, WeaponSideCmd cmd, Contexts contexts)
         {
-            var weaponId = controller.HeldWeaponAgent.ConfigId;
-            var weaponState = controller.HeldWeaponAgent.RunTimeComponent;
-            var nowTime = controller.RelatedTime;
-            //var delta = weaponState.NextAttackPeriodStamp - nowTime;
-            //delta = weaponState.ContinueAttackEndStamp - nowTime;
-            bool isProne = (controller.RelatedCharState.GetCurrentPostureState() == XmlConfig.PostureInConfig.Prone);
-
-            if (cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsLeftAttack) && controller.RelatedThrowAction.ThrowingEntityKey == EntityKey.Default
-                && (controller.RelatedThrowAction.LastFireWeaponKey == controller.HeldWeaponAgent.WeaponKey.EntityId || controller.RelatedThrowAction.LastFireWeaponKey == 0)
-                && !isProne)
+            var nowTime = cmd.UserCmd.RenderTime;
+            var runTimeComponent = controller.HeldWeaponAgent.RunTimeComponent;
+            if(!cmd.FiltedInput(XmlConfig.EPlayerInput.MeleeAttack))
+                return;
+            if (cmd.FiltedInput(XmlConfig.EPlayerInput.IsLeftAttack) && 
+                controller.RelatedThrowAction.ThrowingEntityKey == EntityKey.Default
+                && (controller.RelatedThrowAction.LastFireWeaponKey == controller.HeldWeaponAgent.WeaponKey.EntityId || controller.RelatedThrowAction.LastFireWeaponKey == 0))
             {
-                if (nowTime > weaponState.NextAttackPeriodStamp)
+                if (nowTime > runTimeComponent.NextAttackPeriodStamp)
                 {
                     // 轻击1
-                    weaponState.NextAttackPeriodStamp = nowTime + _config.AttackTotalInterval; //目前表里配的间隔时间是结束后到开始时间
-                    weaponState.ContinueAttackStartStamp = nowTime + _config.AttackOneCD;
-                    weaponState.ContinueAttackEndStamp = nowTime + _config.ContinousInterval;
+                    runTimeComponent.NextAttackPeriodStamp = nowTime + _config.AttackTotalInterval; //目前表里配的间隔时间是结束后到开始时间
+                    runTimeComponent.ContinueAttackStartStamp = nowTime + _config.AttackOneCD;
+                    runTimeComponent.ContinueAttackEndStamp = nowTime + _config.ContinousInterval;
                     controller.RelatedCharState.LightMeleeAttackOne(OnAttackAniFinish);
-                    AfterAttack(controller, cmd);
+                    AfterAttack(controller, cmd,EMeleeAttackType.Soft);
                 }
-                else if (CompareUtility.IsBetween(nowTime, weaponState.ContinueAttackStartStamp, weaponState.ContinueAttackEndStamp))
+                else if (CompareUtility.IsBetween(nowTime, runTimeComponent.ContinueAttackStartStamp, runTimeComponent.ContinueAttackEndStamp))
                 {
                     // 轻击2
-                    weaponState.ContinueAttackStartStamp = 0;
-                    weaponState.ContinueAttackEndStamp = 0;
-                    weaponState.NextAttackPeriodStamp = Math.Max(nowTime + _config.AttackOneCD, weaponState.ContinueAttackEndStamp);
+                    runTimeComponent.ContinueAttackStartStamp = 0;
+                    runTimeComponent.ContinueAttackEndStamp = 0;
+                    runTimeComponent.NextAttackPeriodStamp = Math.Max(nowTime + _config.AttackOneCD, runTimeComponent.ContinueAttackEndStamp);
                     controller.RelatedCharState.LightMeleeAttackTwo(OnAttackAniFinish);
-                    AfterAttack(controller, cmd);
+                    AfterAttack(controller, cmd,EMeleeAttackType.Soft);
                 }
                 controller.RelatedThrowAction.LastFireWeaponKey = controller.HeldWeaponAgent.WeaponKey.EntityId;
             }
-            else if (cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsRightAttack) && nowTime >= weaponState.NextAttackPeriodStamp && !isProne)
+            else if (cmd.FiltedInput(XmlConfig.EPlayerInput.IsRightAttack) && nowTime >= runTimeComponent.NextAttackPeriodStamp)
             {
                 controller.RelatedCharState.MeleeSpecialAttack(OnAttackAniFinish);
-                weaponState.NextAttackPeriodStamp = nowTime + _config.SpecialDamageInterval;
-                AfterAttack(controller, cmd);
+                runTimeComponent.NextAttackPeriodStamp = nowTime + _config.SpecialDamageInterval;
+                AfterAttack(controller, cmd,EMeleeAttackType.Hard);
             }
         }
 
@@ -69,20 +67,19 @@ namespace App.Shared.GameModules.Weapon.Behavior
         {
         }
 
-        public void AfterAttack(PlayerWeaponController controller, IWeaponCmd cmd)
+        public void AfterAttack(PlayerWeaponController controller, WeaponSideCmd cmd, EMeleeAttackType attckType)
         {
-            //TODO 声音和特效添加 
             if (cmd.IsFire)
             {
                 //  DebugUtil.MyLog("DamageInterval:"+_config.DamageInterval);
-                StartMeleeAttack(controller, cmd.RenderTime + _config.DamageInterval,
-                    new MeleeAttackInfo { AttackType = MeleeAttckType.LeftMeleeAttack },
+                StartMeleeAttack(controller, cmd.UserCmd.RenderTime + _config.DamageInterval,
+                    new MeleeAttackInfo { AttackType = attckType },
                     _config);
             }
             else
             {
-                StartMeleeAttack(controller, cmd.RenderTime + _config.SpecialDamageInterval,
-                   new MeleeAttackInfo { AttackType = MeleeAttckType.RightMeleeAttack },
+                StartMeleeAttack(controller, cmd.UserCmd.RenderTime + _config.SpecialDamageInterval,
+                   new MeleeAttackInfo { AttackType = attckType},
                    _config);
             }
             controller.AfterAttack();
@@ -92,6 +89,8 @@ namespace App.Shared.GameModules.Weapon.Behavior
         {
             controller.CreateSetMeleeAttackInfo(attackInfo, config);
             controller.CreateSetMeleeAttackInfoSync(attackTime);
+            if(controller.AudioController != null)
+                controller.AudioController.PlayMeleeAttackAudio(controller.HeldConfigId,(int)attackInfo.AttackType);
         }
     }
 }

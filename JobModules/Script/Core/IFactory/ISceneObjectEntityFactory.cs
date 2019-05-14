@@ -10,13 +10,11 @@ namespace Core
 {
     public interface IMapObjectEntityFactory
     {
-        IEntity CreateDoor(string objectId,
-            GameObject gameObject, Action<object> detachCallback);
+        IEntity CreateDoor(int objectId, GameObject gameObject);
 
-        IEntity CreateDestructibleObject(string objectId,
-            GameObject gameObject, Action<object> detachCallback);
+        IEntity CreateDestructibleObject(int objectId, GameObject gameObject);
 
-        IEntity CreateGlassyObject(string objectId, GameObject gameObject, Action<object> brokenCallback);
+        IEntity CreateGlassyObject(int objectId, GameObject gameObject);
     }
     
     public interface ISceneObjectEntityFactory
@@ -39,5 +37,7 @@ namespace Core
 
         IEntity GetSceneEntity(int value);
         IEntity CreateSceneAudioEmitterEntity(Vector3 positionValue, EntityKey entityKey);
+        IEntity CreateSceneAudioBgEmitterEntity(Vector3 positionValue, EntityKey entityKey);
+
     }
 }

@@ -69,24 +69,23 @@ namespace App.Shared.GameModules.Camera
 
         private int LastTime;
         private const float HeightTestRadius = 0.20f;
-        
-        public CameraPostUpdateSystem(Contexts context):base(context)
+
+        public CameraPostUpdateSystem(Contexts context) : base(context)
         {
             _playerContext = context.player;
             _vehicleContext = context.vehicle;
             _freeMoveContext = context.freeMove;
-            _baseCollisionLayers = UnityLayers.SceneCollidableLayerMask;
-            {
-                _archoroffsetArm = new SpringArm();
-                _postOffsetArm = new SpringArm();
-                _offsetArm = new SpringArm();
+            _baseCollisionLayers = UnityLayers.CameraCollidableLayerMask;
+            
+            _archoroffsetArm = new SpringArm();
+            _postOffsetArm = new SpringArm();
+            _offsetArm = new SpringArm();
 
-                _archoroffsetArm.Set(HeightTestRadius, 0.2f, 5, 0.1f, _baseCollisionLayers);
-                _postOffsetArm.Set(0.06f, 0.5f, 5, 0.05f, _baseCollisionLayers);
-                _offsetArm.Set(0.04f, 0.02f, 5, 0.02f, _baseCollisionLayers);
-            }
+            _archoroffsetArm.Set(HeightTestRadius, 0.2f, 5, 0.1f, _baseCollisionLayers);
+            _postOffsetArm.Set(0.06f, 0.5f, 5, 0.05f, _baseCollisionLayers);
+            _offsetArm.Set(0.04f, 0.02f, 5, 0.02f, _baseCollisionLayers);
         }
-        
+
         public void OnRender()
         {
             var playerEntity = _playerContext.flagSelfEntity;
@@ -135,7 +134,7 @@ namespace App.Shared.GameModules.Camera
             if (player.appearanceInterface.Appearance.IsFirstPerson)
             {
                 var punchRotation = new Vector3(2 * player.orientation.PunchPitch,
-                    2 * player.orientation.PunchYaw, player.orientation.Roll);
+                    2 * player.orientation.PunchYaw, player.orientation.FireRoll);
                 UpdateCollisions(player.thirdPersonDataForObserving.ThirdPersonData,
                     player.thirdPersonDataForObserving.ThirdPersonOutput, punchRotation, player, cmd.ClientTime);
             }
@@ -149,7 +148,7 @@ namespace App.Shared.GameModules.Camera
             
             UpdateCollisionLayerMask(player);
             var punchRotation = new Vector3(2 * player.orientation.PunchPitch,
-                2 * player.orientation.PunchYaw, player.orientation.Roll);
+                2 * player.orientation.PunchYaw, player.orientation.FireRoll);
 
             UpdateCollisions(player.cameraStateOutputNew, player.cameraFinalOutputNew, punchRotation,
                 player, cmd.ClientTime);
@@ -167,11 +166,15 @@ namespace App.Shared.GameModules.Camera
             bool needCollisionWithCar =
                 playerEntity.stateInterface.State.GetActionKeepState() != ActionKeepInConfig.Drive &&
                 playerEntity.gamePlay.GameState != Components.GameState.AirPlane;
+            
             _collisionLayers = needCollisionWithCar
                 ? _baseCollisionLayers
                 : _baseCollisionLayers & ~UnityLayers.VehicleLayerMask;
+
+            _offsetArm.CollisionLayers = _collisionLayers;
+            
             _archoroffsetArm.CollisionLayers =
-                _postOffsetArm.CollisionLayers = _offsetArm.CollisionLayers = _collisionLayers;
+                _postOffsetArm.CollisionLayers = _collisionLayers & ~UnityLayers.GlassLayerMask;
         }
         
         private void UpdateCollisions(CameraStateOutputNewComponent calsOut, CameraFinalOutputNewComponent camera,

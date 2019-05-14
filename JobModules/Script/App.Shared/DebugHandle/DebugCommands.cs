@@ -60,12 +60,13 @@
 
         public const string SetWeapon = "sw";
         public const string AudioEmitter = "ae";
-
+        public const string AudioBgm = "aeb";
         public const string SetGrenade = "sg";
         public const string DropWeapon = "dw";
         public const string TestWeaponAssemble = "twa";
 
         public const string SetAttachment = "sa";
+        public const string SetWeaponAttachment = "swam";
         public const string ClearAttachment = "ca";
         public const string SwitchAttachment = "swa";
         public const string ShowAvaliablePartType = "showpt";
@@ -168,6 +169,18 @@
 
         public const string OnlyDirLight = "onlydirlight";
         public const string PostFxOpt = "postfxopt";
+
+        public const string Gpui = "gpui";
+
+        public const string Shadowmap = "Shadowmap";
+        public const string Light = "Light";
+        public const string Road = "Road";
+
+        public const string Revive = "revive";
+        public const string PosShow = "posshow";
+        public const string PosEdit = "posEdit";
+
+        public const string IndoorLightCull = "indoorlightcull";
     }
 
     public interface IDebugCommandHandler

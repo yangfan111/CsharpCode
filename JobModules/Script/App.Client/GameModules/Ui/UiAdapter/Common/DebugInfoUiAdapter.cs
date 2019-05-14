@@ -29,6 +29,7 @@ namespace App.Client.GameModules.Ui.UiAdapter.Common
                     Core.Utils.Version.Instance.LocalAsset));
                 sb.AppendLine(string.Format("server :{0} asset;{1}", Core.Utils.Version.Instance.RemoteVersion,
                     Core.Utils.Version.Instance.RemoteAsset));
+                sb.AppendLine(SingletonManager.Get<StaticColliderCounter>().GetMessage());
                 sb.AppendLine(SingletonManager.Get<DurationHelp>().LastAvg);
                 sb.AppendLine(string.Format(" Rewind:{0} time:{1}  pos:{2:N2} {3:N2} {4:N2} origin:{5:N2} {6:N2} {7:N2} ",
                     SingletonManager.Get<DurationHelp>().RewindCount,
