@@ -23,7 +23,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                _playerPos.Set(_contexts.player.flagSelfEntity.position.FixedVector3);
+                _playerPos.Set(_contexts.ui.uI.Player.position.FixedVector3);
                 return _playerPos;
             }
         }

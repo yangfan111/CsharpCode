@@ -17,7 +17,7 @@ namespace Core.CharacterState.Action.States.Transfiguration
                         return true;
                     return false;
                 },
-                null, (int)ActionStateId.CommonNull, null, 0, new[] { FsmInput.TransfigurationFinishEnd });
+                null, (int)ActionStateId.TransfigurationNull, null, 0, new[] { FsmInput.TransfigurationFinishEnd });
 
             #endregion
         }

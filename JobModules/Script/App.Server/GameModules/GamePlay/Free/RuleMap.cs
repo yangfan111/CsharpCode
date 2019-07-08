@@ -1,11 +1,5 @@
-﻿using App.Server.GameModules.GamePlay;
-using App.Shared.Components;
-using commons.data;
-using commons.data.mysql;
-using System;
+﻿using App.Shared.Components;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace App.Client.GameModules.GamePlay.Free
 {
@@ -53,11 +47,38 @@ namespace App.Client.GameModules.GamePlay.Free
             {
                 dic = new Dictionary<int, string>();
 
-                List<DataRecord> list = MysqlUtil.SelectRecords("select * from rule_replace", FreeRuleConfig.MysqlConnection);
+                dic.Add(5007, "bigHead");
+                dic.Add(2005, "bioMain");
+                dic.Add(5006, "bioMain");
+                dic.Add(2002, "bomb");
+                dic.Add(5005, "bomb");
+                dic.Add(1002, "chicken");
+                dic.Add(5001, "chicken");
+                dic.Add(5003, "chicken");
+                dic.Add(5004, "chicken");
+                dic.Add(6001, "chicken");
+                dic.Add(6009, "chicken");
+                dic.Add(6010, "chicken");
+                dic.Add(100201, "chicken");
+                dic.Add(100202, "chicken");
+                dic.Add(100203, "chicken");
+                dic.Add(100204, "chicken");
+                dic.Add(3005, "GrenadeFight");
+                dic.Add(2004, "groupClassic");
+                dic.Add(5008, "groupClassic");
+                dic.Add(2003, "groupNormal");
+                dic.Add(5002, "groupNormal");
+                dic.Add(6002, "groupNormal");
+                dic.Add(3002, "mftest");
+                dic.Add(3004, "PistolFight");
+                dic.Add(3003, "SniperFight");
+                dic.Add(500002, "testCase");
+                dic.Add(500001, "yctest");
+                /*List<DataRecord> list = MysqlUtil.SelectRecords("select * from rule_replace", FreeRuleConfig.MysqlConnection);
                 foreach (DataRecord dr in list)
                 {
                     dic.Add(int.Parse(dr.GetValue("race")), dr.GetValue("free"));
-                }
+                }*/
             }
         }
 

@@ -1,10 +1,10 @@
-﻿using System;
-using App.Client.GameModules.Ui.UiAdapter.Interface.Common;
+﻿using App.Client.GameModules.Ui.UiAdapter.Interface.Common;
 using App.Client.GameModules.Ui.ViewModels.Common;
 using App.Shared.Components.Ui;
 using Assets.UiFramework.Libs;
 using Core.GameModule.Interface;
 using Core.Utils;
+using System;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {
@@ -68,6 +68,10 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void UpdateRemainTime()
         {
             var tipList = _adapter.SystemTipDataQueue;
+            if (tipList.Count == 0)
+            {
+                return;
+            }
             var curTime = DateTime.Now.Ticks / 10000;
             var item = tipList.Peek();
             if ((curTime - _createTime) > item.DurationTime)

@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Core.Free;
+using System.Collections.Generic;
 
 namespace Core.Room
 {
-    public class RoomInfo
+    public class RoomInfo : IRule
     {
         public long HallRoomId;
         public int ModeId;
@@ -22,7 +23,7 @@ namespace Core.Room
         public int RoomDisplayId;
         public int RoomCapacity;
         public string PreLoadUI = "";
-        public string PreLoadAssetInfo=""; //AssetInfo Format: "AssetBundName0/AssetName0,AssetBundName1/AssetName1,..."
+        public List<string> PreLoadAssetInfo = new List<string>(); //AssetInfo Format: "AssetBundName0/AssetName0,AssetBundName1/AssetName1,..."
 
         public RoomInfo()
         {
@@ -53,7 +54,12 @@ namespace Core.Room
             RoomName = room.RoomName;
             RoomDisplayId = room.RoomDisplayId;
             ChannelName = room.ChannelName;
-            PreLoadAssetInfo = "";
+            //PreLoadAssetInfo = "";
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.RoomInfo;
         }
     }
 }

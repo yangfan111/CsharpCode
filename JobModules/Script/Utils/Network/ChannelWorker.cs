@@ -8,34 +8,37 @@ namespace Core.Network
 {
     public abstract class ChannelWorker : AbstractThread
     {
-	    private static LoggerAdapter _logger = new LoggerAdapter(typeof(ChannelWorker));
+        private static LoggerAdapter _logger = new LoggerAdapter(typeof(ChannelWorker));
         public static bool IsSuspend = false;
-        protected ChannelWorker(ReadWriteList<AbstractNetowrkChannel> holder, int threadIdx, int threadCount, string name = "default"): base(name)
+
+        protected ChannelWorker(ReadWriteList<AbstractNetowrkChannel> holder, int threadIdx, int threadCount,
+            string name = "default") : base(name)
         {
             _holder = holder;
             _threadIdx = threadIdx;
             _threadCount = threadCount;
         }
 
-       
+
         private double _runningTime;
         private double _totalTime;
         private readonly ReadWriteList<AbstractNetowrkChannel> _holder;
         private readonly int _threadIdx;
-        private readonly int _threadCount; 
+        private readonly int _threadCount;
         private Stopwatch _stopwatch = new Stopwatch();
         private float _rate;
-        private int _pollIntval=2;
+        private int _pollIntval = 5;
+
         protected override void Run()
         {
-	        Thread.CurrentThread.Name = GetType().ToString();
+            Thread.CurrentThread.Name = GetType().ToString();
             while (Running)
             {
                 try
                 {
                     var copy = _holder.ForRead().FindAll(x => x.Id % _threadCount == _threadIdx);
 
-                  
+
                     _stopwatch.Reset();
                     _stopwatch.Start();
                     bool hasWork = false;
@@ -57,22 +60,20 @@ namespace Core.Network
                     {
                         Thread.Sleep(sleep);
                     }
+
                     _stopwatch.Stop();
                     _totalTime += _stopwatch.ElapsedTicks / 10000f;
                     if (_totalTime >= 5000)
                     {
-                        
                         _rate = (float) (100 * _runningTime / (_totalTime));
                         _totalTime = 0;
                         _runningTime = 0;
                     }
-                    
                 }
                 catch (Exception e)
                 {
-                    _logger.ErrorFormat("Thread {0} error {1}",Name, e);
+                    _logger.ErrorFormat("Thread {0} error {1}", Name, e);
                 }
-
             }
         }
 

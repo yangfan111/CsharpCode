@@ -9,6 +9,7 @@ using Assets.UiFramework.Libs;
 using Core.Enums;
 using Core.GameModule.Interface;
 using Core.Utils;
+using UIComponent.UI;
 using UnityEngine;
 using UnityEngine.UI;
 using Utils.AssetManager;
@@ -43,9 +44,9 @@ namespace App.Client.GameModules.Ui.Models.Common
 
 		private class CellInfo//击杀消息所包含的内容
         {
-            public Text DeadName;
+            public UIText DeadName;
             public Image HeadShotIcon;
-            public Text KillerName;
+            public UIText KillerName;
             public Image DeathTypeIcon;
             public Image HurtShotIcon;
             public Transform Root;
@@ -74,29 +75,28 @@ namespace App.Client.GameModules.Ui.Models.Common
             if (infoItemRoot == null || infoItemModel == null)
                 return;
 
-            //infoItemModel.gameObject.SetActive(false);
             infoItemModel.GetComponent<Canvas>().enabled = false;
             _cellViewHeight = infoItemModel.GetComponent<RectTransform>().sizeDelta.y;
 
             for (int index = 0; index < _cellLength; index++)
             {
-                Transform transform = GameObject.Instantiate(infoItemModel, infoItemRoot);
+                Transform transform = UnityEngine.Object.Instantiate(infoItemModel, infoItemRoot);
                 _infoItemList.Add(transform);
                 InitCellInfoRef(transform);
                 (transform as RectTransform).anchoredPosition -= new Vector2(0, (5 + _cellViewHeight) * index);
             }
 
-            settings = infoItemModel.Find("DeadName").GetComponent<Text>().GetGenerationSettings(Vector2.zero);
+            //settings = infoItemModel.Find("DeadName").GetComponent<Text>().GetGenerationSettings(Vector2.zero);
         }
 
         private void InitCellInfoRef(Transform transform)
         {
             CellInfo cellInfo = new CellInfo();
-            cellInfo.DeadName = transform.Find("DeadName").GetComponent<Text>();
+            cellInfo.DeadName = transform.Find("DeadName").GetComponent<UIText>();
             cellInfo.DeathTypeIcon = transform.Find("DeathTypeIcon").GetComponent<Image>();
             cellInfo.HeadShotIcon = transform.Find("HeadShotIcon").GetComponent<Image>();
             cellInfo.HurtShotIcon = transform.Find("HurtShotIcon").GetComponent<Image>();
-            cellInfo.KillerName = transform.Find("KillerName").GetComponent<Text>();
+            cellInfo.KillerName = transform.Find("KillerName").GetComponent<UIText>();
             cellInfo.Root = transform;
             cellInfo.RootCanvas = transform.GetComponent<Canvas>();
             _cellInfoRefList.Add(cellInfo);
@@ -134,13 +134,11 @@ namespace App.Client.GameModules.Ui.Models.Common
                 {
                     IKillInfoItem item = _adapter.KillInfos[i];
                     UpdateMessageToCell(item, cell);
-                    //UIUtils.SetActive(tf, true);
                     UIUtils.SetEnable(cell.RootCanvas, true);
                     UpdateLayout(item,cell);
                 }
                 else
                 {
-                    //UIUtils.SetActive(tf, false);
                     UIUtils.SetEnable(cell.RootCanvas, false);
                 }
             }
@@ -180,14 +178,14 @@ namespace App.Client.GameModules.Ui.Models.Common
                 }
                 if (item.deathType == EUIDeadType.Weapon || item.deathType == EUIDeadType.Unarmed)//需要翻转
                 {
-                    cell.DeathTypeIcon.rectTransform.localScale = new Vector2(-1, 1);
+                    cell.DeathTypeIcon.rectTransform.localScale = new Vector3(-1, 1, 1);
                     var size = (cell.DeathTypeIcon).rectTransform.sizeDelta;
                     totalWidth -= new Vector2(size.x, 0);
                     cell.DeathTypeIcon.rectTransform.anchoredPosition = totalWidth;
                 }
             else
-            {
-                    cell.DeathTypeIcon.rectTransform.localScale = new Vector2(1, 1);
+                {
+                    cell.DeathTypeIcon.rectTransform.localScale = new Vector3(1, 1, 1);
                     var size = (cell.DeathTypeIcon).rectTransform.sizeDelta;
                     cell.DeathTypeIcon.rectTransform.anchoredPosition = totalWidth;
                     totalWidth -= new Vector2(size.x, 0);
@@ -218,7 +216,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         }
 
-        private TextGenerationSettings settings;
+        //private TextGenerationSettings settings;
         /// <summary>
         /// 更新击杀信息
         /// </summary>
@@ -316,11 +314,11 @@ namespace App.Client.GameModules.Ui.Models.Common
             CellInfo cellInfo = cell;
 
             cellInfo.DeadName.text = item.deadName;
-            float tempWidth1 = cellInfo.DeadName.cachedTextGeneratorForLayout.GetPreferredWidth(item.deadName, settings) / cellInfo.DeadName.pixelsPerUnit;
+            float tempWidth1 = cellInfo.DeadName.preferredWidth;
             cellInfo.DeadName.rectTransform.sizeDelta = new Vector2(tempWidth1, _cellViewHeight);
 
             cellInfo.KillerName.text = item.killerName;
-            float tempWidth2 = cellInfo.DeadName.cachedTextGeneratorForLayout.GetPreferredWidth(item.killerName, settings) / cellInfo.KillerName.pixelsPerUnit;
+            float tempWidth2 = cellInfo.KillerName.preferredWidth;
             cellInfo.KillerName.rectTransform.sizeDelta = new Vector2(tempWidth2, _cellViewHeight);
 	        Color color = _normalColor;
 	        bool isKillerInTeam = item.killerTeamId == _adapter.SelfTeamId;

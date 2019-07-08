@@ -15,5 +15,6 @@ namespace Core.Prediction.UserPrediction.Cmd
         EntityKey OwnerEntityKey { get; }
         IUserCmd LastTempCmd { get;  }
         IFilteredInput GetFiltedInput(IUserCmd userCmd);
+        bool IsEnable();
     }
 }

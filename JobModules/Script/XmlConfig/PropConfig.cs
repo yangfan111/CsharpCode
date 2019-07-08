@@ -13,6 +13,7 @@ namespace XmlConfig
         public List<int> TidList;
         public List<int> PacksTypeList;
         public int EffectVal;   //作用值
+        public int TimeType;    
     }
 
     [XmlRoot("root")]

@@ -22,29 +22,24 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 return;
             }
             var state = controller.RelatedCharState.GetActionState();
-            var runTimeComponent = heldAgent.RunTimeComponent;
-
-            //开火中：重置拉栓 
-            if (state == ActionInConfig.SpecialFireHold ||
-                (runTimeComponent.PullBoltInterrupt && state == ActionInConfig.Null))
+            //正常开火拉栓
+            if (state == ActionInConfig.SpecialFireHold)
             {
-                runTimeComponent.PullBoltInterrupt = false;
-                if (!runTimeComponent.IsPullingBolt)
-                {
-                    controller.RelatedCharState.SpecialFireEnd();
-                    if(controller.AudioController != null)
-                        controller.AudioController.PlayPullBoltAudio(heldAgent.ConfigId);
-                }
-                SetPullBolt(runTimeComponent, true);
-             
+                controller.AudioController.PlayPullBoltAudio(heldAgent.ConfigId);
+                controller.RelatedCharState.SpecialFireEnd();
                 return;
-            }
 
-            //拉栓行为结束：拉栓成功
-            if (runTimeComponent.IsPullingBolt && state != ActionInConfig.SpecialFireEnd)
+            }
+            if (heldAgent.RunTimeComponent.PullBoltInterrupt && state == ActionInConfig.Null)
             {
-                SetPullBolt(runTimeComponent, false);
-                runTimeComponent.PullBoltFinish = true;
+                if (heldAgent.BaseComponent.Bullet > 0)
+                {
+                    var needActionDeal = SingletonManager.Get<WeaponResourceConfigManager>()
+                                    .NeedActionDeal(heldAgent.ConfigId, ActionDealEnum.Reload);
+                    //只拉栓逻辑
+                    SpecialFireAppearance(heldAgent.Owner.WeaponController(), needActionDeal);
+                }
+                heldAgent.RunTimeComponent.PullBoltInterrupt = false;
             }
         }
 
@@ -71,6 +66,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
             var relatedAppearance = controller.RelatedAppearence;
             if (relatedCharState == null)
                 return;
+            controller.HeldWeaponAgent.RunTimeComponent.PullBoltInterrupt = false;
             var isAiming = controller.RelatedCameraSNew.IsAiming();
             if (isAiming)
             {
@@ -80,6 +76,8 @@ namespace App.Shared.GameModules.Weapon.Behavior
                     {
                         relatedAppearance.RemountWeaponOnRightHand();
                     }
+                    controller.HeldWeaponAgent.RunTimeComponent.PullBoltFinish = true; 
+
                 });
             }
             else
@@ -90,6 +88,8 @@ namespace App.Shared.GameModules.Weapon.Behavior
                     {
                         relatedAppearance.RemountWeaponOnRightHand();
                     }
+                    controller.HeldWeaponAgent.RunTimeComponent.PullBoltFinish = true; 
+
                 });
             }
 
@@ -101,10 +101,5 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
         }
 
-        private void SetPullBolt(WeaponRuntimeDataComponent runtimeDataComponent, bool isDoing)
-        {
-            runtimeDataComponent.IsPullingBolt     = isDoing;
-            runtimeDataComponent.PullBoltInterrupt = false;
-        }
     }
 }

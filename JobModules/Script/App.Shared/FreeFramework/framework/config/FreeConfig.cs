@@ -40,6 +40,7 @@ using com.wd.free.condition;
 using App.Shared.FreeFramework.framework.camera;
 using App.Shared.FreeFramework.framework.ai;
 using App.Shared.FreeFramework.framework.buf;
+using Core.Free;
 
 namespace com.wd.free.config
 {
@@ -402,6 +403,7 @@ namespace com.wd.free.config
             aliasOne(alias, new NotParaCondition());
             aliasOne(alias, new AndParaCondition());
             aliasOne(alias, new CameraFollowAction());
+            aliasOne(alias, new CameraFixAim());
             aliasOne(alias, new CameraResetAction());
             aliasOne(alias, new AnimationTestValue());
             aliasOne(alias, new PlayerTestValue());
@@ -418,10 +420,14 @@ namespace com.wd.free.config
             aliasOne(alias, new DefineEffectBufAction());
             aliasOne(alias, new AddEffectBufAction());
             aliasOne(alias, new PlayerPressKeyAction());
+            aliasOne(alias, new PlayerRageAction());
+            aliasOne(alias, new ChangeAvatarAction());
+            aliasOne(alias, new ChangeTeamidAction());
+            aliasOne(alias, new ClearPosAction());
         }
 
         // 会把父类的字段也会加入，需要注意当以前的代码中父类的字段没有按照这样的命名规范时会有问题
-        private static void aliasOne(XmlAlias alias, object obj)
+        private static void aliasOne(XmlAlias alias, IRule obj)
         {
             string classAlias = ToXmlName(obj.GetType().Name);
             alias.AddClass(classAlias, obj);

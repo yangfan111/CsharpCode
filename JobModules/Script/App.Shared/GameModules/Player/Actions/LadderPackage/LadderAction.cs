@@ -86,7 +86,7 @@ namespace App.Shared.GameModules.Player.Actions.LadderPackage
 
             _startLadder = false;
 
-            _directOutputs.CacheFsmOutput(NetworkAnimatorLayer.PlayerSyncLayer, 0,
+            _directOutputs.CacheFsmOutput(NetworkAnimatorLayer.PlayerSyncLayer, 1,
                 CharacterView.ThirdPerson);
 
             _ladder.ResetPlayerSetting();

@@ -4,14 +4,13 @@ using App.Server.GameModules.GamePlay.Free.item.config;
 using App.Server.GameModules.GamePlay.Free.player;
 using App.Server.GameModules.GamePlay.Free.weapon;
 using App.Shared;
-using App.Shared.FreeFramework.Free;
 using App.Shared.GameModules.GamePlay.Free.Map;
+using App.Shared.GameModules.Player;
 using Assets.App.Server.GameModules.GamePlay.Free;
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using com.cpkf.yyjd.tools.util;
 using com.cpkf.yyjd.tools.util.math;
-using com.wd.free.action.function;
 using com.wd.free.item;
 using com.wd.free.para;
 using Core.EntityComponent;
@@ -20,9 +19,7 @@ using Free.framework;
 using gameplay.gamerule.free.item;
 using gameplay.gamerule.free.rule;
 using Sharpen;
-using System.Collections.Generic;
 using UnityEngine;
-using Utils.Configuration;
 using Utils.Singleton;
 using WeaponConfigNs;
 using XmlConfig;
@@ -101,9 +98,9 @@ namespace App.Server.GameModules.GamePlay.Free.client
                     if (entity != null)
                     {
                         freeItem.entityId = entity.entityKey.Value.EntityId;
-                        freeItem.cat = entity.simpleEquipment.Category;
-                        freeItem.id = entity.simpleEquipment.Id;
-                        freeItem.count = entity.simpleEquipment.Count;
+                        freeItem.cat = entity.simpleItem.Category;
+                        freeItem.id = entity.simpleItem.Id;
+                        freeItem.count = entity.simpleItem.Count;
                     }
                     else
                     {
@@ -134,47 +131,63 @@ namespace App.Server.GameModules.GamePlay.Free.client
             {
                 ItemPosition ip = FreeItemManager.GetItemPosition(room.FreeArgs, key, fd.GetFreeInventory().GetInventoryManager());
                 FreeItemInfo info = FreeItemConfig.GetItemInfo(ip.key.GetKey());
-                if (ip.count > 1)
+                var stackable = true;
+                if (info.cat == (int)ECategory.Weapon)
                 {
-                    SimpleProto data = FreePool.Allocate();
-                    data.Key = FreeMessageConstant.ShowSplitUI;
-                    data.Ins.Add(info.cat);
-                    data.Ins.Add(info.id);
-                    data.Ins.Add(ip.count);
-                    data.Ss.Add(key);
-                    data.Ss.Add(ip.GetKey().GetName());
-                    FreeMessageSender.SendMessage(fd.Player, data);
+                    WeaponResConfigItem item = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(info.id);
+                    if (item.Type != (int)EWeaponType_Config.ThrowWeapon)
+                    {
+                        stackable = false;
+                    }
                 }
+                else
+                {
+                    if (info.stack <= 1)
+                    {
+                        stackable = false;
+                    }
+                }
+                SimpleProto data = FreePool.Allocate();
+                if (!stackable || ip.count <= 1)
+                {
+                    data.Key = FreeMessageConstant.ChickenTip;
+                    data.Ss.Add("word78");
+                    FreeMessageSender.SendMessage(fd.Player, data);
+                    return;
+                }
+                data.Key = FreeMessageConstant.ShowSplitUI;
+                data.Ins.Add(info.cat);
+                data.Ins.Add(info.id);
+                data.Ins.Add(ip.count);
+                data.Ss.Add(key);
+                data.Ss.Add(ip.GetKey().GetName());
+                FreeMessageSender.SendMessage(fd.Player, data);
+                PlayerStateUtil.AddPlayerState(EPlayerGameState.InterruptItem, fd.Player.gamePlay);
             }
         }
 
         public static void AddItemToPlayer(ServerRoom room, PlayerEntity player, int entityId, int cat, int id, int count, string toInv = "")
         {
-            SceneObjectEntity entity = room.RoomContexts.sceneObject.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(entityId, (short)EEntityType.SceneObject));
+            SceneObjectEntity entity = room.RoomContexts.sceneObject.GetEntityWithEntityKey(new EntityKey(entityId, (short)EEntityType.SceneObject));
             FreeMoveEntity freeMoveEntity = null;
             if (entity == null || entity.isFlagDestroy)
             {
-                freeMoveEntity = room.RoomContexts.freeMove.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(entityId, (short)EEntityType.FreeMove));
+                freeMoveEntity = room.RoomContexts.freeMove.GetEntityWithEntityKey(new EntityKey(entityId, (short)EEntityType.FreeMove));
                 if (freeMoveEntity == null)
                 {
                     return;
                 }
             }
 
-            room.FreeArgs.TempUse("current", (FreeData)player.freeData.FreeData);
+            FreeData fd = (FreeData) player.freeData.FreeData;
+            room.FreeArgs.TempUse("current", fd);
 
-            if (!FreeItemConfig.Contains(cat, id))
-            {
-                return;
-            }
+            if (!FreeItemConfig.Contains(cat, id)) return;
 
             FreeItemInfo item = FreeItemConfig.GetItemInfo(cat, id);
             CreateItemToPlayerAction action = new CreateItemToPlayerAction();
 
-            FreeData fd = (FreeData)player.freeData.FreeData;
-
             action.name = "default";
-
             switch (item.cat)
             {
                 case (int)ECategory.Weapon:
@@ -184,7 +197,6 @@ namespace App.Server.GameModules.GamePlay.Free.client
 
                         int c1 = fd.freeInventory.GetInventoryManager().GetInventory("w1").posList.Count;
                         int c2 = fd.freeInventory.GetInventoryManager().GetInventory("w2").posList.Count;
-
 
                         if (toInv.StartsWith("w1"))
                         {
@@ -243,7 +255,18 @@ namespace App.Server.GameModules.GamePlay.Free.client
                     {
                         action.name = "default";
                     }
-
+                    else if(item.subType == "w6")
+                    {
+                        action.name = "armor";
+                        if (entity != null) count = entity.armorDurability.CurDurability;
+                        DropItem(action.name, fd, room);
+                    }
+                    else if(item.subType == "w7")
+                    {
+                        action.name = "hel";
+                        if (entity != null) count = entity.armorDurability.CurDurability;
+                        DropItem(action.name, fd, room);
+                    }
                     break;
                 case (int)ECategory.Avatar:
                     action.name = item.subType;
@@ -255,50 +278,44 @@ namespace App.Server.GameModules.GamePlay.Free.client
                 default:
                     break;
             }
-
-            //handleDropOne(new string[] { "w2" }, action, item, fd, room, entity);
-            //handleAddToDefault(new string[] { "p1", "p2", "p3", "p4", "p5" }, action, item, fd, room, entity);
-
             action.key = FreeItemConfig.GetItemKey(item.cat, item.id);
 
             int canCount = 0;
-
             if (action.name == "default")
             {
                 canCount = BagCapacityUtil.CanAddToBagCount(room.FreeArgs, fd, item.cat, item.id, count);
+            }
+            else if (item.type == "avatar" || action.name == "hel" || action.name == "armor")
+            {
+                canCount = count;
             }
             else
             {
                 canCount = 1;
             }
 
-            if (canCount > 0)
+            if (canCount > 0 && !string.IsNullOrEmpty(action.name))
             {
                 PlayerAnimationAction.DoAnimation(room.RoomContexts, PlayerAnimationAction.Interrupt, fd.Player, true);
                 PlayerAnimationAction.DoAnimation(room.RoomContexts, 101, fd.Player, true);
+                PlayerStateUtil.AddPlayerState(EPlayerGameState.InterruptItem, fd.Player.gamePlay);
 
                 if (!string.IsNullOrEmpty(action.key))
                 {
                     action.count = canCount.ToString();
                     action.SetPlayer("current");
                     room.FreeArgs.TempUse("current", fd);
-
                     action.Act(room.FreeArgs);
-
                     room.FreeArgs.Resume("current");
 
                     if (count > canCount)
                     {
-                        UseCommonAction use = new UseCommonAction();
-                        use.key = "showBottomTip";
-                        use.values = new List<ArgValue>();
-                        use.values.Add(new ArgValue("msg", "拾取了" + count + "个中的" + canCount + "个"));
-
-                        room.FreeArgs.TempUse("current", fd);
-                        use.Act(room.FreeArgs);
-                        room.FreeArgs.Resume("current");
-                        room.FreeArgs.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.
-                            CreateSimpleEquipmentEntity((ECategory)item.cat, item.id, (count - canCount), entity.position.Value);
+                        SimpleProto msg = FreePool.Allocate();
+                        msg.Key = FreeMessageConstant.ChickenTip;
+                        msg.Ss.Add("word80," + count + "," + canCount);
+                        FreeMessageSender.SendMessage(fd.Player, msg);
+                        room.FreeArgs.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleObjectEntity((ECategory)item.cat,
+                            item.id, count - canCount, entity == null ? freeMoveEntity.position.Value : entity.position.Value);
                     }
                 }
                 else
@@ -306,66 +323,40 @@ namespace App.Server.GameModules.GamePlay.Free.client
                     Debug.LogError(item.cat + "-" + item.key + " not existed");
                 }
 
-                if (entity != null)
-                {
-                    entity.isFlagDestroy = true;
-
-                }
-
-                if (freeMoveEntity != null)
-                {
-                    freeMoveEntity.isFlagDestroy = true;
-                }
-                //Debug.LogErrorFormat("destroy entity {0}", entity != null);
-
-                FreeSoundUtil.PlayOnce("pick", 225, room.FreeArgs, fd);
+                if (entity != null) entity.isFlagDestroy = true;
+                if (freeMoveEntity != null) freeMoveEntity.isFlagDestroy = true;
             }
-
             room.FreeArgs.Resume("current");
         }
 
         public static string AutoPutPart(FreeData fd, FreeItemInfo partInfo, string toInv = "", ServerRoom room = null)
         {
+            string inv = null;
             if (toInv.StartsWith("w1"))
             {
-                return putOnPart(fd, 1, partInfo, toInv, room);
+                inv = putOnPart(fd, 1, partInfo, toInv, room);
             }
             else if (toInv.StartsWith("w2"))
             {
-                return putOnPart(fd, 2, partInfo, toInv, room);
+                inv = putOnPart(fd, 2, partInfo, toInv, room);
             }
             else if (toInv.StartsWith("w3"))
             {
-                return putOnPart(fd, 3, partInfo, toInv, room);
+                inv = putOnPart(fd, 3, partInfo, toInv, room);
             }
             else
             {
-                string inv = putOnPart(fd, 1, partInfo);
-                if (inv != null)
-                {
-                    return inv;
-                }
-                else
+                inv = putOnPart(fd, 1, partInfo);
+                if (inv == null)
                 {
                     inv = putOnPart(fd, 2, partInfo);
-                    if (inv != null)
-                    {
-                        return inv;
-                    }
-                    else
+                    if (inv == null)
                     {
                         inv = putOnPart(fd, 3, partInfo);
-                        if (inv != null)
-                        {
-                            return inv;
-                        }
-                        else
-                        {
-                            return "default";
-                        }
                     }
                 }
             }
+            return inv == null ? "default" : inv;
         }
 
         private static string putOnPart(FreeData fd, int weaponType, FreeItemInfo info, string toInv = "", ServerRoom room = null)
@@ -373,11 +364,12 @@ namespace App.Server.GameModules.GamePlay.Free.client
             WeaponResConfigItem weapon = GetWeapon(fd, weaponType);
             if (weapon != null)
             {
-                foreach (EWeaponPartType part in SingletonManager.Get<WeaponPartsConfigManager>().GetAvaliablePartTypes(weapon.Id))
+                int detailId = WeaponPartUtil.GetWeaponFstMatchedPartId(info.id, weapon.Id);
+                var weaponconfigMngr = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(weapon.Id);
+                foreach (EWeaponPartType part in weaponconfigMngr.ApplyPartsSlot)
                 {
                     int p = FreeWeaponUtil.GetWeaponPart(part);
-                    int detailId = WeaponPartUtil.GetWeaponFstMatchedPartId(info.id, weapon.Id);
-                    if (SingletonManager.Get<WeaponPartsConfigManager>().IsPartMatchWeapon(detailId, weapon.Id))
+                    if (weaponconfigMngr.IsPartMatchWeapon(detailId))
                     {
                         if ("p" + p == info.subType)
                         {
@@ -420,10 +412,8 @@ namespace App.Server.GameModules.GamePlay.Free.client
                 {
                     if (info.cat > 0)
                     {
-                        room.RoomContexts.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleEquipmentEntity(
-                    (ECategory)info.cat,
-                     info.id,
-                     ip.GetCount(), fd.Player.position.Value);
+                        room.RoomContexts.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleObjectEntity((ECategory)info.cat,
+                            info.id, ip.GetCount(), fd.Player.position.Value);
                     }
                 }
             }
@@ -476,19 +466,14 @@ namespace App.Server.GameModules.GamePlay.Free.client
             if (c3 > 0)
             {
                 ItemPosition ip = w3.posList[0];
-
                 w3.RemoveItem(room.FreeArgs, ip);
-
                 FreeItemInfo info = FreeItemConfig.GetItemInfo(ip.GetKey().GetKey());
 
                 if (info.cat > 0)
                 {
-                    room.RoomContexts.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleEquipmentEntity(
-                (ECategory)info.cat,
-                 info.id,
-                 ip.GetCount(), fd.Player.position.Value);
+                    room.RoomContexts.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleObjectEntity((ECategory)info.cat, 
+                        info.id, ip.GetCount(), fd.Player.position.Value, ip.GetCount());
                 }
-
             }
         }
     }

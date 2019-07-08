@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Core.Fsm;
 using Utils.Appearance;
 using XmlConfig;
 
 namespace Core.CharacterState.Posture
 {
-    class PostureManager : FsmManager, IFsmUpdate, ICharacterPostureInConfig, IGetPostureState
+    internal class PostureManager : FsmManager, IFsmUpdate, ICharacterPostureInConfig, IGetPostureState
     {
         private readonly PostureFsm _commonFsm;
         private readonly PostureFsm _leanFsm;
@@ -43,7 +41,8 @@ namespace Core.CharacterState.Posture
         public void Update(IAdaptiveContainer<IFsmInputCommand> commands,
                            int frameInterval,
                            Action<FsmOutput> addOutput,
-                           FsmUpdateType updateType)
+                           FsmUpdateType updateType,
+                           List<FsmInput> limits)
         {
             if ((_commonUpdateType & updateType) != 0)
             {

@@ -1,12 +1,14 @@
 ﻿using System;
 using App.Shared.Components.Ui;
 using App.Client.GameModules.Ui.UiAdapter;
+using App.Shared.Audio;
 using App.Shared.Configuration;
 using App.Shared.Player;
 using Core.Configuration;
 using Core.Utils;
 using UnityEngine;
 using Utils.Appearance;
+using Utils.Appearance.Bone;
 using Utils.Singleton;
 using Utils.Utils;
 
@@ -146,6 +148,7 @@ namespace App.Client.GameModules.ClientEffect.EffectLogic
                 screenFlashInfo.KeepTime = keepTime;
                 screenFlashInfo.DecayTime = decayTime;
                 AllContexts.ui.uI.ScreenFlashInfo = screenFlashInfo;
+                GameAudioMedia.PlayFlashDizzyAudio(pos,Math.Min(0,40-dis));
             }
         }
     }

@@ -11,11 +11,13 @@ using com.wd.free.skill;
 using com.wd.free.unit;
 using com.wd.free.util;
 using gameplay.gamerule.free.ui;
+using System;
+using Core.Free;
 
 namespace gameplay.gamerule.free.item
 {
     [System.Serializable]
-    public class PlayerRemoveItemAction : AbstractPlayerAction
+    public class PlayerRemoveItemAction : AbstractPlayerAction, IRule
     {
         private const long serialVersionUID = 2754682892581756843L;
 
@@ -77,6 +79,11 @@ namespace gameplay.gamerule.free.item
             //del.SetScope(1);
             //del.SetPlayer("current");
             //del.Act(args);
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerRemoveItemAction;
         }
     }
 }

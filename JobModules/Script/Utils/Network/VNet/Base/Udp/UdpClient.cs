@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Utils;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -8,6 +9,7 @@ namespace VNet.Base.Udp
 {
     public class UdpClient : UdpService, IVNetClient
     {
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(UdpClient));
         private IPEndPoint _endPoint;
         public event Action<IVNetPeer> OnConnectFailedListener;
         public event Action<IVNetPeer> OnConnectListener;
@@ -71,6 +73,44 @@ namespace VNet.Base.Udp
         private void OnSend(object sender, SocketAsyncEventArgs args)
         {
 
+        }
+
+        public void ReConnect()
+        {
+            /*throw new NotImplementedException();*/
+        }
+
+        public void CloseSocket(Socket socket)
+        {
+            if (socket == null || !socket.Connected)
+            {
+                return;
+            }
+            try
+            {
+                if (this.RealTimeSocket != null)
+                {
+                    this.RealTimeSocket.Shutdown(SocketShutdown.Both);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Debug("Close1:" + ex.Message);
+            }
+            try
+            {
+                socket.Close();
+            }
+            catch (Exception ex2)
+            {
+                Logger.Debug("Close2:" + ex2.Message);
+            }
+        }
+
+        public void CloseConnect()
+        {
+            CloseSocket(this.RealTimeSocket);
+            /*throw new NotImplementedException();*/
         }
     }
 }

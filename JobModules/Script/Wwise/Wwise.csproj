@@ -53,6 +53,8 @@
     <Compile Include="AKShared.cs" />
     <Compile Include="AkBankManagerExt.cs" />
     <Compile Include="AkUtilitiesExt.cs" />
+    <Compile Include="AudioBattleListener.cs" />
+    <Compile Include="AudioProjectManager.cs" />
     <Compile Include="Deployment\API\Generated\Common\AKRESULT.cs" />
     <Compile Include="Deployment\API\Generated\Common\Ak3DPositionType.cs" />
     <Compile Include="Deployment\API\Generated\Common\Ak3DSpatializationMode.cs" />

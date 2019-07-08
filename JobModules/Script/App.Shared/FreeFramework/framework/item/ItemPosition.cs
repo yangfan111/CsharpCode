@@ -4,10 +4,11 @@ using com.wd.free.@event;
 using com.wd.free.para;
 using System;
 using UnityEngine;
+using Core.Free;
 
 namespace com.wd.free.item
 {
-    public class ItemPosition : IFeaturable, IParable
+    public class ItemPosition : IFeaturable, IParable, IRule
     {
         private static int uniqueIndex = 1;
 
@@ -201,6 +202,11 @@ namespace com.wd.free.item
         {
             IniParameters();
             return paras;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ItemPosition;
         }
     }
 }

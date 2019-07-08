@@ -5,11 +5,12 @@ using com.wd.free.exception;
 using com.wd.free.map.position;
 using com.wd.free.para;
 using com.wd.free.unit;
+using Core.Free;
 
 namespace gameplay.gamerule.free.map
 {
     [System.Serializable]
-    public class SelectPointAction : AbstractGameAction
+    public class SelectPointAction : AbstractGameAction, IRule
     {
         private const long serialVersionUID = 3615114353547135092L;
 
@@ -47,12 +48,21 @@ namespace gameplay.gamerule.free.map
                 args.GetDefault().GetParameters().TempUse(new FloatPara("y", up.GetY()));
                 args.GetDefault().GetParameters().TempUse(new FloatPara("z", up.GetZ()));
                 args.GetDefault().GetParameters().TempUse(new IntPara("index", ++index));
+                args.GetDefault().GetParameters().TempUse(new BoolPara("invalid", up.GetInvalid()));
+                args.GetDefault().GetParameters().TempUse(new IntPara("randomindex", up.GetRandomindex()));
                 action.Act(args);
                 args.GetDefault().GetParameters().Resume("x");
                 args.GetDefault().GetParameters().Resume("y");
                 args.GetDefault().GetParameters().Resume("z");
                 args.GetDefault().GetParameters().Resume("index");
+                args.GetDefault().GetParameters().Resume("invalid");
+                args.GetDefault().GetParameters().Resume("randomindex");
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SelectPointAction;
         }
     }
 }

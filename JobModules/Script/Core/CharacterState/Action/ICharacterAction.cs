@@ -82,6 +82,7 @@ namespace Core.CharacterState.Action
 
         // Action
         void StartClimb(float kind, System.Action callBack);
+        void FinishedClimb();
         void EnterLadder(float enterKind, System.Action callBack);
         void ExitLadder(float exitKind, System.Action callBack);
         void MiddleEnterLadder();

@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Core.Common;
+using Core;
 using Core.Utils;
-using Shared.Scripts;
 using Shared.Scripts.Effect;
 using UnityEngine;
 using Utils.AssetManager;

@@ -7,11 +7,13 @@ using Utils.Utils.Buildin;
 using Core.EntityComponent;
 using System.Collections.Generic;
 using System.Text;
+using Core.ObjectPool;
+using Core.SnapshotReplication.Serialization.NetworkObject;
 
 namespace Core
 {
 
-    public class WeaponBagContainer : IPatchClass<WeaponBagContainer>, IDisposable
+    public class WeaponBagContainer :  IReusableObject, INetworkObject
     {
         public WeaponBagContainer() : this(true)
         {
@@ -37,15 +39,15 @@ namespace Core
         }
         private List<WeaponBagSlotData> slotWeapons = new List<WeaponBagSlotData>(GlobalConst.WeaponSlotMaxLength);
 
-        public int HeldSlotPointer { get; private set; }
+        public byte HeldSlotPointer { get; private set; }
 
-        public int LastSlotPointer { get; private set; }
+        public byte LastSlotPointer { get; private set; }
 
         /// <summary>
         /// 背包实际索引号
         /// </summary>
         public int BagIndex { get; private set; }
-        public void ChangeSlotPointer(int nowSlot)
+        public void ChangeSlotPointer(byte nowSlot)
         {
 
             LastSlotPointer = HeldSlotPointer;
@@ -90,6 +92,22 @@ namespace Core
         {
             Dispose();
         }
+
+        public void CopyFrom(object rightComponent)
+        {
+            MergeFromPatch(rightComponent as WeaponBagContainer);
+        }
+
+        public void ReInit()
+        {
+            HeldSlotPointer = 0;
+            LastSlotPointer = 0;
+            for (int i = 0; i < GlobalConst.WeaponSlotMaxLength; i++)
+            {
+                slotWeapons[i].Remove(EntityKey.Default);
+            }
+        }
+
         //public void Trash()
         //{
         //    HeldSlotPointer = 0;
@@ -151,8 +169,8 @@ namespace Core
         public void Read(BinaryReader reader)
         {
 
-            HeldSlotPointer = reader.ReadInt32();
-            LastSlotPointer = reader.ReadInt32();
+            HeldSlotPointer = reader.ReadByte();
+            LastSlotPointer = reader.ReadByte();
             for (int i = 0; i < GlobalConst.WeaponSlotMaxLength; i++)
             {
                 var entityId = reader.ReadInt32();
@@ -161,7 +179,7 @@ namespace Core
                 slotWeapons[i].Sync(weaponKey);
             }
         }
-        public void Write(WeaponBagContainer comparedInfo, MyBinaryWriter writer)
+        public void Write( MyBinaryWriter writer)
         {
 
 

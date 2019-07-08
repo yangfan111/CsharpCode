@@ -18,5 +18,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
         void ShowNoticeWindow(string title, Action yesCallback, Action noCallback, string yesText, string noText);
 
         GamePlayComponent gamePlay { get; }
+        bool IsHXMod { get;}
     }
 }

@@ -34,7 +34,7 @@ namespace Utils.Appearance.Weapon
             {
                 var loadKey = new LoadKey();
                 _loadKeys[asset] = loadKey;
-                _assetManager.LoadAssetAsync("WeaponModelLoader", asset, OnLoadSucc);
+                _assetManager.LoadAssetAsync("WeaponModelLoader", asset, OnLoadSucc, new AssetLoadOption(recyclable: true));
             }
         }
 
@@ -46,6 +46,11 @@ namespace Utils.Appearance.Weapon
                 Logger.DebugFormat("OnLoadSucc {0}", unityObj.Address);
             }
 #endif
+            if (!_loadKeys.ContainsKey(unityObj.Address))
+            {
+                _assetManager.Recycle(unityObj);
+                return;
+            }
             _loadKeys.Remove(unityObj.Address);
             var go = unityObj.AsGameObject;
             _loadedGo[unityObj.Address] = unityObj;
@@ -54,7 +59,7 @@ namespace Utils.Appearance.Weapon
             {
                 _loadedCb(unityObj.Address, go);
             }
-        }
+            }
 
         public void RegisterLoadedCb(Action<AssetInfo, object> cb)
         {

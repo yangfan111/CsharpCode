@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace App.Client.GameModules.GamePlay.Free.Entitas
 {
-    public class PlayerInterceptCmdSystem : AbstractStepExecuteSystem
+    public class  PlayerInterceptCmdSystem : AbstractStepExecuteSystem
     {
         private Contexts _contexts;
         private List<IPlayerCmdHandler> generators;

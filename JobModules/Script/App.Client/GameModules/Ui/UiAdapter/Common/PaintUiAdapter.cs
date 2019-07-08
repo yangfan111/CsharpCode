@@ -83,15 +83,19 @@ namespace App.Client.GameModules.Ui.UiAdapter
             if (!FreshSelectedPaintIndex)
                 return;
             var paintIdList = PaintIdList;
-            for (int i = 0, maxi = paintIdList.Count; i < maxi; i++)
+            SelectedPaintIndex = SelectValidIndex(paintIdList);
+            FreshSelectedPaintIndex = false;
+        }
+
+        public static int SelectValidIndex(List<int> list) {
+            for (int i = 0, maxi = list.Count; i < maxi; i++)
             {
-                if (paintIdList[i] > 0)
+                if (list[i] > 0)
                 {
-                    SelectedPaintIndex = i;
-                    break;
+                    return i;
                 }
             }
-            FreshSelectedPaintIndex = false;
+            return 0;
         }
 
         public GamePlayComponent gamePlay

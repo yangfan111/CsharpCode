@@ -1,7 +1,9 @@
-using System.Collections.Generic;
 using App.Server.GameModules.GamePlay;
 using App.Server.GameModules.GamePlay.free.player;
-using Sharpen;
+using App.Server.GameModules.GamePlay.Free.item;
+using App.Server.GameModules.GamePlay.Free.item.config;
+using App.Shared;
+using App.Shared.GameModules.Vehicle;
 using com.cpkf.yyjd.tools.util;
 using com.cpkf.yyjd.tools.util.math;
 using com.wd.free.@event;
@@ -11,11 +13,9 @@ using com.wd.free.para;
 using com.wd.free.skill;
 using gameplay.gamerule.free.rule;
 using gameplay.gamerule.free.ui;
-using App.Server.GameModules.GamePlay.Free.item;
-using UnityEngine;
-using App.Shared;
-using App.Server.GameModules.GamePlay.Free.item.config;
-using Assets.XmlConfig;
+using Sharpen;
+using Utils.Configuration;
+using Utils.Singleton;
 using XmlConfig;
 
 namespace gameplay.gamerule.free.item
@@ -247,9 +247,15 @@ namespace gameplay.gamerule.free.item
 
         public static void UseItem(string key, FreeData fd, ISkillArgs args)
         {
-            if (fd.Player.stateInterface.State.GetCurrentPostureState() == PostureInConfig.Climb)
+            var manager = SingletonManager.Get<StateTransitionConfigManager>();
+            foreach (EPlayerState state in fd.Player.StateInteractController().GetCurrStates())
             {
-                return;
+                StateTransitionConfigItem condition = manager.GetConditionByState(state);
+                if (condition == null) continue;
+                if (!condition.IsUseItem)
+                {
+                    return;
+                }
             }
 
             FreeRuleEventArgs fr = (FreeRuleEventArgs)args;

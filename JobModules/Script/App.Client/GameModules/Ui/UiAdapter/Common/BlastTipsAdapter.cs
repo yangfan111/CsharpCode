@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Client.GameModules.Ui.UiAdapter;
+﻿using App.Client.GameModules.Ui.UiAdapter;
 using App.Client.GameModules.Ui.UiAdapter.Interface.Common;
 using App.Shared.Components;
 using App.Shared.Components.Ui;
-using App.Shared.Components.UserInput;
-using Assets.App.Client.GameModules.Ui.UiAdapter.Interface;
 using Core.Enums;
-using Core.Ui;
-using KinematicCharacterController;
-using UserInputManager.Lib;
 
 namespace Assets.App.Client.GameModules.Ui.UiAdapter.Common
 {
@@ -22,7 +13,6 @@ namespace Assets.App.Client.GameModules.Ui.UiAdapter.Common
         public BlastTipsAdapter(Contexts contexts)
         {
             _contexts = contexts;
-            
         }
 
         public BlastComponent GetBlastData()
@@ -43,21 +33,18 @@ namespace Assets.App.Client.GameModules.Ui.UiAdapter.Common
         public bool IsCampPass()
         {
             var player = GetPlayerEntity();
-            var cam = player.playerInfo.Camp;
-            return (cam == (int)EUICampType.T);
+            var camp = player.playerInfo.Camp;
+            return camp == (int) EUICampType.T;
         }
 
         public bool IsGameRulePass()
         {
-            return (GetGameRule() == GameRules.Bomb);
+            return GameRules.IsBomb(GetGameRule());
         }
 
         public bool NeedShow()
         {
-            var player = GetPlayerEntity();
-            var cam = player.playerInfo.Camp;
-            var camNeedShow = (cam == (int)EUICampType.T);
-            return (GetGameRule() == GameRules.Bomb) && camNeedShow;
+            return IsGameRulePass() && IsCampPass();
         }
     }
 }

@@ -39,15 +39,7 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Free
         public override void CalcOutput(PlayerEntity player, ICameraMotorInput input, ICameraMotorState state, SubCameraMotorState subState,
             DummyCameraMotorOutput output, ICameraNewMotor last, int clientTime)
         {
-            if (last.ModeId == (short) ECameraFreeMode.Off)
-            {
-//                var elapsedPercent = ElapsedPercent(clientTime, subState.ModeTime, _transitionTime);
-//                output.ArchorPostOffset =
-//                    Vector3.Lerp(Vector3.zero, -state.GetMainConfig().ScreenOffset, elapsedPercent);
-            }
-
             output.EulerAngle = new Vector3(state.FreePitch, state.FreeYaw, 0);
-           
         }
 
         public override void UpdatePlayerRotation(ICameraMotorInput input, ICameraMotorState state, PlayerEntity player)
@@ -61,7 +53,7 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Free
 
         public override void PreProcessInput(PlayerEntity player, ICameraMotorInput input, ICameraMotorState state)
         {
-            var config = state.GetMainConfig();
+            var config = input.GetPoseConfig(state.GetMainMotor().NowMode);
             float yaw = state.FreeYaw + input.ArchorYaw;
             float pitch = state.FreePitch + input.ArchorPitch;
 

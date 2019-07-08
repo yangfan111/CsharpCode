@@ -7,11 +7,12 @@ using com.wd.free.@event;
 using com.wd.free.unit;
 using UnityEngine;
 using com.wd.free.util;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.map.position
 {
     [Serializable]
-    public class PosAngleSelector : AbstractPosSelector
+    public class PosAngleSelector : AbstractPosSelector, IRule
     {
         private IPosSelector pos;
         private string radius;
@@ -38,6 +39,11 @@ namespace App.Server.GameModules.GamePlay.Free.map.position
             }
 
             return up;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PosAngleSelector;
         }
     }
 }

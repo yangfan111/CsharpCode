@@ -137,7 +137,7 @@ namespace App.Shared.EntityFactory
             bool isDestructibleObject)
         {
             
-            var destructibleObject = CreateMapObject(_idGenerator.GetNextEntityId(), objectId, gameObject, resetAction);
+            var destructibleObject = CreateMapObject(objectId, objectId, gameObject, resetAction);
             AddEntityReference(destructibleObject, gameObject);
             var fracturedObject = gameObject.GetComponent<FracturedObject>();
             if (fracturedObject != null)

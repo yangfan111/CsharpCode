@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Core.Utils;
 using UnityEngine;
 using Utils.Configuration;
 using Utils.Singleton;
@@ -49,12 +50,12 @@ namespace App.Shared.Audio
             config = SingletonManager.Get<AudioGroupManager>().FindById(in_grpId);
         }
 
-        public void SetSwitch(GameObject target)
+        public void InitSwitch(GameObject target)
         {
             if (this.stateIndex < 0)
             {
-                AKRESULT akresult = AkSoundEngine.SetSwitch(config.Group, config.States[0], target);
-                if (AudioUtil.VerifyAKResult(akresult, "AKSwitch state:"+config.Group))
+                AKRESULT akresult = AkSoundEngine.SetSwitch(config.Group, config.StateArr[0], target);
+                if (AudioUtil.VerifyAKResult(akresult, string.Format("AKSwitch state:{0}-{1}", config.Group,config.StateArr[0])))
                 {
                     this.stateIndex = 0;
                 }
@@ -66,7 +67,18 @@ namespace App.Shared.Audio
             if (stateIndex < 0) return;
             if (stateIndex != this.stateIndex || this.stateIndex < 0)
             {
-                AKRESULT akresult = AkSoundEngine.SetSwitch(config.Group, config.States[stateIndex], target);
+                AKRESULT akresult;
+                if (config.StateArr.Length > stateIndex)
+                {
+                    akresult = AkSoundEngine.SetSwitch(config.Group, config.StateArr[stateIndex], target);
+                }
+                  
+                else
+                {
+                    AudioUtil.Logger.ErrorFormat("wise group:{0},state {1}", config.Group, stateIndex);  
+                    akresult = AKRESULT.AK_Fail;
+                }
+                  
                 if (AudioUtil.VerifyAKResult(akresult, "AKSwitch state:"+config.Group))
                 {
                     this.stateIndex = stateIndex;

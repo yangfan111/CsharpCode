@@ -1,14 +1,16 @@
-﻿using Core.GameTime;
+﻿using App.Shared;
+using App.Shared.DebugSystem;
+using App.Shared.FreeFramework.framework.trigger;
+using App.Shared.FreeFramework.framework.unit;
+using com.wd.free.@event;
+using Com.Wooduan.Ssjj2.Common.Net.Proto;
+using Core.Free;
+using Core.GameTime;
 using Core.Network;
+using Core.Room;
 using Core.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Shared.DebugSystem;
-using App.Shared;
-using Com.Wooduan.Ssjj2.Common.Net.Proto;
-using Core.Room;
 using UnityEngine;
 using Utils.Singleton;
 
@@ -192,6 +194,12 @@ namespace App.Server
                 }
 
                 _dispatcher.AddEvent(evt);
+
+                var args = _roomFactory.contexts().session.commonSession.FreeArgs as IEventArgs;
+                if (args != null)
+                {
+                    args.Trigger(FreeTriggerConstant.PRELOAD_RESOURCE, new TempUnit("roomInfo", new ObjectUnit(e.RoomPlayerList)));
+                }
             }
             
         }

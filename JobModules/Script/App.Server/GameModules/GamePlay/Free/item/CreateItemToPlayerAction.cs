@@ -1,34 +1,28 @@
-using System;
 using App.Server.GameModules.GamePlay;
 using App.Server.GameModules.GamePlay.free.player;
-using Sharpen;
 using com.cpkf.yyjd.tools.util;
-using com.wd.free.@event;
 using com.wd.free.action;
+using com.wd.free.@event;
 using com.wd.free.item;
 using com.wd.free.para;
 using com.wd.free.skill;
 using com.wd.free.unit;
 using com.wd.free.util;
+using Core.Free;
 using gameplay.gamerule.free.rule;
 
 namespace gameplay.gamerule.free.item
 {
     [System.Serializable]
-    public class CreateItemToPlayerAction : AbstractPlayerAction
+    public class CreateItemToPlayerAction : AbstractPlayerAction, IRule
     {
         private const long serialVersionUID = 6361325829890462542L;
 
         private const string INI_COUNT = "1";
-
         public string name;
-
         public string key;
-
         public string count;
-
         private IGameAction action;
-
         private IGameAction failAction;
 
         [System.NonSerialized]
@@ -56,13 +50,15 @@ namespace gameplay.gamerule.free.item
                 FreeData fd = (FreeData)player;
                 args.TempUse(ParaConstant.PARA_PLAYER_CURRENT, fd);
                 args.TempUse(ParaConstant.PARA_ITEM, fi);
+
+                args.TempUsePara(new StringPara("from", "ground"));
+
                 if (action != null)
                 {
                     action.Act(args);
                 }
 
-                if (fd.freeInventory.GetInventoryManager().GetInventory(FreeUtil.ReplaceVar(name, args))
-                    .AddItem((ISkillArgs)args, fi, true))
+                if (fd.freeInventory.GetInventoryManager().GetInventory(FreeUtil.ReplaceVar(name, args)).AddItem((ISkillArgs)args, fi, true))
                 {
                     //addtimePara.setValue(fr.room.getServerTime());
                     fi.GetParameters().AddPara(addtimePara);
@@ -77,9 +73,15 @@ namespace gameplay.gamerule.free.item
                     }
                 }
 
+                fr.ResumePara("from");
                 fr.Resume(ParaConstant.PARA_PLAYER_CURRENT);
                 fr.Resume(ParaConstant.PARA_ITEM);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.CreateItemToPlayerAction;
         }
     }
 }

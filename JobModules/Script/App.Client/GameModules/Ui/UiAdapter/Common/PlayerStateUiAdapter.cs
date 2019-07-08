@@ -1,6 +1,4 @@
 ﻿using App.Shared.Components.Player;
-using App.Client.GameModules.Ui.UiAdapter;
-using App.Shared.Player;
 using UnityEngine;
 using XmlConfig;
 
@@ -9,14 +7,13 @@ namespace App.Client.GameModules.Ui.UiAdapter
     public class PlayerStateUiAdapter : UIAdapter, IPlayerStateUiAdapter
     {
         private PlayerEntity _playerEntity;
+        private Contexts _contexts;
 
-        public PlayerStateUiAdapter()
+        public PlayerStateUiAdapter(Contexts contexts)
         {
+            this._contexts = contexts;
         }
-        public string PlayerName
-        {
-            get { return PlayerEntity.playerInfo.PlayerName; }
-        }
+
         public int CurUIModel { get { return 1; }}             //1 默认模式 2可选方案
  
      
@@ -41,7 +38,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                if (null != PlayerEntity)
+                if (PlayerEntity.hasOxygenEnergyInterface)
                     return PlayerEntity.oxygenEnergyInterface.Oxygen.CurrentOxygen;
                 return 0;
             }
@@ -60,26 +57,15 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                if (PlayerEntity != null)
-                {
-                    return (int)PlayerEntity.gamePlay.CurHp;
-                }
-                else
-                {
-                    return 0;
-                }
+                return (int)PlayerEntity.gamePlay.CurHp;
             }
         }
         public int MaxHp
         {
             get
             {
-                if (PlayerEntity != null)
-                    return PlayerEntity.gamePlay.MaxHp;
-                else
-                {
-                    return 0;
-                }
+                return PlayerEntity.gamePlay.MaxHp;
+
             }
         }
         public int CurrentHpInHurtedState     //受伤状态下 的当前血量
@@ -98,7 +84,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                if (PlayerEntity != null)
+                if (PlayerEntity.hasStateInterface)
                 {
                     Core.CharacterState.ICharacterState state = PlayerEntity.stateInterface.State;
                     PostureInConfig postureInConfig = state.GetCurrentPostureState();
@@ -140,7 +126,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                if (PlayerEntity != null && PlayerEntity.hasAppearanceInterface &&  PlayerEntity.appearanceInterface.Appearance.IsFirstPerson)
+                if (PlayerEntity.hasAppearanceInterface &&  PlayerEntity.appearanceInterface.Appearance.IsFirstPerson)
                     return 1;
                 else
                     return 3;
@@ -151,14 +137,14 @@ namespace App.Client.GameModules.Ui.UiAdapter
         //装备组
         public bool IsDead
         {
-            get { return PlayerEntity != null && PlayerEntity.gamePlay.IsDead(); }
+            get { return PlayerEntity.gamePlay.IsDead(); }
         }
         //头盔
         public float maxHelmet
         {
             get
             {
-                return PlayerEntity != null ? PlayerEntity.gamePlay.MaxHelmet : 0;
+                return PlayerEntity.gamePlay.MaxHelmet;
             }
         }
 
@@ -166,7 +152,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                return PlayerEntity != null ? PlayerEntity.gamePlay.CurHelmet : 0;
+                return PlayerEntity.gamePlay.CurHelmet;
             }
         }
 
@@ -176,14 +162,14 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                return PlayerEntity != null ? PlayerEntity.gamePlay.MaxArmor : 0;
+                return PlayerEntity.gamePlay.MaxArmor;
             }
         }      
         public float curArmor
         {
             get
             {
-                return PlayerEntity != null ? PlayerEntity.gamePlay.CurArmor : 0;
+                return PlayerEntity.gamePlay.CurArmor;
             }
         }      
 
@@ -193,7 +179,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
             get
             {
                 PlayerEntity player = PlayerEntity;
-                if (null != player && player.hasCameraFx && null != player.cameraFx.Poison)
+                if (player.hasCameraFx && null != player.cameraFx.Poison)
                 {
                     return player.cameraFx.Poison.GetComponent<ParticleSystem>();
                 }
@@ -205,19 +191,14 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                return _playerEntity;
-            }
-
-            set
-            {
-                _playerEntity = value;
+                return _contexts.ui.uI.Player;
             }
         }
 
        
         public override bool IsReady()
         {
-            return _playerEntity != null;
+            return PlayerEntity != null;
         }
     }
 }

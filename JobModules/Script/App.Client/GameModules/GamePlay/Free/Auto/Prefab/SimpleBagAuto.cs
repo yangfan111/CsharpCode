@@ -318,7 +318,7 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
             {
                 if (item.hasPosition
                     && IsNear(item.position.Value, player.position.Value)
-                    && item.hasSimpleEquipment && item.simpleEquipment.Category > 0
+                    && item.hasSimpleItem && item.simpleItem.Category > 0
                     && HasNoObstacle(item, player))
                 {
                     current.Add(item.entityKey.Value.EntityId);
@@ -375,7 +375,7 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
 
                 //foreach (var item in context.sceneObject.GetEntities())
                 //{
-                //    if (item.hasPosition && IsNear(item.position.Value, player.position.Value) && item.hasSimpleEquipment && item.simpleEquipment.Category > 0
+                //    if (item.hasPosition && IsNear(item.position.Value, player.position.Value) && item.hasSimpleItem && item.simpleEquipment.Category > 0
                 //        && HasNoObstacle(item, player))
                 //    {
                 //        list.Add(item);
@@ -427,20 +427,20 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
                 }
                 foreach (var item in list)
                 {
-                    if (item.simpleEquipment.Category == (int)ECategory.Weapon)
+                    if (item.simpleItem.Category == (int)ECategory.Weapon)
                     {
-                        WeaponConfigNs.WeaponResConfigItem weapon = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(item.simpleEquipment.Id);
+                        WeaponConfigNs.WeaponResConfigItem weapon = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(item.simpleItem.Id);
                         if (weapon.Type != (int)EWeaponType_Config.ThrowWeapon)
                         {
-                            item.simpleEquipment.Count = 0;
+                            item.simpleItem.Count = 0;
                         }
                     }
-                    if (item.simpleEquipment.Category == (int)ECategory.Avatar)
+                    if (item.simpleItem.Category == (int)ECategory.Avatar)
                     {
-                        item.simpleEquipment.Count = 0;
+                        item.simpleItem.Count = 0;
                     }
 
-                    ItemBar prefab = AddChild(item.simpleEquipment.Category, item.simpleEquipment.Id, item.simpleEquipment.Count, item.entityKey.Value.EntityId);
+                    ItemBar prefab = AddChild(item.simpleItem.Category, item.simpleItem.Id, item.simpleItem.Count, item.entityKey.Value.EntityId);
 
                     if (prefab != null)
                     {
@@ -703,7 +703,7 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
     {
         public override int Compare(SceneObjectEntity x, SceneObjectEntity y)
         {
-            return AutoSimpleBag.CompareItem(x.simpleEquipment.Category, x.simpleEquipment.Id, y.simpleEquipment.Category, y.simpleEquipment.Id);
+            return AutoSimpleBag.CompareItem(x.simpleItem.Category, x.simpleItem.Id, y.simpleItem.Category, y.simpleItem.Id);
         }
     }
 

@@ -6,23 +6,32 @@ using Utils.Singleton;
 
 namespace Utils.Utils
 {
+
     public class ConsumerThread<Job, Result> : AbstractThread
     {
         private LoggerAdapter _logger;
-        private BlockingQueue<Job> _queue = new BlockingQueue<Job>(32);
+        private BlockingQueue<Job> _queue;
         private float _rate;
         private Func<Job, Result> _action;
         private CustomProfileInfo _profile;
         private CustomProfileInfo _profile2;
         private volatile int _count = 0;
 
-        public ConsumerThread(string name, Func<Job, Result> action) :base(name)
+        public ConsumerThread(string name, Func<Job, Result> action, BlockingQueue<Job> queue=null) :base(name)
         {
             _action = action;
             _profile = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo(name);
             _profile2 = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo(name+"_all");
             _logger =
                 new LoggerAdapter(Name);
+            if (queue == null)
+            {
+                _queue = new BlockingQueue<Job>(32);
+            }
+            else
+            {
+                _queue = queue;
+            }
         }
 
         public void Offer(Job job)
@@ -33,7 +42,7 @@ namespace Utils.Utils
 
         public bool IsDone()
         {
-            return _count == 0;
+            return _queue.Count == 0;
         }
 
       
@@ -51,15 +60,15 @@ namespace Utils.Utils
                     _logger.Debug("start");
                     try
                     {
-                        SingletonManager.Get<DurationHelp>().ProfileStart(_profile);
+                        _profile.BeginProfileOnlyEnableProfile();
                         _action(task);
-                        SingletonManager.Get<DurationHelp>().ProfileStart(_profile2);
+                       // _profile2.BeginProfileOnlyEnableProfile();
                         Interlocked.Decrement(ref _count);
                     }
                     finally
                     {
-                        SingletonManager.Get<DurationHelp>().ProfileEnd(_profile);
-                        SingletonManager.Get<DurationHelp>().ProfileEnd(_profile2);
+                        _profile.EndProfileOnlyEnableProfile();
+                       // _profile2.EndProfileOnlyEnableProfile();
                     }
                     _logger.Debug("end");
                 }

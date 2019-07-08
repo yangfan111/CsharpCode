@@ -11,7 +11,7 @@ namespace App.Shared.GameModules.Player.Actions.LadderPackage
         private const string LadderTopTag = "LadderTop";
         private const string LadderMiddleTag = "LadderMiddle";
         private const string LadderBottomTag = "LadderBottom";
-        
+        public static Collider[]colliders = new Collider[512];
         public static bool CheckLadderKind(PlayerEntity player, out LadderLocation location, bool considerDirection = false)
         {
             location = LadderLocation.Null;
@@ -26,20 +26,22 @@ namespace App.Shared.GameModules.Player.Actions.LadderPackage
             
             //DebugDraw.DebugWireSphere(capsuleBottom, Color.red, capsuleRadius);
 
-            var colliders = Physics.OverlapSphere(capsuleBottom, capsuleRadius, UnityLayers.ClimbLadderLayerMask);
-            if (colliders.Length <= 0) return false;
+            var length = Physics.OverlapSphereNonAlloc(capsuleBottom, capsuleRadius, colliders, UnityLayers.ClimbLadderLayerMask);
+            if (length == 0) return false;
 
 
-            location = CheckLadderLocation(colliders, playerTransform, considerDirection);
+            location = CheckLadderLocation(colliders, length, playerTransform, considerDirection);
 
             return location != LadderLocation.Null;
         }
 
-        private static LadderLocation CheckLadderLocation(Collider[] colliders, Transform transform, bool considerDirection)
+        private static LadderLocation CheckLadderLocation(Collider[] colliders, int length, Transform transform, bool considerDirection)
         {
             var ret = LadderLocation.Null;
-            foreach (var collider in colliders)
+            for (var i = 0; i < length; i++)
             {
+                var collider = colliders[i];
+            
                 var directionCondition = considerDirection &&
                                          Mathf.Acos(Vector3.Dot(transform.forward, collider.transform.forward)) *
                                          Mathf.Rad2Deg > 10f;

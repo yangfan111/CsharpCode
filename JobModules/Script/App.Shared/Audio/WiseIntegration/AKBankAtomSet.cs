@@ -49,7 +49,6 @@ namespace App.Shared.Audio
         public void DoLoadBank(AKBankAtom atom,System.Action<AKRESULT> handler)
         {
             LoadPrepare(atom);
-            
             AKRESULT akresult = AkBankManager.LoadBankRes(atom.BankName, false, false);
             LoadFinish(atom, akresult);
             if (handler != null)

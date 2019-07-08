@@ -16,10 +16,13 @@ namespace App.Shared.Components.ClientSession
         public int Fps60;
         public int RecvCmdCount;
         public int GcCount;
-
+        public bool GcStatus;
+        public int AllocatedMb;
+        public int AllocationRateMbps;
+        
         public override string ToString()
         {
-            return string.Format("ad: {0}, md: {1}, fps: {2} {3} {4}, Gc:{5}", AvgDelta, MaxDelta, Fps5, Fps30, Fps60,  GcCount);
+            return string.Format("ad: {0}, md: {1}, fps: {2} {3} {4}, Gc:{5} {6} {7}MB {8}MB", AvgDelta, MaxDelta, Fps5, Fps30, Fps60,  GcCount, GcStatus,AllocatedMb, AllocationRateMbps);
         }
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using Utils.Appearance.Bone;
 using Utils.AssetManager;
 using Utils.Configuration;
 using Utils.Singleton;

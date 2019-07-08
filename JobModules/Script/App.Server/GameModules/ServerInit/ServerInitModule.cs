@@ -1,6 +1,4 @@
-﻿using App.Shared;
-using App.Shared.GameModules.Configuration;
-using Core.GameModule.Module;
+﻿using Core.GameModule.Module;
 using Core.SessionState;
 
 namespace App.Server.ServerInit
@@ -17,9 +15,7 @@ namespace App.Server.ServerInit
     {
         public ServerEntityInitModule(Contexts contexts)
         {
-           
             AddSystem(new ServerEntitiesInitSystem(contexts));
-
         }
     }
 }

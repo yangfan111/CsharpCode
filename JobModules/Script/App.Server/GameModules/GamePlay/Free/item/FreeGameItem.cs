@@ -5,12 +5,13 @@ using com.wd.free.skill;
 using com.wd.free.unit;
 using gameplay.gamerule.free.rule;
 using gameplay.gamerule.free.ui;
+using Core.Free;
 
 namespace gameplay.gamerule.free.item
 {
 	[System.Serializable]
-	public class FreeGameItem : FreeItem
-	{
+	public class FreeGameItem : FreeItem, IRule
+    {
 		private const long serialVersionUID = -6970843131876269900L;
 
 		private const string INI_RADIUS = "300";
@@ -50,5 +51,10 @@ namespace gameplay.gamerule.free.item
 		{
 			this.cat = cat;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeGameItem;
+        }
+    }
 }

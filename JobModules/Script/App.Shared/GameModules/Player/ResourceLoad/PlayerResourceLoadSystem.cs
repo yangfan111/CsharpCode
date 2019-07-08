@@ -17,8 +17,9 @@ namespace App.Shared.GameModules.Player.ResourceLoad
         private readonly PlayerContext _player;
         private readonly FirstPersonModelLoadHandler _p1Handler;
         private readonly ThirdPersonModelLoadHandler _p3Handler;
-        private readonly InterceptPool _interceptPool = new InterceptPool();
-
+        private readonly AssetsAsyncCallPool _assetsAsyncCallPool = new AssetsAsyncCallPool();
+        private readonly List<AssetInfo> _assetInfos = new List<AssetInfo>();
+        
         public PlayerResourceLoadSystem(Contexts contexts) : base(contexts.player)
         {
             _player = contexts.player;
@@ -51,7 +52,10 @@ namespace App.Shared.GameModules.Player.ResourceLoad
                     _p1Handler.OnLoadSucc);
             }
 
-            Logger.InfoFormat("created client player entity {0}, id:{1}, avatarIds:{2}", player.entityKey,
+            var audioController = player.AudioController();
+            if (audioController != null)
+                audioController.LoadMapAmbient(AssetManager);
+            Logger.InfoFormat("CharacterLog-- created client player entity {0}, id:{1}, avatarIds:{2}", player.entityKey,
                 player.playerInfo.RoleModelId,
                 string.Join(",", player.playerInfo.AvatarIds.Select(i => i.ToString()).ToArray()));
         }
@@ -61,25 +65,105 @@ namespace App.Shared.GameModules.Player.ResourceLoad
             base.OnLoadResources(assetManager);
             foreach (var entity in _player.GetEntities())
             {
-                if (entity.hasAppearanceInterface)
+                if (!entity.hasAppearanceInterface) continue;
+                var loadRequests = entity.appearanceInterface.Appearance.GetLoadRequests();
+                if (loadRequests.Count > 0)
                 {
-                    var loadRequests = entity.appearanceInterface.Appearance.GetLoadRequests();
-                    foreach (var request in loadRequests)
-                    {
-                        var intercept = _interceptPool.Get();
-                        intercept.SetParam(entity, request.GetHandler<PlayerEntity>());
-                        assetManager.LoadAssetAsync(entity, request.AssetInfo, intercept.Call);
-                    }
-
-                    var recycleRequests = entity.appearanceInterface.Appearance.GetRecycleRequests();
-                    foreach (var request in recycleRequests)
-                    {
-                        entity.RemoveAsset(request);
-                        assetManager.Recycle(request);
-                    }
-
-                    entity.appearanceInterface.Appearance.ClearRequests();
+                    var call = _assetsAsyncCallPool.Get();
+                    call.CreateCallFuncMapping(entity, loadRequests);
+                    CreateAssetInfos(loadRequests);
+                    assetManager.LoadAssetsAsync(entity, _assetInfos, 
+                        call.CallFunc); 
                 }
+
+                var recycleRequests = entity.appearanceInterface.Appearance.GetRecycleRequests();
+                foreach (var request in recycleRequests)
+                {
+                    entity.RemoveAsset(request);
+                    assetManager.Recycle(request);
+                }
+
+                entity.appearanceInterface.Appearance.ClearRequests();
+            }
+        }
+
+        private void CreateAssetInfos(List<AbstractLoadRequest> loadRequests)
+        {
+            _assetInfos.Clear();
+            foreach (var request in loadRequests)
+                _assetInfos.Add(request.AssetInfo);
+        }
+
+        private class AssetsAsyncCall
+        {
+            private readonly AssetsAsyncCallPool _assetsAsyncCallPool;
+            private readonly InterceptPool _interceptPool;
+            private readonly List<Action<PlayerEntity, UnityObject>> _list = 
+                new List<Action<PlayerEntity, UnityObject>>();
+
+            public AssetsAsyncCall(AssetsAsyncCallPool assetsAsyncCallPool, InterceptPool interceptPool)
+            {
+                _assetsAsyncCallPool = assetsAsyncCallPool;
+                _interceptPool = interceptPool;
+            }
+            
+            public void CreateCallFuncMapping(PlayerEntity player, List<AbstractLoadRequest> loadRequests)
+            {
+                if (null == loadRequests)
+                {
+                    Logger.ErrorFormat("loadRequestsList is Null");
+                    return;
+                }
+                
+                foreach (var request in loadRequests)
+                {
+                    var intercept = _interceptPool.Get();
+                    intercept.SetParam(player, request.GetHandler<PlayerEntity>());
+                    _list.Add(intercept.Call);
+                }
+            }
+            
+            public void CallFunc(PlayerEntity player, List<UnityObject> objects)
+            {
+                if(objects.Count != _list.Count)
+                    Logger.ErrorFormat("Batch Load UnityObject Number Not Match Request  RequestsCount:{0}, objectsCount:{1}",
+                        _list.Count, objects.Count);
+                
+                for (var i = 0; i < objects.Count; ++i)
+                {
+                    if (_list.Count <= i || null == _list[i]) continue;
+                    _list[i].Invoke(player, objects[i]);
+                    _list[i] = null;
+                }
+
+                // Free Remain PoolObj
+                foreach (var action in _list)
+                {
+                    if(null == action) continue;
+                    action.Invoke(player, null);
+                }
+                
+                _list.Clear();
+                _assetsAsyncCallPool.Free(this);
+            }
+        }
+        
+        private class AssetsAsyncCallPool
+        {
+            private readonly Queue<AssetsAsyncCall> _pool = new Queue<AssetsAsyncCall>();
+            private readonly InterceptPool _interceptPool = new InterceptPool();
+            
+            public AssetsAsyncCall Get()
+            {
+                if (_pool.Count <= 0)
+                    return new AssetsAsyncCall(this, _interceptPool);
+                
+                return _pool.Dequeue();
+            }
+
+            public void Free(AssetsAsyncCall item)
+            {
+                _pool.Enqueue(item);
             }
         }
 
@@ -87,16 +171,6 @@ namespace App.Shared.GameModules.Player.ResourceLoad
         {
             return SingletonManager.Get<RoleConfigManager>().GetRoleItemById(roleId).HasFirstPerson;
         }
-
-        private void ChangeRole(PlayerEntity player, int roleId)
-        {
-            if(player.hasPlayerInfo)
-                player.playerInfo.ChangeNewRole(roleId);
-            
-            SingleExecute(player);
-        }
-        
-        //private void Clear
         
         private class LoadResourceIntercept
         {
@@ -119,7 +193,7 @@ namespace App.Shared.GameModules.Player.ResourceLoad
             public void Call(PlayerEntity player, UnityObject unityObj)
             {
                 _player.AddAsset(unityObj);
-                _handler(player, unityObj);
+                _handler.Invoke(player, unityObj);
                 _pool.Free(this);
             }
         }

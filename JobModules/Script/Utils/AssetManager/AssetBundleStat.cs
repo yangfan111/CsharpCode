@@ -31,7 +31,7 @@ namespace Utils.AssetManager
 
         public void AssetBundleLoaded(string name)
         {
-            _logger.InfoFormat("Load Asset Bundle {0} Successfully", name);
+            _logger.DebugFormat("Load Asset Bundle {0} Successfully", name);
         }
 
         public void AssetBundleNotFound(string name, string errorInfo)

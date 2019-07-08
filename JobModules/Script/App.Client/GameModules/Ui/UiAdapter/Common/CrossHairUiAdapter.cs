@@ -13,42 +13,53 @@ namespace App.Client.GameModules.Ui.UiAdapter
 {
     public class CrossHairUiAdapter : UIAdapter, ICrossHairUiAdapter
     {
-        private Contexts      _contexts;
+        private Contexts _contexts;
         private PlayerContext _playerContext;
-        private UiContext     _uiContext;
+        private UiContext _uiContext;
 
         public CrossHairUiAdapter(Contexts contexts)
         {
-            _contexts      = contexts;
+            _contexts = contexts;
             _playerContext = contexts.player;
-            _uiContext     = contexts.ui;
+            _uiContext = contexts.ui;
+        }
+
+        public override bool IsReady()
+        {
+            return Player != null;
+        }
+
+        private PlayerEntity Player
+        {
+            get { return _uiContext.uI.Player; }
         }
 
         private WeaponBaseAgent HeldWeaponAgent
         {
-            get { return _playerContext.flagSelfEntity.WeaponController().HeldWeaponAgent; }
+            get
+            {
+                var controller = Player.WeaponController();
+                return controller == null ? null : controller.HeldWeaponAgent;
+            }
         }
 
         //准心组
         private CrossHairType type;
-        private bool          isOpenCrossHairMotion = true; //常态类型准心 是否开启了准心运动
+        private bool isOpenCrossHairMotion = true; //常态类型准心 是否开启了准心运动
 
         public CrossHairType Type //准心类型
         {
             get
             {
                 var type = CrossHairType.Normal;
-                if (null != _playerContext.flagSelfEntity)
+                var player = Player;
+                if (CrossShouldBeHidden(player))
                 {
-                    var player = _playerContext.flagSelfEntity;
-                    if (CrossShouldBeHidden(player))
-                    {
-                        type = CrossHairType.Novisible;
-                    }
-                    else if (FocusTargetIsTeammate())
-                    {
-                        type = CrossHairType.AddBlood;
-                    }
+                    type = CrossHairType.Novisible;
+                }
+                else if (FocusTargetIsTeammate())
+                {
+                    type = CrossHairType.AddBlood;
                 }
 
                 return type;
@@ -90,7 +101,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             return false;
         }
-        
+
 
 //        public CrossHairNormalTypeStatue Statue //常态类型准心 当前状态
 //        {
@@ -122,20 +133,32 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public float XSpread
         {
-            get { return HeldWeaponAgent.RunTimeComponent.LastSpreadX; }
+            get
+            {
+                var agent = HeldWeaponAgent;
+                if (agent == null) return 0;
+                return agent.RunTimeComponent.LastSpreadX;
+            }
         }
 
         public float YSpread
         {
-            get { return HeldWeaponAgent.RunTimeComponent.LastSpreadY; }
+            get
+            {
+                var agent = HeldWeaponAgent;
+                if (agent == null) return 0;
+                return agent.RunTimeComponent.LastSpreadY;
+            }
         }
 
         public float SpreadDuration
         {
             get
             {
-                float duration      = 1f;
-                var   currStates = _playerContext.flagSelfEntity.StateInteractController().GetCurrStates();
+                float duration = 1f;
+                var controller = Player.StateInteractController();
+                if (controller == null) return duration;
+                var currStates = controller.GetCurrStates();
                 if (currStates.Contains(EPlayerState.Firing))
                 {
                     duration = GlobalConst.FireSpreadDuration;
@@ -150,7 +173,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
             }
         }
 
-   
 
 //        private bool PlayerIsMoving(PlayerEntity player)
 //        {
@@ -170,13 +192,9 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                var player = _playerContext.flagSelfEntity;
-                if (null == player)
-                {
-                    return 0;
-                }
 
-                return HeldWeaponAgent.RunTimeComponent.ContinuesShootCount;
+                var agent = HeldWeaponAgent;
+                return agent == null ? 0 : agent.RunTimeComponent.ContinuesShootCount;
             }
         }
 
@@ -189,7 +207,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                var player = _playerContext.flagSelfEntity;
+                var player = Player;
                 if (null == player)
                 {
                     return 0;
@@ -211,7 +229,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                var player = _playerContext.flagSelfEntity;
+                var player = Player;
                 if (null == player)
                 {
                     return false;
@@ -222,7 +240,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
                     return false;
                 }
 
-                var part     = player.attackDamage.GetAndResetHitPart();
+                var part = player.attackDamage.GetAndResetHitPart();
                 var critical = (EBodyPart) part == EBodyPart.Head;
                 return critical;
             }
@@ -239,10 +257,13 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                var player = _contexts.player.flagSelfEntity;
+                var player = Player;
                 if (player.hasPlayerWeaponBagSet)
                 {
-                    var weaponInfo = player.WeaponController().HeldWeaponAgent.BaseComponent;
+                    var agent = HeldWeaponAgent;
+                    if (agent == null) return SingletonManager.Get<WeaponAvatarConfigManager>().GetEmptyHandId();
+                    return agent.WeaponConfigAssy.NewWeaponCfg.AvatorId;
+                    /*var weaponInfo = agent.BaseComponent;
                     if (weaponInfo != null)
                     {
                         var avatarId = weaponInfo.WeaponAvatarId;
@@ -256,7 +277,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
                         {
                             return defaultAvatar;
                         }
-                    }
+                    }*/
                 }
 
                 return SingletonManager.Get<WeaponAvatarConfigManager>().GetEmptyHandId();

@@ -5,11 +5,12 @@ using gameplay.gamerule.free.ui;
 using Sharpen;
 using System;
 using Shared.Scripts.MapConfigPoint;
+using Core.Free;
 
 namespace com.wd.free.map.position
 {
     [Serializable]
-    public class MapPointRegion : AbstractMapRegion
+    public class MapPointRegion : AbstractMapRegion, IRule
     {
         public string type;
 
@@ -33,6 +34,11 @@ namespace com.wd.free.map.position
                 }
             }
             return null;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.MapPointRegion;
         }
 
         public override bool InRectange(FreeUIUtil.Rectangle arg1, IEventArgs arg2)

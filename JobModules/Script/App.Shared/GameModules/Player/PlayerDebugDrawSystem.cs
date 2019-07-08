@@ -1,7 +1,7 @@
 ﻿using System;
 using App.Client.GameModules.Player;
 using App.Shared.EntityFactory;
-using App.Shared.GameModules.Bullet;
+using App.Shared.GameModules.Attack;
 using Core.Animation;
 using Core.Compensation;
 using Core.EntityComponent;
@@ -36,7 +36,7 @@ namespace App.Shared.GameModules.Player
 
         protected override void OnGamePlay(PlayerEntity entity)
         {
-            _hitBoxEntityManager.UpdateHitBox(entity.entityAdapter.SelfAdapter);
+            _hitBoxEntityManager.UpdateHitBox(entity.entityAdapter.SelfAdapter,0, 0);
             _hitBoxEntityManager.DrawHitBoxOnFrame(entity.entityAdapter.SelfAdapter);
         }
     }

@@ -12,24 +12,24 @@ namespace App.Shared.Components.Weapon
     [Weapon]
     public class WeaponBasicDataComponent : IUserPredictionComponent
     {
-        [DontInitilize, NetworkProperty] public int ConfigId;
-        [DontInitilize, NetworkProperty] public int WeaponAvatarId;
-        [DontInitilize, NetworkProperty] public int UpperRail;
-        [DontInitilize, NetworkProperty] public int LowerRail;
-        [DontInitilize, NetworkProperty] public int SideRail;
-        [DontInitilize, NetworkProperty] public int Stock;
-        [DontInitilize, NetworkProperty] public int Muzzle;
-        [DontInitilize, NetworkProperty] public int Magazine;
-        [DontInitilize, NetworkProperty] public int Bullet;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int ConfigId;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int WeaponAvatarId;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int UpperRail;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int LowerRail;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int SideRail;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Stock;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Muzzle;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Magazine;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Bullet;
         [DontInitilize, NetworkProperty] public bool PullBolt;
-        [DontInitilize, NetworkProperty] public int FireModel;
-        [DontInitilize, NetworkProperty] public int ReservedBullet;
+        [DontInitilize, NetworkProperty(127,0,1)] public int FireModel;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int ReservedBullet;
         [DontInitilize] private WeaponAllConfigs configCache;
-        [DontInitilize, NetworkProperty] public int Bore;
-        [DontInitilize, NetworkProperty] public int Feed;
-        [DontInitilize, NetworkProperty] public int Trigger;
-        [DontInitilize, NetworkProperty] public int Interlock;
-        [DontInitilize, NetworkProperty] public int Brake;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Bore;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Feed;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Trigger;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Interlock;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Brake;
 
         public int RealFireModel
         {

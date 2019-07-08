@@ -3,12 +3,13 @@ using Sharpen;
 using com.wd.free.@event;
 using gameplay.gamerule.free.ui.component;
 using com.wd.free.map.position;
+using Core.Free;
 
 namespace gameplay.gamerule.free.component
 {
 	[System.Serializable]
-	public class ComponentFreeEffect : IFreeEffect, IComponentable
-	{
+	public class ComponentFreeEffect : IFreeEffect, IComponentable, IRule
+    {
 		private const long serialVersionUID = 3147927303245355665L;
 
 		private string name;
@@ -86,5 +87,10 @@ namespace gameplay.gamerule.free.component
 		{
 			return GetCurrentEffect(args).GetAutos(args);
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ComponentFreeEffect;
+        }
+    }
 }

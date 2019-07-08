@@ -7,12 +7,13 @@ using com.wd.free.item;
 using com.wd.free.map.position;
 using com.wd.free.util;
 using gameplay.gamerule.free.rule;
+using Core.Free;
 
 namespace gameplay.gamerule.free.item
 {
 	[System.Serializable]
-	public class CreateItemToSceneAction : AbstractGameAction
-	{
+	public class CreateItemToSceneAction : AbstractGameAction, IRule
+    {
 		private const long serialVersionUID = 5687056626382340079L;
 
 		private const string INI_COUNT = "1";
@@ -51,5 +52,10 @@ namespace gameplay.gamerule.free.item
 				}
 			}
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.CreateItemToSceneAction;
+        }
+    }
 }

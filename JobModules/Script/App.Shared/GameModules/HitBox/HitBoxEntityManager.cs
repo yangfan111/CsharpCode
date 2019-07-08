@@ -11,17 +11,17 @@ using Core.Utils;
 using UnityEngine;
 using Utils.Singleton;
 
-namespace App.Shared.GameModules.Bullet
+namespace App.Shared.GameModules.Attack
 {
     public interface IHitBoxContext
     {
-        Vector3 GetPosition(EntityKey entityKey);
-        float GetRadius(EntityKey entityKey);
-        void EnableHitBox(EntityKey entityKey, bool enalbe);
+        Vector3         GetPosition(EntityKey entityKey);
+        float           GetRadius(EntityKey entityKey);
+        void            EnableHitBox(EntityKey entityKey, bool enalbe);
         List<Transform> GetCollidersTransform(EntityKey entityKey);
-        
-        void UpdateHitBox(IGameEntity gameEntity);
 
+        void UpdateHitBox(IGameEntity gameEntity, int renderTime, int cmdSeq);
+        void RecoverHitBox(IGameEntity gameEntity, int renderTime);
     }
 
     public class HitBoxEntityManager : IHitBoxEntityManager
@@ -32,45 +32,52 @@ namespace App.Shared.GameModules.Bullet
 
         public HitBoxEntityManager(Contexts contexts, bool isServer)
         {
-            _subManagers = new IHitBoxContext[(int)EEntityType.End];
+            _subManagers = new IHitBoxContext[(int) EEntityType.End];
             if (isServer)
                 _subManagers[(int) EEntityType.Player] = new ServerPlayerHitBoxContext(contexts.player);
-            else 
-                _subManagers[(int) EEntityType.Player] = new ClientPlayerHitBoxContext(contexts.player);
-            _subManagers[(int)EEntityType.Vehicle] = new VehicleHitBoxContext(contexts.vehicle);
+            else
+                _subManagers[(int) EEntityType.Player] = new PlayerHitBoxContext(contexts.player);
+            _subManagers[(int) EEntityType.Vehicle] = new VehicleHitBoxContext(contexts.vehicle);
         }
 
         private Vector3 GetPosition(IGameEntity gameEntity)
         {
-            var pos = gameEntity.Position.Value;
             var subManager = GetSubManager(gameEntity.EntityType);
-            if(subManager!=null)
+            if (subManager != null)
                 return subManager.GetPosition(gameEntity.EntityKey);
-            return pos;
+            return gameEntity.Position.Value;
         }
 
         private float GetRadius(IGameEntity gameEntity)
         {
             var subManager = GetSubManager(gameEntity.EntityType);
-            if(subManager!=null)
+            if (subManager != null)
                 return subManager.GetRadius(gameEntity.EntityKey);
             return 0;
         }
-
+        /*
+            _subManagers = new IHitBoxContext[(int) EEntityType.End];
+            if (isServer)
+                _subManagers[(int) EEntityType.Player] = new ServerPlayerHitBoxContext(contexts.player);
+            else
+                _subManagers[(int) EEntityType.Player] = new PlayerHitBoxContext(contexts.player);
+            _subManagers[(int) EEntityType.Vehicle] = new VehicleHitBoxContext(contexts.vehicle);
+        */
         public bool GetPositionAndRadius(IGameEntity gameEntity, out Vector3 position, out float radius)
         {
-            var pos = gameEntity.Position.Value;
+            var pos        = gameEntity.Position.Value;
             var subManager = GetSubManager(gameEntity.EntityType);
             if (subManager != null)
             {
+                //        return entity.hitBox.HitPreliminaryGeo.position;
                 position = subManager.GetPosition(gameEntity.EntityKey) + pos;
-                radius = subManager.GetRadius(gameEntity.EntityKey);
+                radius   = subManager.GetRadius(gameEntity.EntityKey);
                 return true;
             }
 
             {
                 position = Vector3.zero;
-                radius = 0;
+                radius   = 0;
                 return false;
             }
         }
@@ -81,18 +88,26 @@ namespace App.Shared.GameModules.Bullet
             {
                 return _subManagers[type];
             }
+
             return null;
         }
-        
-        public void UpdateHitBox(IGameEntity gameEntity)
+
+        public void UpdateHitBox(IGameEntity gameEntity, int renderTime, int cmdSeq)
         {
             var subManager = GetSubManager(gameEntity.EntityType);
             if (subManager != null)
             {
-                subManager.UpdateHitBox(gameEntity);
+                subManager.UpdateHitBox(gameEntity, renderTime, cmdSeq);
             }
         }
-
+        public void RecoverHitBox(IGameEntity gameEntity, int renderTime)
+        {
+            var subManager = GetSubManager(gameEntity.EntityType);
+            if (subManager != null)
+            {
+                subManager.RecoverHitBox(gameEntity, renderTime);
+            }
+        }
         public void DrawHitBoxOnBullet(IGameEntity gameEntity)
         {
             if (DebugConfig.DrawHitBoxOnBullet)
@@ -108,6 +123,8 @@ namespace App.Shared.GameModules.Bullet
                 DrawHitBox(gameEntity, 0);
             }
         }
+
+        
 
         public void DrawHitBox(IGameEntity gameEntity, float time)
         {
@@ -138,7 +155,8 @@ namespace App.Shared.GameModules.Bullet
 
         public bool BoxCast(BoxInfo box, out RaycastHit hitInfo, int hitboxLayerMask)
         {
-            return Physics.BoxCast(box.Origin, box.HalfExtens, box.Direction, out hitInfo, box.Orientation, box.Length, hitboxLayerMask); 
+            return Physics.BoxCast(box.Origin, box.HalfExtens, box.Direction, out hitInfo, box.Orientation, box.Length,
+            hitboxLayerMask);
         }
     }
 }

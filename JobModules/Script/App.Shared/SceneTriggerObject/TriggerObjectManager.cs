@@ -12,6 +12,7 @@ using Core.GameTime;
 using Core.SceneManagement;
 using Core.Utils;
 using Entitas;
+using Sharpen;
 using UltimateFracturing;
 using UnityEngine;
 using UnityEngine.Assertions.Must;
@@ -215,11 +216,10 @@ namespace App.Shared.SceneTriggerObject
             }
             return null;
         }
-        
 
         public void Put(int id, GameObject go)
         {
-            _triggerObjects[id] = go;
+            _triggerObjects.Put(id, go);
             CacheNewId(id);
         }
 
@@ -268,11 +268,10 @@ namespace App.Shared.SceneTriggerObject
 
     internal class TriggerObjectInternalManager<TTriggerScript> : ITriggerObjectInternalManger where TTriggerScript: MonoBehaviour
     {
-
+        
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(TriggerObjectInternalManager<TTriggerScript>));
         private int _typeValue;
         private TriggerObjectPool _pool = new TriggerObjectPool();
-
         
         private List<int> _tempIdList = new List<int>();
         private List<GameObject> _tempGameObejctList = new List<GameObject>();
@@ -302,11 +301,11 @@ namespace App.Shared.SceneTriggerObject
                     continue;
                 }
 
-                _logger.InfoFormat(" loadObj : {0} ,id:{1}", go, objId);
+                _logger.DebugFormat(" loadObj : {0} ,id:{1}", go, objId);
                 _tempIdList.Add(objId);
                 _tempGameObejctList.Add(go);
                 
-                int instacneid = gameObject.GetInstanceID();
+                int instacneid = go.GetInstanceID();
                 if (!_tempGameObjIdList.ContainsKey(instacneid))
                     _tempGameObjIdList.Add(instacneid, objId);
             }
@@ -331,7 +330,7 @@ namespace App.Shared.SceneTriggerObject
 
                 int objId = SceneTriggerObjectUtility.GetId(go);
 
-                _logger.InfoFormat(" loadObj : {0} ,id:{1}", go, objId);
+                _logger.DebugFormat(" loadObj : {0} ,id:{1}", go, objId);
                 _tempIdList.Add(objId);
                 _tempGameObejctList.Add(go);
 
@@ -362,13 +361,17 @@ namespace App.Shared.SceneTriggerObject
                 if (tag == null) continue;
                 int objId = tag.id;   
 
-                _logger.InfoFormat(" loadObj : {0} ,id:{1}", go, objId);
+                _logger.DebugFormat(" loadObj : {0} ,id:{1}", go, objId);
                 _tempIdList.Add(objId);
                 _tempGameObejctList.Add(go);
 
                 int instacneid = gameObject.GetInstanceID();
                 if (!_tempGameObjIdList.ContainsKey(instacneid))
                     _tempGameObjIdList.Add(instacneid, objId);
+                else
+                {
+                    _logger.ErrorFormat(" conflict mapObjId, gameObj: {0} ", go);
+                }
             }
 
             _tempTriggerCompList.Clear();
@@ -380,8 +383,9 @@ namespace App.Shared.SceneTriggerObject
             {
                 return;
             }
-            var sceneId = _tempGameObjIdList[gameObject.GetInstanceID()];
-            _tempIdList.Add(sceneId);
+            var obj = _tempGameObjIdList[gameObject.GetInstanceID()];
+            _tempGameObjIdList.Remove(gameObject.GetInstanceID());
+            _tempIdList.Add(obj);
         }
 
         private void ClearTempGameObjectList()
@@ -404,6 +408,7 @@ namespace App.Shared.SceneTriggerObject
             foreach (var id in _tempIdList)
             {
                 _pool.Remove(id);
+                _logger.DebugFormat("remove gameObj which id = {0}", id);
             }
         }
 
@@ -433,7 +438,8 @@ namespace App.Shared.SceneTriggerObject
             AddTempGameObjectToPool();
             ClearTempGameObjectList();
             if(_logger.IsDebugEnabled)
-                _logger.DebugFormat("Load Scene Trigger Object Type {0} name{1}", _typeValue, unityObj.AsGameObject.name);
+                 _logger.ErrorFormat("Load Scene Trigger Object Type {0} name{1}, id: {2}", _typeValue,
+                unityObj.AsGameObject.name, id);
         }
 
         public void OnMapObjSceneLoaded_SmallMap(UnityObject unityObj)

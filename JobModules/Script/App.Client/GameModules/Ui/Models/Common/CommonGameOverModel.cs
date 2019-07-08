@@ -39,7 +39,8 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void InitReceiver()
         {
-            pointerReceiver = new PointerReceiver(Layer.Env, BlockType.All);
+            pointerReceiver = new PointerReceiver(UiConstant.specicalCmdKeyLayer - 1, BlockType.All);
+            keyReceiver = new KeyReceiver(UiConstant.specicalCmdKeyLayer - 1, BlockType.All);
         }
 
         Transform winAnime, loseAnime,tieAnime;
@@ -94,6 +95,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         }
         private PointerReceiver pointerReceiver;
+        private KeyReceiver keyReceiver;
 
         private void ShowContinueBtn()
         {
@@ -107,6 +109,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         {
             if (haveRegister) return;
             _adapter.RegisterPointerReceive(pointerReceiver);
+            _adapter.RegisterKeyReceive(keyReceiver);
             haveRegister = true;
         }
 
@@ -117,6 +120,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             {
                 haveRegister = false;
                 _adapter.UnRegisterPointerReceive(pointerReceiver);
+                _adapter.UnRegisterKeyReceive(keyReceiver);
                 _adapter.CanOpenUiByKey = true;
             }
             if (enable)

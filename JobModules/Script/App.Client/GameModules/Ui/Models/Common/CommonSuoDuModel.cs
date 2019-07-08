@@ -15,7 +15,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 {
     public class CommonSuoDuModel : ClientAbstractModel, IUiSystem
     {
-        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CommonMiniMap));
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CommonSuoDuModel));
         ISuoDuUiAdapter adapter = null;
         private bool isGameObjectCreated = false;
         private DuQuanInfo curDuquan = new DuQuanInfo(-1,new MapFixedVector2(Vector2.zero), 0, 0,0);
@@ -38,6 +38,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         //时间相关变量
         private float waitTime = 0;
+        private float startTime = 0;
 
         private CommonSuoDuViewModel _viewModel = new CommonSuoDuViewModel();
         protected override IUiViewModel ViewModel
@@ -76,6 +77,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                     var tempData = adapter.CurDuquan;
                     rawDuquan.SetValue(tempData.Level, tempData.Center, tempData.Radius, tempData.WaitTime, tempData.MoveTime);
                     waitTime = rawDuquan.WaitTime;
+                    startTime = Time.time;
                 }
 
                 //设置当前数据
@@ -198,7 +200,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             for(int i = 0; i < points.Count; i++)
             {
                 float result = UnityEngine.Vector2.Dot(startPoint - endPoint, points[i] - endPoint); //求出两向量之间的夹角  
-                if ((int)result == 1)
+                if (result > 0)
                     return i;
             }
             return 0;
@@ -265,7 +267,8 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void RefreshSliderTime(float interval)
         {
-            waitTime -= interval;
+            waitTime -= Time.time - startTime;
+            startTime = Time.time;
             if (waitTime > 0)
             {
                 _viewModel.TimeGameObjectActiveSelf = true;

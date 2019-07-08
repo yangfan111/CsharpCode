@@ -1,6 +1,7 @@
 ﻿using Core.Animation;
 using Core.Utils;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace Core
 {
@@ -10,6 +11,10 @@ namespace Core
         public int grenadeCount;
 
         public bool HasValue { get; set; }
+        public GrenadeCacheData CreateInstance()
+        {
+            return new GrenadeCacheData();
+        }
 
         public GrenadeCacheData Clone()
         {

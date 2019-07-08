@@ -8,11 +8,12 @@ using commons.data.mysql;
 using commons.data;
 using Sharpen;
 using com.wd.free.util;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.action
 {
     [Serializable]
-    public class MysqlLogAction : AbstractGameAction
+    public class MysqlLogAction : AbstractGameAction, IRule
     {
         public string key;
         public string message;
@@ -25,6 +26,11 @@ namespace App.Server.GameModules.GamePlay.Free.action
             dr.AddField("key", key);
             dr.AddField("message", FreeUtil.ReplaceVar(message, args));
             MysqlUtil.Add(dr, "simple_log", FreeRuleConfig.MysqlConnection);
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.MysqlLogAction;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using App.Shared.GameModules.Common;
 using App.Shared.Player.Events;
 using App.Shared.SceneTriggerObject;
@@ -9,6 +10,7 @@ using Core.Utils;
 using Entitas;
 using UltimateFracturing;
 using UnityEngine;
+using UnityEngineInternal;
 
 namespace App.Shared.Util
 {
@@ -35,9 +37,10 @@ namespace App.Shared.Util
         public static void FetchFractruedState(GameObject gameObj)
         {
             var mapObj = GetMapObjectByGameObject(gameObj);
-            if(mapObj==null) return;
+            if (mapObj == null) return;
             var glassObj = gameObj.GetComponent<FracturedGlassyObject>();
-            if(glassObj!=null)
+            if (glassObj != null)
+            {
                 foreach (var chunk in glassObj.Chunks)
                 {
                     if (chunk.IsBroken())
@@ -45,9 +48,11 @@ namespace App.Shared.Util
                         mapObj.glassyData.SetBroken(chunk.ChunkId);
                     }
                 }
+            }
 
-            var fracObj = gameObj.GetComponent<FracturedObject>(); 
-            if(fracObj!=null)
+            var fracObj = gameObj.GetComponent<FracturedObject>();
+            if (fracObj != null)
+            {
                 foreach (var frac in fracObj.ListFracturedChunks)
                 {
                     if (frac.IsBroken())
@@ -55,7 +60,10 @@ namespace App.Shared.Util
                         mapObj.destructibleData.SetDestruction(frac.ChunkId);
                     }
                 }
+                mapObj.destructibleData.LastSyncDestructionState = mapObj.destructibleData.DestructionState;
+            }
             
+
         }
 
         public static void AddCallBack<T>(GameObject go, Action<object> callback) where T : FracturedBaseObject
@@ -131,56 +139,19 @@ namespace App.Shared.Util
             _triggerEvent.Remove(rawObj);
         }
         
-        public static MapObjectEntity GetMapObjectOfFracturedHittable(FracturedHittable fracturedHittable)
-        {
-            var testChunkAdpater = fracturedHittable as FracturedObjectChunkAdapter;
-            MapObjectEntity result = null;
-            if (testChunkAdpater != null && testChunkAdpater.FracturedObjectSource != null)
-            {
-                return GetMapObjectByGameObject(testChunkAdpater.FracturedObjectSource.gameObject);
-            }
-
-            var testFracturedChunk = fracturedHittable as FracturedChunk;
-            if (testFracturedChunk != null)
-            {
-                return GetMapObjectOfFracturedChunk(testFracturedChunk);
-            }
-
-            var testFracturedGlassyChunk = fracturedHittable as FracturedGlassyChunk;
-            if (testFracturedGlassyChunk != null)
-            {
-                return GetMapObjectOfFracturedChunk(testFracturedGlassyChunk);
-            }
-            
-            var testFracturedObject = fracturedHittable as FracturedObject;
-            if (testFracturedObject != null)
-            {
-                return GetMapObjectByGameObject(testFracturedObject.gameObject);
-            }
-
-            var testGlassyChunkAdapter = fracturedHittable as FracturedGlassyChunkAdapter;
-            if (testGlassyChunkAdapter != null)
-            {
-                return GetMapObjectByGameObject(testGlassyChunkAdapter.FracturedObjectSource.gameObject);
-            }
-
-            return null;
-        }
-
         public static MapObjectEntity GetMapObjectByGameObject(GameObject gameObject)
         {
             var  entityReference = gameObject.GetComponent<EntityReference>();
             if (entityReference == null)
             {
-                _logger.ErrorFormat("Can not find Destructible Object Entity for FracturedObject {0}",
-                    gameObject.name);
+                _logger.DebugFormat("gameObj {0} do not have entityReference",gameObject.name);
                 return null;
             }
 
             var destructibleObject = entityReference.Reference as MapObjectEntity;
             if (destructibleObject == null)
             {
-                _logger.ErrorFormat("Entity Reference is Null for FracturedObject {0}",
+                _logger.DebugFormat("Entity Reference is Null for FracturedObject {0}",
                     gameObject.name);
                 return null;
             }
@@ -204,15 +175,7 @@ namespace App.Shared.Util
             where TObject: FracturedBaseObject
         {
             var fracturedObjectSource = chunk.FracturedObjectSource;
-          
-            var mapObject = GetMapObjectByGameObject(fracturedObjectSource.gameObject);
-            if (mapObject == null)
-            {
-                _logger.ErrorFormat("Can not find Destructible Object Entity for FracturedObject {0}, ChunkId {1}",
-                    fracturedObjectSource.name, chunk.ChunkId);
-            }
-
-            return mapObject;
+            return GetMapObjectByGameObject(fracturedObjectSource.gameObject);
         }
 
         public static void RecordMapObj(int id, int type, MapObjectEntity entity)
@@ -230,9 +193,12 @@ namespace App.Shared.Util
             _gameObjIdRecorder.RecordId(obj, type, id);
         }
 
-        public static GameObject GetGameObjectById(int id)
+        public static void DeleteRecord(int id)
         {
-            return _gameObjIdRecorder.GetObj(id);
+            var rawObj = _gameObjIdRecorder.GetObj(id);
+            var type = _gameObjIdRecorder.GetType(rawObj);
+            _mapObjectRecorder.Delete(id, type);
+            _gameObjIdRecorder.RemoveRecord(id);
         }
 
         public static int GetGameObjId(GameObject obj)
@@ -260,7 +226,7 @@ namespace App.Shared.Util
             var evt = EventInfos.Instance.Allocate(EEventType.CreateMapObj, false) as CreateMapObjEvent;
             evt.Type = type;
             evt.Id = id;
-            player.uploadEvents.StoreEvents.AddEvent(evt);
+            player.uploadEvents.Events.AddEvent(evt);
             _logger.InfoFormat("StoreCreateMapObjMsg: {0}", evt);
         }
     }

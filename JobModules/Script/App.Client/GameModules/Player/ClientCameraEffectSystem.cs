@@ -3,6 +3,7 @@ using Core.CameraControl.NewMotor;
 using Core.GameModule.Interface;
 using Core.Utils;
 using Entitas;
+using Shared.Scripts.Effect;
 using UnityEngine;
 using XmlConfig;
 
@@ -12,7 +13,8 @@ namespace App.Client.GameModules.Player
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(ClientCameraEffectSystem));
         private IGroup<PlayerEntity> _playerGroup;
-        private Transform _scopeTrans;
+        private Transform _scopeP1Trans;
+        private Transform _scopeP3Trans;
         private bool _isGunSightEffect;
         private const string DofMaskName = "Aim_dofmask";
 
@@ -49,7 +51,19 @@ namespace App.Client.GameModules.Player
         {
             player.appearanceInterface.Appearance.ResetP1ObjShader();
             //没有判断是否有配件等条件，因为有可能有默认带镜的武器
-            var hand = player.appearanceInterface.Appearance.GetWeaponP1InHand();
+            StartSetModelScope(player.appearanceInterface.Appearance.GetWeaponP1InHand(), ref _scopeP1Trans, true);
+            CancelModelScope(ref _scopeP3Trans, false);
+        }
+        
+        private void CancelSights(PlayerEntity player)
+        {
+            player.appearanceInterface.Appearance.SetP1ObjTopLayerShader();
+            CancelModelScope(ref _scopeP1Trans, true);
+            StartSetModelScope(player.appearanceInterface.Appearance.GetWeaponP3InHand(), ref _scopeP3Trans, false);
+        }
+
+        private void StartSetModelScope(GameObject hand, ref Transform scopeTrans, bool isFirstModel)
+        {
             if (null == hand)
             {
                 //丢枪的时候，逻辑在服务端处理，客户端同步之前可能会没有武器
@@ -60,52 +74,52 @@ namespace App.Client.GameModules.Player
             foreach (var child in hand.transform.GetComponentsInChildren<Transform>())
             {
                 if (child.name != DofMaskName) continue;
-                _scopeTrans = child;
+                scopeTrans = child;
                 var renderer = child.GetComponent<Renderer>();
-                if (null != renderer)
+                if (null != renderer && isFirstModel)
                 {
                     renderer.enabled = false;
                 }
-
-                child.SendMessage("EnableEffect", true, SendMessageOptions.DontRequireReceiver);
-                if (child.childCount > 0)
+                
+                //三人称不调用景深脚本
+                if (isFirstModel)
                 {
-                    var inner = child.GetChild(0);
-                    if (null != inner)
-                    {
-                        inner.gameObject.SetActive(true);
-                        var innerRenderer = inner.GetComponent<MeshRenderer>();
-                        if (null != innerRenderer)
-                        {
-                            innerRenderer.enabled = true;
-                        }
-                    }
+                    child.SendMessage("EnableEffect", true, SendMessageOptions.DontRequireReceiver);
+                    SetScope(child, true);
                 }
-
+               
                 break;
             }
         }
 
-        private void CancelSights(PlayerEntity player)
+        private void CancelModelScope(ref Transform scopeTrans, bool isFirstModel)
         {
-            player.appearanceInterface.Appearance.SetP1ObjTopLayerShader();
-            if (null == _scopeTrans) return;
-            _scopeTrans.SendMessage("EnableEffect", false, SendMessageOptions.DontRequireReceiver);
-            if (_scopeTrans.childCount > 0)
+            if (null == scopeTrans) return;
+            if (isFirstModel)
             {
-                var inner = _scopeTrans.GetChild(0);
+                scopeTrans.SendMessage("EnableEffect", false, SendMessageOptions.DontRequireReceiver);
+                SetScope(scopeTrans, false);
+            }
+            scopeTrans = null;
+        }
+
+
+        private void SetScope(Transform scope, bool enable)
+        {
+            if (scope.childCount > 0)
+            {
+                var inner = scope.GetChild(0);
                 if (null != inner)
                 {
-                    inner.gameObject.SetActive(false);
-                    var renderer = inner.GetComponent<MeshRenderer>();
-                    if (null != renderer)
+                    inner.gameObject.SetActive(enable);
+                    var innerRender = inner.GetComponent<AbstractEffectMonoBehaviour>();
+                    if (innerRender != null)
                     {
-                        renderer.enabled = false;
+                        innerRender.SetParam("Enable", enable);
                     }
                 }
             }
-
-            _scopeTrans = null;
         }
+        
     }
 }

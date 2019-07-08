@@ -58,6 +58,29 @@ namespace Assets.Sources.Free.Utility
         }
 
 
+        public static float yRoundx(Vector3 v) {
+            if (Math.Abs(v.y) < 0.01f) return -90;
+            if (Math.Abs(v.z) < 0.01f) {
+                if (v.y > 0) return 0;
+                else return 180;
+            }
+            return -(float)(Math.Atan2(v.z, v.y) / RAD);
+        }
+
+        public static float yRoundz(Vector3 v) {
+            if (Math.Abs(v.x) < 0.01f)
+            {
+                if (v.z > 0.01f) return 180;
+                else if (v.z < -0.01f) return 0; 
+            }
+            if (Math.Abs(v.z) < 0.01f)
+            {
+                if (v.x > 0.01f) return -90;
+                else if (v.x < -0.01f) return 90;
+            }
+            return - 90 - (float)(Math.Atan2(v.z, v.x) / RAD);
+        }
+
         public static void Vector3DMA(Vector3 v, float s, Vector3 b, ref Vector3 o)
         {
             o.x = v.x + b.x * s;

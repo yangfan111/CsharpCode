@@ -120,7 +120,11 @@ namespace VNet
                     _stopwatch.Reset();
                     long l = item.MemoryStream.Length;
                     item.MemoryStream.Seek(0, SeekOrigin.Begin);
-                    item.MemoryStream.Write(BitConverter.GetBytes(RemoteConnId), 0, 4);
+                    item.MemoryStream.WriteByte((byte)(RemoteConnId>>0));
+                    item.MemoryStream.WriteByte((byte)(RemoteConnId>>8));
+                    item.MemoryStream.WriteByte((byte)(RemoteConnId>>16));
+                    item.MemoryStream.WriteByte((byte)(RemoteConnId>>24));
+                    
                     
                     RealTimePeer.Send(item.MemoryStream.GetBuffer(), (int)item.MemoryStream.Length, 0);
 
@@ -156,6 +160,11 @@ namespace VNet
             get { return _isConnected; }
         }
 
+        public override bool IsUdpConnected
+        {
+            get { return _connecter.isRealTimeConnected; }
+        }
+
         public override SocketError ErrorCode
         {
             get { return RealiableConn.ErrorCode; }
@@ -165,7 +174,9 @@ namespace VNet
         {
             if (null != RealTimePeer)
             {
-                AddToSerializeQueue(new VNetworkMessageItem(messageType, messageBody, RealTimeChannel));
+                var item = VNetworkMessageItem.Allocate(messageType, messageBody, RealTimeChannel);
+                AddToSerializeQueue(item);
+                item.ReleaseReference();
             }
             else
             {
@@ -175,7 +186,9 @@ namespace VNet
 
         public override void SendReliable(int messageType, object messageBody)
         {
-            AddToSerializeQueue(new VNetworkMessageItem(messageType, messageBody, ReliableChannel));
+            var item = VNetworkMessageItem.Allocate(messageType, messageBody, ReliableChannel);
+            AddToSerializeQueue(item);
+            item.ReleaseReference();
         }
 
         public override string IdInfo()

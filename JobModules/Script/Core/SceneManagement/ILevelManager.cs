@@ -16,9 +16,8 @@ namespace Core.SceneManagement
         event Action<UnityObject> GoUnloaded;
 
         void UpdateOrigin(Vector3 pos);
-      
 
-        void GetRequests(List<AssetInfo> sceneRequests, List<AssetInfo> goRequests);
+        void GetRequests(List<AssetInfo> sceneRequests, List<AssetInfo> goRequests, List<IEnumerable<AssetInfoEx<MeshRenderer>>> lightmapsRequests);
         int NotFinishedRequests { get; }
         void LoadResource(string visioncenterupdatesystem, IUnityAssetManager assetManager, AssetInfo request);
     }

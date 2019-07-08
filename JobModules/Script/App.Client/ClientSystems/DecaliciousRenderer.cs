@@ -18,8 +18,6 @@ namespace App.Client.ThreeEyedGames
         protected SortedDictionary<int, Dictionary<Material, HashSet<Decal>>> _deferredDecals;
         protected SortedDictionary<int, Dictionary<Material, HashSet<Decal>>> _unlitDecals;
         protected List<MeshRenderer> _limitToMeshRenderers;
-        protected List<SkinnedMeshRenderer> _limitToSkinnedMeshRenderers;
-        protected HashSet<GameObject> _limitToGameObjects;
         protected List<Decal> _decalComponent;
         protected List<MeshFilter> _meshFilterComponent;
 
@@ -47,15 +45,13 @@ namespace App.Client.ThreeEyedGames
 
         //// TODO: Currently only this is only one mesh, find a good solution that produces
         //// no garbage (as in, neither GC allocs nor dead meshes)
-        //private Mesh temporaryMesh = null;
+        private Mesh temporaryMesh = null;
 
         void OnEnable()
         {
             _deferredDecals = new SortedDictionary<int, Dictionary<Material, HashSet<Decal>>>();
             _unlitDecals = new SortedDictionary<int, Dictionary<Material, HashSet<Decal>>>();
             _limitToMeshRenderers = new List<MeshRenderer>();
-            _limitToSkinnedMeshRenderers = new List<SkinnedMeshRenderer>();
-            _limitToGameObjects = new HashSet<GameObject>();
             _decalComponent = new List<Decal>();
             _meshFilterComponent = new List<MeshFilter>();
             _matrices = new Matrix4x4[1023];
@@ -82,11 +78,11 @@ namespace App.Client.ThreeEyedGames
                 _bufferUnlit = null;
             }
 
-            if (_bufferLimitTo != null)
-            {
-                GetComponent<Camera>().RemoveCommandBuffer(_camEventLimitTo, _bufferLimitTo);
-                _bufferLimitTo = null;
-            }
+            //if (_bufferLimitTo != null)
+            //{
+            //    GetComponent<Camera>().RemoveCommandBuffer(_camEventLimitTo, _bufferLimitTo);
+            //    _bufferLimitTo = null;
+            //}
         }
 
         void OnPreRender()
@@ -115,11 +111,11 @@ namespace App.Client.ThreeEyedGames
             // Make sure that command buffers are created
             CreateBuffer(ref _bufferDeferred, _camera, _bufferDeferredName, _camEventDeferred);
             CreateBuffer(ref _bufferUnlit, _camera, _bufferUnlitName, _camEventUnlit);
-            CreateBuffer(ref _bufferLimitTo, _camera, _bufferLimitToName, _camEventLimitTo);
+            //CreateBuffer(ref _bufferLimitTo, _camera, _bufferLimitToName, _camEventLimitTo);
 
             // Render Game Objects that are special decal targets
-            _bufferLimitTo.Clear();
-            DrawLimitToGameObjects(_camera);
+            //_bufferLimitTo.Clear();
+            //DrawLimitToGameObjects(_camera);
 
             // Prepare command buffer for deferred decals
             _bufferDeferred.Clear();
@@ -143,36 +139,31 @@ namespace App.Client.ThreeEyedGames
             while (decalEnum.MoveNext())
                 decalEnum.Current.Value.Clear();
 
-            // Clear limit to targets for next frame
-            _limitToGameObjects.Clear();
         }
 
         private void DrawLimitToGameObjects(Camera cam)
         {
-            if (_limitToGameObjects.Count == 0)
-                return;
-
             if (_materialLimitToGameObjects == null)
                 _materialLimitToGameObjects = new Material(Shader.Find("Hidden/Decalicious Game Object ID"));
 
             var limitToId = Shader.PropertyToID("_DecaliciousLimitToGameObject");
-            _bufferLimitTo.GetTemporaryRT(limitToId, -1, -1, 0, FilterMode.Point, RenderTextureFormat.RFloat);
+            _bufferLimitTo.GetTemporaryRT(limitToId, -1, -1, 0, FilterMode.Point, RenderTextureFormat.RInt);
             _bufferLimitTo.SetRenderTarget(limitToId, BuiltinRenderTextureType.CameraTarget);
             _bufferLimitTo.ClearRenderTarget(false, true, Color.black);
 
-            //if (temporaryMesh == null)
-            //    temporaryMesh = new Mesh();
+            if (temporaryMesh == null)
+                temporaryMesh = new Mesh();
 
             // Loop over all game objects used for limiting decals
             Plane[] frustumPlanes = GeometryUtility.CalculateFrustumPlanes(cam);
-            foreach (GameObject go in _limitToGameObjects)
+            foreach (GameObject go in GameObject.FindObjectsOfType<GameObject>())
             {
-                _bufferLimitTo.SetGlobalFloat("_ID", go.GetInstanceID());
+                _bufferLimitTo.SetGlobalFloat("_ID", go.layer);
 
                 // Draw all mesh renderers...
                 _limitToMeshRenderers.Clear();
-                go.GetComponentsInChildren(_limitToMeshRenderers);
-                foreach (MeshRenderer mr in _limitToMeshRenderers)
+                MeshRenderer mr = go.GetComponent<MeshRenderer>();
+                if (null != mr)
                 {
                     // ...if they are not decals themselves...
                     // NOTE: We're using this trick because GetComponent() does some GC allocs
@@ -196,13 +187,12 @@ namespace App.Client.ThreeEyedGames
                     }
                 }
 
-                _limitToSkinnedMeshRenderers.Clear();
-                go.GetComponentsInChildren(_limitToSkinnedMeshRenderers);
-                foreach (SkinnedMeshRenderer mr in _limitToSkinnedMeshRenderers)
-                {
-                    // TODO: Allow limiting to skinned meshes
-                    //mr.BakeMesh(temporaryMesh);
-                    //_bufferLimitTo.DrawMesh(temporaryMesh, mr.transform.localToWorldMatrix, _materialLimitToGameObjects);
+                //_limitToSkinnedMeshRenderers.Clear();
+                SkinnedMeshRenderer smr = go.GetComponent<SkinnedMeshRenderer>();
+                // TODO: Allow limiting to skinned meshes
+                if (null != smr) {
+                    smr.BakeMesh(temporaryMesh);
+                    _bufferLimitTo.DrawMesh(temporaryMesh, smr.transform.localToWorldMatrix, _materialLimitToGameObjects);
                 }
             }
         }
@@ -321,114 +311,6 @@ namespace App.Client.ThreeEyedGames
                 }
             }
         }
-
-        private void DrawDeferredDecals_NormSpecSmooth(Camera cam)
-        {
-            if (_deferredDecals.Count == 0)
-                return;
-
-            var copy1id = Shader.PropertyToID("_CameraGBufferTexture1Copy");
-            _bufferDeferred.GetTemporaryRT(copy1id, -1, -1, 0, FilterMode.Bilinear, RenderTextureFormat.ARGB32);
-
-            var copy2id = Shader.PropertyToID("_CameraGBufferTexture2Copy");
-            _bufferDeferred.GetTemporaryRT(copy2id, -1, -1, 0, FilterMode.Bilinear, RenderTextureFormat.ARGB32);
-
-            // Traverse over decal render order values
-            var allRenderOrderEnum = _deferredDecals.GetEnumerator();
-            while (allRenderOrderEnum.MoveNext())
-            {
-                // Render second pass: specular / smoothness and normals
-                var allDecalEnum = allRenderOrderEnum.Current.Value.GetEnumerator();
-                while (allDecalEnum.MoveNext())
-                {
-                    Material material = allDecalEnum.Current.Key;
-                    HashSet<Decal> decals = allDecalEnum.Current.Value;
-                    int n = 0;
-
-                    var decalListEnum = decals.GetEnumerator();
-                    while (decalListEnum.MoveNext())
-                    {
-                        Decal decal = decalListEnum.Current;
-                        if (decal != null && decal.DrawNormalAndGloss)
-                        {
-                            if (decal.HighQualityBlending)
-                            {
-                                // Create of copy of GBuffer1 (specular / smoothness) and GBuffer 2 (normal)
-                                _bufferDeferred.Blit(BuiltinRenderTextureType.GBuffer1, copy1id);
-                                _bufferDeferred.Blit(BuiltinRenderTextureType.GBuffer2, copy2id);
-
-                                _bufferDeferred.SetRenderTarget(_normalRenderTarget, BuiltinRenderTextureType.CameraTarget);
-
-                                _instancedBlock.Clear();
-                                _instancedBlock.SetFloat("_MaskMultiplier", decal.Fade);
-                                _instancedBlock.SetFloat("_LimitTo", decal.LimitTo ? decal.LimitTo.GetInstanceID() : float.NaN);
-                                _bufferDeferred.DrawMesh(_cubeMesh, decal.transform.localToWorldMatrix, material, 0, 1, _instancedBlock);
-                            }
-                            else
-                            {
-#if UNITY_5_5_OR_NEWER
-                                if (UseInstancing)
-                                {
-                                    // Instanced drawing
-                                    _matrices[n] = decal.transform.localToWorldMatrix;
-                                    _fadeValues[n] = decal.Fade;
-                                    _limitToValues[n] = decal.LimitTo ? decal.LimitTo.GetInstanceID() : float.NaN;
-                                    ++n;
-
-                                    if (n == 1023)
-                                    {
-                                        // Create of copy of GBuffer1 (specular / smoothness) and GBuffer 2 (normal)
-                                        _bufferDeferred.Blit(BuiltinRenderTextureType.GBuffer1, copy1id);
-                                        _bufferDeferred.Blit(BuiltinRenderTextureType.GBuffer2, copy2id);
-
-                                        _bufferDeferred.SetRenderTarget(_normalRenderTarget, BuiltinRenderTextureType.CameraTarget);
-                                        _instancedBlock.Clear();
-                                        _instancedBlock.SetFloatArray("_MaskMultiplier", _fadeValues);
-                                        _instancedBlock.SetFloatArray("_LimitTo", _limitToValues);
-                                        _bufferDeferred.DrawMeshInstanced(_cubeMesh, 0, material, 1, _matrices, n, _instancedBlock);
-                                        n = 0;
-                                    }
-                                }
-                                else
-#endif
-                                {
-                                    if (n == 0)
-                                    {
-                                        // Create of copy of GBuffer1 (specular / smoothness) and GBuffer 2 (normal)
-                                        _bufferDeferred.Blit(BuiltinRenderTextureType.GBuffer1, copy1id);
-                                        _bufferDeferred.Blit(BuiltinRenderTextureType.GBuffer2, copy2id);
-                                    }
-
-                                    _bufferDeferred.SetRenderTarget(_normalRenderTarget, BuiltinRenderTextureType.CameraTarget);
-                                    _instancedBlock.Clear();
-                                    _instancedBlock.SetFloat("_MaskMultiplier", decal.Fade);
-                                    _instancedBlock.SetFloat("_LimitTo", decal.LimitTo ? decal.LimitTo.GetInstanceID() : float.NaN);
-                                    _bufferDeferred.DrawMesh(_cubeMesh, decal.transform.localToWorldMatrix, material, 0, 1, _instancedBlock);
-                                    ++n;
-                                }
-                            }
-                        }
-                    }
-
-#if UNITY_5_5_OR_NEWER
-                    if (UseInstancing && n > 0)
-                    {
-                        // Create of copy of GBuffer1 (specular / smoothness) and GBuffer 2 (normal)
-                        _bufferDeferred.Blit(BuiltinRenderTextureType.GBuffer1, copy1id);
-                        _bufferDeferred.Blit(BuiltinRenderTextureType.GBuffer2, copy2id);
-
-                        _bufferDeferred.SetRenderTarget(_normalRenderTarget, BuiltinRenderTextureType.CameraTarget);
-
-                        _instancedBlock.Clear();
-                        _instancedBlock.SetFloatArray("_MaskMultiplier", _fadeValues);
-                        _instancedBlock.SetFloatArray("_LimitTo", _limitToValues);
-                        _bufferDeferred.DrawMeshInstanced(_cubeMesh, 0, material, 1, _matrices, n, _instancedBlock);
-                    }
-#endif
-                }
-            }
-        }
-
         private void DrawUnlitDecals(Camera cam)
         {
             if (_unlitDecals.Count == 0)
@@ -521,11 +403,6 @@ namespace App.Client.ThreeEyedGames
 
         public void Add(Decal decal, GameObject limitTo)
         {
-            if (limitTo)
-            {
-                _limitToGameObjects.Add(limitTo);
-            }
-
             switch (decal.RenderMode)
             {
                 case Decal.DecalRenderMode.Deferred:

@@ -8,14 +8,20 @@ using com.wd.free.map.position;
 using UnityEngine;
 using com.wd.free.unit;
 using App.Shared.FreeFramework.framework.ai.move;
+using Core.Free;
 
 namespace App.Shared.FreeFramework.Free.condition
 {
     [Serializable]
-    public class DirectMoveCondition : IParaCondition
+    public class DirectMoveCondition : IParaCondition, IRule
     {
         private IPosSelector from;
         private IPosSelector to;
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.DirectMoveCondition;
+        }
 
         public bool Meet(IEventArgs args)
         {

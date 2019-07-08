@@ -71,6 +71,15 @@ namespace App.Server.Robot
 
         public FlowStatue TcpFlowStatus { get; private set; }
         public FlowStatue UdpFlowStatus { get; private set; }
+
+        public bool IsUdpConnected
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public string IdInfo()
         {
             throw new NotImplementedException();

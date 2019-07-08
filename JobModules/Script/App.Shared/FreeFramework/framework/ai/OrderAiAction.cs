@@ -6,11 +6,12 @@ using System.Text;
 using com.wd.free.@event;
 using com.wd.free.para.exp;
 using App.Shared.FreeFramework.framework.ai.move;
+using Core.Free;
 
 namespace com.wd.free.ai
 {
     [Serializable]
-    public class OrderAiAction : AbstractGameAction
+    public class OrderAiAction : AbstractGameAction, IRule
     {
         public string repeat;
         public List<IGameAction> actions;
@@ -63,6 +64,7 @@ namespace com.wd.free.ai
 
                 if (!args.FreeContext.AiSuccess && condition != null && condition.Meet(args))
                 {
+                    index = actions.Count;
                     args.FreeContext.AiSuccess = true;
                 }
             }
@@ -114,6 +116,11 @@ namespace com.wd.free.ai
                 }
             }
 
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.OrderAiAction;
         }
     }
 }

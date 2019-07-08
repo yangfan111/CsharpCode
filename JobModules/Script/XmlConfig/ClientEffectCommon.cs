@@ -7,10 +7,16 @@
 
     public class ClientEffectCommonConfigItem
     {
-        public EClientEffectType Type;
+        public EEffectObjectClassify Type;
         public int ServerLimit;
         public int ClientLimit;
         public int LifeTime;
+        public float CutoffThreshold;
+        public int ObjectLimit;
+        public int PreLoadCfgId;
+        public int Velocity;//只对移动特效
+        public float Delay;
+
     }
 
 }

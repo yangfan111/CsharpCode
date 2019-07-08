@@ -7,14 +7,20 @@ using System.Text;
 using com.wd.free.@event;
 using Core.Free;
 using com.wd.free.util;
+using com.wd.free.para;
 
 namespace App.Server.GameModules.GamePlay.Free.ui
 {
     [Serializable]
-    public class ShowAppUiAction : SendMessageAction
+    public class ShowAppUiAction : SendMessageAction, IRule
     {
         private string show;
         private string ui;
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ShowAppUiAction;
+        }
 
         protected override void BuildMessage(IEventArgs args)
         {

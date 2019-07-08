@@ -1,4 +1,5 @@
 ﻿using UIComponent.UI.Manager;
+using UIComponent.UI.Manager.Alert;
 
 namespace Assets.App.Client.GameModules.Ui
 {
@@ -6,13 +7,15 @@ namespace Assets.App.Client.GameModules.Ui
     {
         public static UIManager UIManager;
         public static TipManager TipManager;
-
+        public static AlertManager AlertManager;
         public static void InitUI(string uiRootName)
         {
-            UiCommon.UIManager = new UIManager(uiRootName);
-            UiCommon.UIManager.CreateUICamera();
-            UiCommon.UIManager.RootRenderMode(UnityEngine.RenderMode.ScreenSpaceCamera, UiCommon.UIManager.UICamera);
-            UiCommon.TipManager = UiCommon.UIManager.GetTipManager();
+            UIManager = new UIManager(uiRootName);
+            UIManager.CreateUICamera();
+            UIManager.RootRenderMode(UnityEngine.RenderMode.ScreenSpaceCamera, UIManager.UICamera);
+            TipManager = UIManager.GetTipManager();
+            AlertManager = UIManager.GetAlertManager();
+            //AlertManager.SetStyle<BattleAlertUIModel>("CommonNotice");
         }
     }
 }

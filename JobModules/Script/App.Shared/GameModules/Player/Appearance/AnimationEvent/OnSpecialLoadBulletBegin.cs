@@ -9,7 +9,6 @@ namespace App.Shared.GameModules.Player.Appearance.AnimationEvent
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(OnSpecialLoadBulletBegin));
         public void AnimationEventCallback(PlayerEntity player, string param, UnityEngine.AnimationEvent eventParam)
         {
-            if(player.AudioController() != null)
                 player.AudioController().PlayReloadBulletAudio(player.WeaponController().HeldConfigId);
       //      DebugUtil.MyLog("Step In");
         //    Logger.Info("Step in");

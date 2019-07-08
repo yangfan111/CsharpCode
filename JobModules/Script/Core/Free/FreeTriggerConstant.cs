@@ -26,6 +26,8 @@
         public const int WEAPON_STATE = 31;
         public const int WEAPON_FIRE = 32;
 
+        public const int POST_PLAYER_INI = 34;
+
         public const int PLAYER_REPORT = 41;
 
         public const int UNIT_TEST = 40;
@@ -34,5 +36,7 @@
         public const int PRELOAD_RESOURCE = 44;
         public const int GRENADE_ROMOVE = 45;
         public const int TEST_CASE_END = 46;
+        public const int PLAYER_SWITCH_BAG = 47;
+        public const int PLAYER_EAT_BUF = 48;
     }
 }

@@ -20,6 +20,8 @@ namespace Assets.Sources
         KeyReceiver _keyReceiver;
         KeyReceiver _specialKeyReceiver;
         KeyReceiver _uiKeyReceiver;
+        KeyReceiver _bioKeyReceiver;
+        KeyReceiver _bioSpecialKeyReceiver;
         PointerReceiver _pointerReceiver;
         IUserInputManager _userInputManager;
         List<IGlobalKeyInputMapper> _inputMapperList = new List<IGlobalKeyInputMapper>();
@@ -95,6 +97,32 @@ namespace Assets.Sources
             _keyReceiver.AddAction(UserInputKey.ScopeIn, data => _userCmd.IsScopeIn = true);
             _keyReceiver.AddAction(UserInputKey.ScopeOut, data => _userCmd.IsScopeOut = true);
             _userInputManager.RegisterKeyReceiver(_keyReceiver);
+
+            #endregion
+            _bioSpecialKeyReceiver = new KeyReceiver(UiConstant.specicalCmdKeyLayer, BlockType.None);
+            _bioSpecialKeyReceiver.AddAction(UserInputKey.Fire, (data) => _userCmd.IsLeftAttack = true);
+            _bioSpecialKeyReceiver.AddAction(UserInputKey.RightAttack, (data) => _userCmd.IsRightAttack = true);
+            _bioSpecialKeyReceiver.AddAction(UserInputKey.CameraFocus, (data) => _userCmd.IsCameraFocus = true);
+
+            _bioKeyReceiver = new KeyReceiver(UiConstant.userCmdKeyLayer, BlockType.None);
+            _bioKeyReceiver.AddAction(UserInputKey.Throwing, (data) => _userCmd.IsThrowing = true);
+            _bioKeyReceiver.AddAction(UserInputKey.FreeCamera, (data) => _userCmd.IsCameraFree = true);
+            _bioKeyReceiver.AddAction(UserInputKey.Jump, (data) => _userCmd.IsJump = true);
+            _bioKeyReceiver.AddAction(UserInputKey.Crouch, (data) => _userCmd.IsCrouch = true);
+            _bioKeyReceiver.AddAction(UserInputKey.Prone, (data) => _userCmd.IsProne = true);
+            _bioKeyReceiver.AddAction(UserInputKey.IsPDown, data => _userCmd.IsPDown = true);
+            _bioKeyReceiver.AddAction(UserInputKey.IsYDown, data => _userCmd.IsYDown = true);
+            _bioKeyReceiver.AddAction(UserInputKey.AddMark, data => _userCmd.IsAddMark = true);
+            _bioKeyReceiver.AddAction(UserInputKey.BreathHold, data => _userCmd.IsHoldBreath = true);
+            _bioKeyReceiver.AddAction(UserInputKey.SwitchAutoRun, data => _userCmd.IsSwitchAutoRun = true);
+            _bioKeyReceiver.AddAction(UserInputKey.IsCDown, data => _userCmd.IsCDown = true);
+            _bioKeyReceiver.AddAction(UserInputKey.IsSpaceDown, data => _userCmd.IsSpaceDown = true);
+            _bioKeyReceiver.AddAction(UserInputKey.HoldF, data => _userCmd.IsF = true);
+            _bioKeyReceiver.AddAction(UserInputKey.SprayPaint, data => _userCmd.IsSprayPaint = true);
+            _bioKeyReceiver.AddAction(UserInputKey.ScopeIn, data => _userCmd.IsScopeIn = true);
+            _bioKeyReceiver.AddAction(UserInputKey.ScopeOut, data => _userCmd.IsScopeOut = true);
+            #region bioMain
+
 
             #endregion
 
@@ -174,6 +202,25 @@ namespace Assets.Sources
             _userInputManager.UnregisterKeyReceiver(_uiKeyReceiver);
             _userInputManager.UnregisterKeyReceiver(_keyReceiver);
             _userInputManager.UnregisterPointerReceiver(_pointerReceiver);
+            _userInputManager.UnregisterKeyReceiver(_bioKeyReceiver);
+        }
+
+        public void SwitchMode(EModeSwitch mode)
+        {
+            switch (mode) {
+                case EModeSwitch.Normal:
+                    _userInputManager.RegisterKeyReceiver(_specialKeyReceiver);
+                    _userInputManager.RegisterKeyReceiver(_keyReceiver);
+                    _userInputManager.UnregisterKeyReceiver(_bioSpecialKeyReceiver);
+                    _userInputManager.UnregisterKeyReceiver(_bioKeyReceiver);
+                    break;
+                case EModeSwitch.Bio:
+                    _userInputManager.RegisterKeyReceiver(_bioSpecialKeyReceiver);
+                    _userInputManager.RegisterKeyReceiver(_bioKeyReceiver);
+                    _userInputManager.UnregisterKeyReceiver(_specialKeyReceiver);
+                    _userInputManager.UnregisterKeyReceiver(_keyReceiver);
+                    break;
+            }
         }
 
         public CmdGeneratorType Type { get; private set; }
@@ -269,6 +316,11 @@ namespace Assets.Sources
             }
            
             return keyCode - (int) KeyCode.Alpha0;
+        }
+
+        public UserCmd GetUserCmd()
+        {
+            return _userCmd;
         }
     }
 }

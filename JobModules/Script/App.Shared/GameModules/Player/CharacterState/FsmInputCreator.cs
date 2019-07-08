@@ -79,8 +79,11 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         private void FromUserCmdToFsmInput(IUserCmd cmd, PlayerEntity player, Contexts contexts)
         {
+            if (player.hasGamePlay && player.gamePlay.IsObserving()) return;
             //Logger.InfoFormat("horzontal val:{0}, vertical val:{1}", cmd.MoveHorizontal, cmd.MoveVertical);
             // 根据WSAD生成FsmInput
+            bool IsSprint = false;
+            bool IsVariant = IsVariantFilter(player);
             if (CompareUtility.IsApproximatelyEqual(cmd.MoveHorizontal, 0, EPS) 
                 && CompareUtility.IsApproximatelyEqual(cmd.MoveVertical, 0, EPS)
                 && !player.playerMove.IsAutoRun)
@@ -100,19 +103,29 @@ namespace App.Shared.GameModules.Player.CharacterState
                 }
                 if(player.playerMove.IsAutoRun)
                 {
-                    SetCommand(FsmInput.Forth, InputValueLimit.MaxAxisValue);
-                }
-                // 冲刺
-                if ((cmd.IsRun || player.playerMove.IsAutoRun) && IsCanSprint(cmd, player))
-                {
-                    if(player.playerMove.IsAutoRun)
+                    if (IsVariant &&
+                        player.hasStateInterface &&
+                        player.stateInterface.State.GetCurrentPostureState() == PostureInConfig.Crouch)
                     {
+                        SetCommand(FsmInput.Forth, InputValueLimit.MaxAxisValue);
+                        SetCommand(FsmInput.Run);
+                    }
+                    else
+                    {
+                        SetCommand(FsmInput.Forth, InputValueLimit.MaxAxisValue);
                         SetCommand(FsmInput.Sprint);
                     }
+                }
+                // 冲刺
+                IsSprint = (cmd.MoveVertical > 0 && cmd.MoveVertical >= Math.Abs(cmd.MoveHorizontal));
+                if (cmd.IsRun && IsCanSprint(cmd, player))
+                {
                     // 冲刺只有前向90度
-                    else if (cmd.MoveVertical > 0 && cmd.MoveVertical >= Math.Abs(cmd.MoveHorizontal))
+                    if (IsSprint)
                     {
-                        SetCommand(FsmInput.Sprint);
+                        if (!(player.hasStateInterface && player.stateInterface.State.GetCurrentPostureState() == PostureInConfig.Crouch && IsVariantFilter(player))) {
+                            SetCommand(FsmInput.Sprint);
+                        }
                     }
                     else
                     {
@@ -122,7 +135,14 @@ namespace App.Shared.GameModules.Player.CharacterState
                 // 静走 静走不被限制
                 else if (cmd.FilteredInput.IsInput(EPlayerInput.IsSlightWalk))
                 {
-                    SetCommand(FsmInput.Walk);
+                    if (IsVariant)
+                    {
+                        SetCommand(FsmInput.Run);
+                    }
+                    else
+                    {
+                        SetCommand(FsmInput.Walk);
+                    }
                 }
                 else if (IsCanRun(cmd))
                 {
@@ -170,8 +190,19 @@ namespace App.Shared.GameModules.Player.CharacterState
 				CheckConditionAndSetCommand(cmd, XmlConfig.EPlayerInput.IsJump, FsmInput.Jump);
             }
 
-            if (cmd.IsCrouch && !IsVariantFilter(player))
+            bool runInterrupt =  (cmd.IsRun && 
+                IsSprint && 
+                IsVariant && 
+                player.hasStateInterface && 
+                player.stateInterface.State.GetCurrentPostureState() == PostureInConfig.Crouch);
+            UserCmd.SetInterrupt(UserCmdEnum.IsRun, runInterrupt ? UserCmdHandle.Interrupt : UserCmdHandle.None);
+
+            if (cmd.IsCrouch)
             {
+                bool autoRunSynchronous = (player.playerMove.IsAutoRun && IsVariant);
+                UserCmd.SetInterrupt(UserCmdEnum.IsRun, autoRunSynchronous ? UserCmdHandle.Synchronous : UserCmdHandle.None);
+                UserCmd.SetInterrupt(UserCmdEnum.IsSwitchAutoRun, autoRunSynchronous ? UserCmdHandle.Synchronous : UserCmdHandle.None);
+
                 CheckConditionAndSetCommand(cmd, XmlConfig.EPlayerInput.IsCrouch, FsmInput.Crouch);
             }
 
@@ -180,7 +211,7 @@ namespace App.Shared.GameModules.Player.CharacterState
                 SetCommand(FsmInput.BigJump);
             }
             
-            if (cmd.IsProne && !IsVariantFilter(player))
+            if (cmd.IsProne && !IsVariant)
             {
                 CheckConditionAndSetCommand(cmd, XmlConfig.EPlayerInput.IsProne, FsmInput.Prone);
             }
@@ -188,9 +219,9 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         private bool IsVariantFilter(PlayerEntity player)
         {
-            return (player.hasPlayerInfo &&
-                (player.playerInfo.JobAttribute == (int)EJobAttribute.EJob_Variant ||
-                player.playerInfo.JobAttribute == (int)EJobAttribute.EJob_Matrix));
+            return (player.hasGamePlay &&
+                (player.gamePlay.JobAttribute == (int)EJobAttribute.EJob_Variant ||
+                player.gamePlay.JobAttribute == (int)EJobAttribute.EJob_Matrix));
         }
 
         private bool IsCanSprint(IUserCmd cmd, PlayerEntity playerEntity)

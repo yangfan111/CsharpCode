@@ -7,11 +7,12 @@ using com.wd.free.@event;
 using com.wd.free.map.position;
 using com.wd.free.unit;
 using UnityEngine;
+using Core.Free;
 
 namespace App.Shared.FreeFramework.framework.ai.move
 {
     [Serializable]
-    public class FaceToAiAction : AbstractPlayerAction
+    public class FaceToAiAction : AbstractPlayerAction, IRule
     {
         private long startTime;
 
@@ -68,6 +69,11 @@ namespace App.Shared.FreeFramework.framework.ai.move
             }
 
             startTime = DateTime.Now.Ticks;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FaceToAiAction;
         }
     }
 }

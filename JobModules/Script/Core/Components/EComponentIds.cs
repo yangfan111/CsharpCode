@@ -57,6 +57,7 @@
         CameraOutput,
         CameraStateUpload,
         ObserveCamera,
+        CameraFireInfo,
 
         BagState,
         WeaponBagSet,
@@ -96,6 +97,7 @@
         PlayerChangeRole,
         PlayerFsmMotor,
         PlayerHitbox,
+        PlayerRagDoll,
         PlayerGamePlay,
         PlayerInfo,
         PlayerMeleeAttacker,
@@ -114,6 +116,9 @@
         WeaponUpdateComponent2,
         WeaponAux,
         WeaponServerUpdate,
+        StatisticsClientData,
+        StatisticsServerData,
+        WeaponDebug,
 
         PlayerWeaponCustomize,
         PlayerAudio,
@@ -151,7 +156,7 @@
         AnimatiorServerTime,
         FpAnimData,
         ClientEffectAssets,
-        BulletGameObject,
+        BulletAsset,
         AppearanceGameObject,
         
         VehicleGameObject,
@@ -161,7 +166,7 @@
         SceneObjectAudioObject,
 
         SceneObjectFlashGameObject,
-        SceneObjectEquip,
+        SceneObjectItem,
         SceneObjectWeapon,
         SceneObjectCastTarget,
         SceneObjectThrowingWeapon,
@@ -193,6 +198,8 @@
         WeaponActiveFlag,
         WeaponRuntimeData,
         WeaponClientData,
+        
+        FreeMoveController,
         
         TriggerEvent,
         PlayerResource,

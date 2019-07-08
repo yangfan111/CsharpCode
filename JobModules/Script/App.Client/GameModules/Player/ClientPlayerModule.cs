@@ -18,19 +18,17 @@ namespace App.Client.GameModules.Player
     {
         public ClientPlayerModule(Contexts contexts)
         {
+            AddSystem(new PlayerStateChangeSystem(contexts));
             AddSystem(new PlayerPlayBackFilterSystem(contexts));
             AddSystem(new PlayerEntityInitSystem(contexts));
-
             AddSystem(new PlayerChangeRoleSystem(contexts));
             AddSystem(new PlayerResourceLoadSystem(contexts));
+            AddSystem(new PlayerEffectsLoadSystem(contexts));
             AddSystem(new ClientPlayerCameraInitSystem(contexts.player));
-
             AddSystem(new PlayerPlaybackSystem(contexts));
             AddSystem(new PlayerFirstPersonHandRotationSystem());
             AddSystem(new InputSchemeUpdateSystem());
-
             AddSystem(new PlayerAutoMoveSystem(contexts));
-            
             //player playBack show
             AddSystem(new CreatePlaybackPlayerLifeStateDataSystem(contexts));
             AddSystem(new PlayerAnimationPlaybackSystem(contexts));
@@ -38,35 +36,30 @@ namespace App.Client.GameModules.Player
             AddSystem(new PlayerBonePlaybackSystem(contexts));
             AddSystem(new PlayerAvatarPlaybackSystem(contexts));
             AddSystem(new WeaponAnimationPlaybackSystem(contexts));
-
             AddSystem(new CameraFxInitSystem(contexts.player));
             AddSystem(new ClientCameraEffectSystem(contexts));
-
             AddSystem(new PlayerDebugDrawSystem(contexts));
-
-            AddSystem(new PlayerDeadAnimSystem(contexts));
-            AddSystem(new PlayerStateChangeSystem(contexts));
             AddSystem(new PlayerEquipPickAndDropSystem(contexts.session.clientSessionObjects.UserCmdGenerator));
             AddSystem(new ClientCameraFinalRenderSystem(contexts));
-
             if (SingletonManager.Get<MapConfigManager>().SceneParameters is SceneConfig)
-                AddSystem(new PositionRelatedEffectUpdateSystem(contexts,
-                    SingletonManager.Get<DynamicScenesController>().GetPositionRelatedEffectUpdater()));
+                AddSystem(new PositionRelatedEffectUpdateSystem(contexts, SingletonManager.Get<DynamicScenesController>().GetPositionRelatedEffectUpdater()));
             else
-                AddSystem(new PositionRelatedEffectUpdateSystem(contexts,
-                    SingletonManager.Get<LevelController>().GetPositionRelatedEffectUpdater()));
-
+                AddSystem(new PositionRelatedEffectUpdateSystem(contexts, SingletonManager.Get<LevelController>().GetPositionRelatedEffectUpdater()));
             AddSystem(new ClientPlayerSaveSystem(contexts));
             AddSystem(new PlayerRaycastInitSystem(contexts));
             AddSystem(new PingSystem(contexts));
             AddSystem(new RaycastTestSystem(contexts));
-            AddSystem(new ClientPlayerWeaponSystem(contexts));
+            AddSystem(new ClientPlayerGUISystem(contexts.player));
+            
             AddSystem(new PlayerUpdateRotationRenderSystem(contexts));
             AddSystem(new ClientPlayerEntityInitSystem(contexts.player));
             AddSystem(new ClientPlayerTipShowSystem(contexts));
             AddSystem(new ClientPlayerDebugDrawBoxSystem(contexts));
-            AddSystem(new ClientPlayerDebugAnimationSystem());
-            //AddSystem(new PlayerGunCameraSystem(contexts.player));
+            #if UNITY_EDITOR
+            AddSystem(new ClientPlayerDebugWeaponSystem(contexts));
+            #endif
+            AddSystem(new ClientPlayerUpdateWeaponSystem(contexts));
+            AddSystem(new PlayerEffectsSystem(contexts));
         }
     }
 

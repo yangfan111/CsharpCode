@@ -1,16 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using App.Shared.Components.Player;
 using Core;
-using Core.Prediction.UserPrediction.Cmd;
-using Core.Utils;
+using System.Collections.Generic;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Player
 {
     public class PlayerStateCollector : IPlayerStateColltector
     {
-        private PlayerEntity          _playerEntity;
+        private PlayerEntity _playerEntity;
         private HashSet<EPlayerState> playerStates = new HashSet<EPlayerState>(EPlayerStateComparer.Instance);
 
         public PlayerStateCollector(PlayerEntity player)
@@ -18,12 +15,10 @@ namespace App.Shared.GameModules.Player
             _playerEntity = player;
         }
 
-        public HashSet<EPlayerState> GetCurrStates(
-            EPlayerStateCollectType collectType)
+        public HashSet<EPlayerState> GetCurrStates(EPlayerStateCollectType collectType)
         {
             switch (collectType)
             {
-                    
                 case EPlayerStateCollectType.UseCacheAddation:
                     if (_playerEntity.playerClientUpdate.OpenUIFrame)
                         playerStates.Add(EPlayerState.OpenUI);
@@ -32,11 +27,10 @@ namespace App.Shared.GameModules.Player
                     if (filteredInput.IsInput(EPlayerInput.IsPullboltInterrupt))
                         playerStates.Add(EPlayerState.PullBoltInterrupt);
                     break;
-                case EPlayerStateCollectType.UseMoment:
+                case EPlayerStateCollectType.CurrentMoment:
                     Update();
                     break;
             }
-          
            
             return playerStates;
         }
@@ -71,64 +65,44 @@ namespace App.Shared.GameModules.Player
                 }
             }
           
-//            if (PlayerStateUtil.HasUIState(gamePlay))
-//                _playerStates.Add(EPlayerState.OpenUI);
             var playerStateSource = _playerEntity.stateInterface.State;
-         
             playerStates.Add(ActionToState(playerStateSource.GetActionState()));
             playerStates.Add(ActionToState(playerStateSource.GetNextActionState()));
             playerStates.Add(KeepActionToState(playerStateSource.GetActionKeepState()));
             playerStates.Add(LeanToState(playerStateSource.GetCurrentLeanState()));
             playerStates.Add(MoveToState(playerStateSource.GetCurrentMovementState()));
             playerStates.Add(MoveToState(playerStateSource.GetNextMovementState()));
-            var poseState     = playerStateSource.GetCurrentPostureState();
+
+            var poseState = playerStateSource.GetCurrentPostureState();
             var nextPoseState = playerStateSource.GetNextPostureState();
             playerStates.Add(PostureToState(poseState));
             if (poseState != nextPoseState && LegalTransition(poseState, nextPoseState))
-            {
                 playerStates.Add(EPlayerState.PostureTrans);
-            }
           
             if (_playerEntity.hasOxygenEnergyInterface && _playerEntity.oxygenEnergyInterface.Oxygen.InSightDebuffState)
-            {
                 playerStates.Add(EPlayerState.RunDebuff);
-            }
 
             if (_playerEntity.hasCameraStateNew && _playerEntity.cameraStateNew.FreeNowMode == (int) ECameraFreeMode.On)
-            {
                 playerStates.Add(EPlayerState.CameraFree);
-            }
 
-            if (IsPlayerOnAir())
-            {
-                playerStates.Add(EPlayerState.OnAir);
-            }
+            if (IsPlayerOnAir()) playerStates.Add(EPlayerState.OnAir);
 
-            if (_playerEntity.gamePlay.IsSave)
-            {
-                playerStates.Add(EPlayerState.Rescue);
-            }
+            if (gamePlay.IsSave) playerStates.Add(EPlayerState.Rescue);
 
-            var move = (playerStates.Contains(EPlayerState.Run)
-                     || playerStates.Contains(EPlayerState.Sprint)
-                     || playerStates.Contains(EPlayerState.Walk));
-            if (move)
-                playerStates.Add(EPlayerState.Move);
-
-            //处理复合状态
-            if (playerStates.Contains(EPlayerState.Prone) 
-             && (move))
-            {
+            var move = playerStates.Contains(EPlayerState.Run) || playerStates.Contains(EPlayerState.Sprint) || playerStates.Contains(EPlayerState.Walk);
+            if (move) playerStates.Add(EPlayerState.Move);
+            if (playerStates.Contains(EPlayerState.Prone) && move)
                 playerStates.Add(EPlayerState.ProneMove);
-            }
-            if(playerStates.Contains(EPlayerState.MeleeAttacking))
-                playerStates.Add(EPlayerState.MeleeAttacking);
-             if(_playerEntity.characterBone.IsWeaponRotState)
+
+            if(_playerEntity.characterBone.IsWeaponRotState)
                 playerStates.Add(EPlayerState.WeaponRotState);
 
-            if (PlayerStateUtil.HasUIState(EPlayerUIState.PaintOpen, gamePlay)) {
+            if (PlayerStateUtil.HasUIState(EPlayerUIState.PaintOpen, gamePlay))
                 playerStates.Add(EPlayerState.PaintDisc);
-            }
+
+            var throwingData = _playerEntity.throwingAction.ActionData;
+            throwingData.IsThrowing = throwingData.IsThrowing && (playerStates.Contains(EPlayerState.Grenade));
+            if(throwingData.IsThrowing) playerStates.Add(EPlayerState.GrenadeThrow);
 
             playerStates.Remove(EPlayerState.None);
         }
@@ -140,18 +114,12 @@ namespace App.Shared.GameModules.Player
             return playerStates;
         }
 
-     
-
         private EPlayerState PostureToState(PostureInConfig posture)
         {
             switch (posture)
             {
                 case PostureInConfig.Crouch:
                     return EPlayerState.Crouch;
-                case PostureInConfig.Dying :
-                case PostureInConfig.DyingTransition:
-                    return EPlayerState.Dying;
-                    break;
                 case PostureInConfig.Climb:
                     return EPlayerState.Climb;
                 case PostureInConfig.Dive:
@@ -265,12 +233,9 @@ namespace App.Shared.GameModules.Player
 
         private bool LegalTransition(PostureInConfig from, PostureInConfig to)
         {
-          
-            var exculde = (from == PostureInConfig.Land
-                       || to == PostureInConfig.Land
-                       || from == PostureInConfig.Crouch && to == PostureInConfig.Stand) ||(from == PostureInConfig.Stand && to == PostureInConfig.Crouch);
             // 站到蹲算到切换防止趴下切枪动作异常
-            //|| from == PostureInConfig.Stand && to == PostureInConfig.Crouch;
+            var exculde = (from == PostureInConfig.Land || to == PostureInConfig.Land || from == PostureInConfig.Crouch && to == PostureInConfig.Stand)
+                        ||(from == PostureInConfig.Stand && to == PostureInConfig.Crouch);
             return !exculde;
         }
     }

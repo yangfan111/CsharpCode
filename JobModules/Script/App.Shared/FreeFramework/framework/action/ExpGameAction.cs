@@ -3,11 +3,12 @@ using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.para.exp;
 using com.wd.free.util;
+using Core.Free;
 
 namespace com.wd.free.action
 {
     [System.Serializable]
-    public class ExpGameAction : AbstractGameAction
+    public class ExpGameAction : AbstractGameAction, IRule
     {
         private const long serialVersionUID = 1131444043139644761L;
 
@@ -44,7 +45,7 @@ namespace com.wd.free.action
         public override void DoAction(IEventArgs args)
         {
             // 如果有变量每次重新生成
-            if (op == null || (exp.Contains(FreeUtil.VAR_START) && exp.Contains(FreeUtil.VAR_END)))
+            if (op == null || ((exp.IndexOf(FreeUtil.VAR_START_CHAR) > -1)&& (exp.IndexOf(FreeUtil.VAR_END_CHAR) > -1)))
             {
                 op = ExpSetParser.Parse(FreeUtil.ReplaceVar(exp, args), args);
             }
@@ -67,6 +68,11 @@ namespace com.wd.free.action
         public override string ToString()
         {
             return exp;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ExpGameAction;
         }
     }
 }

@@ -1,61 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using App.Client.GPUInstancing.Core.Utils;
-using Core.Utils;
 using UnityEngine;
 
 namespace App.Client.GPUInstancing.Core.Spatial
 {
-    enum NodeStatus
-    {
-        OutOfRange,
-        ToBeInstantiated,
-        Instantiating,
-        Cached
-    }
-
-    class NodeIndicator
-    {
-        public GpuInstancingNode Node;
-        public bool IsActive;
-
-        private NodeStatus _status;
-        private readonly Vector3 _mins;
-        private readonly Vector3 _maxs;
-
-        public bool InLastVisibleSet;
-        public bool InCurVisibleSet;
-
-        public bool IsOutOfRange { get { return _status == NodeStatus.OutOfRange; } }
-        public bool IsNeedInstantiation { get { return _status == NodeStatus.ToBeInstantiated; } }
-        public bool IsDuringInstantiation { get { return _status == NodeStatus.Instantiating; } }
-        public bool IsInstantiated { get { return _status == NodeStatus.Cached; } }
-
-        public void SetOutOfRange() { _status = NodeStatus.OutOfRange; }
-        public void SetInRange() { _status = NodeStatus.ToBeInstantiated; }
-        public void SetInstantiating() { _status = NodeStatus.Instantiating; }
-        public void SetInstantiated() { _status = NodeStatus.Cached; }
-        public Vector3 Mins { get { return _mins; } }
-        public Vector3 Maxs { get { return _maxs; } }
-
-        public ComputeBuffer HeightBuffer()
-        {
-            return _heightMapProvider.GetHeightmap();
-        }
-
-        private readonly IHeightMap _heightMapProvider;
-
-        public NodeIndicator(IHeightMap heightMapProvider, Vector3 mins, Vector3 maxs)
-        {
-            _status = NodeStatus.OutOfRange;
-            InLastVisibleSet = InCurVisibleSet = false;
-            _heightMapProvider = heightMapProvider;
-            _mins = mins;
-            _maxs = maxs;
-        }
-    }
-
-    interface IHeightMap
+    public interface IHeightMap
     {
         ComputeBuffer GetHeightmap();
     }
@@ -72,13 +22,13 @@ namespace App.Client.GPUInstancing.Core.Spatial
         private int _xCount;
         private int _zCount;
 
-        private NodeIndicator[,] _nodeStatuses;
+        private GpuInstancingNodeIndicator[,] _nodeStatuses;
         private int[] _maxInstanceCountPerRenderInUnit;
 
         private Vector2 _enableGridDistance;
         private Vector2 _minVisiblePos;
         private Vector2 _maxVisiblePos;
-        private readonly Queue<NodeIndicator> _toBeInstantiatedNodes = new Queue<NodeIndicator>();
+        private readonly Queue<GpuInstancingNodeIndicator> _toBeInstantiatedNodes = new Queue<GpuInstancingNodeIndicator>();
 
         private ushort[] _heightMapData;
         private TextAsset _compactHeightMapData;
@@ -111,7 +61,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
             _xCount = xCount;
             _zCount = zCount;
             
-            _nodeStatuses = new NodeIndicator[_xCount, _zCount];
+            _nodeStatuses = new GpuInstancingNodeIndicator[_xCount, _zCount];
             
             _minVisiblePos = new Vector2(
                 _minPosition.x - enableDistance,
@@ -125,7 +75,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
                 enableDistance / _nodeSize.y);
         }
 
-        public void InitHeightMap(float[,] heightMapData, float fullHeight)
+        public void InitHeightMap(float[,] heightMapData, float fullHeight, float nodeMargin)
         {
             if (_heightMinsF == null)
             {
@@ -182,10 +132,10 @@ namespace App.Client.GPUInstancing.Core.Spatial
                 }
             }
             
-            BuildAabb(_heightMinsF, _heightMaxsF);
+            BuildAabb(_heightMinsF, _heightMaxsF, nodeMargin);
         }
 
-        public void InitHeightMap(TextAsset flowData, int start, float fullHeight, int resolution)
+        public void InitHeightMap(TextAsset flowData, int start, float fullHeight, int resolution, float nodeMargin)
         {
             _compactHeightMapData = flowData;
             _compactHeightMapDataStart = start;
@@ -254,12 +204,12 @@ namespace App.Client.GPUInstancing.Core.Spatial
                 }
             }
                         
-            BuildAabb(_heightMinsF, _heightMaxsF);
+            BuildAabb(_heightMinsF, _heightMaxsF, nodeMargin);
         }
 
         public void AddNode(int x, int z, T node)
         {
-            _nodeStatuses[x, z] = new NodeIndicator(this, _aabbMins[x, z], _aabbMaxs[x, z]) { Node = node };
+            _nodeStatuses[x, z] = new GpuInstancingNodeIndicator(this, _aabbMins[x, z], _aabbMaxs[x, z]) { Node = node };
         }
 
         public void UpdateMaxCountInLayer(T node)
@@ -282,7 +232,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
             _maxInstanceCountPerRenderInUnit = maxCountInLayer.ToArray();
         }
 
-        public NodeIndicator DistanceAndFrustumCulling(Vector3 viewPoint, bool enoughRoom)
+        public GpuInstancingNodeIndicator DistanceAndFrustumCulling(Vector3 viewPoint, bool enoughRoom)
         {
             HandleHeightBuffer(viewPoint);
 
@@ -299,7 +249,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
                 !Helper.AlmostEqual(visibleEndZ, _lastVisibleEndZ))
             {
 
-                HashSet<NodeIndicator> allRelatedNodes = new HashSet<NodeIndicator>();
+                HashSet<GpuInstancingNodeIndicator> allRelatedNodes = new HashSet<GpuInstancingNodeIndicator>();
                 _toBeInstantiatedNodes.Clear();
 
                 for (int i = _lastVisibleStartX; i < _lastVisibleEndX; ++i)
@@ -388,7 +338,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
 
         #endregion
 
-        private void BuildAabb(float[,] mins, float[,] maxs)
+        private void BuildAabb(float[,] mins, float[,] maxs, float nodeMargin)
         {
             _aabbMins = new Vector3[_xCount, _zCount];
             _aabbMaxs = new Vector3[_xCount, _zCount];
@@ -401,6 +351,12 @@ namespace App.Client.GPUInstancing.Core.Spatial
                         mins[i, j] + _minPosition.y, _nodeSize.y * j + _minPosition.z);
                     _aabbMaxs[i, j] = new Vector3(_nodeSize.x * (i + 1) + _minPosition.x,
                         maxs[i, j] + _minPosition.y, _nodeSize.y * (j + 1) + _minPosition.z);
+
+                    _aabbMins[i, j].x -= nodeMargin;
+                    _aabbMins[i, j].z -= nodeMargin;
+                    _aabbMaxs[i, j].x += nodeMargin;
+                    _aabbMaxs[i, j].z += nodeMargin;
+                    _aabbMaxs[i, j].y += 2 * nodeMargin;
                 }
             }
         }

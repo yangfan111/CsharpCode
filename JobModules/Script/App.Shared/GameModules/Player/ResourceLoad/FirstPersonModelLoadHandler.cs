@@ -3,7 +3,8 @@ using App.Shared.GameModules.Player.Appearance.AnimationEvent;
 using App.Shared.Player;
 using Core.Animation;
 using UnityEngine;
-using Utils.Appearance;
+using Utils.Appearance.Bone;
+using Utils.Appearance.Script;
 using Utils.AssetManager;
 
 namespace App.Shared.GameModules.Player.ResourceLoad
@@ -68,6 +69,7 @@ namespace App.Shared.GameModules.Player.ResourceLoad
 
             player.firstPersonAnimator.UnityAnimator.Update(0);
 
+            player.appearanceInterface.Appearance.SetRootGo(player.RootGo());
             player.appearanceInterface.Appearance.SetFirstPersonCharacter(go);
             player.appearanceInterface.FirstPersonAppearance.SetFirstPersonCharacter(go);
 

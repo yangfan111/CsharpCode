@@ -1,4 +1,5 @@
-﻿using App.Client.GPUInstancing.Core.Utils;
+﻿using App.Client.GPUInstancing.Core.Spatial;
+using App.Client.GPUInstancing.Core.Utils;
 using Core.Components;
 using UnityEngine;
 
@@ -10,26 +11,29 @@ namespace App.Client.GPUInstancing.Core.Data
         {
             Left = 0,
             Right = 1,
-            Far = 2,
-            Top = 3,
-            Bottom = 4
+            Top = 2,
+            Bottom = 3,
+            Far = 4,
+            EnumLength = 5
         }
+        private static readonly int[] PlaneIndexIterator =
+        {
+            (int) Direction.Left, (int) Direction.Right, (int) Direction.Top, (int) Direction.Bottom, (int) Direction.Far,
+            (int) Direction.Left, (int) Direction.Right, (int) Direction.Top, (int) Direction.Bottom, (int) Direction.Far
+        };
 
         private float _fov = float.MinValue;
         private float _aspect = float.MinValue;
 
-        private readonly Vector3[] _baseClipNormal =
-        {
-            Vector3.back, Vector3.back, Vector3.back, Vector3.back, Vector3.back
-        };
+        // normal point to the inside of frustum
+        private readonly Vector3[] _baseClipNormal = { Vector3.back, Vector3.back, Vector3.back, Vector3.back, Vector3.back };
+        private readonly int[] _nearVertexIndices = new int[(int) Direction.EnumLength];
 
         private Vector3 _viewPoint;
         public Vector3 ViewPoint { get { return _viewPoint + WorldOrigin.Origin; } }
         private Vector3 _eulerAngles = new Vector3(float.MinValue, float.MinValue, float.MinValue);
-        private float _eulerYAngle = float.MinValue;
 
         private readonly Vector3[] _clipNormal = new Vector3[5];
-        private readonly Vector3[] _2DClipNormal = new Vector3[3];
         private readonly float[] _clipDistance = { 0, 0, 0, 0, 0 };
 
         private readonly float[][] _clipNormalArray =
@@ -46,128 +50,70 @@ namespace App.Client.GPUInstancing.Core.Data
 
         public void Update(Camera camera)
         {
-            bool basicChanged = false;
+            bool needChange = false;
             if (!Helper.AlmostEqual(_fov, camera.fieldOfView) || !Helper.AlmostEqual(_aspect, camera.aspect))
             {
                 _fov = camera.fieldOfView;
                 _aspect = camera.aspect;
 
                 Calculate();
-                basicChanged = true;
+                needChange = true;
             }
 
             var transform = camera.transform;
             var currentEulerAngles = transform.eulerAngles;
-            if (!Helper.AlmostEqual(_eulerAngles, currentEulerAngles) || basicChanged)
+            if (needChange || !Helper.AlmostEqual(_eulerAngles, currentEulerAngles))
             {
                 _eulerAngles = currentEulerAngles;
-                for (int i = 0; i < 5; ++i)
+
+                for (int i = 0; i < (int) Direction.EnumLength; ++i)
                 {
                     _clipNormal[i] = transform.TransformDirection(_baseClipNormal[i]);
                     _clipNormal[i].ConvertToFloatArray(_clipNormalArray[i]);
+
+                    int nearVertexIndex = (_clipNormal[i].x > 0 ? 1 : 0) +
+                                          (_clipNormal[i].y > 0 ? 2 : 0) +
+                                          (_clipNormal[i].z > 0 ? 4 : 0);
+
+                    _nearVertexIndices[i] = nearVertexIndex;
                 }
+
+                needChange = true;
             }
 
-            if (!Helper.AlmostEqual(_eulerYAngle, currentEulerAngles.y) || basicChanged)
+            if (needChange || !Helper.AlmostEqual(_viewPoint, transform.position))
             {
-                _eulerYAngle = currentEulerAngles.y;
+                _viewPoint = transform.position;
+                var cameraPos = ViewPoint;
 
-                var rotationY = Quaternion.AngleAxis(_eulerYAngle, Vector3.up);
-                _2DClipNormal[(int) Direction.Left] = rotationY * _baseClipNormal[(int) Direction.Left];
-                _2DClipNormal[(int) Direction.Right] = rotationY * _baseClipNormal[(int) Direction.Right];
-                _2DClipNormal[(int) Direction.Far] = rotationY * _baseClipNormal[(int) Direction.Far];
+                _clipDistance[(int) Direction.Left] = Vector3.Dot(_clipNormal[(int) Direction.Left], cameraPos);
+                _clipDistance[(int) Direction.Right] = Vector3.Dot(_clipNormal[(int) Direction.Right], cameraPos);
+                _clipDistance[(int) Direction.Top] = Vector3.Dot(_clipNormal[(int) Direction.Top], cameraPos);
+                _clipDistance[(int) Direction.Bottom] = Vector3.Dot(_clipNormal[(int) Direction.Bottom], cameraPos);
             }
-
-            _viewPoint = transform.position;
+            
             _clipDistance[(int) Direction.Far] = -camera.farClipPlane;
         }
 
-        private readonly Vector3[] _shiftedBigAabbPos = new Vector3[8];
-        public bool IsDetailNodeVisible(Vector3 min, Vector3 max)
+        public bool IsNodeVisible(GpuInstancingNodeIndicator node)
         {
-            // 顶面4个点在前
-            _shiftedBigAabbPos[0].Set(max.x, max.y, max.z);
-            _shiftedBigAabbPos[1].Set(max.x, max.y, min.z);
-            _shiftedBigAabbPos[2].Set(min.x, max.y, max.z);
-            _shiftedBigAabbPos[3].Set(min.x, max.y, min.z);
-            _shiftedBigAabbPos[4].Set(max.x, min.y, max.z);
-            _shiftedBigAabbPos[5].Set(max.x, min.y, min.z);
-            _shiftedBigAabbPos[6].Set(min.x, min.y, max.z);
-            _shiftedBigAabbPos[7].Set(min.x, min.y, min.z);
+            var start = node.LastOutsidePlaneIndex;
 
-            for (int i = 0; i < 8; ++i)
+            var vertices = node.Vertices;
+            // AABB and frustum intersection test
+            for (int i = 0; i < (int) Direction.EnumLength; ++i)
             {
-                if (Inside3DFrustum(_shiftedBigAabbPos[i]))
-                    return true;
+                var planeIndex = PlaneIndexIterator[start + i];
+
+                if (Vector3.Dot(_clipNormal[planeIndex], vertices[_nearVertexIndices[planeIndex]]) < _clipDistance[planeIndex])
+                {
+                    node.LastOutsidePlaneIndex = planeIndex;
+                    return false;
+                }
             }
+            
 
-            var viewPoint = ViewPoint;
-            if (viewPoint.x >= min.x && viewPoint.x <= max.x && viewPoint.z >= min.z && viewPoint.z <= max.z)
-                return true;
-
-            // 2m为间隔检查离相机最近的一条/两条边
-            float startX = min.x;
-            float endX = max.x;
-            float startZ = min.z;
-            float endZ = max.z;
-            float fixedX = 0;
-            float fixedZ = 0;
-            float pointInterval = 2;
-
-            if (viewPoint.x < min.x)
-                fixedX = min.x;
-            else if (viewPoint.x > max.x)
-                fixedX = max.x;
-            else
-                startZ = endZ;
-
-            if (viewPoint.z < min.z)
-                fixedZ = min.z;
-            else if (viewPoint.z > max.z)
-                fixedZ = max.z;
-            else
-                startX = endX;
-
-            Vector3 p = new Vector3(startX, max.y, fixedZ);
-            for (float i = startX; i < endX; i += pointInterval)
-            {
-                p.x = i;
-                if (Inside3DFrustum(p))
-                    return true;
-            }
-
-            p.Set(fixedX, max.y, startZ);
-            for (float i = startZ; i < endZ; i += pointInterval)
-            {
-                p.z = i;
-                if (Inside3DFrustum(p))
-                    return true;
-            }
-
-            return false;
-        }
-
-        public bool Is2DRectVisible(Vector2 basePos, Vector2 rectSize)
-        {
-            bool ret = false;
-            var viewPoint = ViewPoint;
-
-            Vector2 shiftedPos = new Vector2(basePos.x - viewPoint.x, basePos.y - viewPoint.z);
-            ret = Helper.FarthestDistance(_2DClipNormal[(int) Direction.Left], shiftedPos, rectSize) >= _clipDistance[(int) Direction.Left] || ret;
-            ret = Helper.FarthestDistance(_2DClipNormal[(int) Direction.Right], shiftedPos, rectSize) >= _clipDistance[(int) Direction.Right] || ret;
-            ret = Helper.FarthestDistance(_2DClipNormal[(int) Direction.Far], shiftedPos, rectSize) >= _clipDistance[(int) Direction.Far] || ret;
-
-            return ret;
-        }
-
-        private bool Inside3DFrustum(Vector3 p)
-        {
-            p -= ViewPoint;
-            bool inside = _clipNormal[(int)Direction.Left].Dot(p) > _clipDistance[(int)Direction.Left];
-            inside = inside && _clipNormal[(int)Direction.Right].Dot(p) > _clipDistance[(int)Direction.Right];
-            inside = inside && _clipNormal[(int)Direction.Far].Dot(p) > _clipDistance[(int)Direction.Far];
-            inside = inside && _clipNormal[(int)Direction.Top].Dot(p) > _clipDistance[(int)Direction.Top];
-            return inside && _clipNormal[(int)Direction.Bottom].Dot(p) > _clipDistance[(int)Direction.Bottom];
+            return true;
         }
 
         private void Calculate()

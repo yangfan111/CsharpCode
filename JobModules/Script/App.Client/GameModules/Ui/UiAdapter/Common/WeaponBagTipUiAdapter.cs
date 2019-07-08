@@ -1,6 +1,5 @@
 ﻿using App.Shared;
 using App.Shared.Components.Ui.UiAdapter;
-using App.Shared.GameModules.Weapon;
 using Core.Utils;
 
 
@@ -21,26 +20,19 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                return _player;
-            }
-            set
-            {
-                _player = value;
+                return _player ?? (_player = _contexts.player.flagSelfEntity);
             }
         }
 
         public override bool IsReady()
         {
-            return Player != null; ;
+            return Player != null; 
         }
 
         public override bool Enable
         {
             get { return _enable && CanOpenBag; }
 
-            set {
-                    _enable = value;
-                }
         }
 
 
@@ -48,11 +40,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                if (null != Player && Player.WeaponController().CanSwitchWeaponBag)
-                {
-                    return true;
-                }
-                return false;
+                return Player.WeaponController().CanSwitchWeaponBag;
             }
         }
 

@@ -149,7 +149,8 @@ namespace Core.CharacterState
         public void Update(IAdaptiveContainer<IFsmInputCommand> commands,
             int frameInterval,
             Action<FsmOutput> addOutput,
-            FsmUpdateType updateType)
+            FsmUpdateType updateType,
+            List<FsmInput> limits)
         {
             if (_needReset)
             {
@@ -161,11 +162,11 @@ namespace Core.CharacterState
             }
 
             if ((updateType & FsmUpdateType.ResponseToInput) != 0)
-                ApplyNewCommand(commands, addOutput);
+                ApplyNewCommand(commands, addOutput, limits);
 
-            _posture.Update(commands, frameInterval, addOutput, updateType);
-            _movement.Update(commands, frameInterval, addOutput, updateType);
-            _action.Update(commands, frameInterval, addOutput, updateType);
+            _posture.Update(commands, frameInterval, addOutput, updateType, limits);
+            _movement.Update(commands, frameInterval, addOutput, updateType, limits);
+            _action.Update(commands, frameInterval, addOutput, updateType, limits);
             UpdateFullBodySpeedScale(addOutput);
         }
 

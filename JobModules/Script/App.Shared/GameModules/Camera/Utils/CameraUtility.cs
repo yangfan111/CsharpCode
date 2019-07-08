@@ -66,11 +66,6 @@ namespace App.Shared.GameModules.Camera.Utils
             return false;
         }
 
-        public static ECameraArchorType GetCameraArchorType(this PlayerEntity player)
-        {
-            return player.cameraArchor.ArchorType;
-        }
-
         private static void LogError(string msg)
         {
             Logger.Error(msg);
@@ -81,7 +76,7 @@ namespace App.Shared.GameModules.Camera.Utils
         {
             if (state.ViewMode == ECameraViewMode.GunSight)
             {
-                var upperRail = player.WeaponController().HeldWeaponAgent.BaseComponent.UpperRail;
+                var upperRail = player.WeaponController().HeldWeaponAgent.PartsScan.UpperRail;
                 if (upperRail > 0)
                 {
                     return SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(upperRail).FovMove;
@@ -89,6 +84,16 @@ namespace App.Shared.GameModules.Camera.Utils
                 return 0.9f;
             }
             return 1f;
+        }
+
+        public static Vector3 GetShiftCameraPos(this PlayerEntity player, Vector3 orig)
+        {
+            return orig - player.position.Value;
+        }
+
+        public static Vector3 GetOrigCameraPos(this PlayerEntity player, Vector3 shiftPos)
+        {
+            return shiftPos + player.position.Value;
         }
 
         #region PhysicTest

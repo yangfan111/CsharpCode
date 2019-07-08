@@ -5,11 +5,12 @@ using Free.framework;
 using System.Collections.Generic;
 using com.cpkf.yyjd.tools.util;
 using Core.Free;
+using com.wd.free.para;
 
 namespace gameplay.gamerule.free.ui.component
 {
     [System.Serializable]
-    public class FreePrefabComponet : AbstractFreeComponent
+    public class FreePrefabComponet : AbstractFreeComponent, IRule
     {
         private string name;
 
@@ -69,6 +70,11 @@ namespace gameplay.gamerule.free.ui.component
             b.Key = 1;
 
             return b;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreePrefabComponet;
         }
     }
 }

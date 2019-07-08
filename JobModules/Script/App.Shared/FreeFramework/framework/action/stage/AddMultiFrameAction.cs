@@ -6,11 +6,12 @@ using com.cpkf.yyjd.tools.util;
 using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.util;
+using Core.Free;
 
 namespace com.wd.free.action.stage
 {
     [Serializable]
-    public class AddMultiFrameAction : AbstractGameAction
+    public class AddMultiFrameAction : AbstractGameAction, IRule
     {
         private string key;
         private IGameAction action;
@@ -18,6 +19,11 @@ namespace com.wd.free.action.stage
         public override void DoAction(IEventArgs args)
         {
            args.FreeContext.MultiFrame.AddAction(FreeUtil.ReplaceVar(key, args), (IGameAction)SerializeUtil.Clone(action));
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.AddMultiFrameAction;
         }
     }
 }

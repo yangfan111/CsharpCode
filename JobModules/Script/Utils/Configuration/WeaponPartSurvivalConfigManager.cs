@@ -34,8 +34,10 @@ namespace Utils.Configuration
 
         public int GetDefaultPartBySetId(int id)
         {
-            var array = FindConfigBySetId(id).PartsList;
-            return array.Length == 0 ? 0 : array[0];
+            var config = FindConfigBySetId(id);
+            if (config == null) return 0;
+            var array = config.PartsList;
+            return array == null || array.Length == 0 ? 0 : array[0];
         
         }
 

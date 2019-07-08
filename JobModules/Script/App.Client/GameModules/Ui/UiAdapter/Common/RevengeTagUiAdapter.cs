@@ -62,7 +62,7 @@ namespace App.Client.GameModules.Ui.UiAdapter.Common
             get
             {
                 if (KillerPlayerEntity == null) return true;
-                if (KillerPlayerEntity.gamePlay.IsDead())//杀手第一次死亡就清空
+                if (KillerPlayerEntity.isFlagDestroy || KillerPlayerEntity.gamePlay.IsDead())//杀手第一次死亡就清空
                 {
                     KillerPlayerEntity = null;
                     return true;

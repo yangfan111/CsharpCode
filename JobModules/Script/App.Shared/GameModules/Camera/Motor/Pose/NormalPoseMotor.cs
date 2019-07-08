@@ -4,7 +4,11 @@ using Assets.App.Shared.GameModules.Camera.Motor.Pose;
 using Core.CameraControl;
 using Core.CameraControl.NewMotor;
 using System.Collections.Generic;
+using Core.Configuration;
+using Core.EntityComponent;
+using Core.Utils;
 using UnityEngine;
+using Utils.Singleton;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Camera.Motor.Pose
@@ -108,15 +112,14 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
         private SubCameraMotorType _motorType;
         private HashSet<short> _excludes;
         private IMotorActive _active;
+        private int _order;
         private readonly float Epsilon = 0.01f;
         protected float _transitionTime ;
         
 
         public NormalPoseMotor(ECameraPoseMode modeId,
-            CameraConfig config,
             HashSet<ECameraPoseMode> excludes,
-            IMotorActive active
-        )
+            IMotorActive active)
         {
             _modeId = (short)modeId;
             _motorType = SubCameraMotorType.Pose;
@@ -127,10 +130,12 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
                 this._excludes.Add((short)e);
             }
 
-            _config = config.GetCameraConfigItem(modeId);
+            _order = SingletonManager.Get<CameraConfigManager>().GetRoleConfig()
+                .GetCameraConfigItem((ECameraPoseMode) _modeId).Order;
+            
             _active = active;
         }
-
+        
         public override short ModeId
         {
             get { return _modeId; }
@@ -141,31 +146,9 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
             return _active.IsActive(input, state);
         }
 
-        public override Vector3 FinalArchorOffset
+        public override int Order 
         {
-            get { return _config.AnchorOffset; }
-        }
-
-        public override Vector3 FinalArchorPostOffset
-        {
-            get { return _config.ScreenOffset; }
-        }
-
-
-        public override Vector3 FinalOffset
-        {
-            get { return new Vector3(0, 0, -_config.Distance); }
-        }
-
-
-        public override float FinalFov
-        {
-            get { return _config.Fov; }
-        }
-
-        public override int Order
-        {
-            get { return _config.Order; }
+            get { return _order; }
         }
         
         public override void CalcOutput(PlayerEntity player, ICameraMotorInput input, ICameraMotorState state,
@@ -174,9 +157,9 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
             ICameraNewMotor last, int clientTime)
         {
             
-            output.Far = _config.Far;
-            output.Near = _config.Near;
-            output.ForbidDetect = _config.ForbidDetect;
+            output.Far = input.GetPoseConfig(_modeId).Far;
+            output.Near = input.GetPoseConfig(_modeId).Near;
+            output.ForbidDetect = input.GetPoseConfig(_modeId).ForbidDetect;
 
             _transitionTime = CameraUtility.GetPostureTransitionTime(_motorType, subState);
             var elapsedPercent = ElapsedPercent(clientTime, subState.ModeTime, _transitionTime);
@@ -185,57 +168,61 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
             if (state.IsFristPersion())
             {
                 //一人称和瞄准相机没有偏移
-                output.Fov = Mathf.Lerp(last.FinalFov, FinalFov, realPercent);
+                output.Fov = Mathf.Lerp(input.GetPoseConfig(last.ModeId).Fov,
+                    input.GetPoseConfig(_modeId).Fov, realPercent);
             }
             else
             {
-                if (last is AirplanePoseMotor || last is DrivePoseMotor)
+                if (last is AirplanePoseMotor || last is DrivePoseMotor )
                 {
                     realPercent = 1;
                 }
 
-                output.ArchorOffset = Vector3.Lerp(last.FinalArchorOffset, FinalArchorOffset, realPercent);
+                output.ArchorOffset = Vector3.Lerp(input.GetPoseConfig(last.ModeId).AnchorOffset,
+                    input.GetPoseConfig(_modeId).AnchorOffset, realPercent);
                 output.ArchorPostOffset =
-                    Vector3.Lerp(last.FinalArchorPostOffset, FinalArchorPostOffset, realPercent);
-                output.Offset = Vector3.Lerp(last.FinalOffset, FinalOffset, realPercent);
+                    Vector3.Lerp(input.GetPoseConfig(last.ModeId).ScreenOffset,
+                        input.GetPoseConfig(_modeId).ScreenOffset, realPercent);
+                output.Offset = Vector3.Lerp(new Vector3(0, 0, -input.GetPoseConfig(last.ModeId).Distance),
+                    new Vector3(0, 0, -input.GetPoseConfig(_modeId).Distance), realPercent);
                 output.ArchorEulerAngle = Vector3.Lerp(last.FinalEulerAngle, FinalEulerAngle, realPercent);
-                output.Fov = Mathf.Lerp(last.FinalFov, FinalFov, realPercent);
+                output.Fov = Mathf.Lerp(input.GetPoseConfig(last.ModeId).Fov,
+                    input.GetPoseConfig(_modeId).Fov, realPercent);
             }
 
         }
-
-
+        
         private bool CanRotatePlayer(ICameraMotorState state)
         {
+            if (state.IsFristPersion() && state.GetMainMotor().NowMode == (byte) ECameraPoseMode.Climb)
+                return false;
             if (state.IsFree()) return false;
             return true;
         }
 
         public override void UpdatePlayerRotation(ICameraMotorInput input, ICameraMotorState state, PlayerEntity player)
         {
-            if ((!input.IsDead || input.IsDead && input.IsObservingFreemove) && CanRotatePlayer(state))
+            if ((!input.IsDead || input.IsDead && player.gamePlay.IsObserving()) && CanRotatePlayer(state))
             {
                 float newDeltaAngle = input.DeltaYaw;
-
                 if (player.playerRotateLimit.LimitAngle)
                 {
                     var candidateAngle = YawPitchUtility.Normalize(player.orientation.Yaw) + input.DeltaYaw;
                     candidateAngle = Mathf.Clamp(candidateAngle, player.playerRotateLimit.LeftBound,
                         player.playerRotateLimit.RightBound);
-                    player.orientation.Yaw = CalculateFrameVal(candidateAngle, 0f, _config.YawLimit);
+                    player.orientation.Yaw = CalculateFrameVal(candidateAngle, 0f, input.GetPoseConfig(_modeId).YawLimit);
                 }
                 else
                 {
-                    player.orientation.Yaw = CalculateFrameVal(player.orientation.Yaw, newDeltaAngle, _config.YawLimit);
+                    player.orientation.Yaw = CalculateFrameVal(player.orientation.Yaw, newDeltaAngle,input.GetPoseConfig(_modeId).YawLimit);
                 }
                
-
                 var deltaPitch = HandlePunchPitch(player, input);
                 player.orientation.Pitch =
-                    CalculateFrameVal(player.orientation.Pitch, deltaPitch, _config.PitchLimit);
+                    CalculateFrameVal(player.orientation.Pitch, deltaPitch, input.GetPoseConfig(_modeId).PitchLimit);
             }
         }
-
+        
         private float HandlePunchPitch(PlayerEntity player, ICameraMotorInput input)
         {
             if(player.orientation.PunchPitch > -0.001 || input.DeltaPitch < 0.001)

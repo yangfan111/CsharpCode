@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using App.Shared;
 using Core.Utils;
 using Shared.Scripts.SceneManagement;
 using UnityEngine;
@@ -46,7 +47,8 @@ namespace App.Client.SceneManagement.DistanceCulling
             for (int i = 0; i < count; i++)
             {
                 var data = sceneStruct.Objects[i];
-                root.InsertStreamingGo(GetStreamingGo(data, sceneStruct.Index, i), data.Position, data.Size);
+                if(!FilterStreamingObject(data))
+                    root.InsertStreamingGo(GetStreamingGo(data, sceneStruct.Index, i), data.Position, data.Size);
             }
 
             return root;
@@ -66,7 +68,8 @@ namespace App.Client.SceneManagement.DistanceCulling
                 while (_buildingGoIndex < goCount && _timer.ElapsedMilliseconds < 1)
                 {
                     var data = scene.Objects[_buildingGoIndex];
-                    root.InsertStreamingGo(GetStreamingGo(data, scene.Index, _buildingGoIndex), data.Position, data.Size);
+                    if(!FilterStreamingObject(data))
+                        root.InsertStreamingGo(GetStreamingGo(data, scene.Index, _buildingGoIndex), data.Position, data.Size);
                     
                     ++_buildingGoIndex;
                 }
@@ -82,6 +85,24 @@ namespace App.Client.SceneManagement.DistanceCulling
                 
                 _timer.Stop();
             }
+        }
+
+        private bool FilterStreamingObject(StreamingObject so)
+        {
+            if (SharedConfig.IgnoreProp)
+            {
+                var tagValue = so.SceneTag;
+                //filter inprop, out prop and inoutprop but wall, house and door, terrain
+
+                if (MultiTagHelper.IsDoor(tagValue) || MultiTagHelper.IsHouse(tagValue)
+                    || MultiTagHelper.IsWall(tagValue) || MultiTagHelper.IsTerrain(tagValue))
+                    return false;
+
+                if (MultiTagHelper.InDoor(tagValue) || MultiTagHelper.OutDoor(tagValue))
+                    return true;
+            }
+            
+            return false;
         }
 
         private DistCullingCat GetCullingCatForGo(StreamingObject data)

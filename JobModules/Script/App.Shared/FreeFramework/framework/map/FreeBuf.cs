@@ -13,12 +13,13 @@ using com.wd.free.skill;
 using com.wd.free.unit;
 using com.wd.free.util;
 using gameplay.gamerule.free.ui;
+using Core.Free;
 
 namespace com.wd.free.map
 {
 	[System.Serializable]
-	public class FreeBuf : BaseGameUnit
-	{
+	public class FreeBuf : BaseGameUnit, IRule
+    {
 		private const long serialVersionUID = 8842439127192517271L;
 
 		private string key;
@@ -79,19 +80,30 @@ namespace com.wd.free.map
 		[System.NonSerialized]
 		private int realTime;
 
-		public FreeBuf()
+        [System.NonSerialized]
+        private int posindex;
+
+        public FreeBuf()
 		{
 		}
 
-		public virtual void OnCreate(IEventArgs skill)
+		public virtual bool OnCreate(IEventArgs skill)
 		{
 		    startTime = skill.Rule.ServerTime;
-			this.ins = new HashSet<long>();
+            IPosSelector pos = GetPos(region.GetCenter(skill));
+            if(pos.Select(skill).GetInvalid()) return false;
+            this.ins = new HashSet<long>();
 			this.showedIds = new HashSet<long>();
 			this.realKey = FreeUtil.ReplaceVar(key, skill);
 			this.realTime = FreeUtil.ReplaceInt(time, skill);
             this.paras = new SimpleParaList();
 
+            this.posindex = -1;
+            ParaList list = skill.GetDefault().GetParameters();
+            if (list.HasPara("posindex"))
+            {
+                posindex = (int)list.Get("posindex").GetValue();
+            }
             skill.TempUse("buf", this);
             bool hasCreator = false;
 			if (creator != null && creator.hasFreeData)
@@ -106,7 +118,7 @@ namespace com.wd.free.map
 			}
 			if (effectAction != null)
 			{
-				effectAction.SetSelector(GetPos(region.GetCenter(skill)));
+				effectAction.SetSelector(pos);
 				effectAction.SetKey("bufeffect_" + realKey);
 			}
 			else
@@ -115,7 +127,7 @@ namespace com.wd.free.map
 				{
 					show = new FreeEffectShowAction();
 					show.SetKey(effect);
-					show.SetPos(GetPos(region.GetCenter(skill)));
+					show.SetPos(pos);
 				}
 			}
             skill.Resume("buf");
@@ -127,6 +139,7 @@ namespace com.wd.free.map
 			{
 				bufCondition = new ExpParaCondition(FreeUtil.ReplaceVar(condition, skill));
 			}
+            return true;
 		}
 
 		public virtual string GetRealKey()
@@ -213,7 +226,9 @@ namespace com.wd.free.map
 			pas.SetX(up.GetX().ToString());
 			pas.SetY(up.GetY().ToString());
 			pas.SetZ(up.GetZ().ToString());
-			return pas;
+            pas.SetInvalid(up.GetInvalid().ToString());
+            pas.SetRandomindex(up.GetRandomindex().ToString());
+            return pas;
 		}
 
 		private void AddParas(IEventArgs args)
@@ -353,8 +368,21 @@ namespace com.wd.free.map
 					{
 						if (eatAction != null)
 						{
+                            // record parentkey
+                            IPosSelector posCenter = GetPos(region.GetCenter(skill));
+                            skill.GetDefault().GetParameters().TempUse(new IntPara("posindex", posCenter.Select(skill).GetRandomindex()));
 							eatAction.Act(skill);
-							if (consume)
+                            skill.GetDefault().GetParameters().RemovePara("posindex");
+
+                            // handle
+                            if (posindex >= 0)
+                            {
+                                skill.GetDefault().GetParameters().TempUse(new IntPara("resetpos", posindex));
+                                skill.Triggers.Trigger(FreeTriggerConstant.PLAYER_EAT_BUF, skill);
+                                skill.GetDefault().GetParameters().RemovePara("resetpos");
+                            }
+
+                            if (consume)
 							{
                                 skill.FreeContext.Bufs.RemoveBuf(skill, this.realKey);
                             }
@@ -475,5 +503,10 @@ namespace com.wd.free.map
 			this.time = time.ToString();
 			this.realTime = time;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeBuf;
+        }
+    }
 }

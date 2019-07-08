@@ -38,7 +38,7 @@ namespace App.Shared.Components.Player
         private void CacheAnimatorParameters()
         {
             _parameterCount = _unityAnimator.parameterCount;
-            Logger.InfoFormat("Parameters Count: {0}", ParameterCount);
+            Logger.InfoFormat("CharacterLog-- Parameters Count: {0}", ParameterCount);
             _paramArray = new AnimatorControllerParameter[ParameterCount];
             _paramHashArray = new int[ParameterCount];
             

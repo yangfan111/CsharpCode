@@ -7,10 +7,14 @@ namespace App.Shared.Audio
     internal class AudioDispatcher
     {
         //     internal AudioRegulator Regulator { get; private set; }
-        private AudioBankLoader bankLoader;
+        private readonly AudioBankLoader bankLoader;
 
         private readonly AKTypesController typesController = new AKTypesController();
 
+        internal void Free()
+        {
+            typesController.Free();
+        }
         internal AudioDispatcher(AudioBankLoader loader)
         {
             bankLoader = loader;
@@ -22,7 +26,7 @@ namespace App.Shared.Audio
 
         internal void PostEvent(AudioEventItem econfig, AkGameObj target, bool skipSwitchSetting = false)
         {
-            bankLoader.LoadAtom(econfig.BankRef, false, (AKRESULT result) =>
+            bankLoader.LoadAtom(econfig.BankRef, false, (result) =>
             {
                 if (AudioUtil.VerifyAKResult(result, "Audio load atom:" + econfig.BankRef))
                 {
@@ -43,6 +47,9 @@ namespace App.Shared.Audio
                 target.gameObject, 0, AkCurveInterpolation.AkCurveInterpolation_Linear);
             AudioUtil.VerifyAKResult(result, "StopEvent:" + econfig.Event);
         }
+
+        #region overrride method for switchgroup
+
 
         internal void SetSwitch(AkGameObj target, AudioGrp_ShotMode shotModelGrpIndex)
         {
@@ -89,7 +96,11 @@ namespace App.Shared.Audio
             var emitterData = typesController.GetEmitter(target);
             emitterData.SetSwitch(grpId, index);
         }
+        #endregion
 
+        #region todo method
+
+        
 
         internal void PrepareEvent(int eventId)
         {
@@ -110,5 +121,7 @@ namespace App.Shared.Audio
         void OnAsyncBnkALoadFail(string bankName)
         {
         }
+        #endregion
+
     }
 }

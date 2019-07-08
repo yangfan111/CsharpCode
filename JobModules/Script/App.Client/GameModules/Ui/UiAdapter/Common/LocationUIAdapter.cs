@@ -11,13 +11,23 @@ namespace App.Client.GameModules.Ui.UiAdapter
             _contexts = contexts;
         }
 
+        public override bool IsReady()
+        {
+            return Player != null;
+        }
+
+        private PlayerEntity Player
+        {
+            get { return _contexts.ui.uI.Player; }
+        }
+
         public float _CurFaceDirection
         {
             get
             {
                 //Vector2 curDireciton = new Vector2(_contexts.player.flagSelfEntity.orientation.Yaw, _contexts.player.flagSelfEntity.orientation.Pitch);
                 // return Vector2.Angle(Vector3.forward, curDireciton);
-                CurFaceDirection = -_contexts.player.flagSelfEntity.orientation.Yaw;
+                CurFaceDirection = -Player.orientation.Yaw;
                 return CurFaceDirection;
             }         
             set

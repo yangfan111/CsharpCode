@@ -587,9 +587,9 @@ namespace App.Client.GameModules.Ui.Models.Common
             ChatListState = EUIChatListState.Receive;
         }
 
-        protected override void OnGameobjectDestoryed()
+        public override void Destory()
         {
-            base.OnGameobjectDestoryed();
+            base.Destory();
             if (_closeViewAnim != null)
             {
                 _closeViewAnim.Kill();

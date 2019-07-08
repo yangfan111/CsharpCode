@@ -20,7 +20,7 @@ namespace App.Client.CastObjectUtil
             var colTrans = model.transform.Find(SceneObjectConstant.NormalColliderName);
             if(null == colTrans)
             {
-                Logger.ErrorFormat("no normal collider find in {0}", model.name);
+                Logger.WarnFormat("no normal collider find in {0}", model.name);
                 var colGo = new GameObject(SceneObjectConstant.NormalColliderName);
                 colTrans = colGo.transform;
                 colTrans.parent = model.transform;
@@ -34,7 +34,7 @@ namespace App.Client.CastObjectUtil
 
             if (needRotation)
             {
-                colTrans.Rotate(new Vector3(0, 0, 90));
+                colTrans.transform.localRotation = Quaternion.Euler(0, 0, 90);
             }
             var normalCollider = colTrans.GetComponent<BoxCollider>();
             if(null == normalCollider)

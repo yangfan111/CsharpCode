@@ -1,8 +1,11 @@
 using App.Server.GameModules.GamePlay.free.player;
+using App.Shared.Audio;
 using App.Shared.Components;
 using App.Shared.Components.Player;
+using App.Shared.FreeFramework.framework.trigger;
 using App.Shared.GameModules.Player;
 using App.Shared.GameModules.Player.Actions;
+using App.Shared.GameModules.Player.Actions.LadderPackage;
 using App.Shared.GameModules.Player.CharacterState;
 using App.Shared.GameModules.Player.Oxygen;
 using App.Shared.GameModules.Weapon.Behavior;
@@ -10,30 +13,25 @@ using App.Shared.Player;
 using Assets.App.Shared.EntityFactory;
 using Assets.App.Shared.GameModules.Player.Robot.Adapter;
 using BehaviorDesigner.Runtime;
+using com.wd.free.@event;
 using com.wd.free.para;
+using Core;
 using Core.AnimatorClip;
-using Core.BulletSimulation;
+using Core.Attack;
 using Core.CharacterState;
+using Core.CharacterState.Action.CommandLimit;
 using Core.CharacterState.Posture;
-using Core.Configuration;
 using Core.EntityComponent;
 using Core.Event;
-using Core;
+using Core.Free;
 using Core.GameModule.System;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Room;
 using Core.Statistics;
 using Core.Utils;
-using Core.WeaponLogic.Throwing;
 using System.Collections.Generic;
-using App.Shared.Audio;
-using App.Shared.GameModules;
-using App.Shared.GameModules.Player.Actions.LadderPackage;
-using Assets.XmlConfig;
 using UnityEngine;
 using UnityEngine.AI;
-using Utils.Configuration;
-using Utils.Singleton;
 
 
 namespace App.Shared.EntityFactory
@@ -87,7 +85,7 @@ namespace App.Shared.EntityFactory
                 playerInfo.PlayerName, playerInfo.RoleModelId,
                 playerInfo.TeamId, playerInfo.Num, playerInfo.Level, playerInfo.BackId, playerInfo.TitleId,
                 playerInfo.BadgeId, playerInfo.AvatarIds, playerInfo.WeaponAvatarIds, playerInfo.Camp,
-                playerInfo.SprayLacquers, 0, position);
+                playerInfo.SprayLacquers, position);
             playerEntity.AddPlayerToken(playerInfo.Token);
             playerEntity.playerInfo.WeaponBags = playerInfo.WeaponBags;
             playerEntity.AddUserCmd();
@@ -116,8 +114,9 @@ namespace App.Shared.EntityFactory
             playerEntity.AddPlayerSkyMove(false, -1);
             playerEntity.AddPlayerSkyMoveInterVar();
             playerEntity.AddTime(0);
-            playerEntity.AddGamePlay(100, 100, -1, -1);
+            playerEntity.AddGamePlay(100, 100, -1, -1, true, true, 0);
             playerEntity.AddChangeRole(false);
+            playerEntity.AddRagDoll("Bip01 Pelvis", Vector3.zero, Vector3.zero);
 
             //            playerEntity.AddWeaponState();
 
@@ -144,17 +143,17 @@ namespace App.Shared.EntityFactory
             playerEntity.AddPredictedAppearance();
             playerEntity.AddClientAppearance();
 
-            playerEntity.AddOxygenEnergy(0);
+            playerEntity.AddOxygenEnergy(100);
 
             playerEntity.AddSound();
             playerEntity.AddUpdateMessagePool();
             playerEntity.AddRemoteEvents(new PlayerEvents());
-            playerEntity.AddUploadEvents(new PlayerEvents(), new PlayerEvents());
+            playerEntity.AddUploadEvents(new PlayerEvents());
 
-            playerEntity.AddStatisticsData(false, new BattleData(), new StatisticsData());
+            playerEntity.AddStatisticsData( new BattleData(),false, new StatisticsData());
             playerEntity.AddPlayerMask((byte) (EPlayerMask.TeamA | EPlayerMask.TeamB),
                 (byte) (EPlayerMask.TeamA | EPlayerMask.TeamB));
-            playerEntity.AddPlayerClientUpdate();
+            playerEntity.AddPlayerClientUpdate(-1);
 
             playerEntity.AttachPlayerAux();
 #if UNITY_EDITOR
@@ -169,6 +168,9 @@ namespace App.Shared.EntityFactory
             playerEntity.AddRaycastTest(5f, new List<GameObject>());
 
             playerEntity.AddPlayerSpray(0);
+
+            // 在角色Entity上追加 KeepWatchForAOIComponent，以记录 视线内残留对象 以及 其加入字典的时间
+            playerEntity.AddKeepWatchForAOI(new Util.WatchDict());
             //Logger.Info(playerEntity.Dump());
             return playerEntity;
         }
@@ -218,7 +220,7 @@ namespace App.Shared.EntityFactory
 
             if (!player.hasStatisticsData)
             {
-                player.AddStatisticsData(false, new BattleData(), new StatisticsData());
+                player.AddStatisticsData( new BattleData(),false, new StatisticsData());
             }
 
             if (!player.hasAutoMoveInterface)
@@ -229,6 +231,8 @@ namespace App.Shared.EntityFactory
                 stateManager.GetIMovementInConfig(), characterInfo);
             stateManager.SetSpeedInterface(speed);
             player.AddStateInterface(stateManager);
+            
+            player.AddFsmInputRelateInterface(new FsmInputRelate());
 
             var oxygen = new OxygenEnergy(100, 0);
             player.AddOxygenEnergyInterface(oxygen);
@@ -295,6 +299,12 @@ namespace App.Shared.EntityFactory
                 player.AddPingStatistics();
             }
 
+            player.AddTip();
+            AttachAudio(contexts, player);
+            AttachWeaponComponents(contexts, player);
+            AttachStateInteract(player);
+            AttachStatistics(player);
+
             if (!player.hasFreeData)
             {
                 FreeData fd = new FreeData(contexts, player);
@@ -303,41 +313,70 @@ namespace App.Shared.EntityFactory
                     fd.AddFields(new ObjectFields(player.statisticsData.Statistics));
                 }
 
+                if (player.hasStatisticsServerData)
+                {
+                    fd.AddFields(new ObjectFields(player.statisticsServerData));
+                }
                 player.AddFreeData(fd);
             }
 
-            player.AddTip();
-            AttachAudioComponents(contexts, player);
-            AttachWeaponComponents(contexts, player);
-            AttachStateInteract(player);
             player.AddPlayerHitMaskController(new CommonHitMaskController(contexts.player, player));
             player.AddThrowingUpdate(false);
             player.AddThrowingAction();
-            player.throwingAction.ActionInfo = new ThrowingActionInfo();
-            Logger.Info("posted player initialize finish!!!!!!!!!!!!!!");
+            player.throwingAction.ActionData = new ThrowingActionData();
+            Logger.Info("*********posted player initialize finish*********");
             DebugUtil.MyLog("posted player initialize finish", DebugUtil.DebugColor.Green);
-            contexts.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleEquipmentEntity(ECategory.GameRes,
-                1004, 1, Vector3.zero);
+            if (!SharedConfig.IsServer)
+            {
+                DebugUtil.InitShootArchiveC(player.entityKey.Value.ToString(), contexts.session.commonSession.RoomInfo.RoomDisplayId);
+            }
+            else
+            {
+                IEventArgs args = contexts.session.commonSession.FreeArgs as IEventArgs;
+                if (null != args)
+                {
+                    args.Trigger(FreeTriggerConstant.POST_PLAYER_INI, new TempUnit("current", (FreeData) player.freeData.FreeData));
+                }
+            }
+//            contexts.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleEquipmentEntity(ECategory.GameRes,
+//                1004, 1, Vector3.zero);
+            
         }
 
-        public static void AttachAudioComponents(Contexts context, PlayerEntity playerEntity)
+        private static void AttachAudio(Contexts context, PlayerEntity playerEntity)
         {
             GameAudioMedia.Dispose();
             playerEntity.AddPlayerAudio();
-            GameModuleManagement.ForceAllocate(playerEntity.entityKey.Value.EntityId,
-                (PlayerAudioController audioController) => { audioController.Initialize(playerEntity); });
+            PlayerAudioControllerBase controller;
+            if (SharedConfig.IsServer)
+                controller = new ServerPlayerAudioController();
+            else
+                controller = new ClientPlayerAudioController();
+            controller.Initialize(playerEntity,context.session.commonSession.RoomInfo.MapId);
+            GameModuleManagement.ForceCache(playerEntity.entityKey.Value.EntityId,controller);
         }
 
-        public static void AttachStateInteract(PlayerEntity player)
+        private static void AttachStateInteract(PlayerEntity player)
         {
             GameModuleManagement.ForceAllocate(player.entityKey.Value.EntityId,
                 (PlayerStateInteractController controller) => { controller.Initialize(player); });
         }
-
-        public static void AttachWeaponComponents(Contexts contexts, PlayerEntity playerEntity)
+        private static void AttachStatistics(PlayerEntity player)
+        {
+            PlayerStatisticsControllerBase controller;
+            if (SharedConfig.IsServer)
+                controller = new ServerPlayerStatisticsController();
+            else
+                controller = new ClientPlayerStatisticsController();
+            controller.Initialize(player);
+            GameModuleManagement.ForceCache(player.entityKey.Value.EntityId,controller);
+        }
+        private static void AttachWeaponComponents(Contexts contexts, PlayerEntity playerEntity)
         {
             WeaponEntityFactory.EntityIdGenerator = contexts.session.commonSession.EntityIdGenerator;
             WeaponEntityFactory.WeaponContxt = contexts.weapon;
+            ThrowingEntityFactory.EntityIdGenerator = contexts.session.commonSession.EntityIdGenerator;
+            ThrowingEntityFactory.ThrowingContext = contexts.throwing;
             var emptyScan = WeaponUtil.CreateScan(WeaponUtil.EmptyHandId);
 
             // playerEntity.RemoveWeaponComponents();
@@ -348,6 +387,10 @@ namespace App.Shared.EntityFactory
             playerEntity.AttachGrenadeCacheData(greandeIds);
             playerEntity.AttachPlayerAmmu();
             playerEntity.playerWeaponAuxiliary.HasAutoAction = true;
+            if (!SharedConfig.IsServer)
+            {
+                playerEntity.AddPlayerWeaponDebug();
+            }
             playerEntity.AttachPlayerCustomize();
             playerEntity.AddPlayerWeaponServerUpdate();
             playerEntity.AttachWeaponComponentBehavior(contexts, greandeIds);
@@ -370,37 +413,12 @@ namespace App.Shared.EntityFactory
                     BagIndex = 0,
                     weaponList = new List<PlayerWeaponData>
                     {
-                        //new PlayerWeaponData
-                        //{
-                        //    Index = 1,
-                        //    WeaponAvatarTplId = 0,
-                        //},
-                        //new PlayerWeaponData
-                        //{
-                        //    Index = 2,
-                        //    WeaponAvatarTplId = 0,
-                        //},
-                        //new PlayerWeaponData
-                        //{
-                        //    Index = 3,
-                        //    WeaponAvatarTplId = 0,
-                        //},
                         new PlayerWeaponData
                         {
                             Index = 3,
                             WeaponTplId = 47,
                             WeaponAvatarTplId = 0,
                         },
-                        //new PlayerWeaponData
-                        //{
-                        //    Index = 5,
-                        //    WeaponAvatarTplId = 0,
-                        //},
-                        //new PlayerWeaponData
-                        //{
-                        //    Index = 6,
-                        //    WeaponAvatarTplId = 0,
-                        //}
                     },
                 }
             };
@@ -452,13 +470,25 @@ namespace App.Shared.EntityFactory
                             Index = 6,
                             WeaponTplId = 39,
                             WeaponAvatarTplId = 0,
+                        },
+                        new PlayerWeaponData
+                        {
+                            Index = 7,
+                            WeaponTplId = 102,
+                            WeaponAvatarTplId = 0,
+                        },
+                        new PlayerWeaponData
+                        {
+                            Index = 8,
+                            WeaponTplId = 202,
+                            WeaponAvatarTplId = 0,
                         }
                     },
                 },
                 new PlayerWeaponBagData
                 {
                     BagIndex = 1,
-                    weaponList = new System.Collections.Generic.List<PlayerWeaponData>
+                    weaponList = new List<PlayerWeaponData>
                     {
                         new PlayerWeaponData
                         {
@@ -496,7 +526,7 @@ namespace App.Shared.EntityFactory
 
             if (!playerEntity.hasCameraFinalOutputNew)
             {
-                playerEntity.AddCameraFinalOutputNew(SingletonManager.Get<CameraConfigManager>().PostTransitionTime);
+                playerEntity.AddCameraFinalOutputNew();
             }
 
             if (!playerEntity.hasCameraStateOutputNew)
@@ -518,11 +548,13 @@ namespace App.Shared.EntityFactory
             {
                 playerEntity.AddCameraStateUpload();
             }
+            
+            if(!playerEntity.hasCameraFireInfo)
+                playerEntity.AddCameraFireInfo();
 
-            if (!playerEntity.hasThirdPersonDataForObserving)
+            if (!playerEntity.hasObserveCamera)
             {
-                playerEntity.AddThirdPersonDataForObserving(new CameraStateOutputNewComponent(),
-                    new CameraFinalOutputNewComponent());
+                playerEntity.AddObserveCamera();          
             }
         }
 

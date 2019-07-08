@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using App.Shared.GameModules.Player;
 using BehaviorDesigner.Runtime.Tasks.Basic.UnityTransform;
+using Core.EntityComponent;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using Core.WeaponLogic;
+
 using Entitas;
 using UnityEngine;
 
@@ -16,16 +17,21 @@ namespace App.Shared.GameModules.Vehicle
     public class VehicleCameraUpdateSystem : IUserCmdExecuteSystem
     {
         private VehicleContext _vehicleContext;
+        private PlayerContext _playerContext;
         private bool _newVehicle = true;
         private float _lastTime;
         public VehicleCameraUpdateSystem(Contexts contexts)
         {
+            _playerContext = contexts.player;
             _vehicleContext = contexts.vehicle;
         }
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
-            var player = (PlayerEntity) owner.OwnerEntity;
+            var own = (PlayerEntity) owner.OwnerEntity;
+
+            var player = HandleWhenObserve(own) ?? own;
+            
             if (!player.IsOnVehicle() || !player.hasCameraConfigNow)
             {
                 _newVehicle = true;
@@ -90,6 +96,33 @@ namespace App.Shared.GameModules.Vehicle
             }
 
             _lastTime = currentTime;
+        }
+
+        private PlayerEntity HandleWhenObserve( PlayerEntity player)
+        {
+            if (player.observeCamera.VehicleId != -1)
+            {
+                var observedPlayer = _playerContext.GetEntityWithEntityKey(new EntityKey(player.gamePlay.CameraEntityId,
+                    (short) EEntityType.Player));
+                if (observedPlayer != null)
+                {
+                    observedPlayer.controlledVehicle.EntityKey =
+                        new EntityKey(player.observeCamera.VehicleId, (short) EEntityType.Vehicle);
+                    var vehicle = _vehicleContext.GetEntityWithEntityKey(observedPlayer.controlledVehicle.EntityKey);
+                    observedPlayer.controlledVehicle.CameraAnchorOffset = vehicle.vehicleAssetInfo.CameraAnchorOffset;
+                    observedPlayer.controlledVehicle.CameraDistance = vehicle.vehicleAssetInfo.CameraDistance;
+                    observedPlayer.controlledVehicle.CameraRotationDamping = vehicle.vehicleAssetInfo.CameraRotationDamping;
+                    if (vehicle != player.observeCamera.ControllVehicle)
+                        observedPlayer.controlledVehicle.ResetCamearData(vehicle.gameObject.UnityObject.AsGameObject.GetComponent<Rigidbody>());
+                    player.observeCamera.ControllVehicle = vehicle;
+                    return observedPlayer;
+                }
+            }
+            else
+            {
+                player.observeCamera.ControllVehicle = null;
+            }
+            return null;
         }
 
         private float NoramlizeAngle(float angle)

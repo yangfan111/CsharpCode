@@ -16,7 +16,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         PlayerCastLogic GetPlayerCastLogic();
         PlayerStateTipLogic GetPlayerStateTipLogic();
         CommonCastLogic GetCommonCastLogic();
-
+        BuffTipLogic GetBuffTipLogic();
         bool IsCountDown();
     }
 }

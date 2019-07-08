@@ -21,9 +21,14 @@ namespace App.Shared
         {
             return IsStepGameStateAudioValied(playerEntity) && IsStepGlobalStateAudioValied(playerEntity);
         }
+
+        public static bool IsInWater(this PlayerEntity playerEntity)
+        {
+            return SingletonManager.Get<MapConfigManager>().InWater(playerEntity.position.Value);
+        }
         private static bool IsStepGlobalStateAudioValied(this PlayerEntity player)
         {
-            return(player.gamePlay.LifeState != (int)EPlayerLifeState.Dead && !player.IsOnVehicle());
+            return (player.gamePlay.LifeState != (int) EPlayerLifeState.Dead && !player.IsOnVehicle()) &&  !player.IsInWater();
         }
 
         private static bool IsStepGameStateAudioValied(this PlayerEntity player)
@@ -48,16 +53,13 @@ namespace App.Shared
         public static AudioGrp_Footstep GetFootStepState(this PlayerEntity player)
         {
             PostureInConfig curPosture = player.stateInterface.State.GetCurrentPostureState();
-            var inWater = SingletonManager.Get<MapConfigManager>().InWater(player.position.Value);
-            if (inWater)
-                return AudioGrp_Footstep.None;
             return AudioUtil.ToAudioFootGrp(curPosture);
          
         }
 
-        public static PlayerAudioController AudioController(this PlayerEntity playerEntity)
+        public static PlayerAudioControllerBase AudioController(this PlayerEntity playerEntity)
         {
-            return GameModuleManagement.Get<PlayerAudioController>(playerEntity.entityKey.Value.EntityId).Value; }
+            return GameModuleManagement.Get<PlayerAudioControllerBase>(playerEntity.entityKey.Value.EntityId); }
         }
 
 

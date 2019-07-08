@@ -11,11 +11,12 @@ using gameplay.gamerule.free.ui;
 using UnityEngine;
 using com.wd.free.map.position;
 using com.wd.free.unit;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.entity
 {
     [Serializable]
-    public class CreateFixEntityAction : AbstractGameAction
+    public class CreateFixEntityAction : AbstractGameAction, IRule
     {
         public string x;
         public string y;
@@ -74,6 +75,11 @@ namespace App.Server.GameModules.GamePlay.Free.entity
             {
                 en.AddLifeTime(DateTime.Now, FreeUtil.ReplaceInt(lifeTime, args));
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.CreateFixEntityAction;
         }
     }
 }

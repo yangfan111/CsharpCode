@@ -8,11 +8,12 @@ using com.wd.free.para;
 using com.wd.free.unit;
 using com.wd.free.util;
 using gameplay.gamerule.free.rule;
+using Core.Free;
 
 namespace gameplay.gamerule.free.item
 {
     [System.Serializable]
-    public class ItemMoveAction : AbstractPlayerAction
+    public class ItemMoveAction : AbstractPlayerAction, IRule
     {
         private const long serialVersionUID = 883839350426129267L;
 
@@ -55,6 +56,11 @@ namespace gameplay.gamerule.free.item
                     }
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ItemMoveAction;
         }
     }
 }

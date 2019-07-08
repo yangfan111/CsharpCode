@@ -5,13 +5,15 @@ using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.map.position;
 using com.wd.free.util;
+using Core.Free;
 using System;
 using UnityEngine;
+using Utils.Singleton;
 
 namespace App.Server.GameModules.GamePlay.Free.item
 {
     [Serializable]
-    public class RefreshItemAtPosAction : AbstractGameAction
+    public class RefreshItemAtPosAction : AbstractGameAction, IRule
     {
         private string cat;
         private string count;
@@ -19,7 +21,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
         public override void DoAction(IEventArgs args)
         {
-            ItemDrop[] list = FreeItemDrop.GetDropItems(FreeUtil.ReplaceVar(cat, args), FreeUtil.ReplaceInt(count, args), args.GameContext.session.commonSession.RoomInfo.MapId);
+            ItemDrop[] list = SingletonManager.Get<FreeItemDrop>().GetDropItems(FreeUtil.ReplaceVar(cat, args), FreeUtil.ReplaceInt(count, args), args.GameContext.session.commonSession.RoomInfo.MapId);
 
             if (list != null)
             {
@@ -27,10 +29,15 @@ namespace App.Server.GameModules.GamePlay.Free.item
                 foreach (ItemDrop drop in list)
                 {
                     args.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.
-                        CreateSimpleEquipmentEntity((ECategory)drop.cat, drop.id, drop.count, new Vector3(p.x + RandomUtil.Random(-100, 100) / 100f, p.y, p.z + RandomUtil.Random(-100, 100) / 100f));
+                        CreateSimpleObjectEntity((ECategory)drop.cat, drop.id, drop.count, new Vector3(p.x + RandomUtil.Random(-100, 100) / 100f, p.y, p.z + RandomUtil.Random(-100, 100) / 100f));
                 }
             }
 
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.RefreshItemAtPosAction;
         }
     }
 }

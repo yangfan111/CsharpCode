@@ -1,11 +1,14 @@
 using System.Collections.Generic;
 using Sharpen;
+using com.wd.free.para;
+using System;
+using Core.Free;
 
 namespace gameplay.gamerule.free.action
 {
 	[System.Serializable]
-	public class CommonActions : Iterable<CommonGameAction>
-	{
+	public class CommonActions : Iterable<CommonGameAction>, IRule
+    {
 		private IList<CommonGameAction> actions;
 
 		public CommonActions()
@@ -23,7 +26,12 @@ namespace gameplay.gamerule.free.action
 	        this.actions.Clear();
 	    }
 
-		public override Sharpen.Iterator<CommonGameAction> Iterator()
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.CommonActions;
+        }
+
+        public override Sharpen.Iterator<CommonGameAction> Iterator()
 		{
 			return actions.Iterator();
 		}

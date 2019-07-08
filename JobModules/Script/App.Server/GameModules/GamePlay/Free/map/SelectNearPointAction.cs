@@ -10,11 +10,12 @@ using App.Shared.FreeFramework.framework.trigger;
 using com.wd.free.map.position;
 using com.wd.free.unit;
 using Shared.Scripts.MapConfigPoint;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.map
 {
     [Serializable]
-    public class SelectNearPointAction : AbstractGameAction
+    public class SelectNearPointAction : AbstractGameAction, IRule
     {
         private string type;
         private string distance;
@@ -55,6 +56,11 @@ namespace App.Server.GameModules.GamePlay.Free.map
         private bool IsNear(Vector3 v1, Vector3 v2, int dis)
         {
             return (v1.x - v2.x) * (v1.x - v2.x) + (v1.z - v2.z) * (v1.z - v2.z) < dis * dis;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SelectNearPointAction;
         }
     }
 }

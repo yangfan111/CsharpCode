@@ -6,6 +6,7 @@ using App.Shared.GameModules.Player.Appearance.WeaponControllerPackage;
 using Core.Appearance;
 using Utils.Appearance;
 using Core.EntityComponent;
+using UnityEngine;
 using Utils.Appearance.ManagerPackage;
 using Utils.Appearance.WardrobePackage;
 
@@ -16,6 +17,7 @@ namespace App.Shared.GameModules.Player.Appearance
         private readonly WeaponController _weaponController;
         private readonly WardrobeController _wardrobeController;
         private readonly PropController _propController;
+        private readonly RagDollController _ragDollController = new RagDollController();
         public AppearanceManager()
         {
             WeaponControllerBaseImpl = new WeaponController();
@@ -127,6 +129,29 @@ namespace App.Shared.GameModules.Player.Appearance
         public WeaponControllerBase GetController<TPlayerWeaponController>()
         {
             return _weaponController;
+        }
+
+        public override void SetThirdPersonCharacter(GameObject obj)
+        {
+            _ragDollController.SetThirdPersonCharacter(obj);
+            base.SetThirdPersonCharacter(obj);
+        }
+        
+        public void SetRagDollComponent(IGameComponent component)
+        {
+            _ragDollController.SetRagDollComponent((RagDollComponent)component);
+        }
+
+        public override void PlayerReborn()
+        {
+            _ragDollController.ControlRagDoll(false);
+            base.PlayerReborn();
+        }
+
+        public override void PlayerDead()
+        {
+            _ragDollController.ControlRagDoll(true);
+            base.PlayerDead();
         }
     }
 }

@@ -46,7 +46,10 @@ namespace App.Shared.GameModules.Player.Actions
         private static bool CanClimb(PlayerEntity player)
         {
             var postureState = player.stateInterface.State.GetCurrentPostureState();
-            return PostureInConfig.Jump != postureState && PostureInConfig.Climb != postureState;
+            var actionState = player.stateInterface.State.GetActionState();
+            return ActionInConfig.MeleeAttack != actionState && 
+                   PostureInConfig.Jump != postureState && 
+                   PostureInConfig.Climb != postureState;
         }
 
         private static bool IsUnique(PlayerEntity player)
@@ -66,6 +69,7 @@ namespace App.Shared.GameModules.Player.Actions
             switch (gameState.CurrentPlayerLifeState)
             {
                 case PlayerLifeStateEnum.Reborn:
+                case PlayerLifeStateEnum.Dying:
                     Reborn(player);
                     break;
                 case PlayerLifeStateEnum.Dead:

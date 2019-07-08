@@ -1,25 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Shared.GameModules.Player.CharacterState;
-using Core.GameModule.Interface;
-using Core.Utils;
+﻿using Core.Utils;
 using Entitas;
-using Core.Animation;
-using App.Shared.GameModules.Player;
-using App.Shared.Components.Player;
-using App.Shared.Player;
-using Core.WeaponAnimation;
-using UnityEngine;
 using Utils.Singleton;
 
 namespace App.Client.GameModules.Player.PlayerShowPackage
 {
     class PlayerAvatarPlaybackSystem : AbstractPlayerBackSystem<PlayerEntity>
     {
-        private static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerAvatarPlaybackSystem));
-        private CustomProfileInfo _info;
+        private readonly CustomProfileInfo _info;
 
         public PlayerAvatarPlaybackSystem(Contexts contexts) : base(contexts)
         {

@@ -2,12 +2,13 @@ using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.unit;
 using com.wd.free.util;
+using Core.Free;
 
 namespace com.wd.free.map.position
 {
 	[System.Serializable]
-	public class PosAssignSelector : AbstractPosSelector
-	{
+	public class PosAssignSelector : AbstractPosSelector, IRule
+    {
 		private const long serialVersionUID = 310862848114343769L;
 
 		private string x;
@@ -20,7 +21,12 @@ namespace com.wd.free.map.position
 
 		private string pitch;
 
-		public PosAssignSelector()
+        private string invalid;
+
+        private string randomindex;
+
+
+        public PosAssignSelector()
 			: base()
 		{
 		}
@@ -93,7 +99,17 @@ namespace com.wd.free.map.position
 			this.z = z;
 		}
 
-		public override UnitPosition Select(IEventArgs args)
+        public virtual void SetInvalid(string invalid)
+        {
+            this.invalid = invalid;
+        }
+
+        public virtual void SetRandomindex(string randomindex)
+        {
+            this.randomindex = randomindex;
+        }
+
+        public override UnitPosition Select(IEventArgs args)
 		{
 			UnitPosition up = new UnitPosition();
 			up.SetX(FreeUtil.ReplaceFloat(x, args));
@@ -101,12 +117,19 @@ namespace com.wd.free.map.position
 			up.SetZ(FreeUtil.ReplaceFloat(z, args));
 			up.SetYaw(FreeUtil.ReplaceFloat(yaw, args));
 			up.SetPitch(FreeUtil.ReplaceFloat(pitch, args));
-			return up;
+            up.SetInvalid(FreeUtil.ReplaceBool(invalid, args));
+            up.SetRandomindex(FreeUtil.ReplaceInt(randomindex, args));
+            return up;
 		}
 
 		public override string ToString()
 		{
 			return x + "," + y + "," + z;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PosAssignSelector;
+        }
+    }
 }

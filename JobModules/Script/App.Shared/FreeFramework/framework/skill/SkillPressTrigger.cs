@@ -1,10 +1,11 @@
+using Core.Free;
 using Sharpen;
 
 namespace com.wd.free.skill
 {
 	[System.Serializable]
-	public class SkillPressTrigger : ISkillTrigger
-	{
+	public class SkillPressTrigger : ISkillTrigger, IRule
+    {
 		private const long serialVersionUID = 4633526227781233320L;
 
 		private int key;
@@ -49,5 +50,10 @@ namespace com.wd.free.skill
 		{
 			this.key = key;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SkillPressTrigger;
+        }
+    }
 }

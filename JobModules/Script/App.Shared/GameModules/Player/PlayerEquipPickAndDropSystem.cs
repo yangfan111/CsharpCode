@@ -1,8 +1,7 @@
-﻿using Core.GameModule.Interface;
+﻿using App.Shared.Components.Player;
+using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using Core;
-using App.Shared.GameModules.Weapon;
 
 namespace App.Shared.GameModules.Player
 {
@@ -20,7 +19,7 @@ namespace App.Shared.GameModules.Player
         {
             var player = owner.OwnerEntity as PlayerEntity;
             var controller = player.WeaponController();
-            if (IsNotAliveThenIgnoreCmd(player))
+            if (!player.gamePlay.IsLifeState(EPlayerLifeState.Alive))
             {
                 return;
             }
@@ -30,19 +29,19 @@ namespace App.Shared.GameModules.Player
                 {
                     player.ModeController().DoPickup(player, cmd.ManualPickUpEquip);
                 }
-                if(cmd.AutoPickUpEquip.Count > 0)
+                if(cmd.AutoPickUpEquip.Count > 0 && cmd.RenderTime - player.position.ServerTime > 500)
                 {
                     player.ModeController().AutoPickupWeapon(player, cmd.AutoPickUpEquip);
                 }
             }
-            else if (cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsDropWeapon))
+            if (cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsDropWeapon))
             {
                 player.ModeController().Drop(player, controller.HeldSlotType,cmd);
             }
             //投掷时会判断是否已经准备，手雷的对象为Playback，不存在预测回滚的问题
             if (controller.AutoThrowing.HasValue && controller.AutoThrowing.Value)
             {
-                if(null != _userCmdGenerator)
+                if(null != _userCmdGenerator && controller.RelatedThrowAction.IsReady == true)
                 {
                     _userCmdGenerator.SetUserCmd((userCmd) => {
                         userCmd.IsThrowing = true;
@@ -51,11 +50,6 @@ namespace App.Shared.GameModules.Player
                 }
             }
             
-        }
-
-        public bool IsNotAliveThenIgnoreCmd(PlayerEntity player)
-        {
-            return !player.gamePlay.IsLifeState(Components.Player.EPlayerLifeState.Alive);
         }
     }
 }

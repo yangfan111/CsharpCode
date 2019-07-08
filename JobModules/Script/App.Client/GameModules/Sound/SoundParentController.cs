@@ -78,18 +78,18 @@ namespace App.Client.GameModules.Sound
                     }
                     break;
                 case EEntityType.Bullet:
-                    var bullet = _contexts.bullet.GetEntityWithEntityKey(parentKey);
-                    if(null != bullet && bullet.hasBulletGameObject)
-                    {
-                        if(null != bullet.bulletGameObject.UnityObject)
-                        {
-                            go.transform.parent = bullet.bulletGameObject.UnityObject.AsGameObject.transform;
-                        }
-                        else
-                        {
-                            Logger.Error("bullet's gameobject is null");
-                        }
-                    }
+//                    var bullet = _contexts.bullet.GetEntityWithEntityKey(parentKey);
+//                    if(null != bullet && bullet.hasBulletGameObject)
+//                    {
+//                        if(null != bullet.BulletAsset.UnityObject)
+//                        {
+//                            go.transform.parent = bullet.BulletAsset.UnityObject.AsGameObject.transform;
+//                        }
+//                        else
+//                        {
+//                            Logger.Error("bullet's gameobject is null");
+//                        }
+//                    }
                     break;
             }
             go.transform.localPosition = Vector3.zero;

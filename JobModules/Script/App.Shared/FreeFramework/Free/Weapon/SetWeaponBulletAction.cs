@@ -1,12 +1,13 @@
 ﻿using com.wd.free.action;
 using com.wd.free.@event;
+using Core.Free;
 using Core;
 using System;
 
 namespace App.Shared.FreeFramework.Free.Weapon
 {
     [Serializable]
-    public class SetWeaponBulletAction : AbstractPlayerAction
+    public class SetWeaponBulletAction : AbstractPlayerAction, IRule
     {
         public int weaponKey;
         public int front;
@@ -20,10 +21,24 @@ namespace App.Shared.FreeFramework.Free.Weapon
                 var weaponBaseAgent = playerEntity.WeaponController().GetWeaponAgent((EWeaponSlotType) weaponKey);
                 if (weaponBaseAgent.IsValid())
                 {
-                    weaponBaseAgent.BaseComponent.Bullet = front;
-                    weaponBaseAgent.BaseComponent.ReservedBullet = back;
+                    if (front > 0) {
+                        weaponBaseAgent.BaseComponent.Bullet = front;
+                    } else {
+                        weaponBaseAgent.BaseComponent.Bullet = weaponBaseAgent.WeaponConfigAssy.PropertyCfg.Bullet;
+                    }
+                    if (back > 0) {
+                        weaponBaseAgent.BaseComponent.ReservedBullet = back;
+                    } else {
+                        weaponBaseAgent.BaseComponent.ReservedBullet = weaponBaseAgent.WeaponConfigAssy.PropertyCfg.Bulletmax;
+
+                    }
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SetWeaponBulletAction;
         }
     }
 }

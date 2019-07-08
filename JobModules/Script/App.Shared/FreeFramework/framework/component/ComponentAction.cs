@@ -1,12 +1,13 @@
 using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.action;
+using Core.Free;
 
 namespace gameplay.gamerule.free.component
 {
 	[System.Serializable]
-	public class ComponentAction : AbstractGameAction, IComponentable
-	{
+	public class ComponentAction : AbstractGameAction, IComponentable, IRule
+    {
 		private const long serialVersionUID = -3096668947524226601L;
 
 		private string name;
@@ -50,5 +51,10 @@ namespace gameplay.gamerule.free.component
 		{
 			return defaultAction;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ComponentAction;
+        }
+    }
 }

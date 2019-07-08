@@ -10,7 +10,7 @@ using EVP;
 using UnityEngine;
 using Utils.Singleton;
 
-namespace App.Shared.GameModules.Bullet
+namespace App.Shared.GameModules.Attack
 {
     public class VehicleHitBoxContext : IHitBoxContext
     {
@@ -70,7 +70,7 @@ namespace App.Shared.GameModules.Bullet
             return null;
         }
 
-        public void UpdateHitBox(IGameEntity gameEntity)
+        public void UpdateHitBox(IGameEntity gameEntity, int renderTime, int cmdSeq)
         {
             var position = gameEntity.Position.Value;
             var hitBoxComponent = GetHitBoxComponent(gameEntity.EntityKey);
@@ -81,6 +81,11 @@ namespace App.Shared.GameModules.Bullet
 
             var vehicle = GetVehicleEntity(gameEntity);
             vehicle.UpdateHitBoxes(gameEntity);
+        }
+
+        public void RecoverHitBox(IGameEntity gameEntity, int renderTime)
+        {
+           
         }
 
         private VehicleEntity GetVehicleEntity(IGameEntity gameEntity)

@@ -1,22 +1,17 @@
 ﻿using App.Server.GameModules.GamePlay.free.player;
-using App.Server.GameModules.GamePlay.Free.item.config;
-using App.Shared.Components.Player;
-using App.Shared.FreeFramework.framework.util;
-using App.Shared.GameModules.Bullet;
+using App.Shared.GameModules.Attack;
+using Assets.App.Server.GameModules.GamePlay.Free;
+using Assets.Utils.Configuration;
 using com.wd.free.@event;
 using com.wd.free.item;
 using Core.Enums;
+using Core.Free;
+using Free.framework;
 using System;
-using WeaponConfigNs;
+using Utils.Singleton;
 
 namespace App.Server.GameModules.GamePlay.Free.item
 {
-    public enum ItemType
-    {
-        Armor,
-        Helmet
-    }
-
     public class ReduceDamageUtil
     {
         public static ItemPosition GetArmor(FreeData fd)
@@ -59,163 +54,89 @@ namespace App.Server.GameModules.GamePlay.Free.item
             {
                 return readDamage;
             }
-            if (damage.part == (int)EBodyPart.Head)
+
+            PlayerEntity playerEntity = fd.Player;
+            if (playerEntity.gamePlay.CurHelmet > 0)
             {
-                ItemPosition ip = GetHelmet(fd);
-                if (ip != null)
+                var config = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(playerEntity.gamePlay.HelmetLv);
+                if (config != null)
                 {
-                    FreeItemInfo info = FreeItemConfig.GetItemInfo(ip.key.GetKey());
-
-                    int percent = 0;
-                    if (info.id == 8)
+                    if (config.NewWeaponCfg.ProtectivePartsList.Contains(damage.part))
                     {
-                        percent = 30;
+                        float reduce = readDamage * config.NewWeaponCfg.DamageReduction / 100;
+                        reduce = Math.Min(playerEntity.gamePlay.CurHelmet, reduce);
+                        playerEntity.gamePlay.CurHelmet = Math.Max(0, playerEntity.gamePlay.CurHelmet - (int) readDamage);
+                        if (reduce > 0 && playerEntity.gamePlay.CurHelmet == 0)
+                        {
+                            playerEntity.gamePlay.HelmetLv = playerEntity.gamePlay.MaxHelmet = 0;
+                            SimpleProto msg = FreePool.Allocate();
+                            msg.Key = FreeMessageConstant.ChickenTip;
+                            msg.Ss.Add("word75," + config.NewWeaponCfg.Name);
+                            FreeMessageSender.SendMessage(playerEntity, msg);
+                        }
+                        ItemPosition ip = GetHelmet(fd);
+                        if (ip != null)
+                        {
+                            args.TempUse("current", (FreeData) playerEntity.freeData.FreeData);
+                            if (playerEntity.gamePlay.CurHelmet == 0)
+                            {
+                                ip.GetInventory().RemoveItem((FreeRuleEventArgs)args, ip);
+                            }
+                            else
+                            {
+                                ip.SetCount(playerEntity.gamePlay.CurHelmet);
+                                ip.GetInventory().GetInventoryUI().UpdateItem((FreeRuleEventArgs)args, ip.GetInventory(), ip);
+                            }
+                            args.Resume("current");
+                        }
+                        damage.damage -= reduce;
+                        readDamage = damage.damage;
+                        playerEntity.statisticsData.Statistics.DefenseDamage += reduce;
                     }
-                    if (info.id == 9)
-                    {
-                        percent = 40;
-                    }
-                    else if (info.id == 10)
-                    {
-                        percent = 55;
-                    }
-
-                    readDamage = ReduceDamage(args, fd, damage, ip, percent, ItemType.Helmet);
                 }
             }
-            else if (damage.part == (int)EBodyPart.Chest || damage.part == (int)EBodyPart.Stomach || damage.part == (int)EBodyPart.Pelvis)
-            {
-                ItemPosition ip = GetArmor(fd);
-                if (ip != null)
-                {
-                    FreeItemInfo info = FreeItemConfig.GetItemInfo(ip.key.GetKey());
-                    int percent = 0;
-                    if (info.id == 1)
-                    {
-                        percent = 30;
-                    }
-                    if (info.id == 2)
-                    {
-                        percent = 40;
-                    }
-                    else if (info.id == 3)
-                    {
-                        percent = 55;
-                    }
 
-                    readDamage = ReduceDamage(args, fd, damage, ip, percent, ItemType.Armor);
+            if (playerEntity.gamePlay.CurArmor > 0)
+            {
+                var config = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(playerEntity.gamePlay.ArmorLv);
+                if (config != null)
+                {
+                    if (config.NewWeaponCfg.ProtectivePartsList.Contains(damage.part))
+                    {
+                        float reduce = readDamage * config.NewWeaponCfg.DamageReduction / 100;
+                        reduce = Math.Min(playerEntity.gamePlay.CurArmor, reduce);
+                        playerEntity.gamePlay.CurArmor = Math.Max(0, playerEntity.gamePlay.CurArmor - (int) readDamage);
+                        if (reduce > 0 && playerEntity.gamePlay.CurArmor == 0)
+                        {
+                            playerEntity.gamePlay.ArmorLv = playerEntity.gamePlay.MaxArmor = 0;
+                            SimpleProto msg = FreePool.Allocate();
+                            msg.Key = FreeMessageConstant.ChickenTip;
+                            msg.Ss.Add("word75," + config.NewWeaponCfg.Name);
+                            FreeMessageSender.SendMessage(playerEntity, msg);
+                        }
+                        ItemPosition ip = GetArmor(fd);
+                        if (ip != null)
+                        {
+                            args.TempUse("current", (FreeData) playerEntity.freeData.FreeData);
+                            if (playerEntity.gamePlay.CurArmor == 0)
+                            {
+                                ip.GetInventory().RemoveItem((FreeRuleEventArgs)args, ip);
+                            }
+                            else
+                            {
+                                ip.SetCount(playerEntity.gamePlay.CurArmor);
+                                ip.GetInventory().GetInventoryUI().UpdateItem((FreeRuleEventArgs)args, ip.GetInventory(), ip);
+                            }
+                            args.Resume("current");
+                        }
+                        damage.damage -= reduce;
+                        readDamage = damage.damage;
+                        playerEntity.statisticsData.Statistics.DefenseDamage += reduce;
+                    }
                 }
             }
 
             return readDamage;
-        }
-
-        private static float ReduceDamage(IEventArgs args, FreeData fd, PlayerDamageInfo damage, ItemPosition ip, int percent, ItemType itemType)
-        {
-            if (ip != null)
-            {
-                float realDamage = damage.damage;
-                float reduce = damage.damage * percent / 100;
-                float realReduce = reduce;
-
-                damage.damage -= realReduce;
-                fd.Player.statisticsData.Statistics.DefenseDamage += reduce;
-
-                // 普通帽子不减少
-                if (reduce > 0)
-                {
-                    ip.SetCount(ip.GetCount() - (int)realDamage);
-                    UpdateGamePlayData(fd, ip, itemType);
-
-                    args.TempUse("current", fd);
-
-                    if (ip.GetCount() <= 0)
-                    {
-                        ip.GetInventory().RemoveItem((FreeRuleEventArgs)args, ip);
-                        FuntionUtil.Call(args, "showBottomTip", "msg", "{desc:10075," + ip.key.GetName() + "}");
-                    }
-                    else
-                    {
-                        ip.GetInventory().GetInventoryUI().UpdateItem((FreeRuleEventArgs)args, ip.GetInventory(), ip);
-                    }
-
-                    args.Resume("current");
-                }
-            }
-
-            return damage.damage;
-        }
-
-        public static void UpdateArmorAndHelmet(FreeData fd)
-        {
-            UpdateGamePlayData(fd, GetArmor(fd), ItemType.Armor);
-            UpdateGamePlayData(fd, GetHelmet(fd), ItemType.Helmet);
-            var armor = GetArmor(fd);
-            var helmet = GetHelmet(fd);
-            var bag = GetBag(fd);
-            if (null != armor && FreeItemConfig.GetItemInfo(armor.key.GetKey()).id == 3
-             && null != helmet && FreeItemConfig.GetItemInfo(helmet.key.GetKey()).id == 10
-             && null != bag && FreeItemConfig.GetItemInfo(bag.key.GetKey()).id == 6)
-            {
-                fd.Player.statisticsData.Statistics.IsFullArmed = true;
-            }
-        }
-
-        public static void UpdateGamePlayData(FreeData fd, ItemPosition ip, ItemType itemType)
-        {
-            GamePlayComponent gamePlay = fd.Player.gamePlay;
-
-            if (ip == null)
-            {
-                if(itemType == ItemType.Armor)
-                {
-                    gamePlay.MaxArmor = 0;
-                    gamePlay.CurArmor = 0;
-                }
-                if (itemType == ItemType.Helmet)
-                {
-                    gamePlay.MaxHelmet = 0;
-                    gamePlay.CurHelmet = 0;
-                }
-            }
-            else
-            {
-                FreeItemInfo itemInfo = FreeItemConfig.GetItemInfo(ip.key.GetKey());
-                switch (itemType)
-                {
-                    case ItemType.Armor:
-                        gamePlay.CurArmor = Math.Max(0, ip.GetCount());
-                        if (itemInfo.id == 1)
-                        {
-                            gamePlay.MaxArmor = 200;
-                        }
-                        else if (itemInfo.id == 2)
-                        {
-                            gamePlay.MaxArmor = 220;
-                        }
-                        else if (itemInfo.id == 3)
-                        {
-                            gamePlay.MaxArmor = 250;
-                        }
-                        break;
-                    case ItemType.Helmet:
-                        gamePlay.CurHelmet = Math.Max(0, ip.GetCount());
-                        if (itemInfo.id == 8)
-                        {
-                            gamePlay.MaxHelmet = 80;
-                        }
-                        else if (itemInfo.id == 9)
-                        {
-                            gamePlay.MaxHelmet = 150;
-                        }
-                        else if (itemInfo.id == 10)
-                        {
-                            gamePlay.MaxHelmet = 230;
-                        }
-                        break;
-                }
-            }
-
         }
     }
 }

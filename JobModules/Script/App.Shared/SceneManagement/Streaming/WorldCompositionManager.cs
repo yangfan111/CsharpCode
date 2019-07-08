@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Security.Permissions;
 using System.Text.RegularExpressions;
+using App.Shared.Configuration;
+using Assets.XmlConfig;
 using Core.Utils;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Utils.AssetManager;
-
+using XmlConfig;
 namespace App.Shared.SceneManagement.Streaming
 {
     class WorldCompositionManager
@@ -63,8 +66,11 @@ namespace App.Shared.SceneManagement.Streaming
 
             // outside parameter measured in grid distance between player and border
             // since center is used, extra 0.5 need to be added
+            //TESTCODE
             _param.LoadRadiusInGrid += 0.5f;
             _param.UnloadRadiusInGrid += 0.5f;
+            //_param.LoadRadiusInGrid = 0.5f;
+            //_param.UnloadRadiusInGrid = 0.5f;
         }
 
         public void UpdateOrigin(Vector3 pos)
@@ -107,7 +113,76 @@ namespace App.Shared.SceneManagement.Streaming
             {
                 var node = _sceneNameToScene[scene.name];
                 node.Status = SceneLoadingStatus.Loaded;
+                if(SharedConfig.needConfigLODTree)
+                {
+                    updateTreeLODConfig(scene);
+                }
+                
             }
+            
+            
+        }
+
+        void updateTreeLODConfig(Scene scene)
+        {
+            GameObject[] roots = scene.GetRootGameObjects();
+            for(int i = 0; i < roots.Length; i++)
+            {
+                bool flag = updateTerreinTreeLOD(roots[i]);
+                if(flag)
+                {
+                    break;
+                }
+            }
+        }
+
+        bool updateTerreinTreeLOD(GameObject obj)
+        {
+            Terrain terrain = obj.GetComponent<Terrain>();
+            if(terrain == null)
+            {
+                return false;
+            }
+
+            string path = Application.streamingAssetsPath + "/LODConfig.xml";
+            if(!File.Exists(path))
+            {
+                return true;
+            }
+
+            string configStr = File.ReadAllText(path);
+            TreeLODConfig config = XmlConfigParser<TreeLODConfig>.Load(configStr);
+
+            TreePrototype[] treeProps = terrain.terrainData.treePrototypes;
+            for(int i = 0; i < treeProps.Length; i++)
+            {
+                TreePrototype treeP = treeProps[i];
+                GameObject tree = treeP.prefab;
+               
+                for (int k = 0; k < config.LODSettings.Count; k++)
+                {
+                    if (tree.name == config.LODSettings[k].assetName)
+                    {
+                        LODGroup group = tree.GetComponent<LODGroup>();
+                        if(group == null)
+                        {
+                            continue;
+                        }
+                        LOD[] arr = group.GetLODs();
+                        TreeLODItem item = config.LODSettings[k];
+                        for (int j = 0; j < arr.Length && j < item.LODPercent.Count; j++)
+                        {
+                            arr[j].screenRelativeTransitionHeight = item.LODPercent[j];
+                        }
+                        group.SetLODs(arr);
+                        break;
+                    }
+                }
+                
+
+               
+            }
+            return true;
         }
 
         public void SceneUnloaded(Scene scene)
@@ -137,21 +212,25 @@ namespace App.Shared.SceneManagement.Streaming
 
         private bool IsSceneShouldBeVisible(Vector2 gridCoordinate, Vector2 sceneCenter)
         {
-            return Math.Abs(gridCoordinate.x - sceneCenter.x) <= _param.LoadRadiusInGrid
-                   && Math.Abs(gridCoordinate.y - sceneCenter.y) <= _param.LoadRadiusInGrid;
+            var loadRadius = WorldCompositionParam.LoadRadiusFromGM > 0 ? WorldCompositionParam.LoadRadiusFromGM : _param.LoadRadiusInGrid;
+            return Math.Abs(gridCoordinate.x - sceneCenter.x) <= loadRadius
+                   && Math.Abs(gridCoordinate.y - sceneCenter.y) <= loadRadius;
         }
 
         private bool IsSceneShouldBeInvisible(Vector2 gridCoordinate, Vector2 sceneCenter)
         {
-            return Math.Abs(gridCoordinate.x - sceneCenter.x) >= _param.UnloadRadiusInGrid
-                   || Math.Abs(gridCoordinate.y - sceneCenter.y) >= _param.UnloadRadiusInGrid;
+            var unloadRadius = WorldCompositionParam.UnloadRadiusFromGM > 0 ? WorldCompositionParam.UnloadRadiusFromGM : _param.UnloadRadiusInGrid;
+            return Math.Abs(gridCoordinate.x - sceneCenter.x) >= unloadRadius
+                   || Math.Abs(gridCoordinate.y - sceneCenter.y) >= unloadRadius;
         }
 
         private void LoadScene(string sceneName)
         {
+            
             _streamingManager.LoadScene(new AssetInfo
             {
-                BundleName = _param.AssetBundleName,
+                //BundleName = _param.AssetBundleName,
+                BundleName = _param.PreMapName + "/scene",
                 AssetName = sceneName
             });
         }

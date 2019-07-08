@@ -1,30 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using App.Shared.Components;
-using App.Shared.Components.Player;
-using App.Shared.Configuration;
-using App.Shared.GameModules.Player;
-using App.Shared.GameModules.Player.CharacterState;
-using Core.CharacterState;
-using Core.CharacterState.Movement;
-using Core.Compare;
-using Core.Configuration;
+﻿using App.Shared.Components.Player;
+using App.Shared.Player;
+using Core.Components;
 using Core.GameModule.Interface;
-using Core.HitBox;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using UnityEngine;
-using Utils.Appearance;
-using Utils.Configuration;
 using XmlConfig;
-using App.Shared.Player;
-using Core.CameraControl;
-using Core.CharacterController;
-using App.Shared.GameModules.Player.Appearance;
-using Core.CharacterController.ConcreteController;
-using Core.Components;
-using Utils.Singleton;
-using Utils.Utils;
 
 namespace App.Shared.GameModules.Player
 {
@@ -67,7 +48,7 @@ namespace App.Shared.GameModules.Player
             {
                 return;
             }
-            
+        
             player.playerMove.ClearState();
 
             // swimhandler和divehandler未解耦，handler内部函数声明为static，解耦后可以不使用switch
@@ -119,8 +100,8 @@ namespace App.Shared.GameModules.Player
 
         private void CorrectPositionByServer(IUserCmd cmd, PlayerEntity player)
         {
-           
-            if ( player.latestAdjustCmd.HasPos()) player.position.Value =  player.latestAdjustCmd.GetPos(cmd.Seq);
+            if (player.latestAdjustCmd.HasPos())
+                player.RootGo().transform.position = player.position.Value = player.latestAdjustCmd.GetPos(cmd.Seq);
         }
 
         private MoveType GetPlayerMoveType(PlayerEntity player)
@@ -191,7 +172,7 @@ namespace App.Shared.GameModules.Player
                 return false;
             }
 
-            if (player.IsOnVehicle() || PlayerStateUtil.HasPlayerState(EPlayerGameState.NotMove, player.gamePlay))
+            if (player.IsOnVehicle() || PlayerStateUtil.HasPlayerState(EPlayerGameState.OnPlane, player.gamePlay))
             {
                 return false;
             }

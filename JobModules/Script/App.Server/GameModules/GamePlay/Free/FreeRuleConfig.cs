@@ -14,6 +14,7 @@ using App.Server.GameModules.GamePlay.Free.player;
 using App.Server.GameModules.GamePlay.Free.replacer;
 using App.Server.GameModules.GamePlay.Free.ui;
 using App.Server.GameModules.GamePlay.Free.weapon;
+using App.Shared.FreeFramework.framework.ui.component;
 using App.Shared.FreeFramework.Free.Action;
 using App.Shared.FreeFramework.Free.Map;
 using App.Shared.FreeFramework.UnitTest;
@@ -27,6 +28,7 @@ using com.wd.free.xml;
 using commons.data;
 using commons.data.mysql;
 using commons.util;
+using Core.Free;
 using gameplay.gamerule.free.action;
 using gameplay.gamerule.free.component;
 using gameplay.gamerule.free.item;
@@ -47,7 +49,7 @@ using UnityEngine;
 namespace App.Server.GameModules.GamePlay
 {
     [Serializable]
-    public class FreeRuleConfig
+    public class FreeRuleConfig : IRule
     {
         private string name;
         private TriggerList triggers;
@@ -362,10 +364,12 @@ namespace App.Server.GameModules.GamePlay
             aliasOne(alias, new ServerShutdownAction());
             aliasOne(alias, new SetUnitTestDataAction());
             aliasOne(alias, new ConsoleCommandAction());
+            aliasOne(alias, new PlayerStageSetAction());
+            aliasOne(alias, new GameTimeMarkAction());
         }
 
         // 会把父类的字段也会加入，需要注意当以前的代码中父类的字段没有按照这样的命名规范时会有问题
-        private static void aliasOne(XmlAlias alias, object obj)
+        private static void aliasOne(XmlAlias alias, IRule obj)
         {
             string classAlias = ToXmlName(obj.GetType().Name);
             alias.AddClass(classAlias, obj);
@@ -413,7 +417,7 @@ namespace App.Server.GameModules.GamePlay
 
         private static void aliasUI(XmlAlias alias)
         {
-            alias.AddClass("poison-circle-action", new PoisonCirlceAction());
+            alias.AddClass("poison-circle-action", new PoisonCircleAction());
             alias.AddField("poison-circle-action", "fromPos", "from-pos");
             alias.AddField("poison-circle-action", "toPos", "to-pos");
             alias.AddAttribue("poison-circle-action", "fromRadius", "from-radius");
@@ -467,6 +471,9 @@ namespace App.Server.GameModules.GamePlay
             alias.AddAttribue("free-position", "notSame", "not-same");
             alias.AddAttribue("free-position", "birth", "birth");
 
+            alias.AddClass("not-same-position", new NotSamePosSelector());
+            alias.AddAttribue("not-same-position", "type", "type");
+
             alias.AddClass("angle-position", new PosAngleSelector());
             alias.AddAttribue("angle-position", "radius", "radius");
             alias.AddAttribue("angle-position", "angle", "angle");
@@ -516,6 +523,7 @@ namespace App.Server.GameModules.GamePlay
             alias.AddClass("point-auto", new AutoPointValue());
             alias.AddClass("rotate-auto", new AutoRotateValue());
             alias.AddClass("position-auto", new AutoPositionValue());
+            alias.AddClass("scale-auto", new AutoScaleValue());
             alias.AddClass("two-position-auto", new AutoTwoPositionValue());
             alias.AddClass("percent-auto", new AutoPercentValue());
             alias.AddClass("cover-auto", new AutoImgCoverValue());
@@ -772,5 +780,9 @@ namespace App.Server.GameModules.GamePlay
             alias.AddAttribue("resort-inventory-action", "order", "order");
         }
 
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeRuleConfig;
+        }
     }
 }

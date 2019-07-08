@@ -26,6 +26,8 @@ namespace Core.Prediction.UserPrediction
         private IUserCmd _currentCmd;
         private IUserCmdOwner _currentUserCmdOwner;
         private ISyncUpdateLatestMsgHandler _syncUpdateLatestMsgHandler;
+        private CustomProfileInfo _syncToEntityProfile;
+        private CustomProfileInfo _filtedInputProfile;
 
         public UserCmdUpdateMsgExecuteManagerSystem(IGameModule gameModule,
             IUserCmdExecuteSystemHandler handler, ISyncUpdateLatestMsgHandler syncUpdateLatestMsgHandler)
@@ -33,7 +35,10 @@ namespace Core.Prediction.UserPrediction
             _systems = gameModule.UserCmdExecuteSystems;
             _handler = handler;
             _syncUpdateLatestMsgHandler = syncUpdateLatestMsgHandler;
-
+            _syncToEntityProfile =
+                SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("UserPrediction_SyncToEntity"); 
+            _filtedInputProfile =
+                SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("UserPrediction_FiltedInput");
             Init();
         }
 
@@ -55,9 +60,31 @@ namespace Core.Prediction.UserPrediction
                 foreach (IUserCmdOwner owner in _handler.UserCmdOwnerList)
                 {
                     _currentUserCmdOwner = owner;
+                    if (!owner.IsEnable())
+                    {
+                        _logger.ErrorFormat("player {0}is destroyed", owner.OwnerEntityKey);
+                        continue;
+                    }
+                    if (owner.UpdateList.Count > 100)
+                    {
+                        _logger.ErrorFormat("!!!!!!!!!!!!!!!!!!!Too Many cmd:{0}  {1}",owner.OwnerEntityKey,
+                            owner.UpdateList.Count);
+                        owner.UpdateList.RemoveRange(0,owner.UpdateList.Count -100);
+                    }
+
+                    int executeCount = 0;
                     foreach (var update in owner.UpdateList)
                     {
-                        _syncUpdateLatestMsgHandler.SyncToEntity(_currentUserCmdOwner, update);
+                        try
+                        {
+                            _syncToEntityProfile.BeginProfileOnlyEnableProfile();
+                            _syncUpdateLatestMsgHandler.SyncToEntity(_currentUserCmdOwner, update);
+                        }
+                        finally
+                        {
+                            _syncToEntityProfile.EndProfileOnlyEnableProfile();
+                        }
+                      
 
                         foreach (var userCmd in owner.UserCmdList)
                         {
@@ -71,8 +98,16 @@ namespace Core.Prediction.UserPrediction
 
                             _logger.DebugFormat("processing user cmd {0}", _currentCmd);
 
-
-                            userCmd.FilteredInput = owner.GetFiltedInput(userCmd);
+                            try
+                            {
+                                _filtedInputProfile.BeginProfileOnlyEnableProfile();
+                                userCmd.FilteredInput = owner.GetFiltedInput(userCmd);
+                            }
+                            finally
+                            {
+                                _filtedInputProfile.EndProfileOnlyEnableProfile();
+                            }
+                          
                             // _logger.InfoFormat("{0} execute cmd {1} ", update.Head.UserCmdSeq, userCmd.Seq);
                             ExecuteSystems();
                             userCmd.FilteredInput = null;
@@ -80,6 +115,11 @@ namespace Core.Prediction.UserPrediction
                         }
 
                         owner.LastestExecuteUserCmdSeq = update.Head.UserCmdSeq;
+                        executeCount++;
+                        if (executeCount > MaxEcecutePreFrame)
+                        {
+                            break;
+                        }
                     }
                 }
             }
@@ -88,5 +128,7 @@ namespace Core.Prediction.UserPrediction
                 SingletonManager.Get<DurationHelp>().ProfileEnd(CustomProfilerStep.UserPrediction);
             }
         }
+
+        public int MaxEcecutePreFrame = 20;
     }
 }

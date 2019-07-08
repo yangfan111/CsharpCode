@@ -15,11 +15,12 @@ using UnityEngine;
 using App.Server.GameModules.GamePlay.free.player;
 using Utils.AssetManager;
 using gameplay.gamerule.free.ui.component;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.entity
 {
     [Serializable]
-    public class CreateMoveEntityAction : AbstractPlayerAction
+    public class CreateMoveEntityAction : AbstractPlayerAction, IRule
     {
         public String name;
         public IFreeMove move;
@@ -50,7 +51,9 @@ namespace App.Server.GameModules.GamePlay.Free.entity
             en.AddFreeData(FreeUtil.ReplaceVar(name, args), new FreeEntityData(en));
             en.freeData.Cat = "";
             en.freeData.Value = "";
-            en.freeData.Scale = new Vector3(1, 1, 1);
+            en.freeData.ScaleX = 1f;
+            en.freeData.ScaleY = 1f;
+            en.freeData.ScaleZ = 1f;
 
             if (distance > 0)
             {
@@ -136,6 +139,11 @@ namespace App.Server.GameModules.GamePlay.Free.entity
             GameObject go = unityObj.AsGameObject;
             go.name = this.name;
             ((FreeEntityData)obj).gameObject = go;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.CreateMoveEntityAction;
         }
     }
 }

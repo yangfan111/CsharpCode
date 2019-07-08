@@ -1,5 +1,4 @@
 ﻿using App.Server.GameModules.GamePlay.Free.player;
-using App.Shared;
 using App.Shared.FreeFramework.framework.buf;
 using com.wd.free.buf;
 using com.wd.free.item;
@@ -7,7 +6,6 @@ using com.wd.free.para;
 using com.wd.free.skill;
 using com.wd.free.unit;
 using Core.Free;
-using Entitas;
 
 namespace App.Server.GameModules.GamePlay.free.player
 {
@@ -46,6 +44,7 @@ namespace App.Server.GameModules.GamePlay.free.player
             AddFields(new ObjectFields(player.playerInfo));
             AddFields(new ObjectFields(player.gamePlay));
             AddFields(new ObjectFields(player.orientation));
+            
             //    AddFields(new ObjectFields(player.weaponState));
             AddFields(new PlayerFields(AllContexts, player));
             if (player.hasPlayerMask)

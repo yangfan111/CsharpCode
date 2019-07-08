@@ -1,4 +1,5 @@
 ﻿using Core.EntityComponent;
+using Core.Free;
 using System;
 using UnityEngine;
 
@@ -14,7 +15,7 @@ namespace Core.Statistics
         }
     }
 
-    public class StatisticsData
+    public class StatisticsData : IRule
     {
         public bool DataCollectSwitch;
         /// <summary>
@@ -245,7 +246,7 @@ namespace Core.Statistics
         /// <summary>
         /// 上次击杀的时间
         /// </summary>
-        public int LastKillTime;
+        public long LastKillTime;
 
         /// <summary>
         /// 死亡的持续时间
@@ -255,7 +256,7 @@ namespace Core.Statistics
         /// <summary>
         /// 上次死亡的时间
         /// </summary>
-        public int LastDeadTime;
+        public long LastDeadTime;
 
         public int Rank;
 
@@ -263,5 +264,15 @@ namespace Core.Statistics
         public int C4DefuseCount;
         public bool HasC4;
         public long RevengeKillerId;
+        
+        // 是否是重击
+        public int AttackType;
+
+        public long GameJoinTime;
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.StatisticsData;
+        }
     }
 }

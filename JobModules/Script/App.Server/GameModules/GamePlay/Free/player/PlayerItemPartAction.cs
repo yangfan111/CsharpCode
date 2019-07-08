@@ -22,7 +22,7 @@ using App.Shared.GameModules.Weapon;
 namespace App.Server.GameModules.GamePlay.Free.player
 {
     [Serializable]
-    public class PlayerItemPartAction : AbstractPlayerAction
+    public class PlayerItemPartAction : AbstractPlayerAction, IRule
     {
         private bool delete;
         private string weaponKey;
@@ -76,6 +76,11 @@ namespace App.Server.GameModules.GamePlay.Free.player
 
             }
 
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerItemPartAction;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using App.Client.CastObjectUtil;
 using App.Shared;
 using App.Shared.GameMode;
+using Core;
 using Core.EntityComponent;
 using Core.Free;
 using Core.Prediction.UserPrediction.Cmd;
@@ -26,7 +27,7 @@ namespace App.Client.GameMode
             get { return _contexts.player.flagSelfEntity; }
         }
 
-        public ClientSurvivalPickupDropHandler(Contexts contexts,int modeId) : base(contexts,modeId)
+        public ClientSurvivalPickupDropHandler(Contexts contexts, int modeId) : base(contexts, modeId)
         {
             _userCmdGenerator = contexts.session.clientSessionObjects.UserCmdGenerator;
             _contexts = contexts;
@@ -40,9 +41,8 @@ namespace App.Client.GameMode
             {
                 return;
             }
+
             SimpleProto pickUp = FreePool.Allocate();
-            _userCmdGenerator.SetUserCmd((cmd) => cmd.IsManualPickUp = true);
-            _userCmdGenerator.SetUserCmd((cmd) => cmd.IsUseAction = true);
             pickUp.Key = FreeMessageConstant.PickUpItem;
             pickUp.Ins.Add(entityId);
             pickUp.Ins.Add(category);
@@ -58,21 +58,28 @@ namespace App.Client.GameMode
         public override void SendAutoPickupWeapon(int entityId)
         {
             var target = _contexts.sceneObject.GetEntityWithEntityKey(new EntityKey(entityId, (short)EEntityType.SceneObject));
-            var model = target.hasUnityObject ? target.unityObject.UnityObject : target.multiUnityObject.FirstAsset;
-            if (!CommonObjectCastUtil.HasObstacleBetweenPlayerAndItem(Player, target.position.Value, model))
+            if (target != null && Player.WeaponController().FilterAutoPickup(target.simpleItem.Id))
             {
-                _userCmdGenerator.SetUserCmd((cmd) => cmd.AutoPickUpEquip.Add(entityId));
-            }
+                var model = target.hasUnityObject ? target.unityObject.UnityObject : target.multiUnityObject.FirstAsset;
+                if (CommonObjectCastUtil.HasObstacleBetweenPlayerAndItem(Player, target.position.Value, model))
+                {
+                    return;
+                }
 
-            SimpleProto pickUp = FreePool.Allocate();
-            _userCmdGenerator.SetUserCmd((cmd) => cmd.IsManualPickUp = true);
-            _userCmdGenerator.SetUserCmd((cmd) => cmd.IsUseAction = true);
-            pickUp.Key = FreeMessageConstant.PickUpItem;
-            pickUp.Ins.Add(entityId);
-            pickUp.Ins.Add(target.simpleEquipment.Category);
-            pickUp.Ins.Add(target.simpleEquipment.Id);
-            pickUp.Ins.Add(1);
-            Player.network.NetworkChannel.SendReliable((int)EClient2ServerMessage.FreeEvent, pickUp);
+                SimpleProto pickUp = FreePool.Allocate();
+                pickUp.Key = FreeMessageConstant.PickUpItem;
+                pickUp.Ins.Add(entityId);
+                pickUp.Ins.Add(target.simpleItem.Category);
+                pickUp.Ins.Add(target.simpleItem.Id);
+                pickUp.Ins.Add(1);
+                Player.network.NetworkChannel.SendReliable((int)EClient2ServerMessage.FreeEvent, pickUp);
+            }
+        }
+
+        protected override void DoDropGrenade(PlayerEntity playerEntity, EWeaponSlotType slot, IUserCmd cmd)
+        {
+            _userCmdGenerator.SetUserCmd((userCmd) => userCmd.IsLeftAttack = true);
+            playerEntity.WeaponController().AutoThrowing = true;
         }
     }
 }

@@ -6,11 +6,12 @@ using System.Text;
 using com.wd.free.@event;
 using App.Server.GameModules.GamePlay.free.player;
 using com.cpkf.yyjd.tools.util;
+using Core.Free;
 
 namespace com.wd.free.buf
 {
     [Serializable]
-    public class DefinePlayerBufAction : AbstractPlayerAction
+    public class DefinePlayerBufAction : AbstractPlayerAction, IRule
     {
         public int buf;
         public IGameAction startAction;
@@ -31,6 +32,11 @@ namespace com.wd.free.buf
 
                 player.Bufs.RegisterPlayerBuf(buf);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.DefinePlayerBufAction;
         }
     }
 }

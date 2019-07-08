@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using Sharpen;
 using com.wd.free.@event;
+using Core.Free;
 
 namespace com.wd.free.action
 {
 	[System.Serializable]
-	public class MultiGameAction : AbstractGameAction
-	{
+	public class MultiGameAction : AbstractGameAction, IRule
+    {
 		private const long serialVersionUID = -714645490977369377L;
 
 		private IList<IGameAction> actions;
@@ -30,6 +31,11 @@ namespace com.wd.free.action
 			}
 			return actions;
 		}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.MultiGameAction;
+        }
 
         public override void Reset(IEventArgs args)
         {

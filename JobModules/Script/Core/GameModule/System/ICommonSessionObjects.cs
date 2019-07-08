@@ -3,13 +3,13 @@ using Utils.AssetManager;
 using Core.EntitasAdpater;
 using Core;
 using Core.IFactory;
-using Core.WeaponLogic;
-using Core.Common;
+
+
 using Core;
 using Core.Room;
 using Core.Configuration;
 using Core.Free;
-using Core.BulletSimulation;
+using Core.Attack;
 using Core.SceneManagement;
 using UnityEngine;
 using App.Shared;
@@ -35,7 +35,6 @@ namespace Core.GameModule.System
         IEntityIdGenerator EntityIdGenerator{ get; set; }
         IEntityIdGenerator EquipmentEntityIdGenerator { get; set; }
         IFreeArgs FreeArgs{ get; set; }
-        IBulletInfoCollector BulletInfoCollector { get; set; }
         ILevelManager LevelManager { get; set; }
         Vector3 InitPosition { get; set; }
     }

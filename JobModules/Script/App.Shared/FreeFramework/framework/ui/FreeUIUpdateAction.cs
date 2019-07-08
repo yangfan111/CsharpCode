@@ -5,12 +5,13 @@ using com.wd.free.@event;
 using com.wd.free.util;
 using Free.framework;
 using gameplay.gamerule.free.ui.component;
+using Core.Free;
 
 namespace gameplay.gamerule.free.ui
 {
 	[System.Serializable]
-	public class FreeUIUpdateAction : SendMessageAction
-	{
+	public class FreeUIUpdateAction : SendMessageAction, IRule
+    {
 		private const long serialVersionUID = -1188091456904593121L;
 
 		private string key;
@@ -124,5 +125,10 @@ namespace gameplay.gamerule.free.ui
 			}
 			return "更新UI'" + key + d + "'\n" + builder.ToString();
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeUIUpdateAction;
+        }
+    }
 }

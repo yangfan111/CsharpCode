@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Core.Utils;
 using Entitas;
+using Sharpen;
 using UnityEngine;
 using Utils.Singleton;
 
@@ -20,14 +21,11 @@ namespace App.Shared.SceneTriggerObject
             }
             _typeRecord = new Dictionary<GameObject, int>();
         }
-        
+
         public void RecordId(GameObject obj, int type, int id)
         {
-            if(!_mapObjIdRecorder[type].ContainsKey(obj))
-                _mapObjIdRecorder[type].Add(obj, id);
-            
-            if ( !_typeRecord.ContainsKey(obj))
-                _typeRecord.Add(obj, type);
+            _mapObjIdRecorder[type].Put(obj, id);
+            _typeRecord.Put(obj, type);
         }
 
         public int GetType(GameObject obj)
@@ -50,6 +48,15 @@ namespace App.Shared.SceneTriggerObject
                 }
             }
             return null;
+        }
+
+        public void RemoveRecord(int id)
+        {
+            var gameObj = GetObj(id);
+            if (gameObj == null) return;
+            var type = GetType(gameObj);
+            _mapObjIdRecorder[type].Remove(gameObj);
+            _typeRecord.Remove(gameObj);
         }
         
         public int GetId(GameObject obj)
@@ -110,8 +117,7 @@ namespace App.Shared.SceneTriggerObject
         
         public void Add(int id, MapObjectEntity obj)
         {
-            if(_mapObjDict.ContainsKey(id)) return;
-            _mapObjDict.Add(id, obj);
+            _mapObjDict.Put(id, obj);
         }
 
         public void Delete(int id)

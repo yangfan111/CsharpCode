@@ -7,11 +7,12 @@ using com.wd.free.@event;
 using commons.data.mysql;
 using commons.data;
 using com.wd.free.ai;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.action
 {
     [Serializable]
-    public class RealTimeAction : AbstractGameAction
+    public class RealTimeAction : AbstractGameAction, IRule
     {
         public override void DoAction(IEventArgs args)
         {
@@ -35,6 +36,11 @@ namespace App.Server.GameModules.GamePlay.Free.action
                     }
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.RealTimeAction;
         }
     }
 }

@@ -16,7 +16,7 @@ namespace VNet.Base.LiteNet
         private EventBasedNetListener _listener = new EventBasedNetListener();
         private NetManager _server;
         private Dictionary<long, IVNetPeer> _peers = new Dictionary<long, IVNetPeer>();
-        private MemoryStream _receiveStream = new MemoryStream(8019);
+        private Dictionary<long, MemoryStream> _receiveStream = new Dictionary<long, MemoryStream>();
         public event Action<IVNetPeer> OnAcceptListener;
         public event Action<IVNetPeer> OnDisconnectListener;
         public void Init()
@@ -55,42 +55,51 @@ namespace VNet.Base.LiteNet
 
         private void OnDisconnect(NetPeer peer, DisconnectInfo info)
         {
-            switch (info.Reason)
+            lock (this)
             {
-                case DisconnectReason.RemoteConnectionClose:
-                    break;
-                case DisconnectReason.ConnectionFailed:
-                case DisconnectReason.SocketReceiveError:
-                case DisconnectReason.Timeout:
-                case DisconnectReason.DisconnectPeerCalled:
-                case DisconnectReason.SocketSendError:
-                    Logger.ErrorFormat("Disconnect : {0} with code {1} {2}", info.Reason, (SocketError)info.SocketErrorCode,peer.ConnectId);
-                    break;
-            }
-
-            IVNetPeer vnetPeer;
-            if (_peers.TryGetValue(peer.ConnectId, out vnetPeer))
-            {
-                vnetPeer.OnDisconnect();
-                _peers.Remove(peer.ConnectId);
-                if (null != OnDisconnectListener)
+                _receiveStream.Remove(peer.ConnectId);
+                switch (info.Reason)
                 {
-                    OnDisconnectListener(vnetPeer);
+                    case DisconnectReason.RemoteConnectionClose:
+                        break;
+                    case DisconnectReason.ConnectionFailed:
+                    case DisconnectReason.SocketReceiveError:
+                    case DisconnectReason.Timeout:
+                    case DisconnectReason.DisconnectPeerCalled:
+                    case DisconnectReason.SocketSendError:
+                        Logger.ErrorFormat("Disconnect : {0} with code {1} {2}", info.Reason,
+                            (SocketError) info.SocketErrorCode, peer.ConnectId);
+                        break;
                 }
-            }
-            else
-            {
-                Logger.ErrorFormat("peer does not exist with id " + peer.ConnectId);
+
+                IVNetPeer vnetPeer;
+                if (_peers.TryGetValue(peer.ConnectId, out vnetPeer))
+                {
+                    vnetPeer.OnDisconnect();
+                    _peers.Remove(peer.ConnectId);
+                    if (null != OnDisconnectListener)
+                    {
+                        OnDisconnectListener(vnetPeer);
+                    }
+                }
+                else
+                {
+                    Logger.ErrorFormat("peer does not exist with id " + peer.ConnectId);
+                }
             }
         }
 
         private void OnConnect(NetPeer peer)
         {
-            var myNetPeer = new LiteNetPeer(peer);
-            _peers[peer.ConnectId] = myNetPeer;
-            if (null != OnAcceptListener)
+            lock (this)
             {
-                OnAcceptListener(myNetPeer);
+                var myNetPeer = new LiteNetPeer(peer);
+                _peers[peer.ConnectId] = myNetPeer;
+                _receiveStream[peer.ConnectId] = new MemoryStream(4096 * 4096);
+                if (null != OnAcceptListener)
+                {
+                    OnAcceptListener(myNetPeer);
+                }
             }
         }
 
@@ -106,10 +115,18 @@ namespace VNet.Base.LiteNet
             {
                 if (null != OnReceiveListener)
                 {
-                    _receiveStream.Write(reader.Data, reader.Position, reader.AvailableBytes);
-                    OnReceiveListener(realTimePeer, _receiveStream);
-                    _receiveStream.Position = 0;
-                    _receiveStream.SetLength(0);
+                    lock (_receiveStream[peer.ConnectId])
+                    {
+                        _receiveStream[peer.ConnectId].Write(reader.Data, reader.Position, reader.AvailableBytes);
+                        OnReceiveListener(realTimePeer, _receiveStream[peer.ConnectId]);
+                        _receiveStream[peer.ConnectId].Position = 0;
+                        _receiveStream[peer.ConnectId].SetLength(0);
+                    }
+
+                    if (reader is NetPacketReader)
+                    {
+                        ((NetPacketReader)reader).RecycleSource();
+                    }
                 }
             }
         }

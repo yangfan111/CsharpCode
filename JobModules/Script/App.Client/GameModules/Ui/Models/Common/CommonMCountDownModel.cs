@@ -35,7 +35,12 @@ namespace App.Client.GameModules.Ui.Models.Common
         }
 
         private bool isBackward;
-        private bool haveCompleted;
+
+        private bool haveCompleted
+        {
+            get { return adapter.HaveCompleted; }
+            set { adapter.HaveCompleted = value; }
+        }
 
         public override void Update(float interval)
         {
@@ -71,6 +76,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                 curTime = duringTime;
                 lastTime = DateTime.Now.Ticks / 10000;
                 adapter.CountDownNum = 0;
+                _backwardAnime.Kill();
             }
             else if (adapter.StartCountDown == false)
             {
@@ -93,6 +99,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private Tween _backwardAnime;
 
+        private const float _backwardTime = 0.3f;
         private void PlayBackwardAnim()
         {
             if (isBackward)
@@ -101,7 +108,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
             if (_backwardAnime != null) _backwardAnime.Kill();
             isBackward = true;
-            _backwardAnime = DOTween.To(() => _viewModel.numBgFillAmount, (x) => _viewModel.numBgFillAmount = x , 1, 0.3f);
+            _backwardAnime = DOTween.To(() => _viewModel.numBgFillAmount, (x) => _viewModel.numBgFillAmount = x , 1, _backwardTime);
             _backwardAnime.onComplete = OnCompleteAnime;
 
         }

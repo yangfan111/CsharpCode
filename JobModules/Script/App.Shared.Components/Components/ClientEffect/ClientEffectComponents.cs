@@ -81,9 +81,9 @@ namespace App.Shared.Components.ClientEffect
     
     public class EffectRotationComponent : IPlaybackComponent 
     {
-        [NetworkProperty]
+        [NetworkProperty(SyncFieldScale.Yaw)]
         public float Yaw;
-        [NetworkProperty]
+        [NetworkProperty(SyncFieldScale.Pitch)]
         public float Pitch;
 
         public void CopyFrom(object rightComponent)
@@ -169,7 +169,7 @@ namespace App.Shared.Components.ClientEffect
         [NetworkProperty]
         public bool HeadShoot;
 
-        [NetworkProperty]
+        [NetworkProperty(SyncFieldScale.Position)]
         public Vector3 PlayerPos;
 
         public void CopyFrom(object rightComponent)
@@ -197,12 +197,12 @@ namespace App.Shared.Components.ClientEffect
     [ClientEffect]
     public class SprayPaintComponent : IPlaybackComponent 
     {
-        [DontInitilize] [NetworkProperty] public Vector3 SprayPaintPos; /*起始位置*/
-        [DontInitilize] [NetworkProperty] public Vector3 SprayPaintForward; /*朝向*/
-        [DontInitilize] [NetworkProperty] public int SprayPrintMask; /*掩码*/
-        [DontInitilize] [NetworkProperty] public Vector3 SprayPrintSize; /*大小*/
-        [DontInitilize] [NetworkProperty] public int SprayPrintType; /*类型*/
-        [DontInitilize] [NetworkProperty] public int SprayPrintSpriteId; /*贴图*/
+        [DontInitilize] [NetworkProperty(SyncFieldScale.Position)] public Vector3 SprayPaintPos; /*起始位置*/
+        [DontInitilize] [NetworkProperty(1,-1,0.01f)] public Vector3 SprayPaintForward; /*朝向*/
+        [DontInitilize] [NetworkProperty(8,0,1)] public int SprayPrintMask; /*掩码*/
+        [DontInitilize] [NetworkProperty(360,-360,0.01f)] public Vector3 SprayPrintSize; /*大小*/
+        [DontInitilize] [NetworkProperty(8,0,1)] public int SprayPrintType; /*类型*/
+        [DontInitilize] [NetworkProperty(32767,0,1)] public int SprayPrintSpriteId; /*贴图*/
 
         public void CopyFrom(object rightComponent) {
             var r = rightComponent as SprayPaintComponent;

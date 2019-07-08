@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using App.Client.GameModules.Ui;
 using App.Shared.Components;
+using App.Shared.GameModules.Configuration;
 using App.Shared.GameModules.Preparation;
 using Core.GameModule.Module;
 using Core.GameModule.System;
@@ -29,7 +30,6 @@ namespace App.Client.ClientGameModules
 
             systems.Add(new SceneResourceLoadingFeature("SceneResourceLoading", CreateSystems(contextsImpl),
                 commonSession));
-
             return systems;
         }
 

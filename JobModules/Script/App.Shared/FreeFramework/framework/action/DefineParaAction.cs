@@ -2,12 +2,13 @@ using System.Collections.Generic;
 using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.para;
+using Core.Free;
 
 namespace com.wd.free.action
 {
 	[System.Serializable]
-	public class DefineParaAction : AbstractGameAction
-	{
+	public class DefineParaAction : AbstractGameAction, IRule
+    {
 		private const long serialVersionUID = 4962914672129547843L;
 
 		private IList<ParaValue> paras;
@@ -50,5 +51,10 @@ namespace com.wd.free.action
 		{
 			this.action = action;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.DefineParaAction;
+        }
+    }
 }

@@ -45,7 +45,7 @@ namespace App.Shared.GameModules.Player
                     upDownValue = _controller.UpdateToTarget(cmd.FrameInterval * 0.001f,
                         Mathf.Clamp((state.IsForth ? -1.0f : -1.0f)
                                     * orientationPitch /
-                                    SingletonManager.Get<CameraConfigManager>().Config
+                                    SingletonManager.Get<CameraConfigManager>().GetRoleConfig(player.playerInfo.RoleModelId)
                                         .PoseConfigs[(int) ECameraPoseMode.Stand].PitchLimit.Max *
                                     state.VerticalValue
                             , -1, 1), upDownValue);

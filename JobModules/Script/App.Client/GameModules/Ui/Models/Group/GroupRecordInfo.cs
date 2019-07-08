@@ -47,16 +47,16 @@ namespace App.Client.GameModules.Ui.Models.Group
             _viewModel.IconGroupShow = data.NeedShow && !data.IsTitle;
             if (data.IsTitle)
             {
-                InitTitleText();
+                InitTitleText(data.CanResque);
             }
         }
 
-        private void InitTitleText()
+        private void InitTitleText(bool canResque)
         {
             _viewModel.RankText = I2.Loc.ScriptLocalization.client_group.word1;
             _viewModel.PlayerNameText = I2.Loc.ScriptLocalization.client_group.word2;
             _viewModel.CorpsText = I2.Loc.ScriptLocalization.client_group.word3;
-            _viewModel.KillText = I2.Loc.ScriptLocalization.client_group.word4;
+            _viewModel.KillText = canResque ? I2.Loc.ScriptLocalization.client_group.word8 : I2.Loc.ScriptLocalization.client_group.word4;
             _viewModel.DamageText = I2.Loc.ScriptLocalization.client_group.word5;
             _viewModel.DeadText = I2.Loc.ScriptLocalization.client_group.word6;
             _viewModel.AssistText = I2.Loc.ScriptLocalization.client_group.word7;

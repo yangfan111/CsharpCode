@@ -8,11 +8,12 @@ using Free.framework;
 using gameplay.gamerule.free.ui;
 using gameplay.gamerule.free.ui.component;
 using Sharpen;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.action
 {
     [Serializable]
-    public class TextMessageAction : SendMessageAction
+    public class TextMessageAction : SendMessageAction, IRule
     {
         private string message;
         private int interval;
@@ -47,24 +48,29 @@ namespace App.Server.GameModules.GamePlay.Free.action
 
                 if (interval == 0)
                 {
-                    interval = 1000;
+                    interval = 0;
                 }
             }
 
-            if (Runtime.CurrentTimeMillis() - lastTime >= interval)
+            if (Runtime.CurrentTimeMillis(false) - lastTime >= interval)
             {
                 textValue.SetText(FreeUtil.ReplaceVar(message, args));
 
                 update.DoAction(args);
                 show.DoAction(args);
 
-                lastTime = Runtime.CurrentTimeMillis();
+                lastTime = Runtime.CurrentTimeMillis(false);
             }
         }
 
         protected override void BuildMessage(IEventArgs args)
         {
 
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.TextMessageAction;
         }
     }
 }

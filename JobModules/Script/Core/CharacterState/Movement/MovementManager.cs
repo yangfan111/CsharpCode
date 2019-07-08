@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Core.Fsm;
-using UnityEngine;
 using Utils.Appearance;
 using Utils.CharacterState;
 using Utils.Compare;
@@ -11,7 +8,7 @@ using XmlConfig;
 
 namespace Core.CharacterState.Movement
 {
-    class MovementManager : FsmManager, ICharacterMovement, IFsmUpdate, ICharacterMovementInConfig
+    internal class MovementManager : FsmManager, ICharacterMovement, IFsmUpdate, ICharacterMovementInConfig
     {
         private readonly MovementFsm _commonFsm;
         private float _forthValue;
@@ -46,7 +43,8 @@ namespace Core.CharacterState.Movement
         public void Update(IAdaptiveContainer<IFsmInputCommand> commands,
                            int frameInterval,
                            Action<FsmOutput> addOutput,
-                           FsmUpdateType updateType)
+                           FsmUpdateType updateType,
+                           List<FsmInput> limits)
         {
             if ((updateType & _directionUpdateType) != 0)
             {

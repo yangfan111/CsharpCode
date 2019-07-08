@@ -15,5 +15,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
         public abstract int GetInstancingDataCount(int index);
 
         public abstract MergeUnit[] GetMergeKernels(ComputeShader shader);
+
+        public abstract bool Empty { get; }
     }
 }

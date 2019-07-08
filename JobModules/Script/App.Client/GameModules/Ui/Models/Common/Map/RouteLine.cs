@@ -52,7 +52,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                 lineRtf.anchoredPosition = middlePos;
 
                 //更新大小
-                float height = Vector2.Distance(startPosByPixel, endPosByPixel);
+                float height = Vector2.Distance(startPosByPixel, endPosByPixel) + 24;//24是头尾两端的圈圈中点位置矫正
                 lineRtf.sizeDelta = new Vector2(lineRtf.sizeDelta.x, height);
             }
         }

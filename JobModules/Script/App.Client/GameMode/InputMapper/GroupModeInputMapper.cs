@@ -23,7 +23,7 @@ namespace App.Client.GameMode
             keyReceiver.AddAction(UserInputKey.Switch3, (data) => userCmd.CurWeapon = (int)EWeaponSlotType.PistolWeapon);
             keyReceiver.AddAction(UserInputKey.Switch4, (data) => userCmd.CurWeapon = (int)EWeaponSlotType.MeleeWeapon);
             keyReceiver.AddAction(UserInputKey.Switch5, (data) => userCmd.CurWeapon = (int)EWeaponSlotType.ThrowingWeapon);
-       //     keyReceiver.AddAction(UserInputKey.Switch6, (data) => userCmd.CurWeapon = (int)EWeaponSlotType.TacticWeapon);
+            keyReceiver.AddAction(UserInputKey.Switch6, (data) => userCmd.CurWeapon = (int)EWeaponSlotType.TacticWeapon);
         }
     }
 }

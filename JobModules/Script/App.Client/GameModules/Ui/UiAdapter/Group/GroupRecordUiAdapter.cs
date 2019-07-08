@@ -32,6 +32,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         public bool NeedShow { get; set; }
         public EUICampType CampType { get; set; }
         public bool CanShowC4 { get; set; }
+        public bool CanResque { get; set; }
     }
 
     public class GroupRecordUiAdapter : UIAdapter, IGroupRecordUiAdapter
@@ -39,7 +40,11 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public override bool Enable
         {
-            get { return _enable && !IsConflict; }
+            get
+            {
+                if (IsConflict) _enable = false;
+                return _enable;
+            }
 
             set { _enable = value; }
         }
@@ -112,6 +117,14 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 }
 
                 return EUICampType.None;
+            }
+        }
+
+        public bool CanRescue
+        {
+            get
+            {
+                return _contexts.session.commonSession.RoomInfo.TeamCapacity > 1;
             }
         }
     }

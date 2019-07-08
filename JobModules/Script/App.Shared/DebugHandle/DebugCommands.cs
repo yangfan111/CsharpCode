@@ -20,11 +20,19 @@
     public class DebugCommands
     {
         public const string SetFrameRate = "SFR";
-        public const string GetQuality = "GetQuality";
+        public const string GetUnityQuality = "GetUnityQuality";
         public const string GetQualityList = "GetQualityList";
         public const string SetQuality = "SetQuality";
 
+        /// <summary>
+        ///  画质GM命令
+        /// </summary>
+        public const string GetQuality = "GetQuality";
         public const string Quality = "Quality";
+        public const string VideoSetting = "videosetting";
+
+
+        public const string VSync = "Vsync";
 
         public const string ShowDrawHitBoxOnBullet = "ShowDrawHitBoxOnBullet";
         public const string HideDrawHitBoxOnBullet = "HideDrawHitBoxOnBullet";
@@ -57,6 +65,7 @@
 
         public const string SetCurBullet = "sb";
         public const string SetReservedBullet = "srb";
+        public const string Shoot = "shoot";
 
         public const string SetWeapon = "sw";
         public const string AudioEmitter = "ae";
@@ -176,11 +185,29 @@
         public const string Light = "Light";
         public const string Road = "Road";
 
+        public const string Prop = "Prop";
+
+        public const string PostProcess = "PostProcess";
+
+        public const string POC = "poc";
+
+        public const string TerrainDist = "terraindist";
+
+        public const string GrassDraw = "grassdraw";
+
+        public const string ZPrepass = "zprepass";
+        public const string ZPrepassCull = "zprepasscull"; 
+
         public const string Revive = "revive";
         public const string PosShow = "posshow";
         public const string PosEdit = "posEdit";
 
+        public const string ShowCamera = "showcamera";
+
         public const string IndoorLightCull = "indoorlightcull";
+        public const string ShowImportantObject = "showimportantobject";
+
+        public const string LoadResource = "loadres";
     }
 
     public interface IDebugCommandHandler

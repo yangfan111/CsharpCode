@@ -1,15 +1,12 @@
-﻿using Assets.App.Server.GameModules.GamePlay.Free;
-using com.wd.free.action;
+﻿using com.wd.free.action;
 using com.wd.free.@event;
 using Core.Free;
-using Free.framework;
-using gameplay.gamerule.free.ui;
 using System;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
     [Serializable]
-    public class PlayerVisibilityAction : AbstractPlayerAction
+    public class PlayerVisibilityAction : AbstractPlayerAction, IRule
     {
         private bool visibility;
 
@@ -18,12 +15,13 @@ namespace App.Server.GameModules.GamePlay.Free.player
             PlayerEntity playerEntity = GetPlayerEntity(args);
             if (null != playerEntity)
             {
-                SimpleProto sp = FreePool.Allocate();
-                sp.Key = FreeMessageConstant.PlayerVisibility;
-                sp.Ins.Add(playerEntity.entityKey.Value.EntityId);
-                sp.Bs.Add(visibility);
-                SendMessageAction.sender.SendMessage(args, sp, 4, string.Empty);
+                playerEntity.gamePlay.Visibility = visibility;
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerVisibilityAction;
         }
     }
 }

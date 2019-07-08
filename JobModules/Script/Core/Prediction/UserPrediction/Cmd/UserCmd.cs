@@ -1,6 +1,7 @@
 ﻿using Core.ObjectPool;
 using System;
 using System.Collections.Generic;
+using XmlConfig;
 
 namespace Core.Prediction.UserPrediction.Cmd
 {
@@ -51,6 +52,7 @@ namespace Core.Prediction.UserPrediction.Cmd
 
         /*private BitVector32 _flags = new BitVector32();*/
         /*暂定8，有越界风险*/
+        private const int FLAGS_LENGTH = 8;
 
         private byte[] _flags = new byte[8];
    
@@ -66,15 +68,64 @@ namespace Core.Prediction.UserPrediction.Cmd
         public float MoveUpDown          { get; set; }
         public int   CurWeapon           { get; set; }
 
+        private static UserCmdHandle[] UserCmdInterrupt = new UserCmdHandle[(int)UserCmdEnum.Length];
+
         public long Buttons
         {
-            get { return BitConverter.ToInt64(_flags, 0); }
-            set { _flags = /*new BitVector32(value)*/BitConverter.GetBytes(value); }
+            get { return /*BitConverter.ToInt64(_flags, 0)*/GetButtons(); }
+            set
+            {
+                _flags = /*new BitVector32(value)*/GetBytes(_flags, value);
+            }
+        }
+
+        public static void SetInterrupt(UserCmdEnum type, UserCmdHandle handle)
+        {
+            UserCmdInterrupt[(int)type] = handle;
+        }
+
+        public long GetButtons()
+        {
+            for (int i = 0; i < (int)UserCmdEnum.Length; i++)
+            {
+                switch (UserCmdInterrupt[i])
+                {
+                    case UserCmdHandle.Interrupt:
+                        AddEnum(i, false);
+                        break;
+                    case UserCmdHandle.Synchronous:
+                        AddEnum(i, true);
+                        break;
+                }
+                switch (i)
+                {
+                    case (int)UserCmdEnum.IsSwitchAutoRun:
+                        SetInterrupt(UserCmdEnum.IsSwitchAutoRun, UserCmdHandle.None);
+                        break;
+                }
+            }
+            return BitConverter.ToInt64(_flags, 0);
+        }
+
+        private static byte[] GetBytes(byte[] flags, long value)
+        {
+            if (flags == null)
+            {
+                flags = new byte[8];
+            }
+
+            unsafe
+            {
+                fixed (byte* numPtr = flags)
+                    *(long*) numPtr = value;
+            }
+            
+            return flags;
         }
 
         private bool AddEnum(int idx, bool add)
         {
-            if (idx < 0 || idx >= this._flags.Length * 8)
+            if (idx < 0 || idx >= FLAGS_LENGTH * 8)
             {
                 return false;
             }
@@ -99,7 +150,7 @@ namespace Core.Prediction.UserPrediction.Cmd
 
         private void ClearEnum()
         {
-            for (int i = 0, maxi = _flags.Length; i < maxi; i++)
+            for (int i = 0; i < FLAGS_LENGTH; i++)
             {
                 _flags[i] = 0;
             }
@@ -107,7 +158,7 @@ namespace Core.Prediction.UserPrediction.Cmd
 
         private bool HasEnum(int idx)
         {
-            return idx >= 0 && idx < this._flags.Length * 8 && ((int) this._flags[idx / 8] & 1 << idx % 8) != 0;
+            return idx >= 0 && idx < 64 && ((int) this._flags[idx / 8] & 1 << idx % 8) != 0;
         }
 
         public bool IsSwitchFireMode

@@ -1,29 +1,21 @@
-﻿using com.wd.free.action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using com.wd.free.@event;
-using com.wd.free.unit;
-using App.Server.GameModules.GamePlay.free.player;
-using Core;
-using com.wd.free.util;
-using UnityEngine;
-using Free.framework;
+﻿using App.Server.GameModules.GamePlay.free.player;
 using App.Shared;
-using Core.CharacterState;
-using Core.Free;
-using XmlConfig;
-using Assets.App.Server.GameModules.GamePlay.Free;
 using App.Shared.GameModules.Weapon;
 using Assets.Utils.Configuration;
+using com.wd.free.action;
+using com.wd.free.@event;
+using Core.Free;
+using com.wd.free.unit;
+using com.wd.free.util;
+using Core;
 using Core.Utils;
+using System;
 using Utils.Singleton;
 
 namespace App.Server.GameModules.GamePlay.Free.weapon
 {
     [Serializable]
-    public class NewAddWeaponAction : AbstractPlayerAction
+    public class NewAddWeaponAction : AbstractPlayerAction, IRule
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(NewAddWeaponAction));
 
@@ -56,7 +48,6 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
                     return;
                 }
 
-                SimpleProto message = new SimpleProto();
                 var scan = WeaponUtil.CreateScan(itemId);
                 if (FreeUtil.ReplaceBool(fullAmmo, args))
                 {
@@ -77,7 +68,7 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
                     }
                 }
 
-                
+                /*SimpleProto message = new SimpleProto();
                 message.Ins.Add(itemId);
                 if (index > 0)
                 {
@@ -90,9 +81,14 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
 
                 message.Ks.Add(2);
                 message.Key = FreeMessageConstant.ChangeAvatar;
-                FreeMessageSender.SendMessage(p, message);
+                FreeMessageSender.SendMessage(p, message);*/
                 //p.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.FreeData, message);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.NewAddWeaponAction;
         }
     }
 }

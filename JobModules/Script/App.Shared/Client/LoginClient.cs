@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Sockets;
 using Core.Network;
 using Core.Network.ENet;
 using Core.Utils;
@@ -63,6 +64,23 @@ namespace App.Shared.Client
             _networkClient.Dispose();
         }
 
+        public void ReConnect()
+        {
+            if (null != _networkClient) {
+                _networkClient.ReConnect();
+            }
+        }
+        public void CloseConnect(ProtocolType protocolType)
+        {
+            if (null != _networkClient) {
+                _networkClient.CloseConnect(protocolType);
+            }
+            if (_networkChannel != null)
+            {
+                _networkChannel.Disconnect();
+                ;
+            }
+        }
 
         public bool Connected
         {

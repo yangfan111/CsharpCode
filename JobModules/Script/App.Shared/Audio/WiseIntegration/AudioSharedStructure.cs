@@ -64,9 +64,12 @@ namespace App.Shared
 
     public enum AudioClientEffectType
     {
-        BulletHit      = 1,
+        Mute = 0,
+        WeaponEnvHit      = 1,
         BulletDrop     = 2,
         ThrowExplosion = 3,
+        WeaponPlayerHit = 4,
+
     }
 
     public enum AudioGrp_Magazine

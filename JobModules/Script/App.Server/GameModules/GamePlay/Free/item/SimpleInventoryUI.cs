@@ -9,11 +9,12 @@ using com.wd.free.skill;
 using com.wd.free.util;
 using gameplay.gamerule.free.ui;
 using App.Server.GameModules.GamePlay.Free.item;
+using Core.Free;
 
 namespace gameplay.gamerule.free.item
 {
     [Serializable]
-    public class SimpleInventoryUI : IInventoryUI
+    public class SimpleInventoryUI : IInventoryUI, IRule
     {
         internal string width;
 
@@ -171,7 +172,7 @@ namespace gameplay.gamerule.free.item
         {
             if (errorAction != null)
             {
-                if (Runtime.CurrentTimeMillis() - lastErrorTime > 2000)
+                if (Runtime.CurrentTimeMillis(false) - lastErrorTime > 2000)
                 {
                     if (args != null)
                     {
@@ -179,7 +180,7 @@ namespace gameplay.gamerule.free.item
                         errorAction.Act(args);
                         args.GetDefault().GetParameters().Resume("message");
                     }
-                    lastErrorTime = Runtime.CurrentTimeMillis();
+                    lastErrorTime = Runtime.CurrentTimeMillis(false);
                 }
             }
         }
@@ -231,6 +232,11 @@ namespace gameplay.gamerule.free.item
             {
                 return (iHeight - itemHeight * inventory.GetRow()) / (inventory.GetRow() - 1);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SimpleInventoryUI;
         }
     }
 }

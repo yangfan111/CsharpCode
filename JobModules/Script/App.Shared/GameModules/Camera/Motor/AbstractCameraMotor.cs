@@ -9,6 +9,7 @@ using Core.Utils;
 using UnityEngine;
 using XmlConfig;
 using System.Collections.Specialized;
+using Core.Configuration;
 using Utils.Configuration;
 using Utils.Singleton;
 
@@ -33,7 +34,6 @@ namespace Core.CameraControl.NewMotor
 
     public interface ICameraMainMotor
     {
-        CameraConfigItem Config { get; }
     }
 
     public interface ICameraNewMotor
@@ -53,8 +53,6 @@ namespace Core.CameraControl.NewMotor
             SubCameraMotorState subState,
             DummyCameraMotorOutput output,
             ICameraNewMotor last, int clientTime);
-
-
         void AddEnterAction(Action<PlayerEntity, ICameraMotorState> action);
         void AddLeaveAction(Action<PlayerEntity, ICameraMotorState> action);
 
@@ -68,13 +66,6 @@ namespace Core.CameraControl.NewMotor
 
     abstract class AbstractCameraMainMotor : AbstractCameraMotor, ICameraMainMotor
     {
-        protected CameraConfigItem _config;
-
-        
-        public CameraConfigItem Config
-        {
-            get { return _config; }
-        }
     }
 
     public abstract class AbstractCameraMotor : ICameraNewMotor

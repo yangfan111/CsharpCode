@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using Sharpen;
+using Core.Free;
 
 namespace com.wd.free.para
 {
     [System.Serializable]
-    public class SimpleParaList : ParaList
+    public class SimpleParaList : ParaList, IRule
     {
         private const long serialVersionUID = -1266253248791630602L;
 
@@ -38,27 +39,17 @@ namespace com.wd.free.para
 
         public override bool HasPara(IPara para)
         {
-            bool has = this.paras.ContainsKey(para.GetName());
-            if (!has)
-            {
-                for(int i = 0; i < fieldList.Count; i++)
-                {
-                    IFields f = fieldList[i];
-                    if (f.HasField(para.GetName()))
-                    {
-                        return true;
-                    }
-                }
-            }
-            return has;
+            string paraName = para.GetName();
+            return HasPara(paraName);
         }
 
         public override bool HasPara(string para)
         {
-            bool has = this.paras.ContainsKey(para);
+            IPara v = null;
+            bool has = this.paras.TryGetValue(para, out v);
             if (!has)
             {
-                for (int i = 0; i < fieldList.Count; i++)
+                for (int i = 0, maxi = fieldList.Count; i < maxi; i++)
                 {
                     IFields f = fieldList[i];
                     if (f.HasField(para))
@@ -120,6 +111,11 @@ namespace com.wd.free.para
                 }
             }
             return para;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SimpleParaList;
         }
     }
 }

@@ -4,11 +4,12 @@ using com.wd.free.@event;
 using com.wd.free.util;
 using Free.framework;
 using gameplay.gamerule.free.ui;
+using Core.Free;
 
 namespace gameplay.gamerule.free.ui.component
 {
     [System.Serializable]
-    public class FreeListComponet : AbstractFreeComponent
+    public class FreeListComponet : AbstractFreeComponent, IRule
     {
         private const long serialVersionUID = -7699020163820046853L;
 
@@ -39,6 +40,11 @@ namespace gameplay.gamerule.free.ui.component
             FreeUICreateAction.Build(b, args, "0", "", false, false, list.AsIterable());
 
             return b;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeListComponet;
         }
     }
 }

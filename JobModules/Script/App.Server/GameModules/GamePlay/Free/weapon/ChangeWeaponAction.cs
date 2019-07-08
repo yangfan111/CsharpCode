@@ -8,11 +8,12 @@ using Core;
 using com.wd.free.util;
 using Core.Free;
 using Free.framework;
+using com.wd.free.para;
 
 namespace App.Server.GameModules.GamePlay.Free.weapon
 {
     [Serializable]
-    public class ChangeWeaponAction : AbstractPlayerAction
+    public class ChangeWeaponAction : AbstractPlayerAction, IRule
     {
         private string weaponKey;
 
@@ -28,6 +29,11 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
             message.Key = FreeMessageConstant.ChangeWeapon;
             message.Ins.Add(index);
             FreeMessageSender.SendMessage(playerEntity, message);
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ChangeWeaponAction;
         }
     }
 }

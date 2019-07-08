@@ -19,8 +19,25 @@ namespace XmlConfig
         public string Desription;
         public string DefaultValue;
         public List<string> ComboxItemNames;
-        public List<int> ComboxItemKeys;
-        public List<string> Additional;
-        public List<string> SettingId;
     }
+
+    [XmlRoot("root")]
+    public class SettingConfigVideo
+    {
+        public SettingConfigVideoItem[] Items;
+    }
+
+    [XmlType("item")]
+    public class SettingConfigVideoItem
+    {
+        public int Id;
+        public int Type;
+        public string TypeName;
+        public int ControlType;
+        public string Desription;
+        public string DefaultValue;
+        public List<string> ComboxItemNames;
+        public List<int> ValuePerLevel;
+    }
+
 }

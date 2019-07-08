@@ -57,8 +57,9 @@ namespace Core.ObjectPool
         public long FreeCount;
 
 
-        public RingBufferObjectAllocator(IObjectFactory factory, int initPoolSize = 0)
+        public RingBufferObjectAllocator(IObjectFactory factory, int initPoolSize = 0, int allocatorNumber=0)
         {
+            allocatorNumber = allocatorNumber > initPoolSize/2 ? initPoolSize/2 : allocatorNumber;
             _factory = factory;
             if (initPoolSize > _pool.Capacity)
             {
@@ -67,7 +68,7 @@ namespace Core.ObjectPool
             }
 
             List<object> temp = new List<object>();
-            for (int i = 0; i < initPoolSize; i++)
+            for (int i = 0; i < allocatorNumber; i++)
             {
                 var o = Allocate();
                 temp.Add(o);

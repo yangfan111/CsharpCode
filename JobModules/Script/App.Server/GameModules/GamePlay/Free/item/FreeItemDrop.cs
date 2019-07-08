@@ -5,11 +5,12 @@ using Sharpen;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Utils.Singleton;
 using XmlConfig;
 
 namespace App.Server.GameModules.GamePlay.Free.item
 {
-    public class FreeItemDrop
+    public class FreeItemDrop : DisposableSingleton<FreeItemDrop>
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(FreeItemDrop));
 
@@ -17,19 +18,21 @@ namespace App.Server.GameModules.GamePlay.Free.item
         private static MyDictionary<int, DropRange> rangeDic;
         private static MyDictionary<string, ItemPriority> catDic;
         private static MyDictionary<int, MyDictionary<int, CatPriority>> extraDic;
-
         private static Dictionary<int, List<ItemDrop>> dropCache;
 
-        public static void Initial(int mapId)
+        public FreeItemDrop()
         {
-            if (dropDic == null || dropDic.Count <= 0)
-            {
-                dropDic = new MyDictionary<int, CatPriority>();
-                catDic = new MyDictionary<string, ItemPriority>();
-                extraDic = new MyDictionary<int, MyDictionary<int, CatPriority>>();
-                rangeDic = new MyDictionary<int, DropRange>();
-                dropCache = new Dictionary<int, List<ItemDrop>>();
+            dropDic = new MyDictionary<int, CatPriority>();
+            catDic = new MyDictionary<string, ItemPriority>();
+            extraDic = new MyDictionary<int, MyDictionary<int, CatPriority>>();
+            rangeDic = new MyDictionary<int, DropRange>();
+            dropCache = new Dictionary<int, List<ItemDrop>>();
+        }
 
+        public void Initial(int mapId)
+        {
+            if (dropDic.Count <= 0)
+            {
                 int loaded = 0;
                 foreach (var item in DropAreaConfig.current.Items)
                 {
@@ -93,7 +96,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
             }
         }
 
-        private static void InitialPoints(int mapId)
+        private void InitialPoints(int mapId)
         {
             foreach (MapConfigPoints.ID_Point point in MapConfigPoints.current.IDPints)
             {
@@ -105,7 +108,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
             Logger.InfoFormat("dropCache loaded, {0}", dropCache.Count);
         }
 
-        public static ItemDrop[] GetDropItems(string cat, int count, int mapId)
+        public ItemDrop[] GetDropItems(string cat, int count, int mapId)
         {
             Initial(mapId);
 
@@ -119,7 +122,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
             return new ItemDrop[0];
         }
 
-        public static List<ItemDrop> GetExtraItems(ItemDrop item)
+        public List<ItemDrop> GetExtraItems(ItemDrop item)
         {
             List<ItemDrop> list = new List<ItemDrop>();
 
@@ -149,7 +152,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
             return list;
         }
 
-        public static List<ItemDrop> GetDropItems(int id, int mapId)
+        public List<ItemDrop> GetDropItems(int id, int mapId)
         {
             Initial(mapId);
 
@@ -203,6 +206,15 @@ namespace App.Server.GameModules.GamePlay.Free.item
             }
 
             return items;
+        }
+
+        protected override void OnDispose()
+        {
+            dropDic.Clear();
+            catDic.Clear();
+            extraDic.Clear();
+            rangeDic.Clear();
+            dropCache.Clear();
         }
     }
 

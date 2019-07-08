@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using App.Client.GameModules.Ui.Models.Biochemical;
+﻿using App.Client.GameModules.Ui.Models.Biochemical;
 using App.Client.GameModules.Ui.Models.Blast;
 using App.Client.GameModules.Ui.Models.Chicken;
 using App.Client.GameModules.Ui.Models.Common;
@@ -14,8 +12,9 @@ using Assets.App.Client.GameModules.Ui.UiAdapter.Common;
 using Assets.UiFramework.Libs;
 using Core.Ui;
 using Core.Utils;
+using System;
+using System.Collections.Generic;
 using UIComponent.UI;
-using CommonMaxMap = App.Client.GameModules.Ui.Models.Common.CommonMaxMap;
 
 namespace Assets.App.Client.GameModules.Ui
 {
@@ -66,7 +65,7 @@ namespace Assets.App.Client.GameModules.Ui
 
 		private static void ReplaceWeaponHud(int gameRule)
         {
-            if (GameRules.Bomb != gameRule) return;
+            if (!GameRules.IsBomb(gameRule)) return;
             var list = contexts.ui.uISession.CreateUi;
             list.RemoveAll((it) => it == UiNameConstant.CommonWeaponHudModel || it == UiNameConstant.BlastWeaponHudModel);
             list.Add(UiNameConstant.BlastWeaponHudModel);
@@ -101,9 +100,9 @@ namespace Assets.App.Client.GameModules.Ui
             uiAdapter.UiSessionComponent = contexts.ui.uISession;
             uiAdapter.UserInputManager = contexts.userInput.userInputManager;
             var model = Activator.CreateInstance(uiData.Model, uiAdapter) as AbstractModel;
+            model.UIRoot(UiCommon.UIManager.GetLayer(uiData.Layer));
             model.Initialize(onModelLoaded);
             model.SetVisible(true);
-            model.UIRoot(UiCommon.UIManager.GetLayer(uiData.Layer));
 
             _onModelInitialized(model);
 
@@ -143,8 +142,8 @@ namespace Assets.App.Client.GameModules.Ui
             RegisterUi(UiNameConstant.CommonDebugInfoModel, typeof(CommonDebugInfoModel), typeof(DebugInfoUiAdapter), UILayer.Alert, new object[] { contexts },
                 new UiGroup[] { UiGroup.Fix });
 
-            RegisterUi(UiNameConstant.CommonHealthGroup, typeof(CommonHealthGroup), typeof(PlayerStateUiAdapter), UILayer.Base, null, 
-                new UiGroup[] { UiGroup.Base, UiGroup.MapHide });
+            RegisterUi(UiNameConstant.CommonHealthGroup, typeof(CommonHealthGroup), typeof(PlayerStateUiAdapter), UILayer.Base, new object[] { contexts }, 
+                new UiGroup[] { UiGroup.Base, UiGroup.MapHide});
             RegisterUi(UiNameConstant.CommonPickUpModel, typeof(CommonPickUpModel), typeof(PickUpUiAdapter), UILayer.Base, new object[] { contexts.player, contexts.sceneObject, contexts.mapObject, contexts.session, contexts.vehicle, contexts.freeMove, contexts.userInput.userInputManager.Instance, contexts.ui }, 
                 new UiGroup[] { UiGroup.Base});
             RegisterUi(UiNameConstant.CommonMiniMap, typeof(CommonMiniMap), typeof(MiniMapUiAdapter), UILayer.Base, new object[] { contexts }, 
@@ -188,8 +187,6 @@ namespace Assets.App.Client.GameModules.Ui
 //                new UiGroup[] { UiGroup.Pop, UiGroup.Singleton });
             RegisterUi(UiNameConstant.CommonMap, typeof(CommonMap), typeof(MiniMapUiAdapter), UILayer.Pop, new object[] { contexts },
                 new UiGroup[] { UiGroup.Pop, UiGroup.Singleton });
-            RegisterUi(UiNameConstant.CommonNoticeModel, typeof(CommonNoticeModel), typeof(NoticeUiAdapter), UILayer.Alert, new object[] { contexts },
-                new UiGroup[] { UiGroup.Alert,UiGroup.GameOverHide });
             RegisterUi(UiNameConstant.CommonPaintDiscModel, typeof(CommonPaintDiscModel), typeof(PaintUiAdapter), UILayer.Pop, new object[] { contexts },
                 new UiGroup[] { UiGroup.Pop,UiGroup.Singleton, UiGroup.SurvivalBagHide });
 
@@ -240,7 +237,7 @@ namespace Assets.App.Client.GameModules.Ui
         {
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonFocusMaskModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonHealthGroup);
-            contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonNoticeModel);
+            //contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonNoticeModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonScreenFlashModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonPickUpModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonMiniMap);
@@ -268,43 +265,31 @@ namespace Assets.App.Client.GameModules.Ui
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonPaintDiscModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonOperationTipModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonSystemTipModel);
-            //contexts.ui.uISession.CreateUi.Add(UiNameConstant.ChickenBagModel);
-            //contexts.ui.uISession.CreateUi.Add(UiNameConstant.ChickenPlaneModel);
-            //contexts.ui.uISession.CreateUi.Add(UiNameConstant.BiochemicalMarkModel);
-
         }
 
         public static void CreateTeamUI(int gameRule)
         {
-            if (GameRules.Team != gameRule) return;
-
+            if (GameRules.IsTeam(gameRule)) return;
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.GroupScoreModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.GroupRecordModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonWeaponBagModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonWeaponBagTipModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonGameOverModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonGameTitleModel);
-
         }
 
         public static void CreateSurvivalUI(int gameRule)
         {
-            var survivalRules = new int[] {GameRules.LadderSoloSurvival, GameRules.LadderDoubleSurvival,
-                GameRules.LadderFourGroupSurvival, GameRules.LadderFiveGroupSurvival,
-                GameRules.SoloSurvival , GameRules.DoubleSurvival, GameRules.FourGroupSurvival, GameRules.FiveGroupSurvival};
-            if (Array.IndexOf(survivalRules, gameRule) == -1) return;
-
+            if (GameRules.IsChicken(gameRule)) return;
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.ChickenScoreModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonTeam);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonSplitModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonSuoDuModel);
-           
         }
 
         public static void CreateBlastUI(int gameRule)
         {
-            if (GameRules.Bomb != gameRule) return;
-
+            if (GameRules.IsBomb(gameRule)) return;
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.BlastScoreModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonRoundOverModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonWeaponBagTipModel);
@@ -318,8 +303,7 @@ namespace Assets.App.Client.GameModules.Ui
 
         public static void CreateAnnihilationUI(int gameRule)
         {
-            if (GameRules.Annihilation != gameRule) return;
-
+            if (GameRules.IsElimation(gameRule)) return;
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.BlastScoreModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonRoundOverModel);
             contexts.ui.uISession.CreateUi.Add(UiNameConstant.CommonWeaponBagModel);
@@ -333,7 +317,6 @@ namespace Assets.App.Client.GameModules.Ui
         {
             UIConfig.configDic.Clear();
         }
-
     }
 
     public class UIConfig

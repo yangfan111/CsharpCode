@@ -1,13 +1,11 @@
-﻿using Core.CameraControl.NewMotor;
-using UnityEngine;
-using Utils.Appearance;
+﻿using UnityEngine;
 using Utils.Configuration;
 using Core.Compare;
-using App.Shared.GameModules.Player.CharacterBone;
 using Core.CharacterBone;
 using App.Shared.Components.Player;
 using Core.EntityComponent;
 using Core.Utils;
+using Utils.Appearance.Bone;
 using Utils.Singleton;
 using XmlConfig;
 
@@ -15,30 +13,45 @@ namespace App.Shared.GameModules.Player.CharacterBone
 {
     public class FollowRot : IFollowRot
     {
-        private static LoggerAdapter _logger = new LoggerAdapter(typeof(FollowRot));
-        
+        //private static LoggerAdapter _logger = new LoggerAdapter(typeof(FollowRot));
+
         private GameObject _characterP3;
 
-        private readonly float _horizontalHeadRotMax = SingletonManager.Get<CharacterStateConfigManager>().HorizontalHeadRotMax;
-        private readonly float _horizontalHeadRotMin = SingletonManager.Get<CharacterStateConfigManager>().HorizontalHeadRotMin;
-        private readonly float _verticalHeadRotMax = SingletonManager.Get<CharacterStateConfigManager>().VerticalHeadRotMax;
-        private readonly float _verticalHeadRotMin = SingletonManager.Get<CharacterStateConfigManager>().VerticalHeadRotMin;
-        private readonly float _neckRotHorizontalIndex = SingletonManager.Get<CharacterStateConfigManager>().NeckRotHorizontalIndex;
-        private readonly float _neckRotVerticalIndex = SingletonManager.Get<CharacterStateConfigManager>().NeckRotVerticalIndex;
-        private readonly float _headRotReversalTime = SingletonManager.Get<CharacterStateConfigManager>().HeadRotReversalTime;
+        private readonly float _horizontalHeadRotMax =
+            SingletonManager.Get<CharacterStateConfigManager>().HorizontalHeadRotMax;
 
-        private const float MaxHandPitchDown = 30.0f;
+        private readonly float _horizontalHeadRotMin =
+            SingletonManager.Get<CharacterStateConfigManager>().HorizontalHeadRotMin;
 
-        private Transform _baseLocatorP3;
+        private readonly float _verticalHeadRotMax =
+            SingletonManager.Get<CharacterStateConfigManager>().VerticalHeadRotMax;
+
+        private readonly float _verticalHeadRotMin =
+            SingletonManager.Get<CharacterStateConfigManager>().VerticalHeadRotMin;
+
+        private readonly float _neckRotHorizontalIndex =
+            SingletonManager.Get<CharacterStateConfigManager>().NeckRotHorizontalIndex;
+
+        private readonly float _neckRotVerticalIndex =
+            SingletonManager.Get<CharacterStateConfigManager>().NeckRotVerticalIndex;
+
+        private readonly float _headRotReversalTime =
+            SingletonManager.Get<CharacterStateConfigManager>().HeadRotReversalTime;
+
+        private const float HandPitchChangeSpeed = 200.0f;
         private Transform _neckP3;
         private Transform _headP3;
         private Transform _rightClavicleP3;
-        private Transform _rightHandP3;
-        private Transform _leftHandP3;
-        private Transform _leftClavicleP3;
+        private Transform _spine;
+        private Transform _spine1;
+
+        private float _currentHandPitch;
+        
+        private readonly CustomProfileInfo _mainInfo;
 
         public FollowRot()
         {
+            _mainInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("FollowRot");
         }
 
         public void SetThirdPersonCharacter(GameObject obj)
@@ -47,7 +60,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
             GetP3Bones(obj);
         }
 
-        public void PreUpdate(FollowRotParam param, ICharacterBone characterBone)
+        public void PreUpdate(FollowRotParam param, ICharacterBone characterBone, float deltaTime)
         {
             //人物正向和载具正向相差180度
             var curAngle = param.CameraFreeYaw;
@@ -83,17 +96,41 @@ namespace App.Shared.GameModules.Player.CharacterBone
             {
                 characterBone.LastHeadRotAngle = curAngle;
             }
+
+            CalcCurrentHandPitch(FollowRotHelper.PitchHandAngle(), deltaTime);
         }
 
         public void Update(CodeRigBoneParam param)
         {
-            FollowRotFunc(param.HeadPitch,
-                param.HeadYaw,
-                param.HandPitch,
-                param.HeadRotProcess,
-                param.IsHeadRotCW,
-                param.IKActive,
-                param.IsServer);
+            try
+            {
+                _mainInfo.BeginProfileOnlyEnableProfile();
+                FollowRotFunc(param.HeadPitch,
+                    param.HeadYaw,
+                    param.CurrentHandPitch,
+                    param.HeadRotProcess,
+                    param.IsHeadRotCW,
+                    param.IsServer);
+            }
+            finally
+            {
+                _mainInfo.EndProfileOnlyEnableProfile();
+            }
+        }
+
+        private void CalcCurrentHandPitch(float handPitch, float deltaTime)
+        {
+            var delta = deltaTime * HandPitchChangeSpeed;
+            if (CompareUtility.IsApproximatelyEqual(_currentHandPitch, handPitch, delta))
+            {
+                _currentHandPitch = handPitch;
+                return;
+            }
+
+            if (_currentHandPitch > handPitch)
+                _currentHandPitch -= delta;
+            else if (_currentHandPitch < handPitch)
+                _currentHandPitch += delta;
         }
 
         //头手随动
@@ -102,18 +139,17 @@ namespace App.Shared.GameModules.Player.CharacterBone
             float handPitch,
             float headRotProcess,
             bool isHeadRotCw,
-            bool iKActive,
             bool isServer)
         {
             if (!ThirdPersonIncluded || isServer) return;
-            HandFollow(handPitch, iKActive);
+            HandFollow(handPitch);
             HeadFollowPitch(headPitch);
             headYaw = SlerpHeadRot(headRotProcess, headYaw, isHeadRotCw);
             HeadFollowYaw(headYaw);
         }
 
         //处理头部随动时，角度在+-180度切换
-        private float SlerpHeadRot(float headRotProcess, float curAngleValue, bool isHeadRotCW)
+        private float SlerpHeadRot(float headRotProcess, float curAngleValue, bool isHeadRotCw)
         {
             if (headRotProcess > _headRotReversalTime)
             {
@@ -127,7 +163,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
             var result = _horizontalHeadRotMin +
                          (_horizontalHeadRotMax - _horizontalHeadRotMin) * headRotProcess / _headRotReversalTime;
-            return isHeadRotCW ? result : -result;
+            return isHeadRotCw ? result : -result;
         }
 
         private void HeadFollowPitch(float headPitch)
@@ -137,13 +173,15 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 return;
             }
 
-            float pitchHead = (headPitch > _verticalHeadRotMax) ? _verticalHeadRotMax : headPitch;
+            var pitchHead = (headPitch > _verticalHeadRotMax) ? _verticalHeadRotMax : headPitch;
             pitchHead = (pitchHead < _verticalHeadRotMin) ? _verticalHeadRotMin : pitchHead;
 
-            _neckP3.rotation = 
-                Quaternion.AngleAxis(pitchHead * _neckRotHorizontalIndex, _characterP3.transform.right) * _neckP3.rotation;
-            _headP3.rotation = 
-                Quaternion.AngleAxis(pitchHead * (1 - _neckRotHorizontalIndex), _characterP3.transform.right) * _headP3.rotation;
+            _neckP3.rotation =
+                Quaternion.AngleAxis(pitchHead * _neckRotHorizontalIndex, _characterP3.transform.right) *
+                _neckP3.rotation;
+            _headP3.rotation =
+                Quaternion.AngleAxis(pitchHead * (1 - _neckRotHorizontalIndex), _characterP3.transform.right) *
+                _headP3.rotation;
         }
 
         private void HeadFollowYaw(float headYaw)
@@ -156,55 +194,43 @@ namespace App.Shared.GameModules.Player.CharacterBone
             var yawHead = (headYaw > _horizontalHeadRotMax) ? _horizontalHeadRotMax : headYaw;
             yawHead = (yawHead < _horizontalHeadRotMin) ? _horizontalHeadRotMin : yawHead;
 
-            _neckP3.rotation = 
+            _neckP3.rotation =
                 Quaternion.AngleAxis(yawHead * _neckRotVerticalIndex, _characterP3.transform.up) * _neckP3.rotation;
-            _headP3.rotation = 
-                Quaternion.AngleAxis(yawHead * (1 - _neckRotVerticalIndex), _characterP3.transform.up) * _headP3.rotation;
+            _headP3.rotation =
+                Quaternion.AngleAxis(yawHead * (1 - _neckRotVerticalIndex), _characterP3.transform.up) *
+                _headP3.rotation;
         }
 
-        private void HandFollow(float handPitch, bool iKActive)
+        private void HandFollow(float handPitch)
         {
             if (CompareUtility.IsApproximatelyEqual(handPitch, 0f))
-            {
                 return;
-            }
 
-            var realClaviclePitch = handPitch;
-            var realHandPitch = 0f;
-            if (handPitch > MaxHandPitchDown)
-            {
-                realClaviclePitch = MaxHandPitchDown;
-                realHandPitch = handPitch - realClaviclePitch;
-            }
+            var spineRotateAngle = GetCurrentRotateAngle(handPitch, 0, FollowRotHelper.SpineRotateMax);
+            var spine1RotateAngle = GetCurrentRotateAngle(handPitch, FollowRotHelper.SpineRotateMax, FollowRotHelper.Spine1RotateMax);
+            var clavicleRotateAngle = GetCurrentRotateAngle(handPitch, FollowRotHelper.SpineRotateMax + FollowRotHelper.Spine1RotateMax, float.MaxValue);
 
-            _rightClavicleP3.rotation = 
-                Quaternion.AngleAxis(realClaviclePitch, _characterP3.transform.right) * _rightClavicleP3.rotation;
-            if (realHandPitch > 0)
-            {
-                _rightHandP3.rotation =
-                    Quaternion.AngleAxis(realHandPitch, _characterP3.transform.right) * _rightHandP3.rotation;
-            }
+            _spine.rotation =
+                Quaternion.AngleAxis(spineRotateAngle, _characterP3.transform.right) *
+                _spine.rotation;
+            _spine1.rotation =
+                Quaternion.AngleAxis(spine1RotateAngle, _characterP3.transform.right) *
+                _spine1.rotation;
+            _rightClavicleP3.rotation =
+                Quaternion.AngleAxis(clavicleRotateAngle, _characterP3.transform.right) * _rightClavicleP3.rotation;
+        }
 
-            //baseWeaponLocator跟随右肩旋转
-            _baseLocatorP3.transform.RotateAround(_rightClavicleP3.transform.position, _characterP3.transform.right,
-                handPitch);
+        private static float GetCurrentRotateAngle(float handPitch, float beforeLimitPitch, float currentLimitPitch)
+        {
+            var direction = handPitch / Mathf.Abs(handPitch);
+
+            handPitch -= beforeLimitPitch * direction;
+            if (handPitch * direction <= 0) return 0;
             
-            if(iKActive) return;
+            if (Mathf.Abs(handPitch) > currentLimitPitch)
+                return currentLimitPitch * direction;
             
-            var leftHandToLeftClav =                                              //手到肩的距离
-                Vector3.Dot(_leftHandP3.position - _leftClavicleP3.position, _characterP3.transform.forward);
-            var leftHandToRightClav =
-                Vector3.Dot(_leftHandP3.position - _rightClavicleP3.position, _characterP3.transform.forward);
-
-            //左肩在右肩之前，旋转角不一致。 左手到左肩距离表示为LL，左手到右肩距离为LR，右肩旋转角theta
-            //左肩旋转角 A = arctan(   LR*sin(theta) / (LL-(1-LR*cos(theta)))   )
-            //左臂旋转后会有轻微穿模，应向前伸展到LR*sin(theta)/sinA长度，暂忽略
-            var leftClavAngle = Mathf.Rad2Deg * Mathf.Atan((leftHandToRightClav * Mathf.Sin(realClaviclePitch * Mathf.Deg2Rad)) /
-                                   (leftHandToLeftClav -
-                                    (1 - Mathf.Cos(realClaviclePitch * Mathf.Deg2Rad)) * leftHandToRightClav));
-
-            _leftClavicleP3.rotation = Quaternion.AngleAxis(leftClavAngle, _characterP3.transform.right) *
-                                       _leftClavicleP3.rotation;
+            return handPitch;
         }
 
         private bool ThirdPersonIncluded
@@ -215,23 +241,22 @@ namespace App.Shared.GameModules.Player.CharacterBone
         private void GetP3Bones(GameObject obj)
         {
             if (null == obj) return;
-            _baseLocatorP3 = BoneMount.FindChildBone(obj, BoneName.AlternativeWeaponLocator);
             _neckP3 = BoneMount.FindChildBone(obj, BoneName.CharacterNeckBoneName);
             _headP3 = BoneMount.FindChildBone(obj, BoneName.CharacterHeadBoneName);
             _rightClavicleP3 = BoneMount.FindChildBone(obj, BoneName.CharacterRightClavicleName);
-            _rightHandP3 = BoneMount.FindChildBone(obj, BoneName.CharacterRightHandName);
-            _leftHandP3 = BoneMount.FindChildBone(obj, BoneName.CharLeftHand);
-            _leftClavicleP3 = BoneMount.FindChildBone(obj, BoneName.CharacterLeftClavicleName);
+
+            _spine = BoneMount.FindChildBoneFromCache(obj, BoneName.CharacterSpineName);
+            _spine1 = BoneMount.FindChildBoneFromCache(obj, BoneName.CharacterSpine1Name);
         }
 
         public void SyncTo(IGameComponent characterBoneComponent)
         {
             var value = characterBoneComponent as CharacterBoneComponent;
-            if(null == value) return;
+            if (null == value) return;
             value.PitchHeadAngle = FollowRotHelper.PitchHeadAngle();
             value.RotHeadAngle = FollowRotHelper.YawHeadAngle();
             value.HeadRotProcess = FollowRotHelper.HeadRotProcess();
-            value.PitchHandAngle = FollowRotHelper.PitchHandAngle();
+            value.CurrentPitchHandAngle = _currentHandPitch;
             value.IsHeadRotCW = FollowRotHelper.IsHeadRotCw();
         }
     }

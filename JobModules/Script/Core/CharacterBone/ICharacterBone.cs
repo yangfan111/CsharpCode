@@ -1,8 +1,11 @@
 ﻿using Core.Fsm;
 using System;
+using Shared.Scripts;
 using UnityEngine;
 using Utils.Appearance;
+using Utils.Appearance.Bone;
 using Utils.Appearance.WardrobePackage;
+using Utils.AssetManager;
 using Utils.CharacterState;
 
 namespace Core.CharacterBone
@@ -26,6 +29,11 @@ namespace Core.CharacterBone
         void SetWardrobeController(WardrobeControllerBase value);
         void SetWeaponController(WeaponControllerBase value);
 
+        void HandleAllWeapon(Action<UnityObject> act);
+        void HandleAllAttachments(Action<UnityObject> act);
+        void HandleAllWardrobe(Action<UnityObject> act);
+        void HandleSingleWardrobe(Wardrobe type, Action<UnityObject> act);
+        
         Transform FastGetBoneTransform(string boneName, CharacterView view);
 
         Transform GetLocation(SpecialLocation location, CharacterView view);

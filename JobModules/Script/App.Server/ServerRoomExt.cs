@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Com.Wooduan.Ssjj2.Common.Net.Proto;
+﻿using Com.Wooduan.Ssjj2.Common.Net.Proto;
 using Core.Room;
-using Core.Utils;
 using Google.Protobuf.Collections;
+using System;
+using System.Collections.Generic;
 using Utils.Configuration;
 using Utils.Singleton;
 
@@ -60,7 +57,7 @@ namespace App.Server
             playerInfo.GameStartTime = (int) DateTime.Now.Ticks / 10000;
             playerInfo.IsLogin = false;
             playerInfo.Camp = roomPlayer.Camp;
-            if (playerInfo.Camp > 0 && playerInfo.TeamId == 0)
+            if (playerInfo.Camp > 0 && playerInfo.TeamId <= 0)
             {
                 playerInfo.TeamId = playerInfo.Camp;
             }

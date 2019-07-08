@@ -1,6 +1,7 @@
 using System.IO;
 using App.Shared.Components.Serializer;
 using App.Shared.EntityFactory;
+using Core;
 using Core.EntityComponent;
 using Core.Event;
 using Core.ObjectPool;
@@ -14,8 +15,10 @@ namespace App.Shared.Player.Events
     {
         public Vector3 Offset;
         public Vector3 HitPoint;
+        public int ChunkId;
+        public bool needEffectEntity;
         public EEnvironmentType EnvironmentType;
-
+        public int HitAudioId;
         public class ObjcetFactory : CustomAbstractObjectFactory
         {
             public ObjcetFactory() : base(typeof(HitEnvironmentEvent))
@@ -30,7 +33,9 @@ namespace App.Shared.Player.Events
 
         public HitEnvironmentEvent()
         {
+            needEffectEntity = true;
         }
+        
 
         public EEventType EventType
         {
@@ -45,6 +50,13 @@ namespace App.Shared.Player.Events
             Offset = FieldSerializeUtil.Deserialize(Offset, reader);
             HitPoint = FieldSerializeUtil.Deserialize(HitPoint, reader);
             EnvironmentType = (EEnvironmentType) FieldSerializeUtil.Deserialize((byte) 0, reader);
+            HitAudioId =  FieldSerializeUtil.Deserialize(HitAudioId, reader);
+            needEffectEntity = FieldSerializeUtil.Deserialize((byte) 0, reader)==1;
+            ChunkId = FieldSerializeUtil.Deserialize(ChunkId, reader);
+
+
+
+
         }
 
         public void WriteBody(MyBinaryWriter writer)
@@ -53,6 +65,11 @@ namespace App.Shared.Player.Events
 
             FieldSerializeUtil.Serialize(HitPoint, writer);
             FieldSerializeUtil.Serialize((byte) EnvironmentType, writer);
+            FieldSerializeUtil.Serialize(HitAudioId, writer);
+            FieldSerializeUtil.Serialize(needEffectEntity?(byte)1:(byte)0, writer);
+            FieldSerializeUtil.Serialize(ChunkId, writer);
+
+
         }
 
         public void RewindTo(IEvent value)
@@ -61,6 +78,10 @@ namespace App.Shared.Player.Events
 
             Offset = right.Offset;
             HitPoint = right.HitPoint;
+            HitAudioId = right.HitAudioId;
+            EnvironmentType = right.EnvironmentType;
+            needEffectEntity = right.needEffectEntity;
+            ChunkId = right.ChunkId;
         }
     }
 
@@ -74,17 +95,8 @@ namespace App.Shared.Player.Events
 
         public override void DoEventClient(Entitas.IContexts contexts, IEntity entity, IEvent e)
         {
-            var playerEntity = entity as PlayerEntity;
-            Contexts c = contexts as Contexts;
-            HitEnvironmentEvent ev = e as HitEnvironmentEvent;
-            if (playerEntity != null)
-            {
-                ClientEffectFactory.CreateHitEnvironmentEffect(c.clientEffect,
-                    c.session.commonSession.EntityIdGenerator,
-                    ev.HitPoint,
-                    ev.Offset,
-                    playerEntity.entityKey.Value, ev.EnvironmentType);
-            }
+            HitEnvironmentEvent hitEvent = e as HitEnvironmentEvent;
+            ClientEffectFactory.CreateHitEnvironmentEffect(hitEvent);
         }
 
 

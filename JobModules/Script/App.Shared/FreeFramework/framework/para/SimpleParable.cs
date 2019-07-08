@@ -1,8 +1,9 @@
+using Core.Free;
 using Sharpen;
 
 namespace com.wd.free.para
 {
-	public class SimpleParable : IParable
+	public class SimpleParable : IParable, IRule
 	{
 		private ParaList list;
 
@@ -43,5 +44,10 @@ namespace com.wd.free.para
 		{
 			return list;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SimpleParable;
+        }
+    }
 }

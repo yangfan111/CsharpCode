@@ -58,10 +58,8 @@ namespace App.Client.ClientSystems
             dv.Volume.m_size = new Vector3(1.2f, 1.2f, 1.2f);
 
             _decal.transform.position = position;
-            /*_decal.transform.up =  forward;*/
-           AngleTrans(ref head, _decal.transform);
-
-            var bundleName = AssetBundleConstant.Icon_Spray;
+            _decal.transform.Rotate(head, Space.Self);
+             var bundleName = AssetBundleConstant.Icon_Spray;
             var assetName = string.Format("Spray_{0}", sprayPrintSpriteId);
             _logger.DebugFormat(assetName);
             var assetManager = contexts.session.commonSession.AssetManager;
@@ -69,16 +67,23 @@ namespace App.Client.ClientSystems
             AssetInfo assetInfo = new AssetInfo(bundleName, assetName);
             assetManager.LoadAssetAsync(assetName, assetInfo, (source, unityObj) =>
             {
+                DecalVolumeParam param = new DecalVolumeParam();
+                param.meshRen = meshRen;
                 if (unityObj != null && unityObj.AsObject != null)
                 {
-                    Sprite sprite = unityObj.AsObject as Sprite;
-                    if (sprite == null) {
-                        _logger.DebugFormat("sprite is null !");
+                    if (unityObj.AsObject is Texture2D)
+                    {
+                        param.texture = unityObj.AsObject as Texture2D;
+                    }
+                    else if (unityObj.AsObject is Sprite)
+                    {
+                        Sprite sprite = unityObj.AsObject as Sprite;
+                        param.texture = sprite.texture;
+                    }
+                    else {
+                        _logger.DebugFormat("unityObj.AsObject is null !");
                         return;
                     }
-                    DecalVolumeParam param = new DecalVolumeParam();
-                    param.meshRen = meshRen;
-                    param.texture = sprite.texture;
                     assetManager.LoadAssetAsync(param, new AssetInfo("shaders", "MaterialForDecal"), OnDecalMaterialLoadSus);
                     dv.Create(forward, 0);
                 }
@@ -158,17 +163,35 @@ namespace App.Client.ClientSystems
             _debugGameObject = arg2.AsObject as GameObject;
             arg1.entity.assets.LoadedAssets.Add(arg1.assetInfo, arg2);
             Decal decal = _debugGameObject.AddComponent<Decal>();
+            _debugGameObject.transform.localEulerAngles = Vector3.zero;
+            Vector3 forward = arg1.forward;
+            float multiplyingpower = forward.y / Math.Max(Math.Max(forward.x, forward.z), 0.01f);
+            bool ground = (multiplyingpower > 0.577f);
 
-            _debugGameObject.transform.localScale = new Vector3(1.2f, 4.0f, 1.2f);
-            _debugGameObject.transform.position = arg1.position;
-            //_debugGameObject.transform.right = arg1.head;
-            //_debugGameObject.transform.up = -arg1.forward;
-            AngleTrans(ref arg1.head, _debugGameObject.transform);
+            arg1.head.x = FreeMathUtility.yRoundx(forward);
+            if (ground)
+            {
+                decal.transform.position = arg1.position;
+            }
+            else
+            {
+                arg1.head.y = 0;
+                arg1.head.z = FreeMathUtility.yRoundz(forward);
+                decal.transform.position = arg1.position - forward * 0.3f;
+            }
+            _debugGameObject.transform.localScale = new Vector3(0.75f, ground ? 0.06f : 0.64f, 0.75f);
+            decal.transform.Rotate(arg1.head, Space.World);
+            float result = Vector3.Dot(forward, decal.transform.forward);
+            if (Math.Abs(result) > 0.1f) {
+                Vector3 localEulerAngles = decal.transform.localEulerAngles;
+                localEulerAngles.x = -localEulerAngles.x;
+                localEulerAngles.z = -localEulerAngles.z;
+                decal.transform.localEulerAngles = localEulerAngles;
+            }
 
             if (arg1.contexts == null) {
                 return;
             }
-
             var bundleName = AssetBundleConstant.Icon_Spray;
             var assetName = string.Format("Spray_{0}", arg1.sprayPrintSpriteId);
             _logger.DebugFormat(assetName);
@@ -177,13 +200,20 @@ namespace App.Client.ClientSystems
             {
                 if (unityObj != null && unityObj.AsObject != null)
                 {
-                    Texture2D texture = unityObj.AsObject as Texture2D;
-                    if (texture != null)
-                    {
+                    if (unityObj.AsObject is Texture2D) {
+                        Texture2D texture = unityObj.AsObject as Texture2D;
                         assetManager.LoadAssetAsync(texture, new AssetInfo("shaders", "New Material"), OnMaterialLoadSus);
-                    }
-                    else
-                    {
+                    } else if (unityObj.AsObject is Sprite) {
+                        Sprite sprite = unityObj.AsObject as Sprite;
+#if UNITY_EDITOR
+                        Material m = new Material(Shader.Find("Decalicious/Deferred Spray"));
+                        decal.Material = m;
+                        m.mainTexture = sprite.texture;
+                        _debugGameObject.GetComponent<MeshRenderer>().enabled = true;
+#else
+                        assetManager.LoadAssetAsync(sprite.texture, new AssetInfo("shaders", "New Material"), OnMaterialLoadSus);
+#endif
+                    } else {
                         _logger.DebugFormat("LoadAssetAsync failed !");
                         GameObject.Destroy(_debugGameObject);
                     }

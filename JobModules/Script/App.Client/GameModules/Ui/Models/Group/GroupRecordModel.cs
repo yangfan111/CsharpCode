@@ -29,6 +29,7 @@ namespace App.Client.GameModules.Ui.Models.Group
             get { return 8; }
         }
 
+
         protected override void OnGameobjectInitialized()
         {
             base.OnGameobjectInitialized();
@@ -40,11 +41,12 @@ namespace App.Client.GameModules.Ui.Models.Group
 
         private void InitKey()
         {
-            KeyReceiver = new KeyReceiver(Layer.Env, BlockType.None);
-            KeyReceiver.AddAction(UserInputKey.ShowRecord, (data) => { _adapter.Enable = true; });
+            OpenKeyReceiver = new KeyReceiver(Layer.Env, BlockType.None);
+            OpenKeyReceiver.AddAction(UserInputKey.ShowRecord, (data) => { _adapter.Enable = true; });
+            _adapter.RegisterOpenKey(OpenKeyReceiver);
+            KeyReceiver = new KeyReceiver(UiConstant.recordWindowKeyBlockLayer, BlockType.All);
             KeyReceiver.AddAction(UserInputKey.HideRecord, (data) => { _adapter.Enable = false; });
-            //_adapter.RegisterKeyReceive(KeyReceiver);
-            _adapter.RegisterOpenKey(KeyReceiver);
+            KeyReceiver.AddAction(UserInputKey.HideWindow, (data) => { _adapter.Enable = false; });
         }
 
         private void InitInfoTitle()
@@ -65,7 +67,7 @@ namespace App.Client.GameModules.Ui.Models.Group
 
         protected virtual void InitTitleInfo(UIList titleList, EUICampType campType)
         {
-            titleList.Add<GroupRecordInfo>(new GroupRecordViewData() { IsTitle = true, NeedShow = true});
+            titleList.Add<GroupRecordInfo>(new GroupRecordViewData() { CanResque = _adapter.CanRescue, IsTitle = true, NeedShow = true});
         }
 
         private void InitVariable()
@@ -75,7 +77,7 @@ namespace App.Client.GameModules.Ui.Models.Group
         }
 
         private UIList _campInfoList1, _campInfoList2;
-        private KeyReceiver KeyReceiver;
+        private KeyReceiver KeyReceiver,OpenKeyReceiver;
 
         private void InitInfoGroup()
         {
@@ -95,7 +97,7 @@ namespace App.Client.GameModules.Ui.Models.Group
         {
             for (int i = 0; i < MaxInfoCount; i++)
             {
-                campInfoList.Add<GroupRecordInfo>(new GroupRecordViewData() { IsTitle = false, NeedShow = false, Rank = i + 1 });
+                campInfoList.Add<GroupRecordInfo>(new GroupRecordViewData() { CanResque = _adapter.CanRescue, IsTitle = false, NeedShow = false, Rank = i + 1 });
             }
         }
 
@@ -167,6 +169,21 @@ namespace App.Client.GameModules.Ui.Models.Group
         {
             (iUIItem.Data as GroupRecordViewData).NeedShow = show;
             (iUIItem as GroupRecordInfo).UpdateInfoView();
+        }
+
+        protected override void OnCanvasEnabledUpdate(bool enable)
+        {
+            base.OnCanvasEnabledUpdate(enable);
+            if (KeyReceiver == null) return;
+            if (enable)
+            {
+                _adapter.RegisterKeyReceive(KeyReceiver);
+            }
+            else
+            {
+                _adapter.UnRegisterKeyReceive(KeyReceiver);
+            }
+
         }
     }
 }

@@ -4,14 +4,14 @@ using com.cpkf.yyjd.tools.condition;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.@event;
 using com.wd.free.exception;
-using com.wd.free.para;
+using Core.Free;
 using com.wd.free.util;
 
 namespace com.wd.free.para.exp
 {
 	[System.Serializable]
-	public class ExpParaCondition : IParaCondition
-	{
+	public class ExpParaCondition : IParaCondition, IRule
+    {
 		private const long serialVersionUID = -3958190970967367085L;
 
 		[System.NonSerialized]
@@ -47,7 +47,7 @@ namespace com.wd.free.para.exp
 				return;
 			}
 			// 如果有变量每次重新生成
-			if (clause == null || (exp.Contains(FreeUtil.VAR_START) && exp.Contains(FreeUtil.VAR_END)))
+			if (clause == null || ((exp.IndexOf(FreeUtil.VAR_START_CHAR) > -1) && (exp.IndexOf(FreeUtil.VAR_END_CHAR) > -1)))
 			{
 				MeetClause<IEventArgs, ParaCondition> temp = new MeetClause<IEventArgs, ParaCondition>(new ExpConditionParser());
 				clause = (MeetClause<IEventArgs, ParaCondition>)temp.Parse(realExp);
@@ -92,5 +92,10 @@ namespace com.wd.free.para.exp
 		{
 			return this.GetType().Name + "-> " + exp;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ExpParaCondition;
+        }
+    }
 }

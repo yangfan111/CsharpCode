@@ -6,6 +6,9 @@ using Core.EntityComponent;
 using Core.Utils;
 using System.Collections.Generic;
 using App.Shared.Components.Weapon;
+using Core.HitBox;
+using UnityEngine;
+using Utils.Singleton;
 using XmlConfig;
 
 namespace App.Shared
@@ -75,7 +78,6 @@ namespace App.Shared
         {
             if (!player.hasPlayerWeaponBagSet)
             {
-                var modeController = player.ModeController();
                 player.AddPlayerWeaponBagSet(WeaponUtil.CreateEmptyBagContainers());
 
             }
@@ -123,11 +125,8 @@ namespace App.Shared
             {
                 player.ReplacePlayerWeaponCustomize(grenenadeKey, emptyKey);
             }
-            var bagSetCmp = player.playerWeaponBagSet;
-            for (int i = 0; i < bagSetCmp.WeaponBags.Count; i++)
-            {
-                bagSetCmp[i].BindCustomizeWeaponKey(player.playerWeaponCustomize.EmptyConstWeaponkey);
-            }
+            var weaponBag = player.playerWeaponBagSet.WeaponBag;
+            weaponBag.BindCustomizeWeaponKey(player.playerWeaponCustomize.EmptyConstWeaponkey);
        
         }
         public static EntityKey CreateCustomizeWeapon(EntityKey lastKey, EntityKey owner, int configId)
@@ -187,5 +186,24 @@ namespace App.Shared
                 playerEntity.weaponSound.PlayList.Add(sound);
             }
         }
+        // public static string GetCollidersDebugDatas(PlayerEntity entity)
+        // {
+        //     if (entity.hasPosition && entity.hasHitBox)
+        //     {
+        //         HitBoxTransformProvider provider = SingletonManager.Get<HitBoxTransformProviderCache>().GetProvider(entity.thirdPersonModel.Value);
+        //         if (provider != null)
+        //         {
+        //             stringBuilder.Length = 0;
+        //             var colliders = provider.GetHitBoxColliders();
+        //             foreach (KeyValuePair<string, Collider> keyPair in colliders)
+        //             {
+        //                 stringBuilder.AppendFormat("<{0}=>trans:{1}>\n", keyPair.Key,
+        //                     keyPair.Value.transform.position);
+        //             }
+        //             return stringBuilder.ToString();
+        //         }
+        //     }
+        //     return string.Empty;
+        // }
     }
 }

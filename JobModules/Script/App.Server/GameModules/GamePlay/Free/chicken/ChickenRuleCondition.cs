@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using com.wd.free.@event;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.chicken
 {
     [Serializable]
-    public class ChickenRuleCondition : IParaCondition
+    public class ChickenRuleCondition : IParaCondition, IRule
     {
         private static IParaCondition[] conditions;
 
@@ -19,6 +20,11 @@ namespace App.Server.GameModules.GamePlay.Free.chicken
             conditions = new IParaCondition[100];
 
             conditions[1] = new CanDropCondition();
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ChickenRuleCondition;
         }
 
         public bool Meet(IEventArgs args)

@@ -69,7 +69,6 @@ namespace App.Shared.GameModules.Camera.Motor.Peek
         {
            
         }
-
         
         
         public override HashSet<short> ExcludeNextMotor()

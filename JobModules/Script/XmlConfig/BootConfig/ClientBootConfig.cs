@@ -33,6 +33,8 @@ namespace XmlConfig.BootConfig
 
         public bool ArtMode;
 
+        public bool RestoreStreamGo;
+
         public override string ToString()
         {
             return string.Format("Resource: {0}, BattleServer: {1}, HallServer: {2}, HttpPort: {3}, MapId: {4}", Resource, BattleServer, HallServer, HttpPort, MapId);

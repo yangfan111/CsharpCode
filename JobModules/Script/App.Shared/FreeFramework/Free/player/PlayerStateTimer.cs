@@ -65,37 +65,40 @@ namespace App.Server.GameModules.GamePlay.Free.player
 
         public void AutoRemove(IEventArgs args, long serverTime)
         {
-            foreach (int key in uiTimer.Keys)
-            {
-                List<long> times = uiTimer[key];
-                for (int i = times.Count - 1; i >= 0; i--)
-                {
-                    if(times[i] < serverTime)
-                    {
-                        times.Remove(times[i]);
-                    }
-                }
-
-                if(times.Count == 0)
-                {
-                    PlayerStateUtil.RemoveUIState((EPlayerUIState)key, player.gamePlay);
-                }
-            }
-
-            foreach (int key in gameTimer.Keys)
-            {
-                List<long> times = gameTimer[key];
-                for (int i = times.Count - 1; i >= 0; i--)
+            Dictionary<int, List<long>>.Enumerator uiTimerIt = uiTimer.GetEnumerator();
+            while (uiTimerIt.MoveNext()) {
+                List<long> times = uiTimerIt.Current.Value;
+                int count = times.Count;
+                for (int i = count - 1; i >= 0; i--)
                 {
                     if (times[i] < serverTime)
                     {
                         times.Remove(times[i]);
+                        count--;
                     }
                 }
-
-                if (times.Count == 0)
+                if (count == 0)
                 {
-                    PlayerStateUtil.RemoveGameState((EPlayerGameState)key, player.gamePlay);
+                    PlayerStateUtil.RemoveUIState((EPlayerUIState)uiTimerIt.Current.Key, player.gamePlay);
+                }
+            }
+
+            Dictionary<int, List<long>>.Enumerator gameTimerIt = gameTimer.GetEnumerator();
+            while (gameTimerIt.MoveNext())
+            {
+                List<long> times = gameTimerIt.Current.Value;
+                int count = times.Count;
+                for (int i = count - 1; i >= 0; i--)
+                {
+                    if (times[i] < serverTime)
+                    {
+                        times.Remove(times[i]);
+                        count--;
+                    }
+                }
+                if (count == 0)
+                {
+                    PlayerStateUtil.RemoveGameState((EPlayerGameState)gameTimerIt.Current.Key, player.gamePlay);
                 }
             }
         }

@@ -1,16 +1,12 @@
 ﻿using Core;
 using Core.Prediction.UserPrediction.Cmd;
-using Core.Utils;
 using System.Collections.Generic;
-using System.Reflection;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Player
 {
     public static class UserCmdInputConverter
     {
-        //  private Dictionary<string, PropertyInfo> _properties;
-
         private static List<InputBlockGroup> inputBlockGrps;
 
         static UserCmdInputConverter()
@@ -32,17 +28,27 @@ namespace App.Shared.GameModules.Player
                 EPlayerInput.IsRightAttack,
             }));
             inputBlockGrps.Add(InputBlockGroup.Create(new[]
+             {
+                 EPlayerInput.IsProne,
+                 EPlayerInput.IsDrawWeapon,
+             }));
+            /*inputBlockGrps.Add(InputBlockGroup.Create(new[]
             {
                 EPlayerInput.IsJump,
                 EPlayerInput.IsSprint,
-            }));
+            }));*/
             inputBlockGrps.Add(InputBlockGroup.Create(new[]
             {
                 EPlayerInput.ChangeCamera,
                 EPlayerInput.IsCrouch,
                 EPlayerInput.IsProne,
-                EPlayerInput.IsSwitchWeapon,
                 EPlayerInput.IsSprint,
+            }));
+            inputBlockGrps.Add(InputBlockGroup.Create(new []
+            {
+                EPlayerInput.IsF,
+                EPlayerInput.IsCameraFocus,
+                EPlayerInput.IsRightAttack
             }));
         }
 
@@ -73,9 +79,7 @@ namespace App.Shared.GameModules.Player
             input.SetInput(EPlayerInput.IsThrowing, cmd.IsThrowing);
             input.SetInput(EPlayerInput.IsSwitchWeapon, cmd.IsSwitchWeapon | cmd.CurWeapon > 0);
             input.SetInput(EPlayerInput.IsUseAction, cmd.IsUseAction);
-
-           
-
+            input.SetInput(EPlayerInput.IsF, cmd.IsF);
 
             ApplySpecialInput(cmd, input);
             ApplyInputBlock(input);
@@ -84,12 +88,9 @@ namespace App.Shared.GameModules.Player
         //特殊的输入设置
         private static void ApplySpecialInput(IUserCmd cmd, IFilteredInput input)
         {
-
             //manual
             input.SetInput(EPlayerInput.IsRun, cmd.MoveHorizontal != 0 || cmd.MoveVertical != 0);
             input.SetInput(EPlayerInput.MeleeAttack, input.IsInput(EPlayerInput.IsLeftAttack) | input.IsInput(EPlayerInput.IsRightAttack));
-//          
-        
         }
 
         /// <summary>

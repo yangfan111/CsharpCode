@@ -5,9 +5,10 @@ using App.Shared.GameModules.Player;
 
 using Core.CameraControl;
 using Core.CameraControl.NewMotor;
+using Core.Configuration;
 using Core.EntityComponent;
 using Core.Prediction.UserPrediction.Cmd;
-
+using Utils.Singleton;
 using XmlConfig;
 using ICameraMotorInput = Core.CameraControl.NewMotor.ICameraMotorInput;
 
@@ -15,7 +16,7 @@ namespace App.Shared.GameModules.Camera
 {
     class DummyCameraMotorInput : ICameraMotorInput
     {
-        public void Generate(Contexts contexts, PlayerEntity player, IUserCmd usercmd, float archorYaw, float archorPitch, ICameraMotorState state)
+        public void Generate(PlayerEntity player, IUserCmd usercmd, ICameraMotorState state)
         {
             var speedRatio = CameraUtility.GetGunSightSpeed(player, state);
             DeltaYaw = usercmd.DeltaYaw * speedRatio;
@@ -26,38 +27,48 @@ namespace App.Shared.GameModules.Camera
                 FilteredChangeCamera = usercmd.FilteredInput.IsInput(EPlayerInput.ChangeCamera);
                 FilteredCameraFocus = usercmd.FilteredInput.IsInput(EPlayerInput.IsCameraFocus);
             }
-            var controller = player.WeaponController();
             FrameInterval = usercmd.FrameInterval;
             ChangeCamera = usercmd.ChangeCamera;
-          
             IsCameraFocus = usercmd.IsCameraFocus;
-         
             IsCmdRun = usercmd.IsRun;
             IsCmdMoveVertical = usercmd.MoveVertical > 0;
-            CurrentPostureState = player.stateInterface.State.GetCurrentPostureState();
-            NextPostureState = player.stateInterface.State.GetNextPostureState();
-            LeanState = player.stateInterface.State.GetNextLeanState();
-            IsAirPlane = player.gamePlay.GameState == GameState.AirPlane;      
-            ActionState = player.stateInterface.State.GetActionState();
-            ActionKeepState = player.stateInterface.State.GetActionKeepState();
+            InterruptCameraFocus = usercmd.IsUseAction || usercmd.IsTabDown;
+
+            if (player.hasStateInterface)
+            {
+                CurrentPostureState = player.stateInterface.State.GetCurrentPostureState();
+                NextPostureState = player.stateInterface.State.GetNextPostureState();
+                LeanState = player.stateInterface.State.GetNextLeanState(); 
+                ActionState = player.stateInterface.State.GetActionState();
+                ActionKeepState = player.stateInterface.State.GetActionKeepState();
+            }
+            else if(player.hasThirdPersonAppearance)
+            {
+                CurrentPostureState = (PostureInConfig) player.thirdPersonAppearance.PostureValue;
+                NextPostureState = (PostureInConfig) player.thirdPersonAppearance.NextPostureValue;
+                ActionState = (ActionInConfig) player.thirdPersonAppearance.ActionValue;
+            }
+
+            IsAirPlane = player.gamePlay.GameState == GameState.AirPlane;     
             IsDriveCar =  player.IsOnVehicle();            
             IsDead = player.gamePlay.IsLifeState(EPlayerLifeState.Dead);
-            CanWeaponGunSight = controller.HeldWeaponAgent.CanWeaponSight;
-            ArchorPitch = YawPitchUtility.Normalize(archorPitch);
-            ArchorYaw = YawPitchUtility.Normalize(archorYaw);
+            CanWeaponGunSight =  player.WeaponController().HeldWeaponAgent.CanWeaponSight;
+            ArchorPitch = YawPitchUtility.Normalize(player.cameraArchor.ArchorEulerAngle.x);
+            ArchorYaw = YawPitchUtility.Normalize(player.cameraArchor.ArchorEulerAngle.y);
             IsParachuteAttached = player.hasPlayerSkyMove && player.playerSkyMove.IsParachuteAttached;
-            if (player.gamePlay.CameraEntityId == 0)
-            {
-                IsObservingFreemove = false;
-            }
-            else
-            {
-                IsObservingFreemove = null != contexts.freeMove.GetEntityWithEntityKey(new EntityKey(player.gamePlay.CameraEntityId, (short) EEntityType.FreeMove));
-            }
-            InterruptCameraFocus = usercmd.IsUseAction || usercmd.IsTabDown;
             LastViewByOrder = player.gamePlay.LastViewModeByCmd;
+            RoleId = player.playerInfo.RoleModelId;
         }
 
+        public void FakeForObserve(PlayerEntity player)
+        {          
+            IsDead = player.gamePlay.IsLifeState(EPlayerLifeState.Dead);
+            ArchorPitch = YawPitchUtility.Normalize(player.cameraArchor.ArchorEulerAngle.x);
+            ArchorYaw = YawPitchUtility.Normalize(player.cameraArchor.ArchorEulerAngle.y);
+            RoleId = player.playerInfo.RoleModelId;
+        }
+        
+        public int RoleId { get; set; }
         public float DeltaYaw { get; set; }
         public float DeltaPitch { get; set; }
         public bool IsCameraFree { get; set; }
@@ -79,8 +90,37 @@ namespace App.Shared.GameModules.Camera
         public float ArchorYaw { get; set; }
         public float ArchorPitch { get; set; }
         public bool IsParachuteAttached { get; set; }
-        public bool IsObservingFreemove { get; set; }
+        
+        public CameraConfigItem Config
+        {
+            get { return SingletonManager.Get<CameraConfigManager>().GetRoleConfig(RoleId); }
+        }
 
+        public PoseCameraConfig GetPoseConfig(int modeId)
+        {
+            return Config.PoseConfigs[modeId];
+        }
+
+        public PeekCameraConfig GetPeekConfig()
+        {
+            return Config.PeekConfig;
+        }
+
+        public FreeCameraConfig GetFreeConfig()
+        {
+            return Config.FreeConfig;
+        }
+
+        public ViewCameraConfig GetViewConfig()
+        {
+            return Config.ViewConfig;
+        }
+
+        public DeadCameraConfig GetDeadConfig()
+        {
+            return Config.DeadConfig;
+        }
+        
         public bool FilteredChangeCamera
         {
             get;
@@ -97,29 +137,28 @@ namespace App.Shared.GameModules.Camera
         }
 
         public bool IsChange(ICameraMotorInput r)
-        { 
+        {
             return r == null
                    || IsCameraFree != r.IsCameraFree
                    || ChangeCamera != r.ChangeCamera
                    || IsCameraFocus != r.IsCameraFocus
-                   || CanCameraFocus!= r.ChangeCamera
-                   || NextPostureState!=r.NextPostureState
-                   || CurrentPostureState!=r.CurrentPostureState
-                   || LeanState!=r.LeanState
-                   || ActionState!=r.ActionState
-                   || IsDriveCar!=r.IsDriveCar
-                   || IsAirPlane!=r.IsAirPlane
-                   || IsDead!=r.IsDead
-                   || CanWeaponGunSight!=r.CanWeaponGunSight
-                   || IsCmdRun!=r.IsCmdRun
-                   || IsCmdMoveVertical!=r.IsCmdMoveVertical
-                   || IsParachuteAttached!=r.IsParachuteAttached
-                   || FilteredChangeCamera!=r.FilteredChangeCamera
-                   || FilteredCameraFocus!=r.FilteredCameraFocus
-                   || InterruptCameraFocus!=r.InterruptCameraFocus
-                   || ActionKeepState!=r.ActionKeepState
-                   || LastViewByOrder != r.LastViewByOrder
-                || IsObservingFreemove != r.IsObservingFreemove;
+                   || CanCameraFocus != r.ChangeCamera
+                   || NextPostureState != r.NextPostureState
+                   || CurrentPostureState != r.CurrentPostureState
+                   || LeanState != r.LeanState
+                   || ActionState != r.ActionState
+                   || IsDriveCar != r.IsDriveCar
+                   || IsAirPlane != r.IsAirPlane
+                   || IsDead != r.IsDead
+                   || CanWeaponGunSight != r.CanWeaponGunSight
+                   || IsCmdRun != r.IsCmdRun
+                   || IsCmdMoveVertical != r.IsCmdMoveVertical
+                   || IsParachuteAttached != r.IsParachuteAttached
+                   || FilteredChangeCamera != r.FilteredChangeCamera
+                   || FilteredCameraFocus != r.FilteredCameraFocus
+                   || InterruptCameraFocus != r.InterruptCameraFocus
+                   || ActionKeepState != r.ActionKeepState
+                   || LastViewByOrder != r.LastViewByOrder;
         }
     }
 }

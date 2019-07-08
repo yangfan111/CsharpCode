@@ -29,7 +29,7 @@ namespace App.Client.GameModules.OC
 
             _param = param as FixedOCParam;
             _scene = new SingleScene(String.Empty, _param.SceneName, Index.InValidIndex);
-            _scene.Load(_param.OCData);
+            _scene.Load(_param.OCData, false);
         }
 
         public void DoCulling(Vector3 position)
@@ -40,7 +40,7 @@ namespace App.Client.GameModules.OC
             }
             else
             {
-                _scene.UndoDisabledObjects();
+                _scene.UndoCulling();
             }
         }
 

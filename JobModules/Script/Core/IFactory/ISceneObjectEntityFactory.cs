@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Assets.XmlConfig;
-using Core;
+﻿using Assets.XmlConfig;
 using Core.EntityComponent;
 using Entitas;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Core
@@ -21,11 +19,7 @@ namespace Core
     {
         List<int> FreeCastEntityToDestoryList { get; }
 
-        IEntity CreateSimpleEquipmentEntity(
-            ECategory category,
-            int id,
-            int count,
-            Vector3 position);
+        IEntity CreateSimpleObjectEntity(ECategory category, int id, int count, Vector3 position, int curDurability = 0);
 
         IEntity CreateSceneWeaponObjectEntity(WeaponScanStruct weaponInfo, Vector3 position);
 

@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using App.Server.GameModules.GamePlay.free.player;
+using App.Shared.GameModules.Player;
 using com.wd.free.action;
 using com.wd.free.@event;
+using com.wd.free.map.position;
 using com.wd.free.para;
 using com.wd.free.para.exp;
 using com.wd.free.skill;
@@ -11,14 +10,13 @@ using com.wd.free.unit;
 using Core.Free;
 using gameplay.gamerule.free.ui;
 using gameplay.gamerule.free.ui.component;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
-using App.Shared.FreeFramework.framework.ui.component;
-using com.wd.free.map.position;
-using App.Server.GameModules.GamePlay.free.player;
 
 namespace App.Server.GameModules.GamePlay.Free.entity
 {
-    public class FreeEntityData : IFreeData, IGameUnit
+    public class FreeEntityData : IFreeData, IGameUnit, IRule
     {
         public string name;
         public IFreeMove move;
@@ -58,6 +56,8 @@ namespace App.Server.GameModules.GamePlay.Free.entity
         private IntPara yPara;
         private IntPara zPara;
 
+        private long lastEffectTime;
+
         public FreeEntityData(FreeMoveEntity entity)
         {
             this._entity = entity;
@@ -85,6 +85,8 @@ namespace App.Server.GameModules.GamePlay.Free.entity
 
         public void Start(IEventArgs args)
         {
+            this.paras.AddFields(new ObjectFields(_entity.freeData));
+
             FreeRuleEventArgs fr = (FreeRuleEventArgs)args;
 
             args.TempUse("entity", this);
@@ -123,17 +125,20 @@ namespace App.Server.GameModules.GamePlay.Free.entity
                 auto.SetField("pos");
                 effect.AddAuto(auto);
 
-                AutoScaleValue scale = new AutoScaleValue();
-                scale.SetId(_entity.entityKey.Value.EntityId.ToString());
-                scale.SetField("scale");
-                effect.AddAuto(scale);
-
                 effect.SetSelector(new PosAssignSelector(_entity.position.Value.x.ToString(),
                     _entity.position.Value.y.ToString(), _entity.position.Value.z.ToString()));
 
+                HashSet<int> playerIds = new HashSet<int>();
+                foreach (PlayerEntity player in args.GameContext.player.GetInitializedPlayerEntities())
+                {
+                    playerIds.Add(player.entityKey.Value.EntityId);
+                }
+                effect.SetPlayerIds(playerIds);
                 //Debug.LogFormat("start pos {0}", _entity.position.Value.ToString());
 
                 effect.Act(args);
+
+                lastEffectTime = DateTime.Now.Ticks / 10000L;
             }
 
             args.Resume(name);
@@ -190,6 +195,19 @@ namespace App.Server.GameModules.GamePlay.Free.entity
                 frameAction.Act(args);
             }
 
+            if (effect != null && DateTime.Now.Ticks / 10000L - lastEffectTime > 1000L)
+            {
+                foreach (PlayerEntity player in args.GameContext.player.GetInitializedPlayerEntities())
+                {
+                    if (!effect.GetPlayerIds().Contains(player.entityKey.Value.EntityId))
+                    {
+                        effect.Act(args);
+                        effect.AddPlayerId(player.entityKey.Value.EntityId);
+                        lastEffectTime = DateTime.Now.Ticks / 10000L;
+                        break;
+                    }
+                }
+            }
             args.Resume(name);
             args.Resume("entity");
         }
@@ -217,6 +235,11 @@ namespace App.Server.GameModules.GamePlay.Free.entity
         public ParaList GetParameters()
         {
             return paras;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeEntityData;
         }
     }
 }

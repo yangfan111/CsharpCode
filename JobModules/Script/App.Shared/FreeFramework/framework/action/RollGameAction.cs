@@ -3,12 +3,13 @@ using com.cpkf.yyjd.tools.util.math;
 using com.wd.free.@event;
 using com.wd.free.para;
 using com.wd.free.util;
+using Core.Free;
 
 namespace com.wd.free.action
 {
 	[System.Serializable]
-	public class RollGameAction : AbstractGameAction
-	{
+	public class RollGameAction : AbstractGameAction, IRule
+    {
 		private const long serialVersionUID = 2178762156182717046L;
 
 		private string percent;
@@ -29,5 +30,10 @@ namespace com.wd.free.action
 				args.GetDefault().GetParameters().Resume("roll");
 			}
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.RollGameAction;
+        }
+    }
 }

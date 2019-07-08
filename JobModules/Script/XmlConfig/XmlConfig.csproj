@@ -82,6 +82,7 @@
     <Compile Include="GameRuleConfig.cs" />
     <Compile Include="GlobalDataConfig.cs" />
     <Compile Include="GloryItemConfig.cs" />
+    <Compile Include="HallSystemEnableConfig.cs" />
     <Compile Include="HitBox\HitBox.cs" />
     <Compile Include="HitBox\HitBoxConfigParser.cs" />
     <Compile Include="HitBox\HitBoxConstants.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="TerrainMaterialConfig.cs" />
     <Compile Include="TerrainSoundConfig.cs" />
     <Compile Include="TerrainVehicleFrictionConfig.cs" />
+    <Compile Include="TreeLODConfig.cs" />
     <Compile Include="TypeForDeathConfig.cs" />
     <Compile Include="Utils\TransformUtility.cs" />
     <Compile Include="VehicleAssetConfig.cs" />

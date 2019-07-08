@@ -13,17 +13,15 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
         public static Vector3 BulletEmittorOffset = new Vector3(0, 0, 0.1f);
 
-        public virtual Vector3 GetFireDir(int seed, PlayerWeaponController controller)
+        public virtual Vector3 GetFireDir(int seed, PlayerWeaponController controller, int userCmdSeq)
         {
-            var weaponState = controller.HeldWeaponAgent.RunTimeComponent;
-
-
+            var runTimeComponent = controller.HeldWeaponAgent.RunTimeComponent;
             var orientation = controller.RelatedOrientation;
-            var yaw = orientation.Yaw - orientation.PunchYaw * 2;
-            var pitch = orientation.Pitch - orientation.AccPunchPitch * 2;
-            var dir = CalculateShotingDir(seed, yaw, pitch, weaponState.LastSpreadX,
-                weaponState.LastSpreadY);
-
+            var yaw = orientation.YawRound - orientation.AccPunchYawValue * 2;
+            var pitch = orientation.PitchRound - orientation.AccPunchPitchValue * 2;
+            var dir = CalculateShotingDir(seed, yaw, pitch, runTimeComponent.LastSpreadX,
+                runTimeComponent.LastSpreadY);
+//            DebugUtil.AppendShootText(userCmdSeq,"Yaw:{0},PunchYaw:{1:F5},pitch:{2:F5},AccPunchPitch:{3:F5},LastSpreadX:{4:F5},LastSpreadY:{5:F5}",yaw,orientation.PunchYaw,orientation.Pitch,orientation.AccPunchPitch,runTimeComponent.LastSpreadX,runTimeComponent.LastSpreadY );
             return dir.normalized;
         }
 
@@ -70,7 +68,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
             {
                 return Vector3.zero;
             }
-            var cameraAngle = outputView.EulerAngle;
+          //  var cameraAngle = outputView.EulerAngle;
             //var matrix = Matrix4x4.TRS(BulletEmittorOffset, Quaternion.Euler(cameraAngle), Vector3.one);
             //var offset = matrix.ExtractPosition();
             //return outputView.Position;

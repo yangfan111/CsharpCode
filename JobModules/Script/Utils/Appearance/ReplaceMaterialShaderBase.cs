@@ -54,10 +54,10 @@ namespace Utils.Appearance
 
         public static void ResetShader(GameObject obj)
         {
-            if (null == obj || null == _defaultShader) return;
+            if (null == obj || null == _defaultShader || null == _topLayerShader) return;
             foreach (var value in obj.GetComponentsInChildren<Renderer>())
             {
-                if (value.material.shader == _topLayerShader)
+                if (value.material.shader.name.Equals(_topLayerShader.name))
                 {
                     value.material.shader = _defaultShader;
                     if (RenderQueues.ContainsKey(value.material.GetInstanceID()))

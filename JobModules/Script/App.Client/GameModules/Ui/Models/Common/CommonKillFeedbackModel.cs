@@ -3,6 +3,7 @@ using Assets.UiFramework.Libs;
 using Core.GameModule.Interface;
 using App.Client.GameModules.Ui.UiAdapter;
 using System.Collections.Generic;
+using App.Client.GameModules.Ui.Utils;
 using UnityEngine;
 using DG.Tweening;
 using UIComponent.UI;
@@ -56,15 +57,17 @@ namespace App.Client.GameModules.Ui.Models.Common
                     var it = list[i];
                     if (killEffectDict.TryGetValue(it, out ret))
                     {
-                        if (ret != new GameObject())
-                        ret.transform.parent.gameObject.SetActive(true);
+                        if (ret != null && ret.transform.parent != null)
+                        {
+                            UIUtils.SetActive(ret.transform.parent, true);
+                        }
                     }
                     else
                     {
-                        killEffectDict.Add(it, new GameObject());
+                        killEffectDict.Add(it, null);
                         Loader.LoadAsync(bundle, GetEffectNameById(it), (obj) =>
                         {
-                            var root = GameObject.Instantiate(animeRoot, groupRoot);
+                            var root = Object.Instantiate(animeRoot, groupRoot);
                             root.gameObject.SetActive(true);
                             GameObject go = obj as GameObject;
                             go.transform.SetParent(root, false);

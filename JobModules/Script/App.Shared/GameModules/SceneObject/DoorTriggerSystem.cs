@@ -4,6 +4,7 @@ using App.Shared.SceneTriggerObject;
 using App.Shared.Util;
 using Core;
 using Core.CameraControl;
+using Core.EntityComponent;
 using Core.Enums;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
@@ -41,12 +42,13 @@ namespace App.Shared.GameModules.SceneObject
         {
             if (cmd.IsUseAction && cmd.UseType == (int) EUseActionType.Door)
             {
-                var entity = MapObjectUtility.GetMapObjByRawId(cmd.UseEntityId, (int) ETriggerObjectType.Door);
+                var entity =
+                    _mapContext.GetEntityWithEntityKey(new EntityKey(cmd.UseEntityId, (int) EEntityType.MapObject));
+                
                 if (entity == null && (SharedConfig.IsServer||SharedConfig.IsOffline))
                 {
                     _listener.CreateMapObj(cmd.UseEntityId);
-                    entity = MapObjectUtility.GetMapObjByRawId(cmd.UseEntityId, (int) ETriggerObjectType.Door);
-                    
+                    entity = _mapContext.GetEntityWithEntityKey(new EntityKey(cmd.UseEntityId, (int) EEntityType.MapObject));
                     if (entity == null)
                     {
                         _logger.ErrorFormat("Door Entity {0} does not exist!", cmd.UseEntityId);
@@ -59,10 +61,7 @@ namespace App.Shared.GameModules.SceneObject
                     var player = (PlayerEntity)owner.OwnerEntity;
                     player.autoMoveInterface.PlayerAutoMove.StopAutoMove();
                     player.stateInterface.State.OpenDoor();
-                    if(player.AudioController()!= null)
                         player.AudioController().PlaySimpleAudio(EAudioUniqueId.OpenDoor);
-
-
                     return;
                 }
                 
@@ -128,7 +127,6 @@ namespace App.Shared.GameModules.SceneObject
                     if (endState != state)
                     {
                         player.stateInterface.State.OpenDoor();
-                        if(player.AudioController()!= null)
                             player.AudioController().PlaySimpleAudio(EAudioUniqueId.OpenDoor);
 
                         if(SharedConfig.IsServer || SharedConfig.IsOffline)

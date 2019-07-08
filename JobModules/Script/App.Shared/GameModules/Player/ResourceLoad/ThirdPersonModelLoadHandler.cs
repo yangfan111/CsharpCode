@@ -7,19 +7,18 @@ using App.Shared.Player;
 using Core.Animation;
 using Core.CharacterState;
 using Core.HitBox;
-using Core.Utils;
 using UnityEngine;
-using Utils.Appearance;
+using Utils.Appearance.Bone;
+using Utils.Appearance.Script;
 using Utils.AssetManager;
 using Utils.Singleton;
+using Object = UnityEngine.Object;
 
 namespace App.Shared.GameModules.Player.ResourceLoad
 {
     public class ThirdPersonModelLoadHandler : ModelLoadHandler
     {
-        private IUnityAssetManager _assetManager;
-        private static readonly LoggerAdapter _logger = new LoggerAdapter(typeof(ThirdPersonModelLoadHandler));
-
+        private readonly IUnityAssetManager _assetManager;
 
         public ThirdPersonModelLoadHandler(Contexts contexts) : base(contexts)
         {
@@ -28,6 +27,9 @@ namespace App.Shared.GameModules.Player.ResourceLoad
 
         public void OnLoadSucc(PlayerEntity player, UnityObject unityObj)
         {
+            if(null == unityObj || null == unityObj.AsGameObject)
+                Logger.ErrorFormat("CharacterLog-- playerEntity:  {0}  unityObj is Null", player.entityKey);
+            
             GameObject go = unityObj;
 
             if (player.hasThirdPersonModel)
@@ -56,7 +58,7 @@ namespace App.Shared.GameModules.Player.ResourceLoad
             go.transform.localPosition = new Vector3(0, 0, 0);
             go.transform.localRotation = Quaternion.identity;
             go.transform.localScale = Vector3.one;
-            Logger.InfoFormat("P3 loaded: {0}", player.entityKey);
+            Logger.InfoFormat("CharacterLog-- P3 loaded: {0}", player.entityKey);
 
             BoneTool.CacheTransform(go);
 
@@ -66,6 +68,12 @@ namespace App.Shared.GameModules.Player.ResourceLoad
             player.bones.Spine = BoneMount.FindChildBoneFromCache(go, BoneName.CharacterSpineName);
 
             player.ReplaceThirdPersonAnimator(go.GetComponent<Animator>());
+
+            if (player.hasFsmInputRelateInterface)
+            {
+                player.fsmInputRelateInterface.Relate.InitLimit();
+                player.fsmInputRelateInterface.Relate.CreateAllLimitFsmInput(player.thirdPersonAnimator.UnityAnimator);
+            }
 
             var ik = go.AddComponent<PlayerIK>();
             ik.SetAnimator(AvatarIKGoal.LeftHand, player.thirdPersonAnimator.UnityAnimator);
@@ -91,7 +99,9 @@ namespace App.Shared.GameModules.Player.ResourceLoad
 
             player.characterControllerInterface.CharacterController.SetCharacterRoot(player.characterContoller.Value
                 .gameObject);
+            player.appearanceInterface.Appearance.SetRootGo(player.RootGo());
             player.appearanceInterface.Appearance.SetThirdPersonCharacter(go);
+            player.appearanceInterface.Appearance.SetRagDollComponent(player.ragDoll);
             player.characterControllerInterface.CharacterController.SetThirdModel(player.thirdPersonModel.Value);
 
             player.characterBoneInterface.CharacterBone.SetCharacterRoot(player.characterContoller.Value
@@ -129,8 +139,12 @@ namespace App.Shared.GameModules.Player.ResourceLoad
                 player.thirdPersonAnimator.UnityAnimator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
             else
                 player.thirdPersonAnimator.UnityAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
-        }
 
+            //人物变身、换肤时，清空特效数据
+            if (player.hasEffects)
+                player.effects.ResetEffects();
+        }
+        
         private void InitCharacterControllerSetting(PlayerEntity player)
         {
             var rootGo = player.RootGo();
@@ -140,7 +154,7 @@ namespace App.Shared.GameModules.Player.ResourceLoad
                 var info = player.characterInfo.CharacterInfoProviderContext;
                 characterController.stepOffset = info.GetStepOffset();
                 characterController.slopeLimit = info.GetSlopeLimit();
-                _logger.DebugFormat("characterController is :{0}, characterinfo:{1}, stepOffset:{2}, slopeLimit:{3}", characterController == null, 
+                Logger.DebugFormat("characterController is :{0}, characterinfo:{1}, stepOffset:{2}, slopeLimit:{3}", characterController == null, 
                     player.hasCharacterInfo,
                     info.GetStepOffset(),
                     info.GetSlopeLimit()
@@ -148,16 +162,16 @@ namespace App.Shared.GameModules.Player.ResourceLoad
             }
             else
             {
-                _logger.DebugFormat("characterController is :{0}, characterinfo:{1}", characterController == null, player.hasCharacterInfo);
+                Logger.DebugFormat("characterController is :{0}, characterinfo:{1}", characterController == null, player.hasCharacterInfo);
             }
         }
 
-        private static void ForceStand(UnityEngine.Animator animator)
+        private static void ForceStand(Animator animator)
         {
             SetPosture(animator, AnimatorParametersHash.Instance.StandValue);
         }
         
-        private static void ForceCrouch(UnityEngine.Animator animator)
+        private static void ForceCrouch(Animator animator)
         {
             SetPosture(animator, AnimatorParametersHash.Instance.CrouchValue);
         }
@@ -166,12 +180,18 @@ namespace App.Shared.GameModules.Player.ResourceLoad
         {
             try
             {
+                // 三人称CullingUpdateTransform，Update(0)不更新Transform
+                var previousMode = animator.cullingMode;
+                animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+                
                 animator.SetFloat(AnimatorParametersHash.Instance.PostureHash, value);
                 animator.Update(0);
+                
+                animator.cullingMode = previousMode;
             }
             catch (Exception e)
             {
-                _logger.ErrorFormat("there is no parameters of {0}, can not force set animator to stand or crouch!!!",
+                Logger.ErrorFormat("there is no parameters of {0}, can not force set animator to stand or crouch!!!",
                     AnimatorParametersHash.Instance.PostureName);
             }
         }
@@ -193,25 +213,24 @@ namespace App.Shared.GameModules.Player.ResourceLoad
             return parent;
         }
 
-        private void RemoveRagdollOnServerSide(GameObject go, List<Collider> except)
+        private static void RemoveRagdollOnServerSide(GameObject go, List<Collider> except)
         {
-            if (SharedConfig.IsServer)
+            if (!SharedConfig.IsServer) return;
+            
+            foreach (var joint in go.GetComponentsInChildren<CharacterJoint>())
             {
-                foreach (var joint in go.GetComponentsInChildren<CharacterJoint>())
-                {
-                    GameObject.Destroy(joint);
-                }
+                Object.Destroy(joint);
+            }
 
-                foreach (var body in go.GetComponentsInChildren<Rigidbody>())
-                {
-                    GameObject.Destroy(body);
-                }
+            foreach (var body in go.GetComponentsInChildren<Rigidbody>())
+            {
+                Object.Destroy(body);
+            }
 
-                foreach (var collider in go.GetComponentsInChildren<Collider>())
-                {
-                    if (except.Contains(collider)) continue;
-                    GameObject.Destroy(collider);
-                }
+            foreach (var collider in go.GetComponentsInChildren<Collider>())
+            {
+                if (except.Contains(collider)) continue;
+                Object.Destroy(collider);
             }
         }
     }

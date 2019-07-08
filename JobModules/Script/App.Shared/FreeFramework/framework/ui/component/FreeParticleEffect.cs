@@ -3,12 +3,13 @@ using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.map.position;
 using com.wd.free.util;
+using Core.Free;
 
 namespace gameplay.gamerule.free.ui.component
 {
 	[System.Serializable]
-	public class FreeParticleEffect : IFreeEffect
-	{
+	public class FreeParticleEffect : IFreeEffect, IRule
+    {
 		private const long serialVersionUID = -6550441006104410613L;
 
 		private string name;
@@ -70,5 +71,10 @@ namespace gameplay.gamerule.free.ui.component
 		{
 			return FreeUtil.ReplaceVar(rotation, args);
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeParticleEffect;
+        }
+    }
 }

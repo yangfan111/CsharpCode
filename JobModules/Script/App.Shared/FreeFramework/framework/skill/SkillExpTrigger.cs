@@ -2,12 +2,15 @@ using Sharpen;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.action;
 using com.wd.free.para.exp;
+using com.wd.free.para;
+using System;
+using Core.Free;
 
 namespace com.wd.free.skill
 {
 	[System.Serializable]
-	public class SkillExpTrigger : AbstractSkillTrigger
-	{
+	public class SkillExpTrigger : AbstractSkillTrigger, IRule
+    {
 		private const long serialVersionUID = 8042541448273731065L;
 
 		private string exp;
@@ -36,5 +39,10 @@ namespace com.wd.free.skill
 				return ISkillTrigger.TriggerStatus.Failed;
 			}
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SkillExpTrigger;
+        }
+    }
 }

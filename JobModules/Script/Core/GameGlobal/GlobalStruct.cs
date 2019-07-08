@@ -2,6 +2,7 @@
 using Assets.XmlConfig;
 using System;
 using Utils.Singleton;
+using XmlConfig;
 
 namespace Core
 {
@@ -18,7 +19,20 @@ namespace Core
             this.slotType = stype;
         }
     }
+    public struct HitHandlerInfo
+    {
+        public HitTargetType targetType;
 
+        public readonly static HitHandlerInfo Fail = new HitHandlerInfo(HitTargetType.Failed);
+
+
+       
+
+        public HitHandlerInfo(HitTargetType targetType)
+        {
+            this.targetType = targetType;
+        }
+    }
     /// <summary>
     /// 武器相关的人物动作 地面-当前武器-背包
     /// </summary>
@@ -29,6 +43,7 @@ namespace Core
         public int Count;
     }
 
+   
     public struct MeleeAttackInfo
     {
         public EMeleeAttackType AttackType;
@@ -85,8 +100,9 @@ namespace Core
 
         public override string ToString()
         {
-            return string.Format("Upper {0}, Lower {1}, Magazine {2}, Stock {3}, Muzzle {4}",
-                UpperRail, LowerRail, Magazine, Stock, Muzzle);
+            return string.Format("Upper {0}, Lower {1}, Magazine {2}, Stock {3}, Muzzle {4},SideRail {5},Bore {6},Feed {7},Trigger {8},Interlock {9},Brake {10}",
+                UpperRail, LowerRail, Magazine, Stock, Muzzle, SideRail, Bore, Feed, Trigger, Interlock, Brake);
+
         }
 
         public static bool operator ==(WeaponPartsStruct x, WeaponPartsStruct y)
@@ -160,6 +176,8 @@ namespace Core
             }
         }
     }
+
+  
 }
 
 

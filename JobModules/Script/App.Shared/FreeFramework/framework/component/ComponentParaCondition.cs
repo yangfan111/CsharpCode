@@ -1,12 +1,13 @@
 using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.para.exp;
+using Core.Free;
 
 namespace gameplay.gamerule.free.component
 {
 	[System.Serializable]
-	public class ComponentParaCondition : IParaCondition, IComponentable
-	{
+	public class ComponentParaCondition : IParaCondition, IComponentable, IRule
+    {
 		private const long serialVersionUID = -3096668947524226601L;
 
 		private string name;
@@ -63,5 +64,10 @@ namespace gameplay.gamerule.free.component
 		{
 			return defaultCondition;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ComponentParaCondition;
+        }
+    }
 }

@@ -48,7 +48,7 @@ namespace App.Shared.GameModules.Player
             SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.SyncFirePosition);
 
             //同步第一人称枪口位置
-            CharacterBoneSynchronizer.SyncToFirePositionComponent(playerEntity.firePosition, playerEntity);
+            CharacterBoneSynchronizer.SyncToFirePositionComponent(playerEntity.firePosition, playerEntity,cmd);
             SingletonManager.Get<DurationHelp>().ProfileEnd(CustomProfilerStep.SyncFirePosition);
 
             //Logger.InfoFormat("PredictedAppearanceComponent:{0}, seq:{1}", playerEntity.predictedAppearance.ToString(), cmd.Seq);

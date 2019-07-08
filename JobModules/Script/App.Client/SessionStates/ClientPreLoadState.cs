@@ -1,9 +1,4 @@
-﻿using App.Shared.SessionStates;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Client.GameModules.Effect;
+﻿using App.Client.GameModules.Effect;
 using App.Shared.Components;
 using App.Shared.GameModules.Configuration;
 using App.Shared.GameModules.Preparation;
@@ -15,7 +10,7 @@ using I2.Loc;
 
 namespace App.Client.SessionStates
 {
-    public class ClientPreLoadState : BasePreLoadState
+    public class ClientPreLoadState : AbstractSessionState
     {
         public ClientPreLoadState(IContexts contexts, EClientSessionStates state, EClientSessionStates next) : base(contexts, (int) state, (int) next)
         {
@@ -24,10 +19,9 @@ namespace App.Client.SessionStates
         public override Systems CreateUpdateSystems(IContexts contexts)
         {
             Contexts _contexts = (Contexts) contexts;
-
-            var systems = base.CreateUpdateSystems(contexts);
+            var systems = new Feature("ClientPreLoadState");
             systems.Add(new PreloadFeature("ClientPreLoadState", CreateSystems(_contexts, this), _contexts.session.commonSession));
-            systems.Add(new BaseConfigurationInitModule(this, _contexts.session.commonSession.AssetManager));
+            systems.Add(new SettingInitSystem());
             return systems;
         }
 
@@ -46,14 +40,10 @@ namespace App.Client.SessionStates
 
         public sealed class PreloadFeature : Feature
         {
-            public PreloadFeature(string name,
-                IGameModule topLevelGameModule,
-                ICommonSessionObjects commonSessionObjects) : base(name)
+            public PreloadFeature(string name, IGameModule topLevelGameModule, ICommonSessionObjects commonSessionObjects) : base(name)
             {
                 topLevelGameModule.Init();
-
                 Add(new ModuleInitSystem(topLevelGameModule, commonSessionObjects.AssetManager));
-                
                 Add(new ResourceLoadSystem(topLevelGameModule, commonSessionObjects.AssetManager));
             }
         }

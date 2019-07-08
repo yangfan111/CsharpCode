@@ -21,7 +21,11 @@ namespace Core.Utils
 
         public void OnThreadCreate(AbstractThread thread)
         {
-            _createdThreads.Add(thread);
+            lock (this)
+            {
+                _createdThreads.Add(thread);
+            }
+           
         }
 
         public void OnThreadStart(AbstractThread thread)

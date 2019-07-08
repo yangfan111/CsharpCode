@@ -139,13 +139,31 @@ namespace App.Shared.Components.Player
             var leftComp = left as NetworkWeaponAnimationComponent;
             var rightComp = right as NetworkWeaponAnimationComponent;
 
-            FirstPersonAnimName = leftComp.FirstPersonAnimName;
-            FirstPersonAnimProgress = leftComp.FirstPersonAnimProgress + 
-                (rightComp.FirstPersonAnimProgress - leftComp.FirstPersonAnimProgress) * interpolationInfo.Ratio;
-            
-            ThirdPersonAnimName = leftComp.ThirdPersonAnimName;
-            ThirdPersonAnimProgress = leftComp.ThirdPersonAnimProgress + 
-                (rightComp.ThirdPersonAnimProgress - leftComp.ThirdPersonAnimProgress) * interpolationInfo.Ratio;
+            if (null == leftComp || null == rightComp) return;
+
+            if (leftComp.FirstPersonAnimName.Equals(rightComp.FirstPersonAnimName))
+            {
+                FirstPersonAnimName = leftComp.FirstPersonAnimName;
+                FirstPersonAnimProgress = leftComp.FirstPersonAnimProgress + 
+                                          (rightComp.FirstPersonAnimProgress - leftComp.FirstPersonAnimProgress) * interpolationInfo.Ratio;
+            }
+            else
+            {
+                FirstPersonAnimName = rightComp.FirstPersonAnimName;
+                FirstPersonAnimProgress = rightComp.FirstPersonAnimProgress;
+            }
+
+            if (leftComp.ThirdPersonAnimName.Equals(rightComp.ThirdPersonAnimName))
+            {
+                ThirdPersonAnimName = leftComp.ThirdPersonAnimName;
+                ThirdPersonAnimProgress = leftComp.ThirdPersonAnimProgress + 
+                                          (rightComp.ThirdPersonAnimProgress - leftComp.ThirdPersonAnimProgress) * interpolationInfo.Ratio;
+            }
+            else
+            {
+                ThirdPersonAnimName = rightComp.ThirdPersonAnimName;
+                ThirdPersonAnimProgress = rightComp.ThirdPersonAnimProgress;
+            }
         }
 
         public void CopyFrom(object rightComponent)
@@ -156,29 +174,6 @@ namespace App.Shared.Components.Player
             FirstPersonAnimProgress = right.FirstPersonAnimProgress;
             ThirdPersonAnimName = right.ThirdPersonAnimName;
             ThirdPersonAnimProgress = right.ThirdPersonAnimProgress;
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="right"></param>
-        /// <returns></returns>
-        public bool IsApproximatelyEqual(object right)
-        {
-
-            var rightComponent = right as NetworkWeaponAnimationComponent;
-
-            var ret = FirstPersonAnimName.Equals(rightComponent.FirstPersonAnimName) &&
-                ThirdPersonAnimName.Equals(rightComponent.ThirdPersonAnimName) &&
-                /*CompareUtility.IsApproximatelyEqual(FirstPersonAnimProgress, rightComponent.FirstPersonAnimProgress) &&*/
-                CompareUtility.IsApproximatelyEqual(ThirdPersonAnimProgress, rightComponent.ThirdPersonAnimProgress);
-
-            if (!ret)
-                _logger.InfoFormat("Local P1:{0}/{1} P3:{2}/{3}\nRemote P1:{4}/{5} P3:{6}/{7}",
-                    FirstPersonAnimName, FirstPersonAnimProgress, ThirdPersonAnimName, ThirdPersonAnimProgress,
-                    rightComponent.FirstPersonAnimName, rightComponent.FirstPersonAnimProgress,
-                    rightComponent.ThirdPersonAnimName, rightComponent.ThirdPersonAnimProgress);
-
-            return ret;
         }
     }
 }

@@ -2,7 +2,6 @@
 using App.Shared;
 using App.Shared.Components.Player;
 using Core.Utils;
-using Entitas.Utils;
 using UnityEngine;
 using UserInputManager.Lib;
 using Utils.Configuration;
@@ -38,15 +37,10 @@ namespace App.Client.GameModules.Ui.Logic
         {
             var player = _playerContext.flagSelfEntity;
             var states = player.StateInteractController().GetCurrStates();
-//            string s = "";
-//            foreach(var val in states)
-//            {
-//                s += (EPlayerState)val+"|";
-//            }
-//            Logger.InfoFormat("Input:"+s);
+            var manager = SingletonManager.Get<StateTransitionConfigManager>();
             foreach(var state in states)
             {
-                StateTransitionConfigItem condition = SingletonManager.Get<StateTransitionConfigManager>().GetConditionByState(state);
+                StateTransitionConfigItem condition = manager.GetConditionByState(state);
                 if (condition == null) continue;
                 if(!condition.IsUseAction)
                 {
@@ -80,7 +74,7 @@ namespace App.Client.GameModules.Ui.Logic
                 return;
             }
             var player = _playerContext.flagSelfEntity;
-            if(null == player || player.gamePlay.LifeState == (int)EPlayerLifeState.Dead)
+            if(null == player || player.gamePlay.LifeState == (int)EPlayerLifeState.Dead || player.gamePlay.TipHideStatus)
             {
                 return;
             }

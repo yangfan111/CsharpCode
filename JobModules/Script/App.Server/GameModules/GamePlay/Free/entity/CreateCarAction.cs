@@ -11,11 +11,12 @@ using App.Shared.Components.Vehicle;
 using UnityEngine;
 using XmlConfig;
 using com.wd.free.util;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.entity
 {
     [Serializable]
-    public class CreateCarAction : AbstractGameAction
+    public class CreateCarAction : AbstractGameAction, IRule
     {
         private string carId;
 
@@ -30,6 +31,11 @@ namespace App.Server.GameModules.GamePlay.Free.entity
             VehicleEntityUtility.CreateNewVehicle(con.vehicle, FreeUtil.ReplaceInt(carId, args),
                 con.session.commonSession.EntityIdGenerator.GetNextEntityId(),
                 map.position.UnityPositionUtil.ToVector3(up));
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.CreateCarAction;
         }
     }
 }

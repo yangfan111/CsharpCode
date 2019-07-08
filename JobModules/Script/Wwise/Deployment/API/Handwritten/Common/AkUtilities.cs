@@ -590,23 +590,23 @@ public partial class AkUtilities
 
 	public static void AddAkAudioListenerToMainCamera(bool logWarning = false)
 	{
-		if (!UnityEngine.Camera.main)
-			return;
-
-		if (UnityEngine.Camera.main.GetComponentInChildren<AkAudioListener>())
-			return;
-
-		var akAudioListener = UnityEditor.Undo.AddComponent<AkAudioListener>(UnityEngine.Camera.main.gameObject);
-		if (!akAudioListener)
-			return;
-
-		var akGameObj = akAudioListener.GetComponentInChildren<AkGameObj>();
-		if (akGameObj)
-			akGameObj.isEnvironmentAware = false;
-
-		if (logWarning)
-			UnityEngine.Debug.LogWarning(
-				"Automatically added AkAudioListener to Main Camera. Go to \"Edit > Wwise Settings...\" to disable this functionality.");
+//		if (!UnityEngine.Camera.main)
+//			return;
+//
+//		if (UnityEngine.Camera.main.GetComponentInChildren<AkAudioListener>())
+//			return;
+//
+//		var akAudioListener = UnityEditor.Undo.AddComponent<AkAudioListener>(UnityEngine.Camera.main.gameObject);
+//		if (!akAudioListener)
+//			return;
+//
+//		var akGameObj = akAudioListener.GetComponentInChildren<AkGameObj>();
+//		if (akGameObj)
+//			akGameObj.isEnvironmentAware = false;
+//
+//		if (logWarning)
+//			UnityEngine.Debug.LogWarning(
+//				"Automatically added AkAudioListener to Main Camera. Go to \"Edit > Wwise Settings...\" to disable this functionality.");
 	}
 
 	public static void RemoveUnityAudioListenerFromMainCamera()

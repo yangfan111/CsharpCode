@@ -14,6 +14,7 @@ namespace App.Shared.Components.Ui
 
         [DontInitilize] public bool CountingDown;
         [DontInitilize] public float CountDownNum;
+        [DontInitilize] public bool HaveCompletedCountDown;
 
         [DontInitilize] public SplitPropInfo SplitPropInfo;
 
@@ -57,23 +58,6 @@ namespace App.Shared.Components.Ui
         [DontInitilize] public int MyselfGameTitle;
 
 
-
-
-        //通知界面全局数据 使用ShowNoticeWindow 设置数据
-        [DontInitilize] public INoticeInfoItem NoticeInfoItem;
-
-        public void ShowNoticeWindow(NoticeWindowStyle style, string title, Action yesCB, Action noCB, string yesText, string noText, float countDownTime, Action countDownCallback)
-        {
-            NoticeInfoItem.style = style;
-            NoticeInfoItem.Title = title;
-            NoticeInfoItem.YesCallback = yesCB;
-            NoticeInfoItem.NoCallback = noCB;
-            NoticeInfoItem.YesText = yesText;
-            NoticeInfoItem.NoText = noText;
-            NoticeInfoItem.CountDownTime = countDownTime;
-            NoticeInfoItem.CountDownCallback = countDownCallback;
-        }
-
         [DontInitilize] public EUIBombInstallState C4InstallState;
         [DontInitilize] public int CurRoundCount;
         [DontInitilize] public IPlayerCountData[] PlayerCountByCampTypeDict;
@@ -113,5 +97,8 @@ namespace App.Shared.Components.Ui
         [DontInitilize] public int HoldWeaponSlotIndex;
         [DontInitilize] public int CurBagWeight;
         [DontInitilize] public int TotalBagWeight;
+        [DontInitilize] public bool ShowBuffTip;
+        [DontInitilize] public string BuffTip;
+        [DontInitilize] public PlayerEntity Player;
     }
 }

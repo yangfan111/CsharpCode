@@ -10,12 +10,14 @@ namespace App.Client.GPUInstancing.Core
         private Camera _renderingCamera;
 
         protected readonly ComputeShader VisibilityShader;
+        protected readonly ComputeShader SortShader;
 
         private readonly float[] _cameraWorldPositiotn = new float[3];
 
-        protected GpuInstancingPipeline(ComputeShader visibilityShader)
+        protected GpuInstancingPipeline(ComputeShader visibilityShader, ComputeShader sortShader)
         {
             VisibilityShader = visibilityShader;
+            SortShader = sortShader;
         }
 
         public void SetRenderingCamera(Camera cam)

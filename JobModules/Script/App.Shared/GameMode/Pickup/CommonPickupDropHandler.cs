@@ -1,18 +1,11 @@
 ﻿using App.Server.GameModules.GamePlay.free.player;
 using App.Shared.FreeFramework.framework.trigger;
-using App.Shared.GameModules.Player;
-using App.Shared.Player;
 using App.Shared.Util;
 using com.wd.free.@event;
 using com.wd.free.para;
 using Core;
-using Core.Configuration;
 using Core.Free;
-using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using UnityEngine;
-using Utils.Configuration;
-using Utils.Singleton;
 
 namespace App.Shared.GameMode
 {
@@ -35,7 +28,7 @@ namespace App.Shared.GameMode
         public override void DoPickup(PlayerEntity player, int sceneKey)
         {
             var sceneEntity = sceneObjectEntityFactory.GetSceneEntity(sceneKey) as SceneObjectEntity;
-            if (sceneEntity == null|| sceneEntity.hasThrowing || !sceneEntity.hasWeaponObject || !sceneEntity.IsCanPickUpByPlayer(player))
+            if (sceneEntity == null|| sceneEntity.hasThrowing || !sceneEntity.hasWeaponObject || !sceneEntity.IsCanPickUpByPlayer(player) || sceneEntity.isFlagDestroy)
             {
                 Logger.ErrorFormat("only weapon is supported in normal mode");
                 return;

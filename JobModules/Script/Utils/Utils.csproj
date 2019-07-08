@@ -55,6 +55,9 @@
     <Reference Include="UnityEngine">
       <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.UI.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEditor">
       <HintPath>..\ThirdParty\Unity\5_6\UnityEditor.dll</HintPath>
     </Reference>
@@ -69,6 +72,7 @@
     <Compile Include="Appearance\Bone\BoneTool.cs" />
     <Compile Include="Appearance\Bone\IBoneRigging.cs" />
     <Compile Include="Appearance\CharacterSpecification.cs" />
+    <Compile Include="Appearance\Effects\EffectUtility.cs" />
     <Compile Include="Appearance\HallReplaceMaterialShader.cs" />
     <Compile Include="Appearance\IAdaptiveContainer.cs" />
     <Compile Include="Appearance\IAppearanceState.cs" />
@@ -81,6 +85,7 @@
     <Compile Include="Appearance\PropItem\PropControllerBase.cs" />
     <Compile Include="Appearance\ReplaceMaterialShaderBase.cs" />
     <Compile Include="Appearance\Script\HitBoxCache.cs" />
+    <Compile Include="Appearance\Script\HumanBodyBonesMappingTable.cs" />
     <Compile Include="Appearance\Script\PlayerIK.cs" />
     <Compile Include="Appearance\Script\TransformCache.cs" />
     <Compile Include="Appearance\ThirdPersonAppearance.cs" />
@@ -95,8 +100,10 @@
     <Compile Include="Appearance\Weapon\IWeaponModelController.cs" />
     <Compile Include="Appearance\Weapon\IWeaponModelLoadController.cs" />
     <Compile Include="Appearance\Weapon\IWeaponModelLoader.cs" />
+    <Compile Include="Appearance\Weapon\WeaponAnimationBase.cs" />
     <Compile Include="Appearance\Weapon\WeaponControllerBase.cs" />
     <Compile Include="Appearance\Weapon\WeaponGameObjectData.cs" />
+    <Compile Include="Appearance\Weapon\WeaponMaterialChangeController.cs" />
     <Compile Include="Appearance\Weapon\WeaponModelAssemblyController.cs" />
     <Compile Include="Appearance\Weapon\WeaponModelController.cs" />
     <Compile Include="Appearance\Weapon\WeaponModelControllerFactory.cs" />
@@ -142,6 +149,8 @@
     <Compile Include="Configuration\RaycastActionConfigManager.cs" />
     <Compile Include="Configuration\RoleAvatarConfigManager.cs" />
     <Compile Include="Configuration\RoleConfigManager.cs" />
+    <Compile Include="Configuration\SettingConfigManager.cs" />
+    <Compile Include="Configuration\SettingVideoConfigManager.cs" />
     <Compile Include="Configuration\StateTransitionConfigManager.cs" />
     <Compile Include="Configuration\TypeForDeathConfigManager.cs" />
     <Compile Include="Configuration\VideoSettingConfigManager.cs" />
@@ -212,10 +221,30 @@
     <Compile Include="ObjectPool\ObjectAllocators.cs" />
     <Compile Include="ObjectPool\RefCounter.cs" />
     <Compile Include="ObjectPool\RingBufferObjectAllocator.cs" />
-    <Compile Include="SettingManager\AllVideoSettingHelper.cs" />
+    <Compile Include="SettingManager\GameQualitySetting\GameQualityID.cs" />
+    <Compile Include="SettingManager\GameQualitySetting\GameQualitySettingBaseMB.cs" />
+    <Compile Include="SettingManager\GameQualitySetting\GameQualitySettingHandler.cs" />
+    <Compile Include="SettingManager\GameQualitySetting\GameQualitySettingManager.cs" />
+    <Compile Include="SettingManager\SettingHandler.cs" />
     <Compile Include="SettingManager\SettingManager.cs" />
     <Compile Include="SettingManager\VideoSettingManager.cs" />
     <Compile Include="Singleton\SingletonManager.cs" />
+    <Compile Include="StatsMonitor\Scripts\Core\Alignment.cs" />
+    <Compile Include="StatsMonitor\Scripts\Core\Bitmap2D.cs" />
+    <Compile Include="StatsMonitor\Scripts\Core\View2D.cs" />
+    <Compile Include="StatsMonitor\Scripts\Editor\EditorUtil.cs" />
+    <Compile Include="StatsMonitor\Scripts\Editor\StatsMonitorEditor.cs" />
+    <Compile Include="StatsMonitor\Scripts\Editor\StatsMonitorWrapperEditor.cs" />
+    <Compile Include="StatsMonitor\Scripts\IProfiler.cs" />
+    <Compile Include="StatsMonitor\Scripts\StatsMonitor.cs" />
+    <Compile Include="StatsMonitor\Scripts\StatsMonitorWrapper.cs" />
+    <Compile Include="StatsMonitor\Scripts\Util\GraphicsFactory.cs" />
+    <Compile Include="StatsMonitor\Scripts\Util\Utils.cs" />
+    <Compile Include="StatsMonitor\Scripts\View\CustomInfoView.cs" />
+    <Compile Include="StatsMonitor\Scripts\View\FPSView.cs" />
+    <Compile Include="StatsMonitor\Scripts\View\GraphView.cs" />
+    <Compile Include="StatsMonitor\Scripts\View\StatsView.cs" />
+    <Compile Include="StatsMonitor\Scripts\View\SysInfoView.cs" />
     <Compile Include="Utils\AbstractThread.cs" />
     <Compile Include="Utils\ArrayUtility.cs" />
     <Compile Include="Utils\BitArrayWrapper.cs" />
@@ -231,6 +260,7 @@
     <Compile Include="Utils\CmdParser.cs" />
     <Compile Include="Utils\CommonEnumEqualityComparer.cs" />
     <Compile Include="Utils\CommonMathUtil.cs" />
+    <Compile Include="Utils\CommonUtil.cs" />
     <Compile Include="Utils\ConsumerThread.cs" />
     <Compile Include="Utils\CopyUtil.cs" />
     <Compile Include="Utils\DebugConfig.cs" />
@@ -239,6 +269,7 @@
     <Compile Include="Utils\DurationHelp.cs" />
     <Compile Include="Utils\EulerUtility.cs" />
     <Compile Include="Utils\ExtDeubg.cs" />
+    <Compile Include="Utils\FPSGraph.cs" />
     <Compile Include="Utils\IEnumerableExt.cs" />
     <Compile Include="Utils\IntersectionDetectTool.cs" />
     <Compile Include="Utils\MatrixExt.cs" />

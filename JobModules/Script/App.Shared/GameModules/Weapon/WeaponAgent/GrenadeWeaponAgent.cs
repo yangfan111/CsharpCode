@@ -42,7 +42,7 @@ namespace App.Shared.GameModules.Weapon
             }
         }
 
-        internal override EntityKey WeaponKey
+        public override EntityKey WeaponKey
         {
             get { return IsValid() ? _bagCacheHandler.GrenadeEntity.entityKey.Value : emptyKeyExtractor(); }
         }
@@ -67,7 +67,10 @@ namespace App.Shared.GameModules.Weapon
             ReleaseWeapon();
             return true;
         }
-
+        internal override bool CanApplyPart
+        {
+            get { return false; }
+        }
         public LoggerAdapter logger = new LoggerAdapter(typeof(GrenadeWeaponAgent));
 
         public override int ConfigId

@@ -15,6 +15,7 @@ namespace Core.EntityComponent
         short EntityType { get; }
         IGameEntity CreateAndGetEntity(EntityKey entityKey);
         IGameEntity GetEntity(EntityKey entityKey);
+        bool TryGetEntity(EntityKey entityKey,out IGameEntity entity);
         bool CanContainComponent<TComponent>() where TComponent: IGameComponent;
         
         IGameGroup CreateGameGroup<TComponent>() where TComponent : IGameComponent;

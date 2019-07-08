@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using com.wd.free.@event;
 using com.wd.free.skill;
+using Core.Free;
 
 namespace App.Shared.FreeFramework.Free.Weapon
 {
     [Serializable]
-    public class DefineWeaponSkillAction : AbstractGameAction
+    public class DefineWeaponSkillAction : AbstractGameAction, IRule
     {
         private int id;
         private List<ISkill> skills;
@@ -23,6 +24,11 @@ namespace App.Shared.FreeFramework.Free.Weapon
                     WeaponSkillFactory.RegisterSkill(id, skill);
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.DefineWeaponSkillAction;
         }
     }
 }

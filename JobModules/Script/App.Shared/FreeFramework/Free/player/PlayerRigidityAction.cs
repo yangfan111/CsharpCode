@@ -6,7 +6,7 @@ using System.Text;
 using com.wd.free.@event;
 using App.Server.GameModules.GamePlay.free.player;
 using App.Shared.FreeFramework.framework.unit;
-using App.Shared.GameModules.Bullet;
+using App.Shared.GameModules.Attack;
 using com.wd.free.para;
 using Assets.Utils.Configuration;
 using Utils.Singleton;

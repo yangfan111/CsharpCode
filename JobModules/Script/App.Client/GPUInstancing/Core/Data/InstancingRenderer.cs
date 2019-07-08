@@ -1,6 +1,8 @@
 ﻿using System;
 using App.Client.GPUInstancing.Core.Utils;
 using UnityEngine;
+using UnityEngine.Rendering;
+using Object = UnityEngine.Object;
 
 namespace App.Client.GPUInstancing.Core.Data
 {
@@ -19,13 +21,14 @@ namespace App.Client.GPUInstancing.Core.Data
 
     public class InstancingRenderer
     {
-        private readonly float[] _lodRatios;
+        private float[] _lodRatios;
 
-        private readonly LodRenderer[] _lodRenderers;
+        // prototype -> several lod level -> several renderers -> several submesh
+        private LodRenderer[] _lodRenderers;
 
         private Vector3 _sphereCenter;
         private float _sphereRadius;
-        private readonly float _lodSize;
+        private float _lodSize;
 
         public Vector3 SphereCenter { get { return _sphereCenter; } }
         public float SphereRadius { get { return _sphereRadius; } }
@@ -33,77 +36,113 @@ namespace App.Client.GPUInstancing.Core.Data
         public float LodSize { get { return _lodSize; } }
         public float[] LodRatios { get { return _lodRatios; } }
 
+        public bool ReceiveShadow { get; private set; }
+        public ShadowCastingMode CastShadow { get; private set; }
+        
         public InstancingRenderer(DetailPrototype prototype)
         {
-            Mesh nonLodMesh = null;
-            Material[] nonLodMaterials = null;
-
             if (prototype.usePrototypeMesh)
             {
-                var go = prototype.prototype;
-                var lodGroup = go.GetComponent<LODGroup>();
-                if (lodGroup != null)
-                {
-                    var lods = lodGroup.GetLODs();
-
-                    _lodRatios = new float[lods.Length];
-                    _lodRenderers = new LodRenderer[lods.Length];
-
-                    for (int i = 0; i < lods.Length; ++i)
-                    {
-                        var lod = lods[i];
-
-                        _lodRatios[i] = lod.screenRelativeTransitionHeight;
-                        _lodRenderers[i] = new LodRenderer
-                        {
-                            Renderers = new LodActualRenderer[lod.renderers.Length]
-                        };
-
-                        for (int j = 0; j < lod.renderers.Length; ++j)
-                        {
-                            var meshFilter = lod.renderers[j].GetComponent<MeshFilter>();
-                            _lodRenderers[i].Renderers[j] = BuildRenderer(meshFilter.sharedMesh,
-                                GetDefaultInstanceMaterial(meshFilter.sharedMesh, null));
-                        }
-                    }
-
-                    SetBoundingVolume(lods[0]);
-                    _lodSize = lodGroup.size;
-                }
-                else
-                {
-                    nonLodMesh = go.GetComponent<MeshFilter>().sharedMesh;
-                    nonLodMaterials = GetDefaultInstanceMaterial(nonLodMesh, go.GetComponent<MeshRenderer>().sharedMaterials);
-                }
+                CreateFromPrefab(prototype.prototype, Constants.Rendering.GetGrassMaterial());
             }
             else
             {
-                nonLodMesh = Constants.Rendering.QuadMesh;
-                nonLodMaterials = new [] { Constants.Rendering.GetGrassMaterial() };
+                var nonLodMesh = Constants.Rendering.QuadMesh;
+                var nonLodMaterials = new [] { Object.Instantiate(Constants.Rendering.GetGrassMaterial()) };
 
                 foreach (var nonLodMaterial in nonLodMaterials)
                 {
                     nonLodMaterial.mainTexture = prototype.prototypeTexture;
+                    nonLodMaterial.mainTexture.wrapMode = TextureWrapMode.Clamp;
                 }
+                
+                CreateNonLodRenderer(nonLodMesh, nonLodMaterials);
             }
 
-            if (_lodRenderers == null)
+            ReceiveShadow = true;
+            CastShadow = ShadowCastingMode.Off;
+        }
+
+        public InstancingRenderer(GameObject go)
+        {
+            ReceiveShadow = false;
+            CastShadow = ShadowCastingMode.Off;
+
+            CreateFromPrefab(go, null);
+        }
+
+        private void CreateFromPrefab(GameObject go, Material replaceMaterial)
+        {
+            var lodGroup = go.GetComponent<LODGroup>();
+            if (lodGroup != null)
             {
-                var renderer = BuildRenderer(nonLodMesh, nonLodMaterials);
+                var lods = lodGroup.GetLODs();
 
-                _lodRenderers = new LodRenderer[1];
-                _lodRenderers[0] = new LodRenderer
+                _lodRatios = new float[lods.Length];
+                _lodRenderers = new LodRenderer[lods.Length];
+
+                for (int i = 0; i < lods.Length; ++i)
                 {
-                    Renderers = new []{ renderer }
-                };
+                    var lod = lods[i];
 
-                var bounds = renderer.Mesh.bounds;
-                _sphereCenter = bounds.center;
-                _sphereRadius = bounds.extents.magnitude;
+                    _lodRatios[i] = lod.screenRelativeTransitionHeight;
+                    _lodRenderers[i] = new LodRenderer
+                    {
+                        Renderers = new LodActualRenderer[lod.renderers.Length]
+                    };
 
-                var size = bounds.size;
-                _lodSize = Mathf.Max(size.x, Mathf.Max(size.y, size.z));
+                    var singleLod = _lodRenderers[i];
+
+                    for (int j = 0; j < lod.renderers.Length; ++j)
+                    {
+                        var meshFilter = lod.renderers[j].GetComponent<MeshFilter>();
+                        // plain meshfiler&meshrenderer
+                        if (meshFilter != null)
+                        {
+                            if (replaceMaterial == null)
+                                singleLod.Renderers[j] = BuildRenderer(meshFilter.sharedMesh,
+                                    lod.renderers[j].GetComponent<MeshRenderer>().sharedMaterials);
+                            else
+                                singleLod.Renderers[j] = BuildRenderer(meshFilter.sharedMesh,
+                                    GetDefaultInstanceMaterial(meshFilter.sharedMesh.subMeshCount, null,
+                                        replaceMaterial));
+                        }
+                        else
+                        {
+                            // Billboard Renderer&Billboard Asset
+                        }
+                    }
+                }
+
+                SetBoundingVolume(lods[0]);
+                _lodSize = lodGroup.size;
             }
+            else
+            {
+                var nonLodMesh = go.GetComponent<MeshFilter>().sharedMesh;
+                var nonLodMaterials = GetDefaultInstanceMaterial(nonLodMesh.subMeshCount,
+                    go.GetComponent<MeshRenderer>().sharedMaterials, replaceMaterial);
+
+                CreateNonLodRenderer(nonLodMesh, nonLodMaterials);
+            }
+        }
+
+        private void CreateNonLodRenderer(Mesh nonLodMesh, Material[] nonLodMaterials)
+        {
+            var renderer = BuildRenderer(nonLodMesh, nonLodMaterials);
+            
+            _lodRenderers = new LodRenderer[1];
+            _lodRenderers[0] = new LodRenderer
+            {
+                Renderers = new []{ renderer }
+            };
+            
+            var bounds = renderer.Mesh.bounds;
+            _sphereCenter = bounds.center;
+            _sphereRadius = bounds.extents.magnitude;
+            
+            var size = bounds.size;
+            _lodSize = Mathf.Max(size.x, Mathf.Max(size.y, size.z));
         }
 
         internal LodRenderer GetLodRenderer(int lodLevel)
@@ -158,13 +197,13 @@ namespace App.Client.GPUInstancing.Core.Data
             _sphereRadius = Vector3.Distance(_sphereCenter, volumeMin);
         }
 
-        private Material[] GetDefaultInstanceMaterial(Mesh mesh, Material[] originMaterials)
+        private Material[] GetDefaultInstanceMaterial(int subMeshCount, Material[] originMaterials, Material replaceMaterial)
         {
-            Material[] instanceMaterials = new Material[mesh.subMeshCount];
+            Material[] instanceMaterials = new Material[subMeshCount];
 
-            for (int i = 0; i < instanceMaterials.Length; ++i)
+            for (int i = 0; i < subMeshCount; ++i)
             {
-                instanceMaterials[i] = Constants.Rendering.GetGrassMaterial();
+                instanceMaterials[i] = Object.Instantiate(replaceMaterial);
                 if (originMaterials != null)
                 {
                     instanceMaterials[i].mainTexture = originMaterials[i].mainTexture;

@@ -22,7 +22,7 @@ namespace Core.UpdateLatest
         }
         
         public UpdateLatestHead Head = new UpdateLatestHead();
-        public List<IUpdateComponent> UpdateComponents = new List<IUpdateComponent>();
+        public List<IUpdateComponent> UpdateComponents = new List<IUpdateComponent>(32);
        
 
         protected override void OnCleanUp()

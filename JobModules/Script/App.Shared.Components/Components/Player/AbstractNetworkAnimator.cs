@@ -21,19 +21,25 @@ namespace App.Shared.Components.Player
         [NetworkProperty] [DontInitilize] public int BaseServerTime;
         [NetworkProperty] [DontInitilize] public int BaseClientTime;
         
-        [NetworkProperty]
-        public List<NetworkAnimatorLayer> AnimatorLayers;
+        [NetworkProperty] public List<NetworkAnimatorLayer> AnimatorLayers;
 
+//        [NetworkProperty]
+        [DontInitilize] public List<byte> BoolAndIntAnimatorParameters;
+//        [NetworkProperty]
+        [DontInitilize] public List<ushort> FloatAnimatorParameters;
+        
         private List<NetworkAnimatorParameter> _animatorParameters;
-        [NetworkProperty]
-        public List<NetworkAnimatorParameter> AnimatorParameters
+        [NetworkProperty] public List<NetworkAnimatorParameter> AnimatorParameters
         {
             set
             {
                 _animatorParameters = value;
                 _animatorParameterIndex = null;
+//                BoolAndIntAnimatorParameters = new List<byte>();
+//                FloatAnimatorParameters = new List<ushort>();
+                
+//                ConvertStructureDataToCompressData();
             }
-
             get
             {
                 return _animatorParameters;
@@ -53,6 +59,82 @@ namespace App.Shared.Components.Player
                 }
 
                 return _animatorParameterIndex;
+            }
+        }
+
+        public void ConvertStructureDataToCompressData()
+        {
+            var count = AnimatorParameters.Count;
+            
+            BoolAndIntAnimatorParameters.Clear();
+            FloatAnimatorParameters.Clear();
+
+            int bitDataIndex = 0;
+            int byteDataIndex = 0;
+            
+            for (int i = 0; i < count; ++i)
+            {
+                var param = AnimatorParameters[i];
+                switch (param.ParamType)
+                {
+                    case AnimatorControllerParameterType.Bool:
+                        BoolAndIntAnimatorParameters[byteDataIndex] |=
+                            (byte) ((param.BoolValue ? 1 : 0) << bitDataIndex++);
+                        break;
+                    case AnimatorControllerParameterType.Float:
+                        FloatAnimatorParameters.Add((ushort) (param.FloatValue * 1000));
+                        break;
+                }
+
+                if (bitDataIndex == 8)
+                {
+                    BoolAndIntAnimatorParameters.Add(0);
+                    ++byteDataIndex;
+                }
+            }
+
+            for (int i = 0; i < count; ++i)
+            {
+                var param = AnimatorParameters[i];
+                if (param.ParamType == AnimatorControllerParameterType.Int)
+                    BoolAndIntAnimatorParameters.Add((byte) param.IntValue);
+            }
+        }
+
+        public void ConvertCompressDataToStructureData()
+        {
+            var count = AnimatorParameters.Count;
+
+            int bitDataIndex = 0;
+            int byteDataIndex = 0;
+            int ushortDataIndex = 0;
+            
+            for (int i = 0; i < count; ++i)
+            {
+                var param = AnimatorParameters[i];
+                switch (param.ParamType)
+                {
+                    case AnimatorControllerParameterType.Bool:
+                        param.BoolValue = (BoolAndIntAnimatorParameters[byteDataIndex] & (1 << bitDataIndex++)) != 0;
+                        break;
+                    case AnimatorControllerParameterType.Float:
+                        param.FloatValue = FloatAnimatorParameters[ushortDataIndex++] / 1000.0f;
+                        FloatAnimatorParameters.Add((ushort) (param.FloatValue * 1000));
+                        break;
+                }
+ 
+                if (bitDataIndex == 8)
+                {
+                    bitDataIndex = 0;
+                    ++byteDataIndex;
+                }
+            }
+ 
+            for (int i = 0; i < count; ++i)
+            {
+                var param = AnimatorParameters[i];
+                if (param.ParamType == AnimatorControllerParameterType.Int)
+                    param.IntValue = BoolAndIntAnimatorParameters[++byteDataIndex];
             }
         }
         
@@ -341,7 +423,7 @@ namespace App.Shared.Components.Player
             {
                 foreach (var networkAnimatorLayer in AnimatorLayers)
                 {
-                    sb.Append("[").Append(networkAnimatorLayer).Append("]").Append("\n");
+                    sb.Append("<").Append(networkAnimatorLayer).Append(">").Append("\n");
                 }
             }
             

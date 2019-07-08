@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using ArtPlugins;
 using Core.Utils;
@@ -17,49 +18,60 @@ namespace Utils.SettingManager
         Low = 1,
         MediumLow,
         Medium,
-        MediumHight,
+        MediumHigh,
         High,
     }
-    public enum SettingId
+    public enum VideoSettingId
     {
+        Begin = 96,
         Quality = 100,
-        Shadow = 101,
-        Chartlet = 103,
-        ShaderDetail = 104,
-        AntiAliasing = 105,
-        VerticalSynchronization = 106,
-        Lighting = 107,
-        Details = 108,
+        End = 109,
     }
-    public class SettingItem
+    public class PlayerSettingItem
     {
-        public int Id;
-        public int Type;
-        public int ControlType;
-        public string Description;
-        public object Value;
-        public object DefaultValue;
-        public List<Dictionary<int,string>> SettingId;
-        public List<int> Levels;
-        public List<List<string>> Additional;
-        public bool Invalid = false;
+
+        public SettingConfigItem item;
+        public string value;
+       
     }
-    public class SettingManager : AbstractConfigManager<SettingManager>
+    public class VideoSettingItem : PlayerSettingItem
     {
+
+    }
+
+
+    public class SettingManager : Singleton<SettingManager>
+    {
+        public static int[] videoEffectRange =  { 102, 103, 104, 105, 107, 108 };
+        public const int CUSTOM_OPTION_INDEX = 5;
+        public const int VIDEO_CONTROLID = 100;
+
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(SettingManager));
-        private static string LocalCacheKey = "Setting";
+        private static string LocalCacheKey = "Setting20190618";
 
-        private Action<List<int>> onchangedCallback = null;
+        private Action onchangedCallback = null;
+        private Dictionary<int, Action> callbackDic = new Dictionary<int, Action>();
 
-        private Dictionary<int, SettingItem> _configDic;
+
+        private Dictionary<int, PlayerSettingItem> _configDic;
+        private Dictionary<int, VideoSetting> _videoSettingDic;
+
+
         private Dictionary<int, string> _localCache;
         private bool maxQualityMode = false;
+
+
+        VideoSettingHandler videoSettingHandler = new VideoSettingHandler();
+
         public SettingManager()
         {
             _localCache = new Dictionary<int, string>();
-            GameQualitySettingManager.getValueListFunc = this.GetConfigById;
+           
+
             maxQualityMode = QualitySettings.names[QualitySettings.GetQualityLevel()].ToLower().StartsWith("max_");
-            _logger.InfoFormat("MaxQualityMode {0}", maxQualityMode? "yes": "not");
+            _logger.InfoFormat("MaxQualityMode {0}", maxQualityMode ? "yes" : "not");
+
+
         }
 
         public static SettingManager GetInstance()
@@ -67,193 +79,282 @@ namespace Utils.SettingManager
             return SingletonManager.Get<SettingManager>();
         }
         #region manager init
-        public override void ParseConfig(string xml)
+
+
+        public void InitConfig(List<SettingConfigItem> list, List<SettingConfigVideoItem> videolist, Dictionary<int, VideoSetting> videoConfigs )
         {
-            var _config = XmlConfigParser<SettingConfig>.Load(xml);
-            if (null == _config)
+
+            _configDic = new Dictionary<int, PlayerSettingItem>();
+            _videoSettingDic = new Dictionary<int, VideoSetting>();
+            foreach (var item in list)
             {
-                Logger.Error("invalid xml content");
-                return;
+                var config = AddItemToManager(item);
+                _configDic[config.item.Id] = config;
             }
 
-            _configDic = new Dictionary<int, SettingItem>();
-            foreach (var item in _config.Items)
+            foreach (var item in videolist)
             {
-                var settingItem = new SettingItem()
-                {
-                    Id = item.Id,
-                    Type = item.Type,
-                    ControlType = item.ControlType,
-                    Description = item.Desription,
-                    DefaultValue = item.DefaultValue,
-                    Value = item.DefaultValue,
-                    Levels = item.ComboxItemKeys
-                };
-                settingItem.SettingId = new List<Dictionary<int, string>>();
-                if (item.SettingId != null)
-                {
-                    for (var i = 0; i < item.SettingId.Count; i++)
-                    {
-                        settingItem.SettingId.Add(SettingConfigUtil.CovertString(item.SettingId[i], ','));
-                    }
-                }
-                settingItem.Additional = new List<List<string>>();
-                if (item.Additional != null)
-                {
-                    for (var i = 0; i < item.Additional.Count; i++)
-                    {
-                        settingItem.Additional.Add(SettingConfigUtil.CovertAdditional(item.Additional[i], ','));
-                    }
-                }
-
-                _configDic[settingItem.Id] = settingItem;
+                var config = AddItemToManager(item);
+                _configDic[config.item.Id] = config;
             }
+            
+
+            GameQualitySettingManager.VideoSettingDic = videoConfigs;
         }
 
-        public void InitConfig(Dictionary<int, SettingItem> config)
-        {
-            _configDic = config;
-        }
+
 
         public bool IsInitialized()
         {
             return _configDic != null;
         }
-        
+
+        private PlayerSettingItem AddItemToManager(SettingConfigItem item)
+        {
+            var settingItem = new PlayerSettingItem();
+            settingItem.item = item;
+            settingItem.value = item.DefaultValue;
+            return settingItem;
+        }
+
+        private PlayerSettingItem AddItemToManager(SettingConfigVideoItem item)
+        {
+            var settingItem = new VideoSettingItem();
+            var baseConfig = new SettingConfigItem();
+            baseConfig.Id = item.Id;
+            baseConfig.Type = item.Type;
+            baseConfig.TypeName = item.TypeName;
+            baseConfig.Desription = item.Desription;
+            baseConfig.ControlType = item.ControlType;
+            baseConfig.ComboxItemNames = item.ComboxItemNames;
+            baseConfig.DefaultValue = item.DefaultValue;
+            settingItem.item = baseConfig;
+            settingItem.value = item.DefaultValue;
+            return settingItem;
+        }
 
         #endregion
 
         #region config operate
         public void ResetSetting()
         {
+            var dic = new Dictionary<int, string>();
             foreach (var item in _configDic)
             {
-                if (item.Value.Value != item.Value.DefaultValue)
+                if (item.Value.value != item.Value.item.DefaultValue)
                 {
-                    item.Value.Value = item.Value.DefaultValue;
-                    item.Value.Invalid = true;
+                    item.Value.value = item.Value.item.DefaultValue;
+                    //SetSettingValue(item.Key, item.Value.value);
                 }
+                dic[item.Key] = item.Value.value;
             }
+            SetSetting(dic);
         }
 
-        public void FlushData(bool isForce = false)
+        public void ResetSetting(List<int> ids)
+        {
+            var dic = new Dictionary<int, string>();
+            foreach (var id in ids)
+            {
+                PlayerSettingItem item=null;
+                _configDic.TryGetValue(id,out item);
+                if (item == null)
+                    continue;
+                if (item.value != item.item.DefaultValue)
+                {
+                    item.value = item.item.DefaultValue;
+                    //SetSettingValue(item.Key, item.Value.value);
+                }
+                dic[id] = item.value;
+            }
+            SetSetting(dic);
+        }
+
+        public void FlushData()
         {
             _localCache.Clear();
             List<int> changedSettingList = new List<int>();
             foreach (var item in _configDic)
             {
-                if (isForce || item.Value.Invalid)
+                if(FilterSaveType(item.Key))
                 {
-                    if(!maxQualityMode ||(maxQualityMode && item.Value.Type != 3))
-                        changedSettingList.Add(item.Value.Id);
+                    if (item.Value.value != null && item.Value.value.Equals(item.Value.item.DefaultValue) == false)
+                        _localCache[item.Value.item.Id] = item.Value.value.ToString();
                 }
-
-                item.Value.Invalid = false;
-                if (item.Value.Type == 3 || item.Value.Type == 4)
-                {
-                    if (item.Value.Value != null &&  item.Value.Value.Equals(item.Value.DefaultValue) == false) _localCache[item.Value.Id] = item.Value.Value.ToString();
-                }
-            }
-
-            try
-            {
-                GameQualitySettingManager.onChanges(changedSettingList);
-                if (onchangedCallback != null)
-                    onchangedCallback(changedSettingList);
-            }
-            catch (Exception)
-            {
-
             }
 
             SaveSettingToLocal();
         }
 
-        public Dictionary<int, object> GetInvalidSettingValue(Dictionary<int , object> dic = null)
+
+        public bool FilterSaveType(int id)
+        {
+            var item = GetSettingItem(id);
+
+            var type = item.item.Type;
+
+            if (type == 3 || type == 4)
+                return true;
+            else
+                return false;
+        }
+
+        public Dictionary<int, object> GetInvalidSettingValue(Dictionary<int, object> dic = null)
         {
             if (dic == null) dic = new Dictionary<int, object>();
             foreach (var item in _configDic)
             {
-                if (item.Value.Invalid)
+                if (item.Value.value != item.Value.item.DefaultValue)
                 {
-                    dic[item.Key] = item.Value.Value;
+                    dic[item.Key] = item.Value.item.DefaultValue;
                 }
             }
             return dic;
         }
 
-        public object GetSettingValue(int id)
+        public string GetSettingValue(int id)
         {
-            return _configDic[id].Value;
+            PlayerSettingItem ret = null;
+            if (_configDic.TryGetValue(id, out ret))
+                return ret.value;
+            else
+                return "";
         }
-        public SettingItem GetSettingItem(int id)
+        public PlayerSettingItem GetSettingItem(int id)
         {
-            return _configDic[id];
+            PlayerSettingItem ret = null;
+            _configDic.TryGetValue(id, out ret);
+            return ret;
         }
 
-        public void SetSettingValue(int id, object value)
+
+        public void SetSetting(Dictionary<int, string> dic)
+        {
+
+            UnityProfiler.StartProfiler("CHANGE SETTING");
+            foreach (var item in dic)
+            {
+                SetSettingValue(item.Key, item.Value);
+            }
+            //callback
+            foreach (var item in dic)
+            {
+                if(item.Value!=null)
+                {
+                    DoCallback(item.Key, item.Value);
+                }
+            }
+
+
+            UnityProfiler.StopProfiler();
+        }
+
+      
+        public void SetSetting(int id, object value)
         {
             if (_configDic.ContainsKey(id) == false)
             {
                 _logger.WarnFormat("invalid id, setting id {0}", id);
                 return;
             }
-
-            if (_configDic[id].Value.Equals(value)) return;
-            _configDic[id].Value = value;
-            _configDic[id].Invalid = true;
-            if (_configDic[id].SettingId != null && _configDic[id].SettingId.Count > 0)
+            if (value != null)
             {
-                int index = 0;
-                try
-                {
-                    index = int.Parse(value.ToString());
-                }
-                catch (Exception e)
-                {
-                }
+                SetSettingValue(id,value);
+                DoCallback(id, value);
+            }
 
-                foreach (var item in _configDic[id].SettingId[index])
+        }
+
+        private void DoCallback(int id, object value)
+        {
+            SettingHandler handler = null;
+            handler = GetSettingHandler(id);
+            if (handler != null)
+            {
+                handler.OnApplySetting(id, value.ToString());
+            }
+            if (callbackDic.ContainsKey(id))
+            {
+                if (callbackDic[id] != null)
                 {
-                    SetSettingValue(item.Key, item.Value);
+                    callbackDic[id]();
                 }
             }
         }
+
+        // 把视频设置分离出来
+        private void SetSettingValue(int id, object value)
+        {
+            if (value != null)
+            {
+                _configDic[id].value = value.ToString();
+            }
+
+        }
+
+        public SettingHandler GetSettingHandler(int settingId)
+        {
+            if (IsVideoSetting(settingId))
+                return videoSettingHandler;
+            return null;
+        }
+        bool IsVideoSetting(int settingId)
+        {
+            return settingId > (int)VideoSettingId.Begin && settingId < (int)VideoSettingId.End;
+        }
+
+
         #endregion
 
         #region update notify
-        public string[] GetConfigById(int id)                                       //setting.xlsl 的Id字段
+        public string GetConfigById(int id)                                       //setting.xlsl 的Id字段
         {
-            List<string> strList = new List<string>();
-            if (_configDic.ContainsKey(id) == false) return strList.ToArray();
+
+            if (_configDic.ContainsKey(id) == false) return null;
 
             var item = _configDic[id];
-            strList.Add(item.Value.ToString());
-
-            if (item.Additional != null && item.Additional.Count > 0)
+            if(id == 98)
             {
-                var addis = item.Additional[int.Parse(item.Value.ToString())];
-                foreach (var addi in addis)
-                {
-                    strList.Add(addi);
-                }
+                var setting = GetSettingItem(id).item;
+                var value = setting.ComboxItemNames[int.Parse(item.value)];
+                return value;
             }
-            
-            return strList.ToArray();
+
+            return item.value.ToString();
+
+
         }
 
-        public void RegisterSettingCallBack(Action<List<int>> func)
+        public void RegisterSettingCallBack(int id, Action func)
         {
-            onchangedCallback += func;
+            Action action;
+            callbackDic.TryGetValue(id, out action);
+            action += func;
+            callbackDic[id] = action;
         }
 
-        public void UnRegisterSettingCallBack(Action<List<int>> func)
+        public void UnRegisterSettingCallBack(int id, Action func)
         {
-            onchangedCallback -= func;
+            Action action;
+            callbackDic.TryGetValue(id, out action);
+            action -= func;
+            callbackDic[id] = action;
         }
         #endregion
 
         #region local Cache
+
+        private bool haveQualityLevelCache = true;
+        public bool HaveQualityLevelCache
+        {
+            get { return haveQualityLevelCache; }
+            set { haveQualityLevelCache = value; }
+        }
+
+        public void DeleteLocalCache()
+        {
+            PlayerPrefs.DeleteKey(LocalCacheKey);
+        }
 
         public void SetSettingFromLocal(bool isSet = true)
         {
@@ -265,17 +366,42 @@ namespace Utils.SettingManager
             }
             catch (Exception e)
             {
-				_logger.Error(e);
+                _logger.Error(e);
             }
 
 
             var sourceDic = SettingConfigUtil.CovertString(str);
-            if (sourceDic == null)
-                return;
-            foreach (var pair in sourceDic)
+
+            // 应用一次所有设置项
+            // 读取本地配置 替换默认配置 并应用
+            var configDic = new Dictionary<int, string>();
+            if(_configDic!=null)
             {
-                if(isSet)
-                SetSettingValue(pair.Key, pair.Value);
+                if (!configDic.ContainsKey((int) VideoSettingId.Quality))
+                {
+                    haveQualityLevelCache = false;
+                }
+                foreach (var item in _configDic)
+                {
+                    configDic[item.Key] = item.Value.value;
+                }
+            }
+            
+            if(sourceDic!=null)
+            {
+                foreach (var item in sourceDic)
+                {
+                    configDic[item.Key] = item.Value;
+                }
+            }
+
+            if (isSet)
+            {
+                SetSetting(configDic);
+            }
+
+            foreach (var pair in configDic)
+            {
                 _localCache[pair.Key] = pair.Value;
             }
         }
@@ -291,43 +417,101 @@ namespace Utils.SettingManager
             {
                 _logger.Error(e);
             }
-            
+
         }
         #endregion
 
+        #region Quality
         public void SetQuality(QualityLevel level)
         {
             if (level == QualityLevel.Undefined) return;
-            SetSettingValue((int)SettingId.Quality, (int)level - 1);
+            SetSetting((int)VideoSettingId.Quality, (5-(int)level));
+
             FlushData();
         }
 
+
         public QualityLevel GetQualityBeforeInit()
         {
-            if(_localCache.Count == 0)
-            SetSettingFromLocal(false);
-            var id = (int) (int) SettingId.Quality;
+            var customQuality = GetQualityCustomLevel();
+            if (customQuality != QualityLevel.Undefined)
+                return customQuality;
+            if (_localCache.Count == 0)
+                SetSettingFromLocal(false);
+            var id = (int)VideoSettingId.Quality;
             if (_localCache.ContainsKey((id)))
             {
                 var cache = _localCache[id];
-                return (QualityLevel)(int.Parse(cache.ToString()) + 1);
+                return (QualityLevel)(5-int.Parse(cache.ToString()));
             }
             else
             {
-                return QualityLevel.Low;
+                // 这里就是表里配的默认画质 
+                return QualityLevel.High;
             }
         }
 
 
         public QualityLevel GetQuality()
         {
-            if (_configDic == null || !_configDic.ContainsKey((int) SettingId.Quality))
+            if (_configDic == null || !_configDic.ContainsKey((int)VideoSettingId.Quality))
             {
                 return QualityLevel.Undefined;
             }
-            var setting = _configDic[(int) SettingId.Quality];
-            return (QualityLevel)(int.Parse(setting.Value.ToString()) + 1);
+            var setting = _configDic[(int)VideoSettingId.Quality];
+            return (QualityLevel)(5-(int.Parse(setting.value.ToString())));
         }
+
+        public void SetQualityByCustomLevel()
+        {
+            var quality = GetQualityCustomLevel();
+            if (quality != QualityLevel.Undefined)
+            {
+                SetQuality(quality);
+            }
+        }
+
+        private QualityLevel GetQualityCustomLevel()
+        {
+            var name = QualitySettings.names[QualitySettings.GetQualityLevel()];
+            if (!name.StartsWith("QL_"))
+                return QualityLevel.Undefined;
+            var res = QualityLevel.Undefined;
+            _qualityDict.TryGetValue(name, out res);
+            return res;
+        }
+
+        public bool UseQualityCustomLevel()
+        {
+            return GetQualityCustomLevel() != QualityLevel.Undefined;
+        }
+
+        private Dictionary<string, QualityLevel> _qualityDict = new Dictionary<string, QualityLevel>
+        {
+            {"QL_Low", QualityLevel.Low},
+            {"QL_MediumLow", QualityLevel.MediumLow},
+            {"QL_Medium", QualityLevel.Medium},
+            {"QL_MediumHigh", QualityLevel.MediumHigh},
+            {"QL_High", QualityLevel.High},
+
+        };
+
+        public Dictionary<int, PlayerSettingItem> ConfigDic
+        {
+            get
+            {
+                return _configDic;
+            }
+
+            set
+            {
+                _configDic = value;
+            }
+        }
+
+       
+        #endregion
+
     }
 
     public class SettingConfigUtil
@@ -406,7 +590,7 @@ namespace Utils.SettingManager
             }
 
             string res = sb.ToString();
-            return res.Substring(0,res.Length - 1);
+            return res.Substring(0, res.Length - 1);
         }
 
         public static string DictionaryToString(Dictionary<int, float> infoDic)

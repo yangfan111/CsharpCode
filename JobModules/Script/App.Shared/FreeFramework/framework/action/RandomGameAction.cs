@@ -4,12 +4,13 @@ using com.cpkf.yyjd.tools.util.collection;
 using com.cpkf.yyjd.tools.util.math;
 using com.wd.free.@event;
 using com.wd.free.para.exp;
+using Core.Free;
 
 namespace com.wd.free.action
 {
 	[System.Serializable]
-	public class RandomGameAction : AbstractGameAction
-	{
+	public class RandomGameAction : AbstractGameAction, IRule
+    {
 		private IList<IGameAction> actions;
 
 		public override void DoAction(IEventArgs args)
@@ -57,9 +58,14 @@ namespace com.wd.free.action
 			this.actions.Add(action);
 		}
 
-		[System.Serializable]
-		public class ConAction : AbstractGameAction
-		{
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.RandomGameAction;
+        }
+
+        [System.Serializable]
+		public class ConAction : AbstractGameAction, IRule
+        {
 			private const long serialVersionUID = 5436170514812431313L;
 
 			private IParaCondition condition;
@@ -114,6 +120,11 @@ namespace com.wd.free.action
 			{
 				this.probability = probability;
 			}
-		}
+
+            public int GetRuleID()
+            {
+                return (int)ERuleIds.ConAction;
+            }
+        }
 	}
 }

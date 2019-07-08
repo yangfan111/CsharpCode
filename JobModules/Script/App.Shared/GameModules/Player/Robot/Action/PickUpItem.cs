@@ -69,9 +69,9 @@ namespace App.Shared.GameModules.Player.Robot.Action
                 var entityId = ItemEntity.Value.entityKey.Value.EntityId;
                 var itemId = 0;
                 var itemCount = 0;
-                if (ItemEntity.Value.hasSimpleEquipment)
+                if (ItemEntity.Value.hasSimpleItem)
                 {
-                    var equip = ItemEntity.Value.simpleEquipment;
+                    var equip = ItemEntity.Value.simpleItem;
                     itemId = equip.Id;
                     itemCount = equip.Count;
                 }

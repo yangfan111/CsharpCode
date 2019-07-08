@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using Utils.Singleton;
 
 namespace App.Client.GameModules.GamePlay.Free.Auto
@@ -24,9 +25,9 @@ namespace App.Client.GameModules.GamePlay.Free.Auto
             if (started)
             {
                 FreeMoveEntity move = SingletonManager.Get<FreeUiManager>().Contexts1.freeMove.GetEntityWithEntityKey(new EntityKey(id, (int)EEntityType.FreeMove));
-                if(move != null)
+                if (move != null)
                 {
-                    return ((FreeDataComponent)move.freeData.FreeData).Scale;
+                    return new Vector3(move.freeData.ScaleX, move.freeData.ScaleY, move.freeData.ScaleZ);
                 }
             }
 

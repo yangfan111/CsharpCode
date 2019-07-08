@@ -34,7 +34,10 @@ namespace com.wd.free.action
         {
             if (!string.IsNullOrEmpty(player))
             {
-                return (FreeData)args.GetUnit(player);
+                FreeData fd = (FreeData)args.GetUnit(player);
+                if (fd != null && fd.Player != null && !fd.Player.isInitialized)
+                    return null;
+                return fd;
             }
 
             return null;

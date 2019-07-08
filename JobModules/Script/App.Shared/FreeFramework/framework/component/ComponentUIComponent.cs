@@ -3,12 +3,13 @@ using Sharpen;
 using com.wd.free.@event;
 using gameplay.gamerule.free.ui.component;
 using Free.framework;
+using Core.Free;
 
 namespace gameplay.gamerule.free.component
 {
 	[System.Serializable]
-	public class ComponentUIComponent : IFreeComponent, IComponentable
-	{
+	public class ComponentUIComponent : IFreeComponent, IComponentable, IRule
+    {
 		private const long serialVersionUID = 5611403387621130161L;
 
 		private string name;
@@ -123,5 +124,10 @@ namespace gameplay.gamerule.free.component
 		{
 			return GetCurrentComponent(args).CreateChildren(args);
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ComponentUIComponent;
+        }
+    }
 }

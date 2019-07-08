@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 using ConsoleApp;
 using YF.FileUtil;
+using YF.Utils;
+
 namespace YF
 {
     public partial class RunLib
@@ -10,7 +12,7 @@ namespace YF
         ///按名字获取短位ID方法
         public static uint GenShortUintIdByName(string inName)
         {
-            return ShortIDGenerator.Compute(inName);
+            return CommonUtil.ShortIDGenerator.Compute(inName);
         }
         ///反射获取全局类型索引值 [类名/类名截取->短id计算] ---> 类名
         /// baseType.Assembly.GetTypes();

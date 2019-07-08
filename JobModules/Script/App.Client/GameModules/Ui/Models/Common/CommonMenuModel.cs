@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 using App.Shared.Components.Player;
 using App.Client.Utility;
 using App.Client.GameModules.Ui.UiAdapter;
+using App.Shared;
 using App.Shared.GameModules.Player;
 
 namespace App.Client.GameModules.Ui.Models.Common
@@ -139,8 +140,11 @@ namespace App.Client.GameModules.Ui.Models.Common
 
                 string title = "";
                 bool isOverGame = menuUiAdapter.PlayStaue == (int)EPlayerLifeState.Dead || menuUiAdapter.WarVictory;
-
-                title = isOverGame ? I2.Loc.ScriptLocalization.client_common.word13 : I2.Loc.ScriptLocalization.client_common.word14;
+                bool isHx = menuUiAdapter.IsHXMod;
+                title = 
+                    isOverGame ? I2.Loc.ScriptLocalization.client_common.word13 :
+                        isHx ? "放弃角逐冠军不会影响奖励,您确定要终止演习嘛?":
+                        I2.Loc.ScriptLocalization.client_common.word14;
 
                 string yesText = I2.Loc.ScriptLocalization.client_common.word15;
                 Action yesCB = ()=>

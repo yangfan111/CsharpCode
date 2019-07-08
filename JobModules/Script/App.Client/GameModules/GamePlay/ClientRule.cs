@@ -1,11 +1,6 @@
 ﻿using App.Server.GameModules.GamePlay;
-using com.wd.free.@event;
 using com.wd.free.para;
 using Core.Free;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace App.Client.GameModules.GamePlay
 {
@@ -55,6 +50,9 @@ namespace App.Client.GameModules.GamePlay
             }
             set { }
         }
+
+        public long GameStartTime { get{return 0;} set { } }
+        public long GameEndTime { get{return 0;} set { } }
 
         public ParaList GetParameters()
         {

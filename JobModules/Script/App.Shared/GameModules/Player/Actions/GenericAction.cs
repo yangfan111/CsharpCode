@@ -1,14 +1,19 @@
 ﻿using App.Shared.Components.GenericActions;
 using App.Shared.GameModules.Player.Actions.ClimbPackage;
 using App.Shared.GameModules.Player.Actions.VaultPackage;
+using Core.Utils;
 using UnityEngine;
 
 namespace App.Shared.GameModules.Player.Actions
 {
     public class GenericAction : IGenericAction
     {
+        public const int ClimbLayerIndex = 8;
+        
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(GenericAction));
         private readonly IAction[] _climbClasses = new IAction[(int)GenericActionKind.Null];
         private IAction _concretenessAction;
+        private Vector3 _p1Position;
 
         public GenericAction()
         {
@@ -17,11 +22,13 @@ namespace App.Shared.GameModules.Player.Actions
 
         public void PlayerReborn(PlayerEntity player)
         {
+            Logger.InfoFormat("GenericAction  PlayerReborn");
             ResetPlayerStatus(player);
         }
 
         public void PlayerDead(PlayerEntity player)
         {
+            Logger.InfoFormat("GenericAction  PlayerDead");
             ResetPlayerStatus(player);
         }
         
@@ -59,6 +66,13 @@ namespace App.Shared.GameModules.Player.Actions
                 return;
             }
 
+            player.stateInterface.State.InterruptAction();
+            
+            if (player.hasFirstPersonModel)
+            {
+                _p1Position = player.firstPersonModel.Value.transform.localPosition;
+            }
+
             GenericActionKind kind;
             float yTranslateOffset;
             float yRotationOffset;
@@ -83,12 +97,23 @@ namespace App.Shared.GameModules.Player.Actions
 
         private void ResetPlayerStatus(PlayerEntity player)
         {
+            if(player.hasStateInterface)
+                player.stateInterface.State.FinishedClimb();
+            
             if (player.hasThirdPersonAnimator)
                 player.thirdPersonAnimator.UnityAnimator.applyRootMotion = false;
+            if (player.hasFirstPersonAnimator)
+                player.firstPersonAnimator.UnityAnimator.applyRootMotion = false;
             if (player.hasThirdPersonModel)
             {
                 player.thirdPersonModel.Value.transform.localPosition = new Vector3(0, 0, 0);
                 player.thirdPersonModel.Value.transform.localRotation = Quaternion.identity;
+            }
+
+            if (player.hasFirstPersonModel)
+            {
+                player.firstPersonModel.Value.transform.localPosition = _p1Position;
+                player.firstPersonModel.Value.transform.localRotation = Quaternion.identity;
             }
                 
             ResetConcretenessAction();

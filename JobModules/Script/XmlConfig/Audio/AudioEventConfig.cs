@@ -6,7 +6,7 @@ namespace XmlConfig
     [XmlRoot("root")]
     public class AudioEventConfig
     {
-        public AudioEventItem[] Items { get; private set; }
+        public AudioEventItem[] Items;
     }
     [XmlType("item")]
     public class AudioEventItem

@@ -3,6 +3,7 @@ using Shared.Scripts;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Utils.Appearance.Bone;
 using Utils.AssetManager;
 using Utils.CharacterState;
 using Utils.Compare;
@@ -280,6 +281,8 @@ namespace Utils.Appearance.WardrobePackage
             _p3Avatar.Show();
 
             InitWardrobe(DefaultModelParts);
+            
+            Logger.InfoFormat("CharacterLog-- Wardrobe GameObject:  {0}", obj.name);
         }
 
         public void SetFirstPersonCharacter(GameObject obj)
@@ -289,6 +292,19 @@ namespace Utils.Appearance.WardrobePackage
 
             _p1Avatar = new CharacterAvatar(_characterP1);
             _p1Avatar.Hide();
+        }
+
+        public void SetRootGo(GameObject obj)
+        {
+            if (_p3Avatar != null)
+            {
+                _p3Avatar.SetRootGo(obj);
+            }
+
+            if (_p1Avatar != null)
+            {
+                _p1Avatar.SetRootGo(obj);
+            }
         }
 
         public void SetAnimatorP3(Animator animator)
@@ -340,7 +356,7 @@ namespace Utils.Appearance.WardrobePackage
         {
             Wardrobe pos = SingletonManager.Get<AvatarAssetConfigManager>().GetAvatarType(id);
             SetLatestWardrobeValue(pos, id);
-            Logger.InfoFormat("Dress {0}", id);
+            Logger.InfoFormat("CharacterLog-- Dress {0}", id);
         }
 
         //脱
@@ -352,7 +368,7 @@ namespace Utils.Appearance.WardrobePackage
                 defaultId = _defaultAvatars[(int) pos];
             
             SetLatestWardrobeValue(pos, defaultId);
-            Logger.InfoFormat("Undress {0}", pos);
+            Logger.InfoFormat("CharacterLog-- Undress {0}", pos);
         }
 
         private void RewindWardrobeHairColor(int id, Wardrobe pos)
@@ -377,7 +393,6 @@ namespace Utils.Appearance.WardrobePackage
                 if (assetData == null) return;
                 if (ThirdPersonIncluded)
                 {
-                    
                     hairHandle.Register(delegate(WardrobeParam param)
                     {
                         param.ApplySkin(assetData.Id);
@@ -404,16 +419,11 @@ namespace Utils.Appearance.WardrobePackage
                     _mountWardrobeHandlers[(int) pos, ValidP3Index].SetInfo(null);
                     UpdateRenderBelowAnimatorP3();
                 }
-                if(!P3HaveInit)
-                    UndressInitAvatar(pos);
             }
             else //穿
             {
                 if (!P3HaveInit)
-                {
-                    DressInitAvatar(id);
                     return;
-                }
                     
                 var assetData = SingletonManager.Get<AvatarAssetConfigManager>().GetAvatarAssetItemById(id);
                 if (assetData == null) return;
@@ -439,6 +449,22 @@ namespace Utils.Appearance.WardrobePackage
             Logger.DebugFormat("rewindWardrobe:     pos  {0}      id  {1}", pos, id);
         }
 
+        public void HandleAllWardrobe(Action<UnityObject> act)
+        {
+            if(_p1Avatar!=null)
+                _p1Avatar.HandleAllWardrobe(act);
+            if(_p3Avatar!=null)
+                _p3Avatar.HandleAllWardrobe(act);
+        }
+
+        public void HandleSignleWardrobe(Wardrobe type, Action<UnityObject> act)
+        {
+            if (_p1Avatar != null)
+                _p1Avatar.HandleSingleAvatar(type, act);
+            if (_animatorP3 != null)
+                _p3Avatar.HandleSingleAvatar(type, act);
+        }
+        
         private void LoadResource(int index, WardrobeParam param)
         {
             var mount = _mountWardrobeHandlers[(int) param.Type, index];
@@ -446,9 +472,13 @@ namespace Utils.Appearance.WardrobePackage
             
             if(index == ValidP3Index)
             {
+                Logger.InfoFormat("CharacterLog-- Will Load P3Default AssetBundle:  {0}", param.P3DefaultResAddr);
                 _loadRequestBatch.Add(CreateLoadRequest(param.P3DefaultResAddr, mount));
                 if (param.HasAlterAppearance)
+                {
+                    Logger.InfoFormat("CharacterLog-- Will Load P3Alter AssetBundle:  {0}", param.AlterResAddr);
                     _loadRequestBatch.Add(CreateLoadRequest(param.AlterResAddr, mount));
+                }
             } else if (index == ValidP1Index)
             {
                 _loadRequestBatch.Add(CreateLoadRequest(param.P1DefaultResAddr, mount));
@@ -616,7 +646,11 @@ namespace Utils.Appearance.WardrobePackage
         private void AddRecycleObject(UnityObject obj)
         {
             if (obj != null)
+            {
+                if(null != obj.AsGameObject)
+                    Logger.InfoFormat("CharacterLog-- Wardrobe Add Recycle:  {0}", obj.AsGameObject.name);
                 _recycleRequestBatch.Add(obj);
+            }
         }
 
         public List<AbstractLoadRequest> GetLoadRequests()
@@ -649,6 +683,7 @@ namespace Utils.Appearance.WardrobePackage
 
         private class MountWardrobeHandler : ILoadedHandler
         {
+            private static LoggerAdapter Logger = new LoggerAdapter(typeof(MountWardrobeHandler));
             private readonly WardrobeControllerBase _dataSource;
             private readonly int _index;
 
@@ -699,6 +734,21 @@ namespace Utils.Appearance.WardrobePackage
                     _dataSource.AddRecycleObject(obj);
                     return;
                 }
+
+                if (null == obj || null == obj.AsGameObject)
+                {
+                    _dataSource.AddRecycleObject(_param.DefaultGameObject);
+                    _dataSource.AddRecycleObject(_param.AlternativeGameObject);
+                    return;
+                }
+                
+                if (!obj.AsGameObject.activeSelf)
+                {
+                    Logger.ErrorFormat("unityObj:  {0}  is unActive", obj.Address);
+                    return;
+                }
+
+                Logger.InfoFormat("CharacterLog-- Wardrobe Load Success: {0}", obj.Address);
 
                 if (obj.Address.Equals(_param.P3DefaultResAddr) ||
                     obj.Address.Equals(_param.P1DefaultResAddr))

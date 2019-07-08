@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 
 namespace Core.Utils
 {
@@ -14,7 +15,20 @@ namespace Core.Utils
         {
             return new Vector3(v3.x / v3.w, v3.y / v3.w, v3.z / v3.w);
         }
+//        public static Vector3 ToPrecisionVector3(this Vector3 v3,byte precision)
+//        {
+//            return new Vector3( v3.x.FloatPrecision(precision),v3.x.FloatPrecision(precision),v3.z.FloatPrecision(precision));
+//        }
 
+        public static float FloatPrecision(this float value,byte precision)
+        {
+            var precisionVal = (int)Math.Pow(10, precision);
+            return (int)(value * precisionVal) * 1.0f / precisionVal;
+        }
+        public static float FloatRoundPrecision(this float value, byte precision)
+        {
+            return (float) Math.Round(value,precision);
+        }
         public static string ToStringExt(this Vector2 v2)
         {
              return String.Format("({0}, {1})", v2.x, v2.y);

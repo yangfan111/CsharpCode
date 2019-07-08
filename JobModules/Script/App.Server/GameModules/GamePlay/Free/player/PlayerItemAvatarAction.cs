@@ -1,29 +1,20 @@
-﻿using com.wd.free.action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using App.Shared.Player;
+using Assets.Utils.Configuration;
+using Assets.XmlConfig;
+using com.wd.free.action;
 using com.wd.free.@event;
-using Free.framework;
-using Core.Free;
-using App.Shared;
-using com.wd.free.item;
-using com.wd.free.util;
-using Core.Configuration;
-using XmlConfig;
 using com.wd.free.para;
-using Utils.Configuration;
-using App.Shared.Player;
-using Assets.App.Server.GameModules.GamePlay.Free;
+using com.wd.free.util;
+using Core.Free;
 using Shared.Scripts;
+using System;
+using Utils.Configuration;
 using Utils.Singleton;
-using App.Server.GameModules.GamePlay.Free.item;
-using App.Server.GameModules.GamePlay.free.player;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
     [Serializable]
-    public class PlayerItemAvatarAction : AbstractPlayerAction
+    public class PlayerItemAvatarAction : AbstractPlayerAction, IRule
     {
         private bool takeoff;
 
@@ -35,69 +26,69 @@ namespace App.Server.GameModules.GamePlay.Free.player
             }
 
             FreeRuleEventArgs fr = (FreeRuleEventArgs)args;
-
             PlayerEntity playerEntity = (PlayerEntity)fr.GetEntity(player);
 
             IParable item = args.GetUnit("item");
 
             if (playerEntity != null && item != null)
             {
-                SimpleProto message = FreePool.Allocate();
-                message.Key = FreeMessageConstant.ChangeAvatar;
-
                 int itemId = FreeUtil.ReplaceInt("{item.itemId}", args);
-
-                if (takeoff)
+                if (FreeUtil.ReplaceInt("{item.itemCat}", args) == (int) ECategory.Weapon)
                 {
-                    TakeOff(playerEntity, itemId);
-                }
-                else
-                {
-                    PutOn(playerEntity, itemId);
+                    if (takeoff)
+                    {
+                        if (SingletonManager.Get<WeaponResourceConfigManager>().IsArmor(itemId))
+                        {
+                            playerEntity.gamePlay.ArmorLv = playerEntity.gamePlay.CurArmor = playerEntity.gamePlay.MaxArmor = 0;
+                        }
+
+                        if (SingletonManager.Get<WeaponResourceConfigManager>().IsHelmet(itemId))
+                        {
+                            playerEntity.gamePlay.HelmetLv = playerEntity.gamePlay.CurHelmet = playerEntity.gamePlay.MaxHelmet = 0;
+                        }
+                    }
+                    else
+                    {
+                        var config = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(itemId);
+                        if (config.Type == (int) EWeaponType_Config.Armor)
+                        {
+                            playerEntity.gamePlay.ArmorLv = itemId;
+                            playerEntity.gamePlay.CurArmor = FreeUtil.ReplaceInt("{item.count}", args);
+                            playerEntity.gamePlay.MaxArmor = config.Durable;
+                        }
+
+                        if (config.Type == (int) EWeaponType_Config.Helmet)
+                        {
+                            playerEntity.gamePlay.HelmetLv = itemId;
+                            playerEntity.gamePlay.CurHelmet = FreeUtil.ReplaceInt("{item.count}", args);
+                            playerEntity.gamePlay.MaxHelmet = config.Durable;
+                        }
+                    }
                 }
 
-                ReduceDamageUtil.UpdateArmorAndHelmet((FreeData)playerEntity.freeData.FreeData);
+                if (FreeUtil.ReplaceInt("{item.itemCat}", args) == (int) ECategory.Avatar)
+                {
+                    var resId = SingletonManager.Get<RoleAvatarConfigManager>().GetResId(itemId, playerEntity.GetSex());
+                    var avatar = SingletonManager.Get<AvatarAssetConfigManager>().GetAvatarAssetItemById(resId);
+                    if (avatar != null)
+                    {
+                        if (takeoff)
+                        {
+                            playerEntity.appearanceInterface.Appearance.ClearAvatar((Wardrobe) avatar.AvatarType);
+                        }
+                        else
+                        {
+                            playerEntity.appearanceInterface.Appearance.ChangeAvatar(resId);
+                        }
+                    }
+                }
             }
 
         }
 
-        public static void PutOn(PlayerEntity playerEntity, int id)
+        public int GetRuleID()
         {
-            var resId = SingletonManager.Get<RoleAvatarConfigManager>().GetResId(id, playerEntity.GetSex());
-            var avatar = SingletonManager.Get<AvatarAssetConfigManager>().GetAvatarAssetItemById(resId);
-            if (avatar != null)
-            {
-
-                SimpleProto message = FreePool.Allocate();
-                message.Key = FreeMessageConstant.ChangeAvatar;
-
-                playerEntity.appearanceInterface.Appearance.ChangeAvatar(resId);
-
-                message.Ins.Add(id);
-                message.Ks.Add(1);
-
-                //FreeMessageSender.SendMessage(playerEntity, message);
-                //playerEntity.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.FreeData, message);
-            }
-        }
-
-        public static void TakeOff(PlayerEntity playerEntity, int id)
-        {
-            var resId = SingletonManager.Get<RoleAvatarConfigManager>().GetResId(id, playerEntity.GetSex());
-            var avatar = SingletonManager.Get<AvatarAssetConfigManager>().GetAvatarAssetItemById(resId);
-            if (avatar != null)
-            {
-                SimpleProto message = FreePool.Allocate();
-                message.Key = FreeMessageConstant.ChangeAvatar;
-
-                playerEntity.appearanceInterface.Appearance.ClearAvatar((Wardrobe)avatar.AvatarType);
-
-                message.Ins.Add(avatar.AvatarType);
-                message.Ks.Add(5);
-
-                //FreeMessageSender.SendMessage(playerEntity, message);
-                //playerEntity.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.FreeData, message);
-            }
+            return (int)ERuleIds.PlayerItemAvatarAction;
         }
     }
 }

@@ -12,6 +12,11 @@ namespace App.Shared.Components.Weapon
 //        [DontInitilize, NetworkProperty] public InterruptData InterruptGunSightWeapon;
 //        [DontInitilize, NetworkProperty] public InterruptData InterruptPullboltWeapon;
         [DontInitilize, NetworkProperty] public bool OpenUIFrame;
+        [NetworkProperty] public short FootstepFrameGroup;
+        public bool HasFootstepFrame
+        {
+            get { return FootstepFrameGroup > -1; }
+        }
 
         public void Clear(){
 //        {
@@ -19,15 +24,14 @@ namespace App.Shared.Components.Weapon
 //            InterruptPullboltWeapon.Reset();
 //            InterruptHoldWeapon.Reset();
             OpenUIFrame = false;
+            FootstepFrameGroup = -1;
         }
 
         public void CopyFrom(object rightComponent)
         {
             var remote = rightComponent as PlayerClientUpdateComponent;
-//            InterruptHoldWeapon.CopyFrom(remote.InterruptHoldWeapon);
-//            InterruptPullboltWeapon.CopyFrom(remote.InterruptPullboltWeapon);
-//            InterruptGunSightWeapon.CopyFrom(remote.InterruptGunSightWeapon);
             OpenUIFrame = remote.OpenUIFrame;
+            FootstepFrameGroup = remote.FootstepFrameGroup;
         }
 
     

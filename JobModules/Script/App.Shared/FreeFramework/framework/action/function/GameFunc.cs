@@ -6,11 +6,12 @@ using com.wd.free.action;
 using com.wd.free.para;
 using com.wd.free.para.exp;
 using com.wd.free.util;
+using Core.Free;
 
 namespace com.wd.free.action.function
 {
 	[System.Serializable]
-	public class GameFunc
+	public class GameFunc : IRule
 	{
 		private const long serialVersionUID = -8123300665766113596L;
 
@@ -194,5 +195,10 @@ namespace com.wd.free.action.function
 		{
 			this.action = action;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.GameFunc;
+        }
+    }
 }

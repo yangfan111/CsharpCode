@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Core.Utils;
+﻿using Core.Utils;
 using UnityEngine;
 using Utils.AssetManager;
 using Object = UnityEngine.Object;
@@ -14,13 +10,19 @@ namespace Utils.Appearance
 {
     class OverrideAnimator
     {
-        private static LoggerAdapter _logger = new LoggerAdapter(typeof(OverrideAnimator));
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(OverrideAnimator));
 
         private readonly Animator _animator;
-        private bool _firstPerson;
+        private readonly bool _firstPerson;
+        
+        private readonly CustomProfileInfo _changeOverrideControllerInfo;
+        private readonly CustomProfileInfo _changeOverrideControllerUpdateAnimationInfo;
 
         public OverrideAnimator(Animator animator, bool firstPerson)
         {
+            _changeOverrideControllerInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("ChangeOverrideController");
+            _changeOverrideControllerUpdateAnimationInfo = 
+                SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("ChangeOverrideControllerUpdateAnimation");
             _animator = animator;
             _firstPerson = firstPerson;
         }
@@ -28,14 +30,22 @@ namespace Utils.Appearance
         public void Change(Sex sex, bool unique, int weaponId)
         {
             if(unique) return;
-            
-            if (_firstPerson)
+
+            try
             {
-                ChangeFirstPersonAnimation(sex, weaponId);
+                _changeOverrideControllerInfo.BeginProfileOnlyEnableProfile();
+                if (_firstPerson)
+                {
+                    ChangeFirstPersonAnimation(sex, weaponId);
+                }
+                else
+                {
+                    ChangeThirdPersonAnimation(sex, weaponId);
+                }
             }
-            else
+            finally
             {
-                ChangeThirdPersonAnimation(sex, weaponId);
+                _changeOverrideControllerInfo.EndProfileOnlyEnableProfile();
             }
         }
         
@@ -67,7 +77,7 @@ namespace Utils.Appearance
             var obj = SingletonManager.Get<WeaponAvatarConfigManager>().GetOrNull(assetInfo);
             if (obj == null)
             {
-                _logger.ErrorFormat("{0} is not preloaded!", assetInfo);
+                Logger.ErrorFormat("{0} is not preloaded!", assetInfo);
             }
             else
             {
@@ -103,14 +113,22 @@ namespace Utils.Appearance
 
         private void ApplyOverrideController(Object obj)
         {
-            AnimatorOverrideController newAnim = obj as AnimatorOverrideController;
+            var newAnim = obj as AnimatorOverrideController;
             if (newAnim != null && _animator.gameObject.activeSelf)
             {
                 //_logger.InfoFormat("change clip from:{0} to:{1}", _animator.runtimeAnimatorController.name, newAnim.name);
                 // should be like this, all override controllers share RuntimeAnimatorController, which set by Editor
-                _animator.runtimeAnimatorController = newAnim;
-                // 虽然保留了状态，但是骨骼数据没有更新，之前取消是因为异步，导致UpdateBone在animator.Update(0)之前，会覆盖上半身修正的数据，导致闪了一帧
-                _animator.Update(0);
+                try
+                {
+                    _changeOverrideControllerUpdateAnimationInfo.BeginProfileOnlyEnableProfile();
+                    _animator.runtimeAnimatorController = newAnim;
+                    // 虽然保留了状态，但是骨骼数据没有更新，之前取消是因为异步，导致UpdateBone在animator.Update(0)之前，会覆盖上半身修正的数据，导致闪了一帧
+                    //_animator.Update(0);
+                }
+                finally
+                {
+                    _changeOverrideControllerUpdateAnimationInfo.EndProfileOnlyEnableProfile(); 
+                }
             }
         }
     }

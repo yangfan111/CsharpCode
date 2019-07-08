@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Core.ObjectPool;
 using Core.Utils;
 using Core.Utils.System46;
@@ -147,6 +148,18 @@ namespace Core.EntityComponent
         protected bool _ownEntity;
         private IGameEntity[] _array;
         protected bool _arrayDirty;
+        protected StringBuilder stringBuilder  = new StringBuilder();
+        public override string ToString()
+        {
+            stringBuilder.Length = 0;
+            foreach (var value in _entities.Keys)
+            {
+                stringBuilder.Append("&");
+                stringBuilder.Append(value);
+            }
+
+            return stringBuilder.ToString();
+        }
         public static EntityMap Allocate(bool ownEntity=true)
         {
             

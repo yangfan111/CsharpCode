@@ -20,6 +20,7 @@ using Utils.Compare;
 using Utils.Singleton;
 using App.Shared.GameModules.Weapon;
 using Poly2Tri;
+using Utils.Appearance.Bone;
 
 namespace App.Shared.GameModules.Player
 {
@@ -317,6 +318,7 @@ namespace App.Shared.GameModules.Player
                 return;
             }
 
+            
             //Logger.InfoFormat("replay pose, networkAnimatior:BaseClientTime{0}, server Time:{1}", networkAnimator.BaseClientTime, networkAnimator.BaseServerTime);
 
             // Animation
@@ -351,7 +353,7 @@ namespace App.Shared.GameModules.Player
                     thirdPersonAppearance.NextPosture, thirdPersonAppearance.Movement),
                 HeadPitch = characterBone.PitchHeadAngle,
                 HeadYaw = characterBone.RotHeadAngle,
-                HandPitch = characterBone.PitchHandAngle,
+                CurrentHandPitch = characterBone.CurrentPitchHandAngle,
                 HeadRotProcess = characterBone.HeadRotProcess,
                 WeaponRot = characterBone.WeaponRot,
                 IsProne = thirdPersonAppearance.Posture == ThirdPersonPosture.Prone,
@@ -384,7 +386,8 @@ namespace App.Shared.GameModules.Player
         public static bool ActiveIK(ThirdPersonAction action, ThirdPersonPosture posture,
             ThirdPersonPosture nextPosture, ThirdPersonMovement movement)
         {
-            return action == ThirdPersonAction.EndOfTheWorld &&
+            return (action == ThirdPersonAction.EndOfTheWorld ||
+                    action == ThirdPersonAction.Null) &&
                    !IKFilter.IsInThirdPersonPostureFilters(posture) &&
                    !IKFilter.IsInThirdPersonPostureFilters(nextPosture) &&
                    movement != ThirdPersonMovement.Sprint;

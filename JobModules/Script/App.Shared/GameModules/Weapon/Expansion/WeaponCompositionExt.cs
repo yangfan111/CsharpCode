@@ -146,7 +146,7 @@ namespace App.Shared
                 case EWeaponSlotType.TacticWeapon:
                     return WeaponInPackage.TacticWeapon;
                 default:
-                    return WeaponInPackage.ThrownWeapon;
+                    return WeaponInPackage.EndOfTheWorld;
             }
         }
 
@@ -201,12 +201,12 @@ namespace App.Shared
 
         public static bool CanAutoPick(this EWeaponType_Config weaponType)
         {
-            return weaponType != EWeaponType_Config.ThrowWeapon;
+            return weaponType != EWeaponType_Config.ThrowWeapon && weaponType != EWeaponType_Config.Armor && weaponType != EWeaponType_Config.Helmet;
         }
 
         public static bool CanAutoPick(this EWeaponSlotType slotType)
         {
-            return slotType != EWeaponSlotType.ThrowingWeapon;
+            return slotType != EWeaponSlotType.ThrowingWeapon && slotType != EWeaponSlotType.None;
         }
 
         public static bool IsValid(this EntityKey enittyKey)

@@ -4,13 +4,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using com.wd.free.@event;
+using Core.Free;
 
 namespace com.wd.free.condition
 {
     [Serializable]
-    public class OrParaCondition : IParaCondition
+    public class OrParaCondition : IParaCondition, IRule
     {
         public List<IParaCondition> conditions;
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.OrParaCondition;
+        }
 
         public bool Meet(IEventArgs args)
         {

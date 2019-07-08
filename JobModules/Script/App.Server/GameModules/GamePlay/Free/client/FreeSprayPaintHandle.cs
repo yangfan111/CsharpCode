@@ -1,10 +1,7 @@
-﻿using System;
-using App.Shared;
+﻿using App.Shared.EntityFactory;
 using Core.Free;
 using Free.framework;
 using UnityEngine;
-using App.Shared.GameModules.Player;
-using App.Shared.EntityFactory;
 using Utils.Configuration;
 
 namespace App.Server.GameModules.GamePlay.free.client
@@ -14,6 +11,10 @@ namespace App.Server.GameModules.GamePlay.free.client
     {
         public bool CanHandle(ServerRoom room, PlayerEntity player, SimpleProto message)
         {
+            if (message.Key != FreeMessageConstant.PlayerSprayPaint)
+            {
+                return false;
+            }
             int serverTime =  room.RoomContexts.session.currentTimeObject.CurrentTime;
             var config = IndividuationConfigManager.GetInstance().GetConfigById(message.Ins[0]);
             int intervalCD = 0;
@@ -23,8 +24,7 @@ namespace App.Server.GameModules.GamePlay.free.client
             else {
                 intervalCD = config.IntervalCD;
             }
-            return message.Key == FreeMessageConstant.PlayerSprayPaint &&
-                  player.playerSpray.mLastCreateTime + intervalCD < serverTime;
+            return player.playerSpray.mLastCreateTime + intervalCD < serverTime;
         }
 
         public void Handle(ServerRoom room, PlayerEntity player, SimpleProto message)

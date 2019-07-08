@@ -3,12 +3,13 @@ using com.cpkf.yyjd.tools.util;
 using com.wd.free.@event;
 using com.wd.free.unit;
 using com.wd.free.util;
+using Core.Free;
 
 namespace com.wd.free.map.position
 {
 	[System.Serializable]
-	public class PosAdjustSelector : IPosSelector
-	{
+	public class PosAdjustSelector : IPosSelector, IRule
+    {
 		private const long serialVersionUID = -7346159163343137078L;
 
 		private string x;
@@ -60,5 +61,10 @@ namespace com.wd.free.map.position
 			}
 			return ups;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PosAdjustSelector;
+        }
+    }
 }

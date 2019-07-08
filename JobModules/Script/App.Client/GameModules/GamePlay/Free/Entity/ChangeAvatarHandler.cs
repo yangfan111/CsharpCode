@@ -1,16 +1,14 @@
-﻿using Assets.Sources.Free;
+﻿using App.Shared;
+using Assets.Sources.Free;
 using Assets.Sources.Free.UI;
+using Core;
 using Core.Free;
 using Free.framework;
-using Core;
-using XmlConfig;
-using Utils.Configuration;
-using Utils.CharacterState;
-using Utils.Singleton;
-using App.Shared.GameModules.Weapon;
-using App.Shared;
 using Shared.Scripts;
-using UnityEngine.AI;
+using Utils.CharacterState;
+using Utils.Configuration;
+using Utils.Singleton;
+using XmlConfig;
 
 namespace App.Client.GameModules.GamePlay.Free.Entity
 {
@@ -85,7 +83,8 @@ namespace App.Client.GameModules.GamePlay.Free.Entity
                     playerEntity.appearanceInterface.Appearance.ClearAvatar((Wardrobe)data.Ins[0]);
                 }else if(data.Ks[0] == 8)
                 {
-                    bool add = data.Bs[0];
+                    //客户端此操作无效，反而会引起外观异常
+                    /*bool add = data.Bs[0];
                     if (add)
                     {
                         weaponController.TryHoldGrenade(data.Ins[0]);
@@ -93,7 +92,7 @@ namespace App.Client.GameModules.GamePlay.Free.Entity
                     else
                     {
                         playerEntity.WeaponController().RemoveGreande(data.Ins[0]);
-                    }
+                    }*/
                 }
                 else if (data.Ks[0] == 7)
                 {

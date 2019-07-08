@@ -4,5 +4,6 @@
     {
         void RealTimeConnect(int connId);
         int UdpPort { get; set; }
+        bool isRealTimeConnected { get; }
     }
 }

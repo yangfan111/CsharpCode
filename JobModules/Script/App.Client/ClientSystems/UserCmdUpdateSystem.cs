@@ -44,6 +44,7 @@ namespace App.Client.ClientSystems
                 var channel = player.network.NetworkChannel;
                 SyncUpdateMessage(player);
                 SendUpdateMessage(player, channel);
+                player.uploadEvents.ReInit();
             }
         }
 

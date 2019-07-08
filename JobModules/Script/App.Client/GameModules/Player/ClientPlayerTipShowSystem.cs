@@ -1,7 +1,8 @@
 ﻿using App.Client.GameModules.GamePlay.Free.App;
 using App.Shared;
+using App.Shared.Components.Player;
 using Assets.Utils.Configuration;
-using Core.Common;
+using Core;
 using Core.GameModule.Interface;
 using Core.Utils;
 using Entitas;
@@ -35,6 +36,11 @@ namespace App.Client.GameModules.Player
                 _playerEntity = player;
                 if (!string.IsNullOrEmpty(player.tip.Content))
                 {
+                    if (player.tip.ForTest)
+                    {
+                        ShowBottomTip(player.tip.Content);
+                        return;
+                    }
                     switch(player.tip.Location)
                     {
                         default:
@@ -46,6 +52,7 @@ namespace App.Client.GameModules.Player
                             break;
                     }
                     player.tip.Content = string.Empty;
+                    player.tip.Location = TipLocation.Bottom;
                 }
                 if(player.tip.TipType != ETipType.None)
                 {
@@ -60,6 +67,7 @@ namespace App.Client.GameModules.Player
                             break;
                     }
                     player.tip.TipType = ETipType.None;
+                    player.tip.Location = TipLocation.Bottom;
                 }
             }
             _playerEntity = null;
@@ -95,7 +103,7 @@ namespace App.Client.GameModules.Player
             ChickenUIUtil.ShowTopTip(TypeToContent(type, GetWeaponName(), GetReloadKey()));
         }
 
-        private static string TypeToContent(ETipType type, string weaponName, string reloadKey)
+        private string TypeToContent(ETipType type, string weaponName, string reloadKey)
         {
             switch (type)
             {
@@ -127,6 +135,7 @@ namespace App.Client.GameModules.Player
                     if (weaponName.Equals("空手")) return "";
                     return string.Format(ScriptLocalization.client_commontip.firewithnobullet, weaponName,reloadKey);
                 case ETipType.NoWeaponInSlot:
+                    if (_playerEntity != null && _playerEntity.gamePlay.JobAttribute != (int) EJobAttribute.EJob_EveryMan) return "";
                     return ScriptLocalization.client_commontip.noweaponinslot;
                 case ETipType.CantSwithGrenade:
                     return ScriptLocalization.client_commontip.cannotswitchgrenade;

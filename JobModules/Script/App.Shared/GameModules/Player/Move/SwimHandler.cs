@@ -63,7 +63,7 @@ namespace App.Shared.GameModules.Player
                     dist.sqrMagnitude > 0 &&
                     player.orientation
                         .Pitch >= //SingletonManager.Get<CameraConfigManager>().GetConfigByType(ECameraViewMode.ThirdPerson).PitchLimit.Max - 1);
-                    SingletonManager.Get<CameraConfigManager>().Config.PoseConfigs[(int)ECameraPoseMode.Stand]
+                    SingletonManager.Get<CameraConfigManager>().GetRoleConfig(player.playerInfo.RoleModelId).PoseConfigs[(int)ECameraPoseMode.Stand]
                         .PitchLimit.Max - 1);
         }
 

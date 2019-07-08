@@ -3,12 +3,13 @@ using com.wd.free.@event;
 using com.wd.free.para;
 using com.wd.free.para.exp;
 using com.wd.free.util;
+using Core.Free;
 
 namespace com.wd.free.action
 {
 	[System.Serializable]
-	public class FormulaAction : AbstractGameAction
-	{
+	public class FormulaAction : AbstractGameAction, IRule
+    {
 		private const long serialVersionUID = -6466171136828397968L;
 
 		private string para;
@@ -41,5 +42,10 @@ namespace com.wd.free.action
 				}
 			}
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FormulaAction;
+        }
+    }
 }

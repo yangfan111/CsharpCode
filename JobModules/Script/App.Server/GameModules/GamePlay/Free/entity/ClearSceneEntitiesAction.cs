@@ -2,12 +2,13 @@
 using App.Shared;
 using com.wd.free.action;
 using com.wd.free.@event;
+using Core.Free;
 using System;
 
 namespace App.Server.GameModules.GamePlay.Free.entity
 {
     [Serializable]
-    public class ClearSceneEntitiesAction : AbstractGameAction
+    public class ClearSceneEntitiesAction : AbstractGameAction, IRule
     {
         public override void DoAction(IEventArgs args)
         {
@@ -52,6 +53,11 @@ namespace App.Server.GameModules.GamePlay.Free.entity
                 playerEntity.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.ClearScene, message);
             }
             message.ReleaseReference();
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ClearSceneEntitiesAction;
         }
     }
 }

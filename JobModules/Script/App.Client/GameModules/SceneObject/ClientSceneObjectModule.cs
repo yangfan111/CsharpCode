@@ -15,7 +15,7 @@ namespace App.Client.GameModules.SceneObject
             AddSystem(new SceneObjectCleanupSystem(contexts));
             AddSystem(new FreeObjectLoadSystem(contexts.freeMove));
             AddSystem(new FreeObjectCleanUpSystem(contexts.freeMove));
-            AddSystem(new CreateMapObjSystem(contexts));
+            AddSystem(new MapObjCleanUpSystem(contexts));
             AddSystem(new FreeObjectPositionUpdateSystem(contexts));
             if (!SharedConfig.DisableDoor)
             {
@@ -28,6 +28,7 @@ namespace App.Client.GameModules.SceneObject
 
             if (SharedConfig.IsOffline)
             {
+                AddSystem(new CreateMapObjSystem(contexts));
                 AddSystem(new DoorRotateSystem(contexts));
             }
 

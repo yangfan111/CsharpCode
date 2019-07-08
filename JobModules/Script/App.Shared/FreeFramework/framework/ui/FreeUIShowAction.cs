@@ -3,12 +3,13 @@ using com.cpkf.yyjd.tools.util;
 using com.wd.free.@event;
 using com.wd.free.util;
 using gameplay.gamerule.free.ui.component;
+using Core.Free;
 
 namespace gameplay.gamerule.free.ui
 {
 	[System.Serializable]
-	public class FreeUIShowAction : SendMessageAction
-	{
+	public class FreeUIShowAction : SendMessageAction, IRule
+    {
 		private const long serialVersionUID = -1188091456904593121L;
 
 		public const string ALWAYS = "0";
@@ -65,5 +66,10 @@ namespace gameplay.gamerule.free.ui
 			}
 			return "展示UI'" + key + d + "'" + "'\n" + builder.ToString();
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeUIShowAction;
+        }
+    }
 }

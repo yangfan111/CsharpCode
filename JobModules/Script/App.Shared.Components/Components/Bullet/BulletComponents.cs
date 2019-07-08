@@ -1,4 +1,4 @@
-﻿using Core.BulletSimulation;
+﻿using Core.Attack;
 using Core.Components;
 using Core.Interpolate;
 using Core.Playback;
@@ -7,6 +7,7 @@ using Entitas;
 using Entitas.CodeGeneration.Attributes;
 using System;
 using System.Collections.Generic;
+using Core;
 using UnityEngine;
 using WeaponConfigNs;
 
@@ -14,11 +15,13 @@ using WeaponConfigNs;
 namespace App.Shared.Components.Bullet
 {
     [Bullet]
-    public class BulletEntityAdapterComponent : IComponent
+    public class BulletRuntimeComponent : IComponent
     {
-        public IBulletEntity Adapter;
-    }
+        [DontInitilize]public List<EEnvironmentType> Layers;
+        public IBulletEntityAgent BulletAgent;
+        public bool IsNew;
 
+    }
     [Bullet]
     [Serializable]
     
@@ -26,28 +29,45 @@ namespace App.Shared.Components.Bullet
     {
         public int GetComponentId() { { return (int)EComponentIds.BulletData; } }
 
-        [NetworkProperty] public Vector3 Velocity;
-        [NetworkProperty] public float Distance;
-
-        public float Gravity;
-        public int RemainFrameTime;
-        public int ServerTime;
-        public float MaxDistance;
-        public int PenetrableLayerCount;
-        public float BaseDamage;
-        public float PenetrableThickness;
-        public BulletConfig DefaultBulletConfig;
-        public float VelocityDecay;
-        public EBulletCaliber Caliber;
-        public int WeaponId;
-        public float DistanceDecay;
-        [DontInitilize] public Vector3 StartPoint;
+        [DontInitilize,NetworkProperty] public PrecisionsVector3 Velocity;
+        [DontInitilize,NetworkProperty(SyncFieldScale.Position)] public float Distance;
+        [DontInitilize] public bool IsAimShoot;
+        [DontInitilize] public float Gravity;
+        [DontInitilize] public int RemainFrameTime;
+        [DontInitilize] public int ServerTime;
+        [DontInitilize] public float MaxDistance;
+        [DontInitilize] public int PenetrableLayerCount;
+        [DontInitilize] public float BaseDamage;
+            //穿透厚度
+            [DontInitilize] public float PenetrableThickness;
+        [DontInitilize] public BulletConfig DefaultBulletConfig;
+        [DontInitilize] public float VelocityDecay;
+        [DontInitilize] public EBulletCaliber Caliber;
+        [DontInitilize] public int WeaponId;
+        [DontInitilize] public float DistanceDecay;
+        [DontInitilize] public PrecisionsVector3 StartPoint;
         [DontInitilize] public Vector3 EmitPoint;
-        [DontInitilize] public Vector3 StartDir;
-        [DontInitilize] public Vector3 HitPoint;
+        [DontInitilize] public PrecisionsVector3 StartDir;
+        [DontInitilize] public PrecisionsVector3 HitPoint;
         [DontInitilize] public EHitType HitType;
         [DontInitilize] public int CmdSeq;
+        [DontInitilize] public BulletStatisticsInfo StatisticsInfo;
+       
+        /*public override string ToString()
+        {
+            return string.Format("Velocity:{0},Distance:{1},Gravity:{2},RemainFrameTime:{3},ServerTime:{4},MaxDistance:{5},PenetrableLayerCount:{6},BaseDamage:{7},PenetrableThickness:{8},VelocityDecay:{9},Caliber:{10},WeaponId:{11},DistanceDecay:{12},StartPoint:{13},Ignore:{14},StartDir:{15},HitPoint:{16}",Velocity.ToString(), Distance.ToString("f2"),Gravity, RemainFrameTime, ServerTime, MaxDistance.ToString("f2"), PenetrableLayerCount, BaseDamage, PenetrableThickness, VelocityDecay.ToString("f2"),Caliber, WeaponId, DistanceDecay.ToString("f2"), StartPoint, 0, StartDir,HitPoint);
+       
+        }*/
+        public string ToBaseString()
+        {
+            return string.Format("Gravity:{0},RemainFrameTime:{1},MaxDistance:{2},PenetrableLayerCount:{3},BaseDamage:{4},PenetrableThickness:{5},VelocityDecay:{6}\nCaliber:{7},WeaponId:{8},DistanceDecay:{9},StartPoint:{10},Ignore:{11},StartDir:{12}",Gravity, RemainFrameTime,  MaxDistance.ToString("f2"), PenetrableLayerCount, BaseDamage, PenetrableThickness, VelocityDecay.ToString("f2"),Caliber, WeaponId, DistanceDecay.ToString("f2"), StartPoint, 0, StartDir);        
+        }
 
+        public string ToDynamicString()
+        {
+            return string.Format("Position:{0},Velocity:{1},Distance:{2},NextFrameTime:{3}", StartPoint, Velocity, Distance, RemainFrameTime);
+        }
+      
         public void CopyFrom(object rightComponent)
         {
             var r = rightComponent as BulletDataComponent;
@@ -67,26 +87,26 @@ namespace App.Shared.Components.Bullet
     [Bullet]
     [Serializable]
     
-    public class BulletGameObjectComponent : SingleAssetComponent 
+    public class BulletAssetComponent : SingleAssetComponent 
     {
-        public override int GetComponentId() { { return (int)EComponentIds.BulletGameObject; } }
+        public override int GetComponentId() { { return (int)EComponentIds.BulletAsset; } }
     }
 
-    [Bullet, UniquePrefix("is")]
-    public class NewComponent : IComponent
-    {
-
-    }
-
-    [Bullet]
-    public class EmitPositionComponent : IComponent
-    {
-        public Vector3 Value; 
-    }
-
-    [Bullet]
-    public class PenetrateInfoComponent : IComponent
-    {
-        public List<EEnvironmentType> Layers;
-    }
+//    [Bullet, UniquePrefix("is")]
+//    public class NewComponent : IComponent
+//    {
+//
+//    }
+//
+//    [Bullet]
+//    public class EmitPositionComponent : IComponent
+//    {
+//        public Vector3 Value; 
+//    }
+//
+//    [Bullet]
+//    public class PenetrateInfoComponent : IComponent
+//    {
+//        public List<EEnvironmentType> Layers;
+//    }
 }

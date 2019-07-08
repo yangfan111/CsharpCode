@@ -1,11 +1,9 @@
 ﻿using App.Server.GameModules.GamePlay.free.player;
-using App.Shared.Player;
-using com.wd.free.skill;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using App.Shared.GameModules.Player;
+using com.wd.free.skill;
+using Utils.Configuration;
+using Utils.Singleton;
+using XmlConfig;
 
 namespace App.Shared.FreeFramework.Free.Chicken
 {
@@ -16,7 +14,27 @@ namespace App.Shared.FreeFramework.Free.Chicken
             FreeData fd = (FreeData)args.GetUnit("current");
             if(fd != null)
             {
-                return PlayerStateUtil.HasPlayerState(EPlayerGameState.InterruptItem, fd.Player.gamePlay);
+                if (PlayerStateUtil.HasPlayerState(EPlayerGameState.InterruptItem, fd.Player.gamePlay))
+                {
+                    return true;
+                }
+
+                var manager = SingletonManager.Get<StateTransitionConfigManager>();
+
+                if (fd.Player.stateInterface.State.GetCurrentPostureState() != fd.Player.stateInterface.State.GetNextPostureState())
+                    return true;
+
+                foreach (EPlayerState state in fd.Player.StateInteractController().GetCurrStates())
+                {
+                    StateTransitionConfigItem condition = manager.GetConditionByState(state);
+                    if (condition == null) continue;
+                    if (!condition.IsUseItem)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             }
 
             return false;

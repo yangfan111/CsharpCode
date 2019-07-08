@@ -1,28 +1,22 @@
-﻿using App.Server.GameModules.GamePlay.free.player;
-using Assets.App.Server.GameModules.GamePlay.Free;
-using com.wd.free.action;
+﻿using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.map.position;
 using com.wd.free.unit;
 using com.wd.free.util;
 using Core.Free;
-using Free.framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
     [Serializable]
-    public class PlayerMoveAction : AbstractPlayerAction
+    public class PlayerMoveAction : AbstractPlayerAction, IRule
     {
         private IPosSelector pos;
         private String pitch;
 
         public override void DoAction(IEventArgs args)
         {
-            PlayerEntity p = ((FreeData)GetPlayer(args)).Player;
+            PlayerEntity p = GetPlayerEntity(args);
 
             UnitPosition up = pos.Select(args);
             if (up != null)
@@ -51,6 +45,11 @@ namespace App.Server.GameModules.GamePlay.Free.player
         public void setPos(IPosSelector pos)
         {
             this.pos = pos;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerMoveAction;
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using LiteNetLib;
 
 namespace Core.ObjectPool
 {
@@ -63,7 +64,8 @@ namespace Core.ObjectPool
             foreach (var customAbstractObjectFactory in FindAllGameComponentType())
             {
                 var type = customAbstractObjectFactory.Type;
-                _allocatorDic[type] = new RingBufferObjectAllocator(customAbstractObjectFactory, customAbstractObjectFactory.InitPoolSize);
+                _allocatorDic[type] = new RingBufferObjectAllocator(customAbstractObjectFactory, 
+                    customAbstractObjectFactory.InitPoolSize, customAbstractObjectFactory.AllocatorNumber);
             }
         }
 
@@ -105,8 +107,9 @@ namespace Core.ObjectPool
             foreach (var allocator in _allocatorDic.Values)
             {
                 allocator.PrintDebugInfo(sb);
+               
             }
-
+            NetPacketPoolsStatue.PrintDebugInfo(sb);
             sb.Append("</table>");
             return sb.ToString();
         }

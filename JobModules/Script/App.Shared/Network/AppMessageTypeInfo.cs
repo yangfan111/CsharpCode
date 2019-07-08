@@ -125,6 +125,7 @@ namespace App.Shared.Network
             _serializeInfo[(int)EServer2ClientMessage.ClearScene] = new ProtoBufSerializeInfo<ClearSceneMessage>(Protobuf.ClearSceneMessage.Parser);
             _serializeInfo[(int)EServer2ClientMessage.GameOver] = new ProtoBufSerializeInfo<GameOverMesssage>(Protobuf.GameOverMesssage.Parser);
             _serializeInfo[(int)EServer2ClientMessage.HeartBeat] = new ProtoBufSerializeInfo<HeartBeatMessage>(Protobuf.HeartBeatMessage.Parser);
+            _serializeInfo[(int)EServer2ClientMessage.SceneInfo] = new ProtoBufSerializeInfo<LoginSuccMessage>(Protobuf.LoginSuccMessage.Parser);
         }
 
 

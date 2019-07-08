@@ -222,20 +222,22 @@ namespace VNet.Base.Tcp
             sendMs.Position = 0;
             sendMs.SetLength(0);
 
-            var lenArray = BitConverter.GetBytes(length);
+            //var lenArray = BitConverter.GetBytes(length);
             if (!_littleEndian)
             {
-                sendMs.WriteByte(lenArray[3]);
-                sendMs.WriteByte(lenArray[2]);
-                sendMs.WriteByte(lenArray[1]);
-                sendMs.WriteByte(lenArray[0]);
+                sendMs.WriteByte((byte)(length>>24));
+                sendMs.WriteByte((byte)(length>>16));
+                sendMs.WriteByte((byte)(length>>8));
+                sendMs.WriteByte((byte)length);
+                
+               
             }
             else
             {
-                sendMs.WriteByte(lenArray[0]);
-                sendMs.WriteByte(lenArray[1]);
-                sendMs.WriteByte(lenArray[2]);
-                sendMs.WriteByte(lenArray[3]);
+                sendMs.WriteByte((byte)length);
+                sendMs.WriteByte((byte)(length>>8));
+                sendMs.WriteByte((byte)(length>>16));
+                sendMs.WriteByte((byte)(length>>24));
             }
            
             sendMs.Write(bytes, offset, length);
@@ -272,7 +274,29 @@ namespace VNet.Base.Tcp
                 return;
             }
             _isConnected = false;
-            ConnSocket.Close();
+            try
+            {
+                if (this.ConnSocket != null)
+                {
+                    this.ConnSocket.Shutdown(SocketShutdown.Both);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.ErrorFormat("Shutdown failed with error {0}", ex.Message);
+            }
+            try
+            {
+                if (this.ConnSocket != null)
+                {
+                    this.ConnSocket.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.ErrorFormat("Close failed with error {0}", ex.Message);
+            }
+            this.ConnSocket = null;
             if (null != OnDisconnectListener)
             {
                 OnDisconnectListener(this);

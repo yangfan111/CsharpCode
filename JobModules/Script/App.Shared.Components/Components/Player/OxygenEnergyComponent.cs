@@ -16,7 +16,7 @@ namespace App.Shared.Components.Player
     
     public class OxygenEnergyComponent : IUserPredictionComponent, IPredictedOxygenState
     {
-        [NetworkProperty] public float CurrentOxygen { get; set; }
+        [NetworkProperty(1000,-1000,0.01f)] public float CurrentOxygen { get; set; }
 
         public int GetComponentId()
         {
@@ -37,7 +37,7 @@ namespace App.Shared.Components.Player
             var rightObj = right as OxygenEnergyComponent;
             if (rightObj != null)
             {
-                return CompareUtility.IsApproximatelyEqual(CurrentOxygen, rightObj.CurrentOxygen);
+                return CompareUtility.IsApproximatelyEqual(CurrentOxygen, rightObj.CurrentOxygen, 0.02f);
             }
             return false;
         }

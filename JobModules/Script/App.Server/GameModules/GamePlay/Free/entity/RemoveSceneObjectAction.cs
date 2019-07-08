@@ -12,11 +12,12 @@ using com.wd.free.util;
 using Core.EntityComponent;
 using gameplay.gamerule.free.ui;
 using UnityEngine;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.entity
 {
     [Serializable]
-    public class RemoveSceneObjectAction : AbstractPlayerAction
+    public class RemoveSceneObjectAction : AbstractPlayerAction, IRule
     {
         private string id;
 
@@ -37,6 +38,11 @@ namespace App.Server.GameModules.GamePlay.Free.entity
                     moveEntity.isFlagDestroy = true;
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.RemoveSceneObjectAction;
         }
     }
 }

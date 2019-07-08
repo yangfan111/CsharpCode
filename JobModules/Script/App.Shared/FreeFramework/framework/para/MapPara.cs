@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using Sharpen;
+using Core.Free;
 
 namespace com.wd.free.para
 {
 	[System.Serializable]
-	public class MapPara : AbstractPara
-	{
+	public class MapPara : AbstractPara, IRule
+    {
 		private const long serialVersionUID = -4439935994846733590L;
 
 		private MyDictionary<string, IPara> map;
@@ -116,9 +117,9 @@ namespace com.wd.free.para
 		}
 
 		[System.NonSerialized]
-		internal static ParaPool<IPara> pool = new ParaPool<IPara>(new com.wd.free.para.MapPara());
+		internal static ParaPool pool = new ParaPool(new com.wd.free.para.MapPara());
 
-		protected internal override ParaPool<IPara> GetPool()
+		protected internal override ParaPool GetPool()
 		{
 			return pool;
 		}
@@ -127,5 +128,10 @@ namespace com.wd.free.para
 		{
 			return name + "=" + map.ToString();
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.MapPara;
+        }
+    }
 }

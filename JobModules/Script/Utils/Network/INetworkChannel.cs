@@ -11,6 +11,7 @@ namespace Core.Network
         FlowStatue TcpFlowStatus{get;}
         FlowStatue UdpFlowStatus{get;}
         bool IsConnected { get; }
+        bool IsUdpConnected { get; }
         event Action<INetworkChannel> Disconnected;
         event Action<INetworkChannel, int, object> MessageReceived;
     

@@ -1,24 +1,36 @@
 ﻿using System;
+using System.Net.Sockets;
 using System.Threading;
+using App.Client.Utility;
 using App.Protobuf;
 using App.Shared;
 using App.Shared.Util;
+using Assets.App.Client.GameModules.Ui;
 using Core.GameModule.Interface;
 using Core.Network;
 using Core.Utils;
 using Entitas;
 using Sharpen;
+using UIComponent.UI.Manager.Alert;
 using UnityEngine;
+/*using Wenzil.Console;*/
 
 namespace App.Client.ClientSystems
 {
     public class PingSystem : IRenderSystem, IOnGuiSystem
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(PingSystem));
+        private const float HeartBeatAckInterval = 2.0f;
+        private const float NetWorkStatusCheckInterval = 5.0f;
+        private const float ReconnectInterval = 3.0f;
         private Contexts _contexts;
        
         private float _next;
         GUIStyle _bb = new GUIStyle();
+        private float LastReconnectCheckTime = 0.0f;
+        private float LastReconnectTime = 0.0f;
+        private bool ReconnectShow = false;
+
 
         public PingSystem(Contexts contexts)
         {
@@ -43,7 +55,7 @@ namespace App.Client.ClientSystems
             _last = time;
             if (time > _next)
             {
-                _next = time + 2;
+                _next = time + HeartBeatAckInterval;
                 var channel = _contexts.session.clientSessionObjects.NetworkChannel;
                 _seq++;
                 if (!SharedConfig.IsOffline)
@@ -100,9 +112,95 @@ namespace App.Client.ClientSystems
             //{
             //    _lastButtonStat = false;
             //}
-          
+            //if (ConsoleSwitch.ReconnectGUI)
+            //{
+            //    DebugGUI();
+            //}
             ShowNetWorkStatus();
+            ReconnectCheck();
+
             //ShowFps();
+        }
+
+        private void DebugGUI()
+        {
+            if (GUILayout.Button("断开Tcp连接"))
+            {
+                GameController().SendMessage("CloseConnect", ProtocolType.Tcp);
+            }
+            if (GUILayout.Button("断开Udp连接"))
+            {
+                GameController().SendMessage("CloseConnect", ProtocolType.Udp);
+            }
+            if (GUILayout.Button("断开Tcp-Udp连接"))
+            {
+                GameController().SendMessage("CloseConnect", ProtocolType.Unspecified);
+            }
+        }
+
+        private void ReconnectCheck()
+        {
+            float time = Time.time;
+
+            if (ReconnectShow)
+            {
+                LastReconnectCheckTime = time;
+                var channel = _contexts.session.clientSessionObjects.NetworkChannel;
+                if (channel.IsConnected) {
+                    UiCommon.AlertManager.ClearQueueAndClose();
+                    ReconnectShow = false;
+                    /*GameController().SendMessage("ChangeState");*/
+                } else {
+                    // 定时重连
+                    /*ReConnect(time);*/
+                }
+                return;
+            }
+
+            if (time - LastReconnectCheckTime > NetWorkStatusCheckInterval) {
+
+                var utTcp = (int)(DateTime.UtcNow.ToMillisecondsSinceEpoch() -
+                _contexts.session.clientSessionObjects.ServerFpsSatatus.LastTcpPing) / 1000;
+                var utUdp = (int)(DateTime.UtcNow.ToMillisecondsSinceEpoch() -
+                _contexts.session.clientSessionObjects.ServerFpsSatatus.LastUdpPing) / 1000;
+
+
+                if ((utTcp > NetWorkStatusCheckInterval ||
+                    utUdp > NetWorkStatusCheckInterval ) &&
+                    !ReconnectShow) {
+                    UiCommon.AlertManager.AddDataToQueueAndShow(AlertWindowStyle.YES, "网络连接中断", /*Application.Quit*/YesCB, null, "确定", null,
+                        0, null);
+                    ReconnectShow = true;
+                }
+
+                LastReconnectCheckTime = time;
+            }
+        }
+
+        private GameObject GameController()
+        {
+            var gameController = GameObject.Find("GameController");
+            return gameController;
+        }
+
+        protected void ReConnect(float time)
+        {
+            if (time - LastReconnectTime > ReconnectInterval) {
+                GameController().SendMessage("ReConnect");
+                LastReconnectTime = time;
+            }
+        }
+
+        private void YesCB()
+        {
+            ReconnectShow = false;
+            HallUtility.GameOver();
+        }
+
+        // 退出至大厅
+        private void NoCB()
+        {
+            ReconnectShow = false;
         }
 
         private void ShowFps()
@@ -157,7 +255,7 @@ namespace App.Client.ClientSystems
             var ut = (int) (DateTime.UtcNow.ToMillisecondsSinceEpoch() -
                             _contexts.session.clientSessionObjects.ServerFpsSatatus.LastUdpPing) / 1000;
 
-            if (ut < 5)
+            if (ut < NetWorkStatusCheckInterval)
             {
                 if (null == _connectedStyle)
                 {

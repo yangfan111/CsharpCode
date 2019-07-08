@@ -27,7 +27,11 @@ namespace com.wd.free.util
 
 		public const string VAR_END = "}";
 
-		public static string EMPTY_STRING = string.Empty;
+        public const char VAR_START_CHAR = '{';
+
+        public const char VAR_END_CHAR = '}';
+
+        public static string EMPTY_STRING = string.Empty;
 
 		private const string TRUE = "true";
         private const string OtherTrue = "True";
@@ -74,13 +78,13 @@ namespace com.wd.free.util
 
         public static bool IsVar(string value)
         {
-            return value != null && value.Contains(VAR_START) && value.Contains(VAR_END);
+            return value != null && (value.IndexOf(VAR_START_CHAR) > -1) && (value.IndexOf(VAR_END_CHAR) > -1);
         }
 
 		public static string ReplaceNumber(string message, IEventArgs args)
 		{
 			string nv = message;
-			if (message != null && message.Contains(VAR_START) && message.Contains(VAR_END))
+			if (message != null && (message.IndexOf(VAR_START_CHAR) > -1) && (message.IndexOf(VAR_END_CHAR) > -1))
 			{
 				nv = ReplaceVar(message, args);
 				if (nv == null)
@@ -187,7 +191,7 @@ namespace com.wd.free.util
 		public static string ReplaceVar(string message, IEventArgs args)
 		{
 			// long s = FreeTimeDebug.recordStart("replace");
-			if (message == null || !message.Contains(VAR_START) || !message.Contains(VAR_END))
+			if (message == null || message.IndexOf(VAR_START_CHAR) < 0 || message.IndexOf(VAR_END_CHAR) < 0)
 			{
 				return message;
 			}

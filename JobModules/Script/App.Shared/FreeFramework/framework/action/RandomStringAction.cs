@@ -5,12 +5,13 @@ using com.cpkf.yyjd.tools.util.math;
 using com.wd.free.@event;
 using com.wd.free.para;
 using com.wd.free.util;
+using Core.Free;
 
 namespace com.wd.free.action
 {
 	[System.Serializable]
-	public class RandomStringAction : AbstractGameAction
-	{
+	public class RandomStringAction : AbstractGameAction, IRule
+    {
 		private const long serialVersionUID = -5592323358066894668L;
 
 		private string keys;
@@ -175,7 +176,12 @@ namespace com.wd.free.action
 			return FreeUtil.ReplaceVar(keys, args);
 		}
 
-		internal class KeyProperty
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.RandomStringAction;
+        }
+
+        internal class KeyProperty
 		{
 			internal string v;
 

@@ -94,4 +94,11 @@
         //英雄击杀
         HeroKO
     }
+
+    // 补给小地图操作
+    public enum EMiniMapSupplyMark {
+        SupplyAdd = 1,
+        SupplyRemove = 2,
+        SupplyClear = 3,
+    }
 }

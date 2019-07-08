@@ -2,6 +2,7 @@
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Camera.Utils;
 using App.Shared.GameModules.Player;
+using Core.EntityComponent;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
@@ -36,13 +37,16 @@ namespace App.Shared.GameModules.Camera
         
         protected override void ExecWhenObserving(PlayerEntity player, IUserCmd cmd)
         {
-        }
-
-        protected override void ExecWhenBeingObserved(PlayerEntity player, IUserCmd cmd)
-        {
-            if (player.appearanceInterface.Appearance.IsFirstPerson)
+            var observedPlayer = player.observeCamera.ObservedPlayer;
+            if (observedPlayer != null)
             {
-                player.thirdPersonDataForObserving.ThirdPersonArchorPosition =  player.position.Value;
+                observedPlayer.cameraArchor.ArchorType = GetAnchorType(observedPlayer);
+                observedPlayer.cameraArchor.ArchorPosition =
+                    GetAnchorPosition(observedPlayer, observedPlayer.cameraArchor.ArchorType);
+                observedPlayer.cameraArchor.ArchorEulerAngle =
+                    GetAnchorEulerAngle(observedPlayer, observedPlayer.cameraArchor.ArchorType);
+                observedPlayer.time.ClientTime = player.time.ClientTime;
+                UpdareArchTransition(observedPlayer);
             }
         }
 
@@ -105,8 +109,8 @@ namespace App.Shared.GameModules.Camera
             {
                 var follow = _playerContext.GetEntityWithEntityKey(
                     new Core.EntityComponent.EntityKey(player.gamePlay.CameraEntityId, (short) EEntityType.Player));
-                if(follow!=null && follow.hasPosition)
-                return ECameraArchorType.FollowEntity;
+                if (follow != null && follow.hasPosition)
+                    return ECameraArchorType.FollowEntity;
             }
             return ECameraArchorType.Third;
         }
@@ -181,7 +185,6 @@ namespace App.Shared.GameModules.Camera
                             Logger.Error("First camera root can't be found");
                         }
                     }
-
                     return player.position.Value;
             }
         }

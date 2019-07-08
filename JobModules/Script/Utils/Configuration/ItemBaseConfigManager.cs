@@ -47,7 +47,7 @@ namespace Utils.Configuration
                         var config = SingletonManager.Get<WeaponPartSurvivalConfigManager>().FindConfigBySetId(id);
                         var partId = SingletonManager.Get<WeaponPartSurvivalConfigManager>().GetDefaultPartBySetId(id);
                         var realConfig = SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(partId);
-                        if (config != null)
+                        if (config != null && realConfig != null)
                             realConfig.Name = config.Name;
                         res = realConfig;
                     }
@@ -62,10 +62,10 @@ namespace Utils.Configuration
                     res = SingletonManager.Get<RoleAvatarConfigManager>().GetConfigById(id); break;
                 case ECategory.Weapon:
                     var weaponConfig = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(id);
+                    if (weaponConfig == null) break;
                     var weaponAvatarConfig = SingletonManager.Get<WeaponAvatarConfigManager>()
                         .GetConfigById(weaponConfig.AvatorId);
                     res = weaponConfig.Copy();
-                    //res = weaponConfig;
                     if (weaponAvatarConfig != null)
                     {
                         res.IconBundle = weaponAvatarConfig.IconBundle;
@@ -73,6 +73,7 @@ namespace Utils.Configuration
                     }
                     break;
             }
+            dict[id] = res;
             return res;
 
 

@@ -65,6 +65,8 @@ namespace Assets.XmlConfig
         MeleeWeapon,
         ThrowWeapon,
         TacticWeapon,
+        Armor,
+        Helmet
     }
 
     public enum EWeaponSubType
@@ -85,6 +87,9 @@ namespace Assets.XmlConfig
         Hand,
         AccurateRifle,
         C4,
+        TacticWeapon,
+        Armor=20,
+        Helmet=21
     }
 
     public enum EWeaponIdType

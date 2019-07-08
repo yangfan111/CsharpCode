@@ -1,16 +1,13 @@
 ﻿using Core.Fsm;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Utils.Appearance;
+using Utils.Appearance.Bone;
 
 namespace Core.CharacterBone
 {
     public interface IWeaponRot
     {
         void SetWeaponPitch(Action<FsmOutput> addOutput, float pitch);
-        void WeaponRotUpdate(CodeRigBoneParam param);
+        void WeaponRotUpdate(CodeRigBoneParam param, float deltaTime);
         void WeaponRotPlayback(CodeRigBoneParam param);
     }
 }

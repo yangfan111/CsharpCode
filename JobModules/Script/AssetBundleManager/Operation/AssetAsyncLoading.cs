@@ -31,9 +31,9 @@ namespace AssetBundleManager.Operation
             if (_request.isDone)
             {
                 var t = (DateTime.Now - CreateTime).Milliseconds;
-                if (t > 100)
+                if (t > 200)
                 {
-                    _logger.ErrorFormat("asset ;{0}:{1} take {2}", BundleName, Name, t);
+                    _logger.WarnFormat("asset ;{0}:{1} take {2}", BundleName, Name, t);
                 }
             }
 

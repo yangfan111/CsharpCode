@@ -26,8 +26,8 @@ using Assets.Sources.Free.UI;
 using Core.GameModule.Step;
 using Core.MyProfiler;
 using Core.SessionState;
-using App.Client.Bullet;
 using App.Client.Utility;
+using App.Shared.Components;
 using Utils.Singleton;
 
 namespace App.Client.Console
@@ -81,11 +81,9 @@ namespace App.Client.Console
         private void InitBuleltInfoCollector(INetworkChannel networkChannel)
         {
             var sessionObjects = _contexts.session.commonSession;
-            sessionObjects.BulletInfoCollector = new ClientBulletInfoCollector(networkChannel);
             _contexts.session.clientSessionObjects.MessageDispatcher.RegisterLater(
                 (int) EServer2ClientMessage.FireInfoAck,
-                new FireInfoAckMessageHandler(_contexts.player,
-                    (ClientBulletInfoCollector) sessionObjects.BulletInfoCollector));
+                new FireInfoAckMessageHandler());
         }
 
         public void OnNetworkDisconnected()
@@ -107,11 +105,11 @@ namespace App.Client.Console
                 if (_isDisposed)
                     return;
 
-                if (_isDisconnected)
-                {
-                    HallUtility.GameOver();
-                }
-                else
+                //if (_isDisconnected)
+                //{
+                //    HallUtility.GameOver();
+                //}
+                //else
                 {
                     SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.Room);
                     var sessionObjects = _contexts.session.clientSessionObjects;
@@ -121,6 +119,12 @@ namespace App.Client.Console
                     _clientSessionStateMachine.Update();
                 }
             }
+#if UNITY_EDITOR
+            catch (Exception e)
+            {
+                Debug.LogError("unknown error : " + e.StackTrace);
+            }
+#endif
             finally
             {
                 SingletonManager.Get<DurationHelp>().ProfileEnd(CustomProfilerStep.Room);
@@ -136,47 +140,59 @@ namespace App.Client.Console
         {
             if (_isDisposed) return;
             _isDisposed = true;
-            _clientSessionStateMachine.Dispose();
-            FreePrefabLoader.Destroy();
-            var _sessionObjects = _contexts.session.commonSession;
-            _contexts.session.commonSession.Dispose();
-            _contexts.session.clientSessionObjects.Dispose();
-
-            if (_contexts.session.clientSessionObjects.NetworkChannel != null)
+            try
             {
-                _contexts.session.clientSessionObjects.NetworkChannel.Dispose();
+                _clientSessionStateMachine.Dispose();
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorFormat("_clientSessionStateMachine.Disposeerror:{0}", ex);
             }
 
-            foreach (var info in _sessionObjects.GameContexts.AllContexts)
+            try
             {
-                foreach (IGameEntity entity in info.GetEntities())
-                {
-                    foreach (var comp in entity.ComponentList)
-                    {
-                        if (comp is IAssetComponent)
-                        {
-                            ((IAssetComponent) comp).Recycle(_sessionObjects.AssetManager);
-                        }
-                    }
+                FreePrefabLoader.Destroy();
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorFormat("FreePrefabLoader.Destroy(){0}", ex);
+            }
 
-                    if (_sessionObjects.AssetManager != null)
-                        _sessionObjects.AssetManager.LoadCancel(entity.RealEntity);
-                    entity.Destroy();
+            try
+            {
+                _contexts.session.commonSession.Dispose();
+                _contexts.session.clientSessionObjects.Dispose();
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorFormat(" _contexts.session {0}", ex);
+            }
+
+            var _sessionObjects = _contexts.session.commonSession;
+            try
+            {
+                if (_contexts.session.clientSessionObjects.NetworkChannel != null)
+                {
+                    _contexts.session.clientSessionObjects.NetworkChannel.Dispose();
                 }
             }
-
-            foreach (Entity entity in _contexts.ui.GetEntities())
+            catch (Exception ex)
             {
-                DestroyEntity(_sessionObjects, entity);
+                _logger.ErrorFormat(" _contexts.NetworkChannel {0}", ex);
             }
 
 
-            foreach (Entity entity in _contexts.sceneObject.GetEntities())
+            RecycleEntitys(_contexts);
+
+            try
             {
-                DestroyEntity(_sessionObjects, entity);
+                _clientSessionStateMachine.ShutDown();
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorFormat(" _clientSessionStateMachine.ShutDown {0}", ex);
             }
 
-            _clientSessionStateMachine.ShutDown();
             try
             {
                 _contexts.Reset();
@@ -186,8 +202,55 @@ namespace App.Client.Console
                 _logger.ErrorFormat("contexts.Reset error:{0}", ex.Message);
             }
 
-            UiModule.DestroyAll();
-            FreeUILoader.Destroy();
+            try
+            {
+                UiModule.DestroyAll();
+                FreeUILoader.Destroy();
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorFormat("contexts.Reset error:{0}", ex.Message);
+            }
+        }
+
+        private void RecycleEntitys(Contexts context)
+        {
+            var _sessionObjects = context.session.commonSession;
+            foreach (var info in _sessionObjects.GameContexts.AllContexts)
+            {
+                foreach (IGameEntity entity in info.GetEntities())
+                {
+                    foreach (var comp in entity.ComponentList)
+                    {
+                        if (comp is IAssetComponent)
+                        {
+                            try
+                            {
+                                ((IAssetComponent) comp).Recycle(_sessionObjects.AssetManager);
+                            }
+                            catch (Exception e)
+                            {
+                                _logger.ErrorFormat("RecycleEntitys {0}", e);
+                            }
+                        }
+                    }
+
+                    if (_sessionObjects.AssetManager != null)
+                        _sessionObjects.AssetManager.LoadCancel(entity.RealEntity);
+                    entity.Destroy();
+                }
+            }
+
+            foreach (Entity entity in context.ui.GetEntities())
+            {
+                DestroyEntity(_sessionObjects, entity);
+            }
+
+
+            foreach (Entity entity in context.sceneObject.GetEntities())
+            {
+                DestroyEntity(_sessionObjects, entity);
+            }
         }
 
         private void DestroyEntity(ICommonSessionObjects sessionObjects, Entity entity)
@@ -196,7 +259,14 @@ namespace App.Client.Console
             {
                 if (comp is IAssetComponent)
                 {
-                    ((IAssetComponent) comp).Recycle(sessionObjects.AssetManager);
+                    try
+                    {
+                        ((IAssetComponent) comp).Recycle(sessionObjects.AssetManager);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.ErrorFormat("RecycleEntitys {0}", e);
+                    }
                 }
             }
 

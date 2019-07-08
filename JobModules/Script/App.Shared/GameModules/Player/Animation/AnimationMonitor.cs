@@ -1,19 +1,16 @@
 using System;
 using System.Collections.Generic;
+using Core.CharacterState.Action.CommandLimit;
 using Core.Fsm;
-using Core.Utils;
 using UnityEngine;
 using Utils.Appearance;
-using Tuple=Core.Utils.Tuple;
 
 namespace App.Shared.GameModules.Player.Animation
 {
     public class AnimationMonitor
     {
         private readonly AnimationClipNameMatcher _matcher = new AnimationClipNameMatcher();
-
-        private readonly Dictionary<string, StateChange> _animationFinished;
-        private readonly List<Tuple<string, StateChange>> _animationFinishedSource;
+        
         // 人物移动在人物状态更新之前，因此某些状态的触发要在Update之前
         private readonly Dictionary<string, FsmInput> _animationProgressBeforeUpdate;
         private readonly Dictionary<string, FsmInput> _p3AnimationProgressAfterUpdate;
@@ -73,54 +70,9 @@ namespace App.Shared.GameModules.Player.Animation
                 { "Use",                FsmInput.BuriedBombProgressP1}
             };
 
-            // speed up _animationFinished
-            _animationFinishedSource = new List<Tuple<string, StateChange>>
-			{
-			    Tuple.Create("JumpStart",       new StateChange { Value = false, Command = FsmInput.Freefall } ),//有过渡
-			    Tuple.Create("JumpEnd",         new StateChange { Value = false, Command = FsmInput.JumpEndFinished } ),//有过渡
-			    Tuple.Create("Fire",            new StateChange { Value = false, Command = FsmInput.FireFinished } ),
-			    Tuple.Create("FireEnd",         new StateChange { Value = false, Command = FsmInput.FireEndFinished } ),
-			    Tuple.Create("Injury",          new StateChange { Value = false, Command = FsmInput.InjuryFinished } ),
-			    Tuple.Create("Reload",          new StateChange { Value = false, Command = FsmInput.ReloadFinished } ),
-			    Tuple.Create("ReloadEmpty",     new StateChange { Value = false, Command = FsmInput.ReloadFinished } ),
-			    Tuple.Create("HolsterStart",    new StateChange { Value = false, Command = FsmInput.HolsterStartFinished } ),
-			    Tuple.Create("HolsterEnd",      new StateChange { Value = false, Command = FsmInput.HolsterEndFinished } ),
-			    Tuple.Create("Select",          new StateChange { Value = false, Command = FsmInput.SelectFinished } ),
-			    Tuple.Create("ReloadEnd",       new StateChange { Value = false, Command = FsmInput.ReloadFinished } ),//有过渡
-			    Tuple.Create("PickUp",          new StateChange { Value = false, Command = FsmInput.PickUpEnd } ),
-			    Tuple.Create("OpenDoor",        new StateChange { Value = false, Command = FsmInput.OpenDoorEnd } ),
-			    Tuple.Create("Props",           new StateChange { Value = false, Command = FsmInput.PropsEnd } ),
-			    Tuple.Create("Melee",           new StateChange { Value = false, Command = FsmInput.MeleeAttackFinished } ),
-			    Tuple.Create("ThrowEnd",        new StateChange { Value = false, Command = FsmInput.GrenadeEndFinish } ),
-			    Tuple.Create("ParachuteOpen1",  new StateChange { Value = false, Command = FsmInput.ParachuteOpen1Finished } ),
-			    Tuple.Create("Enter",           new StateChange { Value = false, Command = FsmInput.ToProneTransitFinish } ),
-			    Tuple.Create("Quit",            new StateChange { Value = false, Command = FsmInput.OutProneTransitFinish } ),
-                Tuple.Create("Climb",           new StateChange { Value = false, Command = FsmInput.GenericActionFinished } ),
-			    Tuple.Create("Use",             new StateChange { Value = false, Command = FsmInput.BuriedBombFinished } ),
-			    Tuple.Create("Dismantle",       new StateChange { Value = false, Command = FsmInput.DismantleBombFinished } ),
-			    Tuple.Create("2InjuredMove",       new StateChange { Value = false, Command = FsmInput.DyingTransitionFinished } ),
-			    Tuple.Create("EnterLadder",     new StateChange { Value = false, Command = FsmInput.EnterLadderFinished } ),
-                Tuple.Create("ExitLadder",      new StateChange { Value = false, Command = FsmInput.ExitLadderFinished } ),
-			    Tuple.Create("TransfigurationStart",      new StateChange { Value = false, Command = FsmInput.TransfigurationStartEnd } ),
-			    Tuple.Create("TransfigurationFinish",      new StateChange { Value = false, Command = FsmInput.TransfigurationFinishEnd } ),
-			    Tuple.Create("RageStart",       new StateChange { Value = false, Command = FsmInput.RageStartFinished } ),
-			    Tuple.Create("RageEnd",         new StateChange { Value = false, Command = FsmInput.RageEndFinished } ),
-            };
-
-            // 只播放一遍的动画，依赖它们的结束触发命令
-            // 有过渡的需要打开interruption source
-            _animationFinished = new Dictionary<string, StateChange>();
-                
-            var count = _animationFinishedSource.Count;
-            for (var i = 0; i < count; i++)
-            {
-                var item = _animationFinishedSource[i];
-                _animationFinished.Add(item.Item1, item.Item2);
-            }
-
             _animationLoopCount = new Dictionary<string, LoopCount>
             {
-                { "ReloadLoop",   new LoopCount { Value = 0, Command = FsmInput.SpecialReloadTrigger } }
+                { "ReloadLoop",   new LoopCount { Value = -1, Command = FsmInput.SpecialReloadTrigger } }
             };
         }
         List<AnimatorClipInfo> _animatorClipInfos = new List<AnimatorClipInfo>();
@@ -134,12 +86,12 @@ namespace App.Shared.GameModules.Player.Animation
                 if (_animatorClipInfos.Count > 0)
                 {
                     var animState = animator.GetCurrentAnimatorStateInfo(i);
-                    bool inTransition = animator.IsInTransition(i);
+                    var inTransition = animator.IsInTransition(i);
                     
                     var type = _matcher.Match(GetAnimationClipName(animState,_animatorClipInfos[0].clip));
-                    if (_animationFinished.ContainsKey(type) && !inTransition)
+                    if (FsmInputRelate.AnimationFinished.ContainsKey(type) && !inTransition)
                     {
-                        _animationFinished[type].Value = true;
+                        FsmInputRelate.AnimationFinished[type].Value = true;
                     }
                     // 不在在transition的时候，才进行Land检测，因为在transiton的时候可能是下一个状态
                     if (_animationProgressBeforeUpdate.ContainsKey(type) && !inTransition)
@@ -192,11 +144,10 @@ namespace App.Shared.GameModules.Player.Animation
                 if (_animatorClipInfos.Count > 0)
                 {
                     var animState = animatorP3.GetCurrentAnimatorStateInfo(i);
-                    
                     var type = _matcher.Match(GetAnimationClipName(animState,_animatorClipInfos[0].clip));
-                    if (_animationFinished.ContainsKey(type) && !animatorP3.IsInTransition(i) && _animationFinished[type].Value)
+                    if (FsmInputRelate.AnimationFinished.ContainsKey(type) && !animatorP3.IsInTransition(i) && FsmInputRelate.AnimationFinished[type].Value)
                     {
-                        _animationFinished[type].Value = false;
+                        FsmInputRelate.AnimationFinished[type].Value = false;
                     }
 
                     if (_animationLoopCount.ContainsKey(type))
@@ -209,15 +160,12 @@ namespace App.Shared.GameModules.Player.Animation
                 }
             }
 
-            var count = _animationFinishedSource.Count;
-            for (var i = 0; i < count; i++)
+            foreach (var value in FsmInputRelate.AnimationFinished)
             {
-                var item = _animationFinishedSource[i].Item2;
-                if (item.Value)
-                {
-                    SetCommand(commands, item.Command);
-                    item.Value = false;
-                }
+                var item = value.Value;
+                if (!item.Value) continue;
+                SetCommand(commands, item.Command);
+                item.Value = false;
             }
         }
 
@@ -275,14 +223,8 @@ namespace App.Shared.GameModules.Player.Animation
 
             return _animationClipNameCache[state.fullPathHash];
         }
-        
-        class StateChange
-        {
-            public bool Value;
-            public FsmInput Command;
-        }
 
-        class LoopCount
+        private class LoopCount
         {
             public int Value;
             public FsmInput Command;

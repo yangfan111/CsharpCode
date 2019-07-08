@@ -5,6 +5,7 @@ namespace Core.ObjectPool
     public abstract class CustomAbstractObjectFactory : AbstractObjectFactory
     {
         public Type Type;
+
         protected CustomAbstractObjectFactory(Type type) : base(type)
         {
             Type = type;
@@ -14,13 +15,20 @@ namespace Core.ObjectPool
         {
             get { return 8; }
         }
+
+        public virtual int AllocatorNumber
+        {
+            get { return InitPoolSize/2; }
+        }
     }
+
     public abstract class AbstractObjectFactory : IObjectFactory
     {
         protected AbstractObjectFactory(Type type)
         {
             _isResetable = typeof(IReusableObject).IsAssignableFrom(type);
         }
+
         private bool _isResetable;
 
         public abstract object MakeObject();
@@ -31,7 +39,6 @@ namespace Core.ObjectPool
             {
                 (arg0 as IReusableObject).ReInit();
             }
-         
         }
 
         public void DestroyObject(object arg0)

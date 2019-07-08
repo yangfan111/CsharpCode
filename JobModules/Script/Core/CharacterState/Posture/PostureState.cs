@@ -40,8 +40,7 @@ namespace Core.CharacterState.Posture
 
             state.AddTransition(new PostureTransition(
                     state.AvailableTransitionId(),
-                    (command, addOutput) => FsmTransition.SimpleCommandHandler(command, FsmInput.Crouch) ||
-                                            FsmTransition.SimpleCommandHandler(command, FsmInput.PostureCrouch),
+                    (command, addOutput) => FsmTransition.SimpleCommandHandler(command, FsmInput.Crouch),
                     (command, addOutput) => FsmTransitionResponseType.NoResponse,
                     PostureStateId.Crouch,
                     SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Stand,
@@ -54,7 +53,22 @@ namespace Core.CharacterState.Posture
                     AnimatorParametersHash.Instance.CrouchValue,
                     PostureInConfig.Stand,
                     PostureInConfig.Crouch),
-                new[] {FsmInput.Crouch, FsmInput.PostureCrouch});
+                new[] {FsmInput.Crouch});
+            
+            state.AddTransition(new PostureTransition(
+                    state.AvailableTransitionId(),
+                    (command, addOutput) => FsmTransition.SimpleCommandHandler(command, FsmInput.PostureCrouch),
+                    (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                    PostureStateId.Crouch, 0,
+                    AnimatorParametersHash.FirstPersonStandCameraHeight,
+                    AnimatorParametersHash.FirstPersonCrouchCameraHeight,
+                    AnimatorParametersHash.FirstPersonStandCameraForwardOffset,
+                    AnimatorParametersHash.FirstPersonCrouchCameraForwardOffset,
+                    AnimatorParametersHash.Instance.StandValue,
+                    AnimatorParametersHash.Instance.CrouchValue,
+                    PostureInConfig.Stand,
+                    PostureInConfig.Crouch),
+                new[] {FsmInput.PostureCrouch});
 
             #endregion
 
@@ -687,6 +701,13 @@ namespace Core.CharacterState.Posture
                             AnimatorParametersHash.Instance.ProneDisable,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
                         addOutput(FsmOutput.Cache);
+
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ForceEndProneHash,
+                            AnimatorParametersHash.Instance.ForceEndProneName,
+                            AnimatorParametersHash.Instance.ForceFinishThrowEnable,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+
                         Logger.DebugFormat("prone to freefall set!!!");
                         command.Handled = true;
                     }

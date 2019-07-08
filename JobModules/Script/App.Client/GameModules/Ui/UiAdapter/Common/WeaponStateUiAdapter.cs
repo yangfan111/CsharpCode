@@ -1,12 +1,12 @@
 ﻿using App.Shared;
-using App.Shared.Components.Weapon;
-using App.Shared.GameModules.Weapon;
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using Core;
 using Core.Utils;
 using System;
 using System.Collections.Generic;
+using App.Shared.Components;
+using App.Shared.Components.Player;
 using Utils.AssetManager;
 using Utils.Configuration;
 using Utils.Singleton;
@@ -37,10 +37,8 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 {
                     return Slot2Index(Archive.HeldSlotType);
                 }
-                else
-                {
-                    return 0;
-                }
+
+                return 0;
             }
         }
 
@@ -56,11 +54,13 @@ namespace App.Client.GameModules.Ui.UiAdapter
             {
                 return new AssetInfo();
             }
+
             var weaponCfg = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(weaponId);
             if (null == weaponCfg)
             {
                 return new AssetInfo();
             }
+
             var icon = SingletonManager.Get<WeaponAvatarConfigManager>().GetKillIcon(weaponCfg.AvatorId);
             return icon;
         }
@@ -71,6 +71,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
             {
                 return Archive.GetWeaponAgent(Index2Slot(index)).BaseComponent.RealFireModel;
             }
+
             return 0;
         }
 
@@ -80,6 +81,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
             {
                 return 0;
             }
+
             var slot = Index2Slot(index);
             if (slot == EWeaponSlotType.ThrowingWeapon || slot == EWeaponSlotType.TacticWeapon)
             {
@@ -96,6 +98,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
                     return Archive.GrenadeHandler.ShowCount(greandeId);
                 }
             }
+
             return Archive.GetWeaponAgent(Index2Slot(index)).BaseComponent.Bullet;
         }
 
@@ -105,6 +108,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
             {
                 return 0;
             }
+
             return Archive.GetReservedBullet(Index2Slot(index));
         }
 
@@ -114,6 +118,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
             {
                 return false;
             }
+
             return !Archive.IsWeaponSlotEmpty(Index2Slot(index));
         }
 
@@ -122,16 +127,18 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
             var configId = WeaponIdByIndex(index);
 
-            if(configId < 1)
+            if (configId < 1)
             {
                 return 0;
             }
+
             var weaponCfg = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(configId);
             if (null == weaponCfg)
             {
                 return 0;
             }
-            switch ((EWeaponType_Config)weaponCfg.Type)
+
+            switch ((EWeaponType_Config) weaponCfg.Type)
             {
                 case EWeaponType_Config.PrimeWeapon:
                 case EWeaponType_Config.SubWeapon:
@@ -151,6 +158,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
             {
                 return Archive.GetWeaponAgent(Index2Slot(index)).FireModeCount;
             }
+
             return 1;
         }
 
@@ -163,6 +171,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 {
                     return false;
                 }
+
                 var action = player.stateInterface.State.GetActionState();
                 return action == XmlConfig.ActionInConfig.SwitchWeapon;
 
@@ -173,7 +182,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                return _contexts.player.flagSelfEntity;
+                return _contexts.ui.uI.Player;
             }
         }
 
@@ -189,7 +198,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         protected virtual int Slot2Index(EWeaponSlotType slot)
         {
-            return (int)(slot - EWeaponSlotType.PrimeWeapon) + 1;
+            return (int) (slot - EWeaponSlotType.PrimeWeapon) + 1;
         }
 
         private IPlayerWeaponSharedGetter _arhive;
@@ -198,9 +207,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                if (_arhive == null)
-                    _arhive = Player.WeaponController();
-                return _arhive;
+                return Player.WeaponController();
             }
         }
 
@@ -211,23 +218,24 @@ namespace App.Client.GameModules.Ui.UiAdapter
             {
                 return 0;
             }
+
             var helper = Archive.GrenadeHandler;
-            var _grenadeList = helper.GetOwnedIds();
+            var _grenadeList1 = helper.GetOwnedIds();
 
             var realIndex = grenadeIndex - 1;
-            if (realIndex < 0 || realIndex >= _grenadeList.Count)
+            if (realIndex < 0 || realIndex >= _grenadeList1.Count)
             {
                 return 0;
             }
-        
-            return _grenadeList[realIndex];
+
+            return _grenadeList1[realIndex];
         }
 
         public int CurrentGrenadeIndex
         {
             get
             {
-                int index = Archive.GrenadeHandler.GetHoldGrenadeIndex();
+                var index = Archive.GrenadeHandler.GetHoldGrenadeIndex();
                 if (index > 0) index += 1;
                 return Math.Max(index, 1);
             }
@@ -238,7 +246,8 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get { return _slotIndexList; }
         }
-        private List<int> _slotIndexList = new List<int> { 1, 2, 3, 4, 5 };
+
+        private List<int> _slotIndexList = new List<int> {1, 2, 3, 4, 5};
 
         public bool HasGrenadByIndex(int grenadeIndex)
         {
@@ -247,15 +256,37 @@ namespace App.Client.GameModules.Ui.UiAdapter
             {
                 return false;
             }
+
             if (Archive.HeldSlotType != EWeaponSlotType.ThrowingWeapon)
             {
                 return false;
             }
-            else
-            {
-                return GrenadeIdByIndex(grenadeIndex) > 0;
-            }
+
+            return GrenadeIdByIndex(grenadeIndex) > 0;
         }
 
+        private bool BioCloseShow
+        {
+            get
+            {
+                var modeId = _contexts.session.commonSession.RoomInfo.ModeId;
+                return (GameRules.IsBio(modeId) && Player.hasGamePlay &&
+                        Player.gamePlay.JobAttribute != (int) EJobAttribute.EJob_EveryMan);
+
+            }
+
+        }
+
+        public override bool Enable
+        {
+            get { return base.Enable && !BioCloseShow; }
+
+            set { base.Enable = value; }
+        }
     }
+
 }
+
+        
+
+    

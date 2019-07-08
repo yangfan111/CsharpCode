@@ -10,11 +10,13 @@ namespace Core.Appearance
 {
     public interface ICharacterAppearance : ICharacterLoadResource, IInputScheme
     {
+        void SetRootGo(GameObject obj);
         void SetThirdPersonCharacter(GameObject obj);
         void SetFirstPersonCharacter(GameObject obj);
-        void SetRoleModelIdAndInitAvatar(int roleModelId,List<int> avatarIds);
+        void SetRoleModelIdAndInitAvatar(int roleModelId, List<int> avatarIds);
         void SetAnimatorP1(Animator animator);
         void SetAnimatorP3(Animator animator);
+        void SetRagDollComponent(IGameComponent component);
 
         void SetFirstPerson();
         void SetThridPerson();
@@ -24,6 +26,7 @@ namespace Core.Appearance
 
         void PlayerDead();
         void PlayerReborn();
+        void PlayerVisibility(bool value);
 
         void UpdateAvatar();
         void ChangeAvatar(int id);

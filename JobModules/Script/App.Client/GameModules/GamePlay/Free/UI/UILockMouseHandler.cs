@@ -21,8 +21,6 @@ namespace App.Client.GameModules.GamePlay.Free.UI
             bool isLock = simpleProto.Bs[0];
             if (isLock)
             {
-                //dead
-                SingletonManager.Get<FreeUiManager>().GetUi("deadUI").Show(-1);
                 CursorLocker.SystemUnlock = false;
                 //Lock
                 SingletonManager.Get<FreeUiManager>().Contexts1.ui.uI.IsShowCrossHair = true;
@@ -32,15 +30,9 @@ namespace App.Client.GameModules.GamePlay.Free.UI
             }
             else
             {
-                //maxMap
-//                UiModule.commonMaxMap.ShowMap(false);
-                //escMenu
-//                UiModule.commonMenuModel.ShowMenu(false);
-                //setting
                 UiModule.CloseGameSettingUI();
                 //chat
                 SingletonManager.Get<FreeUiManager>().Contexts1.ui.chat.CloseChatView();
-                //UiModule.commonChatModel.CloseSendView();
                 //bag
                 CursorLocker.SystemUnlock = true;
                 if (SingletonManager.Get<FreeUiManager>().GetUi("bagSystemUI").Visible)

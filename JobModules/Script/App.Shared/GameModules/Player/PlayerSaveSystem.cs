@@ -1,10 +1,15 @@
 ﻿using App.Server.GameModules.GamePlay.Free.player;
+using App.Shared.Components;
 using App.Shared.Components.Player;
+using Assets.App.Server.GameModules.GamePlay.Free;
+using Core;
 using Core.EntityComponent;
 using Core.Enums;
+using Core.Free;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
+using Free.framework;
 using UnityEngine;
 using Utils.Utils;
 using XmlConfig;
@@ -16,52 +21,66 @@ namespace App.Shared.GameModules.Player
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerSaveSystem));
 
         private Contexts _contexts;
+        private int saveTime;
 
         public PlayerSaveSystem(Contexts contexts)
         {
             _contexts = contexts;
+            if (GameRules.IsChicken(contexts.session.commonSession.RoomInfo.ModeId))
+            {
+                saveTime = SharedConfig.ChickenSaveNeedTime;
+            }else
+            {
+                saveTime = SharedConfig.CommonSaveNeedTime;
+            }
         }
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             PlayerEntity myEntity = owner.OwnerEntity as PlayerEntity;
             if (null == myEntity) return;
+
             var myState = myEntity.stateInterface.State;
             if (myEntity.gamePlay.IsSave || myEntity.gamePlay.IsBeSave)
             {
                 PlayerEntity teamEntity = _contexts.player.GetEntityWithEntityKey(myEntity.gamePlay.SavePlayerKey);
                 if (null == teamEntity)
                 {
-                    StopSave(myEntity, true, cmd);
+                    StopSave(myEntity, true);
                     return;
                 }
 
-                if (myEntity.time.ClientTime - myEntity.gamePlay.SaveTime >= SharedConfig.SaveNeedTime)
+                if (myEntity.time.ClientTime - myEntity.gamePlay.SaveTime >= saveTime)
                 {
                     if (myEntity.gamePlay.IsSave)
                     {
                         myEntity.statisticsData.Statistics.SaveCount++;
-                    }else{
+                    }
+                    else
+                    {
                         myEntity.statisticsData.Statistics.BeSaveCount++;
                         myEntity.gamePlay.CurHp = myEntity.gamePlay.MaxHp * 0.1f;
-                        myEntity.gamePlay.ChangeLifeState(EPlayerLifeState.Alive, myEntity.time.ClientTime);
+                        if(SharedConfig.IsServer)
+                            myEntity.gamePlay.ChangeLifeState(EPlayerLifeState.Alive, myEntity.time.ClientTime);
                     }
-                    StopSave(myEntity, false, cmd);
+                    StopSave(myEntity, false);
                     return;
                 }
+
                 if (Vector3.Distance(myEntity.position.Value, teamEntity.position.Value) > SharedConfig.MaxSaveDistance)
                 {
-                    StopSave(myEntity, true, cmd);
-                    StopSave(teamEntity, true, cmd);
+                    StopSave(myEntity, true);
+                    StopSave(teamEntity, true);
                     return;
                 }
+
                 if (myEntity.gamePlay.IsSave)
                 {
                     if (!cmd.IsF || myState.NeedInterruptRescue() || !myEntity.gamePlay.IsLifeState(EPlayerLifeState.Alive)
                         || GetAngle(myEntity, teamEntity) > SharedConfig.MaxSaveAngle)
                     {
-                        StopSave(myEntity, true, cmd);
-                        StopSave(teamEntity, true, cmd);
+                        StopSave(myEntity, true);
+                        StopSave(teamEntity, true);
                         return;
                     }
                 }
@@ -69,12 +88,13 @@ namespace App.Shared.GameModules.Player
                 {
                     if (myEntity.gamePlay.IsDead())
                     {
-                        StopSave(myEntity, true, cmd);
-                        StopSave(teamEntity, true, cmd);
+                        StopSave(myEntity, true);
+                        StopSave(teamEntity, true);
                         return;
                     }
                 }
             }
+
             if (cmd.IsUseAction && cmd.UseType == (int) EUseActionType.Player && myEntity.gamePlay.IsSave == false
                 && myState.GetCurrentMovementState() == MovementInConfig.Idle
                 && myState.GetCurrentPostureState() != PostureInConfig.Land && myState.GetCurrentPostureState() != PostureInConfig.Prone)
@@ -84,17 +104,23 @@ namespace App.Shared.GameModules.Player
                 {
                     PlayerAnimationAction.DoAnimation(_contexts, PlayerAnimationAction.Rescue, myEntity, true);
                     myEntity.gamePlay.IsSave = true;
-                    //myEntity.gamePlay.SaveEnterState = (int) PostureInConfig.Crouch;
                     myEntity.gamePlay.SaveTime = myEntity.time.ClientTime;
                     myEntity.gamePlay.SavePlayerKey = saveEntity.entityKey.Value;
                     saveEntity.gamePlay.IsBeSave = true;
                     saveEntity.gamePlay.SaveTime = saveEntity.time.ClientTime;
                     saveEntity.gamePlay.SavePlayerKey = myEntity.entityKey.Value;
+
+                    SimpleProto data = FreePool.Allocate();
+                    data.Key = FreeMessageConstant.CountDown;
+                    data.Bs.Add(true);
+                    data.Fs.Add(saveTime / 1000);
+                    FreeMessageSender.SendMessage(myEntity, data);
+                    FreeMessageSender.SendMessage(saveEntity, data);
                 }
             }
         }
 
-        private void StopSave(PlayerEntity playerEntity, bool isInterrupted, IUserCmd cmd)
+        private void StopSave(PlayerEntity playerEntity, bool isInterrupted)
         {
             if (SharedConfig.IsServer)
             {
@@ -108,16 +134,20 @@ namespace App.Shared.GameModules.Player
                 {
                     if (!isInterrupted)
                     {
-                        PlayerAnimationAction.DoAnimation(_contexts, PlayerAnimationAction.Revive, playerEntity, true);
+                        playerEntity.gamePlay.IsStandPosture = false;
+                        //PlayerAnimationAction.DoAnimation(_contexts, PlayerAnimationAction.Revive, playerEntity, true);
                     }
                     playerEntity.gamePlay.IsBeSave = false;
                 }
+
+                SimpleProto data = FreePool.Allocate();
+                data.Key = FreeMessageConstant.CountDown;
+                data.Bs.Add(false);
+                data.Fs.Add(0);
+                data.Bs.Add(!isInterrupted);
+                if (isInterrupted) data.Ins.Add((int) ETipType.CanNotRescure);
+                FreeMessageSender.SendMessage(playerEntity, data);
             }
-            if (playerEntity.gamePlay.IsBeSave && !isInterrupted)
-            {
-                playerEntity.stateInterface.State.SetPostureCrouch();
-            }
-            playerEntity.gamePlay.IsInteruptSave = isInterrupted;
         }
 
         private float GetAngle(PlayerEntity myEntity, PlayerEntity teamEntity)

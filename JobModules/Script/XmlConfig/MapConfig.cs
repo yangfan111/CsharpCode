@@ -51,9 +51,11 @@ namespace XmlConfig
         public float MiniMapShowSize;
 
         public string Name;
+        public string NameID;
         public string IconBundle;
         public string Icon;
         public string Description;
+        public string DescriptionID;
         public int NewMap;
         public int DefaultPlayerNum;
     }
@@ -79,5 +81,6 @@ namespace XmlConfig
         public int TerrainDimension = 0;
         public string TerrainNamePattern = string.Empty;
         public List<string> AdditiveSceneName = new List<string>();
+        public string PreMapName = string.Empty;
     }
 }

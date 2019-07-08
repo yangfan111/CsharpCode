@@ -14,30 +14,35 @@ namespace App.Client.GameModules.Ui.UiAdapter
 {
     public class ParachuteStateUiAdapter : UIAdapter, IParachuteStateUiAdapter
     {
-        private Contexts contexts;
+        private Contexts _contexts;
         private IMyTerrain _myTerrain;
         private float _curTerrainHeight;
         private bool _DEBUGTRACE = false;
         private FreeRenderObject _plane;
         private float _maxDistance = 10000;
 
+        private PlayerEntity Player
+        {
+            get { return _contexts.ui.uI.Player; }
+        }
+
+
         public ParachuteStateUiAdapter(Contexts contexts)
         {
-            this.contexts = contexts;
+            this._contexts = contexts;
             _myTerrain = SingletonManager.Get<TerrainManager>().GetCurrentTerrain();
         }
 
         public override bool Enable
         {
             get { return IsDrop && base.Enable; }
-            set { base.Enable = value; }
         }
 
         public bool IsDrop
         {
             get
             {
-                return MinMapUpdater.PlayerIsDrop(contexts.player.flagSelfEntity);
+                return MinMapUpdater.PlayerIsDrop(Player);
             }
         }
 
@@ -46,7 +51,8 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                Vector3 fromV = contexts.player.flagSelfEntity.characterContoller.Value.transform.position;
+                if (!Player.hasCharacterContoller) return 0;
+                Vector3 fromV = Player.characterContoller.Value.transform.position;
                 Vector3 toV = new Vector3(fromV.x, fromV.y - _maxDistance, fromV.z);
 
                 Ray r = new Ray(fromV, new Vector3(toV.x - fromV.x, toV.y - fromV.y, toV.z - fromV.z));
@@ -73,7 +79,8 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                float speed = contexts.player.flagSelfEntity.playerMove.Velocity.y * 3.6f;
+                if (!Player.hasPlayerMove) return 0;
+                float speed = Player.playerMove.Velocity.y * 3.6f;
 	            speed = Mathf.Abs(speed);
 				if (_DEBUGTRACE)
                     Debug.LogFormat("DropSpeed.....{0}", speed);
@@ -85,7 +92,8 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                var pos = contexts.player.flagSelfEntity.characterContoller.Value.transform.position;
+                if (!Player.hasCharacterContoller) return 0;
+                var pos = Player.characterContoller.Value.transform.position;
                 float height = new MapFixedVector3(WorldOrigin.WorldPosition(pos)).ShiftedUIVector3().y;
                 if (_DEBUGTRACE)
                     Debug.LogFormat("CurHeight.....{0}", height);

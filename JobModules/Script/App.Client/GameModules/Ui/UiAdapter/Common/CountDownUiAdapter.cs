@@ -20,5 +20,11 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             return _contexts.ui.uI.IsShowCrossHair;
         }
+
+        public bool HaveCompleted
+        {
+            get { return _contexts.ui.uI.HaveCompletedCountDown; }
+            set { _contexts.ui.uI.HaveCompletedCountDown = value; }
+        }
     }
 }

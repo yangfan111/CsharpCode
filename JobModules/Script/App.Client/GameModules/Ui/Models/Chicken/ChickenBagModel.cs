@@ -7,6 +7,7 @@ using App.Client.GameModules.Ui.ViewModels.Chicken;
 using App.Shared.Components.Ui;
 using Assets.App.Client.GameModules.Ui;
 using Assets.UiFramework.Libs;
+using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using Core.GameModule.Interface;
 using Core.Utils;
@@ -18,6 +19,8 @@ using UnityEngine.EventSystems;
 using UserInputManager.Lib;
 using Utils.Configuration;
 using Utils.Singleton;
+using Utils.Utils;
+using WeaponConfigNs;
 using XmlConfig;
 
 namespace App.Client.GameModules.Ui.Models.Chicken
@@ -49,6 +52,7 @@ namespace App.Client.GameModules.Ui.Models.Chicken
             _adapter.RegisterOpenKey(openKeyReceiver);
             keyReveiver = new KeyReceiver(UiConstant.userCmdUIKeyLayer, BlockType.All);
             keyReveiver.AddAction(UserInputKey.OpenBag, (data) => { _adapter.Enable = false; });
+            keyReveiver.AddAction(UserInputKey.HideWindow, (data) => { _adapter.Enable = false; });
             pointerReceiver = new PointerReceiver(UiConstant.userCmdUIKeyLayer, BlockType.All);
         }
 
@@ -63,11 +67,6 @@ namespace App.Client.GameModules.Ui.Models.Chicken
 
         private void InitVariable()
         {
-            if (UIImageLoader.LoadSpriteAsync == null)
-            {
-                UIImageLoader.LoadSpriteAsync = Loader.RetriveSpriteAsync;
-            }
-
             tipManager = UiCommon.TipManager;
             groundScrollRect = FindComponent<UIScrollRect>("GroundScrollView");
             bagScrollRect = FindComponent<UIScrollRect>("BagScrollView");
@@ -135,46 +134,59 @@ namespace App.Client.GameModules.Ui.Models.Chicken
                 var data = new TipShowData();
                 data.CategoryId = (int)ECategory.Weapon;
                 data.TemID = id;
-                HandleWeaponContrastId(data);
-                //ShowTip(data, root);
                 return data;
             }, root);
+        }
+
+        int TypeToSlot(EWeaponType_Config type)
+        {
+            var slot = 0;
+            switch (type)
+            {
+                case EWeaponType_Config.PrimeWeapon: slot = 1;break;
+                case EWeaponType_Config.SubWeapon: slot = 3;break;
+                case EWeaponType_Config.ThrowWeapon: slot = 5;break;
+                case EWeaponType_Config.MeleeWeapon: slot = 4;break;
+            }
+            return slot;
         }
 
         private void HandleWeaponContrastId(TipShowData data)
         {
             var config = GetConfig((int)ECategory.Weapon, data.TemID);
-            var type = config.Type;
-            if (type == 1)//主武器和当前武器比较
+            if (config == null)
             {
-                var index = _adapter.HoldWeaponSlotIndex;
-                if (index > 0)
-                {
-                    data.ContrastTemId = _adapter.GetWeaponIdBySlotIndex(index);
-                }
-                else if(_adapter.GetWeaponIdBySlotIndex(1) > 0)//空手时比较1号位武器
-                {
-                    data.ContrastTemId = _adapter.GetWeaponIdBySlotIndex(1);
-                }
+                Logger.Error("error weapon config id:" + data.TemID);
+            }
+            data.ContrastTemId = 0;
+            var type = config.Type;
+            var slot = TypeToSlot((EWeaponType_Config)type);
+            int ContrastTemId = 0;
+            if (type == 1)//主武器两个槽
+            {
+                var prime2Id = _adapter.GetWeaponIdBySlotIndex(2);
+                var prime1Id = _adapter.GetWeaponIdBySlotIndex(1);
+                if (prime2Id > 0) ContrastTemId = prime2Id;
+                if (prime1Id > 0) ContrastTemId = prime1Id;
             }
             else
             {
-                var id = _adapter.GetWeaponIdBySlotIndex(type - 1);
+                var id = _adapter.GetWeaponIdBySlotIndex(slot);
                 if (id > 0)
                 {
-                    data.ContrastTemId = _adapter.GetWeaponIdBySlotIndex(id);
+                    ContrastTemId = id;
                 }
+            }
+
+            if (ContrastTemId > 0)
+            {
+                data.ContrastTemId = ContrastTemId;
             }
 
         }
 
         private void ShowWeaponPartTip(int weaponSlot, int weaponPartSlot, Transform root)
         {
-            //var id = _adapter.GetWeaponPartIdBySlotIndexAndWeaponPartType(weaponSlot, (EWeaponPartType)weaponPartSlot);
-            //var data = new TipShowData();
-            //data.CategoryId = (int) ECategory.WeaponPart;
-            //data.TemID = id;
-            //ShowTip(data, root);
             ShowTip(() =>
             {
                 var id = _adapter.GetWeaponPartIdBySlotIndexAndWeaponPartType(weaponSlot,
@@ -187,59 +199,42 @@ namespace App.Client.GameModules.Ui.Models.Chicken
             }, root);
         }
 
-        private void ShowEquipmentTip(Wardrobe key,Transform root)
+        bool haveDurable(Wardrobe wardrobe)
         {
-            //int count;
-            //var id = _adapter.GetEquipmentIdByWardrobeType(key, out count);
-            //var data = new TipShowData();
-            //data.CategoryId = (int) ECategory.Avatar;
-            //data.TemID = id;
-            //if (count > 0) data.Num = count;
-            //ShowTip(data, root);      
+            return durableEquipTypeList.Contains(wardrobe);
+        }
+
+        private void ShowEquipmentTip(Wardrobe key,Transform root)
+        {     
             ShowTip(() =>
             {
                 int count;
                 var id = _adapter.GetEquipmentIdByWardrobeType(key, out count);
                 if (id <= 0) return null;
                 var data = new TipShowData();
-                data.CategoryId = (int) ECategory.Avatar;
+                data.CategoryId = haveDurable(key)?(int)ECategory.Weapon:(int) ECategory.Avatar;
                 data.TemID = id;
                 if (count > 0) data.Num = count;
                 return data;
             },root);
         }
 
-        private void ShowTip(TipShowData data, Transform root,bool needPassEvent = true)
-        {
-            UIEventTriggerListener listener = UIEventTriggerListener.Get(root);
-
-            listener.onEnter += (arg1, arg2) =>
-            {
-                tipManager.RegisterTip<CommonTipModel>(root, data);
-            };
-            if(needPassEvent)
-            listener.onDrop += (arg1,arg2)=>
-            {
-                root.GetComponentInParent<UIDragAccepted>().OnDrop(arg2);
-            };
-        }
-
         private void ShowTip(Func<TipShowData> data, Transform root,bool needPassEvent = true)
         {
             UIEventTriggerListener listener = UIEventTriggerListener.Get(root);
 
-            listener.onEnter += (arg1, arg2) =>
+            listener.onEnter = (arg1, arg2) =>
             {
                 tipManager.RegisterTip<CommonTipModel>(root, data.Invoke());
             };
             if(needPassEvent)
-            listener.onDrop += (arg1,arg2)=>
+            listener.onDrop = (arg1,arg2)=>
             {
                 root.GetComponentInParent<UIDragAccepted>().OnDrop(arg2);
             };
         }
 
-
+        private readonly Vector2 _copyWeaponIconSize = new Vector2(72, 72); 
 
         private void InitDragBeginEvent()
         {
@@ -307,6 +302,7 @@ namespace App.Client.GameModules.Ui.Models.Chicken
                 var i1 = i;
                 var key = "4|" + i1.ToString();
                 dragEnd.OnEndDragCallback = (data) => { SetDragStartPos(EChickenBagType.Weapon, key); };
+                dragEnd.CopyItemSize = _copyWeaponIconSize;
                 var listener = UIEventTriggerListener.Get(dragEnd.gameObject);
                 listener.onClick += (UIEventTriggerListener arg1, PointerEventData arg2) =>
                 {
@@ -330,20 +326,25 @@ namespace App.Client.GameModules.Ui.Models.Chicken
             {
                 DragBagItem(data,type);
             };
-            realItem.EnterCallback = (root, data) => { ShowTip(data, root); };
+            realItem.EnterCallback = (bagItem) => { ShowTip(bagItem); };
         }
 
-        private void ShowTip(IBaseChickenBagItemData origData, Transform root)
+        private void ShowTip(ChickenBagItem item)
         {
-            var data = new TipShowData();
-            data.CategoryId = origData.cat;
-            data.TemID = origData.id;
-            data.Num = origData.count;
-            if (data.CategoryId == (int) ECategory.Weapon)
+            
+            ShowTip(() =>
             {
-                HandleWeaponContrastId(data);
-            }
-            ShowTip(data, root);
+                var origData = item.Data as IBaseChickenBagItemData;
+                var data = new TipShowData();
+                data.CategoryId = origData.cat;
+                data.TemID = origData.id;
+                data.Num = origData.count;
+                if (data.CategoryId == (int)ECategory.Weapon)
+                {
+                    HandleWeaponContrastId(data);
+                }
+                return data;
+            }, item.GetRoot());
         }
 
         private void DragBagItem(IBaseChickenBagItemData data, EChickenBagType type)
@@ -452,22 +453,23 @@ namespace App.Client.GameModules.Ui.Models.Chicken
 
         private void UpdateBag()
         {
+            _viewModel.WeightText = _adapter.CurWeight + "/" + _adapter.TotalWeight;
             var list = _adapter.BagItemDataList;
             if (oldBagLit == list) return;
             oldBagLit = list;
             bagItemDataList.SetList(list);
-            _viewModel.WeightText = _adapter.CurWeight + "/" + _adapter.TotalWeight;
         }
 
         private void UpdateEquipment()
         {
             int cat = (int) ECategory.Avatar;
-
+            int durableCat = (int) ECategory.Weapon;
             foreach (Wardrobe type in equipTypeList)
             {
                 int count = 0;
                 int id = _adapter.GetEquipmentIdByWardrobeType(type, out count);
-                UpdateEquip(type, cat, id, count.ToString(), id > 0);
+                var realCat = haveDurable(type) ? durableCat : cat;
+                UpdateEquip(type, realCat, id, count, id > 0);
             }
         }
 
@@ -501,6 +503,10 @@ namespace App.Client.GameModules.Ui.Models.Chicken
             }
         }
 
+        private HashSet<Wardrobe> durableEquipTypeList = new HashSet<Wardrobe>(CommonIntEnumEqualityComparer<Wardrobe>.Instance)
+        {
+            Wardrobe.Cap, Wardrobe.Armor
+        };
 
         private List<Wardrobe> equipTypeList = new List<Wardrobe>
         {
@@ -510,7 +516,7 @@ namespace App.Client.GameModules.Ui.Models.Chicken
         };
         private bool _haveRegister;
 
-        private void UpdateEquip(Wardrobe type, int cat,int id,string count,bool isShow = true)
+        private void UpdateEquip(Wardrobe type, int cat,int id,int count,bool isShow = true)
         {
             
             switch (type)
@@ -530,7 +536,7 @@ namespace App.Client.GameModules.Ui.Models.Chicken
  
         }
 
-        private void UpdateWear(int index, int cat, int id, string count, bool isShow)
+        private void UpdateWear(int index, int cat, int id, int count, bool isShow)
         {
             _viewModel.SetWearGroupShow(index, isShow);
             if (!isShow) return;
@@ -540,7 +546,7 @@ namespace App.Client.GameModules.Ui.Models.Chicken
             _viewModel.SetWearNameText(index, config.Name);
         }
 
-        private void UpdateGear(int index, int cat, int id, string count,bool isShow,bool isLasting)
+        private void UpdateGear(int index, int cat, int id, int count,bool isShow,bool isLasting)
         {
             _viewModel.SetGearIconGroupShow(index, isShow);
             if (!isShow) return;
@@ -550,10 +556,11 @@ namespace App.Client.GameModules.Ui.Models.Chicken
             _viewModel.SetGearLastingLayerShow(index, isLasting);
             _viewModel.SetGearIconBundle(index, config.IconBundle);
             _viewModel.SetGearIconAsset(index, config.Icon);
-            if (isLasting)
-            {
-                _viewModel.SetGearLastingNumText(index, count);
-            }
+            if (!isLasting) return;
+            var weaponConfig = config as WeaponResConfigItem;
+            _viewModel.SetGearLastingNumText(index, count.ToString());
+            if (weaponConfig == null) return;
+            _viewModel.SetGearLastingLayerValue(index, (float)count / weaponConfig.Durable);
         }
 
         private void UpdateWeaponPart(int index, EWeaponPartType type,int cat, int id, bool isShow = true)
@@ -567,37 +574,6 @@ namespace App.Client.GameModules.Ui.Models.Chicken
                 case EWeaponPartType.UpperRail: UpdateUpperRail(index, cat, id, isShow); break;
                 case EWeaponPartType.Magazine: UpdateMagazine(index, cat, id, isShow); break;
             }
-        }
-
-        private void UpdateWeaponPart(int index, int cat,int id, bool isShow = true)
-        {
-            int primeIndex = index / 10;
-            int secondIndex = index % 10;
-            var type = (EWeaponPartType)secondIndex;
-            switch (type)
-            {
-                case EWeaponPartType.Muzzle: UpdateMuzzle(primeIndex, cat,id,isShow);break;
-                case EWeaponPartType.LowerRail:UpdateLowerRail(primeIndex, cat,id, isShow); break;
-                case EWeaponPartType.Stock:UpdateStock(primeIndex, cat,id, isShow); break;
-                case EWeaponPartType.UpperRail: UpdateUpperRail(primeIndex, cat,id, isShow);break;
-                case EWeaponPartType.Magazine: UpdateMagazine(primeIndex, cat,id, isShow);break;
-            }
-        }
-
-        private void UpdateWeaponPart(int index, int cat, Dictionary<EWeaponPartType, int> dictionary)
-        {
-            int primeIndex = index;
-            foreach (KeyValuePair<EWeaponPartType, int> pair in dictionary.ToList())
-            {
-                switch (pair.Key)
-                {
-                    case EWeaponPartType.Muzzle: UpdateMuzzle(primeIndex, cat, pair.Value); break;
-                    case EWeaponPartType.LowerRail: UpdateLowerRail(primeIndex,cat, pair.Value); break;
-                    case EWeaponPartType.Stock: UpdateStock(primeIndex, cat, pair.Value); break;
-                    case EWeaponPartType.UpperRail: UpdateUpperRail(primeIndex, cat, pair.Value); break;
-                    case EWeaponPartType.Magazine: UpdateMagazine(primeIndex, cat, pair.Value); break;
-                }
-            }   
         }
 
         private void UpdateMagazine(int index, int cat, int id, bool isShow = true)
@@ -673,12 +649,8 @@ namespace App.Client.GameModules.Ui.Models.Chicken
         private void UpdateWeaponPartSlot(int index, int id)
         {
             if (index > 3 || index < 1) return; 
-            List<EWeaponPartType> list = SingletonManager.Get<WeaponPartsConfigManager>().GetAvaliablePartTypes(id);
-            _viewModel.SetLowerRailSlotShow(index, false);
-            _viewModel.SetMagazineSlotShow(index, false);
-            _viewModel.SetMuzzleSlotShow(index, false);
-            _viewModel.SetStockSlotShow(index, false);
-            _viewModel.SetUpperRailSlotShow(index, false);
+            List<EWeaponPartType> list = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(id).ApplyPartsSlot;
+            var differentSet =  weaponPartTypeList.Except(list);
             foreach (EWeaponPartType type in list)
             {
                 switch (type)
@@ -690,20 +662,26 @@ namespace App.Client.GameModules.Ui.Models.Chicken
                     case EWeaponPartType.Stock: _viewModel.SetStockSlotShow(index, true);break;
                 }
             }
+            foreach (EWeaponPartType type in differentSet)
+            {
+                switch (type)
+                {
+                    case EWeaponPartType.LowerRail: _viewModel.SetLowerRailSlotShow(index, false); break;
+                    case EWeaponPartType.Muzzle: _viewModel.SetMuzzleSlotShow(index, false); break;
+                    case EWeaponPartType.Magazine: _viewModel.SetMagazineSlotShow(index, false); break;
+                    case EWeaponPartType.UpperRail: _viewModel.SetUpperRailSlotShow(index, false); break;
+                    case EWeaponPartType.Stock: _viewModel.SetStockSlotShow(index, false); break;
+                }
+            }
         }
 
         private ItemBaseConfig GetConfig(int cat,int id)
         {
-            return SingletonManager.Get<ItemBaseConfigManager>().GetConfigById(cat, id);
+            return SingletonManager.Get<ItemBaseConfigManager>().GetConfigById(cat, id,true);
         }
         private ItemBaseConfig GetWeaponPartConfig(int cat, int id)
         {
-            var config = SingletonManager.Get<WeaponPartSurvivalConfigManager>().FindConfigBySetId(id);
-            var partId = SingletonManager.Get<WeaponPartSurvivalConfigManager>().GetDefaultPartBySetId(id);
-            var realConfig = GetConfig(cat, partId);
-            if(config != null)
-            realConfig.Name = config.Name;
-            return realConfig;
+            return GetConfig(cat, id);
         }
 
       
@@ -721,6 +699,23 @@ namespace App.Client.GameModules.Ui.Models.Chicken
                 tipManager.HideShowTip();
             }
 
+            if (!enable)
+            {
+                HideUIDrag();
+            }
+
+        }
+
+        private void HideUIDrag()
+        {
+            for (int i = 0; i < groundScrollRect.Count(); i++)
+            {
+                (groundScrollRect[i] as ChickenBagItem).CloseUIDrag();
+            }
+            for (int i = 0; i < bagScrollRect.Count(); i++)
+            {
+                (bagScrollRect[i] as ChickenBagItem).CloseUIDrag();
+            }
         }
 
         private void UnRegisterKeyReceiver()

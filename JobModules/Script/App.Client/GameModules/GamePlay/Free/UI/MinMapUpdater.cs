@@ -41,7 +41,7 @@ namespace App.Client.GameModules.GamePlay.Free.UI
 
             UpdatePlaine();
 
-            PlayerEntity selfEntity = SingletonManager.Get<FreeUiManager>().Contexts1.player.flagSelfEntity;
+            PlayerEntity selfEntity = SingletonManager.Get<FreeUiManager>().Contexts1.ui.uI.Player;
 
             var data = SingletonManager.Get<FreeUiManager>().Contexts1.ui.map;
             data.TeamInfos.Clear();
@@ -50,12 +50,15 @@ namespace App.Client.GameModules.GamePlay.Free.UI
             var map = SingletonManager.Get<FreeUiManager>().Contexts1.ui.map;
             map.TeamPlayerMarkInfos.Clear();
 
+            var modeId = SingletonManager.Get<FreeUiManager>().Contexts1.session.commonSession.RoomInfo.ModeId;
+
             foreach (PlayerEntity playerEntity in SingletonManager.Get<FreeUiManager>().Contexts1.player.GetEntities())
             {
                 try
                 {
-                    if (playerEntity.hasPlayerInfo && playerEntity.hasPosition
-                        && playerEntity.playerInfo.TeamId == selfEntity.playerInfo.TeamId)
+                    if (playerEntity.hasPlayerInfo && playerEntity.hasPosition &&
+                         ((!GameRules.IsBio(modeId) && playerEntity.playerInfo.TeamId == selfEntity.playerInfo.TeamId) ||
+                         (GameRules.IsBio(modeId) && playerEntity.hasGamePlay && selfEntity.gamePlay.IsMatchJob(playerEntity.gamePlay.JobAttribute))) )
                     {
                         if (!infoMap.ContainsKey(playerEntity.playerInfo.PlayerId))
                         {
@@ -179,6 +182,7 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                         oneInfo.TopPos = PlayerEntityUtility.GetPlayerTopPosition(playerEntity);
                         oneInfo.EntityId = playerEntity.entityKey.Value.EntityId;
                         data.TeamInfos.Add(oneInfo);
+
                     }
                 }
                 catch (Exception e)

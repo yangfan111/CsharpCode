@@ -144,7 +144,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                 {
                     RefreshDisappearHurtedItem(hurtedRecord[key]);
                 }
-                this.OnGameobjectDestoryed();
+                StopTween();
                 adapter.HurtedDataList.Clear();
             }
             else
@@ -262,14 +262,20 @@ namespace App.Client.GameModules.Ui.Models.Common
                 },
                 hurtedTweenDuring);
             }
-        }        
+        }
 
-        protected override void OnGameobjectDestoryed()
+        public override void Destory()
         {
-            foreach(var key in hurtedRecord.Keys.ToList())
+            base.Destory();
+            StopTween();
+        }
+
+        void StopTween()
+        {
+            foreach (var key in hurtedRecord.Keys.ToList())
             {
                 var item = hurtedRecord[key];
-                if(item.Tween != null)
+                if (item.Tween != null)
                 {
                     item.Tween.Kill(true);
                     item.Tween = null;

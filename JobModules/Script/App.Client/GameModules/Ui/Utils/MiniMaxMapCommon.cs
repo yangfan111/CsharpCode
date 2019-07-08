@@ -765,6 +765,11 @@ namespace App.Client.GameModules.Ui.Utils.MiniMaxMapCommon
             }
             return instance;
         }
+
+        public SpriteComon()
+        {
+            PreparedSprites();
+        }
         private Dictionary<string, Sprite> playerMarkSpriteDic = new Dictionary<string, Sprite>();
         public void PreparedSprites()
         {

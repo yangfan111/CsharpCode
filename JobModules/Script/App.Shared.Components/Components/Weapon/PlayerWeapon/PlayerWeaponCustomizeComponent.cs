@@ -23,7 +23,7 @@ namespace App.Shared.Components.Player
         [NetworkProperty] public EntityKey EmptyConstWeaponkey;
         [DontInitilize, NetworkProperty] public int BagOpenLimitTime;
         [DontInitilize, NetworkProperty] public bool BagLockState;
-        [DontInitilize,NetworkProperty] public int TacticWeapon;
+        [DontInitilize,NetworkProperty(int.MaxValue,0,1)] public int TacticWeapon;
 
         public void CopyFrom(object rightComponent)
         {

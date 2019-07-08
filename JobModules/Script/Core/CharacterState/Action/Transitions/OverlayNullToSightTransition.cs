@@ -16,7 +16,12 @@ namespace Core.CharacterState.Action.Transitions
                                                    CharacterView.ThirdPerson);
                     addOutput(FsmOutput.Cache);
 
-                    FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.ADSLayerP1,
+                    FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.ADSLowerBodyLayerP1,
+                                                   AnimatorParametersHash.Instance.ADSEnableValue,
+                                                   CharacterView.FirstPerson);
+                    addOutput(FsmOutput.Cache);
+                    
+                    FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.ADSUpperBodyLayerP1,
                                                    AnimatorParametersHash.Instance.ADSEnableValue,
                                                    CharacterView.FirstPerson);
                     addOutput(FsmOutput.Cache);

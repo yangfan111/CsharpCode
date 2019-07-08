@@ -4,7 +4,7 @@ namespace App.Client.GPUInstancing.Core
 {
     public class GpuInstancingTerrain : GpuInstancingPipeline
     {
-        public GpuInstancingTerrain(ComputeShader visibilityShader) : base(visibilityShader)
+        public GpuInstancingTerrain(ComputeShader visibilityShader) : base(visibilityShader, null)
         {
         }
     }

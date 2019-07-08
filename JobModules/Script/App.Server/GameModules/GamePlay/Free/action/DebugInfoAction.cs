@@ -8,11 +8,12 @@ using com.wd.free.para;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.util;
 using Shared.Scripts.MapConfigPoint;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.action
 {
     [Serializable]
-    public class DebugInfoAction : AbstractGameAction
+    public class DebugInfoAction : AbstractGameAction, IRule
     {
         private string key;
 
@@ -48,6 +49,11 @@ namespace App.Server.GameModules.GamePlay.Free.action
 
                 args.ResumePara("info");
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.DebugInfoAction;
         }
     }
 }

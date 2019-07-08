@@ -7,11 +7,12 @@ using Free.framework;
 using gameplay.gamerule.free.ui.component;
 using Core.Free;
 using System;
+using com.wd.free.para;
 
 namespace gameplay.gamerule.free.ui
 {
     [System.Serializable]
-    public class FreeUiAddChildAction : SendMessageAction
+    public class FreeUiAddChildAction : SendMessageAction, IRule
     {
         public string key;
 
@@ -126,5 +127,9 @@ namespace gameplay.gamerule.free.ui
             return "子UI'" + key + d + "'" + "'\n" + builder.ToString();
         }
 
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeUiAddChildAction;
+        }
     }
 }

@@ -66,6 +66,8 @@ namespace App.Client.GameModules.Vehicle
                 go.transform.position = new Vector3(11, 50, 17);
             }
 
+            _logger.InfoFormat("Client Create Vehicle {0} EntityKey {1} Position {2}", unityObj.Address, vehicle.entityKey, go.transform.position);
+
             vehicle.AddVehicleComponentsPostInit((EVehicleType) vehicle.vehicleAssetInfo.VType, unityObj,
                 _contexts.player, false);
             var vehicleTimer = _contexts.session.clientSessionObjects.VehicleTimer;

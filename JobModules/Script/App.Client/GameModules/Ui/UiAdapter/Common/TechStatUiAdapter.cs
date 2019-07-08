@@ -46,5 +46,14 @@ namespace App.Client.GameModules.Ui.UiAdapter
             if (contexts.player == null) return false;
             return contexts.player.flagSelfEntity.gamePlay.IsDead() && contexts.player.flagSelfEntity.gamePlay.CameraEntityId == 0;
         }
+
+        public bool CanRescue
+        {
+            get
+            {
+                return contexts.session.commonSession.RoomInfo.TeamCapacity > 1;
+            }
+        }
+    
     }
 }

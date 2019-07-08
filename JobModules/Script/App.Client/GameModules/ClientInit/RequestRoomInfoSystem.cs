@@ -45,16 +45,17 @@ namespace App.Client.GameModules.ClientInit
         private bool _loginSuccReceived;
         public void Handle(INetworkChannel networkChannel, int messageType, object messageBody)
         {
-            if (messageType == (int)EServer2ClientMessage.LoginSucc)
-            {
-                LoginSuccMessage msg = (LoginSuccMessage)messageBody;
-               
-                _contexts.session.clientSessionObjects.GameRule = msg.GameRule;
-                _contexts.session.commonSession.RoomInfo.FromLoginSuccMsg(msg);
-                _contexts.session.commonSession.SessionMode = ModeUtil.CreateClientMode(_contexts, _contexts.session.commonSession.RoomInfo.ModeId);
-                //_contexts.session.commonSession.WeaponModeLogic =  ClientGameModeLogicFactoryManager.GetModeLogicFactory(_contexts, _contexts.session.commonSession.RoomInfo.ModeId).CreateWeaponModeLogic();
+            switch (messageType) {
+                case (int)EServer2ClientMessage.LoginSucc:
+                    LoginSuccMessage msg = (LoginSuccMessage)messageBody;
 
-                _loginSuccReceived = true;
+                    _contexts.session.clientSessionObjects.GameRule = msg.GameRule;
+                    _contexts.session.commonSession.RoomInfo.FromLoginSuccMsg(msg);
+                    _contexts.session.commonSession.SessionMode = ModeUtil.CreateClientMode(_contexts, _contexts.session.commonSession.RoomInfo.ModeId);
+                    //_contexts.session.commonSession.WeaponModeLogic =  ClientGameModeLogicFactoryManager.GetModeLogicFactory(_contexts, _contexts.session.commonSession.RoomInfo.ModeId).CreateWeaponModeLogic();
+
+                    _loginSuccReceived = true;
+                    break;
             }
             if ( _loginSuccReceived)
             {

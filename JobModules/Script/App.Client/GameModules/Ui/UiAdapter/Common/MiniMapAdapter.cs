@@ -66,7 +66,10 @@ namespace App.Client.GameModules.Ui.UiAdapter
             }
         }
 
-        
+        private PlayerEntity Player
+        {
+            get { return _contexts.ui.uI.Player; }
+        }
 
         public float MoveSpeed
         {
@@ -76,20 +79,23 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 {
                     return CurVehicleSpeed;
                 }
-                return _contexts.player.flagSelfEntity.playerMove.Velocity.magnitude * 3.6f;
+
+                if (Player.hasPlayerMove) return Player.playerMove.Velocity.magnitude * 3.6f;
+
+                return 0f;
             }
         }
 
         private bool IsOnVehicle
         {
-            get { return null != _contexts.player.flagSelfEntity && _contexts.player.flagSelfEntity.IsOnVehicle(); }
+            get { return null != Player && Player.IsOnVehicle(); }
         }
 
         private float CurVehicleSpeed
         {
             get
             {
-                var vehicle = _contexts.vehicle.GetEntityWithEntityKey(_contexts.player.flagSelfEntity.controlledVehicle.EntityKey);
+                var vehicle = _contexts.vehicle.GetEntityWithEntityKey(Player.controlledVehicle.EntityKey);
                 if (vehicle != null)
                 {
                     return vehicle.GetUiPresentSpeed();
@@ -325,6 +331,10 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
             posList.Clear();
 
+            if (lastIdList.Count == 0)
+            {
+                return;
+            }
             foreach (PlayerEntity pe in _contexts.player.GetEntities())
             {
                 if (lastIdList.Contains(pe.playerInfo.PlayerId))
@@ -358,11 +368,11 @@ namespace App.Client.GameModules.Ui.UiAdapter
             }
         }
 
-        public List<MapFixedVector3> SupplyPos
+        public Dictionary<string, MapFixedVector3> SupplyPos
         {
             get
             {
-                return _contexts.ui.map.SupplyPosList;
+                return _contexts.ui.map.SupplyPosMap;
             }
         }
 

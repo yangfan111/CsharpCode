@@ -1,29 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Shared.GameModules.Player.CharacterState;
-using Core.GameModule.Interface;
+﻿using App.Shared.Components.Player;
 using Core.Utils;
 using Entitas;
-using Core.Animation;
-using App.Shared.GameModules.Player;
-using App.Shared.Components.Player;
-using App.Shared.Player;
-using Core.WeaponAnimation;
-using UnityEngine;
 using Utils.Singleton;
 
 namespace App.Client.GameModules.Player.PlayerShowPackage
 {
     class PlayerAppearancePlaybackSystem : AbstractPlayerBackSystem<PlayerEntity>
     {
-        private static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerAppearancePlaybackSystem));
-        private CustomProfileInfo _info;
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerAppearancePlaybackSystem));
+        
+        private readonly CustomProfileInfo _mainInfo;
+        private readonly CustomProfileInfo _subSyncInfo;
+        private readonly CustomProfileInfo _subTryRewindInfo;
+        private readonly CustomProfileInfo _subRebornInfo;
+        private readonly CustomProfileInfo _subDeadInfo;
 
         public PlayerAppearancePlaybackSystem(Contexts contexts) : base(contexts)
         {
-            _info = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("PlayerAppearancePlayback");
+            _mainInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("PlayerAppearancePlayback");
+            _subSyncInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("AppearancePlaybackSyncFrom");
+            _subTryRewindInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("AppearancePlaybackTryRewind");
+            _subRebornInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("AppearancePlaybackReborn");
+            _subDeadInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("AppearancePlaybackDead");
         }
 
         protected override IGroup<PlayerEntity> GetIGroup(Contexts contexts)
@@ -47,19 +45,46 @@ namespace App.Client.GameModules.Player.PlayerShowPackage
 
             try
             {
-                _info.BeginProfileOnlyEnableProfile();
-                
+                _mainInfo.BeginProfileOnlyEnableProfile();
                 CheckPlayerLifeState(player);
-                
+                CheckPlayerNeedUnActive(player);
                 appearanceInterface.Appearance.CheckP3HaveInit(!player.gamePlay.HasNewRoleIdChangedFlag());
-                appearanceInterface.Appearance.SyncLatestFrom(player.latestAppearance);
-                appearanceInterface.Appearance.SyncPredictedFrom(player.predictedAppearance);
-                appearanceInterface.Appearance.SyncClientFrom(player.clientAppearance);
-                appearanceInterface.Appearance.TryRewind();
+                
+                try
+                {
+                    _subSyncInfo.BeginProfileOnlyEnableProfile();
+                    appearanceInterface.Appearance.SyncLatestFrom(player.latestAppearance);
+                    appearanceInterface.Appearance.SyncPredictedFrom(player.predictedAppearance);
+                    appearanceInterface.Appearance.SyncClientFrom(player.clientAppearance);
+                }
+                finally
+                {
+                    _subSyncInfo.EndProfileOnlyEnableProfile();
+                }
+                
+                try
+                {
+                    _subTryRewindInfo.BeginProfileOnlyEnableProfile();
+                    appearanceInterface.Appearance.TryRewind();
+                }
+                finally
+                {
+                    _subTryRewindInfo.EndProfileOnlyEnableProfile();
+                }
             }
             finally
             {
-                _info.EndProfileOnlyEnableProfile();
+                _mainInfo.EndProfileOnlyEnableProfile();
+            }
+        }
+
+        private void CheckPlayerNeedUnActive(PlayerEntity player)
+        {
+            var appearanceInterface = player.appearanceInterface;
+            if (player.gamePlay.ClientVisibility != player.gamePlay.Visibility)
+            {
+                appearanceInterface.Appearance.PlayerVisibility(player.gamePlay.Visibility);
+                player.gamePlay.ClientVisibility = player.gamePlay.Visibility;
             }
         }
         
@@ -72,6 +97,7 @@ namespace App.Client.GameModules.Player.PlayerShowPackage
             switch (gameState.CurrentPlayerLifeState)
             {
                 case PlayerLifeStateEnum.Reborn:
+                case PlayerLifeStateEnum.Revive:
                     Reborn(player);
                     break;
                 case PlayerLifeStateEnum.Dead:
@@ -82,22 +108,38 @@ namespace App.Client.GameModules.Player.PlayerShowPackage
 
         private void Reborn(PlayerEntity player)
         {
-            if (null == player) return;
-            var appearance = player.appearanceInterface.Appearance;
-            if (null == appearance) return;
-            appearance.PlayerReborn();
+            try
+            {
+                _subRebornInfo.BeginProfileOnlyEnableProfile();
+                if (null == player) return;
+                var appearance = player.appearanceInterface.Appearance;
+                if (null == appearance) return;
+                appearance.PlayerReborn();
             
-            _logger.InfoFormat("PlayerAppearancePlaybackSystem ------  Reborn");
+                Logger.InfoFormat("PlayerAppearancePlaybackSystem ------  Reborn");
+            }
+            finally
+            {
+                _subRebornInfo.EndProfileOnlyEnableProfile();
+            }
         }
         
         private void Dead(PlayerEntity player)
         {
-            if (null == player) return;
-            var appearance = player.appearanceInterface.Appearance;
-            if (null == appearance) return;
-            appearance.PlayerDead();
-            
-            _logger.InfoFormat("PlayerAppearancePlaybackSystem ------  Dead");
+            try
+            {
+                _subDeadInfo.BeginProfileOnlyEnableProfile();
+                if (null == player) return;
+                var appearance = player.appearanceInterface.Appearance;
+                if (null == appearance) return;
+                appearance.PlayerDead();
+
+                Logger.InfoFormat("PlayerAppearancePlaybackSystem ------  Dead");
+            }
+            finally
+            {
+                _subDeadInfo.EndProfileOnlyEnableProfile();
+            }
         }
 
         #endregion

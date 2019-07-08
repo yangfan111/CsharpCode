@@ -75,7 +75,7 @@ private void Serialize(<Comp.Name> lastGameComponent, <Comp.Name> gameComponent,
 SerializeInterfaceMethod(Comp) ::= <<
 public void Serialize(INetworkObject lastNetworkObject, INetworkObject gameComponent, BitArray32 fieldsMask, bool DoCompress, Core.Utils.MyBinaryWriter writer)
 {
-    Serialize(lastNetworkObject as <Comp.Name>, gameComponent as <Comp.Name>,fieldsMask, DoCompress, writer,false);
+    Serialize(lastNetworkObject as <Comp.Name>, gameComponent as <Comp.Name>, fieldsMask, DoCompress, writer, false);
 }
 
 >>
@@ -83,7 +83,7 @@ public void Serialize(INetworkObject lastNetworkObject, INetworkObject gameCompo
 SerializeAllMethod(Comp) ::= <<
 public void SerializeAll(INetworkObject gameComponent, bool DoCompress, Core.Utils.MyBinaryWriter writer)
 {
-    Serialize(null, gameComponent as <Comp.Name>,emptyFieldMask, DoCompress, writer,true);
+    Serialize(null, gameComponent as <Comp.Name>, emptyFieldMask, DoCompress, writer, true);
 }
 
 >>
@@ -91,7 +91,7 @@ public void SerializeAll(INetworkObject gameComponent, bool DoCompress, Core.Uti
 DeserializeFieldCall(FieldName) ::= <<
 if ( readAll || Has<FieldName>(fieldsMask) )
 {
-    gameComponent.<FieldName> = FieldSerializeUtil.Deserialize(gameComponent.<FieldName>,<ComponentInfo.ParamsDict.(FieldName)> reader);
+    gameComponent.<FieldName> = FieldSerializeUtil.Deserialize(gameComponent.<FieldName>, <ComponentInfo.ParamsDict.(FieldName)> reader);
 }
 
 >>

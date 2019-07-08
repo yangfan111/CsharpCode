@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using App.Shared.Audio;
 using App.Shared.Components;
 using App.Shared.Player.Events;
+using App.Shared.Util;
+using Core;
 using Core.Configuration;
 using Core.EntityComponent;
 using Core.Event;
+using Core.ObjectPool;
 using Core.Utils;
 using UnityEngine;
 using Utils.Appearance;
 using Utils.Configuration;
 using Utils.Singleton;
+using WeaponConfigNs;
 using XmlConfig;
 
 namespace App.Shared.EntityFactory
@@ -18,169 +23,136 @@ namespace App.Shared.EntityFactory
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(ClientEffectFactory));
 
-        // 越后越新
-        private static LinkedList<ClientEffectEntity> _bulletDropEntities = new LinkedList<ClientEffectEntity>();
+        
 
-        public static void OnDestroy(ClientEffectEntity entity)
+        #region new effect 
+        public static void AdHitEnvironmentEffectEvent(PlayerEntity srcPlayer, Vector3 hitPoint, Vector3 offset,
+                                                       EEnvironmentType environmentType, int hitAuidoId,
+                                                       int chunkId = 0, bool needEffectEntity = true)
         {
-            if (entity.hasEffectType && entity.effectType.Value == (int) EClientEffectType.BulletDrop)
-            {
-                _bulletDropEntities.Remove(entity);
-            }
-        }
-
-        public static ClientEffectEntity CreateBaseEntity(ClientEffectContext context,
-            IEntityIdGenerator entityIdGenerator, Vector3 pos, int type)
-        {
-            var effectEntity = context.CreateEntity();
-            var nextId = entityIdGenerator.GetNextEntityId();
-            effectEntity.AddEntityKey(new EntityKey(nextId, (int) EEntityType.ClientEffect));
-            effectEntity.AddPosition();
-            effectEntity.position.Value = pos;
-            effectEntity.AddEffectType(type);
-            effectEntity.AddAssets(false,false);
-            effectEntity.AddLifeTime(DateTime.Now, 6000);
-            effectEntity.isFlagSyncNonSelf = true;
-            return effectEntity;
-        }
-
-        public static void CreateBulletDrop(ClientEffectContext context, IEntityIdGenerator idGenerator,
-            EntityKey owner, Vector3 position, float Yaw, float pitch, int effectId,int weaponId,AudioGrp_FootMatType dropMatType)
-        {
-            while (_bulletDropEntities.Count >= SingletonManager.Get<ClientEffectCommonConfigManager>().GetBulletDropMaxCount(SharedConfig.IsServer))
-            {
-                var val = _bulletDropEntities.First.Value;
-                if (val.isEnabled)
-                {
-                    val.isFlagDestroy = true;
-                }
-
-                _bulletDropEntities.RemoveFirst();
-            }
-
-            var type = (int) EClientEffectType.BulletDrop;
-            var entity = CreateBaseEntity(context, idGenerator, position, type);
-            entity.AddEffectId(effectId);
-            entity.AddOwnerId(owner);
-            entity.lifeTime.LifeTime = SingletonManager.Get<ClientEffectCommonConfigManager>().BulletDropLifeTime;
-
-            entity.AddAudio((int)AudioClientEffectType.BulletDrop);
-            entity.audio.AudioClientEffectArg1 = SingletonManager.Get<AudioWeaponManager>().FindById(weaponId).BulletDrop;
-            entity.audio.AudioClientEffectArg2 = (int) dropMatType;
-            entity.AddEffectRotation(Yaw, pitch);
-            entity.AddFlagImmutability(0);
-            _bulletDropEntities.AddLast(entity);
-        }
-
-       
-
-        public static void AdHitEnvironmentEffectEvent(PlayerEntity srcPlayer, Vector3 hitPoint, Vector3 offset,  EEnvironmentType environmentType)
-        {
-            HitEnvironmentEvent e = (HitEnvironmentEvent)EventInfos.Instance.Allocate(EEventType.HitEnvironment, false);
+            HitEnvironmentEvent e =
+                            (HitEnvironmentEvent) EventInfos.Instance.Allocate(EEventType.HitEnvironment, false);
             e.EnvironmentType = environmentType;
-            e.Offset = offset;
-          
-            e.HitPoint = hitPoint;
+            e.Offset          = offset;
+            e.HitAudioId      = hitAuidoId;
+            e.HitPoint        = hitPoint;
+            e.ChunkId         = chunkId;
+
+            e.needEffectEntity = needEffectEntity;
+
             srcPlayer.localEvents.Events.AddEvent(e);
         }
-        public static void CreateHitEnvironmentEffect(
-            ClientEffectContext context,
-            IEntityIdGenerator entityIdGenerator,
-            Vector3 hitPoint,
-            Vector3 normal,
-            EntityKey owner,
-            EEnvironmentType environmentType)
+
+        public static void CreateHitEnvironmentEffect( HitEnvironmentEvent hitEnvironmentEvent)
         {
-            Logger.InfoFormat("===>CreateBulletHitEnvironmentEffet ", environmentType);
-
-            CreateHitEmitEffect(context, entityIdGenerator, hitPoint, normal, owner, environmentType);
-
-            Logger.InfoFormat("EnvType {0} ", environmentType);
-            
+            CreateHitEnvironmentEffect(hitEnvironmentEvent.HitPoint, hitEnvironmentEvent.Offset,
+                hitEnvironmentEvent.EnvironmentType, hitEnvironmentEvent.HitAudioId,
+                hitEnvironmentEvent.needEffectEntity,hitEnvironmentEvent.ChunkId);
         }
-
-        public static void CreateMuzzleSparkEffct(
-            ClientEffectContext context,
-            IEntityIdGenerator entityIdGenerator,
-            EntityKey owner,
-            Transform parent,
-            float pitch,
-            float yaw,
-            int effectId)
+        
+        
+        
+        
+        public static void CreateHitEnvironmentEffect(Vector3 hitPoint, Vector3 normal,
+                                                      EEnvironmentType environmentType, int hitAudioId,
+                                                      bool needEffectEntity,int chunkId,Transform parent = null)
         {
-            var entity = CreateBaseEntity(context, entityIdGenerator, parent.position,
-                (int) EClientEffectType.MuzzleSpark);
-            entity.AddEffectId(effectId);
-            entity.AddOwnerId(owner);
-            entity.lifeTime.LifeTime = 500;
-            entity.AddAttachParent(owner, Vector3.zero);
-            entity.AddEffectRotation(yaw, pitch);
-            entity.isFlagSyncNonSelf = false;
-        }
-
-        private static void CreateHitEmitEffect(
-            ClientEffectContext context,
-            IEntityIdGenerator entityIdGenerator,
-            Vector3 hitPoint,
-            Vector3 normal,
-            EntityKey owner,
-            EEnvironmentType environmentType)
-        {
-            int type = (int) EClientEffectType.End;
-            AudioGrp_HitMatType audioGrpHitMatType = AudioGrp_HitMatType.Concrete;
-            switch (environmentType)
+            EffectTypeInfo effectTypeInfo = environmentType.ToClientEfcInfo();
+            if (needEffectEntity)
             {
-                case EEnvironmentType.Wood:
-                    type = (int) EClientEffectType.WoodHit;
-                    audioGrpHitMatType = AudioGrp_HitMatType.Wood;
-                    
-                    break;
-                case EEnvironmentType.Steel:
-                    type = (int) EClientEffectType.SteelHit;
-                    audioGrpHitMatType = AudioGrp_HitMatType.Metal;
-                    break;
-                case EEnvironmentType.Soil:
-                    type = (int) EClientEffectType.SoilHit;
-                    break;
-                case EEnvironmentType.Stone:
-                    type = (int) EClientEffectType.StoneHit;
-                    break;
-                case EEnvironmentType.Glass:
-                    type = (int) EClientEffectType.GlassHit;
-                    break;
-                case EEnvironmentType.Water:
-                    type = (int) EClientEffectType.WaterHit;
-                    audioGrpHitMatType = AudioGrp_HitMatType.Water;
-
-                    break;
-                default:
-                    type = (int) EClientEffectType.DefaultHit;
-                    break;
+                ClientEffectEmitter clientEffectObj =
+                                LocalObjectGenerator.EffectLocal.GetClientEffectEmitter(EEffectObjectClassify.EnvHit);
+                IEffectBehavior effectBehavior;
+                if (chunkId > 0)
+                {
+                    ChunkEffectBehavior  b1 =ObjectAllocatorHolder<ChunkEffectBehavior>.Allocate();
+                    b1.Initialize(normal, hitPoint, (int) effectTypeInfo.AudioType, hitAudioId,
+                        AudioClientEffectType.WeaponEnvHit,chunkId,parent);
+                    effectBehavior = b1;
+                }
+                else
+                {
+                    NormalEffectBehavior b2 = ObjectAllocatorHolder<NormalEffectBehavior>.Allocate();
+                    b2.Initialize(normal, hitPoint, (int) effectTypeInfo.AudioType, hitAudioId,
+                        AudioClientEffectType.WeaponEnvHit);
+                    effectBehavior = b2;
+                }
+                clientEffectObj.Initialize((int) effectTypeInfo.DefaultId, effectBehavior);
             }
-
-            var effectEntity = CreateBaseEntity(context, entityIdGenerator, hitPoint, type);
-            
-            effectEntity.AddOwnerId(owner);
-            effectEntity.AddNormal(normal);
-            
-            effectEntity.AddAudio((int)AudioClientEffectType.BulletHit);
-            effectEntity.audio.AudioClientEffectArg1 =  (int) audioGrpHitMatType;
-            effectEntity.lifeTime.LifeTime = SingletonManager.Get<ClientEffectCommonConfigManager>().DecayLifeTime;
-            effectEntity.AddFlagImmutability(0);
-            effectEntity.isFlagSyncNonSelf = false;
+            else //应对于空手情况
+            {
+                GameAudioMedia.PlayHitEnvironmentAudio(effectTypeInfo.AudioType, hitAudioId, hitPoint);
+            }
         }
+
+        public static void CreateBulletFlyEffect(EntityKey owner, Vector3 startPos, Quaternion startRocation,
+                                                 Vector3 velocity, int effectId,float delay)
+        {
+            ClientEffectEmitter clientEffectObj =
+                            LocalObjectGenerator.EffectLocal.GetClientEffectEmitter(EEffectObjectClassify.BulletFly);
+            var moveEffectBehavior = ObjectAllocatorHolder<MoveEffectBehavior>.Allocate();
+            moveEffectBehavior.Initialize(startPos, startRocation, velocity, delay);
+            clientEffectObj.Initialize(effectId, moveEffectBehavior);
+            //DebugUtil.MyLog("emit fire effect:{0},{1}", startPos, effectId);
+        }
+        public static void CreateBulletDrop(Vector3 position, float Yaw, float pitch, int effectId,
+                                            int weaponId, AudioGrp_FootMatType dropMatType)
+        {
+            ClientEffectEmitter clientEffectObj =
+                            LocalObjectGenerator.EffectLocal.GetClientEffectEmitter(EEffectObjectClassify.BulletDrop);
+            var yawImmobileEffectBehavior = ObjectAllocatorHolder<YawEffectBehavior>.Allocate();
+            yawImmobileEffectBehavior.Initialize(Yaw,pitch, position, SingletonManager.Get<AudioWeaponManager>().FindById(weaponId).BulletDrop, (int) dropMatType,AudioClientEffectType.BulletDrop);
+            clientEffectObj.Initialize(effectId, yawImmobileEffectBehavior);
+        }
+
+        public static void CreateMuzzleSparkEffct(Vector3 postion, float pitch, float yaw, int effectId,
+                                                  Transform muzzleTrans)
+        {
+            ClientEffectEmitter clientEffectObj =
+                            LocalObjectGenerator.EffectLocal.GetClientEffectEmitter(EEffectObjectClassify.Muzzle);
+            var immobileEffectBehavior = ObjectAllocatorHolder<YawEffectBehavior>.Allocate();
+            immobileEffectBehavior.Initialize(yaw,pitch, postion,muzzleTrans);
+            clientEffectObj.Initialize(effectId, immobileEffectBehavior);
+        }
+        public static void AddHitPlayerEffectEvent(PlayerEntity srcPlayer, EntityKey target, Vector3 hitPoint,
+                                                   int audioId, EBodyPart part)
+        {
+            HitPlayerEvent e = (HitPlayerEvent) EventInfos.Instance.Allocate(EEventType.HitPlayer, false);
+            e.Target      = target;
+            e.HitPoint    = hitPoint;
+            e.HitAudioId  = audioId;
+            e.HitBodyPart = (byte) part;
+            srcPlayer.localEvents.Events.AddEvent(e);
+        }
+
+        public static void CreateHitPlayerEffect(Contexts context, EntityKey owner, HitPlayerEvent hitPlayerEvent)
+        {
+            if (SharedConfig.IsHXMod)
+                return;
+            var player = context.player.GetEntityWithEntityKey(owner);
+            if (null == player || !player.hasBones)
+                return;
+            var effectId = SingletonManager.Get<ClientEffectCommonConfigManager>()
+                            .GetConfigByType(EEffectObjectClassify.PlayerHit).PreLoadCfgId;
+            ClientEffectEmitter clientEffectObj =
+                            LocalObjectGenerator.EffectLocal.GetClientEffectEmitter(EEffectObjectClassify.PlayerHit);
+            var hitPlayerEffectBehavior = ObjectAllocatorHolder<HitPlayerEffectBehavior>.Allocate();
+            hitPlayerEffectBehavior.Initialize(hitPlayerEvent.HitPoint,new AudioEffectData(hitPlayerEvent.HitBodyPart,hitPlayerEvent.HitAudioId,AudioClientEffectType.WeaponPlayerHit), player.bones.Spine);
+            clientEffectObj.Initialize(effectId, hitPlayerEffectBehavior);
+        }
+        #endregion
+
 
         public static void AddBeenHitEvent(PlayerEntity srcPlayer, PlayerEntity target, int damageId, int triggerTime)
         {
             if (CanPlayBeenHit(target))
             {
                 BeenHitEvent e = (BeenHitEvent) EventInfos.Instance.Allocate(EEventType.BeenHit, false);
-                e.Target = target.entityKey.Value;
-                e.UniqueId = damageId;
+                e.Target      = target.entityKey.Value;
+                e.UniqueId    = damageId;
                 e.TriggerTime = triggerTime;
                 srcPlayer.localEvents.Events.AddEvent(e);
             }
-           
         }
 
         private static bool CanPlayBeenHit(PlayerEntity srcPlayer)
@@ -189,98 +161,45 @@ namespace App.Shared.EntityFactory
             {
                 return true;
             }
-            else
-            {
-                return srcPlayer.hasThirdPersonAppearance &&
-                       ((int) srcPlayer.thirdPersonAppearance.Posture >= (int) ThirdPersonPosture.Stand &&
-                        (int) srcPlayer.thirdPersonAppearance.Posture <= (int) ThirdPersonPosture.ProneToCrouch)
-                     && srcPlayer.thirdPersonAppearance.Action == ThirdPersonAction.Null;
-            }
+
+            return srcPlayer.hasThirdPersonAppearance &&
+                            ((int) srcPlayer.thirdPersonAppearance.Posture >= (int) ThirdPersonPosture.Stand &&
+                            (int) srcPlayer.thirdPersonAppearance.Posture <= (int) ThirdPersonPosture.ProneToCrouch) &&
+                            srcPlayer.thirdPersonAppearance.Action == ThirdPersonAction.Null;
         }
 
 
-        public static void AddHitPlayerEffectEvent(PlayerEntity srcPlayer, EntityKey target, Vector3 hitPoint, Vector3 offset)
+        public static void AddHitVehicleEffectEvent(PlayerEntity srcPlayer, EntityKey target, Vector3 hitPoint,
+                                                    Vector3 offset, Vector3 normal)
         {
-            HitPlayerEvent e = (HitPlayerEvent)EventInfos.Instance.Allocate(EEventType.HitPlayer, false);
-            e.Target = target;
-            e.Offset = offset;
-          
+            HitVehicleEvent e = (HitVehicleEvent) EventInfos.Instance.Allocate(EEventType.HitVehicle, false);
+            e.Target   = target;
+            e.Offset   = offset;
+            e.Normal   = normal;
             e.HitPoint = hitPoint;
             srcPlayer.localEvents.Events.AddEvent(e);
         }
-        
-        public static void CreateHitPlayerEffect(
-            ClientEffectContext context,
-            IEntityIdGenerator entityIdGenerator,
-            Vector3 hitPoint,
-            EntityKey owner,
-            EntityKey target,
-            Vector3 offset)
-        {
-            int type = (int) EClientEffectType.HumanHitEffect;
-            var effectEntity = CreateBaseEntity(context, entityIdGenerator, hitPoint, type);
-            effectEntity.AddOwnerId(owner);
-            effectEntity.AddAttachParent(target, offset);
-            effectEntity.isFlagSyncNonSelf = false;
-            Logger.DebugFormat("CreateHitPlayerEffect {0} {1}", effectEntity.entityKey.Value,effectEntity.isFlagSyncNonSelf );
-        }
 
-       
-        
-
-        public static void AddHitVehicleEffectEvent(PlayerEntity srcPlayer, EntityKey target, Vector3 hitPoint, Vector3 offset,
-            Vector3 normal)
+        public static void CreateHitVehicleEffect(ClientEffectContext context, IEntityIdGenerator entityIdGenerator,
+                                                  Vector3 hitPoint, EntityKey owner, EntityKey target, Vector3 offset,
+                                                  Vector3 normal)
         {
-            HitVehicleEvent e = (HitVehicleEvent)EventInfos.Instance.Allocate(EEventType.HitVehicle, false);
-            e.Target = target;
-            e.Offset = offset;
-            e.Normal = normal;
-            e.HitPoint = hitPoint;
-            srcPlayer.localEvents.Events.AddEvent(e);
-        }
-        public static void CreateHitVehicleEffect(
-            ClientEffectContext context,
-            IEntityIdGenerator entityIdGenerator,
-            Vector3 hitPoint,
-            EntityKey owner,
-            EntityKey target,
-            Vector3 offset,
-            Vector3 normal)
-        {
-            int type = (int) EClientEffectType.SteelHit;
+            int type         = (int) EClientEffectType.SteelHit;
             var effectEntity = CreateBaseEntity(context, entityIdGenerator, hitPoint, type);
             effectEntity.AddOwnerId(owner);
             effectEntity.AddNormal(normal);
             effectEntity.AddAttachParent(target, offset);
-            effectEntity.lifeTime.LifeTime = SingletonManager.Get<ClientEffectCommonConfigManager>().DecayLifeTime;
+            effectEntity.lifeTime.LifeTime = GlobalConst.CommonEffectLifeMScd;
             effectEntity.AddFlagImmutability(0);
             effectEntity.isFlagSyncNonSelf = false;
         }
 
-        public static void CreateHitFracturedChunkEffect(
-            ClientEffectContext context,
-            IEntityIdGenerator entityIdGenerator,
-            Vector3 hitPoint,
-            EntityKey owner,
-            EntityKey target,
-            int fragmentId,
-            Vector3 offset,
-            Vector3 normal)
-        {
-            int type = (int) EClientEffectType.SteelHit;
-            var effectEntity = CreateBaseEntity(context, entityIdGenerator, hitPoint, type);
-            effectEntity.AddOwnerId(owner);
-            effectEntity.AddNormal(normal);
-            effectEntity.AddAttachParent(target, offset);
-            effectEntity.attachParent.FragmentId = fragmentId;
-            effectEntity.lifeTime.LifeTime = SingletonManager.Get<ClientEffectCommonConfigManager>().DecayLifeTime;
-            effectEntity.AddFlagImmutability(0);
-        }
-
+     
         public static ClientEffectEntity CreateGrenadeExplosionEffect(ClientEffectContext context,
-            IEntityIdGenerator entityIdGenerator,
-            EntityKey owner, Vector3 position, float yaw, float pitch, int effectId, int effectTime,
-            EClientEffectType effectType)
+                                                                      IEntityIdGenerator entityIdGenerator,
+                                                                      EntityKey owner, Vector3 position, float yaw,
+                                                                      float pitch, int effectId, int effectTime,
+                                                                      EClientEffectType effectType)
         {
             var entity = CreateBaseEntity(context, entityIdGenerator, position, (int) effectType);
             entity.AddOwnerId(owner);
@@ -292,7 +211,7 @@ namespace App.Shared.EntityFactory
         }
 
         /// <summary>
-        /// create spray paint
+        ///     create spray paint
         /// </summary>
         /// <param name="context"></param>
         /// <param name="entityIdGenerator"></param>
@@ -303,29 +222,23 @@ namespace App.Shared.EntityFactory
         /// <param name="sprayPrintType">类型</param>
         /// <param name="sprayPrintSpriteId">贴图</param>
         /// <param name="lifeTime">生命周期</param>
-        public static void CreateSprayPaint(ClientEffectContext context,
-            IEntityIdGenerator entityIdGenerator,
-            Vector3 sprayPaintPos, 
-            Vector3 sprayPaintForward,
-            int sprayPrintMask,
-            Vector3 sprayPrintSize,
-            ESprayPrintType sprayPrintType,
-            int sprayPrintSpriteId,
-            int lifeTime
-            )
+        public static void CreateSprayPaint(ClientEffectContext context, IEntityIdGenerator entityIdGenerator,
+                                            Vector3 sprayPaintPos, Vector3 sprayPaintForward, int sprayPrintMask,
+                                            Vector3 sprayPrintSize, ESprayPrintType sprayPrintType,
+                                            int sprayPrintSpriteId, int lifeTime)
         {
-            int type = (int)EClientEffectType.SprayPrint;
+            int type         = (int) EClientEffectType.SprayPrint;
             var effectEntity = context.CreateEntity();
-            var nextId = entityIdGenerator.GetNextEntityId();
-            effectEntity.AddEntityKey(new EntityKey(nextId, (int)EEntityType.ClientEffect));
+            var nextId       = entityIdGenerator.GetNextEntityId();
+            effectEntity.AddEntityKey(new EntityKey(nextId, (int) EEntityType.ClientEffect));
             effectEntity.AddPosition();
             effectEntity.position.Value = sprayPaintPos;
             effectEntity.AddSprayPaint();
-            effectEntity.sprayPaint.SprayPaintPos = sprayPaintPos;
-            effectEntity.sprayPaint.SprayPaintForward = sprayPaintForward;
-            effectEntity.sprayPaint.SprayPrintMask = sprayPrintMask;
-            effectEntity.sprayPaint.SprayPrintSize = sprayPrintSize;
-            effectEntity.sprayPaint.SprayPrintType = (int)sprayPrintType;
+            effectEntity.sprayPaint.SprayPaintPos      = sprayPaintPos;
+            effectEntity.sprayPaint.SprayPaintForward  = sprayPaintForward;
+            effectEntity.sprayPaint.SprayPrintMask     = sprayPrintMask;
+            effectEntity.sprayPaint.SprayPrintSize     = sprayPrintSize;
+            effectEntity.sprayPaint.SprayPrintType     = (int) sprayPrintType;
             effectEntity.sprayPaint.SprayPrintSpriteId = sprayPrintSpriteId;
 
             effectEntity.AddEffectType(type);
@@ -335,5 +248,22 @@ namespace App.Shared.EntityFactory
             /*effectEntity.lifeTime.LifeTime = SingletonManager.Get<ClientEffectCommonConfigManager>().DecayLifeTime;*/
             effectEntity.AddFlagImmutability(0);
         }
+
+        public static ClientEffectEntity CreateBaseEntity(ClientEffectContext context,
+                                                          IEntityIdGenerator entityIdGenerator, Vector3 pos, int type)
+        {
+            var effectEntity = context.CreateEntity();
+            var nextId       = entityIdGenerator.GetNextEntityId();
+            effectEntity.AddEntityKey(new EntityKey(nextId, (int) EEntityType.ClientEffect));
+            effectEntity.AddPosition();
+            effectEntity.position.Value = pos;
+            effectEntity.AddEffectType(type);
+            effectEntity.AddAssets(false, false);
+            effectEntity.AddLifeTime(DateTime.Now, 6000);
+            effectEntity.isFlagSyncNonSelf = true;
+            return effectEntity;
+        }
+
+
     }
 }

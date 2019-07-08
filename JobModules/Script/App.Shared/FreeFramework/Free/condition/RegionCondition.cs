@@ -7,11 +7,12 @@ using com.wd.free.@event;
 using com.wd.free.map.position;
 using App.Server.GameModules.GamePlay.free.player;
 using com.wd.free.unit;
+using Core.Free;
 
 namespace App.Shared.FreeFramework.Free.condition
 {
     [Serializable]
-    public class RegionCondition : IParaCondition
+    public class RegionCondition : IParaCondition, IRule
     {
         private IMapRegion region;
         private IPosSelector pos;
@@ -29,6 +30,11 @@ namespace App.Shared.FreeFramework.Free.condition
             {
                 return region.In(args, up);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.RegionCondition;
         }
     }
 }

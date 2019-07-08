@@ -4,6 +4,7 @@ using App.Shared.Components.Ui;
 using Assets.App.Client.GameModules.Ui;
 using Assets.UiFramework.Libs;
 using Core.Ui.Map;
+using Core.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,6 +12,8 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 {
     public class AirPlane
     {
+        protected static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(AirPlane));
+
         private IUiResourcesLoader loader;
         //空投点 通用
         private Dictionary<string, Sprite> dropAnimSpriteDic = new Dictionary<string, Sprite>();
@@ -66,10 +69,10 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         }
 
         private List<MapFixedVector2> _dropList;
-        private void UpdateAirDrop(float rate)
+        private void UpdateAirDrop(float rate, bool forceUpdate = false)
         {
             if (_dropList == null) return;
-            if (lastRate.Equals(rate)) return;
+            if (lastRate.Equals(rate) && !forceUpdate) return;
             for (int i = 0; i < _dropList.Count; i++)
             {
                 Transform dropTf = airDropList[i];
@@ -78,6 +81,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                     // 设置空投点的位置
                     Vector2 kTouPosByPixel = (_dropList[i].ShiftedUIVector2()) * rate;
                     dropTf.GetComponent<RectTransform>().anchoredPosition = kTouPosByPixel;
+                    Logger.InfoFormat("Update Drop Pos {0}", kTouPosByPixel);
                 }
             }
         }
@@ -105,6 +109,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                 UIUtils.SetActive(dropTf, true);
                 Vector2 kTouPosByPixel = (dropList[i].ShiftedUIVector2()) * rate;
                 dropTf.GetComponent<RectTransform>().anchoredPosition = kTouPosByPixel;
+                Logger.InfoFormat("Drop Pos {0}", kTouPosByPixel);
             }
             for (; i < airDropList.Count; i++)
             {

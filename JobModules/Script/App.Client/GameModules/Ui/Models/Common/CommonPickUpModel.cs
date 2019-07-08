@@ -33,6 +33,8 @@ namespace App.Client.GameModules.Ui.Models.Common
         private IPlayerStatTipLogic _playerStateTipLogic;
         //准星的状态会影响F提示的显示
         private IPickUpUiAdapter _pickUpUiAdapter;
+        // Buff类型通用提示
+        private BuffTipLogic _buffTipLogic;
 
         /// <summary>
         /// 因为碰撞检测和按钮点击的时序不固定（当前固定，但是可能会因为修改而导致变化），所以通过回调保证在同一帧时序不同的时候结果都正确
@@ -56,6 +58,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             _doorCastLogic = _pickUpUiAdapter.GetDoorCastLogic();
             _playerCastLogic = _pickUpUiAdapter.GetPlayerCastLogic();
             _playerStateTipLogic = _pickUpUiAdapter.GetPlayerStateTipLogic();
+            _buffTipLogic = _pickUpUiAdapter.GetBuffTipLogic();
             _commonCastLogic = _pickUpUiAdapter.GetCommonCastLogic();
         }
 
@@ -78,6 +81,11 @@ namespace App.Client.GameModules.Ui.Models.Common
             _viewModel.Show = false;
 
             ResetCastLogic();
+
+            if (_buffTipLogic.HasTipState())
+            {
+                ShowBuffTip();
+            }
 
             if(_playerStateTipLogic.HasTipState())
             {
@@ -180,6 +188,12 @@ namespace App.Client.GameModules.Ui.Models.Common
                     Logger.DebugFormat("ShowStateTip {0}", _playerStateTipLogic.StateTip);
                 }
             }
+        }
+
+        private void ShowBuffTip()
+        {
+            _viewModel.Show = _buffTipLogic.HasTipState();
+            _viewModel.ItemName = _buffTipLogic.StateTip;
         }
 
         private void ShowCastTip()

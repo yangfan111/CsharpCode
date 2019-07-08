@@ -8,12 +8,13 @@ using com.wd.free.@event;
 using com.wd.free.item;
 using com.wd.free.unit;
 using com.wd.free.util;
+using Core.Free;
 
 namespace gameplay.gamerule.free.item
 {
 	[System.Serializable]
-	public class SetItemCountAction : AbstractPlayerAction
-	{
+	public class SetItemCountAction : AbstractPlayerAction, IRule
+    {
 		private const long serialVersionUID = -8785665361284226681L;
 
 		private string exp;
@@ -48,5 +49,10 @@ namespace gameplay.gamerule.free.item
 				fr.Resume("current");
 			}
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SetItemCountAction;
+        }
+    }
 }

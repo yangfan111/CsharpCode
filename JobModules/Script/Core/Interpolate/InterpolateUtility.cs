@@ -1,4 +1,5 @@
-﻿using Core.Components;
+﻿using System;
+using Core.Components;
 using Core.Playback;
 using UnityEngine;
 
@@ -89,6 +90,21 @@ namespace Core.Interpolate
                 l.x + (r.x - l.x) * ratio,
                 l.y + (r.y - l.y) * ratio,
                 l.z + (r.z - l.z) * ratio);
+        }
+
+        public static float ShortInterpolate(float l, float r, IInterpolationInfo interpolationInfo)
+        {
+            var ratio = interpolationInfo.Ratio;
+            var ret = l;
+            if (Math.Abs(l - r) <= 180)
+                ret = Interpolate(l, r, ratio);
+            else
+            {
+                ret = l < 0 ?
+                    Interpolate(l, r - 360, ratio) :
+                    Interpolate(l - 360, r, ratio);
+            }
+            return ret;
         }
     }
 }

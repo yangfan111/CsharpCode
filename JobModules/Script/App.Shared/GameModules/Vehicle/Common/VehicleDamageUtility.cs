@@ -1,9 +1,11 @@
 ﻿using App.Shared.Components.Vehicle;
-using App.Shared.GameModules.Bullet;
+using App.Shared.GameModules.Attack;
+using App.Shared.GameModules.Weapon;
 using Core.EntityComponent;
 using Core.Enums;
 using Core.Prediction.VehiclePrediction.Event;
 using Core.Utils;
+using UnityEngine;
 using WeaponConfigNs;
 
 namespace App.Shared.GameModules.Vehicle
@@ -42,8 +44,9 @@ namespace App.Shared.GameModules.Vehicle
                             var gamePlay = player.gamePlay;
                             damage = orignalDamge * gamePlay.MaxHp;
                         }
-
-                        BulletPlayerUtility.ProcessPlayerHealthDamage(contexts, _damager, sourcePlayer, player, new PlayerDamageInfo(damage, (int)deadType, (int)EBodyPart.Chest, vehicle.vehicleAssetInfo.Id));
+                        
+                        BulletPlayerUtil.ProcessPlayerHealthDamage(contexts, _damager, sourcePlayer, player, new PlayerDamageInfo(damage, (int)deadType, (int)EBodyPart.Chest, vehicle.vehicleAssetInfo.Id,
+                            false, false, false, deadType == EUIDeadType.VehicleBomb ? player.position.Value : Vector3.zero, deadType == EUIDeadType.VehicleBomb ? player.position.Value - vehicle.position.Value : Vector3.zero));
                         if (sendToServer)
                         {
                             SendDamageToServer(vehicle, player.entityKey.Value, damage);
@@ -55,7 +58,7 @@ namespace App.Shared.GameModules.Vehicle
 
         public static void DoPlayerDamage(Contexts contexts, PlayerEntity sourcePlayer, PlayerEntity targetPlayer, float damage, EUIDeadType hitType = EUIDeadType.VehicleHit, EBodyPart hitPart = EBodyPart.Chest, int weaponId = 0)
         {
-            BulletPlayerUtility.ProcessPlayerHealthDamage(contexts, _damager, sourcePlayer, targetPlayer, new PlayerDamageInfo(damage, (int)hitType, (int)hitPart, weaponId));
+            BulletPlayerUtil.ProcessPlayerHealthDamage(contexts, _damager, sourcePlayer, targetPlayer, new PlayerDamageInfo(damage, (int)hitType, (int)hitPart, weaponId));
         }
 
         public static void SendDamageToServer(VehicleEntity vehicle, EntityKey entityKey, float damage)

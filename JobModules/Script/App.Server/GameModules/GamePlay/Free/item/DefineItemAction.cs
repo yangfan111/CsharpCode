@@ -7,11 +7,12 @@ using com.wd.free.item;
 using com.wd.free.util;
 using gameplay.gamerule.free.rule;
 using UnityEngine;
+using Core.Free;
 
 namespace gameplay.gamerule.free.item
 {
     [System.Serializable]
-    public class DefineItemAction : AbstractGameAction
+    public class DefineItemAction : AbstractGameAction, IRule
     {
         private const long serialVersionUID = 5687056626382340079L;
 
@@ -41,6 +42,11 @@ namespace gameplay.gamerule.free.item
                     }
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.DefineItemAction;
         }
     }
 }

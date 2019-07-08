@@ -42,8 +42,6 @@ namespace Core.CameraControl.NewMotor.View
         public override void CalcOutput(PlayerEntity player, ICameraMotorInput input, ICameraMotorState state, SubCameraMotorState subState,
             DummyCameraMotorOutput output, ICameraNewMotor last, int clientTime)
         {
-           
-            
         }
 
         public override HashSet<short> ExcludeNextMotor()

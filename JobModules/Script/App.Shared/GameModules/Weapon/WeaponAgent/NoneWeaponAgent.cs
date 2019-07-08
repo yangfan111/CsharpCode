@@ -24,7 +24,10 @@ namespace App.Shared.GameModules.Weapon
         {
             return -1;
         }
-
+        internal override bool CanApplyPart
+        {
+            get { return false; }
+        }
         public override void ReleaseWeapon()
         {
         }

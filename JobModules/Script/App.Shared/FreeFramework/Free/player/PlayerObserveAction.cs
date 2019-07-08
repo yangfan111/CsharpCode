@@ -2,6 +2,7 @@
 using App.Shared.GameModules.Player;
 using com.wd.free.action;
 using com.wd.free.@event;
+using Core.Free;
 using Sharpen;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using UnityEngine;
 namespace App.Shared.FreeFramework.Free.player
 {
     [Serializable]
-    public class PlayerObserveAction : AbstractPlayerAction
+    public class PlayerObserveAction : AbstractPlayerAction, IRule
     {
         private string observeEnemy;
         private IGameAction noOneAction;
@@ -19,6 +20,15 @@ namespace App.Shared.FreeFramework.Free.player
         public override void DoAction(IEventArgs args)
         {
             FreeData fd = GetPlayer(args);
+
+            /*if (!fd.Player.gamePlay.IsDead())
+            {
+                fd.Player.gamePlay.CameraEntityId = 0;
+                return;
+            }*/
+
+
+            if (DateTime.Now.Ticks / 10000 - fd.Player.statisticsData.Statistics.LastDeadTime <= 2990L) return;
 
             bool success = ObservePlayer(args, fd, args.GetBool(observeEnemy), args.GetBool(wise));
             if (!success)
@@ -121,6 +131,11 @@ namespace App.Shared.FreeFramework.Free.player
             }
             fd.Player.gamePlay.CameraEntityId = playerEntities[0].playerInfo.EntityId;
             return true;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerObserveAction;
         }
     }
 }

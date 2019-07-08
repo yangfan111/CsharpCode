@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using App.Client.GameModules.Ui.ViewModels.Chicken;
 using App.Shared.Components.Ui;
+using Assets.App.Client.GameModules.Ui;
 using Assets.UiFramework.Libs;
+using Core.Utils;
 using UIComponent.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -15,10 +14,13 @@ namespace App.Client.GameModules.Ui.Models.Chicken
 {
     public class ChickenBagItem: UIItem
     {
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(ChickenBagItem));
+
         private ChickenBagItemViewModel _viewModel = new ChickenBagItemViewModel();
         protected override void SetView()
         {
             base.SetView();
+            SetVisible(true);
             if (Data is IChickenBagItemUiData)
             {
                 SetView(Data as IChickenBagItemUiData);
@@ -34,22 +36,14 @@ namespace App.Client.GameModules.Ui.Models.Chicken
         {
             base.Init();
             InitEvent();
-            InitVariable();
         }
 
-        private void InitVariable()
-        {
-            if (root == null)
-            {
-                root = FindChildGo(_viewModel.ResourceAssetName);
-            }
-        }
 
-        UIEventTriggerListener eventTrigger;
+        private UIEventTriggerListener eventTrigger;
 
         UIDrag uiDrog;
         public Action<IBaseChickenBagItemData> DragCallback;
-        public Action<Transform,IBaseChickenBagItemData> EnterCallback;
+        public Action<ChickenBagItem> EnterCallback;
 
         private void InitEvent()
         {
@@ -62,13 +56,13 @@ namespace App.Client.GameModules.Ui.Models.Chicken
                 }
             }
 
-            eventTrigger = FindComponent<UIEventTriggerListener>("ItemGroup");
+            EnterAction(null, null);
+            eventTrigger = FindComponent<UIEventTriggerListener>(_viewModel.ResourceAssetName);
             if (eventTrigger != null)
             {
                 eventTrigger.onClick = RightClickAction;
-                eventTrigger.onEnter = EnterAction;
             }
-            uiDrog = FindComponent<UIDrag>("ItemGroup");
+            uiDrog = FindComponent<UIDrag>(_viewModel.ResourceAssetName);
             if (uiDrog != null)
             {
                 uiDrog.DragItem = FindChildGo("ItemIcon").gameObject;
@@ -89,7 +83,7 @@ namespace App.Client.GameModules.Ui.Models.Chicken
                     }
                 }
 
-                EnterCallback.Invoke(root,Data as IBaseChickenBagItemData);
+                EnterCallback.Invoke(this);
             }
         }
 
@@ -102,7 +96,12 @@ namespace App.Client.GameModules.Ui.Models.Chicken
         }
 
         public Action<IBaseChickenBagItemData> RightClickCallback;
-        private Transform root;
+
+        public Transform GetRoot()
+        {
+            return ViewInstance.transform;
+            //return _viewModel.ChickenBagItemTransform;
+        }
 
         private void RightClickAction(UIEventTriggerListener arg1, PointerEventData eventData)
         {
@@ -139,8 +138,15 @@ namespace App.Client.GameModules.Ui.Models.Chicken
             _viewModel.ItemGroupShow = true;
             _viewModel.TitleGroupShow = false;
             _viewModel.CountText = realData.count.ToString();
+            _viewModel.CountShow = realData.count > 1;
             var config = SingletonManager.Get<ItemBaseConfigManager>().GetConfigById(realData.cat, realData.id,true);
-            if (config == null) return;
+            if (config == null)
+            {
+                Logger.ErrorFormat("error config cat:{0} id:{1}", realData.cat, realData.id);
+                SetVisible(false);
+                //Destory();
+                return;
+            }
             _viewModel.ItemIconBundle = config.IconBundle;
             _viewModel.ItemIconAsset = config.Icon;
             _viewModel.ItemNameText = config.Name;
@@ -154,5 +160,28 @@ namespace App.Client.GameModules.Ui.Models.Chicken
             }
         }
 
+        protected override void OnAddToPool()
+        {
+            base.OnAddToPool();
+            CloseUIDrag();
+            if (eventTrigger != null)
+            {
+                eventTrigger.onClick = null;
+                eventTrigger.onEnter = null;
+                eventTrigger.onExit = null;
+            }
+
+            var root = GetRoot();
+            if (root != null)
+                UiCommon.TipManager.UnRegisterTip(root);
+        }
+
+        public void CloseUIDrag()
+        {
+            if (uiDrog != null)
+            {
+                uiDrog.DestroyCopy();
+            }
+        }
     }
 }

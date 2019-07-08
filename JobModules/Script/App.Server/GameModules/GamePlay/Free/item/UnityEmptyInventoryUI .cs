@@ -9,11 +9,12 @@ using Sharpen;
 using com.wd.free.para;
 using gameplay.gamerule.free.ui;
 using gameplay.gamerule.free.ui.component;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.item
 {
     [Serializable]
-    public class UnityEmptyInventoryUi : IInventoryUI
+    public class UnityEmptyInventoryUi : IInventoryUI, IRule
     {
         private IGameAction errorAction;
 
@@ -60,7 +61,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
         {
             if (errorAction != null)
             {
-                if (Runtime.CurrentTimeMillis() - lastErrorTime > 2000)
+                if (Runtime.CurrentTimeMillis(false) - lastErrorTime > 2000)
                 {
                     if (args != null)
                     {
@@ -68,7 +69,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
                         errorAction.Act(args);
                         args.GetDefault().GetParameters().Resume("message");
                     }
-                    lastErrorTime = Runtime.CurrentTimeMillis();
+                    lastErrorTime = Runtime.CurrentTimeMillis(false);
                 }
             }
         }
@@ -84,6 +85,11 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
         public void UseItem(ISkillArgs args, ItemInventory inventory, ItemPosition ip)
         {
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.UnityEmptyInventoryUi;
         }
     }
 }

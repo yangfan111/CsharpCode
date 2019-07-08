@@ -54,14 +54,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
             }
         }
 
-        public string Name
-        {
-            get
-            {
-                return _weaponConfig.Name;
-            }
-        }
-
         public AssetInfo WeaponIconAssetInfo
         {
             get
@@ -74,7 +66,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                return _weaponAvatarConfig.Name;
+                return _weaponConfig.Name;
             }
         }
 
@@ -97,14 +89,37 @@ namespace App.Client.GameModules.Ui.UiAdapter
             return new AssetInfo();
         }
 
+        public int GetIdByWeaponPartType(EWeaponPartType weaponPartType)
+        {
+            switch (weaponPartType)
+            {
+                case EWeaponPartType.LowerRail:
+                    return _playerWeaponData.LowerRail;
+                case EWeaponPartType.UpperRail:
+                    return _playerWeaponData.UpperRail;
+                case EWeaponPartType.Stock:
+                    return _playerWeaponData.Stock;
+                case EWeaponPartType.Magazine:
+                    return _playerWeaponData.Magazine;
+                case EWeaponPartType.Muzzle:
+                    return _playerWeaponData.Muzzle;
+            }
+            return 0;
+        }
+
+        public int id
+        {
+            get { return _weaponConfig.Id; }
+        }
     }
 
     public class WeaponBagUiAdapter : UIAdapter, IWeaponBagUiAdapter
     {
         private static LoggerAdapter Logger = new LoggerAdapter(typeof(WeaponBagUiAdapter));
         private Contexts _contexts;
-        public PlayerWeaponController Controller { get; set; }
+
         WeaponBagInfo[] _bagArray;
+
 
         private WeaponBagInfo[] BagArray
         {
@@ -145,15 +160,18 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public override bool IsReady()
         {
-            return Controller != null;
+            return WeaponController != null;
         }
 
         public override bool Enable
         {
-            get { return _enable && WeaponController.CanSwitchWeaponBag; }
+            get
+            {
+                return _enable && WeaponController.CanSwitchWeaponBag;
+            }
 
             set {
-                if (!WeaponController.CanSwitchWeaponBag)
+                if (WeaponController != null && !WeaponController.CanSwitchWeaponBag)
                 {
                     _enable = false;
                 }
@@ -179,19 +197,18 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-              
-                return (Controller.BagOpenLimitTIme - Controller.RelatedTime) / 1000;
+                return (WeaponController.BagOpenLimitTIme - WeaponController.RelatedTime) / 1000;
             }
         }
 
         public IWeaponBagInfo GetWeaponBagInfoByBagIndex(int index)
         {
             return BagArray[index];
-            //return BagArray[index - 1];
         }
-        PlayerWeaponController WeaponController
+        private PlayerWeaponController _weaponController;
+        private PlayerWeaponController WeaponController
         {
-            get { return  _contexts.player.flagSelfEntity.WeaponController(); }
+            get { return _weaponController ?? (_weaponController = _contexts.player.flagSelfEntity.WeaponController()); }
         }
         private int _curBagIndex = 0;
         public int CurBagIndex

@@ -1,5 +1,5 @@
 ﻿using Core;
-using Core.Common;
+
 using Core.Utils;
 using UltimateFracturing;
 using WeaponConfigNs;
@@ -36,8 +36,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
             if (weaponAgent.BaseComponent.Bullet <= 0)
             {
                 controller.ShowTip(ETipType.FireWithNoBullet);
-                if(cmd.FiltedInput(EPlayerInput.IsLeftAttack)&& 
-                    controller.AudioController != null)
+                if(cmd.FiltedInput(EPlayerInput.IsLeftAttack))
                     controller.AudioController.PlayEmptyFireAudio();
                 return false;
             }

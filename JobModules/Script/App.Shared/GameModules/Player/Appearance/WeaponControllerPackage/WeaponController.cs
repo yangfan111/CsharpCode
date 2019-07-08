@@ -1,14 +1,6 @@
-using Core.CharacterState;
-using Core.Compare;
-using Core.Configuration;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using System;
 using App.Shared.Components.Player;
-using Core.Utils;
-using XmlConfig;
 using Utils.Appearance;
 using Utils.Appearance.Weapon;
 using Utils.AssetManager;
@@ -17,10 +9,6 @@ namespace App.Shared.GameModules.Player.Appearance.WeaponControllerPackage
 {
     public class WeaponController : HallWeaponController, ICharacterLoadResource
     {
-        public WeaponController()
-        {
-        }
-        
         #region sync
 
         public void SyncFromLatestComponent(LatestAppearanceComponent value)

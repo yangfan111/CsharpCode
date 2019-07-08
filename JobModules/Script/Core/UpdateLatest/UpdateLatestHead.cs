@@ -10,6 +10,7 @@ namespace Core.UpdateLatest
         public int UserCmdSeq;
       
         public byte ComponentCount;
+        public byte SerializeCount;
         public short BodyLength;
         public int LastSnapshotId;
 
@@ -17,7 +18,7 @@ namespace Core.UpdateLatest
         {
             BaseUserCmdSeq = -1;
             UserCmdSeq = 0;
-            
+            SerializeCount = 0;
             BodyLength = 0;
             LastSnapshotId = -1;
         }
@@ -30,6 +31,7 @@ namespace Core.UpdateLatest
             stream.Write(LastSnapshotId);
           
             stream.Write(ComponentCount);
+            stream.Write(SerializeCount);
             stream.Write((short) 0);
         }
 
@@ -40,22 +42,25 @@ namespace Core.UpdateLatest
             LastSnapshotId = binaryReader.ReadInt32();
           
             ComponentCount = binaryReader.ReadByte();
+            SerializeCount = binaryReader.ReadByte();
             BodyLength = binaryReader.ReadInt16();
         }
-
-        public void ReWriteBodyLength(MyBinaryWriter stream, short bodyLenght)
+        public void ReWriteComponentCountAndBodyLength(MyBinaryWriter stream, short bodyLenght, byte count)
         {
+            SerializeCount = count;
             BodyLength = bodyLenght;
-            stream.Seek(-bodyLenght - 2, SeekOrigin.Current);
+            stream.Seek(-bodyLenght - 3, SeekOrigin.Current);
+            stream.Write(count);
             stream.Write(bodyLenght);
             stream.Seek(bodyLenght, SeekOrigin.Current);
         }
+       
 
         public void ReInit()
         {
             BaseUserCmdSeq = -1;
             UserCmdSeq = 0;
-          
+            SerializeCount = 0;
             BodyLength = 0;
             LastSnapshotId = -1;
         }
@@ -65,7 +70,7 @@ namespace Core.UpdateLatest
         {
             return BaseUserCmdSeq == other.BaseUserCmdSeq && UserCmdSeq == other.UserCmdSeq &&
                    ComponentCount == other.ComponentCount &&
-                   BodyLength == other.BodyLength && LastSnapshotId == other.LastSnapshotId;
+                   BodyLength == other.BodyLength && LastSnapshotId == other.LastSnapshotId && SerializeCount == other.SerializeCount;
         }
 
         public override bool Equals(object obj)
@@ -85,8 +90,11 @@ namespace Core.UpdateLatest
                 hashCode = (hashCode * 397) ^ ComponentCount.GetHashCode();
                 hashCode = (hashCode * 397) ^ BodyLength.GetHashCode();
                 hashCode = (hashCode * 397) ^ LastSnapshotId;
+                hashCode = (hashCode * 397) ^ SerializeCount.GetHashCode();
                 return hashCode;
             }
         }
+
+        
     }
 }

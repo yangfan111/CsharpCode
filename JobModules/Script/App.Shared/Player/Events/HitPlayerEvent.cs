@@ -7,15 +7,17 @@ using Core.ObjectPool;
 using Core.Utils;
 using Entitas;
 using UnityEngine;
+using WeaponConfigNs;
 
 namespace App.Shared.Player.Events
 {
     public class HitPlayerEvent : IEvent
     {
         public EntityKey Target;
-        public Vector3 Offset;
-
-        public Vector3 HitPoint;
+        public Vector3   Offset;
+        public byte      HitBodyPart;
+        public Vector3   HitPoint;
+        public int       HitAudioId;
 
         public class ObjcetFactory : CustomAbstractObjectFactory
         {
@@ -27,10 +29,6 @@ namespace App.Shared.Player.Events
             {
                 return new HitPlayerEvent();
             }
-        }
-
-        public HitPlayerEvent()
-        {
         }
 
         public EEventType EventType
@@ -45,7 +43,9 @@ namespace App.Shared.Player.Events
             Target = FieldSerializeUtil.Deserialize(Target, reader);
             Offset = FieldSerializeUtil.Deserialize(Offset, reader);
 
-            HitPoint = FieldSerializeUtil.Deserialize(HitPoint, reader);
+            HitPoint    = FieldSerializeUtil.Deserialize(HitPoint, reader);
+            HitAudioId  = FieldSerializeUtil.Deserialize(HitAudioId, reader);
+            HitBodyPart = FieldSerializeUtil.Deserialize(HitBodyPart, reader);
         }
 
         public void WriteBody(MyBinaryWriter writer)
@@ -54,14 +54,18 @@ namespace App.Shared.Player.Events
             FieldSerializeUtil.Serialize(Offset, writer);
 
             FieldSerializeUtil.Serialize(HitPoint, writer);
+            FieldSerializeUtil.Serialize(HitAudioId, writer);
+            FieldSerializeUtil.Serialize(HitBodyPart, writer);
         }
 
         public void RewindTo(IEvent value)
         {
             HitPlayerEvent right = value as HitPlayerEvent;
-            Target = right.Target;
-            Offset = right.Offset;
-            HitPoint = right.HitPoint;
+            Target      = right.Target;
+            Offset      = right.Offset;
+            HitPoint    = right.HitPoint;
+            HitAudioId  = right.HitAudioId;
+            HitBodyPart = right.HitBodyPart;
         }
     }
 
@@ -75,18 +79,11 @@ namespace App.Shared.Player.Events
 
         public override void DoEventClient(Entitas.IContexts contexts, IEntity entity, IEvent e)
         {
-            var playerEntity = entity as PlayerEntity;
-            Contexts c = contexts as Contexts;
-            HitPlayerEvent ev = e as HitPlayerEvent;
+            var            playerEntity = entity as PlayerEntity;
+            Contexts       c            = contexts as Contexts;
+            HitPlayerEvent ev           = e as HitPlayerEvent;
             if (playerEntity != null)
-            {
-                ClientEffectFactory.CreateHitPlayerEffect(c.clientEffect,
-                    c.session.commonSession.EntityIdGenerator,
-                    ev.HitPoint,
-                    playerEntity.entityKey.Value,
-                    ev.Target,
-                    ev.Offset);
-            }
+                ClientEffectFactory.CreateHitPlayerEffect(c,playerEntity.entityKey.Value, ev);
         }
 
 

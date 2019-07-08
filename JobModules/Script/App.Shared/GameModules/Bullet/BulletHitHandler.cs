@@ -110,7 +110,8 @@ namespace App.Shared.GameModules.Bullet
 //            }
 
             ClientEffectFactory.AddBeenHitEvent(srcPlayer, targetPlayer, GeneraterUniqueHitId(srcPlayer, cmdSeq), contexts.session.currentTimeObject.CurrentTime);
-            ClientEffectFactory.AddHitPlayerEffectEvent(srcPlayer, targetPlayer.entityKey.Value, hit.point, hit.point - targetPlayer.position.Value);
+            ClientEffectFactory.AddHitPlayerEffectEvent(srcPlayer, targetPlayer.entityKey.Value, hit.point, 
+                hit.point - targetPlayer.position.Value,(int)EAudioUniqueId.BulletHit,part);
 
             _logger.InfoFormat("bullet from {0} hit player {1}, part {2}, hitbox factor {3}, result damage {4}",
                 bulletEntity.OwnerEntityKey, targetPlayer.entityKey.Value, collider, hitboxFactor, totalDamage);
@@ -303,11 +304,12 @@ namespace App.Shared.GameModules.Bullet
             }
             else
             {
-                ClientEffectFactory.AdHitEnvironmentEffectEvent(srcPlayer, hit.point, hit.normal, info.Type);
+                ClientEffectFactory.AdHitEnvironmentEffectEvent(srcPlayer, hit.point, hit.normal, info.Type,(int)EAudioUniqueId.BulletHit);
 
                 if (bulletEntity.IsValid && thicknessInfo.Thickness > 0)
                 {
-                    ClientEffectFactory.AdHitEnvironmentEffectEvent(srcPlayer, thicknessInfo.OutPoint, thicknessInfo.Normal, info.Type);
+                    ClientEffectFactory.AdHitEnvironmentEffectEvent(srcPlayer, thicknessInfo.OutPoint, 
+                        thicknessInfo.Normal, info.Type,(int)EAudioUniqueId.BulletHit);
                 }
             }
 

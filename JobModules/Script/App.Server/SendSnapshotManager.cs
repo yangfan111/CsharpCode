@@ -14,6 +14,7 @@ using Core.ThreadUtils;
 using Core.Utils;
 using Entitas;
 using Sharpen;
+using Utils.Concurrent;
 using Utils.Singleton;
 using Utils.Utils;
 
@@ -34,7 +35,8 @@ namespace App.Server
         }
 
         public CreateSnapshotParams Build(SnapshotFactory snapshotFactory, PlayerEntity player, Bin2DConfig bin2DConfig,
-            IBin2DManager bin, int serverTime, int snapshotSeq, int vehicleSimulationTime, INetworkChannel channel)
+            IBin2DManager bin, int serverTime, int snapshotSeq, int vehicleSimulationTime, INetworkChannel channel,
+            Contexts _newContexts)
         {
             SnapshotFactory = snapshotFactory;
             Player = player;
@@ -45,6 +47,7 @@ namespace App.Server
             VehicleSimulationTime = vehicleSimulationTime;
             Channel = channel;
             PreEnitys.Clear();
+            _contexts = _newContexts;
             return this;
         }
 
@@ -60,6 +63,7 @@ namespace App.Server
 
         public List<IGameEntity> PreEnitys = new List<IGameEntity>();
 
+        public Contexts _contexts;
 
         protected override void OnCleanUp()
         {
@@ -74,6 +78,7 @@ namespace App.Server
             Channel = null;
 
             PreEnitys.Clear();
+            _contexts = null;
             ObjectAllocatorHolder<CreateSnapshotParams>.Free(this);
         }
     }
@@ -86,12 +91,15 @@ namespace App.Server
 
         private ConsumerThread<CreateSnapshotParams, int>[] _createSnapshopThreads;
         private bool[] _createSnapshopThreadsStat;
-        private Contexts _contexts;
-        private IGroup<FreeMoveEntity> _globalFreeMoveEntities;
-        private IGroup<WeaponEntity> _globalWeaponEntities;
-        private IGroup<PlayerEntity> _playerEntities;
+        private readonly Contexts _contexts;
+        private readonly IGroup<FreeMoveEntity> _globalFreeMoveEntities;
+        private readonly IGroup<WeaponEntity> _globalWeaponEntities;
+        private readonly IGroup<PlayerEntity> _playerEntities;
+        private readonly CustomProfileInfo SendSnapshotWait;
         public SendSnapshotManager(Contexts contexts)
         {
+            SendSnapshotWait = SingletonManager.Get<DurationHelp>()
+                .GetProfileInfo(CustomProfilerStep.SendSnapshotWait);
             _contexts = contexts;
             _globalFreeMoveEntities =
                 _contexts.freeMove.GetGroup(FreeMoveMatcher.AllOf(FreeMoveMatcher.GlobalFlag,
@@ -102,7 +110,7 @@ namespace App.Server
             InitThreads();
 #endif
         }
-
+        BlockingQueue<CreateSnapshotParams> _queue = new BlockingQueue<CreateSnapshotParams>(100);
         private void InitThreads()
         {
             if (SharedConfig.MutilThread)
@@ -115,7 +123,7 @@ namespace App.Server
                     _createSnapshopThreads[i] =
                         new ConsumerThread<CreateSnapshotParams, int>(
                             string.Format("CreateSnapshotThread_{0}", i),
-                            CreateSendSnapshot);
+                            CreateSendSnapshot, _queue);
                     _createSnapshopThreads[i].Start();
                 }
             }
@@ -145,12 +153,23 @@ namespace App.Server
                     var p = ObjectAllocatorHolder<CreateSnapshotParams>.Allocate().Build(snapshotFactory, player,
                         bin2DConfig, bin, serverTime,
                         snapshotSeq,
-                        vehicleSimulationTime,  player.network.NetworkChannel);
+                        vehicleSimulationTime,  player.network.NetworkChannel,
+                        _contexts);
+
                     var entitys = p.PreEnitys;
                     AddTeamPlayers(player, entitys, _contexts);
                     AddGlobalFreeMove(player, entitys, freeMoveEntitys);
                     AddWeapon(player, entitys, weaponEntities);
+                   
                     _sendSnapshotTasks.Add(p);
+#if ENABLE_NEW_SENDSNAPSHOT_THREAD
+
+                    if (SharedConfig.MutilThread)
+                    {
+                        _queue.Enqueue(p);
+                    }
+#endif
+   
                     //_logger.InfoFormat("SendSnapshot:{0} {1}",player.entityKey.Value, player.position.Value);
                 }
                 else
@@ -195,10 +214,11 @@ namespace App.Server
                 new MutilExecute<int, CreateSnapshotParams>(SharedConfig.CreateSnapshotThreadCount,
                     _sendSnapshotTasks, CreateSendSnapshot);
             mutilExecute.Start();
-
+           
             try
             {
-                SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.SendSnapshotWait);
+              
+                SendSnapshotWait.BeginProfile();
                 while (!mutilExecute.IsDone())
                 {
                     _logger.DebugFormat("SendSnapshot ThreadsRunning;{0}", mutilExecute.ThreadsRunning);
@@ -207,7 +227,7 @@ namespace App.Server
             }
             finally
             {
-                SingletonManager.Get<DurationHelp>().ProfileEnd(CustomProfilerStep.SendSnapshotWait);
+                SendSnapshotWait.EndProfile();
             }
 
 
@@ -219,15 +239,7 @@ namespace App.Server
             try
             {
                 ChannelWorker.IsSuspend = true;
-                int count = _sendSnapshotTasks.Count;
-                int threadCount = 0;
-                for (int i = 0; i < count; i++)
-                {
-                    var job = _sendSnapshotTasks[i];
-                    _createSnapshopThreads[threadCount].Offer(job);
-                    threadCount++;
-                    threadCount %= _createSnapshopThreads.Length;
-                }
+                
 
 
                 SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.SendSnapshotWait);
@@ -250,13 +262,18 @@ namespace App.Server
             {
                 _createSnapshopThreadsStat[i] = false;
             }
-
+            var spinWait = SpinWaitUtils.GetSpinWait();
             long start = DateTime.UtcNow.ToMillisecondsSinceEpoch();
             while (isRunning)
             {
+                spinWait.SpinOnce();
                 int doneCount = 0;
                 isRunning = false;
                 var now = DateTime.UtcNow.ToMillisecondsSinceEpoch();
+                if (now - start > 10000) {
+                    _logger.DebugFormat("while error, enter offline !");
+                    break;
+                }
                 for (int i = 0; i < createSnapshoThreadsCount; i++)
                 {
 
@@ -284,7 +301,7 @@ namespace App.Server
             foreach (var playerEntity in preEntity)
             {
                 if(playerEntity.hasStage && playerEntity.stage.Value == EPlayerLoginStage.Running)
-                entitys.Add(playerEntity.entityAdapter.SelfAdapter);
+                    entitys.Add(playerEntity.entityAdapter.SelfAdapter);
             }
         }
 
@@ -311,21 +328,35 @@ namespace App.Server
             }
         }
 
+
+        
+
         private static int CreateSendSnapshot(CreateSnapshotParams createSnapshotParams)
         {
             ISnapshot snapshot = null;
             try
             {
                 SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.SendSnapshotCreate);
+
+                //Shared.Util.WatchForAOILogicUtil.UpdateWatchMap(createSnapshotParams.Player.keepWatchForAOI.watchMap,
+                //    createSnapshotParams.PreEnitys, createSnapshotParams._contexts);
+
                 snapshot = createSnapshotParams.SnapshotFactory.GeneratePerPlayerSnapshot(
                     createSnapshotParams.SnapshotSeq,
                     createSnapshotParams.Player.entityKey.Value,
-                    createSnapshotParams.Player.hasObserveCamera
-                        ? createSnapshotParams.Player.observeCamera.PlayerPosition
+                    createSnapshotParams.Player.gamePlay.IsObserving()
+                        ? createSnapshotParams.Player.observeCamera.ObservedPlayerPosition
                         : createSnapshotParams.Player.position.Value,
                     createSnapshotParams.Bin2DConfig,
                     createSnapshotParams.Bin,
-                    createSnapshotParams.PreEnitys);
+                    createSnapshotParams.PreEnitys,
+                    createSnapshotParams.Player.stage.IsAccountStage(),
+                    createSnapshotParams.Player.stage.IsWaitStage()
+                    //, createSnapshotParams.Player.keepWatchForAOI.watchMap
+                    //, Shared.Util.WatchForAOILogicUtil.OnInsertFun
+
+                    );
+
                 snapshot.ServerTime = createSnapshotParams.ServerTime;
                 snapshot.SnapshotSeq = createSnapshotParams.SnapshotSeq;
                 snapshot.VehicleSimulationTime = createSnapshotParams.VehicleSimulationTime;

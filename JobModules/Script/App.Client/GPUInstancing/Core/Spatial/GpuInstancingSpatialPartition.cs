@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using App.Client.GPUInstancing.Core.Data;
 using App.Client.GPUInstancing.Core.Utils;
-using App.Client.SceneManagement.Vegetation;
+using Core.Components;
 using Core.Utils;
 using UnityEngine;
 
@@ -16,7 +16,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
     /// </summary>
     class GpuInstancingSpatialPartition<T> where T : GpuInstancingNode
     {
-        static LoggerAdapter logger = new LoggerAdapter("GpuInstancingSpatialPartition");
+        private static readonly LoggerAdapter _logger = new LoggerAdapter(typeof(GpuInstancingSpatialPartition<T>));
 
         private int _clusterDimensions = 8;
         private GpuInstancingNodeCluster<T>[,] _nodeClusters;
@@ -33,9 +33,11 @@ namespace App.Client.GPUInstancing.Core.Spatial
         private int _lastVisibleStartZ = int.MinValue;
         private int _lastVisibleEndZ = int.MinValue;
 
-        private NodeIndicator _curInstantiatingNode;
-        private NodeIndicator _previousInstantiatingNode;
-        private NodeIndicator[] _cachedNodes;
+        private GpuInstancingNodeIndicator _curInstantiatingNode;
+        private GpuInstancingNodeIndicator _previousInstantiatingNode;
+        private GpuInstancingNodeIndicator[] _cachedNodes;
+        // trees can be seen far far away, so _cachedNodes.Length can be too large to iterate
+        private int _cachedNodesActualLength = 0;
         
         public GpuInstancingSpatialPartition()
         {
@@ -51,7 +53,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
 
                 var cullingGridCountX = Mathf.CeilToInt(cullingDistance / nodeSize.x * 2 + 1);
                 var cullingGridCountZ = Mathf.CeilToInt(cullingDistance / nodeSize.y * 2 + 1);
-                _cachedNodes = new NodeIndicator[cullingGridCountX * cullingGridCountZ];
+                _cachedNodes = new GpuInstancingNodeIndicator[cullingGridCountX * cullingGridCountZ];
             }
         }
 
@@ -95,19 +97,32 @@ namespace App.Client.GPUInstancing.Core.Spatial
             var xIndex = Mathf.RoundToInt(minPosition.x / _clusterSize) + halfSize;
             var zIndex = Mathf.RoundToInt(minPosition.z / _clusterSize) + halfSize;
 
-            _nodeClusters[xIndex, zIndex].Clean();
-            _nodeClusters[xIndex, zIndex] = null;
-
-            var count = _cachedNodes.Length;
-            for (int i = 0; i < count; ++i)
+            if (_nodeClusters[xIndex, zIndex] != null)
             {
-                var node = _cachedNodes[i];
+                _nodeClusters[xIndex, zIndex].Clean();
+                _nodeClusters[xIndex, zIndex] = null;
+            }
+            else
+                _logger.WarnFormat("remove not existed terrain: {0}", minPosition.ToStringExt());
+
+            bool canShrink = true;
+            for (int i = _cachedNodesActualLength; i > 0; --i)
+            {
+                var index = i - 1;
+                var node = _cachedNodes[index];
                 if (node != null)
                 {
                     if (node.IsOutOfRange)
                     {
-                        _cachedNodes[i] = null;
+                        _cachedNodes[index] = null;
+
+                        if (canShrink)
+                            _cachedNodesActualLength = i - 1;
+
+                        continue;
                     }
+
+                    canShrink = false;
                 }
             }
         }
@@ -128,7 +143,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
             int curVisibleEndZ = Mathf.CeilToInt(maxVisiblePosZ / _clusterSize) + halfSize;
 
             bool enoughRoom = true;
-            
+
             for (int i = _lastVisibleStartX; i < _lastVisibleEndX; ++i)
             {
                 for (int j = _lastVisibleStartZ; j < _lastVisibleEndZ; ++j)
@@ -184,12 +199,11 @@ namespace App.Client.GPUInstancing.Core.Spatial
                 _curInstantiatingNode.Node.BuildBuffer(_curInstantiatingNode.HeightBuffer());
             }
 
-            var count = _cachedNodes.Length;
-            for (int i = 0; i < count; ++i)
+            for (int i = 0; i < _cachedNodesActualLength; ++i)
             {
                 var node = _cachedNodes[i];
                 if (node != null && node.IsInstantiated)
-                    node.IsActive = frustum.IsDetailNodeVisible(node.Mins, node.Maxs);
+                    node.IsActive = frustum.IsNodeVisible(node);
             }
         }
 
@@ -200,7 +214,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
                 var dataLength = instancingData.Length;
                 for (int i = 0; i < dataLength; ++i)
                 {
-                    instancingData[i].SetInstancingCount(_cachedNodes.Length, _maxInstanceCountPerRenderInUnit[i]);
+                    instancingData[i].SetInstancingFullSizeParam(_cachedNodes.Length, _maxInstanceCountPerRenderInUnit[i]);
                 }
             }
 
@@ -216,15 +230,16 @@ namespace App.Client.GPUInstancing.Core.Spatial
                         if (_cachedNodes[index] == null)
                         {
                             _cachedNodes[index] = _previousInstantiatingNode;
+
+                            if (index >= _cachedNodesActualLength)
+                                _cachedNodesActualLength = index + 1;
+
                             break;
                         }
                     }
 
                     if (index == count)
-                    {
-                        logger.InfoFormat("Full Exception, mins: {0}, maxs: {1}",
-                            _previousInstantiatingNode.Mins.ToStringExt(), _previousInstantiatingNode.Maxs.ToStringExt());
-                    }
+                        _logger.Error("Full Exception");
 
                     if (!_newInstanceCountLimit)
                         ReplaceBuffer(_previousInstantiatingNode.Node, index, instancingData);
@@ -237,8 +252,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
 
             if (_newInstanceCountLimit)
             {
-                var count = _cachedNodes.Length;
-                for (int i = 0; i < count; ++i)
+                for (int i = 0; i < _cachedNodesActualLength; ++i)
                 {
                     if (_cachedNodes[i] != null)
                         ReplaceBuffer(_cachedNodes[i].Node, i, instancingData);
@@ -260,23 +274,30 @@ namespace App.Client.GPUInstancing.Core.Spatial
                 {
                     instancingData[i].ClearRealBlockCount();
 
-                    var count = _cachedNodes.Length;
-                    for (int j = 0; j < count; ++j)
+                    bool canShrink = true;
+                    for (int j = _cachedNodesActualLength; j > 0; --j)
                     {
-                        var node = _cachedNodes[j];
+                        var index = j - 1;
+                        var node = _cachedNodes[index];
                         if (node != null)
                         {
                             if (node.IsOutOfRange)
                             {
-                                _cachedNodes[j] = null;
+                                _cachedNodes[index] = null;
+
+                                if (canShrink)
+                                    _cachedNodesActualLength = j - 1;
+
                                 continue;
                             }
 
                             if (node.IsActive)
                             {
                                 var realCount = node.Node.GetInstancingDataCount(i);
-                                instancingData[i].SetRealBlockCount(j, realCount);
+                                instancingData[i].SetRealBlockCount(index, realCount);
                             }
+
+                            canShrink = false;
                         }
                     }
                 }
@@ -301,7 +322,6 @@ namespace App.Client.GPUInstancing.Core.Spatial
             _nodeClusters = newClusters;
         }
 
-
         public void SetMergeShader(ComputeShader shader)
         {
             _mergeShader = shader;
@@ -309,10 +329,10 @@ namespace App.Client.GPUInstancing.Core.Spatial
 
         private void ReplaceBuffer(GpuInstancingNode node, int slot, InstancingDraw[] instancingData)
         {
-            var count = instancingData.Length;
+            var prototypeCount = instancingData.Length;
             var kernels = node.GetMergeKernels(_mergeShader);
 
-            for (int i = 0; i < count; ++i)
+            for (int i = 0; i < prototypeCount; ++i)
             {
                 var dataLength = node.GetInstancingDataCount(i);
 
@@ -328,6 +348,35 @@ namespace App.Client.GPUInstancing.Core.Spatial
                     _mergeShader.SetInt(Constants.ShaderVariable.OutputDataOffset, slot * _maxInstanceCountPerRenderInUnit[i]);
 
                     _mergeShader.Dispatch(kernels[j].Kernel, Mathf.CeilToInt(dataLength / (float)Constants.MergeThreadCount), 1, 1);
+                }
+            }
+        }
+
+        public void DebugDraw()
+        {
+            for (int i = 0; i < _cachedNodesActualLength; ++i)
+            {
+                if (_cachedNodes[i] != null && _cachedNodes[i].IsActive)
+                {
+                    var mins = _cachedNodes[i].Vertices[0] - WorldOrigin.Origin;
+                    var maxs = _cachedNodes[i].Vertices[7] - WorldOrigin.Origin;
+
+                    Debug.DrawLine(mins, new Vector3(mins.x, mins.y, maxs.z), Color.red);
+                    Debug.DrawLine(mins, new Vector3(mins.x, maxs.y, mins.z), Color.red);
+                    Debug.DrawLine(mins, new Vector3(maxs.x, mins.y, mins.z), Color.red);
+
+                    Debug.DrawLine(maxs, new Vector3(maxs.x, maxs.y, mins.z), Color.red);
+                    Debug.DrawLine(maxs, new Vector3(maxs.x, mins.y, maxs.z), Color.red);
+                    Debug.DrawLine(maxs, new Vector3(mins.x, maxs.y, maxs.z), Color.red);
+
+                    Debug.DrawLine(new Vector3(maxs.x, mins.y, mins.z), new Vector3(maxs.x, mins.y, maxs.z), Color.red);
+                    Debug.DrawLine(new Vector3(maxs.x, mins.y, mins.z), new Vector3(maxs.x, maxs.y, mins.z), Color.red);
+
+                    Debug.DrawLine(new Vector3(mins.x, maxs.y, mins.z), new Vector3(mins.x, maxs.y, maxs.z), Color.red);
+                    Debug.DrawLine(new Vector3(mins.x, maxs.y, mins.z), new Vector3(maxs.x, maxs.y, mins.z), Color.red);
+
+                    Debug.DrawLine(new Vector3(mins.x, mins.y, maxs.z), new Vector3(mins.x, maxs.y, maxs.z), Color.red);
+                    Debug.DrawLine(new Vector3(mins.x, mins.y, maxs.z), new Vector3(maxs.x, mins.y, maxs.z), Color.red);
                 }
             }
         }

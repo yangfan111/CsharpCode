@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using com.wd.free.@event;
+using Core.Free;
 
 namespace com.wooduan.free.ui
 {
     [Serializable]
-    public class SimpleMessageAction : SendMessageAction
+    public class SimpleMessageAction : SendMessageAction, IRule
     {
         public string key;
         public List<MessageField> fields;
@@ -55,13 +56,23 @@ namespace com.wooduan.free.ui
                 }
             }
         }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SimpleMessageAction;
+        }
     }
 
     [Serializable]
-    public class MessageField
+    public class MessageField : IRule
     {
         public int type;
         public string desc;
         public string value;
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.MessageField;
+        }
     }
 }

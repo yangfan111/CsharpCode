@@ -8,11 +8,12 @@ using App.Server.GameModules.GamePlay.free.player;
 using App.Shared.GameModules.Player;
 using App.Shared.Player;
 using com.wd.free.util;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
     [Serializable]
-    public class SetPlayerUiStateAction : AbstractPlayerAction
+    public class SetPlayerUiStateAction : AbstractPlayerAction, IRule
     {
         private bool remove;
 
@@ -40,6 +41,11 @@ namespace App.Server.GameModules.GamePlay.Free.player
                     PlayerStateUtil.AddUIState(uiState, p.Player.gamePlay);
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SetPlayerUiStateAction;
         }
     }
 }

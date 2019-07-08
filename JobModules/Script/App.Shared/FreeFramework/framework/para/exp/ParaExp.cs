@@ -2,10 +2,11 @@ using Sharpen;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.@event;
 using com.wd.free.para;
+using Core.Free;
 
 namespace com.wd.free.para.exp
 {
-	public class ParaExp
+	public class ParaExp : IRule
 	{
 		private UnitPara unitPara;
 
@@ -86,5 +87,10 @@ namespace com.wd.free.para.exp
 			}
 			return unitPara.GetUnit() + "." + unitPara.GetPara();
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ParaExp;
+        }
+    }
 }

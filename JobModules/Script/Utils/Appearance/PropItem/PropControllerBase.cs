@@ -1,9 +1,8 @@
 ﻿using Core.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
+using Utils.Appearance.Bone;
 using Utils.AssetManager;
 using Utils.CharacterState;
 using Utils.Compare;
@@ -311,16 +310,6 @@ namespace Utils.Appearance.PropItem
             {
                 _dataSource = dataSource;
                 _index = index;
-            }
-
-            private void SetObjLayer(GameObject obj, int layer)
-            {
-                if(null == obj) return;
-                var childCount = obj.transform.childCount;
-                for (var i = 0; i < childCount; ++i)
-                {
-                    obj.transform.GetChild(i).gameObject.layer = layer;
-                }
             }
 
             public void OnLoadSucc<T>(T source, UnityObject unityObj)

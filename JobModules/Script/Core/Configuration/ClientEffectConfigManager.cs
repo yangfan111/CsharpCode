@@ -17,26 +17,21 @@ namespace Core.Configuration
             _typeDic.Clear();
             _configs.Clear();
             var cfg = XmlConfigParser<ClientEffectConfig>.Load(xml);
-            for (var i = 0; i < cfg.Items.Length; i++)
+            foreach (var item in cfg.Items)
             {
-                _typeDic[cfg.Items[i].Type] = cfg.Items[i];
-                if(_configs.ContainsKey(cfg.Items[i].Id))
-                {
-                    Logger.ErrorFormat("id {0} is repeated ", cfg.Items[i].Id);
-                }
-                _configs[cfg.Items[i].Id] = cfg.Items[i];
+                _typeDic[item.Type] = item;
+                _configs[item.Id] = item;
             }
         }
 
         public ClientEffectConfigItem GetConfigItemById(int id)
         {
-            if(!_configs.ContainsKey(id))
-            {
-                DebugUtil.MyLog(string.Format("config with id {0} doesn't exist ! ", id),DebugUtil.DebugColor.Red);
-                Logger.ErrorFormat("config with id {0} doesn't exist ! ", id);
+            if (id == 0)
                 return null;
-            }
-            return _configs[id];
+            ClientEffectConfigItem efcItem;
+            _configs.TryGetValue(id, out efcItem);
+            AssertUtility.Assert(efcItem != null,string.Format("config with id {0} doesn't exist ! ",id));
+            return efcItem;
         }
 
         public ClientEffectConfigItem GetConfigItemByType(EClientEffectType type)

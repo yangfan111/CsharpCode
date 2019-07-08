@@ -32,7 +32,7 @@ namespace App.Shared.GameModules.Player.Robot.Action
           //  bagContext = (mEntity.robot.Wapper.GameContexts as Contexts).bag;
             sceneObjectContext = _contexts.sceneObject;
             weaponGroup = sceneObjectContext.GetGroup(
-                SceneObjectMatcher.AnyOf(SceneObjectMatcher.SimpleEquipment)
+                SceneObjectMatcher.AnyOf(SceneObjectMatcher.SimpleItem)
             );
         }
 

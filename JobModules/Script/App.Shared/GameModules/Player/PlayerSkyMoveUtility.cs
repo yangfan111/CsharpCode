@@ -7,7 +7,7 @@ using com.wd.free.skill;
 using Core.Components;
 using Core.HitBox;
 using Core.Utils;
-using Utils.Appearance;
+using Utils.Appearance.Bone;
 
 namespace App.Shared.GameModules.Player
 {

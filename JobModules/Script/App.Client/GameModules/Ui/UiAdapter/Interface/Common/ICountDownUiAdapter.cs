@@ -9,5 +9,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
         float CountDownNum { get; set; }
         void SetCrossActive(bool isActive);
         bool CrossActiveStatue();
+        bool HaveCompleted { get; set; }
     }
 }

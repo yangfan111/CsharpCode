@@ -20,6 +20,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
             [HideInInspector]
             public string oriWeightText;
             public GameObject GearLastingLayerShow1;
+            public Image GearLastingLayerValue1;
             public Image GearIconSprite1;
             public UIImageLoader GearIconAsset1;
             public UIImageLoader GearIconBundle1;
@@ -28,6 +29,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
             public Text GearLastingNumText1;
             public Text GearNameText1;
             public GameObject GearLastingLayerShow2;
+            public Image GearLastingLayerValue2;
             public Image GearIconSprite2;
             public UIImageLoader GearIconAsset2;
             public UIImageLoader GearIconBundle2;
@@ -36,6 +38,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
             public Text GearLastingNumText2;
             public Text GearNameText2;
             public GameObject GearLastingLayerShow3;
+            public Image GearLastingLayerValue3;
             public Image GearIconSprite3;
             public UIImageLoader GearIconAsset3;
             public UIImageLoader GearIconBundle3;
@@ -44,6 +47,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
             public Text GearLastingNumText3;
             public Text GearNameText3;
             public GameObject GearLastingLayerShow4;
+            public Image GearLastingLayerValue4;
             public Image GearIconSprite4;
             public UIImageLoader GearIconAsset4;
             public UIImageLoader GearIconBundle4;
@@ -406,14 +410,26 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
                     var realName = v.gameObject.name.Replace("(Clone)","");
                     switch (realName)
                     {
+                        case "GearLastingLayer1":
+                            GearLastingLayerValue1 = v;
+                            break;
                         case "GearIcon1":
                             GearIconSprite1 = v;
+                            break;
+                        case "GearLastingLayer2":
+                            GearLastingLayerValue2 = v;
                             break;
                         case "GearIcon2":
                             GearIconSprite2 = v;
                             break;
+                        case "GearLastingLayer3":
+                            GearLastingLayerValue3 = v;
+                            break;
                         case "GearIcon3":
                             GearIconSprite3 = v;
+                            break;
+                        case "GearLastingLayer4":
+                            GearLastingLayerValue4 = v;
                             break;
                         case "GearIcon4":
                             GearIconSprite4 = v;
@@ -571,6 +587,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
 
         private string _weightText;
         private bool _gearLastingLayerShow1;
+        private float _gearLastingLayerValue1;
         private Sprite _gearIconSprite1;
         private string _gearIconAsset1;
         private string _gearIconBundle1;
@@ -579,6 +596,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
         private string _gearLastingNumText1;
         private string _gearNameText1;
         private bool _gearLastingLayerShow2;
+        private float _gearLastingLayerValue2;
         private Sprite _gearIconSprite2;
         private string _gearIconAsset2;
         private string _gearIconBundle2;
@@ -587,6 +605,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
         private string _gearLastingNumText2;
         private string _gearNameText2;
         private bool _gearLastingLayerShow3;
+        private float _gearLastingLayerValue3;
         private Sprite _gearIconSprite3;
         private string _gearIconAsset3;
         private string _gearIconBundle3;
@@ -595,6 +614,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
         private string _gearLastingNumText3;
         private string _gearNameText3;
         private bool _gearLastingLayerShow4;
+        private float _gearLastingLayerValue4;
         private Sprite _gearIconSprite4;
         private string _gearIconAsset4;
         private string _gearIconBundle4;
@@ -713,6 +733,8 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
         private bool _wearGroupShow6;
         public string WeightText { get { return _weightText; } set {if(_weightText != value) Set(ref _weightText, value, "WeightText"); } }
         public bool GearLastingLayerShow1 { get { return _gearLastingLayerShow1; } set {if(_gearLastingLayerShow1 != value) Set(ref _gearLastingLayerShow1, value, "GearLastingLayerShow1"); } }
+        // ReSharper disable once CompareOfFloatsByEqualityOperator
+        public float GearLastingLayerValue1 { get { return _gearLastingLayerValue1; } set {if(_gearLastingLayerValue1 != value) Set(ref _gearLastingLayerValue1, value, "GearLastingLayerValue1"); } }
         public Sprite GearIconSprite1 { get { return _gearIconSprite1; } set {if(_gearIconSprite1 != value) Set(ref _gearIconSprite1, value, "GearIconSprite1"); if(null != _view && null != _view.GearIconSprite1 && null == value) _view.GearIconSprite1.sprite = ViewModelUtil.EmptySprite; } }
         public string GearIconAsset1 { get { return _gearIconAsset1; } set {if(_gearIconAsset1 != value) Set(ref _gearIconAsset1, value, "GearIconAsset1"); } }
         public string GearIconBundle1 { get { return _gearIconBundle1; } set {if(_gearIconBundle1 != value) Set(ref _gearIconBundle1, value, "GearIconBundle1"); } }
@@ -721,6 +743,8 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
         public string GearLastingNumText1 { get { return _gearLastingNumText1; } set {if(_gearLastingNumText1 != value) Set(ref _gearLastingNumText1, value, "GearLastingNumText1"); } }
         public string GearNameText1 { get { return _gearNameText1; } set {if(_gearNameText1 != value) Set(ref _gearNameText1, value, "GearNameText1"); } }
         public bool GearLastingLayerShow2 { get { return _gearLastingLayerShow2; } set {if(_gearLastingLayerShow2 != value) Set(ref _gearLastingLayerShow2, value, "GearLastingLayerShow2"); } }
+        // ReSharper disable once CompareOfFloatsByEqualityOperator
+        public float GearLastingLayerValue2 { get { return _gearLastingLayerValue2; } set {if(_gearLastingLayerValue2 != value) Set(ref _gearLastingLayerValue2, value, "GearLastingLayerValue2"); } }
         public Sprite GearIconSprite2 { get { return _gearIconSprite2; } set {if(_gearIconSprite2 != value) Set(ref _gearIconSprite2, value, "GearIconSprite2"); if(null != _view && null != _view.GearIconSprite2 && null == value) _view.GearIconSprite2.sprite = ViewModelUtil.EmptySprite; } }
         public string GearIconAsset2 { get { return _gearIconAsset2; } set {if(_gearIconAsset2 != value) Set(ref _gearIconAsset2, value, "GearIconAsset2"); } }
         public string GearIconBundle2 { get { return _gearIconBundle2; } set {if(_gearIconBundle2 != value) Set(ref _gearIconBundle2, value, "GearIconBundle2"); } }
@@ -729,6 +753,8 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
         public string GearLastingNumText2 { get { return _gearLastingNumText2; } set {if(_gearLastingNumText2 != value) Set(ref _gearLastingNumText2, value, "GearLastingNumText2"); } }
         public string GearNameText2 { get { return _gearNameText2; } set {if(_gearNameText2 != value) Set(ref _gearNameText2, value, "GearNameText2"); } }
         public bool GearLastingLayerShow3 { get { return _gearLastingLayerShow3; } set {if(_gearLastingLayerShow3 != value) Set(ref _gearLastingLayerShow3, value, "GearLastingLayerShow3"); } }
+        // ReSharper disable once CompareOfFloatsByEqualityOperator
+        public float GearLastingLayerValue3 { get { return _gearLastingLayerValue3; } set {if(_gearLastingLayerValue3 != value) Set(ref _gearLastingLayerValue3, value, "GearLastingLayerValue3"); } }
         public Sprite GearIconSprite3 { get { return _gearIconSprite3; } set {if(_gearIconSprite3 != value) Set(ref _gearIconSprite3, value, "GearIconSprite3"); if(null != _view && null != _view.GearIconSprite3 && null == value) _view.GearIconSprite3.sprite = ViewModelUtil.EmptySprite; } }
         public string GearIconAsset3 { get { return _gearIconAsset3; } set {if(_gearIconAsset3 != value) Set(ref _gearIconAsset3, value, "GearIconAsset3"); } }
         public string GearIconBundle3 { get { return _gearIconBundle3; } set {if(_gearIconBundle3 != value) Set(ref _gearIconBundle3, value, "GearIconBundle3"); } }
@@ -737,6 +763,8 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
         public string GearLastingNumText3 { get { return _gearLastingNumText3; } set {if(_gearLastingNumText3 != value) Set(ref _gearLastingNumText3, value, "GearLastingNumText3"); } }
         public string GearNameText3 { get { return _gearNameText3; } set {if(_gearNameText3 != value) Set(ref _gearNameText3, value, "GearNameText3"); } }
         public bool GearLastingLayerShow4 { get { return _gearLastingLayerShow4; } set {if(_gearLastingLayerShow4 != value) Set(ref _gearLastingLayerShow4, value, "GearLastingLayerShow4"); } }
+        // ReSharper disable once CompareOfFloatsByEqualityOperator
+        public float GearLastingLayerValue4 { get { return _gearLastingLayerValue4; } set {if(_gearLastingLayerValue4 != value) Set(ref _gearLastingLayerValue4, value, "GearLastingLayerValue4"); } }
         public Sprite GearIconSprite4 { get { return _gearIconSprite4; } set {if(_gearIconSprite4 != value) Set(ref _gearIconSprite4, value, "GearIconSprite4"); if(null != _view && null != _view.GearIconSprite4 && null == value) _view.GearIconSprite4.sprite = ViewModelUtil.EmptySprite; } }
         public string GearIconAsset4 { get { return _gearIconAsset4; } set {if(_gearIconAsset4 != value) Set(ref _gearIconAsset4, value, "GearIconAsset4"); } }
         public string GearIconBundle4 { get { return _gearIconBundle4; } set {if(_gearIconBundle4 != value) Set(ref _gearIconBundle4, value, "GearIconBundle4"); } }
@@ -936,6 +964,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
                 view.CreateBindingSet<ChickenBagView, ChickenBagViewModel>();
             bindingSet.Bind(view.WeightText).For(v => v.text).To(vm => vm.WeightText).OneWay();
             bindingSet.Bind(view.GearLastingLayerShow1).For(v => v.activeSelf).To(vm => vm.GearLastingLayerShow1).OneWay();
+            bindingSet.Bind(view.GearLastingLayerValue1).For(v => v.fillAmount).To(vm => vm.GearLastingLayerValue1).OneWay();
             bindingSet.Bind(view.GearIconSprite1).For(v => v.sprite).To(vm => vm.GearIconSprite1).OneWay();
             bindingSet.Bind(view.GearIconAsset1).For(v => v.AssetName).To(vm => vm.GearIconAsset1).OneWay();
             bindingSet.Bind(view.GearIconBundle1).For(v => v.BundleName).To(vm => vm.GearIconBundle1).OneWay();
@@ -944,6 +973,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
             bindingSet.Bind(view.GearLastingNumText1).For(v => v.text).To(vm => vm.GearLastingNumText1).OneWay();
             bindingSet.Bind(view.GearNameText1).For(v => v.text).To(vm => vm.GearNameText1).OneWay();
             bindingSet.Bind(view.GearLastingLayerShow2).For(v => v.activeSelf).To(vm => vm.GearLastingLayerShow2).OneWay();
+            bindingSet.Bind(view.GearLastingLayerValue2).For(v => v.fillAmount).To(vm => vm.GearLastingLayerValue2).OneWay();
             bindingSet.Bind(view.GearIconSprite2).For(v => v.sprite).To(vm => vm.GearIconSprite2).OneWay();
             bindingSet.Bind(view.GearIconAsset2).For(v => v.AssetName).To(vm => vm.GearIconAsset2).OneWay();
             bindingSet.Bind(view.GearIconBundle2).For(v => v.BundleName).To(vm => vm.GearIconBundle2).OneWay();
@@ -952,6 +982,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
             bindingSet.Bind(view.GearLastingNumText2).For(v => v.text).To(vm => vm.GearLastingNumText2).OneWay();
             bindingSet.Bind(view.GearNameText2).For(v => v.text).To(vm => vm.GearNameText2).OneWay();
             bindingSet.Bind(view.GearLastingLayerShow3).For(v => v.activeSelf).To(vm => vm.GearLastingLayerShow3).OneWay();
+            bindingSet.Bind(view.GearLastingLayerValue3).For(v => v.fillAmount).To(vm => vm.GearLastingLayerValue3).OneWay();
             bindingSet.Bind(view.GearIconSprite3).For(v => v.sprite).To(vm => vm.GearIconSprite3).OneWay();
             bindingSet.Bind(view.GearIconAsset3).For(v => v.AssetName).To(vm => vm.GearIconAsset3).OneWay();
             bindingSet.Bind(view.GearIconBundle3).For(v => v.BundleName).To(vm => vm.GearIconBundle3).OneWay();
@@ -960,6 +991,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
             bindingSet.Bind(view.GearLastingNumText3).For(v => v.text).To(vm => vm.GearLastingNumText3).OneWay();
             bindingSet.Bind(view.GearNameText3).For(v => v.text).To(vm => vm.GearNameText3).OneWay();
             bindingSet.Bind(view.GearLastingLayerShow4).For(v => v.activeSelf).To(vm => vm.GearLastingLayerShow4).OneWay();
+            bindingSet.Bind(view.GearLastingLayerValue4).For(v => v.fillAmount).To(vm => vm.GearLastingLayerValue4).OneWay();
             bindingSet.Bind(view.GearIconSprite4).For(v => v.sprite).To(vm => vm.GearIconSprite4).OneWay();
             bindingSet.Bind(view.GearIconAsset4).For(v => v.AssetName).To(vm => vm.GearIconAsset4).OneWay();
             bindingSet.Bind(view.GearIconBundle4).For(v => v.BundleName).To(vm => vm.GearIconBundle4).OneWay();
@@ -1142,6 +1174,8 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
 
         public const string GearLastingLayerShow = "GearLastingLayerShow";
         public const int GearLastingLayerShowCount = 4;
+        public const string GearLastingLayerValue = "GearLastingLayerValue";
+        public const int GearLastingLayerValueCount = 4;
         public const string GearIconSprite = "GearIconSprite";
         public const int GearIconSpriteCount = 4;
         public const string GearIconAsset = "GearIconAsset";
@@ -1249,6 +1283,43 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
         		return GearLastingLayerShow4;
         	default:
         		return default(bool);
+        	}
+        }
+        public bool SetGearLastingLayerValue (int index, float val)
+        {
+        	switch(index)
+        	{
+        	case 1:
+        		GearLastingLayerValue1 = val;
+        		break;
+        	case 2:
+        		GearLastingLayerValue2 = val;
+        		break;
+        	case 3:
+        		GearLastingLayerValue3 = val;
+        		break;
+        	case 4:
+        		GearLastingLayerValue4 = val;
+        		break;
+        	default:
+        		return false;
+        	}
+        	return true;
+        }
+        public float GetGearLastingLayerValue (int index)
+        {
+        	switch(index)
+        	{
+        	case 1:
+        		return GearLastingLayerValue1;
+        	case 2:
+        		return GearLastingLayerValue2;
+        	case 3:
+        		return GearLastingLayerValue3;
+        	case 4:
+        		return GearLastingLayerValue4;
+        	default:
+        		return default(float);
         	}
         }
         public bool SetGearIconSprite (int index, Sprite val)

@@ -6,7 +6,9 @@ using gameplay.gamerule.free.ui;
 using gameplay.gamerule.free.ui.component;
 using Sharpen;
 using System;
+using System.Text;
 using UnityEngine;
+using Utils.Singleton;
 
 namespace com.wd.free.action
 {
@@ -18,21 +20,37 @@ namespace com.wd.free.action
 		protected string desc;
 
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(AbstractGameAction));
+        private static StringBuilder _tempStringBuilder = new StringBuilder();
 
         public virtual void Act(IEventArgs args)
 		{
 			long s = FreeLog.Start(this, args);
-			long startTime = FreeTimeDebug.RecordStart(this.GetType().Name);
-			try
-			{
-				DoAction(args);
-			}
-			catch (Exception e)
-			{
-                string err = "action failed\nat " + FreeLog.ActionMark + "\n at " + this.ToMessage(args) + "\nat " + ExceptionUtil.GetExceptionContent(e);
-				FreeLog.Error(err, this);
+            string actName = this.GetName();
+            long startTime = FreeTimeDebug.RecordStart(actName);
+            try
+            {
+                SingletonManager.Get<DurationHelp>().ProfileStart(actName);
+                DoAction(args);
+            }
+            catch (Exception e)
+            {
+                int length = _tempStringBuilder.Length;
+                _tempStringBuilder.Remove(0, length);
+                _tempStringBuilder.Append("action failed\nat ");
+                _tempStringBuilder.Append(FreeLog.ActionMark);
+                _tempStringBuilder.Append("\n at ");
+                _tempStringBuilder.Append(this.ToMessage(args));
+                _tempStringBuilder.Append("\nat ");
+                _tempStringBuilder.Append(ExceptionUtil.GetExceptionContent(e));
+#if UNITY_EDITOR
+                string err = _tempStringBuilder.ToString();
+                FreeLog.Error(err, this);
                 Debug.LogError(err);
                 _logger.Error(err);
+#else
+                string err = _tempStringBuilder.ToString();
+                _logger.Error(err);
+#endif
 
                 if (args.FreeContext.DebugMode)
                 {
@@ -52,15 +70,19 @@ namespace com.wd.free.action
                     show.SetTime("3000");
 
                     long lastTime = 0L;
-                    if (Runtime.CurrentTimeMillis() - lastTime >= 3000L)
+                    if (Runtime.CurrentTimeMillis(false) - lastTime >= 3000L)
                     {
                         textValue.SetText(FreeUtil.ReplaceVar(err, args));
                         update.DoAction(args);
                         show.DoAction(args);
-                        lastTime = Runtime.CurrentTimeMillis();
+                        lastTime = Runtime.CurrentTimeMillis(false);
                     }
                 }
-			}
+            }
+            finally
+            {
+                SingletonManager.Get<DurationHelp>().ProfileEnd(actName);
+            }
 			FreeTimeDebug.RecordEnd(this.GetType().Name, startTime);
 			FreeLog.Stop(s, this, args);
 		}
@@ -91,5 +113,10 @@ namespace com.wd.free.action
 		{
 			return this.ToString();
 		}
+
+        public virtual string GetName()
+        {
+            return "UnKnow";
+        }
 	}
 }

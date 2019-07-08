@@ -24,5 +24,19 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 return  _contexts.ui.uI.TotalPlayerCountInPlane; 
             }
         }
+
+        private PlayerEntity _player;
+        public PlayerEntity Player
+        {
+            get
+            {
+                return _contexts.ui.uI.Player;
+            }
+        }
+
+        public override bool Enable
+        {
+            get { return base.Enable && Player.gamePlay.GameState == Shared.Components.GameState.AirPlane; }
+        }
     }
 }

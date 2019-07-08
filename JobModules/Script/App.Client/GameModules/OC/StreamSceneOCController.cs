@@ -54,6 +54,9 @@ namespace App.Client.GameModules.OC
 
             _param = param as StreamOCParam;
             _scene = new MultiScene(String.Empty, _param.TerrainNamePattern, _param.TerrainDimension, _param.TerrainSize, _param.OCData);
+
+            _scene.LoadDataHeader();
+
             _param.LevelManager.AfterGoLoaded += OnGoLoad;
             _param.LevelManager.BeforeGoUnloaded += OnGoUnload;
 
@@ -86,7 +89,7 @@ namespace App.Client.GameModules.OC
             }
             else
             {
-                _scene.UndoDisabledObjects();
+                _scene.UndoCulling();
             }
         }
 
@@ -110,6 +113,8 @@ namespace App.Client.GameModules.OC
 
         private void UpdatePVSCache(Vector3 position, bool block)
         {
+            _scene.IsOCDataLoaded();
+
             var gridCoord = ToGridCoordinate(position);
             for (int i = 0; i < _param.TerrainDimension; ++i)
             {
@@ -129,7 +134,7 @@ namespace App.Client.GameModules.OC
                             if (IsPVSShouldLoad(gridCoord, stat.Center))
                             {
                                 stat.Status = PVSStatus.Loading;
-                                if (!_scene.Load(i, j, OnPVSLoaded))
+                                if (!_scene.Load(i, j, true, OnPVSLoaded))
                                 {
                                     stat.Status = PVSStatus.UnLoaded;
                                 }

@@ -43,7 +43,10 @@ namespace Utils.Appearance.ManagerPackage
             WeaponControllerBaseImpl.ClearThirdPersonCharacter();
         }
 
-
+        public void CommonResetWardrobe()
+        {
+            WardrobeControllerBaseImpl.CommonReset();
+        }
         public void CommonReset()
         {
             WardrobeControllerBaseImpl.CommonReset();

@@ -10,11 +10,12 @@ using com.wd.free.util;
 using gameplay.gamerule.free.ui;
 using gameplay.gamerule.free.ui.component;
 using App.Server.GameModules.GamePlay.Free.item;
+using Core.Free;
 
 namespace gameplay.gamerule.free.item
 {
     [Serializable]
-    public class SimpleItemUI : IItemUI
+    public class SimpleItemUI : IItemUI, IRule
     {
         [System.NonSerialized]
         private FreeUICreateAction fui;
@@ -225,6 +226,11 @@ namespace gameplay.gamerule.free.item
                 return (FreeNumberComponet)components[count - 1];
             }
             return null;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SimpleItemUI;
         }
     }
 }

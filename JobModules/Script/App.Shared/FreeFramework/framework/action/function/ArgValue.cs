@@ -1,9 +1,12 @@
+using System;
+using com.wd.free.para;
 using Sharpen;
+using Core.Free;
 
 namespace com.wd.free.action.function
 {
 	[System.Serializable]
-	public class ArgValue
+	public class ArgValue : IRule
 	{
 		private const long serialVersionUID = 2425028715886833864L;
 
@@ -46,5 +49,10 @@ namespace com.wd.free.action.function
 		{
 			return name + "=" + value;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ArgValue;
+        }
+    }
 }

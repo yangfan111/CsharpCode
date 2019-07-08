@@ -9,6 +9,8 @@ using Core;
 using Core.Utils;
 using UnityEngine;
 using Utils.Appearance;
+using Utils.Appearance.Bone;
+using Utils.Appearance.Script;
 using Utils.Singleton;
 using VehicleCommon;
 

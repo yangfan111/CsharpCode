@@ -1,11 +1,12 @@
 using Sharpen;
 using com.wd.free.@event;
+using Core.Free;
 
 namespace gameplay.gamerule.free.ui.component
 {
 	[System.Serializable]
-	public class AutoRotateValue : AbstractAutoValue
-	{
+	public class AutoRotateValue : AbstractAutoValue, IRule
+    {
 		private const long serialVersionUID = 2613028647019236871L;
 
 		private string angle;
@@ -24,5 +25,10 @@ namespace gameplay.gamerule.free.ui.component
 		{
 			this.angle = angle;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.AutoRotateValue;
+        }
+    }
 }

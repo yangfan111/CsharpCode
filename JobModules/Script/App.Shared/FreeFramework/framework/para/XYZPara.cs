@@ -1,11 +1,12 @@
 using System;
 using Sharpen;
+using Core.Free;
 
 namespace com.wd.free.para
 {
 	[System.Serializable]
-	public class XYZPara : AbstractPara
-	{
+	public class XYZPara : AbstractPara, IRule
+    {
 		private const long serialVersionUID = -6806938851773973511L;
 
 		public XYZPara()
@@ -101,11 +102,17 @@ namespace com.wd.free.para
 			return para;
 		}
 
-		private static ParaPool<IPara> pool = new ParaPool<IPara>(new XYZPara());
+		private static ParaPool pool = new ParaPool(new XYZPara());
 
-		protected internal override ParaPool<IPara> GetPool()
+		protected internal override ParaPool GetPool()
 		{
 			return pool;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.XYZPara;
+
+        }
+    }
 }

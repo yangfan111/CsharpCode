@@ -22,9 +22,10 @@ namespace App.Shared.GameModules.Preparation
         private readonly Contexts _contexts;
         private readonly ISessionState _sessionState;
         private readonly LevelManager _levelManager;
-        
+
         private List<AssetInfo> _sceneRequests = new List<AssetInfo>();
         private List<AssetInfo> _goRequests = new List<AssetInfo>();
+        private List<IEnumerable<AssetInfoEx<MeshRenderer>>> _lightmapsRequests = new List<IEnumerable<AssetInfoEx<MeshRenderer>>>();
 
         private readonly bool _isServer;
         public bool AsapMode { get; set; }
@@ -33,7 +34,7 @@ namespace App.Shared.GameModules.Preparation
         {
             _sessionState = sessionState;
             _contexts = ctx;
-            
+
             _sessionState.CreateExitCondition(typeof(InitialSceneLoadingSystem));
 
             _levelManager = new LevelManager(_contexts.session.commonSession.AssetManager, isServer);
@@ -43,7 +44,7 @@ namespace App.Shared.GameModules.Preparation
             _isServer = isServer;
 
             var allMaps = SingletonManager.Get<MapsDescription>();
-            
+
             switch (allMaps.CurrentLevelType)
             {
                 case LevelType.BigMap:
@@ -54,6 +55,7 @@ namespace App.Shared.GameModules.Preparation
                         TerrainSize = allMaps.BigMapParameters.TerrainSize,
                         TerrainNamePattern = allMaps.BigMapParameters.TerrainNamePattern,
                         AssetBundleName = allMaps.BigMapParameters.BundleName,
+                        PreMapName = allMaps.BigMapParameters.PreMapName,
                         FixedScenes = allMaps.BigMapParameters.AdditiveSceneName,
                         LoadRadiusInGrid = 1.0f,
                         UnloadRadiusInGrid = 1.5f
@@ -81,7 +83,7 @@ namespace App.Shared.GameModules.Preparation
                     throw new InvalidEnumArgumentException("map id not set");
             }
         }
-        
+
         public void OnInitModule(IUnityAssetManager assetManager)
         {
             _levelManager.UpdateOrigin(_isServer ? Vector3.zero : _initPosition);
@@ -102,21 +104,33 @@ namespace App.Shared.GameModules.Preparation
 
         private void RequestForResource(IUnityAssetManager assetManager)
         {
-            _levelManager.GetRequests(_sceneRequests, _goRequests);
-            
+            _levelManager.GetRequests(_sceneRequests, _goRequests, _lightmapsRequests);
+
             foreach (var request in _sceneRequests)
             {
                 assetManager.LoadSceneAsync(request, true);
             }
-            
+
             foreach (var request in _goRequests)
             {
                 _levelManager.LoadResource("InitialSceneLoadingSystem", assetManager, request);
-                
             }
-            
+
+            foreach (var request in _lightmapsRequests)
+            {
+                MeshRenderer mr = null;
+                List<AssetInfo> infos = new List<AssetInfo>();
+                foreach (var ex in request)
+                {
+                    infos.Add(ex.asset);
+                    if (mr == null) mr = ex.data;
+                }
+                assetManager.LoadAssetsAsync(mr, infos, _levelManager.LightmapsLoadedWrapper);
+            }
+
             _sceneRequests.Clear();
             _goRequests.Clear();
+            _lightmapsRequests.Clear();
         }
     }
 }

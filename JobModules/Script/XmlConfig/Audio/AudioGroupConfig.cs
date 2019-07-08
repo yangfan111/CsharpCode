@@ -22,7 +22,6 @@ namespace XmlConfig
         public List<string> States;
         public string DefaultState;
         public List<int> TriggerType;
-        #if UNITY_EDITOR
         public int selectedIndex = 0;
         public string []statesArr;
         public string[] StateArr
@@ -32,7 +31,6 @@ namespace XmlConfig
                 return statesArr;
             }
         }
-#endif
 
     }
 }

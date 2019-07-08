@@ -1,11 +1,14 @@
-﻿using App.Shared;
+﻿using App.Server.GameModules.GamePlay.free.player;
+using App.Shared;
 using App.Shared.Components.Player;
+using App.Shared.FreeFramework.framework.ai;
 using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.util;
 using Core.Components;
-using System;
 using Core.EntityComponent;
+using Core.Free;
+using System;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
@@ -13,7 +16,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
     /// Defines the <see cref="PlayerReliveAction" />
     /// </summary>
     [Serializable]
-    public class PlayerReliveAction : AbstractPlayerAction
+    public class PlayerReliveAction : AbstractPlayerAction, IRule
     {
         private string resetWeapon;
 
@@ -21,43 +24,52 @@ namespace App.Server.GameModules.GamePlay.Free.player
 
         public override void DoAction(IEventArgs args)
         {
-            bool rw = FreeUtil.ReplaceBool(resetWeapon, args);
-            bool rp = FreeUtil.ReplaceBool(resetPosition, args);
-
-            PlayerEntity p = GetPlayerEntity(args);
-            if (p != null)
+            PlayerEntity player = GetPlayerEntity(args);
+            if (player != null)
             {
-                CalculateDeadTime(p);
-                p.gamePlay.LifeState = (int)EPlayerLifeState.Alive;
-                p.gamePlay.CurHp = p.gamePlay.MaxHp;
-                p.isFlagCompensation = true;
-                p.gamePlay.CurArmor = p.gamePlay.MaxArmor;
-                p.gamePlay.CurHelmet = p.gamePlay.MaxHelmet;
-                //p.stateInterface.State.PlayerReborn();
-                p.position.InterpolateType = (int)PositionInterpolateMode.Discrete;
-                p.position.ServerTime = args.GameContext.session.currentTimeObject.CurrentTime;
-                p.gamePlay.InHurtedCount = 0;
-                p.statisticsData.Statistics.EvenKillCount = 0;
-                p.WeaponController().RelatedThrowAction.ThrowingEntityKey = new EntityKey(0, (short) EEntityType.End);
-                p.WeaponController().RelatedThrowAction.LastFireWeaponKey = -1;
+                CalculateDeadTime(player, args);
+                player.gamePlay.LifeState = (int)EPlayerLifeState.Alive;
+                player.gamePlay.IsStandPosture = true;
+                player.gamePlay.CurHp = player.gamePlay.MaxHp;
+                player.isFlagCompensation = true;
+                //player.gamePlay.CurArmor = player.gamePlay.MaxArmor;
+                //player.gamePlay.CurHelmet = player.gamePlay.MaxHelmet;
+                player.oxygenEnergyInterface.Oxygen.ResetOxygen(true);
+                player.position.InterpolateType = (int) PositionInterpolateMode.Discrete;
+                player.position.ServerTime = args.GameContext.session.currentTimeObject.CurrentTime;
+                player.gamePlay.InHurtedCount = 0;
+                player.statisticsData.Statistics.EvenKillCount = 0;
+                player.WeaponController().RelatedThrowAction.ThrowingEntityKey = new EntityKey(0, (short) EEntityType.End);
+                player.WeaponController().RelatedThrowAction.LastFireWeaponKey = -1;
+                PlayerAnimationAction.DoAnimation(args.GameContext, PlayerAnimationAction.PlayerReborn, player);
                 if (FreeUtil.ReplaceBool(resetWeapon, args))
                 {
-                    p.ModeController().RecoverPlayerWeapon(p, p.WeaponController().HeldBagPointer);
+                    player.ModeController().RecoverPlayerWeapon(player, player.WeaponController().HeldBagPointer);
                 }
-                PlayerAnimationAction.DoAnimation(args.GameContext, PlayerAnimationAction.PlayerReborn, p);
+                PlayerInterceptCommands.InterceptKeys(player, SimplePlayerInput.ATTACK, 200);
+                PlayerInterceptCommands.InterceptKeys(player, SimplePlayerInput.ATTACK2, 200);
             }
         }
 
-        private void CalculateDeadTime(PlayerEntity playerEntity)
+        private void CalculateDeadTime(PlayerEntity playerEntity, IEventArgs args)
         {
-            if (playerEntity.statisticsData.Statistics.LastDeadTime == 0)
+            if (playerEntity.statisticsData.Statistics.LastDeadTime == 0L)
             {
+                if (playerEntity.gamePlay.IsDead())
+                {
+                    playerEntity.statisticsData.Statistics.GameJoinTime = args.Rule.ServerTime;
+                }
                 playerEntity.statisticsData.Statistics.DeadTime = 0;
             }
-            else if (playerEntity.gamePlay.LifeState != 1)
+            else if (playerEntity.gamePlay.IsDead())
             {
-                playerEntity.statisticsData.Statistics.DeadTime += (int)(System.DateTime.Now.Ticks / 10000L) - playerEntity.statisticsData.Statistics.LastDeadTime;
+                playerEntity.statisticsData.Statistics.DeadTime += (int) (DateTime.Now.Ticks / 10000L - playerEntity.statisticsData.Statistics.LastDeadTime);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerReliveAction;
         }
     }
 }

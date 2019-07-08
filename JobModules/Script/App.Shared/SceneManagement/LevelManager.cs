@@ -72,13 +72,14 @@ namespace App.Shared.SceneManagement
             trs.Clear();
             // recover origin state info
             GameObject go = unityObject.AsGameObject;
-            go.GetComponentsInChildren<MeshRenderer>(true,mrs);
+            go.GetComponentsInChildren<MeshRenderer>(true, mrs);
             foreach (MeshRenderer mr in mrs)
             {
                 if (mr != null)
                 {
                     int id = mr.GetInstanceID();
                     if (originShadows.ContainsKey(id)) mr.shadowCastingMode = originShadows[id];
+                    
                     if (originLightProbes.ContainsKey(id)) mr.lightProbeUsage = originLightProbes[id];
 
                     // recover lightmap
@@ -87,7 +88,7 @@ namespace App.Shared.SceneManagement
                 }
             }
 
-            go.GetComponentsInChildren<Transform>(true,trs);
+            go.GetComponentsInChildren<Transform>(true, trs);
             foreach (Transform tr in trs)
             {
                 if (tr != null)
@@ -119,11 +120,6 @@ namespace App.Shared.SceneManagement
         private readonly AssetLoadOption _assetLoadOption;
 
         private IUnityAssetManager _assetManager;
-
-        public IUnityAssetManager assetManager
-        {
-            get { return _assetManager; }
-        }
 
         public LevelManager(IUnityAssetManager assetManager, bool isServer)
         {
@@ -157,6 +153,8 @@ namespace App.Shared.SceneManagement
             AfterGoLoaded = null;
             BeforeGoUnloaded = null;
             GoUnloaded = null;
+            LightmapLoaded = null;
+            LightmapUnloaded = null;
             DefaultGo.DisposeStreamGo();
         }
 
@@ -168,6 +166,8 @@ namespace App.Shared.SceneManagement
         public event Action<UnityObject> AfterGoLoaded;
         public event Action<UnityObject> BeforeGoUnloaded;
         public event Action<UnityObject> GoUnloaded;
+        public event Action<MeshRenderer, IEnumerable<UnityObject>> LightmapLoaded;
+        public event Action<IEnumerable<UnityObject>> LightmapUnloaded;
 
         public void UpdateOrigin(Vector3 pos)
         {
@@ -205,7 +205,7 @@ namespace App.Shared.SceneManagement
             --NotFinishedRequests;
         }
 
-        public void GetRequests(List<AssetInfo> sceneRequests, List<AssetInfo> goRequests)
+        public void GetRequests(List<AssetInfo> sceneRequests, List<AssetInfo> goRequests, List<IEnumerable<AssetInfoEx<MeshRenderer>>> lightmapsRequests)
         {
             if (_cachedLoadSceneRequest.Count != 0)
             {
@@ -217,6 +217,12 @@ namespace App.Shared.SceneManagement
             {
                 goRequests.AddRange(_cachedLoadGoRequest);
                 _cachedLoadGoRequest.Clear();
+            }
+
+            if (_cachedLoadLightmapsRequest.Count != 0)
+            {
+                lightmapsRequests.AddRange(_cachedLoadLightmapsRequest);
+                _cachedLoadLightmapsRequest.Clear();
             }
 
             ProcessUnloadRequests();
@@ -235,6 +241,7 @@ namespace App.Shared.SceneManagement
 
         private readonly List<AssetInfo> _cachedLoadSceneRequest = new List<AssetInfo>();
         private readonly List<AssetInfo> _cachedLoadGoRequest = new List<AssetInfo>();
+        private readonly List<IEnumerable<AssetInfoEx<MeshRenderer>>> _cachedLoadLightmapsRequest = new List<IEnumerable<AssetInfoEx<MeshRenderer>>>();
         private readonly Queue<string> _cachedUnloadSceneRequest = new Queue<string>();
         private readonly Queue<UnityObject> _cachedUnloadGoRequest = new Queue<UnityObject>();
 
@@ -245,10 +252,16 @@ namespace App.Shared.SceneManagement
         public void SetToWorldCompositionLevel(WorldCompositionParam param, IStreamingGoManager streamingGo)
         {
             _fixedSceneNames = param.FixedScenes;
-            _sceneManager = new StreamingManager(this, streamingGo, SingletonManager.Get<StreamingLevelStructure>().Data,               
-                SingletonManager.Get<ScenesLightmapStructure>().Data, SingletonManager.Get<ScenesIndoorCullStructure>().Data, param, _fixedSceneNames.Count);
+            StreamingLevelStructure streamingLevel = SingletonManager.Get<StreamingLevelStructure>();
+            ScenesLightmapStructure lightmap = SingletonManager.Get<ScenesLightmapStructure>();
+            lightmap.ListToDict();
+            ScenesIndoorCullStructure indoor = SingletonManager.Get<ScenesIndoorCullStructure>();
+            indoor.ListToDict();
+            _sceneManager = new StreamingManager(this, streamingGo, streamingLevel.Data,
+                lightmap.Data, indoor.Data, param, _fixedSceneNames.Count);
 
-            RequestForFixedScenes(param.AssetBundleName);
+            //RequestForFixedScenes(param.AssetBundleName);
+            RequestForFixedScenes(param.PreMapName + "/scene");
         }
 
         public void SetToFixedScenesLevel(OnceForAllParam param)
@@ -290,7 +303,18 @@ namespace App.Shared.SceneManagement
             ++NotFinishedRequests;
         }
 
+        public void AddLoadLightmapsRequest(IEnumerable<AssetInfoEx<MeshRenderer>> infos)
+        {
+            _cachedLoadLightmapsRequest.Add(infos);
+            ++NotFinishedRequests;
+        }
+
+        public void AddUnloadLightmapsRequest(IEnumerable<UnityObject> uObjs)
+        {
+            throw new NotImplementedException("not implement AddUnloadLightmapsRequest");
+        }
         #endregion
+
 
         private void SceneLoadedWrapper(Scene scene, LoadSceneMode mode)
         {
@@ -315,6 +339,12 @@ namespace App.Shared.SceneManagement
             _logger.InfoFormat("scene unloaded {0}", scene.name);
         }
 
+        public void LightmapsLoadedWrapper(MeshRenderer mr, List<UnityObject> uObjs)
+        {
+            if (LightmapLoaded != null) LightmapLoaded(mr, uObjs);
+            --NotFinishedRequests;
+        }
+
         private void ProcessUnloadRequests()
         {
             var goCount = _cachedUnloadGoRequest.Count;
@@ -329,9 +359,11 @@ namespace App.Shared.SceneManagement
 
                 if (GoUnloaded != null)
                     GoUnloaded.Invoke(go);
-
-                _assetManager.Recycle(go);
-
+                if(!SharedConfig.DisableRecycleSetramingGo)
+                   _assetManager.Recycle(go);
+                else
+                    UnityEngine.Object.Destroy(go);
+                
                 --NotFinishedRequests;
             }
 

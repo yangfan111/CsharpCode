@@ -2,7 +2,7 @@
 using UnityEngine;
 using Utils.Utils;
 
-namespace Utils.Appearance
+namespace Utils.Appearance.Bone
 {
     public static class BoneName
     {

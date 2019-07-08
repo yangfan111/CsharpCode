@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Core.GameModule.System;
+﻿using Core.GameModule.System;
 using Core.Utils;
-using Sharpen;
+using System.Collections.Generic;
 using Utils.AssetManager;
 
 namespace App.Shared.SessionStates
@@ -42,11 +38,18 @@ namespace App.Shared.SessionStates
            
         }
 
-        private List<AssetInfo> ParseAssetInfosStr(string assetInfosStr)
+        private List<AssetInfo> ParseAssetInfosStr(List<string> assetInfosStr)
         {
-
-            var assetInfoArray = assetInfosStr.Split(",");
             var assetInfoList = new List<AssetInfo>();
+            foreach (string asset in assetInfosStr)
+            {
+                int bundleNameLen = asset.LastIndexOf('/');
+                if (bundleNameLen <= 0) continue;
+                var bundleName = asset.Substring(0, bundleNameLen);
+                var assetName = asset.Substring(bundleNameLen + 1);
+                assetInfoList.Add(new AssetInfo(bundleName, assetName));
+            }
+            /*var assetInfoArray = assetInfosStr.Split(",");
             foreach (var info in assetInfoArray)
             {
                 var assetInfo = info.Trim();
@@ -67,7 +70,7 @@ namespace App.Shared.SessionStates
                 }
 
                 assetInfoList.Add(new AssetInfo(bundleName, assetName));
-            }
+            }*/
 
             return assetInfoList;
         }

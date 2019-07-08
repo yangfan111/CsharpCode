@@ -10,11 +10,12 @@ using App.Server.GameModules.GamePlay.Free.map.position;
 using com.wd.free.para;
 using App.Shared.Configuration;
 using Utils.Singleton;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.action
 {
     [Serializable]
-    public class UnityTraceAction : AbstractGameAction
+    public class UnityTraceAction : AbstractGameAction, IRule
     {
         public enum TraceType
         {
@@ -87,6 +88,11 @@ namespace App.Server.GameModules.GamePlay.Free.action
             args.GetDefault().GetParameters().Resume("tx");
             args.GetDefault().GetParameters().Resume("ty");
             args.GetDefault().GetParameters().Resume("tz");
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.UnityTraceAction;
         }
     }
 }

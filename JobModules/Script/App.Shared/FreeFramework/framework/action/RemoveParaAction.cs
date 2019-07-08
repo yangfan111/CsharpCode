@@ -2,12 +2,13 @@ using Sharpen;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.@event;
 using com.wd.free.para;
+using Core.Free;
 
 namespace com.wd.free.action
 {
 	[System.Serializable]
-	public class RemoveParaAction : AbstractGameAction
-	{
+	public class RemoveParaAction : AbstractGameAction, IRule
+    {
 		private const long serialVersionUID = 5695293732519970848L;
 
 		private string key;
@@ -33,5 +34,10 @@ namespace com.wd.free.action
 				}
 			}
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.RemoveParaAction;
+        }
+    }
 }

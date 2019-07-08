@@ -5,11 +5,12 @@ using System.Text;
 using com.wd.free.@event;
 using App.Server.GameModules.GamePlay.free.player;
 using UnityEngine;
+using Core.Free;
 
 namespace App.Shared.FreeFramework.UnitTest
 {
     [Serializable]
-    public class AnimationTestValue : AbstractTestValue
+    public class AnimationTestValue : AbstractTestValue, IRule
     {
         public override TestValue GetCaseValue(IEventArgs args)
         {
@@ -41,6 +42,11 @@ namespace App.Shared.FreeFramework.UnitTest
             tv.AddField("倾斜转换标识", fd.Player.state.LeanTransitionId);
 
             return tv;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.AnimationTestValue;
         }
     }
 }

@@ -13,27 +13,28 @@ namespace Core.Event
         public int ServerTime = 0;
         public bool HasHandler;
 
-        private Dictionary<EEventType, List<IEvent>>
-            _events = new Dictionary<EEventType, List<IEvent>>(EEventTypeComparer.Instance);
+        private List<IEvent>
+            _events = new List<IEvent>();
+
 
         public PlayerEvents()
         {
-            foreach(EEventType etype in Enum.GetValues(typeof(EEventType)))
-            {
-                _events.Add(etype, new List<IEvent>());
-            }
         }
 
-        public Dictionary<EEventType,List<IEvent>> Events
+        public void GetEvents(EEventType etype, List<IEvent> events)
         {
-            get { return _events; }
+            foreach (var @event in _events)
+            {
+                if (@event.EventType == etype)
+                {
+                    events.Add(@event);
+                }
+            }
         }
 
         public void AddEvent(IEvent e)
         {
-           
-            _events[e.EventType].Add(e);
-           
+            _events.Add(e);
         }
 
         public int Count
@@ -41,85 +42,90 @@ namespace Core.Event
             get { return _events.Count; }
         }
 
+        public List<IEvent> Events
+        {
+            get { return _events; }
+        }
+
         public void ReInit()
         {
+            
             ServerTime = -1;
             HasHandler = false;
-     
-            foreach (var v in _events.Values)
+
+            foreach (var v in _events)
             {
-                foreach(var vv in v)
-                {
-                  
-                    EventInfos.Instance.Free(vv);
-              
-                }
-                v.Clear();
+                EventInfos.Instance.Free(v);
             }
-          
+
+            _events.Clear();
         }
 
         public void CopyFrom(object rightComponent)
         {
             ReInit();
             var right = rightComponent as PlayerEvents;
-            foreach (var rightKeyPair in right._events)
+            int c = right._events.Count;
+            for (var i = 0; i < c; i++)
             {
-
-                _events[rightKeyPair.Key].Clear();
-                foreach (var node in rightKeyPair.Value)
-                {
-                    var v = EventInfos.Instance.Allocate(rightKeyPair.Key, node.IsRemote);
-                    v.RewindTo(node);
-                    _events[rightKeyPair.Key].Add(node);
-                }
-         
+                var node = right._events[i];
+                var v = EventInfos.Instance.Allocate(node.EventType, node.IsRemote);
+                v.RewindTo(node);
+                _events.Add(v);
             }
+
 
             ServerTime = right.ServerTime;
             HasHandler = right.HasHandler;
         }
 
-       
 
         public void Write(MyBinaryWriter writer)
         {
             AssertUtility.Assert((int) EEventType.End < 255);
-          
-            writer.Write((byte) _events.Count);
-            foreach (KeyValuePair<EEventType, List<IEvent>> eventListPair in _events)
+            int c = _events.Count;
+            writer.Write((short)c);
+            for (var i = 0; i < c; i++)
             {
-                writer.Write((byte)eventListPair.Key);
-                writer.Write(eventListPair.Value.Count);
-                foreach(var node in eventListPair.Value)
-                {
-                    node.WriteBody(writer);
-                }
+                var node = _events[i];
+                writer.Write((byte) node.EventType);
+                node.WriteBody(writer);
             }
+        }
 
+        private int EEventsComparer(IEvent x, IEvent y)
+        {
+            return (int) (y.EventType) - (int) (y.EventType);
         }
 
         public void Read(BinaryReader reader)
         {
             ReInit();
             AssertUtility.Assert((int) EEventType.End < 255);
-          
-            int count = reader.ReadByte();
-           
+
+            short count = reader.ReadInt16();
+
             for (int i = 0; i < count; i++)
             {
-                var type = (EEventType)reader.ReadByte();
-                _events[type].Clear();
-                
-                var length = reader.ReadInt32();
-                for(int j=0;j<length;j++)
-                {
-                    var v = EventInfos.Instance.Allocate(type, true);
-                    v.ReadBody(reader);
-                    _events[type].Add(v);
-                }
+                var type = (EEventType) reader.ReadByte();
 
+                var v = EventInfos.Instance.Allocate(type, true);
+                v.ReadBody(reader);
+                _events.Add(v);
             }
+        }
+
+        public IEvent GetFirstEvent(EEventType eEventType)
+        {
+            foreach (var @event in _events)
+            {
+                if (@event.EventType == eEventType)
+                {
+                    return @event;
+                }
+            }
+
+            return null;
         }
     }
 }

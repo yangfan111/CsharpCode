@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using App.Shared.Components.Serializer;
 using Core.EntityComponent;
 using Core.Network;
@@ -101,8 +102,9 @@ namespace App.Shared.Network.SerializeInfo
         }
 
         private long SerializeComponents(MyBinaryWriter binaryWriter, List<IUpdateComponent> oldComponents,
-            List<IUpdateComponent> currentComponents)
+            List<IUpdateComponent> currentComponents, out int count)
         {
+            int c = 0;
             var startPostion = binaryWriter.Position;
             foreach (var currentComponent in currentComponents)
             {
@@ -114,13 +116,16 @@ namespace App.Shared.Network.SerializeInfo
                     {
                         var bitMask = serializer.DiffNetworkObject(oldComponent,
                             currentComponent);
-                        var modifyPatch = ModifyComponentPatch.Allocate(oldComponent, currentComponent, bitMask);
+                        if (bitMask.HasValue())
+                        {
+                            var modifyPatch = ModifyComponentPatch.Allocate(oldComponent, currentComponent, bitMask);
 
-                        modifyPatch.Serialize(binaryWriter, _componentSerializerManager);
-                        modifyPatch.ReleaseReference();
+                            modifyPatch.Serialize(binaryWriter, _componentSerializerManager);
+                            modifyPatch.ReleaseReference();
+                            c++;
 
+                        }
                         isModife = true;
-
                         break;
                     }
                 }
@@ -130,10 +135,12 @@ namespace App.Shared.Network.SerializeInfo
                     var addPatch = AddComponentPatch.Allocate(currentComponent);
                     addPatch.Serialize(binaryWriter, _componentSerializerManager);
                     addPatch.ReleaseReference();
+                    c++;
                 }
             }
 
             var endPosition = binaryWriter.Position;
+            count = c;
             return endPosition - startPostion;
         }
 
@@ -144,20 +151,22 @@ namespace App.Shared.Network.SerializeInfo
             var binaryWriter = MyBinaryWriter.Allocate(stream);
             long bodyLength;
             var old = MessagePool.GetPackageBySeq(msg.Head.BaseUserCmdSeq);
+            int count = 0;
             if (old != null)
             {
                 msg.Head.Serialize(binaryWriter);
-                bodyLength = SerializeComponents(binaryWriter, old.UpdateComponents, msg.UpdateComponents);
+                bodyLength = SerializeComponents(binaryWriter, old.UpdateComponents, msg.UpdateComponents, out count);
             }
             else
             {
                 msg.Head.BaseUserCmdSeq = -1;
                 msg.Head.Serialize(binaryWriter);
-                bodyLength = SerializeComponents(binaryWriter, _emptyUpdateComponents, msg.UpdateComponents);
+                bodyLength = SerializeComponents(binaryWriter, _emptyUpdateComponents, msg.UpdateComponents,out count);
             }
 
             AssertUtility.Assert(bodyLength < 65535);
-            msg.Head.ReWriteBodyLength(binaryWriter, (short) bodyLength);
+            
+            msg.Head.ReWriteComponentCountAndBodyLength(binaryWriter, (short) bodyLength, (byte) count);
             binaryWriter.ReleaseReference();
             return stream;
         }
@@ -165,7 +174,8 @@ namespace App.Shared.Network.SerializeInfo
         public object Deserialize(Stream inStream)
         {
             ReusableList<UpdateLatestPacakge> list = ReusableList<UpdateLatestPacakge>.Allocate();
-            BinaryReader binaryReader = new BinaryReader(inStream);
+            BinaryReader binaryReader = new BinaryReader(inStream,Encoding.UTF8);
+            
             string version = binaryReader.ReadString();
             if (!version.Equals(_version))
             {
@@ -190,7 +200,7 @@ namespace App.Shared.Network.SerializeInfo
                         }
 
 
-                        for (int c = 0; c < pacakge.Head.ComponentCount; c++)
+                        for (int c = 0; c < pacakge.Head.SerializeCount; c++)
                         {
                             var opType = (ComponentReplicateOperationType) binaryReader.ReadByte();
 

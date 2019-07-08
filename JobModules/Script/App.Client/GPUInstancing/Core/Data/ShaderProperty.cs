@@ -5,25 +5,42 @@ namespace App.Client.GPUInstancing.Core.Data
 {
     class TerrainProperty
     {
-        private readonly float _heightMapResolution;
+        private float _heightMapResolution;
 
-        private readonly float _detailResolution;
-        private readonly float _detailResolutionPerPatch;
+        private float[] _terrainSize;
+        private float[] _basePosition;
 
-        private readonly float _detailDensity;
-        private readonly float _detailDistance;
+        private float _detailResolution;
+        private float _detailResolutionPerPatch;
 
-        private readonly float[] _terrainSize;
-        private readonly float[] _basePosition;
+        private float _detailDensity;
+        private float _detailDistance;
+
+        private float _treeDistance;
         // for world shifting
         // public float[] Offset { get; private set; }
 
-        public TerrainProperty(UnityEngine.Terrain terrain, TerrainData data, float detailDistance)
+        public void InitForDetail(UnityEngine.Terrain terrain, TerrainData data, float detailDistance, Vector3 basePos)
         {
-            _heightMapResolution = data.heightmapResolution;
+            InitCommon(terrain, data, basePos);
 
             _detailDensity = terrain.detailObjectDensity;
             _detailDistance = detailDistance;
+
+            _detailResolution = data.detailResolution;
+            _detailResolutionPerPatch = data.detailResolutionPerPatch;           
+        }
+
+        public void InitForTree(UnityEngine.Terrain terrain, TerrainData data, float treeDistance, Vector3 basePos)
+        {
+            InitCommon(terrain, data, basePos);
+
+            _treeDistance = treeDistance;
+        }
+
+        private void InitCommon(UnityEngine.Terrain terrain, TerrainData data, Vector3 basePos)
+        {
+            _heightMapResolution = data.heightmapResolution;
 
             var terrainSize = data.size;
             _terrainSize = new float[3];
@@ -31,14 +48,10 @@ namespace App.Client.GPUInstancing.Core.Data
             _terrainSize[1] = terrainSize.y;
             _terrainSize[2] = terrainSize.z;
 
-            var position = terrain.transform.position;
             _basePosition = new float[3];
-            _basePosition[0] = position.x;
-            _basePosition[1] = position.y;
-            _basePosition[2] = position.z;
-
-            _detailResolution = data.detailResolution;
-            _detailResolutionPerPatch = data.detailResolutionPerPatch;
+            _basePosition[0] = basePos.x;
+            _basePosition[1] = basePos.y;
+            _basePosition[2] = basePos.z;
         }
 
         public void SetDetailInstantiationProperty(ComputeShader shader)
@@ -55,6 +68,18 @@ namespace App.Client.GPUInstancing.Core.Data
         {
             shader.SetFloat(Constants.ShaderVariable.CullingDistance, _detailDistance);
         }
+
+        public void SetTreeInstantiationProperty(ComputeShader shader)
+        {
+            shader.SetFloat(Constants.TerrainVariable.HeightMapResolution, _heightMapResolution);
+            shader.SetFloats(Constants.TerrainVariable.TerrainSize, _terrainSize);
+            shader.SetFloats(Constants.DetailVariable.BasePosition, _basePosition);
+        }
+
+        public void SetTreeCullingProperty(ComputeShader shader)
+        {
+            shader.SetFloat(Constants.ShaderVariable.CullingDistance, _treeDistance);
+        }
     }
 
     class DividedDetailProperty
@@ -67,7 +92,7 @@ namespace App.Client.GPUInstancing.Core.Data
         private readonly float[] _dryColor;
         private readonly int _layer;
 
-        public DividedDetailProperty(TerrainData data, DetailPrototype prototype, float resolution, int layer)
+        public DividedDetailProperty(DetailPrototype prototype, float resolution, int layer)
         {
             _scale = new float[4];
             _scale[0] = prototype.minWidth;

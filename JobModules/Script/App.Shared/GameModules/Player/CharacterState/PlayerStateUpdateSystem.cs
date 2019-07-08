@@ -1,35 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using App.Shared.Components.Player;
+﻿using App.Shared.Components.Player;
 using App.Shared.Configuration;
 using App.Shared.GameModules.Player.Actions;
 using App.Shared.GameModules.Player.Animation;
+using App.Shared.GameModules.Player.Appearance.AnimationEvent;
+using App.Shared.Player;
 using Core.Animation;
-using Core.Appearance;
+using Core.AnimatorClip;
+using Core.CharacterController;
 using Core.CharacterState;
+using Core.CharacterState.Posture;
+
 using Core.Fsm;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using UnityEngine;
-using App.Shared.GameModules.Player.Appearance;
-using App.Shared.GameModules.Player.Appearance.AnimationEvent;
-using App.Shared.Player;
-using Core.Common;
-using Utils.Appearance;
-using Utils.CharacterState;
 using Core.WeaponAnimation;
+using ECM.Components;
+using System.Collections.Generic;
+using Core;
+using UnityEngine;
+using Utils.Appearance;
+using Utils.Compare;
 using Utils.Configuration;
 using Utils.Singleton;
 using Utils.Utils;
 using XmlConfig;
-using App.Shared.GameModules.Weapon;
-using Core;
-using Core.AnimatorClip;
-using Core.CharacterController;
-using Core.CharacterState.Posture;
-using ECM.Components;
-using Utils.Compare;
 
 namespace App.Shared.GameModules.Player.CharacterState
 {
@@ -53,6 +48,7 @@ namespace App.Shared.GameModules.Player.CharacterState
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             PlayerEntity playerEntity = (PlayerEntity)owner.OwnerEntity;
+
             CheckPlayerLifeState(playerEntity);
 
             if (cmd.PredicatedOnce)
@@ -130,6 +126,8 @@ namespace App.Shared.GameModules.Player.CharacterState
 
             //_logger.InfoFormat("net work component hash:{0},{3}, SnapshotId:{1}, seq:{2}", playerEntity.networkAnimator.GetHashCode(), cmd.SnapshotId, cmd.Seq, playerEntity.networkAnimator.ToString());
             //_logger.InfoFormat("state component hash:{0}, SnapshotId:{1}, seq:{2}", playerEntity.state, cmd.SnapshotId, cmd.Seq);
+
+            
         }
 
         private void WriteNetworkAnimation(IUserCmd cmd, PlayerEntity playerEntity)
@@ -141,10 +139,12 @@ namespace App.Shared.GameModules.Player.CharacterState
                 AnimatorChange(NetworkAnimatorUtil.GetAnimatorLayers(playerEntity.firstPersonAnimator.UnityAnimator,
                     playerEntity.fpAnimStatus.AnimatorLayers,
                     _fsmOutputs.AnimatorP1ChangedTrigger()), playerEntity.fpAnimStatus, cmd);
+//                playerEntity.fpAnimStatus.ConvertStructureDataToCompressData();
 
                 AnimatorChange(NetworkAnimatorUtil.GetAnimatorLayers(playerEntity.thirdPersonAnimator.UnityAnimator,
                     playerEntity.networkAnimator.AnimatorLayers,
                     _fsmOutputs.AnimatorP3ChangedTrigger()), playerEntity.networkAnimator, cmd);
+//                playerEntity.networkAnimator.ConvertStructureDataToCompressData();
             }
             finally
             {
@@ -162,7 +162,8 @@ namespace App.Shared.GameModules.Player.CharacterState
 
                 _fsmOutputs.ResetOutput();
                 // 更新状态机
-                stateManager.Update(commandsContainer, 0, _fsmOutputs.AddOutput, FsmUpdateType.ResponseToAnimation);
+                stateManager.Update(commandsContainer, 0, _fsmOutputs.AddOutput, FsmUpdateType.ResponseToAnimation,
+                    playerEntity.fsmInputRelateInterface.Relate.GetFsmInputLimits());
                 // 更新Clip速率
                 animatorClipManager.Update(_fsmOutputs.AddOutput,
                     playerEntity.thirdPersonAnimator.UnityAnimator,
@@ -214,7 +215,7 @@ namespace App.Shared.GameModules.Player.CharacterState
                 _fsmOutputs.ResetOutput();
                 // 更新状态机
                 stateManager.Update(commandsContainer, cmd.FrameInterval, _fsmOutputs.AddOutput,
-                    FsmUpdateType.ResponseToInput);
+                    FsmUpdateType.ResponseToInput, playerEntity.fsmInputRelateInterface.Relate.GetFsmInputLimits());
                 // 更新手臂动画
                 playerEntity.characterBoneInterface.CharacterBone.SetWeaponPitch(_fsmOutputs.AddOutput,
                     playerEntity.characterBone.WeaponPitch);
@@ -1004,6 +1005,8 @@ namespace App.Shared.GameModules.Player.CharacterState
             var stateManager = player.stateInterface.State;
             if (null == stateManager) return;
             stateManager.Revive();
+            if(!player.gamePlay.IsStandPosture)
+                stateManager.SetPostureCrouch();
         }
 
         private void Dying(PlayerEntity player)

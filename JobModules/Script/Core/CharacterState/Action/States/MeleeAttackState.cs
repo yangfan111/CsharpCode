@@ -47,7 +47,7 @@ namespace Core.CharacterState.Action.States
             if (command.IsMatch(FsmInput.LightMeleeAttackOne))
             {
                 FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MeleeStateHash,
-                    AnimatorParametersHash.Instance.MeleeAttackName,
+                    AnimatorParametersHash.Instance.MeleeStateName,
                     AnimatorParametersHash.Instance.LightMeleeOne,
                     CharacterView.FirstPerson | CharacterView.ThirdPerson);
                 addOutput(FsmOutput.Cache);
@@ -56,28 +56,23 @@ namespace Core.CharacterState.Action.States
             else if (command.IsMatch(FsmInput.LightMeleeAttackTwo))
             {
                 FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MeleeStateHash,
-                    AnimatorParametersHash.Instance.MeleeAttackName,
+                    AnimatorParametersHash.Instance.MeleeStateName,
                     AnimatorParametersHash.Instance.LightMeleeTwo,
+                    CharacterView.FirstPerson | CharacterView.ThirdPerson);
+                addOutput(FsmOutput.Cache);
+                TurnOnUpperBodyOverlay(addOutput);
+            }
+            else if (command.IsMatch(FsmInput.MeleeSpecialAttack))
+            {
+                FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MeleeStateHash,
+                    AnimatorParametersHash.Instance.MeleeStateName,
+                    AnimatorParametersHash.Instance.ForceMelee,
                     CharacterView.FirstPerson | CharacterView.ThirdPerson);
                 addOutput(FsmOutput.Cache);
                 TurnOnUpperBodyOverlay(addOutput);
             }
             
             return base.HandleInput(command, addOutput);
-        }
-
-        public override void Update(int frameInterval, Action<FsmOutput> addOutput)
-        {
-            if (UpdateForTheFirstTime)
-            {
-                FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MeleeAttackHash,
-                                         AnimatorParametersHash.Instance.MeleeAttackName,
-                                         AnimatorParametersHash.Instance.MeleeAttackEnd,
-                                         CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
-                addOutput(FsmOutput.Cache);
-            }
-            
-            base.Update(frameInterval, addOutput);
         }
 
         public override void DoBeforeLeaving(Action<FsmOutput> addOutput)

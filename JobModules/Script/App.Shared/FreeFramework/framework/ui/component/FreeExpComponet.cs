@@ -1,12 +1,13 @@
 using Sharpen;
 using com.wd.free.@event;
 using Free.framework;
+using Core.Free;
 
 namespace gameplay.gamerule.free.ui.component
 {
 	[System.Serializable]
-	public class FreeExpComponet : AbstractFreeComponent
-	{
+	public class FreeExpComponet : AbstractFreeComponent, IRule
+    {
 		private const long serialVersionUID = -7699020163820046853L;
 
 		public override int GetKey(IEventArgs args)
@@ -31,5 +32,10 @@ namespace gameplay.gamerule.free.ui.component
 
 			return proto;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeExpComponet;
+        }
+    }
 }

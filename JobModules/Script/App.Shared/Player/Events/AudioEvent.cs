@@ -137,7 +137,7 @@ namespace App.Shared.Player.Events
         public override void RewindTo(AudioEvent right)
         {
             base.RewindTo(right);
-            WeaponId = ((AudioWeaponFireEvent) right).WeaponId;
+            WeaponId = ((AudioPullboltEvent) right).WeaponId;
         }
 
         public override void WriteBody(MyBinaryWriter writer)
@@ -348,14 +348,13 @@ namespace App.Shared.Player.Events
         /// <param name="e"></param>
         public override void DoEventClient(Entitas.IContexts contexts, IEntity entity, IEvent e)
         {
-            if ((entity as PlayerEntity).isFlagSelf)
-            {
-                return;
-            }
 
             //  var controller = (entity as PlayerEntity).AudioController();
+            if (SharedConfig.IsMute)
+                return;
             AudioEvent audioEvent = e as AudioEvent;
-       //     DebugUtil.MyLog("Play event :"+audioEvent.EventType);
+        
+         //  DebugUtil.MyLog("Play other event :"+audioEvent.EventType);
             switch (audioEvent.EventType)
             {
                 case EEventType.AFootstep:

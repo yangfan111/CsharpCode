@@ -3,13 +3,12 @@ using App.Client.GameModules.Player;
 using App.Shared.GameModules.Player;
 using Utils.AssetManager;
 using Core.Utils;
-using Core.WeaponLogic;
 using UnityEngine;
 using Utils.Utils;
-using Core.WeaponLogic.Throwing;
 using App.Shared.Components.Player;
 using App.Shared;
-using App.Shared.GameModules.Weapon.Behavior;
+using App.Shared.GameModules.Weapon;
+using Core;
 
 namespace App.Client.GameModules.Throwing
 {
@@ -85,9 +84,9 @@ namespace App.Client.GameModules.Throwing
 
         protected override bool Filter(PlayerEntity player)
         {
-            return player.hasThrowingAction && null != player.throwingAction.ActionInfo
-                                            && player.throwingAction.ActionInfo.IsReady
-                                            && !player.throwingAction.ActionInfo.IsThrow
+            return player.hasThrowingAction && null != player.throwingAction.ActionData
+                                            && player.throwingAction.ActionData.IsReady
+                                            && !player.throwingAction.ActionData.IsThrow
                                             && player.gamePlay.IsLifeState(EPlayerLifeState.Alive);
         }
 
@@ -100,8 +99,8 @@ namespace App.Client.GameModules.Throwing
             else
             {
                 RefreshThrowingData(player);
-                DrawThrowingLine(player.throwingAction.ActionInfo.Pos, player.throwingAction.ActionInfo.Vel,
-                    player.throwingAction.ActionInfo.Gravity, player.throwingAction.ActionInfo.Decay,
+                DrawThrowingLine(player.throwingAction.ActionData.Pos, player.throwingAction.ActionData.Vel,
+                    player.throwingAction.ActionData.Gravity, player.throwingAction.ActionData.Decay,
                     _lineWidth, _deltaTime, _totalLength);
             }
         }
@@ -119,20 +118,20 @@ namespace App.Client.GameModules.Throwing
 
         private void RefreshThrowingData(PlayerEntity player)
         {
-            ThrowingActionInfo actionInfo = player.throwingAction.ActionInfo;
+            ThrowingActionData actionData = player.throwingAction.ActionData;
             var dir = BulletDirUtility.GetThrowingDir(player.WeaponController());
-            if (actionInfo.IsNearThrow)
+            if (actionData.IsNearThrow)
             {
-                actionInfo.Vel = dir * actionInfo.Config.NearInitSpeed;
+                actionData.Vel = dir * actionData.Config.NearInitSpeed;
             }
             else
             {
-                actionInfo.Vel = dir * actionInfo.Config.FarInitSpeed;
+                actionData.Vel = dir * actionData.Config.FarInitSpeed;
             }
-            actionInfo.Pos = PlayerEntityUtility.GetThrowingEmitPosition(player.WeaponController());
-            actionInfo.Gravity = actionInfo.Config.Gravity;
-            actionInfo.Decay = actionInfo.Config.VelocityDecay;
-            actionInfo.CountdownTime = actionInfo.Config.CountdownTime;
+            actionData.Pos = PlayerEntityUtility.GetThrowingEmitPosition(player.WeaponController());
+            actionData.Gravity = actionData.Config.Gravity;
+            actionData.Decay = actionData.Config.VelocityDecay;
+            actionData.CountdownTime = actionData.Config.CountdownTime;
         }
 
         private void AddThrowingLine()

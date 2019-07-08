@@ -3,6 +3,9 @@ using Core.EntityComponent;
 using Core.Utils;
 using Entitas;
 using System;
+using App.Shared.Components.Player;
+using App.Shared.GameModules.Attack;
+using Core.Attack;
 using UnityEngine;
 using WeaponConfigNs;
 
@@ -11,38 +14,27 @@ namespace App.Shared.EntityFactory
     public class BulletEntityFactory
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(BulletEntityFactory));
-        private BulletContext _bulletContext;
-        private IEntityIdGenerator _entityIdGenerator;
-        public BulletEntityFactory(BulletContext bulletContext, IEntityIdGenerator entityIdGenerator)
-        {
-            _bulletContext = bulletContext;
-            _entityIdGenerator = entityIdGenerator;
-        }
+        public static BulletContext bulletContext {private get; set;  }
+        public static IEntityIdGenerator entityIdGenerator { private get; set; }
 
-        public Entity CreateBulletEntity(int cmdSeq, EntityKey entityKey, int serverTime, Vector3 dir, int weaponId, EBulletCaliber caliber,
-            BulletConfig bulletConfig, Vector3 viewPosition, Vector3 emitPosition)
+        public static BulletEntity CreateBulletEntity(PlayerBulletData bulletData, EntityKey owner)
         {
-            int bulletEntityId = _entityIdGenerator.GetNextEntityId();
-        
-            Vector3 velocity = dir * bulletConfig.EmitVelocity;
-            var bulletEntity = _bulletContext.CreateEntity();
-            float maxDistance = bulletConfig.MaxDistance;
-            bulletEntity.AddEntityKey(new EntityKey(bulletEntityId, (int)EEntityType.Bullet));
+            int     bulletEntityId = entityIdGenerator.GetNextEntityId();
+            var     bulletEntity   = bulletContext.CreateEntity();
 
-            bulletEntity.AddBulletData(velocity, 0, bulletConfig.Gravity, 0, serverTime, maxDistance, bulletConfig.PenetrableLayerCount, 
-                bulletConfig.BaseDamage, bulletConfig.PenetrableThickness, bulletConfig,bulletConfig.VelocityDecay,
-                caliber, weaponId, bulletConfig.DistanceDecayFactor);
+            bulletEntity.AddEntityKey(new EntityKey(bulletEntityId, (int) EEntityType.Bullet));
             bulletEntity.AddPosition();
-            bulletEntity.position.Value = viewPosition;
-            bulletEntity.AddOwnerId(entityKey);
-            bulletEntity.bulletData.CmdSeq = cmdSeq;
-            bulletEntity.bulletData.StartPoint = viewPosition;
-            bulletEntity.bulletData.EmitPoint = emitPosition;
-            bulletEntity.bulletData.StartDir = dir;
-            bulletEntity.isNew = true;
-            bulletEntity.AddEmitPosition(emitPosition);
-            bulletEntity.isFlagSyncNonSelf = true;
+            bulletEntity.position.Value = bulletData.ViewPosition;
+            bulletEntity.AddOwnerId(owner);
+            bulletEntity.AddBulletData();
+            bulletEntity.bulletData.StartPoint = bulletData.ViewPosition;
+            bulletEntity.bulletData.EmitPoint  = bulletData.EmitPosition;
+            bulletEntity.bulletData.StartDir   = bulletData.Dir;
+            bulletEntity.isFlagSyncNonSelf     = true;
             bulletEntity.AddLifeTime(DateTime.Now, SharedConfig.BulletLifeTime); // in case user logout
+            IBulletEntityAgent entityAgent = new BulletEntityAgent(bulletEntity);
+            bulletEntity.AddBulletRuntime(entityAgent,true);
+            bulletData.ReleaseReference();
             return bulletEntity;
         }
     }

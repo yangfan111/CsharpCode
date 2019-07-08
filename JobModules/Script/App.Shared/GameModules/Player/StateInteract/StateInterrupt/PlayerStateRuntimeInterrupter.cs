@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using Core;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
+using System.Collections.Generic;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Player
@@ -25,12 +25,11 @@ namespace App.Shared.GameModules.Player
         private void ResisterHoldWeapon()
         {
             var handler = new HoldWeaponHandler(playerEntity);
-            handler.ResisterEmitter(new InterruptEmitter(EPlayerState.Dying, EInterruptCmdType.InterruptSimple));
+            handler.ResisterEmitter(new InterruptEmitter(EPlayerState.Dying, EInterruptCmdType.InterruptAndRollback));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.Drive, EInterruptCmdType.InterruptAndRollback));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.Swim, EInterruptCmdType.InterruptAndRollback));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.Climb, EInterruptCmdType.InterruptAndRollback));
-         
-
+            handler.ResisterEmitter(new InterruptEmitter(EPlayerState.Rescue, EInterruptCmdType.InterruptAndRollback));
 
             interruptHandlers[(int)EInterruptType.HoldWeapon] = handler;
         }
@@ -49,7 +48,7 @@ namespace App.Shared.GameModules.Player
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.SpecialReload, EInterruptCmdType.InterruptSimple));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.PaintDisc, EInterruptCmdType.InterruptSimple));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.SwitchWeapon, EInterruptCmdType.InterruptSimple));
-            handler.ResisterEmitter(new InterruptEmitter(EPlayerState.WeaponRotState, EInterruptCmdType.InterruptAndRollback));
+         //   handler.ResisterEmitter(new InterruptEmitter(EPlayerState.WeaponRotState, EInterruptCmdType.InterruptAndRollback));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.ProneMove, EInterruptCmdType.InterruptAndRollback));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.PostureTrans, EInterruptCmdType.InterruptAndRollback));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.PullBolt, EInterruptCmdType.InterruptAndRollback));
@@ -88,7 +87,7 @@ namespace App.Shared.GameModules.Player
             RelatedCharState.ForceFinishGrenadeThrow();
             PlayerStateUtil.AddPlayerState(EPlayerGameState.InterruptItem, playerEntity.gamePlay);
             if (playerEntity.hasThrowingAction)
-                playerEntity.throwingAction.ActionInfo.ClearState();
+                playerEntity.throwingAction.ActionData.InternalCleanUp();
         }
 
     }

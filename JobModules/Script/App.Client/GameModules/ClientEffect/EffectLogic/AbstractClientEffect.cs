@@ -7,13 +7,13 @@ using Utils.AssetManager;
 using Utils.Singleton;
 using Entitas;
 
-namespace App.Client.GameModules.ClientEffect.EffectLogic
+namespace App.Client.GameModules.ClientEffect
 {
     internal abstract class AbstractClientEffect : IEffectLogic
     {
         protected Contexts AllContexts;
         protected ClientEffectConfigItem _effectConfig;
-        protected ISoundEntityFactory _soundEntityFactory;  
+     //   protected ISoundEntityFactory _soundEntityFactory;  
 
         public virtual void OnCreate(EClientEffectType type, int effectId)
         {
@@ -75,7 +75,7 @@ namespace App.Client.GameModules.ClientEffect.EffectLogic
         public void SetContexts(IContexts contexts)
         {
             AllContexts = contexts as Contexts;
-            _soundEntityFactory = AllContexts.session.entityFactoryObject.SoundEntityFactory;
+          //  _soundEntityFactory = AllContexts.session.entityFactoryObject.SoundEntityFactory;
         }
     }
 }

@@ -3,6 +3,7 @@ using Core;
 using Core.Utils;
 using System.Collections.Generic;
 using App.Shared.Player.Events;
+using Core.ObjectPool;
 using UnityEngine;
 using XmlConfig;
 
@@ -20,17 +21,27 @@ namespace App.Shared.Audio
            var          instanceId = target.gameObject.GetInstanceID();
            if (!EmitterDict.TryGetValue(instanceId, out emitter))
            {
-               emitter                 = new AudioEmitter(target);
+               emitter = ObjectAllocatorHolder<AudioEmitter>.Allocate();
+               emitter.SetTarget(target);
                EmitterDict[instanceId] = emitter;
            }
 
            return emitter;
         }
 
+        public void Free()
+        {
+            foreach (var value in EmitterDict.Values)
+            {
+                ObjectAllocatorHolder<AudioEmitter>.Free(value);
+            }
+            EmitterDict.Clear();
+        }
+
     }
     internal class AudioEmitter
     {
-        internal AudioEmitter(AkGameObj target)
+        internal void SetTarget(AkGameObj target)
         {
             this.target = target;
         }
@@ -62,8 +73,8 @@ namespace App.Shared.Audio
                 eventItem.SwitchGroup.ForEach(
                     (id) =>
                     {
-                        var atom = RegisterGetSwitch(id);
-                        atom.SetSwitch(target.gameObject);
+                        AKSwitchAtom atom = RegisterGetSwitch(id);
+                        atom.InitSwitch(target.gameObject);
                     });
             }
 

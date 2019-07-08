@@ -8,7 +8,7 @@ using Core.CharacterState;
 using Core.CharacterState.Movement;
 using Core.CharacterState.Posture;
 using Core.Utils;
-using Core.WeaponLogic;
+
 using UnityEngine;
 using XmlConfig;
 using Core.Configuration;

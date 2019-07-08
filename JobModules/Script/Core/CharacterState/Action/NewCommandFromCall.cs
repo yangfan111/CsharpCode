@@ -290,6 +290,11 @@ namespace Core.CharacterState.Action
             SetNewCallbackFromFunctionCall(FsmInput.GenericActionFinished, FsmInput.GenericActionFinished, callBack);
         }
 
+        public void FinishedClimb()
+        {
+            SetNewCommandFromFunctionCall(FsmInput.FinishedClimb);
+        }
+
         public void EnterLadder(float enterKind, System.Action callBack)
         {
             Logger.InfoFormat("EnterLadder  kind:  {0}", enterKind);

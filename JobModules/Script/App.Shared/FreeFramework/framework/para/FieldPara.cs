@@ -97,9 +97,9 @@ namespace com.wd.free.para
             return para.Copy();
         }
 
-        private static ParaPool<IPara> pool = new ParaPool<IPara>(new com.wd.free.para.FieldPara());
+        private static ParaPool pool = new ParaPool(new com.wd.free.para.FieldPara());
 
-        protected internal override ParaPool<IPara> GetPool()
+        protected internal override ParaPool GetPool()
         {
             return pool;
         }

@@ -7,11 +7,12 @@ using App.Server.GameModules.GamePlay.free.player;
 using App.Server.GameModules.GamePlay.Free.weapon;
 using Core;
 using App.Shared.GameModules.Weapon;
+using Core.Free;
 
 namespace App.Shared.FreeFramework.UnitTest
 {
     [Serializable]
-    public class WeaponTestValue : AbstractTestValue
+    public class WeaponTestValue : AbstractTestValue, IRule
     {
         public string slot;
 
@@ -38,5 +39,9 @@ namespace App.Shared.FreeFramework.UnitTest
             return tv;
         }
 
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.WeaponTestValue;
+        }
     }
 }

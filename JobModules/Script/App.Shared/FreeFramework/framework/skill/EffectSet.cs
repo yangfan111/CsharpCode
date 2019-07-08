@@ -36,7 +36,7 @@ namespace com.wd.free.skill
 			{
 				this.effects[effct.GetSource()] = effct;
 				this.key = effct.GetKey();
-				this.timeMap[GetEffectKey(effct)] = Runtime.CurrentTimeMillis();
+				this.timeMap[GetEffectKey(effct)] = Runtime.CurrentTimeMillis(false);
 			}
 		}
 
@@ -45,7 +45,7 @@ namespace com.wd.free.skill
 			IList<long> re = new List<long>();
 			foreach (ISkillEffect ef in effects.Values)
 			{
-				if (ef.IsTimeOut(Runtime.CurrentTimeMillis() - timeMap[GetEffectKey(ef)]))
+				if (ef.IsTimeOut(Runtime.CurrentTimeMillis(false) - timeMap[GetEffectKey(ef)]))
 				{
 					re.Add(ef.GetSource());
 				}

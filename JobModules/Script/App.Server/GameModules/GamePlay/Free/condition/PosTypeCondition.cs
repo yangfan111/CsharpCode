@@ -8,11 +8,12 @@ using UnityEngine;
 using com.wd.free.util;
 using App.Shared.Configuration;
 using Utils.Singleton;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.condition
 {
     [Serializable]
-    public class PosTypeCondition : IParaCondition
+    public class PosTypeCondition : IParaCondition, IRule
     {
         [NonSerialized]
         public const int Water = 1;
@@ -53,6 +54,11 @@ namespace App.Server.GameModules.GamePlay.Free.condition
             }
 
             return false;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PosTypeCondition;
         }
     }
 }

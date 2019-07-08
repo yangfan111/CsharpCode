@@ -27,9 +27,9 @@ namespace App.Shared.Components.Player
     
     public class PlayerMoveByAnimUpdateComponent : IUpdateComponent
     {
-        [NetworkProperty] [DontInitilize] public FixedVector3 Position;
-        [NetworkProperty] [DontInitilize] public float ModelPitch;
-        [NetworkProperty] [DontInitilize] public float ModelYaw;
+        [NetworkProperty(SyncFieldScale.Position)] [DontInitilize] public FixedVector3 Position;
+        [NetworkProperty(SyncFieldScale.Pitch)] [DontInitilize] public float ModelPitch;
+        [NetworkProperty(SyncFieldScale.Yaw)] [DontInitilize] public float ModelYaw;
         [NetworkProperty] [DontInitilize] public bool NeedUpdate;
 
         public int GetComponentId()
@@ -55,16 +55,16 @@ namespace App.Shared.Components.Player
     {
         [NetworkProperty] [DontInitilize] public bool IsMoveEnabled;
 
-        [NetworkProperty] [DontInitilize] public float Pitch;
-        [NetworkProperty] [DontInitilize] public float Yaw;
-        [NetworkProperty] [DontInitilize] public float Roll;
+        [NetworkProperty(SyncFieldScale.Pitch)] [DontInitilize] public float Pitch;
+        [NetworkProperty(SyncFieldScale.Yaw)] [DontInitilize] public float Yaw;
+        [NetworkProperty(SyncFieldScale.Roll)] [DontInitilize] public float Roll;
 
-        [NetworkProperty] [DontInitilize] public int SkyMoveStage;
-        [NetworkProperty] [DontInitilize] public int GameState;
-        [NetworkProperty] [DontInitilize] public FixedVector3 SkyPosition;
-        [NetworkProperty] [DontInitilize] public Quaternion SkyRotation;
-        [NetworkProperty] [DontInitilize] public Vector3 SkyLocalPlayerPosition;
-        [NetworkProperty] [DontInitilize] public Quaternion SkyLocalPlayerRotation;
+        [NetworkProperty(SyncFieldScale.stage)] [DontInitilize] public int SkyMoveStage;
+        [NetworkProperty(SyncFieldScale.stage)] [DontInitilize] public int GameState;
+        [NetworkProperty(SyncFieldScale.Position)] [DontInitilize] public FixedVector3 SkyPosition;
+        [NetworkProperty(SyncFieldScale.Quaternion)] [DontInitilize] public Quaternion SkyRotation;
+        [NetworkProperty(SyncFieldScale.Position)] [DontInitilize] public Vector3 SkyLocalPlayerPosition;
+        [NetworkProperty(SyncFieldScale.Quaternion)] [DontInitilize] public Quaternion SkyLocalPlayerRotation;
 
         public int GetComponentId()
         {
@@ -93,24 +93,24 @@ namespace App.Shared.Components.Player
     
     public class MoveUpdateComponent : IUpdateComponent
     {
-        [NetworkProperty] [DontInitilize] public Vector3 Velocity;
-        [NetworkProperty] [DontInitilize] public FixedVector3 LastPosition;
-        [NetworkProperty] [DontInitilize] public Vector3 Rotation;
+        [NetworkProperty(100,-100,0.01f)] [DontInitilize] public Vector3 Velocity;
+        [NetworkProperty(SyncFieldScale.Position)] [DontInitilize] public FixedVector3 LastPosition;
+        [NetworkProperty(SyncFieldScale.EularAngle)] [DontInitilize] public Vector3 Rotation;
         [NetworkProperty] [DontInitilize] public Vector3 Dist;
         [NetworkProperty] [DontInitilize] public Vector3 VehicleRideOffOffset;
         
         [NetworkProperty] [DontInitilize] public bool IsGround;
         [NetworkProperty] [DontInitilize] public bool IsCollided;
-        [NetworkProperty] [DontInitilize] public float TanSteepAngle; //因坡度过大，人物减速
+        [NetworkProperty(90,-90,0.01f)] [DontInitilize] public float TanSteepAngle; //因坡度过大，人物减速
         [NetworkProperty] [DontInitilize] public bool MoveInWater; //涉水状态
         [NetworkProperty] [DontInitilize] public bool BeginDive; //由游泳状态转为潜水状态
         [NetworkProperty] [DontInitilize] public bool NeedUpdate;
 
         [NetworkProperty] [DontInitilize] public float SpeedRatio;
         [NetworkProperty] [DontInitilize] public float MoveSpeedRatio;
-        [NetworkProperty] [DontInitilize] public float ModelPitch;
-        [NetworkProperty] [DontInitilize] public float ModelYaw;
-        [NetworkProperty] [DontInitilize] public int MoveType; //移动场景（陆地、空中、水）
+        [NetworkProperty(SyncFieldScale.Pitch)] [DontInitilize] public float ModelPitch;
+        [NetworkProperty(SyncFieldScale.Yaw)] [DontInitilize] public float ModelYaw;
+        [NetworkProperty(SyncFieldScale.stage)] [DontInitilize] public int MoveType; //移动场景（陆地、空中、水）
 
         public void CopyFrom(object rightComponent)
         {

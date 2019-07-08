@@ -1,5 +1,6 @@
 ﻿using com.wd.free.@event;
 using com.wd.free.map.position;
+using com.wd.free.para;
 using com.wd.free.para.exp;
 using com.wd.free.unit;
 using com.wd.free.util;
@@ -7,11 +8,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.condition
 {
     [Serializable]
-    public class DistanceCondition : IParaCondition
+    public class DistanceCondition : IParaCondition, IRule
     {
         private IPosSelector source;
         private IPosSelector target;
@@ -36,6 +38,11 @@ namespace App.Server.GameModules.GamePlay.Free.condition
                 }
             }
             return false;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.DistanceCondition;
         }
     }
 }

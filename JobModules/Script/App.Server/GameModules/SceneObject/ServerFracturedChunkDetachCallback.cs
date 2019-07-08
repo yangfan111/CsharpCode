@@ -19,18 +19,20 @@ namespace App.Server.GameModules.SceneObject
         private ISceneObjectEntityFactory _sceneObjectEntityFactory;
         private ICurrentTime _currentTime;
         private IMapObjectEntityFactory MapObjectEntityFactory;
+        
         public ServerFracturedChunkDetachCallback(Contexts contexts)
         {
             _sceneObjectContext = contexts.sceneObject;
             _sceneObjectEntityFactory = contexts.session.entityFactoryObject.SceneObjectEntityFactory;
             _currentTime = contexts.session.currentTimeObject;
-            MapObjectEntityFactory= contexts.session.entityFactoryObject.MapObjectEntityFactory;
+            MapObjectEntityFactory = contexts.session.entityFactoryObject.MapObjectEntityFactory;
         }
 
         public void OnDetach(object o)
         {
             FracturedChunk chunk = o as FracturedChunk;
             var destructibleObject = MapObjectUtility.GetMapObjectOfFracturedChunk(chunk);
+
             if (destructibleObject != null)
             {
                 var data = destructibleObject.destructibleData;

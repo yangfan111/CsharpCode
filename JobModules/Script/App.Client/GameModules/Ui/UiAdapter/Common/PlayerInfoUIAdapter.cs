@@ -12,10 +12,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         private Shared.Components.Ui.UIComponent _ui;
 
        
-        public List<ITipData> CountdownTipDataList
-        {
-            get { return _contexts.ui.uI.CountdownTipDataList; }
-        }
+
 
         public PlayerInfoUIAdapter(Contexts contexts)
         {
@@ -31,10 +28,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
             }
         }
 
-        public int GetGameRule()
-        {
-            return _contexts.session.commonSession.RoomInfo.ModeId;
-        }
+
 
         public int CurrentHp          //非受伤状态的当前血量
         {

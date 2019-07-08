@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using com.wd.free.@event;
 using App.Server.GameModules.GamePlay.Free.entity;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
     [Serializable]
-    public class FollowEntityAction : AbstractPlayerAction
+    public class FollowEntityAction : AbstractPlayerAction, IRule
     {
         private string entity;
         private bool remove;
@@ -38,6 +39,11 @@ namespace App.Server.GameModules.GamePlay.Free.player
                     }
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FollowEntityAction;
         }
     }
 }

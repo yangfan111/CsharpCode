@@ -6,11 +6,12 @@ using System.Text;
 using com.wd.free.@event;
 using Core.Utils;
 using com.wd.free.trigger;
+using Core.Free;
 
 namespace App.Shared.FreeFramework.UnitTest
 {
     [Serializable]
-    public class TestCaseAction : AbstractTestCaseAction
+    public class TestCaseAction : AbstractTestCaseAction, IRule
     {
         static LoggerAdapter logger = new LoggerAdapter("UnitTest");
 
@@ -33,6 +34,11 @@ namespace App.Shared.FreeFramework.UnitTest
 
                 args.Resume(UnitTestConstant.Tester);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.TestCaseAction;
         }
     }
 }

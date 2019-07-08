@@ -86,6 +86,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
         /// 槽位序号列表(武器hud的从上至下对应list的从头到尾)
         /// </summary>
         List<int> SlotIndexList { get; }
-	
-	}
+
+    }
 }

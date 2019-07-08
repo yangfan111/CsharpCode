@@ -1,6 +1,5 @@
 ﻿using Core;
 using Core.Prediction.UserPrediction.Cmd;
-using System.Collections.Generic;
 
 namespace App.Shared.GameMode
 {
@@ -13,21 +12,21 @@ namespace App.Shared.GameMode
 
         protected override void DoDropGrenade(PlayerEntity playerEntity, EWeaponSlotType slot, IUserCmd cmd)
         {
-            if (slot == EWeaponSlotType.ThrowingWeapon)
-            {
-                cmd.IsThrowing = true;
-                return;
-            }
+            cmd.IsLeftAttack = true;
+            playerEntity.WeaponController().AutoThrowing = true;
         }
 
         public override void Drop(PlayerEntity player, EWeaponSlotType slot, IUserCmd cmd)
         {
-            
+            if (slot == EWeaponSlotType.ThrowingWeapon)
+            {
+                DoDropGrenade(player,slot,cmd);
+            }
         }
 
-        public override void AutoPickupWeapon(PlayerEntity player, List<int> sceneKeys)
+        /*public override void AutoPickupWeapon(PlayerEntity player, List<int> sceneKeys)
         {
-        }
+        }*/
 //使用服务器操作
             //var player = _playerContext.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(playerEntityId, (short)EEntityType.Player));
             //player.WeaponController().HeldWeaponAgent.SetFlagWaitDestroy();

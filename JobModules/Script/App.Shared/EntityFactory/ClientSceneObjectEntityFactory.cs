@@ -1,7 +1,5 @@
-﻿using System;
-using App.Shared.Components;
+﻿using App.Shared.Components;
 using Assets.XmlConfig;
-using com.cpkf.yyjd.tools.util.math;
 using Core;
 using Core.EntityComponent;
 using Core.GameTime;
@@ -24,7 +22,7 @@ namespace App.Shared.EntityFactory
         {
             return null;
         }
-        public override IEntity CreateSimpleEquipmentEntity(ECategory category, int id, int count, Vector3 p)
+        public override IEntity CreateSimpleObjectEntity(ECategory category, int id, int count, Vector3 p, int curDurability = 0)
         {
             return null;
         }

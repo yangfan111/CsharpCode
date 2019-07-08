@@ -20,56 +20,96 @@ namespace App.Shared.Components.Player
     [Player]
     public class PlayerAudioComponent : IGameComponent
     {
-        [DontInitilize] public int LastFootPrintPlayStamp;
-        [DontInitilize] public int ReloadedBulletLeft;
+        [DontInitilize] public bool InWaterState;
 
         public int GetComponentId()
         {
             return (int)EComponentIds.PlayerAudio;
         }
     }
-
-    [Player,]
-    public class PlayerWeaponAuxiliaryComponent : IGameComponent
+    [Player]
+    public class PlayerWeaponDebugComponent : IUpdateComponent
     {
-        // PlayerInterruptStateComponent
-        //PlayerBulletDataComponent
-        [DontInitilize] public List<PlayerBulletData> BulletList;
+        [DontInitilize] public EntityKey Slot1;
+        [DontInitilize] public int       ConfigId1;
+        [DontInitilize] public EntityKey Slot2;
+        [DontInitilize] public int       ConfigId2;
+        [DontInitilize] public EntityKey Slot3;
+        [DontInitilize] public int       ConfigId3;
+        [DontInitilize] public EntityKey Slot4;
+        [DontInitilize] public int       ConfigId4;
+
+        [DontInitilize] public EntityKey Slot5;
+        [DontInitilize] public int       ConfigId5;
+
+        [DontInitilize] public EntityKey Slot6;
+        [DontInitilize] public int       ConfigId6;
+        /// <summary>
+        /// 0:None;1:left,-1:right
+        /// </summary>
+        [DontInitilize,NetworkProperty] public int DebugAutoMove; 
 
 
-
-
-        [DontInitilize] public bool ClientInitialize;
-
-        [DontInitilize] public List<EClientEffectType> EffectList;
-
-
-
-        //Auto Fire
-        [DontInitilize] public bool HasAutoAction;
-        [DontInitilize] public bool  AutoFire;
-
-        [DontInitilize] public bool AutoThrowing;
-
-        //TODO:移到别处
-
+        public void CopyFrom(object rightComponent)
+        {
+            DebugAutoMove = (rightComponent as PlayerWeaponDebugComponent).DebugAutoMove;
+        }
 
         public int GetComponentId()
         {
-            return (int) EComponentIds.WeaponAux;
+            return (int)EComponentIds.WeaponDebug;
         }
-
     }
 
-
-
-    public class PlayerBulletData : BaseRefCounter
+    [Player,]
+        public class PlayerWeaponAuxiliaryComponent : IGameComponent
         {
-            public Vector3 Dir;
-            public Vector3 ViewPosition;
-            public Vector3 EmitPosition;
-            
+            // PlayerInterruptStateComponent
+            //PlayerBulletDataComponent
+            [DontInitilize] public List<PlayerBulletData> BulletList;
 
+
+
+
+            [DontInitilize] public bool ClientInitialize;
+
+            [DontInitilize] public List<EClientEffectType> EffectList;
+
+
+
+            //Auto Fire
+            [DontInitilize] public bool HasAutoAction;
+            [DontInitilize] public bool AutoFire;
+
+            [DontInitilize] public bool AutoThrowing;
+
+            //TODO:移到别处
+
+
+            public int GetComponentId()
+            {
+                return (int) EComponentIds.WeaponAux;
+            }
+
+        }
+
+        
+
+        public class PlayerBulletData : BaseRefCounter
+        {
+            public PrecisionsVector3 Dir;
+            public PrecisionsVector3 ViewPosition;
+            public Vector3 EmitPosition;
+
+            
+            public override string ToString()
+            {
+                return string.Format("{0},{1},{2}", Dir, ViewPosition, EmitPosition);
+            }
+            public  string ToStringExt()
+            {
+                return string.Format("Dir:{0},ViewPosition:{1}", Dir, ViewPosition);
+            }
             public static PlayerBulletData Allocate()
             {
                 return ObjectAllocatorHolder<PlayerBulletData>.Allocate();

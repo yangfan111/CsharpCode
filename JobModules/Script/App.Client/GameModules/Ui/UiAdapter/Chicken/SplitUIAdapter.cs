@@ -50,7 +50,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public void ShowIllegalTip()
         {
-            Player.tip.TipType = Core.Common.ETipType.EnterNumError;
+            Player.tip.TipType = Core.ETipType.EnterNumError;
         }
     }
 }

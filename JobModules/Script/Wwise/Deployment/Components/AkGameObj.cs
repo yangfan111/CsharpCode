@@ -42,6 +42,8 @@ public class AkGameObj : UnityEngine.MonoBehaviour,IComparer<AkGameObj>
 
 	private AkGameObjPositionData m_posData;
 
+	public bool IsMainObject { get; set; }
+
 	/// When not set to null, the position will be offset relative to the Game Object position by the Position Offset
 	public AkGameObjPositionOffsetData m_positionOffsetData;
 
@@ -183,7 +185,14 @@ public class AkGameObj : UnityEngine.MonoBehaviour,IComparer<AkGameObj>
 	public long EndTimeSecStamp { get; set; }
 
 	public bool IsMute { get; set; }
-	public int SequenceIndex { get; set; }
+
+	public void ThrdPlay(uint Different_player_effect)
+	{
+		IsMute = false;
+		AkSoundEngine.SetRTPCValue(Different_player_effect, 1f, gameObject);
+
+	}
+	public uint SequenceIndex { get; set; }
 
 	private void Update()
 	{
@@ -423,7 +432,7 @@ public class AkGameObj : UnityEngine.MonoBehaviour,IComparer<AkGameObj>
 
 	public int Compare(AkGameObj x, AkGameObj y)
 	{
-		return x.SequenceIndex - y.SequenceIndex ;
-	}
+        return x.SequenceIndex.CompareTo(y.SequenceIndex);
+    }
 }
 #endif // #if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.

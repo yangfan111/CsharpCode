@@ -94,7 +94,7 @@ namespace App.Shared.GameMode
                 case EBulletCaliber.E57mm:
                     return relatedAmmunition.ReservedBullet57;
                 default:
-                    Logger.ErrorFormat("Illegal caliber {0}", caliber);
+                    Logger.WarnFormat("Illegal caliber {0}", caliber);
                     return 0;
             }
         }

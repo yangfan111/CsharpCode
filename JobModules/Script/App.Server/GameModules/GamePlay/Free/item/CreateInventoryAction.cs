@@ -5,12 +5,13 @@ using com.wd.free.action;
 using com.wd.free.item;
 using com.wd.free.skill;
 using com.wd.free.unit;
+using Core.Free;
 
 namespace gameplay.gamerule.free.item
 {
 	[System.Serializable]
-	public class CreateInventoryAction : AbstractPlayerAction
-	{
+	public class CreateInventoryAction : AbstractPlayerAction, IRule
+    {
 		private const long serialVersionUID = 3638982865899274709L;
 
 		private string name;
@@ -73,5 +74,10 @@ namespace gameplay.gamerule.free.item
 		{
 			this.row = row;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.CreateInventoryAction;
+        }
+    }
 }

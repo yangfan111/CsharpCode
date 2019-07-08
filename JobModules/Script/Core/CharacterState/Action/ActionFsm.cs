@@ -44,9 +44,6 @@ namespace Core.CharacterState.Action
 
             AddState(ActionState.CreateBuriedBombState(), infoProvider, characterInfo);
             AddState(ActionState.CreateDismantleBombState(), infoProvider, characterInfo);
-            
-            AddState(ActionState.CreateTransfigurationStartState(), infoProvider, characterInfo);
-            AddState(ActionState.CreateTransfigurationFinishState(), infoProvider, characterInfo);
 
             _resetParam = ResetCommon;
         }
@@ -68,6 +65,15 @@ namespace Core.CharacterState.Action
             _resetParam = ResetKeep;
         }
 
+        public void InitTransfigurationState(IFsmTransitionHelper infoProvider, ICharacterInfoProvider characterInfo)
+        {
+            AddState(ActionState.CreateTransfigurationNullState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateTransfigurationStartState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateTransfigurationFinishState(), infoProvider, characterInfo);
+
+            _resetParam = ResetTransfiguration;
+        }
+
         public bool CanFire()
         {
             return ActionStateId.Reload != (ActionStateId) CurrentState.StateId;
@@ -82,7 +88,7 @@ namespace Core.CharacterState.Action
             }
         }
 
-        private void ResetCommon(Action<FsmOutput> addOutput)
+        private static void ResetCommon(Action<FsmOutput> addOutput)
         {
             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.UpperBodySpeedRatioHash,
                 AnimatorParametersHash.Instance.UpperBodySpeedRatioName,
@@ -168,12 +174,6 @@ namespace Core.CharacterState.Action
                 CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
             addOutput(FsmOutput.Cache);
 
-            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MeleeAttackHash,
-                AnimatorParametersHash.Instance.MeleeAttackName,
-                AnimatorParametersHash.Instance.MeleeAttackEnd,
-                CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
-            addOutput(FsmOutput.Cache);
-            
             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MeleeStateHash,
                 AnimatorParametersHash.Instance.MeleeStateName,
                 AnimatorParametersHash.Instance.NullMelee,
@@ -209,31 +209,14 @@ namespace Core.CharacterState.Action
                 AnimatorParametersHash.Instance.DismantleDisableValue,
                 CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
             addOutput(FsmOutput.Cache);
-            
-            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.TransfigurationStartHash,
-                AnimatorParametersHash.Instance.TransfigurationStartName,
-                AnimatorParametersHash.Instance.TransfigurationStartDisable,
-                CharacterView.ThirdPerson, false);
-            addOutput(FsmOutput.Cache);
-            
-            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.TransfigurationFinishHash,
-                AnimatorParametersHash.Instance.TransfigurationFinishName,
-                AnimatorParametersHash.Instance.TransfigurationFinishDisable,
-                CharacterView.ThirdPerson, false);
-            addOutput(FsmOutput.Cache);
 
             FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.ADSLayer,
                 AnimatorParametersHash.Instance.ADSDisableValue,
                 CharacterView.ThirdPerson);
             addOutput(FsmOutput.Cache);
-
-            FsmOutput.Cache.SetLayerWeight(AnimatorParametersHash.Instance.ADSLayerP1,
-                AnimatorParametersHash.Instance.ADSDisableValue,
-                CharacterView.FirstPerson);
-            addOutput(FsmOutput.Cache);
         }
 
-        private void ResetKeep(Action<FsmOutput> addOutput)
+        private static void ResetKeep(Action<FsmOutput> addOutput)
         {
             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.VehiclesAnimHash,
                 AnimatorParametersHash.Instance.VehiclesAnimName,
@@ -260,19 +243,19 @@ namespace Core.CharacterState.Action
             addOutput(FsmOutput.Cache);
         }
 
-        private bool GetCurrentOrNextState(bool getCurrent, ActionStateId state)
+        private static void ResetTransfiguration(Action<FsmOutput> addOutput)
         {
-            if (getCurrent)
-            {
-                return state == (ActionStateId) CurrentState.StateId;
-            }
-
-            if (CurrentState.ActiveTransition != null)
-            {
-                return state == (ActionStateId) CurrentState.ActiveTransition.To;
-            }
-
-            return false;
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.TransfigurationStartHash,
+                AnimatorParametersHash.Instance.TransfigurationStartName,
+                AnimatorParametersHash.Instance.TransfigurationStartDisable,
+                CharacterView.ThirdPerson, false);
+            addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.TransfigurationFinishHash,
+                AnimatorParametersHash.Instance.TransfigurationFinishName,
+                AnimatorParametersHash.Instance.TransfigurationFinishDisable,
+                CharacterView.ThirdPerson, false);
+            addOutput(FsmOutput.Cache);
         }
 
         public ActionInConfig GetActionState()

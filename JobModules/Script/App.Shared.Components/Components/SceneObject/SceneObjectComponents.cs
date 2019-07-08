@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Utils.AssetManager;
+using XmlConfig;
 
 namespace App.Shared.Components.SceneObject
 {
@@ -65,31 +66,71 @@ namespace App.Shared.Components.SceneObject
         }
     }
 
-    [SceneObject]
-    public class WeaponAttachmentComponent : IComponent
+    public struct PartAssetData
     {
-        public Dictionary<AssetInfo, int> AttachmentDic;
-        public List<AssetInfo> EffectDic;
+        public GameObject UnityObject;
+        public int PartId;
+        public int PartSlotType;
+        public WeaponPartLocation PartLocation;
+    }
+    [SceneObject]
+    public class WeaponAttachmentComponent : IComponent,IResetableComponent
+    {
+        [DontInitilize]
+        public Dictionary<AssetInfo, PartAssetData> PartAssetDict
+        {
+            get;
+            private set;
+        }
+
+        public bool ContainsPart(AssetInfo assetInfo)
+        {
+            PartAssetData assetData;
+            PartAssetDict.TryGetValue(assetInfo, out assetData);
+            return assetData.PartId > 0;
+        }
+//        [DontInitilize]
+//        public Dictionary<AssetInfo, UnityObject> EffectAssetDict
+//        {
+//            get;
+//            private set;
+//        }
+        [DontInitilize]
+        public List<UnityObject> EffectAssetList { get; private set; }
+
+        public WeaponAttachmentComponent()
+        {
+            PartAssetDict = new Dictionary<AssetInfo, PartAssetData>(AssetInfo.AssetInfoComparer.Instance);
+            EffectAssetList  = new List<UnityObject>();
+
+
+        }
+        public void Reset()
+        {
+            EffectAssetList.Clear();
+            PartAssetDict.Clear();
+        }
+        
     }
 
     [SceneObject, ]
     public class WeaponObjectComponent : IPlaybackComponent 
     {
-        [DontInitilize, NetworkProperty] public int ConfigId;
-        [DontInitilize, NetworkProperty] public int WeaponAvatarId;
-        [DontInitilize, NetworkProperty] public int UpperRail;
-        [DontInitilize, NetworkProperty] public int LowerRail;
-        [DontInitilize, NetworkProperty] public int SideRail;
-        [DontInitilize, NetworkProperty] public int Stock;
-        [DontInitilize, NetworkProperty] public int Muzzle;
-        [DontInitilize, NetworkProperty] public int Magazine;
-        [DontInitilize, NetworkProperty] public int Bullet;
-        [DontInitilize, NetworkProperty] public int ReservedBullet;
-        [DontInitilize, NetworkProperty] public int Bore;
-        [DontInitilize, NetworkProperty] public int Feed;
-        [DontInitilize, NetworkProperty] public int Trigger;
-        [DontInitilize, NetworkProperty] public int Interlock;
-        [DontInitilize, NetworkProperty] public int Brake;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int ConfigId;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int WeaponAvatarId;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int UpperRail;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int LowerRail;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int SideRail;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Stock;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Muzzle;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Magazine;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Bullet;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int ReservedBullet;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Bore;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Feed;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Trigger;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Interlock;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveInt)] public int Brake;
 
         public void CopyFrom(object rightComponent)
         {
@@ -237,7 +278,7 @@ namespace App.Shared.Components.SceneObject
     /// 根据配置生成的场景物件
     /// </summary>
     [SceneObject, ]
-    public class SimpleEquipmentComponent : IPlaybackComponent
+    public class SimpleItemComponent : IPlaybackComponent
     {
         [NetworkProperty]
         public int Id;
@@ -248,7 +289,7 @@ namespace App.Shared.Components.SceneObject
 
         public virtual void CopyFrom(object rightComponent)
         {
-            var comp = rightComponent as SimpleEquipmentComponent;
+            var comp = rightComponent as SimpleItemComponent;
             if (null == comp)
             {
                 return;
@@ -260,7 +301,7 @@ namespace App.Shared.Components.SceneObject
 
         public virtual int GetComponentId()
         {
-            return (int)EComponentIds.SceneObjectEquip;
+            return (int)EComponentIds.SceneObjectItem;
         }
         public bool IsInterpolateEveryFrame(){ return false; }
         public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
@@ -288,7 +329,13 @@ namespace App.Shared.Components.SceneObject
     {
         [DontInitilize] public int Time;
         [DontInitilize] public Vector3 Velocity;
+    }
 
+    [SceneObject]
+    public class ArmorDurabilityComponent : IComponent
+    {
+        public int CurDurability;
+        public int MaxDurability;
     }
 
     [MapObject]
@@ -405,7 +452,7 @@ namespace App.Shared.Components.SceneObject
 
         [NetworkProperty]
         [DontInitilize]
-        public int ResetCount;
+        public short ResetCount;
 
 
         public bool HasAnyChunkDetached()
@@ -510,7 +557,7 @@ namespace App.Shared.Components.SceneObject
 
         public float InitialRotation;
 
-        [NetworkProperty]
+        [NetworkProperty(SyncFieldScale.EularAngle)]
         public float Rotation;//[0, 360)
 
         public int GetComponentId()

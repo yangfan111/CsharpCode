@@ -16,8 +16,10 @@ namespace Sharpen
 	{
 		private static Runtime instance;
 		private List<ShutdownHook> shutdownHooks = new List<ShutdownHook> ();
+        private static long currentTimeMillis;
 
-		public void AddShutdownHook (Runnable r)
+
+        public void AddShutdownHook (Runnable r)
 		{
 			ShutdownHook item = new ShutdownHook ();
 			item.Runnable = r;
@@ -29,10 +31,13 @@ namespace Sharpen
 			return Environment.ProcessorCount;
 		}
 
-		public static long CurrentTimeMillis ()
+		public static long CurrentTimeMillis (bool update = true)
 		{
-			return DateTime.UtcNow.ToMillisecondsSinceEpoch ();
-		}
+            if (update) {
+                currentTimeMillis = DateTime.UtcNow.ToMillisecondsSinceEpoch();
+            }
+            return currentTimeMillis;
+        }
 
 		public SystemProcess Exec (string[] cmd, string[] envp, FilePath dir)
 		{

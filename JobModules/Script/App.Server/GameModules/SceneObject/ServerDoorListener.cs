@@ -35,7 +35,11 @@ namespace App.Server.GameModules.SceneObject
         public override IEntity CreateMapObj(int id)
         {
             var gameObj = _objectManager.Get(id);
-            if (gameObj == null) return null;
+            if (gameObj == null)
+            {
+                _logger.ErrorFormat("Can't create mapObj, because gameObj(id={0}) is not loaded", id);
+                return null;
+            }
             var door = (MapObjectEntity)MapObjectEntityFactory.CreateDoor(id, gameObj);
             MapObjectUtility.RecordMapObj(id, (int) _triggerType, door);
             MapObjectUtility.FetchFractruedState(gameObj);
@@ -44,7 +48,7 @@ namespace App.Server.GameModules.SceneObject
 
         public override void OnTriggerObjectLoaded(int id, GameObject gameObject)
         {
-            _logger.DebugFormat("Door Loaded {0}", id);
+            _logger.InfoFormat("Door Loaded {0}", id);
 
             MapObjectUtility.RecordGameObjId(gameObject, (int)_triggerType, id);
             MapObjectUtility.AttachRawObjToFracture(gameObject);

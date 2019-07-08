@@ -1,11 +1,12 @@
 ﻿using com.wd.free.action;
 using com.wd.free.@event;
+using Core.Free;
 using System;
 
 namespace App.Shared.FreeFramework.framework.ai
 {
     [Serializable]
-    public class PlayerInterceptKeyAction : AbstractPlayerAction
+    public class PlayerInterceptKeyAction : AbstractPlayerAction, IRule
     {
         private enum KeyType { Press = 1, Intercept = 2, Cancel = 3 }
         private int type;
@@ -30,6 +31,11 @@ namespace App.Shared.FreeFramework.framework.ai
                 default:
                     break;
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerInterceptKeyAction;
         }
     }
 }

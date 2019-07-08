@@ -87,10 +87,28 @@ namespace Core.EntityComponent
         public IGameEntity GetGameEntity(EntityKey entityKey)
         {
             var info = _infos[entityKey.EntityType];
-
+            if (info == null)
+            {
+                AssertUtility.Assert(false, "_infos["+ entityKey.EntityType.ToString()+"] == null");
+                return null;
+            }
             return info.GetEntity(entityKey);
         }
+#pragma warning disable RefCounter002
+        public bool TryGetGameEntity(EntityKey entityKey, out IGameEntity entity)
+#pragma warning restore RefCounter002
+        {
+            entity = null;
+            
+            var info = _infos[entityKey.EntityType];
+            if (info == null)
+            {
+                AssertUtility.Assert(false, "_infos[" + entityKey.EntityType.ToString() + "] == null");
+                return false;
+            }
 
+            return info.TryGetEntity(entityKey, out entity);
+        }
 
         public IGameContext[] AllContexts { get { return _infos.Values.ToArray(); } }
 

@@ -10,14 +10,15 @@ using com.wd.free.para;
 using com.wd.free.unit;
 using com.wd.free.util;
 using gameplay.gamerule.free.rule;
+using Core.Free;
 
 namespace gameplay.gamerule.free.item
 {
 	/// <summary>丢弃物品和移除物品的区别在于,丢弃物品丢弃的是上次使用的物品</summary>
 	/// <author>Dave</author>
 	[System.Serializable]
-	public class PlayerDropItemAction : AbstractPlayerAction
-	{
+	public class PlayerDropItemAction : AbstractPlayerAction, IRule
+    {
 		private const long serialVersionUID = 6361325829890462542L;
 
 		private string cat;
@@ -63,5 +64,10 @@ namespace gameplay.gamerule.free.item
 				}
 			}
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerDropItemAction;
+        }
+    }
 }

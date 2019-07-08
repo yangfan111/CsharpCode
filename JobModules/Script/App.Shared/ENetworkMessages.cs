@@ -44,6 +44,7 @@
         ClearScene,
         GameOver,
         HeartBeat,
+        SceneInfo,
         Max
     }
 

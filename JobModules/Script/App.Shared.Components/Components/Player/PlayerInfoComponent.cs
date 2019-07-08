@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Entitas;
+using Core.Free;
 
 namespace App.Shared.Components.Player
 {
@@ -25,7 +26,7 @@ namespace App.Shared.Components.Player
     /// </summary>
     [Player]
     
-    public class PlayerInfoComponent : IPlaybackComponent,ICreatePlayerInfo,IResetableComponent
+    public class PlayerInfoComponent : IPlaybackComponent,ICreatePlayerInfo,IResetableComponent, IRule
     {
         //玩家信息
         public string Token { get; set; }
@@ -43,8 +44,6 @@ namespace App.Shared.Components.Player
         [NetworkProperty]public List<int> WeaponAvatarIds{ get; set; }
         [NetworkProperty]public int Camp { get; set; }
         [NetworkProperty]public List<int> SprayLacquers { get; set; } /*喷漆*/
-
-        [NetworkProperty] public int JobAttribute { get; set; } /*职业*/
         /// <summary>
         /// 初始位置
         /// </summary>
@@ -101,7 +100,6 @@ namespace App.Shared.Components.Player
             SprayLacquers.AddRange(right.SprayLacquers);
 
             Camp = right.Camp;
-            JobAttribute = right.JobAttribute;
             Token = right.Token;
             InitPosition = right.InitPosition;
         }
@@ -153,6 +151,11 @@ namespace App.Shared.Components.Player
         public override string ToString()
         {
             return string.Format("EntityId: {0}, PlayerId: {1}, PlayerName: {2}, RoleModelId: {3}, AvatarIds: {4}", EntityId, PlayerId, PlayerName, RoleModelId, AvatarIds);
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerInfoComponent;
         }
     }
 }

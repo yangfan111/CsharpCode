@@ -4,12 +4,13 @@ using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.action;
 using System;
+using Core.Free;
 
 namespace com.wd.free.action.stage
 {
 	[System.Serializable]
-	public class StageTimeAction : AbstractGameAction
-	{
+	public class StageTimeAction : AbstractGameAction, IRule
+    {
 		private const long serialVersionUID = 1L;
 
 		private IList<OneTimeStageAction> stages;
@@ -58,7 +59,12 @@ namespace com.wd.free.action.stage
 			}
 		}
 
-		private sealed class StageComparer : IComparer<OneTimeStageAction>
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.StageTimeAction;
+        }
+
+        private sealed class StageComparer : IComparer<OneTimeStageAction>
 		{
 		    private IEventArgs args;
 

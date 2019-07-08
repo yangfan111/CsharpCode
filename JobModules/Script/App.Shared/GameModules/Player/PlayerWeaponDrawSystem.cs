@@ -1,7 +1,7 @@
 ﻿using App.Shared.Util;
+using Core;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using Core;
 
 
 namespace App.Shared.GameModules.Player
@@ -28,10 +28,10 @@ namespace App.Shared.GameModules.Player
             if (cmd.IsForceUnmountWeapon)
             {
               
-                controller.UnArmWeapon(false);
+                DebugUtil.MyLog("Force Unmount");
+                controller.UnArmWeapon(false, false);
                 return;
             }
-
             if(!cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsDrawWeapon))
             {
                 return;
@@ -54,7 +54,6 @@ namespace App.Shared.GameModules.Player
                 }
                 else
                 {
-                    changeWeaponSucess = false;
                     if (Logger.IsInfoEnabled)
                     {
                         Logger.Info("last weapon slot is none");
@@ -63,8 +62,9 @@ namespace App.Shared.GameModules.Player
             }
             else
             {
+                DebugUtil.MyLog("Force Unmount");
                 //   player.soundManager.Value.PlayOnce(XmlConfig.EPlayerSoundType.ChangeWeapon);
-                controller.UnArmWeapon(true); 
+                controller.UnArmWeapon(true, false); 
                  
             }
         }

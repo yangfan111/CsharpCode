@@ -44,7 +44,7 @@ namespace App.Shared.GameModules.Player.Oxygen
         public void ResetOxygen(bool needReset)
         {
             if(needReset)
-                _currentOxygen = MinOxygenEnergy;
+                _currentOxygen = MaxOxygenEnergy;
         }
 
         public void UpdateOxygenEnergy(float deltaTime)

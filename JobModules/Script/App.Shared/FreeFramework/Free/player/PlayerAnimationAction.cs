@@ -1,21 +1,20 @@
-﻿using com.wd.free.action;
-using System;
-using com.wd.free.@event;
-using App.Server.GameModules.GamePlay.free.player;
-using Free.framework;
-using Core.Free;
-using com.wd.free.util;
-using Assets.App.Server.GameModules.GamePlay.Free;
-using App.Shared.Player;
+﻿using App.Server.GameModules.GamePlay.free.player;
 using App.Shared;
-using App.Shared.GameModules.Weapon;
+using App.Shared.Player;
+using Assets.App.Server.GameModules.GamePlay.Free;
+using com.wd.free.action;
+using com.wd.free.@event;
+using com.wd.free.util;
 using Core;
 using Core.EntityComponent;
+using Core.Free;
+using Free.framework;
+using System;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
     [Serializable]
-    public class PlayerAnimationAction : AbstractPlayerAction
+    public class PlayerAnimationAction : AbstractPlayerAction, IRule
     {
         public const int PickUp = 101;
         public const int Rescue = 102;
@@ -102,17 +101,20 @@ namespace App.Server.GameModules.GamePlay.Free.player
                             break;
                         case OpenDoor:
                             player.stateInterface.State.OpenDoor();
-                            if(player.AudioController()!= null)
-                                player.AudioController().PlaySimpleAudio(EAudioUniqueId.OpenDoor);
-
+                            player.AudioController().PlaySimpleAudio(EAudioUniqueId.OpenDoor);
                             break;
                         case PlayerReborn:
+                            if (player.WeaponController().RelatedThrowAction.IsReady)
+                            {
+                                player.WeaponController().RelatedThrowAction.InternalCleanUp();
+                            }
                             player.stateInterface.State.PlayerReborn();
                             player.appearanceInterface.Appearance.PlayerReborn();
                             player.genericActionInterface.GenericAction.PlayerReborn(player);
                             break;
                         case Revive:
                             player.stateInterface.State.Revive();
+                            player.stateInterface.State.SetPostureCrouch();
                             break;
                         case Stand:
                             player.stateInterface.State.Stand();
@@ -155,6 +157,11 @@ namespace App.Server.GameModules.GamePlay.Free.player
                     FreeMessageSender.SendMessage(player, message);
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerAnimationAction;
         }
     }
 }

@@ -6,11 +6,13 @@ using com.wd.free.util;
 using Free.framework;
 using gameplay.gamerule.free.ui.component;
 using Core.Free;
+using com.wd.free.para;
+using System;
 
 namespace gameplay.gamerule.free.ui
 {
     [System.Serializable]
-    public class FreeUICreateAction : SendMessageAction
+    public class FreeUICreateAction : SendMessageAction, IRule
     {
         private const long serialVersionUID = -1188091456904593121L;
 
@@ -136,6 +138,11 @@ namespace gameplay.gamerule.free.ui
                 d = "(" + desc + ")";
             }
             return "创建UI'" + key + d + "'" + "'\n" + builder.ToString();
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeUICreateAction;
         }
     }
 }

@@ -17,18 +17,16 @@ namespace AssetBundleManager.Warehouse
         }
 
         public override AssetBundleLoading LoadAssetBundle(string name)
-        {
+        {         
             return OperationFactory.CreateAssetBundleSimulatedLoading(name, name);
         }
-
+        //AssetDatabase实现本地模拟
         public override AssetLoading LoadAsset(string bundleName, string name, Type objectType)
         {
             AssetSimulatedLoading operation = null;
 #if UNITY_EDITOR
             UnityEngine.Object asset = null;
             string[] assetPaths = UnityEditor.AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(bundleName, name);
-
-
 
             if (objectType == null)
             {

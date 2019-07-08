@@ -1,10 +1,12 @@
+using System;
 using Sharpen;
+using Core.Free;
 
 namespace com.wd.free.para
 {
 	[System.Serializable]
-	public class TimeElapsePara : AbstractPara
-	{
+	public class TimeElapsePara : AbstractPara, IRule
+    {
 		private const long serialVersionUID = -5389493185692272386L;
 
 		private int totalTime;
@@ -144,11 +146,16 @@ namespace com.wd.free.para
 			return t;
 		}
 
-		private static ParaPool<IPara> pool = new ParaPool<IPara>(new com.wd.free.para.TimeElapsePara());
+		private static ParaPool pool = new ParaPool(new com.wd.free.para.TimeElapsePara());
 
-		protected internal override ParaPool<IPara> GetPool()
+		protected internal override ParaPool GetPool()
 		{
 			return pool;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.TimeElapsePara;
+        }
+    }
 }

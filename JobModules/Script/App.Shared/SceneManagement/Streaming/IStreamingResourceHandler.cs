@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using Utils.AssetManager;
 
 namespace App.Shared.SceneManagement.Streaming
@@ -9,5 +10,7 @@ namespace App.Shared.SceneManagement.Streaming
         void UnloadScene(string sceneName);
         void LoadGo(int sceneIndex, int goIndex);
         void UnloadGo(UnityObject unityObj, int sceneIndex);
+        void LoadLightmaps(IEnumerable<AssetInfoEx<MeshRenderer>> infos);
+        void UnloadLightmaps(IEnumerable<UnityObject> uObjs);
     }
 }

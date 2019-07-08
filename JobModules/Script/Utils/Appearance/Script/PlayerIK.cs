@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using Utils.Appearance.Bone;
 
-namespace Utils.Appearance
+namespace Utils.Appearance.Script
 {
     public class PlayerIK : MonoBehaviour
     {
@@ -123,26 +124,33 @@ namespace Utils.Appearance
             switch (goal)
             {
                 case AvatarIKGoal.LeftHand:
-                    param.RootBone = animator.GetBoneTransform(HumanBodyBones.LeftUpperArm);
-                    param.MiddleBone = animator.GetBoneTransform(HumanBodyBones.LeftLowerArm);
-                    param.EndBone = animator.GetBoneTransform(HumanBodyBones.LeftHand);
+                    param.RootBone = GetBoneTransform(animator, HumanBodyBones.LeftUpperArm);
+                    param.MiddleBone = GetBoneTransform(animator, HumanBodyBones.LeftLowerArm);
+                    param.EndBone = GetBoneTransform(animator, HumanBodyBones.LeftHand);
                     break;
                 case AvatarIKGoal.RightHand:
-                    param.RootBone = animator.GetBoneTransform(HumanBodyBones.RightUpperArm);
-                    param.MiddleBone = animator.GetBoneTransform(HumanBodyBones.RightLowerArm);
-                    param.EndBone = animator.GetBoneTransform(HumanBodyBones.RightHand);
+                    param.RootBone = GetBoneTransform(animator, HumanBodyBones.RightUpperArm);
+                    param.MiddleBone = GetBoneTransform(animator, HumanBodyBones.RightLowerArm);
+                    param.EndBone = GetBoneTransform(animator, HumanBodyBones.RightHand);
                     break;
                 case AvatarIKGoal.LeftFoot:
-                    param.RootBone = animator.GetBoneTransform(HumanBodyBones.LeftUpperLeg);
-                    param.MiddleBone = animator.GetBoneTransform(HumanBodyBones.LeftLowerLeg);
-                    param.EndBone = animator.GetBoneTransform(HumanBodyBones.LeftFoot);
+                    param.RootBone = GetBoneTransform(animator, HumanBodyBones.LeftUpperLeg);
+                    param.MiddleBone = GetBoneTransform(animator, HumanBodyBones.LeftLowerLeg);
+                    param.EndBone = GetBoneTransform(animator, HumanBodyBones.LeftFoot);
                     break;
                 case AvatarIKGoal.RightFoot:
-                    param.RootBone = animator.GetBoneTransform(HumanBodyBones.RightUpperLeg);
-                    param.MiddleBone = animator.GetBoneTransform(HumanBodyBones.RightLowerLeg);
-                    param.EndBone = animator.GetBoneTransform(HumanBodyBones.RightFoot);
+                    param.RootBone = GetBoneTransform(animator, HumanBodyBones.RightUpperLeg);
+                    param.MiddleBone = GetBoneTransform(animator, HumanBodyBones.RightLowerLeg);
+                    param.EndBone = GetBoneTransform(animator, HumanBodyBones.RightFoot);
                     break;
             }
+        }
+
+        private Transform GetBoneTransform(Animator animator, HumanBodyBones bone)
+        {
+            var obj = animator.gameObject;
+            if (!HumanBodyBonesMappingTable.Table.ContainsKey(bone)) return null;
+            return BoneMount.FindChildBone2(obj, HumanBodyBonesMappingTable.Table[bone]);
         }
 
         private void EnableIK(IKParam param)

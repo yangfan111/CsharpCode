@@ -3,11 +3,12 @@ using Sharpen;
 using com.cpkf.yyjd.tools.util.math;
 using com.wd.free.@event;
 using com.wd.free.util;
+using Core.Free;
 
 namespace com.wd.free.para
 {
     [System.Serializable]
-    public class ParaValue
+    public class ParaValue : IRule
     {
         private const long serialVersionUID = 5260989621718192497L;
 
@@ -109,6 +110,11 @@ namespace com.wd.free.para
             }
 
             return para;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ParaValue;
         }
     }
 }

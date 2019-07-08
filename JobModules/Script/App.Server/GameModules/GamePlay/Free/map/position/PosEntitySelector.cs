@@ -12,11 +12,12 @@ using com.wd.free.unit;
 using com.wd.free.util;
 using UnityEngine;
 using App.Shared.GameModules.Player;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.map.position
 {
     [Serializable]
-    public class PosEntitySelector : AbstractPosSelector
+    public class PosEntitySelector : AbstractPosSelector, IRule
     {
         public string condition;
 
@@ -92,8 +93,8 @@ namespace App.Server.GameModules.GamePlay.Free.map.position
 
         private void IniCon()
         {
-            if (con == null || (condition != null && condition.Contains(FreeUtil.VAR_START)
-                                                  && condition.Contains(FreeUtil.VAR_END)))
+            if (con == null || (condition != null && (condition.IndexOf(FreeUtil.VAR_START_CHAR) > -1 )
+                                                  && (condition.IndexOf(FreeUtil.VAR_END_CHAR) > -1)))
             {
                 if (!string.IsNullOrEmpty(condition))
                 {
@@ -136,6 +137,11 @@ namespace App.Server.GameModules.GamePlay.Free.map.position
             o.x = v.x + b.x * s;
             o.y = v.y + b.y * s;
             o.z = v.z + b.z * s;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PosEntitySelector;
         }
     }
 }

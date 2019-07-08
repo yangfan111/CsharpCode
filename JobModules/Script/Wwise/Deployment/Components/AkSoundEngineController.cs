@@ -1,4 +1,7 @@
+using UnityEngine;
+
 #if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.
+
 
 public class AkSoundEngineController
 {
@@ -14,9 +17,39 @@ public class AkSoundEngineController
             return ms_Instance;
         }
     }
-    public static event System.Action OnAudioPluginInitialized;
     
-    public static  System.Action OnAudioPluginInitializedInEditor;
+    #region customize
+    
+    //
+    // public static System.Action OnAudioPluginInitializedInEditor;
+    
+    public static IAudioProjectManager AudioManager {private get; set; }
+
+    public static IAudioProjectManager AudioMgrGetter
+    {
+        get
+        {
+            if (AudioManager != null && AudioManager.prepareReady)
+                return AudioManager;
+            return null;
+        }
+    }
+    
+
+    public static bool HasAudioMgr
+    {
+        get { return AudioManager != null; }
+    }
+    
+    #endregion
+ 
+    
+    
+    
+    
+    
+    
+    
     private AkSoundEngineController()
     {
 #if UNITY_EDITOR
@@ -123,7 +156,7 @@ public class AkSoundEngineController
 #else
 			UnityEngine.Debug.LogError("WwiseUnity: Sound engine is already initialized.");
 #endif
-            DoInitializedEvent();
+         //   DoInitializedEvent();
             return;
         }
 
@@ -139,12 +172,13 @@ public class AkSoundEngineController
 
     void DoInitializedEvent()
     {
-        if (OnAudioPluginInitialized != null && UnityEngine.Application.isPlaying)
-            OnAudioPluginInitialized();
-#if UNITY_EDITOR
-        if (OnAudioPluginInitializedInEditor != null && !UnityEngine.Application.isPlaying)
-            OnAudioPluginInitializedInEditor();
-#endif
+        if (AudioManager != null)
+            AudioManager.OnWiseInitializedSucess();
+       
+        // #if UNITY_EDITOR
+        //         if (OnAudioPluginInitializedInEditor != null && !UnityEngine.Application.isPlaying)
+        //             OnAudioPluginInitializedInEditor();
+        // #endif
     }
 
     public void OnDisable()

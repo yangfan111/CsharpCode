@@ -16,7 +16,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
     /// Defines the <see cref="PlayerWeaponDropAction" />
     /// </summary>
     [Serializable]
-    public class PlayerWeaponDropAction : AbstractPlayerAction
+    public class PlayerWeaponDropAction : AbstractPlayerAction, IRule
     {
         /// <summary>
         /// 0 是当前武器
@@ -52,6 +52,11 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 ta.AddUnit("current", (FreeData)player.freeData.FreeData);
                 args.Trigger(FreeTriggerConstant.WEAPON_DROP, ta);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerWeaponDropAction;
         }
     }
 }

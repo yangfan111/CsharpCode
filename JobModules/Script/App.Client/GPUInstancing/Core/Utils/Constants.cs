@@ -17,14 +17,17 @@ namespace App.Client.GPUInstancing.Core.Utils
         public const int StrideSizeFloat3 = StrideSizeFloat * 3;
 
         public const int DetailInstantiationThreadCount = 32;
+        public const int TreeInstantiationTreadCount = 1024;
         public const int MergeThreadCount = 1024;
         public const int VisibilityThreadCount = 1024;
 
         public static class CsPath
         {
             public const string DetailInstantiationInResource = "Compute/DetailInstantiation";
+            public const string TreeInstantiationInResource = "Compute/TreeInstantiation";
             public const string MergeBufferInResource = "Compute/MergeBuffer";
             public const string VisibilityDeterminationInResource = "Compute/VisibilityDetermination";
+            public const string GpuSortInResource = "Compute/GpuSort";
         }
 
         public static class CsKernel
@@ -90,6 +93,7 @@ namespace App.Client.GPUInstancing.Core.Utils
             public static readonly int TerrainSize = Shader.PropertyToID("TerrainSize");
             public static readonly int HeightMapData = Shader.PropertyToID("HeightMapData");
             public static readonly int HeightMapResolution = Shader.PropertyToID("HeightMapResolution");
+            public static readonly int TransformData = Shader.PropertyToID("TransformData");
 
             // UnityTerrain CBuffer 
             public static readonly int WavingTint = Shader.PropertyToID("_WavingTint");
@@ -124,10 +128,14 @@ namespace App.Client.GPUInstancing.Core.Utils
             public static readonly int HealthyColor = Shader.PropertyToID("HealthyColor");
             public static readonly int DryColor = Shader.PropertyToID("DryColor");
 
-            public static readonly int TransformData = Shader.PropertyToID("TransformData");
             public static readonly int NormalData = Shader.PropertyToID("NormalData");
             public static readonly int ColorData = Shader.PropertyToID("ColorData");
             public static readonly int Cutoff = Shader.PropertyToID("_Cutoff");
+        }
+
+        public static class TreeVariable
+        {
+            public static readonly int RawTRSData = Shader.PropertyToID("RawTRSData");
         }
 
         public static class RandVariable
@@ -177,7 +185,7 @@ namespace App.Client.GPUInstancing.Core.Utils
 
             public static Material GetGrassMaterial()
             {
-                return new Material(GrassMaterial);
+                return GrassMaterial;
             }
 
             public const string GrassMaterialInResource = "Materials/DefaultGrass";

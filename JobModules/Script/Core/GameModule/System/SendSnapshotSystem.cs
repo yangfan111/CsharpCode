@@ -16,7 +16,6 @@ namespace App.Client.ClientGameModules.System
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(SendSnapshotSystem));
         private IRoom _room;
 
-
         public SendSnapshotSystem(IRoom room)
         {
             _room = room;
@@ -33,7 +32,6 @@ namespace App.Client.ClientGameModules.System
             {
                 SingletonManager.Get<DurationHelp>().ProfileEnd(CustomProfilerStep.SendSnapshot);
             }
-           
         }
     }
 }

@@ -1,23 +1,15 @@
 ﻿using Core.Utils;
-using Entitas.Utils;
-using WeaponConfigNs;
-using XmlConfig;
 
 namespace App.Shared.GameModules.Weapon.Behavior
 {
     /// <summary>
-    /// Defines the <see cref="CommonFireAppearanceUpdater" />
+    ///     Defines the <see cref="CommonFireAppearanceUpdater" />
     /// </summary>
     public class CommonFireAppearanceUpdater : IIdleAndAfterFireProcess
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CommonFireAppearanceUpdater));
 
-        protected virtual void DoIdle(PlayerWeaponController controller, WeaponSideCmd cmd)
-        {
-          
-        }
 
-      
         public virtual void OnAfterFire(WeaponBaseAgent agent, WeaponSideCmd cmd)
         {
             var weaponController = agent.Owner.WeaponController();
@@ -29,7 +21,6 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 else
                     relatedCharState.Fire();
             }
-          
         }
 
         public void OnIdle(WeaponBaseAgent agent, WeaponSideCmd cmd)
@@ -37,10 +28,14 @@ namespace App.Shared.GameModules.Weapon.Behavior
             if (!cmd.IsFire)
             {
                 var audioController = agent.Owner.AudioController();
-                if (audioController != null)
-                    audioController.StopFireTrigger();
-                DoIdle(agent.Owner.WeaponController(),cmd);
+
+                audioController.StopFireTrigger();
+                DoIdle(agent.Owner.WeaponController(), cmd);
             }
+        }
+
+        protected virtual void DoIdle(PlayerWeaponController controller, WeaponSideCmd cmd)
+        {
         }
     }
 }

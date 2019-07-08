@@ -6,12 +6,13 @@ using com.wd.free.@event;
 using com.wd.free.item;
 using com.wd.free.unit;
 using gameplay.gamerule.free.ui;
+using Core.Free;
 
 namespace gameplay.gamerule.free.item
 {
 	[System.Serializable]
-	public class OpenInventoryAction : AbstractPlayerAction
-	{
+	public class OpenInventoryAction : AbstractPlayerAction, IRule
+    {
 		private const long serialVersionUID = 7873774135852129840L;
 
 		private string name;
@@ -113,5 +114,10 @@ namespace gameplay.gamerule.free.item
 		{
 			this.alwaysOpen = alwaysOpen;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.OpenInventoryAction;
+        }
+    }
 }

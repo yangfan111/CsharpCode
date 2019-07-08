@@ -3,6 +3,7 @@ using Assets.XmlConfig;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.action;
 using com.wd.free.@event;
+using Core.Free;
 using com.wd.free.util;
 using Core;
 using System;
@@ -10,7 +11,7 @@ using System;
 namespace App.Server.GameModules.GamePlay.Free.weapon
 {
     [Serializable]
-    public class NewRemoveWeaponAction : AbstractPlayerAction
+    public class NewRemoveWeaponAction : AbstractPlayerAction, IRule
     {
         private string weaponKey;
         private string weaponType;
@@ -59,6 +60,11 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
                     }
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.NewRemoveWeaponAction;
         }
     }
 }

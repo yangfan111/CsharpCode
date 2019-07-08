@@ -24,11 +24,6 @@ namespace App.Client.Tools
     public class TerrainSampler : MonoBehaviour
     {
         /// <summary>
-        /// 日志适配器，最终输出json格式
-        /// </summary>
-        // private LoggerAdapter logger = new LoggerAdapter("TerrainSamplerLogger");
-
-        /// <summary>
         /// 记录采样得到的文本数据
         /// </summary>
         private StringBuilder logData = new StringBuilder();
@@ -191,6 +186,14 @@ namespace App.Client.Tools
 
         public ILevelManager LevelManager { get; set; }
 
+        private int MapID
+        {
+            get
+            {
+                return SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.MapId;
+            }
+        }
+
         void CheckToStartSample()
         {
             if ((SharedConfig.InSamplingMode || SharedConfig.InLegacySampleingMode) && !InSamplingMode)
@@ -264,7 +267,7 @@ namespace App.Client.Tools
 
             string formatString = "{{\"x\":{0},\"y\":{1},\"fps\":{2},\"batches\":{3},\"setPassCalls\":{4},\"tris\":{5},\"verts\":{6},\"camDirX\":{7},\"camDirY\":{8},\"camDirZ\":{9}," +
                 "\"camUpX\":{10},\"camUpY\":{11},\"camUpZ\":{12},\"camPosX\":{13},\"camPosY\":{14},\"camPosZ\":{15},\"camFOV\":{16},\"camNear\":{17},\"camFar\":{18}," +
-                "\"camOC\":{19},\"camHDR\":{20},\"camMSAA\":{21},\"shadowCaster\":{22},\"frameTime\":{23},\"renderTime\":{24}}}";
+                "\"camOC\":{19},\"camHDR\":{20},\"camMSAA\":{21},\"shadowCaster\":{22},\"frameTime\":{23},\"renderTime\":{24},\"mapID\":{25}}}";
 
             if (samplePointNum > 0)
             {
@@ -273,7 +276,7 @@ namespace App.Client.Tools
 
             logData.AppendFormat(formatString, sampleData.X, sampleData.Y, sampleData.FrameRate, sampleData.Batches, sampleData.SetPassCalls, sampleData.Triangles, sampleData.Vertices,
                 sampleData.CamDirX, sampleData.CamDirY, sampleData.CamDirZ, sampleData.CamUpX, sampleData.CamUpY, sampleData.CamUpZ, sampleData.CamPosX, sampleData.CamPosY, sampleData.CamPosZ,
-                sampleData.CamFOV, sampleData.CamNear, sampleData.CamFar, sampleData.camOC, sampleData.camHDR, sampleData.camMSAA, sampleData.shadowCaster, sampleData.frameTime, sampleData.renderTime);
+                sampleData.CamFOV, sampleData.CamNear, sampleData.CamFar, sampleData.camOC, sampleData.camHDR, sampleData.camMSAA, sampleData.shadowCaster, sampleData.frameTime, sampleData.renderTime, MapID);
 
             return worstIndex;
         }
@@ -460,7 +463,7 @@ namespace App.Client.Tools
         /// <returns></returns>
         private IEnumerator Sample()
         {
-            Debug.LogError("begin sampler");
+            Debug.LogErrorFormat("begin sampler, mapId:{0}", MapID);
 
             logData.Append("[");
             yield return new WaitForSeconds(30);
@@ -474,16 +477,36 @@ namespace App.Client.Tools
             Camera.main.nearClipPlane = 0.03f;
             Camera.main.farClipPlane = 8000;
 
-            int samplePointNum = 0;                                             // 记录采样点总数
-            for (int i = 0; i < 8; i++)
+            // 确定采样的起止范围
+            int columnStart = -1, columnEnd = columnStart;
+            int rowStart = -1, rowEnd = rowStart;
+            if (MapID == 2)
             {
-                for (int j = 0; j < 8; j++)
+                columnStart = rowStart = 0;
+                columnEnd = rowEnd = 7;
+            }
+            else if (MapID == 4)
+            {
+                columnStart = rowStart = 3;
+                columnEnd = rowEnd = 5;
+            }
+
+            if (columnStart == -1)
+            {
+                Debug.LogErrorFormat("不支持性能采样的地图,mapId:{0}", MapID);
+                goto FINISHSAMPLE;
+            }
+
+            int samplePointNum = 0;                                             // 记录采样点总数
+            for (int i = columnStart; i <= columnEnd; i++)
+            {
+                for (int j = rowStart; j <= rowEnd; j++)
                 {
                     // 判断地形块是否需要采样
                     if (!IsBlockNeedToSample(i, j)) continue;
 
                     // 计算当前地块中心在大地图中的位置
-                    Vector3 pos = CalculateCoordinate(i, j, BlockSize * 0.5f, BlockSize * 0.5f);
+                    Vector3 pos = CalculateCoordinate(i - columnStart, j - rowStart, BlockSize * 0.5f, BlockSize * 0.5f);
 
                     // 将人物移动到计算位置
                     MoveTo(pos);
@@ -512,7 +535,7 @@ namespace App.Client.Tools
                             }
 
                             // 取得采样点在大地图中的位置（仅x,z有意义）
-                            Vector3 currentPos = CalculateCoordinate(i, j, x, z);
+                            Vector3 currentPos = CalculateCoordinate(i - columnStart, j - rowStart, x, z);
 
                             // 确定采样点y方向上的具体坐标
                             Vector3 groundPos = FindTheGroundPos(currentPos);
@@ -525,7 +548,9 @@ namespace App.Client.Tools
                             if (forceStopSample) goto FINISHSAMPLE;
 
                             // 采样点四个角度采样
-                            int posX = (int)(i * BlockSize + x) - 4000, posZ = (int)(j * BlockSize + z) - 4000;
+                            var minVec = SingletonManager.Get<MapsDescription>().BigMapParameters.TerrainMin;
+                            int posX = (int)((i - columnStart) * BlockSize + x + minVec.x);
+                            int posZ = (int)((j - rowStart) * BlockSize + z + minVec.z);
                             SampleData[] datas = new SampleData[4];
                             for (int dir = 0; dir < 4; dir++)
                             {
@@ -645,6 +670,25 @@ namespace App.Client.Tools
             Camera.main.nearClipPlane = 0.03f;
             Camera.main.farClipPlane = 8000;
 
+            int columnStart = -1, columnEnd = columnStart;
+            int rowStart = -1, rowEnd = rowStart;
+            if (MapID == 2)
+            {
+                columnStart = rowStart = 0;
+                columnEnd = rowEnd = 7;
+            }
+            else if (MapID == 4)
+            {
+                columnStart = rowStart = 3;
+                columnEnd = rowEnd = 5;
+            }
+
+            if (columnStart == -1)
+            {
+                Debug.LogErrorFormat("不支持性能采样的地图，mapID:{0}", MapID);
+                goto FINISHSAMPLE;
+            }
+
             int samplePointNum = 0;                                             // 记录采样点总数
             for (int num = 0; num < points.Count; num++)
             {
@@ -655,7 +699,7 @@ namespace App.Client.Tools
                 if (!IsBlockNeedToSample(i, j)) continue;
 
                 // 计算当前地块中心在大地图中的位置
-                Vector3 pos = CalculateCoordinate(i, j, BlockSize * 0.5f, BlockSize * 0.5f);
+                Vector3 pos = CalculateCoordinate(i - columnStart, j - rowStart, BlockSize * 0.5f, BlockSize * 0.5f);
 
                 // 将人物移动到计算位置
                 MoveTo(pos);
@@ -796,6 +840,25 @@ namespace App.Client.Tools
             Camera.main.nearClipPlane = 0.03f;
             Camera.main.farClipPlane = 8000;
 
+            int columnStart = -1, columnEnd = columnStart;
+            int rowStart = -1, rowEnd = rowStart;
+            if (MapID == 2)
+            {
+                columnStart = rowStart = 0;
+                columnEnd = rowEnd = 7;
+            }
+            else if (MapID == 4)
+            {
+                columnStart = rowStart = 3;
+                columnEnd = rowEnd = 5;
+            }
+
+            if (columnStart == -1)
+            {
+                Debug.LogErrorFormat("不支持性能采样的地图，mapID：{0}", MapID);
+                goto FINISHSAMPLE;
+            }
+
             int samplePointNum = 0;                                             // 记录采样点总数
             for (int k = 0; k < scenes.Count; k++)
             {
@@ -805,7 +868,7 @@ namespace App.Client.Tools
                 if (!IsBlockNeedToSample(i, j)) continue;
 
                 // 计算当前地块中心在大地图中的位置
-                Vector3 pos = CalculateCoordinate(i, j, BlockSize * 0.5f, BlockSize * 0.5f);
+                Vector3 pos = CalculateCoordinate(i - columnStart, j - rowStart, BlockSize * 0.5f, BlockSize * 0.5f);
 
                 // 将人物移动到计算位置
                 MoveTo(pos);
@@ -834,7 +897,7 @@ namespace App.Client.Tools
                         }
 
                         // 取得采样点在大地图中的位置（仅x,z有意义）
-                        Vector3 currentPos = CalculateCoordinate(i, j, x, z);
+                        Vector3 currentPos = CalculateCoordinate(i - columnStart, j - rowStart, x, z);
 
                         // 确定采样点y方向上的具体坐标
                         Vector3 groundPos = FindTheGroundPos(currentPos);
@@ -847,7 +910,9 @@ namespace App.Client.Tools
                         if (forceStopSample) goto FINISHSAMPLE;
 
                         // 采样点四个角度采样
-                        int posX = (int)(i * BlockSize + x) - 4000, posZ = (int)(j * BlockSize + z) - 4000;
+                        var minVec = SingletonManager.Get<MapsDescription>().BigMapParameters.TerrainMin;
+                        int posX = (int)((i - columnStart) * BlockSize + x + minVec.x);
+                        int posZ = (int)((j - rowStart) * BlockSize + z + minVec.z);
                         SampleData[] datas = new SampleData[4];
                         for (int dir = 0; dir < 4; dir++)
                         {

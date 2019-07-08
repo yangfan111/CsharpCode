@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using Sharpen;
+using com.wd.free.para;
+using Core.Free;
 
 namespace com.wd.free.skill
 {
 	[System.Serializable]
-	public class SkillMultiTrigger : ISkillTrigger
-	{
+	public class SkillMultiTrigger : ISkillTrigger, IRule
+    {
 		private const long serialVersionUID = -6693234022996398380L;
 
 		private IList<ISkillTrigger> triggers;
@@ -41,5 +43,10 @@ namespace com.wd.free.skill
 				return ISkillTrigger.TriggerStatus.Failed;
 			}
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SkillMultiTrigger;
+        }
+    }
 }

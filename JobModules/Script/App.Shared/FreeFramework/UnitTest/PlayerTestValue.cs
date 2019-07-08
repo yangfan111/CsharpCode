@@ -5,11 +5,12 @@ using System.Text;
 using com.wd.free.@event;
 using App.Server.GameModules.GamePlay.free.player;
 using com.wd.free.para;
+using Core.Free;
 
 namespace App.Shared.FreeFramework.UnitTest
 {
     [Serializable]
-    public class PlayerTestValue : AbstractTestValue
+    public class PlayerTestValue : AbstractTestValue, IRule
     {
         private string field;
 
@@ -27,6 +28,11 @@ namespace App.Shared.FreeFramework.UnitTest
             }
 
             return tv;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerTestValue;
         }
     }
 }

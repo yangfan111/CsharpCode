@@ -2,12 +2,13 @@ using Sharpen;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.@event;
 using com.wd.free.para;
+using Core.Free;
 
 namespace com.wd.free.action
 {
 	[System.Serializable]
-	public class ListAddAction : AbstractGameAction
-	{
+	public class ListAddAction : AbstractGameAction, IRule
+    {
 		private const long serialVersionUID = -1981334499779306804L;
 
 		public const string TEMP_SORT = "temp_sort";
@@ -50,7 +51,12 @@ namespace com.wd.free.action
 			return new _IParable_53();
 		}
 
-		private sealed class _IParable_53 : IParable
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ListAddAction;
+        }
+
+        private sealed class _IParable_53 : IParable
 		{
 			public _IParable_53()
 			{

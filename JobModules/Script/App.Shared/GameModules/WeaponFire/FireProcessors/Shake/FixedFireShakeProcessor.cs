@@ -1,6 +1,4 @@
 ﻿using Core.Utils;
-using UnityEngine;
-using WeaponConfigNs;
 
 namespace App.Shared.GameModules.Weapon.Behavior
 {
@@ -27,6 +25,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
         public override void OnFrame(WeaponBaseAgent agent, WeaponSideCmd cmd)
         {
             UpdateOrientationAttenuation(agent, cmd);
+            RecoverFireRoll(agent, cmd);
             base.OnFrame(agent,cmd);
         }
 

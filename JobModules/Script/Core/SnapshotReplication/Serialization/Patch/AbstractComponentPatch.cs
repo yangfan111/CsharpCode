@@ -9,7 +9,6 @@ namespace Core.SnapshotReplication.Serialization.Patch
 {
     public abstract class AbstractComponentPatch: BaseRefCounter
     {
-        
 
         private IGameComponent _component;
 
@@ -17,7 +16,7 @@ namespace Core.SnapshotReplication.Serialization.Patch
 
         protected AbstractComponentPatch()
         {
-            
+
         }
 
         public IGameComponent Component

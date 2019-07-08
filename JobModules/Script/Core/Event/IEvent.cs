@@ -35,6 +35,7 @@ namespace Core.Event
         PullBolt,
         HitVehicle,
         HitPlayer,
+        HitPlayerStastics,
         BeenHit,
         HitEnvironment,
         ADefault, 

@@ -19,7 +19,7 @@ using Utils.Singleton;
 
 namespace Core.CharacterState.Action
 {
-    class ActionState : FsmState
+    public class ActionState : FsmState
     {
         protected override string GetStateName(short id)
         {
@@ -400,7 +400,7 @@ namespace Core.CharacterState.Action
                     if (command.IsMatch(FsmInput.LightMeleeAttackOne))
                     {
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MeleeStateHash,
-                            AnimatorParametersHash.Instance.MeleeAttackName,
+                            AnimatorParametersHash.Instance.MeleeStateName,
                             AnimatorParametersHash.Instance.LightMeleeOne,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
@@ -408,7 +408,7 @@ namespace Core.CharacterState.Action
                     else if (command.IsMatch(FsmInput.LightMeleeAttackTwo))
                     {
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MeleeStateHash,
-                            AnimatorParametersHash.Instance.MeleeAttackName,
+                            AnimatorParametersHash.Instance.MeleeStateName,
                             AnimatorParametersHash.Instance.LightMeleeTwo,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
@@ -416,19 +416,13 @@ namespace Core.CharacterState.Action
                     else if (command.IsMatch(FsmInput.MeleeSpecialAttack))
                     {
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MeleeStateHash,
-                            AnimatorParametersHash.Instance.MeleeAttackName,
+                            AnimatorParametersHash.Instance.MeleeStateName,
                             AnimatorParametersHash.Instance.ForceMelee,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
                     }
                     else
                         return false;
-                    
-                    FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MeleeAttackHash,
-                                             AnimatorParametersHash.Instance.MeleeAttackName,
-                                             AnimatorParametersHash.Instance.MeleeAttackStart,
-                                             CharacterView.FirstPerson | CharacterView.ThirdPerson, true);
-                    addOutput(FsmOutput.Cache);
                     
                     command.Handled = true;
                     
@@ -579,54 +573,6 @@ namespace Core.CharacterState.Action
                     return false;
                 },
                 null, (int)ActionStateId.DismantleBomb, null, 0, new[] { FsmInput.DismantleBomb });
-            
-            #endregion
-            
-            #region CommonNull to TransfigurationStart
-            
-            state.AddTransition(
-                (command, addOutput) =>
-                {
-                    if (command.IsMatch(FsmInput.TransfigurationStart))
-                    {
-                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.TransfigurationStartHash,
-                            AnimatorParametersHash.Instance.TransfigurationStartName,
-                            AnimatorParametersHash.Instance.TransfigurationStartEnable,
-                            CharacterView.ThirdPerson, false);
-                        addOutput(FsmOutput.Cache);
-
-                        command.Handled = true;
-
-                        return true;
-                    }
-
-                    return false;
-                },
-                null, (int)ActionStateId.TransfigurationStart, null, 0, new[] { FsmInput.TransfigurationStart });
-            
-            #endregion
-            
-            #region CommonNull to TransfigurationFinish
-            
-            state.AddTransition(
-                (command, addOutput) =>
-                {
-                    if (command.IsMatch(FsmInput.TransfigurationFinish))
-                    {
-                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.TransfigurationFinishHash,
-                            AnimatorParametersHash.Instance.TransfigurationFinishName,
-                            AnimatorParametersHash.Instance.TransfigurationFinishEnable,
-                            CharacterView.ThirdPerson, false);
-                        addOutput(FsmOutput.Cache);
-
-                        command.Handled = true;
-
-                        return true;
-                    }
-
-                    return false;
-                },
-                null, (int)ActionStateId.TransfigurationFinish, null, 0, new[] { FsmInput.TransfigurationFinish });
             
             #endregion
             
@@ -862,6 +808,75 @@ namespace Core.CharacterState.Action
         
         #endregion
 
+        #region Transfiguration
+
+        public static ActionState CreateTransfigurationNullState()
+        {
+            ActionState state = new ActionState(ActionStateId.TransfigurationNull);
+
+            #region TransfigurationNull to TransfigurationStart
+            
+            state.AddTransition(
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.TransfigurationStart))
+                    {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.TransfigurationStartHash,
+                            AnimatorParametersHash.Instance.TransfigurationStartName,
+                            AnimatorParametersHash.Instance.TransfigurationStartEnable,
+                            CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+
+                        command.Handled = true;
+
+                        return true;
+                    }
+
+                    return false;
+                },
+                null, (int)ActionStateId.TransfigurationStart, null, 0, new[] { FsmInput.TransfigurationStart });
+            
+            #endregion
+            
+            #region TransfigurationNull to TransfigurationFinish
+            
+            state.AddTransition(
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.TransfigurationFinish))
+                    {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.TransfigurationFinishHash,
+                            AnimatorParametersHash.Instance.TransfigurationFinishName,
+                            AnimatorParametersHash.Instance.TransfigurationFinishEnable,
+                            CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+
+                        command.Handled = true;
+
+                        return true;
+                    }
+
+                    return false;
+                },
+                null, (int)ActionStateId.TransfigurationFinish, null, 0, new[] { FsmInput.TransfigurationFinish });
+            
+            #endregion
+
+            return state;
+        }
+        
+        public static ActionState CreateTransfigurationStartState()
+        {
+            return new TransfigurationStart(ActionStateId.TransfigurationStart);
+        }
+        
+        public static ActionState CreateTransfigurationFinishState()
+        {
+            return new TransfigurationFinish(ActionStateId.TransfigurationFinish);
+        }
+
+        #endregion
+        
         #region UpperBody Additive Animation Layer
 
         public static ActionState CreateFireState()
@@ -1054,16 +1069,6 @@ namespace Core.CharacterState.Action
             #endregion
 
             return state;
-        }
-
-        public static ActionState CreateTransfigurationStartState()
-        {
-            return new TransfigurationStart(ActionStateId.TransfigurationStart);
-        }
-        
-        public static ActionState CreateTransfigurationFinishState()
-        {
-            return new TransfigurationFinish(ActionStateId.TransfigurationFinish);
         }
         
         #endregion

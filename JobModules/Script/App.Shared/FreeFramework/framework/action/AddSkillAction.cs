@@ -7,11 +7,12 @@ using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.skill;
 using com.wd.free.unit;
+using Core.Free;
 
 namespace com.wd.free.action
 {
     [Serializable]
-    public class AddSkillAction : AbstractPlayerAction
+    public class AddSkillAction : AbstractPlayerAction, IRule
     {
         private List<ISkill> skills;
 
@@ -39,6 +40,11 @@ namespace com.wd.free.action
                     unit.GetUnitSkill().AddSkill((ISkill)SerializeUtil.Clone(skill));
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.AddSkillAction;
         }
     }
 }

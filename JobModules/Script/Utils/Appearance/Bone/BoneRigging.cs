@@ -4,9 +4,10 @@ using Core.Utils;
 using UnityEngine;
 using Utils.Compare;
 using Utils.Configuration;
-using Shared.Scripts;
+using Utils.Appearance.Script;
+using Utils.Singleton;
 
-namespace Utils.Appearance
+namespace Utils.Appearance.Bone
 {
     public struct CodeRigBoneParam
     {
@@ -42,7 +43,7 @@ namespace Utils.Appearance
 
         public float HeadPitch;
         public float HeadYaw;
-        public float HandPitch;
+        public float CurrentHandPitch;
         public float HeadRotProcess;
         public bool IsHeadRotCW;
 
@@ -95,6 +96,9 @@ namespace Utils.Appearance
         private const float Spine1PeekDegree = 20;
         private const float PitchMaxDegree = 30;
         private const float PitchMinDegree = -30;
+        
+        private Matrix4x4 _matrix;
+        private bool _updateBone = true;
 
         private GameObject _characterP1;
         private GameObject _characterP3;
@@ -102,19 +106,21 @@ namespace Utils.Appearance
         private Transform _viewPointP1;
 
         // baseLocator用于旋转和对齐
+        private Transform _directionLocatorP1;
         private Transform _baseLocatorP1;
         private Transform _cameraLocatorP1;
         private Transform _rightHandP1;
         private Transform _leftHandP1;
         private Transform _sightLocationP1;
 
-        private Transform _baseLocatorP3;
         private Transform _spineP3;
         private Transform _spine1P3;
         private Transform _pelvisP3;
 
         private Quaternion _pelvisUntouchedStandRotationP3 = Quaternion.identity;
         private Quaternion _pelvisUntouchedCrouchRotationP3 = Quaternion.identity;
+        
+        private readonly CustomProfileInfo _mainInfo;
 
         private List<ThirdPersonPosture> ExcludePostures = new List<ThirdPersonPosture>()
         {
@@ -128,6 +134,7 @@ namespace Utils.Appearance
 
         public BoneRigging()
         {
+            _mainInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("BoneRigging");
         }
 
         public void SetFirstPersonCharacter(GameObject obj)
@@ -146,12 +153,14 @@ namespace Utils.Appearance
         {
             if(null == _pelvisP3) return;
             _pelvisUntouchedStandRotationP3 = _pelvisP3.localRotation;
+            _logger.InfoFormat("CharacterLog-- pelvisUntouchedStandRotationP3:   {0}", _pelvisUntouchedStandRotationP3.ToStringExt());
         }
         
         public void SetStableCrouchPelvisRotation()
         {
             if(null == _pelvisP3) return;
             _pelvisUntouchedCrouchRotationP3 = _pelvisP3.localRotation;
+            _logger.InfoFormat("CharacterLog-- pelvisUntouchedCrouchRotationP3:   {0}", _pelvisUntouchedCrouchRotationP3.ToStringExt());
         }
 
         public bool SetIKTarget(GameObject objP1, GameObject objP3, ref bool weaponHasIk)
@@ -203,32 +212,37 @@ namespace Utils.Appearance
 
         public void Update(CodeRigBoneParam param)
         {
-            if (ThirdPersonIncluded)
+            try
             {
-                StableUpperBody(param.OverlayAnimationWeight, param.PostureWhenOverlay);
-                _ikControllerP3.SetIKActive(param.IKActive);
+                _mainInfo.BeginProfileOnlyEnableProfile();
+                if (ThirdPersonIncluded)
+                {
+                    StableUpperBody(param.OverlayAnimationWeight, param.PostureWhenOverlay);
+                    _ikControllerP3.SetIKActive(param.IKActive);
+                }
+
+                Peek(param.PeekAmplitude, param.IsSight);
+                PitchP1(param.PitchAmplitude);
+
+                if (FirstPersonIncluded)
+                {
+                    var parent = _characterP1.transform.parent;
+                    try
+                    {
+                        _characterP1.transform.SetParent(null, false);
+                        SetFirstPersonShift(CreateFirstPersonOffsetParam(param));
+                        SetSightStatus(CreateSightStatusParam(param));
+                        _ikControllerP1.SetIKActive(param.IKActive);
+                    }
+                    finally
+                    {
+                        _characterP1.transform.SetParent(parent, false);
+                    }
+                }
             }
-
-            Peek(param.PeekAmplitude);
-            PitchP1(param.PitchAmplitude);
-
-            if (FirstPersonIncluded)
+            finally
             {
-                var parent = _characterP1.transform.parent;
-                try
-                {
-                    _characterP1.transform.SetParent(null, false);
-
-                    ResetSightModelScaleToAvoidSideEffect();
-                    SetFirstPersonShift(CreateFirstPersonOffsetParam(param));
-                    SetSightStatus(CreateSightStatusParam(param));
-                    ScaleSightModelToFakeSpecialFov(param.ScopeScale);
-                    _ikControllerP1.SetIKActive(param.IKActive);
-                }
-                finally
-                {
-                    _characterP1.transform.SetParent(parent, false);
-                }
+                _mainInfo.EndProfileOnlyEnableProfile();
             }
         }
 
@@ -270,13 +284,11 @@ namespace Utils.Appearance
         #endregion
 
         // left -> peek < 0
-        private void Peek(float peek)
+        private void Peek(float peek, bool isSight)
         {
-            if (!CompareUtility.IsApproximatelyEqual(peek, 0))
-            {
-                if (FirstPersonIncluded) PeekP1(peek);
-                if (ThirdPersonIncluded) PeekP3(peek);
-            }
+            if (CompareUtility.IsApproximatelyEqual(peek, 0)) return;
+            if (FirstPersonIncluded) PeekP1(peek, isSight);
+            if (ThirdPersonIncluded) PeekP3(peek);
         }
 
         private void PitchP1(float pitch)
@@ -286,11 +298,15 @@ namespace Utils.Appearance
                     Quaternion.AngleAxis(pitch, Vector3.right) * _viewPointP1.localRotation;
         }
 
-        private void PeekP1(float peek)
+        private void PeekP1(float peek, bool isSight)
         {
-            var r = ConvertRotation(_characterP1.transform, _baseLocatorP1,
-                Quaternion.AngleAxis(CharacterStateConfigManager.Instance.PeekDegreeP1 * peek, Vector3.back));
-            _baseLocatorP1.rotation = _baseLocatorP1.rotation * r;
+            if (!isSight)
+            {
+                var r = ConvertRotation(_baseLocatorP1.transform, _baseLocatorP1,
+                    Quaternion.AngleAxis(CharacterStateConfigManager.Instance.PeekDegreeP1 * peek, Vector3.back));
+                _baseLocatorP1.rotation = _baseLocatorP1.rotation * r;
+            }
+            
             _viewPointP1.localPosition = ConvertPosition(_characterP1.transform, _viewPointP1,
                 new Vector3(CharacterStateConfigManager.Instance.PeekXTransition * peek,
                     CharacterStateConfigManager.Instance.PeekYTransition * Mathf.Abs(peek), 0));
@@ -327,16 +343,17 @@ namespace Utils.Appearance
             Quaternion ret;
             switch (type)
             {
-                    case ThirdPersonPosture.Crouch:
-                        ret = _pelvisUntouchedCrouchRotationP3;
-                        break;
-                    case ThirdPersonPosture.Stand:
-                        ret = _pelvisUntouchedStandRotationP3;
-                        break;
-                    default:
-                        ret = _pelvisUntouchedStandRotationP3;
-                        break;   
+                case ThirdPersonPosture.Crouch:
+                    ret = _pelvisUntouchedCrouchRotationP3;
+                    break;
+                case ThirdPersonPosture.Stand:
+                    ret = _pelvisUntouchedStandRotationP3;
+                    break;
+                default:
+                    ret = _pelvisUntouchedStandRotationP3;
+                    break;
             }
+
             return ret;
         }
 
@@ -352,10 +369,6 @@ namespace Utils.Appearance
             Quaternion ret = Quaternion.Slerp(from, to, t);
             return ret;
         }
-
-        private Matrix4x4 _matrix;
-
-        private bool _updateBone = true;
 
         // 腰射与肩射的切换，与肩射呼吸动作
         private void SetSightStatus(SightStatusParam param)
@@ -378,13 +391,14 @@ namespace Utils.Appearance
                 var tempPos = _sightLocationP1.localPosition;
                 var tempRot = _sightLocationP1.localRotation;
 
+                // 记录viewPoint与sightLocator的相对位移
                 if (_updateBone)
-                    _matrix = _baseLocatorP1.worldToLocalMatrix * _sightLocationP1.localToWorldMatrix;
+                    _matrix = _viewPointP1.worldToLocalMatrix * _sightLocationP1.localToWorldMatrix;
 
                 SetSightMove(param);
 
                 _updateBone = param.SightProgress < 1;
-                var finalMatrix = _baseLocatorP1.localToWorldMatrix * _matrix;
+                var finalMatrix = _viewPointP1.localToWorldMatrix * _matrix;
                 _sightLocationP1.position = finalMatrix.ExtractPosition();
                 _sightLocationP1.rotation = finalMatrix.ExtractRotation();
 
@@ -416,7 +430,7 @@ namespace Utils.Appearance
                         Mathf.Clamp01(param.SightProgress)),
                     Quaternion.Slerp(_sightLocationP1.rotation, alignedMatrix.ExtractRotation(),
                         Mathf.Clamp01(param.SightProgress)),
-                    _baseLocatorP1);
+                    _directionLocatorP1);
 
                 // 目标：sightlocater的向前方向旋转SightPeekDegree的角度,实现瞄准QE
                 // 做法，把baseLocator先转换到sightLocation关节空间，对sightLocation的局部坐标系沿着自身向前旋转SightPeekDegree的角度，转换到世界坐标系，最后把结果转换到baseLocator父关节的坐标系
@@ -428,9 +442,10 @@ namespace Utils.Appearance
                                           -_sightLocationP1.localRotation.Forward()) *
                                       _sightLocationP1.localRotation,
                                       Vector3.one);
+                
                 AlignCoordinateSystems(_sightLocationP1, povitMatrix.ExtractPosition(),
                     povitMatrix.ExtractRotation(),
-                    _baseLocatorP1);
+                    _directionLocatorP1);
 
                 _sightLocationP1.localPosition = tempPos;
                 _sightLocationP1.localRotation = tempRot;
@@ -453,23 +468,10 @@ namespace Utils.Appearance
                 matrix4X4.ExtractRotation().eulerAngles.ToStringExt());
         }
 
-        private void ResetSightModelScaleToAvoidSideEffect()
-        {
-            _baseLocatorP1.localScale = Vector3.one;
-        }
-
-        private void ScaleSightModelToFakeSpecialFov(float scale)
-        {
-            if (scale > 0)
-            {
-                _baseLocatorP1.localScale = new Vector3(1, 1, scale);
-            }
-        }
-
         // 第一人称腰射时手/枪的随动
         private void SetFirstPersonShift(FirstPersonOffsetParam param)
         {
-            if (!FirstPersonIncluded || !param.IsFirstPerson) return;
+            if (!FirstPersonIncluded || !param.IsFirstPerson || param.IsSight) return;
 
             if (!CompareUtility.IsApproximatelyEqual(param.HorizontalShift, 0) ||
                 !CompareUtility.IsApproximatelyEqual(param.VerticalShift, 0))
@@ -482,7 +484,7 @@ namespace Utils.Appearance
                     AlignCoordinateSystems(_leftHandP1,
                         _leftHandP1.position,
                         modifiedRotation,
-                        _baseLocatorP1);
+                        _directionLocatorP1);
                 }
 
                 if (!CompareUtility.IsApproximatelyEqual(param.VerticalShift, 0))
@@ -493,13 +495,13 @@ namespace Utils.Appearance
                     AlignCoordinateSystems(_rightHandP1,
                         _rightHandP1.position,
                         modifiedRotation,
-                        _baseLocatorP1);
+                        _directionLocatorP1);
                 }
             }
 
             // 一人称腰射状态下人物偏移(枪，分辨率相关)
-            _baseLocatorP1.localPosition += param.FirstPersonPositionOffset;
-            _baseLocatorP1.localEulerAngles += param.FirstPersonRotationOffset;
+            _directionLocatorP1.localPosition += param.FirstPersonPositionOffset;
+            _directionLocatorP1.localEulerAngles += param.FirstPersonRotationOffset;
         }
 
         private bool FirstPersonIncluded
@@ -517,6 +519,7 @@ namespace Utils.Appearance
             if (null == obj) return;
             _viewPointP1 = BoneMount.FindChildBone(obj, BoneName.ViewPoint);
             _baseLocatorP1 = BoneMount.FindChildBone(obj, BoneName.FirstPersonHandLocator);
+            _directionLocatorP1 = BoneMount.FindChildBone(obj, BoneName.FirstPersonSubHandLocator);
             _cameraLocatorP1 = BoneMount.FindChildBone(obj, BoneName.FirstPersonCameraLocator);
             _rightHandP1 = BoneMount.FindChildBone(obj, BoneName.CharacterRightHandName);
             _leftHandP1 = BoneMount.FindChildBone(obj, BoneName.CharacterLeftHandName);
@@ -527,7 +530,6 @@ namespace Utils.Appearance
         private void GetP3Bones(GameObject obj)
         {
             if (null == obj) return;
-            _baseLocatorP3 = BoneMount.FindChildBone(obj, BoneName.AlternativeWeaponLocator);
             _spineP3 = BoneMount.FindChildBone(obj, BoneName.CharacterSpineName); //"Bip01 Spine");
             _spine1P3 = BoneMount.FindChildBone(obj, BoneName.CharacterSpine1Name); // "Bip01 Spine1");
             _pelvisP3 = BoneMount.FindChildBone(obj, BoneName.CharacterBipPelvisName); //"Bip01 Pelvis");

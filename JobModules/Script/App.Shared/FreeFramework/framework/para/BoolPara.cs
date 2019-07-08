@@ -1,11 +1,13 @@
 using System;
 using Sharpen;
+using com.cpkf.yyjd.tools.util.math;
+using Core.Free;
 
 namespace com.wd.free.para
 {
 	[System.Serializable]
-	public class BoolPara : AbstractPara
-	{
+	public class BoolPara : AbstractPara, IRule
+    {
 		private const long serialVersionUID = -8824870098367160681L;
 
 		public BoolPara()
@@ -27,12 +29,12 @@ namespace com.wd.free.para
 
 		public override IPara Initial(string con, string v)
 		{
-			com.wd.free.para.BoolPara p = (com.wd.free.para.BoolPara)pool.BorrowObject();
+			com.wd.free.para.BoolPara p = (com.wd.free.para.BoolPara)this.Copy();
 			p.name = EMPTY_NAME;
 			try
 			{
-				p.value = bool.Parse(v);
-			}
+                p.value = ParseUtility.QuickBoolParse(v);
+            }
 			catch (Exception)
 			{
 				p.value = false;
@@ -42,14 +44,32 @@ namespace com.wd.free.para
 
 		public override IPoolable Copy()
 		{
-			return new com.wd.free.para.BoolPara(this.name, (bool)this.value);
+            BoolPara para = pool.Spawn(true) as BoolPara;
+            para.SetName(this.name);
+            para.SetValue(this.value);
+            para.SetTemp(true);
+            return /*new com.wd.free.para.BoolPara(this.name, (bool)this.value)*/para;
 		}
 
-		internal static ParaPool<IPara> pool = new ParaPool<IPara>(new com.wd.free.para.BoolPara());
+		internal static ParaPool pool = new ParaPool(new com.wd.free.para.BoolPara(), 100);
 
-		protected internal override ParaPool<IPara> GetPool()
+		protected internal override ParaPool GetPool()
 		{
 			return pool;
 		}
-	}
+
+        public override void Recycle()
+        {
+            base.Recycle();
+            this.SetName(default(string));
+            this.SetValue(default(object));
+            this.SetTemp(false);
+            pool.Recycle(this);
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.BoolPara;
+        }
+    }
 }

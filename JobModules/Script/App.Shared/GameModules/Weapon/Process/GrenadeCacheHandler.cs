@@ -1,58 +1,58 @@
-﻿using App.Shared.Components.Player;
-using Assets.Utils.Configuration;
-using com.wd.free.@event;
-using com.wd.free.para;
-using Core;
-using Core.EntityComponent;
-using Core.Free;
-using Core.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using App.Shared.Components.Weapon;
-using Utils.Singleton;
+using com.wd.free.@event;
+using com.wd.free.para;
+using Core.Free;
+using Core.Utils;
 
 namespace App.Shared.GameModules.Weapon
 {
     /// <summary>
-    /// Defines the <see cref="GrenadeCacheHandler" />
+    ///     Defines the <see cref="GrenadeCacheHandler" />
     /// </summary>
     public class GrenadeCacheHandler : IGrenadeCacheHandler
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(GrenadeCacheHandler));
 
+        /// <summary>
+        ///     手雷config id集合
+        /// </summary>
+        private readonly List<int> grenadeConfigIds;
 
-        public Dictionary<int, int> HeldGrenades { get; private set; }
+        private readonly List<int> grenadeValuedIds;
+
+        private IFreeArgs FreeArgs;
 
         private Func<GrenadeCacheDataComponent> grenadeDataExtractor;
 
         private Func<WeaponEntity> grenadeEntityExtractor;
 
-        private IFreeArgs FreeArgs;
+        //   , Func<WeaponEntity> grenadeEntiyExtractor
+        public GrenadeCacheHandler(Func<GrenadeCacheDataComponent> extractor,
+                                   Func<WeaponEntity> in_grenadeEntiyExtractor, List<int> grenadeIds,
+                                   IFreeArgs freeArgs)
+        {
+            grenadeDataExtractor   = extractor;
+            grenadeConfigIds       = grenadeIds;
+            grenadeEntityExtractor = in_grenadeEntiyExtractor;
+            grenadeValuedIds       = new List<int>();
+            HeldGrenades           = new Dictionary<int, int>();
+            FreeArgs               = freeArgs;
+        }
 
         private GrenadeCacheDataComponent GrandeCache
         {
             get { return grenadeDataExtractor(); }
         }
 
-        /// <summary>
-        /// 手雷config id集合
-        /// </summary>
-        private readonly List<int> grenadeConfigIds;
-
-        private readonly List<int> grenadeValuedIds;
-
-        //   , Func<WeaponEntity> grenadeEntiyExtractor
-        public GrenadeCacheHandler(Func<GrenadeCacheDataComponent> extractor,
-                                  Func<WeaponEntity>              in_grenadeEntiyExtractor, List<int> grenadeIds,
-                                  IFreeArgs                       freeArgs)
+        public WeaponEntity GrenadeEntity
         {
-            grenadeDataExtractor   = extractor;
-            grenadeConfigIds       = grenadeIds;
-            grenadeEntityExtractor = in_grenadeEntiyExtractor;
-            grenadeValuedIds       = new List<int>();
-            HeldGrenades = new Dictionary<int, int>();
-            FreeArgs               = freeArgs;
+            get { return grenadeEntityExtractor(); }
         }
+
+
+        public Dictionary<int, int> HeldGrenades { get; private set; }
 
         public bool AddCache(int id)
         {
@@ -63,12 +63,6 @@ namespace App.Shared.GameModules.Weapon
             HeldGrenades[id] =  value;
             Sync();
             return true;
-        }
-
-        public void SetCurr(int curr)
-        {
-            GrandeCache.LastId                       = curr;
-            GrenadeEntity.weaponBasicData.ConfigId   = curr;
         }
 
 
@@ -87,11 +81,6 @@ namespace App.Shared.GameModules.Weapon
             return -1;
         }
 
-        public void SendFreeTrigger(int expendId)
-        {
-            (FreeArgs as IEventArgs).Trigger(FreeTriggerConstant.GRENADE_ROMOVE, new IntPara("Id", expendId));
-        }
-
         public void ClearCache(bool includeCurrent = true)
         {
             if (includeCurrent)
@@ -104,11 +93,6 @@ namespace App.Shared.GameModules.Weapon
         public void ClearEntityCache()
         {
             grenadeEntityExtractor().weaponBasicData.Reset();
-        }
-
-        public int GetCount(int id)
-        {
-            return HeldGrenades.ContainsKey(id) ? HeldGrenades[id] : 0;
         }
 
         public List<int> GetOwnedIds()
@@ -128,6 +112,38 @@ namespace App.Shared.GameModules.Weapon
             return GetOwnedIds().IndexOf(LastGrenadeId);
         }
 
+        public int LastGrenadeId
+        {
+            get { return GrandeCache.LastId; }
+        }
+
+        public void Rewind()
+        {
+            for (int i = 0; i < grenadeConfigIds.Count; i++)
+                SetCache(grenadeConfigIds[i], GrandeCache.GrenadeArr[i].grenadeCount);
+        }
+
+        public int ShowCount(int id)
+        {
+            return GetCount(id);
+        }
+
+        public void SetCurr(int curr)
+        {
+            GrandeCache.LastId                     = curr;
+            GrenadeEntity.weaponBasicData.ConfigId = curr;
+        }
+
+        public void SendFreeTrigger(int expendId)
+        {
+            (FreeArgs as IEventArgs).Trigger(FreeTriggerConstant.GRENADE_ROMOVE, new IntPara("Id", expendId));
+        }
+
+        public int GetCount(int id)
+        {
+            return HeldGrenades.ContainsKey(id) ? HeldGrenades[id] : 0;
+        }
+
         public int FindUsable(bool autoStuff)
         {
             if (HeldGrenades.Count == 0) return -1;
@@ -143,11 +159,6 @@ namespace App.Shared.GameModules.Weapon
             return -1;
         }
 
-        public int LastGrenadeId
-        {
-            get { return GrandeCache.LastId; }
-        }
-
 
         private void SetCache(int id, int count)
         {
@@ -159,22 +170,6 @@ namespace App.Shared.GameModules.Weapon
         {
             for (int i = 0; i < grenadeConfigIds.Count; i++)
                 GrandeCache.GrenadeArr[i].grenadeCount = GetCount(grenadeConfigIds[i]);
-        }
-
-        public void Rewind()
-        {
-            for (int i = 0; i < grenadeConfigIds.Count; i++)
-                SetCache(grenadeConfigIds[i], GrandeCache.GrenadeArr[i].grenadeCount);
-        }
-
-        public int ShowCount(int id)
-        {
-            return GetCount(id);
-        }
-
-        public WeaponEntity GrenadeEntity
-        {
-            get { return grenadeEntityExtractor(); }
         }
     }
 }

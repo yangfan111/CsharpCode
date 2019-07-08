@@ -9,11 +9,12 @@ using Assets.App.Server.GameModules.GamePlay.Free;
 using com.wd.free.util;
 using Core.Free;
 using Free.framework;
+using com.wd.free.para;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
     [Serializable]
-    public class PlayerSpeedAction : AbstractPlayerAction
+    public class PlayerSpeedAction : AbstractPlayerAction, IRule
     {
         private string speed;
         private string jump;
@@ -35,6 +36,11 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 ps.Fs.Add(FreeUtil.ReplaceFloat(jump, args));
                 FreeMessageSender.SendMessage(fd.Player, ps);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerSpeedAction;
         }
     }
 }

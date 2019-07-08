@@ -6,6 +6,7 @@ using Core.CharacterState;
 using App.Shared.Components.Player;
 using Core.CharacterState.Posture;
 using Core.Compare;
+using Core.Components;
 using Core.EntityComponent;
 using Core.Event;
 using UnityEngine;
@@ -45,6 +46,11 @@ namespace App.Shared.Components.Serializer
         }
 
         public static bool Equals(Vector3 a, Vector3 b)
+        {
+            return a.x == b.x && a.y == b.y && a.z == b.z;
+        } 
+        
+        public static bool Equals(FixedVector3 a, FixedVector3 b)
         {
             return a.x == b.x && a.y == b.y && a.z == b.z;
         }

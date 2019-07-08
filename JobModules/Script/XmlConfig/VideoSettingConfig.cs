@@ -21,5 +21,7 @@ namespace XmlConfig
         public List<float> LevelDatas;
         public float MinValue;
         public float MaxValue;
+        public List<int> ValuePerLevel;
+
     }
 }

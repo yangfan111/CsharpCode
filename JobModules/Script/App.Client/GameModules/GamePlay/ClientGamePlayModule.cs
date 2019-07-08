@@ -1,6 +1,7 @@
 ﻿using App.Client.GameModules.ClientInit;
 using App.Client.GameModules.GamePlay.Free.UI;
 using App.Client.GameModules.GamePlay.Offline;
+using App.Server.GameModules;
 using App.Shared.Components;
 using App.Shared.DebugSystem;
 using App.Shared.FreeFramework.Entitas;
@@ -26,11 +27,12 @@ namespace App.Client.GameModules.GamePlay
             {
                 AddSystem(new RewindFirstSnapshotInitSystem(contexts));
             }
-            AddSystem(new BulletReloadSystem(contexts, contexts.session.commonSession));
+            AddSystem(new BulletReloadSystem(contexts.session.commonSession));
 
             AddSystem(new TestFrameSystem(contexts));
             AddSystem(new FreeUiSystem());
             AddSystem(new LocalEventPlaySystem(contexts,false));
+            
             AddSystem(new RemoteEventPlaySystem(contexts,false));
             AddSystem(new InputIniSystem(contexts));
             AddSystem(new FreePredictCmdSystem(contexts));

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Core.CharacterState.Posture;
 using Core.Fsm;
 using Utils.Appearance;
@@ -9,10 +7,11 @@ using XmlConfig;
 
 namespace Core.CharacterState.Action
 {
-    class ActionManager : FsmManager, IFsmUpdate, IGetActionState
+    internal class ActionManager : FsmManager, IFsmUpdate, IGetActionState
     {
         private readonly ActionFsm _commonFsm;
         private readonly ActionFsm _keepFsm;
+        private readonly ActionFsm _transfigurationFsm;
 
         private FsmUpdateType _commonUpdateType = FsmUpdateType.ResponseToInput | FsmUpdateType.ResponseToAnimation;
         private FsmUpdateType _keepUpdateType = FsmUpdateType.ResponseToInput | FsmUpdateType.ResponseToAnimation;
@@ -26,18 +25,24 @@ namespace Core.CharacterState.Action
             _keepFsm = new ActionFsm("KeepAction");
             _keepFsm.InitKeep(infoProvider, characterInfo);
             AddFsm(_keepFsm);
+            
+            _transfigurationFsm = new ActionFsm("TransfigurationAction");
+            _transfigurationFsm.InitTransfigurationState(infoProvider, characterInfo);
+            AddFsm(_transfigurationFsm);
         }
 
         public void Reset(Action<FsmOutput> addOutput)
         {
             _commonFsm.Reset(addOutput);
             _keepFsm.Reset(addOutput);
+            _transfigurationFsm.Reset(addOutput);
         }
 
         public void SetName(string name)
         {
             _commonFsm.Name = name;
             _keepFsm.Name = name;
+            _transfigurationFsm.Name = name;
         }
 
         #region IFsmUpdate
@@ -45,7 +50,8 @@ namespace Core.CharacterState.Action
         public void Update(IAdaptiveContainer<IFsmInputCommand> commands,
                            int frameInterval,
                            Action<FsmOutput> addOutput,
-                           FsmUpdateType updateType)
+                           FsmUpdateType updateType,
+                           List<FsmInput> limits)
         {
             if ((updateType & _commonUpdateType) != 0)
             {
@@ -55,6 +61,7 @@ namespace Core.CharacterState.Action
             if ((updateType & _keepUpdateType) != 0)
             {
                 _keepFsm.Update(commands, frameInterval, addOutput);
+                _transfigurationFsm.Update(commands, frameInterval, addOutput);
             }
         }
 

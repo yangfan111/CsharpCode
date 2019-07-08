@@ -8,6 +8,7 @@ using Core.ObjectPool;
 using Core.SnapshotReplication.Serialization.NetworkObject;
 using Core.SnapshotReplication.Serialization.Serializer;
 using Core.Utils;
+using UnityEngine;
 using Utils.Utils.Buildin;
 
 namespace Core.SnapshotReplication.Serialization.Patch
@@ -39,6 +40,8 @@ namespace Core.SnapshotReplication.Serialization.Patch
                 sb.Append("<td>Current</td>");
                 sb.Append("</thead>");
 
+                long totalSum = 0, totoalAve = 0, totalCur = 0;
+
                 for (int i =0 ;i<_total.Length;i++)
                 {
                     if(_total[i] <=0) continue;
@@ -67,8 +70,33 @@ namespace Core.SnapshotReplication.Serialization.Patch
                     sb.Append("</td>");
 
                     sb.Append("</tr>");
+
+                    totalSum += _total[i];
+                    totoalAve += _average[i];
+                    totalCur += _current[i];
+
                 }
 
+                sb.Append("<tr>");
+                
+                sb.Append("<td>");
+                sb.Append("sum");
+                sb.Append("</td>");
+                
+                sb.Append("<td>");
+                sb.Append(totalSum);
+                sb.Append("</td>");
+                
+                sb.Append("<td>");
+                sb.Append(totoalAve);
+                sb.Append("</td>");
+                
+                sb.Append("<td>");
+                sb.Append(totalCur);
+                sb.Append("</td>");
+                
+                sb.Append("</tr>");
+                
                 return sb.ToString();
 
             }

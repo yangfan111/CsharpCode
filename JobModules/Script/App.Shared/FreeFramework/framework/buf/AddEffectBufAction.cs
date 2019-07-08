@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using com.wd.free.@event;
 using App.Server.GameModules.GamePlay.free.player;
+using Core.Free;
 
 namespace App.Shared.FreeFramework.framework.buf
 {
     [Serializable]
-    public class AddEffectBufAction : AbstractPlayerAction
+    public class AddEffectBufAction : AbstractPlayerAction, IRule
     {
         public string effect;
         public string level;
@@ -27,6 +28,11 @@ namespace App.Shared.FreeFramework.framework.buf
             {
                 fd.EffectBufs.AddEffect(args.GetString(effect), args.GetFloat(level), realTime);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.AddEffectBufAction;
         }
     }
 }

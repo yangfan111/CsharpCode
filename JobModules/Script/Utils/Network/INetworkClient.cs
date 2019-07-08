@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Sockets;
 using VNet.Base.Interface;
 
 namespace Core.Network
@@ -17,6 +18,8 @@ namespace Core.Network
         event Action<IVNetPeer, MemoryStream> OnReliableReceiveListener;
 
         void Connect(string ip, NetworkPortInfo portInfo);
+        void ReConnect();
+        void CloseConnect(ProtocolType protocolType);
         void Update();
         bool IsConnected { get; }
         bool IsMultiThread { get; }

@@ -3,12 +3,13 @@ using com.cpkf.yyjd.tools.util;
 using com.wd.free.@event;
 using com.wd.free.para;
 using com.wd.free.util;
+using Core.Free;
 
 namespace com.wd.free.action
 {
 	[System.Serializable]
-	public class ForAction : AbstractGameAction
-	{
+	public class ForAction : AbstractGameAction, IRule
+    {
 		private const long serialVersionUID = -5366033203749986601L;
 
 		private string from;
@@ -46,5 +47,10 @@ namespace com.wd.free.action
 				}
 			}
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ForAction;
+        }
+    }
 }

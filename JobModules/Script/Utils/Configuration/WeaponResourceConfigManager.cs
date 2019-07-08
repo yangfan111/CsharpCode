@@ -72,6 +72,36 @@ namespace Assets.Utils.Configuration
             }
             return C4Id.Value == weaponId;
         }
+
+        public bool IsArmors(int weaponId)
+        {
+            var config = GetConfigById(weaponId);
+            if (config != null)
+            {
+                return config.Type == (int) EWeaponType_Config.Armor || config.Type == (int) EWeaponType_Config.Helmet;
+            }
+            return false;
+        }
+
+        public bool IsArmor(int weaponId)
+        {
+            var config = GetConfigById(weaponId);
+            if (config != null)
+            {
+                return config.Type == (int) EWeaponType_Config.Armor;
+            }
+            return false;
+        }
+
+        public bool IsHelmet(int weaponId)
+        {
+            var config = GetConfigById(weaponId);
+            if (config != null)
+            {
+                return config.Type == (int) EWeaponType_Config.Helmet;
+            }
+            return false;
+        }
         
         public int GetAvatarByWeaponId(int id)
         {

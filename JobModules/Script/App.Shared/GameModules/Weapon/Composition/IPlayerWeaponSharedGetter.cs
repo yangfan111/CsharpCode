@@ -2,6 +2,7 @@
 using App.Shared.GameModules.Weapon;
 using Core;
 using Core.EntityComponent;
+using Core.Event;
 using System.Collections.Generic;
 using WeaponConfigNs;
 using XmlConfig;
@@ -23,7 +24,7 @@ namespace App.Shared
         int BagOpenLimitTIme { get; }
 
         int OverrideBagTactic { get; }
-
+        PlayerEvents RelatedLocalEvents { get; }
         bool BagLockState { get; set; }
 
       //  void AddSightViewInterrupt();
@@ -75,7 +76,7 @@ namespace App.Shared
         /// <summary>
         /// 当前背包索引
         /// </summary>
-        int HeldBagPointer { get; }
+        byte HeldBagPointer { get; }
 
         /// <summary>
         /// 判断是否为当前槽位

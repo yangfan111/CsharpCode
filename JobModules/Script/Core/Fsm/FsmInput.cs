@@ -260,6 +260,7 @@ namespace Core.Fsm
 
         // 
         Climb,
+        FinishedClimb,
         GenericActionFinished,
         
         EnterLadder,

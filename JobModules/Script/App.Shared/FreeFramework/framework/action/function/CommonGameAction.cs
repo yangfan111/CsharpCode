@@ -2,11 +2,12 @@ using System.Collections.Generic;
 using Sharpen;
 using com.wd.free.action;
 using com.wd.free.action.function;
+using Core.Free;
 
 namespace gameplay.gamerule.free.action
 {
 	[System.Serializable]
-	public class CommonGameAction
+	public class CommonGameAction : IRule
 	{
 		private const long serialVersionUID = -790144672493625524L;
 
@@ -112,5 +113,10 @@ namespace gameplay.gamerule.free.action
 		{
 			this.desc = desc;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.CommonGameAction;
+        }
+    }
 }

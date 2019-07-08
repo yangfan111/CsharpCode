@@ -17,7 +17,8 @@ namespace App.Client.GameModules.GamePlay.Free.App
         public bool CanHandle(int key)
         {
             return key == FreeMessageConstant.GroupScoreUI || key == FreeMessageConstant.GroupTechStatUI
-                || key == FreeMessageConstant.GroupGameOverUI || key == FreeMessageConstant.PlayerTipHide;
+                || key == FreeMessageConstant.GroupGameOverUI || key == FreeMessageConstant.PlayerTipHide ||
+                key == FreeMessageConstant.CommonPlayerInfoUI;
         }
 
         public void Handle(SimpleProto data)
@@ -46,10 +47,15 @@ namespace App.Client.GameModules.GamePlay.Free.App
                 ui.GameResult = (EUIGameResultType)data.Ins[0];
             }
 
+            if (data.Key == FreeMessageConstant.CommonPlayerInfoUI) {
+                var ui = contexts.ui.uI;
+                contexts.ui.uISession.UiState[UiNameConstant.CommonPlayerInfo] = data.Bs[0];
+            }
+
             if (data.Key == FreeMessageConstant.GroupTechStatUI)
             {
                 var ui = contexts.ui.uI;
-                ui.RoomId = 1;
+                //ui.RoomId = 1;
                 ui.PlayerCount = data.Ins[0];
 
                 RoomInfo room = contexts.session.commonSession.RoomInfo;

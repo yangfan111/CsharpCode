@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Core.Free
+﻿namespace Core.Free
 {
     public interface IFreeRule
     {
@@ -11,5 +6,7 @@ namespace Core.Free
         string FreeType { get; }
         bool GameOver { get; set; }
         bool GameExit { get; set; }
+        long GameStartTime { get; set; }
+        long GameEndTime { get; set; }
     }
 }

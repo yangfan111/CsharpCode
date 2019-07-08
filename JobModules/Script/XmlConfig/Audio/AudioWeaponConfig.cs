@@ -33,7 +33,7 @@ namespace XmlConfig
         public int Left2;
         public int Right;
         [XmlElement("HitList")]
-        public HitList list;
+        public HitList HitList;
     }
     public class HitList
     {

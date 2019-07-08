@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using Assets.App.Shared.GameModules.Camera;
 using Core.CameraControl.NewMotor;
+using Core.Configuration;
 using Core.Utils;
 using UnityEngine;
+using Utils.Singleton;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Camera.Motor.Peek
@@ -13,13 +15,10 @@ namespace App.Shared.GameModules.Camera.Motor.Peek
 
         private readonly bool _isRight;
 
-        private PeekCameraConfig _config;
-
         public PeekOnMotor(bool isright, PeekCameraConfig config)
         {
             _isRight = isright;
             _modeId = (short) (_isRight ? ECameraPeekMode.Right : ECameraPeekMode.Left);
-            _config = config;
             _finalPostOffset = _isRight ? config.ThirdOffset : -config.ThirdOffset;
         }
 
@@ -55,18 +54,18 @@ namespace App.Shared.GameModules.Camera.Motor.Peek
         {
             if (state.ViewMode.Equals(ECameraViewMode.ThirdPerson))
             {
-                _finalPostOffset = (_isRight ? 1 : -1) * _config.ThirdOffset;
+                _finalPostOffset = (_isRight ? 1 : -1) * input.GetPeekConfig().ThirdOffset;
             }
             else if (state.ViewMode.Equals(ECameraViewMode.FirstPerson))
             {
-                _finalPostOffset = (_isRight ? 1 : -1) * _config.FirstOffset;
+                _finalPostOffset = (_isRight ? 1 : -1) * input.GetPeekConfig().FirstOffset;
             }
             else if (state.ViewMode.Equals(ECameraViewMode.GunSight))
             {
-                _finalPostOffset = (_isRight ? 1 : -1) * _config.GunSightOffset;
+                _finalPostOffset = (_isRight ? 1 : -1) * input.GetPeekConfig().GunSightOffset;
             }
 
-            var elapsedPercent = ElapsedPercent(clientTime, subState.ModeTime, _config.TransitionTime);
+            var elapsedPercent = ElapsedPercent(clientTime, subState.ModeTime, input.GetPeekConfig().TransitionTime);
             output.PostOffset = Vector3.Lerp(Vector3.zero, FinalPostOffset, elapsedPercent);
             state.LastPeekPercent = (_isRight ? 1 : -1) * elapsedPercent;
             if (elapsedPercent < 1)
@@ -74,7 +73,7 @@ namespace App.Shared.GameModules.Camera.Motor.Peek
                 _logger.DebugFormat("output.PostOffset:{0}", output.PostOffset);
             }
         }
-
+        
         public override void UpdatePlayerRotation(ICameraMotorInput input, ICameraMotorState state, PlayerEntity player)
         {
         }

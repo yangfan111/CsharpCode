@@ -68,8 +68,8 @@ namespace App.Client.GameModules.ClientEffect
                 Vector3 forward = entity.sprayPaint.SprayPaintForward;
                 Logger.DebugFormat("PlayerSprayPaintUtility.CreateBasicDecal");
                 int sprayPrintSpriteId = entity.sprayPaint.SprayPrintSpriteId;
-                PlayerSprayPaintUtility.CreateDecalVolume(entity, _contexts, position, forward, head, sprayPrintSpriteId);
-                effectLogic = ClientEffectLogicFactory.CreateEffectLogic(entity.effectType.Value, _contexts);
+                PlayerSprayPaintUtility.CreateBasicDecal(entity, _contexts, position, forward, head, sprayPrintSpriteId);
+                effectLogic = /*ClientEffectLogicFactory.CreateEffectLogic(entity.effectType.Value, _contexts)*/null;
             }
             else
             {

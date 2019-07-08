@@ -24,7 +24,7 @@ namespace App.Shared.Components.Player
         public int GetComponentId() { { return (int)EComponentIds.PlayerControlledEntity; } }
 
         [DontInitilize]
-        [NetworkProperty]
+        [NetworkProperty(16,0,1)]
         public int Role;
 
         [DontInitilize]
@@ -37,7 +37,7 @@ namespace App.Shared.Components.Player
 
         [DontInitilize]
         [NetworkProperty]
-        public int ForceRideOffVehicleSignal;
+        public byte ForceRideOffVehicleSignal;
 
         [DontInitilize]
         [NetworkProperty]
@@ -149,7 +149,7 @@ namespace App.Shared.Components.Player
             RideOffSignal = ForceRideOffVehicleSignal;
         }
 
-        private void ResetCamearData(Rigidbody body)
+        public void ResetCamearData(Rigidbody body)
         {
             var target = body.transform;
             CameraLocalTargetOffSet = body.centerOfMass;

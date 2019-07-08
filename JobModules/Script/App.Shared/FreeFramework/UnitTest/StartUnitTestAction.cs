@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using com.wd.free.@event;
+using Core.Free;
 
 namespace App.Shared.FreeFramework.UnitTest
 {
     [Serializable]
-    public class StartUnitTestAction : AbstractGameAction
+    public class StartUnitTestAction : AbstractGameAction, IRule
     {
         private int action;
 
@@ -26,6 +27,11 @@ namespace App.Shared.FreeFramework.UnitTest
             {
                 args.FreeContext.TestCase.Resume(args);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.StartUnitTestAction;
         }
     }
 }

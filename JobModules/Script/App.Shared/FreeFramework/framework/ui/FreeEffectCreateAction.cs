@@ -1,41 +1,34 @@
-using System.Collections.Generic;
-using Sharpen;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.@event;
 using com.wd.free.map.position;
 using com.wd.free.unit;
 using com.wd.free.util;
+using Core.Free;
 using Free.framework;
 using gameplay.gamerule.free.ui.component;
+using Sharpen;
+using System.Collections.Generic;
 
 namespace gameplay.gamerule.free.ui
 {
-	[System.Serializable]
-	public class FreeEffectCreateAction : SendMessageAction
-	{
+    [System.Serializable]
+	public class FreeEffectCreateAction : SendMessageAction, IRule
+    {
 		private const long serialVersionUID = -1188091456904593121L;
 
 		private string key;
-
 		private bool show;
-
 		private bool pvs;
-
 		private IPosSelector selector;
-
 		private string scale;
-
 		private string rotation;
-
 		private string img;
-
 		private IList<IFreeEffect> effects;
-
 		private IList<IFreeUIAuto> autos;
-
 		private string desc;
-
 		private string size;
+
+        private HashSet<int> playerIds;
 
 		public FreeEffectCreateAction()
 		{
@@ -254,11 +247,29 @@ namespace gameplay.gamerule.free.ui
 			this.size = size;
 		}
 
-		
+        public virtual HashSet<int> GetPlayerIds()
+        {
+            return playerIds;
+        }
+
+        public virtual void SetPlayerIds(HashSet<int> playerIds)
+        {
+            this.playerIds = playerIds;
+        }
+
+        public virtual void AddPlayerId(int playerId)
+        {
+            this.playerIds.Add(playerId);
+        }
 
 		public override string GetMessageDesc()
 		{
 			return "创建特效" + key + "\n" + builder.ToString();
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeEffectCreateAction;
+        }
+    }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using com.wd.free.@event;
 using Assets.App.Server.GameModules.GamePlay.Free.chicken;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.chicken
 {
@@ -12,7 +13,7 @@ namespace App.Server.GameModules.GamePlay.Free.chicken
     /// 大逃杀模式中不通用的一些行为，通用的行为单独作为Action
     /// </summary>
     [Serializable]
-    public class ChickenRuleAction : AbstractGameAction
+    public class ChickenRuleAction : AbstractGameAction, IRule
     {
         private int code;
         private string value;
@@ -40,6 +41,11 @@ namespace App.Server.GameModules.GamePlay.Free.chicken
                     action.Act(args);
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ChickenRuleAction;
         }
     }
 }

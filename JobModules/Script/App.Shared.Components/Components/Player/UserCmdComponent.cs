@@ -64,7 +64,7 @@ namespace App.Shared.Components.Player
     [Player]
     public class LatestAdjustCmdComponent : ISelfLatestComponent
     {
-        [DontInitilize] [NetworkProperty] public FixedVector3 AdjustPos;
+        [DontInitilize] [NetworkProperty(SyncFieldScale.Position)] public FixedVector3 AdjustPos;
         [NetworkProperty] public int ServerSeq;
         public int ClientSeq = -1;
         

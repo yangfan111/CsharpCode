@@ -13,7 +13,20 @@ namespace Utils.Configuration
     {
         private Dictionary<int, VideoSetting> _configs = new Dictionary<int, VideoSetting>();
         private VideoSettingConfig _config;
-        Dictionary<EVideoSettingType, List<VideoSetting>> typeDict = new Dictionary<EVideoSettingType, List<VideoSetting>>();
+        Dictionary<EVideoSettingType, HashSet<VideoSetting>> typeDict = new Dictionary<EVideoSettingType, HashSet<VideoSetting>>();
+
+        public Dictionary<int, VideoSetting> Configs
+        {
+            get
+            {
+                return _configs;
+            }
+
+            set
+            {
+                _configs = value;
+            }
+        }
 
         public override void ParseConfig(string xml)
         {
@@ -29,7 +42,7 @@ namespace Utils.Configuration
                 var type = (EVideoSettingType)item.Type;
                 if (!typeDict.ContainsKey(type))
                 {
-                    typeDict.Add(type, new List<VideoSetting>());
+                    typeDict.Add(type, new HashSet<VideoSetting>());
                 }
                 typeDict[type].Add(item);
             }
@@ -60,7 +73,7 @@ namespace Utils.Configuration
             return dict;
         }
 
-        public Dictionary<EVideoSettingType, List<VideoSetting>> GetTypeDict()
+        public Dictionary<EVideoSettingType, HashSet<VideoSetting>> GetTypeDict()
         {
             return typeDict;
         }

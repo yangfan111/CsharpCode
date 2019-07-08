@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using com.wd.free.@event;
+using Core.Free;
 
 namespace App.Shared.FreeFramework.UnitTest
 {
     [Serializable]
-    public class VarTestValue : AbstractTestValue
+    public class VarTestValue : AbstractTestValue, IRule
     {
         public string exp;
         public bool number;
@@ -28,5 +29,9 @@ namespace App.Shared.FreeFramework.UnitTest
             return tv;
         }
 
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.VarTestValue;
+        }
     }
 }

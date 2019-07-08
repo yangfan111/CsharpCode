@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using com.wd.free.para;
 using com.wd.free.skill;
+using Core.Free;
 
 namespace com.wd.free.skill
 {
     [Serializable]
-    public class PlayerActionSkill : ActionSkill
+    public class PlayerActionSkill : ActionSkill, IRule
     {
         private bool active;
 
@@ -44,6 +45,11 @@ namespace com.wd.free.skill
             {
                 resume.Act(args);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerActionSkill;
         }
     }
 }

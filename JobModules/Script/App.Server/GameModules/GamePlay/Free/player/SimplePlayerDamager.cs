@@ -1,4 +1,4 @@
-﻿using App.Shared.GameModules.Bullet;
+﻿using App.Shared.GameModules.Attack;
 using com.wd.free.@event;
 
 namespace App.Server.GameModules.GamePlay.Free.player

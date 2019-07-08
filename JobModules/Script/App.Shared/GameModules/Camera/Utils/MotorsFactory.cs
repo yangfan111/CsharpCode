@@ -24,36 +24,32 @@ namespace Assets.App.Shared.GameModules.Camera.Utils
 
             var pose = motors.GetDict(SubCameraMotorType.Pose);
 
-//            config.GetCameraConfigItem(ECameraViewMode.ThirdPerson)
-            pose[(int) ECameraPoseMode.Stand] = new NormalPoseMotor(ECameraPoseMode.Stand, config, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new ThirdPersonActice());
-            pose[(int) ECameraPoseMode.Crouch] = new NormalPoseMotor(ECameraPoseMode.Crouch, config, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new CrouchActice());
-            pose[(int) ECameraPoseMode.Prone] = new NormalPoseMotor(ECameraPoseMode.Prone, config, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new ProneActice());
-            pose[(int) ECameraPoseMode.Swim] = new NormalPoseMotor(ECameraPoseMode.Swim, config, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new SwimActice());
-            pose[(int) ECameraPoseMode.Dying] = new NormalPoseMotor(ECameraPoseMode.Dying, config, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new DyingActice());
-            pose[(int) ECameraPoseMode.Dead] = new DeadPoseMotor(ECameraPoseMode.Dead, config, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new DeadActice(), config.DeadConfig);
-            pose[(int) ECameraPoseMode.Parachuting] = new NormalPoseMotor(ECameraPoseMode.Parachuting, config, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new ParachutingActice());
-
-            pose[(int) ECameraPoseMode.ParachutingOpen] = new NormalPoseMotor(ECameraPoseMode.ParachutingOpen, config, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new ParachutingOpenActice());
-            
-            pose[(int) ECameraPoseMode.Gliding] = new GlidingPoseMotor(ECameraPoseMode.Gliding, config, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new GlidingActice());
-            pose[(int) ECameraPoseMode.DriveCar] = new DrivePoseMotor(ECameraPoseMode.DriveCar, config, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance), contexts.vehicle, contexts.freeMove);
-            pose[(int) ECameraPoseMode.AirPlane] = new AirplanePoseMotor(ECameraPoseMode.AirPlane, config, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance), contexts.vehicle, contexts.freeMove);
-            pose[(int) ECameraPoseMode.Climb] = new NormalPoseMotor(ECameraPoseMode.Climb, config, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance), new ClimbActive());
-
-            pose[(int) ECameraPoseMode.Rescue] = new NormalPoseMotor(ECameraPoseMode.Rescue, config, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new RescueActive());
+            pose[(int) ECameraPoseMode.Stand] = new NormalPoseMotor(ECameraPoseMode.Stand, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new ThirdPersonActice());
+            pose[(int) ECameraPoseMode.Crouch] = new NormalPoseMotor(ECameraPoseMode.Crouch, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new CrouchActice());
+            pose[(int) ECameraPoseMode.Prone] = new NormalPoseMotor(ECameraPoseMode.Prone, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new ProneActice());
+            pose[(int) ECameraPoseMode.Swim] = new NormalPoseMotor(ECameraPoseMode.Swim, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new SwimActice());
+            pose[(int) ECameraPoseMode.Dying] = new NormalPoseMotor(ECameraPoseMode.Dying, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new DyingActice());
+            pose[(int) ECameraPoseMode.Dead] = new DeadPoseMotor(ECameraPoseMode.Dead, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new DeadActice(), config.GetRoleConfig().DeadConfig);
+            pose[(int) ECameraPoseMode.Parachuting] = new NormalPoseMotor(ECameraPoseMode.Parachuting, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new ParachutingActice());
+            pose[(int) ECameraPoseMode.ParachutingOpen] = new NormalPoseMotor(ECameraPoseMode.ParachutingOpen, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new ParachutingOpenActice());
+            pose[(int) ECameraPoseMode.Gliding] = new GlidingPoseMotor(ECameraPoseMode.Gliding, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new GlidingActice());
+            pose[(int) ECameraPoseMode.DriveCar] = new DrivePoseMotor(ECameraPoseMode.DriveCar, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance), contexts.vehicle, contexts.freeMove);
+            pose[(int) ECameraPoseMode.AirPlane] = new AirplanePoseMotor(ECameraPoseMode.AirPlane, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance), contexts.vehicle, contexts.freeMove);
+            pose[(int) ECameraPoseMode.Climb] = new NormalPoseMotor(ECameraPoseMode.Climb, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance), new ClimbActive());
+            pose[(int) ECameraPoseMode.Rescue] = new NormalPoseMotor(ECameraPoseMode.Rescue, new HashSet<ECameraPoseMode>(CommonIntEnumEqualityComparer<ECameraPoseMode>.Instance),  new RescueActive());
 
             var free = motors.GetDict(SubCameraMotorType.Free);
             free[(int) ECameraFreeMode.On] = new FreeOnMotor();
-            free[(int) ECameraFreeMode.Off] = new FreeOffMotor(config.FreeConfig.TransitionTime);
+            free[(int) ECameraFreeMode.Off] = new FreeOffMotor(config.GetRoleConfig().FreeConfig.TransitionTime);
 
             var peek = motors.GetDict(SubCameraMotorType.Peek);
-            peek[(int) ECameraPeekMode.Off] = new PeekOffMotor(config.PeekConfig.TransitionTime);
-            peek[(int) ECameraPeekMode.Left] = new PeekOnMotor(false,config.PeekConfig);
-            peek[(int) ECameraPeekMode.Right] = new PeekOnMotor(true,config.PeekConfig);
+            peek[(int) ECameraPeekMode.Off] = new PeekOffMotor(config.GetRoleConfig().PeekConfig.TransitionTime);
+            peek[(int) ECameraPeekMode.Left] = new PeekOnMotor(false,config.GetRoleConfig().PeekConfig);
+            peek[(int) ECameraPeekMode.Right] = new PeekOnMotor(true,config.GetRoleConfig().PeekConfig);
 
             var view = motors.GetDict(SubCameraMotorType.View);
             view[(int)ECameraViewMode.FirstPerson] = new FirstViewMotor();
-            view[(int)ECameraViewMode.GunSight] = new GunSightMotor(contexts);
+            view[(int)ECameraViewMode.GunSight] = new GunSightMotor();
             view[(int)ECameraViewMode.ThirdPerson] = new ThirdViewMotor();
 
             CameraActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.Pose,

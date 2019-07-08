@@ -107,7 +107,7 @@ namespace Core.Animation
                     }
                     return 0;
                 });
-
+        
                 for (int i = 0; i < sortedLayers.Count; i++)
                 {
                     var layerIndex = sortedLayers[i].LayerIndex;
@@ -124,9 +124,9 @@ namespace Core.Animation
                         {
                             deltaTime = sortedLayers[i].TransitionTime;
                         }
-
+        
                         animator.Play(layer.CurrentStateHash, layerIndex, 0);
-
+        
                         // make normalized time effect
                         animator.Update(0, false);
                         animator.Update(deltaTime, false);

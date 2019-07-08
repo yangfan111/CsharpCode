@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using Core.Network;
 using Core.Replicaton;
 using Core.SnapshotReplication.Serialization.Channel;
@@ -29,7 +30,7 @@ namespace Core.SnapshotReplication
 
         public object Deserialize(Stream inStream)
         {
-            BinaryReader reader = new BinaryReader(inStream);
+            BinaryReader reader = new BinaryReader(inStream, Encoding.UTF8);
             return _recvChannel.DeSerializeSnapshot(reader);
         }
 

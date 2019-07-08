@@ -205,6 +205,7 @@ namespace App.Shared.Components.Common
     [FreeMove]
     public class HitBoxComponent : IAssetComponent, IGameComponent
     {
+        public int RenderTime;
         public BoundingSphere HitPreliminaryGeo;
         public GameObject HitBoxGameObject;
         public bool Enabled;

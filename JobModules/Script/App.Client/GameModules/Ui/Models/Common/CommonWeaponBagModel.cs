@@ -4,10 +4,13 @@ using App.Client.GameModules.Ui.Utils;
 using App.Client.GameModules.Ui.ViewModels.Common;
 using App.Client.Utility;
 using App.Shared.Components.Ui.UiAdapter;
+using Assets.App.Client.GameModules.Ui;
 using Assets.UiFramework.Libs;
+using Assets.XmlConfig;
 using Core.GameModule.Interface;
 using Core.Utils;
 using UIComponent.UI;
+using UIComponent.UI.Manager;
 using UnityEngine;
 using UnityEngine.UI;
 using UserInputManager.Lib;
@@ -27,6 +30,7 @@ namespace App.Client.GameModules.Ui.Models.Common
     }
     public class CommonWeaponBagModel : ClientAbstractModel, IUiHfrSystem
     {
+        private TipManager tipManager;
 
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CommonWeaponBagModel));
         private CommonWeaponBagViewModel _viewModel = new CommonWeaponBagViewModel();
@@ -155,6 +159,8 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void InitVariable()
         {
+            tipManager = UiCommon.TipManager;
+
             weaponItem = FindComponent<Transform>("CommonWeaponItem");
             weaponItem.gameObject.SetActive(false);
             primeWeapon = FindComponent<Transform>("PrimeWeaponItem");
@@ -272,7 +278,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         protected override void OnCanvasEnabledUpdate(bool enable)
         {
-            base.SetCanvasEnabled(enable);
+            base.OnCanvasEnabledUpdate(enable);
 
             if (!_inited && enable && _viewInitialized)
             {
@@ -323,6 +329,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void UpdateBagItem(IWeaponBagItemInfo item, WeaponBagUiItem uiItem)
         {
+            UpdateWeaponTip(item, uiItem);
             uiItem.WeaponName.text = null == item ? "" : item.WeaponName;
             var weaponIcon = uiItem.WeaponIcon;
             var assetInfo = null == item ? _emptyIcon : item.WeaponIconAssetInfo;
@@ -359,6 +366,23 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
         }
 
+        private void UpdateWeaponTip(IWeaponBagItemInfo item, WeaponBagUiItem uiItem)
+        {
+            var transform = uiItem.WeaponIcon.transform;
+            if (item == null || item.id <= 0)
+            {
+                tipManager.UnRegisterTip(transform);
+                return;
+            }
+
+            var id = item.id;
+            if (id <= 0) return ;
+            var data = new TipShowData();
+            data.CategoryId = (int)ECategory.Weapon;
+            data.TemID = id;
+            tipManager.RegisterTip<CommonTipModel>(transform, data);
+        }
+
         private Dictionary<EWeaponPartType, int> WeaponPartTypeToIndexDict = new Dictionary<EWeaponPartType, int>
         {
             {EWeaponPartType.UpperRail, 1},
@@ -376,6 +400,12 @@ namespace App.Client.GameModules.Ui.Models.Common
                 var assetInfo = null == info ? _emptyIcon : info.GetWeaponPartInfoByWeaponPartType(pair.Key);
                 var tf = uiItem.WeaponPartTfList[pair.Value - 1];
                 var image = uiItem.WeaponPartIconList[pair.Value - 1];
+                int id = 0;
+                if (info != null)
+                {
+                    id = info.GetIdByWeaponPartType(pair.Key);
+                }
+                UpdateWeaponPartTip(id, image.transform);
 
                 if (string.IsNullOrEmpty(assetInfo.AssetName) || string.IsNullOrEmpty(assetInfo.BundleName))
                 {
@@ -399,6 +429,20 @@ namespace App.Client.GameModules.Ui.Models.Common
                     });
                 }
             }
+        }
+
+        private void UpdateWeaponPartTip(int id, Transform transform)
+        {
+            if (id <= 0)
+            {
+                tipManager.UnRegisterTip(transform);
+                return;
+            }
+
+            var data = new TipShowData();
+            data.CategoryId = (int)ECategory.WeaponPart;
+            data.TemID = id;
+            tipManager.RegisterTip<CommonTipModel>(transform, data);
         }
 
         Transform GetNewWeaponItem(Transform root,bool haveWeaponPart,string type = "")

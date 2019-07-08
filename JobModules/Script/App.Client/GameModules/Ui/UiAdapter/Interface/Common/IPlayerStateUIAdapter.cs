@@ -6,8 +6,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
 {
     public interface IPlayerStateUiAdapter : IAbstractUiAdapter
     {
-        PlayerEntity PlayerEntity { set; }
-        string PlayerName { get; }
         int CurrentHp { get; }
         int MaxHp { get; }
         int MayRecoverHp { get; }

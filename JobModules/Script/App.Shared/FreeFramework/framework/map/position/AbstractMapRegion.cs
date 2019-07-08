@@ -24,7 +24,7 @@ namespace com.wd.free.map.position
 		{
 			if (!StringUtil.IsNullOrEmpty(con))
 			{
-				if (condition == null || (con.Contains(FreeUtil.VAR_START) && con.Contains(FreeUtil.VAR_END)))
+				if (condition == null || ((con.IndexOf(FreeUtil.VAR_START_CHAR) > -1) && (con.IndexOf(FreeUtil.VAR_END_CHAR) > -1)))
 				{
 					condition = new ExpParaCondition(con);
 				}

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using App.Client.GameModules.Player;
 using App.Shared.Components.Player;
 using BehaviorDesigner.Runtime.Tasks;
+using Core.CameraControl;
 using Core.CameraControl.NewMotor;
 using Core.Components;
 using Core.EntityComponent;
@@ -32,51 +33,31 @@ namespace App.Shared.GameModules.GamePlay
         {
             return true;
         }
-
-        protected override void BeforeOnGamePlay()
-        {
-            foreach (var entity in GetIGroup(_contexts).GetEntities())
-            {
-                entity.gamePlay.BeingObserved = false;
-            }
-        }
-
-        protected override void AfterOnGamePlay()
-        {
-            foreach (var entity in GetIGroup(_contexts).GetEntities())
-            {
-                if (!entity.gamePlay.BeingObserved)
-                {
-                    if (entity.hasObserveCamera)
-                        entity.RemoveObserveCamera();
-                }
-            }
-        }
         
-        protected override void OnGamePlay(PlayerEntity entity)
-        {
-            UpdateValue(entity);
-        }
-
-        private void UpdateValue(PlayerEntity player)
+        protected override void OnGamePlay(PlayerEntity player)
         {
             int ObserveEntityId = player.gamePlay.CameraEntityId;
             if (ObserveEntityId == 0) return;
             var observedPlayer =
                 _contexts.player.GetEntityWithEntityKey(new EntityKey(ObserveEntityId, (short) EEntityType.Player));
             if (observedPlayer == null) return;
-            observedPlayer.gamePlay.BeingObserved = true;
-            
-            if (!observedPlayer.hasObserveCamera)
-            {
-                observedPlayer.AddObserveCamera();
-            }
 
-            observedPlayer.observeCamera.Fov = observedPlayer.cameraFinalOutputNew.Fov;
-            observedPlayer.observeCamera.CameraPosition =
-                observedPlayer.cameraStateUpload.ThirdPersonCameraPostion.ShiftedToFixedVector3();
-            observedPlayer.observeCamera.CameraEularAngle = observedPlayer.cameraFinalOutputNew.EulerAngle;
-            observedPlayer.observeCamera.PlayerPosition = observedPlayer.position.Value; 
+            player.observeCamera.MainNowMode = observedPlayer.cameraStateNew.MainNowMode;
+            player.observeCamera.FreeNowMode = observedPlayer.cameraStateNew.FreeNowMode;
+            player.observeCamera.PeekNowMode = observedPlayer.cameraStateNew.PeekNowMode;
+
+            player.observeCamera.FreeYaw = observedPlayer.cameraStateUpload.FreeYaw;
+            player.observeCamera.FreePitch = observedPlayer.cameraStateUpload.FreePitch;
+
+            if (observedPlayer.cameraArchor.ArchorType == ECameraArchorType.Car)
+            {
+                player.observeCamera.VehicleId = observedPlayer.controlledVehicle.EntityKey.EntityId;
+                player.observeCamera.ObservedPlayerPosition = observedPlayer.cameraFinalOutputNew.Position;
+            }
+            else
+            {
+                player.observeCamera.VehicleId = -1;
+            }
         }
     }
 }

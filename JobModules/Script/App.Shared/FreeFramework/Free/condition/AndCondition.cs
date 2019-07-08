@@ -1,19 +1,25 @@
 using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.para.exp;
+using Core.Free;
 
 namespace gameplay.gamerule.free.condition
 {
 	[System.Serializable]
-	public class AndCondition : IParaCondition
-	{
+	public class AndCondition : IParaCondition, IRule
+    {
 		private const long serialVersionUID = -5968357087453563990L;
 
 		private IParaCondition condition1;
 
 		private IParaCondition condition2;
 
-		public virtual bool Meet(IEventArgs args)
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.AndCondition;
+        }
+
+        public virtual bool Meet(IEventArgs args)
 		{
 			bool flag = false;
 			if (condition1 != null)

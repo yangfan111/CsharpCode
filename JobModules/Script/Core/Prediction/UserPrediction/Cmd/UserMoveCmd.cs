@@ -18,6 +18,13 @@ namespace Core.Prediction.UserPrediction.Cmd
         public int Buttons = 0;
     }
 
+    public enum UserCmdHandle
+    {
+        None,
+        Interrupt, // 打断
+        Synchronous, // 同步
+    }
+
     public enum UserCmdEnum
     {
         IsRun,
@@ -63,5 +70,6 @@ namespace Core.Prediction.UserPrediction.Cmd
 
         IsScopeIn,
         IsScopeOut,
+        Length,
     }
 }

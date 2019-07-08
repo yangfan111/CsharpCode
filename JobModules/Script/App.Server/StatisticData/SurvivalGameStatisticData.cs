@@ -1,16 +1,10 @@
-﻿using App.Server.GameModules.GamePlay.free.player;
-using App.Shared.Components.Player;
-using App.Shared.FreeFramework.framework.trigger;
-using com.wd.free.@event;
-using com.wd.free.para;
-using Com.Wooduan.Ssjj2.Common.Net.Proto;
+﻿using Com.Wooduan.Ssjj2.Common.Net.Proto;
 using Core.Free;
 using Core.Room;
 using Core.Statistics;
 using Core.Utils;
 using System;
 using System.Collections.Generic;
-using App.Shared.Components;
 
 namespace App.Server.StatisticData
 {
@@ -44,22 +38,22 @@ namespace App.Server.StatisticData
             }
             gameOverPlayer.Statistics[(int) EStatisticsID.KillCount] = playerInfo.StatisticsData.KillCount;
             gameOverPlayer.Statistics[(int) EStatisticsID.HitDownCount] = playerInfo.StatisticsData.HitDownCount;
-            gameOverPlayer.Statistics[(int) EStatisticsID.PlayerDamage] = (int)playerInfo.StatisticsData.PlayerDamage;
-            gameOverPlayer.Statistics[(int) EStatisticsID.TotalDamage] = (int)playerInfo.StatisticsData.TotalDamage;
+            gameOverPlayer.Statistics[(int) EStatisticsID.PlayerDamage] = Convert.ToInt32(playerInfo.StatisticsData.PlayerDamage);
+            gameOverPlayer.Statistics[(int) EStatisticsID.TotalDamage] = Convert.ToInt32(playerInfo.StatisticsData.TotalDamage);
             gameOverPlayer.Statistics[(int) EStatisticsID.ShootingCount] = playerInfo.StatisticsData.ShootingCount;
             gameOverPlayer.Statistics[(int) EStatisticsID.ShootingSuccCount] = playerInfo.StatisticsData.ShootingSuccCount;
             gameOverPlayer.Statistics[(int) EStatisticsID.ShootingPlayerCount] = playerInfo.StatisticsData.ShootingPlayerCount;
             gameOverPlayer.Statistics[(int) EStatisticsID.CritCount] = playerInfo.StatisticsData.CritCount;
-            gameOverPlayer.Statistics[(int) EStatisticsID.TotalMoveDistance] = (int)playerInfo.StatisticsData.TotalMoveDistance;
-            gameOverPlayer.Statistics[(int) EStatisticsID.VehicleMoveDistance] = (int)playerInfo.StatisticsData.VehicleMoveDistance;
+            gameOverPlayer.Statistics[(int) EStatisticsID.TotalMoveDistance] = Convert.ToInt32(playerInfo.StatisticsData.TotalMoveDistance);
+            gameOverPlayer.Statistics[(int) EStatisticsID.VehicleMoveDistance] = Convert.ToInt32(playerInfo.StatisticsData.VehicleMoveDistance);
             gameOverPlayer.Statistics[(int) EStatisticsID.AssistCount] = playerInfo.StatisticsData.AssistCount;
-            gameOverPlayer.Statistics[(int) EStatisticsID.CureVolume] = (int)playerInfo.StatisticsData.CureVolume;
+            gameOverPlayer.Statistics[(int) EStatisticsID.CureVolume] = Convert.ToInt32(playerInfo.StatisticsData.CureVolume);
             gameOverPlayer.Statistics[(int) EStatisticsID.AccSpeedTime] = playerInfo.StatisticsData.AccSpeedTime;
             gameOverPlayer.Statistics[(int) EStatisticsID.SaveCount] = playerInfo.StatisticsData.SaveCount;
-            gameOverPlayer.Statistics[(int) EStatisticsID.TotalBeDamage] = (int)playerInfo.StatisticsData.TotalBeDamage;
-            gameOverPlayer.Statistics[(int) EStatisticsID.DefenseDamage] = (int)playerInfo.StatisticsData.DefenseDamage;
+            gameOverPlayer.Statistics[(int) EStatisticsID.TotalBeDamage] = Convert.ToInt32(playerInfo.StatisticsData.TotalBeDamage);
+            gameOverPlayer.Statistics[(int) EStatisticsID.DefenseDamage] = Convert.ToInt32(playerInfo.StatisticsData.DefenseDamage);
             gameOverPlayer.Statistics[(int) EStatisticsID.DeadCount] = playerInfo.StatisticsData.DeadCount;
-            gameOverPlayer.Statistics[(int) EStatisticsID.KillDistance] = (int)playerInfo.StatisticsData.MaxKillDistance;
+            gameOverPlayer.Statistics[(int) EStatisticsID.KillDistance] = Convert.ToInt32(playerInfo.StatisticsData.MaxKillDistance);
             gameOverPlayer.Statistics[(int) EStatisticsID.DestroyVehicle] = playerInfo.StatisticsData.DestroyVehicle;
             gameOverPlayer.Statistics[(int) EStatisticsID.UseThrowingCount] = playerInfo.StatisticsData.UseThrowingCount;
             gameOverPlayer.Statistics[(int) EStatisticsID.IsFullArmed] = playerInfo.StatisticsData.IsFullArmed ? 1 : 0;
@@ -84,11 +78,8 @@ namespace App.Server.StatisticData
             gameOverPlayer.Statistics[(int) EStatisticsID.CritKillCount] = playerInfo.StatisticsData.CritKillCount;
             gameOverPlayer.Statistics[(int) EStatisticsID.GetFirstBlood] = playerInfo.StatisticsData.GetFirstBlood ? 1 : 0;
             gameOverPlayer.Statistics[(int) EStatisticsID.TeamCount] = _dictTeams.Count;
-            if(((PlayerEntity) playerInfo.PlayerEntity).gamePlay.LifeState != (int) EPlayerLifeState.Alive)
-            {
-                playerInfo.StatisticsData.DeadTime += (int) (System.DateTime.Now.Ticks / 10000L) - playerInfo.StatisticsData.LastDeadTime;
-            }
             gameOverPlayer.Statistics[(int) EStatisticsID.DeadTime] = playerInfo.StatisticsData.DeadTime;
+            gameOverPlayer.Statistics[(int) EStatisticsID.AliveTime] = (playerInfo.StatisticsData.GameTime - playerInfo.StatisticsData.DeadTime) / 1000;
             AddHonorData(gameOverPlayer, playerInfo);
             PlayerReportTrigger(gameOverPlayer, playerInfo, freeArgs);
         }

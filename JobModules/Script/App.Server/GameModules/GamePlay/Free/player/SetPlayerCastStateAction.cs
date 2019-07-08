@@ -5,11 +5,12 @@ using com.wd.free.@event;
 using com.wd.free.util;
 using System;
 using App.Shared.GameModules.Player;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
     [Serializable]
-    class SetPlayerCastStateAction : AbstractPlayerAction
+    class SetPlayerCastStateAction : AbstractPlayerAction, IRule
     {
         private bool remove;
 
@@ -30,6 +31,11 @@ namespace App.Server.GameModules.GamePlay.Free.player
                     PlayerStateUtil.AddCastState(castState, p.Player.gamePlay);
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SetPlayerCastStateAction;
         }
     }
 }

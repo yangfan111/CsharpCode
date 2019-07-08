@@ -10,6 +10,9 @@ namespace App.Client.GameModules.ClientEffect
         {
             AddSystem(new ClientEffectEntityInitSystem(contexts));
             AddSystem(new ClientEffectRenderSystem(contexts));
+            AddSystem(new ClientEffectObjectRenderSystem(contexts));
+
+            
             AddSystem(new ClientEffectCleanUpSystem(contexts.clientEffect));
             AddSystem(new ClientEffectLimitSystem(contexts));
         }

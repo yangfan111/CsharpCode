@@ -1,14 +1,15 @@
-﻿using Core.Attack;
+﻿using Core;
 using Core.Components;
 using Core.Playback;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
 using Core.SyncLatest;
 using Entitas;
+using Core.Free;
 
 namespace App.Shared.Components.Player
 {
     [Player, ]
-    public class PlayerMaskComponent : ISelfLatestComponent, IPlaybackComponent 
+    public class PlayerMaskComponent : ISelfLatestComponent, IPlaybackComponent , IRule
     {
         [NetworkProperty] public int SelfMask;
         [NetworkProperty] public int TargetMask;
@@ -33,6 +34,11 @@ namespace App.Shared.Components.Player
         public void SyncLatestFrom(object rightComponent)
         {
             CopyFrom(rightComponent);
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerMaskComponent;
         }
     }
 

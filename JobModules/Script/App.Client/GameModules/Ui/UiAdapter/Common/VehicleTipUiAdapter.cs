@@ -15,10 +15,17 @@ namespace App.Client.GameModules.Ui.UiAdapter
         private PlayerContext _playerContext;
         private VehicleContext _vehicleContext;
 
+        private UiContext _uiContext;
         public VehicleTipUiAdapter(Contexts contexts)
         {
             this._playerContext = contexts.player;
             this._vehicleContext = contexts.vehicle;
+            this._uiContext = contexts.ui;
+        }
+
+        private PlayerEntity Player
+        {
+            get { return _uiContext.uI.Player; }
         }
 
         public override bool Enable
@@ -27,17 +34,16 @@ namespace App.Client.GameModules.Ui.UiAdapter
             {
                 return IsOnVehicle && !IsPlayerDead && base.Enable;
             }
-            set { base.Enable = value; }
         }
 
         public bool IsOnVehicle
         {
-            get { return null != _playerContext.flagSelfEntity && _playerContext.flagSelfEntity.IsOnVehicle(); }
+            get { return null != Player && Player.IsOnVehicle(); }
         }
 
         private VehicleEntity GetCurrentVehicle()
         {
-            return _vehicleContext.GetEntityWithEntityKey(_playerContext.flagSelfEntity.controlledVehicle.EntityKey);
+            return _vehicleContext.GetEntityWithEntityKey(Player.controlledVehicle.EntityKey);
         }
 
         public bool IsWheelBrokeByIndex(VehiclePartIndex index, out VehicleUiWheelIndex uiIndex)
@@ -153,7 +159,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         }
         public bool IsPlayerDead
         {
-            get { return _playerContext.flagSelfEntity.gamePlay.IsLifeState(EPlayerLifeState.Dead); }
+            get { return Player.gamePlay.IsLifeState(EPlayerLifeState.Dead); }
         }
 
         public AssetInfo CurVehicleAssetInfo

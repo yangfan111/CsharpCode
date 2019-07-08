@@ -184,6 +184,12 @@ namespace Core.CharacterState.Posture.States
                                      CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
             addOutput(FsmOutput.Cache);
             
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.ForceEndProneHash,
+                AnimatorParametersHash.Instance.ForceEndProneName,
+                AnimatorParametersHash.Instance.ForceEndProneDisable,
+                CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+            addOutput(FsmOutput.Cache);
+            
             FsmOutput.Cache.SetValue(FsmOutputType.CharacterControllerJumpHeight, _characterInfo.GetStandCapsule().Height);
             addOutput(FsmOutput.Cache);
             

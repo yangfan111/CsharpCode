@@ -16,6 +16,26 @@ namespace App.Client.SceneManagement.DistanceCulling
                 || (tagValue & (1 << (int)MultiTagBase.TagEnum.InBothProps)) != 0;
         }
 
+        public static bool IsDoor(int tagValue)
+        {
+            return (tagValue & (1 << (int) MultiTagBase.TagEnum.Door)) != 0;
+        }
+
+        public static bool IsWall(int tagValue)
+        {
+            return (tagValue & (1 << (int)MultiTagBase.TagEnum.Wall)) != 0;
+        }
+
+        public static bool IsHouse(int tagValue)
+        {
+            return (tagValue & (1 << (int)MultiTagBase.TagEnum.House)) != 0;
+        }
+
+        public static bool IsTerrain(int tagValue)
+        {
+            return (tagValue & (1 << (int)MultiTagBase.TagEnum.Terrain)) != 0;
+        }
+
         public static bool RoadShortDecal(GameObject go)
         {
             bool ret = false;
@@ -79,5 +99,6 @@ namespace App.Client.SceneManagement.DistanceCulling
 
             return ret;
         }
+
     }
 }

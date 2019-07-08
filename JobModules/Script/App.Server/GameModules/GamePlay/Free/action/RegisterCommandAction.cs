@@ -7,11 +7,12 @@ using com.wd.free.@event;
 using gameplay.gamerule.free.ui;
 using Core.Free;
 using App.Server.GameModules.GamePlay.Free.client;
+using com.wd.free.para;
 
 namespace App.Server.GameModules.GamePlay.Free.action
 {
     [Serializable]
-    public class RegisterCommandAction : SendMessageAction
+    public class RegisterCommandAction : SendMessageAction, IRule
     {
         private string command;
         private string usage;
@@ -40,6 +41,11 @@ namespace App.Server.GameModules.GamePlay.Free.action
                 FreeDebugCommandHandler.RegisterCommand(command, action);
             }
             
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.RegisterCommandAction;
         }
     }
 }

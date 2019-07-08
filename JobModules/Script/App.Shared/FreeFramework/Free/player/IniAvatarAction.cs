@@ -1,19 +1,15 @@
-﻿using com.wd.free.action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using App.Shared.Player;
+using com.wd.free.action;
 using com.wd.free.@event;
-using Utils.Configuration;
-using Free.framework;
 using Core.Free;
-using App.Shared.Player;
+using System;
+using Utils.Configuration;
 using Utils.Singleton;
 
 namespace App.Shared.FreeFramework.Free.player
 {
     [Serializable]
-    public class IniAvatarAction : AbstractPlayerAction
+    public class IniAvatarAction : AbstractPlayerAction, IRule
     {
         public override void DoAction(IEventArgs args)
         {
@@ -23,10 +19,16 @@ namespace App.Shared.FreeFramework.Free.player
             if (0 == ids.Count) {
                 ids = player.playerInfo.CacheAvatarIds;
             }
-            for(int i = 0; i < ids.Count; i++)
+
+            for(int i = 0; i < (ids == null ? 0 : ids.Count); i++)
             {
                 PutOn(player, ids[i]);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.IniAvatarAction;
         }
 
         private void PutOn(PlayerEntity playerEntity, int id)
@@ -35,15 +37,7 @@ namespace App.Shared.FreeFramework.Free.player
             var avatar = SingletonManager.Get<AvatarAssetConfigManager>().GetAvatarAssetItemById(resId);
             if (avatar != null)
             {
-                SimpleProto message = FreePool.Allocate();
-                message.Key = FreeMessageConstant.ChangeAvatar;
-
                 playerEntity.appearanceInterface.Appearance.ChangeAvatar(resId);
-
-                message.Ins.Add(id);
-                message.Ks.Add(1);
-
-                //playerEntity.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.FreeData, message);
             }
         }
     }

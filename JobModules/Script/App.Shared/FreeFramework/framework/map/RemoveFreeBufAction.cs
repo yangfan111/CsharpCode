@@ -6,11 +6,12 @@ using System.Text;
 using com.wd.free.@event;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.util;
+using Core.Free;
 
 namespace com.wd.free.map
 {
     [Serializable]
-    public class RemoveFreeBufAction : AbstractGameAction
+    public class RemoveFreeBufAction : AbstractGameAction, IRule
     {
         private String key;
 
@@ -24,6 +25,11 @@ namespace com.wd.free.map
                     args.FreeContext.Bufs.RemoveBuf(args, k);
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.RemoveFreeBufAction;
         }
     }
 }

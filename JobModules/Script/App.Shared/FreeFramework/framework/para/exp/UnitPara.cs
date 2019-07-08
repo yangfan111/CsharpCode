@@ -11,11 +11,21 @@ namespace com.wd.free.para.exp
     {
         private const string DOT = ".";
 
+        private const int TYPE_COUNT = 6;
+
+        private const char CHAR1 = '_';
+
+        private const char CHAR2 = ',';
+
+        private static char[] Chars1 = new char[] { '[', ']' };
+
+        private static string[] Strings1 = new string[] { "[@", "='", "']/@" };
+
         private string unit;
 
         private string para;
 
-        private static Dictionary<int, Dictionary<string, string[]>> splitCache = new Dictionary<int, Dictionary<string, string[]>>();
+        private static Dictionary<string, string[]>[] splitCache = new Dictionary<string, string[]>[TYPE_COUNT];
 
         public UnitPara()
             : base()
@@ -54,14 +64,17 @@ namespace com.wd.free.para.exp
                 }
                 else
                 {
+                    bool has = (para.IndexOf('[') > -1);
+                    bool has2 = (para.IndexOf(']') > -1);
                     string[] vs = Split(GetPara(), 1);
-                    if (para.Contains("[") && para.Contains("]"))
+
+                    if (has && has2)
                     {
                         vs = new string[] { para };
                     }
                     if (vs.Length != 4)
                     {
-                        if (para.Contains("[@") && para.Contains("']/@"))
+                        if (has && has2 && para.Contains("[@") && para.Contains("']/@")) /* ºı…ŸContainsµ˜”√ */
                         {
                             vs = Split(GetPara(), 2);
                         }
@@ -81,7 +94,7 @@ namespace com.wd.free.para.exp
                     }
                     else
                     {
-                        if (para.Contains("[") && para.Contains("]"))
+                        if (has && has2)
                         {
                             vs = Split(para, 3);
                             if (vs.Length == 3 && StringUtil.IsNullOrEmpty(vs[2]))
@@ -120,36 +133,38 @@ namespace com.wd.free.para.exp
 
         private static string[] Split(string v, int type)
         {
-            if (!splitCache.ContainsKey(type))
+            Dictionary<string, string[]> dict = splitCache[type];
+            if (null == dict)
             {
-                splitCache.Add(type, new Dictionary<string, string[]>());
+                dict = new Dictionary<string, string[]>();
+                splitCache[type] = dict;
             }
-
-            if (!splitCache[type].ContainsKey(v))
+            string[] split = null;
+            if (!dict.TryGetValue(v, out split))
             {
                 switch (type)
                 {
                     case 1:
-                        splitCache[type].Add(v, StringUtil.Split(v, "_"));
+                        dict.Add(v, StringUtil.Split(v, CHAR1));
                         break;
                     case 2:
-                        splitCache[type].Add(v, StringUtil.Split(v, new string[] { "[@", "='", "']/@" }));
+                        dict.Add(v, StringUtil.Split(v, Strings1));
                         break;
                     case 3:
-                        splitCache[type].Add(v, StringUtil.Split(v, new string[] { "[", "]" }));
+                        dict.Add(v, StringUtil.Split(v, Chars1));
                         break;
                     case 4:
-                        splitCache[type].Add(v, StringUtil.Split(v, DOT));
+                        dict.Add(v, StringUtil.Split(v, DOT));
                         break;
                     case 5:
-                        splitCache[type].Add(v, StringUtil.Split(v, ","));
+                        dict.Add(v, StringUtil.Split(v, CHAR2));
                         break;
                     default:
                         break;
                 }
             }
 
-            return splitCache[type][v];
+            return dict[v];
         }
 
         public static com.wd.free.para.exp.UnitPara ParseOne(string exp)

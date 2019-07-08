@@ -12,6 +12,7 @@ using com.wd.free.item;
 using com.wd.free.map.position;
 using com.wd.free.util;
 using Core.EntityComponent;
+using Core.Free;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,7 +21,7 @@ using Utils.Singleton;
 namespace App.Server.GameModules.GamePlay.Free.item
 {
     [Serializable]
-    public class CreateBoxItemAction : AbstractGameAction
+    public class CreateBoxItemAction : AbstractGameAction, IRule
     {
         private string name;
         private string id;
@@ -53,11 +54,11 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
             if (string.IsNullOrEmpty(id))
             {
-                ItemDrop[] list = FreeItemDrop.GetDropItems(FreeUtil.ReplaceVar(cat, args), FreeUtil.ReplaceInt(count, args), args.GameContext.session.commonSession.RoomInfo.MapId);
+                ItemDrop[] list = SingletonManager.Get<FreeItemDrop>().GetDropItems(FreeUtil.ReplaceVar(cat, args), FreeUtil.ReplaceInt(count, args), args.GameContext.session.commonSession.RoomInfo.MapId);
                 foreach (ItemDrop drop in list)
                 {
                     CreateItemFromItemDrop(args, p, drop, realName);
-                    List<ItemDrop> extra = FreeItemDrop.GetExtraItems(drop);
+                    List<ItemDrop> extra = SingletonManager.Get<FreeItemDrop>().GetExtraItems(drop);
                     foreach (ItemDrop e in extra)
                     {
                         CreateItemFromItemDrop(args, p, e, realName);
@@ -153,6 +154,11 @@ namespace App.Server.GameModules.GamePlay.Free.item
             en.freeData.Value = SingletonManager.Get<DeadBoxParser>().ToString(info);
 
             en.isFlagSyncNonSelf = true;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.CreateBoxItemAction;
         }
     }
 

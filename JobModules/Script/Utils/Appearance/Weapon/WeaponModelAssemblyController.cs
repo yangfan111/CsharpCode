@@ -1,6 +1,7 @@
 ﻿//#define UnitTest
 using Core.Utils;
 using UnityEngine;
+using Utils.Appearance.Bone;
 using XmlConfig;
 
 namespace Utils.Appearance.Weapon
@@ -25,7 +26,8 @@ namespace Utils.Appearance.Weapon
             {
                 var srcRotation = _rootGo.transform.rotation;
                 _rootGo.transform.rotation = Quaternion.identity;
-                weaponGo.transform.parent = _rootGo.transform;
+//                weaponGo.transform.parent = _rootGo.transform;
+                weaponGo.transform.SetParent(_rootGo.transform);
                 weaponGo.transform.localScale = Vector3.one;
                 weaponGo.transform.localRotation = Quaternion.identity;
                 weaponGo.transform.localPosition = GetCenterOffset(weaponGo);
@@ -51,7 +53,7 @@ namespace Utils.Appearance.Weapon
                 Logger.DebugFormat("attach {0} to {1} in {2}", partGo.name, weaponGo.name, partLocation);
             }
 #endif
-            ShowWeapon(weaponGo);
+            
             if(partLocation != WeaponPartLocation.EndOfTheWorld)
             {
                 _boneMount.MountWeaponAttachment(partGo, weaponGo, partLocation);
@@ -62,6 +64,8 @@ namespace Utils.Appearance.Weapon
                 Logger.ErrorFormat("Location is illegal with item location {0}", partLocation);
 #endif
             }
+
+            ShowWeapon(weaponGo);
         }
 
         protected Vector3 GetCenterOffset(GameObject go)

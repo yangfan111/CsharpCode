@@ -79,6 +79,7 @@ namespace Core.Network
         public abstract void SendReliable(int messageType, object messageBody);
         public abstract void SendRealTime(int messageType, object messageBody);
         public abstract bool IsConnected { get; }
+        public abstract bool IsUdpConnected { get; }
         public abstract void Disconnect();
         public int LocalConnId { get; set; }
         public virtual int RemoteConnId { get; set; }
@@ -236,7 +237,8 @@ namespace Core.Network
         {
             if (IsConnected && _serializer != null)
             {
-                item.RefMessageBody();
+                
+                item.AcquireReference();
                 _serializeQueue.Enqueue(item);
             }
             else
@@ -352,12 +354,13 @@ namespace Core.Network
                     if (isMultiThread)
                         count++;
 
-                    _logger.DebugFormat("too many pending message {0}, count = {1}", ToString(),
+                    _logger.InfoFormat("too many pending message {0}, count = {1}", ToString(),
                         _serializeQueue.Count);
 
 
                     NetworkMessageItem item = (NetworkMessageItem) _serializeQueue.Dequeue();
-                    item.ReleaseMessageBody();
+                    
+                    item.ReleaseReference();
                 }
             }
             else
@@ -369,23 +372,27 @@ namespace Core.Network
                     try
                     {
                         NetworkMessageItem item = (NetworkMessageItem) _serializeQueue.Dequeue();
+                        MemoryStream ms = ObjectAllocatorHolder<MemoryStream>.Allocate();
                         try
                         {
-                            MemoryStream ms = ObjectAllocatorHolder<MemoryStream>.Allocate();
+                       
                             ms.Seek(4, SeekOrigin.Begin);
                             DoSerialize(ms, item.MessageType, item.MessageBody);
                             item.MemoryStream = ms;
+                            if (IsConnected)
+                            {
+                                DoSend(item);
+                            }
+                            
                         }
                         finally
                         {
-                            item.ReleaseMessageBody();
+                            ObjectAllocatorHolder<MemoryStream>.Free(item.MemoryStream);
+                            item.ReleaseReference();
                         }
-                        if (IsConnected)
-                        {
-                            DoSend(item);
-                        }
+                        
 
-                        ObjectAllocatorHolder<MemoryStream>.Free(item.MemoryStream);
+                       
                         //_sendQueue.Enqueue(item);
                     }
                     catch (Exception e)
@@ -430,20 +437,24 @@ namespace Core.Network
 
         protected void DoSerialize(MemoryStream ms, int messageType, object messageBody)
         {
-            byte[] bytes = BitConverter.GetBytes(messageType);
+            
             if (!LittleEndian)
             {
-                ms.WriteByte(bytes[3]);
-                ms.WriteByte(bytes[2]);
-                ms.WriteByte(bytes[1]);
-                ms.WriteByte(bytes[0]);
+                ms.WriteByte((byte)(messageType>>24));
+                ms.WriteByte((byte)(messageType>>16));
+                ms.WriteByte((byte)(messageType>>8));
+                ms.WriteByte((byte)messageType);
+               
+               
+              
             }
             else
             {
-                ms.WriteByte(bytes[0]);
-                ms.WriteByte(bytes[1]);
-                ms.WriteByte(bytes[2]);
-                ms.WriteByte(bytes[3]);
+              
+                ms.WriteByte((byte)messageType);
+                ms.WriteByte((byte)(messageType>>8));
+                ms.WriteByte((byte)(messageType>>16));
+                ms.WriteByte((byte)(messageType>>24));
             }
 
             

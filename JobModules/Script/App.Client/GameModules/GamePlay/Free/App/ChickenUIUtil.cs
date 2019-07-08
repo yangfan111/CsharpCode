@@ -1,9 +1,6 @@
-﻿using App.Client.GameModules.GamePlay.Free.UI;
+﻿using App.Client.GameModules.Ui.UiAdapter;
+using Assets.App.Client.GameModules.Ui;
 using Assets.Sources.Free.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using com.cpkf.yyjd.tools.util;
 using Utils.Singleton;
 
@@ -13,25 +10,29 @@ namespace App.Client.GameModules.GamePlay.Free.App
     {
         public static void ShowBottomTip(string msg)
         {
-            SimpleFreeUI ui = SingletonManager.Get<FreeUiManager>().GetUi("downTipUI");
-            if(ui != null && !StringUtil.IsNullOrEmpty(msg))
+            Contexts contexts = SingletonManager.Get<FreeUiManager>().Contexts1;
+            if(!StringUtil.IsNullOrEmpty(msg))
             {
-                FreePrefabComponent txt = (FreePrefabComponent)ui.GetComponent(0);
-                txt.SetFieldValue("Content", msg);
-
-                ui.Show(5000);
+                contexts.ui.uISession.UiState[UiNameConstant.CommonOperationTipModel] = true;
+                contexts.ui.uI.OperationTipData = new BaseTipData
+                {
+                    Title = msg,
+                    DurationTime = 5000
+                };
             }
         }
 
         public static void ShowTopTip(string msg)
         {
-            SimpleFreeUI ui = SingletonManager.Get<FreeUiManager>().GetUi("upTipUI");
-            if (ui != null && !StringUtil.IsNullOrEmpty(msg))
+            Contexts contexts = SingletonManager.Get<FreeUiManager>().Contexts1;
+            if(!StringUtil.IsNullOrEmpty(msg))
             {
-                FreePrefabComponent txt = (FreePrefabComponent)ui.GetComponent(0);
-                txt.SetFieldValue("Content", msg);
-
-                ui.Show(5000);
+                contexts.ui.uISession.UiState[UiNameConstant.CommonSystemTipModel] = true;
+                contexts.ui.uI.SystemTipDataQueue.Enqueue(new BaseTipData
+                {
+                    Title = msg,
+                    DurationTime = 5000
+                });
             }
         }
     }

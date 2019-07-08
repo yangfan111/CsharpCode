@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using com.wd.free.action;
+﻿using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.util;
+using Core.Free;
 using Sharpen;
+using System;
 
 namespace App.Server.GameModules.GamePlay.framework.action
 {
     [Serializable]
-    public class TimeFilterAction : AbstractGameAction
+    public class TimeFilterAction : AbstractGameAction, IRule
     {
         private string interval;
 
@@ -23,27 +21,28 @@ namespace App.Server.GameModules.GamePlay.framework.action
 
         public override void DoAction(IEventArgs args)
         {
-            if (Runtime.CurrentTimeMillis() - lastDoTime > FreeUtil.ReplaceInt(interval,args))
+            long now = Runtime.CurrentTimeMillis();
+            if (now - lastDoTime > (long) FreeUtil.ReplaceInt(interval, args))
             {
-                
-                if(firstDelay && lastDoTime == 0)
+                if (!firstDelay || lastDoTime != 0L)
                 {
-                    lastDoTime = Runtime.CurrentTimeMillis();
-                }
-                else
-                {
-                    lastDoTime = Runtime.CurrentTimeMillis();
                     if (action != null)
                     {
                         action.Act(args);
                     }
-                } 
+                }
+                lastDoTime = now;
             }
         }
 
         public override void Reset(IEventArgs args)
         {
             lastDoTime = 0;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.TimeFilterAction;
         }
     }
 }

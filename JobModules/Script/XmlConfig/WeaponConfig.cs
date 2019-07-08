@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
+using UnityEngine;
 using XmlConfig;
 
 namespace WeaponConfigNs
@@ -71,6 +72,29 @@ namespace WeaponConfigNs
         public int Sort;
         public int Workshop; //厂牌
         public List<int> ApplyParts;  //可解锁与装配配件
+        public string DOFParameter; //景深
+        public int Durable;
+        public List<int> ProtectivePartsList;
+        public int DamageReduction;
+
+        public string[] GetDOFParameters
+        {
+            get
+            {
+                if (DOFParameterSplits == null)
+                {
+                    DOFParameterSplits = DOFParameter.Split(',');
+                }
+
+                foreach (var VARIABLE in DOFParameterSplits)
+                {
+                    Debug.Log(VARIABLE);
+                }
+                return DOFParameterSplits;
+            }
+        }
+        private string[] DOFParameterSplits; //景深
+     
 
         public bool IsSnipperType
         {
@@ -144,6 +168,8 @@ namespace WeaponConfigNs
         public List<AnimatorStateItem> AnimatorStateTimes { get; set; }
         public int RigidityDuration;
         public int RigidityEffect;
+    
+
     }
 
     [XmlType("item")]
@@ -185,8 +211,8 @@ namespace WeaponConfigNs
         public int Spark { get; set; }
         [XmlElement(IsNullable = false, ElementName = "BulletDrop")]
         public int BulletDrop;
-        [XmlElement(IsNullable = false, ElementName = "ClipDrop")]
-        public int ClipDrop;
+        [XmlElement(IsNullable = false, ElementName = "BulletFly")]
+        public int BulletFly;
     }
 
     public class MeleeWeaponEffectConfig : WeaponEffectConfig
@@ -211,6 +237,11 @@ namespace WeaponConfigNs
         [XmlAttribute()] public string AssetName;
     }
 
+    public class Ragdoll
+    {
+        [XmlAttribute()] public int RagdollForce;
+    }
+
     ///////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////
@@ -219,11 +250,6 @@ namespace WeaponConfigNs
     [XmlInclude(typeof(TacticWeaponBehaviorConfig))]
     public abstract class WeaponAbstractBehavior
     {
-        
-        [System.Obsolete]
-        [XmlElement(IsNullable = true, ElementName = "Sound")]
-        public WeaponSoundConfig SoundConfig { get; set; }
-
         [XmlElement(IsNullable = true, ElementName = "Effect")]
         public WeaponEffectConfig EffectConfig { get; set; }
 
@@ -233,6 +259,10 @@ namespace WeaponConfigNs
         public float MaxSpeed { get; set; }
         [XmlAttribute()]
         public bool CantRun { get; set; }
+        [XmlAttribute()]
+        public byte IsSilence;
+
+        public Ragdoll Ragdoll;
     }
 
     [XmlType("DoubleWeaponLogic")]
@@ -303,6 +333,9 @@ namespace WeaponConfigNs
         [XmlElement(IsNullable = true, ElementName = "Spread")]
         public SpreadLogicConfig SpreadLogic { get; set; }
 
+        [XmlElement(IsNullable = true, ElementName = "FireRoll")]
+        public FireRollConfig FireRoll { get; set; }
+
         [XmlElement(IsNullable = true, ElementName = "FireCounter")]
         public FireCounterConfig FireCounter { get; set; }
 
@@ -335,6 +368,7 @@ namespace WeaponConfigNs
 
         [XmlElement(IsNullable = true, ElementName = "Throwing")]
         public ThrowingConfig Throwing { get; set; }
+        
     }
 
     #region AccuracyConfig
@@ -458,14 +492,23 @@ namespace WeaponConfigNs
         }
     }
 
-
     [XmlType("SpreadScale")]
     public class SpreadScale 
     {
         [XmlAttribute()] public float ScaleX { get; set; }
         [XmlAttribute()] public float ScaleY { get; set; }
     }
+    #endregion
 
+    #region FireRoll
+
+    public class FireRollConfig
+    {
+        [XmlAttribute()] public int FireRollTime { get; set; }
+        [XmlAttribute()] public int FireRollBackTime { get; set; }
+        [XmlAttribute()] public float FireRollFactor { get; set; }
+        [XmlAttribute()] public float MaxFireRollAngle { get; set; }
+    }
     #endregion
 
     #region ShakeConfig

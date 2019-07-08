@@ -144,7 +144,12 @@ namespace App.Shared.Components.Serializer
             basevalue.CopyFrom(patchvalue);
             return basevalue;
         }
-        
+        public static WeaponBagContainer Merge(WeaponBagContainer basevalue, WeaponBagContainer patchvalue)
+        {
+            basevalue.MergeFromPatch(patchvalue);
+            return basevalue;
+        }
+
         public static UnityAnimationEventCommands Merge(UnityAnimationEventCommands basevalue, UnityAnimationEventCommands patchvalue)
         {
             basevalue.Reset();

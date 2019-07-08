@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using Sharpen;
+using Core.Free;
 
 namespace com.wd.free.skill
 {
 	[System.Serializable]
-	public class RangeBufSkill : AbstractCoolDownSkill
-	{
+	public class RangeBufSkill : AbstractCoolDownSkill, IRule
+    {
 		private const long serialVersionUID = -3257043555978488725L;
 
 		private int range;
@@ -27,5 +28,10 @@ namespace com.wd.free.skill
 		public override void Initial(ISkillArgs args)
 		{
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.RangeBufSkill;
+        }
+    }
 }

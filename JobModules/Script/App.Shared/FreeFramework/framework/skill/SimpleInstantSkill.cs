@@ -3,12 +3,13 @@ using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.action;
 using com.wd.free.para;
+using Core.Free;
 
 namespace com.wd.free.skill
 {
 	[System.Serializable]
-	public class SimpleInstantSkill : AbstractSkill
-	{
+	public class SimpleInstantSkill : AbstractSkill, IRule
+    {
 		private const long serialVersionUID = 6967171122753916574L;
 
 		private IList<IPara> paras;
@@ -41,7 +42,12 @@ namespace com.wd.free.skill
 			}
 		}
 
-		private class _IParable_33 : IParable
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SimpleInstantSkill;
+        }
+
+        private class _IParable_33 : IParable
 		{
 			public _IParable_33(IList<IPara> paras)
 			{

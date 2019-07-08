@@ -1,30 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Server.GameModules.GamePlay.free.player;
-using App.Server.GameModules.GamePlay.Free.map.position;
+﻿using App.Server.GameModules.GamePlay.free.player;
+using App.Shared.GameModules.Common;
+using App.Shared.GameModules.Vehicle;
 using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.map.position;
 using com.wd.free.para;
 using com.wd.free.unit;
 using com.wd.free.util;
-using UnityEngine;
-using Core.Utils;
-using App.Shared.GameModules.Common;
-using App.Shared.GameModules.Player;
-using App.Shared.GameModules.Vehicle;
 using Core.Enums;
+using Core.Free;
+using Core.Utils;
+using System;
 using UltimateFracturing;
+using UnityEngine;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
     [Serializable]
-    public class BombHurtAction : AbstractGameAction
+    public class BombHurtAction : AbstractGameAction, IRule
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(BombHurtAction));
-        private static float CeilCheckDistance = 20f;
+        private static float CeilCheckDistance = 200f;
         private IPosSelector pos;
 
         private string damage;
@@ -97,7 +93,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
             if (null == exclude)
             {
                 Debug.DrawLine(bombPosition, colPosition, Color.red, 10f);
-                if (Physics.Linecast(bombPosition, colPosition, out hitInfo, UnityLayerManager.GetLayerMask(EUnityLayerName.Default)))
+                if (Physics.Linecast(bombPosition, colPosition, out hitInfo, UnityLayers.SceneCollidableLayerMask))
                 {
                     if (Logger.IsDebugEnabled)
                     {
@@ -112,7 +108,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 return false;
             }
             var dir = colPosition - bombPosition;
-            var obstacles = Physics.RaycastAll(bombPosition, dir, dir.magnitude, UnityLayerManager.GetLayerMask(EUnityLayerName.Default));
+            var obstacles = Physics.RaycastAll(bombPosition, dir, dir.magnitude, UnityLayers.SceneCollidableLayerMask);
             foreach (var obstacle in obstacles)
             {
                 if (!exclude(obstacle.transform))
@@ -204,15 +200,15 @@ namespace App.Server.GameModules.GamePlay.Free.player
 
         private void HandlePlayer(Collider collider, IEventArgs fr, Contexts contexts, float damage, Vector3 bombPos)
         {
-            if (HasObstacle(collider.bounds.center, collider.bounds.center + Vector3.up * CeilCheckDistance))
-            {
-                return;
-            }
             var entityReference = collider.transform.GetComponent<EntityReference>();
             var player = entityReference.Reference as PlayerEntity;
             if (null == player)
             {
                 Logger.ErrorFormat("player {0} has no player reference ", collider.name);
+                return;
+            }
+            if (HasObstacle(player.position.Value, player.position.Value + Vector3.up * CeilCheckDistance))
+            {
                 return;
             }
             /*if (player.IsOnVehicle())
@@ -263,6 +259,11 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 default:
                     return damage;
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.BombHurtAction;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Sockets;
 using Core.Utils;
 using LiteNetLib;
 using LiteNetLib.Utils;
@@ -74,12 +75,19 @@ namespace VNet.Base.LiteNet
 
         public void OnNetworkReceive(NetPeer peer, NetDataReader reader, DeliveryMethod deliveryMethod)
         {
-            if (null != OnReceiveListener)
+            lock (_receiveStream)
             {
-                _receiveStream.Write(reader.Data, reader.Position, reader.AvailableBytes);
-                OnReceiveListener(_peer, _receiveStream);
-                _receiveStream.Position = 0;
-                _receiveStream.SetLength(0);
+                if (null != OnReceiveListener)
+                {
+                    _receiveStream.Write(reader.Data, reader.Position, reader.AvailableBytes);
+                    OnReceiveListener(_peer, _receiveStream);
+                    _receiveStream.Position = 0;
+                    _receiveStream.SetLength(0);
+                }
+                if (reader is NetPacketReader)
+                {
+                    ((NetPacketReader)reader).RecycleSource();
+                }
             }
         }
 
@@ -91,6 +99,16 @@ namespace VNet.Base.LiteNet
                 OnDisconnectListener(_peer);
             }
             Logger.InfoFormat("Lite Net Disconnected with info {0} , error {1} {2}",  info.Reason, info.SocketErrorCode, _peer.ConnectId);
+        }
+
+        public void ReConnect()
+        {
+            /*throw new NotImplementedException();*/
+        }
+
+        public void CloseConnect()
+        {
+            /*throw new NotImplementedException();*/
         }
     }
 }

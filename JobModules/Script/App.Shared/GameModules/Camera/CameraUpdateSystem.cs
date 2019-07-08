@@ -1,13 +1,14 @@
 ﻿using App.Shared.Components.Player;
-using App.Shared.GameModules.Camera.Utils;
 using Assets.App.Shared.GameModules.Camera;
 using Core.CameraControl.NewMotor;
-using Core.Configuration;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using System;
 using System.Collections.Generic;
+using App.Shared.GameModules.Camera.Utils;
+using Core.Configuration;
+using Core.EntityComponent;
 using UnityEngine;
 using Utils.Configuration;
 using Utils.Singleton;
@@ -35,8 +36,8 @@ namespace App.Shared.GameModules.Camera
         {
             _playerContext = context.player;
             _motors = m;
-            _state = new DummyCameraMotorState(_motors);
-            _dummyState = new DummyCameraMotorState(_motors);
+            _state = new DummyCameraMotorState();
+            _dummyState = new DummyCameraMotorState();
         }
 
 
@@ -44,20 +45,32 @@ namespace App.Shared.GameModules.Camera
         {
             var player = owner.OwnerEntity as PlayerEntity;
             if (player == null) return;
-            
+
             CommonUpdate(player,cmd);
         }
         
         protected override void ExecWhenObserving(PlayerEntity player, IUserCmd cmd)
         {
-        }
-
-        protected override void ExecWhenBeingObserved(PlayerEntity player, IUserCmd cmd)
-        {         
-            var archotRotation = player.cameraArchor.ArchorEulerAngle;
-            if (player.appearanceInterface.Appearance.IsFirstPerson)
+            var observedPlayer = player.observeCamera.ObservedPlayer;
+            
+            if (observedPlayer != null)
             {
-                CalcuForObserving(cmd, player, archotRotation, player.thirdPersonDataForObserving.ThirdPersonData);
+                DummyCameraMotorInput _input = (DummyCameraMotorInput) observedPlayer.cameraStateNew.CameraMotorInput;
+                if (_input == null) 
+                    _input = new DummyCameraMotorInput();
+                _input.FakeForObserve(observedPlayer);
+                
+                DummyCameraMotorState.Convert(observedPlayer.cameraStateNew, _state);
+                
+                observedPlayer.cameraStateNew.CameraMotorInput = observedPlayer.cameraStateNew.LastCameraMotorInput;
+                observedPlayer.cameraStateNew.LastCameraMotorInput = _input;
+                
+                var result = observedPlayer.cameraStateOutputNew;
+                CalcFinalOutput(observedPlayer, (DummyCameraMotorInput) observedPlayer.cameraStateNew.LastCameraMotorInput,
+                    result,_state);
+            
+                DummyCameraMotorState.Convert(_state, observedPlayer.cameraStateNew);
+                
             }
         }
 
@@ -68,24 +81,23 @@ namespace App.Shared.GameModules.Camera
             if (!player.hasCameraStateNew) return;
             if (!player.hasCameraStateOutputNew) return;
 
-            var archotRotation = player.cameraArchor.ArchorEulerAngle;
             var result = player.cameraStateOutputNew;
             
-            CalcuForNormal(cmd, player, archotRotation, result);
-
-            DummyCameraMotorState.Convert(_state, player.cameraStateNew);
+            CalcuForNormal(cmd, player, result);
 
             CopyStateToUploadComponent(player.cameraStateNew, player.cameraStateUpload);
-            player.cameraStateUpload.ArchorType = (Byte) player.cameraArchor.ArchorType;
         }
 
-        private void CalcuForNormal(IUserCmd cmd, PlayerEntity player, Vector3 archotRotation,
-            CameraStateOutputNewComponent result)
+        private void CalcuForNormal(IUserCmd cmd, PlayerEntity player, CameraStateOutputNewComponent result)
         {
             DummyCameraMotorState.Convert(player.cameraStateNew, _state);
-            
+
             DummyCameraMotorInput _input = (DummyCameraMotorInput) player.cameraStateNew.CameraMotorInput;
-            _input.Generate(_context, player, cmd, archotRotation.y, archotRotation.x, _state);
+
+            _input.Generate(player, cmd, _state);
+
+            if (!HasConfigInitialed(_input))
+                return;
 
             for (int i = 0; i < (int) SubCameraMotorType.End; i++)
             {
@@ -93,52 +105,40 @@ namespace App.Shared.GameModules.Camera
                 SetNextMotor(player, type, _state, _input);
             }
 
-            CameraActionManager.OnAction(player, _state);
-                
-            player.cameraStateUpload.EnterActionCode = CameraActionManager.GetActionCode(CameraActionType.Enter);
-            player.cameraStateUpload.LeaveActionCode = CameraActionManager.GetActionCode(CameraActionType.Leave);
+            HandleAction(player);
+
             CameraActionManager.ClearActionCode();
 
             player.cameraStateNew.CameraMotorInput = player.cameraStateNew.LastCameraMotorInput;
             player.cameraStateNew.LastCameraMotorInput = _input;
             
+            player.cameraConfigNow.Config = _input.GetPoseConfig(_state.GetMainMotor().NowMode);
+            player.cameraConfigNow.PeekConfig = _input.GetPeekConfig();
+            player.cameraConfigNow.DeadConfig = _input.GetDeadConfig();
+            
             CalcFinalOutput(player, (DummyCameraMotorInput) player.cameraStateNew.LastCameraMotorInput,
                 result,_state);
+            
+            DummyCameraMotorState.Convert(_state, player.cameraStateNew);
+            player.cameraStateNew.CanFire =
+                !_state.IsFree() && _input.GetPoseConfig(player.cameraStateNew.MainNowMode).CanFire;
         }
-        
 
-        private void CalcuForObserving(IUserCmd cmd, PlayerEntity player, Vector3 archotRotation,
-            CameraStateOutputNewComponent result)
+        private void HandleAction(PlayerEntity player)
         {
-            DummyCameraMotorState.Convert(player.cameraStateNew, _dummyState);
-            _dummyState.Dict[(int) SubCameraMotorType.View].NowMode = (byte)ECameraViewMode.ThirdPerson;
-            _dummyState.Dict[(int) SubCameraMotorType.View].LastMode = (byte)ECameraViewMode.FirstPerson;
-            DummyCameraMotorInput _input = (DummyCameraMotorInput) player.cameraStateNew.CameraMotorInput;
-            _input.Generate(_context, player, cmd, archotRotation.y, archotRotation.x, _state);
-
-            CalcFinalOutput(player, _input, result, _dummyState);
-            result.ArchorPosition = player.thirdPersonDataForObserving.ThirdPersonArchorPosition;
+            player.cameraStateUpload.EnterActionCode = CameraActionManager.GetActionCode(CameraActionType.Enter);
+            player.cameraStateUpload.LeaveActionCode = CameraActionManager.GetActionCode(CameraActionType.Leave);
+            CameraActionManager.OnAction(player, _state);
         }
         
         private void CopyStateToUploadComponent(CameraStateNewComponent input, CameraStateUploadComponent output)
         {
             output.MainNowMode = input.MainNowMode;
-            output.MainLastMode = input.MainLastMode;
-            output.MainModeTime = input.MainModeTime;
             output.ViewNowMode = input.ViewNowMode;
-            output.ViewLastMode = input.ViewLastMode;
-            output.ViewModeTime = input.ViewModeTime;
             output.PeekNowMode = input.PeekNowMode;
-            output.PeekLastMode = input.PeekLastMode;
-            output.PeekModeTime = input.PeekModeTime;
             output.FreeNowMode = input.FreeNowMode;
-            output.FreeLastMode = input.FreeLastMode;
-            output.FreeModeTime = input.FreeModeTime;
             output.FreeYaw = input.FreeYaw;
             output.FreePitch = input.FreePitch;
-            output.LastFreeYaw = input.LastFreeYaw;
-            output.LastFreePitch = input.LastFreePitch;
-            output.LastPeekPercent = input.LastPeekPercent;
             output.CanFire = input.CanFire;
         }
 
@@ -150,9 +150,6 @@ namespace App.Shared.GameModules.Camera
         private void CalcFinalOutput(PlayerEntity player, DummyCameraMotorInput input,
             CameraStateOutputNewComponent finalOutput, DummyCameraMotorState state)
         {
-            player.cameraConfigNow.Config = state.GetMainConfig();
-            player.cameraConfigNow.PeekConfig = SingletonManager.Get<CameraConfigManager>().Config.PeekConfig;
-            player.cameraConfigNow.DeadConfig = SingletonManager.Get<CameraConfigManager>().Config.DeadConfig;
             _output.Init();
             _output.ArchorPosition =
                 player.cameraArchor.ArchorPosition+
@@ -177,8 +174,8 @@ namespace App.Shared.GameModules.Camera
             finalOutput.Far = _output.Far;
             finalOutput.Near = _output.Near;
             finalOutput.NeedDetectDistance = !_output.ForbidDetect;
-            SmoothFov(player);
             
+            SmoothFov(player,input.GetViewConfig());
         }
 
         private DummyCameraMotorOutput CalcSubFinalCamera(PlayerEntity player, ICameraMotorInput input,
@@ -195,8 +192,7 @@ namespace App.Shared.GameModules.Camera
         }
 
         private ICameraNewMotor SetNextMotor(PlayerEntity player, SubCameraMotorType type,
-            ICameraMotorState stat, DummyCameraMotorInput input
-        )
+            ICameraMotorState stat, DummyCameraMotorInput input)
         {
             var dict = _motors.GetDict(type);
             var subState = _state.Get(type);
@@ -221,15 +217,13 @@ namespace App.Shared.GameModules.Camera
 
             if (nextMotor.ModeId != oldMotor.ModeId || subState.ModeTime == 0)
             {
-                Logger.DebugFormat("{0} Levae :{1} To {2} with input{3}", _cmdSeq, oldMotor.ModeId, nextMotor.ModeId,
+                Logger.InfoFormat("{0} Leave :{1} To {2} with input{3}", _cmdSeq, oldMotor.ModeId, nextMotor.ModeId,
                     input);
-
+                subState.ModeTime = player.time.ClientTime;
+                subState.NowMode = (byte) nextMotor.ModeId;
+                subState.LastMode = (byte) oldMotor.ModeId;
                 CameraActionManager.SetActionCode(CameraActionType.Leave, type, oldMotor.ModeId);
                 CameraActionManager.SetActionCode(CameraActionType.Enter, type, nextMotor.ModeId);
-
-                subState.NowMode = (byte) nextMotor.ModeId;
-                subState.ModeTime = player.time.ClientTime;
-                subState.LastMode = (byte) oldMotor.ModeId;
             }
 
             if (type == SubCameraMotorType.View)
@@ -276,7 +270,7 @@ namespace App.Shared.GameModules.Camera
         private float lastFov ;
         private int lastVeryTime ;
         private int lastTransitionTime = 200;
-        private void SmoothFov(PlayerEntity player)
+        private void SmoothFov(PlayerEntity player, ViewCameraConfig viewConfig)
         {
             var comp = player.cameraStateOutputNew;
             lastAimFov = lastAimFov == 0 ? comp.Fov : lastAimFov;
@@ -290,7 +284,7 @@ namespace App.Shared.GameModules.Camera
             }
             lastVeryTime = comp.Fov == lastFov ? lastVeryTime : player.time.ClientTime;
             lastFov = comp.Fov;
-            var period = UpdateTransitionTime(player);
+            var period = UpdateViewModeTransitionTime(player, viewConfig);
             var percent = CalcuPercent(player.time.ClientTime, lastVeryTime, period);
             var result = Mathf.Lerp(lastAimFov, comp.Fov, percent);
             if (result == comp.Fov)
@@ -300,16 +294,15 @@ namespace App.Shared.GameModules.Camera
             comp.Fov = result;
         }
 
-
-        private readonly int OnGunSightTransitionTime = SingletonManager.Get<CharacterStateConfigManager>()
-            .GetPostureTransitionTime(PostureInConfig.Null, PostureInConfig.Sight);
-        private readonly int OffGunSightTranstitionTime = SingletonManager.Get<CharacterStateConfigManager>()
-            .GetPostureTransitionTime(PostureInConfig.Sight, PostureInConfig.Null);
-        private readonly int OnHoldBreathTransitionTime = CameraUtility._manager.Config.ViewConfig.OnHoldBreathTransitionTime;
-        private readonly int OffHoldBreathTransitionTime = CameraUtility._manager.Config.ViewConfig.OffHoldBreathTransitionTime;
-        private readonly int DefaultFovTransitionTime = CameraUtility._manager.Config.ViewConfig.DefaltFovTransitionTime;
-        private int UpdateTransitionTime(PlayerEntity player)
+        private bool HasConfigInitialed(DummyCameraMotorInput input)
         {
+            return input.GetPoseConfig(0) != null;
+        }
+        
+        private int UpdateViewModeTransitionTime(PlayerEntity player, ViewCameraConfig config)
+        {
+            if (!player.hasOxygenEnergyInterface)
+                return config.DefaltFovTransitionTime;
             bool isGunSight = _state.Dict[(int) SubCameraMotorType.View].NowMode == (byte) ECameraViewMode.GunSight;
             bool isHoldBreath = player.oxygenEnergyInterface.Oxygen.InShiftState;
             bool isOffGunSight = _state.Dict[(int) SubCameraMotorType.View].LastMode == (byte) ECameraViewMode.GunSight;
@@ -317,16 +310,18 @@ namespace App.Shared.GameModules.Camera
             if (isGunSight)
             {
                 if (isHoldBreath)
-                    return OnHoldBreathTransitionTime;
+                    return config.OnHoldBreathTransitionTime;
                 if(player.oxygenEnergyInterface.Oxygen.ShiftVeryTime> _state.Dict[(int)SubCameraMotorType.View].ModeTime)
-                    return OffHoldBreathTransitionTime;
-                return OnGunSightTransitionTime;
+                    return config.OffHoldBreathTransitionTime;
+                return SingletonManager.Get<CharacterStateConfigManager>()
+                    .GetPostureTransitionTime(PostureInConfig.Null, PostureInConfig.Sight);
             }
             
             if (isOffGunSight)
-                return OffGunSightTranstitionTime;
+                return SingletonManager.Get<CharacterStateConfigManager>()
+                    .GetPostureTransitionTime(PostureInConfig.Sight, PostureInConfig.Null);
             
-            return DefaultFovTransitionTime;
+            return config.DefaltFovTransitionTime;
         }
     }
 }

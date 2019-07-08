@@ -6,11 +6,12 @@ using Sharpen;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.action;
 using com.wd.free.@event;
+using Core.Free;
 
 namespace com.wd.free.map
 {
     [System.Serializable]
-    public class FreeBufCreateAction : AbstractPlayerAction
+    public class FreeBufCreateAction : AbstractPlayerAction, IRule
     {
         private const long serialVersionUID = 6850781259702774772L;
 
@@ -28,7 +29,7 @@ namespace com.wd.free.map
                     {
                         copy.SetCreator(targetPlayer.Player);
                     }
-                    copy.OnCreate(args);
+                    if (!copy.OnCreate(args)) continue;
                     args.TempUse("buf", copy);
                     try
                     {
@@ -51,6 +52,11 @@ namespace com.wd.free.map
             }
 
             bufs.Add(buf);
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeBufCreateAction;
         }
     }
 }

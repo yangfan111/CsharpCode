@@ -5,12 +5,13 @@ using com.wd.free.@event;
 using com.wd.free.item;
 using gameplay.gamerule.free.ui;
 using gameplay.gamerule.free.ui.component;
+using Core.Free;
 
 namespace gameplay.gamerule.free.item
 {
     [Serializable]
-	public class SimpleBackUI
-	{
+	public class SimpleBackUI : IRule
+    {
 		[System.NonSerialized]
 		private FreeUICreateAction fui;
 
@@ -36,5 +37,10 @@ namespace gameplay.gamerule.free.item
 			fui.SetPlayer("current");
 			fui.Act(args);
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SimpleBackUI;
+        }
+    }
 }

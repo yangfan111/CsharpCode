@@ -1,5 +1,4 @@
-﻿using App.Client.GameModules.SceneObject;
-using App.Client.GameModules.Ui.Logic;
+﻿using App.Client.GameModules.Ui.Logic;
 using UserInputManager.Lib;
 using Utils.Configuration;
 using Utils.Singleton;
@@ -69,9 +68,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         public FreeObjectCastLogic GetFreeObjectCastLogic()
         {
             return new FreeObjectCastLogic(
-                freeMove,
-                player,
-                session.clientSessionObjects.UserCmdGenerator,
+                freeMove, player, userInputManager,
                 SingletonManager.Get<RaycastActionConfigManager>().Distance);
         }
         public DoorCastLogic GetDoorCastLogic()
@@ -106,6 +103,14 @@ namespace App.Client.GameModules.Ui.UiAdapter
         public bool IsCountDown()
         {
             return uiContext.uI.CountingDown;
+        }
+
+        public BuffTipLogic GetBuffTipLogic()
+        {
+            return new BuffTipLogic(
+                player,
+                uiContext,
+                session.clientSessionObjects.UserCmdGenerator);
         }
     }
 }

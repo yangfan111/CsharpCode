@@ -13,8 +13,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
             {
                 weaponBaseAgent.RunTimeComponent.IsPrevCmdFire = false;
                 var audioController = weaponBaseAgent.Owner.AudioController();
-                if (audioController != null)
-                    audioController.StopFireTrigger();
+                audioController.StopFireTrigger();
             }
         }
 
@@ -27,7 +26,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
             float intervalFactor = 1 - weaponBaseAgent.GetAttachedAttributeByType(WeaponAttributeType.AttackInterval) / 100;
             runtimeDataComponent.NextAttackTimestamp = cmd.UserCmd.RenderTime + Mathf.CeilToInt(weaponBaseAgent.CommonFireCfg.AttackInterval * intervalFactor);
             runtimeDataComponent.NeedAutoBurstShoot       = false;
-            runtimeDataComponent.ContinuesShootCount = 0;
+          //  runtimeDataComponent.ContinuesShootCount = 0;
             runtimeDataComponent.LastAttackTimestamp = cmd.UserCmd.RenderTime;
         }
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Core.Utils;
 using UnityEngine;
 
 namespace XmlConfig
@@ -27,6 +29,8 @@ namespace XmlConfig
         ParachutingOpen,
         Gliding,
         Climb,
+        BuriedBomb,
+        DismantleBomb,
         End
     }
     
@@ -90,29 +94,20 @@ namespace XmlConfig
     }
 
     [Serializable]
-    public class SpecialZoneCameraConfig
+    public class CameraConfigItem
     {
-        public float FloorTestHeight;
-        public float OffsetLengthInBuilding;
-        public float OffsetLengthWhenClimbing;
-        public float ArchorOffsetLengthWhenClimbing;
-        public float FocusPositionLerpTime;
-    }
-    
-    [Serializable]
-    public class CameraConfig
-    {
-        public CameraConfigItem[] PoseConfigs;
+        public int RoleType;
+        
+        public PoseCameraConfig[] PoseConfigs;
         public PeekCameraConfig PeekConfig;
         public FreeCameraConfig FreeConfig;
         public DeadCameraConfig DeadConfig;
         public ViewCameraConfig ViewConfig;
         public ObserveCameraConfig ObserveConfig;
-        public SpecialZoneCameraConfig SpecialZoneConfig;
         public int DefaultTransitionTime;
         public int PostTransitionTime;
-
-        public CameraConfigItem GetCameraConfigItem(ECameraPoseMode Type)
+        
+        public PoseCameraConfig GetCameraConfigItem(ECameraPoseMode Type)
         {
             foreach (var cameraConfigItem in PoseConfigs)
             {
@@ -123,7 +118,26 @@ namespace XmlConfig
             }
             return null;
         }
+    }
+    
+    [Serializable]
+    public class CameraConfig
+    {
+        public CameraConfigItem[] ConfigItems;
 
+        private Dictionary<int, CameraConfigItem> _configDict = new Dictionary<int, CameraConfigItem>();
+        public CameraConfigItem GetRoleConfig(int roleType = 0)
+        {
+            return _configDict[roleType];
+        }
+
+        public void RecordConfigs()
+        {
+            foreach (var item in ConfigItems)
+            {
+                _configDict.Add(item.RoleType, item);
+            }
+        }
     }
 
     [Serializable]
@@ -150,7 +164,7 @@ namespace XmlConfig
     }
     
     [Serializable]
-    public class CameraConfigItem
+    public class PoseCameraConfig
     {
         public int Id;
         public int Order;

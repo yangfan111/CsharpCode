@@ -86,17 +86,19 @@
     <Compile Include="Appearance\ICharacterControllerAppearance.cs" />
     <Compile Include="Appearance\ICharacterFirstPersonAppearance.cs" />
     <Compile Include="Appearance\IInputScheme.cs" />
-    <Compile Include="Attack\IHitMaskController.cs" />
-    <Compile Include="BulletSimulation\BulletHitSimulator.cs" />
-    <Compile Include="BulletSimulation\BulletLayers.cs" />
-    <Compile Include="BulletSimulation\BulletMoveSimulator.cs" />
-    <Compile Include="BulletSimulation\BulletSegmentComparator.cs" />
-    <Compile Include="BulletSimulation\IBulletEntity.cs" />
-    <Compile Include="BulletSimulation\IBulletEntityCollector.cs" />
-    <Compile Include="BulletSimulation\IBulletHitHandler.cs" />
-    <Compile Include="BulletSimulation\IBulletInfoCollector.cs" />
-    <Compile Include="BulletSimulation\IBulletSegment.cs" />
-    <Compile Include="BulletSimulation\PlayerMask.cs" />
+    <Compile Include="AssetManager\UnityAssetManangerSystem.cs" />
+    <Compile Include="Attack\BulletSimulation\BulletHitSimulator.cs" />
+    <Compile Include="Attack\BulletSimulation\BulletInterfaces.cs" />
+    <Compile Include="Attack\BulletSimulation\BulletLayers.cs" />
+    <Compile Include="Attack\BulletSimulation\BulletMoveSimulator.cs" />
+    <Compile Include="Attack\BulletSimulation\BulletSegmentComparator.cs" />
+    <Compile Include="Attack\BulletSimulation\DefaultBulletSegment.cs" />
+    <Compile Include="Attack\BulletSimulation\PlayerMask.cs" />
+    <Compile Include="Attack\HitBox\HitBoxGameObjectUpdater.cs" />
+    <Compile Include="Attack\HitBox\HitBoxHierarchyGenerator.cs" />
+    <Compile Include="Attack\HitBox\HitBoxOwnerComponent.cs" />
+    <Compile Include="Attack\HitBox\HitBoxTransformProvider.cs" />
+    <Compile Include="Attack\HitBox\IHitBoxTransformProvider.cs" />
     <Compile Include="CameraControl\ICameraInput.cs" />
     <Compile Include="CameraControl\ICameraState.cs" />
     <Compile Include="CameraControl\NewMotor\CameraIntfaces.cs" />
@@ -133,6 +135,7 @@
     <Compile Include="CharacterState\Action\ActionManager.cs" />
     <Compile Include="CharacterState\Action\ActionState.cs" />
     <Compile Include="CharacterState\Action\ActionStateId.cs" />
+    <Compile Include="CharacterState\Action\CommandLimit\FsmInputRelate.cs" />
     <Compile Include="CharacterState\Action\ICharacterAction.cs" />
     <Compile Include="CharacterState\Action\INewCommandFromCall.cs" />
     <Compile Include="CharacterState\Action\NewCommandFromCall.cs" />
@@ -211,8 +214,6 @@
     <Compile Include="CharacterState\Posture\Transitions\PostureTransition.cs" />
     <Compile Include="CharacterState\Posture\UnityAnimationEventCommands.cs" />
     <Compile Include="CharacterState\StateInterCommands.cs" />
-    <Compile Include="Common\IGlobalEffectManager.cs" />
-    <Compile Include="Common\ITipManager.cs" />
     <Compile Include="CommonResource\AssetStatus.cs" />
     <Compile Include="CommonResource\BaseCommonResourceComponent.cs" />
     <Compile Include="CommonResource\EAssetLoadStatus.cs" />
@@ -223,10 +224,10 @@
     <Compile Include="Compensation\CompensationWorld.cs" />
     <Compile Include="Compensation\ICompensationComponent.cs" />
     <Compile Include="Compensation\ICompensationWorld.cs" />
+    <Compile Include="Compensation\ICompensationWorldFactory.cs" />
     <Compile Include="Compensation\IHitBoxEntityManager.cs" />
     <Compile Include="Compensation\ISnapshotEntityMapFilter.cs" />
     <Compile Include="Compensation\RaySegment.cs" />
-    <Compile Include="Compensation\ServerCompensationWorldFactory.cs" />
     <Compile Include="Components\EComponentIds.cs" />
     <Compile Include="Components\EntityAdapterComponent.cs" />
     <Compile Include="Components\EntityKeyComponent.cs" />
@@ -246,6 +247,7 @@
     <Compile Include="Components\NormalComponent.cs" />
     <Compile Include="Components\OwnerIdComponent.cs" />
     <Compile Include="Components\PositionComponent.cs" />
+    <Compile Include="Components\PrecisionsVector3.cs" />
     <Compile Include="Configuration\AssetConfigManager.cs" />
     <Compile Include="Configuration\BulletDropConfigManager.cs" />
     <Compile Include="Configuration\CameraConfigManager.cs" />
@@ -312,6 +314,7 @@
     <Compile Include="EntityComponent\IGameComponent.cs" />
     <Compile Include="EntityComponent\IGameContext.cs" />
     <Compile Include="EntityComponent\IGameEntity.cs" />
+    <Compile Include="EntityComponent\IWatchDict.cs" />
     <Compile Include="EntityComponent\ListBasedGameEntity.cs" />
     <Compile Include="EntityComponent\SortedEnumeratableComparator.cs" />
     <Compile Include="EnumEntityType.cs" />
@@ -323,11 +326,13 @@
     <Compile Include="Event\EventInfos.cs" />
     <Compile Include="Event\IEvent.cs" />
     <Compile Include="Event\PlayerEvents.cs" />
+    <Compile Include="Free\ERuleIds.cs" />
     <Compile Include="Free\FreeMessageConstant.cs" />
     <Compile Include="Free\FreeTriggerConstant.cs" />
     <Compile Include="Free\IFreeArgs.cs" />
     <Compile Include="Free\IFreeData.cs" />
     <Compile Include="Free\IFreeRule.cs" />
+    <Compile Include="Free\IRule.cs" />
     <Compile Include="Fsm\FiniteStateMachine.cs" />
     <Compile Include="Fsm\FsmEnum.cs" />
     <Compile Include="Fsm\FsmInput.cs" />
@@ -337,7 +342,9 @@
     <Compile Include="Fsm\FsmTransition.cs" />
     <Compile Include="Fsm\IFsmUpdate.cs" />
     <Compile Include="GameGlobal\Composition\AudioHitEffectData.cs" />
+    <Compile Include="GameGlobal\Composition\BulletStatisticsInfo.cs" />
     <Compile Include="GameGlobal\Composition\GrenadeCacheData.cs" />
+    <Compile Include="GameGlobal\Composition\ThrowingActionData.cs" />
     <Compile Include="GameGlobal\Composition\WeaponBagContainer.cs" />
     <Compile Include="GameGlobal\Composition\WeaponBagSlotData.cs" />
     <Compile Include="GameGlobal\GlobalConst.cs" />
@@ -407,11 +414,6 @@
     <Compile Include="GameTime\TimeManager.cs" />
     <Compile Include="Geography\ZoneController.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="HitBox\HitBoxGameObjectUpdater.cs" />
-    <Compile Include="HitBox\HitBoxHierarchyGenerator.cs" />
-    <Compile Include="HitBox\HitBoxOwnerComponent.cs" />
-    <Compile Include="HitBox\HitBoxTransformProvider.cs" />
-    <Compile Include="HitBox\IHitBoxTransformProvider.cs" />
     <Compile Include="Http\HttpRequestParser.cs" />
     <Compile Include="Http\HttpUtility.cs" />
     <Compile Include="Http\SimpleHttpServer.cs" />
@@ -583,8 +585,6 @@
     <Compile Include="Utils\VersionDisplay.cs" />
     <Compile Include="WeaponAnimation\IWeaponAnimProgress.cs" />
     <Compile Include="WeaponAnimation\WeaponAnimationController.cs" />
-    <Compile Include="WeaponLogic\IWeaponFireUpdateManagaer.cs" />
-    <Compile Include="WeaponLogic\Throwing\ThrowingActionInfo.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

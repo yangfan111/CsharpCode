@@ -1,11 +1,12 @@
 ﻿using com.wd.free.action;
 using com.wd.free.@event;
+using Core.Free;
 using System;
 
 namespace App.Shared.FreeFramework.framework.action
 {
     [Serializable]
-    public class DebugFreeAction : AbstractGameAction
+    public class DebugFreeAction : AbstractGameAction, IRule
     {
         public bool debug;
         public string fields;
@@ -28,6 +29,11 @@ namespace App.Shared.FreeFramework.framework.action
             }
 
             args.FreeContext.DebugMode = log;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.DebugFreeAction;
         }
     }
 }

@@ -1,27 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Core.Fsm;
-using Core.Utils;
-using UnityEngine;
 using Utils.CharacterState;
-using Utils.Configuration;
-using XmlConfig;
 
 namespace Core.CharacterState.Posture.States
 {
     class ClimbState : PostureState
     {
-        private static LoggerAdapter _logger = new LoggerAdapter(typeof(ClimbState));
+        //private static LoggerAdapter _logger = new LoggerAdapter(typeof(ClimbState));
 
         public ClimbState(PostureStateId id) : base(id)
         {
             #region climb to stand
 
             AddTransition(
-                (command, addOutput) => FsmTransition.SimpleCommandHandler(command, FsmInput.GenericActionFinished),
-                null, (int) PostureStateId.Stand, null, 0, new[] {FsmInput.GenericActionFinished});
+                (command, addOutput) => FsmTransition.SimpleCommandHandler(command, FsmInput.GenericActionFinished) ||
+                                        FsmTransition.SimpleCommandHandler(command, FsmInput.FinishedClimb),
+                null, (int) PostureStateId.Stand, null, 0, new[] {FsmInput.GenericActionFinished, FsmInput.FinishedClimb});
 
             AddTransition(
                 (command, addOutput) =>

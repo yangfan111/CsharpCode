@@ -46,17 +46,17 @@ namespace App.Client.GameModules.Ui.Models.Blast
             _viewModel.IconGroupShow = data.NeedShow && !data.IsTitle;
             if (data.IsTitle)
             {
-                InitTitleText();
-                _viewModel.BombText = data.CampType == EUICampType.T ? I2.Loc.ScriptLocalization.client_blast.word3 : I2.Loc.ScriptLocalization.client_blast.word4;//ÂñÀ× ²ðÀ×
+                InitTitleText(data.CanResque);
+                _viewModel.BombText = data.CampType == EUICampType.T ? I2.Loc.ScriptLocalization.client_blast.word3 : I2.Loc.ScriptLocalization.client_blast.word4;//åŸ‹é›· æ‹†é›·
             }
         }
 
-        private void InitTitleText()
+        private void InitTitleText(bool canResque)
         {
             _viewModel.RankText = I2.Loc.ScriptLocalization.client_blast.word5;
             _viewModel.PlayerNameText = I2.Loc.ScriptLocalization.client_blast.word6;
             _viewModel.CorpsText = I2.Loc.ScriptLocalization.client_blast.word7;
-            _viewModel.KillText = I2.Loc.ScriptLocalization.client_blast.word8;
+            _viewModel.KillText = canResque ? I2.Loc.ScriptLocalization.client_blast.word12 : I2.Loc.ScriptLocalization.client_blast.word8;
             _viewModel.DamageText = I2.Loc.ScriptLocalization.client_blast.word9;
             _viewModel.DeadText = I2.Loc.ScriptLocalization.client_blast.word10;
             _viewModel.AssistText = I2.Loc.ScriptLocalization.client_blast.word11;

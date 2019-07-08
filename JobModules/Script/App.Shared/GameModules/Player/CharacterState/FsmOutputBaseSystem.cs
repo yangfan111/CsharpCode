@@ -2,22 +2,17 @@
 using Core.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using App.Shared.Components.Player;
 using Core.Animation;
 using Core.Appearance;
 using Core.CharacterController;
-using Core.EntityComponent;
-using Sharpen;
 using UnityEngine;
-using Utils.Appearance;
+using Utils.Appearance.Bone;
 using Utils.CharacterState;
 using Utils.Compare;
 
 namespace App.Shared.GameModules.Player.CharacterState
 {
-
     class FsmOutputAction
     {
         public Action<PlayerEntity, FsmOutput> ClientAction;
@@ -208,8 +203,8 @@ namespace App.Shared.GameModules.Player.CharacterState
         private static bool _animatorP1Changed;
         private static bool _animatorP3Changed;
         
-        private static bool _animatorP1NeedUpdate = false;
-        private static bool _animatorP3NeedUpdate = false;
+        private static bool _animatorP1NeedUpdate;
+        private static bool _animatorP3NeedUpdate;
         
         public FsmOutputBaseSystem()
         {
@@ -245,8 +240,6 @@ namespace App.Shared.GameModules.Player.CharacterState
 
         public void SetOutput(PlayerEntity player)
         {
-            IBoneRigging boneRigging = player.characterBoneInterface.CharacterBone;
-
             foreach (var output in _fsmOutput)
             {
                 if (output.Valid)
@@ -453,10 +446,9 @@ namespace App.Shared.GameModules.Player.CharacterState
             return false;
         }
 
-        private static bool SetLayerWeight(Animator animator, FsmOutput output)
+        private static void SetLayerWeight(Animator animator, FsmOutput output)
         {
             animator.SetLayerWeight(output.IntValue, output.FloatValue);
-            return true;
         }
     }
 }

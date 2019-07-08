@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Core.Appearance;
+﻿using Core.Appearance;
 using Core.Compare;
 using Core.Components;
 using Core.EntityComponent;
@@ -74,12 +70,12 @@ namespace App.Shared.Components.Player
             var rightObj = right as FirstPersonAppearanceComponent;
             if (rightObj != null)
             {
-                return CompareUtility.IsApproximatelyEqual(FirstPersonHeight, rightObj.FirstPersonHeight)
+                return CompareUtility.IsApproximatelyEqual(FirstPersonHeight, rightObj.FirstPersonHeight, 0.02f)
                        && CompareUtility.IsApproximatelyEqual(FirstPersonForwardOffset,
-                           rightObj.FirstPersonForwardOffset)
-                       && CompareUtility.IsApproximatelyEqual(SightHorizontalShift, rightObj.SightHorizontalShift)
-                       && CompareUtility.IsApproximatelyEqual(SightVerticalShift, rightObj.SightVerticalShift)
-                       && CompareUtility.IsApproximatelyEqual(SightVerticalShiftRange, rightObj.SightVerticalShiftRange)
+                           rightObj.FirstPersonForwardOffset, 0.02f)
+                       && CompareUtility.IsApproximatelyEqual(SightHorizontalShift, rightObj.SightHorizontalShift, 0.02f)
+                       && CompareUtility.IsApproximatelyEqual(SightVerticalShift, rightObj.SightVerticalShift, 0.02f)
+                       && CompareUtility.IsApproximatelyEqual(SightVerticalShiftRange, rightObj.SightVerticalShiftRange, 0.02f)
                        && CompareUtility.IsApproximatelyEqual(SightHorizontalShiftDirection,
                            rightObj.SightHorizontalShiftDirection)
                        && CompareUtility.IsApproximatelyEqual(SightVerticalShiftDirection,
@@ -119,13 +115,13 @@ namespace App.Shared.Components.Player
     [Player]
     public class FirstPersonAppearanceUpdateComponent : IUpdateComponent
     {
-        [DontInitilize] [NetworkProperty] public float SightHorizontalShift { get; set; }
-        [DontInitilize] [NetworkProperty] public float SightVerticalShift { get; set; }
-        [DontInitilize] [NetworkProperty] public float SightVerticalShiftRange { get; set; }
-        [DontInitilize] [NetworkProperty] public int SightHorizontalShiftDirection { get; set; }
-        [DontInitilize] [NetworkProperty] public int SightVerticalShiftDirection { get; set; }
-        [DontInitilize] [NetworkProperty] public int SightRemainVerticalPeriodTime { get; set; }
-        [DontInitilize] [NetworkProperty] public int RandomSeed { get; set; }
+        [DontInitilize] [NetworkProperty(100,-100,0.01f)] public float SightHorizontalShift { get; set; }
+        [DontInitilize] [NetworkProperty(100,-100,0.01f)] public float SightVerticalShift { get; set; }
+        [DontInitilize] [NetworkProperty(100,-100,0.01f)] public float SightVerticalShiftRange { get; set; }
+        [DontInitilize] [NetworkProperty(10,-10,1)] public int SightHorizontalShiftDirection { get; set; }
+        [DontInitilize] [NetworkProperty(10,-10,1)] public int SightVerticalShiftDirection { get; set; }
+        [DontInitilize] [NetworkProperty(1000,-1000,1)] public int SightRemainVerticalPeriodTime { get; set; }
+        [DontInitilize] [NetworkProperty(SyncFieldScale.PositiveShort)] public int RandomSeed { get; set; }
 
         public void CopyFrom(object rightComponent)
         {
@@ -245,47 +241,47 @@ namespace App.Shared.Components.Player
     [Player]
     public class LatestAppearanceComponent : ISelfLatestComponent, IPlaybackComponent
     {
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOne;
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOneMuzzle;
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOneLowRail;
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOneMagazine;
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOneButtstock;
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponOneScope;
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwo;
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwoMuzzle;
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwoLowRail;
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwoMagazine;
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwoButtstock;
-        [DontInitilize] [NetworkProperty] public int PrimaryWeaponTwoScope;
-        [DontInitilize] [NetworkProperty] public int SideArm;
-        [DontInitilize] [NetworkProperty] public int SideArmMuzzle;
-        [DontInitilize] [NetworkProperty] public int SideArmLowRail;
-        [DontInitilize] [NetworkProperty] public int SideArmMagazine;
-        [DontInitilize] [NetworkProperty] public int SideArmButtstock;
-        [DontInitilize] [NetworkProperty] public int SideArmScope;
-        [DontInitilize] [NetworkProperty] public int MeleeWeapon;
-        [DontInitilize] [NetworkProperty] public int ThrownWeapon;
-        [DontInitilize] [NetworkProperty] public int TacticWeapon;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int PrimaryWeaponOne;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int PrimaryWeaponOneMuzzle;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int PrimaryWeaponOneLowRail;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int PrimaryWeaponOneMagazine;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int PrimaryWeaponOneButtstock;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int PrimaryWeaponOneScope;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int PrimaryWeaponTwo;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int PrimaryWeaponTwoMuzzle;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int PrimaryWeaponTwoLowRail;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int PrimaryWeaponTwoMagazine;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int PrimaryWeaponTwoButtstock;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int PrimaryWeaponTwoScope;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int SideArm;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int SideArmMuzzle;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int SideArmLowRail;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int SideArmMagazine;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int SideArmButtstock;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int SideArmScope;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int MeleeWeapon;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int ThrownWeapon;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int TacticWeapon;
 
-        [DontInitilize] [NetworkProperty] public int Cap;
-        [DontInitilize] [NetworkProperty] public int PendantFace;
-        [DontInitilize] [NetworkProperty] public int Inner;
-        [DontInitilize] [NetworkProperty] public int Armor;
-        [DontInitilize] [NetworkProperty] public int Outer;
-        [DontInitilize] [NetworkProperty] public int Glove;
-        [DontInitilize] [NetworkProperty] public int Waist;
-        [DontInitilize] [NetworkProperty] public int Trouser;
-        [DontInitilize] [NetworkProperty] public int Foot;
-        [DontInitilize] [NetworkProperty] public int Bag;
-        [DontInitilize] [NetworkProperty] public int Entirety;
-        [DontInitilize] [NetworkProperty] public int CharacterHair;
-        [DontInitilize] [NetworkProperty] public int CharacterHairContainer;
-        [DontInitilize] [NetworkProperty] public int CharacterHead;
-        [DontInitilize] [NetworkProperty] public int CharacterGlove;
-        [DontInitilize] [NetworkProperty] public int CharacterInner;
-        [DontInitilize] [NetworkProperty] public int CharacterTrouser;
-        [DontInitilize] [NetworkProperty] public int CharacterFoot;
-        [DontInitilize] [NetworkProperty] public int PropId;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int Cap;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int PendantFace;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int Inner;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int Armor;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int Outer;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int Glove;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int Waist;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int Trouser;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int Foot;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int Bag;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int Entirety;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int CharacterHair;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int CharacterHairContainer;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int CharacterHead;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int CharacterGlove;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int CharacterInner;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int CharacterTrouser;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int CharacterFoot;
+        [DontInitilize] [NetworkProperty(int.MaxValue,-1,1)] public int PropId;
 
         public int GetComponentId()
         {
@@ -403,8 +399,8 @@ namespace App.Shared.Components.Player
     [Player]
     public class ClientAppearanceComponent : IUpdateComponent, IPlaybackComponent
     {
-        [DontInitilize] [NetworkProperty] public int AlternativeWeaponLocator;
-        [DontInitilize] [NetworkProperty] public int AlternativeP3WeaponLocator;
+        [DontInitilize] [NetworkProperty(10,-10,1)] public int AlternativeWeaponLocator;
+        [DontInitilize] [NetworkProperty(10,-10,1)] public int AlternativeP3WeaponLocator;
         
         public int GetComponentId()
         {
@@ -436,9 +432,9 @@ namespace App.Shared.Components.Player
     [Player]
     public class PredictedAppearanceComponent : IUserPredictionComponent, ICompensationComponent, IPlaybackComponent
     {
-        [DontInitilize] [NetworkProperty] public int WeaponInHand;
-        [DontInitilize] [NetworkProperty] public int ReloadState;
-        [DontInitilize] [NetworkProperty] public int OverrideControllerState;
+        [DontInitilize] [NetworkProperty(100,-100,1)] public int WeaponInHand;
+        [DontInitilize] [NetworkProperty(100,-100,1)] public int ReloadState;
+        [DontInitilize] [NetworkProperty(100,-100,1)] public int OverrideControllerState;
 
         public int GetComponentId()
         {

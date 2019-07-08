@@ -2,11 +2,12 @@ using System.Collections.Generic;
 using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.action;
+using Core.Free;
 
 namespace com.wd.free.trigger
 {
     [System.Serializable]
-    public class GameTrigger : Iterable<IGameAction>
+    public class GameTrigger : Iterable<IGameAction>, IRule
     {
         private const long serialVersionUID = -1671098087428358092L;
 
@@ -161,6 +162,11 @@ namespace com.wd.free.trigger
         public override string ToString()
         {
             return this.rule + " " + this.key + " " + this.name + "{" + actions.ToString() + "}";
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.GameTrigger;
         }
     }
 }

@@ -11,7 +11,12 @@ namespace App.Shared.GameModules.Weapon.Behavior
     public class RifleFireShakeProcessor : AbstractFireShakeProcessor
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(RifleFireShakeProcessor));
-
+        /// <summary>
+        /// TargetPunchPitchDelta => AccPunchYaw,AccPunchYawValue
+        /// </summary>
+        /// <param name="agent"></param>
+        /// <param name="cmd"></param>
+                        
         public override void OnFrame(WeaponBaseAgent agent, WeaponSideCmd cmd)
         {
             var weaponController = agent.Owner.WeaponController();
@@ -41,13 +46,22 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 orient.AccPunchYaw += runTimeComponent.PunchYawSpeed * deltaTime;
                 orient.AccPunchYawValue = orient.AccPunchYaw * shakeGroup.HPunchOffsetFactor;
 
-                orient.FireRoll += runTimeComponent.CameraRotationSpeed * frameInterval;
                 if (GlobalConst.EnableWeaponLog)
                     DebugUtil.MyLog(("orient.AccPunchPitch:" + orient.AccPunchPitch));
             }
             else
             {
                 UpdateOrientationAttenuation(agent, cmd);
+            }
+
+            if (agent.FireRollCfg != null && runTimeComponent.CameraRotationInterval > 0)
+            {
+                runTimeComponent.CameraRotationInterval -= frameInterval;
+                orient.FireRoll += runTimeComponent.CameraRotationSpeed * frameInterval;
+            }
+            else
+            {
+                RecoverFireRoll(agent, cmd);
             }
 
             base.OnFrame(agent, cmd);
@@ -63,7 +77,12 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
             CalcBaseShake(agent, cmd.UserCmd.Seq, shakeInfo);
         }
-
+        /// <summary>
+        /// last/NewAccPunchPitch->TargetPunchPitchDelta 
+        /// </summary>
+        /// <param name="heldAgent"></param>
+        /// <param name="seed"></param>
+        /// <param name="shakeInfo"></param>
         private void CalcBaseShake(WeaponBaseAgent heldAgent, int seed, ShakeInfo shakeInfo)
         {
             var weaponController = heldAgent.Owner.WeaponController();
@@ -100,41 +119,26 @@ namespace App.Shared.GameModules.Weapon.Behavior
             runTimeComponent.PunchYawSpeed = FireShakeFormula.CalcPitchSpeed(punchYaw,
                 orient.AccPunchYaw, runTimeComponent.PunchDecayLeftInterval);
             //PunchPitchSpeed(Not Speed) 
-            var rotation = orient.FireRoll;
-            var rotateYaw = CalculateRotationDegree(heldAgent, dirShakeArgs);
-            if (UnityEngine.Random.Range(0, 2) == 0) rotateYaw = -rotateYaw;
-            if (rotation + rotateYaw >= 3)
+            if (heldAgent.FireRollCfg != null)
             {
-                runTimeComponent.CameraRotationSpeed = (3 - rotation) / runTimeComponent.PunchDecayLeftInterval;
-            }
-            else if (rotation + rotateYaw <= -3)
-            {
-                runTimeComponent.CameraRotationSpeed = (-3 - rotation) / runTimeComponent.PunchDecayLeftInterval;
-            }
-            else
-            {
-                runTimeComponent.CameraRotationSpeed = rotateYaw / runTimeComponent.PunchDecayLeftInterval;
-            }
-        }
-
-        private float CalculateRotationDegree(WeaponBaseAgent agent, ShakeInfoStruct dirShakeArgs)
-        {
-            switch (agent.WeaponConfigAssy.NewWeaponCfg.Type)
-            {
-                case 1:
-                    return dirShakeArgs.UpBase * 1.5f;
-                case 2:
-                    return dirShakeArgs.UpBase * 2f;
-                case 3:
-                    return dirShakeArgs.UpBase * 1.3f;
-                case 4:
-                    return dirShakeArgs.UpBase * 1.5f;
-                case 5:
-                    return dirShakeArgs.UpBase * 2f;
-                case 6:
-                    return dirShakeArgs.UpBase;
-                default:
-                    return 0;
+                var rotation = orient.FireRoll;
+                var fireRollCfg = heldAgent.WeaponConfigAssy.S_FireRollCfg;
+                var rotateYaw = dirShakeArgs.UpBase * fireRollCfg.FireRollFactor;
+                runTimeComponent.CameraRotationInterval = heldAgent.FireRollCfg.FireRollTime;
+                if (Random.Range(0, 2) == 0) rotateYaw = -rotateYaw;
+                var maxFireRollAngle = fireRollCfg.MaxFireRollAngle;
+                if (rotation + rotateYaw >= maxFireRollAngle)
+                {
+                    runTimeComponent.CameraRotationSpeed = (maxFireRollAngle - rotation) / runTimeComponent.CameraRotationInterval;
+                }
+                else if (rotation + rotateYaw <= -maxFireRollAngle)
+                {
+                    runTimeComponent.CameraRotationSpeed = (-maxFireRollAngle - rotation) / runTimeComponent.CameraRotationInterval;
+                }
+                else
+                {
+                    runTimeComponent.CameraRotationSpeed = rotateYaw / runTimeComponent.CameraRotationInterval;
+                }
             }
         }
 

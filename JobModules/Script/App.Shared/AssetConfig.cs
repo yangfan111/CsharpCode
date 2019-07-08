@@ -34,15 +34,14 @@ namespace App.Shared
             return new AssetInfo(item.FirstModelAssetBundle, item.FirstModelAssetName);
         }
 
-        public static AssetInfo GetBulletAssetInfo(EBulletType type)
+        public static AssetInfo GetBulletAssetInfo(bool isAim)
         {
-            switch (type)
-            {
-                case EBulletType.Light:
-                    return new AssetInfo("common/bullet", "dandao01");
-                default:
-                    return new AssetInfo("common/bullet", "bolt");
-            }
+            //if(isAim)
+                return  new AssetInfo("common/bullet", "dandao03");
+            return new AssetInfo("common/bullet", "bolt");
+            //if (isAim)
+            //        return new AssetInfo("common/bullet", "dandao03");
+            //    return new AssetInfo("common/bullet", "bolt");
         }
 		
 		public static AssetInfo GetVehicleAssetInfo(string assetBundleName, string modelName)

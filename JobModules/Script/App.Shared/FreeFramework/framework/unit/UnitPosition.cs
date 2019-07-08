@@ -16,7 +16,11 @@ namespace com.wd.free.unit
         private float cylinderVolR;
         private float cylinderVolH;
 
-		public UnitPosition() : base()
+        private bool invalid;
+        private int randomindex;
+
+
+        public UnitPosition() : base()
 		{
 		}
 
@@ -107,7 +111,27 @@ namespace com.wd.free.unit
             get { return new Vector3(x, y, z); }
         }
 
-	    protected bool Equals(UnitPosition other)
+        public void SetInvalid(bool invalid)
+        {
+            this.invalid = invalid;
+        }
+
+        public bool GetInvalid()
+        {
+            return invalid;
+        }
+
+        public void SetRandomindex(int randomindex)
+        {
+            this.randomindex = randomindex;
+        }
+
+        public int GetRandomindex()
+        {
+            return randomindex;
+        }
+
+        protected bool Equals(UnitPosition other)
 	    {
 	        return x.Equals(other.x) && y.Equals(other.y) && z.Equals(other.z) && yaw.Equals(other.yaw) && pitch.Equals(other.pitch)
 	               && cylinderVolR.Equals(other.cylinderVolR) && cylinderVolH.Equals(other.cylinderVolH);

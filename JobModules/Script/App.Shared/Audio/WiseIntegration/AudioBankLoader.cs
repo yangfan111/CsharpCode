@@ -26,6 +26,8 @@ namespace App.Shared.Audio
             string[] assetNames = AudioUtil.GetBankAssetNamesByFolder(null);
             foreach (string bankName in assetNames)
             {
+                if(bankName.Contains("hall_"))
+                    continue;
                 AKBankAtom atom = bankAtomSet.Register(bankName, AudioBank_LoadAction.Normal, AudioBank_LoadMode.Sync);
                 bankAtomSet.DoLoadBank(atom, null);
             }

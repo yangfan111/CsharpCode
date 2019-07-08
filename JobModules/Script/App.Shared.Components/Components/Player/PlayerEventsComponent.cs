@@ -17,8 +17,7 @@ using Entitas.CodeGeneration.Attributes;
 
 namespace App.Shared.Components.Player
 {
-   
-
+  
     [Player]
     [Serializable]
     
@@ -38,7 +37,7 @@ namespace App.Shared.Components.Player
     public class UploadEventsComponent : IReusableObject, IUpdateComponent
     {
         [NetworkProperty] public PlayerEvents Events;
-        public PlayerEvents StoreEvents;
+      
         
         public void ReInit()
         {

@@ -88,7 +88,7 @@ namespace App.Shared.ContextInfos
                     v = customVisibleRadiusDict[i];
                 }
 
-                var cell = next_p2(v) / 4 > 8 ? next_p2(v) / 4 : 8;
+                var cell = next_p2(v) / 8 > 2 ? next_p2(v) / 8 : 2;
                 Bin2DConfig _config = new Bin2DConfig(minX, minY, maxX, maxY, cell, v);
                 if (i == (int) EEntityType.SceneObject || i == (int) EEntityType.MapObject)
                 {

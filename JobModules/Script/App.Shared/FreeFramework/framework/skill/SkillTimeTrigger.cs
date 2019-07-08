@@ -1,12 +1,14 @@
 using Sharpen;
 using com.wd.free.action;
 using UnityEngine;
+using com.wd.free.para;
+using Core.Free;
 
 namespace com.wd.free.skill
 {
 	[System.Serializable]
-	public class SkillTimeTrigger : ISkillTrigger
-	{
+	public class SkillTimeTrigger : ISkillTrigger, IRule
+    {
 		private const long serialVersionUID = 6618913049715717146L;
 
 		private int time;
@@ -41,14 +43,14 @@ namespace com.wd.free.skill
 			{
 				if (startTime == 0)
 				{
-					startTime = Runtime.CurrentTimeMillis();
+					startTime = Runtime.CurrentTimeMillis(false);
 					if (castAction != null)
 					{
 						castAction.Act(args);
 					}
 				}
 			}
-			if (startTime > 0 && Runtime.CurrentTimeMillis() - startTime >= time)
+			if (startTime > 0 && Runtime.CurrentTimeMillis(false) - startTime >= time)
 			{
 				startTime = 0;
 				return ISkillTrigger.TriggerStatus.Success;
@@ -81,5 +83,10 @@ namespace com.wd.free.skill
         {
             this.startTime = 0;
         }
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SkillTimeTrigger;
+        }
+    }
 }

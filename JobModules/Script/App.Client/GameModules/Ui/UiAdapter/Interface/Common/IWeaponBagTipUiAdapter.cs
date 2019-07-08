@@ -8,10 +8,5 @@ namespace App.Shared.Components.Ui.UiAdapter
 
     public interface IWeaponBagTipUiAdapter : IAbstractUiAdapter
     {
-        PlayerEntity Player
-        {
-            get;
-            set;
-        }
     }
 }

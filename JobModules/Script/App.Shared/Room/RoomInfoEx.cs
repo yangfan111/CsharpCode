@@ -1,5 +1,6 @@
 ﻿using App.Protobuf;
 using Core.Room;
+using System.Linq;
 
 namespace App.Client.GameModules.Room
 {
@@ -21,7 +22,7 @@ namespace App.Client.GameModules.Room
             roomInfo.RoomName = message.RoomName;
             roomInfo.RoomDisplayId = message.RoomDisplayId;
             roomInfo.RoomCapacity = message.RoomCapacity;
-            roomInfo.PreLoadAssetInfo = message.PreLoadAssetInfo;
+            roomInfo.PreLoadAssetInfo = message.PreLoadAssetInfo.ToList();
             roomInfo.PreLoadUI = message.PreLoadUI;
         }
 
@@ -41,7 +42,14 @@ namespace App.Client.GameModules.Room
             message.RoomName = roomInfo.RoomName == null ? "" : roomInfo.RoomName;
             message.RoomDisplayId = roomInfo.RoomDisplayId;
             message.RoomCapacity = roomInfo.RoomCapacity;
-            message.PreLoadAssetInfo = roomInfo.PreLoadAssetInfo;
+            message.PreLoadAssetInfo.Clear();
+            if (roomInfo.PreLoadAssetInfo != null && roomInfo.PreLoadAssetInfo.Count > 0)
+            {
+                foreach (var asset in roomInfo.PreLoadAssetInfo)
+                {
+                    message.PreLoadAssetInfo.Add(asset);
+                }
+            }
             message.PreLoadUI = roomInfo.PreLoadUI;
         }
     }

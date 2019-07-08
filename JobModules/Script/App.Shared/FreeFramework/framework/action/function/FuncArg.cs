@@ -1,10 +1,11 @@
+using Core.Free;
 using Sharpen;
 
 namespace com.wd.free.action.function
 {
 	[System.Serializable]
-	public class FuncArg
-	{
+	public class FuncArg : IRule
+    {
 		private const long serialVersionUID = -5858886919480535254L;
 
 		private string type;
@@ -69,5 +70,10 @@ namespace com.wd.free.action.function
 		{
 			this.defaultValue = defaultValue;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FuncArg;
+        }
+    }
 }

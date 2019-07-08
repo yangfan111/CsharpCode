@@ -64,7 +64,6 @@ namespace Core.CharacterState
             ProneValue = 0;
             CrouchValue = 1;
             StandValue = 2;
-            StableValue = 3;
 
             FrontPostureName = "FrontPosture";
             FrontStand = 0f;
@@ -262,10 +261,6 @@ namespace Core.CharacterState
             OpenDoorEnable = true;
             OpenDoorDisable = false;
 
-            MeleeAttackName = "Melee";
-            MeleeAttackStart = true;
-            MeleeAttackEnd = false;
-
             MeleeStateName = "MeleeState";
             NullMelee = 0;
             LightMeleeOne = 1;
@@ -315,7 +310,8 @@ namespace Core.CharacterState
             InjuredMoveDisableValue = false;
 
             ADSLayer = 7;
-            ADSLayerP1 = 3;
+            ADSLowerBodyLayerP1 = 4;
+            ADSUpperBodyLayerP1 = 5;
             ADSEnableValue = 1;
             ADSDisableValue = 0;
 
@@ -404,7 +400,6 @@ namespace Core.CharacterState
         public float ProneValue { get; private set; }
         public float CrouchValue { get; private set; }
         public float StandValue { get; private set; }
-        public float StableValue { get; private set; }
         #endregion
 
         #region FrontPosture
@@ -1010,18 +1005,6 @@ namespace Core.CharacterState
         public int VehiclesStateHash { get; private set; }
         #endregion
 
-        #region MeleeAttack
-        private string _meleeAttackName = string.Empty;
-        public string MeleeAttackName
-        {
-            get { return _meleeAttackName; }
-            set { _meleeAttackName = value; MeleeAttackHash = StringToHash(value); }
-        }
-        public int MeleeAttackHash { get; private set; }
-        public bool MeleeAttackStart { get; private set; }
-        public bool MeleeAttackEnd { get; private set; }
-        #endregion
-        
         #region MeleeState
 
         private string _meleeStateName = string.Empty;
@@ -1256,9 +1239,9 @@ namespace Core.CharacterState
         public int SuccessStateHash { get; private set; }
 
         #endregion
-
         public int ADSLayer { get; private set; }
-        public int ADSLayerP1 { get; private set; }
+        public int ADSUpperBodyLayerP1 { get; private set; }
+        public int ADSLowerBodyLayerP1 { get; private set; }
         public float ADSEnableValue { get; private set; }
         public float ADSDisableValue { get; private set; }
 

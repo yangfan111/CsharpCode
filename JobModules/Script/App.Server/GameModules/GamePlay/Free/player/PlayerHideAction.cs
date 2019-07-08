@@ -2,6 +2,7 @@
 using App.Shared.Components;
 using com.wd.free.action;
 using com.wd.free.@event;
+using Core.Free;
 using com.wd.free.unit;
 using com.wd.free.util;
 using System;
@@ -10,7 +11,7 @@ using Utils.Appearance;
 namespace App.Server.GameModules.GamePlay.Free.player
 {
     [Serializable]
-    public class PlayerHideAction : AbstractPlayerAction
+    public class PlayerHideAction : AbstractPlayerAction, IRule
     {
         private string show;
 
@@ -34,6 +35,11 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 }
             }
             
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerHideAction;
         }
     }
 }

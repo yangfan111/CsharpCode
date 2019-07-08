@@ -1,8 +1,6 @@
 ﻿using Assets.UiFramework.Libs;
 using Core.Utils;
 using System;
-using System.Collections.Generic;
-using Sharpen;
 using UnityEngine;
 using Utils.AssetManager;
 using Object = System.Object;
@@ -35,21 +33,11 @@ namespace App.Client.GameModules.Ui
 
         public void RetriveSpriteAsync(AssetInfo assetInfo, Action<Sprite> callback)
         {
-            if (string.IsNullOrEmpty(assetInfo.BundleName) || string.IsNullOrEmpty(assetInfo.AssetName))
-            {
-                Logger.ErrorFormat("illegal params bundle {0}, name {0}", assetInfo.BundleName, assetInfo.AssetName);
-                if (null != callback)
-                {
-                    callback(null);
-                }
-                return;
-            }
-
             LoadAsync(assetInfo, (obj) =>
             {
                 if (null != callback)
                 {
-                    callback(CreateSprite(obj));
+                    callback(GetSprite(obj as Sprite));
                 }
             },objectType: typeof(Sprite));
         }
@@ -68,14 +56,15 @@ namespace App.Client.GameModules.Ui
         {
             if (string.IsNullOrEmpty(assetInfo.BundleName) || string.IsNullOrEmpty(assetInfo.AssetName))
             {
-                Debug.LogError("asset error." + assetInfo.BundleName + "," + assetInfo.AssetName);
+                //Debug.LogError("asset error." + assetInfo.BundleName + "," + assetInfo.AssetName);
                 return;
             }
 
-            _assetManager.LoadAssetAsync("UiResourceLoader", assetInfo, (source, unityObj)=>{
+            _assetManager.LoadAssetAsync("UiResourceLoader", assetInfo, (source, unityObj)=>
+            {
                 try
                 {
-                    if (callback  != null)
+                    if (callback != null)
                     {
                         callback(unityObj);
                     }
@@ -105,13 +94,6 @@ namespace App.Client.GameModules.Ui
 
         public void GetConfigAsync(string bundleName, string assetName, Action<TextAsset> callback)
         {
-            if (string.IsNullOrEmpty(assetName) || string.IsNullOrEmpty(assetName))
-            {
-                Logger.ErrorFormat("config load info is illegal with bundle{0}, name {0}", bundleName, assetName);
-                return;
-            }
-
-            //TODO 这里现在有内存分配，需要优化
             LoadAsync(bundleName, assetName, (obj) =>
             {
                 if (null != callback)
@@ -121,33 +103,48 @@ namespace App.Client.GameModules.Ui
             });
         }
 
-        private Sprite CreateSprite(object src)
+        private Sprite GetSprite(Sprite sprite)
         {
-            var sprite = src as Sprite;
-            
             if (null != sprite)
             {
                 if (sprite.texture != null)
                 {
-                    if (sprite.texture.width > 1024 && sprite.texture.height > 512)
+                    if (sprite.texture.width >= 1024 && sprite.texture.height >= 512)
                     {
                         Logger.WarnFormat("You Would Better Change {0} Mode From Sprite To Default", sprite.name);
                     }
                 }
                 return sprite;
             }
-        
+            return ViewModelUtil.EmptySprite;
+        }
 
-            var tex = src as Texture2D;
-            if (null != tex)
+        public void RetriveTextureAsync(string bundle, string asset, Action<Texture> callback)
+        {
+            LoadAsync(new AssetInfo(bundle, asset), (obj) =>
             {
-                return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.zero);
-            }
+                if (null != callback)
+                {
+                    callback(GetTexture(obj as Texture));
+                }
+            }, null, typeof(Texture));
+        }
 
-            return null;
+        private Texture GetTexture(Texture texture)
+        {
+            if (null != texture)
+            {
+                return texture;
+            }
+            return ViewModelUtil.EmptySprite.texture;
         }
 
         public void LoadUIEffectAsync(string bundleName, string assetName, bool active = false, Action<GameObject> action = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Load(GameObject prefab, string bundle, string name, Action<UnityEngine.Object> callback, GameObject parent = null)
         {
             throw new NotImplementedException();
         }

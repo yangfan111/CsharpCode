@@ -29,6 +29,11 @@ namespace Utils.AssetManager
             get { return Value as GameObject; }
         }
 
+        public void ToggleGameObject(bool val)
+        {
+            if(AsGameObject)
+                AsGameObject.SetActive(val);
+        }
         public IAssetPostProcessor _assetPostProcessor = null;
 
         public T As<T>() where T : Object

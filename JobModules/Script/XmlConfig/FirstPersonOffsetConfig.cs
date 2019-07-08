@@ -27,19 +27,19 @@ namespace XmlConfig
         public List<int> SightOffsetRatio2;
         public List<int> SightOffsetRatio3;
 
-        public float HorizontalUpperLimit = 4;
-        public float HorizontalRestoreVel = 20;
-        public float HorizontalVelCoefficient = 1;
-        public float VerticalUpperLimit = 2;
-        public float VerticalRestoreVel = 10;
-        public float VerticalVelCoefficient = 0.95f;
+        public float HorizontalUpperLimit;
+        public float HorizontalRestoreVel;
+        public float HorizontalVelCoefficient;
+        public float VerticalUpperLimit;
+        public float VerticalRestoreVel;
+        public float VerticalVelCoefficient;
 
-        public float SightHorizontalUpperLimit = 4;
-        public float SightHorizontalRestoreVel = 20;
-        public float SightHorizontalVelCoefficient = 1;
-        public float SightVerticalUpperLimit = 2;
-        public float SightVerticalRestoreVel = 10;
-        public float SightVerticalVelCoefficient = 0.95f;
+        public float SightHorizontalUpperLimit;
+        public float SightHorizontalRestoreVel;
+        public float SightHorizontalVelCoefficient;
+        public float SightVerticalUpperLimit;
+        public float SightVerticalRestoreVel;
+        public float SightVerticalVelCoefficient;
     }
 
     [XmlRoot("root")]

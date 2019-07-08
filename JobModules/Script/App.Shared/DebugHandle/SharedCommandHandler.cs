@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using Assets.Utils.Configuration;
 using UnityEngine;
 using Utils.Appearance;
 using Utils.Appearance.Weapon;
@@ -23,6 +24,8 @@ using Utils.SettingManager;
 using Utils.Singleton;
 using XmlConfig;
 using QualityLevel = Utils.SettingManager.QualityLevel;
+using ArtPlugins;
+using Utils.Appearance.Bone;
 
 namespace App.Shared.DebugHandle
 {
@@ -36,22 +39,32 @@ namespace App.Shared.DebugHandle
             {
                 string target = message.Args[0].ToLower();
                 var frameRate = int.Parse(message.Args[1]);
-
+                if(frameRate == -1)
+                {
+                    QualitySettings.vSyncCount = 1;
+                    return "ok";
+                }
+                QualitySettings.vSyncCount = 0;
                 GameSettingUtility.SetFrameRate(target, frameRate);
                 return "ok";
 
             }
-            else if (message.Command == DebugCommands.GetQuality)
+            else if (message.Command == DebugCommands.GetUnityQuality)
             {
                 var qualityName = GameSettingUtility.GetQualityName();
                 message.Args = new string[1];
                 message.Args[0] = qualityName;
-                return "ok";
+                return qualityName;
             }
             else if (message.Command == DebugCommands.GetQualityList)
             {
                 message.Args = GameSettingUtility.GetQualityNameList();
                 return "ok";
+            }
+            else if (message.Command == DebugCommands.GetQuality)
+            {
+                var qualityName = SettingManager.GetInstance().GetQuality();
+                return qualityName.ToString();
             }
             else if (message.Command == DebugCommands.SetQuality)
             {
@@ -65,6 +78,13 @@ namespace App.Shared.DebugHandle
                 SettingManager.GetInstance().SetQuality((QualityLevel)levelIndex);
                 return "ok";
             }
+            else if (message.Command == DebugCommands.VideoSetting)
+            {
+                int id = int.Parse(message.Args[0]);
+
+                return  GameQualitySettingManager.GetVideoValue((EVideoSettingId)id);
+            }
+            
             else if (message.Command == DebugCommands.LodBias)
             {
                 if (message.Args.Length > 0)
@@ -319,7 +339,7 @@ namespace App.Shared.DebugHandle
                     result =  BigMapDebug.HandleCommand(player,message.Args);
                     break;
                 case DebugCommands.ChangeBag:
-                    player.WeaponController().SwitchBag();
+                    player.WeaponController().SwitchBag(int.Parse(message.Args[0]));
                  //   contexts.session.clientSessionObjects.UserCmdGenerator.SetUserCmd((cmd) => cmd.BagIndex = 1);
                     break;
                 case DebugCommands.ChangeHp:
@@ -360,6 +380,22 @@ namespace App.Shared.DebugHandle
                     sceneObjectEntityFactory2.CreateSceneAudioBgEmitterEntity( player.position.Value, player.entityKey.Value);
 
                     break;
+                case DebugCommands.Shoot:
+                    if (message.Args.Length > 0)
+                    {
+                        string s = message.Args[0];
+                        if (s == "clean")
+                        {
+                            SharedConfig.CleanShowShootText = true;
+                        }
+                    }
+                    else
+                    {
+                        SharedConfig.ShowShootText = !SharedConfig.ShowShootText;
+                    }
+                  
+
+                    break;
                 case DebugCommands.SetWeapon:
                     int weaponIdToSet = 0;
                     int avatarId = 0;
@@ -378,6 +414,8 @@ namespace App.Shared.DebugHandle
                         weaponSlotToSet = int.Parse(message.Args[2].Trim());
                     }
                     var weaponInfo = WeaponUtil.CreateScan(weaponIdToSet,(val)=> val.AvatarId = avatarId > 0 ? avatarId : 0);
+                    weaponInfo.Bullet = 100;
+                    weaponInfo.ReservedBullet = 100;
                     if (weaponSlotToSet != 0)
                     {
                         player.WeaponController().ReplaceWeaponToSlot((EWeaponSlotType)weaponSlotToSet, weaponInfo);
@@ -495,7 +533,7 @@ namespace App.Shared.DebugHandle
                     int weaponId = player.WeaponController().HeldWeaponAgent.ConfigId;
                     if (weaponId > 0)
                     {
-                        var list = SingletonManager.Get<WeaponPartsConfigManager>().GetAvaliablePartTypes(weaponId);
+                        var list = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(weaponId).ApplyParts;
                         for (int j = 0; j < list.Count; j++)
                         {
                             result += list[j] + ",";
@@ -696,7 +734,7 @@ namespace App.Shared.DebugHandle
                     int id;
                     if (int.TryParse(message.Args[0], out category) && int.TryParse(message.Args[1], out id))
                     {
-                        sceneObjectEntityFactory.CreateSimpleEquipmentEntity((Assets.XmlConfig.ECategory) category, id,
+                        sceneObjectEntityFactory.CreateSimpleObjectEntity((Assets.XmlConfig.ECategory) category, id,
                             1, player.position.Value);
                     }
                     break;
@@ -1108,28 +1146,29 @@ namespace App.Shared.DebugHandle
 
         protected override string OnProcess(Contexts contexts, PlayerEntity player, string[] args)
         {
-            if(SharedConfig.IsServer)
-            {
-                if(arg1 < 0)
-                {
-                    return "";
-                }
-                var content = contexts.session.commonSession.BulletInfoCollector.GetStatisticData(arg1);
-                if(player.hasNetwork)
-                {
-                    var msg = Protobuf.ServerDebugMessage.Allocate();
-                    msg.Content = content;
-                    player.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.DebugMessage, msg);
-                    msg.ReleaseReference();
-                }
-                Logger.Info(content);
-                return content; 
-            }
-            else
-            {
-                SharedConfig.ShowHitFeedBack = !SharedConfig.ShowHitFeedBack;
-                return contexts.session.commonSession.BulletInfoCollector.GetStatisticData(arg1) + " ShowHItFeedBack is " + SharedConfig.ShowHitFeedBack;
-            }
+            return "";
+            // if(SharedConfig.IsServer)
+            // {
+            //     if(arg1 < 0)
+            //     {
+            //         return "";
+            //     }
+            //     var content = contexts.session.commonSession.BulletInfoCollector.GetStatisticData(arg1);
+            //     if(player.hasNetwork)
+            //     {
+            //         var msg = Protobuf.ServerDebugMessage.Allocate();
+            //         msg.Content = content;
+            //         player.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.DebugMessage, msg);
+            //         msg.ReleaseReference();
+            //     }
+            //     Logger.Info(content);
+            //     return content; 
+            // }
+            // else
+            // {
+            //     SharedConfig.ShowHitFeedBack = !SharedConfig.ShowHitFeedBack;
+            //     return contexts.session.commonSession.BulletInfoCollector.GetStatisticData(arg1) + " ShowHItFeedBack is " + SharedConfig.ShowHitFeedBack;
+            // }
         }
     }
 }

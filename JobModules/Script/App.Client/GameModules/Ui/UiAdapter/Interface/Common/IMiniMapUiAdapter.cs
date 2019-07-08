@@ -266,7 +266,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         List<Vector3> MotherPos { get; }
         List<Vector3> HeroPos { get; }
         List<Vector3> HumanPos { get; }
-        List<MapFixedVector3> SupplyPos { get; }
+        Dictionary<string, MapFixedVector3> SupplyPos { get; }
         #endregion
     }
 }

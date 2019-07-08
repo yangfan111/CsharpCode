@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using App.Shared.GameModules.Camera.Utils;
 using Assets.App.Shared.GameModules.Camera;
 using Core.Utils;
@@ -38,7 +39,8 @@ namespace Core.CameraControl.NewMotor.View
         public override bool IsActive(ICameraMotorInput input, ICameraMotorState state)
         {
             if (state.IsFree()) return false;
-            if (!state.GetMainConfig().CanSwitchView) return false;
+            var config = input.GetPoseConfig(state.GetMainMotor().NowMode);
+            if (!config.CanSwitchView) return false;
 
             if (state.ViewMode == ECameraViewMode.FirstPerson && input.FilteredChangeCamera)
             {

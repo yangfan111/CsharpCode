@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using App.Shared.Components.FreeMove;
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Camera.Utils;
+using BehaviorDesigner.Runtime.Tasks.Basic.UnityQuaternion;
 using BehaviorDesigner.Runtime.Tasks.Basic.UnityTime;
+using BehaviorDesigner.Runtime.Tasks.Basic.UnityTransform;
 using Core.CameraControl;
 using Core.Compare;
 using Core.Components;
@@ -25,13 +29,9 @@ namespace App.Shared.GameModules.Camera
         public readonly float CollisionRecoverySpeed = 5f;
         public readonly float MinCollisionDistance = 0f;
 
-        private Vector3 observeOffset = SingletonManager.Get<CameraConfigManager>().Config.ObserveConfig.Offset;
+        private Vector3 observeOffset = SingletonManager.Get<CameraConfigManager>().Config.GetRoleConfig().ObserveConfig.Offset;
         private float observeDistance =
-            SingletonManager.Get<CameraConfigManager>().Config.ObserveConfig.ObserveDistance;
-        private float MaxTestHeight = SingletonManager.Get<CameraConfigManager>().Config.SpecialZoneConfig.FloorTestHeight;
-        private float OffsetInBuilding = SingletonManager.Get<CameraConfigManager>().Config.SpecialZoneConfig.OffsetLengthInBuilding;
-        private float FocusPositionLerpTime =
-            SingletonManager.Get<CameraConfigManager>().Config.SpecialZoneConfig.FocusPositionLerpTime;
+            SingletonManager.Get<CameraConfigManager>().Config.GetRoleConfig().ObserveConfig.ObserveDistance;
 
         /// <summary>
         /// 相机离开碰撞点的距离
@@ -57,7 +57,6 @@ namespace App.Shared.GameModules.Camera
             new Vector3(-RaycastOffset, 0, 0)
         };
 
-        private const float _collisionOffsetStartDistance = 1.8f;
         private VehicleContext _vehicleContext;
         private FreeMoveContext _freeMoveContext;
         private int _baseCollisionLayers;
@@ -76,7 +75,7 @@ namespace App.Shared.GameModules.Camera
             _vehicleContext = context.vehicle;
             _freeMoveContext = context.freeMove;
             _baseCollisionLayers = UnityLayers.CameraCollidableLayerMask;
-            
+
             _archoroffsetArm = new SpringArm();
             _postOffsetArm = new SpringArm();
             _offsetArm = new SpringArm();
@@ -116,7 +115,12 @@ namespace App.Shared.GameModules.Camera
             var observedPlayer = _playerContext.GetEntityWithEntityKey(new EntityKey(observedObjId, (short)EEntityType.Player));
             if (observedPlayer != null)
             {
-                CalcuWhenObservePlayer(player, observedPlayer);
+                UpdateCollisionLayerMask(observedPlayer);
+                var punchRotation = new Vector3(2 * observedPlayer.orientation.PunchPitch,
+                    observedPlayer.orientation.PunchYaw, observedPlayer.orientation.FireRoll);
+
+                UpdateCollisions(observedPlayer.cameraStateOutputNew, player.cameraFinalOutputNew, punchRotation,
+                    observedPlayer, cmd.ClientTime);
             }
             else
             {
@@ -129,30 +133,19 @@ namespace App.Shared.GameModules.Camera
             }
         }
 
-        protected override void ExecWhenBeingObserved(PlayerEntity player, IUserCmd cmd)
-        {
-            if (player.appearanceInterface.Appearance.IsFirstPerson)
-            {
-                var punchRotation = new Vector3(2 * player.orientation.PunchPitch,
-                    2 * player.orientation.PunchYaw, player.orientation.FireRoll);
-                UpdateCollisions(player.thirdPersonDataForObserving.ThirdPersonData,
-                    player.thirdPersonDataForObserving.ThirdPersonOutput, punchRotation, player, cmd.ClientTime);
-            }
-        }
-
         protected override void ExecWhenNormal(PlayerEntity player, IUserCmd cmd)
         {
             if (!player.hasCameraObj) return;
             if (!player.hasCameraFinalOutputNew) return;
             if (!player.hasCameraStateOutputNew) return;
-            
+
             UpdateCollisionLayerMask(player);
             var punchRotation = new Vector3(2 * player.orientation.PunchPitch,
-                2 * player.orientation.PunchYaw, player.orientation.FireRoll);
+                player.orientation.PunchYaw, player.orientation.FireRoll);
 
             UpdateCollisions(player.cameraStateOutputNew, player.cameraFinalOutputNew, punchRotation,
                 player, cmd.ClientTime);
-            
+
             SingletonManager.Get<DurationHelp>().Position = player.cameraStateOutputNew.ArchorPosition;
         }
 
@@ -164,6 +157,7 @@ namespace App.Shared.GameModules.Camera
         private void UpdateCollisionLayerMask(PlayerEntity playerEntity)
         {
             bool needCollisionWithCar =
+                playerEntity.hasStateInterface &&
                 playerEntity.stateInterface.State.GetActionKeepState() != ActionKeepInConfig.Drive &&
                 playerEntity.gamePlay.GameState != Components.GameState.AirPlane;
             
@@ -182,32 +176,33 @@ namespace App.Shared.GameModules.Camera
         {
             var doLag = !player.appearanceInterface.Appearance.IsFirstPerson;
             var realRotation = Quaternion.Euler(calsOut.ArchorEulerAngle + calsOut.EulerAngle + punchRotation);
+            var index = (player.gamePlay.JobAttribute == (int) EJobAttribute.EJob_Variant) ? 0.75f : 1f;
 
             var postOffset = calsOut.ArchorPostOffset + calsOut.PostOffset;
             var realArchorOffset = calsOut.ArchorOffset;
             var realPostOffset = postOffset;
             var archorRotation = Quaternion.Euler(0, calsOut.ArchorEulerAngle.y, 0);
-            
+
             //计算头顶位置
-            _archoroffsetArm.Offset = realArchorOffset / 2;
-            var heightTestStart = calsOut.ArchorPosition + archorRotation * realArchorOffset / 2;
+            _archoroffsetArm.Offset = realArchorOffset / 2 * index;
+            var heightTestStart = calsOut.ArchorPosition + archorRotation * realArchorOffset / 2 * index;
             _archoroffsetArm.Update(heightTestStart, archorRotation, curTime - LastTime, doLag, calsOut.NeedDetectDistance);
-            realArchorOffset = _archoroffsetArm.LastLoc - calsOut.ArchorPosition;
-            
+            realArchorOffset = (_archoroffsetArm.LastLoc - calsOut.ArchorPosition) ;
+
             //计算锚点位置
-            _postOffsetArm.Offset = realPostOffset;
+            _postOffsetArm.Offset = realPostOffset * index;
             _postOffsetArm.Update(_archoroffsetArm.LastLoc, archorRotation, curTime - LastTime, false, calsOut.NeedDetectDistance);
-            realPostOffset = _postOffsetArm.LastLoc - _archoroffsetArm.LastLoc;
+            realPostOffset = (_postOffsetArm.LastLoc - _archoroffsetArm.LastLoc);
             var postOffsetFactor = Mathf.Max( realPostOffset.magnitude / postOffset.magnitude, 1);
             var startingPosition = calsOut.FinalArchorPosition =
                 calsOut.ArchorPosition + postOffsetFactor * realArchorOffset + realPostOffset;
 
-            //封闭建筑内拉近摄像机距离
+//            封闭建筑内拉近摄像机距离
 //            if(BuildingRestrictTest(calsOut, player))
 //                calsOut.Offset = calsOut.Offset.normalized * OffsetInBuilding;
             
             //相机位置计算
-            _offsetArm.Offset = calsOut.Offset;
+            _offsetArm.Offset = calsOut.Offset * index;
             _offsetArm.Update(startingPosition, realRotation, curTime - LastTime, doLag, true);  
 
             camera.PlayerFocusPosition = startingPosition;
@@ -231,55 +226,16 @@ namespace App.Shared.GameModules.Camera
             Debug.DrawLine(p3, p4, Color.blue);
 #endif
         }
-
-        private bool BuildingRestrictTest(CameraStateOutputNewComponent calsOut, PlayerEntity player)
-        {
-            if (player.stateInterface.State.GetActionState() != ActionInConfig.Gliding &&
-                player.stateInterface.State.GetActionState() != ActionInConfig.Parachuting &&
-                player.gamePlay.GameState != Components.GameState.AirPlane)
-            {
-                var realHeight = HeightTest(player, MaxTestHeight);
-                if (realHeight >= 0)
-                {
-                    if (realHeight < MaxTestHeight)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-        
-        private const float TinyDistanceOffset = 0.01f;
-        //胶囊探测，防止摄像机与天花板穿模
-        public float HeightTest(PlayerEntity player, float maxHeight)
-        {
-            var calsOut = player.cameraStateOutputNew;
-            float radius = player.characterContoller.Value.radius;
-            var center = calsOut.ArchorPosition + calsOut.ArchorOffset.normalized * (player.characterContoller.Value.height - radius);
-            var direction = calsOut.ArchorOffset.normalized;
-            RaycastHit hitInfo;
-            if (Physics.CapsuleCast(center, center, radius, direction, out hitInfo, maxHeight,UnityLayers.SceneCollidableLayerMask))
-            {
-                if (hitInfo.distance > 0)
-                {
-                    var result = hitInfo.distance - TinyDistanceOffset + player.characterContoller.Value.height -
-                                     radius;
-                    return result;
-                }
-            }
-            return -1;
-        }
         
         private void CalcuWhenObserveFreeMove(PlayerEntity playerEntity, FreeMoveEntity observedFreeMove)
         {
             var camera = playerEntity.cameraFinalOutputNew;
             var calsOut = playerEntity.cameraStateOutputNew;
 
-            camera.EulerAngle = calsOut.ArchorEulerAngle + calsOut.EulerAngle;
+            CalcuFreeMoveEularAngle(observedFreeMove, camera, calsOut);
 
             var rotation = Quaternion.Euler(camera.EulerAngle);
-            var archorPos = observedFreeMove.position.Value + observeOffset;
+            var archorPos = observedFreeMove.position.Value + (observedFreeMove.hasFreeMoveController? Vector3.zero:observeOffset);
             float actualDistance = CameraUtility.ScatterCast(archorPos, rotation, observeDistance,
                                        _samplePoints, _collisionLayers);
             
@@ -287,16 +243,17 @@ namespace App.Shared.GameModules.Camera
             camera.Position = archorPos + finalPostOffset;
         }
 
-        private void CalcuWhenObservePlayer(PlayerEntity playerEntity, PlayerEntity observedPlayer)
+        private static void CalcuFreeMoveEularAngle(FreeMoveEntity observedFreeMove, CameraFinalOutputNewComponent camera,
+            CameraStateOutputNewComponent calsOut)
         {
-            if (!observedPlayer.hasObserveCamera)
-                return ;
-
-            var camera = playerEntity.cameraFinalOutputNew;
-            var playerData = observedPlayer.observeCamera;
-
-            camera.Position = playerData.CameraPosition.ShiftedVector3();
-            camera.EulerAngle = playerData.CameraEularAngle;
+            if (observedFreeMove.hasFreeMoveController && observedFreeMove.freeMoveController.ControllType ==
+                (byte) EFreeMoveControllType.FixFocusPos)
+            {
+                var aimAt = observedFreeMove.freeMoveController.FocusOnPosition.ShiftedVector3();
+                var vect = aimAt - observedFreeMove.position.Value;
+                camera.EulerAngle = Quaternion.LookRotation(vect).eulerAngles;
+            }
+            else camera.EulerAngle = calsOut.ArchorEulerAngle + calsOut.EulerAngle;
         }
         
         private void UploadComponent(PlayerEntity player)
@@ -304,17 +261,11 @@ namespace App.Shared.GameModules.Camera
             var input = player.cameraFinalOutputNew;
             var output = player.cameraStateUpload;
             
-            output.Position = input.Position.ShiftedToFixedVector3();
+            output.Position = player.GetShiftCameraPos(input.Position);
             output.EulerAngle = input.EulerAngle;
             output.Fov = input.Fov;
             output.Far = input.Far;
             output.Near = input.Near;
-            output.PlayerFocusPosition = input.PlayerFocusPosition.ShiftedToFixedVector3();
-            
-            output.ThirdPersonCameraPostion =
-                player.appearanceInterface.Appearance.IsFirstPerson
-                    ? player.thirdPersonDataForObserving.ThirdPersonOutput.Position
-                    : player.cameraFinalOutputNew.Position;
         }
     }
 }

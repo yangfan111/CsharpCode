@@ -15,7 +15,7 @@ namespace App.Client.GameModules.Player
          */
         protected abstract bool Filter(TEntity entity);
         protected abstract void OnGamePlay(TEntity entity);
-        private IGroup<TEntity> _group;
+        protected IGroup<TEntity> _group;
 
         protected AbstractGamePlaySystem(Contexts contexts)
         {

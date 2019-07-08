@@ -74,11 +74,11 @@ namespace App.Client.GameModules.GamePlay.Free.App
                 }
                 else if (type == 5)
                 {
-                    return "w" + pos / 10 + "" + GetPartFromWeaponPart(pos % 10) + "0,0";
+                    return "w" + pos / 10 + "" + GetPartFromWeaponPart(pos % 10) + ",0,0";
                 }
                 else if (type == 3)
                 {
-                    return avatarInv[pos];
+                    return avatarInv[pos] + ",0,0";
                 }
                 else if (nameDic.ContainsKey(type))
                 {

@@ -39,7 +39,7 @@ namespace App.Client.GameMode
             });
         }
 
-        protected override void DoDropGrenade(PlayerEntity playerEntity,EWeaponSlotType slot, IUserCmd cmd)
+        /*protected override void DoDropGrenade(PlayerEntity playerEntity,EWeaponSlotType slot, IUserCmd cmd)
         {
             if (null != _userCmdGenerator)
             {
@@ -49,7 +49,7 @@ namespace App.Client.GameMode
                 });
                 playerEntity.WeaponController().AutoThrowing = true;
             }
-        }
+        }*/
 
         public override void SendAutoPickupWeapon(int entityId)
         {
@@ -57,7 +57,11 @@ namespace App.Client.GameMode
             var model = target.hasUnityObject ? target.unityObject.UnityObject : target.multiUnityObject.FirstAsset;
             if (!CommonObjectCastUtil.HasObstacleBetweenPlayerAndItem(Player, target.position.Value, model))
             {
-                _userCmdGenerator.SetUserCmd((cmd) => cmd.AutoPickUpEquip.Add(entityId));
+                _userCmdGenerator.SetUserCmd((cmd) =>
+                {
+                    if (!cmd.AutoPickUpEquip.Contains(entityId))
+                        cmd.AutoPickUpEquip.Add(entityId);
+                });
             }
         }
     }

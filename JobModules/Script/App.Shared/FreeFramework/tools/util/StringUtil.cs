@@ -208,7 +208,36 @@ namespace com.cpkf.yyjd.tools.util
 			return Sharpen.Collections.ToArray(list, new string[] {  });
 		}
 
-		public static string[] SplitWithoutBlank(string @string, string rex)
+        public static string[] Split(string @string, char rex)
+        {
+            int[] indexs = GetAllIndex(@string, rex);
+            IList<string> list = new List<string>();
+            for (int i = 0; i < indexs.Length; i++)
+            {
+                if (i == 0)
+                {
+                    list.Add(Sharpen.Runtime.Substring(@string, 0, indexs[i]));
+                }
+                if (i < indexs.Length - 1)
+                {
+                    list.Add(Sharpen.Runtime.Substring(@string, indexs[i] + 1/*rex.Length*/, indexs[i + 1]));
+                }
+                else
+                {
+                    if (i == indexs.Length - 1)
+                    {
+                        list.Add(Sharpen.Runtime.Substring(@string, indexs[i] + 1/*rex.Length*/));
+                    }
+                }
+            }
+            if (indexs.Length == 0)
+            {
+                list.Add(@string);
+            }
+            return Sharpen.Collections.ToArray(list, new string[] { });
+        }
+
+        public static string[] SplitWithoutBlank(string @string, string rex)
 		{
 			int[] indexs = GetAllIndex(@string, rex);
 			IList<string> list = new List<string>();
@@ -266,10 +295,27 @@ namespace com.cpkf.yyjd.tools.util
 			return Sharpen.Collections.ToArray(list, new string[] {  });
 		}
 
-		/// <summary>判断字符是否为中文字符</summary>
-		/// <param name="ch">字符</param>
-		/// <returns>true则是中文字符，false不是中文字符</returns>
-		public static bool IsChineseCharacter(char ch)
+        public static string[] Split(string @string, char[] rexs)
+        {
+            /*Arrays.Sort(rexs, GetLenComparator());*/
+            IList<string> list = new List<string>();
+            list.Add(@string);
+            for (int i = 0; i < rexs.Length; i++)
+            {
+                IList<string> newList = new List<string>();
+                foreach (string s in list)
+                {
+                    Sharpen.Collections.AddAll(newList, Arrays.AsList(Split(s, rexs[i])));
+                }
+                list = newList;
+            }
+            return Sharpen.Collections.ToArray(list, new string[] { });
+        }
+
+        /// <summary>判断字符是否为中文字符</summary>
+        /// <param name="ch">字符</param>
+        /// <returns>true则是中文字符，false不是中文字符</returns>
+        public static bool IsChineseCharacter(char ch)
 		{
 			string @string = ch.ToString();
 			return chinesePattern.Matcher(@string).Find();
@@ -662,11 +708,36 @@ namespace com.cpkf.yyjd.tools.util
 			return ins;
 		}
 
-		/// <summary>返回所有的rex在souce串中出现的位置</summary>
-		/// <param name="source">源字符串</param>
-		/// <param name="rex">表达式</param>
-		/// <returns>所有的位置信息</returns>
-		public static int[] GetAllIndex(string source, string[] rexs)
+        public static int[] GetAllIndex(string source, char rex)
+        {
+            List<int> list = new List<int>();
+            int position = 0;
+            while (position < source.Length)
+            {
+                int index = source.IndexOf(rex, position);
+                if (index > -1)
+                {
+                    list.Add(source.IndexOf(rex, position));
+                    position = index + 1;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            int[] ins = new int[list.Count];
+            for (int i = 0; i < ins.Length; i++)
+            {
+                ins[i] = list[i];
+            }
+            return ins;
+        }
+
+        /// <summary>返回所有的rex在souce串中出现的位置</summary>
+        /// <param name="source">源字符串</param>
+        /// <param name="rex">表达式</param>
+        /// <returns>所有的位置信息</returns>
+        public static int[] GetAllIndex(string source, string[] rexs)
 		{
 			List<int> list = new List<int>();
 			foreach (string s in rexs)

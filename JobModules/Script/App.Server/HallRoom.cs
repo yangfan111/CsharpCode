@@ -103,6 +103,7 @@ namespace App.Server
         public void Init()
         {
             TotalPlayerCount = 0;
+            if (ModeId == 0) ModeId = _contexts.session.commonSession.RoomInfo.ModeId;
             var type = SingletonManager.Get<GameModeConfigManager>().GetBagTypeById(ModeId);
             switch (type)
             {
@@ -268,6 +269,11 @@ namespace App.Server
             if (_dictPlayers.ContainsKey(playerId))
             {
                 IPlayerInfo player = _dictPlayers[playerId];
+                if (player.StatisticsData != null && player.StatisticsData.GameTime <= 0)
+                {
+                    player.StatisticsData.DeadTime += (int) (DateTime.Now.Ticks / 10000L - player.StatisticsData.LastDeadTime);
+                    player.StatisticsData.GameTime = (int)(_contexts.session.commonSession.FreeArgs.Rule.ServerTime - player.StatisticsData.GameJoinTime);
+                }
                 gameOverPlayer = GameOverPlayer.Allocate();
                 SetGameOverPlayerValue(gameOverPlayer, player);
                 //_gameStatisticData.SetStatisticData(gameOverPlayer, playerInfo, _contexts.session.commonSession.FreeArgs);
@@ -309,14 +315,20 @@ namespace App.Server
                             msg.Players.Add(gameOverPlayer);
                         }
                     }
+
+                    msg.TotalPlayer = _dictPlayers.Count + _dictGoPlayers.Count;
                 }
                 catch (Exception e)
                 {
                     _logger.ErrorFormat("GameOver ... Error:{0}", e.StackTrace);
                 }
             }
+            else
+            {
+                Dispose();
+            }
 
-            Dispose();
+         
 
             var evt = RoomEvent.AllocEvent<GameOverEvent>();
             evt.HallRoomId = HallRoomId;
@@ -326,7 +338,10 @@ namespace App.Server
 
         private void SetGameOverPlayerValue(GameOverPlayer gameOverPlayer, IPlayerInfo player)
         {
-            _gameStatisticData.SetStatisticData(gameOverPlayer, player, _contexts.session.commonSession.FreeArgs);
+            if (_gameStatisticData != null)
+            {
+                _gameStatisticData.SetStatisticData(gameOverPlayer, player, _contexts.session.commonSession.FreeArgs);
+            }
         }
     }
 

@@ -6,6 +6,7 @@ using Core.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -36,6 +37,7 @@ namespace AssetBundleManagement
             {
                 throw new Exception("Null AssetLoading!!");
             }
+
             list.AddLast(assetLoading);
         }
     }
@@ -44,29 +46,37 @@ namespace AssetBundleManagement
     {
         enum AssetBundleStatus
         {
-            Blank, Loading, Loaded, Failed
+            Blank,
+            Loading,
+            Loaded,
+            Failed
         }
-       
+
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(AssetBundlePool));
-        
+
         private IAssetBundleStat _statRecorder;
 
         // AssetBundle Address
         private AssetBundleWarehouseAddr _defaultWarehouseAddr;
-        private Dictionary<AssetBundleWarehouseAddr, List<string>> _supplementaryWarehouseAddr = new Dictionary<AssetBundleWarehouseAddr, List<string>>(AssetBundleWarehouseAddr.Comparer);
+
+        private Dictionary<AssetBundleWarehouseAddr, List<string>> _supplementaryWarehouseAddr =
+            new Dictionary<AssetBundleWarehouseAddr, List<string>>(AssetBundleWarehouseAddr.Comparer);
+
         private HashSet<string> _supplementaryBundles = new HashSet<string>();
 
         private AssetBundleWarehouse _defaultWarehouse;
-        private Dictionary<string, AssetBundleWarehouse> _supplementaryWarehouses = new Dictionary<string, AssetBundleWarehouse>();
+
+        private Dictionary<string, AssetBundleWarehouse> _supplementaryWarehouses =
+            new Dictionary<string, AssetBundleWarehouse>();
 
         private Dictionary<string, string[]> _allDependencies = new Dictionary<string, string[]>();
-        
+
         private LinkedList<AssetBundleLoading> _loadingAssetBundles = new LinkedList<AssetBundleLoading>();
         private HashSet<string> _loadingAssetBundleNames = new HashSet<string>();
         private LinkedList<AssetBundleLoading> _assetBundleWaitForDependencies = new LinkedList<AssetBundleLoading>();
         private Dictionary<string, LoadedAssetBundle> _loadedAssetBundles = new Dictionary<string, LoadedAssetBundle>();
         private HashSet<string> _failedAssetBundleNames = new HashSet<string>();
-        
+
         private LinkedList<AssetLoading> _assetsWaitForBundle = new LinkedList<AssetLoading>();
         private LinkedList<AssetLoading> _loadingAssets = new LinkedList<AssetLoading>();
         private LinkedList<AssetLoading> _loadedAssets = new LinkedList<AssetLoading>();
@@ -78,7 +88,7 @@ namespace AssetBundleManagement
             if (stat == null)
                 _statRecorder = new AssetBundleStatPlaceHolder();
             else
-                _statRecorder = stat; 
+                _statRecorder = stat;
         }
 
         public bool IsIdle
@@ -87,7 +97,7 @@ namespace AssetBundleManagement
             {
                 return _loadingAssets.Count == 0
                        && _loadedAssets.Count == 0
-                       && _assetsWaitForBundle.Count == 0 
+                       && _assetsWaitForBundle.Count == 0
                        && _loadingAssetBundleNames.Count == 0;
             }
         }
@@ -96,7 +106,7 @@ namespace AssetBundleManagement
         {
             if (addr == null)
                 throw new ArgumentNullException();
-            
+
             if (addr.Pattern == AssetBundleLoadingPattern.EndOfTheWorld
                 || addr.Pattern != AssetBundleLoadingPattern.Simulation && string.IsNullOrEmpty(addr.Path))
                 throw new ArgumentException(addr.ToString());
@@ -113,7 +123,7 @@ namespace AssetBundleManagement
         {
             if (addr == null || bundles == null)
                 throw new ArgumentNullException();
-                
+
             if (addr.Pattern == AssetBundleLoadingPattern.EndOfTheWorld
                 || addr.Pattern != AssetBundleLoadingPattern.Simulation && string.IsNullOrEmpty(addr.Path))
                 throw new ArgumentException(addr.ToString());
@@ -128,15 +138,15 @@ namespace AssetBundleManagement
 
                 _supplementaryBundles.Add(bundles[i]);
             }
-            
+
             if (string.IsNullOrEmpty(addr.Manifest))
                 addr.Manifest = Utility.GetPlatformName();
 
             addr.Path = Utility.ProcessAssetBundleBasePath(addr.Path);
-            
+
             if (!_supplementaryWarehouseAddr.ContainsKey(addr))
                 _supplementaryWarehouseAddr.Add(addr, new List<string>());
-            
+
             _supplementaryWarehouseAddr[addr].AddRange(bundles);
         }
 
@@ -148,8 +158,10 @@ namespace AssetBundleManagement
             {
                 _loadingAssetBundles.AddLast(ret.AssetBundleLoadingOperation);
                 _assetsWaitForBundle.AddLastExt(ret.ManifestLoadingOperation);
+                _loadingAssetBundleNames.Add(ret.ManifestLoadingOperation.BundleName);
                 yield return ret.ManifestLoadingOperation;
-                
+
+                _loadingAssetBundleNames.Remove(ret.ManifestLoadingOperation.BundleName);
                 SetManifest(ret.ManifestLoadingOperation.LoadedAsset as AssetBundleManifest);
                 _defaultWarehouse.SetManifest(ret.ManifestLoadingOperation.LoadedAsset as AssetBundleManifest);
                 yield return Clear();
@@ -163,24 +175,27 @@ namespace AssetBundleManagement
                 {
                     _loadingAssetBundles.AddLast(ret.AssetBundleLoadingOperation);
                     _assetsWaitForBundle.AddLastExt(ret.ManifestLoadingOperation);
+                    _loadingAssetBundleNames.Add(ret.ManifestLoadingOperation.BundleName);
                     yield return ret.ManifestLoadingOperation;
-                    
+
+                    _loadingAssetBundleNames.Remove(ret.ManifestLoadingOperation.BundleName);
+
                     SetManifest(ret.ManifestLoadingOperation.LoadedAsset as AssetBundleManifest);
                     warehouse.SetManifest(ret.ManifestLoadingOperation.LoadedAsset as AssetBundleManifest);
                     yield return Clear();
                 }
-                
+
                 foreach (var bundle in addr.Value)
                     _supplementaryWarehouses.Add(bundle, warehouse);
             }
         }
-        
+
         public void Update()
         {
             UpdateAssetBundleLoading();
             UpdateAssetLoading();
         }
-        
+
         public void FetchAsset(Action<AssetLoadedEvent> callBack)
         {
             var assetItor = _loadedAssets.First;
@@ -193,7 +208,7 @@ namespace AssetBundleManagement
                     var evt = new AssetLoadedEvent()
                     {
                         BundleName = operation.BundleName,
-                        AssetName =  operation.Name,
+                        AssetName = operation.Name,
                         LoadedAsset = operation.LoadedAsset,
                         Processed = false
                     };
@@ -223,7 +238,7 @@ namespace AssetBundleManagement
 
         public Dictionary<string, LoadedAssetBundle> LoadedAssetBundles
         {
-            get { return _loadedAssetBundles;}
+            get { return _loadedAssetBundles; }
         }
 
         public void LoadAssetBundle(string bundleName)
@@ -240,10 +255,11 @@ namespace AssetBundleManagement
             {
                 var warehouse = FindWarehouse(bundleName, _defaultWarehouse);
                 var assetLoading = warehouse.LoadAsset(bundleNameWithVariant, assetName, ObjectType);
-                if(warehouse is SimulationWarehouse)
+                if (warehouse is SimulationWarehouse)
                 {
                     LoadingPattern = AssetLoadingPattern.Simulation;
                 }
+
                 if (assetLoading != null)
                 {
                     _assetsWaitForBundle.AddLastExt(assetLoading);
@@ -251,7 +267,8 @@ namespace AssetBundleManagement
                 }
             }
 
-            _assetsWaitForBundle.AddLastExt(AssetBundleWarehouse.LoadFailed(LoadingPattern,false, bundleName, assetName, ObjectType));
+            _assetsWaitForBundle.AddLastExt(AssetBundleWarehouse.LoadFailed(LoadingPattern, false, bundleName,
+                assetName, ObjectType));
         }
 
         public void LoadScene(string bundleName, string assetName, bool isAdditive)
@@ -264,7 +281,8 @@ namespace AssetBundleManagement
             }
             else
             {
-                _assetsWaitForBundle.AddLastExt(AssetBundleWarehouse.LoadFailed(AssetLoadingPattern.Unkown,true, bundleName, assetName,null));
+                _assetsWaitForBundle.AddLastExt(AssetBundleWarehouse.LoadFailed(AssetLoadingPattern.Unkown, true,
+                    bundleName, assetName, null));
             }
         }
 
@@ -273,7 +291,8 @@ namespace AssetBundleManagement
             AssetBundleLoading operation;
 
             var preferedWarehouse = _defaultWarehouse;
-            var status = LoadAssetBundle(bundleName, _defaultWarehouse, out operation, out bundleNameWithVariant, out preferedWarehouse);
+            var status = LoadAssetBundle(bundleName, _defaultWarehouse, out operation, out bundleNameWithVariant,
+                out preferedWarehouse);
 
             if (status != AssetBundleStatus.Failed && _loadDependency)
             {
@@ -287,7 +306,8 @@ namespace AssetBundleManagement
                             string dependencyBundleNameWithVariant;
                             AssetBundleWarehouse dependentWarehouse;
                             preferedWarehouse = _defaultWarehouse;
-                            status = LoadAssetBundle(v, preferedWarehouse, out dependency, out dependencyBundleNameWithVariant, out dependentWarehouse);
+                            status = LoadAssetBundle(v, preferedWarehouse, out dependency,
+                                out dependencyBundleNameWithVariant, out dependentWarehouse);
                             if (status == AssetBundleStatus.Blank || status == AssetBundleStatus.Loading)
                                 operation.AddDependency(dependencyBundleNameWithVariant);
                         }
@@ -304,7 +324,7 @@ namespace AssetBundleManagement
             {
                 if (_allDependencies.ContainsKey(v))
                     throw new ArgumentException("duplicate assetbundle");
-                
+
                 _allDependencies.Add(v, manifest.GetAllDependencies(v));
             }
         }
@@ -332,12 +352,25 @@ namespace AssetBundleManagement
             return warehouse;
         }
 
-        private AssetBundleStatus LoadAssetBundle(string bundleName, AssetBundleWarehouse defaultWarehouse, out AssetBundleLoading operation,
+        private AssetBundleStatus LoadAssetBundle(string bundleName, AssetBundleWarehouse defaultWarehouse,
+            out AssetBundleLoading operation,
             out string nameWithVariant, out AssetBundleWarehouse preferedWarehouse)
         {
+            if (string.IsNullOrEmpty(bundleName))
+            {
+                operation = null;
+                preferedWarehouse = null;
+                nameWithVariant = bundleName;
+                return AssetBundleStatus.Failed;
+            }
             preferedWarehouse = FindWarehouse(bundleName, defaultWarehouse);
             nameWithVariant = preferedWarehouse.RemapBundleName(bundleName);
 
+            if (string.IsNullOrEmpty(nameWithVariant))
+            {
+                operation = null;
+                return AssetBundleStatus.Failed;
+            }
             if (_loadedAssetBundles.ContainsKey(nameWithVariant))
             {
                 operation = null;
@@ -355,13 +388,25 @@ namespace AssetBundleManagement
                 operation = null;
                 return AssetBundleStatus.Failed;
             }
-            _logger.InfoFormat("LoadAssetBundle :{0}", nameWithVariant);
+
+            _logger.DebugFormat("LoadAssetBundle :{0}", nameWithVariant);
 
             _loadingAssetBundleNames.Add(nameWithVariant);
-            
-            operation = preferedWarehouse.LoadAssetBundle(nameWithVariant);
-            _loadingAssetBundles.AddLast(operation);
- 
+            operation = null;
+            try
+            {
+                operation = preferedWarehouse.LoadAssetBundle(nameWithVariant);
+                _loadingAssetBundles.AddLast(operation);
+            }
+            catch (Exception e)
+            {
+                _logger.ErrorFormat("{0}", e);
+                _loadingAssetBundleNames.Remove(nameWithVariant);
+                _failedAssetBundleNames.Add(nameWithVariant);
+                return AssetBundleStatus.Failed;
+            }
+
+
             return AssetBundleStatus.Blank;
         }
 
@@ -371,7 +416,7 @@ namespace AssetBundleManagement
             while (bundleItor != null)
             {
                 var nextBundle = bundleItor.Next;
-                
+
                 var operation = bundleItor.Value;
                 if (operation.IsDone())
                 {
@@ -388,7 +433,7 @@ namespace AssetBundleManagement
                         {
                             _loadingAssetBundleNames.Remove(operation.Name);
                             _loadedAssetBundles.Add(operation.Name, operation.Content);
-                        }   
+                        }
                         else
                             _assetBundleWaitForDependencies.AddLast(bundleItor);
                     }
@@ -401,7 +446,7 @@ namespace AssetBundleManagement
                 }
 
                 bundleItor = nextBundle;
-            }           
+            }
         }
 
         private void RemoveDependency(string loadedBundleName)
@@ -435,9 +480,8 @@ namespace AssetBundleManagement
         private void UpdateAssetLoading()
         {
             UpdateLoadingAsset();
-            if(_loadingAssets.Count==0)
+            if (_loadingAssets.Count == 0)
                 LoadWaitAsset();
-          
         }
 
         private void UpdateLoadingAsset()
@@ -482,6 +526,7 @@ namespace AssetBundleManagement
                         }
                     }
                 }
+
                 assetItor = next;
             }
         }
@@ -492,7 +537,9 @@ namespace AssetBundleManagement
             if (operation.LoadingPattern == AssetLoadingPattern.Simulation)
             {
 #if UNITY_EDITOR
-                string[] assetPaths = UnityEditor.AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(operation.BundleName, operation.Name);
+                string[] assetPaths =
+                    UnityEditor.AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(operation.BundleName,
+                        operation.Name);
                 if (assetPaths != null && assetPaths.Length > 0)
                 {
                     needLog = true;
@@ -513,9 +560,11 @@ namespace AssetBundleManagement
                     }
                 }
             }
+
             if (needLog)
             {
-                _logger.WarnFormat("AssetBundles {0} Has {1} But You Use The Error Type {2} To Loader", operation.BundleName, operation.Name, operation.ObjectType);
+                _logger.WarnFormat("AssetBundles {0} Has {1} But You Use The Error Type {2} To Loader",
+                    operation.BundleName, operation.Name, operation.ObjectType);
             }
         }
 
@@ -541,9 +590,8 @@ namespace AssetBundleManagement
 
                     _assetsWaitForBundle.Remove(assetItor);
                     _loadingAssets.AddLast(assetItor);
-                }
-
-                if (_failedAssetBundleNames.Contains(operation.BundleName))
+                    
+                }else if (_failedAssetBundleNames.Contains(operation.BundleName))
                 {
                     _assetsWaitForBundle.Remove(assetItor);
 
@@ -551,6 +599,10 @@ namespace AssetBundleManagement
                         _statRecorder.SceneNotFound(operation.BundleName, operation.Name);
                     else
                         _statRecorder.AssetNotFound(operation.LoadingPattern, operation.BundleName, operation.Name);
+                }else if (!_loadingAssetBundleNames.Contains(operation.BundleName))
+                {
+                    _logger.ErrorFormat("_assetsWaitForBundle not in  _loadingAssetBundleNames {0}", operation.BundleName);
+                    _assetsWaitForBundle.Remove(assetItor);
                 }
 
                 assetItor = next;
@@ -572,26 +624,59 @@ namespace AssetBundleManagement
             {
                 v.Value.Bundle.Unload(true);
             }
+
             _loadedAssetBundles.Clear();
 
             foreach (var bundle in _loadingAssetBundles)
             {
                 yield return bundle.Cancel();
             }
+
             _loadingAssetBundles.Clear();
         }
 
 
         public void Reset()
         {
-            
             foreach (var v in _loadedAssetBundles)
             {
-                if (v.Value != null && v.Value.Bundle != null) 
+                if (v.Value != null && v.Value.Bundle != null)
                     v.Value.Bundle.Unload(false);
             }
 
             _loadedAssetBundles.Clear();
+        }
+
+        public string Status()
+        {
+            return string.Format(
+                "_loadingAssets:{0}, _loadedAssets:{1}, _assetsWaitForBundle:{2}, _loadingAssetBundleNames:{3}",
+                ListToString(_loadingAssets)
+                , ListToString(_loadedAssets)
+                , ListToString(_assetsWaitForBundle)
+                , ListToString(_loadingAssetBundleNames));
+        }
+
+        private object ListToString(HashSet<string> list)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var assetLoading in list)
+            {
+                sb.Append(assetLoading).Append(",");
+            }
+
+            return sb.ToString();
+        }
+
+        private static string ListToString(ICollection<AssetLoading> list)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var assetLoading in list)
+            {
+                sb.Append(assetLoading.BundleName).Append(",");
+            }
+
+            return sb.ToString();
         }
     }
 }

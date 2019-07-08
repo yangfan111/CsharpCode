@@ -1,9 +1,10 @@
 using Sharpen;
 using com.wd.free.action;
+using Core.Free;
 
 namespace com.wd.free.para
 {
-	public class ObjectFields : IFields
+	public class ObjectFields : IFields, IRule
 	{
 		private object obj;
 
@@ -37,5 +38,10 @@ namespace com.wd.free.para
 		{
 			return new FieldPara(obj, field, ReflectionCache.GetField(obj, field));
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ObjectFields;
+        }
+    }
 }

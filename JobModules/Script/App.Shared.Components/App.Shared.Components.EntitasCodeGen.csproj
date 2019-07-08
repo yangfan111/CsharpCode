@@ -68,6 +68,7 @@
     <Compile Include="Components\FreeMove\AirPlaneComponent.cs" />
     <Compile Include="Components\FreeMove\FreeDataComponent.cs" />
     <Compile Include="Components\FreeMove\FreeMoveCatComponent.cs" />
+    <Compile Include="Components\FreeMove\FreeMoveController.cs" />
     <Compile Include="Components\FreeMove\FreeMoveKeyComponent.cs" />
     <Compile Include="Components\FreeMove\UnityGameObjectComponent.cs" />
     <Compile Include="Components\GameRules.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Components\Player\FreeDataComponent.cs" />
     <Compile Include="Components\Player\GamePlayComponent.cs" />
     <Compile Include="Components\Player\GenericActionComponent.cs" />
+    <Compile Include="Components\Player\KeepWatchForAOIComponent.cs" />
     <Compile Include="Components\Player\MeleeAttackerComponent.cs" />
     <Compile Include="Components\Player\NetworkAnimatorComponent.cs" />
     <Compile Include="Components\Player\OrientationComponent.cs" />
@@ -110,6 +112,7 @@
     <Compile Include="Components\Player\PlayerSkyMoveComponent.cs" />
     <Compile Include="Components\Player\PlayerSoundComponent.cs" />
     <Compile Include="Components\Player\PlayerSprayComponent.cs" />
+    <Compile Include="Components\Player\RagDollComponent.cs" />
     <Compile Include="Components\Player\RaycastComponent.cs" />
     <Compile Include="Components\Player\RaycastTestComponent.cs" />
     <Compile Include="Components\Player\RecycleableAssetComponent.cs" />
@@ -146,13 +149,12 @@
     <Compile Include="Components\Serializer\FieldSerializer\LongSerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\QuaternionSerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\ShortSerialize.cs" />
-    <Compile Include="Components\Serializer\FieldSerializer\StateInterCommandsSerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\StringSerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\Uint16Serializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\UintSerializer.cs" />
-    <Compile Include="Components\Serializer\FieldSerializer\UnityAnimationEventCommandsSerializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\Vector2Serializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\Vector3Serializer.cs" />
+    <Compile Include="Components\Serializer\FieldSerializer\WeaponBagSerializer.cs" />
     <Compile Include="Components\Session\FpsSatatus.cs" />
     <Compile Include="Components\Session\ServerStatus.cs" />
     <Compile Include="Components\Session\SessionComponents.cs" />

@@ -97,7 +97,7 @@ namespace App.Client.GameModules.GamePlay.Offline
                 var time = 1;
                 while (time-- > 0)
                 {
-                   _contexts.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleEquipmentEntity(
+                   _contexts.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleObjectEntity(
                         ECategory.GameItem,
                         id,
                         count,
@@ -124,7 +124,7 @@ namespace App.Client.GameModules.GamePlay.Offline
                 var time = 1;
                 while (time-- > 0)
                 {
-                   _contexts.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleEquipmentEntity(
+                   _contexts.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleObjectEntity(
                         ECategory.Weapon,
                         id,
                         count,

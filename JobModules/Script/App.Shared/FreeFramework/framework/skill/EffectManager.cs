@@ -42,11 +42,12 @@ namespace com.wd.free.skill
 
 		public virtual void Frame(ISkillArgs args)
 		{
-			foreach (EffectSet ef in map.Values)
-			{
-				ef.RemoveTimeOut();
-				ef.Effect(args);
-			}
+            MyDictionary<string, EffectSet>.Enumerator it = map.GetEnumerator();
+            while (it.MoveNext()) {
+                EffectSet ef = it.Current.Value;
+                ef.RemoveTimeOut();
+                ef.Effect(args);
+            }
 		}
 	}
 }

@@ -45,33 +45,36 @@ namespace Utils.SettingManager
 
         public void FlushVideoSettingData(Dictionary<int, float> sendValList)
         {
-            AllVideoSettingHelper.Instance.UpdateVideoSettingData(sendValList);
-            SaveLocalVideoSetting(sendValList);
+            foreach (var item in sendValList)
+            {
+                GameQualitySettingManager.ApplyVideoEffect((EVideoSettingId)item.Key,item.Value);
+            }
+
+            
+            //SaveLocalVideoSetting(sendValList);
         }
 
+        public void SaveSingleLocalVideoSetting(EVideoSettingId id, float value)
+        {
+
+            _localCache[(int) id] = value;
+        }
+
+        private Dictionary<int, float> _localCache = new Dictionary<int, float>();
         public Dictionary<int, float> LoadLocalVideoSetting()
         {
-            Dictionary<int, float> dict = new Dictionary<int, float>();
-            string str = string.Empty;
-            try
-            {
-                str = PlayerPrefs.GetString(LocalVideoCacheKey, string.Empty);
-            }
-            catch (Exception e)
-            {
-                _logger.Error(e);
-            }
 
-            var sourceDic = SettingConfigUtil.CovertString(str);
-            if (sourceDic == null)
-                return null;
-            foreach (var pair in sourceDic)
+            foreach (var item in GameQualitySettingManager.VideoSettingDic)
             {
-                //SetSettingValue(pair.Key, pair.Value);
-                dict.Add(pair.Key, float.Parse(pair.Value));
-            }
+                float? val = GameQualitySettingManager.GetVideoSourceValue((EVideoSettingId)item.Key);
+                if (val.HasValue)
+                {
+                    _localCache[item.Key] = val.Value;
+                }
+               
+            } 
 
-            return dict;
+            return _localCache;
         }
 
         private Dictionary<EVideoSettingType, string> _typeNameDict = new Dictionary<EVideoSettingType, string>()

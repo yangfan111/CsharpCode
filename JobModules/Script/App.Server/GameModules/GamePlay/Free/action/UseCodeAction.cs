@@ -1,37 +1,32 @@
-﻿using System;
-using App.Server.GameModules.GamePlay.Free.action.ui;
+﻿using App.Server.GameModules.GamePlay.free.player;
+using App.Server.GameModules.GamePlay.Free.client;
+using App.Server.GameModules.GamePlay.Free.item;
+using App.Server.GameModules.GamePlay.Free.item.config;
+using App.Shared;
+using App.Shared.GameModules.Attack;
+using App.Shared.GameModules.Player;
+using App.Shared.GameModules.Vehicle;
+using Assets.XmlConfig;
 using com.wd.free.action;
 using com.wd.free.@event;
-using gameplay.gamerule.free.ui;
+using com.wd.free.item;
+using com.wd.free.para;
+using com.wd.free.skill;
+using com.wd.free.util;
 using Core.Free;
 using Free.framework;
-using com.wd.free.util;
-using UnityEngine;
-using App.Shared.GameModules.Vehicle;
-using App.Server.GameModules.GamePlay.free.player;
-using com.wd.free.item;
-using WeaponConfigNs;
 using gameplay.gamerule.free.item;
-using com.wd.free.skill;
-using App.Server.GameModules.GamePlay.Free.item;
-using com.wd.free.action.function;
+using gameplay.gamerule.free.ui;
+using System;
 using System.Collections.Generic;
-using com.wd.free.para;
-using App.Shared.GameModules.Bullet;
-using Core.Enums;
-using Assets.XmlConfig;
-using App.Server.GameModules.GamePlay.Free.item.config;
-using App.Server.GameModules.GamePlay.Free.client;
-using App.Shared.GameModules.Player;
-using Core;
-using App.Shared;
-using App.Shared.Util;
-using App.Shared.GameModules.Weapon;
+using UnityEngine;
+using Utils.Singleton;
+using WeaponConfigNs;
 
 namespace App.Server.GameModules.GamePlay.Free.action
 {
     [Serializable]
-    public class UseCodeAction : AbstractGameAction
+    public class UseCodeAction : AbstractGameAction, IRule
     {
         private string code;
 
@@ -111,12 +106,12 @@ namespace App.Server.GameModules.GamePlay.Free.action
                 ItemDrop id = new ItemDrop();
                 id.cat = 2;
                 id.id = 1;
-                List<ItemDrop> ids = FreeItemDrop.GetExtraItems(id);
+                List<ItemDrop> ids = SingletonManager.Get<FreeItemDrop>().GetExtraItems(id);
 
                 foreach (ItemDrop item in ids)
                 {
                     args.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.
-                                    CreateSimpleEquipmentEntity((ECategory)item.cat, item.id, item.count, new Vector3(2, 1, 2));
+                                    CreateSimpleObjectEntity((ECategory)item.cat, item.id, item.count, new Vector3(2, 1, 2));
                 }
             }
 
@@ -166,13 +161,16 @@ namespace App.Server.GameModules.GamePlay.Free.action
 
                 if (fd != null)
                 {
-                    UseCommonAction use = new UseCommonAction();
-                    use.key = "updateBagCapacity";
-                    use.values = new List<ArgValue>();
-                    use.values.Add(new ArgValue("weight", ((int)Math.Ceiling(BagCapacityUtil.GetWeight(fd))).ToString()));
-                    use.values.Add(new ArgValue("capacity", BagCapacityUtil.GetCapacity(fd).ToString()));
+                    SimpleProto sp = FreePool.Allocate();
+                    sp.Key = FreeMessageConstant.InventoyUI;
+                    sp.Bs.Add(false);
+                    sp.Ks.Add(0);
+                    sp.Ks.Add(0);
 
-                    use.Act(args);
+                    sp.Ks.Add((int)BagCapacityUtil.GetCapacity(fd));
+                    sp.Ks.Add((int)Math.Ceiling(BagCapacityUtil.GetWeight(fd)));
+
+                    SendMessageAction.sender.SendMessage(args, sp, 1, "current");
                 }
             }
         }
@@ -184,6 +182,7 @@ namespace App.Server.GameModules.GamePlay.Free.action
                 int key = FreeUtil.ReplaceInt("{key}", args);
                 FreeData fd = (FreeData)args.GetUnit("current");
 
+                CarryClipUtil.AddCurrentClipToBag(key, fd, args);
                 ItemInventory defInv = fd.freeInventory.GetInventoryManager().GetDefaultInventory();
                 for (int i = 1; i <= 5; i++)
                 {
@@ -204,8 +203,6 @@ namespace App.Server.GameModules.GamePlay.Free.action
                         }
                     }
                 }
-
-                CarryClipUtil.AddCurrentClipToBag(key, fd, args);
             }
         }
 
@@ -350,6 +347,11 @@ namespace App.Server.GameModules.GamePlay.Free.action
 
                 SendMessageAction.sender.SendMessage(args, message, 4, string.Empty);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.UseCodeAction;
         }
     }
 }

@@ -448,6 +448,7 @@ namespace App.Shared.SceneManagement
                             v.enabled = false;
                         else
                         {
+                            if (v != Camera.main) continue;//非主相机不需要GQS_Bind_Camera
                             Type t = Type.GetType("ArtPlugins.GQS_Bind_Camera, Assembly-CSharp");
                             if (t != null)
                             {

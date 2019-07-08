@@ -1,11 +1,13 @@
-﻿using com.wd.free.action;
+﻿using System;
+using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.map.position;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.entity
 {
     [System.Serializable]
-    class CreateCastSceneEntityAction : AbstractGameAction
+    class CreateCastSceneEntityAction : AbstractGameAction, IRule
     {
         private IPosSelector pos;
         private int key;
@@ -25,6 +27,11 @@ namespace App.Server.GameModules.GamePlay.Free.entity
             {
                 sceneObjectEntity.AddCastFlag(castflag);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.CreateCastSceneEntityAction;
         }
     }
 }

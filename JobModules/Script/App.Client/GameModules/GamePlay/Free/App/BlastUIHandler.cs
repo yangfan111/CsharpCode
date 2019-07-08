@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using App.Client.GameModules.Ui.UiAdapter;
 using App.Shared;
-using App.Shared.Components.Player;
-using App.Shared.GameModules.Weapon;
+using Assets.App.Client.GameModules.Ui;
 using Assets.Sources.Free;
 using Assets.Sources.Free.UI;
 using Core;
 using Core.Free;
 using Core.Ui.Map;
 using Free.framework;
-using UnityEngine;
 using Utils.Singleton;
 
 namespace App.Client.GameModules.GamePlay.Free.App
@@ -88,15 +83,22 @@ namespace App.Client.GameModules.GamePlay.Free.App
 
             if (data.Key == FreeMessageConstant.BombDropTipUI)
             {
+                var msg = "";
                 if (data.Bs[0])
                 {
-                    contexts.player.flagSelfEntity.tip.Content = data.Ss[0] + " 携带的C4掉落在了地上";
+                    msg = data.Ss[0] + " 携带的C4掉落在了地上";
                 }
                 else
                 {
-                    contexts.player.flagSelfEntity.tip.Content = data.Ss[0] + " 拾取了C4";
+                    msg = data.Ss[0] + " 拾取了C4";
                 }
-                contexts.player.flagSelfEntity.tip.Location = TipComponent.TipLocation.Top;   
+                BaseTipData tip = new BaseTipData
+                {
+                    Title = msg,
+                    DurationTime = 5000
+                };
+                contexts.ui.uISession.UiState[UiNameConstant.CommonSystemTipModel] = true;
+                contexts.ui.uI.SystemTipDataQueue.Enqueue(tip);
             }
         }
     }

@@ -1,20 +1,18 @@
-﻿using com.wd.free.action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using App.Server.GameModules.GamePlay.Free.map.position;
+using App.Shared.GameModules.Player;
+using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.map.position;
-using App.Server.GameModules.GamePlay.Free.map.position;
-using com.wd.free.unit;
 using com.wd.free.util;
+using Core.Free;
 using Core.Utils;
+using System;
 using UnityEngine;
 
 namespace App.Server.GameModules.GamePlay.Free.entity
 {
     [Serializable]
-    public class CreateSceneObjectAction : AbstractPlayerAction
+    public class CreateSceneObjectAction : AbstractPlayerAction, IRule
     {
         public string cat;
         public string id;
@@ -29,11 +27,12 @@ namespace App.Server.GameModules.GamePlay.Free.entity
             if (player != null)
             {
                 RaycastHit hit;
-                Ray ray = new Ray(player.position.Value, dropPos);
-                if(Physics.Raycast(ray, out hit, Vector3.Distance(player.position.Value, dropPos), UnityLayers.SceneCollidableLayerMask))
+                Vector3 throwPos = player.GetHandWeaponPosition();
+                Ray ray = new Ray(throwPos, dropPos - throwPos);
+                if(Physics.Raycast(ray, out hit, Vector3.Distance(throwPos, dropPos) - 0.01f, UnityLayers.PickupObstacleLayerMask))
                 {
                     RaycastHit vhit;
-                    if (Physics.Raycast(hit.point, Vector3.down, out vhit, 10000, UnityLayers.SceneCollidableLayerMask))
+                    if (Physics.Raycast(hit.point + new Vector3(0, 0.1f, 0), Vector3.down, out vhit, 100, UnityLayers.PickupObstacleLayerMask))
                     {
                         dropPos = vhit.point;
                     }
@@ -42,14 +41,27 @@ namespace App.Server.GameModules.GamePlay.Free.entity
                         dropPos = hit.point;
                     }
                 }
+                else
+                {
+                    RaycastHit vhit;
+                    if (Physics.Raycast(dropPos + new Vector3(0, 0.1f, 0), Vector3.down, out vhit, 100, UnityLayers.PickupObstacleLayerMask))
+                    {
+                        dropPos = vhit.point;
+                    }
+                }
             }
-            SceneObjectEntity entity = (SceneObjectEntity) args.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleEquipmentEntity(
-                (Assets.XmlConfig.ECategory)FreeUtil.ReplaceInt(cat, args), FreeUtil.ReplaceInt(id, args), FreeUtil.ReplaceInt(count, args), dropPos);
+            SceneObjectEntity entity = (SceneObjectEntity) args.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleObjectEntity(
+                (Assets.XmlConfig.ECategory)FreeUtil.ReplaceInt(cat, args), FreeUtil.ReplaceInt(id, args), FreeUtil.ReplaceInt(count, args), dropPos, FreeUtil.ReplaceInt(count, args));
             if(entity != null && !string.IsNullOrEmpty(time))
             {
                 entity.AddLifeTime(DateTime.Now, args.GetInt(time));
             }
             Debug.LogFormat("create item {0},{1},{2}", FreeUtil.ReplaceInt(cat, args), FreeUtil.ReplaceInt(id, args), FreeUtil.ReplaceInt(count, args));
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.CreateSceneObjectAction;
         }
     }
 }

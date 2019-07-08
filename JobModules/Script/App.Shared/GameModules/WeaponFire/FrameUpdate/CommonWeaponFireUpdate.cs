@@ -8,11 +8,19 @@ namespace App.Shared.GameModules.Weapon.Behavior
         private IWeaponFireController fireController;
         private WeaponSideCmd _cmd = new WeaponSideCmd(EWeaponSide.Left);
 
+        public CommonWeaponFireUpdate()
+        {
+        }
+
         public CommonWeaponFireUpdate(IWeaponFireController controller)
+        {
+            SetController(controller);
+        }
+
+        public void SetController(IWeaponFireController controller)
         {
             fireController = controller;
         }
-
 
         public void Update(EntityKey owner, IUserCmd cmd, Contexts contexts)
         {

@@ -30,6 +30,9 @@ namespace App.Client.MessageHandler
             _contexts.session.clientSessionObjects.ServerFpsSatatus.Fps30 = ping.Fps30;
             _contexts.session.clientSessionObjects.ServerFpsSatatus.Fps60 = ping.Fps60;
             _contexts.session.clientSessionObjects.ServerFpsSatatus.GcCount = ping.GcCount;
+            _contexts.session.clientSessionObjects.ServerFpsSatatus.GcStatus = ping.GcStatus;
+            _contexts.session.clientSessionObjects.ServerFpsSatatus.AllocatedMb = ping.AllocatedMb;
+            _contexts.session.clientSessionObjects.ServerFpsSatatus.AllocationRateMbps = ping.AllocationRateMbps;
             long time = DateTime.UtcNow.ToMillisecondsSinceEpoch();
            // _logger.DebugFormat("{0} {1}",time%10000,ping.Time%10000);
             var p = (int) (time - ping.Time);

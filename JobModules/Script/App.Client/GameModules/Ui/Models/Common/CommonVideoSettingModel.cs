@@ -88,7 +88,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
         }
 
-        private void InitOption(EVideoSettingType key, List<VideoSetting> typeListForThisKey)
+        private void InitOption(EVideoSettingType key, HashSet<VideoSetting> typeListForThisKey)
         {
             var textModel = GameObject.Instantiate(_textModel, _parentRoot);
             var title = VideoSettingManager.GetInstance().GetTypeNameByType(key);
@@ -134,7 +134,15 @@ namespace App.Client.GameModules.Ui.Models.Common
                     curVal.ToString();
                 _sendValList[config.Id] = curVal;
             });
-            _uiControlDict.Add(config.Id, slider);
+            if (_uiControlDict.ContainsKey(config.Id))
+            {
+                Debug.LogError(config.Id + " is already in _uiControlDict");
+                _uiControlDict[config.Id] = slider;
+            }
+            else
+            {
+                _uiControlDict.Add(config.Id, slider);
+            }
         }
 
         private void InitCombox(VideoSetting config)
@@ -145,7 +153,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             int selectedIndex = -1;
             for (int i = 0; i < config.LevelDatas.Count; i++)
             {
-                cComboxDic.Add(config.LevelNames[i], config.Id + ":" + config.LevelDatas[i]);
+                cComboxDic[config.LevelNames[i]] = config.Id + ":" + config.LevelDatas[i];
                 float targetVal;
                 if(_sendValList.TryGetValue(config.Id,out targetVal))
                 if (Math.Abs(config.LevelDatas[i] - targetVal) < 0.0001f)
@@ -156,7 +164,17 @@ namespace App.Client.GameModules.Ui.Models.Common
             uiCombox.RegisteComBox(cComboxDic);
             uiCombox.itemSelect = ComBoxItemClick;
             uiCombox.SetSelectByIndex(selectedIndex);
-            _uiControlDict.Add(config.Id, uiCombox);
+            //这里会报错，字典里已存在这个字段，看上去像是重复加载，为了进入游戏先临时修复 by wzq
+            if(_uiControlDict.ContainsKey(config.Id))
+            {
+                Debug.LogError(config.Id + " is already in _uiControlDict");
+                _uiControlDict[config.Id] = uiCombox;
+            }
+            else
+            {
+                _uiControlDict.Add(config.Id, uiCombox);
+            }
+            
         }
 
         private void InitCheckBox(VideoSetting config)
@@ -165,7 +183,15 @@ namespace App.Client.GameModules.Ui.Models.Common
             var toggle = toggleModel.GetComponent<Toggle>();
             toggle.isOn = (int)_sendValList[config.Id] != 0;
             toggle.onValueChanged.AddListener((bool isOn) => { _sendValList[config.Id] = isOn ? 1 : 0; });
-            _uiControlDict.Add(config.Id, toggle);
+            if (_uiControlDict.ContainsKey(config.Id))
+            {
+                Debug.LogError(config.Id + " is already in _uiControlDict");
+                _uiControlDict[config.Id] = toggle;
+            }
+            else
+            {
+                _uiControlDict.Add(config.Id, toggle);
+            }
         }
 
         private void ComBoxItemClick(object obj)
@@ -203,40 +229,56 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
         }
 
-        private void InitControlValue(int id, object control)
+        private void InitControlValue(int id, object control, bool isDefault = true)
         {
+
             if (control is UICombox)
             {
-                InitCombox(id, control as UICombox);
+                InitCombox(id, control as UICombox,isDefault);
             }
             else if (control is Toggle)
             {
-                InitToggle(id, control as Toggle);
+                InitToggle(id, control as Toggle, isDefault);
             }
             else if (control is Slider)
             {
-                InitSlider(id, control as Slider);
+                InitSlider(id, control as Slider, isDefault);
             }
         }
 
-        private void InitSlider(int id, Slider control)
+        private void InitSlider(int id, Slider control,bool isDefault = true)
         {
+            if (!_sendValList.ContainsKey(id) && !isDefault) return;
+
             var config = VideoSettingConfigManager.GetInstance().GetItemById(id);
-            control.value = ((float)config.DefaultValue - config.MinValue) / (config.MaxValue - config.MinValue); ;
+            float curValue = isDefault
+                ? config.DefaultValue
+                : _sendValList[id];
+            control.value = (curValue - config.MinValue) / (config.MaxValue - config.MinValue);
         }
 
-        private void InitToggle(int id, Toggle control)
+        private void InitToggle(int id, Toggle control, bool isDefault = true)
         {
-            bool defaultIndex = VideoSettingConfigManager.GetInstance().GetItemById(id).DefaultValue == 1;
+            if (!_sendValList.ContainsKey(id) && !isDefault) return;
+
+            var config = VideoSettingConfigManager.GetInstance().GetItemById(id);
+            float curValue = isDefault
+                ? config.DefaultValue
+                : _sendValList[id];
+            bool defaultIndex = curValue == 1;
             control.isOn = defaultIndex;
         }
 
-        private void InitCombox(int id, UICombox control)
+        private void InitCombox(int id, UICombox control, bool isDefault = true)
         {
+            if (!_sendValList.ContainsKey(id) && !isDefault) return;
+
             var config = VideoSettingConfigManager.GetInstance().GetItemById(id);
+            float curValue = isDefault
+                ? config.DefaultValue
+                : _sendValList[id];
             var defaultList = config.LevelDatas;
-            var defaultValue = config.DefaultValue;
-            int defaultIndex = defaultList.FindIndex((val) => Math.Abs(val - defaultValue) < 0.0000001);
+            int defaultIndex = defaultList.FindIndex((val) => Math.Abs(val - curValue) < 0.0000001);
             control.SetSelectByIndex(defaultIndex);
         }
 
@@ -273,10 +315,14 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         protected override void OnCanvasEnabledUpdate(bool enable)
         {
-            base.SetCanvasEnabled(enable);
+            base.OnCanvasEnabledUpdate(enable);
 
             _adapter.Enable = enable;
-
+            if (enable)
+            {
+                InitDefaultDict(ref _sendValList);
+                ResetGui();
+            }
             if (enable && !_haveRegister)
             {
                 RegisterKeyReceiver();
@@ -284,6 +330,18 @@ namespace App.Client.GameModules.Ui.Models.Common
             else if (!enable && _haveRegister)
             {
                 UnRegisterKeyReceiver();
+            }
+        }
+
+        private void ResetGui()
+        {
+            foreach (int id in Enum.GetValues(typeof(EVideoSettingId)))
+            {
+                object control;
+                if (_uiControlDict.TryGetValue(id, out control))
+                {
+                    InitControlValue(id, control,false);
+                }
             }
         }
 

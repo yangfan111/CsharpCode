@@ -53,22 +53,6 @@ namespace App.Shared.GameModules.Player.ResourceLoad
                 ChangeRoleByCmd(entity);
 
                 AssetLoadSuccess(entity);
-
-                // 狂暴技能 临时代码
-                if(!entity.isFlagSelf || !entity.hasPlayerInfo || entity.playerInfo.RoleModelId != 100) continue;
-                
-                if (Input.GetKeyDown(KeyCode.Alpha1))
-                {
-                    entity.stateInterface.State.RageStart();
-                    entity.appearanceInterface.Appearance.ChangeAvatar(390);
-                }
-
-                if (Input.GetKeyDown(KeyCode.Alpha2))
-                {
-                    entity.stateInterface.State.RageEnd();
-                    entity.appearanceInterface.Appearance.ChangeAvatar(389);
-                }
-                //////////////////////
             }
         }
 
@@ -131,6 +115,14 @@ namespace App.Shared.GameModules.Player.ResourceLoad
         {
             if (!player.isFlagSelf || !player.hasStateInterface || !player.hasEntityKey) return;
 
+            if (!NeedPlayChangeRoleAnimation(player))
+            {
+                _animationFinished[player.entityKey.Value.EntityId] = true;
+                if (SharedConfig.IsServer && player.hasChangeRole)
+                    player.changeRole.ChangeRoleAnimationFinished = true;
+                return;
+            }
+
             if (SharedConfig.IsServer && player.hasChangeRole)
                 player.changeRole.ChangeRoleAnimationFinished = false;
             
@@ -140,6 +132,16 @@ namespace App.Shared.GameModules.Player.ResourceLoad
                 if (SharedConfig.IsServer && player.hasChangeRole)
                     player.changeRole.ChangeRoleAnimationFinished = true;
             });
+        }
+
+        private bool NeedPlayChangeRoleAnimation(PlayerEntity player)
+        {
+            if (!player.hasPlayerInfo) return false;
+            
+            var item = SingletonManager.Get<RoleConfigManager>().GetRoleItemById(player.playerInfo.RoleModelId);
+            if (null == item) return false;
+
+            return item.Unique;
         }
 
         private static void ClearPlayerData(PlayerEntity player)
@@ -182,7 +184,7 @@ namespace App.Shared.GameModules.Player.ResourceLoad
                     ClearComponentData(player);
                     _p3Handler.OnLoadSucc(player, _p3Objs[entityId]);
 
-                    if (player.hasStateInterface)
+                    if (player.hasStateInterface && NeedPlayChangeRoleAnimation(player))
                         player.stateInterface.State.TransfigurationFinish(null);
 
                     _p3Objs.Remove(entityId);

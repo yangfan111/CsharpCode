@@ -1,12 +1,13 @@
-using System.Collections.Generic;
-using Sharpen;
 using com.cpkf.yyjd.tools.data.sort;
 using com.cpkf.yyjd.tools.util;
+using Core.Free;
+using Sharpen;
+using System.Collections.Generic;
 
 namespace com.wd.free.para
 {
-	[System.Serializable]
-	public class ParaList : IFeaturable
+    [System.Serializable]
+	public class ParaList : IFeaturable, IRule
 	{
 		private const long serialVersionUID = -8515650288168248280L;
 
@@ -142,5 +143,10 @@ namespace com.wd.free.para
 				return null;
 			}
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int) ERuleIds.ParaList;
+        }
+    }
 }

@@ -30,10 +30,13 @@ namespace App.Shared.GameModules.Weapon.Behavior
             {
                 runTimeComponent.NextAttackTimestamp = cmd.UserCmd.RenderTime + Mathf.CeilToInt(config.BurstAttackInterval * intervalFactor);
                 runTimeComponent.BurstShootCount = 0;
-
             }
+
             if (heldBaseAgent.BaseComponent.Bullet == 0)
+            {
                 runTimeComponent.BurstShootCount = 0;
+                runTimeComponent.NeedAutoBurstShoot = false;
+            }
         }
 
     }

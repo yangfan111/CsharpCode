@@ -26,20 +26,23 @@ namespace App.Shared.GameModules.Configuration
         private IConfigParser _parser;
         private volatile bool _isDone = false;
         private volatile bool _isExit = false;
+        private bool forceMainThread = false;
         private string _cfg;
-
+        private bool _reload;
         private string GetConditionId()
         {
             return string.Format("DefaultConfigInitSystem-{0}-{1}", typeof(T).Name, _assetInfo);
         }
 
-        public DefaultConfigInitSystem(IUnityAssetManager assetManager, ISessionCondition sessionState, AssetInfo asset, IConfigParser parser, bool reload = false)
+        public DefaultConfigInitSystem(IUnityAssetManager assetManager, ISessionCondition sessionState, AssetInfo asset, IConfigParser parser, bool reload = false, bool forceMainThread = false)
         {
             _assetManager = assetManager;
             _sessionState = sessionState;
             _assetInfo = asset;
             _sessionState.CreateExitCondition(GetConditionId());
             _parser = parser;
+            _reload = reload;
+            this.forceMainThread = forceMainThread;
             if (reload)
             {
                 SingletonManager.Get<T>().IsInitialized = false;
@@ -58,7 +61,7 @@ namespace App.Shared.GameModules.Configuration
         public void Execute()
         {
        
-            if (SingletonManager.Get<T>().IsInitialized)
+            if (!_reload && SingletonManager.Get<T>().IsInitialized)
             {
                 IsDone = true;
             }
@@ -95,21 +98,36 @@ namespace App.Shared.GameModules.Configuration
             }
 
             Logger.InfoFormat("ParseConfig {0}:{1}", assetInfo.BundleName, assetInfo.AssetName);
-
-            ThreadPool.QueueUserWorkItem(ParseConfig, this);
+            if(forceMainThread == false)
+            {
+                ThreadPool.QueueUserWorkItem(ParseConfig, this);
+            }
+            else
+            {
+                ParseConfig();
+            }
 
             SingletonManager.Get<SubProgressBlackBoard>().Step();
         }
 
         public void ParseConfig()
         {
-            _parser.ParseConfig(_cfg);
+            try
+            {
+                _parser.ParseConfig(_cfg);
            
-            var config = SingletonManager.Get<T>();
-            config.IsInitialized = true;
+                var config = SingletonManager.Get<T>();
+                config.IsInitialized = true;
 
-            _cfg = null;
-            IsDone = true;
+                _cfg = null;
+                IsDone = true;
+            }
+            catch (Exception e)
+            {
+                Logger.ErrorFormat("ParseConfig {0} {1}", GetConditionId(), e);
+               
+            }
+           
            
             Logger.InfoFormat("ParseConfig {0}", GetConditionId());
         }

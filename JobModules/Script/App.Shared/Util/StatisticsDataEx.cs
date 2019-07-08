@@ -1,4 +1,4 @@
-﻿using App.Shared.GameModules.Bullet;
+﻿using App.Shared.GameModules.Attack;
 using Assets.XmlConfig;
 using Core.Enums;
 using Core.Statistics;

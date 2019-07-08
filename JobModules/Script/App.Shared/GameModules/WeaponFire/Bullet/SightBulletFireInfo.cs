@@ -11,10 +11,11 @@ namespace App.Shared.GameModules.Weapon.Behavior
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(SightBulletFireInfo));
 
-        public override Vector3 GetFireDir(int seed, PlayerWeaponController controller)
+        public override Vector3 GetFireDir(int seed, PlayerWeaponController controller, int userCmdSeq)
         {
             var delta = GetFireViewPosition(controller) - controller.RelatedCameraFinal.Position;
             var weaponData = controller.HeldWeaponAgent.RunTimeComponent;
+            DebugUtil.AppendShootText(userCmdSeq,"ViewPos1:{0},ViewPos2:{1} Sx:{2} Sy:{3}",GetFireViewPosition(controller) ,controller.RelatedCameraFinal.Position,weaponData.LastSpreadX,weaponData.LastSpreadY);
             return CalculateShotingDir(seed,
                 delta.GetYaw(),
                 delta.GetPitch(),

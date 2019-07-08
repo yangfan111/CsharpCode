@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using App.Shared.Components.Player;
+using App.Shared.GameModules.Camera.Utils;
 using Assets.App.Shared.GameModules.Camera;
 using Core.CameraControl.NewMotor;
 using Core.GameModule.Interface;
@@ -28,8 +29,7 @@ namespace App.Shared.GameModules.Camera
         {
             _context = context;
             _playerContext = context.player;
-            _state = new DummyCameraMotorState(_motors);
-
+            _state = new DummyCameraMotorState();
         }
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
@@ -39,18 +39,19 @@ namespace App.Shared.GameModules.Camera
             if (!playerEntity.hasCameraStateNew) return;
             if (!playerEntity.hasCameraStateOutputNew) return;
 
-            CopyClientOutputToComponent(playerEntity.cameraStateUpload, playerEntity.cameraFinalOutputNew);
+            CopyClientOutputToComponent(playerEntity);
         }
 
-        private void CopyClientOutputToComponent(CameraStateUploadComponent input,
-             CameraFinalOutputNewComponent output)
+        private void CopyClientOutputToComponent(PlayerEntity player)
         {
-            output.Position = input.Position.ShiftedVector3();
+            var input = player.cameraStateUpload;
+            var output = player.cameraFinalOutputNew;
+            
+            output.Position = player.GetOrigCameraPos(input.Position);
             output.EulerAngle = input.EulerAngle;
             output.Fov = input.Fov;
             output.Far = input.Far;
             output.Near = input.Near;
-            output.PlayerFocusPosition = input.PlayerFocusPosition.ShiftedVector3();
         }
 
         public ISimpleParallelUserCmdExecuteSystem CreateCopy()
@@ -60,7 +61,7 @@ namespace App.Shared.GameModules.Camera
 
         public void OnRender()
         {
-            throw new NotImplementedException();
+
         }
     }
 }

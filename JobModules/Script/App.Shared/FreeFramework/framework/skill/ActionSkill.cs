@@ -1,11 +1,12 @@
 using Sharpen;
 using com.wd.free.action;
+using Core.Free;
 
 namespace com.wd.free.skill
 {
 	[System.Serializable]
-	public class ActionSkill : AbstractCoolDownSkill
-	{
+	public class ActionSkill : AbstractCoolDownSkill, IRule
+    {
 		private const long serialVersionUID = -2098741273322300043L;
 
 		protected IGameAction initial;
@@ -57,5 +58,10 @@ namespace com.wd.free.skill
 		{
 			this.resume = resume;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ActionSkill;
+        }
+    }
 }

@@ -3,26 +3,25 @@ using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using Core.Animation;
-using Utils.Appearance;
-using Core.Appearance;
 using App.Shared.GameModules.Player.CharacterState;
-using Core.CharacterState;
 using UnityEngine;
 using XmlConfig;
-using App.Shared.Player;
 using Core.CharacterBone;
 using App.Shared.GameModules.Player.Appearance;
 using Core.Compare;
 using Shared.Scripts;
+using Utils.Appearance.Bone;
 using Utils.Configuration;
 using Utils.Singleton;
 
 namespace App.Shared.GameModules.Player.CharacterBone
 {
-    class PlayerCharacterBoneUpdateSystem : IUserCmdExecuteSystem
+    public class PlayerCharacterBoneUpdateSystem : IUserCmdExecuteSystem
     {
-        private static LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerCharacterBoneUpdateSystem));
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerCharacterBoneUpdateSystem));
         private readonly FsmOutputBaseSystem _fsmOutputs = new FsmOutputBaseSystem();
+
+        private float _deltaTime;
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
@@ -31,12 +30,14 @@ namespace App.Shared.GameModules.Player.CharacterBone
             
             if(null != player && player.gamePlay.IsLifeState(EPlayerLifeState.Dead)) return;
 
+            _deltaTime = cmd.FrameInterval / 1000.0f;
+
             SightUpdate(player, cmd.FrameInterval);
             SyncSightComponent(player);
             BoneUpdate(player);
         }
 
-        private void SyncSightComponent(PlayerEntity player)
+        private static void SyncSightComponent(PlayerEntity player)
         {
             var toComponent = player.firstPersonAppearanceUpdate;
             var fromComponent = player.firstPersonAppearance;
@@ -67,7 +68,6 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
         private void BoneUpdate(PlayerEntity player)
         {
-            var appearanceP1 = player.appearanceInterface.FirstPersonAppearance;
             var characterBone = player.characterBoneInterface.CharacterBone;
             _fsmOutputs.ResetOutput();
             characterBone.Execute(_fsmOutputs.AddOutput);
@@ -83,7 +83,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
                     CameraEulerAngle = player.cameraFinalOutputNew.EulerAngle,
                     ClientTime = player.time.ClientTime
                 };
-                characterBone.PreUpdate(rotParam, player.characterBoneInterface.CharacterBone);
+                characterBone.PreUpdate(rotParam, player.characterBoneInterface.CharacterBone, _deltaTime);
                 characterBone.SyncTo(player.characterBone);
             }
 
@@ -109,10 +109,10 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 SightHorizontalShift = /*appearanceP1.SightShift.Buff * */player.firstPersonAppearance.SightHorizontalShift,
                 SightVerticalShift = /*appearanceP1.SightShift.Buff * */player.firstPersonAppearance.SightVerticalShift,
                 SightShiftBuff = player.oxygenEnergyInterface.Oxygen.SightShiftBuff,
-                IKActive = IKFilter.FilterPlayerIK(action, nextAction, keepAction, posture, nextPosture, movement),
+                IKActive = IKFilter.FilterPlayerIk(action, nextAction, keepAction, posture, nextPosture, movement),
                 HeadPitch = player.characterBone.PitchHeadAngle,
                 HeadYaw = player.characterBone.RotHeadAngle,
-                HandPitch = player.characterBone.PitchHandAngle,
+                CurrentHandPitch = player.characterBone.CurrentPitchHandAngle,
                 HeadRotProcess = player.characterBone.HeadRotProcess,
                 IsHeadRotCW = player.characterBone.IsHeadRotCW,
                 WeaponRot = player.characterBone.WeaponRot,
@@ -123,9 +123,10 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 FirstPersonRotationOffset = player.characterBone.FirstPersonRotationOffset,
                 FirstPersonSightOffset = player.characterBone.FirstPersonSightOffset
             };
+       //     DebugUtil.MyLog("SightVerticalShift:"+param.SightVerticalShift + "||SightVerticalShift:"+param.SightVerticalShift);
             
             if (!SharedConfig.IsServer)
-                characterBone.WeaponRotUpdate(param);
+                characterBone.WeaponRotUpdate(param, _deltaTime);
             else
                 characterBone.WeaponRotPlayback(param);
             characterBone.Update(param);

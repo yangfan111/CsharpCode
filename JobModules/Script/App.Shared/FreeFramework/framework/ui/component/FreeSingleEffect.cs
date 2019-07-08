@@ -4,12 +4,13 @@ using com.cpkf.yyjd.tools.util;
 using com.wd.free.@event;
 using com.wd.free.map.position;
 using com.wd.free.util;
+using Core.Free;
 
 namespace gameplay.gamerule.free.ui.component
 {
 	[System.Serializable]
-	public class FreeSingleEffect : IFreeEffect
-	{
+	public class FreeSingleEffect : IFreeEffect, IRule
+    {
 		private const long serialVersionUID = -6550441006104410613L;
 
 		private string depth;
@@ -223,5 +224,10 @@ namespace gameplay.gamerule.free.ui.component
 		{
 			this.autos = autos;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeSingleEffect;
+        }
+    }
 }

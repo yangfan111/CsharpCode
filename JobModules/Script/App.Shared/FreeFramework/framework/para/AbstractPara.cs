@@ -165,6 +165,6 @@ namespace com.wd.free.para
 		}
 
 		// getPool().returnObject(this);
-		protected internal abstract ParaPool<IPara> GetPool();
+		protected internal abstract ParaPool GetPool();
 	}
 }

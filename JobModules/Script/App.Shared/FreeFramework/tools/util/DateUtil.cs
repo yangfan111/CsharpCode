@@ -245,7 +245,7 @@ namespace com.cpkf.yyjd.tools.util
 					break;
 				}
 			}
-			return new DateTime(Runtime.CurrentTimeMillis() - (long)time);
+			return new DateTime(Runtime.CurrentTimeMillis(false) - (long)time);
 		}
 
 		public static int GetDateCount(DateUtil.TimeUnit tu, int value)

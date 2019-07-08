@@ -1,21 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using App.Client.GameModules.Free;
-using App.Client.GameModules.GamePlay.Free.Auto.Prefab;
-using App.Client.GameModules.Ui.Models.Chicken;
 using App.Client.GameModules.Ui.UiAdapter;
-using App.Shared;
 using App.Shared.Components.Ui;
-using App.Shared.Components.Ui.UiAdapter;
 using Assets.App.Client.GameModules.Ui;
 using Assets.Sources.Free.Effect;
-using Assets.Sources.Free.Render;
 using Assets.Sources.Free.UI;
 using Assets.UiFramework.Libs;
 using Core;
-using Core.Components;
 using Core.Enums;
 using Core.GameModule.Interface;
 using Core.SessionState;
@@ -25,7 +17,6 @@ using Core.Utils;
 using Loxodon.Framework.Binding;
 using Loxodon.Framework.Contexts;
 using Shared.Scripts;
-using UIComponent.UI.Manager;
 using UnityEngine;
 using UserInputManager.Lib;
 using Utils.AssetManager;
@@ -94,32 +85,9 @@ namespace App.Client.GameModules.Ui.System
 
         private void InitPlayerData()
         {
-            var adapters = _contexts.ui.uISession.UiAdapters;
             var playerEntity = _contexts.player.flagSelfEntity;
-            if (adapters.ContainsKey(UiNameConstant.CommonHealthGroup))
-            {
-                var uiAdapter = adapters[UiNameConstant.CommonHealthGroup] as IPlayerStateUiAdapter;
-                if (uiAdapter != null)
-                {
-                    uiAdapter.PlayerEntity = playerEntity;
-                }
-            }
-            if (adapters.ContainsKey(UiNameConstant.CommonWeaponBagModel))
-            {
-                var uiAdapter = adapters[UiNameConstant.CommonWeaponBagModel] as IWeaponBagUiAdapter;
-                if (uiAdapter != null)
-                {
-                    uiAdapter.Controller = playerEntity.WeaponController();
-                }
-            }
-            if (adapters.ContainsKey(UiNameConstant.CommonWeaponBagTipModel))
-            {
-                var uiAdapter = adapters[UiNameConstant.CommonWeaponBagTipModel] as IWeaponBagTipUiAdapter;
-                if (uiAdapter != null)
-                {
-                    uiAdapter.Player = playerEntity;
-                }
-            }
+            _contexts.ui.uI.Player = playerEntity;
+
 
             /*喷漆*/
             var sprayLacquers = playerEntity.playerInfo.SprayLacquers;
@@ -153,9 +121,6 @@ namespace App.Client.GameModules.Ui.System
             contexts.ui.uI.KillFeedBackList = new List<int>();
             contexts.ui.uI.ScoreByCampTypeDict = new int[(int) EUICampType.Length];
 
-            contexts.ui.uIEntity.uI.NoticeInfoItem = new NoticeInfoItem();
-
-
             contexts.ui.map.RouteLineStartPoint = new MapFixedVector2(100, 60);
             contexts.ui.map.RouteLineEndPoint = new MapFixedVector2(300, 140);
 
@@ -173,7 +138,7 @@ namespace App.Client.GameModules.Ui.System
             contexts.ui.map.PlaneData = new AirPlaneData();
             contexts.ui.map.TeamPlayerMarkInfos = new List<TeamPlayerMarkInfo>();
             contexts.ui.map.MapMarks = new Dictionary<long, MiniMapPlayMarkInfo>();
-            contexts.ui.map.SupplyPosList = new List<MapFixedVector3>();
+            contexts.ui.map.SupplyPosMap = new Dictionary<string, MapFixedVector3>();
 
             contexts.ui.uI.GroupBattleDataDict =
                 Enumerable.Repeat(new List<IGroupBattleData>(), (int) EUICampType.Length).ToArray();
@@ -197,51 +162,10 @@ namespace App.Client.GameModules.Ui.System
             contexts.ui.uI.WeaponPartList = new int[(int)EWeaponSlotType.Length,(int)EWeaponPartType.Length];
             contexts.ui.uI.EquipIdList = new KeyValuePair<int, int>[(int)Wardrobe.EndOfTheWorld];
 
-            //TestBagData(contexts.ui.uI.ChickenBagItemDataList);
-            //TestPaintData(contexts.ui.uI.PaintIdList);
-                       //TestMapData(contexts);
-            //TestBagData(contexts.ui.uI);
+            
+            //TestMapData(contexts);
         }
 
-        private void TestBagData(Shared.Components.Ui.UIComponent uI)
-        {
-            uI.WeaponIdList[2] = 3;
-            uI.WeaponPartList[2, 3] = 1;
-            uI.EquipIdList[8] = new KeyValuePair<int, int>(1,2);
-            var item1 = new BaseChickenBagItemData { id = 11, key = "2|2", cat = 2 };
-            var item2 = new BaseChickenBagItemData { id = 11, key = "2|7", cat = 9, count = 11 };
-            var item3 = new BaseChickenBagItemData { id = 11, key = "2|22", cat = 5, count = 15 };
-            uI.ChickenBagItemDataList.Add(item1);
-            uI.ChickenBagItemDataList.Add(item2);
-            uI.ChickenBagItemDataList.Add(item3);
-
-            var item11 = new BaseChickenBagItemData { id = 11, key = "2|2", cat = 2 };
-            var item21 = new BaseChickenBagItemData { id = 11, key = "2|7", cat = 9, count = 11 };
-            var item31 = new BaseChickenBagItemData { id = 11, key = "2|22", cat = 5, count = 15 };
-
-        }
-
-        
-
-        private void TestBagData(List<IBaseChickenBagItemData> chickenBagItemDataList)
-        {
-            var item1 = new BaseChickenBagItemData { id = 11, key = "2|2", cat = 2};
-            var item2 = new BaseChickenBagItemData { id = 11, key = "2|7", cat = 9,count = 11};
-            var item3 = new BaseChickenBagItemData { id = 11, key = "2|22", cat = 5,count = 15};
-            chickenBagItemDataList.Add(item1);
-            chickenBagItemDataList.Add(item2);
-            chickenBagItemDataList.Add(item3);
-        }
-
-        private void TestPaintData(List<int> list)
-        {
-            list.Add(3001);
-            list.Add(0);
-            list.Add(3003);
-            list.Add(2001);
-            list.Add(0);
-            list.Add(3008);
-        }
 
         private static void InitLoxodon()
         {

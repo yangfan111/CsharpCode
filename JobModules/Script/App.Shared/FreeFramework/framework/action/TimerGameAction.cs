@@ -9,11 +9,12 @@ using com.wd.free.para.exp;
 using com.wd.free.util;
 using UnityEngine;
 using System;
+using Core.Free;
 
 namespace com.wd.free.action
 {
     [System.Serializable]
-    public class TimerGameAction : AbstractGameAction
+    public class TimerGameAction : AbstractGameAction, IRule
     {
         private const long serialVersionUID = 6879644291778679633L;
 
@@ -218,6 +219,11 @@ namespace com.wd.free.action
         public override String ToString()
         {
             return this.time + " " + this.name;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.TimerGameAction;
         }
     }
 }

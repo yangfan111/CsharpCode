@@ -153,6 +153,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                 SendMessage();
                 HideWindow();
             });
+            keyReveiver.AddAction(UserInputKey.HideWindow, (data) => { HideWindow(); });
         }
         private void OnSplitBtnClick()
         {

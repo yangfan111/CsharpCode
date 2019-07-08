@@ -5,11 +5,12 @@ using System.Text;
 using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.util;
+using Core.Free;
 
 namespace com.wd.free.action.stage
 {
     [Serializable]
-    public class TimeLastAction : AbstractGameAction
+    public class TimeLastAction : AbstractGameAction, IRule
     {
         public string lastTime;
 
@@ -40,6 +41,11 @@ namespace com.wd.free.action.stage
                     action.Act(args);
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.TimeLastAction;
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿using App.Shared.GameModules.Weapon;
+﻿using App.Server.GameModules.GamePlay.free.player;
+using App.Shared.FreeFramework.framework.trigger;
+using com.wd.free.@event;
+using Core.Free;
 using Core.GameModule.Interface;
 using Core.GameModule.System;
 using Core.Prediction.UserPrediction.Cmd;
@@ -8,27 +11,27 @@ namespace App.Shared.GameModules.Player
     public class PlayerBagSwitchSystem : IUserCmdExecuteSystem
     {
         private ICommonSessionObjects _commonSessionObjects;
-        public PlayerBagSwitchSystem(ICommonSessionObjects commonSessionObjects)
+        private Contexts _contexts;
+
+        public PlayerBagSwitchSystem(ICommonSessionObjects commonSessionObjects, Contexts contexts)
         {
             _commonSessionObjects = commonSessionObjects;
+            _contexts = contexts;
         }
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
-            //if(SharedConfig.IsServer)
-            //{
-                if (cmd.BagIndex > 0)
+            if (cmd.BagIndex > 0)
+            {
+                var player = owner.OwnerEntity as PlayerEntity;
+                player.WeaponController().SwitchBag(cmd.BagIndex-1);
+
+                var args = _contexts.session.commonSession.FreeArgs as IEventArgs;
+                if (args != null)
                 {
-                    var player = owner.OwnerEntity as PlayerEntity;
-                    player.WeaponController().SwitchBag(cmd.BagIndex-1);
-                //if (player.WeaponController().CanSwitchWeaponBag)
-                //    {
-                //        player.WeaponController().SwitchBag(player);
-                //    }
-                    //    var bags = player.playerInfo.WeaponBags;
+                    args.Trigger(FreeTriggerConstant.PLAYER_SWITCH_BAG, new TempUnit("current", (FreeData) player.freeData.FreeData));
                 }
-        //    }
-            
+            }
         }
     }
 }

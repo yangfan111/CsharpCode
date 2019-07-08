@@ -10,6 +10,7 @@ using UnityEngine;
 using Utils.Utils;
 using UnityEngine.UI;
 using WeaponConfigNs;
+using App.Shared.Components.Player;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {
@@ -133,7 +134,12 @@ namespace App.Client.GameModules.Ui.Models.Common
 
 		private bool UpdateVisible()
 		{
-			for (int i = 1; i <= TotalSlotNum; i++)
+            //var player = _adapter.Player;
+            //bool Show = true;
+            //if (null != player && player.hasPlayerInfo) {
+            //    Show = (player.playerInfo.JobAttribute == (int)EJobAttribute.EJob_Variant);
+            //}
+            for (int i = 1; i <= TotalSlotNum; i++)
 			{
 				if (_adapter.HasWeaponByIndex(i))
 				{

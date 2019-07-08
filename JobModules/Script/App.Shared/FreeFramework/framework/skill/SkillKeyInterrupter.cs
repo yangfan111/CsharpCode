@@ -1,11 +1,13 @@
 using Sharpen;
 using com.cpkf.yyjd.tools.util;
+using com.wd.free.para;
+using Core.Free;
 
 namespace com.wd.free.skill
 {
 	[System.Serializable]
-	public class SkillKeyInterrupter : ISkillInterrupter
-	{
+	public class SkillKeyInterrupter : ISkillInterrupter, IRule
+    {
 		private const long serialVersionUID = -3224470478507787105L;
 
 		private string press;
@@ -103,5 +105,10 @@ namespace com.wd.free.skill
 		{
 			this.release = release;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SkillKeyInterrupter;
+        }
+    }
 }

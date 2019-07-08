@@ -20,6 +20,7 @@ namespace App.Client.SceneManagement.DistanceCulling.Factory
             var count = _renderers.Count;
             for (int i = 0; i < count; i++)
             {
+               
                 _renderers[i].shadowCastingMode = value ? ShadowCastingMode.On : ShadowCastingMode.Off;
             }
         }

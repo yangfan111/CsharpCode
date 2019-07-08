@@ -3,6 +3,16 @@ using Core.Network;
 
 namespace Core.Room
 {
+    public enum RoomState
+    {
+        Initialized,
+        Running, //is running game
+        Disposing,
+        Disposed,
+        RValid,
+        RRuleOver,
+        RGameOver,
+    }
 
     public interface IRoom : IDisposable
     {
@@ -15,7 +25,7 @@ namespace Core.Room
         void SendSnapshot();
         void CompensationSnapshot();
         void RunFreeGameRule();
-        void GameOver(bool forceExit);
+        void GameOver(bool forceExit, RoomState state);
         void SetGameMode(int mode, int mapId);
         bool SendLoginSucc(IPlayerInfo playerInfo, INetworkChannel channel);
         void SetPlayerStageRunning(IPlayerInfo playerInfo, INetworkChannel channel);

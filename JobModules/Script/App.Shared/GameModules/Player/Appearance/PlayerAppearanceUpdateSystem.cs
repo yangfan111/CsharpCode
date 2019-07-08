@@ -30,6 +30,8 @@ namespace App.Shared.GameModules.Player.Appearance
         private void AppearanceUpdate(PlayerEntity player)
         {
             var appearance = player.appearanceInterface.Appearance;
+
+            CheckPlayerNeedUnActive(player);
             
             if(player.hasGamePlay)
                 appearance.CheckP3HaveInit(!player.gamePlay.HasNewRoleIdChangedFlag());
@@ -46,6 +48,16 @@ namespace App.Shared.GameModules.Player.Appearance
             appearance.SyncClientTo(player.clientAppearance);
         }
 
+        private void CheckPlayerNeedUnActive(PlayerEntity player)
+        {
+            var appearanceInterface = player.appearanceInterface;
+            if (player.gamePlay.ClientVisibility != player.gamePlay.Visibility)
+            {
+                appearanceInterface.Appearance.PlayerVisibility(player.gamePlay.Visibility);
+                player.gamePlay.ClientVisibility = player.gamePlay.Visibility;
+            }
+        }
+
         #region LifeState
 
         private void CheckPlayerLifeState(PlayerEntity player)
@@ -55,6 +67,7 @@ namespace App.Shared.GameModules.Player.Appearance
             switch (gameState.CurrentPlayerLifeState)
             {
                 case PlayerLifeStateEnum.Reborn:
+                case PlayerLifeStateEnum.Revive:
                     Reborn(player);
                     break;
                 case PlayerLifeStateEnum.Dead:

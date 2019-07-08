@@ -7,12 +7,13 @@ using com.wd.free.item;
 using com.wd.free.map.position;
 using com.wd.free.para;
 using gameplay.gamerule.free.rule;
+using Core.Free;
 
 namespace gameplay.gamerule.free.item
 {
 	[System.Serializable]
-	public class DropItemToSceneAction : AbstractGameAction
-	{
+	public class DropItemToSceneAction : AbstractGameAction, IRule
+    {
 		private const long serialVersionUID = 2908167368363002320L;
 
 		private string item;
@@ -35,5 +36,10 @@ namespace gameplay.gamerule.free.item
 				fi.Drop(fr, pos.Select(args));
 			}
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.DropItemToSceneAction;
+        }
+    }
 }

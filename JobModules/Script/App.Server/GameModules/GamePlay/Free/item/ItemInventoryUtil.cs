@@ -1,11 +1,11 @@
 using App.Server.GameModules.GamePlay;
-using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.item;
 using com.wd.free.para;
 using com.wd.free.skill;
 using gameplay.gamerule.free.rule;
 using gameplay.gamerule.free.ui;
+using Sharpen;
 
 namespace gameplay.gamerule.free.item
 {
@@ -186,10 +186,10 @@ namespace gameplay.gamerule.free.item
             fr.Resume(PARA_ITEM);
         }
 
-        private static void MoveItem(int countX, int countY, ItemInventory fromIn, ItemInventory toIn, IInventoryUI fromUI, IInventoryUI toUI, ItemPosition ip, ItemPosition old, ISkillArgs args)
+        public static void MoveItem(int countX, int countY, ItemInventory fromIn, ItemInventory toIn, IInventoryUI fromUI, IInventoryUI toUI, ItemPosition ip, ItemPosition old, ISkillArgs args)
         {
-            if (fromIn.CanMoveTo(ip, toIn, countX, countY))
-            {
+            //if (fromIn.CanMoveTo(ip, toIn, countX, countY))
+            //{
                 fromIn.ChangePosition(ip, toIn, countX, countY);
                 HandleMoveAction(fromIn, toIn, fromUI, toUI, ip, args);
                 if (fromIn == toIn)
@@ -201,7 +201,7 @@ namespace gameplay.gamerule.free.item
                     fromUI.DeleteItem(args, fromIn, ip);
                     toUI.AddItem(args, toIn, ip);
                 }
-            }
+            /*}
             else
             {
                 fromIn.ChangePosition(ip, fromIn, ip.GetX(), ip.GetY());
@@ -210,7 +210,7 @@ namespace gameplay.gamerule.free.item
                     fromUI.CanNotMoveAction.Act(args);
                 }
                 fromUI.UpdateItem(args, fromIn, ip);
-            }
+            }*/
         }
 
         private static void ExchangeItem(ItemInventory fromIn, ItemInventory toIn, IInventoryUI fromUI, IInventoryUI toUI, ItemPosition ip, ItemPosition old, ISkillArgs args)

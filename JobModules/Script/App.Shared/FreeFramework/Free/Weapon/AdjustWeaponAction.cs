@@ -2,15 +2,17 @@
 using Assets.XmlConfig;
 using com.wd.free.action;
 using com.wd.free.@event;
+using Core.Free;
 using com.wd.free.util;
 using Core;
 using System;
 using System.Collections.Generic;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.weapon
 {
     [Serializable]
-    public class AdjustWeaponAction : AbstractPlayerAction
+    public class AdjustWeaponAction : AbstractPlayerAction, IRule
     {
         private string weaponType;
 
@@ -57,7 +59,17 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
                         continue;
                     player.WeaponController().DestroyWeapon((EWeaponSlotType)i, -1);
                 }
+
+                if (!grenadeReserved)
+                {
+                    player.WeaponController().GrenadeHandler.ClearCache();
+                }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.AdjustWeaponAction;
         }
     }
 }

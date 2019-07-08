@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Core.Utils;
 using Shared.Scripts;
 using UnityEngine;
@@ -24,13 +23,13 @@ namespace Utils.Appearance.ManagerPackage
 
         private GameObject _characterP3;
         private GameObject _characterP1;
+        private GameObject _rootGo;
 
         private CharacterView _view = CharacterView.ThirdPerson;
+        private static readonly string EffectsName = "Effects";
 
         private readonly List<UnityObject> _recycleRequestBatch = new List<UnityObject>();
         private readonly List<AbstractLoadRequest> _loadRequestBatch = new List<AbstractLoadRequest>();
-
-        private HitBoxCache _hitboxHandler;
         
         protected AppearanceManagerBase()
         {
@@ -48,23 +47,51 @@ namespace Utils.Appearance.ManagerPackage
             get { return _characterP1; }
         }
 
-        public void SetThirdPersonCharacter(GameObject obj)
+        public virtual void SetThirdPersonCharacter(GameObject obj)
         {
+            WeaponControllerBaseImpl.SetRootGo(_rootGo);
+            
             WeaponControllerBaseImpl.SetThirdPersonCharacter(obj);
             WardrobeControllerBaseImpl.SetThirdPersonCharacter(obj);
             PropControllerBaseImpl.SetThirdPersonCharacter(obj);
             _characterP3 = obj;
-            _hitboxHandler = obj.GetComponent<HitBoxCache>();
+            
+            WardrobeControllerBaseImpl.SetRootGo(_rootGo);
+            Logger.InfoFormat("CharacterLog-- third AppearanceBaseRootGo: {0}", _rootGo.name);
         }
-
+        
         public void SetFirstPersonCharacter(GameObject obj)
         {
+            WeaponControllerBaseImpl.SetRootGo(_rootGo);
+            
             WeaponControllerBaseImpl.SetFirstPersonCharacter(obj);
             WardrobeControllerBaseImpl.SetFirstPersonCharacter(obj);
             PropControllerBaseImpl.SetFirstPersonCharacter(obj);
 
             _characterP1 = obj;
             AppearanceUtils.DisableRender(_characterP1);
+            
+            WardrobeControllerBaseImpl.SetRootGo(_rootGo);
+            Logger.ErrorFormat("first ApperanceBaseRootGo: " + _rootGo);
+        }
+        
+        public void SetRootGo(GameObject obj)
+        {
+            _rootGo = obj;
+            AddEffectsObject(obj);
+            Logger.InfoFormat("CharacterLog-- SetRootGo : {0}", obj.name);
+        }
+        
+        private void AddEffectsObject(GameObject root)
+        {
+            if (root.transform.Find(EffectsName) == null)
+            {
+                var thirdModelOffset = new GameObject(EffectsName);
+                thirdModelOffset.transform.SetParent(root.transform);
+                thirdModelOffset.transform.localPosition = new Vector3(0, 0, 0);
+                thirdModelOffset.transform.localRotation = Quaternion.identity;
+                thirdModelOffset.transform.localScale = Vector3.one;
+            }
         }
         
         public void SetAnimatorP1(Animator animator)
@@ -152,16 +179,22 @@ namespace Utils.Appearance.ManagerPackage
 
         public virtual void PlayerDead()
         {
-            ControlRagDoll(true);
             UnmountWeaponFromHand();
             SetThridPerson();
-            Logger.DebugFormat("Player Dead");
+            Logger.InfoFormat("CharacterLog-- Player Dead");
         }
 
-        public void PlayerReborn()
+        public virtual void PlayerReborn()
         {
-            ControlRagDoll(false);
-            Logger.DebugFormat("Player Reborn");
+            Logger.InfoFormat("CharacterLog-- Player Reborn");
+        }
+
+        public void PlayerVisibility(bool value)
+        {
+            if (null != _characterP3)
+                _characterP3.SetActive(value);
+            if (null != _characterP1)
+                _characterP1.SetActive(value);
         }
 
         public virtual void Execute()
@@ -432,40 +465,5 @@ namespace Utils.Appearance.ManagerPackage
 
         #endregion
         
-        private static readonly List<Rigidbody> RagDollList = new List<Rigidbody>(128);
-        private static readonly List<Collider> RagDollColliderList = new List<Collider>(1024);
-
-        private void ControlRagDoll(bool enable)
-        {
-            RagDollList.Clear();
-            
-            _characterP3.GetComponentsInChildren(RagDollList);
-            foreach (var v in RagDollList)
-            {
-                v.detectCollisions = enable;
-                v.isKinematic = !enable;
-            }
-            
-            RagDollColliderList.Clear();
-            _characterP3.GetComponentsInChildren(RagDollColliderList);
-            var hitboxList = _hitboxHandler.GetHitBox().Values;
-            foreach (var v in RagDollColliderList)
-            {
-                if(hitboxList.Contains(v)) continue;
-                v.enabled = enable;
-            }
-            
-            if (!enable)
-                ResetRagDollRootBoneTransform();
-        }
-        
-        private void ResetRagDollRootBoneTransform()
-        {
-            if (null == _characterP3) return;
-            var rootBone = BoneMount.FindChildBoneFromCache(_characterP3, BoneName.CharacterBipPelvisBoneName);
-            if(null == rootBone) return;
-            rootBone.localPosition = Vector3.zero;
-            rootBone.localRotation = Quaternion.identity;
-        }
     }
 }

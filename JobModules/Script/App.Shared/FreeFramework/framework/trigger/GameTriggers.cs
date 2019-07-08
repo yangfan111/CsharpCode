@@ -2,13 +2,15 @@ using System.Collections.Generic;
 using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.action;
+using Core.Free;
+using Core.Utils;
 
 namespace com.wd.free.trigger
 {
     public class GameTriggers
     {
         private MyDictionary<int, IList<GameTrigger>> triggers;
-
+        private static LoggerAdapter _logger = new LoggerAdapter(typeof(GameTriggers));
         public GameTriggers()
         {
             this.triggers = new MyDictionary<int, IList<GameTrigger>>();
@@ -109,6 +111,9 @@ namespace com.wd.free.trigger
                 {
                     trigger.Trigger(args);
                 }
+            }
+            if (@event == FreeTriggerConstant.GAME_INI) {
+                _logger.Info(tList == null ? "tList is null !" : "tList Count " + tList.Count);
             }
         }
     }

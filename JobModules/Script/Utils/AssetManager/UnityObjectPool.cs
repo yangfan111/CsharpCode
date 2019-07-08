@@ -10,14 +10,14 @@ namespace Utils.AssetManager
 {
     public interface IUnityObjectPool 
     {
-        void Add(UnityObject unityObj);
+        void Add(UnityObject unityObj,bool active = false);
         UnityObject GetOrNull(AssetInfo key, bool autoActive = true);
         void Clear();
     }
 
     public class DefaultUnityObjectPool : IUnityObjectPool
     {
-        public void Add(UnityObject unityObj)
+        public void Add(UnityObject unityObj, bool active = false)
         {
             unityObj.OnDestory();
             unityObj.Destroy();
@@ -47,12 +47,14 @@ namespace Utils.AssetManager
         }
 
         private Dictionary<AssetInfo, ObjectPool<UnityObject>> _poolDict = new Dictionary<AssetInfo, ObjectPool<UnityObject>>(AssetInfo.AssetInfoIngoreCaseComparer.Instance);
-        public void Add(UnityObject unityObj)
+        public void Add(UnityObject unityObj,bool active)
         {
             try
             {
-
-                unityObj.SetActive(false);
+                if(!active)
+                {
+                    unityObj.SetActive(false);
+                }
                 if (_onlyCacheGameObject)
                 {
                     if (unityObj.AsGameObject != null)
@@ -70,7 +72,7 @@ namespace Utils.AssetManager
             catch (Exception e)
             {
                 _logger.ErrorFormat("UnityGameObjectPool key:{0}, Exception:{1}", unityObj.Address, e);
-                throw e;
+                //throw e;
             }
         }
 

@@ -6,6 +6,7 @@ using Core.SyncLatest;
 using Core.Utils;
 using Entitas.CodeGeneration.Attributes;
 using System;
+using Core.Free;
 
 namespace App.Shared.Components.Player
 {
@@ -32,7 +33,7 @@ namespace App.Shared.Components.Player
 
 
     [Player]
-    public class GamePlayComponent : ISelfLatestComponent, IPlaybackComponent
+    public class GamePlayComponent : ISelfLatestComponent, IPlaybackComponent, IRule
     {
         public static string[] LifeStateString = new[]
         {
@@ -56,6 +57,7 @@ namespace App.Shared.Components.Player
 
         [DontInitilize] public int LastLifeState; // PlayerLifeState
         [DontInitilize] [NetworkProperty] public int LifeState; // PlayerLifeState
+        [DontInitilize] public bool IsStandPosture;
 
         [DontInitilize] [NetworkProperty] public int LifeStateChangeTime; // ServerTime
 
@@ -87,15 +89,16 @@ namespace App.Shared.Components.Player
         [DontInitilize] [NetworkProperty] public bool IsBeSave;
         [DontInitilize] [NetworkProperty] public int SaveTime;
         [DontInitilize] [NetworkProperty] public EntityKey SavePlayerKey;
-        //[DontInitilize] [NetworkProperty] public int SaveEnterState;
-        [DontInitilize] /*[NetworkProperty] */public bool IsInteruptSave;
-        
+
         [DontInitilize] [NetworkProperty] public bool CoverInit;                    //是否开始执行用户指令
        
         [DontInitilize] public short LastViewModeByCmd;                         //LastViewMode: 记录由指令驱动的人称转换，用于人物复活时恢复人称状态
 
-        [DontInitilize] public bool TipHideStatus;
-
+        [DontInitilize] [NetworkProperty] public bool TipHideStatus;
+        [NetworkProperty] public bool Visibility;
+        public bool ClientVisibility;
+        [NetworkProperty] public int JobAttribute { get; set; }
+        [DontInitilize] [NetworkProperty] public bool ChickenHxWin;
 
         public void ChangeLifeState(EPlayerLifeState state, int time)
         {
@@ -204,6 +207,7 @@ namespace App.Shared.Components.Player
             CurHp = hp.CurHp;
             NewRoleId = hp.NewRoleId;
             LifeState = hp.LifeState;
+            IsStandPosture = hp.IsStandPosture;
             LifeStateChangeTime = hp.LifeStateChangeTime;
             MaxHp = hp.MaxHp;
             GameState = hp.GameState;
@@ -227,10 +231,38 @@ namespace App.Shared.Components.Player
             IsBeSave = hp.IsBeSave;
             SaveTime = hp.SaveTime;
             SavePlayerKey = hp.SavePlayerKey;
-            //SaveEnterState = hp.SaveEnterState;
-            //IsInteruptSave = hp.IsInteruptSave;
 
             CoverInit = hp.CoverInit;
+            Visibility = hp.Visibility;
+            TipHideStatus = hp.TipHideStatus;
+            JobAttribute = hp.JobAttribute;
+            ChickenHxWin = hp.ChickenHxWin;
+        }
+
+        public bool IsMatchJob(int jobAttribute) {
+            switch (JobAttribute) {
+                case (int)EJobAttribute.EJob_EveryMan:
+                case (int)EJobAttribute.EJob_Hero:
+                    return jobAttribute == (int)EJobAttribute.EJob_EveryMan || jobAttribute == (int)EJobAttribute.EJob_Hero;
+                case (int)EJobAttribute.EJob_Variant:
+                case (int)EJobAttribute.EJob_Matrix:
+                    return jobAttribute == (int)EJobAttribute.EJob_Variant || jobAttribute == (int)EJobAttribute.EJob_Matrix;
+            }
+            return false;
+        }
+
+        public bool IsMatrix()
+        {
+            return (JobAttribute == (int)EJobAttribute.EJob_Matrix);
+        }
+        public bool IsVariant()
+        {
+            return (JobAttribute == (int)EJobAttribute.EJob_Variant || JobAttribute == (int)EJobAttribute.EJob_Matrix);
+        }
+
+        public bool CanAutoPick()
+        {
+            return (JobAttribute == (int)EJobAttribute.EJob_EveryMan);
         }
 
         public float DecreaseHp(float damage, int time = 0)
@@ -265,6 +297,11 @@ namespace App.Shared.Components.Player
         public bool IsObserving()
         {
             return CameraEntityId != 0;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.GamePlayComponent;
         }
     }
 }

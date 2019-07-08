@@ -1,29 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Utils.Appearance;
+﻿using Utils.Appearance;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Player.CharacterBone
 {
     public class IKFilter
     {
-        private static readonly ActionInConfig[] _actionStateFilters = new ActionInConfig[]
+        private static readonly ActionInConfig[] ActionStateFilters =
         {
             ActionInConfig.Reload,
             ActionInConfig.SpecialReload,
             ActionInConfig.OpenDoor,
             ActionInConfig.SwitchWeapon,
-            ActionInConfig.PickUp
+            ActionInConfig.PickUp,
+            ActionInConfig.SpecialFireEnd
         };
 
-        private static readonly ActionKeepInConfig[] _keepActionStateFilters = new ActionKeepInConfig[]
+        private static readonly ActionKeepInConfig[] KeepActionStateFilters =
         {
             ActionKeepInConfig.Rescue
         };
 
-        private static readonly PostureInConfig[] _postureStateFilters = new PostureInConfig[]
+        private static readonly PostureInConfig[] PostureStateFilters =
         {
             PostureInConfig.ProneTransit,
             PostureInConfig.ProneToCrouch,
@@ -32,12 +29,12 @@ namespace App.Shared.GameModules.Player.CharacterBone
             PostureInConfig.Climb
         };
 
-        private static readonly MovementInConfig[] _movementStateFilters =
+        private static readonly MovementInConfig[] MovementStateFilters =
         {
             MovementInConfig.Sprint
         };
 
-        private static ThirdPersonPosture[] _thirdPersonPostureFilters = new ThirdPersonPosture[]
+        private static readonly ThirdPersonPosture[] ThirdPersonPostureFilters =
         {
             ThirdPersonPosture.Swim, ThirdPersonPosture.Dive,
             ThirdPersonPosture.Prone,
@@ -47,12 +44,12 @@ namespace App.Shared.GameModules.Player.CharacterBone
             ThirdPersonPosture.Climb
         };
 
-        public static bool FilterPlayerIK(ActionInConfig action, ActionInConfig nextAction, 
+        public static bool FilterPlayerIk(ActionInConfig action, ActionInConfig nextAction, 
             ActionKeepInConfig keepAction, PostureInConfig posture,
             PostureInConfig nextPosture, MovementInConfig movement)
         {
             return !(IsStateInActionFilter(action) ||
-                     IsStateInActionFilter(action) ||
+                     IsStateInActionFilter(nextAction) ||
                      IsStateInKeepActionFilter(keepAction) ||
                      IsStateInPostureFilter(posture) ||
                      IsStateInPostureFilter(nextPosture) ||
@@ -61,9 +58,9 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
         private static bool IsStateInActionFilter(ActionInConfig state)
         {
-            for (var i = 0; i < _actionStateFilters.Length; ++i)
+            for (var i = 0; i < ActionStateFilters.Length; ++i)
             {
-                if (_actionStateFilters[i] == state)
+                if (ActionStateFilters[i] == state)
                 {
                     return true;
                 }
@@ -74,9 +71,9 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
         private static bool IsStateInKeepActionFilter(ActionKeepInConfig state)
         {
-            for (var i = 0; i < _keepActionStateFilters.Length; ++i)
+            for (var i = 0; i < KeepActionStateFilters.Length; ++i)
             {
-                if (_keepActionStateFilters[i] == state)
+                if (KeepActionStateFilters[i] == state)
                 {
                     return true;
                 }
@@ -87,9 +84,9 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
         private static bool IsStateInPostureFilter(PostureInConfig state)
         {
-            for (var i = 0; i < _postureStateFilters.Length; ++i)
+            for (var i = 0; i < PostureStateFilters.Length; ++i)
             {
-                if (_postureStateFilters[i] == state)
+                if (PostureStateFilters[i] == state)
                 {
                     return true;
                 }
@@ -100,9 +97,9 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
         private static bool IsStateInMovementFilter(MovementInConfig state)
         {
-            for (var i = 0; i < _movementStateFilters.Length; ++i)
+            for (var i = 0; i < MovementStateFilters.Length; ++i)
             {
-                if (_movementStateFilters[i] == state)
+                if (MovementStateFilters[i] == state)
                 {
                     return true;
                 }
@@ -113,9 +110,9 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
         public static bool IsInThirdPersonPostureFilters(ThirdPersonPosture posture)
         {
-            for (var i = 0; i < _thirdPersonPostureFilters.Length; ++i)
+            for (var i = 0; i < ThirdPersonPostureFilters.Length; ++i)
             {
-                if (_thirdPersonPostureFilters[i] == posture)
+                if (ThirdPersonPostureFilters[i] == posture)
                 {
                     return true;
                 }

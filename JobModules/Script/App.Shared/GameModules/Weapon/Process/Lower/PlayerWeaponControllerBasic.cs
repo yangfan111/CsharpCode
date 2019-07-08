@@ -28,9 +28,9 @@ namespace App.Shared.GameModules.Weapon
         }
 
 
-        public PlayerAudioController AudioController
+        public PlayerAudioControllerBase AudioController
         {
-            get { return GameModuleManagement.Get<PlayerAudioController>(Owner.EntityId).Value; }
+            get { return GameModuleManagement.Get<PlayerAudioControllerBase>(Owner.EntityId); }
         }
         public PlayerStateInteractController InteractController
         {
@@ -183,7 +183,7 @@ namespace App.Shared.GameModules.Weapon
         }
 
 
-        public int HeldBagPointer
+        public byte HeldBagPointer
         {
             get { return RelatedBagSet.HeldBagPointer; }
             set { RelatedBagSet.HeldBagPointer = value; }
@@ -242,24 +242,8 @@ namespace App.Shared.GameModules.Weapon
 
         public bool CanSwitchWeaponBag
         {
-            get { return ModeController.CanModeSwitchBag && !BagLockState && (BagOpenLimitTIme > RelatedTime); }
+            get { return ModeController.CanModeSwitchBag && !BagLockState && (BagOpenLimitTIme > RelatedTime) && entity.gamePlay.IsAlive(); }
         }
-
-        //        public void PlayFireAudio()
-        //        {
-        //            if (!IsHeldSlotEmpty)
-        //                GameAudioMedia.PlayWeaponAudio(HeldConfigId, RelatedAppearence.WeaponHandObject(), (config) => config.Fire);
-        //        }
-        //        public void PlayPullBoltAudio()
-        //        {
-        //            if (!IsHeldSlotEmpty)
-        //                GameAudioMedia.PlayWeaponAudio(HeldConfigId, RelatedAppearence.WeaponHandObject(), (config) => config.PullBolt);
-        //        }
-        //        public void PlayReloadAudio()
-        //        {
-        //            if (!IsHeldSlotEmpty)
-        //                GameAudioMedia.PlayWeaponAudio(HeldConfigId, RelatedAppearence.WeaponHandObject(), (config) => config.ReloadStart);
-        //        }
 
 
         public List<PlayerBulletData> BulletList
@@ -271,10 +255,6 @@ namespace App.Shared.GameModules.Weapon
         {
             get { return RelatedWeaponAux.EffectList; }
         }
-
-
-
-
 
         public int GetReservedBullet(EBulletCaliber caliber)
         {

@@ -1,14 +1,13 @@
-using System;
-using System.Reflection;
-using System.Collections.Generic;
-using UnityEngine;
+using Assets.UiFramework.Libs;
 using Loxodon.Framework.Binding;
 using Loxodon.Framework.Binding.Builder;
 using Loxodon.Framework.ViewModels;
 using Loxodon.Framework.Views;
-using Assets.UiFramework.Libs;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using UnityEngine;
 using UnityEngine.UI;
-using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {

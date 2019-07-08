@@ -1,26 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using App.Shared.Components;
+﻿using App.Shared.Components;
 using App.Shared.GameModules.Player;
-using App.Shared.Player;
-using Assets.App.Server.GameModules.GamePlay.Free;
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
-using com.cpkf.yyjd.tools.util.math;
 using Core;
 using Core.EntityComponent;
-using Core.Enums;
-using Core.Free;
 using Core.GameTime;
 using Core.Utils;
 using Entitas;
-using Free.framework;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Utils.Singleton;
 using Object = UnityEngine.Object;
 
 namespace App.Shared.EntityFactory
 {
+    public interface IAudioEmitterEditor
+    {
+        bool LookAtListener1 { get; set; }
+        void SetListener(GameObject player);
+    }
+    
     public class ServerSceneObjectEntityFactory : ISceneObjectEntityFactory
     {
         private static readonly LoggerAdapter _logger = new LoggerAdapter(typeof(ServerSceneObjectEntityFactory));
@@ -64,9 +64,9 @@ namespace App.Shared.EntityFactory
                 
                 Object res = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>("Assets/Assets/CoreRes/Sound/Model/AudioEmitter.prefab");
                 var clone = GameObject.Instantiate(res) as GameObject;
-                var  emitter = clone.AddComponent<AudioEmitterEditor>();
-                emitter.transform.position = new Vector3(p.x,p.y+2f,p.z);
-                emitter.LookAtListener = true;
+                var  emitter = clone.GetComponent(typeof(IAudioEmitterEditor)) as IAudioEmitterEditor;
+                clone.transform.position = new Vector3(p.x,p.y+2f,p.z);
+                emitter.LookAtListener1 = true;
                 emitter.SetListener(playerEntity.appearanceInterface.Appearance.CharacterP3);
                 #endif
             }
@@ -88,11 +88,7 @@ namespace App.Shared.EntityFactory
             return null;
         }
 
-        public virtual IEntity CreateSimpleEquipmentEntity(
-            ECategory category,
-            int id,
-            int count,
-            Vector3 position)
+        public virtual IEntity CreateSimpleObjectEntity(ECategory category, int id, int count, Vector3 position, int curDurability = 0)
         {
             var entity = _sceneObjectContext.CreateEntity();
             entity.AddEntityKey(new EntityKey(_equipGenerator.GetNextEntityId(), (short)EEntityType.SceneObject));
@@ -100,13 +96,20 @@ namespace App.Shared.EntityFactory
 
             entity.AddPosition();
             entity.position.Value = position;
-            entity.AddSimpleEquipment(id, count, (int)category);
             if (category == ECategory.Weapon)
             {
                 entity.AddWeaponObject();
                 entity.weaponObject.ConfigId = id;
+                if (SingletonManager.Get<WeaponResourceConfigManager>().IsArmors(id))
+                {
+                    int maxDurability = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(id).Durable;
+                    if (curDurability == 0)
+                        entity.AddArmorDurability(maxDurability, maxDurability);
+                    else entity.AddArmorDurability(curDurability, maxDurability);
+                }
             }
-
+            entity.AddSimpleItem(id, count, (int)category);
+                
             entity.AddFlagImmutability(_currentTime.CurrentTime);
             return entity;
         }

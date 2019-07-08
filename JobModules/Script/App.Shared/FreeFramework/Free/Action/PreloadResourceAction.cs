@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using com.wd.free.@event;
-using com.wd.free.para;
+using Core.Free;
 using Core.Room;
 using Core.Utils;
 
 namespace App.Shared.FreeFramework.Free.Action
 {
     [Serializable]
-    public class PreloadResourceAction : AbstractGameAction
+    public class PreloadResourceAction : AbstractGameAction, IRule
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(PreloadResourceAction));
 
@@ -59,6 +59,11 @@ namespace App.Shared.FreeFramework.Free.Action
             info.PreLoadUI = string.Join(",", set.ToArray());
 
             _logger.Info("已预加载资源：" + ui);
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PreloadResourceAction;
         }
     }
 }

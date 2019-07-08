@@ -2,6 +2,8 @@
 using Utils.AssetManager;
 using Core.Utils;
 using System.Collections.Generic;
+using UnityEngine;
+using Utils.Appearance.Bone;
 using Utils.Utils;
 using XmlConfig;
 
@@ -75,7 +77,8 @@ namespace Utils.Appearance.Weapon
             }
 #endif
             _weaponGo = go;
-            if(_waitPartGoDic.Count > 0)
+            BoneTool.CacheTransform(go as GameObject);
+            if (_waitPartGoDic.Count > 0)
             {
                 foreach(var pair in _waitPartGoDic)
                 {
@@ -91,6 +94,7 @@ namespace Utils.Appearance.Weapon
 
         private void OnPartLoaded(T go, WeaponPartLocation partType)
         {
+            BoneTool.CacheTransform(go as GameObject);
             _partGoDic[partType] = go;
             if(null != _weaponGo)
             {

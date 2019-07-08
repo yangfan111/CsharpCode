@@ -1,4 +1,6 @@
+using com.cpkf.yyjd.tools.util.math;
 using com.wd.free.@event;
+using Core.Free;
 using com.wd.free.unit;
 using com.wd.free.util;
 using gameplay.gamerule.free.ui;
@@ -8,7 +10,7 @@ using System;
 namespace com.wd.free.map.position
 {
     [System.Serializable]
-    public class MapCircleRegion : AbstractMapRegion
+    public class MapCircleRegion : AbstractMapRegion, IRule
     {
         private const long serialVersionUID = 6163747739967853887L;
 
@@ -32,7 +34,7 @@ namespace com.wd.free.map.position
             float r = 0f;
             try
             {
-                r = float.Parse(radius);
+                r = /*float.Parse(radius)*/ ParseUtility.QuickFloatParse(radius);
             }
             catch (Exception)
             {
@@ -84,7 +86,7 @@ namespace com.wd.free.map.position
             float r = 0f;
             try
             {
-                r = float.Parse(radius);
+                r = /*float.Parse(radius)*/ParseUtility.QuickFloatParse(radius);
             }
             catch (Exception)
             {
@@ -140,6 +142,11 @@ namespace com.wd.free.map.position
         public override bool IsDynamic()
         {
             return change;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.MapCircleRegion;
         }
     }
 }

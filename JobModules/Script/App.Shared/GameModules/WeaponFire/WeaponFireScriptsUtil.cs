@@ -95,7 +95,7 @@ namespace App.Shared.GameModules.Weapon
             var defaultFireConfig = config as DefaultFireLogicConfig;
             if (null != defaultFireConfig)
             {
-                return new ShowFireListenerInMap(_contexts.ui);
+                return new ShowFireListener(_contexts.ui);
             }
             return null;
         }
@@ -163,10 +163,12 @@ namespace App.Shared.GameModules.Weapon
             return new CommonFireAppearanceUpdater();
         }
 
-        public AfterFireEventListener  CreateEffectManager(WeaponEffectConfig config)
+        public AfterFireEffectEventListener  CreateEffectManager(WeaponEffectConfig config)
         {
-            //TODO 近战特效
-            return new AfterFireEventListener(_contexts.clientEffect, _entityIdGenerator, config);
+            if(SharedConfig.IsServer)
+                return new ServerFireEffectEventListener(_contexts.clientEffect, _entityIdGenerator, config);
+            else 
+                return new AfterFireEffectEventListener(_contexts.clientEffect, _entityIdGenerator, config);            
         }
 
         public IFireEffectFactory CreateFireEffectFactory(BulletConfig config)
@@ -203,10 +205,6 @@ namespace App.Shared.GameModules.Weapon
             }
         }
 
-        public IThrowingFactory CreateThrowingFactory(WeaponResConfigItem newWeaponConfig, ThrowingConfig config)
-        {
-            return new ThrowingFactory(_contexts.throwing, _entityIdGenerator, newWeaponConfig, config);
-        }
 
         public IBulletFireListener  CreateBulletFireListener(BulletConfig config)
         {
@@ -239,95 +237,5 @@ namespace App.Shared.GameModules.Weapon
             return null;
         }
 
-        /// <summary>
-        /// Defines the <see cref="ThrowingFactory" />
-        /// </summary>
-        public class ThrowingFactory : IThrowingFactory
-        {
-            private ThrowingConfig _config;
-
-            public ThrowingFactory(ThrowingContext throwingContext, IEntityIdGenerator entityIdGenerator, WeaponResConfigItem newWeaponConfig, ThrowingConfig throwingConfig)
-            {
-                _throwingContext = throwingContext;
-                _entityIdGenerator = entityIdGenerator;
-                _newWeaponConfig = newWeaponConfig;
-                _config = throwingConfig;
-            }
-
-            private ThrowingContext _throwingContext;
-
-            private IEntityIdGenerator _entityIdGenerator;
-
-            private WeaponResConfigItem _newWeaponConfig;
-
-            public int ThrowingHitCount
-            {
-                get
-                {
-                    return 0;
-                }
-            }
-
-            public float ThrowingInitSpeed(bool isNear)
-            {
-                if (isNear)
-                {
-                    return _config.NearInitSpeed;
-                }
-                else
-                {
-                    return _config.FarInitSpeed;
-                }
-            }
-
-            public int BombCountdownTime
-            {
-                get { return _config.CountdownTime; }
-            }
-
-            public ThrowingConfig ThrowingConfig
-            {
-                get { return _config; }
-            }
-
-            public EntityKey CreateThrowing(PlayerWeaponController controller, Vector3 direction, int renderTime, float initVel)
-            {
-                var throwingEntity = ThrowingEntityFactory.CreateThrowingEntity(
-                    _throwingContext,
-                    _entityIdGenerator,
-                    controller,
-                    renderTime,
-                    direction,
-                    initVel,
-                    _newWeaponConfig,
-                    _config);
-
-                _logger.InfoFormat("CreateThrowing from {0} with velocity {1}, entity key {2}",
-                    throwingEntity.position.Value,
-                    throwingEntity.throwingData.Velocity,
-                    throwingEntity.entityKey);
-
-                return throwingEntity.entityKey.Value;
-            }
-
-            public void UpdateThrowing(EntityKey entityKey, bool isThrow, float initVel)
-            {
-                ThrowingEntity throwing = _throwingContext.GetEntityWithEntityKey(entityKey);
-                if (null != throwing)
-                {
-                    throwing.throwingData.IsThrow = isThrow;
-                    throwing.throwingData.InitVelocity = initVel;
-                }
-            }
-
-            public void DestroyThrowing(EntityKey entityKey)
-            {
-                ThrowingEntity throwing = _throwingContext.GetEntityWithEntityKey(entityKey);
-                if (null != throwing)
-                {
-                    throwing.isFlagDestroy = true;
-                }
-            }
-        }
     }
 }

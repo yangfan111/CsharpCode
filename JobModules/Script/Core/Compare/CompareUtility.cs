@@ -26,7 +26,11 @@ namespace Core.Compare
         {
             return System.Math.Abs(left - right) < maxError;
         }
-
+        public static bool IsApproximatelyEqual(float left, float right, byte precision)
+        {
+            var precisionVal = (int)Math.Pow(10, precision);
+            return (int) (left * precisionVal) == (int) (right * precisionVal);
+        }
         public static bool IsApproximatelyEqual(double left, double right, double maxError = 0.01)
         {
             return System.Math.Abs(left - right) < maxError;

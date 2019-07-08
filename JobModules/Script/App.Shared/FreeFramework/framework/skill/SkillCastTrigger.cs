@@ -3,12 +3,13 @@ using com.wd.free.action;
 using com.wd.free.para.exp;
 using com.wd.free.util;
 using UnityEngine;
+using Core.Free;
 
 namespace com.wd.free.skill
 {
 	[System.Serializable]
-	public class SkillCastTrigger : ISkillTrigger
-	{
+	public class SkillCastTrigger : ISkillTrigger, IRule
+    {
 		private const long serialVersionUID = 6618913049715717146L;
 
 		private string time;
@@ -59,7 +60,7 @@ namespace com.wd.free.skill
 			{
 				if (startTime == 0 && release)
 				{
-					startTime = Runtime.CurrentTimeMillis();
+					startTime = Runtime.CurrentTimeMillis(false);
 					if (castAction != null)
 					{
 						castAction.Act(args);
@@ -72,7 +73,7 @@ namespace com.wd.free.skill
 				release = true;
 			}
             
-			if (startTime > 0 && Runtime.CurrentTimeMillis() - startTime >= realTime)
+			if (startTime > 0 && Runtime.CurrentTimeMillis(false) - startTime >= realTime)
 			{
 				startTime = 0;
 				return ISkillTrigger.TriggerStatus.Success;
@@ -109,5 +110,10 @@ namespace com.wd.free.skill
 		{
 			this.interrupter = interrupter;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SkillCastTrigger;
+        }
+    }
 }

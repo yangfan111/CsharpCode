@@ -1,11 +1,12 @@
 using Sharpen;
 using com.wd.free.action;
+using Core.Free;
 
 namespace com.wd.free.skill
 {
 	[System.Serializable]
-	public class SimpleSkillEffect : AbstractSkillEffect
-	{
+	public class SimpleSkillEffect : AbstractSkillEffect, IRule
+    {
 		private const long serialVersionUID = -5148825136040458649L;
 
 		protected internal IGameAction effect;
@@ -28,7 +29,12 @@ namespace com.wd.free.skill
 			}
 		}
 
-		public override void Resume(ISkillArgs args)
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SimpleSkillEffect;
+        }
+
+        public override void Resume(ISkillArgs args)
 		{
 			if (resume != null)
 			{

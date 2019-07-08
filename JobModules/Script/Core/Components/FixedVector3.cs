@@ -1,5 +1,7 @@
 using System;
+using Core.Compare;
 using Core.SpatialPartition;
+using Core.Utils;
 using UnityEngine;
 
 namespace Core.Components
@@ -24,6 +26,7 @@ namespace Core.Components
         }
     }
 
+
     public struct FixedVector3
     {
         public const float kEpsilon = 1E-05f;
@@ -38,7 +41,7 @@ namespace Core.Components
             this.y = y;
             this.z = z;
         }
-
+     
 
         public override bool Equals(object other)
         {
@@ -77,7 +80,7 @@ namespace Core.Components
         public override string ToString()
         {
             var origin = WorldOrigin.Origin;
-            return String.Format("world:({0:F1}, {1:F1}, {2:F1}) shifted:({3:F1}, {4:F1},{5:F1})", x, y, z,
+            return String.Format("world:({0:F2}, {1:F2}, {2:F2}) shifted:({3:F2}, {4:F2},{5:F2})", x, y, z,
                 x - origin.x,
                 y - origin.y, z - origin.z);
         }

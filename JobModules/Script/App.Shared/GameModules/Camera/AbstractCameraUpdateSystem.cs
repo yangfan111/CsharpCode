@@ -7,18 +7,10 @@ namespace App.Shared.GameModules.Camera
     {   
         protected abstract void ExecWhenObserving(PlayerEntity player, IUserCmd cmd);
         
-        //temporary: observed player calcu twice and upload data(final position and rotation)
-        //           observing player copy the data
-        //should be: observed player upload states, observing player calcu with states 
-        protected abstract void ExecWhenBeingObserved(PlayerEntity player, IUserCmd cmd);
         protected abstract void ExecWhenNormal(PlayerEntity player, IUserCmd cmd);
         
         protected virtual void FinalExec(PlayerEntity player, IUserCmd cmd) {}        
         protected virtual void BeforeExec(PlayerEntity player, IUserCmd cmd) {}
-        protected virtual bool CanPlayAsNormal(PlayerEntity player)
-        {
-            return true;
-        }
 
         protected Contexts _contexts;
         
@@ -36,15 +28,7 @@ namespace App.Shared.GameModules.Camera
             }
             else
             {
-                if (CanPlayAsNormal(player))
-                {
-                    ExecWhenNormal(player,cmd);
-                }
-            
-                if (player.gamePlay.BeingObserved)
-                {
-                    ExecWhenBeingObserved(player,cmd);
-                }
+                ExecWhenNormal(player, cmd);
             }
             FinalExec(player,cmd);
         }

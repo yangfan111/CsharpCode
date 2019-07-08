@@ -69,6 +69,7 @@ namespace Core.CharacterState.Action
         RageEnd,
         SuccessPose,
         
+        TransfigurationNull,
         TransfigurationStart,
         TransfigurationFinish,
 

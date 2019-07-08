@@ -7,11 +7,12 @@ using com.wd.free.map.position;
 using com.wd.free.unit;
 using com.wd.free.util;
 using UnityEngine;
+using Core.Free;
 
 namespace com.wd.free.map.position
 {
     [Serializable]
-    public class PosDirectionSelector : AbstractPosSelector
+    public class PosDirectionSelector : AbstractPosSelector, IRule
     {
         private IPosSelector pos;
 
@@ -67,6 +68,11 @@ namespace com.wd.free.map.position
             o.x = v.x + b.x * s;
             o.y = v.y + b.y * s;
             o.z = v.z + b.z * s;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PosDirectionSelector;
         }
     }
 }

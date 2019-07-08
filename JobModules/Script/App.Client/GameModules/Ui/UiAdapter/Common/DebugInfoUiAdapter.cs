@@ -63,8 +63,8 @@ namespace App.Client.GameModules.Ui.UiAdapter.Common
 
                 var ut = (int)(DateTime.UtcNow.ToMillisecondsSinceEpoch() -
                                sessionObjects.ServerFpsSatatus.LastUdpPing) / 1000;
-
-                sb.AppendLine(string.Format("client :{0}", sessionObjects.FpsSatatus));
+                
+                sb.AppendLine(string.Format("client :{0} {1}", sessionObjects.FpsSatatus, SingletonManager.Get<gc_manager>().status()));
                 sb.AppendLine(string.Format("server :{0}", _contexts.session.clientSessionObjects.ServerFpsSatatus));
                 sb.AppendLine(string.Format("ping t:{0}, u:{1}, tt:{2}, ut:{3}",
                     sessionObjects.ServerFpsSatatus.TcpPing, sessionObjects.ServerFpsSatatus.UdpPing,

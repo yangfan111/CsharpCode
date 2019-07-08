@@ -29,7 +29,7 @@ using Utils.Singleton;
 namespace App.Server.GameModules.GamePlay.Free.item
 {
     [Serializable]
-    public class UnityOneInventoryUi : IInventoryUI
+    public class UnityOneInventoryUi : IInventoryUI, IRule
     {
         private IGameAction errorAction;
 
@@ -81,7 +81,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
         {
             if (errorAction != null)
             {
-                if (Runtime.CurrentTimeMillis() - lastErrorTime > 2000)
+                if (Runtime.CurrentTimeMillis(false) - lastErrorTime > 2000)
                 {
                     if (args != null)
                     {
@@ -89,7 +89,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
                         errorAction.Act(args);
                         args.GetDefault().GetParameters().Resume("message");
                     }
-                    lastErrorTime = Runtime.CurrentTimeMillis();
+                    lastErrorTime = Runtime.CurrentTimeMillis(false);
                 }
             }
         }
@@ -218,12 +218,12 @@ namespace App.Server.GameModules.GamePlay.Free.item
             {
                 int id = (int)((IntPara)ip.GetParameters().Get("itemId")).GetValue();
 
-                WeaponResConfigItem config = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(id);
-                if (config != null)
+                WeaponAllConfigs configs = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(id);
+                if (configs != null)
                 {
                     HashSet<int> list = new HashSet<int>();
 
-                    foreach (XmlConfig.EWeaponPartType part in SingletonManager.Get<WeaponPartsConfigManager>().GetAvaliablePartTypes(id))
+                    foreach (XmlConfig.EWeaponPartType part in configs.ApplyPartsSlot)
                     {
                         list.Add(FreeWeaponUtil.GetWeaponPart(part));
                     }
@@ -295,6 +295,11 @@ namespace App.Server.GameModules.GamePlay.Free.item
         public void UseItem(ISkillArgs args, ItemInventory inventory, ItemPosition ip)
         {
             ReDraw(args, inventory, true);
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.UnityOneInventoryUi;
         }
     }
 }

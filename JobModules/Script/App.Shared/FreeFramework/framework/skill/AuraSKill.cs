@@ -5,12 +5,13 @@ using com.wd.free.@event;
 using com.wd.free.para;
 using com.wd.free.para.exp;
 using com.wd.free.unit;
+using Core.Free;
 
 namespace com.wd.free.skill
 {
 	[System.Serializable]
-	public class AuraSKill : AbstractSkill
-	{
+	public class AuraSKill : AbstractSkill, IRule
+    {
 		private const long serialVersionUID = -2075872402350578799L;
 
 		private int range;
@@ -35,9 +36,14 @@ namespace com.wd.free.skill
 			}
 		}
 
-		[System.Serializable]
-		public class GroupEffect
-		{
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.AuraSKill;
+        }
+
+        [System.Serializable]
+		public class GroupEffect : IRule
+        {
 			private const long serialVersionUID = -3348967790172052193L;
 
 			private string key;
@@ -97,6 +103,11 @@ namespace com.wd.free.skill
 				}
 				bea.Resume("give");
 			}
-		}
+
+            public int GetRuleID()
+            {
+                return (int)ERuleIds.AuraSKill;
+            }
+        }
 	}
 }

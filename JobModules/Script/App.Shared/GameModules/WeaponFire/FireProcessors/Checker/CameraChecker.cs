@@ -1,5 +1,5 @@
 ﻿
-namespace App.Shared.GameModules.Weapon.Behavior.FireCheck
+namespace App.Shared.GameModules.Weapon.Behavior
 {
     /// <summary>
     /// Defines the <see cref="CameraChecker" />

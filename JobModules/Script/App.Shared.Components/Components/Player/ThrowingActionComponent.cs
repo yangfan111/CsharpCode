@@ -1,7 +1,8 @@
-﻿using Core.Components;
+﻿using Core;
+using Core.Components;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
 using Core.UpdateLatest;
-using Core.WeaponLogic.Throwing;
+
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace App.Shared.Components.Player
     [Player]
     public class ThrowingActionComponent : IComponent
     {
-        [DontInitilize] public ThrowingActionInfo ActionInfo;
+        [DontInitilize] public ThrowingActionData ActionData;
 
         public int GetComponentId()
         {

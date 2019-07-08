@@ -1,5 +1,4 @@
 ﻿using Assets.Utils.Configuration;
-using Core.Appearance;
 using Core.CameraControl;
 using Core.CharacterBone;
 using Core.CharacterState;
@@ -13,9 +12,13 @@ using App.Shared.GameModules.Player.Appearance.WardrobeControllerPackage;
 using App.Shared.GameModules.Player.Appearance.WeaponControllerPackage;
 using App.Shared.GameModules.Player.CharacterBone.IkControllerPackage;
 using Core.EntityComponent;
+using Shared.Scripts;
 using UnityEngine;
 using Utils.Appearance;
+using Utils.Appearance.Bone;
+using Utils.Appearance.Script;
 using Utils.Appearance.WardrobePackage;
+using Utils.AssetManager;
 using Utils.CharacterState;
 using Utils.Configuration;
 using Utils.Singleton;
@@ -45,8 +48,8 @@ namespace App.Shared.GameModules.Player.CharacterBone
         private float _sightMoveHorizontalShift;
         private float _sightMoveVerticalShift;
 
-        private bool _attachmentNeedIK = false;
-        private bool _weaponHasIK = false;
+        private bool _attachmentNeedIK;
+        private bool _weaponHasIK;
 
         private GameObject _characterRoot;
         private CharacterView _view = CharacterView.ThirdPerson;
@@ -56,6 +59,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
         private PlayerIK _firstPlayerIk;
         private PlayerIK _thirdPlayerIk;
 
+        private readonly CustomProfileInfo _mainInfo;
 
         public Action CacheChangeCacheAction { private set; get; }
         public float PeekDegree { get; private set; }
@@ -82,6 +86,8 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
         public CharacterBoneManager()
         {
+            _mainInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("CharacterBoneManager");
+            
             _boneRigging.EnableSightMove = EnableSightMove;
             _playerIkController = new PlayerIkController();
             CacheChangeCacheAction = () =>
@@ -146,7 +152,6 @@ namespace App.Shared.GameModules.Player.CharacterBone
         {
             _characterP1 = obj;
             _boneRigging.SetFirstPersonCharacter(obj);
-            _weaponRot.SetFirstPersonCharacter(obj);
             if (null != obj)
                 _firstPlayerIk = obj.GetComponent<PlayerIK>();
         }
@@ -226,12 +231,12 @@ namespace App.Shared.GameModules.Player.CharacterBone
             _directOutputs.Apply(addOutput);
         }
 
-        public void PreUpdate(FollowRotParam param, ICharacterBone characterBone)
+        public void PreUpdate(FollowRotParam param, ICharacterBone characterBone, float deltaTime)
         {
-            _followRot.PreUpdate(param, characterBone);
+            _followRot.PreUpdate(param, characterBone, deltaTime);
         }
 
-        public void WeaponRotUpdate(CodeRigBoneParam param)
+        public void WeaponRotUpdate(CodeRigBoneParam param, float deltaTime)
         {
             if (!param.IsEmptyHand)
             {
@@ -247,7 +252,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
                     param.MuzzleLocationP1 = muzzleTransform.position;
             }
 
-            _weaponRot.WeaponRotUpdate(param);
+            _weaponRot.WeaponRotUpdate(param, deltaTime);
         }
         
         public void WeaponRotPlayback(CodeRigBoneParam param)
@@ -255,41 +260,55 @@ namespace App.Shared.GameModules.Player.CharacterBone
             _weaponRot.WeaponRotPlayback(param);
         }
 
+        public void GetWeaponObj()
+        {
+            _weaponController.RemountWeaponInPackage();
+        }
+
         public void Update(CodeRigBoneParam param)
         {
-            param.PeekAmplitude = PeekDegree;
-            param.SightProgress = _sightProgress;
-            param.FastMoveHorizontalShift = _fastMoveHorizontalShift;
-            param.FastMoveVerticalShift = _fastMoveVerticalShift;
-            param.SightMoveHorizontalShift = _sightMoveHorizontalShift;
-            param.SightMoveVerticalShift = _sightMoveVerticalShift;
-            param.IsFirstPerson = IsFirstPerson;
-
-            var needIk = UpdateSightData(ref param);
-
-            // 有动作状态控制是否需要开启IK
-            param.IKActive = IsIKActive || param.IKActive && needIk;
-            param.IsEmptyHand = _weaponController.IsEmptyHand();
-            if (param.IsEmptyHand)
+            try
             {
-                if (!IsFirstPerson)
+                _mainInfo.BeginProfileOnlyEnableProfile();
+                
+                param.PeekAmplitude = PeekDegree;
+                param.SightProgress = _sightProgress;
+                param.FastMoveHorizontalShift = _fastMoveHorizontalShift;
+                param.FastMoveVerticalShift = _fastMoveVerticalShift;
+                param.SightMoveHorizontalShift = _sightMoveHorizontalShift;
+                param.SightMoveVerticalShift = _sightMoveVerticalShift;
+                param.IsFirstPerson = IsFirstPerson;
+
+                var needIk = UpdateSightData(ref param);
+
+                // 有动作状态控制是否需要开启IK
+                param.IKActive = IsIKActive || param.IKActive && needIk;
+                param.IsEmptyHand = _weaponController.IsEmptyHand();
+                if (param.IsEmptyHand)
                 {
-                    //第三人称空手取消pitch
-                    param.PitchAmplitude = 0;
+                    if (!IsFirstPerson)
+                    {
+                        //第三人称空手取消pitch
+                        param.PitchAmplitude = 0;
+                    }
+
+                    // 空手状态没有随动效果
+                    param.FastMoveHorizontalShift = 0;
+                    param.FastMoveVerticalShift = 0;
+                    _attachmentNeedIK = false;
+                    _weaponHasIK = false;
                 }
-
-                // 空手状态没有随动效果
-                param.FastMoveHorizontalShift = 0;
-                param.FastMoveVerticalShift = 0;
-                _attachmentNeedIK = false;
-                _weaponHasIK = false;
-            }
             
-            param.SightModelOffset = YawPitchUtility.Normalize(_characterRoot.transform.rotation).x;
+                param.SightModelOffset = YawPitchUtility.Normalize(_characterRoot.transform.rotation).x;
 
-            _boneRigging.Update(param);
-            _followRot.Update(param);
-            UpdateIk();
+                _boneRigging.Update(param);
+                _followRot.Update(param);
+                UpdateIk();
+            }
+            finally
+            {
+                _mainInfo.EndProfileOnlyEnableProfile();
+            }
         }
 
         public void SyncTo(IGameComponent characterBoneComponent)
@@ -306,6 +325,30 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 AnimatorParametersHash.Instance.EnableSightMoveName,
                 enable,
                 CharacterView.FirstPerson);
+        }
+
+        public void HandleAllWeapon(Action<UnityObject> act)
+        {
+            if(_weaponController != null)
+                _weaponController.HandleAllWeapon(act);   
+        }
+
+        public void HandleAllAttachments(Action<UnityObject> act)
+        {
+            if(_weaponController != null)
+                _weaponController.HandleAllAttachments(act);   
+        }
+
+        public void HandleAllWardrobe(Action<UnityObject> act)
+        {
+            if(_wardrobeController != null)
+                _wardrobeController.HandleAllWardrobe(act);
+        }
+
+        public void HandleSingleWardrobe(Wardrobe type, Action<UnityObject> act)
+        {
+            if (_wardrobeController != null)
+                _wardrobeController.HandleSignleWardrobe(type, act);
         }
 
         // 包括枪配件的改变
@@ -441,11 +484,11 @@ namespace App.Shared.GameModules.Player.CharacterBone
                     _cacheP1Transform[i] = null;
                 }
                 _cacheP1.Clear();
-                _characterP1.GetComponentsInChildren<TransformCache>(_cacheP1);
+                _characterP1.GetComponentsInChildren(_cacheP1);
 
                 for (int location = 0; location < (int) SpecialLocation.EndOfTheWorld; ++location)
                 {
-                    _cacheP1Transform[(int) location] = _mount.GetLocation(
+                    _cacheP1Transform[location] = _mount.GetLocation(
                         _mount.SearchingStart(_characterP1, (SpecialLocation) location), (SpecialLocation) location);
                 }
 
@@ -463,11 +506,11 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 }
 
                 _cacheP3.Clear();
-                _characterP3.GetComponentsInChildren<TransformCache>(_cacheP3);
+                _characterP3.GetComponentsInChildren(_cacheP3);
                 
                 for (int location = 0; location < (int) SpecialLocation.EndOfTheWorld; ++location)
                 {
-                    _cacheP3Transform[(int) location] = _mount.GetLocation(
+                    _cacheP3Transform[location] = _mount.GetLocation(
                         _mount.SearchingStart(_characterP3, (SpecialLocation) location), (SpecialLocation) location);
                 }
 

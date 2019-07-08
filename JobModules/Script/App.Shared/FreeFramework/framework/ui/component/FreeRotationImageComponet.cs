@@ -2,12 +2,13 @@ using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.util;
 using Free.framework;
+using Core.Free;
 
 namespace gameplay.gamerule.free.ui.component
 {
 	[System.Serializable]
-	public class FreeRotationImageComponet : AbstractFreeComponent
-	{
+	public class FreeRotationImageComponet : AbstractFreeComponent, IRule
+    {
 		private const long serialVersionUID = -7699020163820046853L;
 
 		private bool reverse;
@@ -35,5 +36,10 @@ namespace gameplay.gamerule.free.ui.component
 		    b.Key = 1;
 			return b;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeRotationImageComponet;
+        }
+    }
 }

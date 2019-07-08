@@ -55,7 +55,7 @@ namespace Core.GameModule.System
     public abstract class AbstractFrameworkSystem<T> : Feature, IReactiveSystem
     {
         private bool _initialized;
-        private LoggerAdapter _logger = new LoggerAdapter(typeof(AbstractFrameworkSystem<T>));
+        private LoggerAdapter _logger = new LoggerAdapter(string.Format("Core.GameModule.System.AbstractFrameworkSystem.{0}",typeof(T).Name));
 
 
         public abstract IList<T> Systems { get; }
@@ -162,7 +162,7 @@ namespace Core.GameModule.System
                         }
                         catch (Exception e)
                         {
-                            _logger.ErrorFormat("error executing {0}: {1}", module.GetType(), e);
+                            _logger.DebugFormat("error executing {0}: {1}", module.GetType(), e);
                         }
                         finally
                         {
@@ -223,7 +223,7 @@ namespace Core.GameModule.System
 {
     public abstract class AbstractFrameworkSystem<T> : Systems, IReactiveSystem
     {
-        private LoggerAdapter _logger = new LoggerAdapter(typeof(AbstractFrameworkSystem<T>));
+        private LoggerAdapter _logger = new LoggerAdapter(string.Format("Core.GameModule.System.AbstractFrameworkSystem.{0}",typeof(T).Name));
 
         public abstract IList<T> Systems { get; }
         public abstract void SingleExecute(T system);

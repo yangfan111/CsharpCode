@@ -25,6 +25,15 @@ namespace VNet
                 return new VNetPacketMemSteam();
             }
 
+            public override int InitPoolSize
+            {
+                get { return 256; }
+            }
+
+            public override int AllocatorNumber
+            {
+                get { return 64; }
+            }
         }
         public static VNetPacketMemSteam Allocate()
         {

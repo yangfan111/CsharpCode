@@ -7,11 +7,12 @@ using com.wd.free.action;
 using com.wd.free.item;
 using com.wd.free.skill;
 using gameplay.gamerule.free.rule;
+using Core.Free;
 
 namespace gameplay.gamerule.free.item
 {
-	public class PositionHotKey : IHotKey
-	{
+	public class PositionHotKey : IHotKey, IRule
+    {
 		private IList<ConditionHotKey> keys;
 
 		public virtual string GetHotKey(IEventArgs args, ItemPosition ip)
@@ -49,7 +50,12 @@ namespace gameplay.gamerule.free.item
 			}
 		}
 
-		[System.Serializable]
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PositionHotKey;
+        }
+
+        [System.Serializable]
 		internal class ItemHotkeyAction : AbstractGameAction
 		{
 			private const long serialVersionUID = 2047134880792143342L;

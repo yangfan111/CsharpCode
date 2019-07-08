@@ -1,12 +1,13 @@
 using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.para.exp;
+using Core.Free;
 
 namespace com.wd.free.action
 {
 	[System.Serializable]
-	public class ConditionGameAction : AbstractGameAction
-	{
+	public class ConditionGameAction : AbstractGameAction, IRule
+    {
 		private const long serialVersionUID = -2931122771587588898L;
 
 		private IParaCondition condition;
@@ -73,5 +74,10 @@ namespace com.wd.free.action
 			}
 			return s;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ConditionGameAction;
+        }
+    }
 }

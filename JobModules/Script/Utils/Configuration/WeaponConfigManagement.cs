@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using Assets.XmlConfig;
-using log4net.Filter;
+﻿using Assets.XmlConfig;
+using System.Collections.Generic;
 using UnityEngine;
 using Utils.Configuration;
 using Utils.Singleton;
@@ -33,6 +32,11 @@ namespace Assets.Utils.Configuration
         public int S_Id
         {
             get { return InitWeaponAllConfig.Id; }
+        }
+
+        public bool S_IsSilence
+        {
+            get { return InitAbstractBehavior.IsSilence == 1; }
         }
 
         public WeaponEffectConfig S_EffectConfig
@@ -79,6 +83,16 @@ namespace Assets.Utils.Configuration
             }
         }
 
+        public Ragdoll S_Ragdoll
+        {
+            get
+            {
+                if (InitAbstractBehavior != null)
+                    return InitAbstractBehavior.Ragdoll;
+                return null;
+            }
+        }
+
         /// <summary>
         /// behavior layer
         /// base:WeaponAbstractBehavior,ext :DoubleWeaponBehaviorConfig ,ext :TacticWeaponBehaviorConfig ,ext:DefaultWeaponBehaviorConfig 
@@ -116,8 +130,42 @@ namespace Assets.Utils.Configuration
         public RifleShakeConfig           SRifleShakeCfg            { get; private set; }
         public FixedShakeConfig           SFixedShakeCfg            { get; private set; }
         public DefaultFireModeLogicConfig S_DefaultFireModeLogicCfg { get; private set; }
+        public FireRollConfig S_FireRollCfg { get; private set; }
 
-        private WeaponResConfigItem newWeaponConfigCache;
+        public List<int> ApplyParts
+        {
+            get { return NewWeaponCfg.ApplyParts; }
+        }
+
+        private List<EWeaponPartType> applyPartsSlotCache;
+
+        public List<EWeaponPartType> ApplyPartsSlot
+        {
+            get
+            {
+                if (applyPartsSlotCache == null)
+                {
+                    applyPartsSlotCache = new List<EWeaponPartType>();
+                    if (ApplyParts != null)
+                    {
+                        ApplyParts.ForEach(partId =>
+                        {
+                            var partCfg = SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(partId);
+                            if (partCfg != null)
+                                applyPartsSlotCache.Add((EWeaponPartType) partCfg.Type);
+                        });
+                    }
+                }
+
+
+                return applyPartsSlotCache;
+            }
+        }
+
+        public bool IsPartMatchWeapon(int partId)
+        {
+            return ApplyParts != null && ApplyParts.Contains(partId);
+        }
 
         public WeaponResConfigItem NewWeaponCfg
         {
@@ -129,6 +177,23 @@ namespace Assets.Utils.Configuration
             }
         }
 
+        private WeaponResConfigItem    newWeaponConfigCache;
+        private WeaponAvatarConfigItem weaponAvatarConfigCache;
+
+        public WeaponAvatarConfigItem WeaponDefaultAvartar
+        {
+            get
+            {
+                if (weaponAvatarConfigCache == null)
+                {
+                    weaponAvatarConfigCache = SingletonManager
+                                              .Get<WeaponAvatarConfigManager>().GetConfigById(NewWeaponCfg.AvatorId);
+                }
+
+                return weaponAvatarConfigCache;
+            }
+        }
+
         private WeaponPropertyConfigItem propertyCfgCache;
 
         public WeaponPropertyConfigItem PropertyCfg
@@ -137,21 +202,7 @@ namespace Assets.Utils.Configuration
             {
                 if (propertyCfgCache == null)
                     propertyCfgCache = SingletonManager.Get<WeaponPropertyConfigManager>().FindByWeaponId(S_Id);
-                if (propertyCfgCache == null)
-                {
-                    propertyCfgCache = new WeaponPropertyConfigItem() {
-                        Category = 2,
-                        Bullet = 0,
-                        Bulletmax = 0,
-                        Power = 60,
-                        Limitcycle = 60,
-                        Accurate = 0,
-                        Weight = 0,
-                        Stability = 0,
-                        Penetrate = 0,
-                        Scope = 35
-                    };
-                }
+                propertyCfgCache = propertyCfgCache ?? WeaponPropertyConfigItem.DefaultProperty;
                 return propertyCfgCache;
             }
         }
@@ -290,6 +341,7 @@ namespace Assets.Utils.Configuration
                     S_CommonFireCfg       = S_DefaultFireLogicCfg.Basic;
                     S_RifleFireCounterCfg = S_DefaultFireLogicCfg.FireCounter as RifleFireCounterConfig;
                     S_BulletCfg           = S_DefaultFireLogicCfg.Bullet;
+                    S_FireRollCfg = S_DefaultFireLogicCfg.FireRoll;
 
                     ProcessAccuracy(S_DefaultFireLogicCfg);
                     ProcessShake(S_DefaultFireLogicCfg);
@@ -503,7 +555,7 @@ namespace Assets.Utils.Configuration
         {
             WeaponAllConfigs configs;
             _configCache.TryGetValue(id, out configs);
-            if(configs == null)
+            if (configs == null)
                 Logger.WarnFormat("{0} does not exist in weapon config ", id);
             return configs;
         }

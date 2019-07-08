@@ -90,12 +90,9 @@ namespace Utils.Configuration
 
         public WeaponAvatarConfigItem GetConfigById(int id)
         {
-            if(_configItems.ContainsKey(id))
-            {
-                return _configItems[id];
-            }
-            Logger.ErrorFormat("avatar id {0} doesn't exist in config", id);
-            return null;
+            WeaponAvatarConfigItem configItem;
+            _configItems.TryGetValue(id, out configItem);
+            return configItem;
         }
 
         public bool HaveLeftWeapon(int id)
@@ -152,7 +149,16 @@ namespace Utils.Configuration
             {
                 return new AssetInfo(cfg.ModelBundle, cfg.ResP3);
             }
-            return new AssetInfo();
+            return AssetInfo.EmptyInstance;
+        }
+        public AssetInfo GetTexWeapoonAsset(int id)
+        {
+            var cfg = GetConfigById(id);
+            if(null != cfg)
+            {
+                return new AssetInfo(cfg.ModelBundle, cfg.Texture);
+            }
+            return AssetInfo.EmptyInstance;
         }
         
         public AssetInfo GetFirstPersonWeaponModel(int id)
@@ -162,7 +168,8 @@ namespace Utils.Configuration
             {
                 return new AssetInfo(cfg.ModelBundle, cfg.ResP1);
             }
-            return new AssetInfo();
+            return AssetInfo.EmptyInstance;
+
         }
         
         public List<AssetInfo> GetEffectAsset(int id)

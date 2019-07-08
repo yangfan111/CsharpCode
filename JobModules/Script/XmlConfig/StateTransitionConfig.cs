@@ -37,6 +37,7 @@ namespace XmlConfig
         IsUseAction,
         IsAutoReload,
         IsAutoFire,
+        IsF,
         Length,
     }
 
@@ -131,6 +132,7 @@ namespace XmlConfig
         RunDebuff,
         CameraFree,
         Props,
+        GrenadeThrow,
         Length,
         //运行时手动生成
         Move,
@@ -171,5 +173,6 @@ namespace XmlConfig
         public bool MeleeAttack;
         public bool IsUseAction;
         public bool IsPullboltInterrupt;
+        public bool IsUseItem;
     }
 }

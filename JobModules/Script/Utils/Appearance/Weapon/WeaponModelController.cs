@@ -216,6 +216,23 @@ namespace Utils.Appearance.Weapon
             return _lastWeapon.Id > 0;
         }
 
+        public void UnloadWeapon()
+        {
+            _weaponModelLoadController.Unload(_weapon.Asset);
+            _lastWeapon.Id = 0;
+            _weapon.Id = 0;
+            _weapon.Asset = default(AssetInfo);
+            for (var t = EWeaponPartType.None + 1; t < EWeaponPartType.Length; t++)
+            {
+                _deafultWeaponPartDic[t] = 0;
+                if(!_lastWeaponPartDic[t].Id.Equals(UniversalConsts.InvalidIntId)) _weaponModelLoadController.Unload(_lastWeaponPartDic[t].Asset);
+                _lastWeaponPartDic[t] = new AssetItem
+                {
+                    Id = UniversalConsts.InvalidIntId,
+                };
+            }
+        }
+
         private void RefreshAssets()
         {
 #if !UnitTest

@@ -1,5 +1,4 @@
-﻿using Core;
-using Core.Utils;
+﻿using Core.Utils;
 using UnityEngine;
 using XmlConfig;
 
@@ -7,14 +6,15 @@ namespace App.Shared.GameModules.Player.Actions.VaultPackage
 {
     public class VaultUp : IAction
     {
-        protected static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(VaultUp));
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(VaultUp));
 
-        protected const float FixedNormalizeTime = 0.32f;
-        protected float LastNormalizeTime;
+        private const float FixedNormalizeTime = 0.32f;
+        private float _lastNormalizeTime;
         
-        protected PlayerEntity Player;
-        protected Animator ThirdPersonAnimator;
-        protected GameObject ThirdPersonModel;
+        private PlayerEntity _player;
+        private Animator _thirdPersonAnimator;
+        private Animator _firstPersonAnimator;
+        private GameObject _thirdPersonModel;
 
         private readonly GenericActionKind _kind;
 
@@ -26,15 +26,17 @@ namespace App.Shared.GameModules.Player.Actions.VaultPackage
             _kind = kind;
         }
 
-        public virtual void Update()
+        public void Update()
         {
         }
 
         public void ActionInput(PlayerEntity player)
         {
-            Player = player;
-            ThirdPersonAnimator = player.thirdPersonAnimator.UnityAnimator;
-            ThirdPersonModel = player.thirdPersonModel.Value;
+            _player = player;
+            _thirdPersonAnimator = player.thirdPersonAnimator.UnityAnimator;
+            _thirdPersonModel = player.thirdPersonModel.Value;
+
+            _firstPersonAnimator = player.firstPersonAnimator.UnityAnimator;
 
             if (CanTriggerAction && ActionConditions && !_triggerActionOnce)
             {
@@ -48,39 +50,42 @@ namespace App.Shared.GameModules.Player.Actions.VaultPackage
             Logger.InfoFormat("TriggerAnimation");
 
             _isPlayingAnimation = true;
-            ThirdPersonAnimator.applyRootMotion = true;
-            LastNormalizeTime = 0.0f;
+            _thirdPersonAnimator.applyRootMotion = true;
+            _firstPersonAnimator.applyRootMotion = true;
+            _lastNormalizeTime = 0.0f;
             
-            Player.stateInterface.State.StartClimb((float)_kind, () => {
+            _player.stateInterface.State.StartClimb((float)_kind, () => {
                 Logger.InfoFormat("Finish Vault");
                 ResetConcretAction();
-                ThirdPersonAnimator.applyRootMotion = false;
+                _thirdPersonAnimator.applyRootMotion = false;
+                _firstPersonAnimator.applyRootMotion = false;
             });
 
             _triggerActionOnce = true;
         }
 
-        public virtual void AnimationBehaviour()
+        public void AnimationBehaviour()
         {
-            if (null == Player) return;
+            if (null == _player) return;
             if (PlayingAnimation)
             {
-                var normalizedTime = ThirdPersonAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime;
-                if (!ThirdPersonAnimator.isMatchingTarget && ThirdPersonAnimator.GetCurrentAnimatorStateInfo(0).IsName("ClimbStart") &&
+                var normalizedTime = _thirdPersonAnimator.GetCurrentAnimatorStateInfo(GenericAction.ClimbLayerIndex).normalizedTime;
+                if (!_thirdPersonAnimator.isMatchingTarget && _thirdPersonAnimator.GetCurrentAnimatorStateInfo(GenericAction.ClimbLayerIndex).IsName("ClimbStart") &&
                     normalizedTime <= FixedNormalizeTime)
                 {
                     var yTranslateSpeed = ModelYTranslateOffset / FixedNormalizeTime;
-                    ThirdPersonModel.transform.Translate((normalizedTime - LastNormalizeTime) * yTranslateSpeed * Vector3.up);
+                    _thirdPersonModel.transform.Translate((normalizedTime - _lastNormalizeTime) * yTranslateSpeed * Vector3.up);
 
                     var yRotationSpeed = ModelYRotationOffset / FixedNormalizeTime;
-                    ThirdPersonModel.transform.Rotate((normalizedTime - LastNormalizeTime) * yRotationSpeed * Vector3.up);
+                    _thirdPersonModel.transform.Rotate((normalizedTime - _lastNormalizeTime) * yRotationSpeed * Vector3.up);
                     
-                    LastNormalizeTime = normalizedTime;
+                    _lastNormalizeTime = normalizedTime;
                 }
             }
             else
             {
-                ThirdPersonAnimator.applyRootMotion = false;
+                _thirdPersonAnimator.applyRootMotion = false;
+                _firstPersonAnimator.applyRootMotion = false;
             }
         }
 
@@ -88,11 +93,11 @@ namespace App.Shared.GameModules.Player.Actions.VaultPackage
         {
             get
             {
-                if (null == Player) return false;
+                if (null == _player) return false;
 
-                var playerPosture = Player.stateInterface.State.GetCurrentPostureState();
+                var playerPosture = _player.stateInterface.State.GetCurrentPostureState();
 
-                var baseLayerInfo = ThirdPersonAnimator.GetCurrentAnimatorStateInfo(0);
+                var baseLayerInfo = _thirdPersonAnimator.GetCurrentAnimatorStateInfo(GenericAction.ClimbLayerIndex);
 
                 if (!_isPlayingAnimation && playerPosture == PostureInConfig.Climb &&
                     (baseLayerInfo.IsName("ClimbStart") || baseLayerInfo.IsName("ClimbEnd")))
@@ -118,7 +123,7 @@ namespace App.Shared.GameModules.Player.Actions.VaultPackage
         {
             get
             {
-                var playerPosture = Player.stateInterface.State.GetCurrentPostureState();
+                var playerPosture = _player.stateInterface.State.GetCurrentPostureState();
                 return playerPosture == PostureInConfig.Stand;
             }
         }

@@ -4,11 +4,12 @@ using com.wd.free.action;
 using com.wd.free.@event;
 using Core.Free;
 using Free.framework;
+using com.wd.free.para;
 
 namespace App.Shared.FreeFramework.Free.player
 {
     [Serializable]
-    public class PlayerBattleDataResetAction : AbstractPlayerAction
+    public class PlayerBattleDataResetAction : AbstractPlayerAction, IRule
     {
         public override void DoAction(IEventArgs args)
         {
@@ -20,6 +21,11 @@ namespace App.Shared.FreeFramework.Free.player
                 sp.Key = FreeMessageConstant.ResetBattleData;
                 FreeMessageSender.SendMessage(playerEntity, sp);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerBattleDataResetAction;
         }
     }
 }

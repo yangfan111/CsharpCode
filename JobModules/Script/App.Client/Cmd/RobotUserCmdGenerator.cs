@@ -119,5 +119,14 @@ namespace Assets.Sources
         {
 
         }
+
+        public void SwitchMode(EModeSwitch mode)
+        {
+        }
+
+        public UserCmd GetUserCmd()
+        {
+            return _userCmd;
+        }
     }
 }

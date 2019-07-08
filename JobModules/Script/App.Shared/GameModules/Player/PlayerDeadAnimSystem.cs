@@ -1,35 +1,18 @@
-﻿using App.Client.GameModules.Player;
-using App.Shared.Components.Player;
-using App.Shared.GameModules.Weapon;
-using App.Shared.Player;
+﻿using App.Shared.Components.Player;
+using Core.GameModule.Interface;
+using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using Entitas;
 
 namespace App.Shared.GameModules.Player
 {
-    public class PlayerDeadAnimSystem : AbstractGamePlaySystem<PlayerEntity>
+    public class PlayerDeadAnimSystem : IUserCmdExecuteSystem
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerDeadAnimSystem));
-        private Contexts _contexts;
 
-        public PlayerDeadAnimSystem(Contexts context) : base(context)
+        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
-            _contexts = context;
-        }
-
-        protected override IGroup<PlayerEntity> GetIGroup(Contexts contexts)
-        {
-            return contexts.player.GetGroup(PlayerMatcher.AllOf(PlayerMatcher.StateInterface,
-                PlayerMatcher.AppearanceInterface, PlayerMatcher.GamePlay));//PlayerMatcher.PlayerAction));
-        }
-
-        protected override bool Filter(PlayerEntity entity)
-        {
-            return true;
-        }
-
-        protected override void OnGamePlay(PlayerEntity playerEntity)
-        {
+            var playerEntity = (PlayerEntity)owner.OwnerEntity;
+            
             if(null == playerEntity || null == playerEntity.playerGameState ||
                null == playerEntity.characterControllerInterface) 
                 return;

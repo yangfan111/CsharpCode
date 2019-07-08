@@ -6,6 +6,7 @@ using UserInputManager.Lib;
 using UserInputManager.Utility;
 using Utils.AssetManager;
 using Utils.Singleton;
+using InputManager = App.Client.GameModules.UserInput.InputManager;
 
 namespace Assets.App.Client.GameModules.UserInput
 {
@@ -13,12 +14,13 @@ namespace Assets.App.Client.GameModules.UserInput
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(InputConfigInitSystem));
 
+        private Contexts _contexts;
         private UserInputContext _inputContext;
-
         private ISessionState _sessionState;
 
         public InputConfigInitSystem(Contexts contexts, ISessionState sessionState)
         {
+            _contexts = contexts;
             _inputContext = contexts.userInput;
             _sessionState = sessionState;
 
@@ -34,7 +36,7 @@ namespace Assets.App.Client.GameModules.UserInput
         public void OnLoadSucc(string source, UnityObject unityObj)
         {
             SingletonManager.Get<SubProgressBlackBoard>().Step();
-            var manager = new InputManager();
+            var manager = new InputManager(_contexts);
             if (!_inputContext.hasUserInputManager)
             {
                 var helper = new UserInputHelper(manager);

@@ -7,11 +7,12 @@ using com.wd.free.@event;
 using Core.Free;
 using gameplay.gamerule.free.ui.component;
 using com.wd.free.util;
+using com.wd.free.para;
 
 namespace App.Server.GameModules.GamePlay.framework.ui
 {
     [Serializable]
-    public class FreeUiDuplicateAction : SendMessageAction
+    public class FreeUiDuplicateAction : SendMessageAction, IRule
     {
         public string type;
         public string key;
@@ -57,6 +58,11 @@ namespace App.Server.GameModules.GamePlay.framework.ui
                     }
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeUiDuplicateAction;
         }
     }
 }

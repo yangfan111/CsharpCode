@@ -14,11 +14,12 @@ using com.wd.free.item;
 using com.wd.free.para;
 using Core.EntityComponent;
 using Core.SpatialPartition;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.entity
 {
     [Serializable]
-    public class FindItemAction : AbstractPlayerAction
+    public class FindItemAction : AbstractPlayerAction, IRule
     {
         private int radius;
 
@@ -60,17 +61,17 @@ namespace App.Server.GameModules.GamePlay.Free.entity
             }
 
             SceneObjectEntity entity = fr.GameContext.sceneObject.GetEntityWithEntityKey(localEntity.EntityKey);
-            if (entity != null && entity.hasSimpleEquipment && entity.simpleEquipment != null)
+            if (entity != null && entity.hasSimpleItem && entity.simpleItem != null)
             {
                 if (IsNear(entity.position.Value, _playerEntity.position.Value))
                 {
                     CreateItemToPlayerAction action = new CreateItemToPlayerAction();
-                    action.key = FreeItemConfig.GetItemKey(entity.simpleEquipment.Category, entity.simpleEquipment.Id);
+                    action.key = FreeItemConfig.GetItemKey(entity.simpleItem.Category, entity.simpleItem.Id);
                     action.name = "ground";
 
                     if (!string.IsNullOrEmpty(action.key))
                     {
-                        action.count = entity.simpleEquipment.Count.ToString();
+                        action.count = entity.simpleItem.Count.ToString();
                         action.SetPlayer("current");
                         fr.TempUse("current", (FreeData) _playerEntity.freeData.FreeData);
 
@@ -92,6 +93,11 @@ namespace App.Server.GameModules.GamePlay.Free.entity
         private bool IsNear(Vector3 v1, Vector3 v2)
         {
             return Math.Abs(v1.x - v2.x) < radius && Math.Abs(v1.z - v2.z) < radius;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FindItemAction;
         }
     }
 }

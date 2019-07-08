@@ -8,6 +8,7 @@ using com.wd.free.action;
 using Sharpen;
 using UnityEngine;
 using Core.Utils;
+using Core.Free;
 
 namespace com.wd.free.xml
 {
@@ -18,20 +19,20 @@ namespace com.wd.free.xml
 
         private static MyDictionary<string, string[]> extendsCache = new MyDictionary<string, string[]>();
 
-        private MyDictionary<string, object> objDic;
+        private MyDictionary<string, IRule> objDic;
         private MyDictionary<string, MyDictionary<string, string>> attrDic;
         private MyDictionary<string, MyDictionary<string, string>> fieldDic;
         private MyDictionary<string, string> classNameDic;
 
         public XmlAlias()
         {
-            objDic = new MyDictionary<string, object>();
+            objDic = new MyDictionary<string, IRule>();
             attrDic = new MyDictionary<string, MyDictionary<string, string>>();
             fieldDic = new MyDictionary<string, MyDictionary<string, string>>();
             classNameDic = new MyDictionary<string, string>();
         }
 
-        public void AddClass(string name, object obj)
+        public void AddClass(string name, IRule obj)
         {
             this.objDic[name] = obj;
             this.classNameDic[obj.GetType().Name] = name;

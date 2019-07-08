@@ -1,6 +1,4 @@
-﻿using Core;
-using Core.Prediction.UserPrediction.Cmd;
-using Core.Utils;
+﻿using Core.Utils;
 using UnityEngine;
 
 namespace App.Shared.GameModules.Weapon.Behavior
@@ -48,22 +46,32 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 //UpdateLen: AccPunchYaw  =>AccPunchYaw   
                 orientation.AccPunchYaw   = punchYaw * puntchLength;
                 orientation.AccPunchPitch = punchPitch * puntchLength;
-        
+         
                 var factor = GePuntchFallbackFactor(agent.Owner.WeaponController());
                 //GePuntchFallbackFactor : AccPunchYaw => AccPunchPitch     
                 orientation.AccPunchYawValue   = orientation.AccPunchYaw * factor;
                 orientation.AccPunchPitchValue = orientation.AccPunchPitch * factor;
             }
+        }
+
+        protected void RecoverFireRoll(WeaponBaseAgent agent, WeaponSideCmd cmd)
+        {
+            var orientation = agent.Owner.WeaponController().RelatedOrientation;
             var rotateYaw = orientation.FireRoll;
             if (rotateYaw != 0)
             {
-                var rotatePos = rotateYaw >= 0;
-                rotateYaw -= rotateYaw * cmd.UserCmd.FrameInterval  / FireShakeProvider.GetDecayInterval(agent);
-                if ((rotatePos && rotateYaw < 0) || (!rotatePos && rotateYaw > 0)) rotateYaw = 0;
+                if (agent.FireRollCfg == null)
+                {
+                    rotateYaw = 0;
+                }
+                else
+                {
+                    var rotatePos = rotateYaw >= 0;
+                    rotateYaw -= rotateYaw * cmd.UserCmd.FrameInterval  / agent.FireRollCfg.FireRollBackTime;
+                    if ((rotatePos && rotateYaw < 0) || (!rotatePos && rotateYaw > 0)) rotateYaw = 0;
+                }
                 orientation.FireRoll = rotateYaw;
             }
-
-
         }
 
 //        public static float easeOutExpo(float t, float b, float c, float d)

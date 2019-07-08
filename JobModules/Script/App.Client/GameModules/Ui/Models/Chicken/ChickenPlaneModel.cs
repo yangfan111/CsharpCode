@@ -35,6 +35,7 @@ namespace App.Client.GameModules.Ui.Models.Chicken
         public ChickenPlaneModel(IPlaneUiAdapter adapter) : base(adapter)
         {
             _adapter = adapter;
+            _adapter.Enable = false;
         }
 
         public override void Update(float interval)

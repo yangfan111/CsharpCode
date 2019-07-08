@@ -1,12 +1,13 @@
 using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.util;
+using Core.Free;
 
 namespace gameplay.gamerule.free.ui.component
 {
 	[System.Serializable]
-	public class FreeUITextValue : AbstractFreeUIValue
-	{
+	public class FreeUITextValue : AbstractFreeUIValue, IRule
+    {
 		private const long serialVersionUID = 5852438718279157187L;
 
 		private string text;
@@ -42,5 +43,10 @@ namespace gameplay.gamerule.free.ui.component
 		{
 			return  "ui text value:" + text;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeUITextValue;
+        }
+    }
 }

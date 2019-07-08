@@ -28,6 +28,9 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
             public Text CountText;
             [HideInInspector]
             public string oriCountText;
+            public GameObject CountShow;
+            [HideInInspector]
+            public bool oriCountShow;
             public UIImageLoader ItemIconBundle;
             [HideInInspector]
             public string oriItemIconBundle;
@@ -51,6 +54,9 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
                             break;
                         case "ItemGroup":
                             ItemGroupShow = v.gameObject;
+                            break;
+                        case "Count":
+                            CountShow = v.gameObject;
                             break;
                     }
                 }
@@ -94,6 +100,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
         private bool _itemGroupShow;
         private string _titleText;
         private string _countText;
+        private bool _countShow;
         private string _itemIconBundle;
         private string _itemIconAsset;
         private string _itemNameText;
@@ -101,6 +108,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
         public bool ItemGroupShow { get { return _itemGroupShow; } set {if(_itemGroupShow != value) Set(ref _itemGroupShow, value, "ItemGroupShow"); } }
         public string TitleText { get { return _titleText; } set {if(_titleText != value) Set(ref _titleText, value, "TitleText"); } }
         public string CountText { get { return _countText; } set {if(_countText != value) Set(ref _countText, value, "CountText"); } }
+        public bool CountShow { get { return _countShow; } set {if(_countShow != value) Set(ref _countShow, value, "CountShow"); } }
         public string ItemIconBundle { get { return _itemIconBundle; } set {if(_itemIconBundle != value) Set(ref _itemIconBundle, value, "ItemIconBundle"); } }
         public string ItemIconAsset { get { return _itemIconAsset; } set {if(_itemIconAsset != value) Set(ref _itemIconAsset, value, "ItemIconAsset"); } }
         public string ItemNameText { get { return _itemNameText; } set {if(_itemNameText != value) Set(ref _itemNameText, value, "ItemNameText"); } }
@@ -189,6 +197,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
             bindingSet.Bind(view.ItemGroupShow).For(v => v.activeSelf).To(vm => vm.ItemGroupShow).OneWay();
             bindingSet.Bind(view.TitleText).For(v => v.text).To(vm => vm.TitleText).OneWay();
             bindingSet.Bind(view.CountText).For(v => v.text).To(vm => vm.CountText).OneWay();
+            bindingSet.Bind(view.CountShow).For(v => v.activeSelf).To(vm => vm.CountShow).OneWay();
             bindingSet.Bind(view.ItemIconBundle).For(v => v.BundleName).To(vm => vm.ItemIconBundle).OneWay();
             bindingSet.Bind(view.ItemIconAsset).For(v => v.AssetName).To(vm => vm.ItemIconAsset).OneWay();
             bindingSet.Bind(view.ItemNameText).For(v => v.text).To(vm => vm.ItemNameText).OneWay();
@@ -202,6 +211,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
             _itemGroupShow = view.ItemGroupShow.activeSelf;
             _titleText = view.TitleText.text;
             _countText = view.CountText.text;
+            _countShow = view.CountShow.activeSelf;
             _itemIconBundle = view.ItemIconBundle.BundleName;
             _itemIconAsset = view.ItemIconAsset.AssetName;
             _itemNameText = view.ItemNameText.text;
@@ -214,6 +224,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
             view.oriItemGroupShow = _itemGroupShow;
             view.oriTitleText = _titleText;
             view.oriCountText = _countText;
+            view.oriCountShow = _countShow;
             view.oriItemIconBundle = _itemIconBundle;
             view.oriItemIconAsset = _itemIconAsset;
             view.oriItemNameText = _itemNameText;
@@ -236,6 +247,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
 			ItemGroupShow = _view.oriItemGroupShow;
 			TitleText = _view.oriTitleText;
 			CountText = _view.oriCountText;
+			CountShow = _view.oriCountShow;
 			ItemIconBundle = _view.oriItemIconBundle;
 			ItemIconAsset = _view.oriItemIconAsset;
 			ItemNameText = _view.oriItemNameText;

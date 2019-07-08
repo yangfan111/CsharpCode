@@ -1,5 +1,5 @@
-using App.Shared.Components.Player;
-using Core.Common;
+
+using Core;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 
@@ -7,33 +7,22 @@ namespace App.Shared.GameModules.Player
 {
     public class PlayerStateTipSystem: IUserCmdExecuteSystem
     {
-        public PlayerStateTipSystem(Contexts context)
+        private Contexts _contexts;
+
+        public PlayerStateTipSystem(Contexts contexts)
         {
+            _contexts = contexts;
         }
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             PlayerEntity player = owner.OwnerEntity as PlayerEntity;
-            if (player.gamePlay.IsLifeState(EPlayerLifeState.Dead))
+            if (!player.gamePlay.IsDead())
             {
-                return;
-            }
-
-            ShowPlayerStateTip(player);
-        }
-
-        private void ShowPlayerStateTip(PlayerEntity player)
-        {
-            // 窒息状态
-            if (player.hasOxygenEnergyInterface && player.oxygenEnergyInterface.Oxygen.InDivingDeffState)
-            {
-                player.tip.TipType = ETipType.OutOfOxygen;
-            }
-            
-            // 打断救援
-            if (player.hasGamePlay && player.gamePlay.IsInteruptSave && player.tip.TipType != ETipType.CanNotRescure)
-            {
-                player.tip.TipType = ETipType.CanNotRescure;
+                if (player.hasOxygenEnergyInterface && player.oxygenEnergyInterface.Oxygen.InDivingDeffState)
+                {
+                    player.tip.TipType = ETipType.OutOfOxygen;
+                }
             }
         }
     }

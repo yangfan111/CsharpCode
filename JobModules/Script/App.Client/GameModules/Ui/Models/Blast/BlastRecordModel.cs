@@ -22,14 +22,14 @@ namespace App.Client.GameModules.Ui.Models.Blast
 
         protected override void InitTitleInfo(UIList titleList, EUICampType campType)
         {
-            titleList.Add<BlastRecordInfo>(new GroupRecordViewData() { IsTitle = true, NeedShow = true, CampType = campType});
+            titleList.Add<BlastRecordInfo>(new GroupRecordViewData() { CanResque = _adapter.CanRescue,IsTitle = true, NeedShow = true, CampType = campType});
         }
 
         protected override void InitAllRecordInfo(UIList campInfoList, EUICampType campType)
         {
             for (int i = 0; i < MaxInfoCount; i++)
             {
-                campInfoList.Add<BlastRecordInfo>(new GroupRecordViewData() { IsTitle = false, NeedShow = false, Rank = i + 1, CampType = campType, CanShowC4 = _adapter.MyCamp == EUICampType.T});
+                campInfoList.Add<BlastRecordInfo>(new GroupRecordViewData() { CanResque = _adapter.CanRescue, IsTitle = false, NeedShow = false, Rank = i + 1, CampType = campType, CanShowC4 = _adapter.MyCamp == EUICampType.T});
             }
         }
 

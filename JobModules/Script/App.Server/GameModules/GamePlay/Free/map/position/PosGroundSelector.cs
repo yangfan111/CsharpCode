@@ -9,14 +9,20 @@ using UnityEngine;
 using App.Shared.Configuration;
 using Utils.Singleton;
 using Core.Utils;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.map.position
 {
     [Serializable]
-    public class PosGroundSelector : AbstractPosSelector
+    public class PosGroundSelector : AbstractPosSelector, IRule
     {
         private IPosSelector pos;
         private float waterDelta;
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PosGroundSelector;
+        }
 
         public override UnitPosition Select(IEventArgs args)
         {

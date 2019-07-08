@@ -12,6 +12,9 @@ using UnityEngine;
 using Utils.Singleton;
 using XmlConfig;
 using App.Client.GameModules.GamePlay.Free.App;
+using App.Client.GameModules.Ui.Models.Chicken;
+using App.Shared.GameModules.Player;
+using Core.Utils;
 
 namespace App.Client.GameModules.Ui.UiAdapter
 {
@@ -47,6 +50,8 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
     public class ChickenBagUiAdapter : UIAdapter, IChickenBagUiAdapter
     {
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(ChickenBagUiAdapter));
+
         private Contexts _contexts;
 
         public ChickenBagUiAdapter(Contexts contexts)
@@ -57,6 +62,11 @@ namespace App.Client.GameModules.Ui.UiAdapter
         public int GetWeaponIdBySlotIndex(int index)
         {
             var list = _contexts.ui.uI.WeaponIdList;
+            if (index < 0 || index >= list.Length)
+            {
+                Logger.Error("error index" + index);
+                return 0;
+            }
             return list[index];
         }
 
@@ -127,7 +137,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
             {
                 if (item.hasPosition
                     && IsNear(item.position.Value, Player.position.Value)
-                    && item.hasSimpleEquipment && item.simpleEquipment.Category > 0
+                    && item.hasSimpleItem && item.simpleItem.Category > 0
                     && HasNoObstacle(item, Player))
                 {
                     current.Add(item.entityKey.Value.EntityId);
@@ -203,19 +213,12 @@ namespace App.Client.GameModules.Ui.UiAdapter
             }
             foreach (var item in list)
             {
-                if (item.simpleEquipment.Category == (int)ECategory.Weapon)
-                {
-                    item.simpleEquipment.Count = 0;
-                }
-                if (item.simpleEquipment.Category == (int)ECategory.Avatar)
-                {
-                    item.simpleEquipment.Count = 0;
-                }
                 var data = new ChickenBagItemUiData
                 {
-                    cat = item.simpleEquipment.Category,
-                    id = item.simpleEquipment.Id,
-                    count = item.simpleEquipment.Count,
+                    cat = item.simpleItem.Category,
+                    id = item.simpleItem.Id,
+                    count = item.simpleItem.Category == (int)ECategory.Weapon ? 1:
+                        item.simpleItem.Count,
                     key = "1|" + item.entityKey.Value.EntityId
                 };
                 _groundItemDataList.Add(data);
@@ -225,6 +228,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
             return true;
         }
+
 
         private void FillBox(Dictionary<string, List<FreeMoveEntity>> dic, bool dead)
         {
@@ -253,20 +257,13 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 foreach (SimpleItemInfo info in infos)
                 {
                     int count = info.count;
-                    if (info.cat == (int)ECategory.Weapon)
-                    {
-                        count = 0;
-                    }
-                    if (info.cat == (int)ECategory.Avatar)
-                    {
-                        count = 0;
-                    }
 
                     var data = new ChickenBagItemUiData
                     {
                         cat = info.cat,
                         id = info.id,
-                        count = count,
+                        count = info.cat == (int)ECategory.Weapon ? 1 :
+                            count,
                         key = "1|" + info.entityId
                     };
                     _groundItemDataList.Add(data);
@@ -292,6 +289,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         public void SendSplitItem(string splitKey)
         {
             Debug.Log("SendSplitItem" + splitKey);
+            ChickenBagUtil.ClickItem(splitKey, true);
         }
 
         #endregion
@@ -328,6 +326,17 @@ namespace App.Client.GameModules.Ui.UiAdapter
             get { return _player ?? (_player = _contexts.player.flagSelfEntity); }
         }
 
+        public override bool Enable
+        {
+            set
+            {
+                base.Enable = value;
+                if (value)
+                    PlayerStateUtil.AddUIState(EPlayerUIState.BagOpen, Player.gamePlay);
+                else
+                    PlayerStateUtil.RemoveUIState(EPlayerUIState.BagOpen, Player.gamePlay);
+            }
+        }
 
     }
 

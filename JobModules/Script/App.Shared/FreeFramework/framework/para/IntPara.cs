@@ -2,12 +2,13 @@ using System;
 using Sharpen;
 using com.cpkf.yyjd.tools.util.math;
 using com.wd.free.exception;
+using Core.Free;
 
 namespace com.wd.free.para
 {
 	[System.Serializable]
-	public class IntPara : AbstractPara, IComparable<com.wd.free.para.IntPara>
-	{
+	public class IntPara : AbstractPara, IComparable<com.wd.free.para.IntPara>, IRule
+    {
 		private const long serialVersionUID = -6695618994224887482L;
 
 		public IntPara()
@@ -192,11 +193,16 @@ namespace com.wd.free.para
 		}
 
 		[System.NonSerialized]
-		internal static ParaPool<IPara> pool = new ParaPool<IPara>(new com.wd.free.para.IntPara());
+		internal static ParaPool pool = new ParaPool(new com.wd.free.para.IntPara());
 
-		protected internal override ParaPool<IPara> GetPool()
+		protected internal override ParaPool GetPool()
 		{
 			return pool;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.IntPara;
+        }
+    }
 }

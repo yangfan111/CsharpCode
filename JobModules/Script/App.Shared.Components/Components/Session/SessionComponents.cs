@@ -2,13 +2,11 @@ using System;
 using App.Shared.Components.ClientSession;
 using App.Shared.Components.ServerSession;
 using Core;
-using Core.BulletSimulation;
-using Core.Common;
+using Core.Attack;
+
 using Core.Configuration;
 using Core.EntitasAdpater;
 using Core.Free;
-using Core;
-using Core;
 using Core.GameModule.System;
 using Core.GameTime;
 using Core.IFactory;
@@ -27,7 +25,6 @@ using Core.SpatialPartition;
 using Core.SyncLatest;
 using Core.UpdateLatest;
 using Core.Utils;
-using Core.WeaponLogic;
 
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
@@ -77,7 +74,7 @@ namespace App.Shared.Components
         [DontInitilize]public IEntityIdGenerator EntityIdGenerator{ get; set; }
         [DontInitilize]public IEntityIdGenerator EquipmentEntityIdGenerator { get; set; }
         [DontInitilize]public IFreeArgs FreeArgs { get; set; }
-        [DontInitilize]public IBulletInfoCollector BulletInfoCollector { get; set; }
+   //     [DontInitilize]public IBulletInfoCollector BulletInfoCollector { get; set; }
         [DontInitilize]public ILevelManager LevelManager { get; set; }
         [DontInitilize]public Vector3 InitPosition { get; set; }
         [DontInitilize] public IWeaponFireUpdateManagaer WeaponFireUpdateManager { get; set; }
@@ -92,7 +89,9 @@ namespace App.Shared.Components
     public enum EClientSessionStates
     {
         LoadConfig,
+        LoadOptionConfig,
         LoadSubResourceConfig,
+        RequestSceneInfo,
         RequestRoomInfo,
         LoadSceneMapConfig,
         LoadOCConfig,

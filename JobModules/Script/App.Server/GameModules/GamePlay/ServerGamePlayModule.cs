@@ -17,11 +17,12 @@ namespace App.Server.GameModules.GamePlay
             var gameRule = contexts.session.serverSessionObjects.GameRule;
 
             //AddSystem(new SimplePlayerLifeSystem(contexts, contexts.serverSession.sessionObjects));
-            AddSystem(new BulletReloadSystem(contexts, contexts.session.commonSession));
+            AddSystem(new BulletReloadSystem(contexts.session.commonSession));
             AddSystem(new FreePlayerCmdSystem(contexts, room));
             AddSystem(new RigidbodyDebugInfoSystem(contexts));
             AddSystem(new MapObjectDebugInfoSystem(contexts));
             AddSystem(new LocalEventPlaySystem(contexts, true));
+            
             AddSystem(new FreePredictCmdSystem(contexts));
            
             AddSystem(new ObserveSystem(contexts));

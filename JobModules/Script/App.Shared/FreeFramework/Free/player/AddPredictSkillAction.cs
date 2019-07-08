@@ -3,6 +3,7 @@ using com.cpkf.yyjd.tools.util;
 using com.wd.free.action;
 using com.wd.free.config;
 using com.wd.free.@event;
+using com.wd.free.para;
 using com.wd.free.skill;
 using com.wd.free.xml;
 using Core.Free;
@@ -15,7 +16,7 @@ using System.Text;
 namespace App.Shared.FreeFramework.Free.player
 {
     [Serializable]
-    public class AddPredictSkillAction : AbstractPlayerAction
+    public class AddPredictSkillAction : AbstractPlayerAction, IRule
     {
         private List<ISkill> skills;
 
@@ -54,6 +55,11 @@ namespace App.Shared.FreeFramework.Free.player
 
                 FreeMessageSender.SendMessage(unit.Player, msg);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.AddPredictSkillAction;
         }
     }
 }

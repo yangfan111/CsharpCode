@@ -4,6 +4,7 @@ using App.Client.GameModules.Ui.ViewModels.Common;
 using App.Client.GameModules.Ui.UiAdapter;
 using Assets.App.Client.GameModules.Ui;
 using Assets.UiFramework.Libs;
+using Assets.XmlConfig;
 using Utils.AssetManager;
 using Core.Enums;
 using Core.GameModule.Interface;
@@ -36,7 +37,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         private DateTime _initPanelTime;
         private string _handAssetName;
         private Image _deathTypeIconImage;
-
+        private Text _titleText;
         protected override IUiViewModel ViewModel
         {
             get { return _viewModel; }
@@ -50,6 +51,11 @@ namespace App.Client.GameModules.Ui.Models.Common
             _infoItemModel.gameObject.SetActive(false);
             _deathTypeIconImage = FindChildGo("DeathTypeIcon").GetComponent<Image>();
             _handAssetName = "HandKill";
+            //_titleText = FindChildGo("Text2").GetComponent<Text>();
+            //if (_titleText != null)
+            //{
+            //    _titleText.text = _adapter.CanRescue ? "HIT DOWN" : "KILL";
+            //}
         }
 
 
@@ -168,14 +174,19 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void ShowWeaponIcon(int weaponId)
         {
-            WeaponAvatarConfigItem config = SingletonManager.Get<WeaponAvatarConfigManager>().GetConfigById(weaponId);
+            var config = SingletonManager.Get<ItemBaseConfigManager>().GetConfigById((int)ECategory.Weapon,weaponId);
             if (null != config)
             {
                 Loader.RetriveSpriteAsync(config.IconBundle, config.Icon,
                     (sprite) => { _viewModel.DeathTypeIconSprite = sprite; });
+                SetDeathIconView(true);
+            }
+            else
+            {
+                Logger.Error("Not found config with weaponId:" + weaponId);
+                SetDeathIconView(false);
             }
 
-            SetDeathIconView(true);
         }
 
         private void SetDeathIconView(bool val)

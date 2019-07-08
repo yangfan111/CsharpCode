@@ -1,9 +1,8 @@
 ﻿using Assets.Sources.Free;
 using Assets.Sources.Free.UI;
-using Core.Enums;
+using Core;
 using Core.Free;
 using Free.framework;
-using UnityEngine;
 using Utils.Singleton;
 
 namespace App.Client.GameModules.GamePlay.Free.UI
@@ -15,12 +14,19 @@ namespace App.Client.GameModules.GamePlay.Free.UI
             return key == FreeMessageConstant.CountDown;
         }
 
-        public void Handle(SimpleProto simpleProto)
+        public void Handle(SimpleProto data)
         {
-//            var data = SingletonManager.Get<FreeUiManager>().Contexts1.ui.uiDataAdapterEntity.uiDataAdapter.CrossHariState;
-//            data.SetCountDown(simpleProto.Bs[0], simpleProto.Fs[0]);
-            SingletonManager.Get<FreeUiManager>().Contexts1.ui.uI.CountingDown = simpleProto.Bs[0];
-            SingletonManager.Get<FreeUiManager>().Contexts1.ui.uI.CountDownNum = simpleProto.Fs[0];
+            var ui = SingletonManager.Get<FreeUiManager>().Contexts1.ui.uI;
+            ui.CountingDown = data.Bs[0];
+            ui.CountDownNum = data.Fs[0];
+            if (data.Bs.Count > 1)
+            {
+                ui.HaveCompletedCountDown = data.Bs[1];
+            }
+            if (data.Ins.Count > 0 && data.Ins[0] != 0)
+            {
+                SingletonManager.Get<FreeUiManager>().Contexts1.player.flagSelfEntity.tip.TipType = (ETipType) data.Ins[0];
+            }
         }
     }
 }

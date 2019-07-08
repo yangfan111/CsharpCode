@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Sharpen
 {
 	using System;
@@ -9,7 +11,7 @@ namespace Sharpen
 
 		public ObjectInputStream (InputStream s)
 		{
-			this.reader = new BinaryReader (s.GetWrappedStream ());
+			this.reader = new BinaryReader (s.GetWrappedStream (),Encoding.UTF8);
 		}
 
 		public int ReadInt ()

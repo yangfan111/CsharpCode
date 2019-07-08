@@ -19,23 +19,41 @@ namespace App.Client.SceneManagement.Vegetation
         private bool _hasTerrain;
 
         private readonly GpuInstancingDetailOnTerrain _detailManager;
+        private readonly GpuInstancingTreeOnTerrain _treeManager;
         private Dictionary<string, Vector3> _minPosMap = new Dictionary<string, Vector3>();
         private Dictionary<string, List<string>> _sceneToTerrain = new Dictionary<string, List<string>>();
         
         private bool _enableGpui = true;
         private Dictionary<string, Terrain> _cachedTerrain = new Dictionary<string, Terrain>();
         private Dictionary<string, float> _cachedDetailDist = new Dictionary<string, float>();
+        private Dictionary<string, float> _cachedTreeDist = new Dictionary<string, float>();
 
         private readonly List<string> _loadedTerrainNames = new List<string>();
 
         private int _loadingDataCount = 0;
+        
+        public bool IsReady
+        {
+            get { return _detailManager != null; }
+//            get { return _detailManager != null && _treeManager != null; }
+        }
 
         public TerrainRenderer()
         {
-            _detailManager = new GpuInstancingDetailOnTerrain(
-                (ComputeShader) Resources.Load(Constants.CsPath.DetailInstantiationInResource),
-                (ComputeShader) Resources.Load(Constants.CsPath.MergeBufferInResource),
-                (ComputeShader) Resources.Load(Constants.CsPath.VisibilityDeterminationInResource));
+            var detailInstantiation = (ComputeShader) Resources.Load(Constants.CsPath.DetailInstantiationInResource);
+            var treeInstantiation = (ComputeShader) Resources.Load(Constants.CsPath.TreeInstantiationInResource);
+            var merge = (ComputeShader) Resources.Load(Constants.CsPath.MergeBufferInResource);
+            var visibility = (ComputeShader) Resources.Load(Constants.CsPath.VisibilityDeterminationInResource);
+            var sort = (ComputeShader) Resources.Load(Constants.CsPath.GpuSortInResource);
+
+            if (merge != null && visibility != null)
+            {
+                if (detailInstantiation != null)
+                    _detailManager = new GpuInstancingDetailOnTerrain(detailInstantiation, merge, visibility, sort);
+                
+//                if (treeInstantiation != null)
+//                    _treeManager = new GpuInstancingTreeOnTerrain(treeInstantiation, merge, visibility);
+            }
         }
         
         public void SceneLoaded(Scene scene, LoadSceneMode mode)
@@ -55,10 +73,14 @@ namespace App.Client.SceneManagement.Vegetation
                         _minPosMap.Add(terrain.name, terrain.transform.position);
                         _cachedTerrain.Add(terrain.name, terrain);
                         _cachedDetailDist.Add(terrain.name, terrain.detailObjectDistance);
+                        _cachedTreeDist.Add(terrain.name, terrain.treeDistance);
                     }
 
                     if (SharedConfig.EnableGpui)
+                    {
                         terrain.detailObjectDistance = 0;
+//                        terrain.treeDistance = 0;
+                    }
 
                     _loadedTerrainNames.Add(terrain.name);
                     ++_loadingDataCount;
@@ -77,9 +99,11 @@ namespace App.Client.SceneManagement.Vegetation
                 foreach (var terrain in _sceneToTerrain[scene.name])
                 {
                     _detailManager.TerrainUnloaded(_minPosMap[terrain]);
+//                    _treeManager.TerrainUnloaded(_minPosMap[terrain]);
                     _minPosMap.Remove(terrain);
                     _cachedTerrain.Remove(terrain);
                     _cachedDetailDist.Remove(terrain);
+                    _cachedTreeDist.Remove(terrain);
                 }
 
                 _sceneToTerrain[scene.name].Clear();
@@ -114,16 +138,17 @@ namespace App.Client.SceneManagement.Vegetation
             {
                 if (_cachedTerrain.ContainsKey(terrainName))
                 {
-                    try
-                    {
-                        if (!_detailManager.TerrainLoaded(_cachedTerrain[terrainName], _cachedDetailDist[terrainName]))
-                            logger.ErrorFormat("unmatch parameter in {0}", terrainName);
-                    }
-                    catch (Exception e)
-                    {
-                        logger.Error(terrainName + "\n" + e.Message + "\n" + e.StackTrace);
-                        throw e;
-                    }
+                    var terrainData = _cachedTerrain[terrainName].terrainData;
+                    var heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapResolution,
+                        terrainData.heightmapResolution);
+                        
+                    if (!_detailManager.TerrainLoaded(_cachedTerrain[terrainName], _cachedDetailDist[terrainName],
+                        _minPosMap[terrainName], heightMap))
+                        logger.ErrorFormat("{0} will not have grass", terrainName);
+                        
+//                    if (!_treeManager.TerrainLoaded(_cachedTerrain[terrainName], _cachedTreeDist[terrainName],
+//                        _minPosMap[terrainName], heightMap))
+//                        logger.ErrorFormat("{0} will not have tree", terrainName);
                 }
                 else
                     logger.ErrorFormat("wrong loaded terraindata name: {0}", terrainName);
@@ -132,8 +157,13 @@ namespace App.Client.SceneManagement.Vegetation
             {
                 if (_cachedTerrain.ContainsKey(terrainName))
                 {
-                    if (!_detailManager.TerrainLoaded(data, _cachedTerrain[terrainName], _cachedDetailDist[terrainName]))
-                        logger.ErrorFormat("unmatch parameter in {0}", terrainName);
+                    if (!_detailManager.TerrainLoaded(data, _cachedTerrain[terrainName], _cachedDetailDist[terrainName],
+                        _minPosMap[terrainName]))
+                        logger.ErrorFormat("{0} will not have grass", terrainName);
+                        
+//                    if (!_treeManager.TerrainLoaded(data, _cachedTerrain[terrainName], _cachedTreeDist[terrainName],
+//                        _minPosMap[terrainName]))
+//                        logger.ErrorFormat("{0} will not have tree", terrainName);
                 }
             }
         }
@@ -142,7 +172,11 @@ namespace App.Client.SceneManagement.Vegetation
 
         public void SetCamera(Camera cam)
         {
-            _detailManager.SetRenderingCamera(cam);
+            if (_detailManager != null)
+                _detailManager.SetRenderingCamera(cam);
+            
+//            if (_treeManager != null)
+//                _treeManager.SetRenderingCamera(cam);
         }
 
         public void Draw()
@@ -150,7 +184,10 @@ namespace App.Client.SceneManagement.Vegetation
             if (SharedConfig.EnableGpui)
             {
                 if (_hasTerrain)
+                {
                     _detailManager.Draw();
+//                    _treeManager.Draw();
+                }
             }
 
             if (_enableGpui != SharedConfig.EnableGpui)
@@ -161,6 +198,7 @@ namespace App.Client.SceneManagement.Vegetation
                     foreach (var terrain in _cachedTerrain)
                     {
                         terrain.Value.detailObjectDistance = _cachedDetailDist[terrain.Key];
+//                        terrain.Value.treeDistance = _cachedTreeDist[terrain.Key];
                     }
                 }
                 else
@@ -168,6 +206,7 @@ namespace App.Client.SceneManagement.Vegetation
                     foreach (var terrain in _cachedTerrain)
                     {
                         terrain.Value.detailObjectDistance = 0;
+//                        terrain.Value.treeDistance = 0;
                     }
                 }
             }

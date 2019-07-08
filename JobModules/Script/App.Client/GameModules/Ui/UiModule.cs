@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using App.Client.GameModules.Free;
+using App.Client.GameModules.Ui.System;
 using App.Client.Utility;
 using App.Shared;
 using App.Shared.DebugHandle;
@@ -10,10 +11,11 @@ using Core.Utils;
 using UnityEngine;
 using Assets.App.Client.GameModules.Ui;
 using Core.GameModule.Interface;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui
 {
-    public class UiModule : GameModule ,  IUiHfrSystem
+    public class UiModule : GameModule, IUiHfrSystem
     {
         static List<AbstractModel> _uiModels = new List<AbstractModel>();
         static Dictionary<string, AbstractModel> _uiModelsDic = new Dictionary<string, AbstractModel>();
@@ -31,24 +33,33 @@ namespace App.Client.GameModules.Ui
         public UiModule(Contexts contexts)
         {
             UiModule.contexts = contexts;
-            
+
             instance = this;
             var loader = new UiResourceLoader(contexts.session.commonSession.AssetManager);
             AbstractModel.SetUiResourceLoader(loader);
             FreeGlobalVars.Loader = loader;
+            if (UIImageLoader.LoadSpriteAsync == null) //没有通过大厅直接进入游戏
+            {
+                UIImageLoader.LoadSpriteAsync = loader.RetriveSpriteAsync;
+            }
+
+            if (UIImageLoader.LoadTextureAsync == null)
+            {
+                UIImageLoader.LoadTextureAsync = loader.RetriveTextureAsync;
+            }
 
             AddModelSystems();
             AddSystem(new UiSessionSystem(contexts));
-            AddSystem(new UiPlayerDataInitSystem(contexts));
+            //AddSystem(new UiPlayerDataInitSystem(contexts));
+            AddSystem(new ObserveUISystem(contexts));
             AddSystem(this);
-
         }
 
         private void AddModelSystems()
         {
             foreach (var model in _uiModels)
             {
-                if(model is IUserSystem)
+                if (model is IUserSystem)
                     AddSystem(model as IUserSystem);
             }
         }
@@ -58,6 +69,7 @@ namespace App.Client.GameModules.Ui
             if (CursorLocker.SystemUnlock) return;
             contexts.ui.uISession.UiState[name] = false;
         }
+
         public void ShowUI(string name)
         {
             if (CursorLocker.SystemUnlock) return;
@@ -74,6 +86,7 @@ namespace App.Client.GameModules.Ui
                 sb.Append(name);
                 sb.Append("\n");
             }
+
             return sb.ToString();
         }
 
@@ -84,6 +97,7 @@ namespace App.Client.GameModules.Ui
             {
                 model.Destory();
             }
+
             _uiModels.Clear();
             _uiModelsDic.Clear();
             UiCreateFactory.Destroy();
@@ -156,6 +170,16 @@ namespace App.Client.GameModules.Ui
         public void OnUiRender(float intervalTime)
         {
             UiCommon.UIManager.Update();
+            if (Input.GetKeyDown(KeyCode.F6))
+            {
+                SwitchUIRootShow();
+            }
+        }
+
+        private void SwitchUIRootShow()
+        {
+            var root = UiCommon.UIManager.UIRoot;
+            root.SetActive(!root.activeSelf);
+        }
     }
-}
 }

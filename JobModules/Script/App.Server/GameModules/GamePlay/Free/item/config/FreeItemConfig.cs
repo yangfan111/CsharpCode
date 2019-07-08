@@ -232,11 +232,18 @@ namespace App.Server.GameModules.GamePlay.Free.item.config
                     if (part.PartsList != null)
                     {
                         WeaponPartsConfigItem item = SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(part.PartsList[0]);
-                        FreeItemInfo itemInfo = new FreeItemInfo((int)ECategory.WeaponPart, part.Id, ((int)ECategory.WeaponPart * 10000 + part.Id).ToString(),
-                            part.Name, "part", "p" + partMap[item.Type].ToString(), "", "icon/weaponpart/" + item.Icon, "icon/weaponpart/" + item.Icon, 0);
-                        itemInfo.weight = item.Weight;
-                        list.Add(itemInfo);
-                        AddToInfoDic(itemInfo);
+                        if(item != null)
+                        {
+                            FreeItemInfo itemInfo = new FreeItemInfo((int)ECategory.WeaponPart, part.Id, ((int)ECategory.WeaponPart * 10000 + part.Id).ToString(),
+                               part.Name, "part", "p" + partMap[item.Type].ToString(), "", "icon/weaponpart/" + item.Icon, "icon/weaponpart/" + item.Icon, 0);
+                            itemInfo.weight = item.Weight;
+                            list.Add(itemInfo);
+                            AddToInfoDic(itemInfo);
+                        }
+                        else
+                        {
+                            Debug.LogWarningFormat("weapon part {0},{1},{2} is not valid.", part.Id, part.Name, part.PartsList[0]);
+                        }
                     }
                     else
                     {

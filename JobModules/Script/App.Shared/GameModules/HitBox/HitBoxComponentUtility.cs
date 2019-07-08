@@ -30,7 +30,7 @@ namespace App.Shared.GameModules.HitBox
                 pc.OwnerEntityKey = entityKey;
                 pc.gameObject.layer = UnityLayerManager.GetLayerIndex(EUnityLayerName.Hitbox);
             });
-            playerEntity.AddHitBox(new BoundingSphere(sc.center, sc.radius), hitboxGo, false);
+            playerEntity.AddHitBox(-1, new BoundingSphere(sc.center, sc.radius), hitboxGo, false);
             hitboxGo.SetActive(false);
 
             return hitboxGo;
@@ -40,7 +40,7 @@ namespace App.Shared.GameModules.HitBox
             HitBoxTransformProvider provider)
         {
             provider.SetActive(false);
-            playerEntity.ReplaceHitBox(new BoundingSphere(provider.BoundSpherePosition(), provider.BoundSphereRadius()),
+            playerEntity.ReplaceHitBox(-1, new BoundingSphere(provider.BoundSpherePosition(), provider.BoundSphereRadius()),
                 null, false);
             var trans = provider.GetHitBoxTransforms();
             foreach (var item in trans)

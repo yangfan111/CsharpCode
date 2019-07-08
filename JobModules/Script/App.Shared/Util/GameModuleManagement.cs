@@ -71,10 +71,10 @@ namespace App.Shared
         internal static void Cache(T instance,int cookie)
         {
             instance.cookie = cookie;
-            if (logics.ContainsKey(cookie))
+            T hvalue;
+            if (logics.TryGetValue(cookie, out hvalue))
             {
-                var tmp = logics[cookie];
-                tmp.Dispose();
+                hvalue.Dispose();
             }
             if (s_Default == null) s_Default = instance;
             logics[cookie] = instance;
@@ -91,10 +91,10 @@ namespace App.Shared
         }
         internal static T ForceAllocate(int cookie, System.Action<T> processor)
         {
-            if (logics.ContainsKey(cookie))
+            T hvalue;
+            if (logics.TryGetValue(cookie, out hvalue))
             {
-                var tmp = logics[cookie];
-                tmp.Dispose();
+                hvalue.Dispose();
             }
            return Allocate(cookie, processor);
         }

@@ -13,9 +13,7 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Free
         private float _transitionTime ;
         private SubCameraMotorType _motorType;
 
-
-        public FreeOffMotor(float transitionTime
-        )
+        public FreeOffMotor(float transitionTime)
         {
             _transitionTime = transitionTime;
             _motorType = SubCameraMotorType.View;
@@ -54,30 +52,20 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Free
                     output.EulerAngle = Vector3.Lerp(new Vector3(state.LastFreePitch, state.LastFreeYaw, 0),Vector3.zero, elapsedPercent);
                     state.FreeYaw = output.ArchorEulerAngle.y;
                     state.FreePitch= output.ArchorEulerAngle.x;
-                   
-//                    output.ArchorPostOffset =
-//                        Vector3.Lerp( -state.GetMainConfig().ScreenOffset,Vector3.zero, elapsedPercent);
                 }
                 else
                 {
                     output.EulerAngle = Vector3.zero;
                     state.FreeYaw = output.ArchorEulerAngle.y;
                     state.FreePitch= output.ArchorEulerAngle.x;
-                
                 }
-
             }
-          
-           
-           
         }
 
         public override void UpdatePlayerRotation(ICameraMotorInput input, ICameraMotorState state, PlayerEntity player)
         {
            
         }
-
-        
 
         public override HashSet<short> ExcludeNextMotor()
         {

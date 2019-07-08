@@ -13,6 +13,9 @@ namespace AssetBundleManager.Warehouse
     abstract class AssetBundleWarehouse
     {
         private readonly string _manifestBundleName;
+        /// <summary>
+        /// assetName -> Variants
+        /// </summary>
         private Dictionary<string, HashSet<string>> _bundlesWithVariant = new Dictionary<string, HashSet<string>>();
         private string[] _activeVariants = { };
         private readonly bool _isSceneQuantityLevel;
@@ -34,7 +37,7 @@ namespace AssetBundleManager.Warehouse
                     OperationFactory.CreateManifestLoading(_manifestBundleName, "AssetBundleManifest")
             };
         }
-
+        //GetAllAssetBundlesWithVariant
         public virtual void SetManifest(AssetBundleManifest obj)
         {
             foreach (var v in obj.GetAllAssetBundlesWithVariant())
@@ -46,7 +49,7 @@ namespace AssetBundleManager.Warehouse
                 _bundlesWithVariant[splits[0]].Add(splits[1]);
             }
 
-            var _allAssetBundle = obj.GetAllAssetBundles();
+            string[] _allAssetBundle = obj.GetAllAssetBundles();
             if (_allAssetBundle.Length == 0)
             {
                 _logger.InfoFormat("!!!!!!!!!!!! the _allAssetBundle is null !!!!!!!!!!!!!");

@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace XmlConfig
 {
@@ -32,6 +33,9 @@ namespace XmlConfig
         /// 枪托
         /// </summary>
         Stock,
+        /// <summary>
+        /// 枪膛
+        /// </summary>
         Bore,
         Feed,
         Trigger,
@@ -77,6 +81,21 @@ namespace XmlConfig
         public float DistanceDecay;
         public float EmitVelocity;
         public float AttackInterval;
+        public string DOFParameter; //景深
+        public string[] GetDOFParameters
+               {
+                   get
+                   {
+                       if (DOFParameterSplits == null)
+                       {
+                           DOFParameterSplits = DOFParameter.Split(',');
+                       }
+       
+                       return DOFParameterSplits;
+                   }
+               }
+               private string[] DOFParameterSplits; //景深
+             
     }
 
     [XmlRoot("root")]

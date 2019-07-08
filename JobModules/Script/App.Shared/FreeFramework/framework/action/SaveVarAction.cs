@@ -2,12 +2,13 @@ using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.para;
 using com.wd.free.util;
+using Core.Free;
 
 namespace com.wd.free.action
 {
 	[System.Serializable]
-	public class SaveVarAction : AbstractGameAction
-	{
+	public class SaveVarAction : AbstractGameAction, IRule
+    {
 		private const long serialVersionUID = -3856004590316476013L;
 
 		private string name;
@@ -22,5 +23,10 @@ namespace com.wd.free.action
 				args.SetPara(FreeUtil.ReplaceVar(name, args), parable);
 			}
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SaveVarAction;
+        }
+    }
 }

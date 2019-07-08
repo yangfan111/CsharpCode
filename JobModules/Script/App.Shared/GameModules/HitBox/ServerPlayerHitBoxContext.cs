@@ -1,118 +1,70 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using App.Shared.Components.Common;
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Player;
-using Core.Animation;
-using Core.Components;
+using App.Shared.Player;
 using Core.EntityComponent;
-using Core.HitBox;
 using Core.Utils;
-using System.Text;
 using UnityEngine;
-using Utils.Singleton;
 
-namespace App.Shared.GameModules.Bullet
+namespace App.Shared.GameModules.Attack
 {
-    public class ServerPlayerHitBoxContext : IHitBoxContext
+    public class ServerPlayerHitBoxContext : PlayerHitBoxContext
     {
-        private static LoggerAdapter _logger = new LoggerAdapter(typeof(ServerPlayerHitBoxContext));
-        private PlayerContext _playerContext;
-        private AnimatorPoseReplayer _poseReplayer;
-
-        public ServerPlayerHitBoxContext(PlayerContext playerContext)
+        public ServerPlayerHitBoxContext(PlayerContext playerContext) : base(playerContext)
         {
-            _playerContext = playerContext;
-            _poseReplayer = new AnimatorPoseReplayer();
         }
 
-        public Vector3 GetPosition(EntityKey entityKey)
-        {
-            var entity = _playerContext.GetEntityWithEntityKey(entityKey);
-            if (entity == null) return Vector3.zero;
-            return entity.hitBox.HitPreliminaryGeo.position;
-        }
-
-        public float GetRadius(EntityKey entityKey)
-        {
-            var entity = _playerContext.GetEntityWithEntityKey(entityKey);
-            if (entity == null) return -1;
-            return entity.hitBox.HitPreliminaryGeo.radius;
-        }
-
-        public void EnableHitBox(EntityKey entityKey, bool enable)
-        {
-            var entity = _playerContext.GetEntityWithEntityKey(entityKey);
-            if (entity != null && entity.hasPosition && entity.hasHitBox)
-            {
-                var provider = SingletonManager.Get<HitBoxTransformProviderCache>().GetProvider(entity.thirdPersonModel.Value);
-                if (provider != null)
-                    provider.SetActive(enable);
-            }
-        }
-
-        public List<Transform> GetCollidersTransform(EntityKey entityKey)
-        {
-            var entity = _playerContext.GetEntityWithEntityKey(entityKey);
-            if (entity != null && entity.hasPosition && entity.hasHitBox)
-            {
-                var provider = SingletonManager.Get<HitBoxTransformProviderCache>().GetProvider(entity.thirdPersonModel.Value);
-                if (provider != null) return provider.GetHitBoxTransforms().Values.ToList();
-            }
-            return null;
-        }
-
-        public HitBoxComponent GetHitBoxComponent(EntityKey entityKey)
-        {
-            var entity = _playerContext.GetEntityWithEntityKey(entityKey);
-            if ( entity!= null && entity.hasPosition && entity.hasHitBox)
-            {
-                return entity.hitBox;
-            }
-
-            return null;
-        }
-
-        public void UpdateHitBox(IGameEntity gameEntity)
+        public override void UpdateHitBox(IGameEntity gameEntity, int renderTime, int cmdSeq)
         {
             var position = gameEntity.Position.Value;
-            var rotation = gameEntity.GetComponent<OrientationComponent>().RotationYaw;
-            var hitBoxComponent = GetHitBoxComponent(gameEntity.EntityKey);
+            var rotation = gameEntity.GetComponent<OrientationComponent>().ModelView;
+            var playerEntity = GetPlayerEntity(gameEntity);
+            var hitBoxComponent = GetHitBoxComponent(playerEntity);
 
             if (hitBoxComponent != null)
             {
-
-                var playerEntity = GetPlayerEntity(gameEntity);
-				
                 playerEntity.thirdPersonAnimator.UnityAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 
-                PlayerEntityUtility.UpdateTransform(playerEntity,
-                        gameEntity.GetComponent<NetworkAnimatorComponent>(),
-                        gameEntity.GetComponent<PredictedAppearanceComponent>(),
-                        gameEntity.GetComponent<OrientationComponent>());
-                //_logger.DebugFormat("server animator {0}", gameEntity.GetComponent<NetworkAnimatorComponent>().ToStringExt());
-                
-                PlayerEntityUtility.UpdateTransform(playerEntity,
-                                                    playerEntity.networkAnimator,
-                                                    playerEntity.predictedAppearance,
-                                                    playerEntity.orientation);
-                
-                playerEntity.thirdPersonAnimator.UnityAnimator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
+                PlayerEntityUtility.UpdateTransform(playerEntity, gameEntity.GetComponent<NetworkAnimatorComponent>(),
+                    gameEntity.GetComponent<PredictedAppearanceComponent>(),
+                    gameEntity.GetComponent<OrientationComponent>());
 
-                if (_logger.IsDebugEnabled)
-                {
-                    StringBuilder s = new StringBuilder();
-                    hitBoxComponent.HitBoxGameObject.transform.Recursively(t => s.Append("[n " + t.name + ", p " + t.position.ToStringExt() + ", r " + t.rotation.ToStringExt() + "]"));
-                    _logger.DebugFormat("hitbox pos {0}, rot {1}, transforms {2}, ", position, rotation, s);
-                }
+                // DebugUtil.AppendShootText(renderTime, "server animator {0}",
+                //     gameEntity.GetComponent<NetworkAnimatorComponent>().ToStringExt());
+
+                playerEntity.RootGo().transform.SetPositionAndRotation(position, rotation);
+                playerEntity.hitBox.RenderTime = renderTime;
+
+                // if (_logger.IsDebugEnabled)
+                // {
+                //     StringBuilder s = new StringBuilder();
+                //     hitBoxComponent.HitBoxGameObject.transform.Recursively(t => s.Append("[n " + t.name + ", p " + t.position.ToStringExt() + ", r " + t.rotation.ToStringExt() + "]"));
+                // //    _logger.DebugFormat("hitbox pos {0}, rot {1}, transforms {2}, ", position, rotation, s);
+                // DebugUtil.AppendShootText(cmdSeq,"hitbox pos {0}, rot {1}, transforms {2}, ", position, rotation, s);
+                // }
+                base.UpdateHitBox(gameEntity, renderTime, cmdSeq);
             }
         }
 
-      
-        private PlayerEntity GetPlayerEntity(IGameEntity gameEntity)
+        public override void RecoverHitBox(IGameEntity gameEntity, int renderTime)
         {
-            var playerEntity = _playerContext.GetEntityWithEntityKey(gameEntity.EntityKey);
-            return playerEntity;
+            var playerEntity = GetPlayerEntity(gameEntity);
+            var hitBoxComponent = GetHitBoxComponent(playerEntity);
+            if (hitBoxComponent != null)
+            {
+                if (playerEntity.hitBox.RenderTime != renderTime)
+                {
+                    playerEntity.RootGo().transform.SetPositionAndRotation(playerEntity.position.Value, playerEntity.orientation.ModelView);
+                    
+                    PlayerEntityUtility.UpdateTransform(playerEntity, playerEntity.networkAnimator,
+                        playerEntity.predictedAppearance, playerEntity.orientation);
+                    playerEntity.thirdPersonAnimator.UnityAnimator.cullingMode =
+                        AnimatorCullingMode.CullUpdateTransforms;
+                    playerEntity.hitBox.RenderTime = renderTime;
+                    
+                }
+            }
+
+            base.RecoverHitBox(gameEntity, renderTime);
         }
     }
 }

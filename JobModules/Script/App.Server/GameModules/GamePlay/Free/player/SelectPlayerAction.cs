@@ -12,11 +12,12 @@ using gameplay.gamerule.free.rule;
 using App.Server.GameModules.GamePlay;
 using App.Server.GameModules.GamePlay.free.player;
 using App.Shared.GameModules.Player;
+using Core.Free;
 
 namespace gameplay.gamerule.free.player
 {
     [System.Serializable]
-    public class SelectPlayerAction : AbstractGameAction
+    public class SelectPlayerAction : AbstractGameAction, IRule
     {
         private const long serialVersionUID = -5711184360474846389L;
 
@@ -170,7 +171,7 @@ namespace gameplay.gamerule.free.player
 
         private void Ini(IEventArgs args)
         {
-            if (con == null || (condition != null && condition.Contains(FreeUtil.VAR_START) && condition.Contains(FreeUtil.VAR_END)))
+            if (con == null || (condition != null && (condition.IndexOf(FreeUtil.VAR_START_CHAR) > -1) && (condition.IndexOf(FreeUtil.VAR_END_CHAR) > -1)))
             {
                 if (!StringUtil.IsNullOrEmpty(condition))
                 {
@@ -181,6 +182,11 @@ namespace gameplay.gamerule.free.player
                     selectedName = "current";
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.SelectPlayerAction;
         }
     }
 }

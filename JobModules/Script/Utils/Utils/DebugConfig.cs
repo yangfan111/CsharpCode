@@ -7,5 +7,6 @@
         public static bool DrawBulletLine = false;
         public static bool DrawThrowingLine = false;
         public static float DrawHitBoxDuration = 10f;
+        public static bool AppendShootArchiveText = true;
     }
 }

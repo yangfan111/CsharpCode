@@ -10,5 +10,7 @@ namespace com.wd.free.action
         void Reset(IEventArgs args);
 
 		string ToMessage(IEventArgs args);
+
+        string GetName();
 	}
 }

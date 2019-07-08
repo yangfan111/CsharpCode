@@ -14,18 +14,48 @@ namespace Core.Components
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(MultiAssetComponent));
 
-        public Dictionary<AssetInfo, UnityObject> LoadedAssets { get; private set; }
+        [DontInitilize] public Dictionary<AssetInfo, UnityObject> LoadedAssets { get; private set; }
 
+        public void CacheAssetObject(UnityObject unityObject)
+        {
+            loadingAssetInfos.Remove(unityObject.Address);
+            LoadedAssets[unityObject.Address] = unityObject;
+        }
+        
+
+        public HashSet<AssetInfo> loadingAssetInfos { get; private set; }
+
+        public bool AddLoadingAssets(AssetInfo assetInfo)
+        {
+            UnityObject uo;
+            LoadedAssets.TryGetValue(assetInfo, out uo);
+            if (uo == null)
+            {
+                loadingAssetInfos.Add(assetInfo);
+                return true;
+            }
+
+            return false;
+        }
+        
         protected MultiAssetComponent()
         {
-            LoadedAssets = new Dictionary<AssetInfo, UnityObject>(AssetInfo.AssetInfoComparer.Instance);
+            loadingAssetInfos = new HashSet<AssetInfo>();
+            LoadedAssets      = new Dictionary<AssetInfo, UnityObject>(AssetInfo.AssetInfoComparer.Instance);
         }
+        
+        public void Prepare()
+        {
+            loadingAssetInfos.Clear();
+            
+        }
+
 
         public virtual void Recycle(IUnityAssetManager assetManager)
         {
             foreach (var asset in LoadedAssets)
             {
-                if(asset.Value != null)
+                if (asset.Value != null)
                     assetManager.Recycle(asset.Value);
             }
         }
@@ -37,28 +67,20 @@ namespace Core.Components
                 if (LoadedAssets.Count > 0)
                 {
                     var first = LoadedAssets.First();
-                    if(first.Value != null)
-                    return first.Value.AsGameObject;
+                    if (first.Value != null)
+                        return first.Value.AsGameObject;
                 }
-               
+
                 return null;
-                
-                
             }
         }
 
         public abstract int GetComponentId();
 
-       
         public void Reset()
         {
-            if (LoadedAssets == null)
-                LoadedAssets =
-                    new Dictionary<AssetInfo, UnityObject>(AssetInfo.AssetInfoComparer.Instance);
-            else
-            {
-                LoadedAssets.Clear();
-            }
+            LoadedAssets.Clear();
+            loadingAssetInfos.Clear();
         }
     }
 }

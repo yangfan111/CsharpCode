@@ -54,12 +54,12 @@ namespace com.wd.free.skill
 
 		public virtual void Pause()
 		{
-			this.pause = Runtime.CurrentTimeMillis();
+			this.pause = Runtime.CurrentTimeMillis(false);
 		}
 
 		public virtual void Resume()
 		{
-			this.currentTime += Runtime.CurrentTimeMillis() - pause;
+			this.currentTime += Runtime.CurrentTimeMillis(false) - pause;
 			this.pause = 0;
 		}
 
@@ -70,12 +70,12 @@ namespace com.wd.free.skill
 
 		public virtual bool IsLastOver()
 		{
-			return (pause == 0 && (Runtime.CurrentTimeMillis() - currentTime) >= lastDuration) || activeInter;
+			return (pause == 0 && (Runtime.CurrentTimeMillis(false) - currentTime) >= lastDuration) || activeInter;
 		}
 
 		public virtual bool IsCooldownOver()
 		{
-			return pause == 0 && (Runtime.CurrentTimeMillis() - currentTime) >= coolDownDuration;
+			return pause == 0 && (Runtime.CurrentTimeMillis(false) - currentTime) >= coolDownDuration;
 		}
 
 		public virtual bool IsActive()
@@ -90,7 +90,7 @@ namespace com.wd.free.skill
 
 		public virtual void Start()
 		{
-			this.currentTime = Runtime.CurrentTimeMillis();
+			this.currentTime = Runtime.CurrentTimeMillis(false);
 			this.active = true;
 			this.activeInter = false;
 			this.interrupt = false;

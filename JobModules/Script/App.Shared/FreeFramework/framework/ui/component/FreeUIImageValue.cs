@@ -1,12 +1,13 @@
 using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.util;
+using Core.Free;
 
 namespace gameplay.gamerule.free.ui.component
 {
 	[System.Serializable]
-	public class FreeUIImageValue : AbstractFreeUIValue
-	{
+	public class FreeUIImageValue : AbstractFreeUIValue, IRule
+    {
 		private const long serialVersionUID = -8816773404741426794L;
 
 		private string url;
@@ -42,5 +43,10 @@ namespace gameplay.gamerule.free.ui.component
 		{
 			return "ui image value:" + url;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeUIImageValue;
+        }
+    }
 }

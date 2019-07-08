@@ -66,14 +66,14 @@ namespace App.Server
                 serverRoom.SetRoomInfo(hallRoom);
                 serverRoom.SetGameMode(message.ModeId, message.MapId);
                 
-                _logger.InfoFormat("Create Room {0}", message.MapId);
+                _logger.InfoFormat("Create Room {0}", message);
             }
             else
             {
                 HallRoom hallRoom = new DummyHallRoom(_dispatcher, _contexts);
+                serverRoom.SetGameMode(RuleMap.GetRuleId(SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.Rule), SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.MapId);
                 //hallRoom.Init(); //本地测试无需发战报
                 serverRoom.SetHallRoom(hallRoom);
-                serverRoom.SetGameMode(RuleMap.GetRuleId(SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.Rule), SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.MapId);
             }
             return serverRoom;
         }
@@ -81,6 +81,11 @@ namespace App.Server
         private void ResetEventDispacther()
         {
             _contexts.session.serverSessionObjects.RoomEventDispatchter = _dispatcher;
+        }
+
+        public Contexts contexts()
+        {
+            return _contexts;
         }
     }
 }

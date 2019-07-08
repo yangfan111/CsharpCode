@@ -11,9 +11,13 @@ namespace App.Client.GPUInstancing.Core.Spatial
 {
     class GpuInstancingDetailNode : GpuInstancingNode
     {
+        #region Debug
+
         public string TerrainName;
         public int X;
         public int Z;
+
+        #endregion
 
         private List<ushort[]> _countInNode;
         private OfflineDetailData _compactCountInNode;
@@ -33,6 +37,8 @@ namespace App.Client.GPUInstancing.Core.Spatial
 
         private TerrainProperty _terrainProperty;
         private List<DividedDetailProperty> _detailProperties;
+
+        private bool _empty = true;
 
         public void InitCountInUnit(List<int[,]> detail, int indexX, int indexY, int size)
         {
@@ -78,6 +84,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
                 {
                     _countInNode.Add(layer);
                     layer = null;
+                    _empty = false;
                 }
                 else
                     _countInNode.Add(null);
@@ -125,6 +132,8 @@ namespace App.Client.GPUInstancing.Core.Spatial
                         _compactCountInNode.Lengths.Add(unitDataLength);
                     }
                     index += layerOffset;
+
+                    _empty = false;
                 }
                 else
                 {
@@ -180,10 +189,10 @@ namespace App.Client.GPUInstancing.Core.Spatial
                     _count[i] = new ComputeBuffer(1, Constants.StrideSizeInt);
                 }
 
-                _countInCpu[i] = -1;
+                _countInCpu[i] = _totalCountInLayer[i];
 
                 _count[i].SetData(initialCounter);
-                _instantiationShader.SetBuffer(kernelId, Constants.DetailVariable.TransformData, _transform[i]);
+                _instantiationShader.SetBuffer(kernelId, Constants.TerrainVariable.TransformData, _transform[i]);
                 _instantiationShader.SetBuffer(kernelId, Constants.DetailVariable.NormalData, _normal[i]);
                 _instantiationShader.SetBuffer(kernelId, Constants.DetailVariable.ColorData, _color[i]);
                 _instantiationShader.SetBuffer(kernelId, Constants.ShaderVariable.CounterData, _count[i]);
@@ -228,6 +237,7 @@ namespace App.Client.GPUInstancing.Core.Spatial
         }
 
         private readonly ComputeBuffer[] _cache = new ComputeBuffer[(int) DetailBufferType.Length];
+
         public override ComputeBuffer[] GetInstancingData(int index)
         {
             _cache[(int) DetailBufferType.Transform] = _transform[index];
@@ -238,18 +248,17 @@ namespace App.Client.GPUInstancing.Core.Spatial
 
         public override int GetInstancingDataCount(int index)
         {
-            if (_countInCpu[index] == -1)
-            {
-                _count[index].GetData(_countArray);
-                _countInCpu[index] = _countArray[0];
-            }
-
             return _countInCpu[index];
         }
 
         public override MergeUnit[] GetMergeKernels(ComputeShader shader)
         {
             return MergeKernel.GetDetailMergeKernel(shader);
+        }
+
+        public override bool Empty
+        {
+            get { return _empty; }
         }
     }
 }

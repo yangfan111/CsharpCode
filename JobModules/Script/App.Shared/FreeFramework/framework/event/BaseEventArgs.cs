@@ -36,6 +36,8 @@ namespace com.wd.free.@event
 
         protected FreeBufManager _bufs;
 
+        protected PosManager _poss;
+
         protected FreeContext _freeContext;
 
         private MyDictionary<string, Stack<IParable>> temp;
@@ -51,7 +53,8 @@ namespace com.wd.free.@event
             this._componentMap = new GameComponentMap();
             this._components = new GameComponents();
             this._bufs = new FreeBufManager();
-            this._freeContext = new FreeContext(_gameContext);
+            this._poss = new PosManager(this);
+            this._freeContext = new FreeContext(_gameContext, this);
         }
 
         public virtual GameTriggers Triggers
@@ -121,9 +124,10 @@ namespace com.wd.free.@event
 
         public virtual IParable GetUnit(string key)
         {
-            if (directMap.Count > 0 && directMap.ContainsKey(key))
+            IParable v = null;
+            if (/*directMap.Count > 0 && */directMap.TryGetValue(key, out v))
             {
-                return directMap[key];
+                return v;
             }
             else
             {
@@ -148,7 +152,8 @@ namespace com.wd.free.@event
 
         public virtual void TempUse(string key, IParable paras)
         {
-            if (!temp.ContainsKey(key))
+            Stack<IParable> v = null;
+            if (!temp.TryGetValue(key, out v))
             {
                 temp[key] = new Stack<IParable>();
             }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using App.Client.ThreeEyedGames;
 
 namespace App.Client.ClientSystems
 {
@@ -7,7 +8,6 @@ namespace App.Client.ClientSystems
     {
         private static bool initialized = false;
         private static MeshRenderer[] meshRenderers;
-        private static MeshCollider[] meshColliders;
         // MeshRenderer
         private static LayerMask ignoreLayer;
         // MeshCollider
@@ -27,16 +27,17 @@ namespace App.Client.ClientSystems
             careLayer.value = (1 << LayerMask.NameToLayer(HITBOX));
 
             meshRenderers = Object.FindObjectsOfType<MeshRenderer>();
-            meshColliders = Object.FindObjectsOfType<MeshCollider>();
             initialized = true;
         }
 
+
+        private static List<Polygon> meshPols = new List<Polygon>();
         public static Mesh Create(DecalVolume decal, float surfaceMaxAngle, float surfaceDistance, float smoothAngle, Vector3 normal, float ratio)
         {
-            var pols = new List<Polygon>();
+            meshPols.Clear();
             var transform = decal.transform;
             var bounds = decal.GetBounds();
-            List<GameObject> affectedList = decal.GetGameObjectsInBounds(meshRenderers, meshColliders, ignoreLayer, careLayer);
+            List<GameObject> affectedList = decal.GetGameObjectsInBounds(meshRenderers, ignoreLayer, careLayer);
             Terrain[] terrains = Terrain.activeTerrains;
 
             for (int i = 0, count = terrains.Length; i < count; i++)
@@ -48,12 +49,12 @@ namespace App.Client.ClientSystems
                 var terrainBounds = new Bounds(terrainPos + terrainSize * 0.5f, terrainSize);
 
                 if (bounds.Intersects(terrainBounds) == false) continue;
-                pols.AddRange(CreateFromTerrain(terrains[i], terrainPos, terrainSize, bounds, decal, surfaceMaxAngle));
+                meshPols.AddRange(CreateFromTerrain(terrains[i], terrainPos, terrainSize, bounds, decal, surfaceMaxAngle));
             }
 
-            pols.AddRange(CreateFromObjects(affectedList, decal, surfaceMaxAngle));
+            meshPols.AddRange(CreateFromObjects(affectedList, decal, surfaceMaxAngle));
             
-            Mesh mesh = CreateMesh(pols, true);
+            Mesh mesh = CreateMesh(meshPols, true);
 
             var verts = mesh.vertices;
             for (int i = 0, count = verts.Length; i < count; i++)
@@ -85,30 +86,37 @@ namespace App.Client.ClientSystems
             return vertices;
         }
 
+        private static List<Polygon> objectsPols = new List<Polygon>();
         private static List<Polygon> CreateFromObjects(List<GameObject> objects, TransformVolume volume, float surfaceMaxAngle)
         {
-            var pols = new List<Polygon>();
+            objectsPols.Clear();
             for (int i = 0, count = objects.Count; i < count; i++)
             {
-                Mesh mesh = null;
-                MeshFilter meshFilter  = objects[i].GetComponent<MeshFilter>();
-                if (meshFilter == null) {
-                    MeshCollider meshCollider = objects[i].GetComponent<MeshCollider>();
-                    mesh = meshCollider.sharedMesh;
-                }
-                else {
-                    mesh = meshFilter.sharedMesh;
-                }
-                var verts = mesh.vertices;
-                for (int v = 0, count2 = verts.Length; v < count2; v++)
+                bool isOfflineMeshData = false;
+                Vector3[] verts = null;
+                int[] triangles = null;
+                //OfflineMeshData offlineMeshData = objects[i].GetComponent<OfflineMeshData>();
+                //if (null != offlineMeshData) {
+                //    verts = offlineMeshData.vertices;
+                //    triangles = offlineMeshData.triangles;
+                //    isOfflineMeshData = true;
+                //} else
                 {
-                    verts[v] = objects[i].transform.TransformPoint(verts[v]);
+                    MeshFilter meshFilter = objects[i].GetComponent<MeshFilter>();
+                    if (meshFilter == null || meshFilter.sharedMesh == null) continue;
+                    Mesh mesh = meshFilter.sharedMesh;
+                    verts = mesh.vertices;
+                    triangles = mesh.triangles;
                 }
-
-                pols.AddRange(CreatePolygons(verts, mesh.triangles));
+                if (!isOfflineMeshData) {
+                    for (int v = 0, count2 = verts.Length; v < count2; v++) {
+                        verts[v] = objects[i].transform.TransformPoint(verts[v]);
+                    }
+                }
+                objectsPols.AddRange(CreatePolygons(verts, triangles));
             }
 
-            return CutPolygons(pols, volume, surfaceMaxAngle);
+            return CutPolygons(objectsPols, volume, surfaceMaxAngle);
         }
         
         private static List<Polygon> CreateFromTerrain(Terrain terrain, Vector3 terrainPos, Vector3 terrainSize, Bounds bounds, TransformVolume volume, float surfaceMaxAngle)
@@ -116,7 +124,7 @@ namespace App.Client.ClientSystems
             Vector3 start = bounds.center - bounds.size * 0.5f;
             Vector3 end = bounds.center + bounds.size * 0.5f;
             float size = terrainSize.x / (terrain.terrainData.heightmapResolution - 1);
-            var pols = TerrainPlane(terrainPos, size, start, end, terrainSize);
+            var pols = TerrainPlane(terrainPos, size * 8, start, end, terrainSize);
 
             for (int p = 0, count = pols.Count; p < count; p++)
             {
@@ -132,11 +140,12 @@ namespace App.Client.ClientSystems
             return CutPolygons(pols, volume, surfaceMaxAngle);
         }
 
+        private static List<Vector3> vertices = new List<Vector3>();
+        private static List<int> triangles = new List<int>();
         private static Mesh CreateMesh(List<Polygon> polygons, bool merge)
         {
-            List<Vector3> vertices = new List<Vector3>();
-            List<int> triangles = new List<int>();
-
+            vertices.Clear();
+            triangles.Clear();
             for (int i = 0, count = polygons.Count; i < count; i++)
             {
                 for (int v = 0; v < 3; v++)
@@ -262,9 +271,10 @@ namespace App.Client.ClientSystems
             return Vector3.Angle(-up, direction) >= surfaceMaxAngle;
         }
 
+        private static List<Polygon> terrainPols = new List<Polygon>();
         private static List<Polygon> TerrainPlane(Vector3 gridStart, float gridSize, Vector3 start, Vector3 end, Vector3 planeSize)
         {
-            var pols = new List<Polygon>();
+            terrainPols.Clear();
             Vector3 snapedStart = GetSnapedPosition(start, gridStart, gridSize);
             Vector3 snapedEnd = GetSnapedPosition(end, gridStart, gridSize);
             Vector3 place = snapedEnd - snapedStart;
@@ -283,12 +293,12 @@ namespace App.Client.ClientSystems
                     Vector3 facePos = snapedStart + cacheGridSize;
                     if (IsInPlane(facePos, gridStart, planeSize))
                     {
-                        pols.AddRange(PolygonFace(facePos, gridSize));
+                        terrainPols.AddRange(PolygonFace(facePos, gridSize));
                     }
                 }
             }
             
-            return pols;
+            return terrainPols;
         }
 
         private static Polygon[] PolygonFace(Vector3 position, float size)
@@ -296,18 +306,15 @@ namespace App.Client.ClientSystems
             var fwr = Vector3.forward;
             var ri = Vector3.right;
 
-            var vertices = new[]
-            {
-                position + (-fwr - ri) * 0.5f * size,
-                position + (fwr - ri) * 0.5f * size,
-                position + (fwr + ri) * 0.5f * size,
-                position + (-fwr + ri) * 0.5f * size
-            };
+            Vector3 vert0 = position + (-fwr - ri) * 0.5f * size;
+            Vector3 vert1 = position + (fwr - ri) * 0.5f * size;
+            Vector3 vert2 = position + (fwr + ri) * 0.5f * size;
+            Vector3 vert3 = position + (-fwr + ri) * 0.5f * size;
 
             return new[]
             {
-                new Polygon(vertices[0], vertices[1], vertices[2]),
-                new Polygon(vertices[2], vertices[3], vertices[0])
+                new Polygon(vert0, vert1, vert2),
+                new Polygon(vert2, vert3, vert0)
             };
         }
 

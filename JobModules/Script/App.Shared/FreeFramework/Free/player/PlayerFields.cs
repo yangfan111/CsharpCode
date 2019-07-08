@@ -5,10 +5,11 @@ using App.Server.GameModules.GamePlay.Free.weapon;
 using App.Shared.GameModules.Player;
 using App.Shared;
 using App.Shared.GameModules.Weapon;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
-    public class PlayerFields : IFields
+    public class PlayerFields : IFields, IRule
     {
         private static string[] fields;
         private static HashSet<string> fieldSet;
@@ -91,6 +92,11 @@ namespace App.Server.GameModules.GamePlay.Free.player
         public string[] GetFields()
         {
             return fields;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerFields;
         }
 
         public bool HasField(string field)

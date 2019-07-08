@@ -21,7 +21,10 @@ namespace App.Shared.GameModules.Weapon
         //public override void OnExpend(System.Action<EWeaponSlotType> callback)
 
         //{
-
+        internal override bool CanApplyPart
+        {
+            get { return false; }
+        }
         //}
         public MeleeWeaponAgent(Func<EntityKey> in_holdExtractor, Func<EntityKey> in_emptyExtractor, EWeaponSlotType slot, GrenadeCacheHandler grenadeHandler) : base(in_holdExtractor, in_emptyExtractor, slot, grenadeHandler)
         {

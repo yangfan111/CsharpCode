@@ -148,6 +148,7 @@ namespace App.Shared.GameModules.Vehicle
 
             var rigidBody = vehicle.gameObject.UnityObject.AsGameObject.GetComponent<Rigidbody>();
             playerEntity.controlledVehicle.RideOn(preferedSeat, vehicle.entityKey.Value, rigidBody, _currentTime.CurrentTime);
+            playerEntity.AudioController().StopSwimAudio();
             CheckAndAddOwnerId(vehicle, playerEntity);
             SetPositionInterpolateMode(playerEntity);
             playerEntity.SetCharacterStateWithVehicle(_contexts, _vehicleContext);

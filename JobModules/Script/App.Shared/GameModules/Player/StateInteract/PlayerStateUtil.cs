@@ -31,12 +31,12 @@ namespace App.Shared.GameModules.Player
                 HasUIState(EPlayerUIState.ExitOpen,player)||
                 HasUIState(EPlayerUIState.MapOpen,player);
         }
+        
         public static void RemoveUIState(EPlayerUIState state, GamePlayComponent player)
         {
             player.UIState &= ~(1 << (int)state);
             player.UIStateUpdate = true;
         }
-
         
         public static bool HasPlayerState(EPlayerGameState state, GamePlayComponent player)
         {
@@ -86,13 +86,16 @@ namespace App.Shared.GameModules.Player
         DivingChok = 5,
         NotMove = 6,
         InterruptItem=7,
+        Invincible = 8,
         
         PlayerReborn,
         PlayerRevive,
         PlayerDead,
         PlayerDying,
         TurnOver,
-        TurnStart
+        TurnStart,
+        OnPlane,
+        CanDefuse
     }
 
     public enum EPlayerCastState

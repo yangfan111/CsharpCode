@@ -74,13 +74,23 @@ namespace Core.Free
         public const int RevengeTagUI = 114;
         public const int FetchUIValue = 115;
         public const int PlayerMoveSpeedSet = 116;
-        public const int PlayerVisibility = 117;
+        public const int PlaneUI = 117;
         public const int PlayerJumpSpeedSet = 118;
         public const int PlayerTipHide = 119;
 		public const int PlayerSprayPaint = 120;
         public const int PlayerPressKey = 121;
         public const int PlayerScale = 122;
         public const int PlayerBiochemicalMark = 123;
+        public const int PlayerMiniMapSupplyMark = 124;
+        public const int CommonPlayerInfoUI = 125;
+        public const int PlayerRageStart = 126;
+
+        public const int CommonTipUI = 130;
+        public const int ClearCommonTipUI = 131;
+        public const int ChickenTip = 132;
+
+        public const int ThirdPerson = 133;
+        public const int CommonPickUpModel = 134;
 
         private static Dictionary<int, string> MessageDesc = new Dictionary<int, string>();
 

@@ -25,7 +25,7 @@ namespace App.Server.GameModules.SceneObject
             if (entity == null || entity.isFlagDestroy)
             {
                 entity = (SceneObjectEntity) _contexts.session.entityFactoryObject.SceneObjectEntityFactory
-                    .CreateSimpleEquipmentEntity(
+                    .CreateSimpleObjectEntity(
                         ECategory.GameItem,
                         104,
                         1,

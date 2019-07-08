@@ -10,7 +10,7 @@ namespace App.Shared.GameModules.Player
     public class UserCmdOwnerAdapter : IUserCmdOwner
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(UserCmdOwnerAdapter));
-        private                 PlayerEntity  _playerEntity;
+        private PlayerEntity _playerEntity;
 
         public UserCmdOwnerAdapter(PlayerEntity playerEntity)
         {
@@ -38,8 +38,8 @@ namespace App.Shared.GameModules.Player
                     _playerEntity.AddUpdateMessagePool();
                 ;
                 return _playerEntity.updateMessagePool.UpdateMessagePool.GetPackagesLargeThan(_playerEntity
-                                                                                              .updateMessagePool
-                                                                                              .LastestExecuteUserCmdSeq);
+                    .updateMessagePool
+                    .LastestExecuteUserCmdSeq);
             }
         }
 
@@ -48,7 +48,7 @@ namespace App.Shared.GameModules.Player
             get
             {
                 return _playerEntity
-                       .updateMessagePool.LastestExecuteUserCmdSeq;
+                    .updateMessagePool.LastestExecuteUserCmdSeq;
             }
             set
             {
@@ -83,22 +83,31 @@ namespace App.Shared.GameModules.Player
             }
         }
 
-    /// <summary>
-    /// 获得过滤后的input命令
-    /// </summary>
-    /// <param name="userCmd"></param>
-    /// <returns></returns>
+        /// <summary>
+        /// 获得过滤后的input命令
+        /// </summary>
+        /// <param name="userCmd"></param>
+        /// <returns></returns>
         public IFilteredInput GetFiltedInput(IUserCmd userCmd)
         {
-            var interactController= _playerEntity.StateInteractController();
+            var interactController = _playerEntity.StateInteractController();
             if (!_playerEntity.isEnabled || _playerEntity.isFlagDestroy)
             {
                 Logger.Error("player is destroyed");
                 return interactController.EmptyInput;
             }
 
-            return interactController.ApplyUserCmd(userCmd);
-       
+            return interactController.ApplyUserCmd(userCmd, _playerEntity.playerWeaponDebug.DebugAutoMove);
+        }
+
+        public bool IsEnable()
+        {
+            if (!_playerEntity.isEnabled || _playerEntity.isFlagDestroy)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

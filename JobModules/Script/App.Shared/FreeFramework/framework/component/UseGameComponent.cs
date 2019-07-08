@@ -6,11 +6,12 @@ using com.wd.free.action.function;
 using com.wd.free.para;
 using com.wd.free.trigger;
 using System;
+using Core.Free;
 
 namespace gameplay.gamerule.free.component
 {
     [Serializable]
-    public class UseGameComponent
+    public class UseGameComponent : IRule
 	{
 		private string key;
 
@@ -144,7 +145,12 @@ namespace gameplay.gamerule.free.component
 			iniTrigger.AddAction(new UseGameComponent.AddComponentParaAction(this, this.name, args));
 		}
 
-		[System.Serializable]
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.UseGameComponent;
+        }
+
+        [System.Serializable]
 		internal class AddComponentParaAction : AbstractGameAction
 		{
 			private const long serialVersionUID = -8318145779075011619L;

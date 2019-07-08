@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Utils.AssetManager;
@@ -11,6 +12,8 @@ namespace App.Shared.SceneManagement
         void AddLoadGoRequest(AssetInfo addr);
         void AddUnloadSceneRequest(string sceneName);
         void AddUnloadGoRequest(UnityObject go);
+        void AddLoadLightmapsRequest(IEnumerable<AssetInfoEx<MeshRenderer>> infos);
+        void AddUnloadLightmapsRequest(IEnumerable<UnityObject> uObjs);
 
         event Action<Scene, LoadSceneMode> SceneLoaded;
         event Action<Scene> SceneUnloaded;
@@ -18,5 +21,7 @@ namespace App.Shared.SceneManagement
         event Action<UnityObject> AfterGoLoaded;
         event Action<UnityObject> BeforeGoUnloaded;
         event Action<UnityObject> GoUnloaded;
+        event Action<MeshRenderer, IEnumerable<UnityObject>> LightmapLoaded;
+        event Action<IEnumerable<UnityObject>> LightmapUnloaded;
     }
 }

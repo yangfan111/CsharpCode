@@ -63,6 +63,7 @@ namespace App.Client.GameModules.Ui.UiAdapter.Common
 
             data = FreePool.Allocate();
             data.Key = FreeUIEvent.EVENT_CLICK;
+            data.Bs.Add(false);
             data.Ss.Add("ObservePlayer");
             SingletonManager.Get<FreeUiManager>().Contexts1.session.clientSessionObjects.NetworkChannel.SendReliable((int)EClient2ServerMessage.FreeEvent, data);
         }

@@ -4,6 +4,7 @@ using Core.Components;
 using Core.Prediction.UserPrediction;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
 using Entitas.CodeGeneration.Attributes;
+using WeaponConfigNs;
 
 namespace App.Shared.Components.Weapon
 {
@@ -13,14 +14,14 @@ namespace App.Shared.Components.Weapon
     [Player,]
     public class PlayerWeaponAmmunitionComponent : IUserPredictionComponent
     {
-        [DontInitilize, NetworkProperty] public int ReservedBullet300;
-        [DontInitilize, NetworkProperty] public int ReservedBullet45;
-        [DontInitilize, NetworkProperty] public int ReservedBullet50;
-        [DontInitilize, NetworkProperty] public int ReservedBullet556;
-        [DontInitilize, NetworkProperty] public int ReservedBullet762;
-        [DontInitilize, NetworkProperty] public int ReservedBullet9;
-        [DontInitilize, NetworkProperty] public int ReservedBullet12;
-        [DontInitilize, NetworkProperty] public int ReservedBullet57;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveShort)] public int ReservedBullet300;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveShort)] public int ReservedBullet45;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveShort)] public int ReservedBullet50;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveShort)] public int ReservedBullet556;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveShort)] public int ReservedBullet762;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveShort)] public int ReservedBullet9;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveShort)] public int ReservedBullet12;
+        [DontInitilize, NetworkProperty(SyncFieldScale.PositiveShort)] public int ReservedBullet57;
 
         public void CopyFrom(object rightComponent)
         {

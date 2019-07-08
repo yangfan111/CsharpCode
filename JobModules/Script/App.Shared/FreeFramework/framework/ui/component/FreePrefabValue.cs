@@ -5,11 +5,12 @@ using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.util;
 using Core.Free;
+using com.wd.free.para;
 
 namespace gameplay.gamerule.free.ui.component
 {
     [System.Serializable]
-    public class FreePrefabValue : AbstractFreeUIValue
+    public class FreePrefabValue : AbstractFreeUIValue, IRule
     {
         private List<OnePrefabValue> values;
 
@@ -55,10 +56,15 @@ namespace gameplay.gamerule.free.ui.component
         {
             return "ui prefab value:" + values;
         }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreePrefabValue;
+        }
     }
 
     [Serializable]
-    public class OnePrefabValue
+    public class OnePrefabValue : IRule
     {
         public string field;
         public string value;
@@ -73,13 +79,23 @@ namespace gameplay.gamerule.free.ui.component
             this.field = field;
             this.value = value;
         }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.OnePrefabValue;
+        }
     }
 
     [Serializable]
-    public class OnePrefabEvent
+    public class OnePrefabEvent : IRule
     {
         public string field;
         public string eventKey;
         public int eventType;
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.OnePrefabEvent;
+        }
     }
 }

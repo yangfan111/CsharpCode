@@ -8,6 +8,7 @@ using Core.Compare;
 using Core.Components;
 using Core.EntityComponent;
 using Core;
+using Core.CharacterState.Action.CommandLimit;
 using Core.Prediction;
 using Core.Prediction.UserPrediction;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
@@ -179,8 +180,6 @@ namespace App.Shared.Components.Player
         [NetworkProperty] public UnityAnimationEventCommands ThirdPersonAnimationEventCallBack;
         [NetworkProperty, DontInitilize] public bool IsJumpForSync;
         
-     
-
 //        bool IComparableComponent.IsApproximatelyEqual(object right)
 //        {
 //            return IsApproximatelyEqual(right);
@@ -300,12 +299,15 @@ namespace App.Shared.Components.Player
         }
     }
     
-    
-    
     [Player]
     public class StateInterfaceComponent : IComponent
     {
         public ICharacterState State;
     }
-  
+
+    [Player]
+    public class FsmInputRelateInterfaceComponent : IComponent
+    {
+        public FsmInputRelate Relate;
+    }
 }

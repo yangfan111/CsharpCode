@@ -17,7 +17,7 @@ namespace App.Shared
 {
     public static class AudioUtil
     {
-        public static readonly LoggerAdapter AudioLogger = new LoggerAdapter(typeof(AudioDispatcher));
+        public static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(AudioDispatcher));
 
         public static void AssertProcessResult(AKRESULT result, string s, params object[] args)
         {
@@ -27,11 +27,11 @@ namespace App.Shared
                 if (result != AKRESULT.AK_Success && result != AKRESULT.AK_BankAlreadyLoaded)
                 {
                     //   DebugUtil.MyLog(s + string.Format(" {0} ", result), DebugUtil.DebugColor.Grey);
-                    AudioLogger.Info(string.Format("[Audio Result Exception]{0}  {1}", s, result));
+                    Logger.Info(string.Format("[Audio Result Exception]{0}  {1}", s, result));
                 }
                 else
                 {
-                    AudioLogger.Info(s + string.Format(" {0} ", result));
+                    Logger.Info(s + string.Format(" {0} ", result));
                 }
             }
         }
@@ -51,6 +51,17 @@ namespace App.Shared
                     return AudioGrp_ShotMode.Trriple;
                 default:
                     return AudioGrp_ShotMode.Single;
+            }
+        }
+
+        public static AudioGrp_HitMatType ToAudioGrpHitMatType(this EBodyPart bodyPart)
+        {
+            switch (bodyPart)
+            {
+                case EBodyPart.Head:
+                    return AudioGrp_HitMatType.Head;
+                default:
+                    return AudioGrp_HitMatType.Body;
             }
         }
 
@@ -78,7 +89,7 @@ namespace App.Shared
             try
             {
                 string assetFolder = (string.IsNullOrEmpty(folder)) ? AkUtilities.GetWiseBankFolder_Full() : folder;
-                var paths = Directory.GetFiles(assetFolder, "*.bnk", SearchOption.TopDirectoryOnly);
+                var    paths       = Directory.GetFiles(assetFolder, "*.bnk", SearchOption.TopDirectoryOnly);
                 for (int i = 0; i < paths.Length; i++)
                     paths[i] = Path.GetFileName(paths[i]);
                 return paths;
@@ -106,6 +117,39 @@ namespace App.Shared
                     return AudioGrp_FootMatType.Default;
             }
         }
+
+        public static EAudioUniqueId ToUseItemAudioUniqueId(int itemId)
+        {
+            var gameItemConfig = SingletonManager.Get<GameItemConfigManager>().GetConfigById(itemId);
+            EAudioUniqueId audioUniqueId =EAudioUniqueId.None ;
+            switch ((EItemAudioType) gameItemConfig.Type)
+            {
+                case EItemAudioType.Bandage:
+                    audioUniqueId = EAudioUniqueId.UseBandage;
+                    break;
+                case EItemAudioType.Doping:
+                    audioUniqueId = EAudioUniqueId.UseDoping;
+                    break;
+                case EItemAudioType.EngeryDrink:
+                    audioUniqueId = EAudioUniqueId.UseEngeryDrink;
+                    break;
+                case EItemAudioType.Gasoline:
+                    break;
+                case EItemAudioType.MedicalPackage:
+                    audioUniqueId = EAudioUniqueId.UseMedicalPackage;
+                    break;
+                case EItemAudioType.AidPackage:
+                    audioUniqueId = EAudioUniqueId.UseAidPackage;
+                    break;
+                case EItemAudioType.Pill:
+                    audioUniqueId = EAudioUniqueId.UsePill;
+                    break;
+                default:
+                    break;
+            }
+
+            return audioUniqueId;
+        }
         public static EAudioUniqueId ToAudioUniqueId(ECategory itemCategory, int itemId)
         {
             EAudioUniqueId audioUniqueId = EAudioUniqueId.None;
@@ -115,9 +159,9 @@ namespace App.Shared
                     break;
                 case ECategory.WeaponPart:
 
-                    var partId = SingletonManager.Get<WeaponPartSurvivalConfigManager>().GetDefaultPartBySetId(itemId);
+                    var partId  = SingletonManager.Get<WeaponPartSurvivalConfigManager>().GetDefaultPartBySetId(itemId);
                     var partCfg = SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(partId);
-                    switch ((EWeaponPartType)partCfg.Type)
+                    switch ((EWeaponPartType) partCfg.Type)
                     {
                         case EWeaponPartType.UpperRail:
                             audioUniqueId = EAudioUniqueId.PickupSightPart;
@@ -129,14 +173,14 @@ namespace App.Shared
                             audioUniqueId = EAudioUniqueId.PickupWeaponPart;
                             break;
                     }
+
                     break;
                 case ECategory.GameItem:
                     var gameItemConfig = SingletonManager.Get<GameItemConfigManager>().GetConfigById(itemId);
-                    switch ((EItemAudioType)gameItemConfig.Type)
+                    switch ((EItemAudioType) gameItemConfig.Type)
                     {
-                        
                         case EItemAudioType.Bullet:
-                              audioUniqueId = EAudioUniqueId.PickupBullet;
+                            audioUniqueId = EAudioUniqueId.PickupBullet;
                             break;
                         case EItemAudioType.AidPackage:
                             audioUniqueId = EAudioUniqueId.PickupAidPackage;
@@ -162,11 +206,13 @@ namespace App.Shared
                         default:
                             break;
                     }
+
                     break;
                 case ECategory.Avatar:
                     audioUniqueId = EAudioUniqueId.PickupCloth;
                     break;
             }
+
             return audioUniqueId;
         }
 
@@ -220,7 +266,7 @@ namespace App.Shared
             {
                 if (GlobalConst.EnableAudioLog)
                     DebugUtil.MyLog("Audio Post event failed:{0}", atomEvtName);
-                AudioLogger.ErrorFormat("Audio Post event failed:{0}", atomEvtName);
+                Logger.ErrorFormat("Audio Post event failed:{0}", atomEvtName);
             }
             else if (GlobalConst.EnableAudioLog)
             {
@@ -233,7 +279,7 @@ namespace App.Shared
             var result = akresult.Sucess();
             if (!result)
             {
-                AudioLogger.ErrorFormat("Audio process {1} failed:{0}", akresult, contexts);
+                Logger.ErrorFormat("Audio process {1} failed:{0}", akresult, contexts);
                 if (GlobalConst.EnableAudioLog)
                 {
                     DebugUtil.MyLog("Audio process {1} failed:{0}", akresult, contexts);
@@ -243,8 +289,8 @@ namespace App.Shared
             {
                 DebugUtil.MyLog("Audio process {0} sucess", contexts);
             }
-            return result;
 
+            return result;
         }
     }
 }

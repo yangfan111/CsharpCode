@@ -15,5 +15,6 @@ namespace Core.EntitasAdpater
         EntityKey Self { get; set; }
 
         IGameEntity GetGameEntity(EntityKey entityKey);
+        bool TryGetGameEntity(EntityKey entityKey, out IGameEntity entity);
     }
 }

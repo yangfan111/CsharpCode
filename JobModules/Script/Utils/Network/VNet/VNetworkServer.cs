@@ -25,23 +25,11 @@ namespace VNet
             {
                 _reliableServer.Init();
             }
-            InitMemoryCache();
+            //InitMemoryCache();
             LittleEndian = littleEndian;
         }
 
-        private void InitMemoryCache()
-        {
-            var preallocCount = 1024;
-            var array = new VNetPacketMemSteam[preallocCount];
-            for (var i = 0; i < array.Length; i++)
-            {
-                array[i] = VNetPacketMemSteam.Allocate();
-            }
-            for (var i = 0; i < array.Length; i++)
-            {
-                array[i].ReleaseReference();
-            }
-        }
+       
 
         protected override void Poll()
         {

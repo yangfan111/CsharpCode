@@ -7,11 +7,12 @@ using com.wd.free.@event;
 using com.wd.free.util;
 using App.Server.GameModules.GamePlay.Free.entity;
 using App.Server.GameModules.GamePlay;
+using Core.Free;
 
 namespace com.wd.free.entity
 {
     [Serializable]
-    public class ChangeMoveAction : AbstractGameAction
+    public class ChangeMoveAction : AbstractGameAction, IRule
     {
         private string entity;
         private IFreeMove move;
@@ -26,6 +27,11 @@ namespace com.wd.free.entity
                 FreeEntityData data = (FreeEntityData)((FreeMoveEntity)obj).freeData.FreeData;
                 data.SetMove(args, move);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ChangeMoveAction;
         }
     }
 }

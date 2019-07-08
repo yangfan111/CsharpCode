@@ -147,15 +147,9 @@ namespace App.Client.GameModules.Ui.Models.Common
         #region 武器
         private void RefreshWeaponTips()
         {
-            _viewModel.attrGroupActiveSelf = true;
-            var weapongProperConfig = SingletonManager.Get<WeaponPropertyConfigManager>().FindByWeaponId(curShowTipData.TemID);
-            WeaponPropertyConfigItem contrastWeaponProperConfig = null;
-            if(curShowTipData.ContrastTemId > 0)
-            contrastWeaponProperConfig = SingletonManager.Get<WeaponPropertyConfigManager>().FindByWeaponId(curShowTipData.ContrastTemId);
+            var weaponConfig = SingletonManager.Get<ItemBaseConfigManager>().GetConfigById((int)ECategory.Weapon, curShowTipData.TemID, true) as WeaponResConfigItem;
 
-            var weaponConfig = SingletonManager.Get<ItemBaseConfigManager>().GetConfigById((int)ECategory.Weapon,curShowTipData.TemID,true) as WeaponResConfigItem;
-
-            if (weaponConfig == null || weapongProperConfig == null)
+            if (weaponConfig == null)
                 return;
 
             //刷新topGroup        
@@ -166,6 +160,9 @@ namespace App.Client.GameModules.Ui.Models.Common
 
                 _viewModel.infoOneActiveSelf = false;
                 _viewModel.infoTwoActiveSelf = false;
+
+                //刷新描述
+                _viewModel.desText = weaponConfig.Description;
                 switch ((EWeaponType_Config)weaponConfig.Type)
                 {
                     case EWeaponType_Config.PrimeWeapon:
@@ -208,9 +205,28 @@ namespace App.Client.GameModules.Ui.Models.Common
                             }
                         }
                         break;
+                    case EWeaponType_Config.Armor:
+                    case EWeaponType_Config.Helmet:
+                    {
+                        RefreshDurableEquimentTips(weaponConfig);
+                            return;
+                    }
+                        
                 }
             }
+            RefreshWeaponProperty();
+            
 
+        }
+
+        private void RefreshWeaponProperty()
+        {
+            var weapongProperConfig = SingletonManager.Get<WeaponPropertyConfigManager>().FindByWeaponId(curShowTipData.TemID);
+            WeaponPropertyConfigItem contrastWeaponProperConfig = null;
+            if (curShowTipData.ContrastTemId > 0)
+                contrastWeaponProperConfig = SingletonManager.Get<WeaponPropertyConfigManager>().FindByWeaponId(curShowTipData.ContrastTemId);
+            if (weapongProperConfig == null) return;
+            _viewModel.attrGroupActiveSelf = true;
             //刷新属性
             {
                 foreach (var tran in attributeGoList)
@@ -222,7 +238,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                 float destValue = 0;
                 if (weapongProperConfig.Power != 0 && usingIndex < attributeGoList.Count)
                 {
-                    
+
                     if (contrastWeaponProperConfig != null)
                         destValue = contrastWeaponProperConfig.Power;
                     RefreshAttributeItem(attributeGoList[usingIndex++], weapongProperConfig.Power, destValue, I2.Loc.ScriptLocalization.client_common.word26);
@@ -273,10 +289,36 @@ namespace App.Client.GameModules.Ui.Models.Common
                     RefreshAttributeItem(attributeGoList[usingIndex++], weapongProperConfig.Bullet, destValue, I2.Loc.ScriptLocalization.client_common.word32);
                 }
             }
-
-            //刷新描述
-            _viewModel.desText = weaponConfig.Description;
         }
+
+        private void RefreshDurableEquimentTips(WeaponResConfigItem data)
+        {
+            if (data == null) return;
+            //刷新topGroup
+            _viewModel.attrGroupActiveSelf = false;
+            _viewModel.typeText = GetDurableTypeText((EWeaponType_Config) data.Type);
+            _viewModel.nameText = data.Name;
+            _viewModel.infoOneActiveSelf = true;
+            _viewModel.infoOneText =
+                data.Durable > 0 ? I2.Loc.ScriptLocalization.client_common.word36 + data.Durable : "";
+
+            _viewModel.infoTwoText =
+                data.Weight > 0 ? I2.Loc.ScriptLocalization.client_common.word25 + data.Weight : "";
+        }
+
+        private string GetDurableTypeText(EWeaponType_Config type)
+        {
+            switch (type)
+            {
+                case EWeaponType_Config.Armor:
+                    return "防弹衣";
+                case EWeaponType_Config.Helmet:
+                    return "头盔";
+                default:
+                    return string.Empty;
+            }
+        }
+
         private string GetStrByCaliber(int Caliber)
         {
             string result = "";
@@ -310,7 +352,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                 case 6:
                     {
                         result = "300Mag";
-                    }
+                    }       
                     break;
                 case 7:
                     {

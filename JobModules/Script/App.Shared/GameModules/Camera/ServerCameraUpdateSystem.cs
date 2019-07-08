@@ -31,7 +31,7 @@ namespace App.Shared.GameModules.Camera
             _freeMoveContext = context.freeMove;
             _playerContext = context.player;
             _motors = m;
-            _state = new DummyCameraMotorState(_motors);
+            _state = new DummyCameraMotorState();
 
             foreach (SubCameraMotorType value in System.Enum.GetValues(typeof(SubCameraMotorType)))
             {
@@ -47,44 +47,29 @@ namespace App.Shared.GameModules.Camera
             if (!player.hasCameraStateOutputNew) return;
 
             CopyClientStateToComponent(player.cameraStateUpload, player.cameraStateNew);
-            player.cameraArchor.ArchorType = (ECameraArchorType)player.cameraStateUpload.ArchorType;
 
+            HandleAction(player);
+        }
+
+        private void HandleAction(PlayerEntity player)
+        {
             CameraActionManager.CopyActionCode(CameraActionType.Enter, player.cameraStateUpload.EnterActionCode);
             CameraActionManager.CopyActionCode(CameraActionType.Leave, player.cameraStateUpload.LeaveActionCode);
-            CameraActionManager.OnAction(player,_state);
+            CameraActionManager.OnAction(player, _state);
         }
 
         private void CopyClientStateToComponent(CameraStateUploadComponent input, CameraStateNewComponent output)
         {
             output.MainNowMode = input.MainNowMode;
-            output.MainLastMode = input.MainLastMode;
-            output.MainModeTime = input.MainModeTime;
             output.ViewNowMode = input.ViewNowMode;
-            output.ViewLastMode = input.ViewLastMode;
-            output.ViewModeTime = input.ViewModeTime;
             output.PeekNowMode = input.PeekNowMode;
-            output.PeekLastMode = input.PeekLastMode;
-            output.PeekModeTime = input.PeekModeTime;
             output.FreeNowMode = input.FreeNowMode;
-            output.FreeLastMode = input.FreeLastMode;
-            output.FreeModeTime = input.FreeModeTime;
             output.FreeYaw = input.FreeYaw;
             output.FreePitch = input.FreePitch;
-            output.LastFreeYaw = input.LastFreeYaw;
-            output.LastFreePitch = input.LastFreePitch;
-            output.LastPeekPercent = input.LastPeekPercent;
+//            output.LastFreeYaw = input.LastFreeYaw;
+//            output.LastFreePitch = input.LastFreePitch;
+//            output.LastPeekPercent = input.LastPeekPercent;
             output.CanFire = input.CanFire;
-        }
-
-        private void CopyClientOutputToComponent(CameraStateUploadComponent input,
-             CameraFinalOutputNewComponent output)
-        {
-            output.Position = input.Position.ShiftedVector3();
-            output.EulerAngle = input.EulerAngle;
-            output.Fov = input.Fov;
-            output.Far = input.Far;
-            output.Near = input.Near;
-            output.PlayerFocusPosition = input.PlayerFocusPosition.ShiftedVector3();
         }
 
         public ISimpleParallelUserCmdExecuteSystem CreateCopy()
@@ -94,7 +79,6 @@ namespace App.Shared.GameModules.Camera
 
         public void OnRender()
         {
-            throw new NotImplementedException();
         }
     }
 }

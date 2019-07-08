@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.EntityComponent;
 using Core.Prediction.UserPrediction.Cmd;
+using Shared.Scripts.Effect;
+using UnityEngine;
+using Utils.AssetManager;
 using XmlConfig;
 
 namespace Core
@@ -46,6 +50,22 @@ namespace Core
         IFilteredInput EmptyInput { get; }
         IFilteredInput UserInput  { get; }
 
-        IFilteredInput ApplyUserCmd(IUserCmd userCmd);
+        IFilteredInput ApplyUserCmd(IUserCmd userCmd,int debugMoveSignal);
+    }
+    public interface IWeaponFireUpdateManagaer
+    {
+    }
+    public interface IGlobalEffectManager
+    {
+        void              AddGameObject(string effectName, GameObject obj);
+        void              RemoveGameObject(string effectName, GameObject obj);
+        IEffectController GetEffectController(string effectName);
+        void              LoadAllGlobalEffect(IUnityAssetManager assetManager, Action allLoadSucc);
+    }
+    public interface IHitMaskController
+    {
+        List<int> BulletExcludeTargetList   { get; }
+        List<int> MeleeExcludeTargetList    { get; }
+        List<int> ThrowingExcludeTargetList { get; }
     }
 }

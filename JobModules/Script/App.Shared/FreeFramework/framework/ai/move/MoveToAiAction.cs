@@ -10,11 +10,12 @@ using UnityEngine;
 using Free.framework;
 using Core.Free;
 using Assets.App.Server.GameModules.GamePlay.Free;
+using com.wd.free.para;
 
 namespace App.Shared.FreeFramework.framework.ai.move
 {
     [Serializable]
-    public class MoveToAiAction : AbstractPlayerAction
+    public class MoveToAiAction : AbstractPlayerAction, IRule
     {
         private long startTime;
         private IPosSelector pos;
@@ -129,6 +130,11 @@ namespace App.Shared.FreeFramework.framework.ai.move
             proto.Fs.Add(v.z);
 
             FreeMessageSender.SendMessage(player, proto);
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.MoveToAiAction;
         }
     }
 }

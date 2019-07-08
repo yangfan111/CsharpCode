@@ -1,17 +1,17 @@
-﻿using com.wd.free.action;
-using System;
-using System.Collections.Generic;
+﻿using App.Shared.GameModules.Player;
+using Assets.App.Server.GameModules.GamePlay.Free;
+using com.wd.free.action;
 using com.wd.free.@event;
+using Core.Enums;
 using Core.Free;
 using Free.framework;
-using Assets.App.Server.GameModules.GamePlay.Free;
-using Core.Enums;
-using App.Shared.GameModules.Player;
+using System;
+using System.Collections.Generic;
 
 namespace App.Server.GameModules.GamePlay.Free.app
 {
     [Serializable]
-    public class GroupTechStatUiAction : AbstractGameAction
+    public class GroupTechStatUiAction : AbstractGameAction, IRule
     {
         private static IComparer<TechStat> KdComparater = new KdStatComparator();
         private static IComparer<TechStat> KillComparater = new KillStatComparator();
@@ -22,7 +22,6 @@ namespace App.Server.GameModules.GamePlay.Free.app
 
             builder.Key = FreeMessageConstant.GroupTechStatUI;
 
-            builder.Ins.Add(args.GameContext.player.count);
 
             List<TechStat> list = new List<TechStat>();
 
@@ -30,7 +29,7 @@ namespace App.Server.GameModules.GamePlay.Free.app
             bool needSort = true;
             foreach (PlayerEntity p in args.GameContext.player.GetInitializedPlayerEntities())
             {
-                TechStat ts = new TechStat(p, index++);
+                TechStat ts = new TechStat(p, index++, args.GameContext.session.commonSession.RoomInfo.TeamCapacity);
                 builder.Ps.Add(ts.ToMessage());
                 list.Add(ts);
                 if (!p.statisticsData.Statistics.DataCollectSwitch)
@@ -38,6 +37,7 @@ namespace App.Server.GameModules.GamePlay.Free.app
                     needSort = false;
                 }
             }
+            builder.Ins.Add(index);
 
             if (needSort)
             {
@@ -70,6 +70,11 @@ namespace App.Server.GameModules.GamePlay.Free.app
             {
                 FreeMessageSender.SendMessage(p, builder);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.GroupTechStatUiAction;
         }
     }
 
@@ -178,13 +183,13 @@ namespace App.Server.GameModules.GamePlay.Free.app
         public int c4DefuseCount;
         public bool hasC4;
 
-        public TechStat(PlayerEntity player, int index)
+        public TechStat(PlayerEntity player, int index, int teamCap)
         {
-            this.id = (int)player.playerInfo.PlayerId;
-            this.kill = player.statisticsData.Statistics.KillCount;
+            this.id = (int) player.playerInfo.PlayerId;
+            this.kill = teamCap > 1 ? player.statisticsData.Statistics.HitDownCount : player.statisticsData.Statistics.KillCount;
             this.dead = player.statisticsData.Statistics.DeadCount;
             this.assist = player.statisticsData.Statistics.AssistCount;
-            this.damage = (int)player.statisticsData.Statistics.TotalDamage;
+            this.damage = Convert.ToInt32(player.statisticsData.Statistics.TotalDamage);
             this.team = player.playerInfo.Camp;
             this.isDead = player.gamePlay.IsDead();
             this.name = player.playerInfo.PlayerName;
@@ -192,8 +197,8 @@ namespace App.Server.GameModules.GamePlay.Free.app
             this.honor = 0;
             this.ping = player.pingStatistics.Ping;
             this.index = index;
-            this.lastKillTime = player.statisticsData.Statistics.LastKillTime;
-            this.lastDeadTime = player.statisticsData.Statistics.LastDeadTime;
+            this.lastKillTime = (int) player.statisticsData.Statistics.LastKillTime;
+            this.lastDeadTime = (int) player.statisticsData.Statistics.LastDeadTime;
             this.c4PlantCount = player.statisticsData.Statistics.C4PlantCount;
             this.c4DefuseCount = player.statisticsData.Statistics.C4DefuseCount;
             this.hasC4 = player.statisticsData.Statistics.HasC4;

@@ -1,5 +1,6 @@
 ﻿using App.Server.GameModules.GamePlay.player;
 using App.Server.GameModules.Player;
+using App.Shared.GameModules.Bullet;
 using App.Shared.GameModules.Player;
 using App.Shared.GameModules.Player.ResourceLoad;
 using Core.GameModule.Module;
@@ -16,13 +17,11 @@ namespace App.Server
 
             AddSystem(new PlayerChangeRoleSystem(contexts));
             AddSystem(new PlayerResourceLoadSystem(contexts));
-            
-            AddSystem(new PlayerDeadAnimSystem(contexts));
-       
 
             AddSystem(new PlayerDebugDrawSystem(contexts));
             AddSystem(new ServerPlayerWeaponInitSystem(contexts.player, contexts.session.commonSession));
             AddSystem(new PlayerEquipPickAndDropSystem(null));
+            AddSystem(new ServerBulletInfoCollectSystem(contexts.bullet,contexts.player));
         }
     }
 }

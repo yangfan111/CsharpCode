@@ -20,7 +20,6 @@ namespace AssetBundleManager.Warehouse
         public override AssetBundleLoading LoadAssetBundle(string name)
         {
             string url = _assetBundlePathPrefix + name;
-
             var operation = OperationFactory.CreateAssetBundleSyncLoading(name, url);
             operation.SetContent(AssetBundle.LoadFromFile(url));
 

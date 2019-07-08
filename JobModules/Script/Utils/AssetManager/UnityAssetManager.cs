@@ -5,8 +5,11 @@ using Core.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using AssetBundleManager.Warehouse;
 using Common;
+using Shared.Scripts;
 using UnityEngine;
 using Utils.Singleton;
 using XmlConfig.BootConfig;
@@ -51,6 +54,8 @@ namespace Utils.AssetManager
 
         Dictionary<string, LoadedAssetBundle> LoadedAssetBundles { get; }
 
+        bool IsAssetExit(AssetInfo assetInfo);
+
         void LoadAssetBundleAsync(string bundleName);
 
 
@@ -58,8 +63,8 @@ namespace Utils.AssetManager
             AssetLoadOption assetLoadOption = default(AssetLoadOption));
 
 
-        void LoadAssetsAsync<T>(T source, IEnumerable<AssetInfo> assetInfos,
-            Action<T, IEnumerable<UnityObject>> handlerAction,
+        void LoadAssetsAsync<T>(T source, List<AssetInfo> assetInfos,
+            Action<T, List<UnityObject>> handlerAction,
             AssetLoadOption assetLoadOption = default(AssetLoadOption));
 
         void LoadSceneAsync(AssetInfo assetInfo, bool isAdditive);
@@ -68,7 +73,7 @@ namespace Utils.AssetManager
 
         void LoadCancel(AssetInfo assetInfo);
 
-        void Recycle(UnityObject unityObject);
+        void Recycle(UnityObject unityObject,bool active = false);
 
         void Update();
 
@@ -174,8 +179,10 @@ namespace Utils.AssetManager
         {
             public AssetLoadRequest()
             {
-                _invokeOnLoadedProfile = DurationHelp.Instance.GetCustomProfileInfo("AssetLoadRequest_invokeOnLoadedProfile");
-                _invokeOnLoadedProfile2 = DurationHelp.Instance.GetCustomProfileInfo("AssetLoadRequest_invokeOnLoadedProfile2");
+                _invokeOnLoadedProfile =
+                    DurationHelp.Instance.GetCustomProfileInfo("AssetLoadRequest_invokeOnLoadedProfile");
+                _invokeOnLoadedProfile2 =
+                    DurationHelp.Instance.GetCustomProfileInfo("AssetLoadRequest_invokeOnLoadedProfile2");
             }
 
             public override object SourceObject
@@ -198,6 +205,9 @@ namespace Utils.AssetManager
             {
                 set { _requestBatch = value; }
             }
+
+            public int BatchIndex { get; set; }
+
             private CustomProfileInfo _invokeOnLoadedProfile;
             private CustomProfileInfo _invokeOnLoadedProfile2;
 
@@ -206,7 +216,7 @@ namespace Utils.AssetManager
                 var loadedObject = LoadedObject;
                 try
                 {
-                    _invokeOnLoadedProfile.BeginProfile();
+                    _invokeOnLoadedProfile.BeginProfileOnlyEnableProfile();
                     if (loadedObject == null)
                     {
                         loadedObject = new UnityObject(null, AssetInfo);
@@ -218,14 +228,14 @@ namespace Utils.AssetManager
                 }
                 finally
                 {
-                    _invokeOnLoadedProfile.EndProfile();
+                    _invokeOnLoadedProfile.EndProfileOnlyEnableProfile();
                 }
-                
+
                 if (_requestBatch != null || _onLoaded != null)
                 {
                     try
                     {
-                        _invokeOnLoadedProfile2.BeginProfile();
+                        _invokeOnLoadedProfile2.BeginProfileOnlyEnableProfile();
                         var profiler = SingletonManager.Get<LoadRequestProfileHelp>().GetProfile(AssetInfo);
                         profiler.StartWatch();
 
@@ -242,9 +252,8 @@ namespace Utils.AssetManager
                     }
                     finally
                     {
-                        _invokeOnLoadedProfile2.EndProfile();
+                        _invokeOnLoadedProfile2.EndProfileOnlyEnableProfile();
                     }
-                    
                 }
             }
 
@@ -278,24 +287,20 @@ namespace Utils.AssetManager
             private T _source;
             private List<UnityObject> _loadedUnityObjects = new List<UnityObject>();
 
-            private Action<T, IEnumerable<UnityObject>> _onLoaded;
+            private Action<T, List<UnityObject>> _onLoaded;
 
-            public Action<T, IEnumerable<UnityObject>> OnLoaded
+            public Action<T, List<UnityObject>> OnLoaded
             {
                 set { _onLoaded = value; }
             }
 
             private bool _isDisposed;
             private int _referenceCount;
-
+            private bool _autoActive;
             public void PackRequest(AssetLoadRequest<T> req)
             {
-                if (_source == null)
-                {
-                    _source = req.Source;
-                }
-
                 req.ReferenceBatch = this;
+                req.BatchIndex = _referenceCount;
                 _referenceCount++;
             }
 
@@ -306,8 +311,8 @@ namespace Utils.AssetManager
                     _logger.Error("Call UnpackRequest On Disposed Asset Load Request Batch!");
                     return;
                 }
-
-                _loadedUnityObjects.Add(unityObj);
+                _loadedUnityObjects[req.BatchIndex] = unityObj;
+                unityObj.SetActive(false);
                 req.ReferenceBatch = null;
                 _referenceCount--;
                 if (_referenceCount <= 0)
@@ -318,6 +323,18 @@ namespace Utils.AssetManager
                     {
                         try
                         {
+                            if (_autoActive)
+                            {
+                                for (var i = 0; i < _loadedUnityObjects.Count; i++)
+                                {
+                                    var unity = _loadedUnityObjects[i];
+                                    if (unity != null)
+                                    {
+                                        unity.SetActive(true);
+                                    }
+                                }
+                            }
+
                             _onLoaded(_source, _loadedUnityObjects);
                         }
                         catch (Exception e)
@@ -330,10 +347,19 @@ namespace Utils.AssetManager
                 }
             }
 
-            public static AssetLoadRequestBatch<T> Alloc()
+            public static AssetLoadRequestBatch<T> Alloc(T source, int count, bool autoActive)
             {
+                   
                 var batch = ObjectAllocatorHolder<AssetLoadRequestBatch<T>>.Allocate();
                 batch._isDisposed = false;
+                batch._source = source;
+                batch._autoActive = autoActive;
+                batch._loadedUnityObjects.Clear();
+                for (int i = 0; i < count; i++)
+                {
+                    batch._loadedUnityObjects.Add(null);
+                }
+
                 return batch;
             }
 
@@ -383,6 +409,7 @@ namespace Utils.AssetManager
         public UnityAssetManager(IUnityObjectPool objectPool, int maxLoadingAssetNum = Int32.MaxValue,
             bool useAssetPool = true)
         {
+            
             _objectPool = objectPool;
             _maxLoadingAssetNum = Math.Max(1, maxLoadingAssetNum);
             _useAssetPool = useAssetPool;
@@ -394,6 +421,19 @@ namespace Utils.AssetManager
             _loadedProfile = DurationHelp.Instance.GetCustomProfileInfo("UpdateLoadRequests_Loaded");
             _disposeOperationProfile =
                 DurationHelp.Instance.GetCustomProfileInfo("UpdateLoadRequests_DisposeOperation");
+            AssetBundleProviderDelegate.GetAssetBundle = (string bundlename) =>
+            {
+                if (_bundlePool
+                    .LoadedAssetBundles.ContainsKey(bundlename))
+                {
+                    return _bundlePool.LoadedAssetBundles[bundlename].Bundle;
+                }
+                else
+                {
+                    LoadAssetBundleAsync(bundlename);
+                }
+                return null;
+            };
         }
 
         public class SupplementaryWarehouse
@@ -404,12 +444,17 @@ namespace Utils.AssetManager
 
         public IEnumerator Init(ResourceConfig config, ICoRoutineManager coRoutineManager, bool isServer = false)
         {
+#if !UNITY_EDITOR
+            var isLQ =
+ SettingManager.SettingManager.GetInstance().GetQualityBeforeInit() == SettingManager.QualityLevel.Low;
+#else
+            var isLQ = false;
+#endif
             _logger.InfoFormat("UnityAssetManager init:IsServer:{0} ,Quality:{1}", isServer,
                 SettingManager.SettingManager.GetInstance().GetQualityBeforeInit());
             coRoutineManager.StartCoRoutine(InitUpdate());
             coRoutineManager.StartCoRoutine(Init(config,
-                !isServer && SettingManager.SettingManager.GetInstance().GetQualityBeforeInit() ==
-                SettingManager.QualityLevel.Low));
+                !isServer && isLQ));
 
             yield return new WaitUntil(() => _isInitialized);
         }
@@ -420,6 +465,7 @@ namespace Utils.AssetManager
             {
                 Update();
                 yield return null;
+               
             }
         }
 
@@ -457,6 +503,7 @@ namespace Utils.AssetManager
                 }
             }
 
+           
             yield return InitWarehouse(defaultWarehouseAddr, supplementaryWarehouses, isLow);
         }
 
@@ -511,7 +558,23 @@ namespace Utils.AssetManager
         public Dictionary<string, LoadedAssetBundle> LoadedAssetBundles
         {
             get { return _bundlePool.LoadedAssetBundles; }
+
         }
+
+        public bool IsAssetExit(AssetInfo assetInfo)
+        {
+            if(_assetPool.ContainsKey(assetInfo))
+            {
+                return true;
+            }
+            return false;
+
+        }
+
+        public IUnityObjectPool ObjectPool {
+            get { return _objectPool; }
+        }
+
 
         public void LoadAssetBundleAsync(string bundleName)
         {
@@ -529,20 +592,21 @@ namespace Utils.AssetManager
             AppendAssetRequest(source, assetInfo, handlerAction, assetLoadOption);
         }
 
-
         public void LoadAssetsAsync<T>(T source,
-            IEnumerable<AssetInfo> assetInfos,
-            Action<T, IEnumerable<UnityObject>> handlerAction,
+            List<AssetInfo> assetInfos,
+            Action<T, List<UnityObject>> handlerAction,
             AssetLoadOption assetLoadOption = default(AssetLoadOption))
         {
             if (assetInfos != null)
             {
-                var batch = AssetLoadRequestBatch<T>.Alloc();
+                var batch = AssetLoadRequestBatch<T>.Alloc(source, assetInfos.Count(), !assetLoadOption.DontAutoActive);
                 batch.OnLoaded = handlerAction;
                 int count = 0;
+                var singleOption = new AssetLoadOption(true, assetLoadOption.Parent,
+                    assetLoadOption.Recyclable, assetLoadOption.PostProcessorFactory, assetLoadOption.ObjectType);
                 foreach (var assetInfo in assetInfos)
                 {
-                    var req = AppendAssetRequest(source, assetInfo, null, assetLoadOption);
+                    var req = AppendAssetRequest(source, assetInfo, null, singleOption);
                     batch.PackRequest(req);
                     count++;
                 }
@@ -578,8 +642,8 @@ namespace Utils.AssetManager
                 {
                     _logger.ErrorFormat("Loading Asset {0} is Invalid from {1}", assetInfo, e);
                 }
-               
-                
+
+
                 req.IsDisposed = true;
                 return req;
             }
@@ -678,7 +742,7 @@ namespace Utils.AssetManager
             }
         }
 
-        public void Recycle(UnityObject unityObject)
+        public void Recycle(UnityObject unityObject,bool active = false)
         {
             if (unityObject != null && unityObject.AsObject != null)
             {
@@ -686,7 +750,7 @@ namespace Utils.AssetManager
                 var profiler = SingletonManager.Get<LoadRequestProfileHelp>().GetProfile(unityObject.Address);
                 profiler.RecycleTimes++;
 
-                _objectPool.Add(unityObject);
+                _objectPool.Add(unityObject, active);
             }
         }
 
@@ -775,7 +839,8 @@ namespace Utils.AssetManager
                                     }
                                     else
                                     {
-                                        _bundlePool.LoadAsset(assetInfo.BundleName, assetInfo.AssetName, req.Option.ObjectType);
+                                        _bundlePool.LoadAsset(assetInfo.BundleName, assetInfo.AssetName,
+                                            req.Option.ObjectType);
                                         var node = AssetLoadRequestNode.Alloc(req);
                                         AssetLoadRequestNode cachedNode;
                                         if (_loadingRequests.TryGetValue(req.AssetInfo, out cachedNode))
@@ -807,14 +872,25 @@ namespace Utils.AssetManager
             }
         }
 
+
         private void UpdateLoadedRequest()
         {
-            while (_loadedRequests.Count > 0)
+            float time = 0;
+            while (_loadedRequests.Count > 0 && ProcessLoadedRequestTime > 0 && time < ProcessLoadedRequestTime)
             {
                 var req = _loadedRequests.Dequeue();
+#if ENABLE_PROFILER
+                var _profile = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo(string.Format(
+                    "InvokeOnLoaded_{0}_{1}",
+                    req.AssetInfo.BundleName.Replace("/", "_"), req.AssetInfo.AssetName));
+#endif
                 try
                 {
+#if ENABLE_PROFILER
+                    _profile.BeginProfile();
+#else
                     _loadedProfile.BeginProfile();
+#endif
                     req.InvokeOnLoaded(DisposeOperation);
                 }
                 catch (Exception e)
@@ -823,12 +899,18 @@ namespace Utils.AssetManager
                 }
                 finally
                 {
-                    _loadedProfile.EndProfile();
+#if ENABLE_PROFILER
+                    time += _profile.EndProfile();
+#else
+                    time += _loadedProfile.EndProfile();
+#endif
                 }
 
                 AbstractAssetLoadRequest.Free(req);
             }
         }
+
+        public static float ProcessLoadedRequestTime=100;
 
         private bool IsPendingReuqest(AbstractAssetLoadRequest req)
         {
@@ -974,6 +1056,7 @@ namespace Utils.AssetManager
                 yield return new WaitUntil(() =>
                 {
                     UpdateBundlePool();
+                    _logger.InfoFormat("_bundlePool: {0}", _bundlePool.Status());
                     return _bundlePool.IsIdle;
                 });
             }

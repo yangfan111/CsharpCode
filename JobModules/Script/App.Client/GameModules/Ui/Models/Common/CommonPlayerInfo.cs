@@ -57,7 +57,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                         continue;
                     }
                     _playerInfoDic[info.PlayerId].UpdateLocation(info.TopPos);
-                    _playerInfoDic[info.PlayerId].UpdateInfo(info.Num, info.Color, info.PlayerName,info.EntityId, selectedPlayerId,playerInfoUIAdapter.CountdownTipDataList,playerInfoUIAdapter.GetGameRule(),playerInfoUIAdapter.HpPercent);
+                    _playerInfoDic[info.PlayerId].UpdateInfo(info.Num, info.Color, info.PlayerName,info.EntityId, selectedPlayerId, info.CurHp*1.0f/info.MaxHp);
                     
                 }
                 else
@@ -117,7 +117,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         {
             var info = new PlayerInfo();
             info.Init(GameObject.Instantiate(FindChildGo("playerInfo").gameObject, FindChildGo("Show")));
-            info.UpdateInfo(PlayInfo.Num, PlayInfo.Color, PlayInfo.PlayerName, PlayInfo.EntityId, 0,playerInfoUIAdapter.CountdownTipDataList, playerInfoUIAdapter.GetGameRule(),playerInfoUIAdapter.HpPercent);
+            info.UpdateInfo(PlayInfo.Num, PlayInfo.Color, PlayInfo.PlayerName, PlayInfo.EntityId, 0,1);
             info.UpdateLocation(PlayInfo.TopPos);
             return info;
         }
@@ -187,70 +187,16 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
         }
 
-        public void UpdateInfo(int index, Color color, string name,int playerID,int selectId, List<ITipData> countdownTipDataList, int rule,int percent)
+        public void UpdateInfo(int index, Color color, string name,int playerID,int selectId,float percent)
         {
 
-            
             _playerId = playerID;
           
             _indexImage.color = color;
             Color oriColor = _nameText.color;
 
-           
-            if (isStartUp)
-            {
-                if (rule == GameRules.Team)
-                {
-                    
-                    _bloodText.gameObject.SetActive(true);
-                    _bloodText.text = percent + "%";
-                    if (!hasWait)
-                        DOVirtual.DelayedCall(5f, () =>
-                            {
-                                isStartUp = false;
-                                DOTween.ToAlpha(() => _nameText.color, (c) => _nameText.color = c, 0.5f, 0.5f);
-                                DOTween.ToAlpha(() => _bloodText.color, (c) => _bloodText.color = c, 0f, 0.5f);
-                            }
-                        );
-                    hasWait = true;
-                   
-                  
-                }
-                else
-                {
-                    if (countdownTipDataList.Count > 0 && hasWait==false)
-                    {
-                        oriColor = new Color(oriColor.r, oriColor.g, oriColor.b, 1);
-                        _nameText.color = oriColor;
-                        _bloodText.color = oriColor;
-                        hasWait = true;
-                       
-                    }
-                    else if (countdownTipDataList.Count > 0)
-                    {
-                        
-                    }
-                    else if (countdownTipDataList.Count == 0 && hasWait)
-                    {
-                        
-                        isStartUp = false;
-                        DOTween.ToAlpha(() => _nameText.color, (c) => _nameText.color = c, 0.5f, 0.5f);
-                        DOTween.ToAlpha(() => _bloodText.color, (c) => _bloodText.color = c, 0f, 0.5f);
-                    }
-                    else
-                    {
-                        DoNormalSet(selectId, oriColor);
-                    }
-                }
-            }
-            else
-            {
-                DoNormalSet(selectId, oriColor);
-            }
+            DoNormalSet(selectId, oriColor,percent);
 
-           
-
-           
             _indexText.text = index.ToString();
             _nameText.text = name;
 
@@ -258,20 +204,23 @@ namespace App.Client.GameModules.Ui.Models.Common
             //LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
         }
 
-        private void DoNormalSet(int selectId, Color oriColor)
+        private void DoNormalSet(int selectId, Color oriColor,float percent)
         {
-            //Debug.Log(selectId);
+
             if (_playerId == selectId)
             {
                 oriColor = new Color(oriColor.r, oriColor.g, oriColor.b, 1);
                 _nameText.color = oriColor;
+                _bloodText.gameObject.SetActive(true);
+                _bloodText.text = ((int)(percent * 100)).ToString()+"%";
             }
             else
             {
                 oriColor = new Color(oriColor.r, oriColor.g, oriColor.b, 0.5f);
                 _nameText.color = oriColor;
+                _bloodText.gameObject.SetActive(false);
             }
-            _bloodText.gameObject.SetActive(false);
+            
         }
 
 

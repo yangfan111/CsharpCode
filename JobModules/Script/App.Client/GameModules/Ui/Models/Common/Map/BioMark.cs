@@ -73,7 +73,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
         private float _rate;
 
-        public void UpdateBioLabel(List<Vector3> motherPos, List<Vector3> heroPos, List<Vector3> humanPos,List<MapFixedVector3> supplyBoxPos, float rate)
+        public void UpdateBioLabel(List<Vector3> motherPos, List<Vector3> heroPos, List<Vector3> humanPos,Dictionary<string, MapFixedVector3> supplyBoxPos, float rate)
         {
             UpdateBioLabel(motherPos, rate, EBioMarkType.Mother);
             UpdateBioLabel(heroPos, rate, EBioMarkType.Hero);
@@ -89,6 +89,18 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             for (int i = 0; i < count; i++)
             {
                 ((goList[i].transform) as RectTransform).anchoredPosition = new Vector2(posList[i].x, posList[i].z) * rate;
+            }
+        }
+
+        private void UpdateBioLabel(Dictionary<string, MapFixedVector3> posDict, float rate, EBioMarkType type) {
+            int count = posDict.Count;
+            var goList = GetMark(type, count);
+            Dictionary<string, MapFixedVector3>.Enumerator it = posDict.GetEnumerator();
+            int i = 0;
+            while (it.MoveNext()) {
+                var pos = it.Current.Value.ShiftedUIVector3();
+                ((goList[i].transform) as RectTransform).anchoredPosition = new Vector2(pos.x, pos.z) * rate;
+                i++;
             }
         }
 

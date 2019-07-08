@@ -26,6 +26,7 @@ namespace App.Shared.GameModules.Player.Actions
         private static float _capsuleHeight;
 
         private const float VaultPly = 0.6f;
+        private const float VaultHeightLimit = 0.51f;
 
         private const float VerticalDistanceDeviation = 0.1f;
 
@@ -37,6 +38,12 @@ namespace App.Shared.GameModules.Player.Actions
         private const float AllRoundCastZoOffset = 0.5f;
         private const float AllRoundCastYoOffsetOne = 2.4f;
         private const float AllRoundCastYoOffsetTwo = 1.5f;
+
+        private const float MinClimbHeight = 1.0f;
+        private const float MaxClimbHeight = 2.3f;
+        private const float MinVaultHeight = 0.3f;
+        private const float MaxVaultHeight = 2.3f;
+        
 
         // 探测前方1m是否有障碍物
         public static bool ClimbUpFrontDistanceTest(PlayerEntity player)
@@ -155,7 +162,7 @@ namespace App.Shared.GameModules.Player.Actions
 
             var playerTransform = player.RootGo().transform;
             var distance = collisionPoint.y - playerTransform.position.y;
-            if (distance < 0.3 || distance > 2.3) return;
+            if (distance < MinClimbHeight || distance > MaxClimbHeight) return;
 
             //最终位置能否站人
             var overlapPos = collisionPoint + playerTransform.up * 0.2f;
@@ -176,7 +183,7 @@ namespace App.Shared.GameModules.Player.Actions
             
             var playerTransform = player.RootGo().transform;
             var distance = collisionPoint.y - playerTransform.position.y;
-            if (distance < 0.3 || distance > 2.3) return false;
+            if (distance < MinVaultHeight || distance > MaxVaultHeight) return false;
 
             // 检测翻越过程中障碍
             var testPoint = new Vector3(playerTransform.position.x, collisionPoint.y, playerTransform.position.z);
@@ -187,7 +194,7 @@ namespace App.Shared.GameModules.Player.Actions
 
             // 
             _overlapPos = playerTransform.position + _matchForward * (VaultPly + 2.0f * _capsuleRadius - PlayerEntityUtility.CcSkinWidth);
-            _overlapPos.y = (collisionPoint + -playerTransform.up * 0.45f).y;
+            _overlapPos.y = (collisionPoint + -playerTransform.up * (VaultHeightLimit + 2 * PlayerEntityUtility.CcSkinWidth)).y;
             
             PlayerEntityUtility.GetCapsule(player, _overlapPos, out _capsuleBottom, out _capsuleUp,
                 out _capsuleRadius);
@@ -282,13 +289,12 @@ namespace App.Shared.GameModules.Player.Actions
         {
             if (null == player || !player.hasThirdPersonAnimator) return false;
             var thirdPersonAnimator = player.thirdPersonAnimator.UnityAnimator;
-            return thirdPersonAnimator.GetCurrentAnimatorStateInfo(0).IsName("ClimbEnd");
+            return thirdPersonAnimator.GetCurrentAnimatorStateInfo(GenericAction.ClimbLayerIndex).IsName("ClimbEnd");
         }
 
         private static bool OverlapCapsuleTest(PlayerEntity playerEntity)
         {
             var gameObject = playerEntity.RootGo();
-            var prevLayer = gameObject.layer;
             var prev = IntersectionDetectTool.SetColliderDisable(gameObject);
 
             var overlapPos = gameObject.transform.position;
@@ -305,7 +311,6 @@ namespace App.Shared.GameModules.Player.Actions
         private static bool IsHitGround(PlayerEntity playerEntity)
         {
             var gameObject = playerEntity.RootGo();
-            var prevLayer = gameObject.layer;
             var prev = IntersectionDetectTool.SetColliderDisable(gameObject);
 
             var startPoint = gameObject.transform.position;

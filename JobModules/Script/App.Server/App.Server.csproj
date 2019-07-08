@@ -89,12 +89,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AllocationClient.cs" />
-    <Compile Include="Bullet\ServerBulletInfoCollector.cs" />
     <Compile Include="Common\ServerRuntimeGameConfig.cs" />
-    <Compile Include="Damage\ServerDamageInfoCollector.cs" />
     <Compile Include="FileSystemConfig\ServerFileSystemConfigManager.cs" />
-    <Compile Include="GameModules\Bullet\ServerBulletInfoCollectSystem.cs" />
-    <Compile Include="GameModules\Bullet\ServerBulletModule.cs" />
+    <Compile Include="GameModules\Attack\ServerBulletInfoCollectSystem.cs" />
     <Compile Include="GameModules\GamePlay\Free\FreeArgConstant.cs" />
     <Compile Include="GameModules\GamePlay\Free\FreeGameContext.cs" />
     <Compile Include="GameModules\GamePlay\Free\FreeGameRule.cs" />
@@ -168,6 +165,7 @@
     <Compile Include="GameModules\GamePlay\Free\entity\RemoveSceneObjectAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\entity\SelectFreeMoveAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\hall\BattleReportAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\hall\GameTimeMarkAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\hall\PlayerReportAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\item\BagCapacityUtil.cs" />
     <Compile Include="GameModules\GamePlay\Free\item\CarryClipUtil.cs" />
@@ -210,12 +208,11 @@
     <Compile Include="GameModules\GamePlay\Free\item\UnityOneInventoryUI.cs" />
     <Compile Include="GameModules\GamePlay\Free\item\config\FreeItemConfig.cs" />
     <Compile Include="GameModules\GamePlay\Free\item\config\ItemDefReplacer.cs" />
-    <Compile Include="GameModules\GamePlay\Free\map\FreeMapPosition.cs" />
     <Compile Include="GameModules\GamePlay\Free\map\PlaySoundAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\map\SelectNearPointAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\map\SelectPointAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\map\position\NotSamePosSelector.cs" />
     <Compile Include="GameModules\GamePlay\Free\map\position\PosAngleSelector.cs" />
-    <Compile Include="GameModules\GamePlay\Free\map\position\PosEditSelector.cs" />
     <Compile Include="GameModules\GamePlay\Free\map\position\PosEntitySelector.cs" />
     <Compile Include="GameModules\GamePlay\Free\map\position\PosGroundSelector.cs" />
     <Compile Include="GameModules\GamePlay\Free\map\position\UnityPositionUtil.cs" />
@@ -228,12 +225,13 @@
     <Compile Include="GameModules\GamePlay\Free\player\PlayerHurtAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\player\PlayerItemAvatarAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\player\PlayerItemPartAction.cs" />
-    <Compile Include="GameModules\GamePlay\Free\player\PlayerItemWeaponction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\PlayerItemWeaponAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\player\PlayerMaskAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\player\PlayerMoveAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\player\PlayerReliveAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\player\PlayerResetAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\player\PlayerSpeedAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\player\PlayerStageSetAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\player\PlayerVisibilityAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\player\PlayerWeaponDropAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\player\SelectPlayerAction.cs" />
@@ -245,7 +243,7 @@
     <Compile Include="GameModules\GamePlay\Free\replacer\TextDescReplacer.cs" />
     <Compile Include="GameModules\GamePlay\Free\ui\BombCircleAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\ui\LockMouseAction.cs" />
-    <Compile Include="GameModules\GamePlay\Free\ui\PoisonCirlceAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\ui\PoisonCircleAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\ui\ScoreInfoAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\ui\ShowAppUiAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\ui\ShowPartAction.cs" />
@@ -265,6 +263,7 @@
     <Compile Include="GameModules\Player\ServerTimeWriterSystem.cs" />
     <Compile Include="GameModules\SceneManagement\ServerScenePostprocessorSystem.cs" />
     <Compile Include="GameModules\SceneObject\CreateMapObjByEventSystem.cs" />
+    <Compile Include="GameModules\SceneObject\SceneObjectLimitSystem.cs" />
     <Compile Include="GameModules\SceneObject\ServerAbstractTriggerObjectListener.cs" />
     <Compile Include="GameModules\SceneObject\ServerDebugSystem.cs" />
     <Compile Include="GameModules\SceneObject\ServerDestructibleObjectListener.cs" />

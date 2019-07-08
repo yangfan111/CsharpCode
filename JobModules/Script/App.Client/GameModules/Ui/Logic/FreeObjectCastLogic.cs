@@ -1,11 +1,8 @@
 ﻿using App.Client.CastObjectUtil;
 using App.Shared;
 using App.Shared.GameModules.GamePlay.Free;
-using Assets.Sources.Free.Utility;
 using com.cpkf.yyjd.tools.util;
 using Core.EntityComponent;
-using Core.Free;
-using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using I2.Loc;
 using UserInputManager.Lib;
@@ -17,23 +14,19 @@ namespace App.Client.GameModules.Ui.Logic
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(FreeObjectCastLogic));
         private FreeMoveContext _freeMoveContext;
         private PlayerContext _playerContext;
-        private IUserCmdGenerator _userCmdGenerator;
+        private IUserInputManager _userInputManager;
         private UnityEngine.Vector3 _centeroffset; 
 
-        public FreeObjectCastLogic(
-            FreeMoveContext freeMoveContext,
-            PlayerContext playerContext,
-            IUserCmdGenerator cmdGenerator,
-            float distance) : base(playerContext, distance)
+        public FreeObjectCastLogic(FreeMoveContext freeMoveContext, PlayerContext playerContext, IUserInputManager userInputManager, float distance) : base(playerContext, distance)
         {
-            _userCmdGenerator = cmdGenerator;
             _freeMoveContext = freeMoveContext;
             _playerContext = playerContext;
+            _userInputManager = userInputManager;
         }
 
         public override void OnAction()
         {
-            _userCmdGenerator.SetUserCmd((cmd) => cmd.IsTabDown = true);
+            _userInputManager.InsertKey(new KeyData(UserInputKey.OpenBag));
         }
 
         protected override void DoSetData(PointerData data)

@@ -11,6 +11,7 @@ namespace Core.Fsm
         void Update(IAdaptiveContainer<IFsmInputCommand> commands,
                     int frameInterval,
                     Action<FsmOutput> addOutput,
-                    FsmUpdateType updateType);
+                    FsmUpdateType updateType,
+                    List<FsmInput> limits);
     }
 }

@@ -17,7 +17,8 @@ namespace App.Client.SessionStates
             if (SharedConfig.InSamplingMode)
             {
                 AddState(new RequestRoomInfoState(contexts, EClientSessionStates.RequestRoomInfo, EClientSessionStates.ProfilePreparation));
-                AddState(new ProfilePreparationState(contexts, EClientSessionStates.ProfilePreparation, EClientSessionStates.LoadSceneMapConfig));
+                AddState(new ProfilePreparationState(contexts, EClientSessionStates.ProfilePreparation, EClientSessionStates.LoadOptionConfig));
+                AddState(new ClientOptionLoadState(contexts, EClientSessionStates.LoadOptionConfig, EClientSessionStates.LoadSceneMapConfig));
                 AddState(new LoadSceneMapConfig(contexts, EClientSessionStates.LoadSceneMapConfig, EClientSessionStates.Profile, true, false));
                 AddState(new ProfileState(contexts, EClientSessionStates.Profile, EClientSessionStates.Profile));
             }

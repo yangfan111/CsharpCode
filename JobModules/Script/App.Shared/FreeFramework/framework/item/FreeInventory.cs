@@ -1,24 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using App.Server.GameModules.GamePlay.free.player;
+using App.Server.GameModules.GamePlay.Free.player;
+using App.Shared;
+using App.Shared.FreeFramework.Free.Chicken;
+using App.Shared.GameModules.Player;
+using Assets.App.Server.GameModules.GamePlay.Free;
 using com.cpkf.yyjd.tools.data.sort;
-using com.wd.free.item;
-using com.wd.free.skill;
-using Sharpen;
 using com.wd.free.action;
 using com.wd.free.@event;
-using App.Server.GameModules.GamePlay.free.player;
 using com.wd.free.para.exp;
-using com.wd.free.action.function;
-using Free.framework;
+using com.wd.free.skill;
+using com.wd.free.util;
 using Core.Free;
-using App.Shared;
-using App.Shared.FreeFramework.Free;
-using App.Shared.FreeFramework.Free.Chicken;
-using App.Shared.Player;
-using App.Server.GameModules.GamePlay.Free.player;
-using App.Shared.GameModules.Player;
+using Free.framework;
+using Sharpen;
+using System;
+using System.Collections.Generic;
 
 namespace com.wd.free.item
 {
@@ -50,10 +46,18 @@ namespace com.wd.free.item
             }
         }
 
-        public void UsingItem(ISkillArgs args)
+        public void UsingItem(ISkillArgs args, FreeData fd)
         {
             if (startUse)
             {
+                if (itemSkill.inter != null && itemSkill.inter.IsInterrupted(args))
+                {
+                    args.TempUse("item", currentItem);
+                    itemSkill.interAction.Act(args);
+                    StopUseItem(args, fd, true);
+                    args.Resume("item");
+                    return;
+                }
                 itemSkill.Frame(args);
             }
         }
@@ -65,7 +69,7 @@ namespace com.wd.free.item
             this.itemSkill.SetTrigger(trigger);
             SkillMultiInterrupter inter = new SkillMultiInterrupter();
             inter.inters = new List<ISkillInterrupter>();
-            inter.inters.Add(new SkillKeyInterrupter("5,0,1,2,3,18,23"));
+            //inter.inters.Add(new SkillKeyInterrupter("5,0,1,2,3,18,23"));
 
             SkillConditionInterrupter condition = new SkillConditionInterrupter();
             condition.condition = new ExpParaCondition("current.CurHp <= 0");
@@ -91,6 +95,18 @@ namespace com.wd.free.item
             trigger.SetTime(sing * 1000);
             trigger.Reset();
 
+            itemSkill.inter = null;
+            itemSkill.interAction = null;
+            if (ip.key.GetClickSkill() != null)
+            {
+                PlayerActionSkill skill = ip.key.GetClickSkill() as PlayerActionSkill;
+                if (skill != null && skill.inter != null)
+                {
+                    itemSkill.inter = skill.inter;
+                    itemSkill.interAction = skill.interAction;
+                }
+            }
+
             UsingItemAction interAction = (UsingItemAction)trigger.interAction;
             interAction.fd = fd;
             interAction.ip = ip;
@@ -100,33 +116,21 @@ namespace com.wd.free.item
             action.ip = ip;
 
             StartCounter(args, sing, fd, true);
-
             startUse = true;
-
-            FreeSoundUtil.Stop("use", args, fd);
-
-            if (sound > 0)
-            {
-                FreeSoundUtil.PlayOnce("use", sound, args, fd);
-            }
+            SetCurrentItem(ip, (ISkillArgs)args);
+            SimpleProto data = FreePool.Allocate();
+            data.Key = FreeMessageConstant.PlaySound;
+            data.Ks.Add(0);
+            data.Ins.Add(FreeUtil.ReplaceInt("{item.itemId}", args));
+            fd.Player.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.FreeData, data);
         }
 
         private void StartCounter(IEventArgs args, int time, FreeData fd, bool start)
         {
-            //UseCommonAction use = new UseCommonAction();
-            //use.key = "startUseCounter";
-            //use.values = new List<ArgValue>();
-            //use.values.Add(new ArgValue("time", time.ToString()));
-            //use.values.Add(new ArgValue("start", start.ToString().ToLower()));
-
-            //args.TempUse("current", fd);
-            //use.Act(args);
-            //args.Resume("current");
             SimpleProto data = FreePool.Allocate();
             data.Key = FreeMessageConstant.CountDown;
             data.Bs.Add(start);
             data.Fs.Add(time);
-
             fd.Player.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.FreeData, data);
         }
 
@@ -243,19 +247,12 @@ namespace com.wd.free.item
                 if (fd != null)
                 {
                     fd.freeInventory.StopUseItem(args, fd, inter);
-                    UseCommonAction use = new UseCommonAction();
-                    use.key = "showBottomTip";
-                    use.values = new List<ArgValue>();
-                    use.values.Add(new ArgValue("msg", "{desc:10072,{item.name}}"));
-
-                    args.TempUse("current", fd);
-                    args.TempUse("item", ip);
-                    use.Act(args);
-                    args.Resume("current");
-                    args.Resume("item");
+                    SimpleProto msg = FreePool.Allocate();
+                    msg.Key = FreeMessageConstant.ChickenTip;
+                    msg.Ss.Add("word72," + ip.key.GetName());
+                    FreeMessageSender.SendMessage(fd.Player, msg);
                     PlayerAnimationAction.DoAnimation(args.GameContext, PlayerAnimationAction.Stop, fd.Player);
-                    FreeSoundUtil.Stop("use", args, fd);
-
+                    //FreeSoundUtil.Stop("use", args, fd);
                     PlayerStateUtil.RemoveGameState(EPlayerGameState.InterruptItem, fd.Player.gamePlay);
                 }
             }
@@ -265,6 +262,7 @@ namespace com.wd.free.item
                 {
                     UseItem(ip, fd, (ISkillArgs)args);
                     fd.freeInventory.StopUseItem(args, fd, inter);
+                    PlayerAnimationAction.DoAnimation(args.GameContext, PlayerAnimationAction.Interrupt, fd.Player);
                 }
             }
         }

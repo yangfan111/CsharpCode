@@ -7,6 +7,7 @@ using Core.Utils;
 using Entitas;
 using UnityEngine;
 using Utils.Appearance;
+using Utils.Appearance.Bone;
 
 namespace App.Shared.GameModules.Vehicle
 {

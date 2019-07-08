@@ -215,6 +215,7 @@ namespace Core.EntitasAdpater
         private IGameEntity GetGameEntity(TEntity entity)
         {
             var comp = GetOrAddGameEntityComponent(entity);
+
             if (comp.SelfAdapter == null)
             {
                 comp.SelfAdapter = EntitasGameEntity<TEntity>.Allocate(entity, _indexLookUp);
@@ -228,6 +229,7 @@ namespace Core.EntitasAdpater
             int index = _indexLookUp.GetComponentIndex<EntityAdapterComponent>();
             EntityAdapterComponent comp =
                 (EntityAdapterComponent) EntitasGameEntity<TEntity>.DoGetComponent(entity, index);
+
             if (comp == null)
             {
                 comp = EntitasGameEntity<TEntity>.DoAddComponent<EntityAdapterComponent>(entity, index);
@@ -263,6 +265,24 @@ namespace Core.EntitasAdpater
             return rrc;
         }
 
+#pragma warning disable RefCounter002
+        public bool TryGetEntity(EntityKey entityKey, out IGameEntity entity)
+#pragma warning restore RefCounter002
+        {
+            entity = null;
+
+            TEntity rc = GetEntityWithEntityKey(entityKey);
+            if (rc == null)
+            {
+                // 就目前而言 GetEntityWithEntityKey 找不到 entityKey 对应的entity，则返回null
+                return false;
+            }
+
+            entity = GetWrapped(rc);
+
+            return entity!=null;
+        }
+
         public IGameEntity GetEntity(EntityKey entityKey)
         {
             TEntity rc = GetEntityWithEntityKey(entityKey);
@@ -271,7 +291,7 @@ namespace Core.EntitasAdpater
 
         public EntitasGameEntity<TEntity> GetWrapped(TEntity rc)
         {
-            return (EntitasGameEntity<TEntity>) GetGameEntity(rc);
+            return (EntitasGameEntity<TEntity>)GetGameEntity(rc);
         }
 
         public bool CanContainComponent<TComponent>() where TComponent : IGameComponent

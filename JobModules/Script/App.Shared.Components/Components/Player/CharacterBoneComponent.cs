@@ -13,18 +13,18 @@ namespace App.Shared.Components.Player
     public class CharacterBoneComponent : IPlaybackComponent, IUpdateComponent
     {
         [DontInitilize] [NetworkProperty] public bool EnableIK;
-        [DontInitilize] [NetworkProperty] public float PitchHeadAngle;
-        [DontInitilize] [NetworkProperty] public float RotHeadAngle;
-        [DontInitilize] [NetworkProperty] public float PitchHandAngle;
+        [DontInitilize] [NetworkProperty(SyncFieldScale.Pitch)] public float PitchHeadAngle;
+        [DontInitilize] [NetworkProperty(SyncFieldScale.Yaw)] public float RotHeadAngle;
+        [DontInitilize] [NetworkProperty(SyncFieldScale.Pitch)] public float CurrentPitchHandAngle;
         [DontInitilize] [NetworkProperty] public float HeadRotProcess;
         [DontInitilize] [NetworkProperty] public bool IsHeadRotCW;
-        [NetworkProperty] public float WeaponPitch;
-        [NetworkProperty] public float WeaponRot;
+        [NetworkProperty(SyncFieldScale.Pitch)] public float WeaponPitch;
+        [NetworkProperty(SyncFieldScale.Yaw)] public float WeaponRot;
         [NetworkProperty] public bool IsWeaponRotState;
 
-        [DontInitilize] [NetworkProperty] public Vector3 FirstPersonPositionOffset;
-        [DontInitilize] [NetworkProperty] public Vector3 FirstPersonRotationOffset;
-        [DontInitilize] [NetworkProperty] public Vector3 FirstPersonSightOffset;
+        [DontInitilize] [NetworkProperty(100,-100,0.00001f)] public Vector3 FirstPersonPositionOffset;
+        [DontInitilize] [NetworkProperty(100,-100,0.00001f)] public Vector3 FirstPersonRotationOffset;
+        [DontInitilize] [NetworkProperty(100,-100,0.00001f)] public Vector3 FirstPersonSightOffset;
 
         public float ScreenRatio;
         public int RealWeaponId;
@@ -50,8 +50,8 @@ namespace App.Shared.Components.Player
                              (rightComponent.PitchHeadAngle - leftComponent.PitchHeadAngle) * ratio;
             RotHeadAngle = leftComponent.RotHeadAngle +
                            (rightComponent.RotHeadAngle - leftComponent.RotHeadAngle) * ratio;
-            PitchHandAngle = leftComponent.PitchHandAngle +
-                             (rightComponent.PitchHandAngle - leftComponent.PitchHandAngle) * ratio;
+            CurrentPitchHandAngle = leftComponent.CurrentPitchHandAngle +
+                             (rightComponent.CurrentPitchHandAngle - leftComponent.CurrentPitchHandAngle) * ratio;
             HeadRotProcess = leftComponent.HeadRotProcess +
                              (rightComponent.HeadRotProcess - leftComponent.HeadRotProcess) * ratio;
             WeaponPitch = leftComponent.WeaponPitch + (rightComponent.WeaponPitch - leftComponent.WeaponPitch) * ratio;
@@ -82,7 +82,7 @@ namespace App.Shared.Components.Player
             var right = rightComponent as CharacterBoneComponent;
             PitchHeadAngle = right.PitchHeadAngle;
             RotHeadAngle = right.RotHeadAngle;
-            PitchHandAngle = right.PitchHandAngle;
+            CurrentPitchHandAngle = right.CurrentPitchHandAngle;
             HeadRotProcess = right.HeadRotProcess;
             IsHeadRotCW = right.IsHeadRotCW;
             WeaponPitch = right.WeaponPitch;

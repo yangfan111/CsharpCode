@@ -45,8 +45,7 @@ namespace App.Client.GameModules.Player
                    
                     mainCamera.transform.localScale = Vector3.one;
                     mainCamera.cullingMask &= ~UnityLayerManager.GetLayerMask(EUnityLayerName.UI);
-                    mainCamera.cullingMask &= ~UnityLayerManager.GetLayerMask(EUnityLayerName.UIParticle);
-                    mainCamera.cullingMask &= ~UnityLayerManager.GetLayerMask(EUnityLayerName.RenderUIParticle);
+                    mainCamera.cullingMask &= ~UnityLayerManager.GetLayerMask(EUnityLayerName.UIRTRender);
                     var fpCamera = cameraFactory.CreateFpCamera(mainCamera);
                     var fxCamera = cameraFactory.CreateFxCamera(mainCamera);
                     player.AddCameraObj();

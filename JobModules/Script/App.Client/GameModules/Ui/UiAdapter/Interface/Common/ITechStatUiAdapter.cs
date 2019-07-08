@@ -13,5 +13,9 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         //战斗技术统计
         BattleData BattleData { get; }
+        /// <summary>
+        /// 是否允许救援
+        /// </summary>
+        bool CanRescue { get; }
     }
 }

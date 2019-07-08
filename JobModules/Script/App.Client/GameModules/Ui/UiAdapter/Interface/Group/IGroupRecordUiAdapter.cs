@@ -45,5 +45,9 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         EUICampType MyCamp { get;}
 
+        /// <summary>
+        /// 是否允许救援
+        /// </summary>
+        bool CanRescue { get; }
     }
 }

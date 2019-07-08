@@ -1,22 +1,20 @@
-using App.Client.GameModules.Ui.ViewModels.Common;
 using App.Client.GameModules.Ui.UiAdapter;
-using Assets.UiFramework.Libs;
-using Core.GameModule.Interface;
-using UnityEngine;
-using DG.Tweening;
-using UnityEngine.UI;
 using App.Client.GameModules.Ui.Utils;
-using Utils.Configuration;
-using Assets.XmlConfig;
-using App.Client.Utility;
+using App.Client.GameModules.Ui.ViewModels.Common;
 using Assets.App.Client.GameModules.Ui;
+using Assets.UiFramework.Libs;
+using Assets.XmlConfig;
 using Core;
-using Core.Utils;
+using Core.GameModule.Interface;
+using DG.Tweening;
+using UnityEngine;
+using UnityEngine.UI;
+using Utils.Configuration;
 using Utils.Singleton;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {
-	public class CommonCrossHairModel : ClientAbstractModel, IUiSystem 
+    public class CommonCrossHairModel : ClientAbstractModel, IUiSystem 
     {
         private ICrossHairUiAdapter adapter = null;
         private CommonCrossHairViewModel _viewModel;
@@ -117,7 +115,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             centerRt = FindComponent<RectTransform>("center");
             centerImg = FindComponent<Image>("center");
 
-            ConstStartPosOffset = sTopRt.localPosition.y;
+//            ConstStartPosOffset = sTopRt.localPosition.y;
             normalTypeLineWH = sTopRt.sizeDelta.y;
          //   normalTypeEndPos = normalTypeStartPos + 0.7f * normalTypeLineWH;
 
@@ -152,27 +150,32 @@ namespace App.Client.GameModules.Ui.Models.Common
                         SetNormalCrossType(adapter.WeaponAvatarId);  //根据weapon不同过得subtype 设置不同的准心图片
                         float startPos = Mathf.Abs(sTopRt.localPosition.y) ;
                         float endPos = Mathf.Abs(YEndPosOffset);
-#if UNITY_EDITOR
-                        if(GlobalConst.EnableWeaponLog)
-                            DebugUtil.MyLog("SpreadUI EndPos:"+endPos+"||"+"currPos:"+startPos);
-#endif
-                        if (Mathf.Abs(YHistoryEndPosOffset - endPos) > 0.1f ||YMoveTween == null)
+                        float spreadDuration = 1f;
+                        //   DebugUtil.MyLog("SpreadUI spreadDuration:"+spreadDuration+" startPos:"+ startPos+" | EndPos:" + endPos+"|"+"currPos:"+sTopRt.localPosition.x);
+                        if (Mathf.Abs(YHistoryEndPosOffset - endPos) > 0.1f )
                         {
-                          
+                            if (YMoveTween != null)
+                                YMoveTween.Kill();
                             YHistoryEndPosOffset = endPos;
-                            YMoveTween = UIUtils.CallTween(startPos, endPos, UpdateYLinesPos,
-                                (value) => { YMoveTween = null; }, adapter.SpreadDuration); //Mathf.Abs(startPos - endPos)/speed);
-                          
+                            spreadDuration = adapter.SpreadDuration;
+                            YMoveTween = UIUtils.CallTween(startPos, endPos, UpdateYLinesPos,(value) => {
+                                    YMoveTween.Kill(); YMoveTween = null; }, spreadDuration); //Mathf.Abs(startPos - endPos)/speed);
                         }
-                        startPos = Mathf.Abs(hRight.localPosition.x) ;
-                        endPos = Mathf.Abs(XEndPosOffset);
-                        if (Mathf.Abs(XHistoryEndPosOffset - endPos) > 0.1f ||XMoveTween == null)
+                        
+                         endPos = Mathf.Abs(XEndPosOffset);
+                        if (Mathf.Abs(XHistoryEndPosOffset - endPos) > 0.1f )
                         {
+                            if (XMoveTween != null)
+                                XMoveTween.Kill();
+                          
+                            startPos = Mathf.Abs(hLeftRt.localPosition.x);
                             XHistoryEndPosOffset = endPos;
+                         
                             XMoveTween = UIUtils.CallTween(startPos, endPos, UpdateXLinesPos,
-                                (value) => { XMoveTween = null; }, adapter.SpreadDuration); //Mathf.Abs(startPos - endPos)/speed);
-                     
+                                (value) => {XMoveTween.Kill(); XMoveTween = null; }, spreadDuration); //Mathf.Abs(startPos - endPos)/speed);
+
                         }
+                       
 //                        CleanTween(adapter.Statue);
 //                        switch (adapter.Statue)
 //                        {
@@ -395,6 +398,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void UpdateXLinesPos(float value)
         {
+          
             hLeftRt.localPosition  = new Vector3(-value, hLeftRt.localPosition.y, hLeftRt.localPosition.z);
             hRightRt.localPosition = new Vector3(value, hRightRt.localPosition.y, hRightRt.localPosition.z);
         }
@@ -414,7 +418,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void SetNormalCrossType(int weaponAvatarId)
         {
             if(weaponAvatarId != lastWeaponAvatarId)
-            {             
+            {
                 var avatarConfig = SingletonManager.Get<WeaponAvatarConfigManager>().GetConfigById(weaponAvatarId);
                 if (avatarConfig != null)
                 {
@@ -428,8 +432,10 @@ namespace App.Client.GameModules.Ui.Models.Common
                         hLeft.gameObject.SetActive(true);
                         hRight.gameObject.SetActive(true);
                     }
-                    else if(avatarConfig.SubType ==(int)EWeaponSubType.Melee
-                        || avatarConfig.SubType == (int)EWeaponSubType.Hand)   //近战武器    只有中心点
+                    else if (avatarConfig.SubType == (int) EWeaponSubType.Melee
+                             || avatarConfig.SubType == (int) EWeaponSubType.Hand ||
+                             avatarConfig.Type == (int) EWeaponType_Config.ThrowWeapon ||
+                             avatarConfig.SubType == (int) EWeaponSubType.C4)   //近战武器  和投掷武器 空手 雷包 只有中心点
                     {
                         sTop.gameObject.SetActive(false);
                         sDown.gameObject.SetActive(false);
@@ -501,10 +507,11 @@ namespace App.Client.GameModules.Ui.Models.Common
         {
             _viewModel.crossHariRootActive = active;
             _viewModel.attackRootActive = active;
-        }       
+        }
 
-        protected override void OnGameobjectDestoryed()
+        public override void Destory()
         {
+            base.Destory();
             if (XMoveTween != null)
             {
                 XMoveTween.Kill();

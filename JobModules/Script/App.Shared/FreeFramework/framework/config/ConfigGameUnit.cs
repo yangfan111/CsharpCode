@@ -3,11 +3,12 @@ using Sharpen;
 using com.wd.free.para;
 using com.wd.free.trigger;
 using com.wd.free.unit;
+using Core.Free;
 
 namespace com.wd.free.config
 {
-	public class ConfigGameUnit
-	{
+	public class ConfigGameUnit : IRule
+    {
 		private string key;
 
 		private string parent;
@@ -78,5 +79,10 @@ namespace com.wd.free.config
 			// }
 			return unit;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ConfigGameUnit;
+        }
+    }
 }

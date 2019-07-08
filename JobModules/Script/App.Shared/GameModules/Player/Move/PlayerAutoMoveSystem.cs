@@ -1,5 +1,4 @@
 using App.Shared.Components.Player;
-using App.Shared.Player;
 using Core.Compare;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
@@ -12,56 +11,115 @@ namespace App.Shared.GameModules.Player.Move
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             var player = (PlayerEntity) owner.OwnerEntity;
-            
+
             CheckPlayerLifeState(player);
             InterruptAutoRun(player, cmd);
-
-            if (cmd.IsSwitchAutoRun)
+            if(cmd.IsSwitchAutoRun && CanAutoRun(player))
             {
                 player.playerMove.IsAutoRun = !player.playerMove.IsAutoRun;
                 if (player.playerMove.IsAutoRun)
                 {
+                    player.stateInterface.State.InterruptAction();
                     PlayerStateUtil.AddPlayerState(EPlayerGameState.InterruptItem, player.gamePlay);
                 }
             }
         }
 
-        private void InterruptAutoRun(PlayerEntity player, IUserCmd cmd)
+        private static bool CanAutoRun(PlayerEntity player)
+        {
+            return CanAutoRunByActionState(player) &&
+                   CanAutoRunByPostureState(player) &&
+                   CanAutoRunByMovementState(player);
+        }
+
+        private static bool CanAutoRunByActionState(PlayerEntity player)
         {
             var actionState = player.stateInterface.State.GetActionState();
-            var curPostureState = player.stateInterface.State.GetCurrentPostureState();
+            var keepActionState = player.stateInterface.State.GetActionKeepState();
+            return ActionKeepInConfig.Sight != keepActionState &&
+                   (ActionInConfig.Injury == actionState ||
+                   ActionInConfig.Null == actionState ||
+                   ActionInConfig.Props == actionState);
+        }
+
+        private static bool CanAutoRunByPostureState(PlayerEntity player)
+        {
+            var postureState = player.stateInterface.State.GetCurrentPostureState();
+            return PostureInConfig.Stand == postureState ||
+                   PostureInConfig.Crouch == postureState ||
+                   PostureInConfig.Prone == postureState ||
+                   PostureInConfig.Swim == postureState ||
+                   PostureInConfig.Dive == postureState;
+        }
+
+        private static bool CanAutoRunByMovementState(PlayerEntity player)
+        {
+            var movementState = player.stateInterface.State.GetCurrentMovementState();
+            return MovementInConfig.Idle == movementState ||
+                   MovementInConfig.Walk == movementState ||
+                   MovementInConfig.Run == movementState ||
+                   MovementInConfig.Sprint == movementState;
+        }
+
+        private static void InterruptAutoRun(PlayerEntity player, IUserCmd cmd)
+        {
+            if(!player.playerMove.IsAutoRun) return;
+            if (!CompareUtility.IsApproximatelyEqual(cmd.MoveHorizontal, 0) ||
+                !CompareUtility.IsApproximatelyEqual(cmd.MoveVertical, 0) ||
+                NeedInterruptAutoRun(player))
+                player.autoMoveInterface.PlayerAutoMove.StopAutoMove();
+        }
+
+        private static bool NeedInterruptAutoRun(PlayerEntity player)
+        {
+            return NeedInterruptAutoRunByActionState(player) ||
+                   NeedInterruptAutoRunByKeepActionState(player) ||
+                   NeedInterruptAutoRunByPostureState(player) ||
+                   NeedInterruptAutoRunByMovementState(player) ||
+                   NeedInterruptAutoRunByLeanState(player);
+        }
+
+        private static bool NeedInterruptAutoRunByActionState(PlayerEntity player)
+        {
+            var actionState = player.stateInterface.State.GetActionState();
+            return ActionInConfig.Null != actionState;
+        }
+
+        private static bool NeedInterruptAutoRunByKeepActionState(PlayerEntity player)
+        {
+            var keepActionState = player.stateInterface.State.GetActionKeepState();
+            return ActionKeepInConfig.Null != keepActionState;
+        }
+
+        private static bool NeedInterruptAutoRunByPostureState(PlayerEntity player)
+        {
+            var postureState = player.stateInterface.State.GetCurrentPostureState();
             var nextPostureState = player.stateInterface.State.GetNextPostureState();
 
-            if (!CompareUtility.IsApproximatelyEqual(cmd.MoveHorizontal, 0) ||
-                !CompareUtility.IsApproximatelyEqual(cmd.MoveVertical, 0))
-                player.autoMoveInterface.PlayerAutoMove.StopAutoMove();
-            else if ((cmd.IsPeekRight || cmd.IsPeekLeft) &&
-                     curPostureState != PostureInConfig.Prone &&
-                     curPostureState != PostureInConfig.Swim &&
-                     curPostureState != PostureInConfig.Dive)
-                player.autoMoveInterface.PlayerAutoMove.StopAutoMove();
-            else if (curPostureState != nextPostureState &&
-                     nextPostureState != PostureInConfig.Dive &&
-                     nextPostureState != PostureInConfig.Swim &&
-                     nextPostureState != PostureInConfig.Land &&
-                     nextPostureState != PostureInConfig.Jump &&
-                     nextPostureState != PostureInConfig.Stand)
-                player.autoMoveInterface.PlayerAutoMove.StopAutoMove();
-            else
-            {
-                switch (actionState)
-                {
-                    case ActionInConfig.MeleeAttack:
-                    case ActionInConfig.SwitchWeapon:
-                    case ActionInConfig.PickUp:
-                    case ActionInConfig.Reload:
-                    case ActionInConfig.SpecialReload:
-                        player.autoMoveInterface.PlayerAutoMove.StopAutoMove();
-                        break;
-                }
-            }
+            if (PostureInConfig.Swim == postureState ||
+                PostureInConfig.Dive == postureState ||
+                PostureInConfig.Jump == postureState ||
+                PostureInConfig.Land == postureState)
+                return false;
+
+            return postureState != nextPostureState;
         }
-        
+
+        private static bool NeedInterruptAutoRunByMovementState(PlayerEntity player)
+        {
+            var movementState = player.stateInterface.State.GetCurrentMovementState();
+            return MovementInConfig.Sprint != movementState &&
+                   MovementInConfig.Run != movementState &&
+                   MovementInConfig.Walk != movementState &&
+                   MovementInConfig.Idle != movementState;
+        }
+
+        private static bool NeedInterruptAutoRunByLeanState(PlayerEntity player)
+        {
+            var leanState = player.stateInterface.State.GetCurrentLeanState();
+            return LeanInConfig.NoPeek != leanState;
+        }
+
         #region LifeState
 
         private void CheckPlayerLifeState(PlayerEntity player)
@@ -86,7 +144,7 @@ namespace App.Shared.GameModules.Player.Move
             if (null == autoMove) return;
             autoMove.StopAutoMove();
         }
-        
+
         private static void Dead(PlayerEntity player)
         {
             if (null == player) return;

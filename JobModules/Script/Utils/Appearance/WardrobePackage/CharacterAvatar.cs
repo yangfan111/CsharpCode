@@ -3,6 +3,8 @@ using Shared.Scripts;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Utils.Appearance.Bone;
+using Utils.Appearance.Effects;
 using Utils.AssetManager;
 using Utils.Configuration;
 using Utils.Singleton;
@@ -298,21 +300,39 @@ namespace Utils.Appearance.WardrobePackage
         private WardrobeParam[] _wardrobes = new WardrobeParam[(int)Wardrobe.EndOfTheWorld];
         private readonly WardrobeStatus _wardrobesStatus = new WardrobeStatus();
         
-        private Dictionary<Wardrobe, Transform[]> _allAvatarBones = new Dictionary<Wardrobe, Transform[]>();
-        
-        private GameObject[] _characterModels;
+        private readonly Dictionary<Wardrobe, Transform[]> _allAvatarBones = new Dictionary<Wardrobe, Transform[]>();
 
         private readonly BoneMount _mount = new BoneMount();
         private bool _enabled;
         private const int AlternativeStartNum = 1000;
         private const int DefaultAvatarId = 1;
         private const Wardrobe StandardPart = Wardrobe.CharacterHead;
-
+        private GameObject _rootGo;
+        
+        private readonly CustomProfileInfo _mainInfo;
+        private readonly CustomProfileInfo _updateBagTransformInfo;
+        private readonly CustomProfileInfo _updateMappingTransformInfo;
+        private readonly CustomProfileInfo _updateLodInfo;
+        private readonly CustomProfileInfo _getLodLevelInfo;
+        private readonly CustomProfileInfo _setLodLevelInfo;
+        
         public CharacterAvatar(GameObject character)
         {
+            _mainInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("CharacterAvatar");
+            _updateBagTransformInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("CharacterAvatarUpdateBagTransform");
+            _updateMappingTransformInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("CharacterAvatarUpdateMappingTransform");
+            _updateLodInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("CharacterAvatarCalcLod");
+            _getLodLevelInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("MyLodGroupGetLodLevel");
+            _setLodLevelInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("MyLodGroupSetLodLevel");
+            
             ReInit(character);
         }
 
+        public void SetRootGo(GameObject obj)
+        {
+            _rootGo = obj;
+        }
+        
         private void ReInit(GameObject character)
         {
             _characterGameObject = character;
@@ -328,6 +348,15 @@ namespace Utils.Appearance.WardrobePackage
                 _wardrobes[(int)param.Type] = new WardrobeParam(assetData);
                 _wardrobes[(int)param.Type].DefaultGameObject = new UnityObject(param.transform.gameObject, new AssetInfo());
             }
+        }
+        
+        public void HandleSingleAvatar(Wardrobe type, Action<UnityObject> act)
+        {
+            if (_wardrobes[(int) type] == null) return; 
+            if(_wardrobes[(int)type].DefaultGameObject!=null)
+                act(_wardrobes[(int)type].DefaultGameObject);
+            if(_wardrobes[(int)type].AlternativeGameObject!=null)
+                act(_wardrobes[(int) type].AlternativeGameObject);
         }
         
         public void SetBagChangedDelegate(Action action)
@@ -357,16 +386,23 @@ namespace Utils.Appearance.WardrobePackage
 
         public void AddWardrobe(WardrobeParam param)
         {
+            if(null != param.DefaultGameObject && null != param.DefaultGameObject.AsGameObject)
+                Logger.InfoFormat("CharacterLog-- CharacterAvatar Add Wardrobe:  {0}", param.DefaultGameObject.AsGameObject.name);
+            
             // 先移除对应位置
             RemoveWardrobe(param.Type, false);
-
+            
             _wardrobes[(int) param.Type] = param;
-
+ 
             // 蒙皮or硬挂
             PutOn(param.DefaultGameObject, (int)param.Type, param.IsSkinned, param.NeedMappingBones);
+            EffectUtility.ReflushGodModeEffect(_rootGo, param.DefaultGameObject);
+            EffectUtility.RegistEffect(_rootGo, param.DefaultGameObject);
+            
             if (param.HasAlterAppearance)
             {
                 PutOn(param.AlternativeGameObject, (int)param.Type + AlternativeStartNum, param.IsSkinned, param.NeedMappingBones);
+                EffectUtility.ReflushGodModeEffect(_rootGo, param.AlternativeGameObject);
             }
             
             // 设置显示状态，由其他位置决定
@@ -389,46 +425,64 @@ namespace Utils.Appearance.WardrobePackage
 
         public void RemoveWardrobe(Wardrobe position, bool updateAppearance = true)
         {
-            if (_wardrobes[(int) position] != null)
+            if (_wardrobes[(int) position] == null) return;
+            
+            if(null != _wardrobes[(int) position] && 
+               null != _wardrobes[(int) position].DefaultGameObject &&
+               null != _wardrobes[(int) position].DefaultGameObject.AsGameObject)
+                Logger.InfoFormat("CharacterLog-- CharacterAvatar Remove Wardrobe:  {0}", _wardrobes[(int) position].DefaultGameObject.AsGameObject.name);
+            
+            var param = _wardrobes[(int) position];
+            _wardrobes[(int) position] = null;
+            
+            // 移除显示
+            TakeOff(param.DefaultGameObject);
+            AddRecycleObject(param.DefaultGameObject);
+            EffectUtility.DeleteGodModeEffect(_rootGo, param.DefaultGameObject);
+            
+            if (param.AlternativeGameObject != null)
             {
-                var param = _wardrobes[(int) position];
-                _wardrobes[(int) position] = null;
-                
-                // 移除显示
-                TakeOff(param.DefaultGameObject);
-                AddRecycleObject(param.DefaultGameObject);
-                
+                TakeOff(param.AlternativeGameObject);
+                AddRecycleObject(param.AlternativeGameObject);
+                EffectUtility.DeleteGodModeEffect(_rootGo, param.AlternativeGameObject);
+            }
+            
+            // 移除对其他位置的影响
+            UnregisterAlternativeAppearance(param);
+            
+            // 更新其他位置的显示
+            if (updateAppearance)
+                ShowAccordingToStatus();
+
+            // 移除RootBone映射
+            if(_mappingBones.ContainsKey((int)position))
+                _mappingBones.Remove((int)position);
+            if (_mappingBones.ContainsKey((int)position + AlternativeStartNum))
+                _mappingBones.Remove((int)position + AlternativeStartNum);
+
+            if (_allAvatarBones.ContainsKey(position))
+            {
+                ResetAvatarRenderBones(_allAvatarBones[position], param.DefaultGameObject);
                 if (param.AlternativeGameObject != null)
-                {
-                    TakeOff(param.AlternativeGameObject);
-                    AddRecycleObject(param.AlternativeGameObject);
-                }
-                
-                // 移除对其他位置的影响
-                UnregisterAlternativeAppearance(param);
-                
-                // 更新其他位置的显示
-                if (updateAppearance)
-                    ShowAccordingToStatus();
+                    ResetAvatarRenderBones(_allAvatarBones[position], param.AlternativeGameObject);
+            }
 
-                // 移除RootBone映射
-                if(_mappingBones.ContainsKey((int)position))
-                    _mappingBones.Remove((int)position);
-                if (_mappingBones.ContainsKey((int)position + AlternativeStartNum))
-                    _mappingBones.Remove((int)position + AlternativeStartNum);
-
-                if (_allAvatarBones.ContainsKey(position))
-                {
-                    ResetAvatarRenderBones(_allAvatarBones[position], param.DefaultGameObject);
-                    if (param.AlternativeGameObject != null)
-                        ResetAvatarRenderBones(_allAvatarBones[position], param.AlternativeGameObject);
-                }
-
-                // 背包挂点
-                RemoveBag(position);
-            }           
+            // 背包挂点
+            RemoveBag(position);
         }
 
+        public void HandleAllWardrobe(Action<UnityObject> act)
+        {
+            for (int i = 0; i < (int) Wardrobe.EndOfTheWorld; i++)
+            {
+                if (_wardrobes[i] == null) continue;
+                if (_wardrobes[i].DefaultGameObject != null)
+                    act(_wardrobes[i].DefaultGameObject);
+                if (_wardrobes[i].AlternativeGameObject != null)
+                    act(_wardrobes[i].AlternativeGameObject);
+            }
+        }
+        
         private void AddBag(WardrobeParam param)
         {
             if (param.Type == Wardrobe.Bag && _bagChanged != null)
@@ -505,95 +559,144 @@ namespace Utils.Appearance.WardrobePackage
 
         public void Update()
         {
-            var param = _wardrobes[(int) Wardrobe.Bag];
-            if (param != null)
+            try
             {
-                if (_attachment6Parent != null && _attachment6ParentInChar != null)
-                {
-                    _attachment6Parent.SetPositionAndRotation(_attachment6ParentInChar.position,
-                                                              _attachment6ParentInChar.rotation);
-                }
+                _mainInfo.BeginProfileOnlyEnableProfile();
 
-                if (_attachment7Parent != null && _attachment7ParentInChar != null)
+                try
                 {
-                    _attachment7Parent.SetPositionAndRotation(_attachment7ParentInChar.position,
-                                                              _attachment7ParentInChar.rotation);
-                }
-            }
-
-            if (null != _mappingBones)
-            {
-                foreach (var items in _mappingBones)
-                {
-                    for (var i = 0; i < items.Value.Count; ++i)
+                    _updateBagTransformInfo.BeginProfileOnlyEnableProfile();
+                    var param = _wardrobes[(int) Wardrobe.Bag];
+                    if (param != null)
                     {
-                        var mapping = items.Value[i];
-                        mapping.WardrobeBone.SetPositionAndRotation(mapping.CharacterBone.position,
-                                mapping.CharacterBone.rotation);
+                        if (_attachment6Parent != null && _attachment6ParentInChar != null)
+                        {
+                            _attachment6Parent.SetPositionAndRotation(_attachment6ParentInChar.position,
+                                _attachment6ParentInChar.rotation);
+                        }
+
+                        if (_attachment7Parent != null && _attachment7ParentInChar != null)
+                        {
+                            _attachment7Parent.SetPositionAndRotation(_attachment7ParentInChar.position,
+                                _attachment7ParentInChar.rotation);
+                        }
                     }
                 }
-            }
+                finally
+                {
+                    _updateBagTransformInfo.EndProfileOnlyEnableProfile();
+                }
 
-            CalcCurrentLod();
+                try
+                {
+                    _updateMappingTransformInfo.BeginProfileOnlyEnableProfile();
+                    if (null != _mappingBones)
+                    {
+                        foreach (var items in _mappingBones)
+                        {
+                            for (var i = 0; i < items.Value.Count; ++i)
+                            {
+                                var mapping = items.Value[i];
+                                mapping.WardrobeBone.SetPositionAndRotation(mapping.CharacterBone.position,
+                                    mapping.CharacterBone.rotation);
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    _updateMappingTransformInfo.EndProfileOnlyEnableProfile();
+                }
+
+                CalcCurrentLod();
+            }
+            finally
+            {
+                _mainInfo.EndProfileOnlyEnableProfile();
+            }
         }
 
         private void CalcCurrentLod()
         {
-            var head = _wardrobes[(int)StandardPart];
-            if(null == head) return;
-            var lodLevel = MyLodGroup.GetLogLevel(head.DefaultGameObject);
-            
-            foreach (var value in _wardrobes)
+            try
             {
-                if(null == value) continue;
-                MyLodGroup.SetLogLevel(value.DefaultGameObject, lodLevel);
-                MyLodGroup.SetLogLevel(value.AlternativeGameObject, lodLevel);
+                _updateLodInfo.BeginProfileOnlyEnableProfile();
+                var head = _wardrobes[(int)StandardPart];
+                if(null == head) return;
+                
+                int lodLevel;
+                try
+                {
+                    lodLevel = MyLodGroup.GetLogLevel(head.DefaultGameObject);
+                    _getLodLevelInfo.BeginProfileOnlyEnableProfile();
+                }
+                finally
+                {
+                    _getLodLevelInfo.EndProfileOnlyEnableProfile();
+                }
+
+                foreach (var value in _wardrobes)
+                {
+                    if(null == value) continue;
+                    try
+                    {
+                        _setLodLevelInfo.BeginProfileOnlyEnableProfile();
+                        MyLodGroup.SetLogLevel(value.DefaultGameObject, lodLevel);
+                        MyLodGroup.SetLogLevel(value.AlternativeGameObject, lodLevel);
+                    }
+                    finally
+                    {
+                        _setLodLevelInfo.EndProfileOnlyEnableProfile();
+                    }
+                }
+            }
+            finally
+            {
+                _updateLodInfo.EndProfileOnlyEnableProfile();
             }
         }
 
         private void PutOn(GameObject go, int type, bool isSkinned, bool needMapping)
         {
-            if(null != go)
+            if(null == go) return;
+            
+            if (isSkinned)
             {
-                if (isSkinned)
-                {
-                    go.transform.SetParent(_characterGameObject.transform, false);
-                    go.transform.localPosition = Vector3.zero;
-                    go.transform.localRotation = Quaternion.identity;
-                    //                go.transform.localScale = Vector3.one;
+                go.transform.SetParent(_characterGameObject.transform, false);
+                go.transform.localPosition = Vector3.zero;
+                go.transform.localRotation = Quaternion.identity;
+                //                go.transform.localScale = Vector3.one;
 
-                    var allWardrobeBones = go.GetComponentsInChildren<Transform>();
-                    _allAvatarBones[(Wardrobe) type] = allWardrobeBones;
-                    
-                    foreach (var renderer in go.GetComponentsInChildren<SkinnedMeshRenderer>())
-                    {
-                        // 映射装扮与人物骨骼
-                        if (needMapping)
-                        {
-                            var wardrobeBones = GetBonesOfTheSameName(renderer.bones, allWardrobeBones);
-                            MappingBones(wardrobeBones, type);
-                        }
-                        renderer.bones = GetBonesOfTheSameName(renderer.bones, _allBones);
-                        renderer.rootBone = GetBoneOfTheSameName(renderer.rootBone, _allBones);
-                    }
-                }
-                else
+                var allWardrobeBones = go.GetComponentsInChildren<Transform>();
+                _allAvatarBones[(Wardrobe) type] = allWardrobeBones;
+                
+                foreach (var renderer in go.GetComponentsInChildren<SkinnedMeshRenderer>())
                 {
-                    _mount.MountWardrobe(go, _characterGameObject);
+                    // 映射装扮与人物骨骼
+                    if (needMapping)
+                    {
+                        var wardrobeBones = GetBonesOfTheSameName(renderer.bones, allWardrobeBones);
+                        MappingBones(wardrobeBones, type);
+                    }
+                    renderer.bones = GetBonesOfTheSameName(renderer.bones, _allBones);
+                    renderer.rootBone = GetBoneOfTheSameName(renderer.rootBone, _allBones);
                 }
-                Logger.DebugFormat("SureAddWardrobe:  {0}", go.name);
             }
+            else
+            {
+                _mount.MountWardrobe(go, _characterGameObject);
+            }
+            Logger.InfoFormat("CharacterLog-- SureAddWardrobe:  {0}", go.name);
         }
         
         private void TakeOff(GameObject go)
         {
-            if(null != go)
-            {
-                go.SetActive(false);
-                go.transform.SetParent(null, false);
-                SetMaskTexture(go, null);
-                Logger.DebugFormat("SureRemoveWardrobe:  {0}", go.name);
-            }
+            if(null == go) return;
+            
+            go.SetActive(false);
+            go.transform.SetParent(null, false);
+            SetMaskTexture(go, null);
+            Logger.InfoFormat("CharacterLog-- SureRemoveWardrobe:  {0}", go.name);
         }
 
         private void RegisterAlternativeAppearance(WardrobeParam param)

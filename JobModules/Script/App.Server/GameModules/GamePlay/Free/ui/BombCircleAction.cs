@@ -9,14 +9,20 @@ using com.wd.free.util;
 using Core.Free;
 using gameplay.gamerule.free.map;
 using gameplay.gamerule.free.ui;
+using com.wd.free.para;
 
 namespace App.Server.GameModules.GamePlay.Free.action.ui
 {
     [Serializable]
-    public class BombCircleAction : SendMessageAction
+    public class BombCircleAction : SendMessageAction, IRule
     {
         private IPosSelector pos;
         private string radius;
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.BombCircleAction;
+        }
 
         protected override void BuildMessage(IEventArgs args)
         {

@@ -1,4 +1,6 @@
-﻿namespace Utils.Appearance
+﻿using Utils.Appearance.Bone;
+
+namespace Utils.Appearance.Bone
 {
     public interface IBoneRigging
     {

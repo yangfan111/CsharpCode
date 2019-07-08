@@ -1,6 +1,7 @@
 ﻿using App.Server.GameModules.GamePlay.Free.item;
 using com.wd.free.action;
 using com.wd.free.@event;
+using Utils.Singleton;
 
 namespace App.Server.GameModules.GamePlay.Free.chicken
 {
@@ -8,7 +9,7 @@ namespace App.Server.GameModules.GamePlay.Free.chicken
     {
         public override void DoAction(IEventArgs args)
         {
-            FreeItemDrop.Initial(args.GameContext.session.commonSession.RoomInfo.MapId);
+            SingletonManager.Get<FreeItemDrop>().Initial(args.GameContext.session.commonSession.RoomInfo.MapId);
         }
     }
 }

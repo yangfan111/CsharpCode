@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Core;
 using Core.Utils;
 using XmlConfig;
+using App.Shared.Components.Player;
 
 namespace App.Shared.GameModules.Player
 {
@@ -15,10 +16,12 @@ namespace App.Shared.GameModules.Player
         List<InterruptEmitter> emitterList = new List<InterruptEmitter>();
 
         private EInterruptState interruptState;
-//        private EInterruptCmdType cmdType;
+        //        private EInterruptCmdType cmdType;
+        private PlayerEntity player;
 
         public InterruptEventHandler(PlayerEntity playerEntity)
         {
+            player = playerEntity;
             interruptState = EInterruptState.Closed;
         }
 
@@ -46,7 +49,7 @@ namespace App.Shared.GameModules.Player
             Trigger(states);
             if (interruptState == EInterruptState.Closed)
                 return;
-            if (states.Contains(EPlayerState.Dead) || states.Contains(EPlayerState.Dying))
+            if (states.Contains(EPlayerState.Dead)/* || states.Contains(EPlayerState.Dying)*/)
             {
                 interruptState = EInterruptState.Closed;
                 recoverFunc    = null;
@@ -63,6 +66,13 @@ namespace App.Shared.GameModules.Player
                         interruptState = EInterruptState.WaitRecover;
                     break;
                 case EInterruptState.WaitRecover:
+                    if (player.hasGamePlay &&
+                        (player.gamePlay.JobAttribute == (int)EJobAttribute.EJob_Matrix ||
+                        player.gamePlay.JobAttribute == (int)EJobAttribute.EJob_Variant)) {
+                        interruptState = EInterruptState.Closed;
+                        return;
+                    }
+
                     if (recoverFunc(states))
                     {
                         Recover();

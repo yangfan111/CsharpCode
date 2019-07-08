@@ -2,8 +2,6 @@
 using App.Server.GameModules.GamePlay.Free.item.config;
 using App.Server.GameModules.GamePlay.Free.weapon;
 using App.Shared;
-using App.Shared.GameModules.Weapon;
-using App.Shared.Util;
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using com.cpkf.yyjd.tools.util.math;
@@ -14,8 +12,6 @@ using Core;
 using gameplay.gamerule.free.item;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Utils.Singleton;
 using WeaponConfigNs;
 
@@ -97,8 +93,9 @@ namespace App.Server.GameModules.GamePlay.Free.item
                     if(leftCount >= ip.GetCount())
                     {
                         leftCount -= ip.GetCount();
-
                         remove.Add(ip);
+                        if (leftCount == 0)
+                            break;
                     }
                     else
                     {
@@ -128,8 +125,9 @@ namespace App.Server.GameModules.GamePlay.Free.item
                     if (leftCount >= ip.GetCount())
                     {
                         leftCount -= ip.GetCount();
-
                         remove.Add(ip);
+                        if (leftCount == 0)
+                            break;
                     }
                     else
                     {
@@ -173,10 +171,8 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
         public static int GetCurrentWeaponClip(int key, FreeData fd, IEventArgs args)
         {
-
-            var weaponAgent = fd.Player.WeaponController().HeldWeaponAgent;
+            var weaponAgent = fd.Player.WeaponController().GetWeaponAgent((EWeaponSlotType) key);
             return weaponAgent.IsValid() ? weaponAgent.BaseComponent.Bullet : 0;
-
         }
     }
 }

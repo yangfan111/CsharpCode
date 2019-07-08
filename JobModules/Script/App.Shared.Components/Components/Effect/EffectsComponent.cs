@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Security.Policy;
 using Core.Components;
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
 using Shared.Scripts;
 using Shared.Scripts.Effect;
+using UnityEngine;
 using Utils.AssetManager;
 
 namespace App.Shared.Components.Effect
@@ -15,8 +17,8 @@ namespace App.Shared.Components.Effect
         private readonly Dictionary<string, IEffectController> _effects = new Dictionary<string, IEffectController>();
         private readonly Dictionary<string, UnityObject> _unityObjects = new Dictionary<string, UnityObject>();
         private static DummyEffectController _dummyEffectController = new DummyEffectController();
-
-        public HashSet<string> GlobalEffects
+        
+        public HashSet<string> GlobalEffects 
         {
             get { return _globalEffects; }
         }
@@ -77,7 +79,7 @@ namespace App.Shared.Components.Effect
         {
             _globalEffects.Remove(effectName);
         }
-
+        
         public IEffectController GetEffect(string effectName)
         {
             IEffectController ret;
@@ -87,6 +89,14 @@ namespace App.Shared.Components.Effect
             }
 
             return _dummyEffectController;
+        }
+
+        public void ResetEffects()
+        {
+            foreach (var value in _effects.Values)
+            {
+                value.Recycle();
+            }
         }
     }
 }

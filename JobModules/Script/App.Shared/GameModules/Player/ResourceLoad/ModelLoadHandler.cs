@@ -20,6 +20,7 @@ namespace App.Shared.GameModules.Player.ResourceLoad
         {
             protected static LoggerAdapter Logger = new LoggerAdapter(typeof(ModelLoadHandler));
             public static readonly string ModeloffsetName = "ModelOffset";
+            public static readonly string EffectsName = "Effects";
             private Contexts _contexts;
 
             protected ModelLoadHandler(Contexts contexts)

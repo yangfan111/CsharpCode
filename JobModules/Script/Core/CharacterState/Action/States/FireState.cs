@@ -25,6 +25,18 @@ namespace Core.CharacterState.Action.States
             AddTransition(
                 (command, addOutput) =>
                 {
+                    if (command.IsMatch(FsmInput.InterruptAction))
+                    {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.InterruptHash,
+                            AnimatorParametersHash.Instance.InterruptName,
+                            AnimatorParametersHash.Instance.InterruptEnable,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, true);
+                        addOutput(FsmOutput.Cache);
+
+                        command.Handled = true;
+                        return FsmStateResponseType.Reenter;
+                    }
+                    
                     if (command.IsMatch(FsmInput.Fire))
                     {
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireEndHash,
@@ -38,7 +50,7 @@ namespace Core.CharacterState.Action.States
 
                     return FsmStateResponseType.Pass;
                 },
-                null, (int) ActionStateId.CommonNull, null, 0, new[] { FsmInput.Fire });
+                null, (int) ActionStateId.CommonNull, null, 0, new[] { FsmInput.Fire, FsmInput.InterruptAction });
 
             AddTransition(
                 (command, addOutput) =>
@@ -89,7 +101,38 @@ namespace Core.CharacterState.Action.States
                 null, (int) ActionStateId.Reload, null, 0, new[] { FsmInput.ReloadEmpty });
 
             #endregion
-            
+
+            #region fire to specialReload
+
+            AddTransition(
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.SpecialReload))
+                    {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireEndHash,
+                            AnimatorParametersHash.Instance.FireEndName,
+                            AnimatorParametersHash.Instance.FireEndEnableValue,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, true);
+                        addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.SpecialReloadHash,
+                            AnimatorParametersHash.Instance.SpecialReloadName,
+                            AnimatorParametersHash.Instance.SpecialReloadEnableValue,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+
+                        command.Handled = true;
+                        
+                        TurnOnUpperBodyOverlay(addOutput);
+                        
+                        return true;
+                    }
+
+                    return false;
+                },
+                null, (int)ActionStateId.SpecialReload, null, 0, new[] { FsmInput.SpecialReload });
+
+            #endregion
         }
 
         public override void DoBeforeEntering(IFsmInputCommand command, Action<FsmOutput> addOutput)
@@ -117,6 +160,12 @@ namespace Core.CharacterState.Action.States
                                      AnimatorParametersHash.Instance.FireEndName,
                                      AnimatorParametersHash.Instance.FireEndDisableValue,
                                      CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+            addOutput(FsmOutput.Cache);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.InterruptHash,
+                AnimatorParametersHash.Instance.InterruptName,
+                AnimatorParametersHash.Instance.InterruptDisable,
+                CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
             addOutput(FsmOutput.Cache);
         }
     }

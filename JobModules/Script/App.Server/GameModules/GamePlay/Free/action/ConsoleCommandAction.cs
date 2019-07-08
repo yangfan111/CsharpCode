@@ -5,11 +5,12 @@ using com.wd.free.@event;
 using Sharpen;
 using System;
 using System.Collections.Generic;
+using Core.Free;
 
 namespace App.Shared.FreeFramework.Free.Action
 {
     [Serializable]
-    class ConsoleCommandAction : AbstractPlayerAction
+    class ConsoleCommandAction : AbstractPlayerAction, IRule
     {
         private string cmd;
 
@@ -36,6 +37,11 @@ namespace App.Shared.FreeFramework.Free.Action
                 DebugCommand debug = new DebugCommand(cmdSplit[0], cmdArgs);
                 FreeDebugCommandHandler.Handle(args, debug, GetPlayerEntity(args));
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ConsoleCommandAction;
         }
     }
 }

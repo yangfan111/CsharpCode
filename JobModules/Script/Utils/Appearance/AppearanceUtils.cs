@@ -46,6 +46,8 @@ namespace Utils.Appearance
                 foreach (var renderer in _skinnedMeshRenderers)
                 {
                     renderer.shadowCastingMode = ShadowCastingMode.Off;
+
+
                 }  
                 _meshRenderers.Clear();
                 obj.GetComponentsInChildren(_meshRenderers);

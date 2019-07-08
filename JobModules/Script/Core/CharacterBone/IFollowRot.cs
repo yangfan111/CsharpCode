@@ -9,7 +9,7 @@ namespace Core.CharacterBone
 {
     public interface IFollowRot
     {
-        void PreUpdate(FollowRotParam param, ICharacterBone characterBone);
+        void PreUpdate(FollowRotParam param, ICharacterBone characterBone, float deltaTime);
         void SyncTo(IGameComponent characterBoneComponent);
     }
 }

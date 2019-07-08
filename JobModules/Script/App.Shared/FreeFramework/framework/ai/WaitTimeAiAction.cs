@@ -6,11 +6,12 @@ using System.Text;
 using com.wd.free.@event;
 using com.wd.free.para.exp;
 using com.wd.free.para;
+using Core.Free;
 
 namespace com.wd.free.ai
 {
     [Serializable]
-    public class WaitTimeAiAction : AbstractGameAction
+    public class WaitTimeAiAction : AbstractGameAction, IRule
     {
         private string time;
 
@@ -67,6 +68,11 @@ namespace com.wd.free.ai
         public override void Reset(IEventArgs args)
         {
             startTime = 0;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.WaitTimeAiAction;
         }
     }
 }

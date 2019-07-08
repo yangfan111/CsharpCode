@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using App.Client.GameModules.Ui.UiAdapter;
+﻿using App.Shared;
 using App.Shared.Components.Player;
 using App.Shared.Components.Ui;
-using UnityEngine;
-using UserInputManager.Lib;
-
+using System;
+using Assets.App.Client.GameModules.Ui;
+using AlertWindowStyle = UIComponent.UI.Manager.Alert.AlertWindowStyle;
 namespace App.Client.GameModules.Ui.UiAdapter
 {
     public class MenuUiAdapter : UIAdapter, IMenuUiAdapter
@@ -65,7 +63,9 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public void ShowNoticeWindow(string title, Action yesCallback, Action noCallback, string yesText, string noText)
         {
-            _contexts.ui.uI.ShowNoticeWindow(NoticeWindowStyle.YESNO, title, yesCallback, noCallback, yesText, noText, 0, null);
+            UiCommon.AlertManager.AddDataToQueueAndShow(AlertWindowStyle.YESNO, title,
+                yesCallback, noCallback, yesText, noText, 0, null);
+            //_contexts.ui.uI.ShowNoticeWindow(NoticeWindowStyle.YESNO, title, yesCallback, noCallback, yesText, noText, 0, null);
         }
 
         public GamePlayComponent gamePlay
@@ -74,6 +74,16 @@ namespace App.Client.GameModules.Ui.UiAdapter
             {
                 return _contexts.player.flagSelfEntity.gamePlay;
             }
+        }
+
+        public bool IsHXMod
+        {
+            get
+            {
+                bool res = SharedConfig.IsHXMod && _contexts.player.flagSelfEntity.gamePlay.ChickenHxWin;
+                return res;
+            }
+
         }
     }
 }

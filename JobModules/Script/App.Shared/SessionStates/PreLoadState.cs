@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Shared.Components;
-using Core.GameModule.Interface;
+﻿using Core.GameModule.Interface;
 using Core.GameModule.Module;
 using Core.GameModule.System;
 using Core.SessionState;
 using Core.Utils;
 using Entitas;
-using UnityEngine;
 using Utils.AssetManager;
 using Utils.Singleton;
 
 namespace App.Shared.SessionStates
 {
-    internal class PreLoadSystem : IResourceLoadSystem
+    public class PreLoadSystem : IResourceLoadSystem
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(PreLoadSystem));
 
@@ -24,13 +18,12 @@ namespace App.Shared.SessionStates
         private bool _isLoading = false;
         private int _loadingCount = 0;
         private IUnityAssetManager _assetManager;
+
         public PreLoadSystem(ISessionState sessionState,  IAssetInfoProvider assetInfoProvider)
         {
             _sessionState = sessionState;
             _assetInfoProvider = assetInfoProvider;
-
             _sessionState.CreateExitCondition(typeof(PreLoadSystem));
-
             SingletonManager.Get<SubProgressBlackBoard>().Add((uint) _assetInfoProvider.AssetInfos.Count);
         }
 
@@ -79,9 +72,7 @@ namespace App.Shared.SessionStates
         }
     }
 
-    
-
-    internal class PreLoadModule : GameModule
+    public class PreLoadModule : GameModule
     {
         public PreLoadModule(ISessionState sessionState, IContexts contexts)
         {
@@ -92,12 +83,8 @@ namespace App.Shared.SessionStates
 
     public class BasePreLoadState : AbstractSessionState
     {
-       
-
-        
         public BasePreLoadState(IContexts contexts, int state, int next) : base(contexts,(int)state, (int) next)
         {
-            
         }
 
         public override Systems CreateUpdateSystems(IContexts contexts)
@@ -105,10 +92,7 @@ namespace App.Shared.SessionStates
             var systems = new Feature("PreLoadingState");
             var contextsImpl = contexts as Contexts;
             var commonSession = contextsImpl.session.commonSession;
-            systems.Add(new ResourceLoadSystem(
-                new PreLoadModule(this,  contexts),
-                commonSession.AssetManager));
-           
+            systems.Add(new ResourceLoadSystem(new PreLoadModule(this,  contexts), commonSession.AssetManager));
             return systems;
         }
 

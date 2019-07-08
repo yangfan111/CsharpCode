@@ -7,8 +7,10 @@ using App.Shared.GameModules.Player;
 using App.Shared.GameModules.Vehicle;
 using Core.CameraControl;
 using Core.CameraControl.NewMotor;
+using Core.Configuration;
 using Core.Utils;
 using UnityEngine;
+using Utils.Singleton;
 using XmlConfig;
 
 namespace Assets.App.Shared.GameModules.Camera.Motor.Pose
@@ -19,10 +21,9 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Pose
         private HashSet<short> excludes;
      
         private float transitionTime = 200f;
-     
+        private int _order;
 
         public DrivePoseMotor(ECameraPoseMode modeId,
-            CameraConfig config,
             HashSet<ECameraPoseMode> excludes,
             VehicleContext vehicleContext,
             FreeMoveContext freeMoveContext     
@@ -36,8 +37,9 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Pose
                 this.excludes.Add((short) e);
             }
 
-            _config = config.GetCameraConfigItem(modeId);
-
+            _order = SingletonManager.Get<CameraConfigManager>().GetRoleConfig()
+                .GetCameraConfigItem((ECameraPoseMode) _modeId).Order;
+            
             CameraActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.Pose, (int)modeId, 
                 (player, state) =>
                 {
@@ -98,15 +100,15 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Pose
                 cameraDistance = controlledVehicle.CameraDistance;
             }
 
-            output.Far = _config.Far;
-            output.ArchorOffset = FinalArchorOffset + cameraAnchorOffset;
-            output.ArchorPostOffset = FinalArchorPostOffset;
-            output.Offset = FinalOffset;
+            output.Far = input.GetPoseConfig(_modeId).Far;
+            output.ArchorOffset = input.GetPoseConfig(_modeId).AnchorOffset + cameraAnchorOffset;
+            output.ArchorPostOffset = input.GetPoseConfig(_modeId).ScreenOffset;
+            output.Offset = new Vector3(0, 0, -input.GetPoseConfig(_modeId).Distance);
             output.Offset.z -= cameraDistance;
             output.ArchorEulerAngle = FinalEulerAngle;
-            output.Fov = FinalFov;
-           
-         }
+            output.Fov = input.GetPoseConfig(_modeId).Fov;
+
+        }
 
         public override void UpdatePlayerRotation(ICameraMotorInput input, ICameraMotorState state, PlayerEntity player)
         {
@@ -121,33 +123,10 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Pose
         {
 
         }
-        public override Vector3 FinalArchorOffset
-        {
-            get { return _config.AnchorOffset; }
-        }
-
-        public override Vector3 FinalArchorPostOffset
-        {
-            get { return _config.ScreenOffset; }
-        }
-
-       
-
-        public override Vector3 FinalOffset
-        {
-            get { return new Vector3(0,0,-_config.Distance); }
-        }
-
-      
-
-        public override float FinalFov
-        {
-            get { return _config.Fov; }
-        }
 
         public override int Order
         {
-            get { return _config.Order; }
+            get { return _order; }
         }
     }
 }

@@ -2,17 +2,18 @@
 using Assets.XmlConfig;
 using com.wd.free.action;
 using com.wd.free.@event;
+using Core.Free;
 using Core.Utils;
 using Shared.Scripts.MapConfigPoint;
 using System;
 using System.Collections.Generic;
-using gameplay.gamerule.free.item;
 using UnityEngine;
+using Utils.Singleton;
 
 namespace App.Server.GameModules.GamePlay.Free.item
 {
     [Serializable]
-    public class RefreshSceneItemAction : AbstractGameAction
+    public class RefreshSceneItemAction : AbstractGameAction, IRule
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(RefreshSceneItemAction));
 
@@ -32,18 +33,19 @@ namespace App.Server.GameModules.GamePlay.Free.item
                     {
                         Logger.Error("地图点位（组）数量为0！");
                     }
+                    List<ItemDrop> list = new List<ItemDrop>();
                     foreach (MapConfigPoints.ID_Point point in MapConfigPoints.current.IDPints)
                     {
-                        List<ItemDrop> list = FreeItemDrop.GetDropItems(point.ID, args.GameContext.session.commonSession.RoomInfo.MapId);
+                        list.AddRange(SingletonManager.Get<FreeItemDrop>().GetDropItems(point.ID, args.GameContext.session.commonSession.RoomInfo.MapId));
                         Logger.InfoFormat("地图点位 {0} 上，将会刷新 {1} 个（组）物品", point.ID, list.Count);
-                        if (list.Count > 0)
-                        {
-                            TimerGameAction timer = new TimerGameAction();
-                            timer.time = "200";
-                            timer.count = list.Count.ToString();
-                            timer.SetAction(new RefreshItemAction(list));
-                            timer.Act(args);
-                        }
+                    }
+                    if (list.Count > 0)
+                    {
+                        TimerGameAction timer = new TimerGameAction();
+                        timer.time = "200";
+                        timer.count = list.Count.ToString();
+                        timer.SetAction(new RefreshItemAction(list));
+                        timer.Act(args);
                     }
                 }
                 else
@@ -51,6 +53,11 @@ namespace App.Server.GameModules.GamePlay.Free.item
                     Logger.Error("地图点位（组）不存在！");
                 }
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.RefreshSceneItemAction;
         }
     }
 
@@ -78,13 +85,13 @@ namespace App.Server.GameModules.GamePlay.Free.item
                     }
                     else
                     {
-                        args.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleEquipmentEntity((ECategory)drop.cat, drop.id, drop.count, GetGround(drop.pos));
+                        args.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleObjectEntity((ECategory)drop.cat, drop.id, drop.count, GetGround(drop.pos));
                     }
 
-                    List<ItemDrop> extra = FreeItemDrop.GetExtraItems(drop);
+                    List<ItemDrop> extra = SingletonManager.Get<FreeItemDrop>().GetExtraItems(drop);
                     foreach (ItemDrop e in extra)
                     {
-                        args.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleEquipmentEntity((ECategory)e.cat, e.id, e.count, GetGround(drop.pos));
+                        args.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleObjectEntity((ECategory)e.cat, e.id, e.count, GetGround(drop.pos));
                     }
                     if (index >= list.Count)
                     {

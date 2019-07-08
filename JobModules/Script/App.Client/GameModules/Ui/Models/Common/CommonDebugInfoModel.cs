@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using App.Client.GameModules.Ui.UiAdapter.Interface.Common;
 using App.Client.GameModules.Ui.ViewModels.Common;
+using Assets.App.Client.GameModules.Ui;
 using Assets.UiFramework.Libs;
 using Core.GameModule.Interface;
 using Core.Utils;
@@ -55,10 +56,11 @@ namespace App.Client.GameModules.Ui.Models.Common
             _adapter.Enable = false;
         }
 
+   
 
         public override void Update(float interval)
         {
-            SingletonManager.Get<DurationHelp>().Update();
+           
             if (DateTime.Now.Ticks - _lastTime < DisplayTime) return;
             _lastTime = DateTime.Now.Ticks;
             UpdateInfo();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Core.Network;
 using Core.Utils;
@@ -38,6 +39,11 @@ namespace VNet
             set { _udpPort = value; }
         }
 
+        public bool isRealTimeConnected
+        {
+            get { return _realTimeClient.IsConnected; }
+        }
+
         protected override void Poll()
         {
             RealTimePoll();
@@ -51,7 +57,7 @@ namespace VNet
             }
         }
 
-        public VNetworkClient(string name = "default") : this(new TcpClient(false), new LiteNetClient(), false, name,
+        public VNetworkClient(string name = "default") : this(new VNet.Base.Tcp.TcpClient(false), new LiteNetClient(), false, name,
             true)
         {
         }
@@ -140,6 +146,46 @@ namespace VNet
         protected override void OnChannelConnected(VNetworkChannel channel)
         {
             channel.SetConnecter(this);
+        }
+
+        public virtual void ReConnect()
+        {
+            if (!_reliableClient.IsConnected) {
+                _reliableClient.ReConnect();
+            }
+            if (!_realTimeClient.IsConnected) {
+                _realTimeClient.ReConnect();
+            }
+        }
+
+        private void CloseTcp()
+        {
+            if (null != _reliableClient && _reliableClient.IsConnected) {
+                _reliableClient.CloseConnect();
+            }
+        }
+
+        private void CloseUdp()
+        {
+            if (null != _realTimeClient && _realTimeClient.IsConnected) {
+                _realTimeClient.CloseConnect();
+            }
+        }
+
+        public virtual void CloseConnect(ProtocolType protocolType)
+        {
+            switch (protocolType) {
+                case ProtocolType.Tcp:
+                    CloseTcp();
+                    break;
+                case ProtocolType.Udp:
+                    CloseUdp();
+                    break;
+                case ProtocolType.Unspecified:
+                    CloseTcp();
+                    CloseUdp();
+                    break;
+            }
         }
     }
 }

@@ -99,9 +99,11 @@ namespace Assets.Sources.Free
             SingletonManager.Get<SimpleUIUpdater>().Add(new MinMapUpdater());
             SingletonManager.Get<SimpleUIUpdater>().Add(new DebugDataUpdater());
             _handlers.Add(new PlayerMoveSpeedHandler());
-            _handlers.Add(new PlayerScaleHandler());
+            _handlers.Add(new PlayerMsgHandler());
             _handlers.Add(new PlayerBiochemicalMarkHandler());
-            _handlers.Add(new PlayerVisibilityHandler());
+            _handlers.Add(new PlayerMiniMapSupplyMarkHandler());
+            _handlers.Add(new PlaneUIHandler());
+            _handlers.Add(new CommonTipHandler());
         }
 
         public override void DoHandle(int message, SimpleProto data)

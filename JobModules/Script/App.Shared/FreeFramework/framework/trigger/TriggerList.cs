@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using Sharpen;
+using Core.Free;
 
 namespace com.wd.free.trigger
 {
 	[System.Serializable]
-	public class TriggerList : Iterable<GameTrigger>
-	{
+	public class TriggerList : Iterable<GameTrigger>, IRule
+    {
 		private const long serialVersionUID = -6223440681146463521L;
 
 		private IList<GameTrigger> triggers;
@@ -42,5 +43,10 @@ namespace com.wd.free.trigger
 		{
 			return triggers.Iterator();
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.TriggerList;
+        }
+    }
 }

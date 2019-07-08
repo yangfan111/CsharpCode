@@ -21,8 +21,7 @@ namespace App.Shared
 
         void TryArmWeaponImmediately(EWeaponSlotType slot);
 
-        EWeaponSlotType UnArmWeapon(bool includeAction, Action onfinish);
-        EWeaponSlotType UnArmWeapon(bool includeAction);
+        EWeaponSlotType UnArmWeapon(bool includeAction,bool needInterrupt = false);
 
         /// <summary>
         /// 武器掉落
@@ -88,10 +87,6 @@ namespace App.Shared
         /// 尝试从手雷库存中拿出手雷并且在空手状态下尝试持有
         /// </summary>
         void TryHoldGrenade(bool autoStuff= true,bool tryArm = true);
-        /// <summary>
-        /// 打断
-        /// </summary>
-        void Interrupt();
 
         void SwitchFireMode();
      //   void InterruptSight();
@@ -114,7 +109,7 @@ namespace App.Shared
         /// <param name="player"></param>
         void SwitchBag();
 
-        PlayerAudioController AudioController { get; }
+        PlayerAudioControllerBase AudioController { get; }
         
     }
 }

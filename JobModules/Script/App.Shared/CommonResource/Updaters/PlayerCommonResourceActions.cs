@@ -15,6 +15,8 @@ using Entitas;
 using Shared.Scripts;
 using UnityEngine;
 using Utils.Appearance;
+using Utils.Appearance.Bone;
+using Utils.Appearance.Script;
 using Utils.Singleton;
 using Object = UnityEngine.Object;
 
@@ -96,6 +98,7 @@ namespace App.Shared.CommonResource.Updaters
 
             player.firstPersonAnimator.UnityAnimator.Update(0);
 
+            player.appearanceInterface.Appearance.SetRootGo(player.RootGo());
             player.appearanceInterface.Appearance.SetFirstPersonCharacter(go);
             player.appearanceInterface.FirstPersonAppearance.SetFirstPersonCharacter(go);
 
@@ -181,12 +184,12 @@ namespace App.Shared.CommonResource.Updaters
             {
                 go.AddComponent<ThirdPersonAnimationClipEvent>();
             }
-
             
             // 设置大厅传入的roleId和avatarId
             player.appearanceInterface.Appearance.SetRoleModelIdAndInitAvatar(player.playerInfo.RoleModelId, player.playerInfo.AvatarIds);
             
             player.characterControllerInterface.CharacterController.SetCharacterRoot(player.characterContoller.Value.gameObject);
+            player.appearanceInterface.Appearance.SetRootGo(player.RootGo());
             player.appearanceInterface.Appearance.SetThirdPersonCharacter(go);
             player.characterControllerInterface.CharacterController.SetThirdModel(player.thirdPersonModel.Value);
 

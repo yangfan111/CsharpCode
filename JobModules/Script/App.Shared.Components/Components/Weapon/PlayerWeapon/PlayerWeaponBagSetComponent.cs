@@ -3,6 +3,7 @@ using Core;
 using Core.Components;
 using Core.Prediction.UserPrediction;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
+using Core.SyncLatest;
 using Core.Utils;
 using Entitas.CodeGeneration.Attributes;
 
@@ -12,22 +13,12 @@ namespace App.Shared.Components.Weapon
     /// 武器背包集合
     /// </summary>
     [Player]
-    public class PlayerWeaponBagSetComponent : IUserPredictionComponent
+    public class PlayerWeaponBagSetComponent : ISelfLatestComponent
     {
-        [NetworkProperty] public List<WeaponBagContainer> WeaponBags;
-        [NetworkProperty, DontInitilize] public int HeldBagPointer;
+        [NetworkProperty] public WeaponBagContainer WeaponBag;
+        [NetworkProperty, DontInitilize] public byte HeldBagPointer;
 
 
-        public WeaponBagContainer this[int bagIndex]
-        {
-            get
-            {
-                AssertUtility.Assert(bagIndex < WeaponBags.Count);
-                if (bagIndex < 0)
-                    bagIndex = 0;
-                return WeaponBags[bagIndex];
-            }
-        }
 
         private bool isInitialized;
 
@@ -36,34 +27,25 @@ namespace App.Shared.Components.Weapon
             CopyFrom(rightComponent as PlayerWeaponBagSetComponent);
         }
 
-        public void Initialize(int usableLength)
+        public void Initialize()
         {
             if (isInitialized)
                 return;
-            if (WeaponBags != null)
+            if (WeaponBag != null)
             {
                 isInitialized = true;
                 return;
             }
 
-            WeaponBags = new List<WeaponBagContainer>(usableLength);
-            for (int i = 0; i < usableLength; i++)
-            {
-                WeaponBags.Add(new WeaponBagContainer());
-            }
-
+            WeaponBag = new WeaponBagContainer();
             isInitialized = true;
         }
 
         private void CopyFrom(PlayerWeaponBagSetComponent right)
         {
-            right.Initialize(GlobalConst.WeaponBagMaxCount);
-            Initialize(GlobalConst.WeaponBagMaxCount);
-            for (int i = 0; i < GlobalConst.WeaponBagMaxCount; i++)
-            {
-                //  DebugUtil.LogInUnity("left:{0} right:{1}", WeaponBags[i].ToString(), right.WeaponBags[i]);
-                WeaponBags[i].RewindTo(right.WeaponBags[i]);
-            }
+            right.Initialize();
+            Initialize();
+            WeaponBag.RewindTo(right.WeaponBag);
         }
 
         public int GetComponentId()
@@ -78,7 +60,7 @@ namespace App.Shared.Components.Weapon
 
         private bool IsApproximatelyEqual(PlayerWeaponBagSetComponent rightComponent)
         {
-            if (WeaponBags[0] == null || (!WeaponBags[0].IsSimilar(rightComponent.WeaponBags[0])))
+            if (WeaponBag == null || (!WeaponBag.IsSimilar(rightComponent.WeaponBag)))
             {
                 //builder.Append("Approxiamate diff :");
                 //builder.Append("left:"+ WeaponBags[i]+"\n");
@@ -86,8 +68,6 @@ namespace App.Shared.Components.Weapon
                 //Logger.InfoFormat(builder.ToString());
                 return false;
             }
-
-            ;
             return true;
         }
 
@@ -96,21 +76,22 @@ namespace App.Shared.Components.Weapon
             CopyFrom(rightComponent);
         }
 
-        //public override string ToString()
-        //{
-        //    //string str = "Prepare Convert Value....";
-        //    //for (int i = 0; i < GameGlobalConst.WeaponBagMaxCount; i++)
-        //    //{
-        //    //    if (WeaponBags != null && WeaponBags[i] != null)
-        //    //        str += WeaponBags[i].ToString();
+        public override string ToString()
+        {
+            string str = "Prepare Convert Value....";
+            return WeaponBag.ToString();
+            return str;
+        }
 
-        //    //}
-        //    return str;
-        //}
+        public void SyncLatestFrom(object rightComponent)
+        {
+            CopyFrom(rightComponent as PlayerWeaponBagSetComponent);
+        }
+
         public void ClearPointer()
         {
             HeldBagPointer = 0;
-            WeaponBags[0].ClearPointer();
+            WeaponBag.ClearPointer();
         }
 
 
@@ -118,18 +99,14 @@ namespace App.Shared.Components.Weapon
 
         public int HeldSlotIndex
         {
-            get { return WeaponBags[0].HeldSlotPointer; }
+            get { return WeaponBag.HeldSlotPointer; }
         }
 
         public int LastSlotIndex
         {
-            get { return WeaponBags[0].LastSlotPointer; }
+            get { return WeaponBag.LastSlotPointer; }
         }
 
-        public WeaponBagContainer HeldBagContainer
-        {
-            get { return WeaponBags[0]; }
-        }
 
         #endregion
     }

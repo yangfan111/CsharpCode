@@ -16,6 +16,7 @@ using Utils.Singleton;
 
 using App.Shared.GameModules.Weapon;
 using Core;
+using Utils.Configuration;
 
 namespace App.Shared.GameModules.Attack
 {
@@ -142,7 +143,9 @@ namespace App.Shared.GameModules.Attack
 //            }
             
             ClientEffectFactory.AddBeenHitEvent(src, target, BulletHitHandler.GeneraterUniqueHitId(src, seq), contexts.session.currentTimeObject.CurrentTime);
-            ClientEffectFactory.AddHitPlayerEffectEvent(src, target.entityKey.Value, hit.point, hit.point - target.position.Value);
+            int heldConfigId = src.WeaponController().HeldConfigId;
+            int audioId      =  SingletonManager.Get<AudioWeaponManager>().FindById(heldConfigId).HitList.Body;
+            ClientEffectFactory.AddHitPlayerEffectEvent(src, target.entityKey.Value, hit.point, hit.point - target.position.Value,audioId,part);
         }
 
         public void OnHitVehicle(Contexts contexts, PlayerEntity src, VehicleEntity target, RaycastHit hit, MeleeAttackInfo attackInfo, MeleeFireLogicConfig config)
@@ -169,7 +172,10 @@ namespace App.Shared.GameModules.Attack
                 RaycastHit effectHit;
                 if (TryGetEffectShowHit(src, out effectHit, config.Range))
                 {
-                    ClientEffectFactory.AdHitEnvironmentEffectEvent(src, effectHit.point, effectHit.normal, EEnvironmentType.Wood);
+                    int heldConfigId = src.WeaponController().HeldConfigId;
+                    int audioId =  SingletonManager.Get<AudioWeaponManager>().FindById(heldConfigId).HitList.Body;
+                   ClientEffectFactory.AdHitEnvironmentEffectEvent(src, effectHit.point, effectHit.normal,
+                       EEnvironmentType.Wood,audioId);
                 }
             }
         }

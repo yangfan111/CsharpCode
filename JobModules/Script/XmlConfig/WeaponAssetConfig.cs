@@ -12,7 +12,7 @@ namespace XmlConfig
         Magazine,
         Buttstock,
         Scope,
-        SideRail,
+        //SideRail,
         EndOfTheWorld
     }
 
@@ -110,7 +110,7 @@ namespace XmlConfig
         public string EffectBundle;
         public List<string> SpecialEffect;
         public float Size;
-
+        public string Texture;
         public string HallAnimBundle;
         public string HallAnimMale;
         public string HallAnimFemale;

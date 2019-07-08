@@ -2,6 +2,8 @@
 using Core.Utils;
 using System.Collections.Generic;
 using Core;
+using Core.EntityComponent;
+using Entitas;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Player
@@ -36,11 +38,22 @@ namespace App.Shared.GameModules.Player
         }
 
 
-        private void UpdateStateInputItems()
+        private void UpdateStateInputItems(IUserCmd cmd)
         {
             currStateInputItems.Clear();
-            //获取当前玩家状态
-            var currStates = playerStateCollector.GetCurrStates(EPlayerStateCollectType.UseMoment);
+            
+            //获取实时玩家状态,每帧只更新一次
+            HashSet<EPlayerState> currStates = playerStateCollector.GetCurrStates(EPlayerStateCollectType.CurrentMoment);
+            //匍匐捡枪不允许移动
+            if (currStates.Contains(EPlayerState.Pickup) && currStates.Contains(EPlayerState.Prone))
+            {
+                cmd.MoveHorizontal = 0f;
+                cmd.MoveVertical = 0f;
+                UserInput.SetInput(EPlayerInput.IsRun,false) ;
+                UserInput.SetInput(EPlayerInput.IsSprint,false) ;
+                UserInput.SetInput(EPlayerInput.IsSlightWalk,false) ;
+                
+            }
             foreach (var state in currStates)
                 currStateInputItems.Add(PlayerStateInputsDataMap.Instance.GetState(state));
         }
@@ -49,16 +62,17 @@ namespace App.Shared.GameModules.Player
         {
             var IsUserThrowing = UserInput.IsInput(EPlayerInput.IsThrowing);
             UserInput.SetInput(EPlayerInput.IsThrowing, true);
+         
+            
             //与逻辑标志位
             var pullInterrupt = false;
-            currStateInputItems.ForEach((state) =>
+            for (int i = 0, maxi = currStateInputItems.Count; i < maxi; i++)
             {
-                if (state != null)
-                {
-                    state.BlockUnavaliableInputs(UserInput);
-                    pullInterrupt = pullInterrupt || state.IsInputEnabled(EPlayerInput.IsPullboltInterrupt);
-                }
-            });
+                PlayerStateInputData state = currStateInputItems[i];
+                if (state == null) continue;
+                state.BlockUnavaliableInputs(UserInput);
+                pullInterrupt = pullInterrupt || state.IsInputEnabled(EPlayerInput.IsPullboltInterrupt);
+            }
             if (!UserInput.IsInput(EPlayerInput.IsThrowing))
                 UserInput.SetInput(EPlayerInput.IsThrowingInterrupt, true);
             else
@@ -72,16 +86,23 @@ namespace App.Shared.GameModules.Player
             return index == -1;
         }
 
-        private void BlockStateInput()
+        private void BlockStateInput(IUserCmd cmd)
         {
-            UpdateStateInputItems();
+            UpdateStateInputItems(cmd);
             BlockUserInput();
         }
 
-        public IFilteredInput ApplyUserCmd(IUserCmd cmd)
+        public IFilteredInput ApplyUserCmd(IUserCmd cmd, int debugMoveSignal)
         {
+#if UNITY_EDITOR
+            if (cmd.MoveHorizontal == 0)
+            {
+                cmd.MoveHorizontal = debugMoveSignal;
+            }
+#endif
             UserCmdInputConverter.ApplyCmdToInput(cmd, UserInput);
-            BlockStateInput();
+           
+            BlockStateInput(cmd);
             return UserInput;
         }
     }

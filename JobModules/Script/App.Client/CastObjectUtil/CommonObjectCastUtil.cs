@@ -1,8 +1,10 @@
 ﻿//#define DEBUG_OBSTACLE
+using App.Client.GameModules.SceneObject;
+using App.Shared.Player;
 using Core.Utils;
 using UnityEngine;
-using System;
-using App.Client.GameModules.SceneObject;
+using Utils.Appearance;
+using Utils.Appearance.Bone;
 
 namespace App.Client.CastObjectUtil
 {
@@ -23,28 +25,15 @@ namespace App.Client.CastObjectUtil
                 return true;
             }
             _castCount = 0;
-            var startPoint = player.cameraStateOutputNew.FinalArchorPosition;
+            /*var startPoint = player.cameraStateOutputNew.FinalArchorPosition;
             int mask = ~(UnityLayerManager.GetLayerMask(EUnityLayerName.UserInputRaycast) | UnityLayerManager.GetLayerMask(EUnityLayerName.Player)
                        | UnityLayerManager.GetLayerMask(EUnityLayerName.Vehicle) | UnityLayerManager.GetLayerMask(EUnityLayerName.NoCollisionWithBullet)
-                       | UnityLayerManager.GetLayerMask(EUnityLayerName.NoCollisionWithEntity));
-#if DEBUG_OBSTACLE
-            DebugDraw.DebugArrow(startPoint, targetCenter - startPoint);
-            if(null == _startGo)
-            {
-                _startGo = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                _startGo.GetComponent<Collider>().enabled = false;
-                _targetGo = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                _targetGo.GetComponent<Collider>().enabled = false;
-                _startGo.transform.localScale = Vector3.one * 0.1f;
-                _targetGo.transform.localScale = Vector3.one * 0.1f;
-            }
-            _startGo.transform.position = startPoint;
-            _targetGo.transform.position = targetCenter;
-#endif
+                       | UnityLayerManager.GetLayerMask(EUnityLayerName.NoCollisionWithEntity));*/
+            var startPoint = BoneMount.FindChildBoneFromCache(player.RootGo(), BoneName.CharacterHeadBoneName).position;
             var dir = startPoint - targetCenter;
             var ray = new Ray(targetCenter, dir.normalized);
             var inRangeOffset = -0.01f;
-            var hits = Physics.RaycastAll(ray, dir.magnitude - inRangeOffset, mask);
+            var hits = Physics.RaycastAll(ray, dir.magnitude - inRangeOffset, UnityLayers.PickupObstacleLayerMask);
             foreach(var hit in hits)
             {
                 Logger.DebugFormat("hit {0}", hit.collider.name);
@@ -54,21 +43,10 @@ namespace App.Client.CastObjectUtil
                 }
                 else
                 {
-                    OnObstacle(true);
-        //            Logger.Debug("onObstacle");
                     return true;
                 }
             }
-        //    Logger.Debug("onObstacle");
-            OnObstacle(false);
             return false;
-        }
-
-        private static void OnObstacle(bool obstacle)
-        {
-#if DEBUG_OBSTACLE
-            _startGo.GetComponent<Renderer>().sharedMaterial.color = obstacle ? Color.red : Color.white;
-#endif
         }
 
         private static bool Ignore(RaycastHit hitInfo, PlayerEntity player, GameObject item)

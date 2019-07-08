@@ -3,6 +3,7 @@ using App.Client.GameModules.Player;
 using App.Client.SceneManagement;
 using App.Client.SceneManagement.DistanceCulling;
 using App.Shared;
+using App.Shared.SceneManagement;
 using Core.Components;
 using Core.GameModule.Interface;
 using Core.SceneManagement;
@@ -12,7 +13,7 @@ using Utils.AssetManager;
 
 namespace App.Client.GameModules.SceneManagement
 {
-    
+
     public class VisionCenterUpdateSystem : IRenderSystem, IResourceLoadSystem
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(VisionCenterUpdateSystem));
@@ -21,6 +22,7 @@ namespace App.Client.GameModules.SceneManagement
         private readonly ITerrainRenderer _terrainRenderer;
         private List<AssetInfo> _sceneRequests = new List<AssetInfo>();
         private List<AssetInfo> _goRequests = new List<AssetInfo>();
+        private List<IEnumerable<AssetInfoEx<MeshRenderer>>> _lightmapsRequests = new List<IEnumerable<AssetInfoEx<MeshRenderer>>>();
 
         public VisionCenterUpdateSystem(Contexts contexts)
         {
@@ -42,8 +44,8 @@ namespace App.Client.GameModules.SceneManagement
 
         public void OnLoadResources(IUnityAssetManager assetManager)
         {
-            _levelManager.GetRequests(_sceneRequests, _goRequests);
-            
+            _levelManager.GetRequests(_sceneRequests, _goRequests, _lightmapsRequests);
+
             foreach (var request in _sceneRequests)
             {
                 assetManager.LoadSceneAsync(request, true);
@@ -53,11 +55,24 @@ namespace App.Client.GameModules.SceneManagement
             foreach (var request in _goRequests)
             {
                 _levelManager.LoadResource("VisionCenterUpdateSystem", assetManager, request);
-               
             }
-            
+
+            foreach (var request in _lightmapsRequests)
+            {
+                MeshRenderer mr = null;
+                List<AssetInfo> infos = new List<AssetInfo>();
+                foreach (var ex in request)
+                {
+                    infos.Add(ex.asset);
+                    if (mr == null) mr = ex.data;
+                }
+                LevelManager lm = _levelManager as LevelManager;
+                assetManager.LoadAssetsAsync(mr, infos, lm.LightmapsLoadedWrapper);
+            }
+
             _sceneRequests.Clear();
             _goRequests.Clear();
+            _lightmapsRequests.Clear();
         }
     }
 }

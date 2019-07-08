@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Assertions;
+using Utils.Appearance;
 using Utils.Singleton;
 
 namespace Core.Utils
@@ -8,6 +9,9 @@ namespace Core.Utils
     using System;
     using System.Runtime.InteropServices;
 
+    /// <summary>
+    /// mono2.0编译的时候默认参数对超过3G的heap memory是不gc的，要注意这个坑！！
+    /// </summary>
     public class gc_manager : Singleton<gc_manager>
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(gc_manager));
@@ -252,13 +256,16 @@ namespace Core.Utils
             public int count;
         };
 
+        private float last_monitor_gc_time = 0;
         public void monitor_gc()
         {
             if (!d_gc_disabled)
             {
                 return;
             }
-
+            float time = Time.realtimeSinceStartup;
+            if (time - last_monitor_gc_time < 2) return;
+            last_monitor_gc_time = time;
             long allocated_bytes = GC.GetTotalMemory(false);
             allocated_mb = ((float) allocated_bytes) / 1024 / 1024;
 
@@ -275,7 +282,7 @@ namespace Core.Utils
             }
 
             {
-                float time = Time.realtimeSinceStartup;
+                
                 if (last_gc_time != -1)
                 {
                     float delta = time - last_gc_time;
@@ -290,6 +297,11 @@ namespace Core.Utils
                     expected_time_until_gc = (allocated_mb_limit - allocated_mb) / average_allocation_rate_mbps;
                 }
             }
+        }
+
+        public string status()
+        {
+            return string.Format("{0} {1}MB {2}MB", d_gc_disabled, (int)allocated_mb, (int)average_allocation_rate_mbps);
         }
     }
 }

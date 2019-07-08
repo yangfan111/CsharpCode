@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq.Expressions;
 using Core.CameraControl.NewMotor;
 using Core.Compare;
@@ -15,93 +15,42 @@ using UnityEngine;
 using Utils.Utils;
 using XmlConfig;
 using System.Collections.Specialized;
+using Core.CameraControl;
 using Core.Interpolate;
+using Core.SyncLatest;
 
 namespace App.Shared.Components.Player
 {
     [Player]
     [Serializable]
-    public class CameraStateNewComponent : IUserPredictionComponent
+    public class CameraStateNewComponent : IComponent
     {
-        [DontInitilize] [NetworkProperty] public byte MainNowMode;
-        [DontInitilize] [NetworkProperty] public byte MainLastMode;
-        [DontInitilize] [NetworkProperty] public int MainModeTime;
+        [DontInitilize] public byte MainNowMode;
+        [DontInitilize] public byte MainLastMode;
+        [DontInitilize] public int MainModeTime;
 
-        [DontInitilize] [NetworkProperty] public byte ViewNowMode;
-        [DontInitilize] [NetworkProperty] public byte ViewLastMode;
-        [DontInitilize] [NetworkProperty] public int ViewModeTime;
+        [DontInitilize] public byte ViewNowMode;
+        [DontInitilize] public byte ViewLastMode; 
+        [DontInitilize] public int ViewModeTime;
 
-        [DontInitilize] [NetworkProperty] public byte PeekNowMode;
-        [DontInitilize] [NetworkProperty] public byte PeekLastMode;
-        [DontInitilize] [NetworkProperty] public int PeekModeTime;
+        [DontInitilize] public byte PeekNowMode;
+        [DontInitilize] public byte PeekLastMode;
+        [DontInitilize] public int PeekModeTime;
 
-        [DontInitilize] [NetworkProperty] public byte FreeNowMode;
-        [DontInitilize] [NetworkProperty] public byte FreeLastMode;
-        [DontInitilize] [NetworkProperty] public int FreeModeTime;
+        [DontInitilize] public byte FreeNowMode;
+        [DontInitilize] public byte FreeLastMode;
+        [DontInitilize] public int FreeModeTime;
 
-        [DontInitilize] [NetworkProperty] public float FreeYaw;
-        [DontInitilize] [NetworkProperty] public float FreePitch;
+        [DontInitilize] public float FreeYaw;
+        [DontInitilize] public float FreePitch;
 
-        [DontInitilize] [NetworkProperty] public float LastFreeYaw;
-        [DontInitilize] [NetworkProperty] public float LastFreePitch;
-        [DontInitilize] [NetworkProperty] public float LastPeekPercent;
-        [DontInitilize] [NetworkProperty] public bool CanFire;
+        [DontInitilize] public float LastFreeYaw;
+        [DontInitilize] public float LastFreePitch;
+        [DontInitilize] public float LastPeekPercent;
+        [DontInitilize] public bool CanFire;
         
         [DontInitilize] public ICameraMotorInput LastCameraMotorInput;
         [DontInitilize] public ICameraMotorInput CameraMotorInput;
-
-
-        public int GetComponentId()
-        {
-            {
-                return (int) EComponentIds.CameraStateNew;
-            }
-        }
-
-        public void CopyFrom(object rightComponent)
-        {
-            var r = ((CameraStateNewComponent) rightComponent);
-            MainNowMode = r.MainNowMode;
-            MainLastMode = r.MainLastMode;
-            MainModeTime = r.MainModeTime;
-            ViewNowMode = r.ViewNowMode;
-            ViewLastMode = r.ViewLastMode;
-            ViewModeTime = r.ViewModeTime;
-            PeekNowMode = r.PeekNowMode;
-            PeekLastMode = r.PeekLastMode;
-            PeekModeTime = r.PeekModeTime;
-            FreeNowMode = r.FreeNowMode;
-            FreeLastMode = r.FreeLastMode;
-            FreeModeTime = r.FreeModeTime;
-            FreeYaw = r.FreeYaw;
-            FreePitch = r.FreePitch;
-            LastFreeYaw = r.LastFreeYaw;
-            LastFreePitch = r.LastFreePitch;
-            LastPeekPercent = r.LastPeekPercent;
-            CanFire = r.CanFire;
-           
-        }
-
-        public bool IsApproximatelyEqual(object right)
-        {
-            var r = (CameraStateNewComponent) right;
-
-            return MainNowMode == r.MainNowMode
-                   && MainLastMode == r.MainLastMode
-                   && MainModeTime == r.MainModeTime
-                   && ViewNowMode == r.ViewNowMode
-                   && ViewLastMode == r.ViewLastMode
-                   && ViewModeTime == r.ViewModeTime
-                   && PeekNowMode == r.PeekNowMode
-                   && PeekLastMode == r.PeekLastMode
-                   && PeekModeTime == r.PeekModeTime
-                   && FreeNowMode == r.FreeNowMode
-                   && FreeLastMode == r.FreeLastMode
-                   && FreeModeTime == r.FreeModeTime
-                   && CompareUtility.IsApproximatelyEqual(FreeYaw, r.FreeYaw)
-                   && CompareUtility.IsApproximatelyEqual(FreePitch, r.FreePitch)
-                   && CanFire == r.CanFire;
-        }
 
         public override string ToString()
         {
@@ -110,18 +59,13 @@ namespace App.Shared.Components.Player
                 MainNowMode, MainLastMode, MainModeTime, PeekNowMode, PeekLastMode, PeekModeTime, FreeNowMode,
                 FreeLastMode, FreeModeTime, FreeYaw, FreePitch, CanFire);
         }
-
-        public void RewindTo(object rightComponent)
-        {
-            CopyFrom(rightComponent);
-        }
     }
     
     [Player]
     [Serializable]
     public class CameraConfigNow : IComponent
     {
-        [DontInitilize] public CameraConfigItem Config;
+        [DontInitilize] public PoseCameraConfig Config;
         [DontInitilize] public PeekCameraConfig PeekConfig;
         [DontInitilize] public DeadCameraConfig DeadConfig;
     }
@@ -134,9 +78,9 @@ namespace App.Shared.Components.Player
         FollowEntity
     
     }
+    
     public interface ICameraMotorOutput
     {
-      
         Vector3 ArchorPosition { get; set; }
         Vector3 ArchorEulerAngle { get; set; }
         Vector3 ArchorOffset { get; set; }
@@ -150,7 +94,6 @@ namespace App.Shared.Components.Player
         float Far { get; set; }
         float Near { get; set; }
     }
-
 
     [Player]
     [Serializable]
@@ -170,7 +113,6 @@ namespace App.Shared.Components.Player
     [Serializable]
     public class CameraStateOutputNewComponent : IComponent, ICameraMotorOutput
     {
-    
         [DontInitilize] public Vector3 ArchorPosition { get; set; }
         [DontInitilize] public Vector3 FinalArchorPosition { get; set; }
         [DontInitilize] public Vector3 ArchorEulerAngle { get; set; }
@@ -185,74 +127,61 @@ namespace App.Shared.Components.Player
         [DontInitilize] public float Far { get; set; }
         [DontInitilize] public float Near { get; set; }
         [DontInitilize] public bool NeedDetectDistance { get; set; }
-        
+        [DontInitilize] public float LastPitchWhenAlive { get; set; }
     }
 
     [Player]
     [Serializable]
-    
-    public class CameraFinalOutputNewComponent : IComponent
+    public class CameraFireInfo : IUpdateComponent
     {
-      
-        [NetworkProperty] [DontInitilize] public Vector3 Position;
-        [NetworkProperty] [DontInitilize] public Vector3 PlayerFocusPosition;
-        [NetworkProperty] [DontInitilize] public Vector3 EulerAngle;
-        [NetworkProperty] [DontInitilize] public float Fov;
-        [NetworkProperty] [DontInitilize] public float Far;
-        [NetworkProperty] [DontInitilize] public float Near;
-        [DontInitilize] public int LastCollisionTime;
-        [DontInitilize] public Vector3 LastCollisionOffset;
-        public int PostTransitionTime;
+        [NetworkProperty][DontInitilize()] public Vector3 PlayerFocusPosition;
+        public void CopyFrom(object rightComponent)
+        {
+            var r = rightComponent as CameraFireInfo;
+            PlayerFocusPosition = r.PlayerFocusPosition;
+        }
 
         public int GetComponentId()
         {
-            return (int) EComponentIds.CameraOutput;
+            return (int) EComponentIds.CameraFireInfo;
         }
-
-        public void RewindTo(object rightComponent)
-        {
-            var r = ((CameraFinalOutputNewComponent) rightComponent);
-          
-            Position = r.Position;
-            EulerAngle = r.EulerAngle;
-            Fov = r.Fov;
-            Far = r.Far;
-            Near = r.Near;
-        }
-
-        public bool IsApproximatelyEqual(object right)
-        {
-            var r = ((CameraFinalOutputNewComponent) right);
-            return CompareUtility.IsApproximatelyEqual(Position, r.Position)
-                   && CompareUtility.IsApproximatelyEqual(EulerAngle, r.EulerAngle)
-                   && CompareUtility.IsApproximatelyEqual(Fov, r.Fov)
-                   && CompareUtility.IsApproximatelyEqual(Far, r.Far)
-                   && CompareUtility.IsApproximatelyEqual(Near, r.Near);
-        }
+    }
+    
+    [Player]
+    [Serializable]
+    public class CameraFinalOutputNewComponent : IComponent
+    {
+      
+        [DontInitilize] public Vector3 Position;
+        [DontInitilize] public Vector3 PlayerFocusPosition;
+        [DontInitilize] public Vector3 EulerAngle;
+        [DontInitilize] public float Fov;
+        [DontInitilize] public float Far;
+        [DontInitilize] public float Near;
 
         public override string ToString()
         {
             return string.Format("Position: {0}, EulerAngle: {1}, Fov: {2}, Far: {3}, Near: {4}", Position.ToStringExt(), EulerAngle.ToStringExt(), Fov, Far, Near);
         }
     }
-   
-    [Player]
-    public class ThirdPersonDataForObservingComponent : IComponent
-    {
-        [DontInitilize] public Vector3 ThirdPersonArchorPosition;
-        public CameraStateOutputNewComponent ThirdPersonData;
-        public CameraFinalOutputNewComponent ThirdPersonOutput;
-    }
     
     [Player]
     [Serializable]
-    public class ObserveCameraComponent : IPlaybackComponent
+    public class ObserveCameraComponent : ISelfLatestComponent
     {
-        [NetworkProperty] [DontInitilize] public FixedVector3 CameraPosition;
-        [NetworkProperty] [DontInitilize] public Vector3 CameraEularAngle;
-        [NetworkProperty] [DontInitilize] public float Fov;
+        [DontInitilize][NetworkProperty] public byte MainNowMode;
+        [DontInitilize][NetworkProperty] public byte PeekNowMode;
+        [DontInitilize][NetworkProperty] public byte FreeNowMode;
         
-        [DontInitilize] public Vector3 PlayerPosition;
+        [DontInitilize][NetworkProperty(SyncFieldScale.Yaw)] public float FreeYaw;
+        [DontInitilize][NetworkProperty(SyncFieldScale.Pitch)] public float FreePitch;
+
+        [DontInitilize][NetworkProperty] public int VehicleId;
+
+        [DontInitilize] public Vector3 ObservedPlayerPosition;
+        
+        [DontInitilize] public PlayerEntity ObservedPlayer;
+        [DontInitilize] public VehicleEntity ControllVehicle;
         
         public int GetComponentId()
         {
@@ -263,25 +192,19 @@ namespace App.Shared.Components.Player
         {
             var r = rightComponent as ObserveCameraComponent;
 
-            CameraPosition = r.CameraPosition;
-            CameraEularAngle = r.CameraEularAngle;
-            Fov = r.Fov;
+            MainNowMode = r.MainNowMode;
+            PeekNowMode = r.PeekNowMode;
+            FreeNowMode = r.FreeNowMode;
+
+            FreeYaw = r.FreeYaw;
+            FreePitch = r.FreePitch;
+
+            VehicleId = r.VehicleId;
         }
-
-        public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
+        
+        public void SyncLatestFrom(object rightComponent)
         {
-            var l = left as ObserveCameraComponent;
-            var r = right as ObserveCameraComponent;
-
-            Fov = InterpolateUtility.Interpolate(l.Fov, r.Fov, interpolationInfo);
-            CameraPosition = InterpolateUtility.Interpolate(l.CameraPosition, r.CameraPosition, interpolationInfo);
-            CameraEularAngle =
-                InterpolateUtility.Interpolate(l.CameraEularAngle, r.CameraEularAngle, interpolationInfo);
-        }
-
-        public bool IsInterpolateEveryFrame()
-        {
-            return true;
+            CopyFrom(rightComponent);
         }
     }
     
@@ -289,44 +212,22 @@ namespace App.Shared.Components.Player
     [Serializable]
     public class CameraStateUploadComponent: IUpdateComponent
     {
-        [NetworkProperty] [DontInitilize] public FixedVector3 Position;
-        [NetworkProperty] [DontInitilize] public Vector3 EulerAngle;
-        [NetworkProperty] [DontInitilize] public FixedVector3 PlayerFocusPosition;
-        [NetworkProperty] [DontInitilize] public float Fov;
-        [NetworkProperty] [DontInitilize] public float Far;
-        [NetworkProperty] [DontInitilize] public float Near;
+        [DontInitilize] [NetworkProperty] public Vector3 Position;
+        [DontInitilize] [NetworkProperty(SyncFieldScale.EularAngle)] public Vector3 EulerAngle;
+        [DontInitilize] [NetworkProperty(180,0,0.01f)] public float Fov;
+        [DontInitilize] [NetworkProperty(10000,0,1f)] public float Far;
+        [DontInitilize] [NetworkProperty(1,0,0.001f)] public float Near;
 
         [DontInitilize] [NetworkProperty] public byte MainNowMode;
-        [DontInitilize] [NetworkProperty] public byte MainLastMode;
-        [DontInitilize] [NetworkProperty] public int MainModeTime;
-
         [DontInitilize] [NetworkProperty] public byte ViewNowMode;
-        [DontInitilize] [NetworkProperty] public byte ViewLastMode;
-        [DontInitilize] [NetworkProperty] public int ViewModeTime;
-
         [DontInitilize] [NetworkProperty] public byte PeekNowMode;
-        [DontInitilize] [NetworkProperty] public byte PeekLastMode;
-        [DontInitilize] [NetworkProperty] public int PeekModeTime;
-
         [DontInitilize] [NetworkProperty] public byte FreeNowMode;
-        [DontInitilize] [NetworkProperty] public byte FreeLastMode;
-        [DontInitilize] [NetworkProperty] public int FreeModeTime;
+        [DontInitilize] [NetworkProperty(SyncFieldScale.Yaw)] public float FreeYaw;
+        [DontInitilize] [NetworkProperty(SyncFieldScale.Pitch)] public float FreePitch;
 
-        [DontInitilize] [NetworkProperty] public float FreeYaw;
-        [DontInitilize] [NetworkProperty] public float FreePitch;
-
-        [DontInitilize] [NetworkProperty] public float LastFreeYaw;
-        [DontInitilize] [NetworkProperty] public float LastFreePitch;
-        [DontInitilize] [NetworkProperty] public float LastPeekPercent;
         [DontInitilize] [NetworkProperty] public bool CanFire;
-
         [DontInitilize] [NetworkProperty] public int EnterActionCode;
         [DontInitilize] [NetworkProperty] public int LeaveActionCode;
-
-        [DontInitilize] [NetworkProperty] public Byte ArchorType;
-        
-        [DontInitilize] [NetworkProperty] public Vector3 ThirdPersonCameraPostion;
-
         
         public void CopyFrom(object rightComponent)
         {
@@ -339,39 +240,23 @@ namespace App.Shared.Components.Player
             Near = r.Near;
 
             MainNowMode = r.MainNowMode;
-            MainLastMode = r.MainLastMode;
-            MainModeTime = r.MainModeTime;
             ViewNowMode = r.ViewNowMode;
-            ViewLastMode = r.ViewLastMode;
-            ViewModeTime = r.ViewModeTime;
             PeekNowMode = r.PeekNowMode;
-            PeekLastMode = r.PeekLastMode;
-            PeekModeTime = r.PeekModeTime;
             FreeNowMode = r.FreeNowMode;
-            FreeLastMode = r.FreeLastMode;
-            FreeModeTime = r.FreeModeTime;
             FreeYaw = r.FreeYaw;
             FreePitch = r.FreePitch;
-            LastFreeYaw = r.LastFreeYaw;
-            LastFreePitch = r.LastFreePitch;
-            LastPeekPercent = r.LastPeekPercent;
             CanFire = r.CanFire;
 
             EnterActionCode = r.EnterActionCode;
             LeaveActionCode = r.LeaveActionCode;
-            PlayerFocusPosition = r.PlayerFocusPosition;
 
-            ArchorType = r.ArchorType;
-            ThirdPersonCameraPostion = r.ThirdPersonCameraPostion;
         }
 
         public int GetComponentId()
         {
             return (int) EComponentIds.CameraStateUpload;
         }
-
     }
-
 
     [Player]
     [Unique]
@@ -388,4 +273,5 @@ namespace App.Shared.Components.Player
     {
         [DontInitilize] public GameObject Poison;
     }
+    
 }

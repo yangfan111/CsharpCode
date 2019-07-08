@@ -1,6 +1,7 @@
 ﻿using App.Server.GameModules.GamePlay;
 using App.Server.GameModules.GamePlay.free.player;
 using com.wd.free.@event;
+using Core.Free;
 using com.wd.free.para.exp;
 using com.wd.free.util;
 using System;
@@ -10,7 +11,7 @@ using Utils.Utils;
 namespace App.Shared.FreeFramework.Free.condition
 {
     [Serializable]
-    public class PlayerAngleDistanceCondition : IParaCondition
+    public class PlayerAngleDistanceCondition : IParaCondition, IRule
     {
         public string entity;
         public string player;
@@ -30,6 +31,11 @@ namespace App.Shared.FreeFramework.Free.condition
                 return CommonMathUtil.GetDiffAngle(ang, yaw) <= FreeUtil.ReplaceFloat(angle, args) && Vector3.Distance(playerEntity.position.Value, objEntity.position.Value) <= FreeUtil.ReplaceFloat(distance, args);
             }
             return false;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerAngleDistanceCondition;
         }
     }
 }

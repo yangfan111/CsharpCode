@@ -106,6 +106,10 @@ namespace Core.Animation
         }
 
         public bool HasValue { get; set; }
+        public NetworkAnimatorParameter CreateInstance()
+        {
+            return new NetworkAnimatorParameter();
+        }
 
         public void Write(NetworkAnimatorParameter right, MyBinaryWriter writer)
         {

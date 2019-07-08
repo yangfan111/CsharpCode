@@ -3,12 +3,18 @@ using com.wd.free.@event;
 using com.wd.free.util;
 using Core.Free;
 using gameplay.gamerule.free.ui;
+using com.wd.free.para;
 
 namespace App.Server.GameModules.GamePlay.Free.action.ui
 {
     [Serializable]
-    public class ScoreInfoAction : SendMessageAction
+    public class ScoreInfoAction : SendMessageAction, IRule
     {
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ScoreInfoAction;
+        }
+
         protected override void BuildMessage(IEventArgs args)
         {
             this.scope = "4";

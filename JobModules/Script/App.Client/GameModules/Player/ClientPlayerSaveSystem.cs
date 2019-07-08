@@ -1,7 +1,4 @@
-﻿using com.wd.free.unit;
-using Core.GameModule.Interface;
-using Core.Utils;
-using UnityEngine;
+﻿using Core.Utils;
 
 namespace App.Client.GameModules.Player
 {
@@ -25,36 +22,34 @@ namespace App.Client.GameModules.Player
 
         public override void OnRender(PlayerEntity playerEntity)
         {
-            var gamePlay = playerEntity.gamePlay;
             var ui = _contexts.ui.uI;
-            if (gamePlay.IsInteruptSave)
+            if (playerEntity.gamePlay.TipHideStatus)
             {
-                _logger.InfoFormat("save action interrupted. {0} {1}", gamePlay.IsSave, gamePlay.IsBeSave);
-                /*if (_isShow)
-                {*/
-                    gamePlay.IsInteruptSave = false;
-                    _isShow = false;
-                    ui.CountingDown = false;
-                    ui.CountDownNum = 0;
-                //}      
+                ui.CountingDown = false;
+                ui.CountDownNum = 0;
+                ui.HaveCompletedCountDown = true;
+                return;
+            }
+
+            /*if (playerEntity.gamePlay.IsSave || playerEntity.gamePlay.IsBeSave)
+            {
+                if (!_isShow)
+                {
+                    _isShow = true;
+                    ui.CountingDown = true;
+                    ui.CountDownNum = _saveTime;
+                }
             }
             else
             {
-                if ((gamePlay.IsBeSave || gamePlay.IsSave))
-                {
-                    if (!_isShow)
-                    {
-                        _isShow = true;
-                        ui.CountingDown = true;
-                        ui.CountDownNum = _saveTime;
-                    }
-                }
-                else
+                if (_isShow)
                 {
                     _isShow = false;
+                    ui.CountingDown = false;
+                    ui.CountDownNum = 0;
+                    ui.HaveCompletedCountDown = !playerEntity.gamePlay.IsInteruptSave;
                 }
-            } 
-            
+            }*/
         }
     }
 }

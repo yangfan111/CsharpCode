@@ -96,6 +96,12 @@ namespace App.Shared.GameModules.Bullet
             if (playerEntity.gamePlay.IsDead())
                 return null;
 
+            if (!playerEntity.hasStatisticsData)
+            {
+                _logger.ErrorFormat("{0} don't have component statisticsData",playerEntity);
+                return null;
+            }
+            
             if ((DateTime.Now.Ticks/10000L) - playerEntity.statisticsData.Statistics.LastHitDownTime <= 1000 && !damage.InstantDeath)
                 return null;
 
@@ -233,7 +239,7 @@ namespace App.Shared.GameModules.Bullet
                             feedbackType |= 1 << (int) EUIKillFeedbackType.Revenge;
                             srcPlayer.statisticsData.Statistics.RevengeKillerId = 0L;
                         }
-                        if (srcPlayer.playerInfo.JobAttribute == (int)EJobAttribute.EJob_Hero) {
+                        if (srcPlayer.gamePlay.JobAttribute == (int)EJobAttribute.EJob_Hero) {
                             //英雄击杀
                             feedbackType |= 1 << (int)EUIKillFeedbackType.HeroKO;
                             playerEntity.playerInfo.SpecialFeedbackType = (int)EUIKillFeedbackType.HeroKO;

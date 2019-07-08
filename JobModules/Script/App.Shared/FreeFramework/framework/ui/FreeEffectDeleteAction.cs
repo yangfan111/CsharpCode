@@ -2,12 +2,13 @@ using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.util;
 using Free.framework;
+using Core.Free;
 
 namespace gameplay.gamerule.free.ui
 {
 	[System.Serializable]
-	public class FreeEffectDeleteAction : SendMessageAction
-	{
+	public class FreeEffectDeleteAction : SendMessageAction, IRule
+    {
 		private const long serialVersionUID = -1188091456904593121L;
 
 		private string key;
@@ -48,5 +49,10 @@ namespace gameplay.gamerule.free.ui
 		{
 			return "删除特效" + key;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeEffectDeleteAction;
+        }
+    }
 }

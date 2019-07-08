@@ -1,41 +1,37 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using App.Server.GameModules.GamePlay.free.player;
 using App.Shared.Components.Player;
 using App.Shared.Components.Weapon;
+using App.Shared.GameModules.Player;
 using App.Shared.Player;
 using Core;
 using Core.Appearance;
-using Core.Attack;
 using Core.CharacterBone;
 using Core.CharacterState;
-using Core.Common;
 using Core.EntityComponent;
 using Core.Event;
-using Core.Free;
 using Core.Statistics;
-using Core.WeaponLogic.Throwing;
-using System;
-using System.Collections.Generic;
-using App.Server.GameModules.GamePlay.free.player;
-using App.Shared.GameModules.Player;
 using WeaponConfigNs;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Weapon
 {
-
     /// <summary>
-    /// Defines the <see cref="PlayerComponentsReference" />
+    ///     Defines the <see cref="PlayerComponentsReference" />
     /// </summary>
     public partial class PlayerWeaponController
     {
         private PlayerEntity entity;
 
-        private void SetEnity(PlayerEntity in_entity) 
+        private void SetEnity(PlayerEntity in_entity)
         {
             entity = in_entity;
-            Owner = entity.entityKey.Value;
+            Owner  = entity.entityKey.Value;
         }
+
         #region//reference getter
+
         public FirePosition RelatedFirePos
         {
             get { return entity.firePosition; }
@@ -43,18 +39,23 @@ namespace App.Shared.GameModules.Weapon
 
         public int JobAttribute
         {
-            get{ if (entity.hasPlayerInfo) return entity.playerInfo.JobAttribute; return 0; }
+            get
+            {
+                if (entity.hasGamePlay) return entity.gamePlay.JobAttribute;
+                return 0;
+            }
         }
 
         public int RelatedTime
         {
             get { return entity.time.ClientTime; }
         }
-       
+
         public GamePlayComponent RelatedGamePlay
         {
             get { return entity.gamePlay; }
         }
+
         public CameraFinalOutputNewComponent RelatedCameraFinal
         {
             get { return entity.cameraFinalOutputNew; }
@@ -67,18 +68,36 @@ namespace App.Shared.GameModules.Weapon
 
         public MeleeAttackInfoSyncComponent RelatedMeleeAttackInfoSync
         {
-            get { return entity.meleeAttackInfoSync; }
+            get
+            {
+                if (!entity.hasMeleeAttackInfoSync)
+                    entity.AddMeleeAttackInfoSync(0);
+                entity.meleeAttackInfoSync.BeforeAttackTime = RelatedTime;
+                return entity.meleeAttackInfoSync;
+            }
+        }
+
+        private MeleeAttackInfoComponent relatedMeleeAttackInfoComponent
+        {
+            get
+            {
+                if (!entity.hasMeleeAttackInfo)
+                    entity.AddMeleeAttackInfo();
+                return entity.meleeAttackInfo;
+            }
         }
 
         public MeleeAttackInfo RelatedMeleeAttackInfo
         {
-            get { return entity.meleeAttackInfo.AttackInfo; }
-            set { entity.meleeAttackInfo.AttackInfo = value; }
+            get { return relatedMeleeAttackInfoComponent.AttackInfo; }
+            set { relatedMeleeAttackInfoComponent.AttackInfo = value; }
         }
+
         public MeleeFireLogicConfig RelatedMeleeAttackInfoCfg
         {
-            set { entity.meleeAttackInfo.AttackConfig = value; }
+            set { relatedMeleeAttackInfoComponent.AttackConfig = value; }
         }
+
         public ThrowingUpdateComponent RelatedThrowUpdate
         {
             get { return entity.throwingUpdate; }
@@ -94,14 +113,14 @@ namespace App.Shared.GameModules.Weapon
             get { return entity.cameraStateNew; }
         }
 
-        public ThrowingActionInfo RelatedThrowAction
+        public CameraFireInfo RelatedCameraInfo
         {
-            get
-            {
-                if (entity.hasThrowingAction)
-                    return entity.throwingAction.ActionInfo;
-                return null;
-            }
+            get { return entity.cameraFireInfo; }
+        }
+
+        public ThrowingActionData RelatedThrowAction
+        {
+            get { return entity.throwingAction.ActionData; }
         }
 
         public OrientationComponent RelatedOrientation
@@ -113,6 +132,7 @@ namespace App.Shared.GameModules.Weapon
         {
             get { return entity.appearanceInterface.FirstPersonAppearance; }
         }
+
         public ICharacterAppearance RelatedAppearence
         {
             get { return entity.appearanceInterface.Appearance; }
@@ -147,14 +167,17 @@ namespace App.Shared.GameModules.Weapon
         {
             get { return entity.characterBoneInterface.CharacterBone; }
         }
+
         public PlayerWeaponBagSetComponent RelatedBagSet
         {
             get { return entity.playerWeaponBagSet; }
         }
+
         public PlayerWeaponServerUpdateComponent RelatedServerUpdate
         {
             get { return entity.playerWeaponServerUpdate; }
         }
+
         public PlayerWeaponAuxiliaryComponent RelatedWeaponAux
         {
             get
@@ -169,33 +192,37 @@ namespace App.Shared.GameModules.Weapon
         {
             get { return entity.playerWeaponCustomize; }
         }
+
         public GrenadeCacheDataComponent RelatedGrenadeCache
         {
             get { return entity.grenadeCacheData; }
         }
+
         public PlayerClientUpdateComponent RelatedClientUpdate
         {
             get
             {
-                if(!entity.hasPlayerClientUpdate)
-                    entity.AddPlayerClientUpdate();
+                if (!entity.hasPlayerClientUpdate)
+                    entity.AddPlayerClientUpdate(-1);
                 return entity.playerClientUpdate;
             }
         }
+
         #endregion
 
         #region//reference modify wrapper
-//        public int? AutoFire
-//        {
-//            get
-//            {
-//
-//                if (RelatedWeaponAux.HasAutoAction)
-//                    return RelatedWeaponAux.AutoFire;
-//                return null;
-//            }
-//            set { RelatedWeaponAux.AutoFire = value.Value; }
-//        }
+
+        //        public int? AutoFire
+        //        {
+        //            get
+        //            {
+        //
+        //                if (RelatedWeaponAux.HasAutoAction)
+        //                    return RelatedWeaponAux.AutoFire;
+        //                return null;
+        //            }
+        //            set { RelatedWeaponAux.AutoFire = value.Value; }
+        //        }
         public bool? AutoThrowing
         {
             get
@@ -206,16 +233,19 @@ namespace App.Shared.GameModules.Weapon
             }
             set { RelatedWeaponAux.AutoThrowing = value.Value; }
         }
+
         public void AddAuxBullet(PlayerBulletData bulletData)
         {
             if (RelatedWeaponAux.BulletList == null) return;
             RelatedWeaponAux.BulletList.Add(bulletData);
         }
+
         public void AddAuxEffect()
         {
             RelatedWeaponAux.ClientInitialize = true;
-            RelatedWeaponAux.EffectList = new List<EClientEffectType>();
+            RelatedWeaponAux.EffectList       = new List<EClientEffectType>();
         }
+
         public void AddAuxBullet()
         {
             RelatedWeaponAux.BulletList = new List<PlayerBulletData>();
@@ -226,10 +256,11 @@ namespace App.Shared.GameModules.Weapon
             if (RelatedWeaponAux.EffectList != null)
                 RelatedWeaponAux.EffectList.Add(effectType);
         }
+
         public void RemoveBagWeapon(EWeaponSlotType slot)
         {
-            var slotData = RelatedBagSet[0][slot];
-            slotData.Remove(RelatedCustomize.EmptyConstWeaponkey);//player slot 数据移除
+            var slotData = RelatedBagSet.WeaponBag[slot];
+            slotData.Remove(RelatedCustomize.EmptyConstWeaponkey); //player slot 数据移除
         }
 
         public void ClearBagPointer()
@@ -239,13 +270,13 @@ namespace App.Shared.GameModules.Weapon
 
         public void SyncBagWeapon(EWeaponSlotType slot, EntityKey key)
         {
-            RelatedBagSet[0][slot].Sync(key);
+            RelatedBagSet.WeaponBag[slot].Sync(key);
         }
 
         public void SetBagHeldSlotType(EWeaponSlotType nowSlot)
         {
-            var slot = (int)nowSlot;
-            var bag = RelatedBagSet[0];
+            var slot = (byte) nowSlot;
+            var bag  = RelatedBagSet.WeaponBag;
             if (bag.HeldSlotPointer == slot)
                 return;
             if (!WeaponUtil.VertifyEweaponSlotIndex(slot, true))
@@ -255,13 +286,14 @@ namespace App.Shared.GameModules.Weapon
 
         public Func<EntityKey> GenerateBagWeaponKeyExtractor(EWeaponSlotType slotType)
         {
-            return () => { return RelatedBagSet[0][slotType].WeaponKey; };
+            return () => { return RelatedBagSet.WeaponBag[slotType].WeaponKey; };
         }
 
         public Func<EntityKey> GenerateBagEmptyKeyExtractor()
         {
             return () => { return RelatedCustomize.EmptyConstWeaponkey; };
         }
+
         public void UnArmC4()
         {
             RelatedAppearence.UnmoutC4(entity.GetSex());
@@ -269,40 +301,22 @@ namespace App.Shared.GameModules.Weapon
 
         public void CreateSetMeleeAttackInfoSync(int in_Sync)
         {
-            if (entity.hasMeleeAttackInfoSync)
-            {
-                RelatedMeleeAttackInfoSync.AttackTime = in_Sync;
-                RelatedMeleeAttackInfoSync.BeforeAttackTime = RelatedTime;
-            }
-            else
-            {
-                entity.AddMeleeAttackInfoSync(in_Sync);
-            }
+            RelatedMeleeAttackInfoSync.AttackTime = in_Sync;
         }
 
         public void CreateSetMeleeAttackInfo(MeleeAttackInfo attackInfo, MeleeFireLogicConfig config)
         {
-            if (entity.hasMeleeAttackInfo)
-            {
-                RelatedMeleeAttackInfo = attackInfo;
-                RelatedMeleeAttackInfoCfg = config;
-            }
-            else
-            {
-                entity.AddMeleeAttackInfo();
-                RelatedMeleeAttackInfo = attackInfo;
-                RelatedMeleeAttackInfoCfg = config;
-            }
+            RelatedMeleeAttackInfo    = attackInfo;
+            RelatedMeleeAttackInfoCfg = config;
         }
 
-        public void CharacterSwitchWeapon(System.Action unarmCallback, System.Action drawCallback, float switchParam)
+        public void CharacterSwitchWeapon(Action unarmCallback, Action drawCallback, float switchParam)
         {
             RelatedCharState.SwitchWeapon(unarmCallback, drawCallback, switchParam);
         }
 
 
-
-        public void CharacterDraw(System.Action drawCallback, float drawParam)
+        public void CharacterDraw(Action drawCallback, float drawParam)
         {
             RelatedCharState.Select(drawCallback, drawParam);
         }
@@ -314,7 +328,7 @@ namespace App.Shared.GameModules.Weapon
             RelatedCharState.ForceFinishGrenadeThrow();
         }
 
-        public void CharacterUnarm(System.Action holsterStartFinished, System.Action holsterEndFinished, float unarmParam)
+        public void CharacterUnarm(Action holsterStartFinished, Action holsterEndFinished, float unarmParam)
         {
             RelatedCharState.InterruptAction();
             RelatedCharState.ForceFinishGrenadeThrow();
@@ -322,20 +336,19 @@ namespace App.Shared.GameModules.Weapon
         }
 
 
-
         public void ThrowActionExecute()
         {
             if (!entity.hasThrowingAction) return;
-            Core.WeaponLogic.Throwing.ThrowingActionInfo actionInfo = RelatedThrowAction;
-            if (actionInfo.IsReady && actionInfo.IsPull)
+            ThrowingActionData actionData = RelatedThrowAction;
+            if (actionData.IsReady && actionData.IsPull)
             {
                 //若已拉栓，销毁ThrowingEntity
-                actionInfo.IsInterrupt = true;
+                actionData.IsInterrupt = true;
             }
             //打断投掷动作
             RelatedCharState.ForceFinishGrenadeThrow();
             //清理手雷状态
-            actionInfo.ClearState();
+            actionData.InternalCleanUp();
         }
 
         public void ApperanceRefreshABreath(float breath)
@@ -344,10 +357,10 @@ namespace App.Shared.GameModules.Weapon
             RelatedFstAappearence.SightShift.SetAttachmentFactor(breath);
         }
 
-        public void ModelRefreshWeaponModel(int weaponId, EWeaponSlotType slot, WeaponPartsStruct attachments)
-        {
-        }
-
+        // public void ModelRefreshWeaponModel(int weaponId, EWeaponSlotType slot, WeaponPartsStruct attachments)
+        // {
+        // }
+        //
 
         public void ShowTip(ETipType tip)
         {
@@ -360,14 +373,12 @@ namespace App.Shared.GameModules.Weapon
             {
                 if (!entity.hasThrowingAction)
                     return false;
-                var pull = RelatedThrowAction.IsPull;
+                var pull    = RelatedThrowAction.IsPull;
                 var destroy = RelatedThrowAction.IsInterrupt;
                 //  DebugUtil.MyLog("destroy :" + destroy + " pull:" + pull, DebugUtil.DebugColor.Default);
                 return (!pull && !destroy);
             }
         }
-
-
 
         #endregion
     }

@@ -15,7 +15,7 @@ namespace App.Client.GameModules.Throwing
 
         protected override bool Filter(PlayerEntity playerEntity)
         {
-            return playerEntity.hasThrowingAction && null != playerEntity.throwingAction.ActionInfo &&
+            return playerEntity.hasThrowingAction && null != playerEntity.throwingAction.ActionData &&
                    _contexts.ui.uI != null;
         }
 
@@ -23,14 +23,14 @@ namespace App.Client.GameModules.Throwing
             {
                 var uidata = _contexts.ui.uI;
 
-                if (player.throwingAction.ActionInfo.ShowCountdownUI)
+                if (player.throwingAction.ActionData.ShowCountdownUI)
                 {
                     if (!_isShow)
                     {
                         _isShow = true;
 //                        adapter.SetCountDown(true, (float)player.throwingAction.ActionInfo.CountdownTime / 1000);
                         uidata.CountingDown = true;
-                        uidata.CountDownNum = (float) player.throwingAction.ActionInfo.CountdownTime / 1000;
+                        uidata.CountDownNum = (float) player.throwingAction.ActionData.CountdownTime / 1000;
                     }
                 }
                 else if (_isShow)
@@ -39,6 +39,7 @@ namespace App.Client.GameModules.Throwing
 //                    adapter.SetCountDown(false, 0);
                     uidata.CountingDown = false;
                     uidata.CountDownNum = 0;
+                    uidata.HaveCompletedCountDown = true;
                 }
             }
         }

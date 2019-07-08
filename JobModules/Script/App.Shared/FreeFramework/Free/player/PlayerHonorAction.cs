@@ -10,11 +10,12 @@ using com.wd.free.para.exp;
 using com.wd.free.util;
 using App.Server.GameModules.GamePlay.free.player;
 using App.Shared.GameModules.Player;
+using Core.Free;
 
 namespace gameplay.gamerule.free.player
 {
     [System.Serializable]
-    public class PlayerHonorAction : AbstractGameAction
+    public class PlayerHonorAction : AbstractGameAction, IRule
     {
         private const long serialVersionUID = 7354887359200319872L;
 
@@ -104,8 +105,13 @@ namespace gameplay.gamerule.free.player
             return Sharpen.Collections.ToArray(r, new PlayerHonorAction.PlayerHonor[0]);
         }
 
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerHonorAction;
+        }
+
         [System.Serializable]
-        public class PlayerHonor : IComparable<PlayerHonorAction.PlayerHonor>
+        public class PlayerHonor : IComparable<PlayerHonorAction.PlayerHonor>, IRule
         {
             private const long serialVersionUID = -3681162991562941760L;
 
@@ -148,7 +154,7 @@ namespace gameplay.gamerule.free.player
                 {
                     ids = new HashSet<int>();
                 }
-                if (con == null || (condition != null && condition.Contains(FreeUtil.VAR_START) && condition.Contains(FreeUtil.VAR_END)))
+                if (con == null || (condition != null && (condition.IndexOf(FreeUtil.VAR_START_CHAR) > -1) && (condition.IndexOf(FreeUtil.VAR_END_CHAR) > -1)))
                 {
                     if (!StringUtil.IsNullOrEmpty(condition))
                     {
@@ -213,6 +219,11 @@ namespace gameplay.gamerule.free.player
             public virtual int CompareTo(PlayerHonorAction.PlayerHonor arg0)
             {
                 return this.priority - arg0.priority;
+            }
+
+            public int GetRuleID()
+            {
+                return (int)ERuleIds.PlayerHonor;
             }
         }
 

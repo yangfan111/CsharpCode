@@ -3,12 +3,13 @@ using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.util;
 using Free.framework;
+using Core.Free;
 
 namespace gameplay.gamerule.free.ui.component
 {
 	[System.Serializable]
-	public class FreeTextComponet : AbstractFreeComponent
-	{
+	public class FreeTextComponet : AbstractFreeComponent, IRule
+    {
 		private const long serialVersionUID = -7699020163820046853L;
 
 		private string text;
@@ -137,5 +138,10 @@ namespace gameplay.gamerule.free.ui.component
 		{
 			this.multiLine = multiLine;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeTextComponet;
+        }
+    }
 }

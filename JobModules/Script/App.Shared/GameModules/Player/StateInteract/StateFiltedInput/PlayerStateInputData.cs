@@ -20,18 +20,27 @@ namespace App.Shared.GameModules.Player
         /// 状态类型对应的生效输入
         /// </summary>
         private HashSet<EPlayerInput> avaliableInputs;
+        private bool[] avaliableInputsContain;
 
         private List<EPlayerInput> unavaliableInputs = new List<EPlayerInput>();
 
         public PlayerStateInputData(EPlayerState state, HashSet<EPlayerInput> inputList)
         {
             ownedState = state;
+            avaliableInputsContain = new bool[(int)EPlayerInput.Length];
             avaliableInputs =
                 inputList ?? new HashSet<EPlayerInput>(CommonIntEnumEqualityComparer<EPlayerInput>.Instance);
             for (var e = EPlayerInput.None + 1; e < EPlayerInput.Length; e++)
             {
                 if (!avaliableInputs.Contains(e))
+                {
                     unavaliableInputs.Add(e);
+                    avaliableInputsContain[(int)e] = false;
+                }
+                else
+                {
+                    avaliableInputsContain[(int)e] = true;
+                }
             }
         }
 
@@ -41,22 +50,21 @@ namespace App.Shared.GameModules.Player
         /// <param name="BlockUnavaliableInputs"></param>
         public void BlockUnavaliableInputs(IFilteredInput filteredInput)
         {
-            unavaliableInputs.ForEach(
-                (input => {
+            for (int i = 0, maxi = unavaliableInputs.Count; i < maxi; i++) {
+                EPlayerInput input = unavaliableInputs[i];
 #if UNITY_EDITOR
-                    if(GlobalConst.EnableInputBlockLog && input == GlobalConst.serachedInput)
-                    {
-                        DebugUtil.MyLog("player state {0} block {1}", ownedState, input);
-                    }
+                if (GlobalConst.EnableInputBlockLog && input == GlobalConst.serachedInput)
+                {
+                    DebugUtil.MyLog("player state {0} block {1}", ownedState, input);
+                }
 #endif
-                    filteredInput.SetInput(input, false);
-                    }
-                ));
+                filteredInput.SetInput(input, false);
+            }
         }
 
         public bool IsInputEnabled(EPlayerInput input)
         {
-            return avaliableInputs.Contains(input);
+            return /*avaliableInputs.Contains(input)*/avaliableInputsContain[(int)input];
         }
 
         public bool IsState(EPlayerState State)

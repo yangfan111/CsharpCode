@@ -19,6 +19,7 @@ namespace App.Server.GameModules.SceneObject
             AddSystem(new ServerSceneObjectThrowingSystem(contexts.sceneObject, 
                 contexts.session.currentTimeObject,
                 contexts.session.commonSession.RuntimeGameConfig));
+            AddSystem(new SceneObjectLimitSystem(contexts));
 #if UNITY_EDITOR
         AddSystem(new ServerDebugSystem(contexts));
 #endif

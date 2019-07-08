@@ -4,6 +4,9 @@ using Object = UnityEngine.Object;
 
 namespace AssetBundleManager.Operation
 {
+    /// <summary>
+    /// SetAssetBundle(LoadedAssetBundle assetBundle) => process { LoadedAsset赋值}
+    /// </summary>
     abstract class AssetLoading : PollingOperation
     {
         public string BundleName { get; private set; }

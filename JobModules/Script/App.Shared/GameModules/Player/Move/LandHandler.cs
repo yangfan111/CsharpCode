@@ -5,14 +5,11 @@ using App.Shared.Player;
 using Core.CameraControl;
 using Core.CharacterController;
 using Core.Compare;
-using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using ECM.Components;
-using Poly2Tri;
 using UnityEngine;
 using Utils.Configuration;
 using Utils.Singleton;
-using Utils.Utils;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Player
@@ -250,10 +247,9 @@ namespace App.Shared.GameModules.Player
             _logger.DebugFormat("ground info:isOnGround:{0}, isValidGround:{1}, isinLedge:{2}, isOutLedge:{3}, isOnStep:{4},groundNormal:{5}, angle:{6}", SpeedCalculator.GroundInfo.isOnGround, SpeedCalculator.GroundInfo.isValidGround
             ,SpeedCalculator.GroundInfo.isOnLedgeSolidSide, SpeedCalculator.GroundInfo.isOnLedgeEmptySide, SpeedCalculator.GroundInfo.isOnStep, SpeedCalculator.GroundInfo.groundNormal, Vector3.Angle(Vector3.up, SpeedCalculator.GroundInfo.groundNormal));
             
-            // 一个人往地面上的半球跳跃时，碰撞结果都是CollisionFlags.Sides，因此isGrounded为false
-            // 1.如果Y轴分量大于0，则人物继续上升
-            // 2.如果人物不能在碰撞点站住，则会加速下滑
-            // 3.latestCollisionSlope < controller.slopeLimit条件一直不满足，角色一直下落，但是没有向下移动，可以认为CharacterController认为已经落地了,靠斜面下滑到latestCollisionSlope < controller.slopeLimit来最终落地
+            // 碰到地面的情况处理
+            // 1.还在下滑过程中，y速度继续向下降
+            // 2.在地面上，y速度降为0
             if (velocityY < 0 && controller.isGrounded)
             {
                 if ( SpeedCalculator.KeepSlide)
@@ -357,11 +353,20 @@ namespace App.Shared.GameModules.Player
             return CalcFinalSpeed(player);
         }
 
+        private RaycastHit hitInfo;
+
         private Vector3 CalcFinalSpeed(PlayerEntity player)
         {
             var scaledVel = CurrentVelocity;
             scaledVel.Scale(new Vector4(player.playerMove.MoveSpeedRatio, 1, player.playerMove.MoveSpeedRatio, 1));
-            return scaledVel + CurrentVelocityOffset;
+            var finalSpeed = scaledVel + CurrentVelocityOffset;
+
+            if (finalSpeed.magnitude > 0 && player.stateInterface.State.GetNextPostureState() != PostureInConfig.Jump && GroundInfo.isValidGround)
+            {
+                finalSpeed.y = -1000;
+            }
+
+            return finalSpeed;
         }
 
         /// <summary>

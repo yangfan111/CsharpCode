@@ -1,16 +1,15 @@
-﻿using UserInputManager.Lib;
-using Assets.XmlConfig;
-using Utils.Configuration;
+﻿using App.Client.CastObjectUtil;
 using App.Shared;
-using Core.Prediction.UserPrediction.Cmd;
-using App.Client.CastObjectUtil;
 using App.Shared.Components;
-using Core.Utils;
-using UnityEngine;
-using Assets.Utils.Configuration;
-using I2.Loc;
-using App.Shared.Player;
 using App.Shared.Util;
+using Assets.Utils.Configuration;
+using Assets.XmlConfig;
+using Core.Prediction.UserPrediction.Cmd;
+using Core.Utils;
+using I2.Loc;
+using UnityEngine;
+using UserInputManager.Lib;
+using Utils.Configuration;
 using Utils.Singleton;
 
 namespace App.Client.GameModules.Ui.Logic
@@ -78,6 +77,14 @@ namespace App.Client.GameModules.Ui.Logic
                 {
                     return;
                 }
+                if (player.hasGamePlay && !player.gamePlay.CanAutoPick())
+                {
+                    return;
+                }
+            }
+            else
+            {
+                return;
             }
             var itemId = SceneObjCastData.ItemId(_pointerData.IdList);
             var count = SceneObjCastData.Count(_pointerData.IdList);
@@ -89,7 +96,14 @@ namespace App.Client.GameModules.Ui.Logic
                     var itemCfg = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(itemId);
                     if(null != itemCfg)
                     {
-                        Tip = string.Format(ScriptLocalization.client_actiontip.pickandequip, itemCfg.Name);
+                        if (itemCfg.Type == (int) EWeaponType_Config.ThrowWeapon)
+                        {
+                            Tip = string.Format(ScriptLocalization.client_actiontip.pickup, itemCfg.Name, string.Format("({0})",count));
+                        }
+                        else
+                        {
+                            Tip = string.Format(ScriptLocalization.client_actiontip.pickandequip, itemCfg.Name);
+                        }
                     }
                     else
                     {

@@ -1,13 +1,11 @@
 ﻿
 
-using System;
-using System.Collections.Generic;
 using App.Shared.Components;
-using App.Shared.Components.Vehicle;
 using Core;
 using Core.Utils;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
-using Utils.Singleton;
 using XmlConfig;
 
 namespace App.Shared
@@ -18,7 +16,7 @@ namespace App.Shared
         static SharedConfig()
         {
 
-            CreateSnapshotThreadCount = LoginServerThreadCount = Environment.ProcessorCount;
+            CreateSnapshotThreadCount = LoginServerThreadCount = Environment.ProcessorCount>MaxThreadCount?MaxThreadCount:Environment.ProcessorCount;
 
         }
 #if UNITY_EDITOR
@@ -56,6 +54,8 @@ namespace App.Shared
 
         public static bool IsOffline;
 
+        public static bool ShowShootText = false;
+        public static bool CleanShowShootText ;
         public static bool IsMute = false;
 
         /**
@@ -81,10 +81,12 @@ namespace App.Shared
         public static int BulletLifeTime = 5000;
         public static int CreateSnapshotThreadCount = 8;
         public static int LoginServerThreadCount = 8;
+        public static int MaxThreadCount = 8;
 
         public static float MaxSaveDistance = 2;
         public static float MaxSaveAngle = 60;
-        public static int SaveNeedTime = 10000;
+        public static int ChickenSaveNeedTime = 10000;
+        public static int CommonSaveNeedTime = 3000;
 
         public static int CullingInterval = 2000;
         public static int CullingRange = 3000;
@@ -95,6 +97,7 @@ namespace App.Shared
         public static bool HaveFallDamage = true;
         public static bool InSamplingMode = false;
         public static bool InLegacySampleingMode = false;
+        public static bool needConfigLODTree = false;
         public static int ModeId = 1002;
 
         /// <summary>
@@ -107,7 +110,7 @@ namespace App.Shared
         public static bool DebugAnimation = false;
         public static bool EnableGpui = true;
 
-        public static bool EnableCustomOC = false;
+        public static bool EnableCustomOC = true;
 
         //大厅传过来的模式，加载需要提前知道
         public static int GameRule = GameRules.Offline;
@@ -122,6 +125,20 @@ namespace App.Shared
 
         public static bool ChangeRole = false;
         public static int ServerFrameRate = 20;
+
+        public static bool IgnoreProp = false;
+
+        public static bool RestoreMultiTag = true;
+
+        public static bool IsHXMod = false;
+        public static bool DisableRecycleSetramingGo = false;
+
+        public static bool GPUSort = false;
+#if HAVE_DEPTH_PREPASS
+        public static int GrassQueue = 1300;
+#else
+        public static int GrassQueue = -1;
+#endif
 
         public static UnityEngine.Vector3 GetPlayerBirthPosition(int entityId)
         {
@@ -174,6 +191,11 @@ namespace App.Shared
                 SharedConfig.InSamplingMode = true;
                 SharedConfig.DisableDoor = true;
             }
+
+            if(bootCmd.ContainsKey("ConfigLODTree"))
+            {
+                SharedConfig.needConfigLODTree = true;
+            }
 			
 	        if (bootCmd.ContainsKey("LegacySampleFps"))
             {
@@ -196,6 +218,11 @@ namespace App.Shared
                 DurationHelp.Debug = false;
             }
 
+            if (bootCmd.ContainsKey("DisableGPUI"))
+            {
+                EnableGpui = false;
+            }
+            
             if (bootCmd.ContainsKey("DisableGc"))
             {
                 SharedConfig.DisableGc = true;
@@ -207,6 +234,25 @@ namespace App.Shared
             if (bootCmd.ContainsKey("Token"))
             {
                 TestUtility.TestToken = bootCmd["Token"];
+            }
+
+            if (bootCmd.ContainsKey("RoleModelId"))
+            {
+                TestUtility.RoleModelId = int.Parse(bootCmd["RoleModelId"]);
+            }
+
+            if (bootCmd.ContainsKey("HXMod"))
+            {
+                SharedConfig.IsHXMod = true;
+            }
+
+            if (bootCmd.ContainsKey("IgnoreProp"))
+            {
+                SharedConfig.IgnoreProp = true;
+            }
+            if (bootCmd.ContainsKey("DisableRecycleSetramingGo"))
+            {
+                SharedConfig.DisableRecycleSetramingGo = true;
             }
            
         }

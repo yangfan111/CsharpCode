@@ -1,5 +1,4 @@
 ﻿using App.Shared.GameModules.Player;
-using App.Shared.Player;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using I2.Loc;
@@ -43,17 +42,12 @@ namespace App.Client.GameModules.Ui.Logic
                     hasTip = true;
                     break;
             }
-            if(PlayerInVehicle())
+            if(MyPlayerEntity.IsOnVehicle() || PlayerStateUtil.HasPlayerState(EPlayerGameState.CanDefuse, MyPlayerEntity.gamePlay))
             {
                 hasTip = true;
             }
+            
             return hasTip;
-        }
-
-        bool PlayerInVehicle()
-        {
-            var player = _playerContext.flagSelfEntity;
-            return player.IsOnVehicle();
         }
 
         private PlayerEntity MyPlayerEntity
@@ -76,14 +70,25 @@ namespace App.Client.GameModules.Ui.Logic
         {
             get
             {
+                var tip = "";
                 switch(_parachuteState)
                 {
                     case ParachuteState.WaitGlide:
-                        return ScriptLocalization.client_actiontip.airjump;
+                        tip = ScriptLocalization.client_actiontip.airjump;
+                        break;
                     case ParachuteState.WaitParachute:
-                        return ScriptLocalization.client_actiontip.openparachute;
+                        tip = ScriptLocalization.client_actiontip.openparachute;
+                        break;
                 }
-                return "";
+
+                if (string.IsNullOrEmpty(tip))
+                {
+                    if (PlayerStateUtil.HasPlayerState(EPlayerGameState.CanDefuse, MyPlayerEntity.gamePlay))
+                    {
+                        tip = "拆包";
+                    }
+                }
+                return tip;
             }
         }
 

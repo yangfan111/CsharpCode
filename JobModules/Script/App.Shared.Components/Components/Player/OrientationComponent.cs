@@ -12,9 +12,10 @@ using Entitas.CodeGeneration.Attributes;
 using UnityEngine;
 using Core;
 using Core.Components;
-using Core;
 using Core.UpdateLatest;
+using Core.Utils;
 using UnityEngine.Serialization;
+using Core.Free;
 
 namespace App.Shared.Components.Player
 {
@@ -23,7 +24,7 @@ namespace App.Shared.Components.Player
     [Player]
     [Serializable]
     
-    public class OrientationComponent : IComponent, IUserPredictionComponent, IPlaybackComponent, ICompensationComponent
+    public class OrientationComponent : IComponent, IUserPredictionComponent, IPlaybackComponent, ICompensationComponent, IRule
     {
         public int GetComponentId() { { return (int)EComponentIds.MoveOrientation; } }
 
@@ -32,23 +33,39 @@ namespace App.Shared.Components.Player
         // 理想状态是主动旋转按实际路径插值（即支持两个Snapshot超过PI的差值的正确插值）
         // 而人物在载具上既有主动旋转（鼠标移动），也有被动旋转（载具移动），区别主/被动进行插值较复杂
         private float _yaw;
-        [NetworkProperty] public float Yaw
+        [NetworkProperty(SyncFieldScale.Yaw)] public float Yaw
         {
-            get { return _yaw; }
+            get { return _yaw.FloatPrecision(3); }
             set { _yaw = YawPitchUtility.Normalize(value); }
         }
+        public float YawRound
+        {
+            get { return _yaw.FloatRoundPrecision(2); }
 
-        [NetworkProperty] public float Pitch;
-        [NetworkProperty] public float Roll;
-        [NetworkProperty] public float PunchYaw;
-        [NetworkProperty] public float PunchPitch;
+        }
+        public float PitchRound
+        {
+            get { return _pitch.FloatRoundPrecision(2); }
+
+        }
+
+   
+        private float _pitch;
+        [NetworkProperty(SyncFieldScale.Pitch)] public float Pitch
+        {
+            get { return _pitch.FloatPrecision(3); }
+            set { _pitch = value; }
+        }
+        [NetworkProperty(SyncFieldScale.Roll)] public float Roll;
+        [NetworkProperty(SyncFieldScale.Yaw)] public float PunchYaw;
+        [NetworkProperty(SyncFieldScale.Pitch)] public float PunchPitch;
         /// <summary>
         /// WeaponPunchYaw 为 NegPunchYaw的缩放，作用于角色
         /// </summary>
-        [FormerlySerializedAs("WeaponPunchYaw")] [NetworkProperty, DontInitilize] public float AccPunchYawValue;
-        [FormerlySerializedAs("WeaponPunchPitch")] [NetworkProperty, DontInitilize] public float AccPunchPitchValue;
-        [NetworkProperty, DontInitilize] public float ModelPitch;
-        [NetworkProperty, DontInitilize] public float ModelYaw;
+        [FormerlySerializedAs("WeaponPunchYaw")] [NetworkProperty(SyncFieldScale.Yaw), DontInitilize] public float AccPunchYawValue;
+        [FormerlySerializedAs("WeaponPunchPitch")] [NetworkProperty(SyncFieldScale.Pitch), DontInitilize] public float AccPunchPitchValue;
+        [NetworkProperty(SyncFieldScale.Pitch), DontInitilize] public float ModelPitch;
+        [NetworkProperty(SyncFieldScale.Yaw), DontInitilize] public float ModelYaw;
 
         [DontInitilize] public float FireRoll;
 
@@ -83,13 +100,13 @@ namespace App.Shared.Components.Player
             var r = right as OrientationComponent;
             if (r.AlwaysEqual || AlwaysEqual)
                 return true;
-            return CompareUtility.IsApproximatelyEqual(Yaw, r.Yaw)
-                   && CompareUtility.IsApproximatelyEqual(Pitch, r.Pitch)
-                   && CompareUtility.IsApproximatelyEqual(Roll, r.Roll)
-                   && CompareUtility.IsApproximatelyEqual(PunchYaw, r.PunchYaw)
-                   && CompareUtility.IsApproximatelyEqual(PunchPitch, r.PunchPitch)
-                   && CompareUtility.IsApproximatelyEqual(ModelPitch, r.ModelPitch)
-                   && CompareUtility.IsApproximatelyEqual(ModelYaw, r.ModelYaw);
+            return CompareUtility.IsApproximatelyEqual(Yaw, r.Yaw, 0.02f)
+                   && CompareUtility.IsApproximatelyEqual(Pitch, r.Pitch, 0.02f)
+                   && CompareUtility.IsApproximatelyEqual(Roll, r.Roll, 0.02f)
+                   && CompareUtility.IsApproximatelyEqual(PunchYaw, r.PunchYaw, 0.02f)
+                   && CompareUtility.IsApproximatelyEqual(PunchPitch, r.PunchPitch, 0.02f)
+                   && CompareUtility.IsApproximatelyEqual(ModelPitch, r.ModelPitch, 0.02f)
+                   && CompareUtility.IsApproximatelyEqual(ModelYaw, r.ModelYaw, 0.02f);
         }
         public bool IsInterpolateEveryFrame(){ return true; }
         public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
@@ -98,13 +115,13 @@ namespace App.Shared.Components.Player
             var r = right as OrientationComponent;
             var rotio = interpolationInfo.Ratio;
 
-            Yaw = ShortInterpolateAngle(l.Yaw, r.Yaw, rotio);
+            Yaw = InterpolateUtility.ShortInterpolate(l.Yaw, r.Yaw, interpolationInfo);
             Pitch = InterpolateUtility.Interpolate(l.Pitch, r.Pitch, rotio);
             Roll = InterpolateUtility.Interpolate(l.Roll, r.Roll, rotio);
             PunchYaw = InterpolateUtility.Interpolate(l.PunchYaw, r.PunchYaw, rotio);
             PunchPitch = InterpolateUtility.Interpolate(l.PunchPitch, r.PunchPitch, rotio);
-            ModelPitch = ShortInterpolateAngle(l.ModelPitch, r.ModelPitch, rotio);
-            ModelYaw = ShortInterpolateAngle(l.ModelYaw, r.ModelYaw, rotio);
+            ModelPitch = InterpolateUtility.ShortInterpolate(l.ModelPitch, r.ModelPitch, interpolationInfo);
+            ModelYaw = InterpolateUtility.ShortInterpolate(l.ModelYaw, r.ModelYaw, interpolationInfo);
         }
 
         /// <summary>
@@ -114,20 +131,6 @@ namespace App.Shared.Components.Player
         /// <param name="r"></param>
         /// <param name="rotio"></param>
         /// <returns></returns>
-        private float ShortInterpolateAngle(float l, float r, float rotio)
-        {
-            var ret = l;
-            if (Math.Abs(l - r) <= 180)
-                ret = InterpolateUtility.Interpolate(l, r, rotio);
-            else
-            {
-                ret = l < 0 ?
-                    InterpolateUtility.Interpolate(l, r - 360, rotio) :
-                    InterpolateUtility.Interpolate(l - 360, r, rotio);
-            }
-
-            return ret;
-        }
 
         public Quaternion ModelView
         {
@@ -160,6 +163,11 @@ namespace App.Shared.Components.Player
         {
             CopyFrom(rightComponent);
         }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.OrientationComponent;
+        }
     }
 
     [Player]
@@ -168,8 +176,8 @@ namespace App.Shared.Components.Player
     {
 
         [NetworkProperty] public bool LimitAngle;
-        [NetworkProperty, DontInitilize] public float LeftBound;
-        [NetworkProperty, DontInitilize] public float RightBound;
+        [NetworkProperty(720,-720,0.001f), DontInitilize] public float LeftBound;
+        [NetworkProperty(720,-720,0.001f), DontInitilize] public float RightBound;
         
         public void CopyFrom(object rightComponent)
         {

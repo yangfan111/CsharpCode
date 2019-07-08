@@ -9,7 +9,11 @@ namespace Core.Prediction.UserPrediction.Cmd
         Robot
 
     }
-
+    public enum EModeSwitch
+    {
+        Normal,
+        Bio,
+    }
     public interface IUserCmdOwnAdapter
     {
         float Yaw { get; }
@@ -24,5 +28,9 @@ namespace Core.Prediction.UserPrediction.Cmd
         void SetLastUserCmd(UserCmd userCmd);
         void SetUserCmd(Action<UserCmd> cb);
         void MockUserCmd(Action<UserCmd> cb);
+
+        void SwitchMode(EModeSwitch mode);
+
+        UserCmd GetUserCmd();
     }
 }

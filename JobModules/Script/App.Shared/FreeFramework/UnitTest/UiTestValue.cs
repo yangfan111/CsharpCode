@@ -7,11 +7,12 @@ using Assets.App.Server.GameModules.GamePlay.Free;
 using App.Server.GameModules.GamePlay.free.player;
 using Free.framework;
 using Core.Free;
+using com.wd.free.para;
 
 namespace App.Shared.FreeFramework.UnitTest
 {
     [Serializable]
-    public class UiTestValue : AbstractTestValue
+    public class UiTestValue : AbstractTestValue, IRule
     {
         public string ui;
 
@@ -39,6 +40,11 @@ namespace App.Shared.FreeFramework.UnitTest
             }
 
             return tv;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.UiTestValue;
         }
     }
 }

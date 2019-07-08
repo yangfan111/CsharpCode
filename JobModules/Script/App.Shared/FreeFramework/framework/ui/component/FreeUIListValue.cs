@@ -8,12 +8,13 @@ using com.wd.free.para;
 using com.wd.free.para.exp;
 using com.wd.free.util;
 using Free.framework;
+using Core.Free;
 
 namespace gameplay.gamerule.free.ui.component
 {
 	[System.Serializable]
-	public class FreeUIListValue : AbstractFreeUIValue
-	{
+	public class FreeUIListValue : AbstractFreeUIValue, IRule
+    {
 		private const long serialVersionUID = 5852438718279157187L;
 
 		private string sorts;
@@ -125,5 +126,10 @@ namespace gameplay.gamerule.free.ui.component
 
 		    return results.ToArray();
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeUIListValue;
+        }
+    }
 }

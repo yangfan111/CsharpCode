@@ -10,6 +10,7 @@ using App.Shared.Player;
 using App.Shared.SceneTriggerObject;
 using App.Shared.Util;
 using Core;
+using Core.EntityComponent;
 using Core.Enums;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
@@ -95,7 +96,8 @@ namespace App.Client.GameModules.Ui.Logic
 
             if (!dot.Equals(0))
             {
-                var mapObj = MapObjectUtility.GetMapObjByRawId(_doorObjId, (int) ETriggerObjectType.Door);
+//                var mapObj = MapObjectUtility.GetMapObjByRawId(_doorObjId, (int) ETriggerObjectType.Door);
+                var mapObj = _doorContext.GetEntityWithEntityKey(new EntityKey(_doorObjId, (int) EEntityType.MapObject));
                 if (mapObj == null)
                 {
                     Tip = ScriptLocalization.client_actiontip.opendoor;
@@ -103,10 +105,7 @@ namespace App.Client.GameModules.Ui.Logic
                 }
                 else
                 {
-                    var door = mapObj as MapObjectEntity;
-                    if (door == null)
-                        return;
-                    var state = door.doorData.State;
+                    var state = mapObj.doorData.State;
                     if (state == (int) DoorState.Closed)
                     {
                         Tip = ScriptLocalization.client_actiontip.opendoor;

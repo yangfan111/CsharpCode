@@ -1,28 +1,43 @@
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
 using App.Shared.GameModules.HitBox;
 using Core.Appearance;
 using Core.CharacterController;
-using Core.HitBox;
 using Core.Utils;
 using UnityEngine;
+using Utils.Appearance.Effects;
 using Utils.Configuration;
 using Utils.Singleton;
-using XmlConfig;
 
 namespace App.Shared.GameModules.Player.Appearance
 {
     public class CharacterControllerManager : ICharacterControllerAppearance
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CharacterController));
+        
+        private const string BlinkEyeScriptName = "BlinkEye";
+        private readonly List<Collider> _colliderList = new List<Collider>();
+        
+        private readonly CustomProfileInfo _subSetLayerInfo;
+        private readonly CustomProfileInfo _subCloseEyeInfo;
+        private readonly CustomProfileInfo _subOpenEyeInfo;
+        
         private GameObject _characterRoot;
         private ICharacterControllerContext _controller;
-        private Transform _attachedHead;
-        private static GameObject _thirdModel;
-        private readonly Regex _attachedHeadNameRegex = new Regex(@"FHead\d*\(Clone\)");
+        private GameObject _thirdModel;
+        
+        public CharacterControllerManager()
+        {
+            _subSetLayerInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("CharacterControllerManagerSetLayer");
+            _subCloseEyeInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("CharacterControllerManagerCloseEye");
+            _subOpenEyeInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("CharacterControllerManagerOpenEye");
+        }
         
         public void SetCharacterRoot(GameObject characterRoot)
         {
             _characterRoot = characterRoot;
+            if(null == _characterRoot) return;
+            _colliderList.Clear();
+            _characterRoot.GetComponentsInChildren(_colliderList);
         }
 
         public void SetThirdModel(GameObject model)
@@ -37,59 +52,50 @@ namespace App.Shared.GameModules.Player.Appearance
         
         public void PlayerDead(bool isSelf = true)
         {
-            SetLayer(_characterRoot, UnityLayerManager.GetLayerIndex(EUnityLayerName.NoCollisionWithEntity));
-            closeEye();
-            if (!isSelf)
-            {
-                _controller.enabled = false;
-            }
-
-            Logger.InfoFormat("PlayerDead :{0}", _characterRoot);
+            SetLayer(_thirdModel, UnityLayerManager.GetLayerIndex(EUnityLayerName.NoCollisionWithEntity));
+            CloseEye();
+            _controller.enabled = false;
+            Logger.InfoFormat("CharacterLog-- PlayerDead :{0}", _characterRoot);
         }
 
         public void PlayerReborn()
         {
-            SetLayer(_characterRoot, UnityLayerManager.GetLayerIndex(EUnityLayerName.Player));
-            openEye();
+            SetLayer(_thirdModel, UnityLayerManager.GetLayerIndex(EUnityLayerName.Player));
+            OpenEye();
             _controller.enabled = true;
             Logger.InfoFormat("PlayerReborn: {0}", _characterRoot);
         }
 
-        private void openEye()
+        private void OpenEye()
         {
-            if(_attachedHead==null)
-                return;
-            HandleOpenEye();
-        }
-
-        private void closeEye()
-        {
-            if (_attachedHead != null)
+            try
             {
-                HandleOpenEye();
-                return;
+                _subOpenEyeInfo.BeginProfileOnlyEnableProfile();
+                var script = EffectUtility.GetEffect(BlinkEyeScriptName);
+                if (script == null) return;
+                script.SetParam("Enable", true);
             }
-            var trans = _characterRoot.GetComponentsInChildren<Transform>(true);
-            foreach (var transform in trans)
-            {  
-                if (_attachedHeadNameRegex.IsMatch(transform.name))
-                {
-                    _attachedHead = transform;
-                    HandleCloseEye();
-                }
+            finally
+            {
+                _subOpenEyeInfo.EndProfileOnlyEnableProfile();
             }
-        }
-        
-        private void HandleCloseEye()
-        {
-            _attachedHead.SendMessage("PlayerDead");
         }
 
-        private void HandleOpenEye()
+        private void CloseEye()
         {
-            _attachedHead.SendMessage("PlayerRelive");
+            try
+            {
+                _subCloseEyeInfo.BeginProfileOnlyEnableProfile();
+                var script = EffectUtility.GetEffect(BlinkEyeScriptName);
+                if (script == null) return;
+                script.SetParam("Enable", false);
+            }
+            finally
+            {
+                _subCloseEyeInfo.EndProfileOnlyEnableProfile();
+            }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -218,13 +224,24 @@ namespace App.Shared.GameModules.Player.Appearance
             }
         }
         
-        private static void SetLayer(GameObject gameObject, int layer)
+        private void SetLayer(GameObject hitboxRoot, int layer)
         {
-            var hitBoxTransforms = HitBoxComponentUtility.GetHitBoxTransforms(_thirdModel);
-            foreach (var v in gameObject.GetComponentsInChildren<Transform>())
+            try
             {
-                if(!hitBoxTransforms.Contains(v))
-                    v.gameObject.layer = layer;
+                _subSetLayerInfo.BeginProfileOnlyEnableProfile();
+                var hitBoxTransforms = HitBoxComponentUtility.GetHitBoxTransforms(hitboxRoot);
+                Logger.InfoFormat("Hitbox_{0} Num:{1}", hitboxRoot, hitBoxTransforms.Count);
+                
+                foreach (var v in _colliderList)
+                {
+                    if(null == v) continue;
+                    if(!hitBoxTransforms.Contains(v.transform))
+                        v.gameObject.layer = layer;
+                }
+            }
+            finally
+            {
+                _subSetLayerInfo.EndProfileOnlyEnableProfile();
             }
         }
     }

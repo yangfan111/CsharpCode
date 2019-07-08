@@ -6,6 +6,7 @@ using Core.Configuration.Sound;
 using Core.Configuration.Terrains;
 using Core.SessionState;
 using Entitas;
+using Shared.Scripts.SceneManagement;
 using System.Collections.Generic;
 using Utils.AssetManager;
 using Utils.Configuration;
@@ -83,16 +84,20 @@ namespace App.Shared.GameModules.Configuration
             AddConfigSystem<GameModeConfigManager>(sessionState, "gamemode");
 
             AddConfigSystem<WeaponAvatarConfigManager>(sessionState, "weapon_avator");
-            AddConfigSystem<StreamingLevelStructure>(sessionState, "streaminglevel", "tablesfrombuilding");
-            AddConfigSystem<ScenesLightmapStructure>(sessionState, "AdditiveScene", "sceneslightmap_additivescene");
-            AddConfigSystem<ScenesIndoorCullStructure>(sessionState, "AdditiveScene", "scenesindoorcull_additivescene");
+            //TESTCODE
+            
+            //AddConfigSystem<StreamingLevelStructure>(sessionState, "Map002" + StreamingConfig.DataXMLName, "002" + StreamingConfig.StreamingDataABName);
+            //AddConfigSystem<ScenesLightmapStructure>(sessionState, "Map002" + StreamingConfig.LightXMLName, "002" + StreamingConfig.StreamingLightDataABName);
+            //AddConfigSystem<ScenesIndoorCullStructure>(sessionState, "Map002" + StreamingConfig.InDoorXMLName, "002" + StreamingConfig.StreamingInDoorABName);
+            
             AddConfigSystem<MapsDescription>(sessionState, "mapConfig");
             AddConfigSystem<AudioWeaponManager>(sessionState, "WeaponAudio");
             AddConfigSystem<AudioEventManager>(sessionState, "AudioEvent");
             AddConfigSystem<AudioGroupManager>(sessionState, "AudioGroup");
             if (!SettingManager.GetInstance().IsInitialized())
             {
-                AddConfigSystem<SettingManager>(sessionState, "setting");
+                AddConfigSystem<SettingConfigManager>(sessionState, "setting");
+                AddConfigSystem<SettingVideoConfigManager>(sessionState, "settingVideoPartial");
             }
 
             AddConfigSystem<VideoSettingConfigManager>(sessionState, "video_setting");

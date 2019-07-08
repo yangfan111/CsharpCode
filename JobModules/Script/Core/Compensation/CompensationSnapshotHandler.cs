@@ -9,8 +9,7 @@ namespace Core.Compensation
         private ISnapshot _snapshot;
         private IInterpolationInfo _interpolationInfo;
 
-        public CompensationSnapshotHandler(
-            IInterpolationInfo interpolationInfo)
+        public CompensationSnapshotHandler(IInterpolationInfo interpolationInfo)
         {
             _snapshot = Snapshot.Allocate();
             _interpolationInfo = interpolationInfo;

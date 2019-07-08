@@ -2,17 +2,18 @@
 using System.Collections;
 using System.Collections.Generic;
 
+
 namespace Utils.AssetManager
 {
     public struct AssetInfo
     {
         public static readonly AssetInfo EmptyInstance = new AssetInfo(string.Empty, string.Empty);
-            
+
         public class AssetInfoComparer : IEqualityComparer<AssetInfo>
         {
             public bool Equals(AssetInfo x, AssetInfo y)
             {
-                return string.Equals(x.AssetName, y.AssetName, System.StringComparison.Ordinal) 
+                return string.Equals(x.AssetName, y.AssetName, System.StringComparison.Ordinal)
                        && string.Equals(x.BundleName, y.BundleName, System.StringComparison.Ordinal);
             }
 
@@ -40,12 +41,12 @@ namespace Utils.AssetManager
             {
                 unchecked
                 {
-                    return ((obj.BundleName != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.BundleName) : 0) * 397) ^ 
+                    return ((obj.BundleName != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.BundleName) : 0) * 397) ^
                            (obj.AssetName != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.AssetName) : 0);
                 }
             }
 
-           
+
             public static readonly AssetInfoIngoreCaseComparer Instance = new AssetInfoIngoreCaseComparer();
         }
 
@@ -63,7 +64,6 @@ namespace Utils.AssetManager
         }
 
         public string BundleName;
-
         public string AssetName;
 
         public AssetInfo(string bundleName, string assetName)
@@ -74,7 +74,7 @@ namespace Utils.AssetManager
 
         public override string ToString()
         {
-            return "[" + BundleName + ":" + AssetName + "]";
+            return string.Format("[{0}:{1}]", BundleName, AssetName);
         }
 
         public static bool operator ==(AssetInfo left, AssetInfo right)
@@ -86,5 +86,11 @@ namespace Utils.AssetManager
         {
             return !left.Equals(right);
         }
+    }
+
+    public struct AssetInfoEx<T>
+    {
+        public AssetInfo asset;
+        public T data;
     }
 }

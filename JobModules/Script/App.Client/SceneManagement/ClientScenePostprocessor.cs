@@ -42,6 +42,7 @@ namespace App.Client.SceneManagement
                 
                 foreach (var v in go.GetComponentsInChildren<Camera>())
                 {
+                    if (v != Camera.main) continue;//非主相机不需要GQS_Bind_Camera
                     Type t = Type.GetType("ArtPlugins.GQS_Bind_Camera, Assembly-CSharp");
                     if (t != null)
                     {
@@ -58,9 +59,29 @@ namespace App.Client.SceneManagement
 //                        v.gameObject.AddComponent<AudioListener>();
 //                    }
                 }
+
+                InitCameraPostProcessEffect();
             }
         }
 
+
+        private void InitCameraPostProcessEffect()
+        {
+            //close SE Screen Space Shadow
+            var mainCam = Camera.main;
+            if (mainCam == null)
+            {
+                _logger.Error("Main Camera does not exist!");
+                return;
+            }
+
+            var sss = mainCam.GetComponent("SEScreenSpaceShadows") as MonoBehaviour;
+            if (sss != null)
+            {
+                sss.enabled = false;
+            }
+
+        }
         public void SceneUnloaded(Scene scene)
         {
             

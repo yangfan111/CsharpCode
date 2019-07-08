@@ -11,11 +11,12 @@ using com.wd.free.util;
 using gameplay.gamerule.free.action;
 using UnityEngine;
 using com.wd.free.debug;
+using Core.Free;
 
 namespace com.wd.free.action.function
 {
     [Serializable]
-    public class UseCommonAction : AbstractGameAction
+    public class UseCommonAction : AbstractGameAction, IRule
     {
         public String key;
         public List<ArgValue> values;
@@ -100,6 +101,11 @@ namespace com.wd.free.action.function
             {
                 return "call " + key;
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.UseCommonAction;
         }
     }
 }

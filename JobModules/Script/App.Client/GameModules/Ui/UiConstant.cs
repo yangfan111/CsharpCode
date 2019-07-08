@@ -51,6 +51,8 @@
         public const Layer paintWindowLayer = Layer.Env + 6;
         public const Layer paintWindowKeyBlockLayer = Layer.Env + 1;
         public const Layer paintWindowPointBlockLayer = Layer.Env + 1;
+
+        public const Layer recordWindowKeyBlockLayer = Layer.Env + 15;
     }
 
 }

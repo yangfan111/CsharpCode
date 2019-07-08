@@ -12,7 +12,7 @@ using Utils.Singleton;
 
 namespace Core.Compensation
 {
-    public class CompensationWorld : BaseRefCounter, ICompensationWorld
+    public class CompensationWorld : BaseRefCounter
     {
         public static CompensationWorld Allocate()
         {
@@ -34,11 +34,17 @@ namespace Core.Compensation
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CompensationWorld));
         private IGameEntity[] _entities;
         private List<bool> _updateAndEnabled = new List<bool>();
+        /*
+         IHitBoxEntityManager hitBoxEntityManager = new HitBoxEntityManager(contexts, false);==>SubManager容器
+        ISnapshotEntityMapFilter snapshotEntityMapFilter = Substitute.For<ISnapshotEntityMapFilter>();
+        hitboxHandler = Substitute.For<IHitBoxEntityManager>();
+        */
         private IHitBoxEntityManager _hitboxHandler;
         private int _serverTime;
         private EntityMap _entityMap;
 
         private CustomProfileInfo _enableHitBox;
+
         private CompensationWorld()
         {
         }
@@ -47,9 +53,10 @@ namespace Core.Compensation
         {
             if (_enableHitBox == null)
             {
-                _enableHitBox=SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("CompensationWorld_enableHitBox");
+                _enableHitBox = SingletonManager.Get<DurationHelp>()
+                    .GetCustomProfileInfo("CompensationWorld_enableHitBox");
             }
-         
+
             _entityMap = entityMap;
             _entityMap.AcquireReference();
             _serverTime = serverTime;
@@ -70,8 +77,11 @@ namespace Core.Compensation
         }
 
         public EntityKey Self { get; set; }
+        /// <summary>
+        /// ownerEntity.playerHitMaskController.HitMaskController.BulletExcludeTargetList
+        /// </summary>
         public List<int> ExcludePlayerList { get; set; }
-        
+
         public bool BoxCast(BoxInfo box, out RaycastHit hitInfo, int hitboxLayerMask)
         {
             for (int i = 0; i < _entities.Length; i++)
@@ -86,13 +96,13 @@ namespace Core.Compensation
                 {
                     continue;
                 }
-                
+
                 if (entity.EntityKey == Self)
                 {
                     _hitboxHandler.EnableHitBox(entity, false);
                     continue;
                 }
-                
+
                 if (entity.EntityType == Self.EntityType && ExcludePlayerList.Contains(entity.EntityId))
                 {
                     _hitboxHandler.EnableHitBox(entity, false);
@@ -113,7 +123,8 @@ namespace Core.Compensation
                             {
                                 _enableHitBox.BeginProfileOnlyEnableProfile();
                                 _hitboxHandler.EnableHitBox(entity, true);
-                                _hitboxHandler.UpdateHitBox(entity);
+                                _hitboxHandler.UpdateHitBox(entity, _serverTime, 0);
+
                                 _hitboxHandler.DrawHitBoxOnBullet(entity);
                                 _updateAndEnabled[i] = true;
                             }
@@ -121,7 +132,6 @@ namespace Core.Compensation
                             {
                                 _enableHitBox.EndProfileOnlyEnableProfile();
                             }
-                           
                         }
                     }
                     else
@@ -134,12 +144,17 @@ namespace Core.Compensation
 
             return _hitboxHandler.BoxCast(box, out hitInfo, hitboxLayerMask);
         }
-        
-        public bool Raycast(RaySegment ray, out RaycastHit hitInfo, int hitboxLayerMask)
+
+    
+
+        public bool Raycast(RaySegment ray, out RaycastHit hitInfo, int hitboxLayerMask, int cmdSeq)
         {
+     
+       
             for (int i = 0; i < _entities.Length; i++)
             {
                 IGameEntity entity = _entities[i];
+           
                 if (!entity.IsCompensation)
                     continue;
                 if (!entity.HasComponent<PositionComponent>())
@@ -152,42 +167,77 @@ namespace Core.Compensation
                     _hitboxHandler.EnableHitBox(entity, false);
                     continue;
                 }
-                
+
                 if (entity.EntityType == Self.EntityType && ExcludePlayerList.Contains(entity.EntityId))
                 {
                     _hitboxHandler.EnableHitBox(entity, false);
                     continue;
                 }
-                
+
+                bool isLineInPoint = false;
+
                 if (!_updateAndEnabled[i]) // 同一个serverTime，hitbox只需要计算一次
                 {
                     Vector3 position;
                     float radius;
+                    //获取当前物体逻辑层位置信息（非transform）
                     if (_hitboxHandler.GetPositionAndRadius(entity, out position, out radius))
                     {
-                        if (IsLineInPointRadius(ray.Ray.origin, ray.Ray.GetPoint(ray.Length), position, radius))
+                        //当前Ray行动轨迹是否打在Radius上,圆形碰撞检测
+                         isLineInPoint = (IsLineInPointRadius(ray.Ray.origin, ray.Ray.GetPoint(ray.Length),
+                            position, radius));
+                        if (isLineInPoint)
                         {
                             try
                             {
                                 _enableHitBox.BeginProfileOnlyEnableProfile();
+                                //开启collider和Rigidbody
                                 _hitboxHandler.EnableHitBox(entity, true);
-                                _hitboxHandler.UpdateHitBox(entity);
+                                //更新碰撞组件及物体实际位置信息
+                                _hitboxHandler.UpdateHitBox(entity, _serverTime, cmdSeq);
                                 _hitboxHandler.DrawHitBoxOnBullet(entity);
                                 _updateAndEnabled[i] = true;
-                                
                             }
                             finally
                             {
                                 _enableHitBox.EndProfileOnlyEnableProfile();
                             }
                         }
+
+                        // DebugUtil.AppendShootText(cmdSeq,
+                        //     "[Inspect]Ray:{0},target player postion:{1},radius:{2},isLineInPoint:{3}", ray.Ray, position, radius,
+                        //     isLineInPoint);
                     }
                     else
                     {
                         _updateAndEnabled[i] = true;
-                        Logger.ErrorFormat("{0} Is Not Exist any more", entity.EntityKey);
+                        //   Logger.ErrorFormat("{0} Is Not Exist any more", entity.EntityKey);
+                        Logger.ErrorFormat("[Hit{0}]GetPositionAndRadius Expection", cmdSeq);
                     }
                 }
+                else
+                {
+                    Vector3 position;
+                    float radius;
+                    if (_hitboxHandler.GetPositionAndRadius(entity, out position, out radius))
+                    {
+                        //当前Ray行动轨迹是否打在Radius上
+                         isLineInPoint = (IsLineInPointRadius(ray.Ray.origin, ray.Ray.GetPoint(ray.Length),
+                            position, radius));
+                        if (isLineInPoint)
+                        {
+                            _hitboxHandler.EnableHitBox(entity, true);
+                        }
+                    }
+                    else
+                    {
+                        _updateAndEnabled[i] = true;
+                        //   Logger.ErrorFormat("{0} Is Not Exist any more", entity.EntityKey);
+                        Logger.ErrorFormat("[Hit{0}]GetPositionAndRadius Expection", cmdSeq);
+                    }
+                }
+
+               
             }
 
             return _hitboxHandler.Raycast(ray.Ray, out hitInfo, ray.Length, hitboxLayerMask);
@@ -203,8 +253,8 @@ namespace Core.Compensation
             float radiusSqr = radius * radius;
             float vec1Sqr = (point - lineStart).sqrMagnitude;
             float vec2Sqr = (point - lineEnd).sqrMagnitude;
-            float vecLineSqr = (lineEnd - lineStart).sqrMagnitude;
-            if (vec1Sqr < radiusSqr || vec2Sqr < radiusSqr)//两个点有一个在圆内
+            //    float vecLineSqr = (lineEnd - lineStart).sqrMagnitude;
+            if (vec1Sqr < radiusSqr || vec2Sqr < radiusSqr) //两个点有一个在圆内
             {
                 return true;
             }
@@ -285,11 +335,28 @@ namespace Core.Compensation
             Logger.ErrorFormat("no entity with key {0}", key);
             return false;
         }
-
+        //帧尾做还原
         public void Release()
         {
+            for (int i = 0; i < _entities.Length; i++)
+            {
+                IGameEntity entity = _entities[i];
+                if (!entity.IsCompensation)
+                    continue;
+                if (!entity.HasComponent<PositionComponent>())
+                {
+                    continue;
+                }
+
+                if (_updateAndEnabled[i])
+                {
+                    _hitboxHandler.RecoverHitBox(entity, -1);
+                    _updateAndEnabled[i] = false;
+                }
+
+            }
+
             ReleaseReference();
-           
         }
     }
 }

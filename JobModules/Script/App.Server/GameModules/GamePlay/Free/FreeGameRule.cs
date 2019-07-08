@@ -6,7 +6,7 @@ using App.Shared.Components.Player;
 using App.Shared.FreeFramework.framework.buf;
 using App.Shared.FreeFramework.framework.trigger;
 using App.Shared.FreeFramework.Free.player;
-using App.Shared.GameModules.Bullet;
+using App.Shared.GameModules.Attack;
 using App.Shared.GameModules.Player;
 using App.Shared.Util;
 using Assets.App.Server.GameModules.GamePlay.Free;
@@ -26,7 +26,7 @@ using WeaponConfigNs;
 
 namespace App.Server.GameModules.GamePlay
 {
-    public class FreeGameRule : IGameRule, IParable
+    public class FreeGameRule : IGameRule, IParable, IRule
     {
 
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(FreeGameRule));
@@ -50,6 +50,9 @@ namespace App.Server.GameModules.GamePlay
 
         private bool serverGameOver;
         private bool serverGameExit;
+
+        private long gameStartTime;
+        private long gameEndTime;
 
         public ServerRoom Room;
 
@@ -169,6 +172,16 @@ namespace App.Server.GameModules.GamePlay
             get { return serverGameExit; }
             set { serverGameExit = value; }
 
+        }
+
+        public long GameStartTime{
+            get { return gameStartTime; }
+            set { gameStartTime = value; }
+        }
+
+        public long GameEndTime { 
+            get { return gameEndTime; }
+            set { gameEndTime = value; }
         }
 
         private FloatPara damagePara;
@@ -304,6 +317,7 @@ namespace App.Server.GameModules.GamePlay
 
         public void GameStart(Contexts room)
         {
+            _logger.Info("Game Rule Start");
             this.startTime = Runtime.CurrentTimeMillis();
 
             this.serverTime = 0;
@@ -333,7 +347,7 @@ namespace App.Server.GameModules.GamePlay
 
                 args.FreeContext.Bufs.Eat(player, args);
 
-                freeData.freeInventory.UsingItem(args);
+                freeData.freeInventory.UsingItem(args, freeData);
 
                 //freeData.GetUnitSkill().Frame(args);
 
@@ -395,12 +409,27 @@ namespace App.Server.GameModules.GamePlay
             }
         }
 
-        //TODO 找到调用的位置，确认逻辑行为
-        public void HandleWeaponState(Contexts contexts, PlayerEntity player)
+        public void HandleWeaponState(Contexts contexts, PlayerEntity player, int weaponId)
         {
-            if (!this.args.Triggers.IsEmpty(FreeTriggerConstant.WEAPON_STATE))
+            if (!args.Triggers.IsEmpty(FreeTriggerConstant.WEAPON_STATE))
             {
                 SimpleParaList dama = new SimpleParaList();
+                dama.AddFields(new ObjectFields(player));
+                /*var weaponData = player.WeaponController().HeldWeaponAgent.ComponentScan;
+                if (!weaponData.IsSafeVailed)
+                    return;
+                dama.AddPara(new IntPara("CarryClip", player.WeaponController().GetReservedBullet()));
+                dama.AddPara(new IntPara("Clip", weaponData.Bullet));
+                var config = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(weaponData.ConfigId);
+                dama.AddPara(new IntPara("ClipType", null == config ? 0 : config.Caliber));*/
+                dama.AddPara(new IntPara("id", weaponId));
+                SimpleParable sp = new SimpleParable(dama);
+                args.TempUse("state", sp);
+                args.TempUse("current", (FreeData)player.freeData.FreeData);
+                args.Trigger(FreeTriggerConstant.WEAPON_STATE, new TempUnit("state", sp), new TempUnit("current", (FreeData)(player).freeData.FreeData) );
+                args.Resume("state");
+                args.Resume("current");
+                /*SimpleParaList dama = new SimpleParaList();
                 //dama.AddFields(new ObjectFields(state));
                 //dama.AddPara(new IntPara("CarryClip", state.ReservedBulletCount));
                 //dama.AddPara(new IntPara("Clip", state.LoadedBulletCount));
@@ -413,7 +442,7 @@ namespace App.Server.GameModules.GamePlay
                 this.args.Triggers.Trigger(FreeTriggerConstant.WEAPON_STATE, args);
 
                 args.Resume("state");
-                args.Resume("current");
+                args.Resume("current");*/
             }
         }
 
@@ -432,6 +461,11 @@ namespace App.Server.GameModules.GamePlay
                 args.Resume("weapon");
                 args.Resume("current");
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeGameRule;
         }
     }
 }

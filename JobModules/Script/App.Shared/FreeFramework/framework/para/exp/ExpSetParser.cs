@@ -27,9 +27,10 @@ namespace com.wd.free.para.exp
 
 		public static IPara GetReplaceValue(string exp, IEventArgs args)
 		{
-			foreach (IExpReplacer replacer in replacers)
-			{
-				if (replacer.CanHandle(exp, args))
+            for (int i = 0, maxi = replacers.Count; i < maxi; i++)
+            {
+                IExpReplacer replacer = replacers[i];
+                if (replacer.CanHandle(exp, args))
 				{
 					return replacer.Replace(exp, args);
 				}

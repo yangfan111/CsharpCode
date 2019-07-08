@@ -1,11 +1,5 @@
 ﻿using App.Shared.Components;
-using Core.Appearance;
 using Core.GameModule.Interface;
-using Entitas;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Utils.Appearance;
 
 namespace Assets.App.Client.GameModules.GamePlay.Free.Entitas
@@ -39,7 +33,6 @@ namespace Assets.App.Client.GameModules.GamePlay.Free.Entitas
                         AppearanceUtils.EnableRender(player.thirdPersonModel.Value);
                         player.gamePlay.ClientState = GameState.Normal;
                     }
-                    
                 }
             }
         }

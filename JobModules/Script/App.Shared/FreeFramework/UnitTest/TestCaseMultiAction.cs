@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using com.wd.free.@event;
 using com.wd.free.trigger;
+using Core.Free;
 
 namespace App.Shared.FreeFramework.UnitTest
 {
     [Serializable]
-    public class TestCaseMultiAction : AbstractTestCaseAction
+    public class TestCaseMultiAction : AbstractTestCaseAction, IRule
     {
         private Dictionary<string, List<TestValue>> dic = new Dictionary<string, List<TestValue>>();
 
@@ -44,6 +45,11 @@ namespace App.Shared.FreeFramework.UnitTest
 
                 args.Resume(UnitTestConstant.Tester);
             }
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.TestCaseMultiAction;
         }
 
         public void Record(IEventArgs args)

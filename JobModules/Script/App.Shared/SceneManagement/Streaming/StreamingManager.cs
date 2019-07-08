@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using App.Shared.Configuration;
+using App.Shared.DebugHandle;
 using App.Shared.SceneTriggerObject;
 using ArtPlugins;
 using Core.Components;
@@ -9,6 +11,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Utils.AssetManager;
 using Utils.Singleton;
+using XmlConfig;
 
 namespace App.Shared.SceneManagement.Streaming
 {
@@ -27,8 +30,8 @@ namespace App.Shared.SceneManagement.Streaming
 
         private readonly ISceneResourceRequestHandler _requestHandler;
         private readonly StreamingData _sceneDescription;
-        private readonly ScenesLightmapData.MeshRecords _scenesLightmapRecords;
-        private readonly ScenesIndoorCullData.IndoorCullRecords _scenesIndoorCullRecords;
+        private readonly MeshRecords _scenesLightmapRecords;
+        private readonly IndoorCullRecords _scenesIndoorCullRecords;
 
         private readonly Dictionary<string, int> _sceneIndex = new Dictionary<string, int>();
 
@@ -45,8 +48,9 @@ namespace App.Shared.SceneManagement.Streaming
 
         private readonly Queue<LoadingGo> _goRequestQueue = new Queue<LoadingGo>();
         private readonly Queue<AssetInfo> _sceneRequestQueue = new Queue<AssetInfo>();
-        private readonly Dictionary<AssetInfo, Queue<LoadingGo>> _loadingGoes = new Dictionary<AssetInfo, Queue<LoadingGo>>();
+        private readonly Queue<IEnumerable<AssetInfoEx<MeshRenderer>>> _lightmapsRequestQueue = new Queue<IEnumerable<AssetInfoEx<MeshRenderer>>>();
 
+        private readonly Dictionary<AssetInfo, Queue<LoadingGo>> _loadingGoes = new Dictionary<AssetInfo, Queue<LoadingGo>>();
         private readonly Dictionary<string, Queue<UnityObject>> _toBeDestroyedGo = new Dictionary<string, Queue<UnityObject>>();
         private readonly Dictionary<string, Queue<UnityObject>> _unloadingScene = new Dictionary<string, Queue<UnityObject>>();
         private TriggerObjectManager _triggerObjectManager;
@@ -54,8 +58,8 @@ namespace App.Shared.SceneManagement.Streaming
         public StreamingManager(ISceneResourceRequestHandler requestHandler,
                                 IStreamingGoManager streamingGo,
                                 StreamingData sceneDescription,
-                                ScenesLightmapData.MeshRecords scenesLightmapRecords,
-                                ScenesIndoorCullData.IndoorCullRecords scenesIndoorCullRecords,
+                                MeshRecords scenesLightmapRecords,
+                                IndoorCullRecords scenesIndoorCullRecords,
                                 WorldCompositionParam param,
                                 int preloadSceneCount)
         {
@@ -81,6 +85,8 @@ namespace App.Shared.SceneManagement.Streaming
             _requestHandler.SceneUnloaded += SceneUnloaded;
             _requestHandler.GoLoaded += GoLoaded;
             _requestHandler.GoUnloaded += GoUnloaded;
+            _requestHandler.LightmapLoaded += LightmapsLoaded;
+            _requestHandler.LightmapUnloaded += LightmapsUnloaded;
         }
 
         #region ISceneResourceManager
@@ -153,6 +159,16 @@ namespace App.Shared.SceneManagement.Streaming
             }
         }
 
+        public void LoadLightmaps(IEnumerable<AssetInfoEx<MeshRenderer>> infos)
+        {
+            _lightmapsRequestQueue.Enqueue(infos);
+            RequestForLoad();
+        }
+
+        public void UnloadLightmaps(IEnumerable<UnityObject> uObjs)
+        {
+            throw new System.NotImplementedException("not implement UnloadLightmaps");
+        }
         #endregion
 
         private bool EnoughRoom()
@@ -179,6 +195,12 @@ namespace App.Shared.SceneManagement.Streaming
                     _loadingGoes.Add(loadingGo.Addr, new Queue<LoadingGo>(16));
 
                 _loadingGoes[loadingGo.Addr].Enqueue(loadingGo);
+            }
+
+            while (EnoughRoom() && _lightmapsRequestQueue.Count > 0)
+            {
+                _requestHandler.AddLoadLightmapsRequest(_lightmapsRequestQueue.Dequeue());
+                ++_concurrentCount;
             }
         }
 
@@ -269,7 +291,15 @@ namespace App.Shared.SceneManagement.Streaming
                     var multiTag = go.GetComponent<MultiTagBase>();
                     if (multiTag != null)
                     {
-                        multiTag.renderId = data.RenderId;
+                        multiTag.renderId = data.RenderId;                      
+                        multiTag.sceneName = data.SceneName;
+                        if (SharedConfig.RestoreMultiTag)
+                        {
+                            for (int i = 0; i < (int)MultiTagBase.TagEnum.Max; ++i)
+                            {
+                                multiTag.btags[i] = ((data.SceneTag) & (1 << i)) != 0;
+                            }
+                        }
                     }
 
                     if (!loadedGoes.ContainsKey(data.Id)) loadedGoes.Add(data.Id, go);
@@ -277,34 +307,10 @@ namespace App.Shared.SceneManagement.Streaming
                     if (!SharedConfig.IsServer)
                     {
                         // 烘焙贴图数据的复原
-                        var mrs = go.GetComponentsInChildren<MeshRenderer>();
-                        foreach (MeshRenderer mr in mrs)
-                        {
-                            if (mr != null)
-                            {
-                                Transform tr = mr.transform;
-                                string pos = tr.position.WorldPosition().ToString("F4");
-                                string identify = string.Format("{0}|{1}", tr.name, pos);
-                                ScenesLightmapData.MeshRecord record;
-                                _scenesLightmapRecords.recordsDict.TryGetValue(identify, out record);
-                                if (record != null)
-                                {
-                                    mr.lightmapScaleOffset = record.lightMapScaleOffset;
-
-                                    // request lightmap to apply
-                                    LevelManager levelManager = _requestHandler as LevelManager;
-                                    if (levelManager != null)
-                                    {
-                                        List<AssetInfo> infos = new List<AssetInfo> { new AssetInfo(record.bundleName, record.colorMapAssetName) };
-                                        if (!string.IsNullOrEmpty(record.dirMapAssetName)) infos.Add(new AssetInfo(record.bundleName, record.dirMapAssetName));
-                                        levelManager.assetManager.LoadAssetsAsync(mr, infos, LightmapLoaded);
-                                    }
-                                }
-                            }
-                        }
+                        TryApplyLightmaps(data.Id);
 
                         // 室内灯光剔除组件的应用
-                        ScenesIndoorCullData.IndoorCullRecord indoorCullRecord;
+                        IndoorCullRecord indoorCullRecord;
                         _scenesIndoorCullRecords.recordsDict.TryGetValue(data.Id, out indoorCullRecord);
                         if (indoorCullRecord != null)
                         {
@@ -319,11 +325,80 @@ namespace App.Shared.SceneManagement.Streaming
                             cull.SetGetLightsFunc(GetLights);
                             cull.SetGetRefProbesFunc(GetReflectionProbes);
                         }
+
+                        if(hideImportObject)
+                        {
+                            checkObjectVisible(go, data);
+                        }
+                       
+                        
                     }
                     RequestForLoad();
                 }
             }
         }
+
+        bool hideImportObject = true;
+
+        Dictionary<string, int> qualitDic = new Dictionary<string, int>();
+        void checkObjectVisible(GameObject obj, StreamingObject data)
+        {
+            string qualityName = GameSettingUtility.GetQualityName();
+            var allMaps = SingletonManager.Get<MapsDescription>();
+            if (allMaps.CurrentLevelType != LevelType.BigMap)
+            {
+                return;
+            }
+            MultiTagBase mul = obj.GetComponent<MultiTagBase>();
+            if (mul == null)
+            {
+                return;
+            }
+
+            if (mul.btags[(int)MultiTagBase.TagEnum.House])
+            {
+                return;
+            }
+
+            mul.importantLevel = data.importantLevel;
+            SceneConfig config = allMaps.BigMapParameters;
+            if(config.PreMapName != "004")
+            {
+                return;
+            }
+            
+
+           
+            int level = 0;
+            //TEST Code
+            /*
+            int level = 0;
+            if(qualitDic.Count <= 0)
+            {
+                qualitDic.Add("QL_Low", 0);
+                qualitDic.Add("QL_MediumLow", 1);
+                qualitDic.Add("QL_Medium", 2);
+                qualitDic.Add("QL_MediumHigh", 3);
+                qualitDic.Add("QL_High", 4);
+            }
+
+            if(!qualitDic.ContainsKey(qualityName))
+            {
+                return;
+            }
+
+            level = qualitDic[qualityName];
+            */
+            if(mul.importantLevel <= level)
+            {
+                obj.SetActive(true);
+            }
+            else
+            {
+                obj.SetActive(false);
+            }
+        }
+
 
         private void GoUnloaded(UnityObject unityObj)
         {
@@ -336,34 +411,79 @@ namespace App.Shared.SceneManagement.Streaming
             _triggerObjectManager.OnMapObjUnloaded(unityObj);
         }
 
-        private void LightmapLoaded(MeshRenderer mr, IEnumerable<UnityObject> uObjs)
+        private void LightmapsLoaded(MeshRenderer mr, IEnumerable<UnityObject> uObjs)
         {
-            if (mr != null)
-            {
-                int count = 0;
-                var iterator = uObjs.GetEnumerator();
-                Texture2D colorMap = null, dirMap = null;
-                while (iterator.MoveNext())
-                {
-                    Texture2D tex = iterator.Current.As<Texture2D>();
-                    if (count == 0) colorMap = tex;
-                    else if (count == 1) dirMap = tex;
-                    ++count;
-                }
-                int index = GetLightmapIndex(colorMap, dirMap);
-                if (index != -1)
-                {
-                    mr.lightmapIndex = index;
+            --_concurrentCount;
+            RequestForLoad();
 
-                    var refs = mr.transform.parent.GetComponentsInChildren<global::Shared.Scripts.ScenesLightmaps.LightmapRefLod>();
-                    for (int i = 0; i < refs.Length; i++)
+            if (mr == null) return;
+
+            int count = 0;
+            var iterator = uObjs.GetEnumerator();
+            Texture2D colorMap = null, dirMap = null;
+            while (iterator.MoveNext())
+            {
+                Texture2D tex = iterator.Current.As<Texture2D>();
+                if (count == 0) colorMap = tex;
+                else if (count == 1) dirMap = tex;
+                ++count;
+            }
+            int index = GetLightmapIndex(colorMap, dirMap);
+            if (index == -1) return;
+
+            mr.lightmapIndex = index;
+
+            // lod烘焙的继承
+            var refs = mr.transform.parent.GetComponentsInChildren<global::Shared.Scripts.ScenesLightmaps.LightmapRefLod>();
+            for (int i = 0; i < refs.Length; i++)
+            {
+                var @ref = refs[i];
+                if (@ref != null) @ref.Apply();
+            }
+        }
+
+        private void LightmapsUnloaded(IEnumerable<UnityObject> uObjs)
+        {
+            throw new System.NotImplementedException("not implement LightmapsUnloaded");
+        }
+
+        private void TryApplyLightmaps(int id)
+        {
+            var meshRecords = _scenesLightmapRecords.GetMeshRecords(id);
+            if (meshRecords == null) return;
+
+            GameObject go = null;
+            if (!loadedGoes.TryGetValue(id, out go) || go == null) return;
+
+            int num = meshRecords.Count;
+            for (int i = 0; i < num; i++)
+            {
+                var record = meshRecords[i];
+                if (record != null && record.siblingIndex < go.transform.childCount)
+                {
+                    Transform child = go.transform.GetChild(record.siblingIndex);
+                    MeshRenderer mr = child.GetComponent<MeshRenderer>();
+                    if (mr == null) continue;
+
+                    mr.lightmapScaleOffset = record.lightMapScaleOffset;
+
+                    // request load lightmaps to apply 
+                    List<AssetInfoEx<MeshRenderer>> infos = new List<AssetInfoEx<MeshRenderer>>();
+                    if (!string.IsNullOrEmpty(record.colorMapAssetName))
                     {
-                        var @ref = refs[i];
-                        if (@ref != null)
-                        {
-                            @ref.Apply();
-                        }
+                        AssetInfoEx<MeshRenderer> info = new AssetInfoEx<MeshRenderer>();
+                        info.asset = new AssetInfo(record.bundleName, record.colorMapAssetName);
+                        info.data = mr;
+                        infos.Add(info);
                     }
+                    if (!string.IsNullOrEmpty(record.dirMapAssetName))
+                    {
+                        AssetInfoEx<MeshRenderer> info = new AssetInfoEx<MeshRenderer>();
+                        info.asset = new AssetInfo(record.bundleName, record.dirMapAssetName);
+                        info.data = mr;
+                        infos.Add(info);
+                    }
+                    LoadLightmaps(infos);
                 }
             }
         }

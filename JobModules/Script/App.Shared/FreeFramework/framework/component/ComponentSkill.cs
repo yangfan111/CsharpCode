@@ -1,11 +1,12 @@
 using Sharpen;
 using com.wd.free.skill;
+using Core.Free;
 
 namespace gameplay.gamerule.free.component
 {
 	[System.Serializable]
-	public class ComponentSkill : AbstractSkill, IComponentable
-	{
+	public class ComponentSkill : AbstractSkill, IComponentable, IRule
+    {
 		private const long serialVersionUID = 5028515268481970234L;
 
 		private string name;
@@ -61,5 +62,10 @@ namespace gameplay.gamerule.free.component
 		{
 			this.desc = desc;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ComponentSkill;
+        }
+    }
 }

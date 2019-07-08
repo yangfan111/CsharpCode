@@ -75,15 +75,19 @@ namespace Assets.Sources.Free.UI
 
             Contexts contexts = SingletonManager.Get<FreeUiManager>().Contexts1;
             var ui = contexts.ui.uI;
-            ui.ChickenBagItemDataList = new List<IBaseChickenBagItemData>();
-            for (int i = 0; i < sp.Ks[1]; i++)
+
+            if (sp.Bs[0])
             {
-                ChickenBagItemUiData data = new ChickenBagItemUiData();
-                data.cat = sp.Ins[i * 3];
-                data.id = sp.Ins[i * 3 + 1];
-                data.count = sp.Ins[i * 3 + 2];
-                ui.ChickenBagItemDataList.Add(data);
-                data.key = sp.Ss[i];
+                ui.ChickenBagItemDataList = new List<IBaseChickenBagItemData>();
+                for (int i = 0; i < sp.Ks[1]; i++)
+                {
+                    ChickenBagItemUiData data = new ChickenBagItemUiData();
+                    data.cat = sp.Ins[i * 3];
+                    data.id = sp.Ins[i * 3 + 1];
+                    data.count = sp.Ins[i * 3 + 2];
+                    ui.ChickenBagItemDataList.Add(data);
+                    data.key = sp.Ss[i];
+                }
             }
 
             ui.TotalBagWeight = sp.Ks[2];

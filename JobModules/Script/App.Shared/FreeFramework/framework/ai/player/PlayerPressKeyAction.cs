@@ -1,6 +1,7 @@
 ﻿using Assets.App.Server.GameModules.GamePlay.Free;
 using com.wd.free.action;
 using com.wd.free.@event;
+using com.wd.free.para;
 using Core.Free;
 using Free.framework;
 using System;
@@ -8,7 +9,7 @@ using System;
 namespace App.Shared.FreeFramework.framework.ai
 {
     [Serializable]
-    public class PlayerPressKeyAction : AbstractPlayerAction
+    public class PlayerPressKeyAction : AbstractPlayerAction, IRule
     {
         private string press;
         private string key;
@@ -24,6 +25,11 @@ namespace App.Shared.FreeFramework.framework.ai
             msg.Ss.Add(key);
             msg.Ins.Add(args.GetInt(time));
             FreeMessageSender.SendMessage(player, msg);
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerPressKeyAction;
         }
     }
 }

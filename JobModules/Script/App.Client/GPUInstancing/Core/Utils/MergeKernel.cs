@@ -40,5 +40,22 @@ namespace App.Client.GPUInstancing.Core.Utils
 
             return _detailMergeKernel;
         }
+
+        private static MergeUnit[] _treeMergeKernel;
+        public static MergeUnit[] GetTreeMergeKernel(ComputeShader shader)
+        {
+            if (_treeMergeKernel == null)
+            {
+                _treeMergeKernel = new MergeUnit[(int) TreeBufferType.Length];
+                _treeMergeKernel[(int) TreeBufferType.Transform] = new MergeUnit
+                {
+                    Kernel = shader.FindKernel(Constants.MergeVariable.MergeFloat4x4),
+                    Input = Constants.MergeVariable.InputFloat4x4,
+                    Output = Constants.MergeVariable.OutputFloat4x4
+                };
+            }
+
+            return _treeMergeKernel;
+        }
     }
 }

@@ -30,36 +30,36 @@ namespace App.Shared.GameMode
 
         protected readonly ISceneObjectEntityFactory sceneObjectEntityFactory;
 
-        public virtual void AutoPickupWeapon(PlayerEntity player, List<int> sceneKeys)
+        public  void AutoPickupWeapon(PlayerEntity player, List<int> sceneKeys)
         {
             for (int i = 0; i < sceneKeys.Count; i++)
             {
                 SceneObjectEntity sceneEntity = sceneObjectEntityFactory.GetSceneEntity(sceneKeys[i]) as SceneObjectEntity;
                 //sceneKeys.Remove(sceneKeys[i]);
-                if (sceneEntity == null || !sceneEntity.hasWeaponObject)
+                if (sceneEntity == null || !sceneEntity.hasWeaponObject || sceneEntity.isFlagDestroy)
                 {
-                    Logger.Warn("sceneEntity null failed");
-                    return;
+                    //Logger.Warn("sceneEntity null failed");
+                    continue;
                 }
 
                 EWeaponType_Config configType = (EWeaponType_Config) SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(sceneEntity.weaponObject.ConfigId).Type;
                 if (!configType.CanAutoPick())
                 {
-                    Logger.Warn("CanAutoPick failed");
-                    return;
+                    //Logger.Warn("CanAutoPick failed");
+                    continue;
                 }
                 if (configType == EWeaponType_Config.TacticWeapon && !sceneEntity.IsCanPickUpByPlayer(player))
                 {
-                    Logger.Warn("IsCanPickUpByPlayer failed");
-                    return;
+                    //Logger.Warn("IsCanPickUpByPlayer failed");
+                    continue;
                 }
 
                 var  newWeaponScan = (WeaponScanStruct) sceneEntity.weaponObject;
                 bool pickupResult  = player.WeaponController().AutoPickUpWeapon(newWeaponScan);
                 if (!pickupResult)
                 {
-                    Logger.Warn("pickupResult failed");
-                    return;
+                    //Logger.Warn("pickupResult failed");
+                    continue;
                 }
               
                 sceneObjectEntityFactory.DestroySceneWeaponObjectEntity(sceneEntity.entityKey.Value);
@@ -107,47 +107,37 @@ namespace App.Shared.GameMode
             var heldAgent = player.WeaponController().HeldWeaponAgent;
             if (heldAgent.IsValid())
             {
-                var  dropPos          = player.GetHandWeaponPosition();
-                var  playerTrans      = player.characterContoller.Value.transform;
-                var  forward          = playerTrans.forward;
-                var  pos              = dropPos + forward * runtimeGameConfig.WeaponDropOffset;
-                var  weaponScacn      = heldAgent.ComponentScan;
+                var  handPos = player.GetHandWeaponPosition();
+                var  dropPos = player.position.Value + player.characterContoller.Value.transform.forward * runtimeGameConfig.WeaponDropOffset;
+
+                var  weaponScacn = heldAgent.ComponentScan;
                 bool generateSceneObj = player.WeaponController().DropWeapon(slot);
                 if (!generateSceneObj || weaponScacn.IsUnSafeOrEmpty()) return;
-                //     DebugUtil.LogInUnity(weaponScacn.ToString(), DebugUtil.DebugColor.Black);
-                RaycastHit        hhit;
+
+                RaycastHit hhit;
                 SceneObjectEntity sceneObjectEntity;
-                if (Physics.Raycast(dropPos, forward, out hhit, runtimeGameConfig.WeaponDropOffset,
-                    UnityLayers.SceneCollidableLayerMask))
+                if (Physics.Raycast(handPos, dropPos - handPos, out hhit, Vector3.Distance(handPos, dropPos), UnityLayers.PickupObstacleLayerMask))
                 {
                     RaycastHit vhit;
-                    if (Physics.Raycast(hhit.point, Vector3.down, out vhit, 100, UnityLayers.SceneCollidableLayerMask))
+                    if (Physics.Raycast(hhit.point + new Vector3(0, 0.1f, 0), Vector3.down, out vhit, 100, UnityLayers.PickupObstacleLayerMask))
                     {
-                        sceneObjectEntity =
-                            sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScacn, vhit.point,
-                                sceneWeaponLifeTime) as SceneObjectEntity;
+                        sceneObjectEntity = sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScacn, vhit.point, sceneWeaponLifeTime) as SceneObjectEntity;
                     }
                     else
                     {
-                        sceneObjectEntity =
-                            sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScacn,
-                                playerTrans.position, sceneWeaponLifeTime) as SceneObjectEntity;
+                        sceneObjectEntity = sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScacn, hhit.point, sceneWeaponLifeTime) as SceneObjectEntity;
                     }
                 }
                 else
                 {
                     RaycastHit vhit;
-                    if (Physics.Raycast(pos, Vector3.down, out vhit, 100, UnityLayers.SceneCollidableLayerMask))
+                    if (Physics.Raycast(dropPos + new Vector3(0, 0.1f, 0), Vector3.down, out vhit, 100, UnityLayers.PickupObstacleLayerMask))
                     {
-                        sceneObjectEntity =
-                            sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScacn, vhit.point,
-                                sceneWeaponLifeTime) as SceneObjectEntity;
+                        sceneObjectEntity = sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScacn, vhit.point, sceneWeaponLifeTime) as SceneObjectEntity;
                     }
                     else
                     {
-                        sceneObjectEntity =
-                            sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScacn,
-                                playerTrans.position, sceneWeaponLifeTime) as SceneObjectEntity;
+                        sceneObjectEntity = sceneObjectEntityFactory.CreateDropSceneWeaponObjectEntity(weaponScacn, dropPos, sceneWeaponLifeTime) as SceneObjectEntity;
                     }
                 }
 

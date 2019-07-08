@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Protobuf;
+﻿using App.Shared.GameModules.Attack;
+using Core.Free;
 using Core.Prediction.UserPrediction.Cmd;
 using Free.framework;
-using App.Shared.GameModules.Bullet;
-using Core.Free;
-using Core.WeaponLogic;
 using WeaponConfigNs;
 
 namespace App.Server.GameModules.GamePlay
@@ -38,9 +32,7 @@ namespace App.Server.GameModules.GamePlay
 
         void HandleFreeEvent(Contexts room, PlayerEntity player, SimpleProto message);
 
-        //TODO 修改
-       // void HandleWeaponState(Contexts room, PlayerEntity player, IPlayerWeaponState state);
-        void HandleWeaponState(Contexts room, PlayerEntity player);
+        void HandleWeaponState(Contexts room, PlayerEntity player, int weaponId);
 
         void HandleWeaponFire(Contexts room, PlayerEntity player, WeaponResConfigItem info);
     }

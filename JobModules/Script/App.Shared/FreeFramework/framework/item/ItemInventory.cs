@@ -1,14 +1,14 @@
-using System.Collections.Generic;
-using Sharpen;
 using com.cpkf.yyjd.tools.data.sort;
 using com.cpkf.yyjd.tools.util;
-using com.wd.free.@event;
 using com.wd.free.action;
+using com.wd.free.@event;
+using com.wd.free.para;
 using com.wd.free.para.exp;
 using com.wd.free.skill;
 using com.wd.free.util;
-using com.wd.free.para;
+using Sharpen;
 using System;
+using System.Collections.Generic;
 
 namespace com.wd.free.item
 {
@@ -124,12 +124,13 @@ namespace com.wd.free.item
             IList<ItemPosition> items = new List<ItemPosition>();
             foreach (ItemPosition ip in posList)
             {
-                if ((ip.x >= x && ip.x < x + w || x >= ip.x && x < ip.x + ip.GetKey().GetGridWidth()) && (ip.y >= y && ip.y < y + h || y >= ip.y && y < ip.y + ip.GetKey().GetGridHeight()))
+                if ((ip.x >= x && ip.x < x + w || x >= ip.x && x < ip.x + ip.GetKey().GetGridWidth()) &&
+                    (ip.y >= y && ip.y < y + h || y >= ip.y && y < ip.y + ip.GetKey().GetGridHeight()))
                 {
                     items.Add(ip);
                 }
             }
-            return Sharpen.Collections.ToArray(items, new ItemPosition[0]);
+            return Collections.ToArray(items, new ItemPosition[0]);
         }
 
         public virtual ItemPosition GetItem(int x, int y)
@@ -295,10 +296,6 @@ namespace com.wd.free.item
             }
         }
 
-        // System.err.println(p1.getKey().getKey() + " " + p2.getX() + ","
-        // + p2.getY() + "->" + p1.getX() + "," + p1.getY());
-        // System.err.println(p2.getKey().getKey() + " " + p1.getX() + ","
-        // + p1.getY() + "->" + p2.getX() + "," + p2.getY());
         public virtual void ReDraw(ISkillArgs args)
         {
             if (inventoryUI != null)
@@ -310,6 +307,11 @@ namespace com.wd.free.item
         public virtual void RemoveItem(ISkillArgs args, ItemPosition ip)
         {
             ip.key.Removed(args);
+            RemoveItemPosition(ip);
+            if (inventoryUI != null)
+            {
+                inventoryUI.DeleteItem(args, this, ip);
+            }
             if (inventoryUI != null && inventoryUI.MoveAction != null)
             {
                 args.TempUsePara(new StringPara("from", this.name));
@@ -319,11 +321,6 @@ namespace com.wd.free.item
 
                 args.ResumePara("from");
                 args.Resume("item");
-            }
-            RemoveItemPosition(ip);
-            if (inventoryUI != null)
-            {
-                inventoryUI.DeleteItem(args, this, ip);
             }
         }
 
@@ -369,16 +366,30 @@ namespace com.wd.free.item
                 }
             }
             ItemPosition old = GetNotFullExisted(item);
-            if (old != null)
+            if (old != null && name != "ground")
             {
                 int addCount = item.GetCount();
                 old.SetKey(item);
                 int removed = Math.Min(item.GetItemStack() - old.GetCount(), item.GetCount());
+
+                args.TempUsePara(new StringPara("inventory", name));
+                item.Added(args);
+                if (inventoryUI != null && inventoryUI.MoveAction != null && useMove)
+                {
+                    if (!item.GetParameters().HasPara("ClipType"))
+                    {
+                        args.TempUsePara(new StringPara("to", this.name));
+                        inventoryUI.MoveAction.Act(args);
+                        args.ResumePara("to");
+                    }
+                }
+
                 old.SetCount(old.GetCount() + removed);
                 if (inventoryUI != null && args != null)
                 {
                     inventoryUI.UpdateItem(args, this, old);
                 }
+
 
                 if (removed < addCount)
                 {
@@ -387,18 +398,17 @@ namespace com.wd.free.item
                     AddNewItem(args, clone, false);
                 }
 
-                args.TempUsePara(new StringPara("inventory", name));
-                item.Added(args);
                 if (inventoryUI != null && inventoryUI.MoveAction != null && useMove)
                 {
-                    args.TempUsePara(new StringPara("to", this.name));
-                    inventoryUI.MoveAction.Act(args);
-                    args.ResumePara("to");
+                    if (item.GetParameters().HasPara("ClipType"))
+                    {
+                        args.TempUsePara(new StringPara("to", this.name));
+                        inventoryUI.MoveAction.Act(args);
+                        args.ResumePara("to");
+                    }
                 }
+
                 args.ResumePara("inventory");
-
-
-
                 return true;
             }
             else
@@ -643,7 +653,7 @@ namespace com.wd.free.item
             {
                 return true;
             }
-            if (canDropCondition == null || (canDrop.Contains(FreeUtil.VAR_START) && canDrop.Contains(FreeUtil.VAR_END)))
+            if (canDropCondition == null || ((canDrop.IndexOf(FreeUtil.VAR_START_CHAR) > -1) && (canDrop.IndexOf(FreeUtil.VAR_END_CHAR) > -1)))
             {
                 canDropCondition = new ExpParaCondition(canDrop);
             }

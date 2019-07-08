@@ -107,7 +107,7 @@ namespace App.Client.ClientSystems
             return bounds;
         }
 
-        public List<GameObject> GetGameObjectsInBounds(MeshRenderer[] meshRenderers, MeshCollider[] meshColliders, LayerMask ignoreLayer, LayerMask careLayer)
+        public List<GameObject> GetGameObjectsInBounds(MeshRenderer[] meshRenderers, LayerMask ignoreLayer, LayerMask careLayer)
         {
             cacheList.Clear();
             Bounds bounds = GetBounds();
@@ -121,18 +121,6 @@ namespace App.Client.ClientSystems
                 if (bounds.Intersects(meshRenderers[i].bounds))
                 {
                     cacheList.Add(meshRenderers[i].gameObject);
-                }
-            }
-
-            for (int i = 0; i < meshColliders.Length; i++)
-            {
-                if (meshColliders[i] == null) continue;
-                if (!meshColliders[i].enabled) continue;
-                if (meshColliders[i].GetComponent<TransformVolume>() != null) continue;
-                if ((1 << meshColliders[i].gameObject.layer & careLayer.value) == 0) continue;
-                if (bounds.Intersects(meshColliders[i].bounds))
-                {
-                    cacheList.Add(meshColliders[i].gameObject);
                 }
             }
             return cacheList;

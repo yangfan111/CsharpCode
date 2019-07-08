@@ -4,15 +4,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using com.wd.free.@event;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.action
 {
     [Serializable]
-    public class BattleEndAction : AbstractGameAction
+    public class BattleEndAction : AbstractGameAction, IRule
     {
         public override void DoAction(IEventArgs args)
         {
             args.Rule.GameOver = true;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.BattleEndAction;
         }
     }
 }

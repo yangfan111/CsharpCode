@@ -19,7 +19,7 @@ using App.Server.GameModules.GamePlay.Free.chicken;
 namespace App.Server.GameModules.GamePlay.Free.item
 {
     [Serializable]
-    public class UnityInventoryUi : IInventoryUI
+    public class UnityInventoryUi : IInventoryUI, IRule
     {
         private IGameAction errorAction;
 
@@ -68,7 +68,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
         {
             if (errorAction != null)
             {
-                if (Runtime.CurrentTimeMillis() - lastErrorTime > 2000)
+                if (Runtime.CurrentTimeMillis(false) - lastErrorTime > 2000)
                 {
                     if (args != null)
                     {
@@ -76,7 +76,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
                         errorAction.Act(args);
                         args.GetDefault().GetParameters().Resume("message");
                     }
-                    lastErrorTime = Runtime.CurrentTimeMillis();
+                    lastErrorTime = Runtime.CurrentTimeMillis(false);
                 }
             }
         }
@@ -87,6 +87,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
             sp.Key = FreeMessageConstant.InventoyUI;
             // 0 重绘，1 添加，2 删除, 3 更新
             sp.Ks.Add(0);
+            sp.Bs.Add(true);
 
             sp.Ks.Add(inventory.posList.Count);
 
@@ -118,6 +119,11 @@ namespace App.Server.GameModules.GamePlay.Free.item
         public void UseItem(ISkillArgs args, ItemInventory inventory, ItemPosition ip)
         {
             ReDraw(args, inventory, true);
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.UnityInventoryUi;
         }
     }
 }

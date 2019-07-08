@@ -1,4 +1,4 @@
-using Sharpen;
+using System;
 using com.cpkf.yyjd.tools.data.sort;
 using com.cpkf.yyjd.tools.util;
 using com.cpkf.yyjd.tools.util.math;
@@ -7,12 +7,13 @@ using com.wd.free.para;
 using com.wd.free.para.exp;
 using com.wd.free.skill;
 using com.wd.free.unit;
+using Core.Free;
 
 namespace com.wd.free.item
 {
-	[System.Serializable]
-	public class FreeItem : IParable, IFeaturable
-	{
+    [System.Serializable]
+	public class FreeItem : IParable, IFeaturable, IRule
+    {
 		private const long serialVersionUID = -5059331058897789796L;
 
 		private static int seq = 100000;
@@ -157,6 +158,11 @@ namespace com.wd.free.item
 			return 50;
 		}
 
+        public virtual ISkill GetClickSkill()
+        {
+            return clickSkill;
+        }
+
 		public virtual IParaCondition GetDragCondition()
 		{
 			return dragCondition;
@@ -244,32 +250,41 @@ namespace com.wd.free.item
 
 		public virtual void Created(ISkillArgs args)
 		{
-			if (createAction != null && args != null)
-			{
-				args.TempUse("item", this);
-				createAction.Act(args);
-				args.Resume("item");
-			}
+            if (args != null)
+            {
+                args.TempUse("item", this);
+                if(createAction != null)
+                {
+                    createAction.Act(args);
+                    args.Resume("item");
+                }
+            }
 		}
 
 		public virtual void Added(ISkillArgs args)
-		{
-			if (addAction != null && args != null)
-			{
+        {
+            if (args != null)
+            {
 				args.TempUse("item", this);
-				addAction.Act(args);
-				args.Resume("item");
-			}
+                if(addAction != null)
+                {
+				    addAction.Act(args);
+				    args.Resume("item");
+                }
+            }
 		}
 
 		public virtual void Removed(ISkillArgs args)
 		{
-			if (removeAction != null && args != null)
-			{
-				args.TempUse("item", this);
-				removeAction.Act(args);
-				args.Resume("item");
-			}
+            if (args != null)
+            {
+                args.TempUse("item", this);
+                if(removeAction != null)
+                {
+                    removeAction.Act(args);
+                    args.Resume("item");
+                }
+            }
 		}
 
 		public virtual int GetCount()
@@ -497,5 +512,10 @@ namespace com.wd.free.item
 		{
 			return paras.GetFeatureValue(feature);
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeItem;
+        }
+    }
 }

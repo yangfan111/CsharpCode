@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Sockets;
 
 namespace VNet.Base.Interface
 {
@@ -7,6 +8,8 @@ namespace VNet.Base.Interface
     {
         void Init();
         void Connect(string ip, int port, long connId);
+        void ReConnect();
+        void CloseConnect();
         void Poll();
         event Action<IVNetPeer> OnConnectFailedListener;
         event Action<IVNetPeer> OnConnectListener;

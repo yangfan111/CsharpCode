@@ -1,26 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Protobuf;
-using App.Server.GameModules.GamePlay.free.player;
-using com.wd.free.para;
+﻿using App.Server.GameModules.GamePlay.free.player;
+using App.Server.GameModules.GamePlay.Free.chicken;
+using App.Server.GameModules.GamePlay.Free.item;
+using App.Server.GameModules.GamePlay.Free.item.config;
+using App.Shared;
+using Assets.Utils.Configuration;
+using Assets.XmlConfig;
+using com.wd.free.item;
+using com.wd.free.skill;
 using Core.Free;
 using Free.framework;
 using gameplay.gamerule.free.item;
 using gameplay.gamerule.free.rule;
-using UnityEngine;
-using App.Server.GameModules.GamePlay.Free.client;
-using App.Shared.GameModules.GamePlay.Free.Map;
-using Assets.XmlConfig;
-using App.Server.GameModules.GamePlay.Free.item.config;
-using com.wd.free.item;
 using Utils.Configuration;
+using Utils.Singleton;
+using WeaponConfigNs;
 using XmlConfig;
-using App.Server.GameModules.GamePlay.Free.item;
-using Assets.App.Server.GameModules.GamePlay.Free;
-using App.Server.GameModules.GamePlay.Free.chicken;
-using com.wd.free.skill;
 
 namespace App.Server.GameModules.GamePlay.free.client
 {
@@ -47,19 +41,32 @@ namespace App.Server.GameModules.GamePlay.free.client
 
                 if (ip.GetCount() > count)
                 {
-                    ip.SetCount(ip.GetCount() - count);
-                    ip.GetInventory().GetInventoryUI().ReDraw((ISkillArgs)room.FreeArgs, ip.GetInventory(), true);
+                    if (info.cat == (int) ECategory.Weapon && SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(info.id).Type == (int) EWeaponType_Config.ThrowWeapon)
+                    {
+                        CarryClipUtil.DeleteGrenade(count, info.id, fd, room.FreeArgs);
+                        for (int i = 0; i < count; i++)
+                        {
+                            player.WeaponController().RemoveGreande(info.id);
+                        }
+                    }
+                    else
+                    {
+                        ip.SetCount(ip.GetCount() - count);
+                        ip.GetInventory().GetInventoryUI().ReDraw((ISkillArgs)room.FreeArgs, ip.GetInventory(), true);
+                    }
                 }
                 else
                 {
                     ip.GetInventory().RemoveItem((ISkillArgs)room.FreeArgs, ip);
                 }
 
-                room.RoomContexts.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleEquipmentEntity(
-                        (Assets.XmlConfig.ECategory)info.cat,
-                        info.id,
-                        count,
-                        fd.Player.position.Value);
+                room.RoomContexts.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleObjectEntity(
+                        (ECategory) info.cat, info.id, count, fd.Player.position.Value);
+
+                if (info.cat == (int) ECategory.GameItem && SingletonManager.Get<GameItemConfigManager>().GetConfigById(info.id).Type == (int) GameItemType.Bullet)
+                {
+                    player.WeaponController().SetReservedBullet((EBulletCaliber) info.id, CarryClipUtil.GetClipCount(info.id, fd, room.FreeArgs));
+                }
             }
 
             room.FreeArgs.Resume(PARA_PLAYER_CURRENT);

@@ -8,11 +8,12 @@ using gameplay.gamerule.free.item;
 using gameplay.gamerule.free.ui;
 using gameplay.gamerule.free.ui.component;
 using com.wd.free.util;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.item
 {
     [Serializable]
-    public class OnlyDataItemUi : IItemUI
+    public class OnlyDataItemUi : IItemUI, IRule
     {
         public void Draw(SimpleInventoryUI ui, IEventArgs args, ItemInventory inventory, ItemPosition ip)
         {
@@ -47,6 +48,11 @@ namespace App.Server.GameModules.GamePlay.Free.item
             fui.SetScope(1);
             fui.SetPlayer("current");
             fui.Act(args);
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.OnlyDataItemUi;
         }
 
         private int GetX(ItemInventory inventory, IEventArgs args, SimpleInventoryUI ui, ItemPosition ip, FreeImageComponet back)

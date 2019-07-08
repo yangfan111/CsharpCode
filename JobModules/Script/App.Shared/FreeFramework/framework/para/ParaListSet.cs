@@ -7,12 +7,13 @@ using com.wd.free.@event;
 using com.wd.free.exception;
 using com.wd.free.para.exp;
 using Sharpen;
+using Core.Free;
 
 namespace com.wd.free.para
 {
 	[System.Serializable]
-	public class ParaListSet : AbstractPara, IEnumerable<ParaList>
-	{
+	public class ParaListSet : AbstractPara, IEnumerable<ParaList>, IRule
+    {
 		private const long serialVersionUID = 2162997136596560057L;
 
 		public const string PARA_ORDER = "order";
@@ -349,9 +350,9 @@ namespace com.wd.free.para
 			return pls;
 		}
 
-		private static ParaPool<IPara> pool = new ParaPool<IPara>(new ParaListSet());
+		private static ParaPool pool = new ParaPool(new ParaListSet());
 
-		protected internal override ParaPool<IPara> GetPool()
+		protected internal override ParaPool GetPool()
 		{
 			return pool;
 		}
@@ -364,6 +365,11 @@ namespace com.wd.free.para
         IEnumerator IEnumerable.GetEnumerator()
         {
             return list.GetEnumerator();
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.ParaListSet;
         }
     }
 }

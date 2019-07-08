@@ -7,12 +7,13 @@ using com.wd.free.@event;
 using com.wd.free.item;
 using com.wd.free.unit;
 using com.wd.free.util;
+using Core.Free;
 
 namespace gameplay.gamerule.free.item
 {
 	[System.Serializable]
-	public class PlayerUseItemAction : AbstractPlayerAction
-	{
+	public class PlayerUseItemAction : AbstractPlayerAction, IRule
+    {
 		private const long serialVersionUID = 6361325829890462542L;
 
 		private string item;
@@ -32,5 +33,10 @@ namespace gameplay.gamerule.free.item
 				FreeItemManager.UseItem(fd.GetFreeInventory().GetItemPosition(fi), fd, fr);
 			}
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PlayerUseItemAction;
+        }
+    }
 }

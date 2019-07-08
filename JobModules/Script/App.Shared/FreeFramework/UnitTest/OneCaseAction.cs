@@ -6,11 +6,12 @@ using System.Linq;
 using System.Text;
 using com.wd.free.@event;
 using com.wd.free.trigger;
+using Core.Free;
 
 namespace App.Shared.FreeFramework.UnitTest
 {
     [Serializable]
-    public class OneCaseAction : AbstractGameAction
+    public class OneCaseAction : AbstractGameAction, IRule
     {
         [NonSerialized]
         public GameTrigger trigger;
@@ -60,6 +61,11 @@ namespace App.Shared.FreeFramework.UnitTest
                 frame.Act(args);
             }
             initialed = false;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.OneCaseAction;
         }
     }
 }

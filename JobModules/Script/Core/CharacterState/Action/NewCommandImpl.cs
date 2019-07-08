@@ -132,16 +132,20 @@ namespace Core.CharacterState.Action
                 _inputCallBack[trigger] = callBack;
             }
 
-            public void TryInvokeCallBack(FsmInput type)
+            public bool TryInvokeCallBack(FsmInput type)
             {
+                bool ret = false;
                 System.Action callBack;
                 _inputCallBack.TryGetValue(type, out callBack);
 
                 if (callBack != null)
                 {
                     callBack.Invoke();
-                    Logger.DebugFormat("Animation End Callback: {0}", type);
+                    ret = true;
+                    Logger.InfoFormat("Animation End Callback: {0}", type);
                 }
+
+                return ret;
             }
 
             public void TryRemoveCallBack(FsmInput type)
@@ -178,13 +182,16 @@ namespace Core.CharacterState.Action
             }
         }
 
-        protected void ApplyNewCommand(IAdaptiveContainer<IFsmInputCommand> commands, Action<FsmOutput> addOutput)
+        protected void ApplyNewCommand(IAdaptiveContainer<IFsmInputCommand> commands, 
+            Action<FsmOutput> addOutput, List<FsmInput> limits)
         {
             for (int i = 0; i < commandsContainer.Length; ++i)
             {
                 var newCommand = commandsContainer[i];
                 if (newCommand.Type != FsmInput.None)
                 {
+                    if(IsBeLimited(newCommand.Type, limits)) continue;
+                    
                     var item = commands.GetAvailableItem();
                     item.Type = newCommand.Type;
                     item.AdditioanlValue = newCommand.AdditionalValue;
@@ -196,6 +203,19 @@ namespace Core.CharacterState.Action
             _directOutputs.Apply(addOutput);
         }
 
+        private bool IsBeLimited(FsmInput input, List<FsmInput> limits)
+        {
+            if (null == limits) return false;
+            foreach (var limit in limits)
+            {
+                if(input != limit) continue;
+                Logger.ErrorFormat("FsmInput have be limited:  {0}", input);
+                return true;
+            }
+
+            return false;
+        }
+
         public void TryAnimationBasedCallBack(IAdaptiveContainer<IFsmInputCommand> commands)
         {
             InterruptAnimationCallBack(commands);
@@ -204,13 +224,16 @@ namespace Core.CharacterState.Action
                 var cmd = commands[i];
                 if (cmd.Type != FsmInput.None)
                 {
-                    _callBackRegister.TryInvokeCallBack(cmd.Type);
-                    _callBackRegister.TryRemoveCallBack(cmd.Type);
-                    _animationCallBackCommand.Add(new AnimationCallBackCommand
+                    var isInvoke = _callBackRegister.TryInvokeCallBack(cmd.Type);
+                    if (isInvoke)
                     {
-                        CommandType = (int) AnimationCallBackCommandType.Apply,
-                        FsmType = (int) cmd.Type
-                    });
+                        _callBackRegister.TryRemoveCallBack(cmd.Type);
+                        _animationCallBackCommand.Add(new AnimationCallBackCommand
+                        {
+                            CommandType = (int) AnimationCallBackCommandType.Apply,
+                            FsmType = (int) cmd.Type
+                        });
+                    }
                 }
             }
         }

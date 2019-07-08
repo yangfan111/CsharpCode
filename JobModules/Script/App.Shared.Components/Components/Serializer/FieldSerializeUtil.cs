@@ -17,6 +17,7 @@ using Core.Event;
 using Core.SnapshotReplication.Serialization.Serializer;
 using Core.Utils;
 using UnityEngine;
+using UnityEngine.Video;
 using Utils.Utils.Buildin;
 
 
@@ -42,9 +43,8 @@ namespace App.Shared.Components.Serializer
         private static EntityKeySerializer _entityKeySerializer = new EntityKeySerializer();
         private static StringSerializer _stringSerializer = new StringSerializer();
 
-        private static StateInterCommandsSerializer _stateInterCommandsSerializer = new StateInterCommandsSerializer();
-        private static UnityAnimationEventCommandsSerializer _unityAnimationEventCommandsSerializer = new UnityAnimationEventCommandsSerializer();
         private static EventsSerializer _eventsSerializer = new EventsSerializer();
+        private static WeaponBagSerializer _weaponBagSerializer = new WeaponBagSerializer();
 
         private static void SendCompressedData(int sendTime, uint toSend, Core.Utils.MyBinaryWriter writer)
         {
@@ -302,6 +302,26 @@ namespace App.Shared.Components.Serializer
             Serialize(data.z, max, min, ratio, sendTimes, DoCompress, writer, last.z, weiteAll);
         }
 
+        public static void Serialize(FixedVector3 typeTag, MyBinaryWriter writer, FixedVector3 last = default(FixedVector3), bool weiteAll = false)
+        {
+            _fixedVector3Serializer.Write(typeTag, writer);
+        }
+        
+        public static void Serialize(FixedVector3 typeTag, float max, float min, float ratio,
+            int sendTimes, bool DoCompress, MyBinaryWriter writer, FixedVector3 last = default(FixedVector3),
+            bool weiteAll = false)
+        {
+            if (!DoCompress)
+            {
+                Serialize(typeTag, writer, last, weiteAll);
+                return;
+            }
+            
+            Serialize(typeTag.x, max, min, ratio, sendTimes, DoCompress, writer, last.x, weiteAll);
+            Serialize(typeTag.y, max, min, ratio, sendTimes, DoCompress, writer, last.y, weiteAll);
+            Serialize(typeTag.z, max, min, ratio, sendTimes, DoCompress, writer, last.z, weiteAll);
+        }
+        
         public static void Serialize(Quaternion data, Core.Utils.MyBinaryWriter writer,
             Quaternion last = default(Quaternion), bool weiteAll = false)
         {
@@ -343,13 +363,14 @@ namespace App.Shared.Components.Serializer
         public static void Serialize(StateInterCommands data, Core.Utils.MyBinaryWriter writer,
             StateInterCommands last = default(StateInterCommands), bool weiteAll = false)
         {
-            _stateInterCommandsSerializer.Write(data, writer);
+            data.Write(writer);
+            
         }
 
         public static void Serialize(UnityAnimationEventCommands data, Core.Utils.MyBinaryWriter writer,
             UnityAnimationEventCommands last = default(UnityAnimationEventCommands), bool weiteAll = false)
         {
-            _unityAnimationEventCommandsSerializer.Write(data, writer);
+            data.Write(writer);
         }
 
         public static void Serialize(EntityKey data, Core.Utils.MyBinaryWriter writer,
@@ -363,7 +384,12 @@ namespace App.Shared.Components.Serializer
         {
             _eventsSerializer.Write(data, writer);
         }
-
+        public static void Serialize(WeaponBagContainer data, Core.Utils.MyBinaryWriter writer, WeaponBagContainer last = null,
+                                     bool weiteAll = false)
+        {
+            _weaponBagSerializer.Write(data, writer);
+        }
+        //_weaponBagSerializer
         private static BitArrayWrapper GetDiffBitArray<T>(List<T> last, List<T> data, bool writeAll)
             where T : IPatchClass<T>, new()
         {
@@ -438,7 +464,7 @@ namespace App.Shared.Components.Serializer
 
             for (int i = 0; i < length; i++)
             {
-                if (list[i] == null) list[i] = new T();
+                if (list[i] == null) list[i] = PatchClassAllocator<T>.Create();
             }
 
             return list;
@@ -531,7 +557,7 @@ namespace App.Shared.Components.Serializer
             }
             for (int i = 0; i < arr.Length; i++)
             {
-                if (arr[i] == null) arr[i] = new T();
+                if (arr[i] == null) arr[i] = PatchClassAllocator<T>.Create();
             }
 
             return arr;
@@ -722,12 +748,32 @@ namespace App.Shared.Components.Serializer
 
         public static StateInterCommands Deserialize(StateInterCommands typeTag, BinaryReader reader)
         {
-            return _stateInterCommandsSerializer.Read(reader);
+            if (typeTag != null)
+            {
+                typeTag.Reset();
+            }
+            else
+            {
+                typeTag = new StateInterCommands(); 
+            }
+           
+            typeTag.Read(reader);
+            return typeTag;
         }
 
         public static UnityAnimationEventCommands Deserialize(UnityAnimationEventCommands typeTag, BinaryReader reader)
         {
-            return _unityAnimationEventCommandsSerializer.Read(reader);
+            if (typeTag != null)
+            {
+                typeTag.Reset();
+            }
+            else
+            {
+                typeTag = new UnityAnimationEventCommands(); 
+            }
+           
+            typeTag.Read(reader);
+            return typeTag;
         }
 
 
@@ -743,18 +789,29 @@ namespace App.Shared.Components.Serializer
         {
             return _eventsSerializer.Read(reader, typeTag);
         }
+        public static WeaponBagContainer Deserialize(WeaponBagContainer typeTag, BinaryReader reader)
+        {
+            return _weaponBagSerializer.Read(reader, typeTag);
+        }
 //        public static void Serialize(InterruptData data, MyBinaryWriter writer , InterruptData last = default(InterruptData), bool weiteAll = false)
 //        {
 //            _interruptSerializer.Write(data, writer);
 //        }
-        public static void Serialize(FixedVector3 typeTag, MyBinaryWriter writer, FixedVector3 last = default(FixedVector3), bool weiteAll = false)
-        {
-            _fixedVector3Serializer.Write(typeTag, writer);
-        }
 
         public static FixedVector3 Deserialize(FixedVector3 typeTag, BinaryReader reader)
         {
-           return  _fixedVector3Serializer.Read(reader);
+            return  _fixedVector3Serializer.Read(reader);
         }
+        
+        public static FixedVector3 Deserialize(FixedVector3 typeTag, float max, float min, float ratio, int receiveTimes, bool DoCompress,
+            BinaryReader reader)
+        {
+            if (!DoCompress) return Deserialize(typeTag, reader);
+            float x = Deserialize(typeTag.x, max, min, ratio, receiveTimes, DoCompress, reader);
+            float y = Deserialize(typeTag.y, max, min, ratio, receiveTimes, DoCompress, reader);
+            float z = Deserialize(typeTag.z, max, min, ratio, receiveTimes, DoCompress, reader);
+            return new FixedVector3(x, y, z);
+        }
+      
     }
 }

@@ -43,7 +43,7 @@ namespace com.wd.free.map
 
 		public virtual void CheckTimeOut(ISkillArgs skill)
 		{
-			if (Runtime.CurrentTimeMillis() - lastTime > 1000)
+			if (Runtime.CurrentTimeMillis(false) - lastTime > 1000)
 			{
 				foreach (FreeBuf buf in map.Values)
 				{
@@ -54,11 +54,12 @@ namespace com.wd.free.map
 
 		public virtual void Eat(PlayerEntity player, ISkillArgs skill)
 		{
-			foreach (FreeBuf buf in map.Values)
-			{
+            MyDictionary<string, FreeBuf>.Enumerator it = map.GetEnumerator();
+            while (it.MoveNext()) {
+                FreeBuf buf = it.Current.Value;
                 FreeLog.SetTrigger(buf);
-				buf.Eat(player, skill);
-			}
+                buf.Eat(player, skill);
+            }
 		}
 
 		public virtual void Reset(IEventArgs args, string key)
@@ -79,5 +80,11 @@ namespace com.wd.free.map
 				map.Remove(key);
 			}
 		}
-	}
+
+        public virtual FreeBuf GetBuf(string key)
+        {
+            return map[key];
+        }
+
+    }
 }

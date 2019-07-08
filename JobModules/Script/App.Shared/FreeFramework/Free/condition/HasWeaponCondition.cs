@@ -3,11 +3,12 @@ using System;
 using com.wd.free.@event;
 using App.Server.GameModules.GamePlay.free.player;
 using App.Shared.GameModules.Weapon;
+using Core.Free;
 
 namespace App.Shared.FreeFramework.Free.condition
 {
     [Serializable]
-    public class HasWeaponCondition : IParaCondition
+    public class HasWeaponCondition : IParaCondition, IRule
     {
         private string player;
         private bool hand;
@@ -29,6 +30,11 @@ namespace App.Shared.FreeFramework.Free.condition
             }
 
             return false;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.HasWeaponCondition;
         }
     }
 }

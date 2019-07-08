@@ -33,6 +33,8 @@ namespace App.Client.GameModules.ClientEffect.EffectLogic
             var offset = 0.001f;
             var normal = entity.normal.Value;
             var go =  entity.assets.FirstAsset;
+            if(!go)
+                return;
             go.transform.SetPositionAndRotation(entity.position.Value + offset * normal,
                 Quaternion.FromToRotation(Vector3.forward, normal));
             go.transform.localScale = Ssjj2AssetsUtility.LocalScale;
@@ -42,7 +44,7 @@ namespace App.Client.GameModules.ClientEffect.EffectLogic
                 {
                     case EEntityType.Vehicle:
                         var vehicle = AllContexts.vehicle.GetEntityWithEntityKey(entity.attachParent.ParentKey);
-                        if (vehicle.hasGameObject && null != vehicle.gameObject.UnityObject)
+                        if (vehicle != null && vehicle.hasGameObject && null != vehicle.gameObject.UnityObject)
                         {
                             go.transform.SetParent(vehicle.gameObject.UnityObject.AsGameObject.transform, false);
                             go.transform.localPosition = entity.attachParent.Offset;
@@ -55,7 +57,7 @@ namespace App.Client.GameModules.ClientEffect.EffectLogic
                         break;
                     case EEntityType.Player:
                         var player = AllContexts.player.GetEntityWithEntityKey(entity.attachParent.ParentKey);
-                        if (player.hasBones && null != player.bones.Spine)
+                        if (player !=null && player.hasBones && null != player.bones.Spine)
                         {
                             go.transform.SetParent(player.bones.Spine.transform, false);
                             go.transform.localPosition = entity.attachParent.Offset;
@@ -155,6 +157,22 @@ namespace App.Client.GameModules.ClientEffect.EffectLogic
         protected override EClientEffectType EffectType
         {
             get { return EClientEffectType.DefaultHit; }
+        }
+    }
+
+    internal class SprayClientEffect : EnvironmentHitClientEffect
+    {
+        protected override EClientEffectType EffectType
+        {
+            get { return EClientEffectType.SprayPrint; }
+        }
+    }
+
+    internal class ShieldHitClientEffect : EnvironmentHitClientEffect
+    {
+        protected override EClientEffectType EffectType
+        {
+            get { return EClientEffectType.ShieldHit; }
         }
     }
 }

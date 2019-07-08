@@ -99,13 +99,8 @@ namespace App.Client.GameModules.SceneObject
                 for (int k = 0; k < (int)ETriggerObjectType.MaxCount; k++)
                 {
                     var idset =_objectManager.GetAllId();
-                    foreach (var item in idset)
-                    {
-                        if (item == id)
-                        {
-                            LoadTriggerObject(id, gameObject);
-                        }
-                    }
+                    if (idset.Contains(id))
+                        LoadTriggerObject(id, gameObject);
                 }
             }
         }

@@ -10,18 +10,24 @@ namespace App.Client.GameModules.Terrain
     {
         private readonly ICommonSessionObjects _commonSession;
         private readonly ClientSessionObjectsComponent _clientSession;
+        private readonly TerrainRenderer _renderer;
         
         public TerrainRendererInitSystem(ICommonSessionObjects commonSession, ClientSessionObjectsComponent clientSession)
         {
             _commonSession = commonSession;
             _clientSession = clientSession;
-            _clientSession.TerrainRenderer = new TerrainRenderer();
+            
+            _renderer = new TerrainRenderer();
+            _clientSession.TerrainRenderer = _renderer;
         }
 
         public void OnInitModule(IUnityAssetManager assetManager)
         {
-            _commonSession.LevelManager.SceneLoaded += _clientSession.TerrainRenderer.SceneLoaded;
-            _commonSession.LevelManager.SceneUnloaded += _clientSession.TerrainRenderer.SceneUnloaded;
+            if (_renderer.IsReady)
+            {
+                _commonSession.LevelManager.SceneLoaded += _clientSession.TerrainRenderer.SceneLoaded;
+                _commonSession.LevelManager.SceneUnloaded += _clientSession.TerrainRenderer.SceneUnloaded;
+            }
         }
     }
 }

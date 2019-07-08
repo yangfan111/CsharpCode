@@ -34,6 +34,7 @@ namespace App.Shared.DebugHandle
             return QualitySettings.names[QualitySettings.GetQualityLevel()];
         }
 
+
         public static string[] GetQualityNameList()
         {
             return SharedConfig.IsServer ? null : QualitySettings.names;

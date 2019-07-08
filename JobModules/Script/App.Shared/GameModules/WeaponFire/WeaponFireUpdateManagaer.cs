@@ -2,7 +2,7 @@
 using Core;
 using Core.Free;
 using Core.Utils;
-using Core.WeaponLogic;
+
 using Utils.Singleton;
 
 
@@ -23,7 +23,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
         //private IWeaponResourceConfigManager  SingletonManager.Get<WeaponResourceConfigManager>();
         private IFreeArgs _freeArgs;
 
-      //  private CommonWeaponFireUpdate _commonWeaponFireUpdate;
+        private CommonWeaponFireUpdate _commonWeaponFireUpdate;
 
         public WeaponFireUpdateManagaer(//WeaponConfigManagement weaponDataConfigManager,
                                   //IWeaponResourceConfigManager weaponConfigManager,
@@ -34,6 +34,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
             //_weaponDataConfigManager = weaponDataConfigManager;
             // SingletonManager.Get<WeaponResourceConfigManager>() = weaponConfigManager;
             _freeArgs = freeArgs;
+            _commonWeaponFireUpdate = new CommonWeaponFireUpdate();
         }
 
         public IWeaponFireUpdate GetFireUpdater(int? weaponId)
@@ -47,8 +48,8 @@ namespace App.Shared.GameModules.Weapon.Behavior
             var weaponAllConfig = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(realWeaponId.Value);
             if (weaponAllConfig.S_DefualtBehavior != null)
             {
-                var commonWeaponFireUpdate = new CommonWeaponFireUpdate(fireScriptsCreator.GetFireController(weaponAllConfig));
-                return commonWeaponFireUpdate;
+                 _commonWeaponFireUpdate.SetController(fireScriptsCreator.GetFireController(weaponAllConfig));
+                return _commonWeaponFireUpdate;
 
             }
              if (weaponAllConfig.S_TacticBehvior != null)

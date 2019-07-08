@@ -56,7 +56,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
             }
             else
             {
-                if(controller.AudioController != null)
+          
                     controller.AudioController.PlayEmptyFireAudio();
             }
             return false;

@@ -12,17 +12,7 @@ namespace Utils.Configuration
         private readonly Dictionary<int, WeaponPartsConfigItem>
             partItems = new Dictionary<int, WeaponPartsConfigItem>();
 
-        /// <summary>
-        /// 武器-可用配件Id列表
-        /// </summary>
-        private readonly Dictionary<int, List<int>> matchedWeaponPartIds = new Dictionary<int, List<int>>();
-      //  private readonly Dictionary<int, List<int>> matchedWeaponPartIdsAlt = new Dictionary<int, List<int>>();
 
-        /// <summary>
-        /// 武器-可用配件槽位列表
-        /// </summary>
-        private readonly Dictionary<int, List<EWeaponPartType>> matchedWeaponPartDefaultSlots =
-            new Dictionary<int, List<EWeaponPartType>>();
 
 
         private Dictionary<int, AttachedAttributeSet> partItemAttributes = new Dictionary<int, AttachedAttributeSet>();
@@ -36,13 +26,6 @@ namespace Utils.Configuration
             foreach (var item in cfg.Items)
             {
                 partItems[item.Id] = item;
-                if (!matchedWeaponPartIds.ContainsKey(item.Apply))
-                    matchedWeaponPartIds[item.Apply] = new List<int>();
-                matchedWeaponPartIds[item.Apply].Add(item.Id);
-                if (!matchedWeaponPartDefaultSlots.ContainsKey(item.Apply))
-                    matchedWeaponPartDefaultSlots[item.Apply] = new List<EWeaponPartType>();
-                if (item.Default < 1)
-                    matchedWeaponPartDefaultSlots[item.Apply].Add((EWeaponPartType) item.Type);
             }
 
         }
@@ -108,41 +91,18 @@ namespace Utils.Configuration
             return 1;
         }
 
-        public bool IsPartMatchWeapon(int partId, int weaponId)
-        {
-            if (!matchedWeaponPartIds.ContainsKey(weaponId))
-            {
-                return false;
-            }
-
-            return matchedWeaponPartIds[weaponId].Contains(partId);
-
-        }
 
         /// <summary>
         /// 获取可用的武器槽列表
         /// </summary>
         /// <param name="weaponId"></param>
         /// <returns>可用的武器槽列表，对应的位置的值为是否可用</returns>
-        public List<EWeaponPartType> GetAvaliablePartTypes(int weaponId)
-        {
-
-            if (matchedWeaponPartDefaultSlots.ContainsKey(weaponId))
-            {
-                return matchedWeaponPartDefaultSlots[weaponId];
-            }
-
-            return EmptyList;
-        }
 
         public AssetInfo GetAsset(int id)
         {
             var cfg = GetConfigById(id);
             if (null == cfg)
-            {
-                return new AssetInfo();
-            }
-
+                return AssetInfo.EmptyInstance;
             return new AssetInfo
             {
                 BundleName = cfg.Bundle,

@@ -36,7 +36,7 @@ namespace App.Shared.GameModules.Weapon
                 if (null != throwing) throwing.isFlagDestroy = true;
 
                 weaponController.RelatedCharState.ForceFinishGrenadeThrow();
-                weaponController.RelatedThrowAction.ClearState();
+                weaponController.RelatedThrowAction.InternalCleanUp();
             }
         }
     }

@@ -15,6 +15,9 @@ namespace App.Client.Utility
         public static string Method_DisposeClient = "DisposeClient";
         public static string Method_SendChatMessageToGamne = "SendChatMessageToGame";
         public static string Method_SendCheckPersonalOnlineStatusToGame = "SendCheckPersonalOnlineStatusToGame";
+        public static string Method_ShowAlert = "Method_ShowAlert";
+        public static string Method_ShowCrossHair = "Method_ShowCrossHair";
+
 
         private static GameObject _hall;
         private static Dictionary<string,List<Action<object>>> _actions = new Dictionary<string, List<Action<object>>>();
@@ -134,5 +137,7 @@ namespace App.Client.Utility
         {
             SendMessage("SendCampChatMessage", data);
         }
+
+     
     }
 }

@@ -1,6 +1,7 @@
 ﻿using App.Client.Console.MessageHandler;
 using App.Protobuf;
 using App.Shared.Components.Ui;
+using Core.Components;
 using Core.Utils;
 using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
@@ -40,13 +41,14 @@ namespace App.Client.MessageHandler
             var forword = selfPlayer.cameraObj.MainCamera.transform.forward;
             var forwordxz = new Vector2(forword.x, forword.z);
             var myPos = selfPlayer.position.Value;
-            var damageSrcPos = new Vector3(messageBody.PosX, 0, messageBody.PosZ);
-            var dir = damageSrcPos - myPos;
+//            var damageSrcPos = new Vector3(messageBody.PosX, 0, messageBody.PosZ);
+            var damageSrcPos = new FixedVector3(messageBody.PosX, 0, messageBody.PosZ);
+            var dir = damageSrcPos.ShiftedVector3() - myPos;
             var dirxz = new Vector2(dir.x, dir.z);
             var cross = dirxz.x * forwordxz.y - dirxz.y * forwordxz.x; 
             var angle = Vector2.Angle(dirxz, forwordxz) * -Mathf.Sign(cross);
             Logger.InfoFormat("myPos {0} srcPos {1} camForward {2} Angle is {3}",myPos, damageSrcPos, forword, angle);
-            _uiContext.uI.HurtedDataList[messageBody.EntityId] = new CrossHairHurtedData(messageBody.Damage, angle, new Vector2(damageSrcPos.x, damageSrcPos.z));
+            _uiContext.uI.HurtedDataList[messageBody.EntityId] = new CrossHairHurtedData(messageBody.Damage, angle, new Vector2(damageSrcPos.ShiftedVector3().x, damageSrcPos.ShiftedVector3().z));
         }
     }
 }

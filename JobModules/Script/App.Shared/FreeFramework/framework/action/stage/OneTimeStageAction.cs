@@ -3,11 +3,12 @@ using Sharpen;
 using com.wd.free.@event;
 using com.wd.free.action;
 using com.wd.free.util;
+using Core.Free;
 
 namespace com.wd.free.action.stage
 {
     [Serializable]
-	public class OneTimeStageAction
+	public class OneTimeStageAction : IRule
 	{
 		public string time;
 
@@ -28,5 +29,10 @@ namespace com.wd.free.action.stage
 			}
 			return realTime;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.OneTimeStageAction;
+        }
+    }
 }

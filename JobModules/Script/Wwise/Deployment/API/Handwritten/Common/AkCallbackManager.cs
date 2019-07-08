@@ -1,3 +1,5 @@
+using UnityEngine;
+
 #if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.
 //////////////////////////////////////////////////////////////////////
 //
@@ -331,12 +333,9 @@ public static class AkCallbackManager
 
 								msg += " (Instance ID: " + AkMonitoringCallbackInfo.gameObjID + ")";
 							}
-						#if UNITY_EDITOR
-							if (AkMonitoringCallbackInfo.errorLevel == AkMonitorErrorLevel.ErrorLevel_Error)
+							if (AkMonitoringCallbackInfo.errorLevel == AkMonitorErrorLevel.ErrorLevel_Error && 
+							    AkMonitoringCallbackInfo.errorCode != AkMonitorErrorCode.ErrorCode_SelectedChildNotAvailable)
 								UnityEngine.Debug.LogWarning(msg);
-							else
-								UnityEngine.Debug.Log(msg);
-							#endif
 						}
 #endif
 						break;

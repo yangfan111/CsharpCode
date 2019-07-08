@@ -16,7 +16,6 @@ namespace App.Client.GameModules.GamePlay.Free.UI
             SingletonManager.Get<SimpleUIUpdater>().Update();
             SingletonManager.Get<ClientFPSUpdater>().Update();
             SingletonManager.Get<FogManager>().Update();
-            SingletonManager.Get<RealTimeCullingUpdater>().Update();
         }
     }
 }

@@ -47,11 +47,11 @@ namespace App.Client.GameModules.Ui.Models.Common
         {
             openKeyReceiver = new KeyReceiver(UiConstant.paintWindowLayer, BlockType.None);
             openKeyReceiver.AddAction(UserInputKey.F1, (data) => { _adapter.Enable = true;});
-            //_adapter.RegisterKeyReceive(openKeyReceiver);
             _adapter.RegisterOpenKey(openKeyReceiver);
 
             keyReveiver = new KeyReceiver(UiConstant.paintWindowKeyBlockLayer, BlockType.All);
             keyReveiver.AddAction(UserInputKey.F1, (data) => { _adapter.Enable = false; });
+            keyReveiver.AddAction(UserInputKey.HideWindow, (data) => { _adapter.Enable = false; });
             pointerReceiver = new PointerReceiver(UiConstant.paintWindowKeyBlockLayer, BlockType.All);
         }
 
@@ -84,10 +84,6 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         void Refresh()
         {
-            if (UIImageLoader.LoadSpriteAsync == null)
-            {
-                UIImageLoader.LoadSpriteAsync = Loader.RetriveSpriteAsync;
-            }
             for (int i = 0; i < btnRoot.childCount; i++)
             {
                 Transform tf = btnRoot.GetChild(i);

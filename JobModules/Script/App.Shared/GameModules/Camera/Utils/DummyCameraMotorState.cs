@@ -1,8 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using App.Shared.Components.Player;
+using App.Shared.GameModules.Camera;
+using Com.Wooduan.Ssjj2.Common.Net.Proto;
 using Core.CameraControl.NewMotor;
+using Core.Configuration;
 using UnityEngine;
+using Utils.Singleton;
 using XmlConfig;
 
 namespace Assets.App.Shared.GameModules.Camera
@@ -12,11 +16,8 @@ namespace Assets.App.Shared.GameModules.Camera
         private Dictionary<int, SubCameraMotorState> _dict =
             new Dictionary<int, SubCameraMotorState>();
 
-        private Motors _motors;
-
-        public DummyCameraMotorState(Motors motors)
+        public DummyCameraMotorState()
         {
-            _motors = motors;
             Dict[(int)SubCameraMotorType.Free] =
                 new SubCameraMotorState();
             Dict[(int)SubCameraMotorType.Pose] =
@@ -49,11 +50,6 @@ namespace Assets.App.Shared.GameModules.Camera
             return Get(SubCameraMotorType.Pose);
         }
 
-        public CameraConfigItem GetMainConfig()
-        {
-            return ((ICameraMainMotor) _motors.GetDict(SubCameraMotorType.Pose)[GetMainMotor().NowMode]).Config;
-        }
-
         public bool IsFree()
         {
             return Get(SubCameraMotorType.Free).NowMode == (short)ECameraFreeMode.On ||  Mathf.Abs(FreeYaw) > 0.1f ||  Mathf.Abs(FreePitch) > 0.1f;
@@ -82,7 +78,6 @@ namespace Assets.App.Shared.GameModules.Camera
             get { return (ECameraPeekMode) Get(SubCameraMotorType.Peek).NowMode; }
         }
 
-
         public static void Convert(CameraStateNewComponent inData, DummyCameraMotorState outData)
         {
             outData.FreePitch = inData.FreePitch;
@@ -94,7 +89,6 @@ namespace Assets.App.Shared.GameModules.Camera
             outData.Dict[(int)SubCameraMotorType.Pose].Set(inData.MainNowMode, inData.MainLastMode, inData.MainModeTime);
             outData.Dict[(int)SubCameraMotorType.Peek].Set(inData.PeekNowMode, inData.PeekLastMode, inData.PeekModeTime);
             outData.Dict[(int)SubCameraMotorType.View].Set(inData.ViewNowMode,inData.ViewLastMode,inData.ViewModeTime);
-        
         }
 
         public static void Convert(DummyCameraMotorState inData, CameraStateNewComponent outData)
@@ -119,8 +113,6 @@ namespace Assets.App.Shared.GameModules.Camera
             outData.PeekNowMode = inData.Dict[(int)SubCameraMotorType.Peek].NowMode;
             outData.PeekLastMode = inData.Dict[(int)SubCameraMotorType.Peek].LastMode;
             outData.PeekModeTime = inData.Dict[(int)SubCameraMotorType.Peek].ModeTime;
-            outData.CanFire = !inData.IsFree() && inData.GetMainConfig().CanFire;
-
         }
     }
 }

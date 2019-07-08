@@ -35,15 +35,14 @@ namespace App.Shared.Components.Ui.UiAdapter
         /// <param name="weaponPartType"></param>
         /// <returns></returns>
         AssetInfo GetWeaponPartInfoByWeaponPartType(EWeaponPartType weaponPartType);
+
+        int GetIdByWeaponPartType(EWeaponPartType weaponId);
+
+        int id { get; }
     }
 
     public interface IWeaponBagUiAdapter : IAbstractUiAdapter
     {
-        PlayerWeaponController Controller
-        {
-            get;
-            set;
-        }
         /// <summary>
         /// 返回背包索引对应的背包信息，如果对应背包为空背包返回null,背包索引从1开始
         /// </summary>

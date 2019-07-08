@@ -24,11 +24,11 @@ namespace App.Client.GPUInstancing.Core.Terrain
         private Vector4 _cameraPosition;
         private Vector4 _waveAndDistance;
 
-        internal DetailInstancingDraw(InstancingRenderer renderer, ComputeShader visShader,
-            UnityEngine.Terrain setting, TerrainData data)
-            : base(renderer, visShader)
+        internal DetailInstancingDraw(InstancingRenderer renderer, ComputeShader visShader, ComputeShader sortShader,
+            UnityEngine.Terrain setting, TerrainData data, Vector3 basePos)
+            : base(renderer, visShader, sortShader)
         {
-            _basePos = setting.transform.position;
+            _basePos = basePos;
             _wavingGrassStrength = data.wavingGrassStrength;
 
             _wavingTint = data.wavingGrassTint;
@@ -68,7 +68,7 @@ namespace App.Client.GPUInstancing.Core.Terrain
         {
             base.SetMaterialPropertyBlock();
 
-            Mbp.SetBuffer(Constants.DetailVariable.TransformData, TransformData);
+            Mbp.SetBuffer(Constants.TerrainVariable.TransformData, TransformData);
             Mbp.SetBuffer(Constants.DetailVariable.NormalData, _normalData);
             Mbp.SetBuffer(Constants.DetailVariable.ColorData, _colorData);
             Mbp.SetFloat(Constants.DetailVariable.Cutoff, 0.375f);

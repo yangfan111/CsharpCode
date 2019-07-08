@@ -15,6 +15,8 @@ namespace App.Server.GameModules.GamePlay.Free.chicken
         public const string BagPistolWeapon = "w3";
         public const string BagMeleeWeapon = "w4";
         public const string BagGrenadeWeapon = "w5";
+        public const string BagBelt = "belt";
+        public const string BagBag = "bag";
 
         // 物品类别
         public const string ItemCatPrimeWeapon = "w1";

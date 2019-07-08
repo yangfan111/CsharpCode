@@ -16,11 +16,12 @@ using App.Shared.FreeFramework.framework.unit;
 using App.Server.GameModules.GamePlay.free.player;
 using App.Shared;
 using App.Shared.GameModules.Common;
+using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.entity
 {
     [Serializable]
-    public class FreePositionMove : AbstractFreeMove
+    public class FreePositionMove : AbstractFreeMove, IRule
     {
         public enum HitType
         {
@@ -45,6 +46,9 @@ namespace App.Server.GameModules.GamePlay.Free.entity
         [NonSerialized]
         private float realTime;
 
+        [NonSerialized]
+        private long startTime;
+
         public override void StartMove(FreeRuleEventArgs args, FreeMoveEntity entity)
         {
             tempPosition = targetPos.Select(args);
@@ -54,6 +58,8 @@ namespace App.Server.GameModules.GamePlay.Free.entity
             }
 
             UnityPositionUtil.SetUnitPositionToEntity(entity.position, startPos.Select(args));
+
+            startTime = DateTime.Now.Ticks / 10000;
         }
 
         protected new IMoveSpeed GetSpeed(IEventArgs args, FreeMoveEntity entity)
@@ -90,9 +96,15 @@ namespace App.Server.GameModules.GamePlay.Free.entity
                 tempPosition = targetPos.Select(args);
             }
 
-            float speedMeter = GetSpeed(args, entity).GetSpeed(args, interval);
+            long nowTime = DateTime.Now.Ticks / 10000;
 
-            float dis = speedMeter * (float)interval / 1000f;
+            int deltaTime = (int)(nowTime - startTime);
+
+            float speedMeter = GetSpeed(args, entity).GetSpeed(args, deltaTime);
+
+            float dis = speedMeter * (float)deltaTime / 1000f;
+
+            startTime = nowTime;
 
             if (tempPosition.Distance(GetEntityPosition(entity)) < dis)
             {
@@ -203,5 +215,9 @@ namespace App.Server.GameModules.GamePlay.Free.entity
             return false;
         }
 
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreePositionMove;
+        }
     }
 }

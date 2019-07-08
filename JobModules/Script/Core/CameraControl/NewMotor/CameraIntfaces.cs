@@ -24,10 +24,16 @@ namespace Core.CameraControl.NewMotor
         float ArchorYaw { get; set; }
         float ArchorPitch { get; set; }
         bool IsParachuteAttached { get; set; }
-        bool IsObservingFreemove { get; set; }
         bool InterruptCameraFocus { get; set; }
         bool IsChange(ICameraMotorInput r);
         short LastViewByOrder { get; set; }
+        CameraConfigItem Config { get; }
+
+        PoseCameraConfig GetPoseConfig(int modeId);
+        PeekCameraConfig GetPeekConfig();
+        FreeCameraConfig GetFreeConfig();
+        ViewCameraConfig GetViewConfig();
+        DeadCameraConfig GetDeadConfig();
     }
 
     public class SubCameraMotorState
@@ -58,7 +64,6 @@ namespace Core.CameraControl.NewMotor
         float LastFreePitch { get; set; }
         float LastPeekPercent { get; set; }
         SubCameraMotorState GetMainMotor();
-        CameraConfigItem GetMainConfig();
         bool IsFree();
         bool IsFristPersion();
         ECameraViewMode ViewMode { get; }

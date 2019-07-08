@@ -16,6 +16,7 @@ namespace App.Server.GameModules.SceneObject
     public class ServerGlassyObjectListener : ServerMapTriggerObjectListener
     {
         private ICurrentTime _currentTime;
+
         public ServerGlassyObjectListener(Contexts contexts): base(contexts, ETriggerObjectType.GlassyObject,
             MapObjectMatcher.AllOf(
                 MapObjectMatcher.EntityKey,
@@ -46,6 +47,7 @@ namespace App.Server.GameModules.SceneObject
         {
             var chunk = o as FracturedGlassyChunk;
             var mapObject = MapObjectUtility.GetMapObjectOfFracturedChunk(chunk);
+           
             if (mapObject != null)
             {
                 mapObject.glassyData.SetBroken(chunk.ChunkId);

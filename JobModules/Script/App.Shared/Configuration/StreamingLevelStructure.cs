@@ -10,20 +10,22 @@ namespace App.Shared.Configuration
         
         public override void ParseConfig(string xml)
         {
-            Data = XmlConfigParser<StreamingData>.Load(xml);
+            StreamingScene scene = XmlConfigParser<StreamingScene>.Load(xml);
 
-            var count = Data.Scenes.Count;
-            for (int i = 0; i < count; i++)
+            if(Data == null)
             {
-                var scene = Data.Scenes[i];
-                scene.Index = i;
+                Data = new StreamingData();
+            }
 
-                var goCount = scene.Objects.Count;
-                for (int j = 0; j < goCount; j++)
-                {
-                    scene.Objects[j].ConvertFromSerialization(scene);
-                    scene.Objects[j].Index = j;
-                }
+            Data.AddScene(scene);
+           
+        }
+
+        public void Clear()
+        {
+            if(Data != null && Data.Scenes != null)
+            {
+                Data.Scenes.Clear();
             }
         }
     }

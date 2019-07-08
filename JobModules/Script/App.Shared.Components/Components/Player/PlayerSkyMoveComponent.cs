@@ -30,7 +30,7 @@ namespace App.Shared.Components.Player
         public bool IsMoving;
 
         [DontInitilize]
-        [NetworkProperty]
+        [NetworkProperty(SyncFieldScale.stage)]
         public int MoveStage;
         
         [NetworkProperty]
@@ -46,7 +46,7 @@ namespace App.Shared.Components.Player
         public float ParachuteTime;
 
         [DontInitilize]
-        [NetworkProperty]
+        [NetworkProperty(SyncFieldScale.Position)]
         public FixedVector3 Position;
 
         [DontInitilize]
@@ -54,7 +54,7 @@ namespace App.Shared.Components.Player
         public Quaternion Rotation;
 
         [DontInitilize]
-        [NetworkProperty]
+        [NetworkProperty(SyncFieldScale.Position)]
         public Vector3 LocalPlayerPosition;
 
         [DontInitilize]

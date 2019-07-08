@@ -1,7 +1,7 @@
 using Core.Utils;
 using UnityEngine;
 
-namespace Utils.Appearance
+namespace Utils.Appearance.Bone
 {
     public static class BoneTool
     {

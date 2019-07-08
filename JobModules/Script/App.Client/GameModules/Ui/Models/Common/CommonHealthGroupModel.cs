@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using App.Client.GameModules.Ui.Utils;
 using App.Client.GameModules.Ui.UiAdapter;
+using App.Shared;
 using Assets.App.Client.GameModules.Ui;
 
 namespace App.Client.GameModules.Ui.Models.Common
@@ -107,10 +108,12 @@ namespace App.Client.GameModules.Ui.Models.Common
             _viewModel.currentHpValue = 0;
             _viewModel.specialHpBgValue = 0.75f;
 
-            LayoutRebuilder.ForceRebuildLayoutImmediate(FindChildGo("root").GetComponent<RectTransform>());
-            currentHpWidth = FindChildGo("currentHp").GetComponent<RectTransform>().rect.width;
             addImgCom = FindChildGo("addImg").GetComponent<RectTransform>();
             reduceImgCom = FindChildGo("reduceImg").GetComponent<RectTransform>();
+            addImgCom.offsetMin = new Vector2(0,2);
+            addImgCom.offsetMax = new Vector2(0, -2);
+            reduceImgCom.offsetMin = new Vector2(0, 2);
+            reduceImgCom.offsetMax = new Vector2(0, -2);
         }
         private void RefresHpGroup(float interval)
         {
@@ -120,7 +123,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                 var maxHp = adapter.MaxHp;
                 var mayRecoverHp = adapter.MayRecoverHp;
                 var curHpInHurted = adapter.CurrentHpInHurtedState;
-
+              
                 if (!adapter.IsInHurtedState)      //非受伤状态
                 {
                     _viewModel.HpGroupGameObjectActiveSelf = true;
@@ -129,27 +132,19 @@ namespace App.Client.GameModules.Ui.Models.Common
                     if(mayRecoverHp == 0)    //此时只显示当前血量 
                     {
                         float number = _viewModel.currentHpValue;
-                        float endNumber = (float)curHp / (float)maxHp;
+                     
 
+                        float endNumber = (float)curHp / (float)maxHp;
                         if(number < endNumber)
                         {
                             addImgCom.gameObject.SetActive(true);
                             reduceImgCom.gameObject.SetActive(false);
 
-                            //设置位置
-                            addImgCom.anchoredPosition = new Vector2(currentHpWidth * number - 2, 0);
-                            //设置长度
-                            addImgCom.sizeDelta = new Vector2((currentHpWidth * (endNumber - number)), addImgCom.sizeDelta.y);
                         }
                         else if(number > endNumber)
                         {
                             addImgCom.gameObject.SetActive(false);
                             reduceImgCom.gameObject.SetActive(true);
-
-                            //设置位置
-                            reduceImgCom.anchoredPosition = new Vector2(-currentHpWidth * (1 - number) + 2, 0);
-                            //设置长度
-                            reduceImgCom.sizeDelta = new Vector2((currentHpWidth * (number - endNumber)), addImgCom.sizeDelta.y);
                         }
                         else
                         {
@@ -161,15 +156,30 @@ namespace App.Client.GameModules.Ui.Models.Common
                         hpTemperTime += interval;
                         if (hpTemperTime >= hpTimeInterval)
                         {
-                            if (addDecreaseTween == null && number != endNumber)
+                            if (addDecreaseTween != null)
+                                addDecreaseTween.Kill();
+                            if (number != endNumber)
                             {
                                 hpTemperTime = 0;
                                 var startNum = number;
                                 var endNum = endNumber;
+                                bool add = endNum - startNum > 0;
                                 addDecreaseTween = DOTween.To(() => startNum, x => startNum = x, endNum, 0.3f);
+                                addDecreaseTween.SetEase(Ease.Linear);
                                 addDecreaseTween.OnUpdate(() =>
                                 {
-                                    _viewModel.currentHpValue = (float)startNum;
+                                    _viewModel.currentHpValue = startNum;
+                                    if(add)
+                                    {
+                                        addImgCom.anchorMin = new Vector2(startNum, 0f);
+                                        addImgCom.anchorMax = new Vector2(endNumber, 1f);
+                                    }
+                                    else
+                                    {
+                                        reduceImgCom.anchorMin = new Vector2(endNumber, 0.0f);
+                                        reduceImgCom.anchorMax = new Vector2(startNum, 1f);
+                                    }
+                                    
                                     if (_viewModel.currentHpValue < 0.3f)
                                     {
                                         _viewModel.currentHpFillColor = new UnityEngine.Color(237f / 255f, 129f / 255f, 129f / 255f, 1.0f);
@@ -473,7 +483,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                         }
                         helmetTween = UIUtils.CallTween(lastHelmet, curHValue, (value) => 
                         {
-                            _viewModel.HelmetFillAmount = (value / maxHValue);
+                            _viewModel.HelmetFillAmount =  1 - (value / maxHValue);
                         }, 
                         (value) => 
                         {
@@ -506,7 +516,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                         }
                         bulletproofTween = UIUtils.CallTween(lastBulletproof, curBValue, (value) =>
                         {
-                            _viewModel.BulletproofFillAmount = (value / maxBValue);
+                            _viewModel.BulletproofFillAmount = 1 - (value / maxBValue);
                         },
                         (value) =>
                         {
@@ -531,6 +541,8 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void RefreshLossBloodEffect()
         {
+            bool isHX = SharedConfig.IsHXMod;
+            if (isHX) return;
             bool isChange;
             if (adapter.IsInHurtedState)
             {

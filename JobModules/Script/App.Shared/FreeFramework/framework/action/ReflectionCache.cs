@@ -5,94 +5,126 @@ using Sharpen;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.exception;
 using com.wd.free.para;
+using com.cpkf.yyjd.tools.util.math;
+using Core.Free;
 
 namespace com.wd.free.action
 {
     public class ReflectionCache
     {
-        private static ICollection<string> types;
+        /*private static ICollection<string> types;*/
+        private static MyDictionary<string, FieldInfo>[] cache;
+        private static MyDictionary<string, FieldInfo>[] simpleFields;
 
-        private static MyDictionary<string, MyDictionary<string, FieldInfo>> cache;
-        private static MyDictionary<string, MyDictionary<string, FieldInfo>> simpleFields;
+        //private static MyDictionary<string, MyDictionary<string, FieldInfo>> cache;
+        //private static MyDictionary<string, MyDictionary<string, FieldInfo>> simpleFields;
 
         static ReflectionCache()
         {
-            cache = new MyDictionary<string, MyDictionary<string, FieldInfo>>();
-            simpleFields = new MyDictionary<string, MyDictionary<string, FieldInfo>>();
-            types = new HashSet<string>();
-            Sharpen.Collections.AddAll(types, Arrays.AsList(new string[] { "double", "single", "int64", "int32", "string", "boolean" }));
+            cache = new MyDictionary<string, FieldInfo>[(int)ERuleIds.ZLength];
+            simpleFields = new MyDictionary<string, FieldInfo>[(int)ERuleIds.ZLength];
+            //cache = new MyDictionary<string, MyDictionary<string, FieldInfo>>();
+            //simpleFields = new MyDictionary<string, MyDictionary<string, FieldInfo>>();
+            /*types = new HashSet<string>();*/
+            /*Sharpen.Collections.AddAll(types, Arrays.AsList(new string[] { "double", "single", "int64", "int32", "string", "boolean" }));*/
+        }
+
+        public static bool ContainType(string type)
+        {
+            return (ParseUtility.IsBoolean(type) || ParseUtility.IsSingle(type) || ParseUtility.IsDouble(type) || ParseUtility.IsInt64(type) || ParseUtility.IsInt32(type) || ParseUtility.IsString(type));
         }
 
         public static bool HasField(object obj, string field)
         {
-            Initial(obj);
+            IRule ruleObj = obj as IRule;
+            Initial(ruleObj);
             if (obj == null)
             {
                 return false;
             }
-            string key = obj.GetType().FullName;
-            return cache[key].ContainsKey(field);
+            /*string key = obj.GetType().FullName;*/
+            if (ruleObj == null)
+            {
+                throw new GameConfigExpception(obj.GetType().ToString() + " is null or not defined.");
+            } 
+            int id = ruleObj.GetRuleID();
+            FieldInfo v = null;
+            return cache[id].TryGetValue(field, out v);
         }
 
         public static string[] GetSimpleFieldNames(object obj)
         {
-            Initial(obj);
+            IRule ruleObj = obj as IRule;
+            Initial(ruleObj);
             if (obj == null)
             {
                 return new string[0];
             }
-            string key = obj.GetType().FullName;
-            return Sharpen.Collections.ToArray(simpleFields[key].Keys, new string[] { });
+            /*string key = obj.GetType().FullName;*/
+            int id = ruleObj.GetRuleID();
+            return Sharpen.Collections.ToArray(simpleFields[id].Keys, new string[] { });
         }
 
         public static bool IsSimpleField(string type)
         {
-            return types.Contains(type);
+            return ContainType(type);
         }
 
         public static string[] GetFieldNames(object obj)
         {
-            Initial(obj);
+            IRule ruleObj = obj as IRule;
+            Initial(ruleObj);
             if (obj == null)
             {
                 return new string[0];
             }
-            string key = obj.GetType().FullName;
-            return Sharpen.Collections.ToArray(cache[key].Keys, new string[] { });
+            /*string key = obj.GetType().FullName;*/
+            int id = ruleObj.GetRuleID();
+            return Sharpen.Collections.ToArray(cache[id].Keys, new string[] { });
         }
 
-        private static void Initial(object obj)
+        private static void Initial(/*object*/IRule obj)
         {
             if (obj != null)
             {
-                string key = obj.GetType().FullName;
-                if (!cache.ContainsKey(key))
+                /*string key = obj.GetType().FullName;*/
+                int id = obj.GetRuleID();
+                if (null == cache[id])
                 {
                     Type cl = obj.GetType();
-                    cache[key] = new MyDictionary<string, FieldInfo>();
-                    simpleFields[key] = new MyDictionary<string, FieldInfo>();
+                    MyDictionary<string, FieldInfo> c = new MyDictionary<string, FieldInfo>();
+                    cache[id] = c;
+                    MyDictionary<string, FieldInfo> s = new MyDictionary<string, FieldInfo>();
+                    simpleFields[id] = s;
                     while (cl != null && !cl.FullName.Equals("java.lang.Object"))
                     {
-                        foreach (FieldInfo f in cl.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
+                        FieldInfo[] fields = cl.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                        for (int i = 0, maxi = (fields == null ? 0 : fields.Length); i < maxi; i++)
                         {
-                            string type = f.FieldType.Name.ToLower();
+                            FieldInfo f = fields[i];
+                            string type = f.FieldType.Name;
 
                             string name = f.Name;
-                            if (name.Contains("<") && name.Contains(">"))
+
+                            int index = name.IndexOf('<');
+                            int index2 = name.IndexOf('>');
+
+                            if (index > -1 && index2 > -1)
                             {
-                                name = name.Substring(1, name.IndexOf(">") - 1);
+                                name = name.Substring(1, index2 - 1);
                             }
 
-                            if (!cache[key].ContainsKey(name))
+                            FieldInfo v = null;
+                            if (!c.TryGetValue(name, out v))
                             {
-                                cache[key][name] = f;
+                                c[name] = f;
                             }
 
-                            if (types.Contains(type))
+                            if (ContainType(type))
                             {
-                                if (!simpleFields[key].ContainsKey(name))
+                                if (!s.TryGetValue(name, out v))
                                 {
-                                    simpleFields[key][name] = f;
+                                    s[name] = f;
                                 }
                             }
                         }
@@ -112,28 +144,29 @@ namespace com.wd.free.action
             AbstractPara para = null;
             if (f != null)
             {
-                string type = f.FieldType.Name.ToLower();
-                if ("int64".Equals(type))
+                string type = f.FieldType.Name;
+
+                if (ParseUtility.IsInt64(type))
                 {
                     para = new LongPara(field);
                 }
-                if ("int32".Equals(type))
+                if (ParseUtility.IsInt32(type))
                 {
                     para = new IntPara(field);
                 }
-                if ("single".Equals(type))
+                if (ParseUtility.IsSingle(type))
                 {
                     para = new FloatPara(field);
                 }
-                if ("double".Equals(type))
+                if (ParseUtility.IsDouble(type))
                 {
                     para = new DoublePara(field);
                 }
-                if ("string".Equals(type))
+                if (ParseUtility.IsString(type))
                 {
                     para = new StringPara(field);
                 }
-                if ("boolean".Equals(type))
+                if (ParseUtility.IsBoolean(type))
                 {
                     para = new BoolPara(field);
                 }
@@ -152,34 +185,35 @@ namespace com.wd.free.action
             return para;
         }
 
-        public static bool ContainsField(object obj, string field)
+        public static bool ContainsField(/*object*/IRule obj, string field)
         {
             Initial(obj);
-            string key = obj.GetType().FullName;
+            /*string key = obj.GetType().FullName;*/
+            int id = obj.GetRuleID();
 
-            return cache[key].ContainsKey(field);
+            return cache[id].ContainsKey(field);
         }
 
         public static object GetValue(FieldInfo field, string stringValue)
         {
-            string type = field.FieldType.Name.ToLower();
-            if ("int64".Equals(type))
+            string type = field.FieldType.Name;
+            if (ParseUtility.IsInt64(type))
             {
                 return long.Parse(stringValue);
             }
-            if ("int32".Equals(type))
+            if (ParseUtility.IsInt32(type))
             {
                 return int.Parse(stringValue);
             }
-            if ("single".Equals(type))
+            if (ParseUtility.IsSingle(type))
             {
                 return float.Parse(stringValue);
             }
-            if ("double".Equals(type))
+            if (ParseUtility.IsDouble(type))
             {
                 return double.Parse(stringValue);
             }
-            if ("boolean".Equals(type))
+            if (ParseUtility.IsBoolean(type))
             {
                 return bool.Parse(stringValue);
             }
@@ -188,15 +222,17 @@ namespace com.wd.free.action
 
         public static FieldInfo GetField(object obj, string field)
         {
-            Initial(obj);
-            string key = obj.GetType().FullName;
-            if (cache[key].ContainsKey(field))
+            IRule ruleObj = obj as IRule;
+            Initial(ruleObj);
+            /*string key = obj.GetType().FullName;*/
+            int id = ruleObj.GetRuleID();
+            if (cache[id].ContainsKey(field))
             {
-                return cache[key][field];
+                return cache[id][field];
             }
             else
             {
-                throw new GameConfigExpception(field + " is not a valid field at " + key);
+                throw new GameConfigExpception(field + " is not a valid field at " + id);
             }
         }
     }

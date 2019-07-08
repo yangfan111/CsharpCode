@@ -44,6 +44,9 @@
     <Reference Include="DOTween">
       <HintPath>..\CommonLibs\DOTween\DOTween\DOTween.dll</HintPath>
     </Reference>
+    <Reference Include="DOTweenPro">
+      <HintPath>..\CommonLibs\DOTween\DOTweenPro\DOTweenPro.dll</HintPath>
+    </Reference>
     <Reference Include="Entitas.CodeGeneration.Attributes">
       <HintPath>..\CommonLibs\Entitas.CodeGeneration.Attributes.dll</HintPath>
     </Reference>
@@ -92,8 +95,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArtModule\ArtModule.cs" />
-    <Compile Include="Battle\ClientDamageInfoCollector.cs" />
-    <Compile Include="Bullet\ClientBulletInfoCollector.cs" />
     <Compile Include="CastObjectUtil\BaseCastData.cs" />
     <Compile Include="CastObjectUtil\BaseGoAssemble.cs" />
     <Compile Include="CastObjectUtil\CommonCastData.cs" />
@@ -141,9 +142,12 @@
     <Compile Include="GPUInstancing\Core\Spatial\GpuInstancingDetailNode.cs" />
     <Compile Include="GPUInstancing\Core\Spatial\GpuInstancingNode.cs" />
     <Compile Include="GPUInstancing\Core\Spatial\GpuInstancingNodeCluster.cs" />
+    <Compile Include="GPUInstancing\Core\Spatial\GpuInstancingNodeIndicator.cs" />
     <Compile Include="GPUInstancing\Core\Spatial\GpuInstancingSpatialPartition.cs" />
+    <Compile Include="GPUInstancing\Core\Spatial\GpuInstancingTreeNode.cs" />
     <Compile Include="GPUInstancing\Core\Terrain\DetailInstancingDraw.cs" />
     <Compile Include="GPUInstancing\Core\Terrain\DetailInstancingPrototype.cs" />
+    <Compile Include="GPUInstancing\Core\Terrain\TreeInstancingDraw.cs" />
     <Compile Include="GPUInstancing\Core\Utils\Constants.cs" />
     <Compile Include="GPUInstancing\Core\Utils\Helper.cs" />
     <Compile Include="GPUInstancing\Core\Utils\MergeKernel.cs" />
@@ -156,30 +160,31 @@
     <Compile Include="GameMode\InputMapper\IGlobalInputMapper.cs" />
     <Compile Include="GameMode\PickupLogic\ClientCommonPickupDropHandler.cs" />
     <Compile Include="GameMode\PickupLogic\ClientSurvivalPickupDropHandler.cs" />
-    <Compile Include="GameModules\Bullet\BulletCleanUpSystem.cs" />
-    <Compile Include="GameModules\Bullet\BulletEntityInitSytem.cs" />
-    <Compile Include="GameModules\Bullet\BulletModule.cs" />
-    <Compile Include="GameModules\Bullet\BulletRenderSystem.cs" />
-    <Compile Include="GameModules\Bullet\ClientBulletInfoCollectSystem.cs" />
+    <Compile Include="GameModules\Attack\BulletEntityInitSytem.cs" />
+    <Compile Include="GameModules\Attack\BulletModule.cs" />
+    <Compile Include="GameModules\Attack\BulletRenderSystem.cs" />
+    <Compile Include="GameModules\Attack\ClientBulletRemoteCollectSystem.cs" />
     <Compile Include="GameModules\ClientEffect\BatchLoadHandler.cs" />
     <Compile Include="GameModules\ClientEffect\ClientEffectCleanUpSystem.cs" />
     <Compile Include="GameModules\ClientEffect\ClientEffectEntityInitSystem.cs" />
     <Compile Include="GameModules\ClientEffect\ClientEffectLimitSystem.cs" />
     <Compile Include="GameModules\ClientEffect\ClientEffectModule.cs" />
+    <Compile Include="GameModules\ClientEffect\ClientEffectObjectRenderSystem.cs" />
     <Compile Include="GameModules\ClientEffect\ClientEffectRenderSystem.cs" />
     <Compile Include="GameModules\ClientEffect\EffectLogic\AbstractClientEffect.cs" />
     <Compile Include="GameModules\ClientEffect\EffectLogic\BulletDropClientEffect.cs" />
     <Compile Include="GameModules\ClientEffect\EffectLogic\ClipDorpClientEffect.cs" />
+    <Compile Include="GameModules\ClientEffect\EffectLogic\EffectLogicFactory.cs" />
     <Compile Include="GameModules\ClientEffect\EffectLogic\EnvironmentHitClientEffect.cs" />
     <Compile Include="GameModules\ClientEffect\EffectLogic\HumanHitClientEffect.cs" />
     <Compile Include="GameModules\ClientEffect\EffectLogic\MuzzleSparkClientEffect.cs" />
     <Compile Include="GameModules\ClientEffect\EffectLogic\Ssjj2AssetsUtility.cs" />
     <Compile Include="GameModules\ClientEffect\EffectLogic\ThrowingClientEffect.cs" />
-    <Compile Include="GameModules\ClientEffect\EffectLogicFactory.cs" />
     <Compile Include="GameModules\ClientInit\CheckPreparingPlayerSystem.cs" />
     <Compile Include="GameModules\ClientInit\ClientInitModule.cs" />
     <Compile Include="GameModules\ClientInit\RequestPlayerInfoSystem.cs" />
     <Compile Include="GameModules\ClientInit\RequestRoomInfoSystem.cs" />
+    <Compile Include="GameModules\ClientInit\RequestSceneInfoSystem.cs" />
     <Compile Include="GameModules\ClientInit\RequestSnapshotSystem.cs" />
     <Compile Include="GameModules\ClientInit\RewindFirstSnapshotInitSystem.cs" />
     <Compile Include="GameModules\Effect\GlobalEffectManager.cs" />
@@ -189,10 +194,12 @@
     <Compile Include="GameModules\GamePlay\Free\App\BlastUIHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\App\ChickenBagUtil.cs" />
     <Compile Include="GameModules\GamePlay\Free\App\ChickenUIUtil.cs" />
+    <Compile Include="GameModules\GamePlay\Free\App\CommonTipHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\App\FetchUIValueHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\App\GroupClassicUIHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\App\GroupUIHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\App\ItemInfoHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\App\PlaneUIHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\App\ShowCodeUIHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\App\ShowSplitUIHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\App\TipData.cs" />
@@ -266,10 +273,10 @@
     <Compile Include="GameModules\GamePlay\Free\Player\PlayerAnimationHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\Player\PlayerBiochemicalMarkHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\Player\PlayerCmdHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Player\PlayerMiniMapSupplyMarkHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\Player\PlayerMoveHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\Player\PlayerMoveSpeedHandler.cs" />
-    <Compile Include="GameModules\GamePlay\Free\Player\PlayerScaleHandler.cs" />
-    <Compile Include="GameModules\GamePlay\Free\Player\PlayerVisibilityHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\Player\PlayerMsgHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\Render\IEffectModel3D.cs" />
     <Compile Include="GameModules\GamePlay\Free\Render\IObject3D.cs" />
     <Compile Include="GameModules\GamePlay\Free\Render\IScreenManage.cs" />
@@ -287,7 +294,6 @@
     <Compile Include="GameModules\GamePlay\Free\Scene\PlayerAudioHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\Scene\PlayerAudioHandlerExt.cs" />
     <Compile Include="GameModules\GamePlay\Free\Scene\PoisonCircleHandler.cs" />
-    <Compile Include="GameModules\GamePlay\Free\Scene\RealTimeCullingUpdater.cs" />
     <Compile Include="GameModules\GamePlay\Free\Scene\SceneLightHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\Scene\SkyBoxHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\Scene\TestFrameHandler.cs" />
@@ -355,13 +361,14 @@
     <Compile Include="GameModules\Player\ClientFreeCmdGenerateSystem.cs" />
     <Compile Include="GameModules\Player\ClientPlayerCameraInitSystem.cs" />
     <Compile Include="GameModules\Player\ClientPlayerEntityInitSystem.cs" />
+    <Compile Include="GameModules\Player\ClientPlayerGUISystem.cs" />
     <Compile Include="GameModules\Player\ClientPlayerModule.cs" />
     <Compile Include="GameModules\Player\ClientPlayerResourceLoadSystem.cs" />
     <Compile Include="GameModules\Player\ClientPlayerSaveSystem.cs" />
     <Compile Include="GameModules\Player\ClientPlayerTipShowSystem.cs" />
-    <Compile Include="GameModules\Player\ClientPlayerWeaponSystem.cs" />
     <Compile Include="GameModules\Player\InputSchemeUpdateSystem.cs" />
     <Compile Include="GameModules\Player\PlayerAutoMoveSystem.cs" />
+    <Compile Include="GameModules\Player\PlayerEffectsSystem.cs" />
     <Compile Include="GameModules\Player\PlayerFirstPersonHandRotationSystem.cs" />
     <Compile Include="GameModules\Player\PlayerGunCameraSystem.cs" />
     <Compile Include="GameModules\Player\PlayerPlayBackFilterSystem.cs" />
@@ -397,6 +404,8 @@
     <Compile Include="GameModules\SceneObject\FreeObjectCleanUpSystem.cs" />
     <Compile Include="GameModules\SceneObject\FreeObjectLoadSystem.cs" />
     <Compile Include="GameModules\SceneObject\FreeObjectPositionUpdateSystem.cs" />
+    <Compile Include="GameModules\SceneObject\MapObjCleanUpSystem.cs" />
+    <Compile Include="GameModules\SceneObject\SceneAssetHandler.cs" />
     <Compile Include="GameModules\SceneObject\SceneObjectCastTargetLoadSystem.cs" />
     <Compile Include="GameModules\SceneObject\SceneObjectCleanupSystem.cs" />
     <Compile Include="GameModules\SceneObject\SceneObjectConstant.cs" />
@@ -420,9 +429,11 @@
     <Compile Include="GameModules\Throwing\ThrowingRenderSystem.cs" />
     <Compile Include="GameModules\Ui\AssetBundleConstant.cs" />
     <Compile Include="GameModules\Ui\Logic\AbstractCastLogic.cs" />
+    <Compile Include="GameModules\Ui\Logic\BuffTipLogic.cs" />
     <Compile Include="GameModules\Ui\Logic\CommonCastLogic.cs" />
     <Compile Include="GameModules\Ui\Logic\DoorCastLogic.cs" />
     <Compile Include="GameModules\Ui\Logic\FreeObjectCastLogic.cs" />
+    <Compile Include="GameModules\Ui\Logic\IBuffTipLogic.cs" />
     <Compile Include="GameModules\Ui\Logic\ICastLogic.cs" />
     <Compile Include="GameModules\Ui\Logic\IPlayerStateTipLogic.cs" />
     <Compile Include="GameModules\Ui\Logic\MapObjectCastLogic.cs" />
@@ -458,8 +469,6 @@
     <Compile Include="GameModules\Ui\Models\Common\CommonLocationModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonMCountDownModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonMenuModel.cs" />
-    <Compile Include="GameModules\Ui\Models\Common\CommonMiniMap.cs" />
-    <Compile Include="GameModules\Ui\Models\Common\CommonNoticeModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonOperationTipModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonPaintDiscModel.cs" />
     <Compile Include="GameModules\Ui\Models\Common\CommonParachuteModel.cs" />
@@ -486,11 +495,7 @@
     <Compile Include="GameModules\Ui\Models\Common\Map\BioMark.cs" />
     <Compile Include="GameModules\Ui\Models\Common\Map\BombArea.cs" />
     <Compile Include="GameModules\Ui\Models\Common\Map\CommonMap.cs" />
-    <Compile Include="GameModules\Ui\Models\Common\Map\CommonMaxMap.cs" />
-    <Compile Include="GameModules\Ui\Models\Common\Map\CommonMaxMapAirPlane.cs" />
-    <Compile Include="GameModules\Ui\Models\Common\Map\CommonMaxMapDuanQuan.cs" />
-    <Compile Include="GameModules\Ui\Models\Common\Map\CommonMaxMapGridBg.cs" />
-    <Compile Include="GameModules\Ui\Models\Common\Map\CommonMaxMapPlayMark.cs" />
+    <Compile Include="GameModules\Ui\Models\Common\Map\CommonMiniMap.cs" />
     <Compile Include="GameModules\Ui\Models\Common\Map\MapGird.cs" />
     <Compile Include="GameModules\Ui\Models\Common\Map\MapGird1.cs" />
     <Compile Include="GameModules\Ui\Models\Common\Map\MapLabel.cs" />
@@ -498,17 +503,13 @@
     <Compile Include="GameModules\Ui\Models\Common\Map\MapPlayer.cs" />
     <Compile Include="GameModules\Ui\Models\Common\Map\RouteLine.cs" />
     <Compile Include="GameModules\Ui\Models\Common\Map\SafeMiniDis.cs" />
-    <Compile Include="GameModules\Ui\Models\Common\MaxMap\CommonMaxMap.cs" />
-    <Compile Include="GameModules\Ui\Models\Common\MaxMap\CommonMaxMapAirPlane.cs" />
-    <Compile Include="GameModules\Ui\Models\Common\MaxMap\CommonMaxMapDuanQuan.cs" />
-    <Compile Include="GameModules\Ui\Models\Common\MaxMap\CommonMaxMapGridBg.cs" />
-    <Compile Include="GameModules\Ui\Models\Common\MaxMap\CommonMaxMapPlayMark.cs" />
     <Compile Include="GameModules\Ui\Models\Common\MaxMap\MaxMapCommon.cs" />
     <Compile Include="GameModules\Ui\Models\Common\PrivateChat.cs" />
     <Compile Include="GameModules\Ui\Models\Common\WeaponHudAnime.cs" />
     <Compile Include="GameModules\Ui\Models\Group\GroupRecordInfo.cs" />
     <Compile Include="GameModules\Ui\Models\Group\GroupRecordModel.cs" />
     <Compile Include="GameModules\Ui\Models\Group\GroupScoreModel.cs" />
+    <Compile Include="GameModules\Ui\System\ObserveUISystem.cs" />
     <Compile Include="GameModules\Ui\System\PlayerAddMarkSystem.cs" />
     <Compile Include="GameModules\Ui\System\PlayerAddMarkUtility.cs" />
     <Compile Include="GameModules\Ui\System\PlayerSprayPaintSystem.cs" />
@@ -543,7 +544,6 @@
     <Compile Include="GameModules\Ui\UiAdapter\Common\LocationUIAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Common\MenuUIAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Common\MiniMapAdapter.cs" />
-    <Compile Include="GameModules\Ui\UiAdapter\Common\NoticeUIAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Common\OperationTipUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Common\PaintUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Common\ParachuteStateUiAdapter.cs" />
@@ -590,7 +590,6 @@
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\ILocationUIAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IMenuUIAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IMiniMapUiAdapter.cs" />
-    <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\INoticeUIAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IOperationTipUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IPaintUiAdapter.cs" />
     <Compile Include="GameModules\Ui\UiAdapter\Interface\Common\IPickUpUiAdapter.cs" />
@@ -674,8 +673,11 @@
     <Compile Include="GameModules\Ui\ViewModels\Group\GroupScoreViewModel.cs" />
     <Compile Include="GameModules\UserInput\InputCollectSystem.cs" />
     <Compile Include="GameModules\UserInput\InputConfigInitSystem.cs" />
+    <Compile Include="GameModules\UserInput\InputManager.cs" />
     <Compile Include="GameModules\UserInput\InputManagerConfigInitSystem.cs" />
+    <Compile Include="GameModules\UserInput\InputProcessor.cs" />
     <Compile Include="GameModules\UserInput\PlayerInputManager.cs" />
+    <Compile Include="GameModules\UserInput\PointerProvider.cs" />
     <Compile Include="GameModules\UserInput\UserInputConst.cs" />
     <Compile Include="GameModules\UserPhysics\SimulationTimeSyncClientSystem.cs" />
     <Compile Include="GameModules\Vehicle\ClientVehicleEntityInitSystem.cs" />
@@ -710,6 +712,7 @@
     <Compile Include="SceneManagement\DistanceCulling\StreamingGoBuilder.cs" />
     <Compile Include="SceneManagement\DistanceCulling\StreamingGoByDistance.cs" />
     <Compile Include="SceneManagement\Vegetation\TerrainRenderer.cs" />
+    <Compile Include="SessionStates\ClientOptionLoadState.cs" />
     <Compile Include="SessionStates\ClientPreLoadState.cs" />
     <Compile Include="SessionStates\ClientProfileSessionStateMachine.cs" />
     <Compile Include="SessionStates\ClientSessionStateMachine.cs" />
@@ -723,10 +726,12 @@
     <Compile Include="SessionStates\LoadSubResourceConfigureState.cs" />
     <Compile Include="SessionStates\LocalizeSessionSystem.cs" />
     <Compile Include="SessionStates\LoginSuccState.cs" />
+    <Compile Include="SessionStates\PostConfigLoadSystem.cs" />
     <Compile Include="SessionStates\PreparingPlayerState.cs" />
     <Compile Include="SessionStates\ProfilePreparationState.cs" />
     <Compile Include="SessionStates\ProfileState.cs" />
     <Compile Include="SessionStates\RequestRoomInfoState.cs" />
+    <Compile Include="SessionStates\RequestSceneInfoState.cs" />
     <Compile Include="SessionStates\WaitSnapshotState.cs" />
     <Compile Include="StartUp\IClientContextInitilizer.cs" />
     <Compile Include="StartUp\Offline\OfflineSimulationSystem.cs" />
@@ -801,10 +806,6 @@
       <Project>{094E10E3-F51B-04E9-DEAF-740FCA1CE04D}</Project>
       <Name>I2Localization</Name>
     </ProjectReference>
-    <ProjectReference Include="..\iTween\iTween.csproj">
-      <Project>{51B5FF02-3D57-2AD9-2612-3E2D1253B129}</Project>
-      <Name>iTween</Name>
-    </ProjectReference>
     <ProjectReference Include="..\LiteNetLib\LiteNetLib.csproj">
       <Project>{B1B5C059-9D6D-02A7-0675-DB02F24B9D97}</Project>
       <Name>LiteNetLib</Name>
@@ -828,10 +829,6 @@
     <ProjectReference Include="..\UiFramework\UiFramework.csproj">
       <Project>{7154591B-DD09-D210-66FE-CBE7D2B2C814}</Project>
       <Name>UiFramework</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UITween\UITween.csproj">
-      <Project>{E6655143-5245-D0DE-5B5D-5BB5C7BB3640}</Project>
-      <Name>UITween</Name>
     </ProjectReference>
     <ProjectReference Include="..\UserInputManager\UserInputManager.csproj">
       <Project>{AF9B4541-9B94-6493-C4C6-4918B01E449F}</Project>

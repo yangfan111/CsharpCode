@@ -3,12 +3,13 @@ using com.cpkf.yyjd.tools.util;
 using com.wd.free.@event;
 using com.wd.free.util;
 using Free.framework;
+using Core.Free;
 
 namespace gameplay.gamerule.free.ui.component
 {
 	[System.Serializable]
-	public class FreeNumberComponet : AbstractFreeComponent
-	{
+	public class FreeNumberComponet : AbstractFreeComponent, IRule
+    {
 		private const long serialVersionUID = -7699020163820046853L;
 
 		private string number;
@@ -60,5 +61,10 @@ namespace gameplay.gamerule.free.ui.component
 		{
 			this.number = number;
 		}
-	}
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.FreeNumberComponet;
+        }
+    }
 }
