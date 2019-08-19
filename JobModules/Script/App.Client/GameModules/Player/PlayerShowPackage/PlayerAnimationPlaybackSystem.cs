@@ -42,8 +42,6 @@ namespace App.Client.GameModules.Player.PlayerShowPackage
             return !entity.isFlagPlayBackFilter;
         }
 
-        private static readonly AnimatorPoseReplayer PoseReplayer = new AnimatorPoseReplayer();
-
         protected override void OnPlayBack(PlayerEntity player)
         {
             try
@@ -58,7 +56,14 @@ namespace App.Client.GameModules.Player.PlayerShowPackage
                 {
                     OverridePlayBackNetworkAnimator(player, networkAnimator.AnimatorLayers);
 
-                    PoseReplayer.ReplayPose(networkAnimator.AnimatorLayers, networkAnimator.AnimatorParameters,
+//                    流量优化用
+//                    if (networkAnimator.AnimatorParameters == null)
+//                    {
+//                        networkAnimator.SetAnimatorParamsWithoutChangeData(
+//                            NetworkAnimatorUtil.GetAnimatorParams(player.thirdPersonAnimator.UnityAnimator));
+//                        networkAnimator.ConvertCompressDataToStructureData();
+//                    }
+                    AnimatorPoseReplayer.ReplayPose(networkAnimator.AnimatorLayers, networkAnimator.AnimatorParameters,
                         player.thirdPersonAnimator.UnityAnimator);
                 }
             }
@@ -88,7 +93,7 @@ namespace App.Client.GameModules.Player.PlayerShowPackage
                     _logger.DebugFormat("trigger time:{0} is lager than currentTime:{1}",
                         player.overrideNetworkAnimator.InjuryTriigerTime, currentTime);
                 }
-                else if (normalizeTime < 1 && normalizeTime >= 0)
+                else if (normalizeTime < 1)
                 {
                     NetworkAnimatorUtil.ForceToInjureState(networkAnimatorAnimatorLayers, normalizeTime);
                 }

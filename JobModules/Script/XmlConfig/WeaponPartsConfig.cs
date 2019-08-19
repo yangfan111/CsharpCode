@@ -10,37 +10,49 @@ namespace XmlConfig
     {
         None,
         /// <summary>
-        /// 弹匣
+        /// 1弹匣
         /// </summary>
-        Magazine,
+        Magazine=1,
         /// <summary>
-        /// 枪口：消焰器，补偿器，消音器
+        /// 2枪口：消焰器，补偿器，消音器
         /// </summary>
-        Muzzle,
+        Muzzle=2,
         /// <summary>
-        /// 导轨:瞄具
+        /// 3导轨:瞄具
         /// </summary>
-        UpperRail,
+        UpperRail=3,
         /// <summary>
-        /// 侧导轨:S型激光辅助
+        /// 4侧导轨:S型激光辅助
         /// </summary>
-        SideRail,
+        SideRail=4,
         /// <summary>
-        /// 握把 
+        /// 5握把 
         /// </summary>
-        LowerRail,
+        LowerRail=5,
         /// <summary>
-        /// 枪托
+        /// 6枪托
         /// </summary>
-        Stock,
+        Stock=6,
         /// <summary>
-        /// 枪膛
+        /// 7枪膛
         /// </summary>
-        Bore,
-        Feed,
-        Trigger,
-        Interlock,
-        Brake,
+        Bore=7,
+        /// <summary>
+        /// 8
+        /// </summary>
+        Feed=8,
+        /// <summary>
+        /// 9
+        /// </summary>
+        Trigger=9,
+        /// <summary>
+        /// 10
+        /// </summary>
+        Interlock=10,
+        /// <summary>
+        /// 11
+        /// </summary>
+        Brake=11,
         Length,
     }
 
@@ -53,7 +65,6 @@ namespace XmlConfig
         public int UnlockLv;
         public int GP;
         public int Gold;
-        public int Sort;
         public int Bullet;//前置子弹数
         public float Weight;
         public float ReloadSpeed;//换弹时间
@@ -82,6 +93,8 @@ namespace XmlConfig
         public float EmitVelocity;
         public float AttackInterval;
         public string DOFParameter; //景深
+        public List<float> ShowRotation;  //展示角度
+        public float ShowDistance;        //展示距离
         public string[] GetDOFParameters
                {
                    get

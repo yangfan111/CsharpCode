@@ -20,7 +20,7 @@ namespace App.Server
 
             AddSystem(new PlayerDebugDrawSystem(contexts));
             AddSystem(new ServerPlayerWeaponInitSystem(contexts.player, contexts.session.commonSession));
-            AddSystem(new PlayerEquipPickAndDropSystem(null));
+            AddSystem(new PlayerEquipPickAndDropSystem());
             AddSystem(new ServerBulletInfoCollectSystem(contexts.bullet,contexts.player));
         }
     }

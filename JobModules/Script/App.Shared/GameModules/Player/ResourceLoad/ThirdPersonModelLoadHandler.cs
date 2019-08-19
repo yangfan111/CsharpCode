@@ -143,6 +143,12 @@ namespace App.Shared.GameModules.Player.ResourceLoad
             //人物变身、换肤时，清空特效数据
             if (player.hasEffects)
                 player.effects.ResetEffects();
+
+            // 处理显隐
+            if (player.hasGamePlay)
+            {
+                PlayerEntityUtility.SetVisibility(go, player.gamePlay.Visibility);
+            }
         }
         
         private void InitCharacterControllerSetting(PlayerEntity player)

@@ -1,6 +1,7 @@
 using System.IO;
 using App.Shared.Components.Serializer;
 using App.Shared.EntityFactory;
+using Core.Components;
 using Core.EntityComponent;
 using Core.Event;
 using Core.ObjectPool;
@@ -16,7 +17,7 @@ namespace App.Shared.Player.Events
         public EntityKey Target;
         public Vector3   Offset;
         public byte      HitBodyPart;
-        public Vector3   HitPoint;
+        public FixedVector3   HitPoint;
         public int       HitAudioId;
 
         public class ObjcetFactory : CustomAbstractObjectFactory

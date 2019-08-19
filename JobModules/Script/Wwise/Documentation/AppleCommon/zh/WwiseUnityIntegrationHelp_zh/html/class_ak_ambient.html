@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>AkAmbient类参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li class="current"><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="tabs">
+    <ul>
+      <li><a href="annotated.html"><span>组合类型列表</span></a></li>
+      <li><a href="classes.html"><span>组合类型索引</span></a></li>
+      <li><a href="hierarchy.html"><span>类继承关系</span></a></li>
+      <li><a href="functions.html"><span>组合类型成员</span></a></li>
+    </ul>
+  </div>
+</div>
+<div class="contents">
+<h1>AkAmbient类参考</h1><!-- doxytag: class="AkAmbient" --><!-- doxytag: inherits="AkEvent" -->
+<p>Use this component to attach a Wwise Event to any object in a scene. The sound can be started at various moments, dependent on the selected Unity trigger. This component is more useful for ambient sounds (sounds related to scene-bound objects) but could also be used for other purposes. Since <a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a> has <a class="el" href="class_ak_event.html" title="Helper class that knows a Wwise Event and when to trigger it in Unity. As of 2017...">AkEvent</a> as its base class, it features the play/stop, play multiple, stop multiple and stop all buttons for previewing the associated Wwise event.  
+<a href="#_details">更多...</a></p>
+<div class="dynheader">
+继承图，类AkAmbient</div>
+<div class="dynsection">
+ <div class="center">
+  <img src="class_ak_ambient.png" usemap="#AkAmbient_map" alt=""/>
+  <map id="AkAmbient_map" name="AkAmbient_map">
+<area href="class_ak_event.html" alt="AkEvent" shape="rect" coords="0,0,72,24"/>
+</map>
+ </div>
+</div>
+
+<p><a href="class_ak_ambient-members.html">所有成员的列表。</a></p>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2"><h2>公有属性</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">AkActionOnEventType&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_event_a9ebd4b3857bd5aa4e48ad140f7418a75.html#a9ebd4b3857bd5aa4e48ad140f7418a75">actionOnEventType</a> = AkActionOnEventType.AkActionOnEventType_Stop</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Replacement action. See AK::SoundEngine::ExecuteEventOnAction().  <a href="#a9ebd4b3857bd5aa4e48ad140f7418a75"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">AkCurveInterpolation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_event_ac9a601f2ea52e2ec4f7da6f6d1f47417.html#ac9a601f2ea52e2ec4f7da6f6d1f47417">curveInterpolation</a> = AkCurveInterpolation.AkCurveInterpolation_Linear</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Fade curve to use with the new Action. See AK::SoundEngine::ExecuteEventOnAction().  <a href="#ac9a601f2ea52e2ec4f7da6f6d1f47417"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_event_a55c358f4863c8f85aa5dd72dcf5b8fcb.html#a55c358f4863c8f85aa5dd72dcf5b8fcb">enableActionOnEvent</a> = false</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Enables additional options to reuse existing events. Use it to transform a Play event into a Stop event without having to define one in the Wwise Project.  <a href="#a55c358f4863c8f85aa5dd72dcf5b8fcb"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">UnityEngine.GameObject&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_event_a6299fe43fd983eef04a9b0aebc8fd4cf.html#a6299fe43fd983eef04a9b0aebc8fd4cf">soundEmitterObject</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Game object onto which the Event will be posted. By default, when empty, it is posted on the same object on which the component was added.  <a href="#a6299fe43fd983eef04a9b0aebc8fd4cf"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_event_a856277457c22871638f774f7b99069d8.html#a856277457c22871638f774f7b99069d8">transitionDuration</a> = 0.0f</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Duration of the fade. See AK::SoundEngine::ExecuteEventOnAction().  <a href="#a856277457c22871638f774f7b99069d8"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html#a66a8b7926fdb83ea328b32f58027e319">MAX_NB_TRIGGERS</a> = 32</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Since our mask is a 32 bits integer, we can't have more than 32 triggers.  <a href="#a66a8b7926fdb83ea328b32f58027e319"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">System.Collections.Generic.List<br class="typebreak"/>
+&lt; int &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html#ae4fb12ca0dcd883567cdae2aa6667f99">triggerList</a> = new System.Collections.Generic.List&lt;int&gt; { START_TRIGGER_ID }</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">List containing the enabled triggers.  <a href="#ae4fb12ca0dcd883567cdae2aa6667f99"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html#a7356afac1aa764845f51a4f403eb277a">useOtherObject</a> = false</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">This property is usefull only when used with colliders. When enabled, the target of the action will be the other colliding object. When disabled, it will be the current object.  <a href="#a7356afac1aa764845f51a4f403eb277a"></a><br/></td></tr>
+<tr><td colspan="2"><h2>静态公有属性</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static <br class="typebreak"/>
+System.Collections.Generic.Dictionary<br class="typebreak"/>
+&lt; uint, string &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html#ae7a9a7b78c99c34282de009bf24d981a">triggerTypes</a> = AkTriggerBase.GetAllDerivedTypes()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Will contain the types of all the triggers derived from <a class="el" href="class_ak_trigger_base.html">AkTriggerBase</a> at runtime.  <a href="#ae7a9a7b78c99c34282de009bf24d981a"></a><br/></td></tr>
+</table>
+<hr/><a name="_details"></a><h2>详细描述</h2>
+<p>Use this component to attach a Wwise Event to any object in a scene. The sound can be started at various moments, dependent on the selected Unity trigger. This component is more useful for ambient sounds (sounds related to scene-bound objects) but could also be used for other purposes. Since <a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a> has <a class="el" href="class_ak_event.html" title="Helper class that knows a Wwise Event and when to trigger it in Unity. As of 2017...">AkEvent</a> as its base class, it features the play/stop, play multiple, stop multiple and stop all buttons for previewing the associated Wwise event. </p>
+<dl class="see"><dt><b>参见:</b></dt><dd><ul>
+<li><a class="el" href="pg__appscripts.html#unity_use_AkEvent_AkAmbient">如何与 inspector 一起使用 AkAmbient</a></li>
+<li><a class="el" href="class_ak_game_obj.html">AkGameObj</a></li>
+<li><a class="el" href="class_ak_event.html">AkEvent</a></li>
+<li><a href="https://www.audiokinetic.com/library/edge/?source=SDK&amp;id=soundengine__events.html" target="_blank">Integration Details - Events</a> (Note: This is described in the Wwise SDK documentation.) </li>
+</ul>
+</dd></dl>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

@@ -27,8 +27,6 @@ namespace App.Server.GameModules.GamePlay.free.client
 {
     public class FreeDragImageHandler : ParaConstant, IFreeMessageHandler
     {
-        private const string Ground = "ground";
-
         public bool CanHandle(ServerRoom room, PlayerEntity player, SimpleProto message)
         {
             return message.Key == FreeMessageConstant.DragImage;
@@ -64,26 +62,26 @@ namespace App.Server.GameModules.GamePlay.free.client
             {
 
             }
-            else if (from.StartsWith(ChickenConstant.BagBelt) || to.StartsWith(ChickenConstant.BagBelt))
+            /*else if (from.StartsWith(ChickenConstant.BagBelt) || to.StartsWith(ChickenConstant.BagBelt))
             {
                 // 腰包不能做任何操作
                 SimpleProto msg = FreePool.Allocate();
                 msg.Key = FreeMessageConstant.ChickenTip;
                 msg.Ss.Add("word63");
                 FreeMessageSender.SendMessage(fd.Player, msg);
-            }
-            else if (from.StartsWith(Ground) && !to.StartsWith(Ground))
+            }*/
+            else if (from.StartsWith(ChickenConstant.BagGround) && !to.StartsWith(ChickenConstant.BagGround))
             {
                 // 地面模糊操作
                 HandleAuto(from, to, room, fd);
             }
-            else if (from.StartsWith(Ground) || to.StartsWith(Ground))
+            else if (from.StartsWith(ChickenConstant.BagGround) || to.StartsWith(ChickenConstant.BagGround))
             {
                 /*if (from.StartsWith(Ground) && !to.StartsWith(Ground))
                 {
                     handleFromGround(from, to, room, fd);
                 }*/
-                if(!from.StartsWith(Ground) && to.StartsWith(Ground))
+                if(!from.StartsWith(ChickenConstant.BagGround) && to.StartsWith(ChickenConstant.BagGround))
                 {
                     FreeItemInfo fromInfo = FreeItemConfig.GetItemInfo(fromIp.key.GetKey());
                     if (fromInfo.cat == (int) ECategory.WeaponPart && from.StartsWith("w"))
@@ -99,7 +97,7 @@ namespace App.Server.GameModules.GamePlay.free.client
                     }
                 }
             }
-            else if (from.StartsWith("default") && to.StartsWith("w"))
+            else if (from.StartsWith(ChickenConstant.BagDefault) && to.StartsWith("w"))
             {
                 // 背包物品拖动到武器槽
                 if (fromIp != null)
@@ -187,7 +185,7 @@ namespace App.Server.GameModules.GamePlay.free.client
                 if (BagCapacityUtil.CanDemountAttachment(room, fd, fromInfo, from, false))
                 {
                     ItemInventory fromInv = fromIp.GetInventory();
-                    ItemInventory toInv = toIp == null ? fd.freeInventory.GetInventoryManager().GetInventory("default") : toIp.GetInventory();
+                    ItemInventory toInv = toIp == null ? fd.freeInventory.GetInventoryManager().GetInventory(ChickenConstant.BagDefault) : toIp.GetInventory();
                     int[] pos = toIp == null ? new int[] {0, 0} : toInv.GetNextEmptyPosition(toIp.GetKey());
                     ItemInventoryUtil.MoveItem(pos[0], pos[1], fromInv, toInv, fromInv.GetInventoryUI(), toInv.GetInventoryUI(), fromIp, null, room.FreeArgs);
                 }
@@ -261,7 +259,7 @@ namespace App.Server.GameModules.GamePlay.free.client
         private void MovePartToWeapon(ServerRoom room, FreeData fd, ItemPosition ip, string to, FreeItemInfo info)
         {
             string inv = PickupItemUtil.AutoPutPart(fd, info, to, room);
-            if (inv != null && inv != "default")
+            if (inv != null && inv != ChickenConstant.BagDefault)
             {
                 ItemInventory toInv = fd.freeInventory.GetInventoryManager().GetInventory(inv);
                 int[] xy = toInv.GetNextEmptyPosition(ip.key);
@@ -279,7 +277,7 @@ namespace App.Server.GameModules.GamePlay.free.client
         private bool HandleBag(string from, string to, ServerRoom room, FreeData fd)
         {
             FreeItemInfo info = null;
-            if (from.StartsWith("ground"))
+            if (from.StartsWith(ChickenConstant.BagGround))
             {
                 SimpleItemInfo sinfo = PickupItemUtil.GetGroundItemInfo(room, fd, from);
                 info = FreeItemConfig.GetItemInfo(sinfo.cat, sinfo.id);
@@ -307,12 +305,12 @@ namespace App.Server.GameModules.GamePlay.free.client
                 RoleAvatarConfigItem avatar = SingletonManager.Get<RoleAvatarConfigManager>().GetConfigById(info.id);
                 if (avatar.Capacity > 0)
                 {
-                    if (from.StartsWith("ground") && !to.StartsWith("ground"))
+                    if (from.StartsWith(ChickenConstant.BagGround) && !to.StartsWith(ChickenConstant.BagGround))
                     {
                         return BagCapacityUtil.CanAddToBag(room.FreeArgs, fd, info.cat, info.id, 1);
                     }
 
-                    if (to.StartsWith("ground") && !from.StartsWith("ground"))
+                    if (to.StartsWith(ChickenConstant.BagGround) && !from.StartsWith(ChickenConstant.BagGround))
                     {
                         return BagCapacityUtil.CanTakeOff(room.FreeArgs, fd, info.cat, info.id);
                     }
@@ -325,13 +323,28 @@ namespace App.Server.GameModules.GamePlay.free.client
         private void HandleAuto(string from, string to, ServerRoom room, FreeData fd)
         {
             SimpleItemInfo info = PickupItemUtil.GetGroundItemInfo(room, fd, from);
-            PickupItemUtil.AddItemToPlayer(room, fd.Player, info.entityId, info.cat, info.id, info.count, to);
+            if (PickupItemUtil.AddItemToPlayer(room, fd.Player, info.entityId, info.cat, info.id, info.count, to))
+            {
+                SimpleProto sp = FreePool.Allocate();
+                sp.Key = FreeMessageConstant.PlaySound;
+                sp.Ks.Add(2);
+                sp.Ins.Add(5018);
+                sp.Bs.Add(false);
+                FreeMessageSender.SendMessage(fd.Player, sp);
+            }
         }
 
         private void handleToGround(string from, string to, ServerRoom room, FreeData fd)
         {
             PlayerStateUtil.AddPlayerState(EPlayerGameState.InterruptItem, fd.Player.gamePlay);
-            FreeItemManager.DragItem(from, fd, room.FreeArgs, Ground);
+            FreeItemManager.DragItem(from, fd, room.FreeArgs, ChickenConstant.BagGround);
+
+            SimpleProto sp = FreePool.Allocate();
+            sp.Key = FreeMessageConstant.PlaySound;
+            sp.Ks.Add(2);
+            sp.Ins.Add(5017);
+            sp.Bs.Add(false);
+            FreeMessageSender.SendMessage(fd.Player, sp);
         }
 
         private void handleFromGround(string from, string to, ServerRoom room, FreeData fd)
@@ -339,7 +352,7 @@ namespace App.Server.GameModules.GamePlay.free.client
             SimpleItemInfo info = PickupItemUtil.GetGroundItemInfo(room, fd, from);
             if (info.cat > 0)
             {
-                ItemInventory inv = fd.freeInventory.GetInventoryManager().GetInventory("ground");
+                ItemInventory inv = fd.freeInventory.GetInventoryManager().GetInventory(ChickenConstant.BagGround);
 
                 if (inv != null)
                 {
@@ -359,9 +372,9 @@ namespace App.Server.GameModules.GamePlay.free.client
 
         private void DragGroundOne(FreeData fd, ServerRoom room, string to)
         {
-            if (to.StartsWith("default"))
+            if (to.StartsWith(ChickenConstant.BagDefault))
             {
-                FreeItemManager.DragItem("ground,0,0", fd, room.FreeArgs, "default");
+                FreeItemManager.DragItem("ground,0,0", fd, room.FreeArgs, ChickenConstant.BagDefault);
             }
             else
             {

@@ -4,8 +4,6 @@ using Core.Free;
 using Free.framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace App.Shared.FreeFramework.framework.buf
 {
@@ -36,9 +34,9 @@ namespace App.Shared.FreeFramework.framework.buf
             bufs.Add(buf.key, buf);
         }
 
-        public void AddEffect(string effect, float level, int time)
+        public void AddEffect(string effect, float level, int time, IEventArgs args)
         {
-            EffectBuf buf = bufs[effect].Clone();
+            EffectBuf buf = bufs[effect].Clone(args);
             buf.level = level;
             buf.time = time;
 
@@ -74,7 +72,7 @@ namespace App.Shared.FreeFramework.framework.buf
                 List<EffectBuf> list = currentBufs[key];
                 for (int i = list.Count - 1; i >= 0; i--)
                 {
-                    if (DateTime.Now.Ticks / 10000 - list[i].startTime > list[i].time && list[i].time > 0)
+                    if (args.Rule.ServerTime - list[i].startTime > list[i].time && list[i].time > 0)
                     {
                         list.Remove(list[i]);
                     }
@@ -167,14 +165,14 @@ namespace App.Shared.FreeFramework.framework.buf
             this.type = type;
         }
 
-        public EffectBuf Clone()
+        public EffectBuf Clone(IEventArgs args)
         {
             EffectBuf buf = new EffectBuf();
             buf.key = key;
             buf.type = type;
             buf.level = level;
             buf.time = time;
-            buf.startTime = DateTime.Now.Ticks / 10000;
+            buf.startTime = args.Rule.ServerTime;
 
             return buf;
         }

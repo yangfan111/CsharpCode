@@ -2,13 +2,16 @@
 using App.Shared.Player;
 using App.Shared.SceneTriggerObject;
 using App.Shared.Util;
+using Assets.App.Server.GameModules.GamePlay.Free;
 using Core;
 using Core.CameraControl;
 using Core.EntityComponent;
 using Core.Enums;
+using Core.Free;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
+using Free.framework;
 using UnityEngine;
 using Utils.Singleton;
 
@@ -44,7 +47,14 @@ namespace App.Shared.GameModules.SceneObject
             {
                 var entity =
                     _mapContext.GetEntityWithEntityKey(new EntityKey(cmd.UseEntityId, (int) EEntityType.MapObject));
-                
+
+                if (owner.OwnerEntity != null) {
+                    var player = (PlayerEntity)owner.OwnerEntity;
+                    if (player != null && player.hasGamePlay) {
+                        player.gamePlay.UseEntityId = cmd.UseEntityId;
+                    }
+                }
+
                 if (entity == null && (SharedConfig.IsServer||SharedConfig.IsOffline))
                 {
                     _listener.CreateMapObj(cmd.UseEntityId);
@@ -60,8 +70,8 @@ namespace App.Shared.GameModules.SceneObject
                 {
                     var player = (PlayerEntity)owner.OwnerEntity;
                     player.autoMoveInterface.PlayerAutoMove.StopAutoMove();
+                    player.StateInteractController().InterruptCharactor();
                     player.stateInterface.State.OpenDoor();
-                        player.AudioController().PlaySimpleAudio(EAudioUniqueId.OpenDoor);
                     return;
                 }
                 
@@ -126,9 +136,18 @@ namespace App.Shared.GameModules.SceneObject
 
                     if (endState != state)
                     {
+                        player.StateInteractController().InterruptCharactor();
                         player.stateInterface.State.OpenDoor();
-                            player.AudioController().PlaySimpleAudio(EAudioUniqueId.OpenDoor);
-
+                       
+                        var audioId = endState == (int)DoorState.Closed ? EAudioUniqueId.CloseDoor : EAudioUniqueId.OpenDoor;
+                        SimpleProto sp = FreePool.Allocate();
+                        sp.Key = FreeMessageConstant.PlaySound;
+                        sp.Ks.Add(2);
+                        sp.Ins.Add((int)audioId);
+                        sp.Bs.Add(true);
+                        FreeMessageSender.SendMessage(player, sp);
+                     
+                        //player.AudioController().PlaySimpleAudio(audioId);
                         if(SharedConfig.IsServer || SharedConfig.IsOffline)
                         {
                             door.doorData.State = (int) DoorState.Rotating;

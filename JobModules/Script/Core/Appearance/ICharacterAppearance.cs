@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Core.EntityComponent;
 using Shared.Scripts;
 using Utils.Appearance.WardrobePackage;
+using Utils.Appearance.Weapon.WeaponShowPackage;
 
 namespace Core.Appearance
 {
@@ -31,6 +32,7 @@ namespace Core.Appearance
         void UpdateAvatar();
         void ChangeAvatar(int id);
         void ClearAvatar(Wardrobe pos);
+        void SetForceLodLevel(int level);
         // prop
         void AddProp(int id);
         void RemoveProp();
@@ -70,14 +72,17 @@ namespace Core.Appearance
         void EndReload();
 
         WardrobeControllerBase GetWardrobeController();
-        WeaponControllerBase GetController<TPlayerWeaponController>();
+        NewWeaponControllerBase GetController<TPlayerWeaponController>();
 
         void ClearThirdPersonCharacter();
         void CheckP3HaveInit(bool value);
 
         void Execute();
+        void Update();
+        void Init();
 
         // 同步用
+        void CreateComponentData(IGameComponent playerLatestAppearance, IGameComponent playerPredictedAppearance);
         void SyncLatestFrom(IGameComponent playerLatestAppearance);
         void SyncPredictedFrom(IGameComponent playerPredictedAppearance);
         void SyncClientFrom(IGameComponent playerClientAppearance);
@@ -85,5 +90,6 @@ namespace Core.Appearance
         void SyncPredictedTo(IGameComponent playerPredictedAppearance);
         void SyncClientTo(IGameComponent playerClientAppearance);
         void TryRewind();
+        void SetVisibility(bool value);
     }
 }

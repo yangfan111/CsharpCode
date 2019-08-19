@@ -11,7 +11,7 @@ namespace Utils.Appearance.WardrobePackage
         
         protected override AbstractLoadRequest CreateLoadRequest(AssetInfo assetInfo, ILoadedHandler loadedHanlder)
         {
-            return LoadRequestFactory.Create<object>(assetInfo, loadedHanlder.OnLoadSucc);
+            return LoadRequestFactory.Create<object>(assetInfo, loadedHanlder.OnLoadSuccess);
         }
     }
 }

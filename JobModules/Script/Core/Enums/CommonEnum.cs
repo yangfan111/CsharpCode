@@ -4,8 +4,8 @@
     public enum EUIBombInstallState
     {
         None,
-        Installing,
-        Completed
+        Installed,
+        Explode
     }
 
     public enum EUIGameResultType
@@ -100,5 +100,11 @@
         SupplyAdd = 1,
         SupplyRemove = 2,
         SupplyClear = 3,
+    }
+
+    public enum EActiveMask {
+        None = 0,
+        DisableAction = 1 << 0,
+        Witness = 1 << 1,
     }
 }

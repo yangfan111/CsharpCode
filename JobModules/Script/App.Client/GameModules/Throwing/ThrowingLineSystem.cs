@@ -9,6 +9,7 @@ using App.Shared.Components.Player;
 using App.Shared;
 using App.Shared.GameModules.Weapon;
 using Core;
+using Utils.Singleton;
 
 namespace App.Client.GameModules.Throwing
 {
@@ -119,16 +120,14 @@ namespace App.Client.GameModules.Throwing
         private void RefreshThrowingData(PlayerEntity player)
         {
             ThrowingActionData actionData = player.throwingAction.ActionData;
-            var dir = BulletDirUtility.GetThrowingDir(player.WeaponController());
+            var throwAmmunitionCalculator = SingletonManager.Get<ThrowAmmunitionCalculator>();
+
+            var dir = throwAmmunitionCalculator.GetFireDir(0,player.WeaponController(),0);
             if (actionData.IsNearThrow)
-            {
                 actionData.Vel = dir * actionData.Config.NearInitSpeed;
-            }
             else
-            {
                 actionData.Vel = dir * actionData.Config.FarInitSpeed;
-            }
-            actionData.Pos = PlayerEntityUtility.GetThrowingEmitPosition(player.WeaponController());
+            actionData.Pos = throwAmmunitionCalculator.GetFireViewPosition(player.WeaponController());
             actionData.Gravity = actionData.Config.Gravity;
             actionData.Decay = actionData.Config.VelocityDecay;
             actionData.CountdownTime = actionData.Config.CountdownTime;

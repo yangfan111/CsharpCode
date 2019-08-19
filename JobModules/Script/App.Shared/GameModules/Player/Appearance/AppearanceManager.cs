@@ -4,26 +4,30 @@ using App.Shared.GameModules.Player.Appearance.PropControllerPackage;
 using App.Shared.GameModules.Player.Appearance.WardrobeControllerPackage; 
 using App.Shared.GameModules.Player.Appearance.WeaponControllerPackage;
 using Core.Appearance;
-using Utils.Appearance;
 using Core.EntityComponent;
 using UnityEngine;
 using Utils.Appearance.ManagerPackage;
 using Utils.Appearance.WardrobePackage;
+using Utils.Appearance.Weapon.WeaponShowPackage;
 
 namespace App.Shared.GameModules.Player.Appearance
 {
     public class AppearanceManager : AppearanceManagerBase, ICharacterAppearance
     {
-        private readonly WeaponController _weaponController;
+        private readonly NewWeaponController _weaponController;
+        private readonly WeaponController _weaponDataBase;
         private readonly WardrobeController _wardrobeController;
         private readonly PropController _propController;
         private readonly RagDollController _ragDollController = new RagDollController();
         public AppearanceManager()
         {
-            WeaponControllerBaseImpl = new WeaponController();
-            _weaponController = (WeaponController) WeaponControllerBaseImpl;
+            WeaponControllerBaseImpl = new NewWeaponController();
+            _weaponController = (NewWeaponController) WeaponControllerBaseImpl;
             
-            WardrobeControllerBaseImpl = new WardrobeController(_weaponController.RemountWeaponInPackage);
+            WeaponDataBaseImpl = new WeaponController();
+            _weaponDataBase = (WeaponController) WeaponDataBaseImpl;
+            
+            WardrobeControllerBaseImpl = new WardrobeController(_weaponController.RemountWeaponDueToBag);
             _wardrobeController = (WardrobeController) WardrobeControllerBaseImpl;
             
             PropControllerBaseImpl = new PropController();
@@ -34,7 +38,6 @@ namespace App.Shared.GameModules.Player.Appearance
 
         public override void Execute()
         {
-            _weaponController.Execute();
             _wardrobeController.Execute();
             if (!SharedConfig.IsServer)
                 _wardrobeController.TryRewind();
@@ -42,7 +45,7 @@ namespace App.Shared.GameModules.Player.Appearance
             if (!SharedConfig.IsServer)
                 _propController.TryRewind();
         }
-
+        
         public override void UpdateAvatar()
         {
             if(!SharedConfig.IsServer)
@@ -64,6 +67,14 @@ namespace App.Shared.GameModules.Player.Appearance
 
         #region Sync
 
+        public void CreateComponentData(IGameComponent playerLatestAppearance, IGameComponent playerPredictedAppearance)
+        {
+            _weaponDataBase.Execute();
+            if(SharedConfig.IsServer || SharedConfig.IsOffline)
+                _weaponDataBase.SyncToLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
+            _weaponDataBase.SyncToPredictedComponent((PredictedAppearanceComponent)playerPredictedAppearance);
+        }
+        
         public void SyncLatestFrom(IGameComponent playerLatestAppearance)
         {
             _weaponController.SyncFromLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
@@ -78,29 +89,29 @@ namespace App.Shared.GameModules.Player.Appearance
 
         public void SyncClientFrom(IGameComponent playerClientAppearance)
         {
-            _weaponController.SyncFromClientComponent((ClientAppearanceComponent)playerClientAppearance);
+            //_weaponController.SyncFromClientComponent((ClientAppearanceComponent)playerClientAppearance);
         }
 
         public void SyncLatestTo(IGameComponent playerLatestAppearance)
         {
-            _weaponController.SyncToLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
+            //_weaponDataBase.SyncToLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
             _wardrobeController.SyncToLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
             _propController.SyncToLatestComponent((LatestAppearanceComponent)playerLatestAppearance);
         }
 
         public void SyncPredictedTo(IGameComponent playerPredictedAppearance)
         {
-            _weaponController.SyncToPredictedComponent((PredictedAppearanceComponent)playerPredictedAppearance);
+            //_weaponDataBase.SyncToPredictedComponent((PredictedAppearanceComponent)playerPredictedAppearance);
         }
 
         public void SyncClientTo(IGameComponent playerClientAppearance)
         {
-            _weaponController.SyncToClientComponent((ClientAppearanceComponent)playerClientAppearance);
+            //_weaponController.SyncToClientComponent((ClientAppearanceComponent)playerClientAppearance);
         }
 
         public void TryRewind()
         {
-            _weaponController.TryRewind();
+            //_weaponController.TryRewind();
             if(!SharedConfig.IsServer) //服务器不需穿戴装扮
             {
                 _wardrobeController.TryRewind();
@@ -126,7 +137,7 @@ namespace App.Shared.GameModules.Player.Appearance
             return _wardrobeController;
         }
         
-        public WeaponControllerBase GetController<TPlayerWeaponController>()
+        public NewWeaponControllerBase GetController<TPlayerWeaponController>()
         {
             return _weaponController;
         }

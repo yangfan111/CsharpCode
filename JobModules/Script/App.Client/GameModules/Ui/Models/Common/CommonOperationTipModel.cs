@@ -169,9 +169,9 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
         }
 
-        public override void Destory()
+        public override void OnDestory()
         {
-            base.Destory();
+            base.OnDestory();
             if (_oldTextMoveAnimSequence != null)
                 _oldTextMoveAnimSequence.Kill();
         }

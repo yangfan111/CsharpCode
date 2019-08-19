@@ -6,6 +6,7 @@ using Core.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Utils.SettingManager;
 using XmlConfig;
 
 namespace App.Shared
@@ -32,10 +33,14 @@ namespace App.Shared
             set { PlayerPrefs.SetInt(IsLocalServer, value ? 1 : 0); }
         }
 
-      
+       
 
 
 #endif
+        public static string RecodFile = "123";
+        public static bool IsReplay = false;
+        public static bool IsRecord = false;
+        
         public static bool DisableDoor = false;
 
         public static bool CollectTriggerObjectDynamic = true;
@@ -54,9 +59,21 @@ namespace App.Shared
 
         public static bool IsOffline;
 
-        public static bool ShowShootText = false;
-        public static bool CleanShowShootText ;
-        public static bool IsMute = false;
+  
+        public static bool isMute;
+
+        public static bool IsMute
+        {
+            get { return isMute; }
+            set
+            {
+                if (isMute != value)
+                {
+                    isMute = value;
+                    AkSoundEngineController.Instance.ActivateAudio(!value);
+                }
+            }
+        }
 
         /**
          * Only for client
@@ -116,6 +133,8 @@ namespace App.Shared
         public static int GameRule = GameRules.Offline;
 
         public static float WorldShiftDistance = 1000;
+        public static float TestWorldShiftDistance = 10;
+        
         public static bool WorldShiftEnable = true;
         public static bool WorldShiftDisableTerrainDetail = false;
         public static float WorldShiftTerrainDetailDistance = 60;
@@ -124,6 +143,7 @@ namespace App.Shared
         public static bool DisableAnimator = false;
 
         public static bool ChangeRole = false;
+        public static bool ShowAnimationClipEvent = false;
         public static int ServerFrameRate = 20;
 
         public static bool IgnoreProp = false;
@@ -133,7 +153,14 @@ namespace App.Shared
         public static bool IsHXMod = false;
         public static bool DisableRecycleSetramingGo = false;
 
+        // [PPAN] 是否以MD5方式加载AssetBundles
+        public static string ABMD5Manifest = null;
+
         public static bool GPUSort = false;
+
+        public static bool EnableDepthPrepass = true;
+        public static bool EnableHZBCull = true; 
+
 #if HAVE_DEPTH_PREPASS
         public static int GrassQueue = 1300;
 #else
@@ -246,15 +273,60 @@ namespace App.Shared
                 SharedConfig.IsHXMod = true;
             }
 
+            if (bootCmd.ContainsKey("NoIgnoreProp"))
+            {
+                SharedConfig.IgnoreProp = false;
+            }
+
             if (bootCmd.ContainsKey("IgnoreProp"))
             {
                 SharedConfig.IgnoreProp = true;
             }
+
+            if (bootCmd.ContainsKey("DepthPrepass"))
+            {
+                SharedConfig.EnableDepthPrepass = true;
+            }
+
+            if (bootCmd.ContainsKey("HZBCull"))
+            {
+                SharedConfig.EnableHZBCull = true;
+            }
+
             if (bootCmd.ContainsKey("DisableRecycleSetramingGo"))
             {
                 SharedConfig.DisableRecycleSetramingGo = true;
             }
-           
+            if (bootCmd.ContainsKey("IsRecord"))
+            {
+                SharedConfig.IsRecord = true;
+            }
+
+            if (bootCmd.ContainsKey("IsReplay"))
+            {
+                SharedConfig.IsReplay = true;
+            }
+
+            if (bootCmd.ContainsKey("RecodFile"))
+            {
+                SharedConfig.RecodFile = bootCmd["RecodFile"];
+            }
+			// [PPAN] Add AssetBundles MD5 Support
+            if (bootCmd.ContainsKey("ABMD5Support"))
+            {
+                SharedConfig.ABMD5Manifest = bootCmd["ABMD5Support"];
+            }
+
+            if (bootCmd.ContainsKey("quality"))
+            {
+                SettingManager.GetInstance().SetBootQualityParm(bootCmd["quality"]);
+            }
+
+            if (bootCmd.ContainsKey("DisableMT"))
+            {
+                SharedConfig.MutilThread = false;
+            }
+
         }
 
         public static bool DisableGc;

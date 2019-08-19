@@ -75,8 +75,9 @@ namespace App.Shared.Components.Player
         AirPlane,
         Car,
         Parachuting,
-        FollowEntity
-    
+        FollowEntity,
+        Witness, // втсийс╫г
+        Default
     }
     
     public interface ICameraMotorOutput

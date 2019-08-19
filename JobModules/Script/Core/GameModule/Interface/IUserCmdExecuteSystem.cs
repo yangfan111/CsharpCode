@@ -18,8 +18,5 @@ namespace Core.GameModule.Interface
         void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd);
     }
     
-    public interface IBeforeUserCmdExecuteSystem:IUserSystem
-    {
-        void BeforeExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd);
-    }
+   
 }

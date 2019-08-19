@@ -113,10 +113,8 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 HeadPitch = player.characterBone.PitchHeadAngle,
                 HeadYaw = player.characterBone.RotHeadAngle,
                 CurrentHandPitch = player.characterBone.CurrentPitchHandAngle,
-                HeadRotProcess = player.characterBone.HeadRotProcess,
-                IsHeadRotCW = player.characterBone.IsHeadRotCW,
                 WeaponRot = player.characterBone.WeaponRot,
-                IsProne = posture == PostureInConfig.Prone,
+                IsFire = action == ActionInConfig.Fire,
                 IsServer = SharedConfig.IsServer,
                 
                 FirstPersonPositionOffset = player.characterBone.FirstPersonPositionOffset,

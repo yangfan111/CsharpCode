@@ -1,20 +1,15 @@
-﻿using com.wd.free.action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using com.wd.free.@event;
-using UnityEngine;
-using gameplay.gamerule.free.item;
-using Core.Configuration;
-using XmlConfig;
+﻿using App.Server.GameModules.GamePlay.free.player;
+using App.Server.GameModules.GamePlay.Free.chicken;
 using App.Server.GameModules.GamePlay.Free.item.config;
-using App.Server.GameModules.GamePlay.free.player;
+using com.wd.free.action;
+using com.wd.free.@event;
 using com.wd.free.item;
 using com.wd.free.para;
 using Core.EntityComponent;
-using Core.SpatialPartition;
 using Core.Free;
+using gameplay.gamerule.free.item;
+using System;
+using UnityEngine;
 
 namespace App.Server.GameModules.GamePlay.Free.entity
 {
@@ -37,7 +32,7 @@ namespace App.Server.GameModules.GamePlay.Free.entity
             if (playerEntity != null)
             {
                 FreeData fd = (FreeData) playerEntity.freeData.FreeData;
-                _ground = fd.freeInventory.GetInventoryManager().GetInventory("ground");
+                _ground = fd.freeInventory.GetInventoryManager().GetInventory(ChickenConstant.BagGround);
                 _ground.Clear();
 
                 var bin2Ds = args.GameContext.session.serverSessionObjects.Bin2dManager.GetBin2Ds();
@@ -67,7 +62,7 @@ namespace App.Server.GameModules.GamePlay.Free.entity
                 {
                     CreateItemToPlayerAction action = new CreateItemToPlayerAction();
                     action.key = FreeItemConfig.GetItemKey(entity.simpleItem.Category, entity.simpleItem.Id);
-                    action.name = "ground";
+                    action.name = ChickenConstant.BagGround;
 
                     if (!string.IsNullOrEmpty(action.key))
                     {

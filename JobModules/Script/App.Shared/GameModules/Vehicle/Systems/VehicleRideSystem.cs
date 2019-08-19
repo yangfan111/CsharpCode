@@ -1,6 +1,7 @@
 ﻿using App.Shared.Components.Player;
 using App.Shared.GameModules.Player;
 using App.Shared.Player;
+using Common;
 using Core.Components;
 using Core.EntityComponent;
 using Core.Enums;
@@ -79,7 +80,7 @@ namespace App.Shared.GameModules.Vehicle
         private bool CheckRideOnVehicle(PlayerEntity playerEntity)
         {
             const float minRideOnInterval = 0.5f;
-            if (playerEntity.gamePlay.IsLifeState(EPlayerLifeState.Alive) && Time.time > playerEntity.controlledVehicle.LastVehicleControllTime + minRideOnInterval)
+            if (playerEntity.gamePlay.IsLifeState(EPlayerLifeState.Alive) && MyGameTime.time > playerEntity.controlledVehicle.LastVehicleControllTime + minRideOnInterval)
             {
                 return true;
             }

@@ -37,7 +37,7 @@ namespace App.Client.ClientGameModules.Bullet
 
         public void OnLoadSucc(BulletEntity bullet, UnityObject unityObj)    
         {
-            if(null != bullet)
+            if(null != bullet && unityObj != null &&unityObj.AsGameObject)
             {
                 bullet.AddBulletAsset(unityObj);
                 if (unityObj.AudioMono == null)

@@ -33,6 +33,7 @@ namespace com.wd.free.ai
             {
                 IGameAction action = actions[index];
                 args.FreeContext.AiSuccess = false;
+                args.FreeContext.OrderComplete = false;
 
                 action.Act(args);
 
@@ -67,6 +68,13 @@ namespace com.wd.free.ai
                     index = actions.Count;
                     args.FreeContext.AiSuccess = true;
                 }
+
+                if (args.FreeContext.OrderComplete)
+                {
+                    args.FreeContext.AiSuccess = true;
+                }
+
+                args.FreeContext.OrderComplete = false;
             }
         }
 

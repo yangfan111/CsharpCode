@@ -71,7 +71,8 @@ namespace App.Shared.GameModules.Player.Appearance
             try
             {
                 _subOpenEyeInfo.BeginProfileOnlyEnableProfile();
-                var script = EffectUtility.GetEffect(BlinkEyeScriptName);
+                
+                var script = EffectUtility.GetEffect(_characterRoot,BlinkEyeScriptName);
                 if (script == null) return;
                 script.SetParam("Enable", true);
             }
@@ -86,7 +87,8 @@ namespace App.Shared.GameModules.Player.Appearance
             try
             {
                 _subCloseEyeInfo.BeginProfileOnlyEnableProfile();
-                var script = EffectUtility.GetEffect(BlinkEyeScriptName);
+                
+                var script = EffectUtility.GetEffect(_characterRoot, BlinkEyeScriptName);
                 if (script == null) return;
                 script.SetParam("Enable", false);
             }
@@ -182,7 +184,9 @@ namespace App.Shared.GameModules.Player.Appearance
             get
             {
                 var characterController = _characterRoot.GetComponent<CharacterController>();
-                if (characterController != null)
+
+                /*if (characterController != null)*/
+                if (!ReferenceEquals(characterController, null))
                 {
                     return characterController.center;
                 }

@@ -19,9 +19,9 @@ namespace VNet.Base.LiteNet
         private Dictionary<long, MemoryStream> _receiveStream = new Dictionary<long, MemoryStream>();
         public event Action<IVNetPeer> OnAcceptListener;
         public event Action<IVNetPeer> OnDisconnectListener;
+
         public void Init()
         {
-            
         }
 
         public void Poll()
@@ -42,11 +42,12 @@ namespace VNet.Base.LiteNet
             _server = new NetManager(_listener);
             //取消超时逻辑，使用TCP的生命周期
             _server.DisconnectTimeout = int.MaxValue;
-            
+
             if (!_server.Start(port))
             {
                 Logger.Error("Server Start Fialed !! check if the port is in use");
             }
+
             _listener.ConnectionRequestEvent += OnRequest;
             _listener.PeerConnectedEvent += OnConnect;
             _listener.NetworkReceiveEvent += OnReceive;
@@ -93,6 +94,7 @@ namespace VNet.Base.LiteNet
         {
             lock (this)
             {
+                Logger.InfoFormat("peer {0} {1} OnConnect ", peer.ConnectId, peer.EndPoint.Address);
                 var myNetPeer = new LiteNetPeer(peer);
                 _peers[peer.ConnectId] = myNetPeer;
                 _receiveStream[peer.ConnectId] = new MemoryStream(4096 * 4096);
@@ -117,19 +119,35 @@ namespace VNet.Base.LiteNet
                 {
                     lock (_receiveStream[peer.ConnectId])
                     {
-                        _receiveStream[peer.ConnectId].Write(reader.Data, reader.Position, reader.AvailableBytes);
-                        OnReceiveListener(realTimePeer, _receiveStream[peer.ConnectId]);
-                        _receiveStream[peer.ConnectId].Position = 0;
-                        _receiveStream[peer.ConnectId].SetLength(0);
+                        var stream = _receiveStream[peer.ConnectId];
+                        stream.Position = 0;
+                        var crc32 = Utils.Utils.Crc32.Compute(reader.Data, reader.Position, reader.AvailableBytes-4);
+                        UInt32 crc32Message = (UInt32)(  reader.Data[reader.Position+reader.AvailableBytes - 1] << 24)
+                                           | (UInt32)(reader.Data[reader.Position+reader.AvailableBytes - 2] << 16)
+                                           | (UInt32)(reader.Data[reader.Position+reader.AvailableBytes - 3] << 8)
+                                           | (UInt32)(reader.Data[reader.Position+reader.AvailableBytes - 4] << 0);
+                        if ( crc32 == crc32Message)
+                        {
+                            stream.Write(reader.Data, reader.Position, reader.AvailableBytes-4);
+
+                            OnReceiveListener(realTimePeer, stream);
+                            stream.Position = 0;
+                            stream.SetLength(0);
+                        }
+                        else
+                        {
+                            Logger.ErrorFormat("udp message crc error:{0} |= {1}", crc32,crc32Message);
+                        }
+
+                      
                     }
 
                     if (reader is NetPacketReader)
                     {
-                        ((NetPacketReader)reader).RecycleSource();
+                        ((NetPacketReader) reader).RecycleSource();
                     }
                 }
             }
         }
     }
-
 }

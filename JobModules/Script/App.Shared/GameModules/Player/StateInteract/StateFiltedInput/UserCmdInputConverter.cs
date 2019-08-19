@@ -39,10 +39,10 @@ namespace App.Shared.GameModules.Player
             }));*/
             inputBlockGrps.Add(InputBlockGroup.Create(new[]
             {
-                EPlayerInput.ChangeCamera,
                 EPlayerInput.IsCrouch,
                 EPlayerInput.IsProne,
-                EPlayerInput.IsSprint,
+                EPlayerInput.ChangeCamera,
+                //EPlayerInput.IsSprint,
             }));
             inputBlockGrps.Add(InputBlockGroup.Create(new []
             {
@@ -82,7 +82,7 @@ namespace App.Shared.GameModules.Player
             input.SetInput(EPlayerInput.IsF, cmd.IsF);
 
             ApplySpecialInput(cmd, input);
-            ApplyInputBlock(input);
+        
         }
 
         //特殊的输入设置
@@ -93,11 +93,16 @@ namespace App.Shared.GameModules.Player
             input.SetInput(EPlayerInput.MeleeAttack, input.IsInput(EPlayerInput.IsLeftAttack) | input.IsInput(EPlayerInput.IsRightAttack));
         }
 
+        public static void ApplyInputInterrupt(IFilteredInput input)
+        {
+            var isNotThrowing = !input.IsInput(EPlayerInput.IsThrowing) || input.IsInput(EPlayerInput.IsThrowingInterrupt);
+            input.SetInput(EPlayerInput.IsThrowing, !isNotThrowing);
+        }
         /// <summary>
         /// 根据组别和优先级筛选生效的输入，用于处理输入同时存在的情况
         /// </summary>
         /// <param name="filteredInput"></param>
-        private static void ApplyInputBlock(IFilteredInput filteredInput)
+        public static void ApplyInputStaticBlock(IFilteredInput filteredInput)
         {
             foreach (var group in inputBlockGrps)
             {

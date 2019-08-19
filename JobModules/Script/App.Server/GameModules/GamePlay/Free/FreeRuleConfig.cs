@@ -258,6 +258,11 @@ namespace App.Server.GameModules.GamePlay
             return XmlParser.FromXml(RemoveComment(xml), GetRuleAlias());
         }
 
+        public static string GetVersion()
+        {
+            return XmlParser.version;
+        }
+
         public static object FromXml(string name, string xml)
         {
             FreeRuleConfig config = (FreeRuleConfig)XmlParser.FromXml(RemoveComment(xml), GetRuleAlias());
@@ -366,6 +371,9 @@ namespace App.Server.GameModules.GamePlay
             aliasOne(alias, new ConsoleCommandAction());
             aliasOne(alias, new PlayerStageSetAction());
             aliasOne(alias, new GameTimeMarkAction());
+            aliasOne(alias, new CampChangeAction());
+            aliasOne(alias, new VehicleUnrideAction());
+            aliasOne(alias, new SqlPointAction());
         }
 
         // 会把父类的字段也会加入，需要注意当以前的代码中父类的字段没有按照这样的命名规范时会有问题

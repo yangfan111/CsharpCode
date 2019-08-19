@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>为 Linux 构建</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>&nbsp;&raquo;&nbsp;<a class="el" href="pg__deploy.html">为目标平台构建您的 Unity 游戏</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="pg_howtobuilddeploylinux">为 Linux 构建 </a></h1><p>如果要在 Linux 机器上测试您的 Unity 应用程序，您需要构建并将该应用程序部署到机器上. 当在 Unity Editor 中执行 <code>Build</code> 或 <code>Build</code> <code>和</code> <code>Run</code> 时，Unity 会生成一个包含已编译游戏的文件夹。复制该文件夹到 Linux 机器中，在构建文件夹中，双击 .x86（32 位的构建）或者 .x86_64（64 位的构建）文件，以启动游戏。</p>
+<p>上的 Wwise Unity Integration，需要在机器上安装 <code>libSDL2了才能运行。如果不安装，那么在启动游戏时，"DLLNotFoundException"</code> 消息会显示出来。 </p>
+<p>如果要为 <b>Ubuntu 12.04</b> 安装 <code>libSDL2，请遵循下列步骤：</code> </p>
+<ul>
+<li><code>sudo apt-get install build-essential libasound2-dev</code></li>
+<li><code>wget <a href="http://www.libsdl.org/release/SDL2-2.0.3.tar.gz">http://www.libsdl.org/release/SDL2-2.0.3.tar.gz</a></code></li>
+<li><code>tar -zxvf SDL2-2.0.3.tar.gz</code></li>
+<li><code>cd SDL2-2.0.3</code></li>
+<li><code>./configure</code></li>
+<li><code>make</code></li>
+<li><code>sudo make install</code></li>
+<li><code>sudo ldconfig</code></li>
+</ul>
+<table  border="0" cellspacing="0" cellpadding="2">
+<tr>
+<td valign="top"><div align="center">
+<img src="Note.gif" alt="Note.gif"/>
+</div>
+</td><td><b>备注：</b>根据机器的配置不同，要求可能会有所不同。对于其它设置的安装说明，请参考 <a href="http://www.libsdl.org" target="_blank">libsdl.org</a>。 </td></tr>
+</table>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

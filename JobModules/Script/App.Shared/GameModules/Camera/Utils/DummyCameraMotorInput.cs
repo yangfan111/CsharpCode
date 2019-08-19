@@ -6,8 +6,8 @@ using App.Shared.GameModules.Player;
 using Core.CameraControl;
 using Core.CameraControl.NewMotor;
 using Core.Configuration;
-using Core.EntityComponent;
 using Core.Prediction.UserPrediction.Cmd;
+using Utils.Configuration;
 using Utils.Singleton;
 using XmlConfig;
 using ICameraMotorInput = Core.CameraControl.NewMotor.ICameraMotorInput;
@@ -16,7 +16,7 @@ namespace App.Shared.GameModules.Camera
 {
     class DummyCameraMotorInput : ICameraMotorInput
     {
-        public void Generate(PlayerEntity player, IUserCmd usercmd, ICameraMotorState state)
+        public void Generate(PlayerEntity player, IUserCmd usercmd, ICameraMotorState state, bool lockView)
         {
             var speedRatio = CameraUtility.GetGunSightSpeed(player, state);
             DeltaYaw = usercmd.DeltaYaw * speedRatio;
@@ -24,11 +24,11 @@ namespace App.Shared.GameModules.Camera
             if (usercmd.FilteredInput != null)
             {
                 IsCameraFree = usercmd.FilteredInput.IsInput(EPlayerInput.IsCameraFree);
-                FilteredChangeCamera = usercmd.FilteredInput.IsInput(EPlayerInput.ChangeCamera);
+                FilteredChangeCamera = lockView ? false : usercmd.FilteredInput.IsInput(EPlayerInput.ChangeCamera);
                 FilteredCameraFocus = usercmd.FilteredInput.IsInput(EPlayerInput.IsCameraFocus);
             }
             FrameInterval = usercmd.FrameInterval;
-            ChangeCamera = usercmd.ChangeCamera;
+            ChangeCamera = lockView ? false :usercmd.ChangeCamera;
             IsCameraFocus = usercmd.IsCameraFocus;
             IsCmdRun = usercmd.IsRun;
             IsCmdMoveVertical = usercmd.MoveVertical > 0;
@@ -58,6 +58,9 @@ namespace App.Shared.GameModules.Camera
             IsParachuteAttached = player.hasPlayerSkyMove && player.playerSkyMove.IsParachuteAttached;
             LastViewByOrder = player.gamePlay.LastViewModeByCmd;
             RoleId = player.playerInfo.RoleModelId;
+            LockViewByRoom = lockView;
+            ModelLoaded = player.hasFirstPersonModel && player.hasThirdPersonModel;
+            IsVariant = JudgeVariant(player);
         }
 
         public void FakeForObserve(PlayerEntity player)
@@ -68,7 +71,17 @@ namespace App.Shared.GameModules.Camera
             RoleId = player.playerInfo.RoleModelId;
         }
         
+        private bool JudgeVariant(PlayerEntity player)
+        {
+            if (null == player || !player.hasPlayerInfo) return false;
+
+            var roleId = player.playerInfo.RoleModelId;
+            return SingletonManager.Get<RoleConfigManager>().GetRoleItemById(roleId).Unique;
+        }
+        
         public int RoleId { get; set; }
+        public bool ModelLoaded { get; set; }
+        public bool LockViewByRoom { get; set; }
         public float DeltaYaw { get; set; }
         public float DeltaPitch { get; set; }
         public bool IsCameraFree { get; set; }
@@ -90,6 +103,7 @@ namespace App.Shared.GameModules.Camera
         public float ArchorYaw { get; set; }
         public float ArchorPitch { get; set; }
         public bool IsParachuteAttached { get; set; }
+        public bool IsVariant { get; set; }
         
         public CameraConfigItem Config
         {

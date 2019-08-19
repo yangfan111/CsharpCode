@@ -20,8 +20,12 @@ namespace App.Shared.GameModules.Player
             switch (collectType)
             {
                 case EPlayerStateCollectType.UseCacheAddation:
-                    if (_playerEntity.playerClientUpdate.OpenUIFrame)
+                    if (_playerEntity.playerClientUpdate.OpenUIFrameSync)
+                    {
+                        _playerEntity.playerClientUpdate.OpenUIFrameSync = false;
                         playerStates.Add(EPlayerState.OpenUI);
+                        
+                    }
                    
                     var filteredInput = _playerEntity.StateInteractController().UserInput;
                     if (filteredInput.IsInput(EPlayerInput.IsPullboltInterrupt))
@@ -103,7 +107,8 @@ namespace App.Shared.GameModules.Player
             var throwingData = _playerEntity.throwingAction.ActionData;
             throwingData.IsThrowing = throwingData.IsThrowing && (playerStates.Contains(EPlayerState.Grenade));
             if(throwingData.IsThrowing) playerStates.Add(EPlayerState.GrenadeThrow);
-
+            if (PlayerStateUtil.HasPlayerState(EPlayerGameState.TurnOver, _playerEntity.gamePlay))
+                playerStates.Add(EPlayerState.FinalPosing);
             playerStates.Remove(EPlayerState.None);
         }
 
@@ -221,6 +226,9 @@ namespace App.Shared.GameModules.Player
                     return EPlayerState.Grenade;
                 case ActionInConfig.Props:
                     return EPlayerState.Props;
+                case ActionInConfig.OpenDoor:
+                    return EPlayerState.OpenDoor;
+
                 default:
                     return EPlayerState.None;
             }

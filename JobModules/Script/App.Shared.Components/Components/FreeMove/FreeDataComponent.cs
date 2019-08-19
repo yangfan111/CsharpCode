@@ -1,50 +1,26 @@
-﻿using Entitas;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Core.Components;
+﻿using Core.Components;
 using Core.Free;
-using Core.Prediction.UserPrediction;
-using Core.SnapshotReplication.Serialization.NetworkProperty;
-using Core.SyncLatest;
-using Core.Playback;
-using Entitas.CodeGeneration.Attributes;
-using UnityEngine;
 using Core.Interpolate;
+using Core.Playback;
+using Core.SnapshotReplication.Serialization.NetworkProperty;
+using Entitas.CodeGeneration.Attributes;
 
 namespace App.Shared.Components.FreeMove
 {
     [FreeMove]
-    
     public class FreeDataComponent : IPlaybackComponent, IRule
     {
-        [NetworkProperty]
-        public string Key;
+        [NetworkProperty] public string Key;
 
-        [NetworkProperty]
-        [DontInitilize]
-        public string Cat;
+        [NetworkProperty] [DontInitilize] public string Cat;
+        [NetworkProperty] [DontInitilize] public string Value;
+        [NetworkProperty] [DontInitilize] public int IntValue;
+        
+        [NetworkProperty] [DontInitilize] public float ScaleX;
+        [NetworkProperty] [DontInitilize] public float ScaleY;
+        [NetworkProperty] [DontInitilize] public float ScaleZ;
 
-        [NetworkProperty]
-        [DontInitilize]
-        public string Value;
-
-        [NetworkProperty]
-        [DontInitilize]
-        public int IntValue;
-
-        [NetworkProperty]
-        [DontInitilize]
-        public float ScaleX;
-
-        [NetworkProperty]
-        [DontInitilize]
-        public float ScaleY;
-
-        [NetworkProperty]
-        [DontInitilize]
-        public float ScaleZ;
+        [NetworkProperty] [DontInitilize] public bool EmptyDelete;
 
         public IFreeData FreeData;
 
@@ -52,7 +28,9 @@ namespace App.Shared.Components.FreeMove
         {
             return  (int)EComponentIds.FreeMoveKey;
         }
+
         public bool IsInterpolateEveryFrame(){ return true; }
+
         public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
         {
             CopyFrom(left);
@@ -71,6 +49,7 @@ namespace App.Shared.Components.FreeMove
             ScaleX = right.ScaleX;
             ScaleY = right.ScaleY;
             ScaleZ = right.ScaleZ;
+            EmptyDelete = right.EmptyDelete;
         }
 
         public int GetRuleID()

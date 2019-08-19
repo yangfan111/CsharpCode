@@ -42,7 +42,7 @@ namespace App.Server.GameModules.GamePlay.Free.map.position
 
             if (!string.IsNullOrEmpty(player))
             {
-                object obj = fr.GetEntity(player);
+                object obj = fr.GetEntity(args.GetString(player));
                 if (obj != null)
                 {
                     if (obj is PlayerEntity)

@@ -1,0 +1,418 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>使用 Wwise Unity 集成</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="pg_appscripts">使用 Wwise Unity 集成 </a></h1><p>该集成提供了一些组件，这些组件可以直接满足最常见的应用场景下的使用需求，而不需要编程。</p>
+<ul>
+<li><a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a> <br/>
+Use this component to attach a Wwise Event to any object in a scene. The sound can be started at various moments, dependent on the selected Unity trigger. This component is more useful for ambient sounds (sounds related to scene-bound objects) but could also be used for other purposes. Since <a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a> has <a class="el" href="class_ak_event.html" title="Helper class that knows a Wwise Event and when to trigger it in Unity. As of 2017...">AkEvent</a> as its base class, it features the play/stop, play multiple, stop multiple and stop all buttons for previewing the associated Wwise event. . 请参阅 <a class="el" href="pg__appscripts.html#unity_use_AkEvent_AkAmbient">如何与 inspector 一起使用 AkAmbient</a> 。<br/>
+</li>
+<li><a class="el" href="class_ak_audio_listener.html" title="Add this script on the game object that represent a listener. This is normally added...">AkAudioListener</a> <br/>
+Add this script on the game object that represent a listener. This is normally added to the Camera object or the Player object, but can be added to any game object when implementing 3D busses. <code>isDefaultListener</code> determines whether the game object will be considered a default listener - a listener that automatically listens to all game objects that do not have listeners attached to their AkGameObjListenerList's.  <br/>
+</li>
+<li><a class="el" href="class_ak_bank.html" title="Loads and unloads a SoundBank at a specified moment. Vorbis sounds can be decompressed...">AkBank</a> <br/>
+Loads and unloads a SoundBank at a specified moment. Vorbis sounds can be decompressed at a specified moment using the decode compressed data option. In that case, the SoundBank will be prepared.  <br/>
+</li>
+<li><a class="el" href="class_ak_emitter_obstruction_occlusion.html" title="Obstructs/Occludes the emitter of the current game object from its listeners if at...">AkEmitterObstructionOcclusion</a> <br/>
+Obstructs/Occludes the emitter of the current game object from its listeners if at least one object is between them. </li>
+<li><a class="el" href="class_ak_environment.html" title="Use this component to define a reverb zone. This needs to be added to a collider...">AkEnvironment</a> <br/>
+Use this component to define a reverb zone. This needs to be added to a collider object to work properly. <a class="el" href="pg__appscripts.html#unity_use_AkEvironment_AkEvironmentPortal">如何通过 inspector来使用 AkEvironment 和 AkEvironmentPortal（混响区域）</a>. <br/>
+</li>
+<li><a class="el" href="class_ak_environment_portal.html" title="Use this component to define an area that straddles two different AkEnvironment&#39;s...">AkEnvironmentPortal</a> <br/>
+Use this component to define an area that straddles two different AkEnvironment's zones and allow mixing between both zones. <a class="el" href="pg__appscripts.html#unity_use_AkEvironment_AkEvironmentPortal">如何通过 inspector来使用 AkEvironment 和 AkEvironmentPortal（混响区域）</a>. <br/>
+</li>
+<li><a class="el" href="class_ak_event.html" title="Helper class that knows a Wwise Event and when to trigger it in Unity. As of 2017...">AkEvent</a> <br/>
+辅助类知道一个 Wwise 事件，以及何时在 Unity 中触发它。请参阅 <a class="el" href="pg__appscripts.html#unity_use_AkEvent_AkAmbient">如何与 inspector 一起使用 AkAmbient</a> 。<br/>
+</li>
+<li><a class="el" href="class_ak_game_obj.html" title="This component represents a sound object in your scene tracking its position and...">AkGameObj</a> <br/>
+This component represents a sound object in your scene tracking its position and other game syncs such as Switches, RTPC and environment values. You can add this to any object that will emit sound, and it will be added to any object that an <a class="el" href="class_ak_audio_listener.html" title="Add this script on the game object that represent a listener. This is normally added...">AkAudioListener</a> is attached to. Note that if it is not present, Wwise will add it automatically, with the default values, to any Unity Game Object that is passed to Wwise.  <br/>
+</li>
+<li><a class="el" href="class_ak_room.html" title="An AkRoom is an enclosed environment that can only communicate to the outside/other...">AkRoom</a> <br/>
+An <a class="el" href="class_ak_room.html" title="An AkRoom is an enclosed environment that can only communicate to the outside/other...">AkRoom</a> is an enclosed environment that can only communicate to the outside/other rooms with AkRoomPortals.  <br/>
+</li>
+<li><a class="el" href="class_ak_room_portal.html" title="An AkRoomPortal can connect two AkRoom components together.">AkRoomPortal</a> <br/>
+Loads and unloads a SoundBank at a specified moment. Vorbis sounds can be decompressed at a specified moment using the decode compressed data option. In that case, the SoundBank will be prepared.  <br/>
+</li>
+<li><a class="el" href="class_ak_emitter_obstruction_occlusion.html" title="Obstructs/Occludes the emitter of the current game object from its listeners if at...">AkEmitterObstructionOcclusion</a> <br/>
+Obstructs/Occludes the spatial audio portal of the current game object from the spatial audio listener if at least one object is between them.  <br/>
+</li>
+<li><a class="el" href="class_ak_spatial_audio_emitter.html" title="Add this script on the GameObject which represents an emitter that uses the Spatial...">AkSpatialAudioEmitter</a> <br/>
+Add this script on the GameObject which represents an emitter that uses the Spatial Audio API.  <br/>
+</li>
+<li><a class="el" href="class_ak_spatial_audio_listener.html" title="Add this script on the game object that represent a listener. This is normally added...">AkSpatialAudioListener</a> <br/>
+Add this script on the game object that represent a listener. This is normally added to the Camera object or the Player object, but can be added to any game object when implementing 3D busses. <code>isDefaultListener</code> determines whether the game object will be considered a default listener - a listener that automatically listens to all game objects that do not have listeners attached to their AkGameObjListenerList's.  <br/>
+</li>
+<li><a class="el" href="class_ak_state.html" title="This will call AkSoundEngine.SetState() whenever the selected Unity event is triggered...">AkState</a> <br/>
+This will call <code>AkSoundEngine.SetState()</code> whenever the selected Unity event is triggered. For example this component could be set on a Unity collider to trigger when an object enters it.  <br/>
+</li>
+<li><a class="el" href="class_ak_surface_reflector.html" title="This component will convert the triangles of the GameObject&#39;s geometry into sound...">AkSurfaceReflector</a> <br/>
+This component will convert the triangles of the GameObject's geometry into sound reflective surfaces.  <br/>
+</li>
+<li><a class="el" href="class_ak_switch.html" title="This will call AkSoundEngine.SetSwitch() whenever the selected Unity event is triggered...">AkSwitch</a> <br/>
+This will call <code>AkSoundEngine.SetSwitch()</code> whenever the selected Unity event is triggered. For example this component could be set on a Unity collider to trigger when an object enters it.  <br/>
+</li>
+</ul>
+<dl class="see"><dt><b>参见:</b></dt><dd><ul>
+<li><a class="el" href="unity__picker.html">Wwise Picker</a></li>
+</ul>
+</dd></dl>
+<h2><a class="anchor" id="wwisetypes">
+Wwise Types</a></h2>
+<p>这个集成还提供了一些类，适用于常见场景以外的大多数应用场景，需要极少量的编程：</p>
+<ul>
+<li>AK.Wwise.AuxBus <br/>
+ <br/>
+</li>
+<li>AK.Wwise.Bank <br/>
+ <br/>
+</li>
+<li>AK.Wwise.CallbackFlags <br/>
+ <br/>
+</li>
+<li>AK.Wwise.Event <br/>
+ <br/>
+</li>
+<li>AK.Wwise.RTPC <br/>
+ <br/>
+</li>
+<li>AK.Wwise.State <br/>
+ <br/>
+</li>
+<li>AK.Wwise.Switch <br/>
+ <br/>
+</li>
+<li>AK.Wwise.Trigger <br/>
+ <br/>
+</li>
+</ul>
+<dl class="see"><dt><b>参见:</b></dt><dd><ul>
+<li><a class="el" href="unity__wwise__types.html">Wwise Types</a></li>
+</ul>
+</dd></dl>
+<h2><a class="anchor" id="waapi_section">
+Wwise Authoring API (WAAPI) client</a></h2>
+<p>A native WAAPI client with a C# API allows you to connect to <a href="https://www.audiokinetic.com/library/edge/?source=SDK&amp;id=waapi.html" target="_blank">WAAPI</a> from within Unity. It currently is available for Windows and macOS. The Wwise Authoring API sends messages via JSON objects. In Unity, the client was implemented using strings. You may use your preferred method to construct valid JSON strings to then give to the WAAPI client.</p>
+<dl class="see"><dt><b>参见:</b></dt><dd><ul>
+<li><a class="el" href="class_ak_waapi_client.html" title="The full Wwise Authoring API is exposed to Unity as a native plugin for the Windows...">AkWaapiClient</a></li>
+<li><a class="el" href="unity__waapi.html">The Unity WAAPI Client</a></li>
+</ul>
+</dd></dl>
+<h2><a class="anchor" id="unity_addsound">
+如何将 Wwise 声音添加到游戏对象上</a></h2>
+<p>共有四种方法可以将声音添加到您的游戏中：</p>
+<ul>
+<li><b>使用 <a class="el" href="unity__picker.html">Wwise Picker</a>.</b>在所有将声音添加到一个对象的方法中，该方法是最简单的。将一个 Event 从 Wwise Picker 窗口拖动到 Unity Viewer 或者 Inspector 中的一个对象上。这样将自动在目标 Game Object 上创建一个 <a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a> 组件。</li>
+<li><b>使用 Add Component 菜单。</b> 将 <a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a> 或者 <a class="el" href="class_ak_event.html" title="Helper class that knows a Wwise Event and when to trigger it in Unity. As of 2017...">AkEvent</a> 组件添加到任意 Unity Game Object 上。</li>
+<li><b>使用 <a class="el" href="unity__wwise__types.html">Wwise Types</a>。</b> 从 C# 脚本中随时调用 <code>AK.Wwise.Event.Post()。</code> </li>
+<li><b>使用脚本。</b> 从 C# 脚本中随时调用 <code>AkSoundEngine.PostEvent()。</code> </li>
+</ul>
+<h2><a class="anchor" id="unity_use_AkEvent_AkAmbient">
+如何与 inspector 一起使用 AkAmbient</a></h2>
+<ul>
+<li><a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a>: <br/>
+<ul>
+<li><b>Trigger On（触发时机为）：</b> <br/>
+ 提供一张 Unity 事件列表，这些 Unity 事件可以触发您的 Wwise 事件。您可以使用的不止这些事件。您可以随时触发事件，方法是在代码的任何位置调用 AkSoundEngine.PostEvent。您也可以自己编写触发器代码，这样您的触发器会出现在您同事可使用的列表中。请参阅 <a class="el" href="unity__add__triggers.html">为 Wwise Events 添加新的 Trigger</a> 。</li>
+<li><b>Event Name（事件名称）: </b> <br/>
+ 指定当前 Wwise 事件的名字。如果要选中一个事件，点击当前事件的名字，以打开事件选择窗口。接下来，您可以点击某个事件然后点击 <em>Ok</em> 按钮，也可以双击事件来选中它。您也可以从 Wwise picker 中拖动一个事件，然后在当前事件的名字上松手，这样也可以选中一个新事件。<br/>
+</li>
+<li><b>Action On Event（定义事件动作）：</b> <br/>
+ 允许用户从 Unity 中直接覆盖在 Wwise 中定义的一些事件参数。这样可以复用现有事件，而不用创建新的事件。<br/>
+<ul>
+<li><em>Action On Event Type</em>（事件动作类型）：<br/>
+ 不沿用事件类型。</li>
+<li><em>Curve Interpolation</em>（曲线插值）: <br/>
+ 不沿用插值曲线。</li>
+<li><em>Fade Time</em>（淡变时间）: <br/>
+ 不沿用声音的淡变时间。</li>
+</ul>
+</li>
+<li><b>Use Callback</b>（使用回调）: <br/>
+ 提供一种简单的方法使游戏对象对事件回调作出反应。<ul>
+<li><em>Game Object</em>：<br/>
+ 会接受回调的游戏对象。如果要选中一个游戏对象，将它从层级结构中拖放到游戏对象区域。</li>
+<li><em>Callback Function</em>（回调函数）: <br/>
+ 这个函数即是在回调发生时会被 <em>Game Object</em> 调用的函数。为了选中这个函数，要在 <em>Callback Function</em> 的文本字段中输入它的名字。<br/>
+ <b>为了起效果，<em>Game Object</em> 必须在它的一个组件中定义 <em>Callback Function</em></b>。<br/>
+ 函数的定义必须是 <b>void FunctionName(AkEventCallbackMsg in_info)</b>。</li>
+<li><em>Callback Flags</em>（回调标志）: <br/>
+ 选中一个标志，其中该标志指明了 <em>Callback Function</em> 在什么时候会被调用。可以一次选中多个标志。如果想了解各个标志的更多信息，请参阅 <a href="https://www.audiokinetic.com/library/?source=SDK&amp;id=_ak_callback_8h_a948c083ff18dc4c8dfe1d32cb0eb6732.html" target="_blank">Wwise SDK 文档</a> 中的 AkCallbackType 枚举量。</li>
+</ul>
+</li>
+<li><b>Play / Stop</b>: <br/>
+ Can be used to preview the Wwise Event when in Edit mode.</li>
+<li><b>Stop All</b>: <br/>
+ Stops all currently playing Wwise events.</li>
+<li><b>Position Type</b>（定位类型）：<br/>
+ 定义事件的位置将被发送到音频引擎的方式。<ul>
+<li><em>Simple_Mode</em>（简单模式）：<br/>
+ 事件的位置将与它依附的游戏对象相同。</li>
+<li><em>Large_Mode</em>（大型模式）：<br/>
+ 事件可以有多个位置，这些位置由一组点来定义。您可以通过点击 Add 按钮在<em><a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a> Tool Bar</em> 中添加一个点。接下来您可以通过四处拖动点的方式来移动各个点。当声音同时来自多个位置时，这种模式是很有用的。海洋中水的声音就是一个很好的例子。</li>
+<li><em>MultiPosition_Mode</em>（多重定位模式）：<br/>
+ 这种模式使我们能够对使用同一个事件的所有 <a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a> 的实例，只使用某个声音的一个实例，<b>这样是为了节约内存</b>。<br/>
+ 所有使用该模式的 <a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a> 实例，如果都使用同一个事件，那么会自动被检测到，并且会实际使用同一个声音实例，而不是多次加载相同的声音。<br/>
+ 注意到，所有该模式下使用同一事件的 <a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a> 实例，会采用同样的 Unity 触发器（见 <a class="el" href="class_ak_event.html" title="Helper class that knows a Wwise Event and when to trigger it in Unity. As of 2017...">AkEvent</a> 中的 <em>Trigger On</em>）。因此，如果改变其中一个 <a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a> 的触发器，则将会自动改变同一事件其它 <a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a> 的触发器。</li>
+<li><b>Show Attenuation Sphere</b>（显示衰减范围）: <br/>
+ 显示了一个范围，它定义了能听到事件所播放的声音的空间。<br/>
+ <b>为了起效果，您必须启用 Wwise 工程中 SoundBank 设置里的 <em>Max Attenuation</em>（Project-&gt;Project Settings-&gt;Soundbanks-&gt;Max attenuation）</b><br/>
+<ul>
+<li><em>Dont_Show</em>（不显示）：<br/>
+ 不显示任何衰减范围。</li>
+<li><em>Current_Event_Only</em>（只显示当前事件）：<br/>
+ 显示在当前模式下调用 <code>AkSoundEngine.PostEvent</code> 之后，播放的所有声音的衰减范围。<br/>
+ 如果在 <em>Simple_Mode</em> 之下，那么只有该游戏对象上的声音的衰减范围会显示出来。<br/>
+ 如果在 <em>Large_Mode</em>之下，那么每个点都会显示一个衰减范围。<br/>
+ 如果在 <em>MultiPosition_Mode</em> 之下，那么对于同一事件 <em>MultiPosition_Mode</em> 中每隔一个 <a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a> 显示其衰减范围。</li>
+<li><em>All_Events</em>（所有事件）：<br/>
+ 为场景中所有 <a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a> 实例显示衰减曲线。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2><a class="anchor" id="using_unity_timeline_integration">
+Using Wwise with Unity Timeline</a></h2>
+<p>For Unity's Timeline feature, there are custom Wwise tracks for triggering Wwise events and setting Wwise RTPC values.</p>
+<dl class="see"><dt><b>参见:</b></dt><dd><ul>
+<li><a class="el" href="unity__timeline.html">Wwise Timeline Integration</a></li>
+</ul>
+</dd></dl>
+<h2><a class="anchor" id="using_waapi">
+Using the Unity WAAPI client</a></h2>
+<p>The Unity integration includes a simple WAAPI client that can be used to interface with the Wwise Authoring tool.</p>
+<dl class="see"><dt><b>参见:</b></dt><dd><ul>
+<li><a class="el" href="unity__waapi.html">The Unity WAAPI Client</a></li>
+</ul>
+</dd></dl>
+<h2><a class="anchor" id="unity_use_AkEvironment_AkEvironmentPortal">
+如何通过 inspector来使用 AkEvironment 和 AkEvironmentPortal（混响区域）</a></h2>
+<p>在 Wwise 中，Reverb Zone（混响区域）被称为 <code>Environment（环境）或者</code> <code>Auxiliary</code> <code>Sends（辅助发送）。Reverb</code> Zone 并不局限于混响效果，而且它是在 Wwise 工程中定义的。</p>
+<p><a class="el" href="class_ak_environment.html" title="Use this component to define a reverb zone. This needs to be added to a collider...">AkEnvironment</a> 组件包含一个非常简单的环境区域。您可以在任何类型的碰撞体上附加一个 AkEnvironment。如果想将一个 <a class="el" href="class_ak_environment.html" title="Use this component to define a reverb zone. This needs to be added to a collider...">AkEnvironment</a> 添加到您的场景：</p>
+<ul>
+<li><b>使用 <a class="el" href="unity__picker.html">Wwise Picker</a>。</b> 这是最简单的添加 <a class="el" href="class_ak_environment.html" title="Use this component to define a reverb zone. This needs to be added to a collider...">AkEnvironment</a> 的方式。将某个 AuxBus 从 Wwise Picker 窗口拖到 Unity Viewer 或者 Inspector 的一个对象上。这将自动在目标 Game Object 上创建一个 <a class="el" href="class_ak_environment.html" title="Use this component to define a reverb zone. This needs to be added to a collider...">AkEnvironment</a> 组件。</li>
+<li><b>使用 "Add Component" 菜单。</b> 将一个 <a class="el" href="class_ak_environment.html" title="Use this component to define a reverb zone. This needs to be added to a collider...">AkEnvironment</a> 组件添加到任意 Unity Game Object。从 Inspector 的选择器中选择需要的环境。</li>
+<li><b>使用脚本。</b> 您可以在任意时间从 C# 脚本调用 <code>AkSoundEngine.SetGameObjectAuxSendValues()。</code> </li>
+</ul>
+<p>我们还有一些门户（portal）可以用来合并两个环境的影响。这两个环境中每个环境对效果的贡献都是和它们与游戏对象间距离相关的。<br/>
+ 如果游戏对象站在两个房间之间，或者站在连接两个环境的隧道中，那么这种功能是很有用的。<br/>
+</p>
+<ul>
+<li>如果想添加一个环境门户到您的工程中，请前往 Unity 菜单栏中的 GameObject-&gt;Wwise-&gt;Environment Portal。</li>
+</ul>
+<p>如果想使用环境和环境门户，您需要一个游戏对象和能觉察到环境的（environment aware） <a class="el" href="class_ak_game_obj.html" title="This component represents a sound object in your scene tracking its position and...">AkGameObj</a> 组件。<br/>
+ <a class="el" href="class_ak_environment_portal.html" title="Use this component to define an area that straddles two different AkEnvironment&#39;s...">AkEnvironmentPortal</a> 会自动探测到和它重叠的 <a class="el" href="class_ak_environment.html" title="Use this component to define a reverb zone. This needs to be added to a collider...">AkEnvironment</a> 对象。重叠的环境将出现在门户 inspector 的两个选择列表中。如果有太多的环境与门户重叠， 您则可以选择让门户和哪些环境混合在一起。</p>
+<p>在 Wwise 中，只有 4 个环境可以同时处于活跃状态。这样 4 个环境按照如下方式选择：</p>
+<ul>
+<li>连接到门户的环境和具有最高优先级的环境将被选择，直到我们选择了 4 个环境，或者直到没有环境连接到门户为止。</li>
+<li>如果并没有 4 个选中的环境，我们将按照下面的方式来选择没有连接到门户的环境：<ul>
+<li>选取最高优先级的环境，直到我们选满 4 个环境为止（如果没有设置 <em>Default</em> 和 <em>Exclude Others</em> 标志）。</li>
+<li>只有在没有选中其它环境的情况下，<em>Default</em> 才会被选中。</li>
+<li>如果您的游戏对象在有着 <em>Exclude Others</em> 标志的环境中，那么该环境将被选中，而其它所有环境将会被废弃。<br/>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><a class="el" href="class_ak_environment.html" title="Use this component to define a reverb zone. This needs to be added to a collider...">AkEnvironment</a> 组件：<br/>
+ 只有 4 个环境可以同时处于活跃状态。<ul>
+<li><b>Priority</b>（优先级）: <br/>
+ 定义一个环境的优先级。<br/>
+ 该数字越小，代表优先级越高。<br/>
+ 如果一个游戏对象处在多于 4 个环境中，只有具有最高优先级的 4 个环境会处于活跃状态（如果没有设置 <em>Default</em> 和 <em>Exclude Others</em> 标志）。</li>
+<li><b>Default</b>（Default）: <br/>
+ 一个默认环境，只有当它是唯一一个包含您游戏对象的环境时，才会处于活跃状态。<br/>
+ 如果您的游戏对象处于一个以上的默认环境中，那么只有具有最高优先级的默认环境会处于活跃状态。</li>
+<li><b>Exclude Others</b>（排除其它）：<br/>
+ 具有此标志的环境不能与其它环境重叠。<br/>
+ 如果您的游戏对象处于一个有着 <em>Exclude Others</em> 标志的环境中，那么其它所有环境将被废弃。<br/>
+ 如果您的游戏对象处于一个以上的有着 <em>Exclude Others</em> 标志的环境中，那么只有那个具有最高优先级的环境会处于激活状态。</li>
+<li><b>AuxBus Name</b>（辅助总线名）：<br/>
+ 指明当前 AuxBus 的名字。如果想选中一个 AuxBus，那么点击当前 AuxBus 的名字，以打开 AuxBus 选择窗口。接下来，您可以点击想选的 AuxBus 然后点击 <em>Ok</em> 按钮，或者双击来选中它。您也可以将想选的 AuxBus 从 Wwise Picker 拖放到当前 AuxBus 的名字上，以选中新的这个 AuxBus。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><a class="el" href="class_ak_environment_portal.html" title="Use this component to define an area that straddles two different AkEnvironment&#39;s...">AkEnvironmentPortal</a> 组件：<br/>
+ 您可以在 Unity 中创建一个环境门户，方法是前往 GameObject-&gt;Wwise-&gt;Environment Portal。<br/>
+ 您可以在两个环境之间放置一个环境门户，当您的游戏对象在门户中时，门户就可以将两个环境的效果结合起来。为了生效，门户必须与这两个环境有交集。<br/>
+ 这两个环境中每个环境对效果的贡献都是和它们与游戏对象间距离相关的。游戏对象离环境越近，环境对最终效果的影响就越大。<br/>
+<ul>
+<li><b>Environment #1</b>（环境一）：<br/>
+ 门户将自动检测与它有交集的所有环境。在这些环境中，放置在门户负面一侧（与选择的轴的方向相反）的那些环境将在下拉菜单中可用。 之所以采用按这种方式来给环境排序，是为了在运行时确定每个环境的贡献时减少所需的计算量。</li>
+<li><b>Environment #2</b>（环境二）：<br/>
+ 门户将自动检测与它有交集的所有环境。在这些环境中，放置在门户正面一侧（与选择的轴的方向相同）的那些环境将在菜单中可用。 之所以采用按这种方式来给环境排序，是为了在运行时确定每个环境的贡献时减少所需的计算量。</li>
+<li><b>Axis</b>（轴）：<br/>
+ 轴用来得出各个环境的贡献。<br/>
+ 例如，如果选择了 z 轴，那么沿着 x 轴移动对于各个环境的贡献没有任何影响。只有 z 轴上的移动才会对它们的贡献产生影响。<br/>
+ <b>注意到，轴在对象空间中。旋转门户的话，轴也会旋转。</b></li>
+</ul>
+</li>
+</ul>
+<dl class="see"><dt><b>参见:</b></dt><dd><ul>
+<li><a href="https://www.audiokinetic.com/library/?source=SDK&amp;id=integrating__elements__environments.html" target="_blank">集成环境和游戏定义的辅助发送</a></li>
+<li><a href="https://www.audiokinetic.com/library/?source=SDK&amp;id=namespace_a_k_1_1_sound_engine_a18f56e8e0e881c4efb9080545efbb233.html" target="_blank">AK::SoundEngine::SetGameObjectAuxSendValues</a></li>
+</ul>
+</dd></dl>
+<h2><a class="anchor" id="unity_code">
+使用 C# 代码来控制声音引擎</a></h2>
+<p>大多数 Wwise SDK 函数可以通过 <code>AkSoundEngine</code> 类在 Unity 中使用。将它想象为 C++ 命名空间 <code>AK::SoundEngine、<code>AK::MusicEngine</code> 等等的替代。想了解与原始</code> SDK 相比，API 绑定中所做的更改，请参考 <a class="el" href="pg__limitations.html">API 变化和限制</a>。 对于更复杂的情况，您需要从代码中调用 Wwise 函数。在 API 中，所有函数中的 <code>GameObjectID</code> 被Unity 风格的 GameObject 所替代。在运行时，这个 GameObject 中将自动添加一个 <a class="el" href="class_ak_game_obj.html" title="This component represents a sound object in your scene tracking its position and...">AkGameObj</a> 组件，除非您之前已经手动添加过了。</p>
+<h3><a class="anchor" id="unity_convertid">
+对于 Event 和 Bank 使用数字 ID，而不是字符串。</a></h3>
+<p>原生 Wwise API 使用字符串或 ID 来触发 Wwise 工程中的事件和其它有名字的对象。您仍然可以在 C# 环境下这样做，方法是将文件 <code>Wwise_IDs.h</code> 转码为 <code>Wwise_IDs.cs。点击</code> <b>Assets &gt; Wwise &gt; Convert Wwise SoundBank IDs</b>。为了完成上述操作，您需要安装 Python。</p>
+<h3><a class="anchor" id="subsect_unity_code_midi">
+Sending MIDI to Wwise.</a></h3>
+<p>MIDI can be sent to Wwise by filling the <code>AkMIDIPost</code> members of <code>AkMIDIPostArray</code> class and calling any of the following methods:</p>
+<ul>
+<li><code>AkMIDIPostArray.PostOnEvent()</code> </li>
+<li><code>AkSoundEngine.PostMIDIOnEvent()</code> </li>
+<li><code>AK.Wwise.Event.PostMIDI()</code> </li>
+</ul>
+<p>The following is a basic script that sends MIDI messages to the sound engine: </p>
+<div class="fragment"><pre class="fragment"><span class="keyword">public</span> <span class="keyword">class </span>MyMIDIBehaviour : UnityEngine.MonoBehaviour
+{
+    <span class="keyword">public</span> AK.Wwise.Event SynthEvent;
+
+    <span class="keyword">private</span> <span class="keywordtype">void</span> Start()
+    {
+        AkMIDIPostArray MIDIPostArrayBuffer = <span class="keyword">new</span> AkMIDIPostArray(6);
+        AkMIDIPost midiEvent = <span class="keyword">new</span> AkMIDIPost();
+
+        midiEvent.byType = AkMIDIEventTypes.NOTE_ON;
+        midiEvent.byChan = 0;
+        midiEvent.byOnOffNote = 56;
+        midiEvent.byVelocity = 127;
+        midiEvent.uOffset = 0;
+        MIDIPostArrayBuffer[0] = midiEvent;
+
+        midiEvent.byOnOffNote = 60;
+        MIDIPostArrayBuffer[1] = midiEvent;
+
+        midiEvent.byOnOffNote = 64;
+        MIDIPostArrayBuffer[2] = midiEvent;
+
+        midiEvent.byType = AkMIDIEventTypes.NOTE_OFF;
+        midiEvent.byOnOffNote = 56;
+        midiEvent.byVelocity = 0;
+        midiEvent.uOffset = 48000 * 8;
+        MIDIPostArrayBuffer[3] = midiEvent;
+
+        midiEvent.byOnOffNote = 60;
+        MIDIPostArrayBuffer[4] = midiEvent;
+
+        midiEvent.byOnOffNote = 64;
+        MIDIPostArrayBuffer[5] = midiEvent;
+
+        SynthEvent.PostMIDI(gameObject, MIDIPostArrayBuffer);
+    }
+}
+</pre></div><h3><a class="anchor" id="subsect_unity_audio_input">
+Using the Audio Input Source Plug-in in Unity.</a></h3>
+<p>The audio input source plug-in can be used via C# scripting. 请参阅 <a href="https://www.audiokinetic.com/library/edge/?source=SDK&amp;id=referencematerial__audioinput.html" target="_blank">Audio Input Source Plug-in from the Wwise SDK documentation</a>.</p>
+<p>The following is a basic script that sends a test tone to the audio input source plug-in: </p>
+<div class="fragment"><pre class="fragment"><span class="keyword">public</span> <span class="keyword">class </span>MyAudioInputBehaviour : UnityEngine.MonoBehaviour
+{
+    <span class="keyword">public</span> AK.Wwise.Event AudioInputEvent;
+    <span class="keyword">public</span> uint SampleRate = 48000;
+    <span class="keyword">public</span> uint NumberOfChannels = 1;
+    <span class="keyword">public</span> uint SampleIndex = 0;
+    <span class="keyword">public</span> uint Frequency = 880;
+    <span class="keyword">private</span> <span class="keywordtype">bool</span> IsPlaying = <span class="keyword">true</span>;
+
+    <span class="comment">// Callback that fills audio samples - This function is called each frame for every channel.</span>
+    <span class="keywordtype">bool</span> AudioSamplesDelegate(uint playingID, uint channelIndex, <span class="keywordtype">float</span>[] samples)
+    {
+        <span class="keywordflow">for</span> (uint i = 0; i &lt; samples.Length; ++i)
+            samples[i] = UnityEngine.Mathf.Sin(Frequency * 2 * UnityEngine.Mathf.PI * (i + SampleIndex) / SampleRate);
+
+        <span class="keywordflow">if</span> (channelIndex == NumberOfChannels - 1)
+            SampleIndex = (uint)(SampleIndex + samples.Length) % SampleRate;
+
+        <span class="comment">// Return false to indicate that there is no more data to provide. This will also stop the associated event.</span>
+        <span class="keywordflow">return</span> IsPlaying;
+    }
+
+    <span class="comment">// Callback that sets the audio format - This function is called once before samples are requested.</span>
+    <span class="keywordtype">void</span> AudioFormatDelegate(uint playingID, AkAudioFormat audioFormat)
+    {
+        <span class="comment">// Channel configuration and sample rate are the main parameters that need to be set.</span>
+        audioFormat.channelConfig.uNumChannels = NumberOfChannels;
+        audioFormat.uSampleRate = SampleRate;
+    }
+
+    <span class="keyword">private</span> <span class="keywordtype">void</span> Start()
+    {
+        <span class="comment">// The AudioInputEvent event, that is setup within Wwise to use the Audio Input plug-in, is posted on gameObject.</span>
+        <span class="comment">// AudioFormatDelegate is called once, and AudioSamplesDelegate is called once per frame until it returns false.</span>
+        AkAudioInputManager.PostAudioInputEvent(AudioInputEvent, gameObject, AudioSamplesDelegate, AudioFormatDelegate);
+    }
+
+    <span class="comment">// This method can be called by other scripts to stop the callback</span>
+    <span class="keyword">public</span> <span class="keywordtype">void</span> StopSound()
+    {
+        IsPlaying = <span class="keyword">false</span>;
+    }
+
+    <span class="keyword">private</span> <span class="keywordtype">void</span> OnDestroy()
+    {
+        AudioInputEvent.Stop(gameObject);
+    }
+}
+</pre></div><h3><a class="anchor" id="subsect_unity_override_akgameobject_positioning">
+Apply Custom Positioning in Unity</a></h3>
+<p>By default, the <code><a class="el" href="class_ak_game_obj.html" title="This component represents a sound object in your scene tracking its position and...">AkGameObj</a></code> component is attached to a specific Unity <code>gameObject</code> and uses its transform (with an optional offset) for full positioning. This is usually adequate for many games, such as first-person shooters. However, games with custom camera angles, such as many third-person games, may find it difficult to accommodate the two aspects of positioning (distance attenuation and spatialization) by simply attaching the audio listener to one game object, such as the main camera in Unity. Other games may want players to experience other custom positioning.</p>
+<p>To this end, the <code><a class="el" href="class_ak_game_obj.html" title="This component represents a sound object in your scene tracking its position and...">AkGameObj</a></code> component class provides overridable positioning to Unity users. Through the three virtual methods <code>GetPosition()</code>, <code>GetForward()</code>, and <code>GetUpward()</code>, users can derive a subclass from <code><a class="el" href="class_ak_game_obj.html" title="This component represents a sound object in your scene tracking its position and...">AkGameObj</a></code> and use that subclass component to customize any number of Unity <code>gameObjects'</code> positioning.</p>
+<p>Here is a simple example of how to use a custom component to override the default <code><a class="el" href="class_ak_audio_listener.html" title="Add this script on the game object that represent a listener. This is normally added...">AkAudioListener</a></code> behavior. With a third-person project integrated with Wwise, remove the existing <code><a class="el" href="class_ak_audio_listener.html" title="Add this script on the game object that represent a listener. This is normally added...">AkAudioListener</a></code> and its associated <code><a class="el" href="class_ak_game_obj.html" title="This component represents a sound object in your scene tracking its position and...">AkGameObj</a></code>. Then attach the following script to the MainCamera object, attach <code><a class="el" href="class_ak_audio_listener.html" title="Add this script on the game object that represent a listener. This is normally added...">AkAudioListener</a></code>, and finally specify the target Unity <code>gameObject</code> (such as the player avatar) that the audio listener's position will follow. After this, the distance attenuation of all the emitters will rely on the selected target Unity <code>gameObject's</code> position as the listener position (an on-screen distance listener), while the orientation of all the emitters is still based on the main camera orientation as the listener orientation (an off-screen orientation listener).</p>
+<div class="fragment"><pre class="fragment"><span class="preprocessor">#if !(UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.</span>
+<span class="preprocessor"></span>
+<span class="comment">//</span>
+<span class="comment">// Copyright (c) 2017 Audiokinetic Inc. / All Rights Reserved</span>
+<span class="comment">//</span>
+<span class="comment"></span>
+<span class="keyword">using</span> UnityEngine;
+<span class="keyword">using</span> System;
+<span class="keyword">using</span> System.Collections.Generic;
+
+
+[AddComponentMenu (<span class="stringliteral">&quot;Wwise/AkGameObj3rdPersonCam&quot;</span>)]
+[ExecuteInEditMode] <span class="comment">//ExecuteInEditMode necessary to maintain proper state of isStaticObject.</span>
+<span class="keyword">public</span> <span class="keyword">class </span>AkGameObj3rdPersonCam : <a class="code" href="class_ak_game_obj.html" title="This component represents a sound object in your scene tracking its position and...">AkGameObj</a>
+{
+    <span class="keyword">public</span> Transform target;            <span class="comment">// The position that this camera will be following. User can specify this to the player character&#39;s Unity gameObject in the Inspector.</span>
+
+    
+    <span class="comment">// Sets the camera position to the player&#39;s position to handle distance attenuation.</span>
+    <span class="keyword">public</span> <span class="keyword">override</span> Vector3 GetPosition ()
+    {
+        <span class="keywordflow">return</span> target.GetComponent&lt;<a class="code" href="class_ak_game_obj.html" title="This component represents a sound object in your scene tracking its position and...">AkGameObj</a>&gt; ().GetPosition ();
+    }
+
+}
+<span class="preprocessor">#endif // #if !(UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.</span>
+</pre></div> </div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

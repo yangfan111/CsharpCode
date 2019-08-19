@@ -16,8 +16,6 @@ namespace App.Shared.Components.Player
         [DontInitilize] [NetworkProperty(SyncFieldScale.Pitch)] public float PitchHeadAngle;
         [DontInitilize] [NetworkProperty(SyncFieldScale.Yaw)] public float RotHeadAngle;
         [DontInitilize] [NetworkProperty(SyncFieldScale.Pitch)] public float CurrentPitchHandAngle;
-        [DontInitilize] [NetworkProperty] public float HeadRotProcess;
-        [DontInitilize] [NetworkProperty] public bool IsHeadRotCW;
         [NetworkProperty(SyncFieldScale.Pitch)] public float WeaponPitch;
         [NetworkProperty(SyncFieldScale.Yaw)] public float WeaponRot;
         [NetworkProperty] public bool IsWeaponRotState;
@@ -52,8 +50,6 @@ namespace App.Shared.Components.Player
                            (rightComponent.RotHeadAngle - leftComponent.RotHeadAngle) * ratio;
             CurrentPitchHandAngle = leftComponent.CurrentPitchHandAngle +
                              (rightComponent.CurrentPitchHandAngle - leftComponent.CurrentPitchHandAngle) * ratio;
-            HeadRotProcess = leftComponent.HeadRotProcess +
-                             (rightComponent.HeadRotProcess - leftComponent.HeadRotProcess) * ratio;
             WeaponPitch = leftComponent.WeaponPitch + (rightComponent.WeaponPitch - leftComponent.WeaponPitch) * ratio;
             WeaponRot = leftComponent.WeaponRot + (rightComponent.WeaponRot - leftComponent.WeaponRot) * ratio;
             ScreenRatio = leftComponent.ScreenRatio + (rightComponent.ScreenRatio - leftComponent.ScreenRatio) * ratio;
@@ -68,7 +64,6 @@ namespace App.Shared.Components.Player
                                      (rightComponent.FirstPersonSightOffset - leftComponent.FirstPersonSightOffset) *
                                      ratio;
 
-            IsHeadRotCW = leftComponent.IsHeadRotCW;
             NeedChangeOffset = leftComponent.NeedChangeOffset;
             RealWeaponId = leftComponent.RealWeaponId;
 
@@ -83,8 +78,6 @@ namespace App.Shared.Components.Player
             PitchHeadAngle = right.PitchHeadAngle;
             RotHeadAngle = right.RotHeadAngle;
             CurrentPitchHandAngle = right.CurrentPitchHandAngle;
-            HeadRotProcess = right.HeadRotProcess;
-            IsHeadRotCW = right.IsHeadRotCW;
             WeaponPitch = right.WeaponPitch;
             WeaponRot = right.WeaponRot;
             IsWeaponRotState = right.IsWeaponRotState;

@@ -236,8 +236,8 @@ namespace App.Client.GameModules.Ui.UiAdapter
             get
             {
                 var index = Archive.GrenadeHandler.GetHoldGrenadeIndex();
-                if (index > 0) index += 1;
-                return Math.Max(index, 1);
+                index += 1;
+                return index;
             }
 
         }

@@ -21,7 +21,7 @@ namespace App.Client.SessionStates
             Contexts _contexts = (Contexts) contexts;
             var systems = new Feature("ClientPreLoadState");
             systems.Add(new PreloadFeature("ClientPreLoadState", CreateSystems(_contexts, this), _contexts.session.commonSession));
-            systems.Add(new SettingInitSystem());
+
             return systems;
         }
 

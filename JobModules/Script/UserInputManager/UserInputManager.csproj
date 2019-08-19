@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AF9B4541-9B94-6493-C4C6-4918B01E449F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UserInputManager</RootNamespace>
+    <AssemblyName>UserInputManager</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Dll.Temp\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\build_obj_dir\Release\UserInputManager\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Dll.Temp\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\build_obj_dir\Debug\UserInputManager\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR;UNITY_5_6;UNITY_5_6_1_OR_NEWER;UNITY_SOURCE_MODIFIED;UNITY_5;UNITY_53_OR_GREATER;UNITY_52_OR_GREATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>..\ThirdParty\Unity\5_6\UnityEditor.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Example\Example.cs" />
+    <Compile Include="InputManager\Runtime\ActionReference.cs" />
+    <Compile Include="InputManager\Runtime\BindingReference.cs" />
+    <Compile Include="InputManager\Runtime\ButtonState.cs" />
+    <Compile Include="InputManager\Runtime\ControlScheme.cs" />
+    <Compile Include="InputManager\Runtime\GamepadAxis.cs" />
+    <Compile Include="InputManager\Runtime\GamepadButton.cs" />
+    <Compile Include="InputManager\Runtime\GamepadIndex.cs" />
+    <Compile Include="InputManager\Runtime\GamepadState.cs" />
+    <Compile Include="InputManager\Runtime\IGamepadStateAdapter.cs" />
+    <Compile Include="InputManager\Runtime\IInputLoader.cs" />
+    <Compile Include="InputManager\Runtime\IInputSaver.cs" />
+    <Compile Include="InputManager\Runtime\InputAction.cs" />
+    <Compile Include="InputManager\Runtime\InputBinding.cs" />
+    <Compile Include="InputManager\Runtime\InputLoaderXML.cs" />
+    <Compile Include="InputManager\Runtime\InputManager.cs" />
+    <Compile Include="InputManager\Runtime\InputManager_Unity.cs" />
+    <Compile Include="InputManager\Runtime\InputSaverXML.cs" />
+    <Compile Include="InputManager\Runtime\InputType.cs" />
+    <Compile Include="InputManager\Runtime\PlayerID.cs" />
+    <Compile Include="InputManager\Runtime\SaveData.cs" />
+    <Compile Include="InputManager\Runtime\ScanFlags.cs" />
+    <Compile Include="InputManager\Runtime\ScanResult.cs" />
+    <Compile Include="InputManager\Runtime\ScanService.cs" />
+    <Compile Include="InputManager\Runtime\ScanSettings.cs" />
+    <Compile Include="Lib\AbstractProvider.cs" />
+    <Compile Include="Lib\BlockType.cs" />
+    <Compile Include="Lib\DataPool.cs" />
+    <Compile Include="Lib\EInputLayer.cs" />
+    <Compile Include="Lib\GameInputManager.cs" />
+    <Compile Include="Lib\InputConfig.cs" />
+    <Compile Include="Lib\KeyConverter.cs" />
+    <Compile Include="Lib\KeyData.cs" />
+    <Compile Include="Lib\KeyDataCollection.cs" />
+    <Compile Include="Lib\KeyHandler.cs" />
+    <Compile Include="Lib\KeyProvider.cs" />
+    <Compile Include="Lib\KeyReceiver.cs" />
+    <Compile Include="Lib\PointerData.cs" />
+    <Compile Include="Lib\PointerKeyHandler.cs" />
+    <Compile Include="Lib\PointerKeyReceiver.cs" />
+    <Compile Include="Lib\PointerProvider.cs" />
+    <Compile Include="Lib\RayCastTarget.cs" />
+    <Compile Include="Lib\UserInputKey.cs" />
+    <Compile Include="Lib\UserInputManager.cs" />
+    <Compile Include="Utility\Panelhandler.cs" />
+    <Compile Include="Utility\RayCastTargetUtil.cs" />
+    <Compile Include="Utility\UserInputHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

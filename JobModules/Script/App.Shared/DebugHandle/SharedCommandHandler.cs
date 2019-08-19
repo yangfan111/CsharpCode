@@ -26,6 +26,7 @@ using XmlConfig;
 using QualityLevel = Utils.SettingManager.QualityLevel;
 using ArtPlugins;
 using Utils.Appearance.Bone;
+using Common;
 
 namespace App.Shared.DebugHandle
 {
@@ -386,14 +387,41 @@ namespace App.Shared.DebugHandle
                         string s = message.Args[0];
                         if (s == "clean")
                         {
-                            SharedConfig.CleanShowShootText = true;
+                            GMVariable.CleanShowShootText = true;
                         }
                     }
                     else
                     {
-                        SharedConfig.ShowShootText = !SharedConfig.ShowShootText;
+                        GMVariable.ShowShootText = !GMVariable.ShowShootText;
                     }
                   
+
+                    break;
+                case DebugCommands.SetAudio:
+                    if (message.Args.Length > 0)
+                    {
+                        string arg1 = message.Args[0];
+                        switch (arg1)
+                        {
+                         case "step":
+                             int matType =  int.Parse(message.Args[1].Trim());
+                             var isUse = (matType > -1);
+                             GMVariable.AudioFoostepMatType = matType;
+                             player.AudioController().SetGMFootstep(isUse);
+                             break;
+                         case "log":
+                             int logType =  int.Parse(message.Args[1].Trim());
+                             if(logType ==1)
+                                GMVariable.AudioPostEventLog = !GMVariable.AudioPostEventLog;
+                             else if(logType==2)
+                                 GMVariable.AudioListenerLog = !GMVariable.AudioListenerLog;
+                             else if(logType==3)
+                                 GMVariable.AudioFootstepLog = !GMVariable.AudioFootstepLog;
+
+                             break;
+
+                        }
+                    }
 
                     break;
                 case DebugCommands.SetWeapon:
@@ -462,6 +490,19 @@ namespace App.Shared.DebugHandle
                             _weaponModelController.RemovePart(dataId);
                             break;
                     }
+                    break;
+                case DebugCommands.TestCmd:
+                    var targ1 = int.Parse(message.Args[0]) ;
+                        switch (targ1)
+                        {
+                            case 1:
+                                GMVariable.ShowSessionTimer = !GMVariable.ShowSessionTimer;
+                            //    LocalObjectGenerator.Dispose(true);
+                                break;
+                            case 2:
+                                GMVariable.SpreadOffsetFactor = int.Parse(message.Args[1]) ;
+                                break;
+                        }
                     break;
                 case DebugCommands.SetAttachment:
                     var res = Core.Enums.EFuncResult.Failed;
@@ -771,7 +812,7 @@ namespace App.Shared.DebugHandle
             }
 
             var result = sb.ToString();
-            _logger.ErrorFormat("Time={0}, {1}", Time.time,  result);
+            _logger.ErrorFormat("Time={0}, {1}", MyGameTime.time,  result);
             return result;
         }
         

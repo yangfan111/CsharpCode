@@ -17,6 +17,7 @@ namespace XmlConfig
         public string Description;
         public string IconBundle;
         public string Icon;
+        public string BGIcon;
     }
 }
 

@@ -31,8 +31,6 @@ namespace App.Server.GameModules.GamePlay.Free.hall
         private int ranktype;
         private bool issend;
 
-        //private List<PlayerEntity> _playerList = new List<PlayerEntity>();
-
         public override void DoAction(IEventArgs args)
         {
             IParable unit = args.GetUnit("report");
@@ -43,29 +41,62 @@ namespace App.Server.GameModules.GamePlay.Free.hall
 
                 GameOverPlayer goPlayer = (GameOverPlayer) sp.GetFieldObject(0);
                 Dictionary<long, GameOverPlayer> goPlayerList = (Dictionary<long, GameOverPlayer>) sp.GetFieldObject(1);
-                Dictionary<long, IPlayerInfo> playerInfoList = (Dictionary<long, IPlayerInfo>) sp.GetFieldObject(2);
-                Dictionary<long, IPlayerInfo> leavedInfoList = (Dictionary<long, IPlayerInfo>) sp.GetFieldObject(3);
-
+                Dictionary<long, IPlayerInfo> playerInfoList = new Dictionary<long, IPlayerInfo>();
+                Dictionary<long, IPlayerInfo> leavedInfoList = new Dictionary<long, IPlayerInfo>();
+                Dictionary<long, IPlayerInfo> infoList = (Dictionary<long, IPlayerInfo>) sp.GetFieldObject(2);
+                Dictionary<long, IPlayerInfo> leftList = (Dictionary<long, IPlayerInfo>) sp.GetFieldObject(3);
+                int TeamCapacity = (int) sp.GetFieldObject(4);
+                Logger.InfoFormat("reporting player {0}, totoal player {1}, left player {2}", goPlayer.Id, infoList.Count, leftList.Count);
                 RankType rankType = (RankType) ranktype;
 
                 IPlayerInfo playerInfo;
-                playerInfoList.TryGetValue(goPlayer.Id, out playerInfo);
-
-                if (null == playerInfo) return;
-                //逃跑玩家为所有游戏中的玩家的最后一名
-                if (playerInfo.StatisticsData.IsRunaway)
+                infoList.TryGetValue(goPlayer.Id, out playerInfo);
+                if (null == playerInfo)
                 {
-                    playerInfo.StatisticsData.Rank = playerInfoList.Count;
+                    Logger.InfoFormat("no IPlayerInfo of player {0}", goPlayer.Id);
+                    return;
                 }
-                //编辑器传来的数据
-                string[] items = fields.Split(',');
-                foreach(var item in items)
+
+                //移除缺少数据的玩家
+                IPlayerInfo availablePlayer;
+                List<long> keys = infoList.Keys.ToList();
+                foreach (long key in keys)
                 {
-                    string[] vs = item.Split('=');
-                    if(vs.Length > 1)
-                        goPlayer.Statistics[int.Parse(vs[0])] = args.GetInt(vs[1]);
-                    else
-                        Logger.ErrorFormat("字符串解析错误，请检查模式编辑器: {0}", fields);
+                    infoList.TryGetValue(key, out availablePlayer);
+                    if (availablePlayer == null || availablePlayer.StatisticsData == null)
+                    {
+                        Logger.InfoFormat("player {0} info not available", key);
+                        continue;
+                    }
+                    playerInfoList.Add(key, availablePlayer);
+                }
+                keys = leftList.Keys.ToList();
+                foreach (long key in keys)
+                {
+                    leftList.TryGetValue(key, out availablePlayer);
+                    if (availablePlayer == null || availablePlayer.StatisticsData == null)
+                    {
+                        Logger.InfoFormat("left player {0} info not available", key);
+                        continue;
+                    }
+                    leavedInfoList.Add(key, availablePlayer);
+                }
+
+                //逃跑玩家为所有游戏中的玩家的最后一名
+                if (playerInfo.StatisticsData.IsRunaway) playerInfo.StatisticsData.Rank = playerInfoList.Count;
+
+                //编辑器传来的数据
+                if (!string.IsNullOrEmpty(fields))
+                {
+                    string[] items = fields.Split(',');
+                    foreach(var item in items)
+                    {
+                        string[] vs = item.Split('=');
+                        if(vs.Length > 1)
+                            goPlayer.Statistics[int.Parse(vs[0])] = args.GetInt(vs[1]);
+                        else
+                            Logger.ErrorFormat("字符串解析错误，请检查模式编辑器: {0}", fields);
+                    }
                 }
                 //团战模式填入两项人数参数
                 if (rankType == RankType.Group)
@@ -74,13 +105,11 @@ namespace App.Server.GameModules.GamePlay.Free.hall
                     int teamCountRate = 0; 
                     foreach (IPlayerInfo ipi in playerInfoList.Values)
                     {
-                        if(ipi.StatisticsData.GameTime >= 3 * 60 * 1000) playerCountRate++;
-                        if(ipi.Camp == playerInfo.Camp) teamCountRate++;
+                        if (ipi.StatisticsData.GameJoinTime > 0 && args.Rule.ServerTime - ipi.StatisticsData.GameJoinTime >= 180000L) playerCountRate++;
+                        if (ipi.Camp == playerInfo.Camp) teamCountRate++;
+                        Logger.InfoFormat("player id {0} camp {1} game join time {2} played time {3}", ipi.PlayerId, ipi.Camp, ipi.StatisticsData.GameJoinTime, args.Rule.ServerTime - ipi.StatisticsData.GameJoinTime);
                     }
-                    foreach (IPlayerInfo ipi in leavedInfoList.Values)
-                    {
-                        if(ipi.StatisticsData.GameTime >= 3 * 60 * 1000) playerCountRate++;
-                    }
+                    Logger.InfoFormat("game total player count {0} report send {1}", playerInfoList.Count, issend);
                     goPlayer.Statistics[(int) EStatisticsID.ModePlayerCount] = teamCountRate;
                     goPlayer.Statistics[(int) EStatisticsID.SectionPlayerCount] = playerCountRate;
                 }
@@ -93,14 +122,14 @@ namespace App.Server.GameModules.GamePlay.Free.hall
                             if (!playerInfo.StatisticsData.IsRunaway)
                             {
                                 List<IPlayerInfo> playerSortList = playerInfoList.Values.ToList();
-                                GroupRank(playerSortList);
+                                GroupRank(playerSortList, playerInfo, TeamCapacity > 1);
                             }
                             break;
                         case RankType.Survival:
                             int modeId = args.GameContext.session.commonSession.RoomInfo.ModeId;
                             if (modeId != GameRules.SoloSurvival && modeId != GameRules.LadderSoloSurvival && modeId != GameRules.AbyssSoloSurvival)
                             {
-                                SurvivalRank(playerInfoList.Values.ToList().Union(leavedInfoList.Values.ToList()).ToList(), goPlayerList, modeId, args);
+                                SurvivalRank(playerInfoList.Values.ToList().Union(leavedInfoList.Values.ToList()).ToList(), goPlayerList, args, playerInfo);
                             }
                             break;
                         default:
@@ -127,10 +156,9 @@ namespace App.Server.GameModules.GamePlay.Free.hall
             }
         }
 
-        private void SurvivalRank(List<IPlayerInfo> players, Dictionary<long, GameOverPlayer> goPlayerList, int modeId, IEventArgs args)
+        private void SurvivalRank(List<IPlayerInfo> players, Dictionary<long, GameOverPlayer> goPlayerList, IEventArgs args, IPlayerInfo playerInfo)
         {
-            if (players.Count < 1)
-                return;
+            if (players.Count < 1) return;
 
             long chickenTeamId = -1L;
             Dictionary<long, int> teamDeadDict = new Dictionary<long, int>();
@@ -138,7 +166,7 @@ namespace App.Server.GameModules.GamePlay.Free.hall
 
             foreach (IPlayerInfo ipi in players)
             {
-                if (!ipi.StatisticsData.IsRunaway && ipi.StatisticsData.DeathOrder == 0)
+                if (!ipi.StatisticsData.IsRunaway && ipi.StatisticsData.LastDeadTime <= 0L)
                 {
                     //和谐模式下，胜出5人不参与排序
                     if (!SharedConfig.IsHXMod && FreeUtil.ReplaceBool("{hasWin}", args))
@@ -195,6 +223,11 @@ namespace App.Server.GameModules.GamePlay.Free.hall
                         }
                     }
                 }
+
+                Logger.InfoFormat("player id {0} should be rank {1} in total team {2}, game has win ? {3}", ipi.PlayerId, ipi.StatisticsData.Rank, teamCount, FreeUtil.ReplaceBool("{hasWin}", args));
+
+                if (ipi.PlayerId == playerInfo.PlayerId) playerInfo.StatisticsData.Rank = ipi.StatisticsData.Rank;
+
                 GameOverPlayer gop;
                 goPlayerList.TryGetValue(ipi.PlayerId, out gop);
                 if (gop != null)
@@ -206,7 +239,7 @@ namespace App.Server.GameModules.GamePlay.Free.hall
             }
         }
 
-        private void GroupRank(List<IPlayerInfo> players)
+        private void GroupRank(List<IPlayerInfo> players, IPlayerInfo playerInfo, bool rescue)
         {
             if (players.Count <= 1)
             {
@@ -214,34 +247,46 @@ namespace App.Server.GameModules.GamePlay.Free.hall
             }
             players.Sort((x, y) =>
             {
-                if (x.StatisticsData.KillCount < y.StatisticsData.KillCount)
-                    return 1;
-                if (x.StatisticsData.KillCount == y.StatisticsData.KillCount)
+                var xStat = x.StatisticsData;
+                var yStat = y.StatisticsData;
+                if (rescue)
                 {
-                    if (x.StatisticsData.DeadCount > y.StatisticsData.DeadCount)
-                        return 1;
-                    if (x.StatisticsData.DeadCount == y.StatisticsData.DeadCount)
-                    {
-                        if (x.StatisticsData.AssistCount < y.StatisticsData.AssistCount)
-                            return 1;
-                        if (x.StatisticsData.AssistCount > y.StatisticsData.AssistCount)
-                            return -1;
-                        if (x.StatisticsData.LastKillTime < y.StatisticsData.LastKillTime)
-                            return -1;
-                        if (x.StatisticsData.LastKillTime > y.StatisticsData.LastKillTime)
-                            return 1;
-                        if (x.StatisticsData.LastDeadTime > y.StatisticsData.LastDeadTime && y.StatisticsData.LastDeadTime != 0)
-                            return -1;
-                        if (x.StatisticsData.LastDeadTime < y.StatisticsData.LastDeadTime && x.StatisticsData.LastDeadTime != 0)
-                            return 1;
-                        return 0;
-                    }
+                    if (xStat.HitDownCount < yStat.HitDownCount) return 1;
+                    if (xStat.HitDownCount > yStat.HitDownCount) return -1;
+                    if (xStat.DeadCount > yStat.DeadCount) return 1;
+                    if (xStat.DeadCount < yStat.DeadCount) return -1;
+                    if (xStat.SaveCount > yStat.SaveCount) return -1;
+                    if (xStat.SaveCount < yStat.SaveCount) return 1;
+                    if (xStat.TotalDamage > yStat.TotalDamage) return -1;
+                    if (xStat.TotalDamage < yStat.TotalDamage) return 1;
+                    if (xStat.LastKillTime < yStat.LastKillTime) return -1;
+                    if (xStat.LastKillTime > yStat.LastKillTime) return 1;
+                    if ((xStat.LastDeadTime == 0 && yStat.LastDeadTime != 0) || (xStat.LastDeadTime > yStat.LastDeadTime && yStat.LastDeadTime != 0)) return -1;
+                    if ((xStat.LastDeadTime != 0 && yStat.LastDeadTime == 0) || (xStat.LastDeadTime < yStat.LastDeadTime && xStat.LastDeadTime != 0)) return 1;
+                    return 0;
                 }
-                return -1;
+                else
+                {
+                    if (xStat.KillCount < yStat.KillCount) return 1;
+                    if (xStat.KillCount > yStat.KillCount) return -1;
+                    if (xStat.DeadCount > yStat.DeadCount) return 1;
+                    if (xStat.DeadCount < yStat.DeadCount) return -1;
+                    if (xStat.AssistCount > yStat.AssistCount) return -1;
+                    if (xStat.AssistCount < yStat.AssistCount) return 1;
+                    if (xStat.TotalDamage > yStat.TotalDamage) return -1;
+                    if (xStat.TotalDamage < yStat.TotalDamage) return 1;
+                    if (xStat.LastKillTime < yStat.LastKillTime) return -1;
+                    if (xStat.LastKillTime > yStat.LastKillTime) return 1;
+                    if ((xStat.LastDeadTime == 0 && yStat.LastDeadTime != 0) || (xStat.LastDeadTime > yStat.LastDeadTime && yStat.LastDeadTime != 0)) return -1;
+                    if ((xStat.LastDeadTime != 0 && yStat.LastDeadTime == 0) || (xStat.LastDeadTime < yStat.LastDeadTime && xStat.LastDeadTime != 0)) return 1;
+                    return 0;
+                }
             });
+
             for (int i = 0; i < players.Count; i++)
             {
                 players[i].StatisticsData.Rank = players[i].StatisticsData.IsRunaway ? players.Count : i + 1;
+                if (players[i].PlayerId == playerInfo.PlayerId) playerInfo.StatisticsData.Rank = players[i].StatisticsData.Rank;
             }
         }
 

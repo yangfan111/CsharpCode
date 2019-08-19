@@ -1,5 +1,4 @@
-﻿using App.Client.CastObjectUtil;
-using App.Client.GameModules.Player;
+﻿using App.Client.GameModules.Player;
 using Entitas;
 using UnityEngine;
 
@@ -7,9 +6,11 @@ namespace App.Client.GameModules.SceneObject
 {
     public class ClientSceneObjectRenderSystem : AbstractRenderSystem<SceneObjectEntity>
     {
+        private Contexts _contexts;
+
         public ClientSceneObjectRenderSystem(Contexts contexts) : base(contexts)
         {
-
+            _contexts = contexts;
         }
 
         protected override bool Filter(SceneObjectEntity entity)
@@ -24,37 +25,37 @@ namespace App.Client.GameModules.SceneObject
 
         protected override void OnRender(SceneObjectEntity entity)
         {
-            if(entity.hasUnityObject && null != entity.unityObject.UnityObject)
+            if (entity.hasUnityObject && null != entity.unityObject.UnityObject)
             {
-                SetPositionWithAnchor(entity.unityObject.UnityObject, entity.position.Value);
+                SetPositionWithAnchor(entity.unityObject.UnityObject, entity);
             }
-            if(entity.hasMultiUnityObject && null != entity.multiUnityObject.FirstAsset)
+
+            if (entity.hasMultiUnityObject && null != entity.multiUnityObject.FirstAsset)
             {
-                SetPositionWithAnchor(entity.multiUnityObject.FirstAsset, entity.position.Value);
+                SetPositionWithAnchor(entity.multiUnityObject.FirstAsset, entity);
             }
-//#if UNITY_EDITOR
-//            if (entity.hasAudioTestEmitter)
-//            {
-//                var go = entity.unityObject.UnityObject.AsGameObject;
-//                var target = go.transform.Find("I004_LOD0");
-//                target.transform.SetParent(null);
-//                entity.audioTestEmitter.Self = target.gameObject;
-//                var emitter = go.GetComponent<AudioEmitterEditor>();
-//                if(!emitter)
-//                    emitter = go.AddComponent<AudioEmitterEditor>();
-//                go.name = "WS-AudioEmitter";
-//                go.transform.scal = Vector3.one * 3f;
-//                go.transform.position = entity.position.Value;
-//                emitter.SetListener(entity.audioTestEmitter.P1);
-//                SetPositionWithAnchor(entity.unityObject.UnityObject, new Vector3(-1,-1,-1));
-//
-//            }
-//            #endif
         }
 
-        private void SetPositionWithAnchor(GameObject go, Vector3 position)
+        private void SetPositionWithAnchor(GameObject go, SceneObjectEntity entity)
         {
-            go.transform.position = position + BaseGoAssemble.GetGroundAnchorOffset(go);
+            if (entity.hasFlagImmutability)
+                entity.flagImmutability.HasUsed();
+            Bounds bounds = entity.position.Bounds;
+            Vector3 delta = Vector3.zero;
+            if (entity.position.Bounds != null && bounds.size != Vector3.zero)
+            {
+                if (entity.position.ModelRotate)
+                {
+                    delta = new Vector3(0, bounds.size.x / 2 + bounds.center.x, 0);
+                }
+                else
+                {
+                    delta = new Vector3(0, bounds.size.y / 2 - bounds.center.y, 0);
+                }
+
+                if (entity.hasSize) delta = delta * entity.size.Value;
+            }
+            go.transform.position = entity.position.Value + delta;
         }
     }
 }

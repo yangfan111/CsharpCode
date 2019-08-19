@@ -40,66 +40,16 @@ namespace App.Shared.Components.Player
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(NetworkAnimatorComponent));
 
         public int GetComponentId() { return (int)EComponentIds.AnimatorData; }
-
-     
-
-        public override void CopyFrom(object rightComponent)
-        {
-            base.CopyFrom(rightComponent);
-        }
-        
+       
         public override void RewindTo(object rightComponent)
         {
             CopyFrom(rightComponent);
-        }
-
-
-        /// <summary>
-        /// warning， 一直返回true,计算以客户端为主，原因， replayPose是不能完全恢复现场，
-        /// 其1:在过渡状态， 有exitTime, normalizeTime会把整数部分截掉，比如5.88->0.88
-        /// 其2:在过渡状态，没有exitTime
-        /// </summary>
-        /// <param name="right"></param>
-        /// <returns></returns>
-        public bool IsApproximatelyEqual(object right)
-        {
-            bool ret = true;
-            var rightObj = right as NetworkAnimatorComponent;
-            if (rightObj != null)
-            {
-//                for (int i = 0; i < AnimatorLayers.Count; i++)
-//                {
-//                    var equal = AnimatorLayers[i].IsApproximatelyEqual(rightObj.AnimatorLayers[i]);
-//                    if (!equal)
-//                    {
-//                        _logger.Info(AnimatorLayers[i].ToString());
-//                        _logger.Info(rightObj.AnimatorLayers[i].ToString());
-//                    }
-//                    ret = ret && equal;
-//                }
-                
-                for (int i = 0; i < AnimatorParameters.Count; i++)
-                {
-                    var equal = AnimatorParameters[i].IsApproximatelyEqual(rightObj.AnimatorParameters[i]);
-                    if (!equal)
-                    {
-                        _logger.Info(AnimatorParameters[i].ToString());
-                        _logger.Info(rightObj.AnimatorParameters[i].ToString());
-                    }
-                    ret = ret && equal;
-                }
-                
-                ret = ret && CompareUtility.IsApproximatelyEqual(BaseClientTime, rightObj.BaseClientTime);
-            }
-
-            return ret;
         }
 
         public override string ToString()
         {
             return string.Format("NetworkAnimatorComponent {0}", base.ToString());
         }
-
     }
 
     /// <summary>

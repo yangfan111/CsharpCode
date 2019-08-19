@@ -131,16 +131,16 @@ namespace App.Server
             _gameModule = new CompositeGameModule();
 
             _gameModule.AddModule(new ServerPlayerModule(contexts));
-            if (GameRules.IsChicken(contexts.session.commonSession.RoomInfo.ModeId))
-            {
+            //if (GameRules.IsChicken(contexts.session.commonSession.RoomInfo.ModeId))
+            //{
                _gameModule.AddModule(new ServerEntityInitModule(contexts));
-            }
+            //}
 
             IHitBoxEntityManager hitBoxEntityManager = new HitBoxEntityManager(contexts, true);
-            var snapshotSelectorContainer =
-                            contexts.session.serverSessionObjects.CompensationSnapshotSelector;
+            var SnapshotSelector =
+                            contexts.session.serverSessionObjects.SnapshotSelector;
             ICompensationWorldFactory factory =
-                            new ServerCompensationWorldFactory(snapshotSelectorContainer, hitBoxEntityManager);
+                            new ServerCompensationWorldFactory(SnapshotSelector, hitBoxEntityManager);
             _gameModule.AddModule(new UserCmdGameModule(contexts, factory,
             new BulletHitHandler(contexts, entityIdGenerator, room.PlayerDamager),
             new MeleeHitHandler(room.PlayerDamager),

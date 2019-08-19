@@ -5,39 +5,50 @@ using Entitas.CodeGeneration.Attributes;
 
 namespace App.Shared.Components.Weapon
 {
-    [Player,]
+    [Player]
     public class PlayerClientUpdateComponent : IUpdateComponent
     {
-//        [DontInitilize, NetworkProperty] public InterruptData InterruptHoldWeapon;
-//        [DontInitilize, NetworkProperty] public InterruptData InterruptGunSightWeapon;
-//        [DontInitilize, NetworkProperty] public InterruptData InterruptPullboltWeapon;
-        [DontInitilize, NetworkProperty] public bool OpenUIFrame;
         [NetworkProperty] public short FootstepFrameGroup;
+
+        [DontInitilize, NetworkProperty] public float LastSpreadOffsetX;
+        [DontInitilize, NetworkProperty] public float LastSpreadOffsetY;
+        [DontInitilize, NetworkProperty] public bool DestoryPreparedThrowingEntity;
+        [DontInitilize] public bool OpenUIFrameSync;
+
+        [DontInitilize]public byte LastMatType;
+
         public bool HasFootstepFrame
         {
             get { return FootstepFrameGroup > -1; }
         }
 
-        public void Clear(){
-//        {
-//            InterruptGunSightWeapon.Reset();
-//            InterruptPullboltWeapon.Reset();
-//            InterruptHoldWeapon.Reset();
-            OpenUIFrame = false;
-            FootstepFrameGroup = -1;
-        }
 
         public void CopyFrom(object rightComponent)
         {
             var remote = rightComponent as PlayerClientUpdateComponent;
-            OpenUIFrame = remote.OpenUIFrame;
             FootstepFrameGroup = remote.FootstepFrameGroup;
+            LastSpreadOffsetY  = remote.LastSpreadOffsetY;
+            LastSpreadOffsetX  = remote.LastSpreadOffsetX;
+            DestoryPreparedThrowingEntity = remote.DestoryPreparedThrowingEntity;
+
         }
 
-    
+
         public int GetComponentId()
         {
-            return (int)EComponentIds.WeaponClientUpdateComponent;
+            return (int) EComponentIds.WeaponClientUpdateComponent;
+        }
+
+        public void Clear()
+        {
+            //        {
+            //            InterruptGunSightWeapon.Reset();
+            //            InterruptPullboltWeapon.Reset();
+            //            InterruptHoldWeapon.Reset();
+            OpenUIFrameSync        = false;
+            FootstepFrameGroup = -1;
+            LastSpreadOffsetX  = LastSpreadOffsetY = 0;
+            DestoryPreparedThrowingEntity = false;
         }
 
         //        public void RewindTo(object rightComponent)

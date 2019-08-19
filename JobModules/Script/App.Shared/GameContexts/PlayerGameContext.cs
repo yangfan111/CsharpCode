@@ -2,7 +2,7 @@ using System;
 using App.Shared.GameModules.Common;
 
 
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core.EntityComponent;
 using Core.GameModule.Common;
 using Core.ObjectPool;

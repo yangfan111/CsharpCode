@@ -5,6 +5,7 @@ namespace VNet.Base.Interface
     public interface IVNetPeer
     {
         void Send(byte[] bytes, int length, int offset);
+        
         void OnDisconnect();
         int ConnectId { get; }
         SocketError ErrorCode { get; }

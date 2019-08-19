@@ -18,7 +18,7 @@ namespace App.Client.GameModules.ClientInit
         public void OnInitModule(IUnityAssetManager assetManager)
         {
             var player =  _contexts.player.flagSelfEntity;
-            _contexts.session.clientSessionObjects.UserPredictionInitManager.RewindFirstSnapshot(player.entityKey.Value);
+            _contexts.session.clientSessionObjects.UserPredictionManager.RewindFirstSnapshot(player.entityKey.Value);
            
             _logger.InfoFormat("RewindFirstSnapshotInitSystem:{0}", player.position.Value);
             player.RootGo().transform.SetPositionAndRotation(player.position.Value, player.orientation.ModelView);

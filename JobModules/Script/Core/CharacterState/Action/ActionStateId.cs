@@ -35,35 +35,37 @@ namespace Core.CharacterState.Action
     /// </summary>
     public enum ActionStateId
     {
-        CommonNull,                     // 0
+        CommonNull,                     
         
-        Fire,                           // 1
-        SpecialFire,                    // 2 
-        SpecialFireHold,                // 3
-        SpecialFireEnd,                 // 4
-        Injury,                         // 5
-        Reload,                         // 6
-        SpecialReload,                  // 7
+        Fire,                           
+        SpecialFire,                    
+        SpecialFireHold,                
+        SpecialFireEnd,                 
+        Injury,                         
+        Reload,                         
+        SpecialReload,                  
 
-        Unarm,                          // 8
-        Draw,                           // 9
-        SwitchWeapon,                   // 10
-        PickUp,                         // 11
-        MeleeAttack,                    // 12
-        Grenade,                        // 13
-        OpenDoor,                       // 14
-        Props,                          // 15
+        Unarm,                          
+        Draw,                           
+        SwitchWeapon,                   
+        PickUp,                         
+        MeleeAttackOne,                 
+        MeleeAttackTwo,                 
+        MeleeAttackSpecial,             
+        Grenade,                        
+        OpenDoor,                       
+        Props,                          
         
-        Gliding,                        // 16
-        Parachuting,                    // 17
+        Gliding,                        
+        Parachuting,                    
         
-        BuriedBomb,                     // 18
-        DismantleBomb,                  // 19
+        BuriedBomb,                     
+        DismantleBomb,                  
 
-        KeepNull,                       // 20
-        Drive,                          // 21
-        Sight,                          // 22
-        Rescue,                         // 23
+        KeepNull,                       
+        Drive,                          
+        Sight,                          
+        Rescue,                         
         RageStart,
         RageLoop,
         RageEnd,

@@ -13,6 +13,7 @@ namespace XmlConfig
     {
         public int Id;
         public string Event;
+        public uint ConvertedId;
         public List<int> SwitchGroup;
         public string BankRef;
 

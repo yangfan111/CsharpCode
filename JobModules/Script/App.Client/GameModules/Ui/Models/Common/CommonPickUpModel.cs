@@ -9,6 +9,7 @@ using App.Client.GameModules.Ui.Logic;
 using Utils.Configuration;
 using App.Client.CastObjectUtil;
 using App.Client.GameModules.Ui.UiAdapter;
+using UnityEngine.UI;
 using Utils.Singleton;
 
 namespace App.Client.GameModules.Ui.Models.Common
@@ -65,18 +66,55 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void RegisterKeyBinding()
         {
            // 虽然是Ui但是其实层级应该是Env
-            var keyreciever = new KeyReceiver(Layer.Env, BlockType.None);
-            keyreciever.AddAction(UserInputKey.PickUp, OnAction);
+            var keyreciever = new KeyReceiver(EInputLayer.Env, BlockType.None);
+            keyreciever.BindKeyAction(UserInputKey.PickUp, OnAction);
             _pickUpUiAdapter.RegisterKeyReceiver(keyreciever);
 
-            var pointerReceiver = new PointerReceiver(Layer.Env, BlockType.None);
-            pointerReceiver.AddAction(UserInputKey.PickUpTip, SetCastData);
+            var pointerReceiver = new PointerReceiver(EInputLayer.Env, BlockType.None);
+            pointerReceiver.BindPointAction(UserInputKey.PickUpTip, SetCastData);
             _pickUpUiAdapter.RegisterPointerReceiver(pointerReceiver);
+        }
+
+        protected override void OnGameobjectInitialized()
+        {
+            base.OnGameobjectInitialized();
+            InitVariable();
+        }
+
+        private Text _itemNameText;
+        private RectTransform _itemNameBgRtf;
+        private Vector2 _origNameBgSize;
+        private Vector2 _origNameSize;
+        private float offset = 12.5f;
+        private void InitVariable()
+        {
+            _itemNameText = FindComponent<Text>("ItemName");
+            _itemNameBgRtf = FindComponent<RectTransform>("ItemNameBg");
+            if (_itemNameBgRtf != null && _itemNameText != null)
+            {
+                _origNameBgSize = _itemNameBgRtf.sizeDelta;
+                _origNameSize = _itemNameText.rectTransform.sizeDelta;
+            }
+        }
+
+        private void ResizeText()
+        {
+            if (_itemNameText == null || _itemNameBgRtf == null) return;
+            var newSize = _itemNameText.preferredWidth;
+            if (newSize > _origNameSize.x - offset)
+            {
+                _itemNameText.rectTransform.sizeDelta = new Vector2(newSize, _origNameSize.y);
+                _itemNameBgRtf.sizeDelta =
+                    new Vector2(_origNameBgSize.x + newSize - _origNameSize.x + offset, _origNameBgSize.y);
+            }
+            else
+            {
+                _itemNameBgRtf.sizeDelta = _origNameBgSize;
+            }
         }
 
         public override void Update(float interval)
         {
-            if (!isVisible) return;
 
             _viewModel.Show = false;
 
@@ -181,19 +219,26 @@ namespace App.Client.GameModules.Ui.Models.Common
                 {
                     return;
                 }
-                _viewModel.Show = true;
-                _viewModel.ItemName = _playerStateTipLogic.StateTip;
-                if(Logger.IsDebugEnabled)
+
+                ShowText(_playerStateTipLogic.StateTip);
+
+                if (Logger.IsDebugEnabled)
                 {
                     Logger.DebugFormat("ShowStateTip {0}", _playerStateTipLogic.StateTip);
                 }
             }
         }
 
+        private void ShowText(string stateTip)
+        {
+            _viewModel.Show = true;
+            _viewModel.ItemName = stateTip;
+            ResizeText();
+        }
+
         private void ShowBuffTip()
         {
-            _viewModel.Show = _buffTipLogic.HasTipState();
-            _viewModel.ItemName = _buffTipLogic.StateTip;
+            ShowText(_buffTipLogic.StateTip);
         }
 
         private void ShowCastTip()
@@ -250,8 +295,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
             else
             {
-                _viewModel.Show = true;
-                _viewModel.ItemName = tip;
+                ShowText(tip);
                 if (null != _doCastAction)
                 {
                     _doCastAction();
@@ -260,9 +304,5 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
        }
 
-        public void OnUiPostprocess()
-        {
-            //do nothing
-        }
     }
 }

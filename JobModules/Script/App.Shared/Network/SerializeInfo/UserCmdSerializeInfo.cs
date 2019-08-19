@@ -16,13 +16,15 @@ namespace App.Shared.Network.SerializeInfo
             _serialize = new ProtoBufSerializeInfo<UserCmdMessage>(UserCmdMessage.Parser);
         }
 
-        public void Serialize(Stream outStream, object message)
+        public int Serialize(Stream outStream, object message)
         {
+           
             ReusableList<IUserCmd> list = (ReusableList<IUserCmd>) message;
             UserCmdMessage msg = UserCmdMessage.Allocate();
             UserCmdMessageConverter.ToProtoBuf(msg, list);
-            _serialize.Serialize(outStream, msg);
+            var ret = _serialize.Serialize(outStream, msg);
             msg.ReleaseReference();
+            return ret;
         }
 
         public object Deserialize(Stream inStream)

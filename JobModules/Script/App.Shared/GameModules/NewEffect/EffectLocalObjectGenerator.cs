@@ -18,6 +18,15 @@ namespace App.Shared
         {
             get { return LocalObjectPools[(int) classify]; }
         }
+
+        protected override void Clear()
+        {
+            for (int i = 0; i < LocalObjectPools.Length; i++)
+            {
+                LocalObjectPools[i].Reusable();
+            }
+            ChunkEffectBehavior.ChunkEffectBehaviors.Clear();
+        }
         void Awake()
         {
             ChunkEffectBehavior.ChunkEffectBehaviors.Clear();
@@ -66,6 +75,7 @@ namespace App.Shared
           
         }
 
+        private ClientEffectEmitter[] clientEffectBehaviorsBuffer; 
         /// <summary>
         /// </summary>
         /// <param name="isConstEffect">是否持续播放</param>
@@ -81,13 +91,13 @@ namespace App.Shared
             }
             else if (playingEffects.Count >= cfgItem.ObjectLimit)
             {
-                var ClientEffectBehaviors = playingEffects.ToArray<ClientEffectEmitter>();
+                clientEffectBehaviorsBuffer = playingEffects.ToArray<ClientEffectEmitter>();
                 int cutoffCount = Mathf.CeilToInt(playingEffects.Count * cfgItem.CutoffThreshold);
-                Array.Sort(ClientEffectBehaviors, ClientEffectEmitter.SequenceIndexComparer);
+                Array.Sort(clientEffectBehaviorsBuffer, ClientEffectEmitter.SequenceIndexComparer);
                 int accCutoffNum = 0;
                 for (int i = 0; i < playingEffects.Count; i++)
                 {
-                    var ele = ClientEffectBehaviors[i];
+                    var ele = clientEffectBehaviorsBuffer[i];
                     if (!ele.IsStatic)
                     {
                         Reusable(ele);

@@ -12,7 +12,9 @@ using App.Client.GameModules.Ui.Utils.MiniMaxMapCommon;
 using App.Shared.Components.Ui;
 using App.Shared.Configuration;
 using Core.Components;
+using Core.Ui.Map;
 using DG.Tweening;
+using UIComponent.UI;
 using UnityEngine.UI;
 using Utils.Singleton;
 using XmlConfig;
@@ -22,6 +24,8 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
     public partial class CommonMiniMap : ClientAbstractModel, IUiHfrSystem
     {
         protected static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CommonMiniMap));
+
+        protected static float borderSize = 150; //地图资源会有额外边
         protected IMiniMapUiAdapter adapter;
         protected bool isGameObjectCreated = false;
 
@@ -38,6 +42,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         protected float playItemModelWidth = 0;
 
         protected Transform root = null;
+        protected Transform bgRect = null;
         protected RectTransform rootRectTf = null;
         protected Transform miniMap = null;
 
@@ -54,6 +59,8 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         protected Transform markRoot = null;
         protected Transform girdRoot = null;
         protected Transform bioMarkRoot = null;
+        protected Transform mapNameRoot = null;
+        protected UIText mapNameText = null;
 
         protected RawImage mapBgRawIamge;
 
@@ -75,6 +82,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
         protected Vector2 lastPos = Vector2.zero; //记录上一次的人物在 以地图左下角的 相对位置 米
         protected Vector2 selfPlayPos = Vector2.zero;
+        protected MapFixedVector3 selfPlayPos3D;  //真实世界的高度
 
         protected CommonMiniMapViewModel _viewModel = new CommonMiniMapViewModel();
         protected override IUiViewModel ViewModel
@@ -94,6 +102,9 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             OriginalMiniMapRepresentWHByRice = MiniMapRepresentWHByRice = GetShowSize();
             Logger.InfoFormat("CurMapSize: \"{0}\" ", MapRealWHByRice);
             InitGui();
+
+            girdRoot.gameObject.SetActive(false);
+            mapNameText.text = SingletonManager.Get<MapConfigManager>().SceneParameters.Name;
         }
         public override void Update(float interval)
         {
@@ -117,7 +128,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 //                _mapGird = new MapGird(lineRoot);
 //                _mapGird1 = new MapGird1(girdRoot);
             }
-            _mapGird1 = new MapGird1(girdRoot);
+//            _mapGird1 = new MapGird1(girdRoot);
             InitMapBg();
             _airPlane = new AirPlane(kTouRoot, Loader);
             _routeLine = new RouteLine(routeRoot);
@@ -129,12 +140,17 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
         protected virtual void UpdateMapBg(Vector2 centerPos)
         {
+            var textureW = mapBgRawIamge.texture.width;
+            var textureH = mapBgRawIamge.texture.height;
             var uvRect = mapBgRawIamge.uvRect;
-            var halfRect = MiniMapRepresentWHByRice * rate / 2;
+            var halfRect = MiniMapRepresentWHByRice * rate / 2f;
             var RealRect = MapRealWHByRice * rate;
             uvRect.x = (centerPos.x * rate - halfRect)/ RealRect;
             uvRect.y = (centerPos.y * rate - halfRect)/ RealRect;
-            uvRect.width = uvRect.height = halfRect * 2/ RealRect;
+//            uvRect.width = uvRect.height = halfRect * 2f / (RealRect);
+            uvRect.width = uvRect.height = halfRect * 2f / (RealRect) * (textureW - borderSize * 2f) / textureW;
+            uvRect.x = (uvRect.x * (textureW - borderSize * 2f) + borderSize) / textureW;
+            uvRect.y = (uvRect.y * (textureH - borderSize * 2f) + borderSize) / textureH;
             mapBgRawIamge.uvRect = uvRect;
         }
 
@@ -147,20 +163,20 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             UpdateMapBg(selfPlayPos);
 //            UpdatePlayerItemList();
 
-            _mapPlayer.Update(adapter.TeamInfos, selfPlayPos, rate, MiniMapRepresentWHByRice, adapter.MapLevel);
+            _mapPlayer.Update(adapter.TeamInfos, selfPlayPos, rate, MiniMapRepresentWHByRice, adapter.MapLevel, selfPlayPos3D);
             _mapMark.Update(adapter.MapMarks, rate);
             _safeCircle.Update(adapter.NextDuquan, selfPlayPos, rate, MiniMapRepresentWHByRice);
             _duquanCircle.Update(adapter.CurDuquan, selfPlayPos, rate, MiniMapRepresentWHByRice);
             _bombArea.Update(adapter.BombArea, selfPlayPos, rate, MiniMapRepresentWHByRice);
             _safeMiniDis.Update(adapter.NextDuquan, selfPlayPos, playItemModelWidth, rate, MiniMapRepresentWHByRice);
 //            if (_mapGird != null) _mapGird.Update(rate, MapRealWHByRice, selfPlayPos, MiniMapRepresentWHByRice);
-            if (_mapGird1 != null) _mapGird1.Update(rate, MapRealWHByRice, selfPlayPos, MiniMapRepresentWHByRice, 0);
+//            if (_mapGird1 != null) _mapGird1.Update(rate, MapRealWHByRice, selfPlayPos, MiniMapRepresentWHByRice, 0);
 
             UpdataMapBg();
 
             _airPlane.Update(interval, rate, adapter.KongTouList(), adapter.PlaneData);
             _routeLine.Updata(adapter.IsShowRouteLine, adapter.RouteLineStartPoint, adapter.RouteLineEndPoint, rate);
-            _mapLabel.UpdateC4(adapter.IsC4Drop, adapter.C4DropPosition, rate);
+            _mapLabel.UpdateC4(adapter, rate);
             _bioMark.UpdateBioLabel(adapter.MotherPos, adapter.HeroPos,adapter.HumanPos, adapter.SupplyPos, rate);
         }
 
@@ -169,11 +185,13 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             //var data = adapter.ObservePlayer;
             //selfPlayPos = data.Pos.ShiftedUIVector2();
             selfPlayPos = adapter.CurPlayerPos;
+            selfPlayPos3D = adapter.CurPlayerPos3D;
         }
 
         private void InitSetting()
         {
             root = FindChildGo("root");
+            bgRect = FindChildGo("bgRect");
             miniMap = FindChildGo("Bg");
             playItemRoot = FindChildGo("playRoot");
             markRoot = FindChildGo("markRoot");
@@ -195,6 +213,8 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             routeRoot = FindChildGo("routeRoot");
             labelRoot = FindChildGo("LabelRoot");
             bioMarkRoot = FindChildGo("BioRoot");
+            mapNameRoot = FindChildGo("MapNameImage");
+            mapNameText = FindChildGo("MapNameText").GetComponent<UIText>();
             rootRectTf = root.GetComponent<RectTransform>();
             mapBgRawIamge = mapBg.GetComponent<RawImage>();
             //保证canvas的 推荐分辨率等于 实际分辨率 解决犹豫网格线只有一个像素的 导致的精度丢失问题

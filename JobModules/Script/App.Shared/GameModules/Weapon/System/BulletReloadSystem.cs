@@ -179,7 +179,7 @@ namespace App.Shared.GameModules.Weapon
             var lastReservedBullet = controller.GetReservedBullet();
             target                                                     =  Mathf.Min(target, lastReservedBullet);
             controller.HeldWeaponAgent.BaseComponent.Bullet            += target;
-            controller.HeldWeaponAgent.RunTimeComponent.PullBoltFinish =  true;
+            controller.HeldWeaponAgent.RunTimeComponent.FinishPullBolt();
             //DebugUtil.MyLog("Bullet reload" + controller.HeldWeaponAgent.BaseComponent.Bullet, DebugUtil.DebugColor.Black);
             controller.SetReservedBullet(lastReservedBullet - target);
 

@@ -6,7 +6,7 @@ namespace AssetBundleManager.Warehouse
 {
     class SimulationWarehouse : AssetBundleWarehouse
     {
-        public SimulationWarehouse(AssetBundleWarehouseAddr addr, bool isLow)
+        public SimulationWarehouse(AssetBundleWarehouseAddr addr, bool isLow, string useMD5 = null)
             : base(addr.Manifest, isLow)
         {
         }
@@ -20,7 +20,7 @@ namespace AssetBundleManager.Warehouse
         {         
             return OperationFactory.CreateAssetBundleSimulatedLoading(name, name);
         }
-        //AssetDatabase实现本地模拟
+
         public override AssetLoading LoadAsset(string bundleName, string name, Type objectType)
         {
             AssetSimulatedLoading operation = null;

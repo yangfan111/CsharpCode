@@ -16,8 +16,8 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
         BezierUtil _bezierUtil = new BezierUtil();
         public GlidingPoseMotor(ECameraPoseMode modeId,
             HashSet<ECameraPoseMode> excludes,
-            IMotorActive active
-        ) : base(modeId, excludes, active)
+            IMotorActive active,
+            Motors m) : base(modeId, excludes, active,m)
         {
             _bezierUtil.CreateRandomPoints(1f,1.5f,-2,2,-0.3f,0.3f,4);
         }

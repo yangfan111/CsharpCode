@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Shared.Components;
-using Core.GameModule.Module;
-using Core.GameModule.System;
-using Core.SessionState;
+﻿using Core.GameModule.Module;
 
 namespace App.Client.GameModules.GamePlay.Free.Entitas
 {

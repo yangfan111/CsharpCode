@@ -128,7 +128,7 @@ namespace App.Shared
             sb.Append("<div><p>==================================================================</div>");
             sb.Append(ObjectAllocators.PrintAllDebugInfo());
             sb.Append("<div><p>==================================================================</div>");
-            sb.Append(EntityMapComparator.PrintDebugInfo());
+            sb.Append(EntityMapCompareExecutor.PrintDebugInfo());
             sb.Append("<div><p>==================================================================</div>");
             sb.Append(AbstractNetworkService.PrintDebugInfo());
             return sb.ToString();
@@ -147,7 +147,7 @@ namespace App.Shared
     {
         public override string HandlerRequest()
         {
-            return EntityMapComparator.PrintDebugInfo();
+            return EntityMapCompareExecutor.PrintDebugInfo();
         }
     }
 

@@ -66,6 +66,9 @@ namespace Core.CameraControl.NewMotor
 
     abstract class AbstractCameraMainMotor : AbstractCameraMotor, ICameraMainMotor
     {
+        public AbstractCameraMainMotor(Motors m) : base(m)
+        {
+        }
     }
 
     public abstract class AbstractCameraMotor : ICameraNewMotor
@@ -73,6 +76,7 @@ namespace Core.CameraControl.NewMotor
         protected static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(AbstractCameraMotor));
         protected Action<PlayerEntity, ICameraMotorState> EnterActions;
         protected Action<PlayerEntity, ICameraMotorState> LeaveActions;
+        protected Motors _motors;
         
         public abstract short ModeId { get; }
 
@@ -115,9 +119,9 @@ namespace Core.CameraControl.NewMotor
         }
 
 
-        protected AbstractCameraMotor()
+        protected AbstractCameraMotor(Motors m)
         {
-
+            _motors = m;
         }
 
         

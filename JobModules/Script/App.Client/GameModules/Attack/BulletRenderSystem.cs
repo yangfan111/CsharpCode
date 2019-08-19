@@ -36,10 +36,10 @@ namespace App.Client.GameModules.Attack
             bulletGo.SetActive( true/*bullet.bulletData.Distance > GlobalConst.InitDistanceForDisplay*/);
             if (bullet.bulletData.Distance < GlobalConst.MaxDistanceForCorrent)
             {
-                float yDown = (GlobalConst.MaxDistanceForCorrent - bullet.bulletData.Distance) / GlobalConst.MaxDistanceForCorrent *
-                              GlobalConst.InitZDown;
+                //float yDown = (GlobalConst.MaxDistanceForCorrent - bullet.bulletData.Distance) / GlobalConst.MaxDistanceForCorrent *
+                //              GlobalConst.InitZDown;
                 var last = bulletGo.transform.position;
-                bulletGo.transform.position = bullet.position.Value + new Vector3(0, -1 * yDown, 0);
+                bulletGo.transform.position = bullet.position.Value;// + new Vector3(0, -1 * yDown, 0);
                 if (DebugConfig.DrawBulletLine)
                 {
                     RuntimeDebugDraw.Draw.DrawLine(last, bulletGo.transform.position, Color.blue, 3f);

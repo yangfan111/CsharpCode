@@ -59,6 +59,7 @@ namespace AssetBundles
 			case RuntimePlatform.WebGLPlayer:
 				return "WebGL";
 			case RuntimePlatform.WindowsPlayer:
+            case RuntimePlatform.WindowsEditor:
 				return "Windows";
 			case RuntimePlatform.OSXPlayer:
 				return "OSX";

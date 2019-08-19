@@ -231,7 +231,7 @@ namespace Core.Statistics
         public bool IsRunaway;
 
         //正常状态下，最后击伤我的
-        public bool IsHited;
+        //public bool IsHited;
         public EntityKey LastHurtKey;
         public int LastHurtType;    //EUIDeadType
         public int LastHurtPart;

@@ -6,7 +6,7 @@ namespace Utils.Appearance.PropItem
     {
         protected override AbstractLoadRequest CreateLoadRequest(AssetInfo assetInfo, ILoadedHandler mountHandler)
         {
-            return LoadRequestFactory.Create<object>(assetInfo, mountHandler.OnLoadSucc);
+            return LoadRequestFactory.Create<object>(assetInfo, mountHandler.OnLoadSuccess);
         }
     }
 }

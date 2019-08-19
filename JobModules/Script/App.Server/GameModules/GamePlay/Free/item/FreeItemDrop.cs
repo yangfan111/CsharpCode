@@ -19,6 +19,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
         private static MyDictionary<string, ItemPriority> catDic;
         private static MyDictionary<int, MyDictionary<int, CatPriority>> extraDic;
         private static Dictionary<int, List<ItemDrop>> dropCache;
+        private bool skip;
 
         public FreeItemDrop()
         {
@@ -27,11 +28,12 @@ namespace App.Server.GameModules.GamePlay.Free.item
             extraDic = new MyDictionary<int, MyDictionary<int, CatPriority>>();
             rangeDic = new MyDictionary<int, DropRange>();
             dropCache = new Dictionary<int, List<ItemDrop>>();
+            skip = false;
         }
 
         public void Initial(int mapId)
         {
-            if (dropDic.Count <= 0)
+            if (dropDic.Count <= 0 && !skip)
             {
                 int loaded = 0;
                 foreach (var item in DropAreaConfig.current.Items)
@@ -48,6 +50,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
                 if (dropDic.Count <= 0)
                 {
                     Logger.InfoFormat("无配置掉落点位，跳过道具表的读取。");
+                    skip = true;
                     return;
                 }
                 MyDictionary<string, List<DropPool>> catMap = new MyDictionary<string, List<DropPool>>();

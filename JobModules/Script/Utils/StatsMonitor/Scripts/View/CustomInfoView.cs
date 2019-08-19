@@ -45,7 +45,8 @@ namespace StatsMonitor.View
                 {
                     c = GraphView.customColor[color];
                 }
-                content += "<color=#" + Util.Utils.Color32ToHex(c) + ">" + item.Name + ":" + item.SampleValue() + "</color>\n";
+                content += "<color=#" + Util.Utils.Color32ToHex(c) + ">" + item.Name + ":" + item.SampleValue().ToString("f3") + "</color>\n";
+                color++;
             }
             _text1.text = content;
         }

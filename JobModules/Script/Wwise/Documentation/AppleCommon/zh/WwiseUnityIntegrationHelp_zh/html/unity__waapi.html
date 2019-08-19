@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>The Unity WAAPI Client</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>&nbsp;&raquo;&nbsp;<a class="el" href="pg__appscripts.html">使用 Wwise Unity 集成</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="unity_waapi">The Unity WAAPI Client </a></h1><p>As of version 2018.1, support for the Wwise Authoring API (WAAPI) is built into the Unity integration (for more information refer to <a href="https://www.audiokinetic.com/library/edge/?source=SDK&amp;id=waapi.html" target="_blank">Using the Wwise Authoring API (WAAPI)</a>).</p>
+<p>A class called <code><a class="el" href="class_ak_waapi_client.html" title="The full Wwise Authoring API is exposed to Unity as a native plugin for the Windows...">AkWaapiClient</a></code> is provided, which can be used to establish a WAAPI connection and start making WAAPI calls. The following line will connect to WAAPI using localhost, on port 8080.</p>
+<div class="fragment"><pre class="fragment"><a class="code" href="class_ak_waapi_client.html" title="The full Wwise Authoring API is exposed to Unity as a native plugin for the Windows...">AkWaapiClient</a>.Connect(<span class="stringliteral">&quot;127.0.0.1&quot;</span>, 8080);
+</pre></div><p>In order to make WAAPI calls and receive responses, JSON arguments must be constructed and parsed. The Unity <code>JsonUtility</code> class makes it easy to translate between C# classes and JSON strings. The following class provides functionality to create JSON strings from classes, and vice-versa.</p>
+<div class="fragment"><pre class="fragment"><span class="keyword">public</span> <span class="keyword">class </span>WaapiJsonClassBase&lt;T&gt;
+{
+    <span class="keyword">public</span> <span class="keyword">override</span> <span class="keywordtype">string</span> ToString()
+    {
+        <span class="keywordflow">return</span> JsonUtility.ToJson(<span class="keyword">this</span>);
+    }
+
+    <span class="keyword">public</span> <span class="keyword">static</span> implicit operator string(WaapiJsonClassBase&lt;T&gt; obj)
+    {
+        <span class="keywordflow">return</span> obj.ToString();
+    }
+
+    <span class="keyword">public</span> <span class="keyword">static</span> T Create(<span class="keywordtype">string</span> FromJson)
+    {
+        <span class="keywordflow">return</span> JsonUtility.FromJson&lt;T&gt;(FromJson);
+    }
+}
+</pre></div><p>This class can then be extended to provide C# wrappers for specific WAAPI schemas. For example, the following classes can be used to construct the arg and option JSON strings for calls to <code>ak.wwise.core.object.get</code> (for more information refer to <a href="https://www.audiokinetic.com/library/edge/?source=SDK&amp;id=ak__wwise__core__object__get.html" target="_blank">ak.wwise.core.object.get</a>).</p>
+<div class="fragment"><pre class="fragment">[System.Serializable]
+<span class="keyword">public</span> <span class="keyword">class </span>ObjectGetArgs : WaapiJsonClassBase&lt;ObjectGetArgs&gt;
+{
+    [System.Serializable]
+    <span class="keyword">public</span> <span class="keyword">class </span>From
+    {
+        <span class="keyword">public</span> <span class="keywordtype">string</span>[] id;
+    }
+
+    <span class="keyword">public</span> From from = <span class="keyword">new</span> From();
+}
+
+[System.Serializable]
+<span class="keyword">public</span> <span class="keyword">class </span>CallOptions : WaapiJsonClassBase&lt;CallOptions&gt;
+{
+    <span class="keyword">public</span> <span class="keywordtype">string</span>[] @<span class="keywordflow">return</span>;
+}
+</pre></div><p>The following class can then be used to parse the result.</p>
+<div class="fragment"><pre class="fragment">[System.Serializable]
+<span class="keyword">public</span> <span class="keyword">class </span>CallReturn : WaapiJsonClassBase&lt;CallReturn&gt;
+{
+    [System.Serializable]
+    <span class="keyword">public</span> <span class="keyword">class </span>ReturnContents
+    {
+        <span class="keyword">public</span> <span class="keywordtype">string</span> name;
+        <span class="keyword">public</span> <span class="keywordtype">string</span> type;
+        <span class="keyword">public</span> <span class="keywordtype">string</span> path;
+    }
+
+    <span class="keyword">public</span> ReturnContents[] @<span class="keywordflow">return</span>;
+}
+</pre></div><p>The following code shows how these examples, along with some similar classes, can be used to create a simple script that connects to WAAPI and registers a callback for when an object is created in Wwise. If this code is added to an existing Unity project with Wwise integrated, a menu option will be added to the editor through which the WAAPI connection can be tested.</p>
+<div class="fragment"><pre class="fragment"><span class="keyword">using</span> System.Collections;
+<span class="keyword">using</span> System.Collections.Generic;
+<span class="keyword">using</span> UnityEngine;
+<span class="keyword">using</span> UnityEditor;
+
+<span class="keyword">public</span> <span class="keyword">class </span>WaapiJsonClassBase&lt;T&gt;
+{
+    <span class="keyword">public</span> <span class="keyword">override</span> <span class="keywordtype">string</span> ToString()
+    {
+        <span class="keywordflow">return</span> JsonUtility.ToJson(<span class="keyword">this</span>);
+    }
+
+    <span class="keyword">public</span> <span class="keyword">static</span> implicit operator string(WaapiJsonClassBase&lt;T&gt; obj)
+    {
+        <span class="keywordflow">return</span> obj.ToString();
+    }
+
+    <span class="keyword">public</span> <span class="keyword">static</span> T Create(<span class="keywordtype">string</span> FromJson)
+    {
+        <span class="keywordflow">return</span> JsonUtility.FromJson&lt;T&gt;(FromJson);
+    }
+
+}
+
+[System.Serializable]
+<span class="keyword">public</span> <span class="keyword">class </span>ProjectInfo : WaapiJsonClassBase&lt;ProjectInfo&gt;
+{
+    [System.Serializable]
+    <span class="keyword">public</span> <span class="keyword">class </span>ProjectInfoDirectories
+    {
+        <span class="keyword">public</span> <span class="keywordtype">string</span> authoring;
+        <span class="keyword">public</span> <span class="keywordtype">string</span> bin;
+        <span class="keyword">public</span> <span class="keywordtype">string</span> help;
+        <span class="keyword">public</span> <span class="keywordtype">string</span> install;
+        <span class="keyword">public</span> <span class="keywordtype">string</span> log;
+        <span class="keyword">public</span> <span class="keywordtype">string</span> user;
+    }
+
+    [System.Serializable]
+    <span class="keyword">public</span> <span class="keyword">class </span>VersionInfo
+    {
+        <span class="keyword">public</span> <span class="keywordtype">int</span> build;
+        <span class="keyword">public</span> <span class="keywordtype">string</span> displayName;
+        <span class="keyword">public</span> <span class="keywordtype">int</span> major;
+        <span class="keyword">public</span> <span class="keywordtype">int</span> minor;
+        <span class="keyword">public</span> <span class="keywordtype">string</span> nickname;
+        <span class="keyword">public</span> <span class="keywordtype">int</span> schema;
+        <span class="keyword">public</span> <span class="keywordtype">int</span> year;
+    }
+
+    <span class="keyword">public</span> <span class="keywordtype">int</span> apiVersion;
+    <span class="keyword">public</span> <span class="keywordtype">string</span> branch;
+    <span class="keyword">public</span> <span class="keywordtype">string</span> configuration;
+    <span class="keyword">public</span> <span class="keywordtype">string</span> copyright;
+    <span class="keyword">public</span> ProjectInfoDirectories directories;
+    <span class="keyword">public</span> <span class="keywordtype">string</span> displayName;
+    <span class="keyword">public</span> <span class="keywordtype">bool</span> isCommandLine;
+    <span class="keyword">public</span> <span class="keywordtype">string</span> platform;
+    <span class="keyword">public</span> <span class="keywordtype">int</span> processId;
+    <span class="keyword">public</span> <span class="keywordtype">string</span> processPath;
+    <span class="keyword">public</span> VersionInfo version;
+}
+
+[System.Serializable]
+<span class="keyword">public</span> <span class="keyword">class </span>ObjectCreatedJsonObject : WaapiJsonClassBase&lt;ObjectCreatedJsonObject&gt;
+{
+    [System.Serializable]
+    <span class="keyword">public</span> <span class="keyword">class </span>subObject
+    {
+        <span class="keyword">public</span> <span class="keywordtype">string</span> id;
+    }
+
+    <span class="keyword">public</span> subObject @object;
+}
+
+[System.Serializable]
+<span class="keyword">public</span> <span class="keyword">class </span>ObjectGetArgs : WaapiJsonClassBase&lt;ObjectGetArgs&gt;
+{
+    [System.Serializable]
+    <span class="keyword">public</span> <span class="keyword">class </span>From
+    {
+        <span class="keyword">public</span> <span class="keywordtype">string</span>[] id;
+    }
+
+    <span class="keyword">public</span> From from = <span class="keyword">new</span> From();
+}
+
+[System.Serializable]
+<span class="keyword">public</span> <span class="keyword">class </span>CallOptions : WaapiJsonClassBase&lt;CallOptions&gt;
+{
+    <span class="keyword">public</span> <span class="keywordtype">string</span>[] @<span class="keywordflow">return</span>;
+}
+
+[System.Serializable]
+<span class="keyword">public</span> <span class="keyword">class </span>CallReturn : WaapiJsonClassBase&lt;CallReturn&gt;
+{
+    [System.Serializable]
+    <span class="keyword">public</span> <span class="keyword">class </span>ReturnContents
+    {
+        <span class="keyword">public</span> <span class="keywordtype">string</span> name;
+        <span class="keyword">public</span> <span class="keywordtype">string</span> type;
+        <span class="keyword">public</span> <span class="keywordtype">string</span> path;
+    }
+
+    <span class="keyword">public</span> ReturnContents[] @<span class="keywordflow">return</span>;
+}
+
+[System.Serializable]
+<span class="keyword">public</span> <span class="keyword">class </span>WaapiTest : MonoBehaviour
+{
+
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keywordtype">void</span> OnObjectCreated(ulong subID, <span class="keywordtype">string</span> Json)
+    {
+        ObjectCreatedJsonObject CreatedObject = ObjectCreatedJsonObject.Create(Json);
+        <span class="keywordflow">if</span>(CreatedObject != null)
+        {
+            <span class="keywordtype">string</span> Result;
+            var Args = <span class="keyword">new</span> ObjectGetArgs { from = <span class="keyword">new</span> ObjectGetArgs.From { <span class="keywordtype">id</span> = <span class="keyword">new</span>[] { CreatedObject.@<span class="keywordtype">object</span>.id } } };
+            var Options = <span class="keyword">new</span> CallOptions { @<span class="keywordflow">return</span> = <span class="keyword">new</span>[]{ <span class="stringliteral">&quot;name&quot;</span>, <span class="stringliteral">&quot;type&quot;</span>, <span class="stringliteral">&quot;path&quot;</span> } };
+
+            <a class="code" href="class_ak_waapi_client.html" title="The full Wwise Authoring API is exposed to Unity as a native plugin for the Windows...">AkWaapiClient</a>.Call(<span class="stringliteral">&quot;ak.wwise.core.object.get&quot;</span>, Args, Options, out Result);
+            var ReturnedObject = CallReturn.Create(Result);
+
+            Debug.Log(<span class="stringliteral">&quot;New object of type &quot;</span> + ReturnedObject.@<span class="keywordflow">return</span>[0].type + <span class="stringliteral">&quot; named &quot;</span> + ReturnedObject.@<span class="keywordflow">return</span>[0].name + <span class="stringliteral">&quot; with ID &quot;</span> + CreatedObject.@<span class="keywordtype">object</span>.id + <span class="stringliteral">&quot; created at path &quot;</span> + ReturnedObject.@<span class="keywordflow">return</span>[0].path);
+        }
+    }
+
+    [MenuItem(<span class="stringliteral">&quot;WWISE/TEST WAAPI&quot;</span>)]
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keywordtype">void</span> WaapiClientTest()
+    {
+        <span class="keywordflow">if</span> (<a class="code" href="class_ak_waapi_client.html" title="The full Wwise Authoring API is exposed to Unity as a native plugin for the Windows...">AkWaapiClient</a>.Connect(<span class="stringliteral">&quot;127.0.0.1&quot;</span>, 8080))
+        {
+            Debug.Log(<span class="stringliteral">&quot;Connect Success!&quot;</span>);
+            <span class="keywordtype">string</span> WaapiResult = <span class="keywordtype">string</span>.Empty;
+            <span class="keywordtype">bool</span> res = <a class="code" href="class_ak_waapi_client.html" title="The full Wwise Authoring API is exposed to Unity as a native plugin for the Windows...">AkWaapiClient</a>.Call(<span class="stringliteral">&quot;ak.wwise.core.getInfo&quot;</span>, <span class="stringliteral">&quot;{}&quot;</span>, <span class="stringliteral">&quot;{}&quot;</span>, out WaapiResult);
+            <span class="keywordflow">if</span> (res)
+            {
+                var projectInfo = ProjectInfo.Create(WaapiResult);
+
+                Debug.Log(projectInfo);
+            }
+            <span class="keywordflow">else</span>
+            {
+                Debug.Log(<span class="stringliteral">&quot;Call failed :(&quot;</span>);
+            }
+
+            var Options = <span class="keyword">new</span> CallOptions { @<span class="keywordflow">return</span> = <span class="keyword">new</span>[] { <span class="stringliteral">&quot;id&quot;</span> } };
+
+            ulong subId = 0;
+            res = <a class="code" href="class_ak_waapi_client.html" title="The full Wwise Authoring API is exposed to Unity as a native plugin for the Windows...">AkWaapiClient</a>.Subscribe(<span class="stringliteral">&quot;ak.wwise.core.object.created&quot;</span>, Options, OnObjectCreated, out subId, out WaapiResult);
+            <span class="keywordflow">if</span> (res)
+            {
+                Debug.Log(<span class="stringliteral">&quot;Subscribe success!&quot;</span> + WaapiResult);
+            }
+            <span class="keywordflow">else</span>
+            {
+                Debug.Log(<span class="stringliteral">&quot;Subscribe failed :(&quot;</span>);
+            }
+        }
+        <span class="keywordflow">else</span>
+        {
+            Debug.Log(<span class="stringliteral">&quot;Connect fail :(&quot;</span>);
+        }
+    }
+}
+</pre></div> </div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

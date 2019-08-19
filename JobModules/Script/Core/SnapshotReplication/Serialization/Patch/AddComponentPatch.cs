@@ -35,6 +35,7 @@ namespace Core.SnapshotReplication.Serialization.Patch
 
         protected override void OnCleanUp()
         {
+            base.OnCleanUp();
             ObjectAllocatorHolder<AddComponentPatch>.Free(this);
         }
 

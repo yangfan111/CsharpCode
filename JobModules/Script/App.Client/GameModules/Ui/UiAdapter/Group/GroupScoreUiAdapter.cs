@@ -1,40 +1,50 @@
-﻿using Core.Enums;
+﻿using System.Collections.Generic;
+using App.Shared.Components.Ui;
+using Core.Enums;
 
 namespace App.Client.GameModules.Ui.UiAdapter
 {
+    public class PlayerCountData : IPlayerCountData
+    {
+        public int PlayerCount { get; set; }
+        public int DeadPlayerCount { get; set; }
+    }
     public class GroupScoreUiAdapter : UIAdapter, IGroupScoreUiAdapter
     {
         private Contexts _contexts;
+        private Shared.Components.Ui.UIComponent _ui;
+
+        public List<IGroupBattleData> GetBattleDataListByCampType(EUICampType type)
+        {
+            var list = _contexts.ui.uI.GroupBattleDataDict[(int)type];
+            return list;
+        }
 
         public GroupScoreUiAdapter(Contexts contexts)
         {
-            this._contexts = contexts;
+            _contexts = contexts;
+            _ui = contexts.ui.uI;
         }
-
-
         public int GameTime
         {
-            get
-            {
-                return _contexts.ui.uI.GameTime;
-            }
-            set
-            {
-                _contexts.ui.uI.GameTime = value;
-            }
+            get { return _ui.GameTime; }
+            set { _ui.GameTime = value; }
         }
 
-        public int KillCountForWin
+
+        public int ScoreForWin
         {
-            get
-            {
-                return _contexts.ui.uI.ScoreForWin;
-            }
+            get { return _ui.ScoreForWin; }
         }
 
-        public int GetKillCountByCampType(EUICampType campType)
+        public int GetScoreByCamp(EUICampType type)
         {
-            return _contexts.ui.uI.ScoreByCampTypeDict[(int)campType];
+            return _ui.ScoreByCampTypeDict[(int)type];
+        }
+
+        public IPlayerCountData GetDataByCampType(EUICampType campType)
+        {
+            return _ui.PlayerCountByCampTypeDict[(int)campType];
         }
 
         public bool NeedPause

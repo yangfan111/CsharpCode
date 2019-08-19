@@ -6,13 +6,12 @@ using UnityEngine;
 
 namespace Core.Animation
 {
-    public class AnimatorPoseReplayer
+    public static class AnimatorPoseReplayer
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(AnimatorPoseReplayer));
-
-        public void ReplayPose(List<NetworkAnimatorLayer> layerList,
-                               List<NetworkAnimatorParameter> paramList,
-                               Animator animator)
+        public static void ReplayPose(List<NetworkAnimatorLayer> layerList,
+                                      List<NetworkAnimatorParameter> paramList,
+                                      Animator animator)
         {
             UpdateAnimatorParameters(paramList, animator);
             UpdateAnimatorLayers(layerList, animator);
@@ -41,111 +40,33 @@ namespace Core.Animation
                 }
             }
         }
+
         private static void UpdateAnimatorLayers(List<NetworkAnimatorLayer> layers, Animator animator)
         {
-            float maxTransitionTime = 0;
-            // check whether Transition exists or not
-            for (int i = 0; i < layers.Count; i++)
+            var layerCount = layers.Count;
+            for (int i = 0; i < layerCount; ++i)
             {
                 var layer = layers[i];
-                if (layer.LayerIndex >= 0)
+                if (layer.LayerIndex < 0)
+                    continue;
+
+                animator.SetLayerWeight(layer.LayerIndex, layer.Weight);
+                if (layer.TransitionNormalizedTime < 0)
+                    animator.Play(layer.CurrentStateFullPathHash, layer.LayerIndex, layer.CurrentStateNormalizedTime);
+                else
                 {
-                    
-                    if (!CompareUtility.IsApproximatelyEqual(layer.TransitionNormalizedTime, NetworkAnimatorLayer.NotInTransition))
-                    {
-                        maxTransitionTime = Mathf.Max(maxTransitionTime, layer.StateDuration * (layer.NormalizedTime - (float)Math.Floor(layer.NormalizedTime)));
-                    }
-                    animator.SetLayerWeight(layer.LayerIndex, layer.Weight);
-                }
-            }
-            
-            if (CompareUtility.IsApproximatelyEqual(maxTransitionTime, 0))
-            {
-                for (int i = 0; i < layers.Count; i++)
-                {
-                    var layer = layers[i];
-                    if (layer.LayerIndex >= 0)
-                    {
-                        animator.Play(layer.CurrentStateHash, layer.LayerIndex, layer.NormalizedTime);
-                    }
-                }
-            }
-            else
-            {
-                List<SortedLayer> sortedLayers = new List<SortedLayer>();
-                for (int i = 0; i < layers.Count; i++)
-                {
-                    if (layers[i].LayerIndex >= 0)
-                    {
-                        if (!CompareUtility.IsApproximatelyEqual(layers[i].TransitionNormalizedTime, NetworkAnimatorLayer.NotInTransition))
-                        {
-                            sortedLayers.Add(new SortedLayer
-                            {
-                                LayerIndex = layers[i].LayerIndex,
-                                TransitionTime = layers[i].StateDuration * (layers[i].NormalizedTime - (float)Math.Floor(layers[i].NormalizedTime))
-                            });
-                        }
-                        else
-                        {
-                            sortedLayers.Add(new SortedLayer
-                            {
-                                LayerIndex = layers[i].LayerIndex,
-                                TransitionTime = 0
-                            });
-                        }
-                    }
-                }
-                sortedLayers.Sort((x, y) =>
-                {
-                    if (x.TransitionTime > y.TransitionTime)
-                    {
-                        return -1;
-                    }
-                    if (x.TransitionTime < y.TransitionTime)
-                    {
-                        return 1;
-                    }
-                    return 0;
-                });
-        
-                for (int i = 0; i < sortedLayers.Count; i++)
-                {
-                    var layerIndex = sortedLayers[i].LayerIndex;
-                    var layer = layers[layerIndex];
-                    float deltaTime = 0.0f;
-                    
-                    if (!CompareUtility.IsApproximatelyEqual(layer.TransitionNormalizedTime, NetworkAnimatorLayer.NotInTransition))
-                    {
-                        if (i != sortedLayers.Count - 1)
-                        {
-                            deltaTime = sortedLayers[i].TransitionTime - sortedLayers[i + 1].TransitionTime;
-                        }
-                        else
-                        {
-                            deltaTime = sortedLayers[i].TransitionTime;
-                        }
-        
-                        animator.Play(layer.CurrentStateHash, layerIndex, 0);
-        
-                        // make normalized time effect
-                        animator.Update(0, false);
-                        animator.Update(deltaTime, false);
-                    }
-                    else
-                    {
-                        animator.Play(layer.CurrentStateHash, layerIndex, layer.NormalizedTime);
-                        animator.Update(0, false);
-                    }
+                    animator.PlayTransition(layer.LayerIndex,
+                        layer.CurrentStateFullPathHash,
+                        layer.TransitionFullPathHash,
+                        layer.TransitionIndex,
+                        layer.TransitionStartTime,
+                        layer.CurrentStateNormalizedTime,
+                        layer.NextStateNormalizedTime,
+                        layer.TransitionNormalizedTime);
                 }
             }
             
             animator.UpdateAndCacheDatas(0);
-        }
-
-        struct SortedLayer
-        {
-            public int LayerIndex;
-            public float TransitionTime;
         }
     }
 }

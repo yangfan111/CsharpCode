@@ -1,5 +1,5 @@
 ﻿using System;
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core.EntityComponent;
 using Core.ObjectPool;
 using Core.SpatialPartition;

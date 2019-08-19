@@ -1,6 +1,7 @@
-﻿#if (!ENTITAS_DISABLE_VISUAL_DEBUGGING && UNITY_EDITOR)
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Common;
+using System.Text;
 using Core.GameModule.Step;
 using Core.Utils;
 using Entitas;
@@ -8,6 +9,16 @@ using Entitas.VisualDebugging.Unity;
 using UnityEngine;
 using Utils.Singleton;
 using SystemInfo = Entitas.VisualDebugging.Unity.SystemInfo;
+using System;
+using System.Collections.Generic;
+using Core.Utils;
+using Entitas;
+using Core.GameModule.Step;
+using UnityEngine;
+using XmlConfig;
+using Utils.Singleton;
+#if (!ENTITAS_DISABLE_VISUAL_DEBUGGING && UNITY_EDITOR)
+
 
 namespace Core.GameModule.System
 {
@@ -131,14 +142,30 @@ namespace Core.GameModule.System
         {
             return StepExecuteManager.Instance.IsStepExecute(_execFrameStep);
         }
-
+        public override string ToString()
+        {
+            return string.Format("{0}", typeof(T).Name);
+            
+        }
+        private void LogSystems()
+        {
+            if (GMVariable.SystemsLog)
+            {
+                StringBuilder s = new StringBuilder();
+                foreach (var sys in Systems)
+                {
+                    s.Append(sys.GetType().Name + " ");
+                }
+                DebugUtil.MyLog(this+" Systems.Count:"+Systems.Count+s.ToString());
+            }
+        }
         protected void ExecuteSystems()
         {
             if (!isStepExecute()) return;
 
             if (!paused)
             {
-                var time = Time.time;
+                var time = MyGameTime.time;
                 if (_lastTime == 0) _lastTime = time;
                 IntervalTime = time - _lastTime;
                 _lastTime = time;
@@ -149,6 +176,9 @@ namespace Core.GameModule.System
                     ResetDurations();
                 }
 
+                LogSystems();
+              
+                
                 for (int i = 0; i < Systems.Count; i++)
                 {
                     var info = _executeSystemInfos[i];
@@ -159,10 +189,12 @@ namespace Core.GameModule.System
                         {
                             SingletonManager.Get<DurationHelp>().ProfileStart(_systemProfiles[i]);
                             SingleExecute(module);
+                        
+                            
                         }
                         catch (Exception e)
                         {
-                            _logger.DebugFormat("error executing {0}: {1}", module.GetType(), e);
+                            _logger.ErrorFormat("error executing {0}: {1}", module.GetType(), e);
                         }
                         finally
                         {
@@ -210,14 +242,7 @@ namespace Core.GameModule.System
     }
 }
 #else
-using System;
-using System.Collections.Generic;
-using Core.Utils;
-using Entitas;
-using Core.GameModule.Step;
-using UnityEngine;
-using XmlConfig;
-using Utils.Singleton;
+
 
 namespace Core.GameModule.System
 {
@@ -263,7 +288,7 @@ namespace Core.GameModule.System
         {
            
             if (!isStepExecute()) return;
-             var time = Time.time;
+             var time = MyGameTime.time;
              if (_lastTime == 0) _lastTime = time;
              IntervalTime = time - _lastTime;
              _lastTime = time;

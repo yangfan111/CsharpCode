@@ -37,6 +37,7 @@ namespace App.Server.GameModules.GamePlay.free.player
         public const int EQUAL = 27;
         public const int SHIFT = 28;
         public const int CTRL = 29;
+        public const int CURSOR_MOVE = 30;
 
         private const int NumberDelta = 1000;
 
@@ -149,6 +150,10 @@ namespace App.Server.GameModules.GamePlay.free.player
                 case PageDown:
                     cmd.IsScopeOut = value;
                     break;
+                case CURSOR_MOVE:
+                    cmd.DeltaPitch = value ? 1 : 0;
+                    cmd.DeltaYaw = value ? 1 : 0;
+                    break;
                 default:
                     break;
             }
@@ -212,6 +217,8 @@ namespace App.Server.GameModules.GamePlay.free.player
                     return _cmd.IsScopeIn;
                 case PageDown:
                     return _cmd.IsScopeOut;
+                case CURSOR_MOVE:
+                    return _cmd.DeltaPitch > 0 || _cmd.DeltaYaw > 0;
 ;               default:
                     return false;
             }

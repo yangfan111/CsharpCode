@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using App.Shared.Components.Player;
 using App.Shared.Components.Ui;
 using Assets.App.Client.GameModules.Ui.UiAdapter.Interface;
 using Utils.Configuration;
@@ -42,5 +43,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         Action<object> AddMessageAction { get; set; }
         Action<object> GetPersonalOnlineStatusCallback { get; set; }
+        GamePlayComponent gamePlay { get; }
     }
 }

@@ -1,15 +1,10 @@
-﻿using App.Client.GameModules.Ui.UiAdapter.Interface;
+﻿using System.Collections.Generic;
+using App.Client.GameModules.Ui.UiAdapter.Interface;
 using App.Shared.Components.Ui;
 using Core.Enums;
 
 namespace App.Client.GameModules.Ui.UiAdapter
 {
-    public class PlayerCountData : IPlayerCountData
-    {
-        public int PlayerCount { get; set; }
-        public int DeadPlayerCount { get; set; }
-        //public int Score { get; set; }
-    }
 
     public class BlastScoreUiAdapter : UIAdapter, IBlastScoreUiAdapter
     {
@@ -33,6 +28,11 @@ namespace App.Client.GameModules.Ui.UiAdapter
             set { _ui.C4InstallState = value; }
         }
 
+        public float C4InitialProgress
+        {
+            get { return _ui.C4InitialProgress; }
+        }
+
         public int PlayerCapacityPerCamp
         {
             get { return _ui.PlayerCapacity / 2; }
@@ -51,6 +51,12 @@ namespace App.Client.GameModules.Ui.UiAdapter
         public IPlayerCountData GetDataByCampType(EUICampType campType)
         {
             return _ui.PlayerCountByCampTypeDict[(int)campType];
+        }
+
+        public List<IGroupBattleData> GetBattleDataListByCampType(EUICampType type)
+        {
+            var list = _contexts.ui.uI.GroupBattleDataDict[(int)type];
+            return list;
         }
 
         public bool NeedPause

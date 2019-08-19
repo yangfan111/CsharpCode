@@ -51,7 +51,7 @@ namespace App.Shared.GameModules.Player.ResourceLoad
                     AssetConfig.GetCharacterHandAssetInfo(player.playerInfo.RoleModelId),
                     _p1Handler.OnLoadSucc);
             }
-
+            
             var audioController = player.AudioController();
             if (audioController != null)
                 audioController.LoadMapAmbient(AssetManager);

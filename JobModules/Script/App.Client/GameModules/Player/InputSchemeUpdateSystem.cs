@@ -13,7 +13,7 @@ using XmlConfig;
 
 namespace App.Client.GameModules.Player
 {
-    public class InputSchemeUpdateSystem: AbstractUserCmdExecuteSystem,IBeforeUserCmdExecuteSystem
+    public class InputSchemeUpdateSystem: AbstractUserCmdExecuteSystem
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(InputSchemeUpdateSystem));
         private static readonly string HorizontalAction = "Horizontal";
@@ -87,13 +87,6 @@ namespace App.Client.GameModules.Player
             updateList.Clear();
         }
 
-        public void BeforeExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
-        {
-			return;
-//            var player = owner.OwnerEntity as PlayerEntity;
-//            AssertUtility.Assert(player != null);
-//            BlockAction(player);
-
-        }
+     
     }
 }

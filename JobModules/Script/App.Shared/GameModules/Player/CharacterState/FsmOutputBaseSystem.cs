@@ -217,9 +217,11 @@ namespace App.Shared.GameModules.Player.CharacterState
         public void ResetOutput()
         {
             _fsmOutputIndex = 0;
-            foreach (var v in _fsmOutput)
+
+            int length = _fsmOutput.Count;
+            for (int i = 0; i < length; ++i)
             {
-                v.Valid = false;
+                _fsmOutput[i].Valid = false;
             }
 
             _animatorP1NeedUpdate = false;

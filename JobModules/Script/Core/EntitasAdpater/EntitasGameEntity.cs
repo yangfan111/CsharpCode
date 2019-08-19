@@ -8,15 +8,12 @@ using Core.EntityComponent;
 using Core.ObjectPool;
 using Core.Playback;
 using Core.Prediction;
-using Core.Prediction.UserPrediction;
 using Core.Replicaton;
-using Core.SyncLatest;
+using Core.Utils;
 using Core.Utils.System46;
 using Entitas;
-using Entitas.CodeGeneration.Attributes;
-using Entitas.Utils;
 
-namespace Core.EntitasAdpater
+namespace Core.EntityComponent
 {
     [SuppressMessage("ReSharper", "UnusedTypeParameter")]
     public class ComponentIndex<TEntityType, TComponentType>
@@ -28,26 +25,58 @@ namespace Core.EntitasAdpater
     [Serializable]
     public class EntitasGameEntity<TEntity> : BaseRefCounter, IGameEntity where TEntity : Entity
     {
-        public static EntitasGameEntity<TEntity> Allocate(TEntity entity, IComponentTypeLookup lookup)
-        {
-            var rc = ObjectAllocatorHolder<EntitasGameEntity<TEntity>>.Allocate();
-            rc.Init(entity, lookup);
-            return rc;
-        }
+        private readonly EntityComponentChanged entityOnOnComponentAddedCache;
+        private readonly EntityComponentChanged entityOnOnComponentRemovedCache;
+        private readonly EntityComponentReplaced entityOnOnComponentReplacedCache;
+        private readonly EntityEvent entityOnOnDestroyEntityCache;
+        private volatile int assetComponentListLock;
+
+        private List<IAssetComponent> assetComponentsList = new List<IAssetComponent>();
+        private volatile bool assetComponentsListDirty;
+        private volatile MyDictionary<int, IGameComponent> compensationDict = new MyDictionary<int, IGameComponent>();
+        private volatile bool compensationListDirty = true;
+
+        private int compensationListLock;
+
+        private List<IGameComponent> componentList = new List<IGameComponent>();
+        private IGameComponent[] componentListCopy;
+
+        private volatile bool componentListDirty = true;
+
+        private int componentListLock;
+
+
+        private TEntity entity;
+
+        private IComponentTypeLookup lookup;
+        private volatile IGameEntity nonSelfEntityCopy;
+        private int nonSelfEntityCopyLock;
+
+        private volatile int nonSelfSnapShotSeq = -1;
+        private volatile MyDictionary<int, IGameComponent> playbacktDict = new MyDictionary<int, IGameComponent>();
+        private volatile bool playbacktListDirty = true;
+
+        private int playbacktListLock;
+        private volatile IGameEntity selfEntityCopy;
+        private int selfEntityCopyLock;
+
+        private volatile int selfSnapShotSeq = -1;
+
+        private volatile MyDictionary<int, IGameComponent> syncLatestDict = new MyDictionary<int, IGameComponent>();
+        private volatile bool syncLatestListDirty = true;
+
+        private int syncLatestListLock;
+
+        List<IGameComponent> updateLatestComponents = new List<IGameComponent>();
 
 
         public EntitasGameEntity()
         {
-            _entityOnOnComponentAddedCache = EntityOnOnComponentAdded;
-            _entityOnOnComponentRemovedCache = EntityOnOnComponentRemoved;
-            _entityOnOnComponentReplacedCache = EntityOnOnComponentReplaced;
-            _entityOnOnDestroyEntityCache = EntityOnOnDestroyEntity;
+            entityOnOnComponentAddedCache    = EntityOnOnComponentAdded;
+            entityOnOnComponentRemovedCache  = EntityOnOnComponentRemoved;
+            entityOnOnComponentReplacedCache = EntityOnOnComponentReplaced;
+            entityOnOnDestroyEntityCache     = EntityOnOnDestroyEntity;
         }
-
-        private readonly EntityComponentChanged _entityOnOnComponentAddedCache;
-        private readonly EntityComponentChanged _entityOnOnComponentRemovedCache;
-        private readonly EntityComponentReplaced _entityOnOnComponentReplacedCache;
-        private readonly EntityEvent _entityOnOnDestroyEntityCache;
 
 
         public int EntityId
@@ -65,27 +94,26 @@ namespace Core.EntitasAdpater
         {
             get
             {
-                int index = _lookup.EntityKeyComponentIndex;
-                if (index >= 0 && _entity.HasComponent(index))
-                    return ((EntityKeyComponent) _entity.GetComponent(index)).Value;
+                int index = lookup.EntityKeyComponentIndex;
+                if (index >= 0 && entity.HasComponent(index))
+                    return ((EntityKeyComponent) entity.GetComponent(index)).Value;
                 throw new Exception(String.Format("entity type {0} don't support component type EntityKey",
                     typeof(TEntity)));
             }
         }
 
-
         public object RealEntity
         {
-            get { return _entity; }
+            get { return entity; }
         }
 
         public PositionComponent Position
         {
             get
             {
-                int index = _lookup.PositionComponentIndex;
-                if (index >= 0 && _entity.HasComponent(index))
-                    return ((PositionComponent) _entity.GetComponent(index));
+                int index = lookup.PositionComponentIndex;
+                if (index >= 0 && entity.HasComponent(index))
+                    return ((PositionComponent) entity.GetComponent(index));
                 throw new Exception(String.Format("entity type {0} don't support component type PositionComponent",
                     typeof(TEntity)));
             }
@@ -95,12 +123,11 @@ namespace Core.EntitasAdpater
         {
             get
             {
-                int index = _lookup.FlagPositionFilterComponentIndex;
-                if (index >= 0 && _entity.HasComponent(index))
-                    return ((PositionFilterComponent) _entity.GetComponent(index));
+                int index = lookup.FlagPositionFilterComponentIndex;
+                if (index >= 0 && entity.HasComponent(index))
+                    return ((PositionFilterComponent) entity.GetComponent(index));
                 throw new Exception(String.Format(
-                    "entity type {0} don't support component type PositionFilterComponent",
-                    typeof(TEntity)));
+                    "entity type {0} don't support component type PositionFilterComponent", typeof(TEntity)));
             }
         }
 
@@ -108,8 +135,8 @@ namespace Core.EntitasAdpater
         {
             get
             {
-                int index = _lookup.OwnerIdComponentIndex;
-                return index >= 0 && _entity.HasComponent(index);
+                int index = lookup.OwnerIdComponentIndex;
+                return index >= 0 && entity.HasComponent(index);
             }
         }
 
@@ -117,11 +144,10 @@ namespace Core.EntitasAdpater
         {
             get
             {
-                int index = _lookup.OwnerIdComponentIndex;
-                if (index >= 0 && _entity.HasComponent(index))
-                    return ((OwnerIdComponent) _entity.GetComponent(index));
-                throw new Exception(String.Format(
-                    "entity type {0} don't support component type OwnerIdComponent",
+                int index = lookup.OwnerIdComponentIndex;
+                if (index >= 0 && entity.HasComponent(index))
+                    return ((OwnerIdComponent) entity.GetComponent(index));
+                throw new Exception(String.Format("entity type {0} don't support component type OwnerIdComponent",
                     typeof(TEntity)));
             }
         }
@@ -130,8 +156,8 @@ namespace Core.EntitasAdpater
         {
             get
             {
-                int index = _lookup.FlagImmutabilityComponentIndex;
-                return index >= 0 && _entity.HasComponent(index);
+                int index = lookup.FlagImmutabilityComponentIndex;
+                return index >= 0 && entity.HasComponent(index);
             }
         }
 
@@ -139,23 +165,22 @@ namespace Core.EntitasAdpater
         {
             get
             {
-                int index = _lookup.FlagImmutabilityComponentIndex;
-                if (index >= 0 && _entity.HasComponent(index))
-                    return ((FlagImmutabilityComponent) _entity.GetComponent(index));
+                int index = lookup.FlagImmutabilityComponentIndex;
+                if (index >= 0 && entity.HasComponent(index))
+                    return ((FlagImmutabilityComponent) entity.GetComponent(index));
                 throw new Exception(String.Format(
-                    "entity type {0} don't support component type FlagImmutabilityComponent",
-                    typeof(TEntity)));
+                    "entity type {0} don't support component type FlagImmutabilityComponent", typeof(TEntity)));
             }
         }
 
-        public LifeTimeComponent LifeTimeComponent {
+        public LifeTimeComponent LifeTimeComponent
+        {
             get
             {
-                int index = _lookup.LifeTimeComponentIndex;
-                if (index >= 0 && _entity.HasComponent(index))
-                    return ((LifeTimeComponent) _entity.GetComponent(index));
-                throw new Exception(String.Format(
-                    "entity type {0} don't support component type LifeTimeComponent",
+                int index = lookup.LifeTimeComponentIndex;
+                if (index >= 0 && entity.HasComponent(index))
+                    return ((LifeTimeComponent) entity.GetComponent(index));
+                throw new Exception(String.Format("entity type {0} don't support component type LifeTimeComponent",
                     typeof(TEntity)));
             }
         }
@@ -165,8 +190,8 @@ namespace Core.EntitasAdpater
         {
             get
             {
-                int index = _lookup.FlagPositionFilterComponentIndex;
-                return index >= 0 && _entity.HasComponent(index);
+                int index = lookup.FlagPositionFilterComponentIndex;
+                return index >= 0 && entity.HasComponent(index);
             }
         }
 
@@ -174,8 +199,8 @@ namespace Core.EntitasAdpater
         {
             get
             {
-                int index = _lookup.FlagCompensationComponentIndex;
-                return index >= 0 && _entity.HasComponent(index);
+                int index = lookup.FlagCompensationComponentIndex;
+                return index >= 0 && entity.HasComponent(index);
             }
         }
 
@@ -183,8 +208,8 @@ namespace Core.EntitasAdpater
         {
             get
             {
-                int index = _lookup.FlagDestroyComponentIndex;
-                return index >= 0 && _entity.HasComponent(index);
+                int index = lookup.FlagDestroyComponentIndex;
+                return index >= 0 && entity.HasComponent(index);
             }
         }
 
@@ -192,8 +217,8 @@ namespace Core.EntitasAdpater
         {
             get
             {
-                int index = _lookup.FlagSelfComponentIndex;
-                return index >= 0 && _entity.HasComponent(index);
+                int index = lookup.FlagSelfComponentIndex;
+                return index >= 0 && entity.HasComponent(index);
             }
         }
 
@@ -201,8 +226,8 @@ namespace Core.EntitasAdpater
         {
             get
             {
-                int index = _lookup.FlagSyncNonSelfComponentIndex;
-                return index >= 0 && _entity.HasComponent(index);
+                int index = lookup.FlagSyncNonSelfComponentIndex;
+                return index >= 0 && entity.HasComponent(index);
             }
         }
 
@@ -210,119 +235,32 @@ namespace Core.EntitasAdpater
         {
             get
             {
-                int index = _lookup.FlagSyncSelfComponentIndex;
-                return index >= 0 && _entity.HasComponent(index);
+                int index = lookup.FlagSyncSelfComponentIndex;
+                return index >= 0 && entity.HasComponent(index);
             }
-        }
-
-      
-
-
-        private TEntity _entity;
-
-        private IComponentTypeLookup _lookup;
-
-        private volatile bool _componentListDirty = true;
-
-
-        public void Init(TEntity entity, IComponentTypeLookup lookup)
-        {
-            _entity = entity;
-            _lookup = lookup;
-            _entity.AddOnComponentAdded(_entityOnOnComponentAddedCache);
-            _entity.AddOnComponentRemoved(_entityOnOnComponentRemovedCache);
-            _entity.AddOnComponentReplaced(_entityOnOnComponentReplacedCache);
-            _entity.AddOnDestroyEntity(_entityOnOnDestroyEntityCache);
-        }
-
-        public void CleanUpEntiryCopy()
-        {
-            lock (this)
-            {
-                _selfSnapShotSeq = -1;
-                _nonSelfSnapShotSeq = -1;
-                if (_selfEntityCopy != null)
-                {
-                    _selfEntityCopy.ReleaseReference();
-                    _selfEntityCopy = null;
-                }
-
-                if (_nonSelfEntityCopy != null)
-                {
-                    _nonSelfEntityCopy.ReleaseReference();
-                    _nonSelfEntityCopy = null;
-                }
-            }
-        }
-
-        protected override void OnCleanUp()
-        {
-            CleanUpEntiryCopy();
-        }
-
-        private void SetDirty()
-        {
-            _componentListDirty = true;
-            _playbacktListDirty = true;
-            _syncLatestListDirty = true;
-            _assetComponentsListDirty = true;
-            _compensationListDirty = true;
-        }
-
-        private void EntityOnOnDestroyEntity(IEntity entity)
-        {
-            CleanUpEntiryCopy();
-            SetDirty();
-            _entity.RemoveOnComponentAdded(_entityOnOnComponentAddedCache);
-            _entity.RemoveOnComponentRemoved(_entityOnOnComponentRemovedCache);
-            _entity.RemoveOnComponentReplaced(_entityOnOnComponentReplacedCache);
-            _entity.RemoveOnDestroyEntity(_entityOnOnDestroyEntityCache);
-        }
-
-        private void EntityOnOnComponentReplaced(IEntity entity, int index1, IComponent previousComponent,
-            IComponent newComponent)
-        {
-            SetDirty();
-        }
-
-        private void EntityOnOnComponentRemoved(IEntity entity, int index1, IComponent component1)
-        {
-            SetDirty();
-        }
-
-        private void EntityOnOnComponentAdded(IEntity entity, int index1, IComponent component1)
-        {
-            SetDirty();
         }
 
         public T AddComponent<T>() where T : IGameComponent, new()
         {
-            int index = _lookup.GetComponentIndex<T>();
+            int index = lookup.GetComponentIndex<T>();
             if (index >= 0)
             {
-                return DoAddComponent<T>(_entity, index);
+                return DoAddComponent<T>(entity, index);
             }
 
             throw new Exception(String.Format("entity type {0} don't support component type {1}", typeof(TEntity),
                 typeof(T)));
         }
 
-        public static T DoAddComponent<T>(TEntity entity, int index) where T : IGameComponent, new()
-        {
-            var component = entity.CreateComponent<T>(index);
-            entity.AddComponent(index, component);
-            return component;
-        }
-
 
         public IGameComponent AddComponent(int componentId)
         {
-            int index = _lookup.GetComponentIndex(componentId);
-            Type componentType = _lookup.GetComponentType(componentId);
+            int  index         = lookup.GetComponentIndex(componentId);
+            Type componentType = lookup.GetComponentType(componentId);
             if (index >= 0)
             {
-                IGameComponent component = (IGameComponent) _entity.CreateComponent(index, componentType);
-                _entity.AddComponent(index, component);
+                IGameComponent component = (IGameComponent) entity.CreateComponent(index, componentType);
+                entity.AddComponent(index, component);
                 return component;
             }
 
@@ -332,13 +270,13 @@ namespace Core.EntitasAdpater
 
         public IGameComponent AddComponent(int componentId, IGameComponent copyValue)
         {
-            int index = _lookup.GetComponentIndex(componentId);
-            Type componentType = _lookup.GetComponentType(componentId);
+            int  index         = lookup.GetComponentIndex(componentId);
+            Type componentType = lookup.GetComponentType(componentId);
             if (index >= 0)
             {
-                IGameComponent component = (IGameComponent) _entity.CreateComponent(index, componentType);
-                ((ICloneableComponent) component).CopyFrom(copyValue);
-                _entity.AddComponent(index, component);
+                IGameComponent component = (IGameComponent) entity.CreateComponent(index, componentType);
+                ((ICloneableComponent) component)?.CopyFrom(copyValue);
+                entity.AddComponent(index, component);
                 return component;
             }
 
@@ -354,246 +292,218 @@ namespace Core.EntitasAdpater
 
         public IGameComponent GetComponent(int componentId)
         {
-            var index = _lookup.GetComponentIndex(componentId);
+            var index = lookup.GetComponentIndex(componentId);
             return DoGetComponent(index);
-        }
-
-        private IGameComponent DoGetComponent(int index)
-        {
-            return DoGetComponent(_entity, index);
-        }
-
-        public static IGameComponent DoGetComponent(TEntity e, int index)
-        {
-            if (index >= 0 && e.HasComponent(index))
-                return e.GetComponent(index) as IGameComponent;
-            return null;
         }
 
         public void RemoveComponent<T>() where T : IGameComponent
         {
-            int index = _lookup.GetComponentIndex<T>();
+            int index = lookup.GetComponentIndex<T>();
             if (index >= 0)
-                _entity.RemoveComponent(index);
+                entity.RemoveComponent(index);
         }
 
         public T GetComponent<T>() where T : IGameComponent
         {
-            int index = _lookup.GetComponentIndex<T>();
+            int index = lookup.GetComponentIndex<T>();
             return (T) DoGetComponent(index);
         }
 
         public void RemoveComponent(int componentType)
         {
-            int index = _lookup.GetComponentIndex(componentType);
+            int index = lookup.GetComponentIndex(componentType);
             if (index >= 0)
-                _entity.RemoveComponent(index);
+                entity.RemoveComponent(index);
         }
-
-        private List<IGameComponent> _componentList = new List<IGameComponent>();
-        private IGameComponent[] _componentListCopy;
 
         public ICollection<IGameComponent> ComponentList
         {
             get { return SortedComponentList; }
         }
 
-        private int _componentListLock;
         public List<IGameComponent> SortedComponentList
         {
             get
             {
-                if (_componentListDirty)
+                if (componentListDirty)
                 {
                     try
                     {
-                        Core.Utils.SpinWait spin = new Core.Utils.SpinWait();
-                        while (Interlocked.Increment(ref _componentListLock) != 1)
+                        SpinWait spin = new SpinWait();
+                        while (Interlocked.Increment(ref componentListLock) != 1)
                         {
-                            Interlocked.Decrement(ref _componentListLock);
+                            Interlocked.Decrement(ref componentListLock);
                             spin.SpinOnce();
                         }
 
-                        if (_componentListDirty)
+                        if (componentListDirty)
                         {
-                            _componentListDirty = false;
+                            componentListDirty = false;
 
-                            if (_componentList == null)
-                                _componentList = new List<IGameComponent>(16);
-                            _componentList.Clear();
-                            var idxById = _lookup.IndexByComponentId;
+                            if (componentList == null)
+                                componentList = new List<IGameComponent>(16);
+                            else
+                                componentList.Clear();
+                            int[] idxById = lookup.IndexByComponentId;
                             for (int i = 0; i < idxById.Length; i++)
                             {
                                 int index = idxById[i];
                                 if (index >= 0)
                                 {
-                                    var component = _entity.HasComponent(index) ? _entity.GetComponent(index) : null;
+                                    var component = entity.HasComponent(index) ? entity.GetComponent(index) : null;
                                     if (component != null && component is IGameComponent)
-                                        _componentList.Add((IGameComponent) component);
+                                        componentList.Add((IGameComponent) component);
                                 }
                             }
 
-                            _componentList.Sort(GameComponentIComparer.Instance);
+                            componentList.Sort(GameComponentIComparer.Instance);
                         }
                     }
                     finally
                     {
-                        Interlocked.Decrement(ref _componentListLock);
+                        Interlocked.Decrement(ref componentListLock);
                     }
                 }
 
-                return _componentList;
+                return componentList;
             }
         }
 
-        private volatile MyDictionary<int, IGameComponent> _syncLatestList = new MyDictionary<int, IGameComponent>();
-        private volatile bool _syncLatestListDirty = true;
-        private volatile MyDictionary<int, IGameComponent> _playbacktList = new MyDictionary<int, IGameComponent>();
-        private volatile bool _playbacktListDirty = true;
-        private volatile MyDictionary<int, IGameComponent> _compensationList = new MyDictionary<int, IGameComponent>();
-        private volatile bool _compensationListDirty = true;
-
-        private int _syncLatestListLock;
-
-        public MyDictionary<int, IGameComponent> SyncLatestComponentDictionary
+        public MyDictionary<int, IGameComponent> SyncLatestComponentDict
         {
             get
             {
-                if (_syncLatestListDirty)
+                if (syncLatestListDirty)
                 {
                     try
                     {
-                        Core.Utils.SpinWait spin = new Core.Utils.SpinWait();
-                        while (Interlocked.Increment(ref _syncLatestListLock) != 1)
+                        SpinWait spin = new SpinWait();
+                        while (Interlocked.Increment(ref syncLatestListLock) != 1)
                         {
-                            Interlocked.Decrement(ref _syncLatestListLock);
+                            Interlocked.Decrement(ref syncLatestListLock);
                             spin.SpinOnce();
                         }
 
-                        if (_syncLatestListDirty)
+                        if (syncLatestListDirty)
                         {
-                            if (_syncLatestList == null)
-                                _syncLatestList = new MyDictionary<int, IGameComponent>();
-                            _syncLatestList.Clear();
-                            var idxById = _lookup.SyncLatestIndexs;
+                            if (syncLatestDict == null)
+                                syncLatestDict = new MyDictionary<int, IGameComponent>();
+                            syncLatestDict.Clear();
+                            var idxById = lookup.SyncLatestIndexs;
                             for (int i = 0; i < idxById.Length; i++)
                             {
                                 int index = idxById[i];
                                 if (index >= 0)
                                 {
-                                    var component = _entity.HasComponent(index) ? _entity.GetComponent(index) : null;
+                                    var component = entity.HasComponent(index) ? entity.GetComponent(index) : null;
                                     if (component != null && component is ILatestComponent)
-                                        _syncLatestList.Add(((IGameComponent) component).GetComponentId(),
+                                        syncLatestDict.Add(((IGameComponent) component).GetComponentId(),
                                             (IGameComponent) component);
                                 }
                             }
 
-                            _syncLatestListDirty = false;
+                            syncLatestListDirty = false;
                         }
                     }
                     finally
                     {
-                        Interlocked.Decrement(ref _syncLatestListLock);
+                        Interlocked.Decrement(ref syncLatestListLock);
                     }
                 }
 
-                return _syncLatestList;
+                return syncLatestDict;
             }
         }
-
-        private int _playbacktListLock;
 
         public MyDictionary<int, IGameComponent> PlayBackComponentDictionary
         {
             get
             {
-                if (_playbacktListDirty)
+                if (playbacktListDirty)
                 {
                     try
                     {
-                        Core.Utils.SpinWait spin = new Core.Utils.SpinWait();
-                        while (Interlocked.Increment(ref _playbacktListLock) != 1)
+                        SpinWait spin = new SpinWait();
+                        while (Interlocked.Increment(ref playbacktListLock) != 1)
                         {
-                            Interlocked.Decrement(ref _playbacktListLock);
+                            Interlocked.Decrement(ref playbacktListLock);
                             spin.SpinOnce();
                         }
 
-                        if (_playbacktListDirty)
+                        if (playbacktListDirty)
                         {
-                            if (_playbacktList == null)
-                                _playbacktList = new MyDictionary<int, IGameComponent>(16);
-                            _playbacktList.Clear();
-                            var idxById = _lookup.PlaybackIndexs;
+                            if (playbacktDict == null)
+                                playbacktDict = new MyDictionary<int, IGameComponent>(16);
+                            playbacktDict.Clear();
+                            var idxById = lookup.PlaybackIndexs;
                             for (int i = 0; i < idxById.Length; i++)
                             {
                                 int index = idxById[i];
                                 if (index >= 0)
                                 {
-                                    var component = _entity.HasComponent(index) ? _entity.GetComponent(index) : null;
+                                    var component = entity.HasComponent(index) ? entity.GetComponent(index) : null;
                                     if (component != null && component is IPlaybackComponent)
-                                        _playbacktList.Add(((IGameComponent) component).GetComponentId(),
+                                        playbacktDict.Add(((IGameComponent) component).GetComponentId(),
                                             (IGameComponent) component);
                                 }
                             }
 
-                            _playbacktListDirty = false;
+                            playbacktListDirty = false;
                         }
                     }
                     finally
                     {
-                        Interlocked.Decrement(ref _playbacktListLock);
+                        Interlocked.Decrement(ref playbacktListLock);
                     }
                 }
 
-                return _playbacktList;
+                return playbacktDict;
             }
         }
 
-        private int _compensationListLock;
-
-        public MyDictionary<int, IGameComponent> SortedCompensationComponentList
+        public MyDictionary<int, IGameComponent> SortedCompensationComponentDict
         {
             get
             {
-                if (_compensationListDirty)
+                if (compensationListDirty)
                 {
                     try
                     {
-                        Core.Utils.SpinWait spin = new Core.Utils.SpinWait();
-                        while (Interlocked.Increment(ref _compensationListLock) != 1)
+                        SpinWait spin = new SpinWait();
+                        while (Interlocked.Increment(ref compensationListLock) != 1)
                         {
-                            Interlocked.Decrement(ref _compensationListLock);
+                            Interlocked.Decrement(ref compensationListLock);
                             spin.SpinOnce();
                         }
 
-                        if (_compensationListDirty)
+                        if (compensationListDirty)
                         {
-                            if (_compensationList == null)
-                                _compensationList = new MyDictionary<int, IGameComponent>(16);
-                            _compensationList.Clear();
-                            var idxById = _lookup.CompensationIndexs;
+                            if (compensationDict == null)
+                                compensationDict = new MyDictionary<int, IGameComponent>(16);
+                            compensationDict.Clear();
+                            var idxById = lookup.CompensationIndexs;
                             for (int i = 0; i < idxById.Length; i++)
                             {
                                 int index = idxById[i];
                                 if (index >= 0)
                                 {
-                                    var component = _entity.HasComponent(index) ? _entity.GetComponent(index) : null;
+                                    var component = entity.HasComponent(index) ? entity.GetComponent(index) : null;
                                     if (component != null && component is ICompensationComponent)
-                                        _compensationList.Add(((IGameComponent) component).GetComponentId(),
+                                        compensationDict.Add(((IGameComponent) component).GetComponentId(),
                                             (IGameComponent) component);
                                 }
                             }
 
-                            _compensationListDirty = false;
+                            compensationListDirty = false;
                         }
                     }
                     finally
                     {
-                        Interlocked.Decrement(ref _compensationListLock);
+                        Interlocked.Decrement(ref compensationListLock);
                     }
                 }
 
-                return _compensationList;
+                return compensationDict;
             }
         }
 
@@ -605,194 +515,281 @@ namespace Core.EntitasAdpater
 
         public void Destroy()
         {
-            _entity.Destroy();
+            entity.Destroy();
         }
 
-        private volatile int _selfSnapShotSeq = -1;
-        private volatile IGameEntity _selfEntityCopy;
-        private int _selfEntityCopyLock;
-
+        #region //self Entity
         public IGameEntity GetSelfEntityCopy(int snapShotSeq)
         {
-            if (_selfSnapShotSeq != snapShotSeq)
+            if (selfSnapShotSeq != snapShotSeq)
             {
                 try
                 {
-                    Core.Utils.SpinWait spin = new Core.Utils.SpinWait();
-                    while (Interlocked.Increment(ref _selfEntityCopyLock) != 1)
+                    SpinWait spin = new SpinWait();
+                    while (Interlocked.Increment(ref selfEntityCopyLock) != 1)
                     {
-                        Interlocked.Decrement(ref _selfEntityCopyLock);
+                        Interlocked.Decrement(ref selfEntityCopyLock);
                         spin.SpinOnce();
                     }
 
-                    if (_selfSnapShotSeq != snapShotSeq)
+                    if (selfSnapShotSeq != snapShotSeq)
                     {
-                        if (_selfEntityCopy != null)
+                        if (selfEntityCopy != null)
                         {
-                            RefCounterRecycler.Instance.ReleaseReference(_selfEntityCopy);
-                            _selfEntityCopy = null;
+                            RefCounterRecycler.Instance.ReleaseReference(selfEntityCopy);
+                            selfEntityCopy = null;
                         }
 
-                        _selfEntityCopy = GameEntity.Allocate(EntityKey);
-                        var idxById = _lookup.SelfIndexs;
+                        selfEntityCopy = GameEntity.Allocate(EntityKey);
+                        var idxById = lookup.SelfIndexs;
                         for (int i = 0; i < idxById.Length; i++)
                         {
                             int index = idxById[i];
                             if (index >= 0)
                             {
-                                var component = _entity.HasComponent(index) ? _entity.GetComponent(index) : null;
+                                var component = entity.HasComponent(index) ? entity.GetComponent(index) : null;
                                 if (component != null && component is IGameComponent)
                                 {
                                     var c = component as IGameComponent;
-                                    _selfEntityCopy.AddComponent(c.GetComponentId(), c);
+                                    selfEntityCopy.AddComponent(c.GetComponentId(), c);
                                 }
                             }
                         }
                     }
 
-                    _selfSnapShotSeq = snapShotSeq;
+                    selfSnapShotSeq = snapShotSeq;
                 }
                 finally
                 {
-                    Interlocked.Decrement(ref _selfEntityCopyLock);
+                    Interlocked.Decrement(ref selfEntityCopyLock);
                 }
 
-                return _selfEntityCopy;
+                return selfEntityCopy;
             }
-            else
+
+            return selfEntityCopy;
+        }
+        
+
+        public IGameEntity GetNonSelfEntityCopy(int snapShotSeq)
+        {
+            if (nonSelfSnapShotSeq != snapShotSeq)
             {
-                return _selfEntityCopy;
+                try
+                {
+                    SpinWait spin = new SpinWait();
+                    while (Interlocked.Increment(ref nonSelfEntityCopyLock) != 1)
+                    {
+                        Interlocked.Decrement(ref nonSelfEntityCopyLock);
+                        spin.SpinOnce();
+                    }
+
+                    if (nonSelfSnapShotSeq != snapShotSeq)
+                    {
+                        if (nonSelfEntityCopy != null)
+                        {
+                            RefCounterRecycler.Instance.ReleaseReference(nonSelfEntityCopy);
+
+                            nonSelfEntityCopy = null;
+                        }
+
+                        nonSelfEntityCopy = GameEntity.Allocate(EntityKey);
+                        var idxById = lookup.NoSelfIndexs;
+                        for (int i = 0; i < idxById.Length; i++)
+                        {
+                            int index = idxById[i];
+                            if (index >= 0)
+                            {
+                                var component = entity.HasComponent(index) ? entity.GetComponent(index) : null;
+                                if (component != null && component is IGameComponent)
+                                {
+                                    var c = component as IGameComponent;
+                                    nonSelfEntityCopy.AddComponent(c.GetComponentId(), c);
+                                }
+                            }
+                        }
+                    }
+
+                    nonSelfSnapShotSeq = snapShotSeq;
+                }
+                finally
+                {
+                    Interlocked.Decrement(ref nonSelfEntityCopyLock);
+                }
+
+
+                return nonSelfEntityCopy;
+            }
+
+            {
+                return nonSelfEntityCopy;
             }
         }
 
-        List<IGameComponent> _updateLatestComponents = new List<IGameComponent>();
+        #endregion
+       
 
         public List<IGameComponent> GetUpdateLatestComponents()
         {
-            _updateLatestComponents.Clear();
-            var idxById = _lookup.UpdateLatestIndexs;
+            updateLatestComponents.Clear();
+            var idxById = lookup.UpdateLatestIndexs;
             for (int i = 0; i < idxById.Length; i++)
             {
                 int index = idxById[i];
                 if (index >= 0)
                 {
-                    var component = _entity.HasComponent(index) ? _entity.GetComponent(index) : null;
+                    var component = entity.HasComponent(index) ? entity.GetComponent(index) : null;
                     if (component != null && component is IGameComponent)
                     {
                         var c = component as IGameComponent;
-                        _updateLatestComponents.Add(c);
+                        updateLatestComponents.Add(c);
                     }
                 }
             }
 
-            return _updateLatestComponents;
+            return updateLatestComponents;
         }
 
-        private volatile int _nonSelfSnapShotSeq = -1;
-        private volatile IGameEntity _nonSelfEntityCopy;
-        private int _nonSelfEntityCopyLock = 0;
-        private volatile bool _assetComponentsListDirty;
-        private volatile int _assetComponentListLock = 0;
-        public IGameEntity GetNonSelfEntityCopy(int snapShotSeq)
-        {
-            if (_nonSelfSnapShotSeq != snapShotSeq)
-            {
-                try
-                {
-                    Core.Utils.SpinWait spin = new Core.Utils.SpinWait();
-                    while (Interlocked.Increment(ref _nonSelfEntityCopyLock) != 1)
-                    {
-                        Interlocked.Decrement(ref _nonSelfEntityCopyLock);
-                        spin.SpinOnce();
-                    }
-
-                    if (_nonSelfSnapShotSeq != snapShotSeq)
-                    {
-                        if (_nonSelfEntityCopy != null)
-                        {
-                            RefCounterRecycler.Instance.ReleaseReference(_nonSelfEntityCopy);
-
-                            _nonSelfEntityCopy = null;
-                        }
-
-                        _nonSelfEntityCopy = GameEntity.Allocate(EntityKey);
-                        var idxById = _lookup.NoSelfIndexs;
-                        for (int i = 0; i < idxById.Length; i++)
-                        {
-                            int index = idxById[i];
-                            if (index >= 0)
-                            {
-                                var component = _entity.HasComponent(index) ? _entity.GetComponent(index) : null;
-                                if (component != null && component is IGameComponent)
-                                {
-                                    var c = component as IGameComponent;
-                                    _nonSelfEntityCopy.AddComponent(c.GetComponentId(), c);
-                                }
-                            }
-                        }
-                    }
-
-                    _nonSelfSnapShotSeq = snapShotSeq;
-                }
-                finally
-                {
-                    Interlocked.Decrement(ref _nonSelfEntityCopyLock);
-                }
-
-
-                return _nonSelfEntityCopy;
-            }
-
-            {
-                return _nonSelfEntityCopy;
-            }
-        }
-        
-        private List<IAssetComponent> _assetComponentsList = new List<IAssetComponent>();
         public List<IAssetComponent> AssetComponents
         {
-           
             get
             {
-                if (_assetComponentsListDirty)
+                if (assetComponentsListDirty)
                 {
                     try
                     {
-                        Core.Utils.SpinWait spin = new Core.Utils.SpinWait();
-                        while (Interlocked.Increment(ref _assetComponentListLock) != 1)
+                        SpinWait spin = new SpinWait();
+                        while (Interlocked.Increment(ref assetComponentListLock) != 1)
                         {
-                            Interlocked.Decrement(ref _assetComponentListLock);
+                            Interlocked.Decrement(ref assetComponentListLock);
                             spin.SpinOnce();
                         }
 
-                        if (_assetComponentsListDirty)
+                        if (assetComponentsListDirty)
                         {
-                            _assetComponentsListDirty = false;
+                            assetComponentsListDirty = false;
 
-                            if (_assetComponentsList == null)
-                                _assetComponentsList = new List<IAssetComponent>(16);
-                            _assetComponentsList.Clear();
-                            var idxById = _lookup.AssetComponentIndexs;
+                            if (assetComponentsList == null)
+                                assetComponentsList = new List<IAssetComponent>(16);
+                            assetComponentsList.Clear();
+                            var idxById = lookup.AssetComponentIndexs;
                             for (int i = 0; i < idxById.Length; i++)
                             {
                                 int index = idxById[i];
                                 if (index >= 0)
                                 {
-                                    var component = _entity.HasComponent(index) ? _entity.GetComponent(index) : null;
+                                    var component = entity.HasComponent(index) ? entity.GetComponent(index) : null;
                                     if (component != null && component is IAssetComponent)
-                                        _assetComponentsList.Add((IAssetComponent) component);
+                                        assetComponentsList.Add((IAssetComponent) component);
                                 }
                             }
                         }
                     }
                     finally
                     {
-                        Interlocked.Decrement(ref _assetComponentListLock);
+                        Interlocked.Decrement(ref assetComponentListLock);
                     }
                 }
 
-                return _assetComponentsList;
+                return assetComponentsList;
             }
+        }
+
+        public static EntitasGameEntity<TEntity> Allocate(TEntity entity, IComponentTypeLookup lookup)
+        {
+            var rc = ObjectAllocatorHolder<EntitasGameEntity<TEntity>>.Allocate();
+            rc.Init(entity, lookup);
+            return rc;
+        }
+
+
+        public void Init(TEntity entity, IComponentTypeLookup lookup)
+        {
+            this.entity = entity;
+            this.lookup = lookup;
+            entity.AddOnComponentAdded(entityOnOnComponentAddedCache);
+            entity.AddOnComponentRemoved(entityOnOnComponentRemovedCache);
+            entity.AddOnComponentReplaced(entityOnOnComponentReplacedCache);
+            entity.AddOnDestroyEntity(entityOnOnDestroyEntityCache);
+        }
+
+        public void CleanUpEntiryCopy()
+        {
+            lock (this)
+            {
+                selfSnapShotSeq    = -1;
+                nonSelfSnapShotSeq = -1;
+                if (selfEntityCopy != null)
+                {
+                    selfEntityCopy.ReleaseReference();
+                    selfEntityCopy = null;
+                }
+
+                if (nonSelfEntityCopy != null)
+                {
+                    nonSelfEntityCopy.ReleaseReference();
+                    nonSelfEntityCopy = null;
+                }
+            }
+        }
+
+        protected override void OnCleanUp()
+        {
+            CleanUpEntiryCopy();
+        }
+
+        private void SetDirty()
+        {
+            componentListDirty       = true;
+            playbacktListDirty       = true;
+            syncLatestListDirty      = true;
+            assetComponentsListDirty = true;
+            compensationListDirty    = true;
+        }
+
+        private void EntityOnOnDestroyEntity(IEntity entity)
+        {
+            CleanUpEntiryCopy();
+            SetDirty();
+            entity.RemoveOnComponentAdded(entityOnOnComponentAddedCache);
+            entity.RemoveOnComponentRemoved(entityOnOnComponentRemovedCache);
+            entity.RemoveOnComponentReplaced(entityOnOnComponentReplacedCache);
+            entity.RemoveOnDestroyEntity(entityOnOnDestroyEntityCache);
+        }
+
+        private void EntityOnOnComponentReplaced(IEntity entity, int index1, IComponent previousComponent,
+                                                 IComponent newComponent)
+        {
+            SetDirty();
+        }
+
+        private void EntityOnOnComponentRemoved(IEntity entity, int index1, IComponent component1)
+        {
+            SetDirty();
+        }
+
+        private void EntityOnOnComponentAdded(IEntity entity, int index1, IComponent component1)
+        {
+            SetDirty();
+        }
+
+        public static T DoAddComponent<T>(TEntity entity, int index) where T : IGameComponent, new()
+        {
+            var component = entity.CreateComponent<T>(index);
+            entity.AddComponent(index, component);
+            return component;
+        }
+
+        private IGameComponent DoGetComponent(int index)
+        {
+            return DoGetComponent(entity, index);
+        }
+
+        public static IGameComponent DoGetComponent(TEntity e, int index)
+        {
+            if (index >= 0 && e.HasComponent(index))
+                return e.GetComponent(index) as IGameComponent;
+            return null;
         }
     }
 }

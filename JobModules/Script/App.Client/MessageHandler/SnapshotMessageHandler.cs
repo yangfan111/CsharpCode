@@ -1,4 +1,5 @@
 ﻿using App.Client.Console.MessageHandler;
+using Common;
 using Core.GameTime;
 using Core.Replicaton;
 using Core.UpdateLatest;
@@ -8,12 +9,12 @@ namespace App.Client.Console
 {
     public class SnapshotMessageHandler : AbstractClientMessageHandler<Snapshot>
     {
-        private ISnapshotPool _pool;
+        private ISnapshotSelector _pool;
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(SnapshotMessageHandler));
         private bool _first = true;
         private ITimeManager _timeManager;
         private IUpdateLatestHandler _updateLatestHandler;
-        public SnapshotMessageHandler(ISnapshotPool pool, IUpdateLatestHandler updateLatestHandler,
+        public SnapshotMessageHandler(ISnapshotSelector pool, IUpdateLatestHandler updateLatestHandler,
             ITimeManager timeManager)
         {
             _pool = pool;
@@ -44,6 +45,8 @@ namespace App.Client.Console
                     _timeManager.RenderTime, messageBody.ServerTime);
             }
 
+            _logger.DebugFormat("DoHandle :seq:{0} usercmd:{1} snapshotId:{2}", MyGameTime.seq, messageBody.LastUserCmdSeq, messageBody.SnapshotSeq);
+              
             _updateLatestHandler.BaseUserCmdSeq = messageBody.LastUserCmdSeq;
             _updateLatestHandler.LastSnapshotId = messageBody.SnapshotSeq;
             _pool.AddSnapshot(messageBody);

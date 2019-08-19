@@ -44,6 +44,7 @@ namespace App.Client.SessionStates
             AddState(new LoginSuccState(contexts, EClientSessionStates.Running, EClientSessionStates.Running)
                 .WithEnterAction(() =>
                 {
+                    
                     UnityAssetManager.ProcessLoadedRequestTime = 4;
                     BackroundloadSettings.SetCurrentSettings(defaultSettings);
                     if (SharedConfig.DisableGc)

@@ -3,27 +3,22 @@ using App.Shared.Configuration;
 using App.Shared.EntityFactory;
 using App.Shared.GameModules.Attack;
 using App.Shared.GameModules.Player;
-using App.Shared.GameModules.Weapon.Behavior;
-using App.Shared.Player;
+using App.Shared.GameModules.Weapon;
 using App.Shared.Util;
 using Assets.XmlConfig;
+using Core;
+using Core.Attack;
 using Core.Compensation;
 using Core.EntityComponent;
 using Core.Enums;
 using Core.GameModule.Interface;
-using Core.IFactory;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using Entitas;
 using System;
 using System.Collections.Generic;
-using App.Shared.Audio;
-using App.Shared.GameModules.Weapon;
-using Core;
 using UltimateFracturing;
 using UnityEngine;
-using Utils.Appearance;
-using Utils.Appearance.Bone;
 using Utils.Singleton;
 using Utils.Utils;
 using WeaponConfigNs;
@@ -51,13 +46,11 @@ namespace App.Shared.GameModules.Throwing
         private static int _fogBombEffectTime = 35000;
 
         private static bool _newRaycast = true;
-        private ISoundEntityFactory _soundEntityFactory;
         
         public ThrowingSimulationSystem(
             Contexts contexts,
             ICompensationWorldFactory compensationWorldFactory,
-            ThrowingHitHandler hitHandler,
-            ISoundEntityFactory soundEntityFactory)
+            ThrowingHitHandler hitHandler)
         {
             _contexts = contexts;
             _layerMask = UnityLayers.SceneCollidableLayerMask | UnityLayerManager.GetLayerIndex(EUnityLayerName.UI);//BulletLayers.GetBulletLayer();
@@ -70,7 +63,6 @@ namespace App.Shared.GameModules.Throwing
             _vehicles = _contexts.vehicle.GetGroup(VehicleMatcher.AllOf(VehicleMatcher.GameObject));
             //all players
             _players = _contexts.player.GetGroup(PlayerMatcher.AllOf(PlayerMatcher.FirstPersonModel, PlayerMatcher.ThirdPersonModel));
-            _soundEntityFactory = soundEntityFactory;
         }
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
@@ -81,8 +73,7 @@ namespace App.Shared.GameModules.Throwing
         private List<IThrowingSegment> _allThrowingSegments = new List<IThrowingSegment>();
         private ThrowingSegmentComparator _comparator = new ThrowingSegmentComparator();
 
-        
-        
+
         public void Update(EntityKey ownerKey, int frameTime)
         {
             _allThrowingSegments.Clear();
@@ -243,12 +234,14 @@ namespace App.Shared.GameModules.Throwing
 
         private void StartFlying(PlayerEntity playerEntity, ThrowingEntity throwingEntity)
         {
-            var dir = BulletDirUtility.GetThrowingDir(playerEntity.WeaponController());
+            var throwAmm = SingletonManager.Get<ThrowAmmunitionCalculator>();
+            var dir = throwAmm.GetFireDir(0,playerEntity.WeaponController(),0);
+            Vector3 pos = throwAmm.GetFireEmitPosition(playerEntity.WeaponController());
             Vector3 vel = dir * throwingEntity.throwingData.InitVelocity;
-            Vector3 pos = PlayerEntityUtility.GetThrowingEmitPosition(playerEntity.WeaponController());
             throwingEntity.position.Value = pos;
             throwingEntity.throwingData.Velocity = vel;
             throwingEntity.throwingData.IsFly = true;
+      //      DebugUtil.MyLog("StartFly Pos:{0} dir:{1}",pos,dir);
 
             /*if (SharedConfig.IsServer)
             {
@@ -407,6 +400,7 @@ namespace App.Shared.GameModules.Throwing
         private void GrenadeDamageHandler(ThrowingEntity throwing)
         {
             PlayerEntity sourcePlayer = null;
+
             if (throwing.hasOwnerId)
             {
                 sourcePlayer = _contexts.player.GetEntityWithEntityKey(throwing.ownerId.Value);
@@ -415,31 +409,18 @@ namespace App.Shared.GameModules.Throwing
             Vector3 hitPoint;
             foreach (PlayerEntity player in _players)
             {
+                if (player.hasPlayerMask && player.playerMask.SelfMask == (int) EPlayerMask.Invincible)
+                    continue;
+
                 float dis = Vector3.Distance(throwing.position.Value, player.position.Value);
-                //头部
-                Vector3 headPos = player.position.Value;
-                Transform tran;
-                if (player.appearanceInterface.Appearance.IsFirstPerson)
-                {
-                    var root = player.RootGo();
-                    tran = BoneMount.FindChildBoneFromCache(root, BoneName.CharacterHeadBoneName);
-                }
-                else
-                {
-                    var root = player.RootGo();
-                    tran = BoneMount.FindChildBoneFromCache(root, BoneName.CharacterHeadBoneName);
-                }
-                if (null != tran)
-                {
-                    headPos = tran.position;
-                }
+
                 if (dis < throwing.throwingData.ThrowConfig.DamageRadius
-                    && ( (!throwing.throwingData.IsFly && throwing.ownerId.Value == player.entityKey.Value)
+                    && ((!throwing.throwingData.IsFly && throwing.ownerId.Value == player.entityKey.Value)
                     || !CommonMathUtil.Raycast(throwing.position.Value, player.position.Value, dis, _layerMask, out hitPoint)
-                    || !CommonMathUtil.Raycast(throwing.position.Value, headPos, dis, _layerMask, out hitPoint)) )
+                    || !CommonMathUtil.Raycast(throwing.position.Value, player.bones.Head.position, dis, _layerMask, out hitPoint)) )
                 {
                     float damage = (1 - dis/throwing.throwingData.ThrowConfig.DamageRadius) * throwing.throwingData.ThrowConfig.BaseDamage;
-                    _throwingHitHandler.OnPlayerDamage(_contexts,sourcePlayer, player, new PlayerDamageInfo(damage, (int)EUIDeadType.Weapon, (int)EBodyPart.None,
+                    _throwingHitHandler.OnPlayerDamage(_contexts, sourcePlayer, player, new PlayerDamageInfo(damage, (int)EUIDeadType.Weapon, (int)EBodyPart.None,
                         GetWeaponIdBySubType((EWeaponSubType)throwing.throwingData.WeaponSubType), false, false, false, player.position.Value, player.position.Value - throwing.position.Value));
                 }
             }

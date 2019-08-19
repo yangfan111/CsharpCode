@@ -22,10 +22,10 @@ namespace Core.SnapshotReplication
             _recvChannel = new SnapshotRecvChannel(serializer);
             _sendChannel = new SnapshotSendChannel(serializer);
         }
-        public void Serialize(Stream outStream, object message)
+        public int Serialize(Stream outStream, object message)
         {
             AssertUtility.Assert(message is ISnapshot);
-            _sendChannel.SerializeSnapshot(message as ISnapshot, outStream);
+           return  _sendChannel.SerializeSnapshot(message as ISnapshot, outStream);
         }
 
         public object Deserialize(Stream inStream)

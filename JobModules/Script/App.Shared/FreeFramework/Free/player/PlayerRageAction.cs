@@ -1,12 +1,9 @@
-﻿using App.Server.GameModules.GamePlay.free.player;
-using App.Shared.GameModules.Player;
+﻿using Assets.App.Server.GameModules.GamePlay.Free;
 using com.wd.free.action;
 using com.wd.free.@event;
 using Core.Free;
-using Sharpen;
+using Free.framework;
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace App.Shared.FreeFramework.Free.player
 {
@@ -18,11 +15,16 @@ namespace App.Shared.FreeFramework.Free.player
         {
             PlayerEntity entity = GetPlayerEntity(args);
             if (entity != null && entity.hasStateInterface) {
+                SimpleProto sp = FreePool.Allocate();
+                sp.Key = FreeMessageConstant.PlayerRageStart;
                 if (rage) {
                     entity.stateInterface.State.RageStart();
+                    sp.Bs.Add(true);
                 } else {
                     entity.stateInterface.State.RageEnd();
+                    sp.Bs.Add(false);
                 }
+                FreeMessageSender.SendMessage(entity, sp);
             }
         }
 

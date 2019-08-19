@@ -9,6 +9,8 @@ namespace App.Client.GameModules.Ui.UiAdapter
     public interface IGroupRecordUiAdapter : IAbstractUiAdapter
     {
 
+        int GetScoreByCampType(EUICampType type);
+
         /// <summary>
         /// 返回对应阵营的数据列表，泰坦阵营位于视图的上方，风暴阵营位于视图的下方
         /// </summary>

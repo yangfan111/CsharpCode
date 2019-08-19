@@ -1,24 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Protobuf;
-using App.Server.GameModules.GamePlay.free.player;
+﻿using App.Server.GameModules.GamePlay.free.player;
+using App.Server.GameModules.GamePlay.Free.chicken;
+using App.Server.GameModules.GamePlay.Free.client;
+using App.Server.GameModules.GamePlay.Free.item;
+using App.Server.GameModules.GamePlay.Free.item.config;
+using App.Shared.GameModules.GamePlay.Free.Map;
+using Assets.App.Server.GameModules.GamePlay.Free;
+using Assets.XmlConfig;
+using com.wd.free.item;
 using com.wd.free.para;
 using Core.Free;
 using Free.framework;
 using gameplay.gamerule.free.item;
 using gameplay.gamerule.free.rule;
 using UnityEngine;
-using App.Server.GameModules.GamePlay.Free.client;
-using App.Shared.GameModules.GamePlay.Free.Map;
-using Assets.XmlConfig;
-using App.Server.GameModules.GamePlay.Free.item.config;
-using com.wd.free.item;
-using Utils.Configuration;
-using XmlConfig;
-using App.Server.GameModules.GamePlay.Free.item;
-using Assets.App.Server.GameModules.GamePlay.Free;
 
 namespace App.Server.GameModules.GamePlay.free.client
 {
@@ -51,27 +45,34 @@ namespace App.Server.GameModules.GamePlay.free.client
                     PickupItemUtil.ShowSplitUI(room, fd, key);
                     return;
                 }
-                if (key.StartsWith("ground"))
+                if (key.StartsWith(ChickenConstant.BagGround))
                 {
                     SimpleItemInfo info = PickupItemUtil.GetGroundItemInfo(room, fd, key);
                     if (info.cat > 0)
                     {
                         if (CanChangeBag(room, fd, key))
                         {
-                            PickupItemUtil.AddItemToPlayer(room, player, info.entityId, info.cat, info.id, info.count);
+                            if (PickupItemUtil.AddItemToPlayer(room, player, info.entityId, info.cat, info.id, info.count))
+                            {
+                                SimpleProto sp = FreePool.Allocate();
+                                sp.Key = FreeMessageConstant.PlaySound;
+                                sp.Ks.Add(2);
+                                sp.Ins.Add(5018);
+                                sp.Bs.Add(false);
+                                FreeMessageSender.SendMessage(player, sp);
+                            }
                         }
 
                     }
                 }
-                else if (key.StartsWith("default"))
+                else if (key.StartsWith(ChickenConstant.BagDefault))
                 {
-
                     ItemPosition ip = FreeItemManager.GetItemPosition(room.FreeArgs, key, fd.GetFreeInventory().GetInventoryManager());
                     FreeItemInfo info = FreeItemConfig.GetItemInfo(ip.key.GetKey());
                     if (info.cat == (int)ECategory.WeaponPart)
                     {
                         string inv = PickupItemUtil.AutoPutPart(fd, FreeItemConfig.GetItemInfo(info.cat, info.id));
-                        if (inv != null && inv != "default")
+                        if (inv != null && inv != ChickenConstant.BagDefault)
                         {
                             ItemInventoryUtil.MovePosition(ip,
                                 fd.GetFreeInventory().GetInventoryManager().GetInventory(inv), 0, 0, room.FreeArgs);
@@ -83,15 +84,15 @@ namespace App.Server.GameModules.GamePlay.free.client
                     }
                 }
                 // 点击装配好的配件，自动进背包
-                else if (key.StartsWith("w") && key.Length == 3)
+                else if (key.StartsWith("w") && key.IndexOf(",") == 3)
                 {
-                    ItemInventory ii = fd.freeInventory.GetInventoryManager().GetInventory(key);
+                    ItemInventory ii = fd.freeInventory.GetInventoryManager().GetInventory(key.Substring(0, 3));
                     ItemInventory defaultInventory = fd.GetFreeInventory().GetInventoryManager().GetDefaultInventory();
-
+                    
                     if (ii != null && ii.posList.Count > 0)
                     {
                         ItemPosition ip = ii.posList[0];
-                        if (BagCapacityUtil.CanAddToBag(room.FreeArgs, fd, ip))
+                        if (BagCapacityUtil.CanDemountAttachment(room, fd, FreeItemConfig.GetItemInfo(ip.key.GetKey()), key, false))
                         {
                             int[] xy = defaultInventory.GetNextEmptyPosition(ip.GetKey());
                             ItemInventoryUtil.MovePosition(ip,
@@ -111,13 +112,12 @@ namespace App.Server.GameModules.GamePlay.free.client
 
         private bool CanChangeBag(ServerRoom room, FreeData fd, string key)
         {
-            if (key.StartsWith("ground"))
+            if (key.StartsWith(ChickenConstant.BagGround))
             {
                 SimpleItemInfo info = PickupItemUtil.GetGroundItemInfo(room, fd, key);
 
                 return BagCapacityUtil.CanChangeBag(room.FreeArgs, fd, info.cat, info.id);
             }
-
             return true;
         }
     }

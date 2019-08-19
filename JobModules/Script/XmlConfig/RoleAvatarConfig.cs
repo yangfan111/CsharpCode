@@ -26,6 +26,5 @@ namespace XmlConfig
         public int PickSound;
         public List<int> ApplyRoleList;
         public List<int> ReplaceList;
-        public int Sort;
     }
 }

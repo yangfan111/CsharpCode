@@ -51,6 +51,8 @@
     <Compile Include="lib\Mics.cs" />
     <Compile Include="lib\TimeUtil.cs" />
     <Compile Include="lib\TodoLib.cs" />
+    <Compile Include="lib\Utils\EntityIdGenerator.cs" />
+    <Compile Include="lib\Utils\EntityKey.cs" />
     <Compile Include="lib\Utils\ShortIDGenerator.cs" />
     <Compile Include="lib\Utils\VoyagerUtil.cs" />
     <Compile Include="lib\Utils\WiseUtil.cs" />

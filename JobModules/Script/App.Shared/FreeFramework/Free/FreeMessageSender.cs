@@ -1,23 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Server.GameModules.GamePlay;
-using App.Shared;
+﻿using App.Shared;
 using com.wd.free.@event;
-using Core.Free;
 using Free.framework;
 using Free.framework.ui;
-using com.wd.free.unit;
 using com.wd.free.util;
 using com.wd.free.para;
 using App.Server.GameModules.GamePlay.free.player;
-using App.Shared.GameModules.Player;
 
 namespace Assets.App.Server.GameModules.GamePlay.Free
 {
-    public class FreeMessageSender : IFreeMessageSender
+    public partial class FreeMessageSender : IFreeMessageSender
     {
+        public static void SendMessageC(PlayerEntity playerEntity, SimpleProto proto)
+        {
+            if(playerEntity.hasNetwork)
+                playerEntity.network.NetworkChannel.SendReliable((int)EClient2ServerMessage.FreeEvent, proto);
+        }
 
         public static void SendMessage(PlayerEntity player, SimpleProto message)
         {

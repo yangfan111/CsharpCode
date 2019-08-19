@@ -18,12 +18,11 @@ namespace App.Client.GameModules.ClientEffect
     {
         private LoggerAdapter Logger = new LoggerAdapter(typeof(ClientEffectEntityInitSystem));
         private Contexts _contexts;
-        private ISoundEntityFactory _soundEntityFactory;
 
         public ClientEffectEntityInitSystem(Contexts contexts) : base(contexts.clientEffect)
         {
             _contexts = contexts;
-            _soundEntityFactory = contexts.session.entityFactoryObject.SoundEntityFactory;
+        //    _soundEntityFactory = contexts.session.entityFactoryObject.SoundEntityFactory;
         }
 
         protected override ICollector<ClientEffectEntity> GetTrigger(IContext<ClientEffectEntity> context)

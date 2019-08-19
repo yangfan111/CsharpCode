@@ -1,13 +1,12 @@
-using UnityEngine;
-using System;
 using App.Shared.Components.Player;
 using Utils.Appearance;
 using Utils.Appearance.Weapon;
+using Utils.Appearance.Weapon.WeaponShowPackage;
 using Utils.AssetManager;
 
 namespace App.Shared.GameModules.Player.Appearance.WeaponControllerPackage
 {
-    public class WeaponController : HallWeaponController, ICharacterLoadResource
+    public class WeaponController : HallWeaponController
     {
         #region sync
 
@@ -43,15 +42,15 @@ namespace App.Shared.GameModules.Player.Appearance.WeaponControllerPackage
         
         #endregion
 
-        public void SetWeaponChangedCallBack(Action<GameObject, GameObject> callBack)
-        {
-            _weaponChangedCallBack = callBack;
-        }
-
-        public void SetCacheChangeAction(Action cacheChangeAction)
-        {
-            _cacheChangeAction = cacheChangeAction;
-        }
+//        public void SetWeaponChangedCallBack(Action<GameObject, GameObject> callBack)
+//        {
+//            _weaponChangedCallBack = callBack;
+//        }
+//
+//        public void SetCacheChangeAction(Action cacheChangeAction)
+//        {
+//            _cacheChangeAction = cacheChangeAction;
+//        }
 
         #region Hepler
 
@@ -139,9 +138,10 @@ namespace App.Shared.GameModules.Player.Appearance.WeaponControllerPackage
 
         protected override AbstractLoadRequest CreateLoadRequest(AssetInfo assetInfo, ILoadedHandler loadedHanlder)
         {
-            return LoadRequestFactory.Create<PlayerEntity>(assetInfo, loadedHanlder.OnLoadSucc);
+            return LoadRequestFactory.Create<PlayerEntity>(assetInfo, loadedHanlder.OnLoadSuccess);
         }
 
         #endregion
     }
 }
+

@@ -1,15 +1,13 @@
-using System;
 using App.Client.GameModules.Ui.UiAdapter;
 using App.Client.GameModules.Ui.ViewModels.Group;
 using Assets.UiFramework.Libs;
 using Core.Enums;
-using UIComponent.UI;
 using UnityEngine;
 
 namespace App.Client.GameModules.Ui.Models.Group
 {
 
-    public class GroupRecordInfo : UIItem
+    public class GroupRecordInfo : AbstractRecordInfo
     {
         private GroupRecordInfoViewModel _viewModel = new GroupRecordInfoViewModel();
 
@@ -22,65 +20,58 @@ namespace App.Client.GameModules.Ui.Models.Group
             }
         }
 
-        protected override void SetView()
+        protected override void UpdateSingleItemBadge(GroupRecordViewData data)
         {
-            base.SetView();
+            var battleData = data.BattleData;
+            var badgeId = battleData.BadgeId;
 
-            UpdateInfoView();
+            if (badgeId <= 0)
+            {
+                _viewModel.BadgeGroupShow = false;
+                return;
+            }
+            if (badgeId != curBadgeId)
+            {
+                curBadgeId = badgeId;
+                var assetInfo = GetBadgeAssetInfo(badgeId);
+                if (string.IsNullOrEmpty(assetInfo.BundleName) || string.IsNullOrEmpty(assetInfo.AssetName))
+                {
+                    _viewModel.BadgeGroupShow = false;
+                    return;
+                }
+
+                _viewModel.BadgeIconBundle = assetInfo.BundleName;
+                _viewModel.BadgeIconAsset = assetInfo.AssetName;
+                _viewModel.BadgeGroupShow = true;
+            }
+
+            _viewModel.BadgeNormalBgShow = !battleData.IsMySelf;
+            _viewModel.BadgeMySelfBgShow = battleData.IsMySelf;
+            _viewModel.BadgeHurtBgShow = battleData.IsHurt;
+            _viewModel.BadgeDeadBgShow = battleData.IsDead;
+
         }
 
-        public void UpdateInfoView()
-        {
-            var data = Data as GroupRecordViewData;
-
-            UpdateGroupShow(data);
-            if (!_viewModel.IconGroupShow) return;
-            UpdateSingleItemData(data);
-            UpdateSingleItemIcon(data);
-            UpdateSingleItemMySelf(data);
-        }
-
-        private void UpdateGroupShow(GroupRecordViewData data)
+        protected override void RealUpdateGroupShow(GroupRecordViewData data)
         {
             _viewModel.ImgGroupShow = !data.IsTitle;
             _viewModel.TextGroupShow = data.NeedShow;
             _viewModel.IconGroupShow = data.NeedShow && !data.IsTitle;
-            if (data.IsTitle)
-            {
-                InitTitleText(data.CanResque);
-            }
         }
 
-        private void InitTitleText(bool canResque)
+        protected override void InitTitleText(bool canRescue)
         {
             _viewModel.RankText = I2.Loc.ScriptLocalization.client_group.word1;
             _viewModel.PlayerNameText = I2.Loc.ScriptLocalization.client_group.word2;
             _viewModel.CorpsText = I2.Loc.ScriptLocalization.client_group.word3;
-            _viewModel.KillText = canResque ? I2.Loc.ScriptLocalization.client_group.word8 : I2.Loc.ScriptLocalization.client_group.word4;
+            _viewModel.KillText = canRescue ? I2.Loc.ScriptLocalization.client_group.EliminateAndHitDown : I2.Loc.ScriptLocalization.client_group.Eliminate;
             _viewModel.DamageText = I2.Loc.ScriptLocalization.client_group.word5;
             _viewModel.DeadText = I2.Loc.ScriptLocalization.client_group.word6;
-            _viewModel.AssistText = I2.Loc.ScriptLocalization.client_group.word7;
-            _viewModel.PingText = "ping";
+            _viewModel.AssistText = canRescue ? I2.Loc.ScriptLocalization.client_group.AssistAndResque : I2.Loc.ScriptLocalization.client_group.word7;
         }
 
-        private Color origColor = new Color32(0xf4, 0xf4, 0xf4, 255);
-        private Color myselfColor = new Color32(0xfd, 0xcd, 0x50, 255);
-        private void UpdateSingleItemMySelf(GroupRecordViewData viewData)
-        {
-            var data = viewData.BattleData;
-            if (data.IsMySelf)
-            {
-                UpdateColor(myselfColor);
-                _viewModel.MySelfMaskShow = true;
-            }
-            else
-            {
-                UpdateColor(origColor);
-                _viewModel.MySelfMaskShow = false;
-            }
-        }
 
-        private void UpdateColor(Color color)
+        protected override void UpdateColor(Color color)
         {
             _viewModel.RankColor = color;
             _viewModel.PlayerNameColor = color;
@@ -89,39 +80,34 @@ namespace App.Client.GameModules.Ui.Models.Group
             _viewModel.DamageColor = color;
             _viewModel.DeadColor = color;
             _viewModel.AssistColor = color;
-            _viewModel.PingColor = color;
         }
 
-        private void UpdateSingleItemIcon(GroupRecordViewData viewData)
+        protected override void UpdateSingleItemIcon(GroupRecordViewData viewData)
         {
             var data = viewData.BattleData;
-            _viewModel.DeadIconShow = data.IsDead;
-            _viewModel.DeathMaskShow = data.IsDead;
+            _viewModel.DeadStateShow = data.IsDead;
+            _viewModel.HurtStateShow = data.IsHurt;
             _viewModel.MySelfMaskShow = data.IsMySelf;
             int gameTitle = data.GameTitle;
-            _viewModel.TitleIconShow1 = IsTitle(EUIGameTitleType.KdKing, gameTitle);
-            _viewModel.TitleIconShow2 = IsTitle(EUIGameTitleType.Ace, gameTitle);
-            _viewModel.TitleIconShow3 = IsTitle(EUIGameTitleType.Second, gameTitle);
-            _viewModel.TitleIconShow4 = IsTitle(EUIGameTitleType.Third, gameTitle);
+            _viewModel.TitleIconShow1 = IsTitle(EUIGameTitleType.Ace, gameTitle);
+            _viewModel.TitleIconShow2 = IsTitle(EUIGameTitleType.Second, gameTitle);
+            _viewModel.TitleIconShow3 = IsTitle(EUIGameTitleType.Third, gameTitle);
+            _viewModel.TitleIconShow4 = IsTitle(EUIGameTitleType.KdKing, gameTitle);
         }
 
-        private bool IsTitle(EUIGameTitleType titleType, int title)
+        protected override void UpdateSingleItemData(GroupRecordViewData viewData)
         {
-            int type = 1 << (int)titleType;
-            return (title & type) == type;
-        }
-
-        private void UpdateSingleItemData(GroupRecordViewData viewData)
-        {
+            var canResque = viewData.CanResque;
             var data = viewData.BattleData;
-            _viewModel.AssistText = data.AssistCount.ToString();
+            _viewModel.AssistText = canResque ? 
+                string.Format(twoDataFormat,data.AssistCount,data.ResqueCount):data.AssistCount.ToString();
             _viewModel.CorpsText = data.CorpsName;
             _viewModel.DamageText = data.Damage.ToString();
             _viewModel.DeadText = data.DeadCount.ToString();
-            _viewModel.KillText = data.KillCount.ToString();
-            _viewModel.PingText = data.Ping.ToString();
+            _viewModel.KillText = canResque ? 
+                string.Format(twoDataFormat,data.HitDownCount, data.KillCount):data.KillCount.ToString();
             _viewModel.PlayerNameText = data.Name;
-            _viewModel.RankText = viewData.Rank.ToString();
+            _viewModel.RankText = data.IsHurt || data.IsDead ? string.Empty : viewData.Rank.ToString();
         }
 
     }

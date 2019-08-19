@@ -1,29 +1,22 @@
-﻿using com.wd.free.item;
+﻿using App.Server.GameModules.GamePlay.free.player;
+using App.Server.GameModules.GamePlay.Free.chicken;
+using App.Server.GameModules.GamePlay.Free.item.config;
+using App.Server.GameModules.GamePlay.Free.ui;
+using App.Server.GameModules.GamePlay.Free.weapon;
+using Assets.App.Server.GameModules.GamePlay.Free;
+using Assets.Utils.Configuration;
+using com.cpkf.yyjd.tools.util;
+using com.wd.free.action;
+using com.wd.free.item;
+using com.wd.free.para;
+using com.wd.free.skill;
+using Core.Free;
+using Free.framework;
+using gameplay.gamerule.free.ui;
+using Sharpen;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using com.wd.free.skill;
-using com.wd.free.action;
-using Sharpen;
-using com.wd.free.para;
-using gameplay.gamerule.free.ui;
-using com.wd.free.util;
-using gameplay.gamerule.free.ui.component;
-using App.Server.GameModules.GamePlay.Free.ui;
-using WeaponConfigNs;
-using Core.Configuration;
-using com.cpkf.yyjd.tools.util;
 using UnityEngine;
-using App.Server.GameModules.GamePlay.free.player;
-using Utils.Configuration;
-using Assets.Utils.Configuration;
-using App.Server.GameModules.GamePlay.Free.weapon;
-using Free.framework;
-using Core.Free;
-using App.Server.GameModules.GamePlay.Free.item.config;
-using Assets.App.Server.GameModules.GamePlay.Free;
-using App.Server.GameModules.GamePlay.Free.chicken;
 using Utils.Singleton;
 
 namespace App.Server.GameModules.GamePlay.Free.item
@@ -98,70 +91,6 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
         public void ReDraw(ISkillArgs args, ItemInventory inventory, bool includeBack)
         {
-            //if (update == null)
-            //{
-            //    update = new FreeUIUpdateAction();
-            //}
-
-            //update.SetKey(FreeUtil.ReplaceVar(uiKey, args));
-            //update.ClearValue();
-
-            //FreeData fd = (FreeData)args.GetUnit("current");
-
-            //FreePrefabValue v = new FreePrefabValue();
-            //v.SetSeq("1");
-            //update.AddValue(v);
-            //v.AddOneValue(new OnePrefabValue(image, ""));
-            //if (!string.IsNullOrEmpty(name))
-            //{
-            //    v.AddOneValue(new OnePrefabValue(name, ""));
-            //}
-            //if (!string.IsNullOrEmpty(count))
-            //{
-            //    v.AddOneValue(new OnePrefabValue(count, ""));
-            //}
-            //update.SetScope(1);
-            //update.SetPlayer("current");
-            //update.Act(args);
-
-            //if (inventory.posList.Count > 0)
-            //{
-            //    ItemPosition ip = inventory.posList[0];
-            //    v.Clear();
-            //    v.AddOneValue(new OnePrefabValue(image, ip.key.GetImg()));
-            //    if (!string.IsNullOrEmpty(name))
-            //    {
-            //        v.AddOneValue(new OnePrefabValue(name, ip.key.GetName()));
-            //    }
-            //    if (!string.IsNullOrEmpty(count))
-            //    {
-            //        if(ip.count != 1)
-            //        {
-            //            v.AddOneValue(new OnePrefabValue(count, ip.GetCount().ToString()));
-            //        }
-            //    }
-            //    else
-            //    {
-            //        v.AddOneValue(new OnePrefabValue(count, ""));
-            //    }
-            //    update.Act(args);
-
-            //    redrawPart(inventory, args, ip, fd);
-
-            //    SimpleProto itemInfo = FreePool.Allocate();
-            //    itemInfo.Key = FreeMessageConstant.ItemInfo;
-            //    itemInfo.Ss.Add(inventory.name);
-            //    FreeItemInfo info = FreeItemConfig.GetItemInfo(ip.key.GetKey());
-            //    itemInfo.Ins.Add(info.cat);
-            //    itemInfo.Ins.Add(info.id);
-            //    itemInfo.Ins.Add(ip.GetCount());
-            //    FreeMessageSender.SendMessage(args, "current", itemInfo);
-            //}
-            //else
-            //{
-            //    clearPart(inventory, args, fd);
-            //}
-
             SimpleProto itemInfo = FreePool.Allocate();
             itemInfo.Key = FreeMessageConstant.ItemInfo;
             itemInfo.Ss.Add(inventory.name);
@@ -185,24 +114,24 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
         private void clearPart(ItemInventory inventory, ISkillArgs args, FreeData fd)
         {
-            if (inventory.name == "w1" || inventory.name == "w2" || inventory.name == "w3")
+            if (inventory.name == ChickenConstant.BagPrimeWeapon || inventory.name == ChickenConstant.BagSecondaryWeapon || inventory.name == ChickenConstant.BagPistolWeapon)
             {
                 ShowPartAction show = new ShowPartAction();
                 show.show = false;
                 show.SetPlayer("current");
                 show.SetScope(1);
 
-                if (inventory.name == "w1")
+                if (inventory.name == ChickenConstant.BagPrimeWeapon)
                 {
                     show.weaponKey = "1";
                     ClearPart(args, fd, 1);
                 }
-                else if (inventory.name == "w2")
+                else if (inventory.name == ChickenConstant.BagSecondaryWeapon)
                 {
                     show.weaponKey = "2";
                     ClearPart(args, fd, 2);
                 }
-                else if (inventory.name == "w3")
+                else if (inventory.name == ChickenConstant.BagPistolWeapon)
                 {
                     show.weaponKey = "3";
                     ClearPart(args, fd, 3);
@@ -214,7 +143,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
 
         private void redrawPart(ItemInventory inventory, ISkillArgs args, ItemPosition ip, FreeData fd)
         {
-            if (inventory.name == "w1" || inventory.name == "w2" || inventory.name == "w3")
+            if (inventory.name == ChickenConstant.BagPrimeWeapon || inventory.name == ChickenConstant.BagSecondaryWeapon || inventory.name == ChickenConstant.BagPistolWeapon)
             {
                 int id = (int)((IntPara)ip.GetParameters().Get("itemId")).GetValue();
 
@@ -247,11 +176,11 @@ namespace App.Server.GameModules.GamePlay.Free.item
                     show.show = true;
                     show.SetPlayer("current");
                     show.SetScope(1);
-                    if (inventory.name == "w1")
+                    if (inventory.name == ChickenConstant.BagPrimeWeapon)
                     {
                         show.weaponKey = "1";
                     }
-                    else if (inventory.name == "w2")
+                    else if (inventory.name == ChickenConstant.BagSecondaryWeapon)
                     {
                         show.weaponKey = "2";
                     }

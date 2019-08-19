@@ -15,18 +15,13 @@ namespace App.Shared.Components.Player
     public abstract class AbstractNetworkAnimator:IInterpolatableComponent, IRewindableComponent,ICloneableComponent
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(AbstractNetworkAnimator));
-        protected static LoggerAdapter _networkAnimatorLogger = new LoggerAdapter("NetworkAnimatorLogger");
         
         [NetworkProperty] [DontInitilize] public bool NeedChangeServerTime;
         [NetworkProperty] [DontInitilize] public int BaseServerTime;
-        [NetworkProperty] [DontInitilize] public int BaseClientTime;
         
         [NetworkProperty] public List<NetworkAnimatorLayer> AnimatorLayers;
-
-//        [NetworkProperty]
-        [DontInitilize] public List<byte> BoolAndIntAnimatorParameters;
-//        [NetworkProperty]
-        [DontInitilize] public List<ushort> FloatAnimatorParameters;
+//        流量优化用
+//        [NetworkProperty] [DontInitilize(false)] public List<CompressedNetworkAnimatorParameter> FloatAnimatorParameters;
         
         private List<NetworkAnimatorParameter> _animatorParameters;
         [NetworkProperty] public List<NetworkAnimatorParameter> AnimatorParameters
@@ -35,9 +30,10 @@ namespace App.Shared.Components.Player
             {
                 _animatorParameters = value;
                 _animatorParameterIndex = null;
-//                BoolAndIntAnimatorParameters = new List<byte>();
-//                FloatAnimatorParameters = new List<ushort>();
-                
+//                流量优化用                
+//                if (FloatAnimatorParameters == null)
+//                    FloatAnimatorParameters = new List<CompressedNetworkAnimatorParameter>();
+//
 //                ConvertStructureDataToCompressData();
             }
             get
@@ -45,7 +41,12 @@ namespace App.Shared.Components.Player
                 return _animatorParameters;
             }
         }
-        
+
+        public void SetAnimatorParamsWithoutChangeData(List<NetworkAnimatorParameter> animatorParameters)
+        {
+            _animatorParameters = animatorParameters;
+        }
+
         private Dictionary<int, int> _animatorParameterIndex;
         public Dictionary<int, int> AnimatorParameterIndex
         {
@@ -61,90 +62,40 @@ namespace App.Shared.Components.Player
                 return _animatorParameterIndex;
             }
         }
-
-        public void ConvertStructureDataToCompressData()
-        {
-            var count = AnimatorParameters.Count;
-            
-            BoolAndIntAnimatorParameters.Clear();
-            FloatAnimatorParameters.Clear();
-
-            int bitDataIndex = 0;
-            int byteDataIndex = 0;
-            
-            for (int i = 0; i < count; ++i)
-            {
-                var param = AnimatorParameters[i];
-                switch (param.ParamType)
-                {
-                    case AnimatorControllerParameterType.Bool:
-                        BoolAndIntAnimatorParameters[byteDataIndex] |=
-                            (byte) ((param.BoolValue ? 1 : 0) << bitDataIndex++);
-                        break;
-                    case AnimatorControllerParameterType.Float:
-                        FloatAnimatorParameters.Add((ushort) (param.FloatValue * 1000));
-                        break;
-                }
-
-                if (bitDataIndex == 8)
-                {
-                    BoolAndIntAnimatorParameters.Add(0);
-                    ++byteDataIndex;
-                }
-            }
-
-            for (int i = 0; i < count; ++i)
-            {
-                var param = AnimatorParameters[i];
-                if (param.ParamType == AnimatorControllerParameterType.Int)
-                    BoolAndIntAnimatorParameters.Add((byte) param.IntValue);
-            }
-        }
-
-        public void ConvertCompressDataToStructureData()
-        {
-            var count = AnimatorParameters.Count;
-
-            int bitDataIndex = 0;
-            int byteDataIndex = 0;
-            int ushortDataIndex = 0;
-            
-            for (int i = 0; i < count; ++i)
-            {
-                var param = AnimatorParameters[i];
-                switch (param.ParamType)
-                {
-                    case AnimatorControllerParameterType.Bool:
-                        param.BoolValue = (BoolAndIntAnimatorParameters[byteDataIndex] & (1 << bitDataIndex++)) != 0;
-                        break;
-                    case AnimatorControllerParameterType.Float:
-                        param.FloatValue = FloatAnimatorParameters[ushortDataIndex++] / 1000.0f;
-                        FloatAnimatorParameters.Add((ushort) (param.FloatValue * 1000));
-                        break;
-                }
- 
-                if (bitDataIndex == 8)
-                {
-                    bitDataIndex = 0;
-                    ++byteDataIndex;
-                }
-            }
- 
-            for (int i = 0; i < count; ++i)
-            {
-                var param = AnimatorParameters[i];
-                if (param.ParamType == AnimatorControllerParameterType.Int)
-                    param.IntValue = BoolAndIntAnimatorParameters[++byteDataIndex];
-            }
-        }
         
-        private bool _needRewind = false;
-        [DontInitilize]
-        public bool NeedRewind
-        {
-            get { var ret = _needRewind; _needRewind = false; return ret; }
-            private set { _needRewind = value; }
-        }
+//        流量优化用
+//        public void ConvertStructureDataToCompressData()
+//        {
+//            var paramCount = AnimatorParameters.Count;
+//            int floatParamCount = 0;
+//            for (int i = 0; i < paramCount; ++i)
+//            {
+//                var param = AnimatorParameters[i];
+//                if (param.ParamType == AnimatorControllerParameterType.Float)
+//                {
+//                    short fixedPointValue = (short) (param.FloatValue * 1000);
+//                    if (floatParamCount < FloatAnimatorParameters.Count)
+//                        FloatAnimatorParameters[floatParamCount].Value = fixedPointValue;
+//                    else
+//                        FloatAnimatorParameters.Add(new CompressedNetworkAnimatorParameter { Value = fixedPointValue });
+//
+//                    floatParamCount++;
+//                }
+//            }
+//        }
+//
+//        public void ConvertCompressDataToStructureData()
+//        {
+//            var paramCount = AnimatorParameters.Count;
+//            var dataCount = FloatAnimatorParameters.Count;
+//            int floatParamIndex = 0;
+//            for (int i = 0; i < paramCount && floatParamIndex < dataCount; ++i)
+//            {
+//                var param = AnimatorParameters[i];
+//                if (param.ParamType == AnimatorControllerParameterType.Float)
+//                    param.FloatValue = FloatAnimatorParameters[floatParamIndex++].Value / 1000.0f;
+//            }
+//        }
         
         // for debug
         private string _entityName = string.Empty;
@@ -153,10 +104,6 @@ namespace App.Shared.Components.Player
         {
             _entityName = name;
         }
-        
-        private int _prevRenderTime = 0;
-        
-        //
         
         private void InitFields(AbstractNetworkAnimator leftComponent)
         {
@@ -173,14 +120,24 @@ namespace App.Shared.Components.Player
             if (AnimatorParameters == null || AnimatorParameters.Count != leftComponent.AnimatorParameters.Count)
             {
                 AnimatorParameters = new List<NetworkAnimatorParameter>(leftComponent.AnimatorParameters.Count);
-                foreach (var param in leftComponent.AnimatorParameters)
-                {
-                    AnimatorParameters.Add(param.Clone());
-                }
 
-                _animatorParameterIndex = null;
+                foreach (var parameter in leftComponent.AnimatorParameters)
+                {
+                    AnimatorParameters.Add(parameter.Clone());
+                }
             }
+            
+//            if (FloatAnimatorParameters == null || FloatAnimatorParameters.Count != leftComponent.FloatAnimatorParameters.Count)
+//            {
+//                FloatAnimatorParameters = new List<CompressedNetworkAnimatorParameter>(leftComponent.FloatAnimatorParameters.Count);
+//
+//                foreach (var param in leftComponent.FloatAnimatorParameters)
+//                {
+//                    FloatAnimatorParameters.Add(param.Clone());
+//                }
+//            }
         }
+        
         public bool IsInterpolateEveryFrame(){ return true; }
         public virtual void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
         {
@@ -190,77 +147,38 @@ namespace App.Shared.Components.Player
             InitFields(leftComponent);
 
             BaseServerTime = leftComponent.BaseServerTime;
-            BaseClientTime = leftComponent.BaseClientTime;
             NeedChangeServerTime = leftComponent.NeedChangeServerTime;
             
-            if (AnimatorLayers.Count > 0 && _networkAnimatorLogger.IsDebugEnabled)
+            // 当动画状态机切换时（人<->怪物）,不做插值，使用left，目前未对动画状态机切换做处理
+            // 此处只是避免出错
+            if (leftComponent.AnimatorLayers.Count == rightComponent.AnimatorLayers.Count)
             {
-                
-                _networkAnimatorLogger.DebugFormat("EntityName:{0}, before Interpolate, layer 0:{1}", _entityName,
-                     AnimatorLayers[0].ToString());
-            }
-            
-            if (leftComponent.AnimatorLayers.Count > 0 && _networkAnimatorLogger.IsDebugEnabled)
-            {
-                _networkAnimatorLogger.DebugFormat("EntityName:{2},Interpolate\n left layer 0:{0}\nright layer 0:{1}",
-                    leftComponent.AnimatorLayers[0], rightComponent.AnimatorLayers[0], _entityName);
-            }
-            
-            AssignAnimatorLayers(leftComponent.AnimatorLayers,
-                                 rightComponent.AnimatorLayers,
-                                 leftComponent.BaseServerTime,
-                                 interpolationInfo.LeftServerTime,
-                                 interpolationInfo.CurrentRenderTime,
-                                 rightComponent.BaseServerTime,
-                                 interpolationInfo.RightServerTime,
-                                 interpolationInfo.Ratio);
-            AssignAnimatorParameters(leftComponent.AnimatorParameters);
-            
-            if (AnimatorLayers.Count > 0 && _networkAnimatorLogger.IsDebugEnabled)
-            {
-                _networkAnimatorLogger.DebugFormat("EntityName:{1},after Interpolate, layer 0:{0}", AnimatorLayers[0], _entityName);
-            }
-            
-            if (_networkAnimatorLogger.IsDebugEnabled)
-            {
-                _networkAnimatorLogger.DebugFormat(
-                    "EntityName:{9},NetworkAnimatorComponent Interpolate, left.BaseServerTime:{0},right.BaseServerTime:{1},  baseServerTime delta:{2}\n interpolate.LeftServerTime:{3}, interpolate.RightServerTime:{4},interpolate.renderTime:{5},interpolate.Ratio:{6}\n interpolate deltaTime:{7}, render time delta:{8} ",
+                AssignAnimatorLayers(leftComponent.AnimatorLayers,
+                    rightComponent.AnimatorLayers,
                     leftComponent.BaseServerTime,
-                    rightComponent.BaseServerTime,
-                    rightComponent.BaseServerTime - leftComponent.BaseServerTime,
-                    interpolationInfo.LeftServerTime,
-                    interpolationInfo.RightServerTime,
                     interpolationInfo.CurrentRenderTime,
-                    interpolationInfo.Ratio,
-                    interpolationInfo.RightServerTime - interpolationInfo.LeftServerTime,
-                    interpolationInfo.CurrentRenderTime - _prevRenderTime,
-                    _entityName
-                );
+                    rightComponent.BaseServerTime,
+                    interpolationInfo.Ratio);
+//                AssignAnimatorParameters(leftComponent.FloatAnimatorParameters, rightComponent.FloatAnimatorParameters,
+//                    interpolationInfo.Ratio);
+                AssignAnimatorParameters(leftComponent.AnimatorParameters, rightComponent.AnimatorParameters, interpolationInfo.Ratio);
             }
-
-            _prevRenderTime = interpolationInfo.CurrentRenderTime;
         }
         
         // @see http://192.168.0.6:8090/pages/viewpage.action?pageId=12046047
         private void AssignAnimatorLayers(List<NetworkAnimatorLayer> leftLayers,
                                           List<NetworkAnimatorLayer> rightLayers,
                                           int leftBaseServerTime,
-                                          int leftServerTime,
                                           int currentRenderTime,
                                           int rightBaseServerTime,
-                                          int rightServerTime,
                                           float ratio)
         {
-            _logger.DebugFormat("currentTime:{0}, leftBaseTime:{1}, leftServerTime:{2}, rightBaseTime:{3}, rightServerTime:{4}",
+            _logger.DebugFormat("currentTime:{0}, leftBaseTime:{1}, rightBaseTime:{2}",
                 currentRenderTime,
                 leftBaseServerTime,
-                leftServerTime,
-                rightBaseServerTime,
-                rightServerTime);
+                rightBaseServerTime);
             AssertUtility.Assert(AnimatorLayers.Count == leftLayers.Count);
-            var elapsedFromLeft = (currentRenderTime - leftBaseServerTime) * 0.001f;
-            var intervalFromLeft = (currentRenderTime - leftServerTime) * 0.001f;
-            var intervalToRight = (rightServerTime - currentRenderTime) * 0.001f;
+            var elapsedTimeSinceStableState = (currentRenderTime - leftBaseServerTime) * 0.001f;
 
             for (int i = 0; i < AnimatorLayers.Count; i++)
             {
@@ -268,106 +186,151 @@ namespace App.Shared.Components.Player
                 var leftLayer = leftLayers[i];
                 var rightLayer = rightLayers[i];
 
-                // 没有变量/动画发生变化，所以直接Update即可
+                // 服务端下发的动画数据不够及时，缺乏有效数据进行内插，改为外插
                 if (leftBaseServerTime == rightBaseServerTime)
                 {
-                    // 回放即是准确定位到某一时刻
                     interpolatedLayer.SetCurrentStateInfo(
                         leftLayer.LayerIndex,
                         leftLayer.Weight,
-                        leftLayer.CurrentStateHash,
-                        leftLayer.NormalizedTime + elapsedFromLeft / leftLayer.StateDuration,
-                        leftLayer.StateDuration,
+                        leftLayer.CurrentStateFullPathHash,
+                        leftLayer.CurrentStateNormalizedTime + elapsedTimeSinceStableState / leftLayer.StateDuration,
+                        leftLayer.TransitionFullPathHash,
+                        leftLayer.TransitionIndex,
+                        leftLayer.TransitionStartTime,
+                        leftLayer.NextStateNormalizedTime,
                         leftLayer.TransitionNormalizedTime,
-                        leftLayer.TransitionDuration);
+                        leftLayer.StateDuration);
                 }
-                else // 有变量/动画发生变化
+                else // 动画正常播放
                 {
-                    // 当leftBaseTime << rightBaseTime
-                    // 如果此时有因变量变化导致的Transition，且未结束，因为使用left的变量，所以不会有Transition的效果(不知道ExitTime)
-                    if (leftLayer.CurrentStateHash == rightLayer.CurrentStateHash)
+                    bool leftInTransition = leftLayer.TransitionNormalizedTime >= 0;
+                    bool rightInTransition = rightLayer.TransitionNormalizedTime >= 0;
+
+                    // 如果要完全复现Transition的开始/结束点，需要Transition的长度，以及当前动画播放速率。
+                    // 动画数据以实时帧率产生，两个Snapshot之间间隔较短
+                    // 因此简化为Transition的开始/结束发生在两个Snapshot正中间
+                    if (!leftInTransition && rightInTransition) // 进入Transition
                     {
-                        var leftNormalizedTime = leftLayer.NormalizedTime +
-                                                 (leftServerTime - leftBaseServerTime) * 0.001f / leftLayer.StateDuration;
-                        interpolatedLayer.SetCurrentStateInfo(
-                            leftLayer.LayerIndex,
-                            leftLayer.Weight + (rightLayer.Weight - leftLayer.Weight) * ratio,
-                            leftLayer.CurrentStateHash,
-                            leftNormalizedTime + (rightLayer.NormalizedTime - leftNormalizedTime) * ratio,
-                            leftLayer.StateDuration,
-                            leftLayer.TransitionNormalizedTime,
-                            leftLayer.TransitionDuration);
-                    }
-                    else
-                    {
-                        // 有过渡
-                        if (leftLayer.TransitionNormalizedTime != NetworkAnimatorLayer.NotInTransition)
+                        if (ratio <= 0.5f) // stable state
                         {
-                            var transitionRemainTime =
-                                leftLayer.TransitionDuration * (1 - leftLayer.TransitionNormalizedTime);
-                            if (intervalFromLeft > transitionRemainTime)
-                            {
-                                interpolatedLayer.SetCurrentStateInfo(leftLayer.LayerIndex,
-                                    leftLayer.Weight + (rightLayer.Weight - leftLayer.Weight) * ratio,
-                                    rightLayer.CurrentStateHash,
-                                    rightLayer.NormalizedTime - intervalToRight / rightLayer.StateDuration,
-                                    rightLayer.StateDuration,
-                                    rightLayer.TransitionNormalizedTime,
-                                    rightLayer.TransitionDuration);
-                            }
-                            else
-                            {
-                                 interpolatedLayer.SetCurrentStateInfo(leftLayer.LayerIndex,
-                                    leftLayer.Weight + (rightLayer.Weight - leftLayer.Weight) * ratio,
-                                    leftLayer.CurrentStateHash,
-                                    leftLayer.NormalizedTime + intervalFromLeft / leftLayer.StateDuration,
-                                    leftLayer.StateDuration,
-                                    leftLayer.TransitionNormalizedTime,
-                                    leftLayer.TransitionDuration);                               
-                            }
+                            interpolatedLayer.SetCurrentStateInfo(
+                                leftLayer.LayerIndex,
+                                leftLayer.Weight + (rightLayer.Weight - leftLayer.Weight) * ratio,
+                                leftLayer.CurrentStateFullPathHash,
+                                leftLayer.CurrentStateNormalizedTime + (rightLayer.CurrentStateNormalizedTime - leftLayer.CurrentStateNormalizedTime) * ratio,
+                                leftLayer.TransitionFullPathHash,
+                                leftLayer.TransitionIndex,
+                                leftLayer.TransitionStartTime,
+                                leftLayer.NextStateNormalizedTime,
+                                leftLayer.TransitionNormalizedTime,
+                                leftLayer.StateDuration);
+                        }
+                        else // transition
+                        {
+                            interpolatedLayer.SetCurrentStateInfo(
+                                leftLayer.LayerIndex,
+                                leftLayer.Weight + (rightLayer.Weight - leftLayer.Weight) * ratio,
+                                rightLayer.CurrentStateFullPathHash,
+                                leftLayer.CurrentStateNormalizedTime + (rightLayer.CurrentStateNormalizedTime - leftLayer.CurrentStateNormalizedTime) * ratio,
+                                rightLayer.TransitionFullPathHash,
+                                rightLayer.TransitionIndex,
+                                rightLayer.TransitionStartTime,
+                                rightLayer.NextStateNormalizedTime * (ratio - 0.5f) * 2,
+                                rightLayer.TransitionNormalizedTime * (ratio - 0.5f) * 2,
+                                rightLayer.StateDuration);
+                        }
+                    }
+                    else if (leftInTransition && !rightInTransition) // 退出Transition
+                    {
+                        if (ratio >= 0.5f) // stable state
+                        {
+                            interpolatedLayer.SetCurrentStateInfo(
+                                leftLayer.LayerIndex,
+                                leftLayer.Weight + (rightLayer.Weight - leftLayer.Weight) * ratio,
+                                rightLayer.CurrentStateFullPathHash,
+                                leftLayer.NextStateNormalizedTime + (rightLayer.CurrentStateNormalizedTime - leftLayer.NextStateNormalizedTime) * ratio,
+                                rightLayer.TransitionFullPathHash,
+                                rightLayer.TransitionIndex,
+                                rightLayer.TransitionStartTime,
+                                rightLayer.NextStateNormalizedTime,
+                                rightLayer.TransitionNormalizedTime,
+                                rightLayer.StateDuration);
+                        }
+                        else // transition
+                        {
+                            interpolatedLayer.SetCurrentStateInfo(
+                                leftLayer.LayerIndex,
+                                leftLayer.Weight + (rightLayer.Weight - leftLayer.Weight) * ratio,
+                                leftLayer.CurrentStateFullPathHash,
+                                // rightLayer中没有关于leftLayer.CurrentStateNormalizedTime的信息，无法插值
+                                leftLayer.CurrentStateNormalizedTime,
+                                leftLayer.TransitionFullPathHash,
+                                leftLayer.TransitionIndex,
+                                leftLayer.TransitionStartTime,
+                                leftLayer.NextStateNormalizedTime + (rightLayer.CurrentStateNormalizedTime - leftLayer.NextStateNormalizedTime) * ratio,
+                                leftLayer.TransitionNormalizedTime + (1 - leftLayer.TransitionNormalizedTime) * ratio * 2,
+                                leftLayer.StateDuration);
+                        }
+                    }
+                    else // 前后两帧无Transition，或者都处于Transition中
+                    {
+                        // 两个状态硬切
+                        if (leftLayer.CurrentStateFullPathHash != rightLayer.CurrentStateFullPathHash)
+                        {
+                            interpolatedLayer.SetCurrentStateInfo(
+                                rightLayer.LayerIndex,
+                                rightLayer.Weight,
+                                rightLayer.CurrentStateFullPathHash,
+                                rightLayer.CurrentStateNormalizedTime * ratio,
+                                rightLayer.TransitionFullPathHash,
+                                rightLayer.TransitionIndex,
+                                rightLayer.TransitionStartTime,
+                                rightLayer.NextStateNormalizedTime,
+                                rightLayer.TransitionNormalizedTime,
+                                rightLayer.StateDuration);                           
                         }
                         else
                         {
-                            var rightCompTime = rightLayer.NormalizedTime * rightLayer.StateDuration;
-
-                            if (rightCompTime >= intervalToRight)
-                            {
-                                interpolatedLayer.SetCurrentStateInfo(leftLayer.LayerIndex,
-                                    leftLayer.Weight + (rightLayer.Weight - leftLayer.Weight) * ratio,
-                                    rightLayer.CurrentStateHash,
-                                    rightLayer.NormalizedTime - intervalToRight / rightLayer.StateDuration,
-                                    rightLayer.StateDuration,
-                                    rightLayer.TransitionNormalizedTime,
-                                    rightLayer.TransitionDuration);
-                            }
-                            else
-                            {
-                                interpolatedLayer.SetCurrentStateInfo(leftLayer.LayerIndex,
-                                    leftLayer.Weight + (rightLayer.Weight - leftLayer.Weight) * ratio,
-                                    leftLayer.CurrentStateHash,
-                                    leftLayer.NormalizedTime + elapsedFromLeft / leftLayer.StateDuration,
-                                    leftLayer.StateDuration,
-                                    leftLayer.TransitionNormalizedTime,
-                                    leftLayer.TransitionDuration);
-                            }
+                            interpolatedLayer.SetCurrentStateInfo(
+                                leftLayer.LayerIndex,
+                                leftLayer.Weight + (rightLayer.Weight - leftLayer.Weight) * ratio,
+                                leftLayer.CurrentStateFullPathHash,
+                                leftLayer.CurrentStateNormalizedTime + (rightLayer.CurrentStateNormalizedTime - leftLayer.CurrentStateNormalizedTime) * ratio,
+                                leftLayer.TransitionFullPathHash,
+                                leftLayer.TransitionIndex,
+                                leftLayer.TransitionStartTime,
+                                leftLayer.NextStateNormalizedTime + (rightLayer.NextStateNormalizedTime - leftLayer.NextStateNormalizedTime) * ratio,
+                                leftLayer.TransitionNormalizedTime + (rightLayer.TransitionNormalizedTime - leftLayer.TransitionNormalizedTime) * ratio,
+                                leftLayer.StateDuration);
                         }
                     }
                 }
             }
         }
         
-        private void AssignAnimatorParameters(List<NetworkAnimatorParameter> paramsList)
+//        private void AssignAnimatorParameters(List<CompressedNetworkAnimatorParameter> leftParams,
+//            List<CompressedNetworkAnimatorParameter> rightParams, float ratio)
+        private void AssignAnimatorParameters(List<NetworkAnimatorParameter> leftParams, List<NetworkAnimatorParameter> rightParams, float ratio)
         {
-            AssertUtility.Assert(AnimatorParameters.Count == paramsList.Count);
+//            AssertUtility.Assert(FloatAnimatorParameters.Count == leftParams.Count);
+//            int count = FloatAnimatorParameters.Count;
+//            for (int i = 0; i < count; i++)
+//            {
+//                FloatAnimatorParameters[i].Value = (short)(leftParams[i].Value + (rightParams[i].Value - leftParams[i].Value) * ratio);
+//            }
+//            
+//            if (AnimatorParameters != null)
+//                ConvertCompressDataToStructureData();
+
+            AssertUtility.Assert(AnimatorParameters.Count == leftParams.Count);
             int count = AnimatorParameters.Count;
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < count; ++i)
             {
                 var oldParam = AnimatorParameters[i];
-                var newParam = paramsList[i];
-                //减少函数调用，by zwl
+                var newParam = leftParams[i];
                 oldParam.ParamType = newParam.ParamType;
                 oldParam.IntValue = newParam.IntValue;
-                oldParam.FloatValue = newParam.FloatValue;
+                oldParam.FloatValue= newParam.FloatValue + (rightParams[i].FloatValue - newParam.FloatValue) * ratio;
                 oldParam.BoolValue = newParam.BoolValue;
                 oldParam.NameHash = newParam.NameHash;
             }
@@ -386,7 +349,6 @@ namespace App.Shared.Components.Player
 
             // used in clone
             BaseServerTime = right.BaseServerTime;
-            BaseClientTime = right.BaseClientTime;
             NeedChangeServerTime = right.NeedChangeServerTime;
             
             int AnimatorLayersCount = AnimatorLayers.Count;
@@ -396,14 +358,20 @@ namespace App.Shared.Components.Player
                 AnimatorLayers[i].RewindTo(right.AnimatorLayers[i]);
             }
 
-            int AnimatorParametersCount = AnimatorParameters.Count;
-            for (int i = 0; i < AnimatorParametersCount; i++)
+            int AnimatorParamsCount = AnimatorParameters.Count;
+            for (int i = 0; i < AnimatorParamsCount; ++i)
             {
                 if(AnimatorParameters[i]==null)AnimatorParameters[i] = new NetworkAnimatorParameter();
                 AnimatorParameters[i].RewindTo(right.AnimatorParameters[i]);
             }
-
-            NeedRewind = true;
+//            int FloatParamCount = FloatAnimatorParameters.Count;
+//            for (int i = 0; i < FloatParamCount; ++i)
+//            {
+//                if (FloatAnimatorParameters[i] == null)
+//                    FloatAnimatorParameters[i] = new CompressedNetworkAnimatorParameter();
+//
+//                FloatAnimatorParameters[i].RewindTo(right.FloatAnimatorParameters[i]);
+//            }
         }
 
         public override string ToString()
@@ -427,14 +395,7 @@ namespace App.Shared.Components.Player
                 }
             }
             
-//            sb.Append("\n}\n");
-//            sb.Append("AnimatorParameters:").Append(AnimatorParameters.GetHashCode()).Append(" {\n");
-//            foreach (var networkAnimatorParameter in AnimatorParameters)
-//            {
-//                sb.Append("[").Append(networkAnimatorParameter).Append("]").Append("\n");
-//            }
-//            sb.Append("\n}\n");
-            sb.AppendFormat("Client Time:{0}, Server Time:{1}", BaseClientTime, BaseServerTime);
+            sb.AppendFormat("Server Time:{0}", BaseServerTime);
             return sb.ToString();
         }
     }

@@ -51,5 +51,22 @@ namespace App.Shared.Components.Ui
         int C4PlantCount { get; set; }
         int C4DefuseCount { get; set; }
         bool HaveC4 { get; set; }
+        /// <summary>
+        /// 勋章(头像)Id
+        /// </summary>
+        int BadgeId { get; set; }
+        /// <summary>
+        /// 玩家是否处于受伤状态
+        /// </summary>
+        bool IsHurt { get; set; }
+        /// <summary>
+        /// 玩家的击倒数量
+        /// </summary>
+        int HitDownCount { get; set; }
+        /// <summary>
+        /// 玩家的救援数量
+        /// </summary>
+        int ResqueCount { get; set; }
+       
     }
 }

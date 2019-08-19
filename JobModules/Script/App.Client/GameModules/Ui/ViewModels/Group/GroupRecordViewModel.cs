@@ -19,12 +19,12 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
             public GameObject Show;
             [HideInInspector]
             public bool oriShow;
-            public Text RoomInfoText;
+            public Text CampScore1;
             [HideInInspector]
-            public string oriRoomInfoText;
-            public Text PlayerCountText;
+            public string oriCampScore1;
+            public Text CampScore2;
             [HideInInspector]
-            public string oriPlayerCountText;
+            public string oriCampScore2;
             
             public void FillField()
             {
@@ -46,11 +46,11 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
                     var realName = v.gameObject.name.Replace("(Clone)","");
                     switch (realName)
                     {
-                        case "RoomInfo":
-                            RoomInfoText = v;
+                        case "CampScore1":
+                            CampScore1 = v;
                             break;
-                        case "PlayerCount":
-                            PlayerCountText = v;
+                        case "CampScore2":
+                            CampScore2 = v;
                             break;
                     }
                 }
@@ -60,11 +60,11 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
 
 
         private bool _show;
-        private string _roomInfoText;
-        private string _playerCountText;
+        private string _campScore1;
+        private string _campScore2;
         public bool Show { get { return _show; } set {if(_show != value) Set(ref _show, value, "Show"); } }
-        public string RoomInfoText { get { return _roomInfoText; } set {if(_roomInfoText != value) Set(ref _roomInfoText, value, "RoomInfoText"); } }
-        public string PlayerCountText { get { return _playerCountText; } set {if(_playerCountText != value) Set(ref _playerCountText, value, "PlayerCountText"); } }
+        public string CampScore1 { get { return _campScore1; } set {if(_campScore1 != value) Set(ref _campScore1, value, "CampScore1"); } }
+        public string CampScore2 { get { return _campScore2; } set {if(_campScore2 != value) Set(ref _campScore2, value, "CampScore2"); } }
 
 		private GameObject _viewGameObject;
 		private Canvas _viewCanvas;
@@ -147,8 +147,8 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
 		     BindingSet<GroupRecordView, GroupRecordViewModel> bindingSet =
                 view.CreateBindingSet<GroupRecordView, GroupRecordViewModel>();
             bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
-            bindingSet.Bind(view.RoomInfoText).For(v => v.text).To(vm => vm.RoomInfoText).OneWay();
-            bindingSet.Bind(view.PlayerCountText).For(v => v.text).To(vm => vm.PlayerCountText).OneWay();
+            bindingSet.Bind(view.CampScore1).For(v => v.text).To(vm => vm.CampScore1).OneWay();
+            bindingSet.Bind(view.CampScore2).For(v => v.text).To(vm => vm.CampScore2).OneWay();
 		
 			bindingSet.Build();
 		}
@@ -156,16 +156,16 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
 		void DataInit(GroupRecordView view)
 		{
             _show = view.Show.activeSelf;
-            _roomInfoText = view.RoomInfoText.text;
-            _playerCountText = view.PlayerCountText.text;
+            _campScore1 = view.CampScore1.text;
+            _campScore2 = view.CampScore2.text;
 		}
 
 
 		void SaveOriData(GroupRecordView view)
 		{
             view.oriShow = _show;
-            view.oriRoomInfoText = _roomInfoText;
-            view.oriPlayerCountText = _playerCountText;
+            view.oriCampScore1 = _campScore1;
+            view.oriCampScore2 = _campScore2;
 		}
 
 
@@ -182,8 +182,8 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
 				return;
 			}
 			Show = _view.oriShow;
-			RoomInfoText = _view.oriRoomInfoText;
-			PlayerCountText = _view.oriPlayerCountText;
+			CampScore1 = _view.oriCampScore1;
+			CampScore2 = _view.oriCampScore2;
 			SpriteReset();
 		}
 

@@ -202,6 +202,7 @@ namespace App.Shared.SceneManagement
                 }
             }
 
+            RemoveRequest(LevelRequestEnum.LoadGo, unityObj.Address.ToString());
             --NotFinishedRequests;
         }
 
@@ -227,6 +228,9 @@ namespace App.Shared.SceneManagement
 
             ProcessUnloadRequests();
         }
+
+        
+
 
         public int NotFinishedRequests { get; private set; }
 
@@ -279,33 +283,51 @@ namespace App.Shared.SceneManagement
 
         #region ISceneResourceRequestHandler
 
+
+
+       
+
         public void AddUnloadSceneRequest(string sceneName)
         {
             _cachedUnloadSceneRequest.Enqueue(sceneName);
             ++NotFinishedRequests;
+
+            AddRequest(LevelRequestEnum.UnloadScene, sceneName);
         }
 
         public void AddLoadSceneRequest(AssetInfo addr)
         {
             _cachedLoadSceneRequest.Add(addr);
             ++NotFinishedRequests;
+
+            AddRequest(LevelRequestEnum.LoadScene, addr.AssetName.ToString());
         }
 
         public void AddLoadGoRequest(AssetInfo addr)
         {
             _cachedLoadGoRequest.Add(addr);
             ++NotFinishedRequests;
+
+            AddRequest(LevelRequestEnum.LoadGo, addr.ToString());
         }
 
         public void AddUnloadGoRequest(UnityObject unityObj)
         {
             _cachedUnloadGoRequest.Enqueue(unityObj);
             ++NotFinishedRequests;
+
+            AddRequest(LevelRequestEnum.UnloadGo, unityObj.Address.ToString());
         }
 
         public void AddLoadLightmapsRequest(IEnumerable<AssetInfoEx<MeshRenderer>> infos)
         {
             _cachedLoadLightmapsRequest.Add(infos);
+
+            foreach (var assetInfoEx in infos)
+            {
+                AddRequest(LevelRequestEnum.LoadLightmaps, assetInfoEx.asset.ToString());
+            }
+
             ++NotFinishedRequests;
         }
 
@@ -315,7 +337,7 @@ namespace App.Shared.SceneManagement
         }
         #endregion
 
-
+        //当 场景读取完成后，调用的函数
         private void SceneLoadedWrapper(Scene scene, LoadSceneMode mode)
         {
             if (_fixedSceneNames != null && _fixedSceneNames.Contains(scene.name))
@@ -324,6 +346,7 @@ namespace App.Shared.SceneManagement
             if (SceneLoaded != null)
                 SceneLoaded.Invoke(scene, mode);
 
+            RemoveRequest(LevelRequestEnum.LoadScene, scene.name);
             --NotFinishedRequests;
 
             _logger.InfoFormat("scene loaded {0}", scene.name);
@@ -334,6 +357,7 @@ namespace App.Shared.SceneManagement
             if (SceneUnloaded != null)
                 SceneUnloaded.Invoke(scene);
 
+            RemoveRequest(LevelRequestEnum.UnloadScene, scene.name);
             --NotFinishedRequests;
 
             _logger.InfoFormat("scene unloaded {0}", scene.name);
@@ -342,6 +366,12 @@ namespace App.Shared.SceneManagement
         public void LightmapsLoadedWrapper(MeshRenderer mr, List<UnityObject> uObjs)
         {
             if (LightmapLoaded != null) LightmapLoaded(mr, uObjs);
+
+            foreach (var assetInfoEx in uObjs)
+            {
+                RemoveRequest(LevelRequestEnum.LoadLightmaps, assetInfoEx.Address.ToString());
+            }
+
             --NotFinishedRequests;
         }
 
@@ -356,6 +386,8 @@ namespace App.Shared.SceneManagement
 
                 if (BeforeGoUnloaded != null)
                     BeforeGoUnloaded(go);
+
+                RemoveRequest(LevelRequestEnum.UnloadGo, go.Address.ToString());
 
                 if (GoUnloaded != null)
                     GoUnloaded.Invoke(go);
@@ -386,5 +418,86 @@ namespace App.Shared.SceneManagement
                 });
             }
         }
+
+
+
+        #region 请求记录
+
+        //public readonly Dictionary<int, HashSet<String>> NotFinishedRequestDict = new Dictionary<int, HashSet<string>>();
+        public readonly Dictionary<int, List<String>> NotFinishedRequestDict = new Dictionary<int, List<string>>();
+
+        public int GetRequestCount()
+        {
+            int count = 0;
+            var enumer = NotFinishedRequestDict.GetEnumerator();
+            while (enumer.MoveNext())
+            {
+                count += enumer.Current.Value.Count;
+            }
+
+            return count;
+        }
+
+        public string GetRequestString()
+        {
+
+            List<string> tempList = new List<string>(16);
+            string str = "\n---------------------------&&&&----LevelManager.GetRequestString----&&&&-------------------------------------";
+            var enumer = NotFinishedRequestDict.GetEnumerator();
+            while (enumer.MoveNext())
+            {
+                tempList.Clear();
+                tempList.AddRange(enumer.Current.Value);
+                str = str + "\n" + ((LevelRequestEnum)enumer.Current.Key).ToString() + ":" + string.Join(",", tempList.ToArray());
+            }
+
+            str += "\n---------------------------------------------------------------------------------------------------";
+
+            return str;
+        }
+
+        public enum LevelRequestEnum
+        {
+            LoadScene,
+            UnloadScene,
+
+            LoadGo,
+            UnloadGo,
+
+            LoadLightmaps,
+            UnloadLightmaps
+        }
+
+        private void AddRequest(LevelRequestEnum requestType, string requestStr)
+        {
+            List<string> hashSet = null;
+            int requestType_int = (int)requestType;
+            if (!NotFinishedRequestDict.TryGetValue(requestType_int, out hashSet))
+            {
+                hashSet = new List<string>();
+                NotFinishedRequestDict.Add(requestType_int, hashSet);
+            }
+
+            hashSet.Add(requestStr);
+        }
+
+        private void RemoveRequest(LevelRequestEnum requestType, string requestStr)
+        {
+            List<string> hashSet = null;
+            int requestType_int = (int)requestType;
+            if (!NotFinishedRequestDict.TryGetValue(requestType_int, out hashSet))
+            {
+                _logger.ErrorFormat("LevelManager 不存在 请求key {0},{1}", requestType, requestStr);
+                return;
+            }
+            else if (!hashSet.Contains(requestStr))
+            {
+                _logger.ErrorFormat("LevelManager 不存在 请求 {0},{1}", requestType, requestStr);
+                return;
+            }
+
+            hashSet.Remove(requestStr);
+        }
+        #endregion
     }
 }

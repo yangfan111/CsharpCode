@@ -84,10 +84,7 @@ namespace App.Client.GameModules.Player.PlayerShowPackage
                     HeadPitch = characterBone.PitchHeadAngle,
                     HeadYaw = characterBone.RotHeadAngle,
                     CurrentHandPitch = characterBone.CurrentPitchHandAngle,
-                    HeadRotProcess = characterBone.HeadRotProcess,
                     WeaponRot = characterBone.WeaponRot,
-                    IsProne = thirdPersonAppearance.Posture == ThirdPersonPosture.Prone,
-                    IsHeadRotCW = characterBone.IsHeadRotCW,
                 
                     FirstPersonPositionOffset = characterBone.FirstPersonPositionOffset,
                     FirstPersonRotationOffset = characterBone.FirstPersonRotationOffset,

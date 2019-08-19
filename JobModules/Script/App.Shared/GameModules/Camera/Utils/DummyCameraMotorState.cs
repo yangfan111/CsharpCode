@@ -88,7 +88,7 @@ namespace Assets.App.Shared.GameModules.Camera
             outData.Dict[(int)SubCameraMotorType.Free].Set(inData.FreeNowMode, inData.FreeLastMode, inData.FreeModeTime);
             outData.Dict[(int)SubCameraMotorType.Pose].Set(inData.MainNowMode, inData.MainLastMode, inData.MainModeTime);
             outData.Dict[(int)SubCameraMotorType.Peek].Set(inData.PeekNowMode, inData.PeekLastMode, inData.PeekModeTime);
-            outData.Dict[(int)SubCameraMotorType.View].Set(inData.ViewNowMode,inData.ViewLastMode,inData.ViewModeTime);
+            outData.Dict[(int)SubCameraMotorType.View].Set(inData.ViewNowMode, inData.ViewLastMode, inData.ViewModeTime);
         }
 
         public static void Convert(DummyCameraMotorState inData, CameraStateNewComponent outData)

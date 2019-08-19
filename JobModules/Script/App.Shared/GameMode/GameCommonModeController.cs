@@ -44,6 +44,7 @@ namespace App.Shared.GameMode
             if (index == -1 )
             {
                 if(!player.hasPlayerInfo)
+                    
                     index = 0;
                 else
                     index = GetDefaultBagIndex(player.playerInfo);

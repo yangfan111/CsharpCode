@@ -1,4 +1,5 @@
 ﻿using App.Server.GameModules.GamePlay.free.player;
+using App.Server.GameModules.GamePlay.Free.chicken;
 using App.Server.GameModules.GamePlay.Free.item.config;
 using App.Server.GameModules.GamePlay.Free.weapon;
 using App.Shared;
@@ -75,7 +76,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
                 FreeItem item = FreeItemManager.GetItem((FreeRuleEventArgs)args, FreeItemConfig.GetItemKey((int)ECategory.GameItem, clipType), count);
                 if (item != null)
                 {
-                    fd.freeInventory.GetInventoryManager().GetInventory("ground").AddItem((ISkillArgs)args, item, true);
+                    fd.freeInventory.GetInventoryManager().GetInventory(ChickenConstant.BagGround).AddItem((ISkillArgs)args, item, true);
                 }
             }
         }

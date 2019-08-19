@@ -1,9 +1,9 @@
 using App.Server.GameModules.GamePlay;
 using App.Server.GameModules.GamePlay.free.player;
+using App.Server.GameModules.GamePlay.Free.chicken;
 using App.Server.GameModules.GamePlay.Free.item;
 using App.Server.GameModules.GamePlay.Free.item.config;
 using App.Shared;
-using App.Shared.GameModules.Vehicle;
 using com.cpkf.yyjd.tools.util;
 using com.cpkf.yyjd.tools.util.math;
 using com.wd.free.@event;
@@ -130,7 +130,7 @@ namespace gameplay.gamerule.free.item
                 }
                 else if (toInv != null)
                 {
-                    if (toInv.GetName() == "default")
+                    if (toInv.GetName() == ChickenConstant.BagDefault)
                     {
                         foreach (ItemPosition old in toInv.GetItems())
                         {
@@ -153,7 +153,7 @@ namespace gameplay.gamerule.free.item
 
                 if (toInv != null && fromInv != toInv)
                 {
-                    if (toInv.GetName() == "default")
+                    if (toInv.GetName() == ChickenConstant.BagDefault)
                     {
                         if (BagCapacityUtil.CanAddToBag(args, fd, ip))
                         {
@@ -252,7 +252,7 @@ namespace gameplay.gamerule.free.item
             {
                 StateTransitionConfigItem condition = manager.GetConditionByState(state);
                 if (condition == null) continue;
-                if (!condition.IsUseItem)
+                if (!condition.GetTransition(Transition.IsUseItem)/*IsUseItem*/)
                 {
                     return;
                 }

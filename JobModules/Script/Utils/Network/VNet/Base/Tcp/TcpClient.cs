@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Core.Utils;
+using LiteNetLib;
 using VNet.Base.Interface;
 
 namespace VNet.Base.Tcp
@@ -50,7 +51,8 @@ namespace VNet.Base.Tcp
         {
             _ip = ip;
             _port = port;
-            var point = new IPEndPoint(IPAddress.Parse(ip), port);
+//            var point = new IPEndPoint(IPAddress.Parse(ip), port);
+            var point = NetUtils.MakeEndPoint(ip, port);
             _socket = new Socket(point.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             var arg = new SocketAsyncEventArgs();
             arg.Completed += OnConnectedComplete;
@@ -133,11 +135,11 @@ namespace VNet.Base.Tcp
             }
         }
 
-        public void Send(string msg)
-        {
-            var bytes = Encoding.UTF8.GetBytes(msg);
-           _tcpConnection.Send(bytes, bytes.Length); 
-        }
+//        public void Send(string msg)
+//        {
+//            var bytes = Encoding.UTF8.GetBytes(msg);
+//           _tcpConnection.Send(bytes, bytes.Length); 
+//        }
 
         public void CloseSocket(Socket socket)
         {

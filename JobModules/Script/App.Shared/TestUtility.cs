@@ -1,4 +1,5 @@
-﻿using Core.Room;
+﻿using System;
+using Core.Room;
 
 namespace App.Shared
 {
@@ -10,7 +11,7 @@ namespace App.Shared
         public static long RobotrIdBase = 100;
         public static string PlayerName = "Test";
         public static string RobotName = "Robot";
-        public static int RoleModelId = 1;
+        public static int RoleModelId = 13;
         public static long TeamId = 0;
         public static string TestRobotToken = "robotTest";
 
@@ -18,12 +19,12 @@ namespace App.Shared
 
         public static IPlayerInfo CreateTestPlayer()
         {
-            return new PlayerInfo(TestToken,null, PlayerId, PlayerName, RoleModelId, TeamId,0,0,0,0,0,null,null,null,false, 0);
+            return new PlayerInfo(TestToken,null, PlayerId, PlayerName, RoleModelId, TeamId,0,0,0,0,0,null,null,null,false,0,null);
         }
 
         public static IPlayerInfo CreateTestPlayer(IRoomId roomId)
         {
-            return new PlayerInfo(TestToken, roomId, PlayerId, PlayerName, RoleModelId, TeamId,0,0,0,0,0,null,null,null,false, 0);
+            return new PlayerInfo(TestToken, roomId, PlayerId, PlayerName, RoleModelId, TeamId,0,0,0,0,0,null,null,null,false, 0,null);
         }
 
         public static long NewPlayerId

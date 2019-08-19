@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Core.Components;
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core.EntityComponent;
 using Core.GameModule.System;
 using Core.SessionState;

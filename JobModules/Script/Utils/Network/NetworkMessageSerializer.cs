@@ -26,9 +26,11 @@ namespace Core.Network
             if (info != null)
             {
                 long start = outStream.Position;
-                info.Serialize(outStream, message);
+                var wl=info.Serialize(outStream, message);
                 info.Statistics.OnSerialize((int) (outStream.Position - start));
-                return outStream.Position - start;
+                var ol= outStream.Position - start;
+                AssertUtility.Assert(ol == wl);
+                return ol;
             }
             else
             {

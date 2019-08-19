@@ -9,24 +9,27 @@ using UnityEngine.Events;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
-    public class CommonMiniMapViewModel : IUiViewModel
+    public class CommonMiniMapViewModel : UIViewModelBase
     {
-        private class CommonMiniMapView : MonoBehaviour
+        private class CommonMiniMapView : UIViewBase
         {
 			public RectTransform rootRectTransform;
 			public UIEventTriggerListener BgUIEventTriggerListener;
 			public RectTransform BgRectTransform;
 			public RectTransform mapRectTransform;
+			public GameObject CommonMiniMap;
 
 
 
-			public void FillField()
+			public override void FillField()
 			{
+				base.FillField();
 				UIBind uibind = GetComponent<UIBind>();
 				rootRectTransform =  uibind.AllObjs[0] as RectTransform;
 				BgUIEventTriggerListener =  uibind.AllObjs[1] as UIEventTriggerListener;
 				BgRectTransform =  uibind.AllObjs[2] as RectTransform;
 				mapRectTransform =  uibind.AllObjs[3] as RectTransform;
+				CommonMiniMap =  uibind.AllObjs[4] as GameObject;
             }
 
         }
@@ -49,6 +52,10 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			get { return _view.mapRectTransform;} 
 			}
 
+			public GameObject CommonMiniMap { 
+			get { return _view.CommonMiniMap;} 
+			}
+
 
 
 
@@ -58,14 +65,14 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 		private Canvas _viewCanvas;
 		private CommonMiniMapView _view;
 		
-		public void Destory()
+		public override void Destory()
         {
             if (_viewGameObject != null)
             {
 				UnityEngine.Object.Destroy(_viewGameObject);
             }
         }
-		public void Visible(bool isViaible)
+		public override void Visible(bool isViaible)
 		{
 		    if (_viewGameObject != null)
             {
@@ -73,14 +80,14 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
 		
 		}
-		public void SetCanvasEnabled(bool value)
+		public override void SetCanvasEnabled(bool value)
         {
             if (_viewCanvas != null)
             {
                 _viewCanvas.enabled = value;
             }
         }
-        public void CreateBinding(GameObject obj)
+        public override void CreateBinding(GameObject obj)
         {
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
@@ -101,6 +108,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 				SaveOriData(view);
 			}
 			_view = view;
+			viewBase = view;
 
 			
         }
@@ -134,7 +142,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			
 		}
 
-		public void Reset()
+		public override void Reset()
 		{
 			if(_viewGameObject == null)
 			{
@@ -144,17 +152,17 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			SpriteReset();
 		}
 
-		public bool IsPropertyExist(string name)
+		public override bool IsPropertyExist(string name)
         {
             return false;
         }
 
-        public Transform GetParentLinkNode()
+        public override Transform GetParentLinkNode()
         {
             return null;
         }
 
-        public Transform GetChildLinkNode()
+        public override Transform GetChildLinkNode()
         {
             return null;
         }
@@ -163,9 +171,9 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 
        
 
-        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
-        public string ResourceAssetName { get { return "CommonMiniMap"; } }
-        public string ConfigBundleName { get { return ""; } }
-        public string ConfigAssetName { get { return ""; } }
+        public override string ResourceBundleName { get { return "ui/client/prefab/common"; } }
+        public override string ResourceAssetName { get { return "CommonMiniMap"; } }
+        public override string ConfigBundleName { get { return ""; } }
+        public override string ConfigAssetName { get { return ""; } }
     }
 }

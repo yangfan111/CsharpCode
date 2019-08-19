@@ -66,8 +66,8 @@
     <Compile Include="Components\EComponentIds.cs" />
     <Compile Include="Components\Effect\EffectsComponent.cs" />
     <Compile Include="Components\FreeMove\AirPlaneComponent.cs" />
+    <Compile Include="Components\FreeMove\BombSoundComponent.cs" />
     <Compile Include="Components\FreeMove\FreeDataComponent.cs" />
-    <Compile Include="Components\FreeMove\FreeMoveCatComponent.cs" />
     <Compile Include="Components\FreeMove\FreeMoveController.cs" />
     <Compile Include="Components\FreeMove\FreeMoveKeyComponent.cs" />
     <Compile Include="Components\FreeMove\UnityGameObjectComponent.cs" />
@@ -155,6 +155,7 @@
     <Compile Include="Components\Serializer\FieldSerializer\Vector2Serializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\Vector3Serializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\WeaponBagSerializer.cs" />
+    <Compile Include="Components\Serializer\PatchPropertySerializer.cs" />
     <Compile Include="Components\Session\FpsSatatus.cs" />
     <Compile Include="Components\Session\ServerStatus.cs" />
     <Compile Include="Components\Session\SessionComponents.cs" />

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using App.Shared;
 using App.Shared.Components.Player;
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core.EntityComponent;
 using Core.Network;
 using Core.ObjectPool;
@@ -17,6 +17,7 @@ using Sharpen;
 using Utils.Concurrent;
 using Utils.Singleton;
 using Utils.Utils;
+using System.Threading;
 
 namespace App.Server
 {
@@ -48,6 +49,7 @@ namespace App.Server
             Channel = channel;
             PreEnitys.Clear();
             _contexts = _newContexts;
+            Status=0;
             return this;
         }
 
@@ -60,7 +62,7 @@ namespace App.Server
         public int VehicleSimulationTime;
         public INetworkChannel Channel;
         public ISnapshot Snapshot;
-
+        public int Status;
         public List<IGameEntity> PreEnitys = new List<IGameEntity>();
 
         public Contexts _contexts;
@@ -142,9 +144,9 @@ namespace App.Server
             _sendSnapshotTasks.Clear();
             var freeMoveEntitys = _globalFreeMoveEntities.GetEntities();
             var weaponEntities = _globalWeaponEntities.GetEntities();
+   
             foreach (var player in _playerEntities.GetEntities())
             {
-              
                 if (player.hasStage &&
                     player.stage.CanSendSnapshot() &&
                     player.network.NetworkChannel.IsConnected &&
@@ -166,6 +168,7 @@ namespace App.Server
 
                     if (SharedConfig.MutilThread)
                     {
+                        _queue.AddRef();
                         _queue.Enqueue(p);
                     }
 #endif
@@ -334,12 +337,18 @@ namespace App.Server
         private static int CreateSendSnapshot(CreateSnapshotParams createSnapshotParams)
         {
             ISnapshot snapshot = null;
+
             try
             {
+                Interlocked.Increment(ref createSnapshotParams.Status);
+                if (createSnapshotParams.Status != 1)
+                {
+                    _logger.ErrorFormat(createSnapshotParams.GetHashCode().ToString() + " .Status == " + createSnapshotParams.Status.ToString());
+                }
+
                 SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.SendSnapshotCreate);
 
-                //Shared.Util.WatchForAOILogicUtil.UpdateWatchMap(createSnapshotParams.Player.keepWatchForAOI.watchMap,
-                //    createSnapshotParams.PreEnitys, createSnapshotParams._contexts);
+                createSnapshotParams.Player.keepWatchForAOI.watchMap.Update(createSnapshotParams.PreEnitys, createSnapshotParams._contexts);
 
                 snapshot = createSnapshotParams.SnapshotFactory.GeneratePerPlayerSnapshot(
                     createSnapshotParams.SnapshotSeq,
@@ -352,9 +361,7 @@ namespace App.Server
                     createSnapshotParams.PreEnitys,
                     createSnapshotParams.Player.stage.IsAccountStage(),
                     createSnapshotParams.Player.stage.IsWaitStage()
-                    //, createSnapshotParams.Player.keepWatchForAOI.watchMap
-                    //, Shared.Util.WatchForAOILogicUtil.OnInsertFun
-
+                    , createSnapshotParams.Player.keepWatchForAOI.watchMap.OnInsertFun
                     );
 
                 snapshot.ServerTime = createSnapshotParams.ServerTime;
@@ -367,10 +374,10 @@ namespace App.Server
                 createSnapshotParams.Snapshot = snapshot;
 
                 createSnapshotParams.Channel.SendRealTime((int)EServer2ClientMessage.Snapshot, snapshot);
-                _logger.DebugFormat("send snapshot seq {0}, entity count {1}, self {2} {3}",
+                _logger.DebugFormat("{4}  send snapshot seq {0}, entity count {1}, self {2} {3}",
                     snapshot.SnapshotSeq,
                     snapshot.EntityList.Count,
-                    snapshot.Self, 0);
+                    snapshot.Self, 0, createSnapshotParams.Player.entityKey.Value);
 
             }
             catch (Exception e)
@@ -380,6 +387,7 @@ namespace App.Server
             }
             finally
             {
+                Interlocked.Decrement(ref createSnapshotParams.Status);
                 if (snapshot != null)
                 {
                     RefCounterRecycler.Instance.ReleaseReference(snapshot);
@@ -389,6 +397,7 @@ namespace App.Server
                 SingletonManager.Get<DurationHelp>().ProfileEnd(CustomProfilerStep.SendSnapshotCreate);
 
             }
+
             return 0;
 
         }

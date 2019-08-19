@@ -8,5 +8,6 @@ namespace App.Client.GameModules.Ui.UiAdapter.Interface.Common
         bool KillerChanged { get; set; }
         long KillerId { get; }
         bool IsKillerDead { get; }
+        bool TagHideStatus { get; }
     }
 }

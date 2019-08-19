@@ -5,7 +5,7 @@ namespace App.Client.GameMode
 {
     public interface IGlobalKeyInputMapper
     {
-        void RegisterEnvKeyInput(KeyReceiver keyReceiver, UserCmd userCmd);
-        void RegisterSpecialCmdKeyInput(KeyReceiver keyReceiver, UserCmd userCmd);
+        void RegisterEnvKeyInput(KeyHandler keyHandler, UserCmd userCmd);
+        void RegisterSpecialCmdKeyInput(KeyHandler keyHandler, UserCmd userCmd);
     }
 }

@@ -52,12 +52,12 @@ namespace App.Shared.GameModules.GamePlay
             if (observedPlayer.cameraArchor.ArchorType == ECameraArchorType.Car)
             {
                 player.observeCamera.VehicleId = observedPlayer.controlledVehicle.EntityKey.EntityId;
-                player.observeCamera.ObservedPlayerPosition = observedPlayer.cameraFinalOutputNew.Position;
             }
             else
             {
                 player.observeCamera.VehicleId = -1;
             }
+            player.observeCamera.ObservedPlayerPosition = observedPlayer.cameraFinalOutputNew.Position;
         }
     }
 }

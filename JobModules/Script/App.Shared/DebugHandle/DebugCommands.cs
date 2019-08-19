@@ -68,12 +68,13 @@
         public const string Shoot = "shoot";
 
         public const string SetWeapon = "sw";
+        public const string SetAudio = "audio";
         public const string AudioEmitter = "ae";
         public const string AudioBgm = "aeb";
         public const string SetGrenade = "sg";
         public const string DropWeapon = "dw";
         public const string TestWeaponAssemble = "twa";
-
+        public const string TestCmd = "tc";
         public const string SetAttachment = "sa";
         public const string SetWeaponAttachment = "swam";
         public const string ClearAttachment = "ca";
@@ -175,6 +176,7 @@
         public const string EnableAnimator = "enableanimator";
         public const string DisableAnimator = "disableanimator";
         public const string Monster = "monster";
+        public const string ShowEvent = "showevent";
 
         public const string OnlyDirLight = "onlydirlight";
         public const string PostFxOpt = "postfxopt";
@@ -196,7 +198,10 @@
         public const string GrassDraw = "grassdraw";
 
         public const string ZPrepass = "zprepass";
-        public const string ZPrepassCull = "zprepasscull"; 
+        public const string ZPrepassCull = "zprepasscull";
+        public const string HZBCull = "hzbcull";
+
+        public const string ProfileGPUFast = "profilegpufast";
 
         public const string Revive = "revive";
         public const string PosShow = "posshow";
@@ -208,6 +213,12 @@
         public const string ShowImportantObject = "showimportantobject";
 
         public const string LoadResource = "loadres";
+        public const string God = "god";
+
+        public const string GcThreshold = "gcthreshold";
+
+        public const string GetMaxQueuedFrames = "getmaxqueuedframes";
+        public const string SetMaxQueuedFrames = "setmaxqueuedframes";
     }
 
     public interface IDebugCommandHandler

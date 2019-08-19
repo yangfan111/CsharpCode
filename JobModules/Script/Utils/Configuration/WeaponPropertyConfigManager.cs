@@ -1,4 +1,6 @@
-﻿using Core.Utils;
+﻿using Assets.XmlConfig;
+using Core.Utils;
+using System;
 using System.Collections.Generic;
 using Utils.Configuration;
 using XmlConfig;
@@ -39,8 +41,45 @@ namespace Assets.Utils.Configuration
         {
             WeaponPropertyConfigItem item = null;
             _weaponPropertyDic.TryGetValue(id, out item);
-            AssertUtility.Assert(item != null);
+            if (item == null)
+            {
+                Logger.Error("Not found id" + id);
+            }
             return item;
+        }
+
+        public WeaponProperty GetWeaponProperty(ECategory category, int templateId)
+        {
+            WeaponPropertyConfigItem cfg = null;
+            if (category == ECategory.Weapon)
+            {
+                cfg = GetWeaponPropertyCfg(templateId);
+            }
+            else if (category == ECategory.WeaponPart)
+            {
+                cfg = GetWeaponPartPropertyCfg(templateId);
+            }
+            if (cfg != null)
+            {
+                return cfg.GetWeaponProperty();
+            }
+            return default(WeaponProperty);
+        }
+
+        private WeaponPropertyConfigItem GetWeaponPartPropertyCfg(int templateId)
+        {
+            WeaponPropertyConfigItem item = null;
+            _weaponPartPropertyDic.TryGetValue(templateId, out item);
+            if (item == null)
+            {
+                Logger.Error("Not found id" + templateId);
+            }
+            return item;
+        }
+
+        private WeaponPropertyConfigItem GetWeaponPropertyCfg(int templateId)
+        {
+            return FindByWeaponId(templateId);
         }
     }
 }

@@ -3,8 +3,10 @@ using Core.Room;
 using Google.Protobuf.Collections;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Utils.Configuration;
 using Utils.Singleton;
+using CampInfo = Core.Room.CampInfo;
 
 namespace App.Server
 {
@@ -50,7 +52,8 @@ namespace App.Server
             int[] sprayLacquers = RepeatedField2IntArray(roomPlayer.SprayLacquers);
             int num = _hallRoom.MaxNum(roomPlayer.TeamId);
             /*JobAttrbute默认人类，其他职业根据模式，在房间里设置*/
-            PlayerInfo playerInfo = new PlayerInfo(token, RoomId, roomPlayer.Id, roomPlayer.Name, roomPlayer.RoleModelId, roomPlayer.TeamId, num, roomPlayer.Level, roomPlayer.BackId, roomPlayer.TitleId, roomPlayer.BadgeId, avatarIds, weaponAvatarIds, sprayLacquers, false, 0);
+            PlayerInfo playerInfo = new PlayerInfo(token, RoomId, roomPlayer.Id, roomPlayer.Name, roomPlayer.RoleModelId, roomPlayer.TeamId, num, roomPlayer.Level,
+                roomPlayer.BackId, roomPlayer.TitleId, roomPlayer.BadgeId, avatarIds, weaponAvatarIds, sprayLacquers, false, 0, CampInfoConvert(roomPlayer.CampInfo));
             playerInfo.RankScore = roomPlayer.RankScore;
             playerInfo.IsKing = roomPlayer.IsKing;
             playerInfo.CreateTime = DateTime.Now.Ticks / 10000;
@@ -118,5 +121,22 @@ namespace App.Server
             return arr;
         }
 
+        private CampInfo CampInfoConvert(Com.Wooduan.Ssjj2.Common.Net.Proto.CampInfo campInfo)
+        {
+            CampInfo ci = new CampInfo
+            {
+                CurrCamp = 1,
+                Preset = new List<Core.Room.Preset>()
+            };
+            if (campInfo != null)
+            {
+                ci.CurrCamp = campInfo.CurrCamp;
+                foreach (PresetInfo p in campInfo.Preset)
+                {
+                    ci.Preset.Add(new Core.Room.Preset(p.Camp, p.RoleModelId, p.AvatarIds.ToList(), p.Pose));
+                }
+            }
+            return ci;
+        }
     }
 }

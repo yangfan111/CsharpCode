@@ -1,19 +1,18 @@
-﻿using System;
+﻿using App.Client.GameModules.Ui.UiAdapter;
 using App.Shared;
+using App.Shared.Audio;
+using App.Shared.Player;
 using App.Shared.Util;
+using Core;
 using Core.Free;
 using Core.Prediction.UserPrediction.Cmd;
-using Free.framework;
-using UnityEngine;
-using App.Shared.Player;
-using Utils.Appearance;
-using App.Client.ClientSystems;
 using Core.Utils;
-using XmlConfig;
-using Utils.Configuration;
-using App.Client.GameModules.Ui.UiAdapter;
-using Assets.Sources.Free.Utility;
+using Free.framework;
+using System;
+using UnityEngine;
 using Utils.Appearance.Bone;
+using Utils.Configuration;
+using XmlConfig;
 
 namespace App.Client.GameModules.Ui.System
 {
@@ -82,28 +81,45 @@ namespace App.Client.GameModules.Ui.System
             Vector3 forward = cameraTran.forward;
             Vector3 head = root.transform.eulerAngles;
 
+            var paintIdList = _contexts.ui.uI.PaintIdList;
+            var selectedPaintIndex = _contexts.ui.uI.SelectedPaintIndex;
+            if (0 == selectedPaintIndex)
+            {
+                selectedPaintIndex = PaintUiAdapter.SelectValidIndex(paintIdList);
+                _contexts.ui.uI.SelectedPaintIndex = selectedPaintIndex;
+            }
+            if (paintIdList == null || paintIdList.Count <= selectedPaintIndex || paintIdList[selectedPaintIndex] == 0)
+            {
+                _logger.DebugFormat("error paintIdList or selectedPaintIndex : " + selectedPaintIndex);
+                //TODO 未装备喷漆提示
+                return;
+            }
+
+            try
+            {
+                PlaySprayAudio();
+            }
+            catch (Exception e)
+            {
+                _logger.DebugFormat(e.Message);
+            }
+
             RaycastHit raycastHit;
             Ray ray = new Ray(headTran.position, cameraTran.forward);
             if (Physics.Raycast(ray, out raycastHit, 3.0f)) {
                 if (!IsIgnore(raycastHit.collider.gameObject))
                 {
-                    var paintIdList = _contexts.ui.uI.PaintIdList;
-                    var selectedPaintIndex = _contexts.ui.uI.SelectedPaintIndex;
-                    if (0 == selectedPaintIndex)
-                    {
-                        selectedPaintIndex = PaintUiAdapter.SelectValidIndex(paintIdList);
-                        _contexts.ui.uI.SelectedPaintIndex = selectedPaintIndex;
-                    }
-                    if (paintIdList == null || paintIdList.Count <= selectedPaintIndex)
-                    {
-                        _logger.DebugFormat("error paintIdList or selectedPaintIndex : " + selectedPaintIndex);
-                        return;
-                    }
-
                     _logger.DebugFormat("SendSprayMessage");
                     SendMarkMessage(raycastHit.point, raycastHit.normal, head, paintIdList[selectedPaintIndex]);
                 }
             }
+        }
+
+        private void PlaySprayAudio()
+        {
+            Vector3 position = _contexts.player.flagSelfEntity.position.Value;
+            GameAudioMedia.PlayUniqueEventAudio(position, EAudioUniqueId.UI_battle_spray);
+            /*_contexts.player.flagSelfEntity.AudioController().PlaySimpleAudio(EAudioUniqueId.UI_battle_spray, false);*/
         }
 
         protected bool IsIgnore(GameObject obj) {

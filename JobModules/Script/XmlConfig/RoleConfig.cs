@@ -8,7 +8,6 @@ namespace XmlConfig
     {
         public int Subtype;
         public int Sex;
-        public int Sort;
 
         public bool HasFirstPerson;
         public bool Unique;

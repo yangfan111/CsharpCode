@@ -12,10 +12,10 @@ namespace App.Shared.Network
         
         private SerializationStatistics _statistics = new SerializationStatistics("snapshot");
         public SerializationStatistics Statistics { get { return _statistics; } }
-        public void Serialize(Stream outStream, object message)
+        public int Serialize(Stream outStream, object message)
         {
            // Snapshot message1 = CloneAndFilterSnapshot((ISnapshot)message);
-            DoSerialize(outStream, (Snapshot)message);
+            return DoSerialize(outStream, (Snapshot)message);
             //message1.ReleaseReference();
         }
 
@@ -24,7 +24,7 @@ namespace App.Shared.Network
         
 
 
-        public abstract void DoSerialize(Stream outStream, Snapshot message);
+        public abstract int DoSerialize(Stream outStream, Snapshot message);
 
        
         

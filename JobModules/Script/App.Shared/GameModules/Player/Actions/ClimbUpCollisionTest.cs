@@ -295,7 +295,7 @@ namespace App.Shared.GameModules.Player.Actions
         private static bool OverlapCapsuleTest(PlayerEntity playerEntity)
         {
             var gameObject = playerEntity.RootGo();
-            var prev = IntersectionDetectTool.SetColliderDisable(gameObject);
+            IntersectionDetectTool.SetColliderDisable(gameObject, IntersectionDetectTool.ColliderEnableState);
 
             var overlapPos = gameObject.transform.position;
             PlayerEntityUtility.GetCapsule(playerEntity, overlapPos, out _capsuleBottom, out _capsuleUp,
@@ -303,7 +303,7 @@ namespace App.Shared.GameModules.Player.Actions
             var casts = Physics.OverlapCapsule(_capsuleBottom, _capsuleUp, _capsuleRadius,
                 UnityLayers.AllCollidableLayerMask);
 
-            IntersectionDetectTool.RestoreCollider(gameObject, prev);
+            IntersectionDetectTool.RestoreCollider(gameObject, IntersectionDetectTool.ColliderEnableState);
 
             return casts.Length > 0;
         }
@@ -311,7 +311,7 @@ namespace App.Shared.GameModules.Player.Actions
         private static bool IsHitGround(PlayerEntity playerEntity)
         {
             var gameObject = playerEntity.RootGo();
-            var prev = IntersectionDetectTool.SetColliderDisable(gameObject);
+            IntersectionDetectTool.SetColliderDisable(gameObject, IntersectionDetectTool.ColliderEnableState);
 
             var startPoint = gameObject.transform.position;
             startPoint.y += _capsuleRadius;
@@ -322,7 +322,7 @@ namespace App.Shared.GameModules.Player.Actions
             var isHit = Physics.SphereCast(startPoint, _capsuleRadius, Vector3.down, out outHit, hitYDistance,
                 UnityLayers.AllCollidableLayerMask);
 
-            IntersectionDetectTool.RestoreCollider(gameObject, prev);
+            IntersectionDetectTool.RestoreCollider(gameObject, IntersectionDetectTool.ColliderEnableState);
 
             // dist高度没碰到，直接返回false
             // dist高度碰到了，但是碰撞点距离手扶点高度小于dist - VerticalDistanceDeviation 或大于dist + VerticalDistanceDeviation

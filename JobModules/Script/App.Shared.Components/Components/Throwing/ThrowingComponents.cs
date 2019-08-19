@@ -24,6 +24,9 @@ namespace App.Shared.Components.Throwing
         public int RemainFrameTime;
         public int ServerTime;
 
+        [DontInitilize] public Vector3 CmrEmitPos;
+        [DontInitilize] public Vector3 HandEmitPos;
+        [DontInitilize] public Vector3 FixedEmitPos;
 
         [NetworkProperty] public Vector3 Velocity;
         [NetworkProperty] public int WeaponSubType;

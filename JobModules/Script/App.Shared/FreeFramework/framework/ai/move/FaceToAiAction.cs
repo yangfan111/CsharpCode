@@ -1,13 +1,10 @@
 ﻿using com.wd.free.action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using com.wd.free.@event;
 using com.wd.free.map.position;
 using com.wd.free.unit;
-using UnityEngine;
 using Core.Free;
+using System;
+using UnityEngine;
 
 namespace App.Shared.FreeFramework.framework.ai.move
 {
@@ -46,7 +43,7 @@ namespace App.Shared.FreeFramework.framework.ai.move
 
                 if (startTime > 0)
                 {
-                    float time = (DateTime.Now.Ticks - startTime) / 10000;
+                    float time = args.Rule.ServerTime - startTime;
 
                     if (deltaYaw > 0)
                     {
@@ -68,7 +65,7 @@ namespace App.Shared.FreeFramework.framework.ai.move
                 }
             }
 
-            startTime = DateTime.Now.Ticks;
+            startTime = args.Rule.ServerTime;
         }
 
         public int GetRuleID()

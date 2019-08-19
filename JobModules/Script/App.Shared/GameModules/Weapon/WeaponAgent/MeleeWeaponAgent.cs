@@ -26,7 +26,7 @@ namespace App.Shared.GameModules.Weapon
             get { return false; }
         }
         //}
-        public MeleeWeaponAgent(Func<EntityKey> in_holdExtractor, Func<EntityKey> in_emptyExtractor, EWeaponSlotType slot, GrenadeCacheHandler grenadeHandler) : base(in_holdExtractor, in_emptyExtractor, slot, grenadeHandler)
+        public MeleeWeaponAgent(Func<EWeaponSlotType, EntityKey> in_holdExtractor, Func<EntityKey> in_emptyExtractor, EWeaponSlotType slot, GrenadeCacheHandler grenadeHandler) : base(in_holdExtractor, in_emptyExtractor, slot, grenadeHandler)
         {
         }
     }

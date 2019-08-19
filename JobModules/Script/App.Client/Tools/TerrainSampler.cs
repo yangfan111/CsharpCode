@@ -1,6 +1,5 @@
 ﻿using App.Client.Scripts;
 using App.Shared;
-using App.Shared.SceneManagement;
 using Core.Utils;
 using System;
 using System.Collections;
@@ -10,198 +9,73 @@ using System.IO;
 using System.Net;
 using System.Text;
 using App.Shared.Configuration;
-using App.Shared.Player;
+using Assets.App.Client.Tools;
 using Core.SceneManagement;
 using UnityEngine;
 using UnityEngine.Profiling;
 using Utils.Singleton;
+using XmlConfig.BootConfig;
 #if UNITY_EDITOR
-using UnityEditor;
 #endif
 
 namespace App.Client.Tools
 {
     public class TerrainSampler : MonoBehaviour
     {
-        /// <summary>
-        /// 记录采样得到的文本数据
-        /// </summary>
-        private StringBuilder logData = new StringBuilder();
+        public BaseTerrainSampler sampler { get; private set; }
 
-        /// <summary>
-        /// 记录系统采样开始时间
-        /// </summary>
-        //private DateTime _systemStartTime;
+        private Contexts contexts;
 
-        /// <summary>
-        /// 系统采样消耗时间
-        /// </summary>
-        private long _systemStartTimeCost = 2 * 1000 * 1000;
-
-        /// <summary>
-        /// 采样间隔
-        /// </summary>
-        private const int SampleInterval = 100;
-
-        /// <summary>
-        /// 采样的起始点
-        /// </summary>
-        private readonly Vector3 SampleStartPoint = new Vector3(0, 200, 0);
-
-        /// <summary>
-        /// 采样的最大点
-        /// </summary>
-        private readonly Vector3 SampleMaxPoint = new Vector3(4000, 200, 4000);
-
-        /// <summary>
-        /// 记录地形块尺寸（1公里）
-        /// </summary>
-        private const float BlockSize = 1000;
-
-        /// <summary>
-        /// 记录是否处于采样模式
-        /// </summary>
-        private Boolean InSamplingMode = false;
-
-        /// <summary>
-        /// 记录是否需要强制停止采样
-        /// </summary>
-        private bool forceStopSample = false;
-
-        /// <summary>
-        /// 记录采样完毕后是否强制退出App
-        /// </summary>
-        private bool forceExitApp = true;
-
-        /// <summary>
-        /// 记录数据采样完毕后是否自动上传网络
-        /// </summary>
-        private bool autoTranslate = false;
-
-        private WaitForSeconds halfWaitTime = new WaitForSeconds(0.5f);
-
-        private List<SampleData> sortedDts = new List<SampleData>();
-
-        private string url
+        private TerrainSampleConfig _sampleConfig = null;
+        private TerrainSampleConfig sampleConfig
         {
             get
             {
-                return SingletonManager.Get<ClientFileSystemConfigManager>().TerrainSampleConfig.Url;
-            }
-        }
-        private string dataKey
-        {
-            get
-            {
-                return SingletonManager.Get<ClientFileSystemConfigManager>().TerrainSampleConfig.Key;
-            }
-        }
-        private string quality
-        {
-            get
-            {
-                return SingletonManager.Get<ClientFileSystemConfigManager>().TerrainSampleConfig.Quality;
-            }
-        }
-        private bool enableFrameLimit
-        {
-            get
-            {
-                return SingletonManager.Get<ClientFileSystemConfigManager>().TerrainSampleConfig.EnableFrameLimit;
-            }
-        }
-        private int frameLimit
-        {
-            get
-            {
-                return SingletonManager.Get<ClientFileSystemConfigManager>().TerrainSampleConfig.FrameLimit;
-            }
-        }
-        private bool enablePosLimit
-        {
-            get
-            {
-                return SingletonManager.Get<ClientFileSystemConfigManager>().TerrainSampleConfig.EnablePosLimit;
-            }
-        }
-        private int posLimitX
-        {
-            get
-            {
-                return SingletonManager.Get<ClientFileSystemConfigManager>().TerrainSampleConfig.PosLimitX;
-            }
-        }
-        private int posLimitZ
-        {
-            get
-            {
-                return SingletonManager.Get<ClientFileSystemConfigManager>().TerrainSampleConfig.PosLimitZ;
-            }
-        }
-        private int posLimitDir
-        {
-            get
-            {
-                return SingletonManager.Get<ClientFileSystemConfigManager>().TerrainSampleConfig.PosLimitDir;
-            }
-        }
-        private int sampleCount
-        {
-            get
-            {
-                return SingletonManager.Get<ClientFileSystemConfigManager>().TerrainSampleConfig.SampleCount;
-            }
-        }
-        private int waitForSample
-        {
-            get
-            {
-                return SingletonManager.Get<ClientFileSystemConfigManager>().TerrainSampleConfig.WaitForSample;
-            }
-        }
-        private bool useHallQuality
-        {
-            get
-            {
-                return SingletonManager.Get<ClientFileSystemConfigManager>().TerrainSampleConfig.UseHallQuality;
-            }
-        }
-        private int hallQuality
-        {
-            get
-            {
-                return SingletonManager.Get<ClientFileSystemConfigManager>().TerrainSampleConfig.HallQuality;
+                if (_sampleConfig == null)
+                    _sampleConfig = SingletonManager.Get<ClientFileSystemConfigManager>().TerrainSampleConfig;
+                return _sampleConfig;
             }
         }
 
-        private PlayerContext _playerContext;
-        /// <summary>
-        /// 记录玩家上下文
-        /// </summary>
-        public PlayerContext PlayerContext
-        {
-            get { return _playerContext; }
-            set { _playerContext = value; }
-        }
-
-        public ILevelManager LevelManager { get; set; }
-
-        private int MapID
+        private Dictionary<int, List<Vector2>> _smallMaps;
+        private Dictionary<int, List<Vector2>> smallMaps
         {
             get
             {
-                return SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.MapId;
+                if (_smallMaps == null)
+                {
+                    _smallMaps = new Dictionary<int, List<Vector2>>();
+                    foreach (SmallMap map in sampleConfig.SmallMaps)
+                    {
+                        _smallMaps.Add(map.MapId, map.Points);
+                    }
+                }
+                return _smallMaps;
             }
         }
 
-        void CheckToStartSample()
+        private Dictionary<int, List<Vector2>> _bigMaps;
+        private Dictionary<int, List<Vector2>> bigMaps
         {
-            if ((SharedConfig.InSamplingMode || SharedConfig.InLegacySampleingMode) && !InSamplingMode)
+            get
             {
-                //_systemStartTime = DateTime.UtcNow;
-                SharedConfig.HaveFallDamage = false;
-                StartCoroutine(Sample());
-                InSamplingMode = true;
+                if (_bigMaps == null)
+                {
+                    _bigMaps = new Dictionary<int, List<Vector2>>();
+                    foreach (BigMap map in sampleConfig.BigMaps)
+                    {
+                        _bigMaps.Add(map.MapId, map.ExcludedScenes);
+                    }
+                }
+                return _bigMaps;
+            }
+        }
+
+        private MapsDescription mapDes
+        {
+            get
+            {
+                return SingletonManager.Get<MapsDescription>();
             }
         }
 
@@ -210,33 +84,6 @@ namespace App.Client.Tools
 #if !UNITY_EDITOR
             RuntimeStats.enabled = true;
 #endif
-
-            // Unity自带游戏品级设置
-            int qualityIndex = -1;
-            for (int i = 0; i < QualitySettings.names.Length; i++)
-            {
-                if (QualitySettings.names[i].Equals(quality))
-                {
-                    qualityIndex = i;
-                    break;
-                }
-            }
-            if (qualityIndex != -1)
-            {
-                Debug.LogFormat("TerrainSampler SetQuality Level index:{0} name:{1} time:{2}", qualityIndex, QualitySettings.names[qualityIndex], System.DateTime.Now);
-                QualitySettings.SetQualityLevel(qualityIndex);
-            }
-
-            // 策划游戏品级设置
-            if (useHallQuality)
-            {
-                Utils.SettingManager.SettingManager.GetInstance().SetQuality((Utils.SettingManager.QualityLevel)hallQuality);
-            }
-        }
-
-        void Start()
-        {
-            CheckToStartSample();
         }
 
         private void OnDisable()
@@ -246,39 +93,566 @@ namespace App.Client.Tools
 #endif
         }
 
-        /// <summary>
-        /// 记录采样点的最坏采样数据
-        /// </summary>
-        private int RecordTheWorstOne(int samplePointNum, SampleData[] dataList)
+        public void StartSample(Contexts contexts)
         {
-            int worstIndex = 0;
-            double lowestFrame = dataList[0].FrameRate;
+            int mapId = SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.MapId;
+            sampler = GetTerrainSampler(mapId);
+            if (sampler == null) return;
 
-            for (int i = 0; i < dataList.Length; i++)
+            this.contexts = contexts;
+            sampler.Init(contexts, sampleConfig, this);
+            sampler.StartSample();
+        }
+
+        /// <summary>
+        /// 强制停止采样并退出应用
+        /// </summary>
+        public void ForceStopAndExitSampler(bool autoTranslate)
+        {
+            if (sampler == null)
             {
-                if (dataList[i].FrameRate < lowestFrame)
+                Debug.LogErrorFormat("ForceStopAndExitSampler error, sampler is null");
+                return;
+            }
+            sampler.ForceStopAndExitSampler(autoTranslate);
+        }
+
+        /// <summary>
+        /// 强制停止采样
+        /// </summary>
+        /// <param name="autoTranslate"></param>
+        public void ForceStopSampler(bool autoTranslate)
+        {
+            if (sampler == null)
+            {
+                Debug.LogErrorFormat("ForceStopSampler error, sampler is null");
+                return;
+            }
+            sampler.ForceStopSampler(autoTranslate);
+        }
+
+        /// <summary>
+        /// 采样指定点列表功能
+        /// </summary>
+        public bool SamplerSomePoints(List<float> list, bool autoTranslate)
+        {
+            // 正在采样
+            if (sampler != null && sampler.isRunning) return false;
+
+            List<Vector2> points = new List<Vector2>();
+            int count = list.Count / 3;
+            for (int i = 0; i < count; i++)
+            {
+                Vector2 vec = new Vector2(list[3 * i], list[3 * i + 2]);
+                points.Add(vec);
+            }
+
+            // 构建点采样器
+            int mapId = SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.MapId;
+            sampler = new PointsTerrainSampler(mapId, points);
+            sampler.Init(contexts, sampleConfig, this);
+            sampler.StartSample(autoTranslate);
+
+            return true;
+        }
+
+        public bool SamplerSomeScenes(List<int> list, bool autoTranslate)
+        {
+            // 正在采样
+            if (sampler != null && sampler.isRunning) return false;
+
+            // 地图场景不支持场景遍历采样
+            int mapId = SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.MapId;
+            if (!bigMaps.ContainsKey(mapId)) return false;
+
+            // 提取需要采样的场景
+            List<Vector2> scenes = new List<Vector2>();
+            int count = list.Count / 2;
+            for (int i = 0; i < count; i++)
+            {
+                Vector2 vec = new Vector2 { x = list[2 * i], y = list[2 * i + 1] };
+                if (!IsExcludedScene(mapId, (int)vec.x, (int)vec.y)) scenes.Add(vec);
+            }
+            if (scenes.Count <= 0) return false;
+
+            // 构建场景采样器
+            sampler = new ScenesTerrainSampler(mapId, scenes);
+            sampler.Init(contexts, sampleConfig, this);
+            sampler.StartSample(autoTranslate);
+
+            return true;
+        }
+
+        private BaseTerrainSampler GetTerrainSampler(int mapId)
+        {
+            if (mapDes.CurrentLevelType == LevelType.Exception)
+            {
+                Debug.LogErrorFormat("采样地图类型不能确定，无法构造采样器，mapId:{0}", mapId);
+                return null;
+            }
+
+            if (mapDes.CurrentLevelType == LevelType.BigMap)
+            {
+                List<Vector2> list = new List<Vector2>();
+                int dim = mapDes.BigMapParameters.TerrainDimension;
+                for (int column = 0; column < dim; column++)
                 {
-                    lowestFrame = dataList[i].FrameRate;
-                    worstIndex = i;
+                    for (int row = 0; row < dim; row++)
+                    {
+                        if (!IsExcludedScene(mapId, column, row))
+                            list.Add(new Vector2 { x = column, y = row });
+                    }
+                }
+
+                return new ScenesTerrainSampler(mapId, list);
+            }
+
+            if (mapDes.CurrentLevelType == LevelType.SmallMap)
+            {
+                List<Vector2> list = null;
+                if (!smallMaps.TryGetValue(mapId, out list) || list.Count <= 0)
+                {
+                    Debug.LogErrorFormat("小地图未配置采样点，请在terrainsample_config.xml文件中配置，mapId:{0}", mapId);
+                    return null;
+                }
+
+                return new PointsTerrainSampler(mapId, smallMaps[mapId]);
+            }
+
+            Debug.LogErrorFormat("未处理的地图类型type:{0} mapId:{1}", mapDes.CurrentLevelType, mapId);
+
+            return null;
+        }
+
+        private bool IsExcludedScene(int mapId, int x, int y)
+        {
+            bool exclude = false;
+            List<Vector2> list = null;
+            if (bigMaps.TryGetValue(mapId, out list) && list.Count > 0)
+            {
+                foreach (Vector2 vec in list)
+                {
+                    if (x.Equals((int)(vec.x)) && y.Equals((int)(vec.y)))
+                    {
+                        exclude = true;
+                        break;
+                    }
+                }
+            }
+            return exclude;
+        }
+    }
+
+    public abstract class BaseTerrainSampler
+    {
+        protected int mapId { get; set; }
+
+        protected StringBuilder sampleData { get; set; }
+
+        /// <summary>
+        /// 是否正在采样
+        /// </summary>
+        public bool isRunning { get; private set; }
+
+        /// <summary>
+        /// 是否停止采样
+        /// </summary>
+        protected bool forceStopSample = false;
+
+        /// <summary>
+        /// 记录采样完毕后是否强制退出App
+        /// </summary>
+        protected bool forceExitApp = true;
+
+        /// <summary>
+        /// 记录数据采样完毕后是否自动上传网络
+        /// </summary>
+        protected bool autoTranslate = false;
+
+        protected PlayerContext playerContext;
+        protected ILevelManager levelManager;
+        protected TerrainSampler mono;
+
+        protected string url;
+        protected int waitForSample;
+        protected int sampleCount;
+
+        protected bool enableFrameLimit;
+        protected int frameLimit;
+
+        protected bool enablePosLimit;
+        protected int posLimitX;
+        protected int posLimitZ;
+        protected int posLimitDir;
+
+        public static int GcThreshold = 3;
+
+        protected WaitForSeconds halfWaitTime = new WaitForSeconds(0.5f);
+
+        protected List<SampleData> sortedDts = new List<SampleData>();
+
+        protected MapsDescription mapDes
+        {
+            get { return SingletonManager.Get<MapsDescription>(); }
+        }
+
+        public BaseTerrainSampler(int mapId)
+        {
+            this.mapId = mapId;
+            sampleData = new StringBuilder();
+        }
+
+        public void Init(Contexts contexts, TerrainSampleConfig config, TerrainSampler mono)
+        {
+            playerContext = contexts.player;
+            levelManager = contexts.session.commonSession.LevelManager;
+            this.mono = mono;
+            url = config.Url;
+            waitForSample = config.WaitForSample;
+            sampleCount = config.SampleCount;
+            enableFrameLimit = config.EnableFrameLimit;
+            frameLimit = config.FrameLimit;
+            enablePosLimit = config.EnablePosLimit;
+            posLimitX = config.PosLimitX;
+            posLimitZ = config.PosLimitZ;
+            posLimitDir = config.PosLimitDir;
+            SetQuality(config.Quality, config.UseHallQuality, config.HallQuality);
+        }
+
+        public void StartSample(bool autoTranslate = true)
+        {
+#if !UNITY_EDITOR
+            RuntimeStats.enabled = true;
+#endif
+            if (isRunning) return;
+
+            isRunning = true;
+            SharedConfig.HaveFallDamage = false;
+            this.autoTranslate = autoTranslate;
+
+            sampleData.Append("[");
+            mono.StartCoroutine(RunSample());
+        }
+
+        private SampleData[] _datas = new SampleData[4];
+        public IEnumerator RunSample()
+        {
+            Debug.LogFormat("begin terrain sample, mapId:{0}", mapId);
+
+            // 确保游戏初始化完毕
+            while (playerContext.flagSelfEntity == null) yield return null;
+            if (forceStopSample) goto FINISHSAMPLE;
+
+            // 相机设置
+            SetMainCamera();
+
+            // 采样每一个需要采样的位置点
+            IEnumerator<Vector2> points = GetSamplePoints();
+            if (points == null) goto FINISHSAMPLE;
+
+            // 采样每一个位置点
+            int samplePointNum = 0; // 记录采样点总数
+            int lastGcPointNum = 0;
+            while (points.MoveNext())
+            {
+                Vector3 groundPos = new Vector3(points.Current.x, 0f, points.Current.y);
+
+                // 触发周边地块的加载
+                MoveTo(groundPos);
+
+                // 等待地块及其相关资源加载完毕
+                yield return mono.StartCoroutine(WaitForTerrainReady());
+                if (forceStopSample) goto FINISHSAMPLE;
+
+                // 确保玩家可以正常降落
+                while (WillPlayerFallToHell(groundPos))
+                {
+                    yield return null;
+                    if (forceStopSample) goto FINISHSAMPLE;
+                }
+
+                // 判断运行时是否停止了采样
+                while (SharedConfig.StopSampler)
+                {
+                    yield return null;
+                    if (forceStopSample) goto FINISHSAMPLE;
+                }
+
+                // 确定人物落地的具体坐标
+                groundPos = FindTheGroundPos(groundPos);
+
+                // 移动人物至采样点
+                MoveTo(groundPos);
+
+                // 等待场景流式加载完毕
+                yield return mono.StartCoroutine(WaitForTerrainReady());
+                if (forceStopSample) goto FINISHSAMPLE;
+
+                for(int i = 0; i < _datas.Length; ++i)
+                {
+                    _dataPool.Return(_datas[i]);
+                    _datas[i] = null;
+                }
+
+                // 采样点四个角度采样
+                int posX = (int) (groundPos.x), posZ = (int) (groundPos.z);
+                
+                for (int dir = 0; dir < 4; dir++)
+                {
+                    // 等待相机转向调整
+                    yield return mono.StartCoroutine(LookAt(dir * 90));
+                    if (forceStopSample) goto FINISHSAMPLE;
+
+                    // 等待帧率稳定
+                    yield return mono.StartCoroutine(WaitFpsStable());
+                    if (forceStopSample) goto FINISHSAMPLE;
+
+                    // 帧率采样
+                    yield return mono.StartCoroutine(SampleFpsData(posX, posZ, _datas, dir));
+                    if (forceStopSample) goto FINISHSAMPLE;
+                }
+
+                // 记录最坏采样方向
+                int worstIndex = RecordTheWorstOne(samplePointNum, _datas);
+                samplePointNum++;
+
+                if (samplePointNum - lastGcPointNum >= GcThreshold)
+                {
+                    lastGcPointNum = samplePointNum;
+                    System.GC.Collect();
+                }
+
+                // 启用了帧率限制,暂停帧率采样
+                if (enableFrameLimit && (int)_datas[worstIndex].FrameRate < frameLimit)
+                {
+                    SharedConfig.StopSampler = true;
+                }
+
+                // 启用了位置限制，暂停帧率采样
+                if (enablePosLimit && posX == posLimitX && posZ == posLimitZ)
+                {
+                    SharedConfig.StopSampler = true;
+
+                    // 将相机调整为指定方向的视角
+                    if (posLimitDir >= 0 && posLimitDir <= 3)
+                        yield return mono.StartCoroutine(LookAt(posLimitDir * 90));
+                    else
+                        yield return mono.StartCoroutine(LookAt(worstIndex * 90));
+                }
+
+                yield return null;
+                if (forceStopSample) goto FINISHSAMPLE;
+
+                while (SharedConfig.StopSampler) // 等待帧率暂停解除
+                {
+                    yield return null;
+                    if (forceStopSample) goto FINISHSAMPLE;
                 }
             }
 
-            SampleData sampleData = dataList[worstIndex];
+            // 采样完毕后处理
+            FINISHSAMPLE:
+            OnFinishSample();
+        }
 
-            string formatString = "{{\"x\":{0},\"y\":{1},\"fps\":{2},\"batches\":{3},\"setPassCalls\":{4},\"tris\":{5},\"verts\":{6},\"camDirX\":{7},\"camDirY\":{8},\"camDirZ\":{9}," +
-                "\"camUpX\":{10},\"camUpY\":{11},\"camUpZ\":{12},\"camPosX\":{13},\"camPosY\":{14},\"camPosZ\":{15},\"camFOV\":{16},\"camNear\":{17},\"camFar\":{18}," +
-                "\"camOC\":{19},\"camHDR\":{20},\"camMSAA\":{21},\"shadowCaster\":{22},\"frameTime\":{23},\"renderTime\":{24},\"mapID\":{25}}}";
+        public void OnFinishSample()
+        {
+            sampleData.Append("]");
+            string sampleString = sampleData.ToString();
 
-            if (samplePointNum > 0)
+            // 写入本地json文件
             {
-                formatString = "," + formatString;
+                DateTime now = DateTime.Now;
+                string filePath = string.Format("./log/terrainsampler_{0}_{1}_{2}_{3}_{4}.json", now.Year, now.Month,
+                    now.Day, now.Hour, now.Minute);
+                string dir = Path.GetDirectoryName(filePath);
+                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                File.WriteAllText(filePath, sampleString);
             }
 
-            logData.AppendFormat(formatString, sampleData.X, sampleData.Y, sampleData.FrameRate, sampleData.Batches, sampleData.SetPassCalls, sampleData.Triangles, sampleData.Vertices,
-                sampleData.CamDirX, sampleData.CamDirY, sampleData.CamDirZ, sampleData.CamUpX, sampleData.CamUpY, sampleData.CamUpZ, sampleData.CamPosX, sampleData.CamPosY, sampleData.CamPosZ,
-                sampleData.CamFOV, sampleData.CamNear, sampleData.CamFar, sampleData.camOC, sampleData.camHDR, sampleData.camMSAA, sampleData.shadowCaster, sampleData.frameTime, sampleData.renderTime, MapID);
+            Debug.LogFormat("mapId:{0}, autoTranslate:{1}, start upload file to web ...", mapId, autoTranslate);
 
-            return worstIndex;
+            if (autoTranslate) // 自动上传网络
+            {
+                using (WebClient client = new WebClient())
+                {
+                    string dataKey = mapDes.CurrentLevelType == LevelType.BigMap ? "bigMap" : "smallMap";
+                    Vector3 minVec = mapDes.SceneParameters.OriginPosition;
+                    Vector3 mapSize = mapDes.SceneParameters.Size;
+
+                    NameValueCollection collection = new NameValueCollection()
+                    {
+                        {"heatMapData", sampleString}
+                    };
+
+                    int mapLen = (int) (mapSize.y > mapSize.x ? mapSize.y : mapSize.x);
+                    string address = string.Format(
+                        "{0}/index.php?mapType={1}&mapId={2}&leftBottomX={3}&leftBottomY={4}&mapSize={5}*{6}&unitSize={7}",
+                        url, dataKey, mapId, minVec.x, minVec.z, mapSize.x, mapSize.y, GetUnitSize(mapLen));
+                    Debug.LogFormat("address:{0}", address);
+                    client.UploadValues(address, "POST", collection);
+                }
+            }
+
+            Debug.LogFormat("finish upload file to web ...");
+
+            if (forceExitApp) Application.Quit();
+
+            // 采样完毕后
+            sampleData.Length = 0;
+            isRunning = false;
+            forceStopSample = false;
+            forceExitApp = true;
+        }
+
+        protected virtual IEnumerator<Vector2> GetSamplePoints()
+        {
+            return null;
+        }
+
+        protected void SetQuality(string qualityName, bool useHallQuality, int hallQuality)
+        {
+            // Unity自带游戏品级设置
+            int qualityIndex = -1;
+            for (int i = 0; i < QualitySettings.names.Length; i++)
+            {
+                if (QualitySettings.names[i].Equals(qualityName))
+                {
+                    qualityIndex = i;
+                    break;
+                }
+            }
+            if (qualityIndex != -1)
+            {
+                Debug.LogFormat("TerrainSampler SetQuality Level index:{0} name:{1} time:{2}", qualityIndex,
+                    QualitySettings.names[qualityIndex], System.DateTime.Now);
+                QualitySettings.SetQualityLevel(qualityIndex);
+            }
+
+            // 策划游戏品级设置
+            if (useHallQuality)
+            {
+                Utils.SettingManager.SettingManager.GetInstance()
+                    .SetQuality((Utils.SettingManager.QualityLevel) hallQuality);
+            }
+        }
+
+        protected void SetMainCamera()
+        {
+            Camera.main.fieldOfView = 50.53401f;
+            Camera.main.nearClipPlane = 0.03f;
+            Camera.main.farClipPlane = 8000;
+        }
+
+        /// <summary>
+        /// 确保大地形中指定位置所需的地块加载完毕
+        /// </summary>
+        protected bool IsTerrainReady()
+        {
+            return levelManager.NotFinishedRequests <= 0;
+        }
+
+        /// <summary>
+        /// 等待指定位置的地形及其相关资源载入完毕
+        /// </summary>
+        protected IEnumerator WaitForTerrainReady()
+        {
+            for (int i = 0; i < 2; i++)
+                yield return null;
+
+            while (!IsTerrainReady())
+                yield return null;
+
+            int count = waitForSample;
+            for (int i = 0; i < count; i++)
+                yield return null;
+        }
+
+        /// <summary>
+        /// 将人物移动到大地图中的指定位置
+        /// </summary>
+        protected void MoveTo(Vector3 pos)
+        {
+            var player = playerContext.flagSelfEntity;
+            player.position.Value = pos;
+            if (App.Shared.SharedConfig.InSamplingMode)
+                Camera.main.transform.position = new Vector3(pos.x, pos.y + 1.7f, pos.z);
+        }
+
+        /// <summary>
+        /// 判断玩家从大地图指定位置是否会落地失败
+        /// </summary>
+        private bool WillPlayerFallToHell(Vector3 pos)
+        {
+            Vector3 fromV = new Vector3(pos.x, 1000, pos.z);
+
+            Vector3 toV = new Vector3(pos.x, -1000, pos.z);
+
+            Ray r = new Ray(fromV, new Vector3(toV.x - fromV.x, toV.y - fromV.y, toV.z - fromV.z));
+
+            RaycastHit hitInfo;
+
+            bool hitted = Physics.Raycast(r, out hitInfo, Mathf.Infinity,
+                UnityLayers.SceneCollidableLayerMask |
+                1 << UnityLayerManager.GetLayerIndex(EUnityLayerName.WaterTrigger));
+
+            if (hitted == false)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 确定指定x,z位置的落地点（y方向值）
+        /// </summary>
+        private Vector3 FindTheGroundPos(Vector3 pos)
+        {
+            Vector3 fromV = new Vector3(pos.x, 1000, pos.z);
+
+            Vector3 toV = new Vector3(pos.x, -1000, pos.z);
+
+            Ray r = new Ray(fromV, new Vector3(toV.x - fromV.x, toV.y - fromV.y, toV.z - fromV.z));
+
+            RaycastHit hitInfo;
+
+            bool hitted = Physics.Raycast(r, out hitInfo, Mathf.Infinity,
+                UnityLayers.SceneCollidableLayerMask |
+                (1 << UnityLayerManager.GetLayerIndex(EUnityLayerName.WaterTrigger)));
+            float yVal = 0;
+            if (hitted == false)
+            {
+                yVal = pos.y;
+            }
+            else
+            {
+                yVal = hitInfo.point.y;
+            }
+
+            Vector3 groundPos = new Vector3(pos.x, hitInfo.point.y, pos.z);
+            return groundPos;
+        }
+
+        /// <summary>
+        /// 将玩家调整到指定朝向
+        /// </summary>
+        private IEnumerator LookAt(float yaw)
+        {
+            var player = playerContext.flagSelfEntity;
+            player.orientation.Pitch = 0;
+            player.orientation.Yaw = yaw;
+
+            if (App.Shared.SharedConfig.InSamplingMode)
+            {
+                Camera.main.transform.eulerAngles = new Vector3(0, player.orientation.Yaw, 0);
+            }
+
+            // 等待2帧相机调整完毕后渲染
+            yield return null;
+            yield return null;
         }
 
         private IEnumerator WaitFpsStable()
@@ -296,17 +670,42 @@ namespace App.Client.Tools
             }
         }
 
+        private static SampleDataPool<SampleData> _dataPool = new SampleDataPool<SampleData>();
+#if HAVE_FAST_GPU_PROFILER && ENABLE_PROFILER
+        private List<GpuTimerQuerySample> _samples = new List<GpuTimerQuerySample>();
+#endif
         private IEnumerator SampleFpsData(int posX, int posZ, SampleData[] dts, int dir)
         {
+            foreach (var dt in sortedDts)
+            {
+                _dataPool.Return(dt);
+            }
             sortedDts.Clear();
 
-            // 采样指定帧数去除三次最大最小值后取平均值
+            // 采样指定帧数去除多个最大最小值后取平均值
             for (int c = 0; c < sampleCount; c++)
             {
                 float fps = 1 / Time.deltaTime;
-                SampleData dt = new SampleData(posX, posZ, fps, RuntimeStats.batches, RuntimeStats.setPassCalls, RuntimeStats.triangles, RuntimeStats.vertices,
-                    Camera.main.transform.forward, Camera.main.transform.up, Camera.main.transform.position, Camera.main.fieldOfView, Camera.main.nearClipPlane, Camera.main.farClipPlane,
-                    Camera.main.useOcclusionCulling ? 1 : 0, Camera.main.allowHDR ? 1 : 0, Camera.main.allowMSAA ? 1 : 0, RuntimeStats.shadowCasters, RuntimeStats.frameTime, RuntimeStats.renderTime);
+
+
+                SampleData dt = _dataPool.Get();
+#if HAVE_FAST_GPU_PROFILER && ENABLE_PROFILER
+                SampleDataSubset subset = dt.SubSet;
+                _samples.Clear();
+                Profiler.GetFastGpuProfilerSamples(_samples);
+                foreach (var sample in _samples)
+                {
+                    subset.Add(sample.StatName, sample.ElapsedTime);
+                }
+#endif
+
+                dt.SetData(posX, posZ, fps, RuntimeStats.batches, RuntimeStats.setPassCalls,
+                    RuntimeStats.triangles, RuntimeStats.vertices,
+                    Camera.main.transform.forward, Camera.main.transform.up, Camera.main.transform.position,
+                    Camera.main.fieldOfView, Camera.main.nearClipPlane, Camera.main.farClipPlane,
+                    Camera.main.useOcclusionCulling ? 1 : 0, Camera.main.allowHDR ? 1 : 0,
+                    Camera.main.allowMSAA ? 1 : 0, RuntimeStats.shadowCasters, RuntimeStats.frameTime,
+                    RuntimeStats.renderTime);
                 sortedDts.Add(dt);
 
                 yield return null;
@@ -321,6 +720,11 @@ namespace App.Client.Tools
             int useOc = 0, useHDR = 0, useMSAA = 0, shadowCaster = 0;
             float frameTime = 0f, renderTime = 0f;
             int dropFrames = 5;
+
+            var dirDt = _dataPool.Get();
+#if HAVE_FAST_GPU_PROFILER && ENABLE_PROFILER
+            SampleDataSubset avrSubset = dirDt.SubSet;
+#endif
             for (int i = dropFrames; i < sampleCount - dropFrames; i++)
             {
                 SampleData sd = sortedDts[i];
@@ -341,6 +745,9 @@ namespace App.Client.Tools
                 shadowCaster += sd.shadowCaster;
                 frameTime += sd.frameTime;
                 renderTime += sd.renderTime;
+#if HAVE_FAST_GPU_PROFILER && ENABLE_PROFILER
+                avrSubset.Add(sd.SubSet);
+#endif
             }
             int count = sampleCount - 2 * dropFrames;
             frame /= count;
@@ -360,8 +767,13 @@ namespace App.Client.Tools
             shadowCaster /= count;
             frameTime /= count;
             renderTime /= count;
+#if HAVE_FAST_GPU_PROFILER && ENABLE_PROFILER
+            avrSubset.Divide(count);
+#endif
 
-            dts[dir] = new SampleData(posX, posZ, frame, batches, setPassCalls, triangles, vertices, forward, up, position, fov, near, far, useOc, useHDR, useMSAA, shadowCaster, frameTime, renderTime);
+            dirDt.SetData(posX, posZ, frame, batches, setPassCalls, triangles, vertices, forward, up,
+                position, fov, near, far, useOc, useHDR, useMSAA, shadowCaster, frameTime, renderTime);
+            dts[dir] = dirDt;
         }
 
         private int CompareSampleData(SampleData a, SampleData b)
@@ -372,747 +784,55 @@ namespace App.Client.Tools
         }
 
         /// <summary>
-        /// 判断玩家从大地图指定位置是否会落地失败
+        /// 记录采样点的最坏采样数据
         /// </summary>
-        private bool WillPlayerFallToHell(Vector3 pos)
+        private readonly string[] _formatStrings = 
         {
-            Vector3 fromV = new Vector3(pos.x, 1000, pos.z);
-
-            Vector3 toV = new Vector3(pos.x, -1000, pos.z);
-
-            Ray r = new Ray(fromV, new Vector3(toV.x - fromV.x, toV.y - fromV.y, toV.z - fromV.z));
-
-            RaycastHit hitInfo;
-
-            bool hitted = Physics.Raycast(r, out hitInfo, Mathf.Infinity, UnityLayers.SceneCollidableLayerMask | 1 << UnityLayerManager.GetLayerIndex(EUnityLayerName.WaterTrigger));
-
-            if (hitted == false)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// 记录不需要采样的空地形块
-        /// </summary>
-        private List<KeyValuePair<int, int>> EmptyBlockList = new List<KeyValuePair<int, int>>()
-        {
-            new KeyValuePair<int, int>(0, 0),
-            new KeyValuePair<int, int>(0, 1),
-            new KeyValuePair<int, int>(0, 2),
-            new KeyValuePair<int, int>(0, 3),
-            new KeyValuePair<int, int>(0, 4),
-            new KeyValuePair<int, int>(0, 5),
-            new KeyValuePair<int, int>(0, 6),
-            new KeyValuePair<int, int>(0, 7),
-            new KeyValuePair<int, int>(1, 0),
-            new KeyValuePair<int, int>(1, 1),
-            new KeyValuePair<int, int>(1, 2),
-            new KeyValuePair<int, int>(1, 6),
-            new KeyValuePair<int, int>(1, 7),
-            new KeyValuePair<int, int>(2, 6),
-            new KeyValuePair<int, int>(2, 7),
-            new KeyValuePair<int, int>(3, 7),
-            new KeyValuePair<int, int>(4, 0),
-            new KeyValuePair<int, int>(5, 0),
-            new KeyValuePair<int, int>(6, 0),
-            new KeyValuePair<int, int>(6, 1),
-            new KeyValuePair<int, int>(7, 0),
-            new KeyValuePair<int, int>(7, 1),
-            new KeyValuePair<int, int>(7, 2),
-            new KeyValuePair<int, int>(7, 3),
-            new KeyValuePair<int, int>(7, 4),
-            new KeyValuePair<int, int>(7, 7),
+            "{{\"x\":{0},\"y\":{1},\"fps\":{2},\"batches\":{3},\"setPassCalls\":{4},\"tris\":{5},\"verts\":{6},\"camDirX\":{7},\"camDirY\":{8},\"camDirZ\":{9},\"camUpX\":{10},\"camUpY\":{11},\"camUpZ\":{12},\"camPosX\":{13},\"camPosY\":{14},\"camPosZ\":{15},\"camFOV\":{16},\"camNear\":{17},\"camFar\":{18},\"camOC\":{19},\"camHDR\":{20},\"camMSAA\":{21},\"usedHeap\":{22},\"totalHeap\":{23},\"totalMemory\":{24},\"mapID\":{25},\"GC\":{26},\"samplePointNum\":{27}",
+            ",{{\"x\":{0},\"y\":{1},\"fps\":{2},\"batches\":{3},\"setPassCalls\":{4},\"tris\":{5},\"verts\":{6},\"camDirX\":{7},\"camDirY\":{8},\"camDirZ\":{9},\"camUpX\":{10},\"camUpY\":{11},\"camUpZ\":{12},\"camPosX\":{13},\"camPosY\":{14},\"camPosZ\":{15},\"camFOV\":{16},\"camNear\":{17},\"camFar\":{18},\"camOC\":{19},\"camHDR\":{20},\"camMSAA\":{21},\"usedHeap\":{22},\"totalHeap\":{23},\"totalMemory\":{24},\"mapID\":{25},\"GC\":{26},\"samplePointNum\":{27}",
         };
-
-        /// <summary>
-        /// 判断地形块是否需要采样
-        /// </summary>
-        private bool IsBlockNeedToSample(int x, int z)
+        private StringBuilder _profilerData = new StringBuilder();
+        private int RecordTheWorstOne(int samplePointNum, SampleData[] dataList)
         {
-            Predicate<KeyValuePair<int, int>> predicate = delegate (KeyValuePair<int, int> kv)
-             {
-                 if ((kv.Key == x) && (kv.Value == z))
-                 {
-                     return true;
-                 }
-                 else
-                 {
-                     return false;
-                 }
-             };
-            // KeyValuePair<int, int> res = EmptyBlockList.Find(predicate);
-            var resIndex = EmptyBlockList.FindIndex(predicate);
-            if (resIndex == -1)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+            int worstIndex = 0;
+            double lowestFrame = dataList[0].FrameRate;
 
-        /// <summary>
-        /// 执行具体采样
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerator Sample()
-        {
-            Debug.LogErrorFormat("begin sampler, mapId:{0}", MapID);
-
-            logData.Append("[");
-            yield return new WaitForSeconds(30);
-            while (_playerContext.flagSelfEntity == null)                       // 确保游戏加载完毕
+            for (int i = 0; i < dataList.Length; i++)
             {
-                yield return null;
-            }
-            if (forceStopSample) goto FINISHSAMPLE;
-
-            Camera.main.fieldOfView = 50.53401f;
-            Camera.main.nearClipPlane = 0.03f;
-            Camera.main.farClipPlane = 8000;
-
-            // 确定采样的起止范围
-            int columnStart = -1, columnEnd = columnStart;
-            int rowStart = -1, rowEnd = rowStart;
-            if (MapID == 2)
-            {
-                columnStart = rowStart = 0;
-                columnEnd = rowEnd = 7;
-            }
-            else if (MapID == 4)
-            {
-                columnStart = rowStart = 3;
-                columnEnd = rowEnd = 5;
-            }
-
-            if (columnStart == -1)
-            {
-                Debug.LogErrorFormat("不支持性能采样的地图,mapId:{0}", MapID);
-                goto FINISHSAMPLE;
-            }
-
-            int samplePointNum = 0;                                             // 记录采样点总数
-            for (int i = columnStart; i <= columnEnd; i++)
-            {
-                for (int j = rowStart; j <= rowEnd; j++)
+                if (dataList[i].FrameRate < lowestFrame)
                 {
-                    // 判断地形块是否需要采样
-                    if (!IsBlockNeedToSample(i, j)) continue;
-
-                    // 计算当前地块中心在大地图中的位置
-                    Vector3 pos = CalculateCoordinate(i - columnStart, j - rowStart, BlockSize * 0.5f, BlockSize * 0.5f);
-
-                    // 将人物移动到计算位置
-                    MoveTo(pos);
-
-                    // 等待地形加载完毕
-                    yield return StartCoroutine(WaitForTerrainReady(pos));
-                    if (forceStopSample) goto FINISHSAMPLE;
-
-                    // 确保玩家可以正常降落
-                    while (WillPlayerFallToHell(pos))
-                    {
-                        yield return null;
-                        if (forceStopSample) goto FINISHSAMPLE;
-                    }
-
-                    //在一个地形块里面迭代采样
-                    for (int x = 1; x < 1000; x += SampleInterval)
-                    {
-                        for (int z = 1; z < 1000; z += SampleInterval)
-                        {
-                            // 判断运行时是否停止了采样
-                            while (SharedConfig.StopSampler)
-                            {
-                                yield return null;
-                                if (forceStopSample) goto FINISHSAMPLE;
-                            }
-
-                            // 取得采样点在大地图中的位置（仅x,z有意义）
-                            Vector3 currentPos = CalculateCoordinate(i - columnStart, j - rowStart, x, z);
-
-                            // 确定采样点y方向上的具体坐标
-                            Vector3 groundPos = FindTheGroundPos(currentPos);
-
-                            // 移动人物至采样点
-                            MoveTo(groundPos);
-
-                            // 等待场景流式加载完毕
-                            yield return StartCoroutine(WaitForTerrainReady(groundPos));
-                            if (forceStopSample) goto FINISHSAMPLE;
-
-                            // 采样点四个角度采样
-                            var minVec = SingletonManager.Get<MapsDescription>().BigMapParameters.TerrainMin;
-                            int posX = (int)((i - columnStart) * BlockSize + x + minVec.x);
-                            int posZ = (int)((j - rowStart) * BlockSize + z + minVec.z);
-                            SampleData[] datas = new SampleData[4];
-                            for (int dir = 0; dir < 4; dir++)
-                            {
-                                // 等待相机转向调整
-                                yield return StartCoroutine(LookAt(dir * 90));
-                                if (forceStopSample) goto FINISHSAMPLE;
-
-                                // 等待帧率稳定
-                                yield return StartCoroutine(WaitFpsStable());
-                                if (forceStopSample) goto FINISHSAMPLE;
-
-                                // 帧率采样
-                                yield return StartCoroutine(SampleFpsData(posX, posZ, datas, dir));
-                                if (forceStopSample) goto FINISHSAMPLE;
-                            }
-
-                            int worstIndex = RecordTheWorstOne(samplePointNum, datas);
-                            samplePointNum++;
-
-                            // 启用了帧率限制,暂停帧率采样
-                            if (enableFrameLimit && (int)datas[worstIndex].FrameRate < frameLimit)
-                            {
-                                SharedConfig.StopSampler = true;
-
-                                // 将相机调整为最坏方向的视角
-                                yield return StartCoroutine(LookAt(worstIndex * 90));
-                            }
-
-                            // 启用了位置限制，暂停帧率采样
-                            if (enablePosLimit && posX == posLimitX && posZ == posLimitZ)
-                            {
-                                SharedConfig.StopSampler = true;
-
-                                // 将相机调整为指定方向的视角
-                                if (posLimitDir >= 0 && posLimitDir <= 3)
-                                    yield return StartCoroutine(LookAt(posLimitDir * 90));
-                                else
-                                    yield return StartCoroutine(LookAt(worstIndex * 90));
-                            }
-
-                            yield return null;
-                            if (forceStopSample) goto FINISHSAMPLE;
-
-                            while (SharedConfig.StopSampler)                        // 等待帧率暂停解除
-                            {
-                                yield return null;
-                                if (forceStopSample) goto FINISHSAMPLE;
-                            }
-
-                            // if (i == 1 && j == 3)
-                            // {
-                            //     goto LaLa;
-                            // }
-                        }
-                    }
-
-                    // LaLa:
-                    //     Debug.LogErrorFormat("i:{0} j:{1}", i, j);
+                    lowestFrame = dataList[i].FrameRate;
+                    worstIndex = i;
                 }
             }
 
-            autoTranslate = true;                                               // 全局采样完毕自动上传
+            SampleData sampleData = dataList[worstIndex];
 
-        FINISHSAMPLE:
-            logData.Append("]");
-            string sampleString = logData.ToString();
+            string formatString = samplePointNum > 0 ? _formatStrings[1] : _formatStrings[0];
+            long unit = 1024 ^ 2;
+            long usedHeap = GC.GetTotalMemory(false) / unit;
+            long totalHeap = Profiler.GetMonoHeapSizeLong() / unit;
+            long allMemory = Profiler.GetTotalAllocatedMemoryLong() / unit;
 
-            // 写入本地json文件
+            this.sampleData.AppendFormat(formatString, sampleData.X, sampleData.Y, sampleData.FrameRate, sampleData.Batches, sampleData.SetPassCalls, sampleData.Triangles, sampleData.Vertices,
+                sampleData.CamDirX, sampleData.CamDirY, sampleData.CamDirZ, sampleData.CamUpX, sampleData.CamUpY, sampleData.CamUpZ, sampleData.CamPosX, sampleData.CamPosY, sampleData.CamPosZ,
+                sampleData.CamFOV, sampleData.CamNear, sampleData.CamFar, sampleData.camOC, sampleData.camHDR, sampleData.camMSAA, usedHeap, totalHeap, allMemory, mapId,
+                GC.CollectionCount(0), samplePointNum);
+
+#if HAVE_FAST_GPU_PROFILER && ENABLE_PROFILER
+            _profilerData.Length = 0;
+            _profilerData.AppendFormat(",\"MainThreadTime\":{0}", Profiler.MainThreadFrameTime);
+            _profilerData.AppendFormat(",\"RenderThreadTime\":{0}", Profiler.RenderThreadFrameTime);
+            _profilerData.AppendFormat(",\"GPUTime\":{0}", Profiler.FastGPUTime);
+            foreach (var data in sampleData.SubSet)
             {
-                DateTime now = DateTime.Now;
-                string filePath = string.Format("./log/terrainsampler_{0}_{1}_{2}_{3}_{4}.json", now.Year, now.Month, now.Day, now.Hour, now.Minute);
-                string dir = Path.GetDirectoryName(filePath);
-                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                File.WriteAllText(filePath, sampleString);
+                _profilerData.AppendFormat(",\"{0}\":{1}", data.Key, data.Value);
             }
-
-            Debug.Log("start upload file to web ...");
-
-            if (autoTranslate)           // 自动上传网络
-            {
-                using (WebClient client = new WebClient())
-                {
-                    NameValueCollection collection = new NameValueCollection()
-                    {
-                        {dataKey,sampleString}
-                    };
-                    Debug.LogFormat("url:{0} dataKey:{1}", url, dataKey);
-                    client.UploadValues(url, "POST", collection);
-                }
-            }
-
-            Debug.Log("finish upload file to web ...");
-
-            if (forceExitApp) Application.Quit();
-
-            // 上传完毕后
-            logData.Length = 0;
-            InSamplingMode = false;
-            forceStopSample = false;
-            forceExitApp = true;
-        }
-
-        private IEnumerator SamplePoints(List<Vector3> points)
-        {
-            if (points == null || points.Count == 0) yield break;
-
-            Debug.LogError("begin sampler some points");
-            logData.Append("[");
-            yield return new WaitForSeconds(30);
-            while (_playerContext.flagSelfEntity == null)                       // 确保游戏加载完毕
-            {
-                yield return null;
-            }
-            if (forceStopSample) goto FINISHSAMPLE;
-
-            Camera.main.fieldOfView = 50.53401f;
-            Camera.main.nearClipPlane = 0.03f;
-            Camera.main.farClipPlane = 8000;
-
-            int columnStart = -1, columnEnd = columnStart;
-            int rowStart = -1, rowEnd = rowStart;
-            if (MapID == 2)
-            {
-                columnStart = rowStart = 0;
-                columnEnd = rowEnd = 7;
-            }
-            else if (MapID == 4)
-            {
-                columnStart = rowStart = 3;
-                columnEnd = rowEnd = 5;
-            }
-
-            if (columnStart == -1)
-            {
-                Debug.LogErrorFormat("不支持性能采样的地图，mapID:{0}", MapID);
-                goto FINISHSAMPLE;
-            }
-
-            int samplePointNum = 0;                                             // 记录采样点总数
-            for (int num = 0; num < points.Count; num++)
-            {
-                Vector2 terrainIndex = GetTerrainIndexByPos(points[num]);
-                int i = (int)terrainIndex.x, j = (int)terrainIndex.y;
-
-                // 判断地形块是否需要采样
-                if (!IsBlockNeedToSample(i, j)) continue;
-
-                // 计算当前地块中心在大地图中的位置
-                Vector3 pos = CalculateCoordinate(i - columnStart, j - rowStart, BlockSize * 0.5f, BlockSize * 0.5f);
-
-                // 将人物移动到计算位置
-                MoveTo(pos);
-
-                // 等待地形加载完毕
-                yield return StartCoroutine(WaitForTerrainReady(pos));
-                if (forceStopSample) goto FINISHSAMPLE;
-
-                // 确保玩家可以正常降落
-                while (WillPlayerFallToHell(pos))
-                {
-                    yield return null;
-                    if (forceStopSample) goto FINISHSAMPLE;
-                }
-
-                // 判断运行时是否停止了采样
-                while (SharedConfig.StopSampler)
-                {
-                    yield return null;
-                    if (forceStopSample) goto FINISHSAMPLE;
-                }
-
-                // 取得采样点在大地图中的位置（仅x,z有意义）
-                Vector3 currentPos = points[num];
-
-                // 确定采样点y方向上的具体坐标
-                Vector3 groundPos = FindTheGroundPos(currentPos);
-
-                // 移动人物至采样点
-                MoveTo(groundPos);
-
-                // 等待场景流式加载完毕
-                yield return StartCoroutine(WaitForTerrainReady(groundPos));
-                if (forceStopSample) goto FINISHSAMPLE;
-
-                // 采样点四个角度采样
-                int posX = (int)(currentPos.x), posZ = (int)(currentPos.z);
-                SampleData[] datas = new SampleData[4];
-                for (int dir = 0; dir < 4; dir++)
-                {
-                    // 等待相机转向调整
-                    yield return StartCoroutine(LookAt(dir * 90));
-                    if (forceStopSample) goto FINISHSAMPLE;
-
-                    // 等待帧率稳定
-                    yield return StartCoroutine(WaitFpsStable());
-                    if (forceStopSample) goto FINISHSAMPLE;
-
-                    // 帧率采样
-                    yield return StartCoroutine(SampleFpsData(posX, posZ, datas, dir));
-                    if (forceStopSample) goto FINISHSAMPLE;
-                }
-
-                int worstIndex = RecordTheWorstOne(samplePointNum, datas);
-                samplePointNum++;
-
-                // 启用了帧率限制,暂停帧率采样
-                if (enableFrameLimit && (int)datas[worstIndex].FrameRate < frameLimit)
-                {
-                    SharedConfig.StopSampler = true;
-                }
-
-                // 启用了位置限制，暂停帧率采样
-                if (enablePosLimit && posX == posLimitX && posZ == posLimitZ)
-                {
-                    SharedConfig.StopSampler = true;
-
-                    // 将相机调整为指定方向的视角
-                    if (posLimitDir >= 0 && posLimitDir <= 3)
-                        yield return StartCoroutine(LookAt(posLimitDir * 90));
-                    else
-                        yield return StartCoroutine(LookAt(worstIndex * 90));
-                }
-
-                yield return null;
-                if (forceStopSample) goto FINISHSAMPLE;
-
-                while (SharedConfig.StopSampler)                        // 等待帧率暂停解除
-                {
-                    yield return null;
-                    if (forceStopSample) goto FINISHSAMPLE;
-                }
-            }
-
-        FINISHSAMPLE:
-            logData.Append("]");
-            string sampleString = logData.ToString();
-
-            // 写入本地json文件
-            {
-                DateTime now = DateTime.Now;
-                string filePath = string.Format("./log/terrainsampler_{0}_{1}_{2}_{3}_{4}.json", now.Year, now.Month, now.Day, now.Hour, now.Minute);
-                string dir = Path.GetDirectoryName(filePath);
-                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                File.WriteAllText(filePath, sampleString);
-            }
-
-            Debug.LogError("autoTranslate:" + autoTranslate);
-
-            if (autoTranslate)           // 自动上传网络
-            {
-                using (WebClient client = new WebClient())
-                {
-                    NameValueCollection collection = new NameValueCollection()
-                    {
-                        {dataKey,sampleString}
-                    };
-                    Debug.LogFormat("url:{0} dataKey:{1}", url, dataKey);
-                    client.UploadValues(url, "POST", collection);
-                }
-            }
-
-            Debug.LogError("finish autoTranslate");
-
-            if (forceExitApp) Application.Quit();
-
-            // 上传完毕后
-            logData.Length = 0;
-            InSamplingMode = false;
-            forceStopSample = false;
-            forceExitApp = true;
-        }
-
-        private IEnumerator SampleScenes(List<Vector2> scenes)
-        {
-            if (scenes == null || scenes.Count == 0) yield break;
-
-            Debug.LogError("begin sampler some scenes");
-            logData.Append("[");
-            yield return new WaitForSeconds(30);
-            while (_playerContext.flagSelfEntity == null)                       // 确保游戏加载完毕
-            {
-                yield return null;
-            }
-            if (forceStopSample) goto FINISHSAMPLE;
-
-            Camera.main.fieldOfView = 50.53401f;
-            Camera.main.nearClipPlane = 0.03f;
-            Camera.main.farClipPlane = 8000;
-
-            int columnStart = -1, columnEnd = columnStart;
-            int rowStart = -1, rowEnd = rowStart;
-            if (MapID == 2)
-            {
-                columnStart = rowStart = 0;
-                columnEnd = rowEnd = 7;
-            }
-            else if (MapID == 4)
-            {
-                columnStart = rowStart = 3;
-                columnEnd = rowEnd = 5;
-            }
-
-            if (columnStart == -1)
-            {
-                Debug.LogErrorFormat("不支持性能采样的地图，mapID：{0}", MapID);
-                goto FINISHSAMPLE;
-            }
-
-            int samplePointNum = 0;                                             // 记录采样点总数
-            for (int k = 0; k < scenes.Count; k++)
-            {
-                int i = (int)scenes[k].x, j = (int)scenes[k].y;
-
-                // 判断地形块是否需要采样
-                if (!IsBlockNeedToSample(i, j)) continue;
-
-                // 计算当前地块中心在大地图中的位置
-                Vector3 pos = CalculateCoordinate(i - columnStart, j - rowStart, BlockSize * 0.5f, BlockSize * 0.5f);
-
-                // 将人物移动到计算位置
-                MoveTo(pos);
-
-                // 等待地形加载完毕
-                yield return StartCoroutine(WaitForTerrainReady(pos));
-                if (forceStopSample) goto FINISHSAMPLE;
-
-                // 确保玩家可以正常降落
-                while (WillPlayerFallToHell(pos))
-                {
-                    yield return null;
-                    if (forceStopSample) goto FINISHSAMPLE;
-                }
-
-                //在一个地形块里面迭代采样
-                for (int x = 1; x < 1000; x += SampleInterval)
-                {
-                    for (int z = 1; z < 1000; z += SampleInterval)
-                    {
-                        // 判断运行时是否停止了采样
-                        while (SharedConfig.StopSampler)
-                        {
-                            yield return null;
-                            if (forceStopSample) goto FINISHSAMPLE;
-                        }
-
-                        // 取得采样点在大地图中的位置（仅x,z有意义）
-                        Vector3 currentPos = CalculateCoordinate(i - columnStart, j - rowStart, x, z);
-
-                        // 确定采样点y方向上的具体坐标
-                        Vector3 groundPos = FindTheGroundPos(currentPos);
-
-                        // 移动人物至采样点
-                        MoveTo(groundPos);
-
-                        // 等待场景流式加载完毕
-                        yield return StartCoroutine(WaitForTerrainReady(groundPos));
-                        if (forceStopSample) goto FINISHSAMPLE;
-
-                        // 采样点四个角度采样
-                        var minVec = SingletonManager.Get<MapsDescription>().BigMapParameters.TerrainMin;
-                        int posX = (int)((i - columnStart) * BlockSize + x + minVec.x);
-                        int posZ = (int)((j - rowStart) * BlockSize + z + minVec.z);
-                        SampleData[] datas = new SampleData[4];
-                        for (int dir = 0; dir < 4; dir++)
-                        {
-                            // 等待相机转向调整
-                            yield return StartCoroutine(LookAt(dir * 90));
-                            if (forceStopSample) goto FINISHSAMPLE;
-
-                            // 等待帧率稳定
-                            yield return StartCoroutine(WaitFpsStable());
-                            if (forceStopSample) goto FINISHSAMPLE;
-
-                            // 帧率采样
-                            yield return StartCoroutine(SampleFpsData(posX, posZ, datas, dir));
-                            if (forceStopSample) goto FINISHSAMPLE;
-                        }
-
-                        int worstIndex = RecordTheWorstOne(samplePointNum, datas);
-                        samplePointNum++;
-
-                        // 启用了帧率限制,暂停帧率采样
-                        if (enableFrameLimit && (int)datas[worstIndex].FrameRate < frameLimit)
-                        {
-                            SharedConfig.StopSampler = true;
-
-                            // 将相机调整为最坏方向的视角
-                            yield return StartCoroutine(LookAt(worstIndex * 90));
-                        }
-
-                        // 启用了位置限制，暂停帧率采样
-                        if (enablePosLimit && posX == posLimitX && posZ == posLimitZ)
-                        {
-                            SharedConfig.StopSampler = true;
-
-                            // 将相机调整为指定方向的视角
-                            if (posLimitDir >= 0 && posLimitDir <= 3)
-                                yield return StartCoroutine(LookAt(posLimitDir * 90));
-                            else
-                                yield return StartCoroutine(LookAt(worstIndex * 90));
-                        }
-
-                        yield return null;
-                        if (forceStopSample) goto FINISHSAMPLE;
-
-                        while (SharedConfig.StopSampler)                        // 等待帧率暂停解除
-                        {
-                            yield return null;
-                            if (forceStopSample) goto FINISHSAMPLE;
-                        }
-                    }
-                }
-            }
-
-        FINISHSAMPLE:
-            logData.Append("]");
-            string sampleString = logData.ToString();
-
-            // 写入本地json文件
-            {
-                DateTime now = DateTime.Now;
-                string filePath = string.Format("./log/terrainsampler_{0}_{1}_{2}_{3}_{4}.json", now.Year, now.Month, now.Day, now.Hour, now.Minute);
-                string dir = Path.GetDirectoryName(filePath);
-                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                File.WriteAllText(filePath, sampleString);
-            }
-
-            Debug.LogError("autoTranslate:" + autoTranslate);
-
-            if (autoTranslate)           // 自动上传网络
-            {
-                using (WebClient client = new WebClient())
-                {
-                    NameValueCollection collection = new NameValueCollection()
-                    {
-                        {dataKey,sampleString}
-                    };
-                    Debug.LogFormat("url:{0} dataKey:{1}", url, dataKey);
-                    client.UploadValues(url, "POST", collection);
-                }
-            }
-
-            Debug.LogError("finish autoTranslate");
-
-            if (forceExitApp) Application.Quit();
-
-            // 上传完毕后
-            logData.Length = 0;
-            InSamplingMode = false;
-            forceStopSample = false;
-            forceExitApp = true;
-        }
-
-        /// <summary>
-        /// 计算指定地块指定位置在大地图中的坐标
-        /// </summary>
-        private Vector3 CalculateCoordinate(int blockX, int blockZ, float xInBlock, float zInBlock)
-        {
-            float x = blockX * BlockSize + xInBlock +
-                      SingletonManager.Get<MapsDescription>().BigMapParameters.TerrainMin.x;
-            float z = blockZ * BlockSize + zInBlock +
-                      SingletonManager.Get<MapsDescription>().BigMapParameters.TerrainMin.z;
-            float y = 0;
-            Vector3 pos = new Vector3(x, y, z);
-            return pos;
-        }
-
-        /// <summary>
-        /// 确定指定x,z位置的落地点（y方向值）
-        /// </summary>
-        private Vector3 FindTheGroundPos(Vector3 pos)
-        {
-            Vector3 fromV = new Vector3(pos.x, 1000, pos.z);
-
-            Vector3 toV = new Vector3(pos.x, -1000, pos.z);
-
-            Ray r = new Ray(fromV, new Vector3(toV.x - fromV.x, toV.y - fromV.y, toV.z - fromV.z));
-
-            RaycastHit hitInfo;
-
-            bool hitted = Physics.Raycast(r, out hitInfo, Mathf.Infinity, UnityLayers.SceneCollidableLayerMask | (1 << UnityLayerManager.GetLayerIndex(EUnityLayerName.WaterTrigger)));
-            float yVal = 0;
-            if (hitted == false)
-            {
-                yVal = pos.y;
-            }
-            else
-            {
-                yVal = hitInfo.point.y;
-            }
-
-            Vector3 groundPos = new Vector3(pos.x, hitInfo.point.y, pos.z);
-            return groundPos;
-        }
-
-        /// <summary>
-        /// 将人物移动到大地图中的指定位置
-        /// </summary>
-        private void MoveTo(Vector3 pos)
-        {
-            var player = _playerContext.flagSelfEntity;
-            player.position.Value = pos;
-            if (App.Shared.SharedConfig.InSamplingMode)
-                Camera.main.transform.position = new Vector3(pos.x, pos.y + 1.7f, pos.z);
-        }
-
-        /// <summary>
-        /// 将玩家调整到指定朝向
-        /// </summary>
-        private IEnumerator LookAt(float yaw)
-        {
-            var player = _playerContext.flagSelfEntity;
-            player.orientation.Pitch = 0;
-            player.orientation.Yaw = yaw;
-
-            if (App.Shared.SharedConfig.InSamplingMode)
-            {
-                Camera.main.transform.eulerAngles = new Vector3(0, player.orientation.Yaw, 0);
-            }
-
-            // 等待2帧相机调整完毕后渲染
-            yield return null;
-            yield return null;
-        }
-
-        /// <summary>
-        /// 确保大地形中指定位置所需的地块加载完毕
-        /// </summary>
-        private bool IsTerrainReady(Vector3 pos)
-        {
-            return LevelManager.NotFinishedRequests <= 0;
-        }
-
-        /// <summary>
-        /// 等待指定位置的地形及其相关资源载入完毕
-        /// </summary>
-        private IEnumerator WaitForTerrainReady(Vector3 pos)
-        {
-            for (int i = 0; i < 2; i++)
-                yield return null;
-
-            while (!IsTerrainReady(pos))
-                yield return null;
-
-            int count = waitForSample;
-            for (int i = 0; i < count; i++)
-                yield return null;
-        }
-
-        /// <summary>
-        /// 记录可视网格的数量
-        /// </summary>
-        private int GetVisibleRenders()
-        {
-            var mrs = FindObjectsOfType<MeshRenderer>();
-            int count = 0, num = mrs.Length;
-            for (int i = 0; i < num; i++)
-            {
-                MeshRenderer mr = mrs[i];
-                if (mr != null && mr.isVisible) ++count;
-            }
-            return count;
+            this.sampleData.Append(_profilerData);
+#endif
+            this.sampleData.Append("}");
+
+            return worstIndex;
         }
 
         /// <summary>
@@ -1136,71 +856,82 @@ namespace App.Client.Tools
             forceExitApp = false;
         }
 
-        /// <summary>
-        /// 指定采样点
-        /// </summary>
-        public bool SamplerSomePoints(List<float> list, bool autoTranslate)
+        public int GetUnitSize(float size)
         {
-            // 正在采样
-            if (InSamplingMode) return false;
+            int len = 1000;
 
-            this.autoTranslate = autoTranslate;
-            List<Vector3> points = new List<Vector3>();
-            int count = list.Count / 3;
-            for (int i = 0; i < count; i++)
-            {
-                Vector3 vec = new Vector3(list[i * 3], list[i * 3 + 1], list[i * 3 + 2]);
-                points.Add(vec);
-            }
+            if (size > 2000f) len = 1000;
+            else if (size > 1000f) len = 500;
+            else if (size > 800f) len = 250;
+            else if (size > 250f) len = 100;
+            else if (size > 100f) len = 50;
+            else len = 20;
 
-            //_systemStartTime = DateTime.UtcNow;
-            SharedConfig.HaveFallDamage = false;
-            StartCoroutine(SamplePoints(points));
-            InSamplingMode = true;
+            return len;
+        }
+    }
 
-            return true;
+    public class PointsTerrainSampler : BaseTerrainSampler
+    {
+        private IEnumerable<Vector2> points = null;
+
+        public PointsTerrainSampler(int mapId, IEnumerable<Vector2> points) : base(mapId)
+        {
+            this.points = points;
         }
 
-        public bool SamplerSomeScenes(List<int> list, bool autoTranslate)
+        protected override IEnumerator<Vector2> GetSamplePoints()
         {
-            // 正在采样
-            if (InSamplingMode) return false;
-
-            this.autoTranslate = autoTranslate;
-            List<Vector2> scenes = new List<Vector2>();
-            int count = list.Count / 2;
-            for (int i = 0; i < count; i++)
+            var iterator = points.GetEnumerator();
+            while (iterator.MoveNext())
             {
-                Vector2 vec = new Vector2(list[i * 2], list[i * 2 + 1]);
-                scenes.Add(vec);
+                yield return iterator.Current;
             }
-
-            //_systemStartTime = DateTime.UtcNow;
-            SharedConfig.HaveFallDamage = false;
-            StartCoroutine(SampleScenes(scenes));
-            InSamplingMode = true;
-
-            return true;
         }
+    }
+
+    public class ScenesTerrainSampler : BaseTerrainSampler
+    {
+        private IEnumerable<Vector2> scenes;
 
         /// <summary>
-        /// 根据指定位置取得地形序号
+        /// 采样点的距离间隔
         /// </summary>
-        public Vector2 GetTerrainIndexByPos(Vector3 pos)
+        private const int sampleInterval = 100;
+
+        public ScenesTerrainSampler(int mapId, IEnumerable<Vector2> scenes) : base(mapId)
         {
-            if (pos.x > 4000f) pos.x = 4000f;
-            else if (pos.x < -4000f) pos.x = -4000f;
+            this.scenes = scenes;
+        }
 
-            if (pos.z > 4000f) pos.z = 4000f;
-            else if (pos.z < -4000f) pos.z = -4000f;
+        protected override IEnumerator<Vector2> GetSamplePoints()
+        {
+            if (mapDes.CurrentLevelType != LevelType.BigMap)
+            {
+                Debug.LogErrorFormat("非大地图不支持场景采样，请联系tzj修改代码以便支持，mapId:{0} levelType:{1}",
+                    mapId, mapDes.CurrentLevelType);
+                yield break;
+            }
 
-            pos.x -= -4000f;
-            pos.z -= -4000f;
+            // 对每一个场景地块进行采样
+            float blockSize = mapDes.BigMapParameters.TerrainSize;
+            Vector3 minVec = mapDes.BigMapParameters.TerrainMin;
+            foreach (Vector2 vec in scenes)
+            {
+                float posStartX = minVec.x + vec.x * blockSize;
+                float posStartZ = minVec.z + vec.y * blockSize;
 
-            int x = (int)(pos.x / 1000f);
-            int z = (int)(pos.z / 1000f);
+                for (int x = 1; x < blockSize; x += sampleInterval)
+                {
+                    for (int z = 1; z < blockSize; z += sampleInterval)
+                    {
+                        float posX = posStartX + x;
+                        float posZ = posStartZ + z;
 
-            return new Vector2(x, z);
+                        yield return new Vector2(posX, posZ);
+                    }
+                }
+            }
         }
     }
 }

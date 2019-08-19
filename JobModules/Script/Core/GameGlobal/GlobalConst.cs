@@ -34,7 +34,6 @@ namespace Core
         public static float        FireSpreadDuration  = 0.4f;
         public static bool         EnableInputBlockLog = false;
         public static EPlayerInput serachedInput;
-        public static bool         EnableAudioLog = false;
         public static bool         EnableStateLog = false;
         public static bool         EnableAssetLog = false;
 
@@ -98,8 +97,23 @@ namespace Core
         public static float offset =0.01f;
 
         public static int AttackTimeBegin{ get; set; }
+        public const float AttributeInvalidValue = -999;
+
+        public static Vector3 LocalScale = new Vector3(0.01f, 0.01f, 0.01f);
+        public static bool isServer;
+
         public const float RaycastStepOffset = 0.01f;
 
         public const int SwitchCdTime = 300;
+        
+        
+        public const float WeaponDropHSpeed=5;
+        public const float WeaponDropVSpeed=-10f;
+        public const float WeaponDropOffset=2;
+        public const int SceneWeaponLifetime=20000;
+        public const int BagLimitTime=30000;
+        public static Vector3 ThrowingEmittorFirstOffset = new Vector3(0.3f, -0.4f, 1.2f);
+        public static Vector3 ThrowingEmittorThirdOffset = new Vector3(0, -0.2f, 3.0f);
+        
     }
 }

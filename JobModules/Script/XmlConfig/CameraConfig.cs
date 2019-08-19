@@ -126,13 +126,26 @@ namespace XmlConfig
         public CameraConfigItem[] ConfigItems;
 
         private Dictionary<int, CameraConfigItem> _configDict = new Dictionary<int, CameraConfigItem>();
+
+        private int previousRoleType = -1;
+
+        private CameraConfigItem cameraConfigItem;
+
         public CameraConfigItem GetRoleConfig(int roleType = 0)
         {
-            return _configDict[roleType];
+            if (roleType == previousRoleType)
+            {
+                return cameraConfigItem;
+            }
+            previousRoleType = roleType;
+
+            cameraConfigItem = _configDict[roleType];
+            return cameraConfigItem;
         }
 
         public void RecordConfigs()
         {
+            previousRoleType = -1;
             foreach (var item in ConfigItems)
             {
                 _configDict.Add(item.RoleType, item);

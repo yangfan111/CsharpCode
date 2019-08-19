@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using App.Shared.Audio;
 using App.Shared.Components;
 using App.Shared.Player.Events;
 using App.Shared.Util;
 using Core;
+using Core.Components;
 using Core.Configuration;
 using Core.EntityComponent;
 using Core.Event;
@@ -35,7 +36,7 @@ namespace App.Shared.EntityFactory
             e.EnvironmentType = environmentType;
             e.Offset          = offset;
             e.HitAudioId      = hitAuidoId;
-            e.HitPoint        = hitPoint;
+            e.HitPoint        = hitPoint.ShiftedToFixedVector3();
             e.ChunkId         = chunkId;
 
             e.needEffectEntity = needEffectEntity;
@@ -45,7 +46,7 @@ namespace App.Shared.EntityFactory
 
         public static void CreateHitEnvironmentEffect( HitEnvironmentEvent hitEnvironmentEvent)
         {
-            CreateHitEnvironmentEffect(hitEnvironmentEvent.HitPoint, hitEnvironmentEvent.Offset,
+            CreateHitEnvironmentEffect(hitEnvironmentEvent.HitPoint.ShiftedVector3(), hitEnvironmentEvent.Offset,
                 hitEnvironmentEvent.EnvironmentType, hitEnvironmentEvent.HitAudioId,
                 hitEnvironmentEvent.needEffectEntity,hitEnvironmentEvent.ChunkId);
         }
@@ -65,17 +66,20 @@ namespace App.Shared.EntityFactory
                 IEffectBehavior effectBehavior;
                 if (chunkId > 0)
                 {
-                    ChunkEffectBehavior  b1 =ObjectAllocatorHolder<ChunkEffectBehavior>.Allocate();
-                    b1.Initialize(normal, hitPoint, (int) effectTypeInfo.AudioType, hitAudioId,
+                    var chunkBehavior =  ObjectAllocatorHolder<ChunkEffectBehavior>.Allocate();  
+                    //ChunkEffectBehavior  b1 =ObjectAllocatorHolder<ChunkEffectBehavior>.Allocate();
+                    chunkBehavior.Initialize(normal, hitPoint, (int) effectTypeInfo.AudioType, hitAudioId,
                         AudioClientEffectType.WeaponEnvHit,chunkId,parent);
-                    effectBehavior = b1;
+                    effectBehavior = chunkBehavior;
                 }
                 else
                 {
-                    NormalEffectBehavior b2 = ObjectAllocatorHolder<NormalEffectBehavior>.Allocate();
-                    b2.Initialize(normal, hitPoint, (int) effectTypeInfo.AudioType, hitAudioId,
+                    var noramlEffect =  ObjectAllocatorHolder<NormalEffectBehavior>.Allocate();  
+
+                    //NormalEffectBehavior b2 = ObjectAllocatorHolder<>.Allocate();
+                    noramlEffect.Initialize(normal, hitPoint, (int) effectTypeInfo.AudioType, hitAudioId,
                         AudioClientEffectType.WeaponEnvHit);
-                    effectBehavior = b2;
+                    effectBehavior = noramlEffect;
                 }
                 clientEffectObj.Initialize((int) effectTypeInfo.DefaultId, effectBehavior);
             }
@@ -90,18 +94,18 @@ namespace App.Shared.EntityFactory
         {
             ClientEffectEmitter clientEffectObj =
                             LocalObjectGenerator.EffectLocal.GetClientEffectEmitter(EEffectObjectClassify.BulletFly);
-            var moveEffectBehavior = ObjectAllocatorHolder<MoveEffectBehavior>.Allocate();
+            var moveEffectBehavior = ObjectAllocatorHolder<MoveEffectBehavior>.Allocate(); 
             moveEffectBehavior.Initialize(startPos, startRocation, velocity, delay);
             clientEffectObj.Initialize(effectId, moveEffectBehavior);
             //DebugUtil.MyLog("emit fire effect:{0},{1}", startPos, effectId);
         }
-        public static void CreateBulletDrop(Vector3 position, float Yaw, float pitch, int effectId,
+        public static void CreateBulletDrop(Vector3 position, float yaw, float pitch, int effectId,
                                             int weaponId, AudioGrp_FootMatType dropMatType)
         {
             ClientEffectEmitter clientEffectObj =
                             LocalObjectGenerator.EffectLocal.GetClientEffectEmitter(EEffectObjectClassify.BulletDrop);
             var yawImmobileEffectBehavior = ObjectAllocatorHolder<YawEffectBehavior>.Allocate();
-            yawImmobileEffectBehavior.Initialize(Yaw,pitch, position, SingletonManager.Get<AudioWeaponManager>().FindById(weaponId).BulletDrop, (int) dropMatType,AudioClientEffectType.BulletDrop);
+            yawImmobileEffectBehavior.Initialize(pitch, yaw, position, SingletonManager.Get<AudioWeaponManager>().FindById(weaponId).BulletDrop, (int) dropMatType,AudioClientEffectType.BulletDrop);
             clientEffectObj.Initialize(effectId, yawImmobileEffectBehavior);
         }
 
@@ -111,7 +115,7 @@ namespace App.Shared.EntityFactory
             ClientEffectEmitter clientEffectObj =
                             LocalObjectGenerator.EffectLocal.GetClientEffectEmitter(EEffectObjectClassify.Muzzle);
             var immobileEffectBehavior = ObjectAllocatorHolder<YawEffectBehavior>.Allocate();
-            immobileEffectBehavior.Initialize(yaw,pitch, postion,muzzleTrans);
+            immobileEffectBehavior.Initialize(pitch, yaw, postion, muzzleTrans);
             clientEffectObj.Initialize(effectId, immobileEffectBehavior);
         }
         public static void AddHitPlayerEffectEvent(PlayerEntity srcPlayer, EntityKey target, Vector3 hitPoint,
@@ -119,7 +123,7 @@ namespace App.Shared.EntityFactory
         {
             HitPlayerEvent e = (HitPlayerEvent) EventInfos.Instance.Allocate(EEventType.HitPlayer, false);
             e.Target      = target;
-            e.HitPoint    = hitPoint;
+            e.HitPoint    = hitPoint.ShiftedToFixedVector3();
             e.HitAudioId  = audioId;
             e.HitBodyPart = (byte) part;
             srcPlayer.localEvents.Events.AddEvent(e);
@@ -137,7 +141,7 @@ namespace App.Shared.EntityFactory
             ClientEffectEmitter clientEffectObj =
                             LocalObjectGenerator.EffectLocal.GetClientEffectEmitter(EEffectObjectClassify.PlayerHit);
             var hitPlayerEffectBehavior = ObjectAllocatorHolder<HitPlayerEffectBehavior>.Allocate();
-            hitPlayerEffectBehavior.Initialize(hitPlayerEvent.HitPoint,new AudioEffectData(hitPlayerEvent.HitBodyPart,hitPlayerEvent.HitAudioId,AudioClientEffectType.WeaponPlayerHit), player.bones.Spine);
+            hitPlayerEffectBehavior.Initialize(hitPlayerEvent.HitPoint.ShiftedVector3(),new AudioEffectData(hitPlayerEvent.HitBodyPart,hitPlayerEvent.HitAudioId,AudioClientEffectType.WeaponPlayerHit), player.bones.Spine);
             clientEffectObj.Initialize(effectId, hitPlayerEffectBehavior);
         }
         #endregion

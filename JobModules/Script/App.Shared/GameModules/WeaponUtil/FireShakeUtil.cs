@@ -1,6 +1,7 @@
 ﻿
 using Core.Utils;
 using System;
+using Assets.Utils.Configuration;
 using WeaponConfigNs;
 using XmlConfig;
 
@@ -75,9 +76,9 @@ namespace App.Shared.GameModules.Weapon
     {
         public static LoggerAdapter logger = new LoggerAdapter(typeof(FireShakeProvider));
         
-        public static float GetDecayInterval(WeaponBaseAgent agent)
+        public static float GetDecayInterval(WeaponAllConfigs configs)
         {
-            return agent.CommonFireCfg.AttackInterval * agent.RifleShakeCfg.DecaytimeFactor;
+            return configs.S_CommonFireCfg.AttackInterval * configs.SRifleShakeCfg.DecaytimeFactor;
         }
 
         public static ShakeGroup GetShakeGroup(RifleShakeConfig shakeConfig, PlayerWeaponController controller)
@@ -111,30 +112,30 @@ namespace App.Shared.GameModules.Weapon
         }
        
         
-        public static ShakeInfoStruct GetFireUpDirShakeArgs(WeaponBaseAgent heldAgent, ShakeInfo shakeInfo)
+        public static ShakeInfoStruct GetFireUpDirShakeArgs(WeaponAttackProxy attackProxy, ShakeInfo shakeInfo)
         {
             var   newInfo = (ShakeInfoStruct) shakeInfo;
 
-            float factor  = heldAgent.GetAttachedAttributeByType(WeaponAttributeType.UpBase);
+            float factor  = attackProxy.GetAttachedAttributeByType(WeaponAttributeType.UpBase);
             if (factor != 0f) newInfo.UpBase *= factor;
         //    logger.Info("Shoot Shake factor:"+factor);
 
-            factor = heldAgent.GetAttachedAttributeByType(WeaponAttributeType.UpMax);
+            factor = attackProxy.GetAttachedAttributeByType(WeaponAttributeType.UpMax);
             if (factor != 0f) newInfo.UpMax *= factor;
 
-            factor = heldAgent.GetAttachedAttributeByType(WeaponAttributeType.UpModifier);
+            factor = attackProxy.GetAttachedAttributeByType(WeaponAttributeType.UpModifier);
             if (factor != 0f) newInfo.UpModifier *= factor;
 
-             factor = heldAgent.GetAttachedAttributeByType(WeaponAttributeType.LateralBase) ;
+             factor = attackProxy.GetAttachedAttributeByType(WeaponAttributeType.LateralBase) ;
             if (factor != 0f) newInfo.LateralBase *= factor;
 
-            factor = heldAgent.GetAttachedAttributeByType(WeaponAttributeType.LateralMax);
+            factor = attackProxy.GetAttachedAttributeByType(WeaponAttributeType.LateralMax);
             if (factor != 0f) newInfo.LateralMax *= factor;
 
-            factor = heldAgent.GetAttachedAttributeByType(WeaponAttributeType.LateralModifier);
+            factor = attackProxy.GetAttachedAttributeByType(WeaponAttributeType.LateralModifier);
             if (factor != 0f) newInfo.LateralModifier *= factor;
 
-            factor = heldAgent.GetAttachedAttributeByType(WeaponAttributeType.LateralTurnback);
+            factor = attackProxy.GetAttachedAttributeByType(WeaponAttributeType.LateralTurnback);
             if (factor != 0f) newInfo.LateralTurnback *= factor;
 
             return newInfo;

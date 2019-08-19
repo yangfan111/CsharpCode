@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Shared.Scripts;
 using Utils.CharacterState;
+using Utils.Singleton;
 using XmlConfig;
 
 namespace Utils.Configuration
@@ -69,6 +70,36 @@ namespace Utils.Configuration
             return _resDic[id];
         }
 
+        public int GetCamp(int id)
+        {
+            var cfg = GetConfigById(id);
+            if (null == cfg)
+            {
+                return 0;
+            }
+            int camp = 0;
+            if (cfg.ApplyRoleList.Contains(0))
+            {
+                return camp;
+            }
+
+            foreach (var roleId in cfg.ApplyRoleList)
+            {
+                var role = SingletonManager.Get<RoleConfigManager>().GetRoleItemById(roleId);
+                if (camp == 0)
+                {
+                    camp = role.Camp;
+                }
+                else
+                {
+                    if (role.Camp != camp)
+                    {
+                        return 0;
+                    }
+                }
+            }
+            return camp;
+        }
 
         public string GetIcon(int id, Sex sex)
         {

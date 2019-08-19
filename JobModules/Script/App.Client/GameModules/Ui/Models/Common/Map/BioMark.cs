@@ -17,8 +17,20 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             Hum,
             Supply
         }
+        class EBioMarkTypeComparer : IEqualityComparer<EBioMarkType>
+        {
+            public bool Equals(EBioMarkType x, EBioMarkType y)
+            {
+                return (x == y);
+            }
+            public int GetHashCode(EBioMarkType obj)
+            {
+                return (int)obj;
+            }
+        }
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(BioMark));
 
+        private static readonly IEqualityComparer<EBioMarkType> _bioMarkTypeComparer = new EBioMarkTypeComparer();
         private Transform _root;
         private RectTransform bioMotherRtf, bioHeroRtf, bioHumRtf,bioSupplyBoxRtf;
 
@@ -36,14 +48,14 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
         private void InitPool()
         {
-            _markPool = new Dictionary<EBioMarkType, List<GameObject>>();
+            _markPool = new Dictionary<EBioMarkType, List<GameObject>>(_bioMarkTypeComparer);
 
             foreach(EBioMarkType type in Enum.GetValues(typeof(EBioMarkType)))
             {
                 _markPool.Add(type,new List<GameObject>());
             }
 
-            _origGoDict = new Dictionary<EBioMarkType, GameObject>();
+            _origGoDict = new Dictionary<EBioMarkType, GameObject>(_bioMarkTypeComparer);
 
             _origGoDict.Add(EBioMarkType.Mother, bioMotherRtf.gameObject);
             _origGoDict.Add(EBioMarkType.Hero, bioHeroRtf.gameObject);
@@ -121,7 +133,8 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
         private List<GameObject> GetMark(EBioMarkType type,int len)
         {
-            var list = _markPool[type];
+            List<GameObject> list;
+            _markPool.TryGetValue(type, out list);
             int needAddCount = 0;
             int needHideCount = 0;
             int listCount = list.Count;

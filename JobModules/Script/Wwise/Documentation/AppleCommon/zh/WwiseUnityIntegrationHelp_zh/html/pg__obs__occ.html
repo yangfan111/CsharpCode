@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>Obstruction and Occlusion</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>&nbsp;&raquo;&nbsp;<a class="el" href="pg__spatialaudio.html">Using Wwise Spatial Audio in Unity</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="pg_obs_occ">Obstruction and Occlusion </a></h1><p>It is possible to obstruct or occlude sounds in Unity. See the following sections for details:</p>
+<ul>
+<li><a class="el" href="pg__obs__occ.html#sect_emitter_obs_occ">A. Emitter Obstruction/Occlusion</a></li>
+<li><a class="el" href="pg__obs__occ.html#sect_portal_obs">B. Portal Obstruction</a></li>
+</ul>
+<h2><a class="anchor" id="sect_emitter_obs_occ">
+A. Emitter Obstruction/Occlusion</a></h2>
+<p>An emitter can be obstructed or occluded in Unity when the <b>Ak Emitter Obstruction Occlusion</b> component is added to its GameObject. When your map doesn't use spatial audio, that is it doesn't have any <b>Ak Room</b> components, the <b>Ak Emitter Obstruction Occlusion</b> component will only use occlusion. In a spatial audio scene, this same component will use obstruction with the spatial audio listener only; the GameObject with the <b>Ak Spatial Audio Listener</b> component. Emitter obstruction is applied to emitters that are in the same room as the spatial audio listener.</p>
+<ol type="1">
+<li>Add an <b>Ak Emitter Obstruction Occlusion</b> component to Button Outside.<ol type="a">
+<li>In <b>Layer Mask</b>, select layers that would block audio. In the SpatialAudioTutorial scene provided with the integration, we have put the first person character on a user created layer called "Player" and the GameObjects with <a class="el" href="class_ak_room.html" title="An AkRoom is an enclosed environment that can only communicate to the outside/other...">AkRoom</a> or <a class="el" href="class_ak_room_portal.html" title="An AkRoomPortal can connect two AkRoom components together.">AkRoomPortal</a> components on a user created layer called "Ignore Audio Raycast". These layers are not selected in the <b>Layer Mask</b> option. <div align="center">
+<img src="AkEmitterObstructionOcclusion.png" alt="AkEmitterObstructionOcclusion.png"/>
+<p><strong>Ak Emitter Obstruction Occlusion component</strong></p></div>
+<div align="center">
+<img src="AkEmitterObstructionOcclusionLayerMask.png" alt="AkEmitterObstructionOcclusionLayerMask.png"/>
+<p><strong>Layer Mask options for the Ak Emitter Obstruction Occlusion component</strong></p></div>
+</li>
+</ol>
+</li>
+<li>Play the scene.<ol type="a">
+<li>Play Button Outside.</li>
+<li>Go behind the Barrier GameObject to hear it occluded or obstructed depending on the presence of any GameObjects with the <b>Ak Room</b> component in your scene.</li>
+</ol>
+</li>
+</ol>
+<h2><a class="anchor" id="sect_portal_obs">
+B. Portal Obstruction</a></h2>
+<p>Sound emitted through portals can also be obstructed. Use the <b>Ak Room Portal Obstruction</b> component on a game object with an <b>Ak Room Portal</b> component to do so. See section <a class="el" href="pg__rooms__portals__tut.html">Rooms and Portals Tutorial</a> to add rooms and portals to your scene, if not done already.</p>
+<ol type="1">
+<li>Add an <b>Ak Room Portal Obstruction</b> component to Outside Portal.<ol type="a">
+<li>In <b>Layer Mask</b>, select layers that would block audio. In the SpatialAudioTutorial scene provided with the integration, we have put the the GameObjects with <a class="el" href="class_ak_room.html" title="An AkRoom is an enclosed environment that can only communicate to the outside/other...">AkRoom</a> components on a user created layer called "Ignore Audio Raycast". This layer is not selected in the <b>Layer Mask</b> option. <div align="center">
+<img src="AkRoomPortalObstruction.png" alt="AkRoomPortalObstruction.png"/>
+<p><strong>Ak Room Portal Obstruction component</strong></p></div>
+<div align="center">
+<img src="AkRoomPortalObstructionLayerMask.png" alt="AkRoomPortalObstructionLayerMask.png"/>
+<p><strong>Layer Mask options for the Ak Room Portal Obstruction component</strong></p></div>
+</li>
+</ol>
+</li>
+<li>Play the scene.<ol type="a">
+<li>Play Button Small Room.</li>
+<li>Go behind the Barrier GameObject to obstruct the portal. </li>
+</ol>
+</li>
+</ol>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

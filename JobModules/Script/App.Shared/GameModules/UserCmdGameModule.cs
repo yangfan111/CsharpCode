@@ -29,9 +29,14 @@ namespace App.Shared.GameModules
         public UserCmdGameModule(Contexts contexts, ICompensationWorldFactory compensationWorldFactory, IBulletHitHandler bulletHitHandler,
             MeleeHitHandler meleeHitHandler, ThrowingHitHandler throwingHitHandler, ICommonSessionObjects commonSessionObjects, Motors motors)
         {
-          
+
+            if (!SharedConfig.IsServer)
+            {
+                AddSystem(new ClientPlayerPreSyncDataSystem());
+            }
+
             AddSystem(new PlayerStatisticsUpdateSystem());
-            AddSystem(new PlayerWeaponCmdGenerateSystem());
+            AddSystem(new PlayerWeaponCmdUpdateSystem());
             AddSystem(new PlayerInterruptUpdateSystem());
             if (SharedConfig.IsServer)
             {
@@ -46,24 +51,29 @@ namespace App.Shared.GameModules
                 AddSystem(new ServerSynchronizeFromComponentSystem());
             }
             AddSystem(new PlayerClientTimeSystem());
-            AddSystem(new PlayerGrenadeInventorySyncSystem());
             AddSystem(new PlayerRotateLimitSystem());
-            
+      
             AddSystem(new CameraPreUpdateSystem(contexts, motors));
             if (!SharedConfig.IsServer)
+            {
+                
                 AddSystem(new ClientPrepareObserveSystem(contexts));
+
+            }
             
             AddSystem(new CameraFireInfoSyncSystem(contexts));
          
             AddSystem(new BulletSimulationSystem(contexts, compensationWorldFactory, bulletHitHandler));
-            AddSystem(new PlayerAttackSystem(contexts));
-            AddSystem(new MeleeAttackSystem(contexts, compensationWorldFactory, meleeHitHandler));
-            AddSystem(new ThrowingSimulationSystem(contexts, compensationWorldFactory, throwingHitHandler, contexts.session.entityFactoryObject.SoundEntityFactory));
-            AddSystem(new PlayerBulletGenerateSystem(contexts));
-            
             AddSystem(new PlayerWeaponSwitchSystem());
             AddSystem(new PlayerWeaponDrawSystem());
-            AddSystem(new PlayerWeaponUpdateSystem(contexts));
+
+            AddSystem(new PlayerAttackSystem(contexts));
+            AddSystem(new MeleeAttackSystem(contexts, compensationWorldFactory, meleeHitHandler));
+            AddSystem(new ThrowingSimulationSystem(contexts, compensationWorldFactory, throwingHitHandler));
+            AddSystem(new PlayerBulletGenerateSystem(contexts));
+            
+        
+            AddSystem(new PlayerWeaponGamePlayUpdateSystem(contexts));
             AddSystem(new PlayerAudioCmdUpdateSystem());
             if (!SharedConfig.IsServer)
             {
@@ -159,8 +169,10 @@ namespace App.Shared.GameModules
                 AddSystem(new CameraPostUpdateSystem(contexts));
             else AddSystem(new ServerPostCameraUpdateSystem(contexts));
             if (!SharedConfig.IsServer)
+            {
                 AddSystem(new PlayerBioSwitchSystem(contexts));
-          
+                AddSystem(new PlayerWitnessSystem(contexts));
+            }
         }
     }
 }

@@ -46,11 +46,13 @@ namespace Core.SpatialPartition
         /// </summary>
         public float CellWidth { get; private set; }
 
+        public float CellWidthBackwards { get; private set; }
+
         /// <summary>
         /// Gets the height of cells in the Bin.
         /// </summary>
         public float CellHeight { get; private set; }
-
+        public float CellHeightBackwards { get; private set; }
         /// <summary>
         /// The coordinate at which this bin's bottom left corner lies.
         /// </summary>
@@ -66,6 +68,8 @@ namespace Core.SpatialPartition
 
             CellWidth = config.CellWidth;
             CellHeight = config.CellHeight;
+            CellWidthBackwards = 1.0f / config.CellWidth;
+            CellHeightBackwards = 1.0f / config.CellHeight;
             _bottomLeft = config.BottomLeft;
             _topRight = new Vector2(_bottomLeft.x + config.GridWidth * config.CellWidth,
                 _bottomLeft.y + config.GridHeight * config.CellHeight);
@@ -211,7 +215,7 @@ namespace Core.SpatialPartition
 
         private Cell GetCell(Vector2 pos)
         {
-            return new Cell((int)((pos.x - _bottomLeft.x) / CellWidth), (int)((pos.y - _bottomLeft.y) / CellHeight));
+            return new Cell((int)((pos.x - _bottomLeft.x) * CellWidthBackwards /*/ CellWidth*/), (int)((pos.y - _bottomLeft.y)  * CellHeightBackwards /*/ CellHeight*/));
         }
 
         private struct Cell
@@ -249,10 +253,10 @@ namespace Core.SpatialPartition
         {
             var internalBounds = new InternalBounds
             {
-                MinX = Mathf.Max(0, (int)((bounds.xMin - _bottomLeft.x) / CellWidth)),
-                MinY = Mathf.Max(0, (int)((bounds.yMin - _bottomLeft.y) / CellHeight)),
-                MaxX = Mathf.Min(Width - 1, (int)((bounds.xMax - _bottomLeft.x) / CellWidth)),
-                MaxY = Mathf.Min(Height - 1, (int)((bounds.yMax - _bottomLeft.y) / CellHeight))
+                MinX = Mathf.Max(0, (int)((bounds.xMin - _bottomLeft.x) * CellWidthBackwards /*/ CellWidth*/)),
+                MinY = Mathf.Max(0, (int)((bounds.yMin - _bottomLeft.y) * CellHeightBackwards /*/ CellHeight*/)),
+                MaxX = Mathf.Min(Width - 1, (int)((bounds.xMax - _bottomLeft.x) * CellWidthBackwards /*/ CellWidth*/)),
+                MaxY = Mathf.Min(Height - 1, (int)((bounds.yMax - _bottomLeft.y) * CellHeightBackwards /*/ CellHeight*/))
             };
 
             return internalBounds;

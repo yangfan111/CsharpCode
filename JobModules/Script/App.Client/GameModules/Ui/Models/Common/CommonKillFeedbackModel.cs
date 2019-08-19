@@ -111,7 +111,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             {
                 if (enable == false)
                 {
-                    UITool.HideChilds(groupRoot);
+                    UITool.SetChildsActive(groupRoot,false);
                 }
             }
         }

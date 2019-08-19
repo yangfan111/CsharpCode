@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>AkGameObj类参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li class="current"><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="tabs">
+    <ul>
+      <li><a href="annotated.html"><span>组合类型列表</span></a></li>
+      <li><a href="classes.html"><span>组合类型索引</span></a></li>
+      <li><a href="hierarchy.html"><span>类继承关系</span></a></li>
+      <li><a href="functions.html"><span>组合类型成员</span></a></li>
+    </ul>
+  </div>
+</div>
+<div class="contents">
+<h1>AkGameObj类参考</h1><!-- doxytag: class="AkGameObj" -->
+<p>This component represents a sound object in your scene tracking its position and other game syncs such as Switches, RTPC and environment values. You can add this to any object that will emit sound, and it will be added to any object that an <a class="el" href="class_ak_audio_listener.html" title="Add this script on the game object that represent a listener. This is normally added...">AkAudioListener</a> is attached to. Note that if it is not present, Wwise will add it automatically, with the default values, to any Unity Game Object that is passed to Wwise.  
+<a href="#_details">更多...</a></p>
+
+<p><a href="class_ak_game_obj-members.html">所有成员的列表。</a></p>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2"><h2>公有成员</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual UnityEngine.Vector3&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_game_obj_a3c97c5520bb2ddb83096ee9f7a7452a9.html#a3c97c5520bb2ddb83096ee9f7a7452a9">GetPosition</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual UnityEngine.Vector3&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_game_obj_aea8a036e1256803caef03267145d088b.html#aea8a036e1256803caef03267145d088b">GetForward</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual UnityEngine.Vector3&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_game_obj_ac2c4df4653f96860c16a5433413d9b8a.html#ac2c4df4653f96860c16a5433413d9b8a">GetUpward</a> ()</td></tr>
+<tr><td colspan="2"><h2>公有属性</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_game_obj_a92b827623ddc330289d2e1f228841399.html#a92b827623ddc330289d2e1f228841399">isEnvironmentAware</a> = true</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Is this object affected by Environment changes? Set to false if not affected in order to save some useless calls. Default is true.  <a href="#a92b827623ddc330289d2e1f228841399"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">AkGameObjPositionOffsetData&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_game_obj_af04d8aad357e219372c374457245cd2b.html#af04d8aad357e219372c374457245cd2b">m_positionOffsetData</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">When not set to null, the position will be offset relative to the Game Object position by the Position Offset.  <a href="#af04d8aad357e219372c374457245cd2b"></a><br/></td></tr>
+</table>
+<hr/><a name="_details"></a><h2>详细描述</h2>
+<p>This component represents a sound object in your scene tracking its position and other game syncs such as Switches, RTPC and environment values. You can add this to any object that will emit sound, and it will be added to any object that an <a class="el" href="class_ak_audio_listener.html" title="Add this script on the game object that represent a listener. This is normally added...">AkAudioListener</a> is attached to. Note that if it is not present, Wwise will add it automatically, with the default values, to any Unity Game Object that is passed to Wwise. </p>
+<dl class="see"><dt><b>参见:</b></dt><dd><ul>
+<li><a href="https://www.audiokinetic.com/library/edge/?source=SDK&amp;id=soundengine__gameobj.html" target="_blank">Integration Details - Game Objects</a> (Note: This is described in the Wwise SDK documentation.)</li>
+<li><a href="https://www.audiokinetic.com/library/edge/?source=SDK&amp;id=soundengine__events.html" target="_blank">Integration Details - Events</a> (Note: This is described in the Wwise SDK documentation.)</li>
+<li><a href="https://www.audiokinetic.com/library/edge/?source=SDK&amp;id=soundengine__listeners.html" target="_blank">Integrating Listeners</a> (Note: This is described in the Wwise SDK documentation.)</li>
+<li><a href="https://www.audiokinetic.com/library/edge/?source=SDK&amp;id=soundengine__switch.html" target="_blank">Integration Details - Switches</a> (Note: This is described in the Wwise SDK documentation.)</li>
+<li><a href="https://www.audiokinetic.com/library/edge/?source=SDK&amp;id=soundengine__states.html" target="_blank">Integration Details - States</a> (Note: This is described in the Wwise SDK documentation.)</li>
+<li><a href="https://www.audiokinetic.com/library/edge/?source=SDK&amp;id=soundengine__environments.html" target="_blank">Integration Details - Environments and Game-defined Auxiliary Sends</a> (Note: This is described in the Wwise SDK documentation.) </li>
+</ul>
+</dd></dl>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

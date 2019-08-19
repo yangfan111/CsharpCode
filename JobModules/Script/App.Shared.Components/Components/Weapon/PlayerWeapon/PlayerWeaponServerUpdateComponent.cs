@@ -1,19 +1,14 @@
-using Core;
 using Core.Components;
-using Core.Prediction.UserPrediction;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
+using Core.SyncLatest;
 using Entitas.CodeGeneration.Attributes;
 using System.Collections.Generic;
 
 namespace App.Shared.Components.Weapon
 {
     [Player,]
-    public class PlayerWeaponServerUpdateComponent : IUserPredictionComponent
+    public class PlayerWeaponServerUpdateComponent : ISelfLatestComponent
     {
-        public EWeaponUpdateCmdType EUpdateCmdType
-        {
-            get { return (EWeaponUpdateCmdType) UpdateCmdType; }
-        }
         [DontInitilize, NetworkProperty] public byte UpdateCmdType;
         [DontInitilize, NetworkProperty] public List<int> ReservedWeaponSubType;
     
@@ -26,11 +21,6 @@ namespace App.Shared.Components.Weapon
         {
             if(ReservedWeaponSubType == null)
                 ReservedWeaponSubType = new List<int>();
-        }
-        public void RewindTo(object rightComponent)
-        {
-            CopyFrom(rightComponent);
-           
         }
 
         public bool CompareArray(List<int> rReservedWeaponSubType)
@@ -70,6 +60,11 @@ namespace App.Shared.Components.Weapon
             UpdateCmdType = remote.UpdateCmdType;
             ReservedWeaponSubType.Clear();
             ReservedWeaponSubType.AddRange(remote.ReservedWeaponSubType);
+        }
+
+        public void SyncLatestFrom(object rightComponent)
+        {
+            CopyFrom(rightComponent);
         }
     }
 }

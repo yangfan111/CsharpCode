@@ -22,54 +22,35 @@ namespace Core
         {
             for (int i = 0; i < GlobalConst.WeaponSlotMaxLength; i++)
             {
-                slotWeapons.Add(new WeaponBagSlotData());
+                /*slotWeapons.Add(new WeaponBagSlotData());*/
+                slotWeapons[i] = new WeaponBagSlotData();
             }
 
         }
-        public int ToIndex(EWeaponSlotType slot)
-        {
-            switch (slot)
-            {
-                case EWeaponSlotType.Pointer:
-                    return HeldSlotPointer;
-                default:
-                    return (int)slot;
+        // public int ToIndex(EWeaponSlotType slot)
+        // {
+        //     switch (slot)
+        //     {
+        //         case EWeaponSlotType.Pointer:
+        //             return HeldSlotPointer;
+        //         default:
+        //             return (int)slot;
+        //
+        //     }
+        // }
+        private /*List<WeaponBagSlotData>*/WeaponBagSlotData[] slotWeapons = new WeaponBagSlotData[GlobalConst.WeaponSlotMaxLength];
 
-            }
-        }
-        private List<WeaponBagSlotData> slotWeapons = new List<WeaponBagSlotData>(GlobalConst.WeaponSlotMaxLength);
-
-        public byte HeldSlotPointer { get; private set; }
-
-        public byte LastSlotPointer { get; private set; }
-
-        /// <summary>
-        /// 背包实际索引号
-        /// </summary>
-        public int BagIndex { get; private set; }
-        public void ChangeSlotPointer(byte nowSlot)
-        {
-
-            LastSlotPointer = HeldSlotPointer;
-            HeldSlotPointer = nowSlot;
-
-        }
-        public void ClearPointer()
-        {
-            LastSlotPointer = 0;
-            HeldSlotPointer = 0;
-        }
-        public WeaponBagSlotData HeldSlotData { get { return slotWeapons[HeldSlotPointer]; } }
+      
+        /*public WeaponBagSlotData HeldSlotData { get { return slotWeapons[HeldSlotPointer]; } }
 
         public WeaponBagSlotData LastSlotData { get { return slotWeapons[LastSlotPointer]; } }
-
+*/
         public WeaponBagSlotData this[EWeaponSlotType slot]
         {
             get
             {
-                int index = ToIndex(slot);
-                AssertUtility.Assert(index < slotWeapons.Count);
-                return slotWeapons[index];
+                AssertUtility.Assert((int)slot < GlobalConst.WeaponSlotMaxLength);
+                return slotWeapons[(int)slot];
             }
         }
         public bool HasValue { get; set; }
@@ -80,8 +61,6 @@ namespace Core
         {
 
             WeaponBagContainer clone = new WeaponBagContainer(false);
-            clone.HeldSlotPointer = HeldSlotPointer;
-            clone.LastSlotPointer = LastSlotPointer;
             for (int i = 0; i < GlobalConst.WeaponSlotMaxLength; i++)
             {
                 clone.slotWeapons[i] = slotWeapons[i].Clone();
@@ -100,8 +79,6 @@ namespace Core
 
         public void ReInit()
         {
-            HeldSlotPointer = 0;
-            LastSlotPointer = 0;
             for (int i = 0; i < GlobalConst.WeaponSlotMaxLength; i++)
             {
                 slotWeapons[i].Remove(EntityKey.Default);
@@ -120,8 +97,6 @@ namespace Core
         public void MergeFromPatch(WeaponBagContainer from)
         {
 
-            HeldSlotPointer = from.HeldSlotPointer;
-            LastSlotPointer = from.LastSlotPointer;
             for (int i = 0; i < GlobalConst.WeaponSlotMaxLength; i++)
             {
                 // if (from._bitArray[i+2] )
@@ -139,7 +114,6 @@ namespace Core
         public bool IsSimilar(WeaponBagContainer right)
         {
             if (right == null) return false;
-            if (HeldSlotPointer != right.HeldSlotPointer || LastSlotPointer != right.LastSlotPointer) return false;
             for (int i = 0; i < GlobalConst.WeaponSlotMaxLength; i++)
             {
                 if (slotWeapons[i] != right.slotWeapons[i])
@@ -169,8 +143,6 @@ namespace Core
         public void Read(BinaryReader reader)
         {
 
-            HeldSlotPointer = reader.ReadByte();
-            LastSlotPointer = reader.ReadByte();
             for (int i = 0; i < GlobalConst.WeaponSlotMaxLength; i++)
             {
                 var entityId = reader.ReadInt32();
@@ -182,10 +154,6 @@ namespace Core
         public void Write( MyBinaryWriter writer)
         {
 
-
-            writer.Write(HeldSlotPointer);
-            writer.Write(LastSlotPointer);
-
             for (int i = 0; i < GlobalConst.WeaponSlotMaxLength; i++)
             {
 
@@ -196,8 +164,6 @@ namespace Core
         }
         public void RewindTo(WeaponBagContainer right)
         {
-            HeldSlotPointer = right.HeldSlotPointer;
-            LastSlotPointer = right.LastSlotPointer;
 
             for (int i = 0; i < GlobalConst.WeaponSlotMaxLength; i++)
             {

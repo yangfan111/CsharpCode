@@ -97,6 +97,7 @@ namespace App.Shared.GameModules.Player.Move
             var nextPostureState = player.stateInterface.State.GetNextPostureState();
 
             if (PostureInConfig.Swim == postureState ||
+                PostureInConfig.Swim == nextPostureState ||
                 PostureInConfig.Dive == postureState ||
                 PostureInConfig.Jump == postureState ||
                 PostureInConfig.Land == postureState)

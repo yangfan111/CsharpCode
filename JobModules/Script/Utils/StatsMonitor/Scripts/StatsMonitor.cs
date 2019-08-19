@@ -192,7 +192,7 @@ namespace StatsMonitor
 
 
         public List<IProfiler> profilerList = new List<IProfiler>();
-
+        public static StatsMonitor Instance;
 
 		// ----------------------------------------------------------------------------
 		// Accessors
@@ -1443,12 +1443,13 @@ namespace StatsMonitor
 			_accAVGSamples = new float[_avgSamples];
 			_isInitialized = true;
 
-            
+            Instance = this;
 
         }
 
 
-		private void Update()
+
+        private void Update()
 		{
 			if (!_isInitialized || !inputEnabled) return;
 
@@ -1521,7 +1522,7 @@ namespace StatsMonitor
 				}
 			}
 #endif
-            }
+        }
 
 
 		private void OnEnable()

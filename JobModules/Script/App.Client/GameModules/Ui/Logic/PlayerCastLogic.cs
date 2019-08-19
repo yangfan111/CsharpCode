@@ -2,6 +2,7 @@
 using UserInputManager.Lib;
 using App.Client.CastObjectUtil;
 using App.Shared.Components.Player;
+using Core.EntityComponent;
 using Core.Enums;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
@@ -36,7 +37,7 @@ namespace App.Client.GameModules.Ui.Logic
         protected override void DoSetData(PointerData data)
         {
             _playerId = PlayerCastData.EntityId(data.IdList);
-            var playerEntity = _playerContext.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(_playerId, (short)EEntityType.Player));
+            var playerEntity = _playerContext.GetEntityWithEntityKey(new EntityKey(_playerId, (short)EEntityType.Player));
             if (null != playerEntity && playerEntity.hasGamePlay)
             {
                 var player = _playerContext.flagSelfEntity;

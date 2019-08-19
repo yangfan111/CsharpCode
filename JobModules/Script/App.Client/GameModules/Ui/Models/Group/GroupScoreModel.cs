@@ -1,20 +1,22 @@
 ﻿using System;
-using App.Client.GameModules.Ui.ViewModels.Group;
 using App.Client.GameModules.Ui.UiAdapter;
+using App.Client.GameModules.Ui.ViewModels.Group;
+using App.Shared.Components.Ui;
 using Assets.UiFramework.Libs;
 using Core.Enums;
 using Core.GameModule.Interface;
 using Core.Utils;
+using I2.Loc;
+using UIComponent.UI;
 using UnityEngine;
 
 namespace App.Client.GameModules.Ui.Models.Group
 {
-
     public class GroupScoreModel : ClientAbstractModel, IUiHfrSystem
     {
-        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(GroupScoreModel));
-        private GroupScoreViewModel _viewModel = new GroupScoreViewModel();
-        private Contexts _contexts;
+        protected LoggerAdapter Logger = new LoggerAdapter(typeof(GroupScoreModel));
+        protected GroupScoreViewModel _viewModel = new GroupScoreViewModel();
+
         private IGroupScoreUiAdapter _adapter;
 
         protected override IUiViewModel ViewModel
@@ -26,92 +28,146 @@ namespace App.Client.GameModules.Ui.Models.Group
         {
             base.OnGameobjectInitialized();
             InitVariable();
+            InitGui();
         }
+
+        protected void InitGui()
+        {
+            _viewModel.TimeShow = NeedUpdateTime;
+        }
+
+        UIList TList, CTList;
 
 
         private void InitVariable()
         {
+            TList = FindComponent<UIList>("PlayerGroup1");
+            CTList = FindComponent<UIList>("PlayerGroup2");
         }
 
-
-
-        public GroupScoreModel(IGroupScoreUiAdapter groupScoreState):base(groupScoreState)
+        public GroupScoreModel(IGroupScoreUiAdapter adapter) : base(adapter)
         {
-            _adapter = groupScoreState;
+            _adapter = adapter;
         }
-        float _interval;
+
         public override void Update(float interval)
         {
-            if (!isVisible || !_viewInitialized) return;
-
-            this._interval = interval;
-            UpdateInfo();
-        }
-
-        private void UpdateInfo()
-        {
-            UpdateKillCount();
+            UpdateState();
+            UpdateWinCodition();
+            UpdateCampData();
             UpdateRemainTime();
-            UpdateWinCondition();
         }
 
-        private void UpdateWinCondition()
+        private void UpdateState()
         {
-            int count = _adapter.KillCountForWin;
-            if (count <= 0)
-            {
-                return;
-            }
-            _viewModel.WinContionText = count.ToString();
-            _viewModel.WinContionColor = Color.white;
+            _needPause = _adapter.NeedPause;
         }
 
-        private int totalTime;
-        long curTime,beginTime;
-        private void UpdateRemainTime()
+        private int _scoreForWin = -1;
+
+        private void UpdateWinCodition()
         {
-            if (_adapter.NeedPause)
+            if (_scoreForWin == _adapter.ScoreForWin)
             {
                 return;
             }
-            int count = _adapter.KillCountForWin;
-            if (count > 0)
+            _scoreForWin = _adapter.ScoreForWin;
+            RealUpdateWinCodition(_scoreForWin);
+        }
+
+        protected virtual void RealUpdateWinCodition(int score)
+        {
+            var format = ScriptLocalization.client_blast.WinKillFormat;
+            _viewModel.ScoreText = NeedUpdateTime ? string.Empty : string.Format(format, score.ToString());
+            if (!NeedUpdateTime)
             {
-                return;
+                _viewModel.TimeText = string.Empty;
             }
+        }
+
+        private int _totalTime;
+        private long _curTime, _beginTime;
+        private bool _needPause = false;
+
+        protected virtual bool NeedUpdateTime
+        {
+            get
+            {
+                return _adapter != null && _adapter.ScoreForWin <= 0;
+            }
+        }
+
+        protected void UpdateRemainTime()
+        {
+            if (!NeedUpdateTime) return;
 
             var newTotalTime = _adapter.GameTime / 1000;
             if (newTotalTime == 0)
             {
-                _viewModel.WinContionText = "00.00";
+                _viewModel.TimeText = "00.00";
                 return;
             }
+
             if (newTotalTime > 0)
             {
-                beginTime = DateTime.Now.Ticks / 10000000;//重置时间
-                totalTime = newTotalTime;
-                _adapter.GameTime = -1000;//取值后设置为无效状态
+                _beginTime = DateTime.Now.Ticks / 10000000; //重置时间
+                _totalTime = newTotalTime;
+                _adapter.GameTime = -1000; //取值后设置为无效状态
+                RefreshTime();
             }
-            curTime = DateTime.Now.Ticks / 10000000;
-            int remainTime = (int)(beginTime - curTime + totalTime);
+
+            if (_needPause) return;
+            RefreshTime();
+        }
+
+        private void RefreshTime()
+        {
+            _curTime = DateTime.Now.Ticks / 10000000;
+            int remainTime = (int)(_beginTime - _curTime + _totalTime);
             remainTime = remainTime < 0 ? 0 : remainTime;
             int minute = remainTime / 60;
             int second = remainTime % 60;
             string minuteStr = minute < 10 ? "0" + minute : minute.ToString();
             string secondStr = second < 10 ? "0" + second : second.ToString();
 
-            //_viewModel.WinContionText = string.Format("{0}.{1}", minute, second);
-            _viewModel.WinContionText = minuteStr + "." + secondStr;
-            _viewModel.WinContionColor = minute < 1 ? Color.red : Color.white;
- 
+            _viewModel.TimeText = minuteStr + "." + secondStr;
+            _viewModel.TimeColor = minute < 1 && second < 30 ? Color.red : Color.white;
         }
 
-        private void UpdateKillCount()
+        private void UpdateCampData()
         {
-            _viewModel.CampKillCountText1 = _adapter.GetKillCountByCampType(EUICampType.T).ToString();
-            _viewModel.CampKillCountText2 = _adapter.GetKillCountByCampType(EUICampType.CT).ToString();
+            UpdateCampData(EUICampType.CT);
+            UpdateCampData(EUICampType.T);
+            UpdateScore();
         }
 
+        private void UpdateScore()
+        {
+            _viewModel.CampKillCountText1 = _adapter.GetScoreByCamp(EUICampType.T).ToString();
+            _viewModel.CampKillCountText2 = _adapter.GetScoreByCamp(EUICampType.CT).ToString();
+        }
+
+        UIList GetUIListByCampType(EUICampType type)
+        {
+            switch (type)
+            {
+                case EUICampType.CT: return CTList;
+                case EUICampType.T: return TList;
+                default: return null;
+            }
+        }
+
+        private void UpdateCampData(EUICampType type)
+        {
+            var dataList = _adapter.GetBattleDataListByCampType(type);
+            var uiList = GetUIListByCampType(type);
+            if (uiList == null)
+            {
+                Logger.Error("Not found UIList With Camp" + type);
+            }
+
+            uiList.SetDataList<PlayerBadgeItem, IGroupBattleData>(dataList);
+        }
     }
 }
 

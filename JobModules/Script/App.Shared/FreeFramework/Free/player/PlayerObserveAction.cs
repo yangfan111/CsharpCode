@@ -1,8 +1,9 @@
-﻿using App.Server.GameModules.GamePlay.free.player;
-using App.Shared.GameModules.Player;
+﻿using App.Shared.GameModules.Player;
+using Assets.App.Server.GameModules.GamePlay.Free;
 using com.wd.free.action;
 using com.wd.free.@event;
 using Core.Free;
+using Free.framework;
 using Sharpen;
 using System;
 using System.Collections.Generic;
@@ -19,18 +20,14 @@ namespace App.Shared.FreeFramework.Free.player
 
         public override void DoAction(IEventArgs args)
         {
-            FreeData fd = GetPlayer(args);
+            PlayerEntity player = GetPlayerEntity(args);
+            if (player == null) return;
 
-            /*if (!fd.Player.gamePlay.IsDead())
-            {
-                fd.Player.gamePlay.CameraEntityId = 0;
-                return;
-            }*/
+            if (args.Rule.ServerTime - player.statisticsData.Statistics.LastDeadTime <= 2900L) return;
 
+            int oldObserveId = player.gamePlay.CameraEntityId;
 
-            if (DateTime.Now.Ticks / 10000 - fd.Player.statisticsData.Statistics.LastDeadTime <= 2990L) return;
-
-            bool success = ObservePlayer(args, fd, args.GetBool(observeEnemy), args.GetBool(wise));
+            bool success = ObservePlayer(args, player, args.GetBool(observeEnemy), args.GetBool(wise));
             if (!success)
             {
                 if (noOneAction != null)
@@ -38,9 +35,17 @@ namespace App.Shared.FreeFramework.Free.player
                     noOneAction.Act(args);
                 }
             }
+
+            if (oldObserveId != player.gamePlay.CameraEntityId)
+            {
+                SimpleProto sp = FreePool.Allocate();
+                sp.Key = FreeMessageConstant.PlayerObserveTrigger;
+                sp.Bs.Add(true);
+                FreeMessageSender.SendMessage(player, sp);
+            }
         }
 
-        public static bool ObservePlayer(IEventArgs args, FreeData fd, bool observeEnemyFlag, bool wiseFlag)
+        public static bool ObservePlayer(IEventArgs args, PlayerEntity player, bool observeEnemyFlag, bool wiseFlag)
         {
             List<PlayerEntity> teammateEntities = new List<PlayerEntity>();
             List<PlayerEntity> enemyEntities = new List<PlayerEntity>();
@@ -48,9 +53,9 @@ namespace App.Shared.FreeFramework.Free.player
 
             foreach (PlayerEntity playerEntity in args.GameContext.player.GetInitializedPlayerEntities())
             {
-                if (!playerEntity.gamePlay.IsDead() && playerEntity.playerInfo.PlayerId != fd.Player.playerInfo.PlayerId)
+                if (!playerEntity.gamePlay.IsDead() && playerEntity.playerInfo.PlayerId != player.playerInfo.PlayerId)
                 {
-                    if (playerEntity.playerInfo.TeamId == fd.Player.playerInfo.TeamId)
+                    if (playerEntity.playerInfo.TeamId == player.playerInfo.TeamId)
                     {
                         teammateEntities.Add(playerEntity);
                     }
@@ -58,7 +63,7 @@ namespace App.Shared.FreeFramework.Free.player
                     {
                         enemyEntities.Add(playerEntity);
                     }
-                    if (playerEntity.playerInfo.PlayerId == fd.Player.statisticsData.Statistics.RevengeKillerId)
+                    if (playerEntity.playerInfo.PlayerId == player.statisticsData.Statistics.RevengeKillerId)
                     {
                         revenge = playerEntity;
                     }
@@ -67,19 +72,19 @@ namespace App.Shared.FreeFramework.Free.player
 
             if (!teammateEntities.IsEmpty())
             {
-                if (FindObserveObject(teammateEntities, fd, false, wiseFlag))
+                if (FindObserveObject(teammateEntities, player, false, wiseFlag))
                 {
                     return true;
                 }
             }
             else if (revenge != null && observeEnemyFlag)
             {
-                fd.Player.gamePlay.CameraEntityId = revenge.playerInfo.EntityId;
+                player.gamePlay.CameraEntityId = revenge.playerInfo.EntityId;
                 return true;
             }
             else if (!enemyEntities.IsEmpty() && observeEnemyFlag)
             {
-                if (FindObserveObject(enemyEntities, fd, true, wiseFlag))
+                if (FindObserveObject(enemyEntities, player, true, wiseFlag))
                 {
                     return true;
                 }
@@ -87,11 +92,11 @@ namespace App.Shared.FreeFramework.Free.player
             return false;
         }
 
-        private static bool FindObserveObject(List<PlayerEntity> playerEntities, FreeData fd, bool observeEnemyFlag, bool wiseFlag)
+        private static bool FindObserveObject(List<PlayerEntity> playerEntities, PlayerEntity player, bool observeEnemyFlag, bool wiseFlag)
         {
             if (playerEntities.Count == 1)
             {
-                fd.Player.gamePlay.CameraEntityId = playerEntities[0].playerInfo.EntityId;
+                player.gamePlay.CameraEntityId = playerEntities[0].playerInfo.EntityId;
                 return true;
             }
 
@@ -99,7 +104,7 @@ namespace App.Shared.FreeFramework.Free.player
             {
                 if (observeEnemyFlag)
                 {
-                    if (Vector3.Distance(fd.Player.position.Value, x.position.Value) > Vector3.Distance(fd.Player.position.Value, y.position.Value))
+                    if (Vector3.Distance(player.position.Value, x.position.Value) > Vector3.Distance(player.position.Value, y.position.Value))
                         return 1;
                     return -1;
                 }
@@ -108,28 +113,28 @@ namespace App.Shared.FreeFramework.Free.player
                 return -1;
             });
 
-            if (fd.Player.gamePlay.CameraEntityId == 0)
+            if (player.gamePlay.CameraEntityId == 0)
             {
-                fd.Player.gamePlay.CameraEntityId = playerEntities[0].playerInfo.EntityId;
+                player.gamePlay.CameraEntityId = playerEntities[0].playerInfo.EntityId;
                 return true;
             }
 
             for (int i = 0; i < playerEntities.Count; i++)
             {
-                if (playerEntities[i].playerInfo.EntityId == fd.Player.gamePlay.CameraEntityId)
+                if (playerEntities[i].playerInfo.EntityId == player.gamePlay.CameraEntityId)
                 {
                     if (wiseFlag)
                     {
-                        fd.Player.gamePlay.CameraEntityId = i == playerEntities.Count - 1 ? playerEntities[0].playerInfo.EntityId : playerEntities[i + 1].playerInfo.EntityId;
+                        player.gamePlay.CameraEntityId = i == playerEntities.Count - 1 ? playerEntities[0].playerInfo.EntityId : playerEntities[i + 1].playerInfo.EntityId;
                     }
                     else
                     {
-                        fd.Player.gamePlay.CameraEntityId = i == 0 ? playerEntities[playerEntities.Count - 1].playerInfo.EntityId : playerEntities[i - 1].playerInfo.EntityId;
+                        player.gamePlay.CameraEntityId = i == 0 ? playerEntities[playerEntities.Count - 1].playerInfo.EntityId : playerEntities[i - 1].playerInfo.EntityId;
                     }
                     return true;
                 }
             }
-            fd.Player.gamePlay.CameraEntityId = playerEntities[0].playerInfo.EntityId;
+            player.gamePlay.CameraEntityId = playerEntities[0].playerInfo.EntityId;
             return true;
         }
 

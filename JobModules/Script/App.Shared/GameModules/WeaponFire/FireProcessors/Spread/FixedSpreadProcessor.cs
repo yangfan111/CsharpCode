@@ -6,11 +6,10 @@
     public class FixedSpreadProcessor : AbstractSpreadProcessor
     {
 
-        protected override void Update(WeaponBaseAgent heldBaseAgent, WeaponSideCmd cmd)
+        protected override void Update(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
-            var config           = heldBaseAgent.FixedSpreadLogicCfg;
-            var runTimeComponent = heldBaseAgent.RunTimeComponent;
-            FireSpreadFormula.ApplyFixedFinalSpread(config.Value, config.SpreadScale, runTimeComponent);
+            var config           = attackProxy.WeaponConfigAssy.S_FixedSpreadLogicCfg;
+            FireSpreadFormula.ApplyFixedFinalSpread(config.Value, config.SpreadScale, attackProxy.RuntimeComponent);
         }
     }
 }

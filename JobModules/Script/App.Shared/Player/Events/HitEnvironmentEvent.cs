@@ -2,6 +2,7 @@ using System.IO;
 using App.Shared.Components.Serializer;
 using App.Shared.EntityFactory;
 using Core;
+using Core.Components;
 using Core.EntityComponent;
 using Core.Event;
 using Core.ObjectPool;
@@ -14,7 +15,7 @@ namespace App.Shared.Player.Events
     public class HitEnvironmentEvent : IEvent
     {
         public Vector3 Offset;
-        public Vector3 HitPoint;
+        public FixedVector3 HitPoint;
         public int ChunkId;
         public bool needEffectEntity;
         public EEnvironmentType EnvironmentType;

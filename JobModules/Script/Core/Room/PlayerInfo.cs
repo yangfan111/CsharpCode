@@ -23,7 +23,7 @@ namespace Core.Room
 
         public PlayerInfo(string token, IRoomId roomId, long playerId, string playerName, int roleModelId, long teamId,
             int num, int level, int backId, int titleId, int badgeId, int[] avatarIds, int[] weaponAvatarIds,
-            int[] sprayLacquers, bool hasTestWeapon, int jobAttrbute) : this()
+            int[] sprayLacquers, bool hasTestWeapon, int jobAttrbute, CampInfo campInfo) : this()
         {
             Token = token;
             RoomId = roomId;
@@ -71,6 +71,7 @@ namespace Core.Room
             }
 
             JobAttribute = jobAttrbute;
+            CampInfo = campInfo;
         }
 
 
@@ -104,6 +105,8 @@ namespace Core.Room
 
         public int SpecialFeedbackType { get; set; }
         public List<int> SprayLacquers { get; set; }
+
+        public CampInfo CampInfo { get; set; }
     }
 
     public class PlayerWeaponData
@@ -111,12 +114,14 @@ namespace Core.Room
         public int Index;
         public int WeaponTplId;
         public int WeaponAvatarTplId;
+        
         public int LowerRail;
         public int UpperRail;
         public int SideRail;
         public int Stock;
         public int Muzzle;
         public int Magazine;
+        
         public int Bore;
         public int Feed;
         public int Trigger;
@@ -243,6 +248,42 @@ namespace Core.Room
                     Logger.ErrorFormat("index {0} is illegal for slot", index);
                     return EWeaponSlotType.None;
             }
+        }
+    }
+
+    public class CampInfo
+    {
+        public int CurrCamp { get; set; }
+        public List<Preset> Preset { get; set; }
+
+        public CampInfo(){}
+
+        public CampInfo(int currCamp, List<Preset> preset)
+        {
+            CurrCamp = currCamp;
+            Preset = preset;
+        }
+
+        public void Reset()
+        {
+            CurrCamp = 0;
+            Preset.Clear();
+        }
+    }
+
+    public class Preset
+    {
+        public int camp;
+        public int roleModelId;
+        public List<int> avatarIds;
+        public int pose;
+
+        public Preset(int camp, int roleModelId, List<int> avatarIds, int pose)
+        {
+            this.camp = camp;
+            this.roleModelId = roleModelId;
+            this.avatarIds = avatarIds;
+            this.pose = pose;
         }
     }
 }

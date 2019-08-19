@@ -46,7 +46,7 @@ namespace com.wd.free.para
 		{
             BoolPara para = pool.Spawn(true) as BoolPara;
             para.SetName(this.name);
-            para.SetValue(this.value);
+            para.SetValue((bool)this.value);
             para.SetTemp(true);
             return /*new com.wd.free.para.BoolPara(this.name, (bool)this.value)*/para;
 		}
@@ -62,7 +62,7 @@ namespace com.wd.free.para
         {
             base.Recycle();
             this.SetName(default(string));
-            this.SetValue(default(object));
+            this.SetValue(default(bool));
             this.SetTemp(false);
             pool.Recycle(this);
         }

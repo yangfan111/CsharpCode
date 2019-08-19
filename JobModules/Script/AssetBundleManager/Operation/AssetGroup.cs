@@ -1,6 +1,6 @@
 namespace AssetBundleManager.Operation
 {
-    enum AssetGroup
+    public enum AssetGroup
     {
         Asset,
         Scene,

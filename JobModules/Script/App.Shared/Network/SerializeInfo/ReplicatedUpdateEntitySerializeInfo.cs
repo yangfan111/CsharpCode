@@ -12,6 +12,7 @@ using Core.UpdateLatest;
 using Core.Utils;
 using log4net.Core;
 using Sharpen;
+using VNet;
 using Version = System.Version;
 
 namespace App.Shared.Network.SerializeInfo
@@ -25,13 +26,14 @@ namespace App.Shared.Network.SerializeInfo
         public IUpdateMessagePool MessagePool { get; private set; }
 
         public ReplicatedUpdateEntitySerializeInfo(ComponentSerializerManager instance,
-            IUpdateMessagePool updateMessagePool, string version)
+            IUpdateMessagePool updateMessagePool, string version, int sendCount = 3)
         {
             _componentSerializerManager = instance;
             MessagePool = updateMessagePool;
             Statistics = new SerializationStatistics("UpdateEntity");
            
             _version = version;
+            _sendCount = sendCount;
         }
 
         public void Dispose()
@@ -41,12 +43,12 @@ namespace App.Shared.Network.SerializeInfo
         }
 
         private List<IUpdateComponent> _emptyUpdateComponents = new List<IUpdateComponent>();
-        private List<MemoryStream> _sendHistoryStreams = new List<MemoryStream>();
+        private List<VNetPacketMemSteam> _sendHistoryStreams = new List<VNetPacketMemSteam>();
         private List<int> _sendHistorySeqs = new List<int>();
         private string _version;
-        public const int SendCount = 3;
+        private readonly int _sendCount;
 
-        public void Serialize(Stream outStream, object message)
+        public int Serialize(Stream outStream, object message)
         {
             var msg = message as UpdateLatestPacakge;
             var binaryWriter = MyBinaryWriter.Allocate(outStream);
@@ -55,16 +57,17 @@ namespace App.Shared.Network.SerializeInfo
             {
                 _logger.ErrorFormat("repetition  msg.Head.UserCmdSeq{0}", msg.Head.UserCmdSeq);
                 binaryWriter.Write((byte) 0);
-                return;
+                return binaryWriter.WriterLenght;
             }
 
             MessagePool.AddMessage(msg);
-            if (_sendHistoryStreams.Count > SendCount)
+            MessagePool.ClearOldMessage(msg.Head.BaseUserCmdSeq);
+            if (_sendHistoryStreams.Count > _sendCount)
             {
                 RemoveHistoryFirst();
             }
 
-            for (int i = 0; i < SendCount; i++)
+            for (int i = 0; i < _sendCount; i++)
             {
                 if (_sendHistorySeqs.Count > 0 && msg.Head.BaseUserCmdSeq > 0 &&
                     _sendHistorySeqs.First() <= msg.Head.BaseUserCmdSeq)
@@ -82,23 +85,26 @@ namespace App.Shared.Network.SerializeInfo
             _sendHistorySeqs.AddLast(msg.Head.UserCmdSeq);
 
 
-            binaryWriter.Write((byte) _sendHistoryStreams.Count);
+                binaryWriter.Write((byte) _sendHistoryStreams.Count);
 
-            foreach (var sendHistroyStream in _sendHistoryStreams)
-            {
-                binaryWriter.Write(sendHistroyStream.GetBuffer(),
-                    (int) (sendHistroyStream.Position - sendHistroyStream.Length), (int) sendHistroyStream.Length);
-            }
+                foreach (var sendHistroyStream in _sendHistoryStreams)
+                {
+                binaryWriter.Write(sendHistroyStream.Stream.GetBuffer(),
+                    (int) (sendHistroyStream.Stream.Position - sendHistroyStream.Length), (int) sendHistroyStream.Length);
+                }
 
-            _logger.DebugFormat("send package{0}", binaryWriter.Position);
+                _logger.DebugFormat("send package{0}", binaryWriter.Position);
+            
+            var ret = binaryWriter.WriterLenght;
             binaryWriter.ReleaseReference();
+            return ret;
         }
 
         private void RemoveHistoryFirst()
         {
             _sendHistorySeqs.RemoveFirst();
             var old = _sendHistoryStreams.RemoveFirst();
-            ObjectAllocatorHolder<MemoryStream>.Free(old);
+            old.ReleaseReference();
         }
 
         private long SerializeComponents(MyBinaryWriter binaryWriter, List<IUpdateComponent> oldComponents,
@@ -144,11 +150,11 @@ namespace App.Shared.Network.SerializeInfo
             return endPosition - startPostion;
         }
 
-        public MemoryStream SerializeSinaglePackage(UpdateLatestPacakge msg)
+        public VNetPacketMemSteam SerializeSinaglePackage(UpdateLatestPacakge msg)
         {
-            MemoryStream stream = ObjectAllocatorHolder<MemoryStream>.Allocate();
-            stream.Seek(0, SeekOrigin.Begin);
-            var binaryWriter = MyBinaryWriter.Allocate(stream);
+            VNetPacketMemSteam stream = VNetPacketMemSteam.Allocate();
+            stream.Stream.Seek(0, SeekOrigin.Begin);
+            var binaryWriter = MyBinaryWriter.Allocate(stream.Stream);
             long bodyLength;
             var old = MessagePool.GetPackageBySeq(msg.Head.BaseUserCmdSeq);
             int count = 0;
@@ -190,6 +196,7 @@ namespace App.Shared.Network.SerializeInfo
                     pacakge.Head.Deserialize(binaryReader);
                     var seq = pacakge.Head.UserCmdSeq;
                     var bodyLenght = pacakge.Head.BodyLength;
+                    MessagePool.ClearOldMessage(pacakge.Head.BaseUserCmdSeq);
                     if (MessagePool.GetPackageBySeq(seq) == null)
                     {
                         var baseSeq = pacakge.Head.BaseUserCmdSeq;

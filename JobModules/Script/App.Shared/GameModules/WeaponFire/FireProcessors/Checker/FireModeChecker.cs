@@ -15,10 +15,10 @@ namespace App.Shared.GameModules.Weapon.Behavior
     /// 
     public class SpecialFireModeChecker: FireModeChecker
     {
-        public override bool IsCanFire(PlayerWeaponController controller, WeaponSideCmd weaponCmd)
+        public override bool IsCanFire(WeaponAttackProxy attackProxy, WeaponSideCmd weaponCmd)
         {
-            if(base.IsCanFire(controller,weaponCmd))
-                 return controller.HeldWeaponAgent.RunTimeComponent.PullBoltFinish;
+            if(base.IsCanFire(attackProxy,weaponCmd))
+                 return attackProxy.RuntimeComponent.PullBoltFinish;
             return false;
 
         }
@@ -28,28 +28,27 @@ namespace App.Shared.GameModules.Weapon.Behavior
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(FireModeChecker));
 
 
-        public virtual bool IsCanFire(PlayerWeaponController controller, WeaponSideCmd cmd)
+        public virtual bool IsCanFire(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
-            WeaponBaseAgent weaponAgent = controller.HeldWeaponAgent;
-            if (cmd.UserCmd.RenderTime < weaponAgent.RunTimeComponent.NextAttackTimestamp)
+            if (cmd.UserCmd.RenderTime < attackProxy.RuntimeComponent.NextAttackTimestamp)
                 return false;
-            if (weaponAgent.BaseComponent.Bullet <= 0)
+            if (attackProxy.BasicComponent.Bullet <= 0)
             {
-                controller.ShowTip(ETipType.FireWithNoBullet);
+                attackProxy.Owner.ShowTip(ETipType.FireWithNoBullet);
                 if(cmd.FiltedInput(EPlayerInput.IsLeftAttack))
-                    controller.AudioController.PlayEmptyFireAudio();
+                    attackProxy.AudioController.PlayEmptyFireAudio();
                 return false;
             }
 
-            EFireMode currentMode = (EFireMode) weaponAgent.BaseComponent.RealFireModel;
+            EFireMode currentMode = (EFireMode) attackProxy.BasicComponent.RealFireModel;
             switch (currentMode)
             {
                 case EFireMode.Manual:
-                    return !weaponAgent.RunTimeComponent.IsPrevCmdFire;
+                    return !attackProxy.RuntimeComponent.IsPrevCmdFire;
                 case EFireMode.Auto:
                     return true;
                 case EFireMode.Burst:
-                    return !weaponAgent.RunTimeComponent.IsPrevCmdFire|| weaponAgent.RunTimeComponent.NeedAutoBurstShoot;
+                    return !attackProxy.RuntimeComponent.IsPrevCmdFire|| attackProxy.RuntimeComponent.NeedAutoBurstShoot;
                 default:
                     return false;
             }

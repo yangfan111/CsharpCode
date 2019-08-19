@@ -7,28 +7,28 @@ namespace App.Shared.GameModules.Weapon.Behavior
     public class CommonFireModeUpdater : IAfterFireProcess, IFrameProcess
     {
 
-        public void OnFrame(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
+        public void OnFrame(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
             if (!cmd.IsFire)
             {
-                weaponBaseAgent.RunTimeComponent.IsPrevCmdFire = false;
-                var audioController = weaponBaseAgent.Owner.AudioController();
-                audioController.StopFireTrigger();
+                attackProxy.RuntimeComponent.IsPrevCmdFire = false;
+                attackProxy.AudioController.StopFireTrigger();
             }
         }
 
-        public void OnAfterFire(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
+        public void OnAfterFire(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
-            if ((EFireMode) weaponBaseAgent.BaseComponent.RealFireModel == EFireMode.Burst)
+            if ((EFireMode) attackProxy.BasicComponent.RealFireModel == EFireMode.Burst)
                 return;
-            var runtimeDataComponent = weaponBaseAgent.RunTimeComponent;
+            var runtimeDataComponent = attackProxy.RuntimeComponent;
             runtimeDataComponent.IsPrevCmdFire = true;
-            float intervalFactor = 1 - weaponBaseAgent.GetAttachedAttributeByType(WeaponAttributeType.AttackInterval) / 100;
-            runtimeDataComponent.NextAttackTimestamp = cmd.UserCmd.RenderTime + Mathf.CeilToInt(weaponBaseAgent.CommonFireCfg.AttackInterval * intervalFactor);
+            float intervalFactor = 1 - attackProxy.GetAttachedAttributeByType(WeaponAttributeType.AttackInterval) / 100;
+            runtimeDataComponent.NextAttackTimestamp = cmd.UserCmd.RenderTime + Mathf.CeilToInt(attackProxy.WeaponConfigAssy.S_CommonFireCfg.AttackInterval * intervalFactor);
             runtimeDataComponent.NeedAutoBurstShoot       = false;
           //  runtimeDataComponent.ContinuesShootCount = 0;
             runtimeDataComponent.LastAttackTimestamp = cmd.UserCmd.RenderTime;
         }
 
+        
     }
 }

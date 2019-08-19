@@ -1,4 +1,5 @@
 ﻿using System;
+using Common;
 using UnityEngine;
 
 namespace Core.GameModule.Step
@@ -106,12 +107,12 @@ namespace Core.GameModule.Step
 
         public void Update()
         {
-            var delta = Time.deltaTime;
-            _timePassed += Time.deltaTime;
+            var delta = MyGameTime.deltaTime;
+            _timePassed += MyGameTime.deltaTime;
             _addFrameCount++;
-            if (Time.time - _lastTime > 5)
+            if (MyGameTime.time - _lastTime > 5)
             {
-                _lastTime = Time.time;
+                _lastTime = MyGameTime.time;
                 var fps = _addFrameCount / _timePassed;
                 _cmdFrameStepConfig.UpdateStep(fps, _timePassed);
                 _uiFrameStepConfig.UpdateStep(fps, _timePassed);

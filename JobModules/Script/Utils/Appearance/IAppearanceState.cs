@@ -77,12 +77,4 @@ namespace Utils.Appearance
 
         EndOfTheWorld
     }
-
-    public enum AppearanceFloatType
-    {
-        PeekDegree,
-        FirstPersonHeight,
-
-        EndOfTheWorld
-    }
 }

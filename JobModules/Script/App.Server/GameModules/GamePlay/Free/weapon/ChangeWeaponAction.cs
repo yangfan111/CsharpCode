@@ -1,14 +1,12 @@
-﻿using com.wd.free.action;
-using System;
-using App.Shared;
-using App.Shared.GameModules.Weapon;
+﻿using App.Shared;
 using Assets.App.Server.GameModules.GamePlay.Free;
+using com.wd.free.action;
 using com.wd.free.@event;
-using Core;
 using com.wd.free.util;
+using Core;
 using Core.Free;
 using Free.framework;
-using com.wd.free.para;
+using System;
 
 namespace App.Server.GameModules.GamePlay.Free.weapon
 {
@@ -22,12 +20,19 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
             PlayerEntity playerEntity = GetPlayerEntity(args);
             int index = FreeUtil.ReplaceInt(weaponKey, args);
             EWeaponSlotType st = FreeWeaponUtil.GetSlotType(index);
-
-            playerEntity.WeaponController().PureSwitchIn(st);
-
             SimpleProto message = FreePool.Allocate();
             message.Key = FreeMessageConstant.ChangeWeapon;
-            message.Ins.Add(index);
+            switch (st)
+            {
+                case EWeaponSlotType.None:
+                    playerEntity.WeaponController().UnArmWeapon(false);
+                    message.Ins.Add(0);
+                    break;
+                default:
+                    playerEntity.WeaponController().PureSwitchIn(st);
+                    message.Ins.Add(index);
+                    break;
+            }
             FreeMessageSender.SendMessage(playerEntity, message);
         }
 

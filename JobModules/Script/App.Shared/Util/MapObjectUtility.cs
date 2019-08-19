@@ -196,6 +196,7 @@ namespace App.Shared.Util
         public static void DeleteRecord(int id)
         {
             var rawObj = _gameObjIdRecorder.GetObj(id);
+            if (rawObj == null) return;
             var type = _gameObjIdRecorder.GetType(rawObj);
             _mapObjectRecorder.Delete(id, type);
             _gameObjIdRecorder.RemoveRecord(id);
@@ -220,13 +221,13 @@ namespace App.Shared.Util
             player.uploadEvents.Events.AddEvent(evt);
         }
 
+        public static readonly List<IEvent> StoredCreateMapObjMsg = new List<IEvent>();
         public static void StoreCreateMapObjMsg(int type, int id, PlayerEntity ownerPlayer = null)
         {
-            var player = ownerPlayer ?? Contexts.sharedInstance.player.flagSelfEntity;
             var evt = EventInfos.Instance.Allocate(EEventType.CreateMapObj, false) as CreateMapObjEvent;
             evt.Type = type;
             evt.Id = id;
-            player.uploadEvents.Events.AddEvent(evt);
+            StoredCreateMapObjMsg.Add(evt);
             _logger.InfoFormat("StoreCreateMapObjMsg: {0}", evt);
         }
     }

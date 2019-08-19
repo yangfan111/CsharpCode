@@ -1,9 +1,10 @@
-using System;
-using System.Collections.Generic;
+using App.Server.GameModules.GamePlay.Free.player;
+using App.Shared.Components.Player;
 using Core;
 using Core.Utils;
+using System;
+using System.Collections.Generic;
 using XmlConfig;
-using App.Shared.Components.Player;
 
 namespace App.Shared.GameModules.Player
 {
@@ -11,6 +12,8 @@ namespace App.Shared.GameModules.Player
     {
         protected Action                            interruptAction;
         protected Action                            recoverAction;
+        protected Action                            blockAction;
+
         public  Func<bool>                        filterFunc;
         protected Func<HashSet<EPlayerState>, bool> recoverFunc;
         List<InterruptEmitter> emitterList = new List<InterruptEmitter>();
@@ -72,11 +75,14 @@ namespace App.Shared.GameModules.Player
                         interruptState = EInterruptState.Closed;
                         return;
                     }
-
                     if (recoverFunc(states))
                     {
                         Recover();
                         interruptState = EInterruptState.Closed;
+                    }
+                    else
+                    {
+                        Block();
                     }
                     break;
             }
@@ -100,6 +106,12 @@ namespace App.Shared.GameModules.Player
             if (!filterFunc() && recoverAction != null)
                 recoverAction();
         }
+        private void Block()
+        {
+        //    DebugUtil.MyLog("block");
+            if (blockAction != null)
+                blockAction();
+        }
     }
 
     public class SightInterruptHandler : InterruptEventHandler
@@ -110,6 +122,9 @@ namespace App.Shared.GameModules.Player
             interruptAction = () => playerEntity.StateInteractController().UserInput.SetInput(EPlayerInput.IsCameraFocus, true);
             recoverAction   = () => playerEntity.StateInteractController().UserInput.SetInput(EPlayerInput.IsCameraFocus, true);
             filterFunc      = playerEntity.cameraStateNew.IsAiming;
+            blockAction = () => playerEntity.StateInteractController().UserInput.SetInput(EPlayerInput.IsCameraFocus, false);
+            
+                
         }
 
        
@@ -120,12 +135,29 @@ namespace App.Shared.GameModules.Player
         public HoldWeaponHandler (PlayerEntity playerEntity) : base(playerEntity)
         {
             var weaponController = playerEntity.WeaponController();
-            interruptAction = () =>  recoveredSlotType = weaponController.UnArmWeapon(false);
-            recoverAction   = () =>  weaponController.ArmWeapon(recoveredSlotType,true);
+            interruptAction = () =>
+            {
+                PlayerAnimationAction.DoAnimation(null, 120, playerEntity);
+                recoveredSlotType = weaponController.UnArmWeapon(false);
+            };
+            recoverAction   = () =>  weaponController.ArmWeapon(recoveredSlotType, true);
             filterFunc      = () =>  !weaponController.IsHeldSlotEmpty;
         }
 
        
+    }
+
+    public class CharactorActionHandler : InterruptEventHandler
+    {
+        public CharactorActionHandler (PlayerEntity playerEntity) : base(playerEntity)
+        {
+            interruptAction = () => playerEntity.StateInteractController().UserInput.SetInput(EPlayerInput.IsActionInterrupt,true);
+            filterFunc = () =>
+            {
+                var states = playerEntity.StateInteractController().GetCurrStates();
+                return states.Contains(EPlayerState.Reload) ||states.Contains(EPlayerState.SpecialReload);
+            };
+        }
     }
 //    public class PullboltHandler : InterruptEventHandler
 //    {

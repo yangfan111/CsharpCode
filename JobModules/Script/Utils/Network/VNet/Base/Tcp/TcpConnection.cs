@@ -215,40 +215,50 @@ namespace VNet.Base.Tcp
                 return;
             }
 
-            SendSocketAsyncEventArgsExt sendArg = ObjectAllocatorHolder<SendSocketAsyncEventArgsExt>.Allocate();
-            sendArg.Completed += OnSendComplete;
-            var sendMs = sendArg.SendBuffer;
+            MemoryStream sendBuffer = ObjectAllocatorHolder<MemoryStream>.Allocate();
             
-            sendMs.Position = 0;
-            sendMs.SetLength(0);
+            sendBuffer.Seek(0, SeekOrigin.Begin);
+            sendBuffer.SetLength(0);
+            
+          
 
             //var lenArray = BitConverter.GetBytes(length);
             if (!_littleEndian)
             {
-                sendMs.WriteByte((byte)(length>>24));
-                sendMs.WriteByte((byte)(length>>16));
-                sendMs.WriteByte((byte)(length>>8));
-                sendMs.WriteByte((byte)length);
+                sendBuffer.WriteByte((byte)(length>>24));
+                sendBuffer.WriteByte((byte)(length>>16));
+                sendBuffer.WriteByte((byte)(length>>8));
+                sendBuffer.WriteByte((byte)length);
                 
                
             }
             else
             {
-                sendMs.WriteByte((byte)length);
-                sendMs.WriteByte((byte)(length>>8));
-                sendMs.WriteByte((byte)(length>>16));
-                sendMs.WriteByte((byte)(length>>24));
+                sendBuffer.WriteByte((byte)length);
+                sendBuffer.WriteByte((byte)(length>>8));
+                sendBuffer.WriteByte((byte)(length>>16));
+                sendBuffer.WriteByte((byte)(length>>24));
             }
            
-            sendMs.Write(bytes, offset, length);
-            sendArg.SetBuffer(sendMs.GetBuffer(), 0, (int) sendMs.Length);
+            sendBuffer.Write(bytes, offset, length);
+         
 
             //Logger.Debug("RealSendMsg");
-            var async = ConnSocket.SendAsync(sendArg);
-            if (!async)
+            try
             {
-                OnSend(sendArg);
+                var async = ConnSocket.Send(sendBuffer.GetBuffer(), 0, (int) sendBuffer.Length, SocketFlags.None);
             }
+            catch (Exception e)
+            {
+                Logger.ErrorFormat("tcp send failed error {0} {1}", e, _connectid);
+                OnDisconnect();
+            }
+            finally
+            {
+                ObjectAllocatorHolder<MemoryStream>.Free(sendBuffer);
+            }
+           
+           
         }
 
         private void OnSendComplete(object sender, SocketAsyncEventArgs args)
@@ -258,6 +268,7 @@ namespace VNet.Base.Tcp
 
         private void OnSend(SocketAsyncEventArgs args)
         {
+           
             args.Completed -= OnSendComplete;
             ObjectAllocatorHolder<SendSocketAsyncEventArgsExt>.Free(args as SendSocketAsyncEventArgsExt);
             if (args.SocketError != SocketError.Success)

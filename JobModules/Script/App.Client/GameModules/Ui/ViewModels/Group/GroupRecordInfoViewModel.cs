@@ -25,15 +25,18 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
             public GameObject IconGroupShow;
             [HideInInspector]
             public bool oriIconGroupShow;
+            public GameObject BadgeGroupShow;
+            [HideInInspector]
+            public bool oriBadgeGroupShow;
             public Image MySelfMaskShow;
             [HideInInspector]
             public bool oriMySelfMaskShow;
-            public Image DeathMaskShow;
+            public Text DeadStateShow;
             [HideInInspector]
-            public bool oriDeathMaskShow;
-            public Image DeadIconShow;
+            public bool oriDeadStateShow;
+            public Text HurtStateShow;
             [HideInInspector]
-            public bool oriDeadIconShow;
+            public bool oriHurtStateShow;
             public Text RankText;
             [HideInInspector]
             public string oriRankText;
@@ -76,12 +79,24 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
             public Text AssistColor;
             [HideInInspector]
             public Color oriAssistColor;
-            public Text PingText;
+            public Image BadgeNormalBgShow;
             [HideInInspector]
-            public string oriPingText;
-            public Text PingColor;
+            public bool oriBadgeNormalBgShow;
+            public Image BadgeMySelfBgShow;
             [HideInInspector]
-            public Color oriPingColor;
+            public bool oriBadgeMySelfBgShow;
+            public Image BadgeHurtBgShow;
+            [HideInInspector]
+            public bool oriBadgeHurtBgShow;
+            public Image BadgeDeadBgShow;
+            [HideInInspector]
+            public bool oriBadgeDeadBgShow;
+            public UIImageLoader BadgeIconBundle;
+            [HideInInspector]
+            public string oriBadgeIconBundle;
+            public UIImageLoader BadgeIconAsset;
+            [HideInInspector]
+            public string oriBadgeIconAsset;
             public GameObject TitleIconShow1;
             public GameObject TitleIconShow2;
             public GameObject TitleIconShow3;
@@ -103,6 +118,9 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
                             break;
                         case "IconGroup":
                             IconGroupShow = v.gameObject;
+                            break;
+                        case "BadgeGroup":
+                            BadgeGroupShow = v.gameObject;
                             break;
                         case "TitleIcon1":
                             TitleIconShow1 = v.gameObject;
@@ -128,11 +146,17 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
                         case "MySelfMask":
                             MySelfMaskShow = v;
                             break;
-                        case "DeathMask":
-                            DeathMaskShow = v;
+                        case "BadgeNormalBg":
+                            BadgeNormalBgShow = v;
                             break;
-                        case "DeadIcon":
-                            DeadIconShow = v;
+                        case "BadgeMySelfBg":
+                            BadgeMySelfBgShow = v;
+                            break;
+                        case "BadgeHurtBg":
+                            BadgeHurtBgShow = v;
+                            break;
+                        case "BadgeDeadBg":
+                            BadgeDeadBgShow = v;
                             break;
                     }
                 }
@@ -143,6 +167,12 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
                     var realName = v.gameObject.name.Replace("(Clone)","");
                     switch (realName)
                     {
+                        case "DeadStateText":
+                            DeadStateShow = v;
+                            break;
+                        case "HurtStateText":
+                            HurtStateShow = v;
+                            break;
                         case "Rank":
                             RankText = v;
                             RankColor = v;
@@ -171,9 +201,18 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
                             AssistText = v;
                             AssistColor = v;
                             break;
-                        case "Ping":
-                            PingText = v;
-                            PingColor = v;
+                    }
+                }
+
+                UIImageLoader[] uiimageloaders = gameObject.GetComponentsInChildren<UIImageLoader>(true);
+                foreach (var v in uiimageloaders)
+                {
+                    var realName = v.gameObject.name.Replace("(Clone)","");
+                    switch (realName)
+                    {
+                        case "BadgeIcon":
+                            BadgeIconBundle = v;
+                            BadgeIconAsset = v;
                             break;
                     }
                 }
@@ -185,9 +224,10 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
         private bool _imgGroupShow;
         private bool _textGroupShow;
         private bool _iconGroupShow;
+        private bool _badgeGroupShow;
         private bool _mySelfMaskShow;
-        private bool _deathMaskShow;
-        private bool _deadIconShow;
+        private bool _deadStateShow;
+        private bool _hurtStateShow;
         private string _rankText;
         private Color _rankColor;
         private string _playerNameText;
@@ -202,8 +242,12 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
         private Color _deadColor;
         private string _assistText;
         private Color _assistColor;
-        private string _pingText;
-        private Color _pingColor;
+        private bool _badgeNormalBgShow;
+        private bool _badgeMySelfBgShow;
+        private bool _badgeHurtBgShow;
+        private bool _badgeDeadBgShow;
+        private string _badgeIconBundle;
+        private string _badgeIconAsset;
         private bool _titleIconShow1;
         private bool _titleIconShow2;
         private bool _titleIconShow3;
@@ -211,9 +255,10 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
         public bool ImgGroupShow { get { return _imgGroupShow; } set {if(_imgGroupShow != value) Set(ref _imgGroupShow, value, "ImgGroupShow"); } }
         public bool TextGroupShow { get { return _textGroupShow; } set {if(_textGroupShow != value) Set(ref _textGroupShow, value, "TextGroupShow"); } }
         public bool IconGroupShow { get { return _iconGroupShow; } set {if(_iconGroupShow != value) Set(ref _iconGroupShow, value, "IconGroupShow"); } }
+        public bool BadgeGroupShow { get { return _badgeGroupShow; } set {if(_badgeGroupShow != value) Set(ref _badgeGroupShow, value, "BadgeGroupShow"); } }
         public bool MySelfMaskShow { get { return _mySelfMaskShow; } set {if(_mySelfMaskShow != value) Set(ref _mySelfMaskShow, value, "MySelfMaskShow"); } }
-        public bool DeathMaskShow { get { return _deathMaskShow; } set {if(_deathMaskShow != value) Set(ref _deathMaskShow, value, "DeathMaskShow"); } }
-        public bool DeadIconShow { get { return _deadIconShow; } set {if(_deadIconShow != value) Set(ref _deadIconShow, value, "DeadIconShow"); } }
+        public bool DeadStateShow { get { return _deadStateShow; } set {if(_deadStateShow != value) Set(ref _deadStateShow, value, "DeadStateShow"); } }
+        public bool HurtStateShow { get { return _hurtStateShow; } set {if(_hurtStateShow != value) Set(ref _hurtStateShow, value, "HurtStateShow"); } }
         public string RankText { get { return _rankText; } set {if(_rankText != value) Set(ref _rankText, value, "RankText"); } }
         public Color RankColor { get { return _rankColor; } set {if(_rankColor != value) Set(ref _rankColor, value, "RankColor"); } }
         public string PlayerNameText { get { return _playerNameText; } set {if(_playerNameText != value) Set(ref _playerNameText, value, "PlayerNameText"); } }
@@ -228,8 +273,12 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
         public Color DeadColor { get { return _deadColor; } set {if(_deadColor != value) Set(ref _deadColor, value, "DeadColor"); } }
         public string AssistText { get { return _assistText; } set {if(_assistText != value) Set(ref _assistText, value, "AssistText"); } }
         public Color AssistColor { get { return _assistColor; } set {if(_assistColor != value) Set(ref _assistColor, value, "AssistColor"); } }
-        public string PingText { get { return _pingText; } set {if(_pingText != value) Set(ref _pingText, value, "PingText"); } }
-        public Color PingColor { get { return _pingColor; } set {if(_pingColor != value) Set(ref _pingColor, value, "PingColor"); } }
+        public bool BadgeNormalBgShow { get { return _badgeNormalBgShow; } set {if(_badgeNormalBgShow != value) Set(ref _badgeNormalBgShow, value, "BadgeNormalBgShow"); } }
+        public bool BadgeMySelfBgShow { get { return _badgeMySelfBgShow; } set {if(_badgeMySelfBgShow != value) Set(ref _badgeMySelfBgShow, value, "BadgeMySelfBgShow"); } }
+        public bool BadgeHurtBgShow { get { return _badgeHurtBgShow; } set {if(_badgeHurtBgShow != value) Set(ref _badgeHurtBgShow, value, "BadgeHurtBgShow"); } }
+        public bool BadgeDeadBgShow { get { return _badgeDeadBgShow; } set {if(_badgeDeadBgShow != value) Set(ref _badgeDeadBgShow, value, "BadgeDeadBgShow"); } }
+        public string BadgeIconBundle { get { return _badgeIconBundle; } set {if(_badgeIconBundle != value) Set(ref _badgeIconBundle, value, "BadgeIconBundle"); } }
+        public string BadgeIconAsset { get { return _badgeIconAsset; } set {if(_badgeIconAsset != value) Set(ref _badgeIconAsset, value, "BadgeIconAsset"); } }
         public bool TitleIconShow1 { get { return _titleIconShow1; } set {if(_titleIconShow1 != value) Set(ref _titleIconShow1, value, "TitleIconShow1"); } }
         public bool TitleIconShow2 { get { return _titleIconShow2; } set {if(_titleIconShow2 != value) Set(ref _titleIconShow2, value, "TitleIconShow2"); } }
         public bool TitleIconShow3 { get { return _titleIconShow3; } set {if(_titleIconShow3 != value) Set(ref _titleIconShow3, value, "TitleIconShow3"); } }
@@ -318,9 +367,10 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
             bindingSet.Bind(view.ImgGroupShow).For(v => v.activeSelf).To(vm => vm.ImgGroupShow).OneWay();
             bindingSet.Bind(view.TextGroupShow).For(v => v.activeSelf).To(vm => vm.TextGroupShow).OneWay();
             bindingSet.Bind(view.IconGroupShow).For(v => v.activeSelf).To(vm => vm.IconGroupShow).OneWay();
+            bindingSet.Bind(view.BadgeGroupShow).For(v => v.activeSelf).To(vm => vm.BadgeGroupShow).OneWay();
             bindingSet.Bind(view.MySelfMaskShow).For(v => v.enabled).To(vm => vm.MySelfMaskShow).OneWay();
-            bindingSet.Bind(view.DeathMaskShow).For(v => v.enabled).To(vm => vm.DeathMaskShow).OneWay();
-            bindingSet.Bind(view.DeadIconShow).For(v => v.enabled).To(vm => vm.DeadIconShow).OneWay();
+            bindingSet.Bind(view.DeadStateShow).For(v => v.enabled).To(vm => vm.DeadStateShow).OneWay();
+            bindingSet.Bind(view.HurtStateShow).For(v => v.enabled).To(vm => vm.HurtStateShow).OneWay();
             bindingSet.Bind(view.RankText).For(v => v.text).To(vm => vm.RankText).OneWay();
             bindingSet.Bind(view.RankColor).For(v => v.color).To(vm => vm.RankColor).OneWay();
             bindingSet.Bind(view.PlayerNameText).For(v => v.text).To(vm => vm.PlayerNameText).OneWay();
@@ -335,8 +385,12 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
             bindingSet.Bind(view.DeadColor).For(v => v.color).To(vm => vm.DeadColor).OneWay();
             bindingSet.Bind(view.AssistText).For(v => v.text).To(vm => vm.AssistText).OneWay();
             bindingSet.Bind(view.AssistColor).For(v => v.color).To(vm => vm.AssistColor).OneWay();
-            bindingSet.Bind(view.PingText).For(v => v.text).To(vm => vm.PingText).OneWay();
-            bindingSet.Bind(view.PingColor).For(v => v.color).To(vm => vm.PingColor).OneWay();
+            bindingSet.Bind(view.BadgeNormalBgShow).For(v => v.enabled).To(vm => vm.BadgeNormalBgShow).OneWay();
+            bindingSet.Bind(view.BadgeMySelfBgShow).For(v => v.enabled).To(vm => vm.BadgeMySelfBgShow).OneWay();
+            bindingSet.Bind(view.BadgeHurtBgShow).For(v => v.enabled).To(vm => vm.BadgeHurtBgShow).OneWay();
+            bindingSet.Bind(view.BadgeDeadBgShow).For(v => v.enabled).To(vm => vm.BadgeDeadBgShow).OneWay();
+            bindingSet.Bind(view.BadgeIconBundle).For(v => v.BundleName).To(vm => vm.BadgeIconBundle).OneWay();
+            bindingSet.Bind(view.BadgeIconAsset).For(v => v.AssetName).To(vm => vm.BadgeIconAsset).OneWay();
             bindingSet.Bind(view.TitleIconShow1).For(v => v.activeSelf).To(vm => vm.TitleIconShow1).OneWay();
             bindingSet.Bind(view.TitleIconShow2).For(v => v.activeSelf).To(vm => vm.TitleIconShow2).OneWay();
             bindingSet.Bind(view.TitleIconShow3).For(v => v.activeSelf).To(vm => vm.TitleIconShow3).OneWay();
@@ -350,9 +404,10 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
             _imgGroupShow = view.ImgGroupShow.activeSelf;
             _textGroupShow = view.TextGroupShow.activeSelf;
             _iconGroupShow = view.IconGroupShow.activeSelf;
+            _badgeGroupShow = view.BadgeGroupShow.activeSelf;
             _mySelfMaskShow = view.MySelfMaskShow.enabled;
-            _deathMaskShow = view.DeathMaskShow.enabled;
-            _deadIconShow = view.DeadIconShow.enabled;
+            _deadStateShow = view.DeadStateShow.enabled;
+            _hurtStateShow = view.HurtStateShow.enabled;
             _rankText = view.RankText.text;
             _rankColor = view.RankColor.color;
             _playerNameText = view.PlayerNameText.text;
@@ -367,8 +422,12 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
             _deadColor = view.DeadColor.color;
             _assistText = view.AssistText.text;
             _assistColor = view.AssistColor.color;
-            _pingText = view.PingText.text;
-            _pingColor = view.PingColor.color;
+            _badgeNormalBgShow = view.BadgeNormalBgShow.enabled;
+            _badgeMySelfBgShow = view.BadgeMySelfBgShow.enabled;
+            _badgeHurtBgShow = view.BadgeHurtBgShow.enabled;
+            _badgeDeadBgShow = view.BadgeDeadBgShow.enabled;
+            _badgeIconBundle = view.BadgeIconBundle.BundleName;
+            _badgeIconAsset = view.BadgeIconAsset.AssetName;
 		}
 
 
@@ -377,9 +436,10 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
             view.oriImgGroupShow = _imgGroupShow;
             view.oriTextGroupShow = _textGroupShow;
             view.oriIconGroupShow = _iconGroupShow;
+            view.oriBadgeGroupShow = _badgeGroupShow;
             view.oriMySelfMaskShow = _mySelfMaskShow;
-            view.oriDeathMaskShow = _deathMaskShow;
-            view.oriDeadIconShow = _deadIconShow;
+            view.oriDeadStateShow = _deadStateShow;
+            view.oriHurtStateShow = _hurtStateShow;
             view.oriRankText = _rankText;
             view.oriRankColor = _rankColor;
             view.oriPlayerNameText = _playerNameText;
@@ -394,8 +454,12 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
             view.oriDeadColor = _deadColor;
             view.oriAssistText = _assistText;
             view.oriAssistColor = _assistColor;
-            view.oriPingText = _pingText;
-            view.oriPingColor = _pingColor;
+            view.oriBadgeNormalBgShow = _badgeNormalBgShow;
+            view.oriBadgeMySelfBgShow = _badgeMySelfBgShow;
+            view.oriBadgeHurtBgShow = _badgeHurtBgShow;
+            view.oriBadgeDeadBgShow = _badgeDeadBgShow;
+            view.oriBadgeIconBundle = _badgeIconBundle;
+            view.oriBadgeIconAsset = _badgeIconAsset;
 		}
 
 
@@ -414,9 +478,10 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
 			ImgGroupShow = _view.oriImgGroupShow;
 			TextGroupShow = _view.oriTextGroupShow;
 			IconGroupShow = _view.oriIconGroupShow;
+			BadgeGroupShow = _view.oriBadgeGroupShow;
 			MySelfMaskShow = _view.oriMySelfMaskShow;
-			DeathMaskShow = _view.oriDeathMaskShow;
-			DeadIconShow = _view.oriDeadIconShow;
+			DeadStateShow = _view.oriDeadStateShow;
+			HurtStateShow = _view.oriHurtStateShow;
 			RankText = _view.oriRankText;
 			RankColor = _view.oriRankColor;
 			PlayerNameText = _view.oriPlayerNameText;
@@ -431,8 +496,12 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
 			DeadColor = _view.oriDeadColor;
 			AssistText = _view.oriAssistText;
 			AssistColor = _view.oriAssistColor;
-			PingText = _view.oriPingText;
-			PingColor = _view.oriPingColor;
+			BadgeNormalBgShow = _view.oriBadgeNormalBgShow;
+			BadgeMySelfBgShow = _view.oriBadgeMySelfBgShow;
+			BadgeHurtBgShow = _view.oriBadgeHurtBgShow;
+			BadgeDeadBgShow = _view.oriBadgeDeadBgShow;
+			BadgeIconBundle = _view.oriBadgeIconBundle;
+			BadgeIconAsset = _view.oriBadgeIconAsset;
 			SpriteReset();
 		}
 

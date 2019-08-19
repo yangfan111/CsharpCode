@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Core.SpatialPartition;
 using Core.Ui.Map;
 using UnityEngine;
 
@@ -97,8 +98,8 @@ namespace App.Shared.Components.Ui
 
     public class MiniMapTeamPlayInfo
     {
-        public MiniMapTeamPlayInfo(long playerId,int entityId, bool isPlayer, int num, Color color, MiniMapPlayStatue statue, Vector2 pos, float faceDirection, List<MiniMapPlayMarkInfo> markList, bool isShooting, int shootingCount,
-            string playerName, int curHp, int maxHp, int curHpInHurted, bool isMark, Vector3 topPos)
+        public MiniMapTeamPlayInfo(long playerId,int entityId, bool isPlayer, int num, Color color, MiniMapPlayStatue statue, Vector3 pos, float faceDirection, List<MiniMapPlayMarkInfo> markList, bool isShooting, int shootingCount,
+            string playerName, int curHp, int maxHp, int curHpInHurted, bool isMark, Vector3 topPos, bool IsShow)
         {
             this.PlayerId = playerId;
             this.EntityId = entityId;
@@ -106,7 +107,8 @@ namespace App.Shared.Components.Ui
             this.Num = num;
             this.Color = color;
             this.Statue = statue;
-            this.Pos = new MapFixedVector2(pos);
+            this.Pos = new MapFixedVector2(pos.To2D());
+            this.Pos3D = new MapFixedVector3(pos);
             this.FaceDirection = faceDirection;
             this.MarkList = markList;
             this.IsShooting = isShooting;
@@ -117,6 +119,7 @@ namespace App.Shared.Components.Ui
             this.CurHpInHurted = curHpInHurted;
             this.IsMark = isMark;
             this.TopPos = topPos;
+            this.IsShow = IsShow;
         }
 
         public MiniMapTeamPlayInfo()
@@ -129,7 +132,8 @@ namespace App.Shared.Components.Ui
         public int Num;                             //0 就是不现实编号
         public Color Color;                         //小队颜色
         public MiniMapPlayStatue Statue;            // 1 常态 2跳伞 3载具 4受伤 5死亡
-        public MapFixedVector2 Pos;                         //只用到  真实世界的 x和z的坐标
+        public MapFixedVector2 Pos;                 //世界坐标 x z
+        public MapFixedVector3 Pos3D;               //坐标高度 x y z 
         public float FaceDirection;                 //0 到 360 
         public List<MiniMapPlayMarkInfo> MarkList;  //标记列表
         public bool IsShooting;                     //是否在开枪
@@ -141,6 +145,7 @@ namespace App.Shared.Components.Ui
         public int CurHpInHurted;                   //受伤血量
         public bool IsMark;                         //是否标记
         public Vector3 TopPos;                      //人物名字位置
+        public bool IsShow = true;                 //是否需要隐藏显示
 
         //是否受伤状态
         public bool IsInHurtedStatue
@@ -212,11 +217,11 @@ namespace App.Shared.Components.Ui
     public class AirPlaneData
     {
         private int type;  //0 无飞机 //1 空投机  2运输机
-        private MapFixedVector2 pos;  //3d世界的x和z 坐标值
+        private MapFixedVector3 pos;  //3d世界的标值
         private float direction; //飞机的朝向
 
         public AirPlaneData() { }
-        public AirPlaneData(int type, MapFixedVector2 pos, float direction)
+        public AirPlaneData(int type, MapFixedVector3 pos, float direction)
         {
             this.type = type;
             this.pos = pos;
@@ -236,7 +241,7 @@ namespace App.Shared.Components.Ui
             }
         }
 
-        public MapFixedVector2 Pos
+        public MapFixedVector3 Pos
         {
             get
             {

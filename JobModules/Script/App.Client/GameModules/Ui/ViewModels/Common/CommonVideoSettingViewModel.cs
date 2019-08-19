@@ -191,8 +191,8 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			return null;
 		}
 
-        public string ResourceBundleName { get { return "ui/hall/prefabs/setting"; } }
-        public string ResourceAssetName { get { return "VideoSetting"; } }
+        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
+        public string ResourceAssetName { get { return "CommonVideoSetting"; } }
         public string ConfigBundleName { get { return ""; } }
         public string ConfigAssetName { get { return ""; } }
     }

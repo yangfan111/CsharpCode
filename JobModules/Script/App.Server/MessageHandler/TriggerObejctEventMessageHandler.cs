@@ -9,6 +9,7 @@ using Core.Network;
 using App.Shared.SceneTriggerObject;
 using App.Shared.Util;
 using Core;
+using Core.EntityComponent;
 using Core.SceneTriggerObject;
 using Core.Utils;
 using Utils.Singleton;

@@ -32,6 +32,8 @@ namespace Core.SessionState
             Application.backgroundLoadingPriority = settings.backgroundLoadingPriority;
             QualitySettings.asyncUploadTimeSlice = settings.asyncUploadTimeSlice;
             QualitySettings.asyncUploadBufferSize = settings.asyncUploadBufferSize;
+            QualitySettings.asyncUploadBufferSize = 32;
+            QualitySettings.asyncUploadTimeSlice = 1;
         }
         public static BackroundloadSettings LoadSettsings = new BackroundloadSettings(ThreadPriority.High,16,8);
     }

@@ -3,11 +3,15 @@ using System.Collections;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
+using Common;
 using Core.Network.ENet;
 using Core.ObjectPool;
 using Core.Utils;
 using VNet;
-
+using System.Security.Cryptography;
+using Utils.Replay;
+using WeaponConfigNs;
+using NetworkMessageRecoder = Utils.Replay.NetworkMessageRecoder;
 
 namespace Core.Network
 {
@@ -89,12 +93,11 @@ namespace Core.Network
 
 
         private volatile INetworkMessageSerializer _serializer;
+        private volatile IRecordManager _recoder;
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(AbstractNetowrkChannel));
         private Queue _serializeQueue = Queue.Synchronized(new Queue());
         private Queue _deserializeQueue = Queue.Synchronized(new Queue());
-        private Queue _sendQueue = Queue.Synchronized(new Queue());
-        private Queue _recvQueue = Queue.Synchronized(new Queue());
-        private MemoryStream _receiveMemoryStream = ObjectAllocatorHolder<MemoryStream>.Allocate();
+        private VNetPacketMemSteam _receiveMemoryStream = VNetPacketMemSteam.Allocate();
         private Stopwatch _stopwatch = new Stopwatch();
         private const int MaxLoopCount = 2;
 
@@ -138,14 +141,14 @@ namespace Core.Network
             try
             {
                 ProcessSerializeQueue();
-                ProcessSendQueue();
+               
                 ProcessDeserializeQueue();
                 //_serializer 有可能是公共的，这里不调Dispose
                 //			if (_serializer != null)
                 //			{
                 //				_serializer.Dispose();
                 //			}
-                ObjectAllocatorHolder<MemoryStream>.Free(_receiveMemoryStream);
+                _receiveMemoryStream.ReleaseReference();
                 _receiveMemoryStream = null;
                 if(_serializer!=null)
                     _serializer.Dispose();
@@ -165,14 +168,12 @@ namespace Core.Network
             get { return _serializeQueue.Count; }
         }
 
-        public int SendQueueCount
-        {
-            get { return _sendQueue.Count; }
-        }
+      
+           
 
         public int RecvQueueCount
         {
-            get { return _recvQueue.Count; }
+            get { return 0; }
         }
 
         public int DeserializeQueueCount
@@ -184,6 +185,12 @@ namespace Core.Network
         {
             get { return _serializer; }
             set { _serializer = value; }
+        }
+
+        public IRecordManager Recoder
+        {
+            get { return _recoder; }
+            set { _recoder = value; }
         }
 
 
@@ -226,6 +233,7 @@ namespace Core.Network
             }
         }
 
+        // network thread
         public void AddToDeserializeQueue(IPacket enetEventPacket)
         {
             enetEventPacket.AcquireReference();
@@ -233,8 +241,20 @@ namespace Core.Network
         }
 
 
+        // main Thread
         protected void AddToSerializeQueue(NetworkMessageItem item)
         {
+            if (_recoder != null)
+            {
+                if (this.Id != _recoder.Info.ChannedId)
+                {
+                    _recoder.Info.ChannedId = this.Id;
+                    _recoder.UpdateInfoToFile();
+                    
+                }
+                _recoder.AddMessage(EReplayMessageType.OUT, NetworkMessageRecoder.RecodMessageItem.Allocate(this,
+                    item.MessageType, item.MessageBody, MyGameTime.stage, MyGameTime.seq, NetworkMessageRecoder.ERecodMessagetype.UdpOut));
+            }
             if (IsConnected && _serializer != null)
             {
                 
@@ -252,21 +272,7 @@ namespace Core.Network
             }
         }
 
-        public int ProcessRecvQueue()
-        {
-            int count = 0;
-            _logger.DebugFormat("ProcessRecvQueue  start  {0} ", _recvQueue.Count);
-            while (_recvQueue.Count > 0)
-            {
-                count++;
-                RecvMessage msg = (RecvMessage) _recvQueue.Dequeue();
-                ProcessMsg(msg);
-            }
 
-            _logger.DebugFormat("ProcessRecvQueue  end  {0} ", _recvQueue.Count);
-
-            return count;
-        }
 
         private void ProcessMsg(RecvMessage msg)
         {
@@ -310,21 +316,19 @@ namespace Core.Network
                 {
                     if (IsConnected)
                     {
-                        if (p is VNetPacket)
-                        {
-                            _receiveMemoryStream.Capacity = Math.Max(_receiveMemoryStream.Capacity, p.Length);
-                            _receiveMemoryStream.SetLength(p.Length);
-                            _receiveMemoryStream.Seek(0, SeekOrigin.Begin);
-                            p.CopyTo(_receiveMemoryStream.GetBuffer(), 0, p.Length, 0);
-                            DoReceived(_receiveMemoryStream);
-                        }
-                        else if (p is VNetPacketMemSteam)
+                        if (p is VNetPacketMemSteam)
                         {
                             var memoryStream = ((VNetPacketMemSteam) p).Stream;
+
                             if (memoryStream != null)
                             {
-                                DoReceived(memoryStream);
+                                //lock (memoryStream)
+                                {
+                                    DoReceived(memoryStream);
+                                }
+
                             }
+
                         }
                     }
                 }
@@ -372,22 +376,22 @@ namespace Core.Network
                     try
                     {
                         NetworkMessageItem item = (NetworkMessageItem) _serializeQueue.Dequeue();
-                        MemoryStream ms = ObjectAllocatorHolder<MemoryStream>.Allocate();
+                       // MemoryStream ms = ObjectAllocatorHolder<MemoryStream>.Allocate();
                         try
                         {
                        
-                            ms.Seek(4, SeekOrigin.Begin);
-                            DoSerialize(ms, item.MessageType, item.MessageBody);
-                            item.MemoryStream = ms;
+                            item.MemoryStream.Seek(4, SeekOrigin.Begin);
+                             var serialize =DoSerialize( item.MemoryStream, item.MessageType, item.MessageBody);
+                           
                             if (IsConnected)
                             {
-                                DoSend(item);
+                                AssertUtility.Assert(DoSend(item) == serialize+4);
                             }
                             
                         }
                         finally
                         {
-                            ObjectAllocatorHolder<MemoryStream>.Free(item.MemoryStream);
+                           
                             item.ReleaseReference();
                         }
                         
@@ -405,37 +409,11 @@ namespace Core.Network
             return count;
         }
 
-        public int ProcessSendQueue(bool isMultiThread = false)
-        {
-            int count = 0;
-            while (_sendQueue.Count > 0 && count < MaxLoopCount)
-            {
                 
-                if (isMultiThread)
-                    count++;
-                try
-                {
-                    NetworkMessageItem item = (NetworkMessageItem) _sendQueue.Dequeue();
-                    if (IsConnected)
-                    {
-                        DoSend(item);
-                    }
-
-                    ObjectAllocatorHolder<MemoryStream>.Free(item.MemoryStream);
-                }
-                catch (Exception e)
-                {
-                    _logger.ErrorFormat("error while do send {0} {1}", IdInfo(), e);
-                }
-            }
-
-            return count;
-        }
-
-        protected abstract void DoSend(NetworkMessageItem item);
+        protected abstract int DoSend(NetworkMessageItem item);
 
 
-        protected void DoSerialize(MemoryStream ms, int messageType, object messageBody)
+        protected int DoSerialize(MemoryStream ms, int messageType, object messageBody)
         {
             
             if (!LittleEndian)
@@ -458,7 +436,8 @@ namespace Core.Network
             }
 
             
-            var send = _serializer.Serialize(ms, messageType, messageBody);
+            int send = (int)_serializer.Serialize(ms, messageType, messageBody);
+            return send +4;
         }
 
         public void PassiveClosed()
@@ -472,6 +451,7 @@ namespace Core.Network
 
         private float _tickTime;
         private int _tickIntval = 2;
+        
 
         public void FlowTick(float time)
         {
@@ -484,6 +464,7 @@ namespace Core.Network
         }
 
         public abstract string IdInfo();
+        public abstract  void RealTimeConnect(int udpPort, int remoteUdpId);
 
         public abstract string DebugInfo();
     }

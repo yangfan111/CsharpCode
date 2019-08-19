@@ -46,6 +46,10 @@ namespace App.Shared.GameModules.Weapon
             }
         }
 
+        public bool NotMove {
+            get { return PlayerStateUtil.HasPlayerState(EPlayerGameState.NotMove, entity.gamePlay); }
+        }
+
         public int RelatedTime
         {
             get { return entity.time.ClientTime; }
@@ -200,12 +204,7 @@ namespace App.Shared.GameModules.Weapon
 
         public PlayerClientUpdateComponent RelatedClientUpdate
         {
-            get
-            {
-                if (!entity.hasPlayerClientUpdate)
-                    entity.AddPlayerClientUpdate(-1);
-                return entity.playerClientUpdate;
-            }
+            get { return entity.playerClientUpdate; }
         }
 
         #endregion
@@ -259,39 +258,61 @@ namespace App.Shared.GameModules.Weapon
 
         public void RemoveBagWeapon(EWeaponSlotType slot)
         {
+            if (slot == EWeaponSlotType.Pointer)
+                slot = (EWeaponSlotType)RelatedCustomize.HeldBagPointer;
             var slotData = RelatedBagSet.WeaponBag[slot];
             slotData.Remove(RelatedCustomize.EmptyConstWeaponkey); //player slot 数据移除
         }
 
         public void ClearBagPointer()
         {
-            RelatedBagSet.ClearPointer();
+            RelatedCustomize.ClearPointer();
         }
 
         public void SyncBagWeapon(EWeaponSlotType slot, EntityKey key)
         {
-            RelatedBagSet.WeaponBag[slot].Sync(key);
+            if (slot == EWeaponSlotType.Pointer)
+                slot = (EWeaponSlotType)RelatedCustomize.HeldBagPointer;
+            var slotData = RelatedBagSet.WeaponBag[slot];
+            slotData.Sync(key);
         }
 
         public void SetBagHeldSlotType(EWeaponSlotType nowSlot)
         {
             var slot = (byte) nowSlot;
-            var bag  = RelatedBagSet.WeaponBag;
-            if (bag.HeldSlotPointer == slot)
+            var relatedCustomize  = RelatedCustomize;
+            if (relatedCustomize.HeldSlotPointer == slot)
                 return;
             if (!WeaponUtil.VertifyEweaponSlotIndex(slot, true))
                 return;
-            bag.ChangeSlotPointer(slot);
+            relatedCustomize.ChangeSlotPointer(slot);
         }
 
         public Func<EntityKey> GenerateBagWeaponKeyExtractor(EWeaponSlotType slotType)
         {
-            return () => { return RelatedBagSet.WeaponBag[slotType].WeaponKey; };
+            return () =>
+            {
+                if (slotType == EWeaponSlotType.Pointer)
+                    slotType = (EWeaponSlotType)RelatedCustomize.HeldBagPointer;
+                return RelatedBagSet.WeaponBag[slotType].WeaponKey;
+            };
+        }
+
+        public EntityKey GenerateBagWeaponKeyExtractorFunc(EWeaponSlotType slotType)
+        {
+            if (slotType == EWeaponSlotType.Pointer)
+                slotType = (EWeaponSlotType)RelatedCustomize.HeldBagPointer;
+            return RelatedBagSet.WeaponBag[slotType].WeaponKey;
         }
 
         public Func<EntityKey> GenerateBagEmptyKeyExtractor()
         {
             return () => { return RelatedCustomize.EmptyConstWeaponkey; };
+        }
+
+        public EntityKey GenerateBagEmptyKeyExtractorFunc()
+        {
+            return RelatedCustomize.EmptyConstWeaponkey;
         }
 
         public void UnArmC4()
@@ -323,13 +344,16 @@ namespace App.Shared.GameModules.Weapon
 
         public void CharacterDrawInterrupt()
         {
+            logger.Info("[Tmp]Interrupt");
             PlayerStateUtil.AddPlayerState(EPlayerGameState.InterruptItem, entity.gamePlay);
             RelatedCharState.InterruptAction();
             RelatedCharState.ForceFinishGrenadeThrow();
+            Owner.AudioController().StopPullBoltAudio();
         }
 
         public void CharacterUnarm(Action holsterStartFinished, Action holsterEndFinished, float unarmParam)
         {
+            logger.Info("[Tmp]Interrupt");
             RelatedCharState.InterruptAction();
             RelatedCharState.ForceFinishGrenadeThrow();
             RelatedCharState.Holster(holsterStartFinished, holsterEndFinished, unarmParam);
@@ -345,6 +369,7 @@ namespace App.Shared.GameModules.Weapon
                 //若已拉栓，销毁ThrowingEntity
                 actionData.IsInterrupt = true;
             }
+
             //打断投掷动作
             RelatedCharState.ForceFinishGrenadeThrow();
             //清理手雷状态

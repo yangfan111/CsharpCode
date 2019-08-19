@@ -12,17 +12,17 @@ namespace WeaponConfigNs
 {
     public class WeaponPartsAchive
     {
-        public int UpperRail;
-        public int LowerRail;
-        public int SideRail;
-        public int Magazine;
-        public int Stock;
-        public int Muzzle;
-        public int Bore;
-        public int Feed;
-        public int Trigger;
-        public int Interlock;
-        public int Brake;
+        public int UpperRail;//3
+        public int LowerRail;//5
+        public int SideRail;//4
+        public int Magazine;//1
+        public int Stock; //6
+        public int Muzzle;//2
+        public int Bore;//7
+        public int Feed;//8
+        public int Trigger;//9
+        public int Interlock;//10
+        public int Brake;//11
 
         public void CloneFrom(WeaponPartsAchive attach)
         {
@@ -69,13 +69,14 @@ namespace WeaponConfigNs
         public float ShiftFov;
         public int PickSound;
         public float Weight;
-        public int Sort;
         public int Workshop; //厂牌
         public List<int> ApplyParts;  //可解锁与装配配件
         public string DOFParameter; //景深
         public int Durable;
         public List<int> ProtectivePartsList;
         public int DamageReduction;
+        public List<float> ShowRotation;  //展示角度
+        public float ShowDistance;        //展示距离
 
         public string[] GetDOFParameters
         {

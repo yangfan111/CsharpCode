@@ -2,7 +2,6 @@
 using App.Shared.GameModules.SceneObject;
 using Core.GameModule.Module;
 using Core.GameModule.System;
-using UnityEngine;
 
 namespace App.Client.GameModules.SceneObject
 {

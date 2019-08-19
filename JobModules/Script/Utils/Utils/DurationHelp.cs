@@ -10,6 +10,7 @@ using Core.MyProfiler;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Profiling;
+using UnityEngine.Rendering;
 using Utils.Appearance;
 using Utils.Singleton;
 
@@ -422,6 +423,15 @@ namespace Core.Utils
                     .Append(RuntimeStats.shadowCasters);
             }
 
+#if HAVE_HZB_CULLING
+            if (GraphicsSettings.hzbCullingEnable)
+            {
+                var hzbCullStats = Profiler.GetHZBCullStats();
+                sb.Append("\n")
+                    .Append(string.Format("Culled Prim:{0}/{1},", hzbCullStats.culledRendererNum, hzbCullStats.totalRendererNum))
+                    .Append(string.Format("Culled Lights:{0}/{1}\n", hzbCullStats.culledLightNum, hzbCullStats.totalLightNum));
+            }
+#endif
 
             return sb.ToString();
         }

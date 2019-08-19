@@ -58,6 +58,15 @@ namespace XmlConfig
         public string DescriptionID;
         public int NewMap;
         public int DefaultPlayerNum;
+        /*public bool OcEnable;*/
+        public int OcType;
+        public bool depthPrepassEnable;
+        public float minRadiusRatioForDepthPrepass;
+        public bool hzbCameraRejectEnable;
+        public float hzbCameraTranslationThreshold;
+        public float hzbCameraRotationThreshold;
+        public float hzbMinCullingDistance;
+        public float hzbProbablyVisibleTime;
     }
 
     [XmlRoot("root")]

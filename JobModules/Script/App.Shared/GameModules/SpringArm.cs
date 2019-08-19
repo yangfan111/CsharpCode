@@ -43,7 +43,6 @@ namespace App.Shared.GameModules
         public Vector3 Offset;
         private float DetectRadius = 0.2f;
         private float LagSpeed = 0.1f;
-        private float Margin = 0.02f;
 
         private float LagMaxTimeStep = 5;
         private float SmalledstNum = 0f;
@@ -55,13 +54,12 @@ namespace App.Shared.GameModules
 
         public Vector3 LastLoc;
 
-        public void Set(float radius, float lagSpeed, int timeStep, float margin, int layer)
+        public void Set(float radius, float lagSpeed, int timeStep, int layer)
         {
             CollisionLayers = layer;
             DetectRadius = radius;
             LagSpeed = lagSpeed;
             LagMaxTimeStep = timeStep;
-            Margin = margin;
             CollisionLayers = layer;
         }
         
@@ -93,7 +91,7 @@ namespace App.Shared.GameModules
             RaycastHit raycast;
             if (Physics.SphereCast(start, DetectRadius, curDist, out raycast, curDist.magnitude, CollisionLayers))
             {
-                resultLoc = start + curDist.normalized * (raycast.distance + DetectRadius - Margin);
+                resultLoc = start + curDist.normalized * (raycast.distance);
             }
             return resultLoc;
         }

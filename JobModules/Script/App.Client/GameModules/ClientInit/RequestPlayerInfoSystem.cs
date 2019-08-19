@@ -83,8 +83,7 @@ namespace App.Client.GameModules.ClientInit
                     var id = idGenerator.GetNextEntityId();
                     var _offlineSelector = new OfflineSnapshotSelector(new EntityKey(id, (int)EEntityType.Player),
                         _contexts.session.commonSession.GameContexts);
-                    _contexts.session.clientSessionObjects.SnapshotSelectorContainer.SnapshotSelector =
-                        _offlineSelector;
+                    _contexts.session.clientSessionObjects.SnapshotSelctor =_offlineSelector;
 
                     _contexts.session.clientSessionObjects.SimulationTimer.CurrentTime = 0;
                     _contexts.session.entityFactoryObject.SceneObjectEntityFactory = new ServerSceneObjectEntityFactory(

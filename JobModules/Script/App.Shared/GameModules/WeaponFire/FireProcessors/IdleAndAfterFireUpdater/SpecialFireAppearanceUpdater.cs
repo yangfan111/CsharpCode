@@ -12,63 +12,64 @@ namespace App.Shared.GameModules.Weapon.Behavior
     /// </summary>
     public class SpecialFireAppearanceUpdater : CommonFireAppearanceUpdater
     {
-        protected override void DoIdle(PlayerWeaponController controller, WeaponSideCmd cmd)
+        LoggerAdapter logger = new LoggerAdapter("SpecialFireAppearanceUpdater");
+        protected override void DoIdle(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
-            var heldAgent = controller.HeldWeaponAgent;
             //null->Fire->SpecialFireHold(1)->SpecialFireEnd->null
             if (cmd.FiltedInput(EPlayerInput.IsPullboltInterrupt))
             {//当前pullBolting被限制，不执行
-                heldAgent.InterruptPullBolt();
+                attackProxy.InterruptPullBolt();
                 return;
             }
-            var state = controller.RelatedCharState.GetActionState();
+            var state = attackProxy.CharacterState.GetActionState();
             //正常开火拉栓
             if (state == ActionInConfig.SpecialFireHold)
             {
-                controller.AudioController.PlayPullBoltAudio(heldAgent.ConfigId);
-                controller.RelatedCharState.SpecialFireEnd();
+                logger.Info("Normal pullbolt");
+                attackProxy.AudioController.PlayPullBoltAudio(attackProxy.WeaponConfigAssy.S_Id);
+                attackProxy.CharacterState.SpecialFireEnd();
+                attackProxy.RuntimeComponent.FinishPullBolt();
                 return;
 
             }
-            if (heldAgent.RunTimeComponent.PullBoltInterrupt && state == ActionInConfig.Null)
+            if (state == ActionInConfig.Null && attackProxy.BasicComponent.Bullet > 0)
             {
-                if (heldAgent.BaseComponent.Bullet > 0)
+                //只拉栓逻辑
+                if (attackProxy.RuntimeComponent.IsPullboltInterrupt)
                 {
-                    var needActionDeal = SingletonManager.Get<WeaponResourceConfigManager>()
-                                    .NeedActionDeal(heldAgent.ConfigId, ActionDealEnum.Reload);
-                    //只拉栓逻辑
-                    SpecialFireAppearance(heldAgent.Owner.WeaponController(), needActionDeal);
+                    logger.Info("Interrupt pullbolt");
+                    attackProxy.RuntimeComponent.FinishPullBolt();
+                    attackProxy.AudioController.PlayPullBoltAudio(attackProxy.WeaponConfigAssy.S_Id);
+                    attackProxy.CharacterState.SpecialFireEnd();
                 }
-                heldAgent.RunTimeComponent.PullBoltInterrupt = false;
+                    // var needActionDeal = SingletonManager.Get<WeaponResourceConfigManager>()
+                    //                 .NeedActionDeal(attackProxy.WeaponConfigAssy.S_Id, ActionDealEnum.Reload);
+                 
             }
         }
 
-        public override void OnAfterFire(WeaponBaseAgent weaponAgent, WeaponSideCmd cmd)
+        public override void OnAfterFire(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
-            weaponAgent.RunTimeComponent.PullBoltFinish = false; 
-            var weaponData = weaponAgent.BaseComponent;
-
-            if (weaponData.Bullet > 0)
+            attackProxy.RuntimeComponent.StartPullBolt();
+            if (attackProxy.BasicComponent.Bullet > 0)
             {
                 var needActionDeal = SingletonManager.Get<WeaponResourceConfigManager>()
-                                                     .NeedActionDeal(weaponData.ConfigId, ActionDealEnum.Reload);
-                SpecialFireAppearance(weaponAgent.Owner.WeaponController(), needActionDeal);
+                                                     .NeedActionDeal(attackProxy.WeaponConfigAssy.S_Id, ActionDealEnum.Reload);
+                SpecialFireAppearance(attackProxy, needActionDeal);
             }
             else
             {
-                base.OnAfterFire(weaponAgent, cmd);
+                base.OnAfterFire(attackProxy, cmd);
             }
         }
 
-        protected void SpecialFireAppearance(PlayerWeaponController controller, bool needActionDeal)
+        protected void SpecialFireAppearance(WeaponAttackProxy attackProxy, bool needActionDeal)
         {
-            var relatedCharState  = controller.RelatedCharState;
-            var relatedAppearance = controller.RelatedAppearence;
+            var relatedCharState  = attackProxy.CharacterState;
+            var relatedAppearance = attackProxy.Appearence;
             if (relatedCharState == null)
                 return;
-            controller.HeldWeaponAgent.RunTimeComponent.PullBoltInterrupt = false;
-            var isAiming = controller.RelatedCameraSNew.IsAiming();
-            if (isAiming)
+            if (attackProxy.CanFire)
             {
                 relatedCharState.SpecialSightsFire(() =>
                 {
@@ -76,7 +77,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
                     {
                         relatedAppearance.RemountWeaponOnRightHand();
                     }
-                    controller.HeldWeaponAgent.RunTimeComponent.PullBoltFinish = true; 
+                    attackProxy.RuntimeComponent.FinishPullBolt(); 
 
                 });
             }
@@ -88,7 +89,8 @@ namespace App.Shared.GameModules.Weapon.Behavior
                     {
                         relatedAppearance.RemountWeaponOnRightHand();
                     }
-                    controller.HeldWeaponAgent.RunTimeComponent.PullBoltFinish = true; 
+
+                    attackProxy.RuntimeComponent.FinishPullBolt();
 
                 });
             }

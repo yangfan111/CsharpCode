@@ -6,6 +6,7 @@ using Assets.XmlConfig;
 using Core.GameModule.System;
 using Core.Utils;
 using Entitas;
+using System;
 using System.Collections.Generic;
 using Utils.AssetManager;
 using Utils.CharacterState;
@@ -61,31 +62,19 @@ namespace App.Client.GameModules.SceneObject
                 LoadWeaponObject(sceneObjectEntity);
             else if (sceneObjectEntity.hasSimpleItem)
                 LoadSimpleItem(sceneObjectEntity);
-
-            //  LoadAudioEnvironment(sceneObjectEntity);
         }
 
-        //private bool bgmInit = false;
-        //private void LoadAudioEnvironment(SceneObjectEntity sceneObjectEntity)
-        //{
-        //    if (!bgmInit)
-        //    {
-        //        _logger.InfoFormat("Create Server Scene Audio");
-        //        bgmInit = true;
-        //        AssetInfo assetInfo = new AssetInfo("sound/common", "S003_Audio_Amb");
-        //        _assetManager.LoadAssetAsync(sceneObjectEntity, assetInfo, _simpleLoadHandler.OnLoadSucc);
-        //    }
-        //}
         private void LoadWeaponObject(SceneObjectEntity sceneObjectEntity)
         {
             var weapon = sceneObjectEntity.weaponObject;
-            //WeaponEntity weaponEntity = WeaponEntityFactory.StuffWeaponEntityFromSceneObject(weapon);
-            //if (weaponEntity == null)
-            //    return;
             
             var allConfigs = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(weapon.ConfigId);
             if (allConfigs == null)
                 return;
+
+            if(WeaponUtil.IsC4p(weapon.ConfigId))
+                sceneObjectEntity.AddBombSound(DateTime.Now.Ticks / 10000L, 0);
+
             var avatarSize = allConfigs.WeaponDefaultAvartar.Size;
             if (avatarSize != 1)
                 sceneObjectEntity.AddSize(avatarSize);
@@ -141,6 +130,11 @@ namespace App.Client.GameModules.SceneObject
                     var itemSsset = SingletonManager.Get<GameItemConfigManager>().GetAssetById(id);
                     if (string.IsNullOrEmpty(itemSsset.AssetName) || string.IsNullOrEmpty(itemSsset.BundleName))
                     {
+#if UNITY_EDITOR
+                        UnityEngine.Debug.LogError(string.Format("item is not config for id {0}", id));
+#else
+                        Logger.ErrorFormat("item is not config for id {0}", id);
+#endif
                         return;
                     }
 

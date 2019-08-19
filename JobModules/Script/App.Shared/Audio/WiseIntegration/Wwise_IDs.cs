@@ -8,14 +8,15 @@ namespace App.Shared.Audio
         /// <summary>
         ///     自己/多人玩家音频播放选择
         /// </summary>
-        public const uint Different_player_effect = 678245580;
-
+        public const uint DifferentPlayerEffect = 678245580;
         /// <summary>
         ///     换弹速度选择
         /// </summary>
-        public const uint Gun_magazine_speed = 3930419550;
+        public const uint GunMagazineSpeed = 3930419550;
         
         public const uint FlashBomb = 527817437;
+
+        public const uint FootstepSoft = 3759402078;
 
 
         public static void GetMapAmb(int id,out MapAmbInfo ambInfo)

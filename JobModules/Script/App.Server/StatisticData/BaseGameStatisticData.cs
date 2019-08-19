@@ -29,11 +29,6 @@ namespace App.Server.StatisticData
             _teamCapacity = teamCapacity;
         }
 
-        /*public bool IsTeamMode()
-        {
-            return _teamCapacity > 1;
-        }*/
-
         public virtual void SetStatisticData(GameOverPlayer gameOverPlayer, IPlayerInfo player, IFreeArgs freeArgs)
         {
             
@@ -48,6 +43,7 @@ namespace App.Server.StatisticData
             list.AddFields(new ObjectFields(_dictGoPlayers));
             list.AddFields(new ObjectFields(_dictPlayers));
             list.AddFields(new ObjectFields(_dictLeavedPlayers));
+            list.AddFields(new ObjectFields(_teamCapacity));
             IEventArgs args = freeArgs as IEventArgs;
             if (null != args)
             {

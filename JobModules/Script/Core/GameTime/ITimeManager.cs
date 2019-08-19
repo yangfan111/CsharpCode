@@ -8,7 +8,7 @@
 
         int ServerTime { get; set; }
 
-        int RenderTime { get; }
+        int RenderTime { get; set; }
 
         float FrameInterpolation { get; }
         

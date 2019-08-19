@@ -144,7 +144,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void InitKeyBinding()
         {
             keyReveiver = new KeyReceiver(UiConstant.splitWindowKeyBlockLayer, BlockType.All);
-            keyReveiver.AddAction(UserInputKey.SplitProp, (data) =>
+            keyReveiver.BindKeyAction(UserInputKey.SplitProp, (data) =>
             {
                 if (!_viewModel.splitBtnInteractable)
                 {
@@ -153,7 +153,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                 SendMessage();
                 HideWindow();
             });
-            keyReveiver.AddAction(UserInputKey.HideWindow, (data) => { HideWindow(); });
+            keyReveiver.BindKeyAction(UserInputKey.HideWindow, (data) => { HideWindow(); });
         }
         private void OnSplitBtnClick()
         {

@@ -14,6 +14,7 @@ using Core.SessionState;
 using Core.Ui;
 using Core.Ui.Map;
 using Core.Utils;
+using DG.Tweening;
 using Loxodon.Framework.Binding;
 using Loxodon.Framework.Contexts;
 using Shared.Scripts;
@@ -114,7 +115,7 @@ namespace App.Client.GameModules.Ui.System
             contexts.ui.uISession.CreateUi = new List<string>();
             contexts.ui.uISession.HideGroup = new List<UiGroup>();
             contexts.ui.uISession.UiGroup = new Dictionary<UiGroup, List<IUiGroupController>>();
-            contexts.ui.uISession.OpenUiKeyReceiverList = new List<IKeyReceiver>();
+            contexts.ui.uISession.OpenUKeyhandlerList = new List<KeyHandler>();
 
             contexts.ui.uI.HurtedDataList = new Dictionary<int, Shared.Components.Ui.CrossHairHurtedData>();
             contexts.ui.uI.KillInfos = new List<Shared.Components.Ui.IKillInfoItem>();
@@ -163,7 +164,7 @@ namespace App.Client.GameModules.Ui.System
             contexts.ui.uI.EquipIdList = new KeyValuePair<int, int>[(int)Wardrobe.EndOfTheWorld];
 
             
-            //TestMapData(contexts);
+//            TestMapData(contexts);
         }
 
 
@@ -197,8 +198,8 @@ namespace App.Client.GameModules.Ui.System
 
             contexts.ui.map.CurDuquan = new DuQuanInfo(contexts.ui.map.OffLineLevel, new MapFixedVector2(15, 15), 5, 5, 60);
             contexts.ui.map.NextDuquan = new DuQuanInfo(contexts.ui.map.OffLineLevel, new MapFixedVector2(25, 25), 3, 10, 140);
-            contexts.ui.map.BombArea = new BombAreaInfo(new MapFixedVector2(10, 10), 5, contexts.ui.map.OffLineLevel);
-            contexts.ui.map.PlaneData = new AirPlaneData(){Type = 1, Pos = new MapFixedVector2(28, 28), Direction = 90f};
+            contexts.ui.map.BombArea = new BombAreaInfo(new MapFixedVector2(15, 15), 5, contexts.ui.map.OffLineLevel);
+            contexts.ui.map.PlaneData = new AirPlaneData(){Type = 1, Pos = new MapFixedVector3(28,100, 28), Direction = 90f};
             contexts.ui.map.TeamPlayerMarkInfos = new List<TeamPlayerMarkInfo>();
             contexts.ui.map.MapMarks = new Dictionary<long, MiniMapPlayMarkInfo>();
 
@@ -211,14 +212,17 @@ namespace App.Client.GameModules.Ui.System
 //            plane.AddEffect(FreeUIUtil.GetInstance().GetEffect(1));
 //            SingletonManager.Get<FreeEffectManager>().AddEffect(plane);
 
-            var go = new GameObject("plane1");
+            var go = new GameObject("plane");
             var plane = go.AddComponent<FreeRenderObject>();
             plane.raderImage = new RaderImage();
-            plane.key = "plane1";
-            plane.model3D.x = 15;
-            plane.model3D.z = 15;
+            plane.key = "plane";
+            plane.model3D.x = -15;
+            plane.model3D.z = -15;
             plane.AddEffect(FreeUIUtil.GetInstance().GetEffect(1));
             SingletonManager.Get<FreeEffectManager>().AddEffect(plane);
+
+            DOTween.To(()=>plane.model3D.x, x=> plane.model3D.x = x, 15, 30);
+            DOTween.To(()=>plane.model3D.z, x=> plane.model3D.z = x, 15, 30);
 
             contexts.ui.map.IsShowRouteLine = true;
             contexts.ui.map.RouteLineStartPoint = new MapFixedVector2(0,0);

@@ -22,14 +22,17 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Pose
      
         private float transitionTime = 200f;
         private int _order;
+        private Motors _motors;
 
         public DrivePoseMotor(ECameraPoseMode modeId,
             HashSet<ECameraPoseMode> excludes,
             VehicleContext vehicleContext,
-            FreeMoveContext freeMoveContext     
-        )
+            FreeMoveContext freeMoveContext,
+            Motors m
+        ):base(m)
         {
             _modeId = (short) modeId;
+            _motors = m;
           
             this.excludes = new HashSet<short>();
             foreach (var e in excludes)
@@ -40,7 +43,7 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Pose
             _order = SingletonManager.Get<CameraConfigManager>().GetRoleConfig()
                 .GetCameraConfigItem((ECameraPoseMode) _modeId).Order;
             
-            CameraActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.Pose, (int)modeId, 
+            _motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.Pose, (int)modeId, 
                 (player, state) =>
                 {
                     if (player.IsOnVehicle())
@@ -59,7 +62,7 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Pose
                     state.FreeYaw = t.y;
                     state.FreePitch = t.x;
                 });
-            CameraActionManager.AddAction(CameraActionType.Leave, SubCameraMotorType.Pose, (int) modeId,
+            _motors.ActionManager.BindKeyAction(CameraActionType.Leave, SubCameraMotorType.Pose, (int) modeId,
                 (player, state) =>
                 {
                     var rotation = player.cameraFinalOutputNew.EulerAngle;

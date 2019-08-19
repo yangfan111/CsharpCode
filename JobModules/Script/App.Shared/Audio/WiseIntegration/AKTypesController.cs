@@ -78,7 +78,7 @@ namespace App.Shared.Audio
                     });
             }
 
-            var playerId = AkSoundEngine.PostEvent(eventItem.Event, target.gameObject,(uint) AkCallbackType.AK_EndOfEvent,GameAudioMedia.OnEventCallback, target);
+            var playerId = AkSoundEngine.PostEvent(eventItem.GetConvertedId(), target.gameObject,(uint) AkCallbackType.AK_EndOfEvent,GameAudioMedia.OnEventCallback, target);
             AudioUtil.LogPostEventResult(playerId, eventItem.Event);
         }
 

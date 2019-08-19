@@ -12,7 +12,6 @@ namespace App.Server.GameModules.GamePlay.Free.entity
     {
         public override void DoAction(IEventArgs args)
         {
-
             var entities = args.GameContext.sceneObject.GetEntities();
             foreach(var entity in entities)
             {

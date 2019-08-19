@@ -1,6 +1,6 @@
 ﻿using Core.Statistics;
-using System.Collections.Generic;
 using Entitas;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Core.Room
@@ -24,8 +24,9 @@ namespace Core.Room
         List<int> SprayLacquers { get; set; }
         PlayerWeaponBagData[] WeaponBags { get; set; }
         Vector3 InitPosition { get; set; }
+        CampInfo CampInfo { get; set; }
     }
-    public interface IPlayerInfo:ICreatePlayerInfo
+    public interface IPlayerInfo : ICreatePlayerInfo
     {
        
         IRoomId RoomId { get; set; }  

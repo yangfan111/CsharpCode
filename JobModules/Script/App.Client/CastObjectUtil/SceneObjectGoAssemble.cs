@@ -2,7 +2,7 @@
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using Core.Utils;
-using Entitas.VisualDebugging.Unity;
+using System.Collections.Generic;
 using UnityEngine;
 using UserInputManager.Lib;
 using UserInputManager.Utility;
@@ -17,97 +17,116 @@ namespace App.Client.CastObjectUtil
 
         public static RayCastTarget Assemble(GameObject model, SceneObjectEntity entity)
         {
-            
+            model.transform.localRotation = Quaternion.Euler(0, 0, 0);
+            model.transform.position = Vector3.zero;
+
             var child = model.transform.Find(SceneObjectConstant.NormalColliderName);
-            if(null != child) child.gameObject.DestroyGameObject();
-            //var needRotate = false;
-            int cat = 0;
-            if (entity.hasWeaponObject)
+            BoxCollider boxCollider;
+            if (null == child)
             {
-                cat = (int) ECategory.Weapon;
+                child = new GameObject(SceneObjectConstant.NormalColliderName).transform;
+                child.parent = model.transform;
+                boxCollider = child.gameObject.AddComponent<BoxCollider>();
+                boxCollider.isTrigger = true;
             }
-            else if (entity.hasSimpleItem)
+            else
             {
-                cat = entity.simpleItem.Category;
+                boxCollider = child.gameObject.GetComponent<BoxCollider>();
             }
+            boxCollider.center = Vector3.zero;
+            boxCollider.enabled = true;
+            child.gameObject.layer = UnityLayerManager.GetLayerIndex(EUnityLayerName.UserInputRaycast);
 
-            if (cat == 0)
-            {
-                Logger.Error("illegal sceneobject has no weapon or equip component ");
-            }
+            if(entity.hasWeaponObject && SingletonManager.Get<WeaponResourceConfigManager>().IsC4(entity.weaponObject.ConfigId))
+                WeaponAnimationBase.FinishedWeaponAnimation(model);
 
-            switch (cat)
+            Bounds bounds = CalculateBounds(model);
+            boxCollider.size = bounds.size; // * model.transform.worldToLocalMatrix;
+            /*if (entity.hasWeaponObject)
             {
-                case (int) ECategory.Weapon:
-                    if (SingletonManager.Get<WeaponResourceConfigManager>().IsC4(entity.weaponObject.ConfigId) ||
-                        SingletonManager.Get<WeaponResourceConfigManager>().IsArmors(entity.weaponObject.ConfigId))
+                var config = SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(entity.weaponObject.ConfigId);
+                if (config != null && ((EWeaponType_Config) config.Type).CanAutoPick())
+                {
+                    if (SingletonManager.Get<WeaponResourceConfigManager>().IsC4(entity.weaponObject.ConfigId))
                     {
-                        WeaponAnimationBase.FinishedWeaponAnimation(model);
-                        model.transform.localRotation = Quaternion.identity;
-                        var c4Collider = model.GetComponent<SphereCollider>();
-                        if (c4Collider == null) c4Collider = model.AddComponent<SphereCollider>();
-                        c4Collider.radius = 0.3f;
-                        c4Collider.isTrigger = true;
+                        boxCollider.size = new Vector3(bounds.size.x, 0.4f, bounds.size.z);
                     }
                     else
                     {
-                        model.transform.localRotation = Quaternion.Euler(0, 0, -90);
-                        var weaponCollider = model.GetComponent<CapsuleCollider>();
-                        if (weaponCollider == null) weaponCollider = model.AddComponent<CapsuleCollider>();
-                        weaponCollider.direction = 2;
-                        weaponCollider.radius = 0.3f;
-                        weaponCollider.height = 0.8f;
-                        weaponCollider.isTrigger = true;
+                        boxCollider.size = new Vector3(0.4f, bounds.size.y, bounds.size.z);
                     }
-                    model.transform.localScale = Vector3.one;
-                    model.transform.position = entity.position.Value + BaseGoAssemble.GetGroundAnchorOffset(model);
-                    break;
-                case (int) ECategory.Avatar:
-                    model.transform.localRotation = Quaternion.identity;
-                    var avatarCollider = model.GetComponent<SphereCollider>();
-                    if (avatarCollider == null) avatarCollider = model.AddComponent<SphereCollider>();
-                    avatarCollider.radius = 0.3f;
-                    avatarCollider.isTrigger = true;
-                    model.transform.localScale = Vector3.one;
-                    break;
-                case (int) ECategory.GameItem:
-                    model.transform.localRotation = Quaternion.identity;
-                    var itemCollider = model.GetComponent<SphereCollider>();
-                    if (itemCollider == null) itemCollider = model.AddComponent<SphereCollider>();
-                    if (entity.hasSize)
-                    {
-                        var size = Mathf.Max(1f, entity.size.Value);
-                        model.transform.localScale  = Vector3.one * size;
-                        itemCollider.radius = 0.3f / size;
-                    }
-                    else
-                    {
-                        model.transform.localScale = Vector3.one;
-                        itemCollider.radius = 0.3f;
-                    }
-                    itemCollider.isTrigger = true;
-                    break;
-                case (int) ECategory.WeaponPart:
-                    model.transform.localRotation = Quaternion.Euler(0, 0, -90);
-                    var partCollider = model.GetComponent<SphereCollider>();
-                    if (partCollider == null) partCollider = model.AddComponent<SphereCollider>();
-                    if (entity.hasSize)
-                    {
-                        var size = Mathf.Max(1f, entity.size.Value);
-                        model.transform.localScale  = Vector3.one * size;
-                        partCollider.radius = 0.3f / size;
-                    }
-                    else
-                    {
-                        model.transform.localScale = Vector3.one;
-                        partCollider.radius = 0.3f;
-                    }
-                    partCollider.isTrigger = true;
-                    break;
+                }
+            }*/
+            entity.position.Bounds = bounds;
+
+            child.localEulerAngles = Vector3.zero;
+            child.localPosition = bounds.center - model.transform.position;
+            child.localScale = Vector3.one;
+
+            if (entity.hasSize) model.transform.localScale  = Vector3.one * Mathf.Max(1f, entity.size.Value);
+            else model.transform.localScale = Vector3.one;
+
+            if ((entity.hasWeaponObject && !SingletonManager.Get<WeaponResourceConfigManager>().IsC4(entity.weaponObject.ConfigId) &&
+                 !SingletonManager.Get<WeaponResourceConfigManager>().IsArmors(entity.weaponObject.ConfigId))
+                || (entity.hasSimpleItem && entity.simpleItem.Category == (int) ECategory.WeaponPart))
+            {
+                model.transform.localRotation = Quaternion.Euler(0, 0, -90);
+                entity.position.ModelRotate = true;
+            }
+            else
+            {
+                entity.position.ModelRotate = false;
             }
 
-            var targer = RayCastTargetUtil.AddRayCastTarget(model.gameObject);
-            return targer;
+            
+            var target = RayCastTargetUtil.AddRayCastTarget(child.gameObject);
+            return target;
         }
+
+        private static Bounds CalculateBounds(GameObject model)
+        {
+            List<MeshRenderer> renderers = new List<MeshRenderer>();
+            model.GetComponentsInChildren(false, renderers);
+            MeshRenderer standard = renderers[0];
+            Vector3 totalMin = standard.bounds.min;
+            Vector3 totalMax = standard.bounds.max;
+            if (renderers.Count > 1)
+            {
+                foreach (MeshRenderer meshRenderer in renderers)
+                {
+                    if (meshRenderer == standard) continue;
+                    var min = meshRenderer.bounds.min;
+                    var max = meshRenderer.bounds.max;
+                    if (min.x < totalMin.x) totalMin.x = min.x;
+                    if (min.y < totalMin.y) totalMin.y = min.y;
+                    if (min.z < totalMin.z) totalMin.z = min.z;
+                    if (max.x > totalMax.x) totalMax.x = max.x;
+                    if (max.y > totalMax.y) totalMax.y = max.y;
+                    if (max.z > totalMax.z) totalMax.z = max.z;
+                }
+            }
+
+            List<SkinnedMeshRenderer> skinnedRenderers = new List<SkinnedMeshRenderer>();
+            model.GetComponentsInChildren(false, skinnedRenderers);
+            if (skinnedRenderers.Count > 0)
+            {
+                foreach (SkinnedMeshRenderer skinnedRenderer in skinnedRenderers)
+                {
+                    var min = skinnedRenderer.bounds.min;
+                    var max = skinnedRenderer.bounds.max;
+                    if (min.x < totalMin.x) totalMin.x = min.x;
+                    if (min.y < totalMin.y) totalMin.y = min.y;
+                    if (min.z < totalMin.z) totalMin.z = min.z;
+                    if (max.x > totalMax.x) totalMax.x = max.x;
+                    if (max.y > totalMax.y) totalMax.y = max.y;
+                    if (max.z > totalMax.z) totalMax.z = max.z;
+                }
+            }
+
+            Bounds bounds = new Bounds();
+            bounds.SetMinMax(totalMin, totalMax);
+            return bounds;
+        }
+
     }
 }

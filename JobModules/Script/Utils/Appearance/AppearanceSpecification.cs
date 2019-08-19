@@ -15,8 +15,9 @@
 
     public enum OverrideControllerState
     {
-        EmptyHanded,
-        WeaponInHand,
+        Null,
+        Transition,
+        NoTransition,
         EndOfTheWorld
     }
 }

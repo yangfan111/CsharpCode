@@ -12,7 +12,7 @@ namespace Utils.Concurrent
     {
         private Queue _queue;
         private Semaphore _semaphore;
-
+        private int _count;
         public BlockingQueue(int initNum = 128)
         {
             _semaphore = new Semaphore(0, Int32.MaxValue); //消息不知道有多少，设个足够大的吧，初始=0
@@ -33,6 +33,18 @@ namespace Utils.Concurrent
                 return default(T);
             }
         }
+
+        public int AddRef()
+        {
+           return Interlocked.Increment(ref _count);
+        }
+
+        public int DelRef()
+        {
+            return Interlocked.Decrement(ref _count);
+        }
+
+        public int Ref { get { return _count; } }
         public T Dequeue(int time)
         {
             if(_semaphore.WaitOne(time))//请求信号量，信号量=0，就会阻塞了

@@ -10,6 +10,10 @@ namespace Assets.App.Shared.GameModules.Camera
         private Dictionary<int, Dictionary<int, ICameraNewMotor>> Dict =
             new Dictionary<int, Dictionary<int, ICameraNewMotor>>();
 
+        public readonly CameraActionManager ActionManager = new CameraActionManager();
+        
+        
+        
         public Motors()
         {
             foreach (int i in Enum.GetValues(typeof(SubCameraMotorType)))

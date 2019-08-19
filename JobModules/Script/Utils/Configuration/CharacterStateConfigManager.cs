@@ -247,6 +247,9 @@ namespace Utils.Configuration
         private float _handRotMax;
         private float _handRotMin;
 
+        private float _headRotSpeed;
+        private float _noHeadRotStartAngle;
+
         //private float _maxSlopeNum;
         
         public float MeleeLayerWeightTransitionTime
@@ -324,11 +327,16 @@ namespace Utils.Configuration
             get { return _neckRotVerticalIndex; }
         }
 
-        public float HeadRotReversalTime
+        public float HeadRotSpeed
         {
-            get { return _headRotReversalTime; }
+            get { return _headRotSpeed; }
         }
 
+        public float NoHeadRotStart
+        {
+            get { return _noHeadRotStartAngle; }
+        }
+        
         public float HandRotMax
         {
             get { return _handRotMax; }
@@ -677,8 +685,9 @@ namespace Utils.Configuration
             _verticalHeadRotMax = cfg.HeadFollowRotateMaxV;
             _verticalHeadRotMin = cfg.HeadFollowRotateMinV;
             _neckRotVerticalIndex = cfg.NeckRotVerticalIndex;
-            _headRotReversalTime = cfg.HeadRotReversalTime;
-
+            _headRotSpeed = cfg.HeadRotSpeed;
+            _noHeadRotStartAngle = cfg.NoHeadRotStartAngle;
+            
             _handRotMax = cfg.HandFollowRotateMax;
             _handRotMin = cfg.HandFollowRotateMin;
 

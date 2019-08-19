@@ -6,6 +6,7 @@ using com.wd.free.map.position;
 using com.wd.free.unit;
 using com.wd.free.util;
 using Core.Free;
+using Core.Utils;
 using System;
 using UnityEngine;
 using WeaponConfigNs;
@@ -15,6 +16,8 @@ namespace App.Server.GameModules.GamePlay.Free.player
     [Serializable]
     public class PlayerHurtAction : AbstractGameAction, IRule
     {
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerHurtAction));
+
         private string damage;
         private string type;
         private string part;
@@ -36,18 +39,24 @@ namespace App.Server.GameModules.GamePlay.Free.player
                     return;
 
                 PlayerEntity sourcePlayer = null;
-                if (!string.IsNullOrEmpty(source))
-                {
-                    sourcePlayer = (PlayerEntity)fr.GetEntity(source);
-                }
-
-                if (string.IsNullOrEmpty(part))
-                {
-                    part = ((int)EBodyPart.Chest).ToString();
-                }
-
                 UnitPosition up = null;
-                if(pos != null) up = pos.Select(args);
+                try
+                {
+                    if (!string.IsNullOrEmpty(source))
+                    {
+                        sourcePlayer = (PlayerEntity)fr.GetEntity(source);
+                    }
+
+                    if (string.IsNullOrEmpty(part))
+                    {
+                        part = ((int)EBodyPart.Chest).ToString();
+                    }
+                    if (pos != null) up = pos.Select(args);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error("PlayerHurtAction handle error" + e.Message);
+                }
                 
                 PlayerDamageInfo damageInfo = new PlayerDamageInfo(FreeUtil.ReplaceFloat(damage, args), FreeUtil.ReplaceInt(type, args), FreeUtil.ReplaceInt(part, args), 0,
                     false, false,FreeUtil.ReplaceBool(dead, args), up != null ? player.position.Value : Vector3.zero, up != null ? player.position.Value - up.Vector3 : Vector3.zero);

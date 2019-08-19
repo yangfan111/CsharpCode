@@ -1,4 +1,7 @@
-﻿using WeaponConfigNs;
+﻿using Core.Components;
+using Core.Utils;
+using Utils.CharacterState;
+using WeaponConfigNs;
 
 namespace App.Shared.GameModules.Weapon.Behavior
 {
@@ -8,13 +11,17 @@ namespace App.Shared.GameModules.Weapon.Behavior
     public class RifleSpreadProcessor : AbstractSpreadProcessor
     {
 
-        protected override void Update(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
-
+        protected override void Update(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
+        
         {
-            RifleSpreadLogicConfig config = weaponBaseAgent.RifleSpreadLogicCfg;
-            var weaponRuntime = weaponBaseAgent.RunTimeComponent;
-            float spreadScaleFactor = FireSpreadProvider.GetSpreadScaleFactor(config, weaponBaseAgent.Owner.WeaponController());
-            FireSpreadFormula.ApplyRifleFinalSpread(spreadScaleFactor, config.SpreadScale,weaponRuntime);
+            // var appearance = controller.RelatedAppearence;
+            // var weaponObject = appearance.IsFirstPerson
+            //                 ? appearance.GetWeaponP1InHand()
+            //                 : appearance.GetWeaponP3InHand();
+            // DebugUtil.MyLog(weaponObject.transform.position.ToString("f4"));
+            RifleSpreadLogicConfig config = attackProxy.WeaponConfigAssy.S_RifleSpreadLogicCfg;
+            float spreadScaleFactor = FireSpreadProvider.GetSpreadScaleFactor(config, attackProxy);
+            FireSpreadFormula.ApplyRifleFinalSpread(spreadScaleFactor ,config.SpreadScale,attackProxy.RuntimeComponent);
         }
 
     }

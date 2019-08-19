@@ -74,6 +74,7 @@ namespace App.Shared.GameModules.Configuration
             AddConfigSystem<VehicleAssetConfigManager>(sessionState, "VehicleConfig");
             AddConfigSystem<VehicleSoundConfigManager>(sessionState, "VehicleSound");
             AddConfigSystem<StateTransitionConfigManager>(sessionState, "StateTransition");
+            AddConfigSystem<StateInteruptConfigManager>(sessionState, "StateInterrupt");
             AddConfigSystem<RaycastActionConfigManager>(sessionState, "RaycastAction");
             AddConfigSystem<LadderRankConfigManager>(sessionState, "ladderrank");
 
@@ -82,9 +83,9 @@ namespace App.Shared.GameModules.Configuration
             AddConfigSystem<EnvironmentTypeConfigManager>(sessionState, "EnvironmentType");
             AddConfigSystem<ClientEffectConfigManager>(sessionState, "ClientEffect");
             AddConfigSystem<GameModeConfigManager>(sessionState, "gamemode");
+            AddConfigSystem<GameRuleConfigManager>(sessionState, "gamerule");
 
             AddConfigSystem<WeaponAvatarConfigManager>(sessionState, "weapon_avator");
-            //TESTCODE
             
             //AddConfigSystem<StreamingLevelStructure>(sessionState, "Map002" + StreamingConfig.DataXMLName, "002" + StreamingConfig.StreamingDataABName);
             //AddConfigSystem<ScenesLightmapStructure>(sessionState, "Map002" + StreamingConfig.LightXMLName, "002" + StreamingConfig.StreamingLightDataABName);
@@ -103,6 +104,9 @@ namespace App.Shared.GameModules.Configuration
             AddConfigSystem<VideoSettingConfigManager>(sessionState, "video_setting");
             AddConfigSystem<LoadingTipConfigManager>(sessionState, "loadingtips");
             AddConfigSystem<IndividuationConfigManager>(sessionState, "individuation");
+            AddConfigSystem<WeaponWorkShopConfigManager>(sessionState, "weapon_workshop");
+            AddConfigSystem<WeaponUpdateConfigManager>(sessionState, "weapons_update");
+            AddConfigSystem<GlobalDataConfigManager>(sessionState, "global_data");
             _sessionState = sessionState;
 
         }

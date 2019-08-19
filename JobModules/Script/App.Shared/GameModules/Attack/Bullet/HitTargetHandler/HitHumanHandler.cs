@@ -119,8 +119,9 @@ namespace App.Shared.GameModules.Attack
                 AttackUtil.GeneraterUniqueHitId(srcPlayer, cmdSeq),
                 contexts.session.currentTimeObject.CurrentTime);
             //添加假红统计
-            srcPlayer.StatisticsController().AddShootPlayer(cmdSeq, bulletEntityAgent, hit.point,
-                hitTargetPlayer.entityKey.Value, hitTargetPlayer.position.Value, part, totalDamage);
+            if(hitTargetPlayer.gamePlay.IsAlive())
+                srcPlayer.StatisticsController().AddShootPlayer(cmdSeq, bulletEntityAgent, hit.point,
+                    hitTargetPlayer.entityKey.Value, hitTargetPlayer.position.Value, part, totalDamage);
             ClientEffectFactory.AddHitPlayerEffectEvent(srcPlayer,hitTargetPlayer.entityKey.Value, hit.point,(int) EAudioUniqueId.BulletHit, part);
 
             BulletHitHandler._logger.InfoFormat("[Hit{5}]bullet from {0} hit player {1}, part {2}, hitbox factor {3}, result damage {4}",

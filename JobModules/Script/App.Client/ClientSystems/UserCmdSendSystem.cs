@@ -17,6 +17,7 @@ using Core.Prediction.VehiclePrediction.TimeSync;
 using Core.SessionState;
 using Core.Utils;
 using Entitas;
+using Sharpen;
 using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 
@@ -90,6 +91,7 @@ namespace App.Client.ClientSystems
             {
                 channel.SendRealTime((int) EClient2ServerMessage.UserCmd, list);
             }
+            _logger.DebugFormat("SendUserCmd:{0}", list.Value.Last().Seq);
 
             list.ReleaseReference();
 

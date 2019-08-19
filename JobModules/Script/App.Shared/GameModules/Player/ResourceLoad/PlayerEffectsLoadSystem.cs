@@ -16,8 +16,13 @@ namespace App.Shared.GameModules.Player.ResourceLoad
     public class PlayerEffectsLoadSystem : ReactiveResourceLoadSystem<PlayerEntity>
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerEffectsLoadSystem));
-        public static readonly string ModeloffsetName = "ModelOffset";
         private readonly PlayerContext _player;
+        private readonly string GodModeName = "GodModeEffect";
+        private readonly AssetInfo[] _assetInfos = new AssetInfo[]
+        {
+            new AssetInfo("effect/common", "GodModeEffect".ToLower()), 
+            new AssetInfo("effect/common", "DepthOfFieldEffect".ToLower()), 
+        };
         
         public PlayerEffectsLoadSystem(Contexts context) : base(context.player)
         {
@@ -55,7 +60,7 @@ namespace App.Shared.GameModules.Player.ResourceLoad
             if (addEffectCurFrame)
                 player.AddEffects();
             player.effects.AddLocalEffect(unityObj);
-            EffectUtility.RegistEffect(player.RootGo().gameObject, unityObj);
+            EffectUtility.RegistEffect(player.RootGo().gameObject, unityObj.AsGameObject);
 
             if (addEffectCurFrame)
             {
@@ -82,11 +87,11 @@ namespace App.Shared.GameModules.Player.ResourceLoad
         private void RegistAllGodModeEffects(PlayerEntity player)
         {
             player.characterBoneInterface.CharacterBone.HandleAllWeapon(
-                o => player.effects.GetEffect(GodModeName).AddGameObject(o) );
+                o => player.effects.GetEffect(GodModeName).AddGameObject(o));
             player.characterBoneInterface.CharacterBone.HandleAllAttachments(
-                o=>player.effects.GetEffect(GodModeName).AddGameObject(o));
+                o => player.effects.GetEffect(GodModeName).AddGameObject(o));
             player.characterBoneInterface.CharacterBone.HandleAllWardrobe(
-                o => { player.effects.GetEffect(GodModeName).AddGameObject(o); });
+                o => player.effects.GetEffect(GodModeName).AddGameObject(o));
         }
 
         private void RegistAllAbstractMono(PlayerEntity player)
@@ -94,13 +99,5 @@ namespace App.Shared.GameModules.Player.ResourceLoad
             player.characterBoneInterface.CharacterBone.HandleSingleWardrobe(Wardrobe.CharacterHead,
                 o => { player.effects.AddLocalEffect(o); });
         }
-        
-        private readonly string GodModeName = "GodModeEffect";
-        
-        private readonly AssetInfo[] _assetInfos = new AssetInfo[]
-        {
-            new AssetInfo("effect/common", "GodModeEffect".ToLower()), 
-            new AssetInfo("effect/common", "DepthOfFieldEffect".ToLower()), 
-        };
     }
 }

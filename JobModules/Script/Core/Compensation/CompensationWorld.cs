@@ -145,12 +145,16 @@ namespace Core.Compensation
             return _hitboxHandler.BoxCast(box, out hitInfo, hitboxLayerMask);
         }
 
-    
+        private CustomProfileInfo pphysicsCast;
+        private CustomProfileInfo plogicCast;
 
         public bool Raycast(RaySegment ray, out RaycastHit hitInfo, int hitboxLayerMask, int cmdSeq)
         {
-     
-       
+            if (pphysicsCast == null)
+                pphysicsCast = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("pphysicsCast");
+            if(plogicCast == null)
+                plogicCast = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("plogicCast");
+            plogicCast.BeginProfileOnlyEnableProfile();
             for (int i = 0; i < _entities.Length; i++)
             {
                 IGameEntity entity = _entities[i];
@@ -239,8 +243,11 @@ namespace Core.Compensation
 
                
             }
-
-            return _hitboxHandler.Raycast(ray.Ray, out hitInfo, ray.Length, hitboxLayerMask);
+            plogicCast.EndProfileOnlyEnableProfile();
+            pphysicsCast.BeginProfileOnlyEnableProfile();
+            var val =_hitboxHandler.Raycast(ray.Ray, out hitInfo, ray.Length, hitboxLayerMask);
+            pphysicsCast.EndProfileOnlyEnableProfile();
+            return val;
         }
 
         public static float DistanceToLine(RaySegment ray, Vector3 point)
@@ -350,6 +357,7 @@ namespace Core.Compensation
 
                 if (_updateAndEnabled[i])
                 {
+                    _hitboxHandler.EnableHitBox(entity, false);
                     _hitboxHandler.RecoverHitBox(entity, -1);
                     _updateAndEnabled[i] = false;
                 }

@@ -27,7 +27,7 @@ namespace Assets.App.Client.GameModules.Ui.UiAdapter.Common
 
         public PlayerEntity GetPlayerEntity()
         {
-            return _contexts.player.flagSelfEntity;
+            return _contexts.ui.uI.Player;
         }
 
         public bool IsCampPass()

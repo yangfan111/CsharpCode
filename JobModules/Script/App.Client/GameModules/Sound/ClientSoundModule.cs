@@ -6,7 +6,7 @@ namespace App.Client.GameModules.Sound
     {
         public ClientSoundModule(Contexts contexts)
         {
-            var soundParentController = new SoundParentController(contexts);
+            /*var soundParentController = new SoundParentController(contexts);
             AddSystem(new SoundResourcesLoadSystem(contexts, soundParentController));
 
             AddSystem(new SoundCleanUpSystem(contexts));
@@ -14,7 +14,8 @@ namespace App.Client.GameModules.Sound
             AddSystem(new SoundPlaySystem(contexts));
             AddSystem(new ClientSoundAutoStopSystem(contexts.sound, contexts.session.clientSessionObjects.SoundPlayer, soundParentController));
 
-            AddSystem(new SoundLimitSystem(contexts.sound));
+            AddSystem(new SoundLimitSystem(contexts.sound));*/
+            AddSystem(new ClientBombSoundSystem(contexts));
 
         }
     }

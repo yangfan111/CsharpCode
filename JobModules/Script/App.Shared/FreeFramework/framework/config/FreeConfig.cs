@@ -386,6 +386,7 @@ namespace com.wd.free.config
             aliasOne(alias, new OneTimeAiAction());
             aliasOne(alias, new WaitTimeAiAction());
             aliasOne(alias, new FinishStepAiAction());
+            aliasOne(alias, new FinishOrderAiAction());
             aliasOne(alias, new RegionCondition());
             aliasOne(alias, new SkillConditionTrigger());
             aliasOne(alias, new DebugFreeAction());

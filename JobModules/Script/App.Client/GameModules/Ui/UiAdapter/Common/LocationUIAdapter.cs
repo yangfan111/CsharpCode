@@ -27,7 +27,8 @@ namespace App.Client.GameModules.Ui.UiAdapter
             {
                 //Vector2 curDireciton = new Vector2(_contexts.player.flagSelfEntity.orientation.Yaw, _contexts.player.flagSelfEntity.orientation.Pitch);
                 // return Vector2.Angle(Vector3.forward, curDireciton);
-                CurFaceDirection = -Player.orientation.Yaw;
+//                CurFaceDirection = -Player.orientation.Yaw;
+                CurFaceDirection = -Player.cameraFinalOutputNew.EulerAngle.y;
                 return CurFaceDirection;
             }         
             set

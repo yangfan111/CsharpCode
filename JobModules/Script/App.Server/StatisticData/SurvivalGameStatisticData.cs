@@ -11,16 +11,10 @@ namespace App.Server.StatisticData
     public class SurvivalGameStatisticData : BaseGameStatisticData 
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(SurvivalGameStatisticData));
-        //匹配积分结算相关
-        /*private float _firstTeamAvgRankScore;
-        private float _secondTeamAvgRankScore;
-        private Dictionary<long, int> _dictDead = new Dictionary<long, int>();
-        private List<IPlayerInfo> _tmpDeadPlayer = new List<IPlayerInfo>(); */
 
         public SurvivalGameStatisticData(Dictionary<long, ITeamInfo> dictTeam, Dictionary<long, IPlayerInfo> dictPlayers, Dictionary<long, IPlayerInfo> leavedPlayers, Dictionary<long, GameOverPlayer> goPlayers, int teamCapacity)
             : base(dictTeam, dictPlayers, leavedPlayers, goPlayers, teamCapacity)
         {
-            _dictTeams = dictTeam;
         }
 
         public override void SetStatisticData(GameOverPlayer gameOverPlayer, IPlayerInfo playerInfo, IFreeArgs freeArgs)

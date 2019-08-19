@@ -115,7 +115,7 @@ namespace Utils.Appearance.Weapon
                 _id = id;
             }
 
-            public void OnLoadSucc<T>(T source, UnityObject unityObj)
+            public void OnLoadSuccess<T>(T source, UnityObject unityObj)
             {
                 if (null == unityObj.AsObject) return;
 

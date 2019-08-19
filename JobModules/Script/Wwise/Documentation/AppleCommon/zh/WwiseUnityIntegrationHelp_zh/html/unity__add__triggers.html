@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>为 Wwise Events 添加新的 Trigger</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>&nbsp;&raquo;&nbsp;<a class="el" href="pg__appscripts.html">使用 Wwise Unity 集成</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="unity_add_triggers">为 Wwise Events 添加新的 Trigger </a></h1><p>在大多数用于 Unity 的 Wwise 组件中，有一个 "Trigger On" 属性，从中您可以选择哪个 Unity 通知/事件将触发 Wwise 组件（Event、Switch、State 等）。这个列表只包含在 Unity 中可以做到的一部分。但是，触发系统是可扩展的，且不需要修改集成代码本身。</p>
+<p>如果想添加一个新的触发器，您只需编写一个来自于 <a class="el" href="class_ak_trigger_base.html">AkTriggerBase</a> 的 C# 类。从 <a class="el" href="class_ak_trigger_base.html">AkTriggerBase</a> 派生的所有类都将通过反射找到，并添加到 "Trigger On" 下拉列表中。这个类包含一个委托，<b>triggerDelegate(GameObject in_target)</b>，当触发器的条件发生时，您必须调用该委托。"目标" 对象是可选的，目前用于碰撞体场合下提供碰撞对象。这使得 Wwise 组件可以在“被撞对象”上发送事件，而不是在碰撞体上发送。</p>
+<p>虽然这个系统完全是可选的，但您也可以使用这个系统来触发游戏代码中的音频组件。每当您的触发条件出现在代码中（或者有一个自定义函数），您只需要调用 <code>GetComponent&lt;YourTriggerClass&gt;()</code>.triggerDelegate(GameObject in_target)。</p>
+<table  border="0" cellspacing="0" cellpadding="2">
+<tr>
+<td valign="top"><div align="center">
+<img src="Note.gif" alt="Note.gif"/>
+</div>
+</td><td><b>备注：</b> 目前， <a class="el" href="class_ak_trigger_base.html">AkTriggerBase</a> 子类的最大数量是 32。 </td></tr>
+</table>
+<p>下面是一个含有自定义函数的示例： </p>
+<div class="fragment"><pre class="fragment"><span class="keyword">public</span> <span class="keyword">class </span>TriggerOnGunHit : <a class="code" href="class_ak_trigger_base.html">AkTriggerBase</a>
+{
+    <span class="keywordtype">void</span> Hit()
+    {
+        <span class="keywordflow">if</span>(triggerDelegate != null) 
+        {
+            triggerDelegate(null);
+        }
+    }
+}
+</pre></div><p>在您的游戏代码中，您可以加入这段代码： </p>
+<div class="fragment"><pre class="fragment"><span class="keywordflow">if</span> (playerIsShot)
+{
+    GetComponent&lt;TriggerOnGunHit&gt;().Hit();
+}
+</pre></div><p>任何连接到 TriggerOnGunHit 触发器的 Wwise 组件就可以正常运行了。请注意，在许多简单的情况下，这种做法完全是多余的；您也可以轻松通过 <code>AkSoundEngine.PostEvent</code>("GunHit", gameObject) 调用基础 Wwise SDK，然后让声音设计师在 Wwise 中处理此事件的效果。 </p>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

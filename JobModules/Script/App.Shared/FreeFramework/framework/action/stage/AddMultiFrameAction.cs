@@ -18,7 +18,7 @@ namespace com.wd.free.action.stage
 
         public override void DoAction(IEventArgs args)
         {
-           args.FreeContext.MultiFrame.AddAction(FreeUtil.ReplaceVar(key, args), (IGameAction)SerializeUtil.Clone(action));
+           args.FreeContext.MultiFrame.BindKeyAction(FreeUtil.ReplaceVar(key, args), (IGameAction)SerializeUtil.Clone(action));
         }
 
         public int GetRuleID()

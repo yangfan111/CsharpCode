@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace XmlConfig
+﻿namespace XmlConfig
 {
     public class ItemBaseConfig
     {
@@ -18,6 +13,7 @@ namespace XmlConfig
         public string IconBundle;
         public string Icon;
         public int Xlv;
+        public int Sort;
 
     }
 }

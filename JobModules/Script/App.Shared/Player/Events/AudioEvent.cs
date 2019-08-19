@@ -8,7 +8,9 @@ using Entitas;
 using UnityEngine;
 using App.Shared.Components.Serializer;
 using Core;
+using Core.Components;
 using Core.Utils;
+using Utils.Singleton;
 
 namespace App.Shared.Player.Events
 {
@@ -274,16 +276,16 @@ namespace App.Shared.Player.Events
     {
 //        public AudioGrp_Footstep    footstepState;
 //        public AudioGrp_FootMatType footMatType;
-        public Vector3 relatedPos;
+        public FixedVector3 relatedPos;
         public Vector3 relatedRocation;
-
+        
         public AudioEvent()
         {
         }
 
         public void Initialize(Vector3 relatedPos, Vector3 relatedRocation)
         {
-            this.relatedPos      = relatedPos;
+            this.relatedPos      = relatedPos.ShiftedToFixedVector3();
             this.relatedRocation = relatedRocation;
         }
 
@@ -348,13 +350,24 @@ namespace App.Shared.Player.Events
         /// <param name="e"></param>
         public override void DoEventClient(Entitas.IContexts contexts, IEntity entity, IEvent e)
         {
-
-            //  var controller = (entity as PlayerEntity).AudioController();
             if (SharedConfig.IsMute)
                 return;
+            //var controller = (entity as PlayerEntity).AudioController();
+            var targetPlayerEntity = entity as PlayerEntity;
+            int cmrEntityId = (contexts as Contexts).player.flagSelfEntity.gamePlay.CameraEntityId;
+         // foreach(PlayerEntity playerEntity in (contexts as Contexts).player.GetEntities())
+            // {
+         //    if(playerEntity.gamePlay.CameraEntityId == player.entityKey.Value.EntityId)
+            //     {
+            //         //TODO
+            //         observePlayer = playerEntity;
+            //         break;
+            //     }
+            // }
+      
             AudioEvent audioEvent = e as AudioEvent;
         
-         //  DebugUtil.MyLog("Play other event :"+audioEvent.EventType);
+            //DebugUtil.MyLog("Play other event :"+audioEvent.EventType);
             switch (audioEvent.EventType)
             {
                 case EEventType.AFootstep:
@@ -367,10 +380,23 @@ namespace App.Shared.Player.Events
                     GameAudioMedia.PlayWeaponFireAudio(audioEvent as AudioWeaponFireEvent);
                     break;
                 case EEventType.ADefault:
-                    GameAudioMedia.PlayUniqueEventAudio(audioEvent as AudioDefaultEvent);
-                    break;
+                    if(cmrEntityId ==targetPlayerEntity.entityKey.Value.EntityId)
+                    {
+                        float RTPCvalue = 1;
+                        GameAudioMedia.PlayUniqueEventAudio(audioEvent as AudioDefaultEvent, RTPCvalue);
+                        break;
+                    }
+                    else
+                    {
+                        float RTPCvalue = 0;
+                        GameAudioMedia.PlayUniqueEventAudio(audioEvent as AudioDefaultEvent, RTPCvalue);
+                        break;
+                    }
                 case EEventType.APullbolt:
                     GameAudioMedia.PlayWeaponReloadAudio(audioEvent as AudioPullboltEvent);
+                    break;
+                case EEventType.AMeleeAttack:
+                    GameAudioMedia.PlayMeleeAttackAudio(audioEvent as AudioMeleeAtkEvent);
                     break;
                 default:
                     break;

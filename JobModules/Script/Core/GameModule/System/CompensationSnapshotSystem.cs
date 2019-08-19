@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using App.Shared;
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core.Network;
 using Core.Replicaton;
 using Core.Room;

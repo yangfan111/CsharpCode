@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using App.Shared.Components.Vehicle;
 using App.Shared.GameModules.Common;
+using Common;
 using Core.EntityComponent;
 using Core.Prediction.VehiclePrediction.Cmd;
 using Core.Prediction.VehiclePrediction.TimeSync;
@@ -114,7 +115,7 @@ namespace App.Shared.GameModules.Vehicle
             for (int i = 0; i < contacts.Length; ++i)
             {
                 Debug.LogFormat("Time {0} this collider {1} other collider {2} vel {3}",
-                    Time.time,
+                    MyGameTime.time,
                     collision.contacts[i].thisCollider.name,
                     collision.contacts[i].otherCollider.name,
                     GetComponent<Rigidbody>().velocity);

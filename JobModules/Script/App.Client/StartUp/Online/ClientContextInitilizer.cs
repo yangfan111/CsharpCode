@@ -1,4 +1,5 @@
-﻿using App.Client.Console;
+﻿using System;
+using App.Client.Console;
 using App.Client.GameModules.Effect;
 using App.Client.GameModules.Vehicle;
 using App.Client.StartUp;
@@ -32,13 +33,20 @@ using Core.UpdateLatest;
 using VehicleCommon;
 using App.Server.GameModules.GamePlay;
 using App.Client.GameModules.GamePlay;
+using App.Client.GameModules.Replay;
+using App.Shared.Network;
+using Core.Utils;
 using UnityEngine;
+using Utils.Replay;
 using Utils.Singleton;
+using NetworkMessageRecoder = Utils.Replay.NetworkMessageRecoder;
+using Random = System.Random;
 
 namespace App.Client
 {
     public class ClientContextInitilizer : IClientContextInitilizer
     {
+        LoggerAdapter _logger = new LoggerAdapter(typeof(ClientContextInitilizer));
         private IUserCmdGenerator _userCmdGenerator;
         private ICoRoutineManager _coRoutineManager;
         private string _loginToken;
@@ -89,30 +97,38 @@ namespace App.Client
             var gameContexts = _contexts.session.commonSession.GameContexts;
             var sessionObjects = _contexts.session.clientSessionObjects;
 
-            sessionObjects.SnapshotPool = new SnapshotPool();
+            // var recoder = 
+            sessionObjects.SnapshotSelctor = new SnapshotPool();
             sessionObjects.UserCmdGenerator = _userCmdGenerator;
-            sessionObjects.MessageDispatcher = new NetworkMessageDispatcher();
-            sessionObjects.SnapshotSelectorContainer =
-                new SnapshotSelectorContainer(new SnapshotSelector(sessionObjects.SnapshotPool));
-            sessionObjects.TimeManager = new TimeManager(_contexts.session.currentTimeObject);
+            
+            if (SharedConfig.IsRecord)
+            {
+                var name = String.Format("replay_{0:yyyy_M_d_HH_mm_ss}_{1}", DateTime.Now, Guid.NewGuid());
+                _logger.InfoFormat("SetUp MessageRecoder :{0}",name);
+                sessionObjects.Record = new RecordManager(name);
+            }
+            else if (SharedConfig.IsReplay)
+            {
+                _logger.InfoFormat("SetUp MessageReplay :{0}",SharedConfig.RecodFile);
+                sessionObjects.Replay = new ReplayManager(SharedConfig.RecodFile);
+               
+            }
+
+            sessionObjects.MessageDispatcher = new NetworkMessageDispatcher(sessionObjects.Record);
           
+            sessionObjects.TimeManager = new TimeManager(_contexts.session.currentTimeObject);
+
             sessionObjects.LoginToken = _loginToken;
-            sessionObjects.SyncLatestHandler = new SyncLatestHandler(sessionObjects.SnapshotSelectorContainer,
-                gameContexts, new SnapshotEntityMapFilter());
-            sessionObjects.SyncLatestManager = new SyncLatestManager(sessionObjects.SyncLatestHandler);
+            sessionObjects.netSyncManager = new SyncLastestManager(gameContexts,sessionObjects.SnapshotSelctor);
 
             sessionObjects.PlaybackInfoProvider = new PlaybackInfoProvider(gameContexts);
             sessionObjects.PlaybackManager = new PlaybackManager(sessionObjects.PlaybackInfoProvider);
-            sessionObjects.UserPredictionInfoProvider = new UserPredictionInfoProvider(
-                sessionObjects.SnapshotSelectorContainer,
+            sessionObjects.UserPredictionProvider = new UserPredictionProvider(
+                sessionObjects.SnapshotSelctor,
                 _contexts.player,
                 gameContexts);
-            sessionObjects.VehiclePredictionInfoProvider = new VehiclePredictionInfoProvider(
-                sessionObjects.SnapshotSelectorContainer,
-                gameContexts, _contexts.vehicle, SharedConfig.ServerAuthorative);
 
-            sessionObjects.UserPredictionInitManager =
-                new PredictionInitManager<IUserPredictionComponent>(sessionObjects.UserPredictionInfoProvider);
+            sessionObjects.UserPredictionManager = new PredictionManager(sessionObjects.UserPredictionProvider);
             sessionObjects.VehicleCmdExecuteSystemHandler = new ClientVehicleCmdExecuteSystemHandler(_contexts);
             sessionObjects.SimulationTimer = new ClientSimulationTimer(SharedConfig.ServerAuthorative);
             sessionObjects.VehicleTimer = new VehicleTimer();
@@ -136,7 +152,6 @@ namespace App.Client
             commonSession.EntityIdGenerator = entityIdGenerator;
             commonSession.EquipmentEntityIdGenerator = equipmentEntityIdGenerator;
             commonSession.RoomInfo = new Core.Room.RoomInfo();
-            commonSession.RuntimeGameConfig = new RuntimeGameConfig();
             //commonSession.PlayerStateCollectorPool = new PlayerStateCollectorPool();
             commonSession.FreeArgs = new FreeRuleEventArgs(_contexts);
             commonSession.FreeArgs.Rule = new ClientRule(commonSession.FreeArgs);

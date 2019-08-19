@@ -12,6 +12,7 @@ namespace XmlConfig
     {
         public int Id;
         public string Name;
+        public int NameId;
         public bool IsSkinned = true;
         public int AvatarType = 0;
         public string BundleName;
@@ -24,6 +25,8 @@ namespace XmlConfig
         public string BundleNameInside;
         public bool HaveP1Avatar = false;
         public bool NeedMapping = false;
+        public int Default;
+        public int Sex;
     }
 
     [XmlRoot("root")]

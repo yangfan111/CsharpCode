@@ -248,6 +248,12 @@ namespace Utils.Appearance.WardrobePackage
             }
         }
 
+        public void SetForceLodLevel(int level)
+        {
+            if(FirstPersonIncluded) _p1Avatar.SetForceLodLevel(level);
+            if(ThirdPersonIncluded) _p3Avatar.SetForceLodLevel(level);
+        }
+
         public void SetP1WardrobeTopLayerShader()
         {
             if (FirstPersonIncluded)
@@ -278,7 +284,9 @@ namespace Utils.Appearance.WardrobePackage
 
             _p3Avatar = new CharacterAvatar(_characterP3);
             _p3Avatar.SetBagChangedDelegate(_bagChanged);
-            _p3Avatar.Show();
+            if (IsFirstPerson)
+                _p3Avatar.Hide();
+            else _p3Avatar.Show();
 
             InitWardrobe(DefaultModelParts);
             
@@ -291,7 +299,9 @@ namespace Utils.Appearance.WardrobePackage
             _p1Index = ValidP1Index;
 
             _p1Avatar = new CharacterAvatar(_characterP1);
-            _p1Avatar.Hide();
+            if (IsFirstPerson)
+                _p1Avatar.Show();
+            else _p1Avatar.Hide();
         }
 
         public void SetRootGo(GameObject obj)
@@ -727,7 +737,7 @@ namespace Utils.Appearance.WardrobePackage
                 _dataSource.ResetWardrobeShader(obj, _dataSource._p1Index);
             }
 
-            public void OnLoadSucc<T>(T source, UnityObject obj)
+            public void OnLoadSuccess<T>(T source, UnityObject obj)
             {
                 if (_param == null)
                 {

@@ -2,6 +2,7 @@
 using UserInputManager.Lib;
 using Utils.Configuration;
 using Utils.Singleton;
+using NotImplementedException = System.NotImplementedException;
 
 namespace App.Client.GameModules.Ui.UiAdapter
 {
@@ -13,10 +14,10 @@ namespace App.Client.GameModules.Ui.UiAdapter
         private SessionContext session;
         private VehicleContext vehicle;
         private FreeMoveContext freeMove;
-        private IUserInputManager userInputManager;
+        private GameInputManager userInputManager;
         private UiContext uiContext;
 
-        public PickUpUiAdapter(PlayerContext player,  SceneObjectContext sceneObject, MapObjectContext mapObject, SessionContext session, VehicleContext vehicle, FreeMoveContext freeMove, IUserInputManager userInputManager, UiContext uiContext)
+        public PickUpUiAdapter(PlayerContext player,  SceneObjectContext sceneObject, MapObjectContext mapObject, SessionContext session, VehicleContext vehicle, FreeMoveContext freeMove, GameInputManager userInputManager, UiContext uiContext)
         {
             this.player = player;
             this.sceneObject = sceneObject;
@@ -28,11 +29,15 @@ namespace App.Client.GameModules.Ui.UiAdapter
             this.uiContext = uiContext;
         }
 
-        public void RegisterKeyReceiver(IKeyReceiver receiver)
+        public void RegisterKeyReceiver(KeyReceiver receiver)
         {
             userInputManager.RegisterKeyReceiver(receiver);
         }
-        public void RegisterPointerReceiver(IPointerReceiver receiver)
+
+
+
+
+        public void RegisterPointerReceiver(PointerReceiver receiver)
         {
             userInputManager.RegisterPointerReceiver(receiver);
         }

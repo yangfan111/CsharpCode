@@ -20,18 +20,18 @@ namespace App.Client.ClientSystems
 
         private void InitKeyReceiver(UserInputContext context)
         {
-            var recevier = new KeyReceiver(Layer.Env + 2, BlockType.None);
-            recevier.AddAction(UserInputKey.LockCursor, (data) =>
+            var recevier = new KeyReceiver(EInputLayer.Env + 2, BlockType.None,"MouseLock");
+            recevier.BindKeyAction(UserInputKey.LockCursor, (data) =>
             {
                 //暂时屏蔽               
                 _contexts.ui.uI.IsShowCrossHair = true;
             });
-            recevier.AddAction(UserInputKey.UnlockCursor, (data) =>
+            recevier.BindKeyAction(UserInputKey.UnlockCursor, (data) =>
             {
                 //暂时屏蔽                
                 _contexts.ui.uI.IsShowCrossHair = false;
             });
-            context.userInputManager.Instance.RegisterKeyReceiver(recevier);
+            context.userInputManager.Mgr.RegisterKeyReceiver(recevier);
         }
 
         public void Initialize()

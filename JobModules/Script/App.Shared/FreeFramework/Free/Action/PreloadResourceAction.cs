@@ -1,4 +1,4 @@
-﻿using com.wd.free.action;
+using com.wd.free.action;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +32,7 @@ namespace App.Shared.FreeFramework.Free.Action
         {
             HashSet<string> set = new HashSet<string>();
 
-            if (!string.IsNullOrEmpty(info.PreLoadUI))
+            if (!string.IsNullOrEmpty(info.PreLoadUI) && info.PreLoadUI != "null")
             {
                 string[] uis = info.PreLoadUI.Split(',');
                 foreach (string u in uis)

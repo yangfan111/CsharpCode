@@ -6,11 +6,11 @@ using Core.Utils;
 
 namespace App.Shared.GameModules.Camera
 {
-    public class PlayerRotateLimitSystem: IBeforeUserCmdExecuteSystem
+    public class PlayerRotateLimitSystem: IUserCmdExecuteSystem
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerRotateLimitSystem));
         
-        public void BeforeExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
             PlayerEntity playerEntity = owner.OwnerEntity as PlayerEntity;
             if (!playerEntity.hasCharacterContoller || !playerEntity.hasPlayerRotateLimit || !playerEntity.hasPosition || !playerEntity.hasOrientation)
@@ -33,5 +33,7 @@ namespace App.Shared.GameModules.Camera
                 limitComponent.SetNoLimit();
             }
         }
+
+        
     }
 }

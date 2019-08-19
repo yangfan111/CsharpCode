@@ -2,12 +2,14 @@
 using Shared.Scripts;
 using System;
 using System.Collections.Generic;
+using Shared.Scripts.Effect;
 using UnityEngine;
 using Utils.Appearance.Bone;
 using Utils.Appearance.Effects;
 using Utils.AssetManager;
 using Utils.Configuration;
 using Utils.Singleton;
+using XmlConfig;
 
 namespace Utils.Appearance.WardrobePackage
 {
@@ -292,14 +294,15 @@ namespace Utils.Appearance.WardrobePackage
         
         private Action _bagChanged;
         private GameObject _characterGameObject;
-        private Transform[] _allBones;
         private Transform _attachment6Parent;
         private Transform _attachment7Parent;
         private Transform _attachment6ParentInChar;
         private Transform _attachment7ParentInChar;
         private WardrobeParam[] _wardrobes = new WardrobeParam[(int)Wardrobe.EndOfTheWorld];
-        private readonly WardrobeStatus _wardrobesStatus = new WardrobeStatus();
+        private Transform[] _allBonesArray;
+        private readonly Dictionary<string, Transform> _allBonesDictionary = new Dictionary<string, Transform>();
         
+        private readonly WardrobeStatus _wardrobesStatus = new WardrobeStatus();
         private readonly Dictionary<Wardrobe, Transform[]> _allAvatarBones = new Dictionary<Wardrobe, Transform[]>();
 
         private readonly BoneMount _mount = new BoneMount();
@@ -308,6 +311,10 @@ namespace Utils.Appearance.WardrobePackage
         private const int DefaultAvatarId = 1;
         private const Wardrobe StandardPart = Wardrobe.CharacterHead;
         private GameObject _rootGo;
+        private GameObject _taaObj;
+
+        private int _currentLodLevel = -1;
+        private int _forceLodLevel = -1;
         
         private readonly CustomProfileInfo _mainInfo;
         private readonly CustomProfileInfo _updateBagTransformInfo;
@@ -336,7 +343,15 @@ namespace Utils.Appearance.WardrobePackage
         private void ReInit(GameObject character)
         {
             _characterGameObject = character;
-            _allBones = _characterGameObject.GetComponentsInChildren<Transform>();
+            _allBonesArray = _characterGameObject.GetComponentsInChildren<Transform>();
+            foreach (var bone in _allBonesArray)
+            {
+                if(_allBonesDictionary.ContainsKey(bone.name)) continue;
+                _allBonesDictionary[bone.name] = bone;
+            }
+            
+            _currentLodLevel = -1;
+            _forceLodLevel = -1;
             
             _wardrobes = new WardrobeParam[(int)Wardrobe.EndOfTheWorld];
             var wardrobeTypes = _characterGameObject.GetComponentsInChildren<WardrobeType>();
@@ -347,6 +362,15 @@ namespace Utils.Appearance.WardrobePackage
                 if(null == assetData) continue;
                 _wardrobes[(int)param.Type] = new WardrobeParam(assetData);
                 _wardrobes[(int)param.Type].DefaultGameObject = new UnityObject(param.transform.gameObject, new AssetInfo());
+            }
+            
+            if(null == Camera.main) return;
+            var transforms = Camera.main.GetComponentsInChildren<Transform>();
+            foreach (var transform in transforms)
+            {
+                if (!transform.name.Equals("TAA_Helper")) continue;
+                _taaObj = transform.gameObject;
+                break;
             }
         }
         
@@ -397,7 +421,7 @@ namespace Utils.Appearance.WardrobePackage
             // 蒙皮or硬挂
             PutOn(param.DefaultGameObject, (int)param.Type, param.IsSkinned, param.NeedMappingBones);
             EffectUtility.ReflushGodModeEffect(_rootGo, param.DefaultGameObject);
-            EffectUtility.RegistEffect(_rootGo, param.DefaultGameObject);
+            EffectUtility.RegistEffect(_rootGo, param.DefaultGameObject.AsGameObject);
             
             if (param.HasAlterAppearance)
             {
@@ -421,6 +445,15 @@ namespace Utils.Appearance.WardrobePackage
 
             // 背包挂点
             AddBag(param);
+
+            //通知TA
+            TaaHelper();
+            
+            //force set lod by addWardrobe
+            ForceCurrentLod();
+
+            // avatar effect
+            SetBindingPointBones(param);
         }
 
         public void RemoveWardrobe(Wardrobe position, bool updateAppearance = true)
@@ -469,6 +502,9 @@ namespace Utils.Appearance.WardrobePackage
 
             // 背包挂点
             RemoveBag(position);
+
+            //通知TA
+            TaaHelper();
         }
 
         public void HandleAllWardrobe(Action<UnityObject> act)
@@ -482,6 +518,15 @@ namespace Utils.Appearance.WardrobePackage
                     act(_wardrobes[i].AlternativeGameObject);
             }
         }
+
+        private void TaaHelper()
+        {
+            if(null == _taaObj || null == _rootGo) return;
+            var baseEffect = _taaObj.GetComponent<AbstractEffectMonoBehaviour>();
+            if(null == baseEffect) return;
+            baseEffect.SetParam("onPlayerRenderChange", (object) _rootGo);
+            Logger.InfoFormat("onPlayerRenderChange  RootName:{0}", _rootGo.name);
+        }
         
         private void AddBag(WardrobeParam param)
         {
@@ -493,12 +538,12 @@ namespace Utils.Appearance.WardrobePackage
                 if (attachment6 != null)
                 {
                     _attachment6Parent = attachment6.parent;
-                    _attachment6ParentInChar = GetBoneOfTheSameName(_attachment6Parent, _allBones);
+                    _attachment6ParentInChar = GetBoneOfTheSameName(_attachment6Parent, _allBonesDictionary);
                 }
                 if (attachment7 != null)
                 {
                     _attachment7Parent = attachment7.parent;
-                    _attachment7ParentInChar = GetBoneOfTheSameName(_attachment7Parent, _allBones);
+                    _attachment7ParentInChar = GetBoneOfTheSameName(_attachment7Parent, _allBonesDictionary);
                 }
                 _bagChanged.Invoke();
             }
@@ -609,11 +654,29 @@ namespace Utils.Appearance.WardrobePackage
                 }
 
                 CalcCurrentLod();
+
+
+                if (Input.GetKeyDown(KeyCode.P))
+                {
+                    foreach (var param in _wardrobes)
+                    {
+                        if(null == param || null == param.DefaultGameObject || 
+                           null == param.DefaultGameObject.AsObject) continue;
+                        var level = MyLodGroup.GetLogLevel(param.DefaultGameObject);
+                        Logger.InfoFormat("{0} lodLevel is : {1} ", param.DefaultGameObject.AsObject.name, level);
+                    }
+                }
             }
             finally
             {
                 _mainInfo.EndProfileOnlyEnableProfile();
             }
+        }
+
+        public void SetForceLodLevel(int level)
+        {
+            _forceLodLevel = level;
+            ForceCurrentLod();
         }
 
         private void CalcCurrentLod()
@@ -624,35 +687,86 @@ namespace Utils.Appearance.WardrobePackage
                 var head = _wardrobes[(int)StandardPart];
                 if(null == head) return;
                 
-                int lodLevel;
+                var needChangeLodLevel = false;
                 try
                 {
-                    lodLevel = MyLodGroup.GetLogLevel(head.DefaultGameObject);
                     _getLodLevelInfo.BeginProfileOnlyEnableProfile();
+                    
+                    var lodLevel = MyLodGroup.GetLogLevel(head.DefaultGameObject);
+                    needChangeLodLevel = lodLevel != _currentLodLevel;
+                    _currentLodLevel = lodLevel;
                 }
                 finally
                 {
                     _getLodLevelInfo.EndProfileOnlyEnableProfile();
                 }
-
-                foreach (var value in _wardrobes)
-                {
-                    if(null == value) continue;
-                    try
-                    {
-                        _setLodLevelInfo.BeginProfileOnlyEnableProfile();
-                        MyLodGroup.SetLogLevel(value.DefaultGameObject, lodLevel);
-                        MyLodGroup.SetLogLevel(value.AlternativeGameObject, lodLevel);
-                    }
-                    finally
-                    {
-                        _setLodLevelInfo.EndProfileOnlyEnableProfile();
-                    }
-                }
+                
+                if(!needChangeLodLevel) return;
+                ForceCurrentLod();
             }
             finally
             {
                 _updateLodInfo.EndProfileOnlyEnableProfile();
+            }
+        }
+
+        private void ForceCurrentLod()
+        {
+            foreach (var value in _wardrobes)
+            {
+                if(null == value) continue;
+                try
+                {
+                    _setLodLevelInfo.BeginProfileOnlyEnableProfile();
+                    if (_forceLodLevel >= 0)
+                    {
+                        MyLodGroup.SetLogLevel(value.DefaultGameObject, _forceLodLevel);
+                        MyLodGroup.SetLogLevel(value.AlternativeGameObject, _forceLodLevel);
+                        continue;
+                    }
+                    if(value.Type == StandardPart) continue;
+                    MyLodGroup.SetLogLevel(value.DefaultGameObject, _currentLodLevel);
+                    MyLodGroup.SetLogLevel(value.AlternativeGameObject, _currentLodLevel);
+                }
+                finally
+                {
+                    _setLodLevelInfo.EndProfileOnlyEnableProfile();
+                }
+            }
+        }
+
+        private void SetBindingPointBones(WardrobeParam param)
+        {
+            if (null == param) return;
+
+            if (null != param.DefaultGameObject &&
+                null != param.DefaultGameObject.AsGameObject)
+            {
+                var comps = param.DefaultGameObject.AsGameObject.GetComponentsInChildren<BindingPointToBone>();
+                if (null != comps && comps.Length != 0)
+                {
+                    foreach (var effect in comps)
+                    {
+                        effect.SetAvatarBones(_allBonesDictionary);
+                    }
+                    Logger.InfoFormat("SetBindingPointBones -- ObjName:  {0}",
+                        param.DefaultGameObject.AsGameObject.name);
+                }
+            }
+
+            if (null != param.AlternativeGameObject &&
+                null != param.AlternativeGameObject.AsGameObject)
+            {
+                var comps = param.AlternativeGameObject.AsGameObject.GetComponentsInChildren<BindingPointToBone>();
+                if (null != comps && comps.Length != 0)
+                {
+                    foreach (var effect in comps)
+                    {
+                        effect.SetAvatarBones(_allBonesDictionary);
+                    }
+                    Logger.InfoFormat("SetBindingPointBones -- ObjName:  {0}",
+                        param.AlternativeGameObject.AsGameObject.name);
+                }
             }
         }
 
@@ -678,8 +792,8 @@ namespace Utils.Appearance.WardrobePackage
                         var wardrobeBones = GetBonesOfTheSameName(renderer.bones, allWardrobeBones);
                         MappingBones(wardrobeBones, type);
                     }
-                    renderer.bones = GetBonesOfTheSameName(renderer.bones, _allBones);
-                    renderer.rootBone = GetBoneOfTheSameName(renderer.rootBone, _allBones);
+                    renderer.bones = GetBonesOfTheSameName(renderer.bones, _allBonesDictionary);
+                    renderer.rootBone = GetBoneOfTheSameName(renderer.rootBone, _allBonesDictionary);
                 }
             }
             else
@@ -705,13 +819,16 @@ namespace Utils.Appearance.WardrobePackage
             
             if (param.EnableOtherAlter)
                 _wardrobesStatus.RegisterAlter(param.AlterType, param.Type);
+            
             if (param.HasHideAvatar)
             {
                 foreach (var pos in param.HidePositions)
                 {
                     _wardrobesStatus.RegisterHide(pos, param.Type);
+                    ReInterpretMaskAppearance(_wardrobes[(int) pos], false);
                 }
             }
+            
             if (param.Masks != null)
             {
                 foreach (var mask in param.Masks)
@@ -727,20 +844,35 @@ namespace Utils.Appearance.WardrobePackage
 
             if (param.EnableOtherAlter)
                 _wardrobesStatus.UnregisterAlter(param.AlterType, param.Type);
-            if (param.HasHideAvatar)
-            {
-                foreach (var pos in param.HidePositions)
-                {
-                    _wardrobesStatus.UnregisterHide(pos, param.Type);
-                }
-            }
+            
             if (param.Masks != null)
             {
                 foreach (var mask in param.Masks)
                 {
                     _wardrobesStatus.UnregisterMask(mask.Item1, param.Type);
                 }
-            }           
+            }    
+            
+            if (param.HasHideAvatar)
+            {
+                foreach (var pos in param.HidePositions)
+                {
+                    _wardrobesStatus.UnregisterHide(pos, param.Type);
+                    ReInterpretMaskAppearance(_wardrobes[(int) pos], true);
+                }
+            }
+        }
+        
+        private void ReInterpretMaskAppearance(WardrobeParam param, bool show)
+        {
+            if (null == param || param.Masks == null) return;
+            foreach (var mask in param.Masks)
+            {
+                if(show)
+                    _wardrobesStatus.RegisterMask(mask.Item1, param.Type);
+                else
+                    _wardrobesStatus.UnregisterMask(mask.Item1, param.Type);
+            }
         }
 
         private void ShowAccordingToStatus()
@@ -824,6 +956,9 @@ namespace Utils.Appearance.WardrobePackage
                 {
                     if(null != tex)
                     {
+                        Logger.InfoFormat("SetObjMask-- ObjName:  {0},  ObjShaderName:  {1}", 
+                            go.name, renderer.material.shader.name);
+                        
                         renderer.material.SetTexture("_MainMaskMap", tex);
                         renderer.material.EnableKeyword("_MAIN_MASK_MAP");
                     }
@@ -836,9 +971,42 @@ namespace Utils.Appearance.WardrobePackage
             }
         }
         
-        private Transform[] GetBonesOfTheSameName(Transform[] nameProvider, Transform[] allBones)
+        private static Transform GetBoneOfTheSameName(Transform wardrobeBone, Transform[] allBones)
         {
-            Transform[] ret = new Transform[nameProvider.Length];
+            if (null == wardrobeBone)
+            {
+                Logger.ErrorFormat("Avatar : {0}  skinnedMeshRenderer Bones Error");
+                return wardrobeBone;
+            }
+            
+            var boneName = wardrobeBone.name;
+            foreach (var bone in allBones)
+            {
+                if (bone.name == boneName)
+                {
+                    return bone;
+                }
+            }
+            
+            //Logger.WarnFormat("Could not fine corresponding bone \"{0}\" in avatar  : maybe is dynamicBone", wardrobeBone.name);
+            return wardrobeBone;
+        }
+        
+        private static Transform[] GetBonesOfTheSameName(Transform[] nameProvider, IDictionary<string, Transform> allBones)
+        {
+            var ret = new Transform[nameProvider.Length];
+
+            for (var i = 0; i < ret.Length; i++)
+            {
+                ret[i] = GetBoneOfTheSameName(nameProvider[i], allBones);
+            }
+
+            return ret;
+        }
+        
+        private static Transform[] GetBonesOfTheSameName(Transform[] nameProvider, Transform[] allBones)
+        {
+            var ret = new Transform[nameProvider.Length];
 
             for (var i = 0; i < ret.Length; i++)
             {
@@ -848,37 +1016,32 @@ namespace Utils.Appearance.WardrobePackage
             return ret;
         }
 
-        private Transform GetBoneOfTheSameName(Transform wardrobeBone, Transform[] allBones)
+        private static Transform GetBoneOfTheSameName(Transform wardrobeBone, IDictionary<string, Transform> allBones)
         {
             if (null == wardrobeBone)
             {
                 Logger.ErrorFormat("Avatar : {0}  skinnedMeshRenderer Bones Error");
                 return wardrobeBone;
             }
-            string boneName = wardrobeBone.name;
-            foreach (var bone in allBones)
-            {
-                if (bone.name == boneName)
-                {
-                    return bone;
-                }
-            }
 
+            if (allBones.ContainsKey(wardrobeBone.name))
+                return allBones[wardrobeBone.name];
+            
             //Logger.WarnFormat("Could not fine corresponding bone \"{0}\" in avatar  : maybe is dynamicBone", wardrobeBone.name);
             return wardrobeBone;
         }
 
-        private Dictionary<int, List<MappingBone>> _mappingBones = new Dictionary<int, List<MappingBone>>();
+        private readonly Dictionary<int, List<MappingBone>> _mappingBones = new Dictionary<int, List<MappingBone>>();
         private void MappingBones(Transform[] wardrobeBones, int type)
         {
             _mappingBones[type] = new List<MappingBone>();
-            for (var i = 0; i < _allBones.Length; ++i)
+            for (var i = 0; i < _allBonesArray.Length; ++i)
             {
                 for (var j = 0; j < wardrobeBones.Length; ++j)
                 {
-                    if (_allBones[i].name.Equals(wardrobeBones[j].name, StringComparison.Ordinal))
+                    if (_allBonesArray[i].name.Equals(wardrobeBones[j].name, StringComparison.Ordinal))
                     {
-                        var item = new MappingBone { WardrobeBone = wardrobeBones[j], CharacterBone = _allBones[i] };
+                        var item = new MappingBone { WardrobeBone = wardrobeBones[j], CharacterBone = _allBonesArray[i] };
                         _mappingBones[type].Add(item);
                         break;
                     }

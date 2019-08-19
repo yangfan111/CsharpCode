@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Core.Utils;
 using Entitas;
 using Entitas.VisualDebugging.Unity;
 using UnityEngine;
 using Utils.Singleton;
+using Utils.AssetManager;
 
 namespace Core.SessionState
 {
@@ -21,6 +23,7 @@ namespace Core.SessionState
         private bool _isLateUpdateSystemsInistalized;
         private bool _isOnDrawGizmosSystemsInistalized;
         private bool _isOnGuiSystemsIntialized;
+      
 
         public virtual int LoadingProgressNum
         {
@@ -48,10 +51,13 @@ namespace Core.SessionState
             NextStateId = nextStateId;
         }
 
+
         public void Initialize()
         {
             if (_initilized)
                 return;
+            if(!GlobalConst.isServer)
+                SingletonManager.Get<SessionStateTimer>().Enter(GetType().Name,StateId);
             _initilized = true;
             _updateSystems = CreateUpdateSystems(_contexts);
             _onDrawGizmosSystems = CreateOnDrawGizmos(_contexts);
@@ -105,6 +111,8 @@ namespace Core.SessionState
                 
             }
             SingletonManager.Get<gc_manager>().gc_collect();
+            if(!GlobalConst.isServer)
+                SingletonManager.Get<SessionStateTimer>().Leave(GetType().Name,StateId);
         }
 
         public abstract Systems CreateUpdateSystems(IContexts contexts);
@@ -196,11 +204,15 @@ namespace Core.SessionState
 	                if ((DateTime.Now - _lastPrintTime).TotalMilliseconds > _logInterval)
 	                {
 		                _lastPrintTime = DateTime.Now;
-						_logger.ErrorFormat("remain contains {0}", string.Join(",", _conditions.ToArray()));
-	                    if (_logInterval < 60000)
-	                        _logInterval *= 2;
+						_logger.ErrorFormat("remain {1} contains {0}", string.Join(",", _conditions.ToArray()),this.GetType().Name);
+               
+                        _logger.Error(UnityAssetManager.GetRemainsAndFailed());
 
-	                }
+
+                        if (_logInterval < 60000)
+                            _logInterval *= 2;
+
+                    }
                 }
                 return rc;
             }

@@ -93,8 +93,10 @@ namespace App.Client.GameModules.Ui.Models.Common
                 RefreshGui(interval);
         }
 
+        private Transform SpreadRootTrans;
         private void InitGui()
         {
+            SpreadRootTrans = FindChildGo("center");
             sTop = FindChildGo("sTop");
             sTopRt = FindComponent<RectTransform>("sTop");
             sTopImg = FindComponent<Image>("sTop");
@@ -123,6 +125,8 @@ namespace App.Client.GameModules.Ui.Models.Common
             _viewModel.ImageRedActive = false;
         }
 
+     
+
         private void RefreshGui(float interval)
         {
             if (adapter != null && isGameObjectCreated)
@@ -140,6 +144,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void RefreshCrossHair(float interval)
         {
+            adapter.UpdateSpread();
             SelectTypePanel(adapter.Type);
             
             
@@ -147,6 +152,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             {
                 case CrossHairType.Normal:
                     {
+                        // SpreadRootTrans.localPosition = new Vector3(adapter.XSpreadOffset*GMVariable.SpreadOffsetFactor,adapter.YSpreadOffset*GMVariable.SpreadOffsetFactor,0);
                         SetNormalCrossType(adapter.WeaponAvatarId);  //根据weapon不同过得subtype 设置不同的准心图片
                         float startPos = Mathf.Abs(sTopRt.localPosition.y) ;
                         float endPos = Mathf.Abs(YEndPosOffset);
@@ -509,9 +515,9 @@ namespace App.Client.GameModules.Ui.Models.Common
             _viewModel.attackRootActive = active;
         }
 
-        public override void Destory()
+        public override void OnDestory()
         {
-            base.Destory();
+            base.OnDestory();
             if (XMoveTween != null)
             {
                 XMoveTween.Kill();

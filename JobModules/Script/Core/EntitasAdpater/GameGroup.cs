@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Core.EntityComponent;
 using Entitas;
 
-namespace Core.EntitasAdpater
+namespace Core.EntityComponent
 {
     public class GameGroup<TEntity> :IGameGroup where TEntity : Entity
     {

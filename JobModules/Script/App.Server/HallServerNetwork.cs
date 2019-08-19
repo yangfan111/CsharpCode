@@ -225,13 +225,14 @@ namespace App.Server
             var msg = RegisterBattleServerMessage.Allocate();
             msg.Id = SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.Id;
             msg.Ip = SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.Ip;
+            msg.InnerIp = SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.InnerIp;
             msg.GameMapId = SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.MapId;
             msg.RoomPort = SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.HallRoomServer.ListenPort;
             msg.BattleTcpPort = SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.BattleServer.TcpPort;
             msg.BattleUdpPort = SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.BattleServer.UdpPort;
 
-            _logger.InfoFormat("Register  Battle Server, Id {0} Ip {1} GameMap Id {2} Room Port {3}, Tcp {4} Udp {5}",
-                msg.Id, msg.Ip, msg.GameMapId, msg.RoomPort, msg.BattleTcpPort, msg.BattleUdpPort);
+            _logger.InfoFormat("Register  Battle Server, Id {0} Ip {1} InnerIp{2} GameMap Id {3} Room Port {4}, Tcp {5} Udp {6}",
+                msg.Id, msg.Ip, msg.InnerIp, msg.GameMapId, msg.RoomPort, msg.BattleTcpPort, msg.BattleUdpPort);
 
             SendRegisterBattleServerMessage(msg);
             //空闲状态

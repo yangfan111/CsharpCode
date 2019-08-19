@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using XmlConfig;
 
@@ -18,6 +19,14 @@ namespace App.Shared.Util
             return string.Format("playing :{0},resume:{1}", playingEffects.Count, reusableEffects.Count);
         }
 
+        public void Reusable()
+        {
+            var effcArr = playingEffects.ToArray();
+            foreach (var tnode in effcArr)
+            {
+                Reusable(tnode);
+            }
+        }
         public void Reusable(T ele)
         {
             ele.Recycle();

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Core.Utils;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Utils.Configuration;
 using Utils.Singleton;
@@ -9,9 +9,9 @@ namespace App.Shared.Audio
 {
     public interface IRef<T>
     {
-        bool Register(T   target);
+        bool Register(T target);
         bool UnRegister(T target);
-        bool Has(T        target);
+        bool Has(T target);
     }
 
 
@@ -19,14 +19,14 @@ namespace App.Shared.Audio
     {
         private readonly HashSet<GameObject> refs = new HashSet<GameObject>();
 
-        public bool Has(GameObject target)
-        {
-            return refs.Contains(target);
-        }
-
         public int Count
         {
             get { return refs.Count; }
+        }
+
+        public bool Has(GameObject target)
+        {
+            return refs.Contains(target);
         }
 
         public virtual bool Register(GameObject target)
@@ -43,7 +43,7 @@ namespace App.Shared.Audio
     public class AKSwitchAtom
     {
         public readonly AudioGroupItem config;
-        public          int            stateIndex = -1;
+        public int stateIndex = -1;
 
         public AKSwitchAtom(int in_grpId)
         {
@@ -52,12 +52,12 @@ namespace App.Shared.Audio
 
         public void InitSwitch(GameObject target)
         {
-            if (this.stateIndex < 0)
+            if (stateIndex < 0)
             {
-                AKRESULT akresult = AkSoundEngine.SetSwitch(config.Group, config.StateArr[0], target);
-                if (AudioUtil.VerifyAKResult(akresult, string.Format("AKSwitch state:{0}-{1}", config.Group,config.StateArr[0])))
+                AKRESULT akresult = AkSoundEngine.SetSwitch(config.GetConvertedGroupId(), config.GetConvertedGroupStateId(0), target);
+                if (AudioUtil.VerifyAKResult(akresult, "AKSwitch state:{0}-{1}", config.Group, config.StateArr[0]))
                 {
-                    this.stateIndex = 0;
+                    stateIndex = 0;
                 }
             }
         }
@@ -70,16 +70,16 @@ namespace App.Shared.Audio
                 AKRESULT akresult;
                 if (config.StateArr.Length > stateIndex)
                 {
-                    akresult = AkSoundEngine.SetSwitch(config.Group, config.StateArr[stateIndex], target);
+                    akresult = AkSoundEngine.SetSwitch(config.GetConvertedGroupId(), config.GetConvertedGroupStateId(stateIndex), target);
                 }
-                  
+
                 else
                 {
-                    AudioUtil.Logger.ErrorFormat("wise group:{0},state {1}", config.Group, stateIndex);  
+                    AudioUtil.Logger.ErrorFormat("wise group:{0},state {1}", config.Group, stateIndex);
                     akresult = AKRESULT.AK_Fail;
                 }
-                  
-                if (AudioUtil.VerifyAKResult(akresult, "AKSwitch state:"+config.Group))
+
+                if (AudioUtil.VerifyAKResult(akresult, "AKSwitch state:{0}", config.Group))
                 {
                     this.stateIndex = stateIndex;
                 }
@@ -87,28 +87,63 @@ namespace App.Shared.Audio
         }
     }
 
-    public class AKBankAtom : AudioRefCounter
+    public class AKBankAtom
     {
-        public string               BankName   { get; private set; }
-        public AudioBank_LoadAction LoadAction { get; private set; }
-        public AudioBank_LoadMode   LoadMode   { get; private set; }
-
-
+        private event WiseReusltHandler lastReulstHandler;
         //public BankLoadStage LoadStage { get; private set; }
 
-        public AKBankAtom(string bnkName, AudioBank_LoadAction loadAction, AudioBank_LoadMode loadMode)
+        public AKBankAtom(string bnkName, AudioBank_LoadMode loadMode)
         {
             BankName   = bnkName;
-            LoadAction = loadAction;
-            LoadMode   = loadMode;
+            LoadMode = loadMode;
             //  LoadStage = BankLoadStage.Unload;
         }
 
-        public AKBankAtom(string bnkName) : this(bnkName,
-            AudioBank_LoadAction.Normal, AudioBank_LoadMode.Sync)
+        public readonly string BankName;
+        public readonly AudioBank_LoadMode LoadMode;
+
+        public bool Execute(WiseReusltHandler handler, out AKRESULT akresult)
         {
+            switch (LoadMode)
+            {
+                case AudioBank_LoadMode.Aync:
+                    akresult = AkBankManager.LoadBank(BankName, DefaultAyncHandler);
+                    if(akresult == AKRESULT.AK_BankAlreadyLoaded)
+                        return true;
+                    if(handler != null)
+                        lastReulstHandler += handler;
+                    return false;
+                case AudioBank_LoadMode.DecodeOnLoad:
+                    akresult = AkBankManager.LoadBank(BankName, true, false);
+                    break;
+
+                case AudioBank_LoadMode.DecodeOnLoadAndSave:
+                    akresult = AkBankManager.LoadBank(BankName, true, true);
+                    break;
+
+
+                case AudioBank_LoadMode.Normal:
+                    akresult = AkBankManager.LoadBank(BankName);
+                    break;
+                default:
+                    akresult = AKRESULT.AK_UnHandled;
+                    break;
+            }
+
+            return true;
         }
 
+        private void DefaultAyncHandler(uint inBankId, IntPtr inInMemoryBankPtr, AKRESULT inELoadResult, uint inMemPoolId,
+                                   object inCookie)
+        {
+            AudioUtil.Logger.InfoFormat("[Wise] Aync Loading {0} {1}", BankName, inELoadResult);
+            if (lastReulstHandler != null)
+            {
+                lastReulstHandler(inELoadResult);
+                lastReulstHandler = null;
+                
+            }
+        }
 
         //public class AKEvent : AKElement
         //{

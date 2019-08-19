@@ -22,7 +22,9 @@ namespace App.Shared
             
             protected override void Free(ClientEffectEmitter emitter)
             {
-                base.Free(emitter);
+                if (Parent)
+                    emitter.nodeObject.transform.SetParent(emitter.PoolFolder);
+                ObjectAllocatorHolder<ChunkEffectBehavior>.Free(this);
                 ChunkEffectBehaviors.Remove(this);
             }
     

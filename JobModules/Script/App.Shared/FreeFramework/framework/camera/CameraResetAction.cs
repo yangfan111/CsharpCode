@@ -1,10 +1,9 @@
-﻿using com.wd.free.action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Assets.App.Server.GameModules.GamePlay.Free;
+using com.wd.free.action;
 using com.wd.free.@event;
 using Core.Free;
+using Free.framework;
+using System;
 
 namespace App.Shared.FreeFramework.framework.camera
 {
@@ -13,8 +12,16 @@ namespace App.Shared.FreeFramework.framework.camera
     {
         public override void DoAction(IEventArgs args)
         {
-            PlayerEntity p = GetPlayerEntity(args);
-            p.gamePlay.CameraEntityId = 0;
+            PlayerEntity player = GetPlayerEntity(args);
+            if (player != null && player.gamePlay.CameraEntityId != 0)
+            {
+                player.gamePlay.CameraEntityId = 0;
+
+                SimpleProto sp = FreePool.Allocate();
+                sp.Key = FreeMessageConstant.PlayerObserveTrigger;
+                sp.Bs.Add(false);
+                FreeMessageSender.SendMessage(player, sp);
+            }
         }
 
         public int GetRuleID()

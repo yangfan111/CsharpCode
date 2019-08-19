@@ -16,6 +16,7 @@ using Core.CommonResource;
 using Core.EntityComponent;
 using Core.Utils;
 using Entitas;
+using Utils.Appearance.Weapon.WeaponShowPackage;
 using Utils.AssetManager;
 using Utils.Configuration;
 using Utils.Singleton;
@@ -118,11 +119,13 @@ namespace App.Shared.CommonResource.Updaters
 
             var characterBone = new CharacterBoneManager();
             characterBone.SetWardrobeController(appearanceManager.GetWardrobeController());
-            characterBone.SetWeaponController(appearanceManager.GetController<WeaponController>());
-            var weaponController = appearanceManager.GetController<WeaponController>() as WeaponController;
+            characterBone.SetWeaponController(appearanceManager.GetController<NewWeaponController>());
+            var weaponController = (NewWeaponController)appearanceManager.GetController<NewWeaponController>();
             if (null != weaponController)
             {
-                weaponController.SetWeaponChangedCallBack(characterBone.CurrentWeaponChanged);
+                weaponController.SetWeaponChangedCallBack(characterBone.CurrentP1WeaponChanged, characterBone.CurrentP3WeaponChanged);
+                weaponController.SetWeaponOrAttachmentDeleteCallBack(characterBone.WeaponOrAttachmentDel);
+                weaponController.SetWeaponOrAttachementAddCallBack(characterBone.WeaponOrAttachmentAdd);
                 weaponController.SetCacheChangeAction(characterBone.CacheChangeCacheAction);
             }
             player.AddCharacterControllerInterface(characterControllerManager);

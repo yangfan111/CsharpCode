@@ -17,7 +17,7 @@ namespace Core.AnimatorClip
 
         public void SetAnimationCleanEventCallback(Action<AnimationEvent> action)
         {
-            _animationCleanEventCallback = action;
+            AnimationCleanEventCallback = action;
         }
 
         public void SetAnimatorClipsTime(int? weaponId)
@@ -68,7 +68,7 @@ namespace Core.AnimatorClip
         {
             var clip = clipInfo.clip;
             if (null == clip || null == _animatorClips) return;
-            var cilpName = _matcher.Match(clip.name);
+            var cilpName = Matcher.Match(clip.name);
             foreach (var item in _animatorClips)
             {
                 if (item.StateName.Equals(cilpName))
@@ -84,7 +84,7 @@ namespace Core.AnimatorClip
         {
             var clip = clipInfo.clip;
             if (null == clip || null == _animatorClips) return;
-            var cilpName = _matcher.Match(clip.name);
+            var cilpName = Matcher.Match(clip.name);
             foreach (var item in _animatorClips)
             {
                 if (item.StateName.Equals(cilpName))

@@ -86,5 +86,28 @@ namespace Utils.Appearance.Weapon
             var renderCenter = -((max + min) / 2f - go.transform.position);
             return renderCenter;
         }
+
+        // 仅限于瞄镜的变化
+        public void RefreshRemovableAttachment(GameObject go, bool hasSights)
+        {
+            var ironSights = BoneMount.FindChildBoneFromCache(go, BoneName.RemovableIronSights);
+            var rail = BoneMount.FindChildBoneFromCache(go, BoneName.RemovableRail);
+
+            if (ironSights != null)
+            {
+                if (hasSights)
+                    AppearanceUtils.DisableRender(ironSights.gameObject);
+                else
+                    AppearanceUtils.EnableRender(ironSights.gameObject);
+            }
+
+            if (rail != null)
+            {
+                if (hasSights)
+                    AppearanceUtils.EnableRender(rail.gameObject);
+                else
+                    AppearanceUtils.DisableRender(rail.gameObject);
+            }
+        }
     }
 }

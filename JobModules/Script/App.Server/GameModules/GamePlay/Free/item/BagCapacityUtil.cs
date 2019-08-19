@@ -1,4 +1,5 @@
 ﻿using App.Server.GameModules.GamePlay.free.player;
+using App.Server.GameModules.GamePlay.Free.chicken;
 using App.Server.GameModules.GamePlay.Free.item.config;
 using App.Shared;
 using App.Shared.GameModules.Weapon;
@@ -152,7 +153,7 @@ namespace App.Server.GameModules.GamePlay.Free.item
         {
             foreach (string name in fd.freeInventory.GetInventoryManager().GetInventoryNames())
             {
-                if (name != "ground")
+                if (name != ChickenConstant.BagGround)
                 {
                     ItemInventory ii = fd.freeInventory.GetInventoryManager().GetInventory(name);
                     if (ii != null)
@@ -181,10 +182,10 @@ namespace App.Server.GameModules.GamePlay.Free.item
         // 获取玩家总容量
         public static float GetCapacity(FreeData fd)
         {
-            float w = 20;
-            foreach (string name in fd.freeInventory.GetInventoryManager().GetInventoryNames())
+            float w = 70;
+            /*foreach (string name in fd.freeInventory.GetInventoryManager().GetInventoryNames())
             {
-                if (name != "ground")
+                if (name != ChickenConstant.BagGround)
                 {
                     ItemInventory ii = fd.freeInventory.GetInventoryManager().GetInventory(name);
                     if (ii != null)
@@ -198,6 +199,19 @@ namespace App.Server.GameModules.GamePlay.Free.item
                                 w += avatar.Capacity;
                             }
                         }
+                    }
+                }
+            }*/
+            ItemInventory ii = fd.freeInventory.GetInventoryManager().GetInventory(ChickenConstant.BagBag);
+            if (ii != null)
+            {
+                foreach (ItemPosition ip in ii.GetItems())
+                {
+                    FreeItemInfo info = FreeItemConfig.GetItemInfo(ip.GetKey().GetKey());
+                    if (info.cat == 9)
+                    {
+                        RoleAvatarConfigItem avatar = SingletonManager.Get<RoleAvatarConfigManager>().GetConfigById(info.id);
+                        w += avatar.Capacity;
                     }
                 }
             }

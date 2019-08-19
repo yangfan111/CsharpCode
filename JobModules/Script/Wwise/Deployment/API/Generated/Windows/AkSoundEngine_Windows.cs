@@ -158,12 +158,13 @@ public partial class AkSoundEngine {
   public static AKRESULT SetMaxNumVoicesLimit(ushort in_maxNumberVoices) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_SetMaxNumVoicesLimit(in_maxNumberVoices); }
 
   public static AKRESULT RenderAudio(bool in_bAllowSyncRender) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_RenderAudio__SWIG_0(in_bAllowSyncRender); }
-
   public static AKRESULT RenderAudio() { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_RenderAudio__SWIG_1(); }
 
   public static AKRESULT RegisterPluginDLL(string in_DllName) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_RegisterPluginDLL(in_DllName); }
 
   public static uint GetIDFromString(string in_pszString) { return AkSoundEnginePINVOKE.CSharp_GetIDFromString__SWIG_0(in_pszString); }
+
+  #region PostEvent
 
   public static uint PostEvent(uint in_eventID, UnityEngine.GameObject in_gameObjectID, uint in_uFlags, AkCallbackManager.EventCallback in_pfnCallback, object in_pCookie, uint in_cExternals, AkExternalSourceInfo in_pExternalSources, uint in_PlayingID) {
 
@@ -279,7 +280,18 @@ public partial class AkSoundEngine {
 		return ret;
 	}
   }
+  public static uint PostEvent(string in_pszEventName, AkGameObj akGameObj, uint in_uFlags, AkCallbackManager.EventCallback in_pfnCallback, object in_pCookie) {
 
+	  var in_gameObjectID_id = AkSoundEngine.GetAkGameObjectID(akGameObj);
+	  AkSoundEngine.PreGameObjectAPICall(akGameObj, in_gameObjectID_id);
+
+	  in_pCookie = AkCallbackManager.EventCallbackPackage.Create(in_pfnCallback, in_pCookie, ref in_uFlags);
+	  {
+		  uint ret = AkSoundEnginePINVOKE.CSharp_PostEvent__SWIG_9(in_pszEventName, in_gameObjectID_id, in_uFlags, in_uFlags != 0 ? (global::System.IntPtr)1 : global::System.IntPtr.Zero, in_pCookie != null ? (global::System.IntPtr)in_pCookie.GetHashCode() : global::System.IntPtr.Zero);
+		  AkCallbackManager.SetLastAddedPlayingID(ret);
+		  return ret;
+	  }
+  }
   public static uint PostEvent(string in_pszEventName, UnityEngine.GameObject in_gameObjectID, uint in_uFlags, AkCallbackManager.EventCallback in_pfnCallback, object in_pCookie) {
 
 	var in_gameObjectID_id = AkSoundEngine.GetAkGameObjectID(in_gameObjectID);
@@ -316,8 +328,23 @@ public partial class AkSoundEngine {
 		return ret;
 	}
   }
+  public static uint PostEvent(string in_pszEventName, AkGameObj in_akGameObj) {
 
-  public static AKRESULT ExecuteActionOnEvent(uint in_eventID, AkActionOnEventType in_ActionType, UnityEngine.GameObject in_gameObjectID, int in_uTransitionDuration, AkCurveInterpolation in_eFadeCurve, uint in_PlayingID) {
+	  var in_gameObjectID_id = AkSoundEngine.GetAkGameObjectID(in_akGameObj);
+	  AkSoundEngine.PreGameObjectAPICall(in_akGameObj, in_gameObjectID_id);
+
+	  {
+		  uint ret = AkSoundEnginePINVOKE.CSharp_PostEvent__SWIG_11(in_pszEventName, in_gameObjectID_id);
+		  AkCallbackManager.SetLastAddedPlayingID(ret);
+		  return ret;
+	  }
+  }
+
+  #endregion
+  
+
+  #region ExecuteActionOnEvent
+public static AKRESULT ExecuteActionOnEvent(uint in_eventID, AkActionOnEventType in_ActionType, UnityEngine.GameObject in_gameObjectID, int in_uTransitionDuration, AkCurveInterpolation in_eFadeCurve, uint in_PlayingID) {
 
 	var in_gameObjectID_id = AkSoundEngine.GetAkGameObjectID(in_gameObjectID);
 	AkSoundEngine.PreGameObjectAPICall(in_gameObjectID, in_gameObjectID_id);
@@ -348,7 +375,6 @@ public partial class AkSoundEngine {
 
     { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_ExecuteActionOnEvent__SWIG_3(in_eventID, (int)in_ActionType, in_gameObjectID_id); }
   }
-
   public static AKRESULT ExecuteActionOnEvent(uint in_eventID, AkActionOnEventType in_ActionType) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_ExecuteActionOnEvent__SWIG_4(in_eventID, (int)in_ActionType); }
 
   public static AKRESULT ExecuteActionOnEvent(string in_pszEventName, AkActionOnEventType in_ActionType, UnityEngine.GameObject in_gameObjectID, int in_uTransitionDuration, AkCurveInterpolation in_eFadeCurve, uint in_PlayingID) {
@@ -385,6 +411,11 @@ public partial class AkSoundEngine {
 
   public static AKRESULT ExecuteActionOnEvent(string in_pszEventName, AkActionOnEventType in_ActionType) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_ExecuteActionOnEvent__SWIG_9(in_pszEventName, (int)in_ActionType); }
 
+
+  #endregion
+  
+
+  
   public static AKRESULT PostMIDIOnEvent(uint in_eventID, UnityEngine.GameObject in_gameObjectID, AkMIDIPostArray in_pPosts, ushort in_uNumPosts) {
 
 	var in_gameObjectID_id = AkSoundEngine.GetAkGameObjectID(in_gameObjectID);
@@ -514,7 +545,7 @@ public partial class AkSoundEngine {
   }
 
   public static void CancelEventCallbackCookie(object in_pCookie) {
-		AkCallbackManager.RemoveEventCallbackCookie(in_pCookie);
+		AkCallbackManager.RemoveEventCallbackByCookie(in_pCookie);
 	}
 
   public static void CancelEventCallbackGameObject(UnityEngine.GameObject in_gameObjectID) {
@@ -526,12 +557,23 @@ public partial class AkSoundEngine {
   }
 
   public static void CancelEventCallback(uint in_playingID) {
-		AkCallbackManager.RemoveEventCallback(in_playingID);
+		AkCallbackManager.RemoveEventCallbackByPlayer(in_playingID);
 	}
+
+  #region Mics
 
   public static AKRESULT GetSourcePlayPosition(uint in_PlayingID, out int out_puPosition, bool in_bExtrapolate) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_GetSourcePlayPosition__SWIG_0(in_PlayingID, out out_puPosition, in_bExtrapolate); }
 
   public static AKRESULT GetSourcePlayPosition(uint in_PlayingID, out int out_puPosition) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_GetSourcePlayPosition__SWIG_1(in_PlayingID, out out_puPosition); }
+  
+  public static AKRESULT Suspend(bool in_bRenderAnyway) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_Suspend__SWIG_0(in_bRenderAnyway); }
+
+  public static AKRESULT Suspend() { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_Suspend__SWIG_1(); }
+
+  public static AKRESULT WakeupFromSuspend() { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_WakeupFromSuspend(); }
+
+  #endregion
+ 
 
   public static AKRESULT GetSourceStreamBuffering(uint in_PlayingID, out int out_buffering, out int out_bIsBuffering) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_GetSourceStreamBuffering(in_PlayingID, out out_buffering, out out_bIsBuffering); }
 
@@ -577,6 +619,8 @@ public partial class AkSoundEngine {
 
   public static AKRESULT SetScalingFactor(UnityEngine.GameObject in_GameObjectID, float in_fAttenuationScalingFactor) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_SetScalingFactor(AkSoundEngine.GetAkGameObjectID(in_GameObjectID), in_fAttenuationScalingFactor); }
 
+
+  #region loadbank
   public static AKRESULT ClearBanks() { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_ClearBanks(); }
 
   public static AKRESULT SetBankLoadIOSettings(float in_fThroughput, char in_priority) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_SetBankLoadIOSettings(in_fThroughput, in_priority); }
@@ -631,7 +675,14 @@ public partial class AkSoundEngine {
 		AkCallbackManager.RemoveBankCallback(in_pCookie);
 	}
 
-  public static AKRESULT PrepareBank(AkPreparationType in_PreparationType, string in_pszString, AkBankContent in_uFlags) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_PrepareBank__SWIG_0((int)in_PreparationType, in_pszString, (int)in_uFlags); }
+  
+
+  #endregion
+  
+
+  #region prepareBank
+
+   public static AKRESULT PrepareBank(AkPreparationType in_PreparationType, string in_pszString, AkBankContent in_uFlags) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_PrepareBank__SWIG_0((int)in_PreparationType, in_pszString, (int)in_uFlags); }
 
   public static AKRESULT PrepareBank(AkPreparationType in_PreparationType, string in_pszString) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_PrepareBank__SWIG_1((int)in_PreparationType, in_pszString); }
 
@@ -658,8 +709,7 @@ public partial class AkSoundEngine {
 		in_pCookie = new AkCallbackManager.BankCallbackPackage(in_pfnBankCallback, in_pCookie);
     { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_PrepareBank__SWIG_11((int)in_PreparationType, in_bankID, global::System.IntPtr.Zero, in_pCookie != null ? (global::System.IntPtr)in_pCookie.GetHashCode() : global::System.IntPtr.Zero); }
   }
-
-  public static AKRESULT ClearPreparedEvents() { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_ClearPreparedEvents(); }
+ public static AKRESULT ClearPreparedEvents() { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_ClearPreparedEvents(); }
 
   public static AKRESULT PrepareEvent(AkPreparationType in_PreparationType, string [] in_ppszString, uint in_uNumEvent) {
 			
@@ -724,6 +774,10 @@ public partial class AkSoundEngine {
 		in_pCookie = new AkCallbackManager.BankCallbackPackage(in_pfnBankCallback, in_pCookie);
     { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_PrepareEvent__SWIG_3((int)in_PreparationType, in_pEventID, in_uNumEvent, global::System.IntPtr.Zero, in_pCookie != null ? (global::System.IntPtr)in_pCookie.GetHashCode() : global::System.IntPtr.Zero); }
   }
+
+  #endregion
+ 
+ 
 
   public static AKRESULT SetMedia(AkSourceSettings in_pSourceSettings, uint in_uNumSourceSettings) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_SetMedia(AkSourceSettings.getCPtr(in_pSourceSettings), in_uNumSourceSettings); }
 
@@ -1125,11 +1179,7 @@ public partial class AkSoundEngine {
 
   public static AKRESULT SetOutputVolume(ulong in_idOutput, float in_fVolume) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_SetOutputVolume(in_idOutput, in_fVolume); }
 
-  public static AKRESULT Suspend(bool in_bRenderAnyway) { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_Suspend__SWIG_0(in_bRenderAnyway); }
 
-  public static AKRESULT Suspend() { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_Suspend__SWIG_1(); }
-
-  public static AKRESULT WakeupFromSuspend() { return (AKRESULT)AkSoundEnginePINVOKE.CSharp_WakeupFromSuspend(); }
 
   public static uint GetBufferTick() { return AkSoundEnginePINVOKE.CSharp_GetBufferTick(); }
 

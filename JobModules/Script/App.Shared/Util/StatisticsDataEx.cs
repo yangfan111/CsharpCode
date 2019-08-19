@@ -66,7 +66,10 @@ namespace App.Shared.Util
                     data.KillWithSubmachineGun += 1;
                     break;
                 case EWeaponSubType.Rifle:
+                case EWeaponSubType.AccurateRifle:
                     data.KillWithRifle += 1;
+                    break;
+                default:
                     break;
             }
         } 

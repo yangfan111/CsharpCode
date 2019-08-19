@@ -31,6 +31,9 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         float XSpread { get; }
         float YSpread { get; }
+        float XSpreadOffset { get; }
+        float YSpreadOffset { get; }
+        void UpdateSpread();
         float SpreadDuration { get; }
         bool IsOpenCrossHairMotion { get; set; }   //是否开启准心运动
         int ShootNum { get; }

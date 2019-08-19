@@ -1,3 +1,5 @@
+using System;
+
 namespace Core
 {
     public struct BulletStatisticsInfo
@@ -12,12 +14,14 @@ namespace Core
         public bool isNewIns;
         public int cmdSeq;
         public bool isBlockIns;
+
+        
         //todo:
         public override string ToString()
         {
-            return string.Format(
+            return ""; /*string.Format(
                 "[cmdReq]{0}\n[origin]\n{1}\n[bulletBase]\n{2}\n[bulletStart]\n{3}\n[bulletEnd]\n{4}\n[aniStr]\n{5}\n[colliderStr]\n{6}",
-                cmdSeq, originStr, bulletBaseStr, bulletRunStartStr, bulletRunEndStr, aniStr, colliderStr);
+                cmdSeq, originStr, bulletBaseStr, bulletRunStartStr, bulletRunEndStr, aniStr, colliderStr);*/
         }
     }
 }

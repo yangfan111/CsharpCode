@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,9 @@ namespace com.wd.free.xml
 {
     public class XmlParser
     {
+        private static LoggerAdapter _logger = new LoggerAdapter(typeof(XmlParser));
+        public static string version = string.Empty;
+
         public static object FromXml(string xml, XmlAlias alias)
         {
             XmlDocument doc = new XmlDocument();
@@ -52,7 +56,21 @@ namespace com.wd.free.xml
                 
                 foreach (XmlNode child in node.ChildNodes)
                 {
-                    handleOneNode(alias, child, childObj, name);
+                    if (child.Name != "version")
+                    {
+                        handleOneNode(alias, child, childObj, name);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            version = child.FirstChild.Value;
+                        }
+                        catch
+                        {
+                            _logger.ErrorFormat("version failed !");
+                        }
+                    }
                 }
             }
 

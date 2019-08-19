@@ -55,6 +55,7 @@
     {
         GunSight,   //开镜
         HoldWeapon, //收枪
+        CharactorAction,
         Count
     }
 
@@ -114,7 +115,7 @@
         MagazineStop = 3047,
         FlashDizzyStop= 4006,
         WeaponC4Burn = 4015,
-        PikcupWeapon = 5011,
+        PickupWeapon = 5011,
         PickupWeaponPart = 5006,
         PicupMagazinePart = 5009,
         PickupSightPart = 5007,
@@ -135,8 +136,11 @@
         UseEngeryDrink = 5013,
         UseMedicalPackage = 5016, //医疗包
         UseAidPackage = 5056, //急救包
-        
-        
+        UI_battle_spray = 5057, //喷漆
+        C4_Alarm = 4016,
+
+
+
         Dive = 7,
         DiveIdle = 8,
         SwimIdle = 9,

@@ -138,6 +138,9 @@ namespace App.Client.Utility
             SendMessage("SendCampChatMessage", data);
         }
 
-     
+        public static void SendLoadingMessage(AsyncOperation operation)
+        {
+            SendMessage("SendLoadingMessage", operation);
+        }
     }
 }

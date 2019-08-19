@@ -5,7 +5,7 @@ using Core;
 using Core.Attack;
 
 using Core.Configuration;
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core.Free;
 using Core.GameModule.System;
 using Core.GameTime;
@@ -14,6 +14,7 @@ using Core.Network;
 using Core.OC;
 using Core.Playback;
 using Core.Prediction;
+using Core.Prediction.UserPrediction;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Prediction.VehiclePrediction;
 using Core.Prediction.VehiclePrediction.TimeSync;
@@ -30,6 +31,7 @@ using Entitas;
 using Entitas.CodeGeneration.Attributes;
 using UnityEngine;
 using Utils.AssetManager;
+using Utils.Replay;
 using VehicleCommon;
 
 namespace App.Shared.Components
@@ -70,7 +72,6 @@ namespace App.Shared.Components
    //     [System.Obsolete]
        // [DontInitilize]public PlayerStateCollectorPool PlayerStateCollectorPool { get; set; }
         [DontInitilize]public RoomInfo RoomInfo { get; set; }
-        [DontInitilize]public RuntimeGameConfig RuntimeGameConfig { get; set; }
         [DontInitilize]public IEntityIdGenerator EntityIdGenerator{ get; set; }
         [DontInitilize]public IEntityIdGenerator EquipmentEntityIdGenerator { get; set; }
         [DontInitilize]public IFreeArgs FreeArgs { get; set; }
@@ -113,51 +114,57 @@ namespace App.Shared.Components
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(ClientSessionObjectsComponent));
         [DontInitilize] public NetworkMessageDispatcher MessageDispatcher;
         [DontInitilize] public INetworkChannel NetworkChannel;
-        [DontInitilize] public IPlayerInfo PlayerInfo { get; set; } 
+        [DontInitilize] public IPlayerInfo PlayerInfo;
         [DontInitilize] public string LoginToken;
         
         
         [DontInitilize] public IUpdateLatestHandler UpdateLatestHandler;
-        [DontInitilize] public ISnapshotPool SnapshotPool;
-        [DontInitilize] public ISnapshotSelectorContainer SnapshotSelectorContainer;
+        [DontInitilize] public ISnapshotSelector SnapshotSelctor;
         [DontInitilize] public ITimeManager TimeManager;
         
         [DontInitilize] public IUserCmdGenerator UserCmdGenerator;
         [DontInitilize] public IPlaybackInfoProvider PlaybackInfoProvider;
         [DontInitilize] public IPlaybackManager PlaybackManager;
         
-        [DontInitilize] public IPredictionInitManager UserPredictionInitManager;
-        [DontInitilize] public IPredictionInitManager VehiclePredictionInitManager;
+        [DontInitilize] public PredictionManager UserPredictionManager;
+    //    [DontInitilize] public PredictionManager VehiclePredictionManager;
         [DontInitilize] public IVehicleCmdExecuteSystemHandler VehicleCmdExecuteSystemHandler;
-        [DontInitilize] public IUserPredictionInfoProvider UserPredictionInfoProvider;
-        [DontInitilize] public IPredictionRewindInfoProvider VehiclePredictionInfoProvider;
+        [DontInitilize] public AbstractPredictionProvider UserPredictionProvider;
+      //  [DontInitilize] public AbstractPredictionProvider VehiclePredictionProvider;
        
        
-        [DontInitilize] public ISyncLatestHandler SyncLatestHandler;
-        [DontInitilize] public ISyncLatestManager SyncLatestManager;
+     //   [DontInitilize] public SyncLatestProvider SyncLatestProvider;
+        [DontInitilize] public SyncLastestManager netSyncManager;
         [DontInitilize] public IClientSimulationTimer SimulationTimer;
         [DontInitilize] public VehicleTimer VehicleTimer;
 
        
         [DontInitilize] public ISoundPlayer SoundPlayer;
-        [DontInitilize] public int GameRule { get; set; }
+        [DontInitilize] public int GameRule;
         [DontInitilize] public IGlobalEffectManager GlobalEffectManager;
       
+
         //服务器状态
-        [DontInitilize] public FpsSatatus FpsSatatus { get; set; }
-        [DontInitilize] public ServerStatus ServerFpsSatatus { get; set; }
+        [DontInitilize] public FpsSatatus FpsSatatus;
+        [DontInitilize] public ServerStatus ServerFpsSatatus;
 
-        [DontInitilize] public IOcclusionCullingController OCController { get; set; }
-        [DontInitilize] public ITerrainRenderer TerrainRenderer { get; set; }
-
+        [DontInitilize] public IOcclusionCullingController OCController;
+        [DontInitilize] public ITerrainRenderer TerrainRenderer;
+        [DontInitilize] public IRecordManager Record;
+        [DontInitilize] public IReplayManager Replay;
+       
         public void Dispose()
         {
             if(NetworkChannel!=null)
                 NetworkChannel.Dispose();
-            if(SnapshotPool!=null)
-                SnapshotPool.Dispose();
+            if(SnapshotSelctor!=null)
+                SnapshotSelctor.Dispose();
             if(OCController != null)
                 OCController.Dispose();
+            if(Record!=null)
+                Record.Dispose();  
+            if(Replay!=null)
+                Replay.Dispose(); 
         }
     }
      [Session]
@@ -165,8 +172,7 @@ namespace App.Shared.Components
     [Serializable]
     public class ServerSessionObjectsComponent : IComponent,IDisposable
     {
-        [DontInitilize] public ISnapshotPool CompensationSnapshotPool;
-        [DontInitilize] public ISnapshotSelectorContainer CompensationSnapshotSelector;
+        [DontInitilize] public ISnapshotSelector SnapshotSelector;
 
         [DontInitilize] public IRoomEventDispatchter RoomEventDispatchter;
 
@@ -195,8 +201,8 @@ namespace App.Shared.Components
 
         public void Dispose()
         {
-            if(CompensationSnapshotPool!=null)
-            CompensationSnapshotPool.Dispose();
+            if(SnapshotSelector!=null)
+                SnapshotSelector.Dispose();
             if(Bin2dManager!=null)
                 Bin2dManager.Dispose();
             if(UpdateMessagePool!=null)

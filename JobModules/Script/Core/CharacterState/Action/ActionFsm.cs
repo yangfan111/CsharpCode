@@ -34,7 +34,9 @@ namespace Core.CharacterState.Action
             AddState(ActionState.CreateDrawState(), infoProvider, characterInfo);
             AddState(ActionState.CreateSwitchWeaponState(), infoProvider, characterInfo);
             AddState(ActionState.CreatePickUpState(), infoProvider, characterInfo);
-            AddState(ActionState.CreateMeleeAttackState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateMeleeAttackOneState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateMeleeAttackTwoState(), infoProvider, characterInfo);
+            AddState(ActionState.CreateMeleeAttackSpecialState(), infoProvider, characterInfo);
             AddState(ActionState.CreateGrenadeState(), infoProvider, characterInfo);
             AddState(ActionState.CreateOpenDoorState(), infoProvider, characterInfo);
             AddState(ActionState.CreatePropsState(), infoProvider, characterInfo);

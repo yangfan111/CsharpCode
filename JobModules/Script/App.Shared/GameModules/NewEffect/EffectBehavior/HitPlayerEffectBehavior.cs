@@ -1,3 +1,4 @@
+using Core.ObjectPool;
 using UnityEngine;
 
 namespace App.Shared
@@ -8,7 +9,11 @@ namespace App.Shared
         {
             emitter.nodeObject.transform.position = Position;
         }
-        
+        protected override void Free(ClientEffectEmitter emitter)
+        {
+            base.Free(emitter);
+            ObjectAllocatorHolder<HitPlayerEffectBehavior>.Free(this);
+        }
     }
 
 }

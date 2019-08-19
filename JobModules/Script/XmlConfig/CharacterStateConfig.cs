@@ -245,7 +245,8 @@ namespace XmlConfig
         public float HeadFollowRotateMaxV = 30;
         public float HeadFollowRotateMinV = -30;
         public float NeckRotVerticalIndex = 0.5f;
-        public float HeadRotReversalTime = 1.0f;
+        public float HeadRotSpeed = 0.3f;
+        public float NoHeadRotStartAngle = 135;
 
         public float HandFollowRotateMax = 30;
         public float HandFollowRotateMin = -30;

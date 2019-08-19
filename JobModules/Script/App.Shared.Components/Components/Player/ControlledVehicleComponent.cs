@@ -1,4 +1,5 @@
-﻿using Core.Components;
+﻿using Common;
+using Core.Components;
 using Core.EntityComponent;
 using Core.Playback;
 using Core.Prediction.UserPrediction;
@@ -118,6 +119,11 @@ namespace App.Shared.Components.Player
             return RideOffSignal != ForceRideOffVehicleSignal;
         }
 
+        public void ForceRideOff()
+        {
+            RideOffSignal = -1;
+        }
+
         public void RideOn(int role, EntityKey entityKey, Rigidbody rigidBody, int executeTime)
         {
             Role = role;
@@ -134,7 +140,7 @@ namespace App.Shared.Components.Player
             EntityKey = EntityKey.Default;
             ExecuteTime = executeTime;
             SetOnVehicle(false);
-            LastVehicleControllTime = Time.time;
+            LastVehicleControllTime = MyGameTime.time;
             ForceRideOffVehicleSignal++;
         }
 

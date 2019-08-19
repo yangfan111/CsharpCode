@@ -70,5 +70,10 @@ namespace App.Client.GameModules.Ui.UiAdapter.Common
                 return false;
             }
         }
+
+        public bool TagHideStatus
+        {
+            get { return _contexts.player.flagSelfEntity.gamePlay.TipHideStatus; }
+        }
     }
 }

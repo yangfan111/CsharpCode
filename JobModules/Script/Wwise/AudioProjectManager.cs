@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-public enum AudioBank_LoadMode
+public enum AudioBank_LoadStage
 {
-    Sync,
-    Async,
-    Prepare
+ Default,
 }
 
 public enum AudioBank_LoadAction
@@ -41,6 +39,9 @@ public interface IAudioProjectManager
     void GoBattle();
     void HallBack();
     void PlayAmbient();
+    void HallGoBattle();
+
+    AudioSourceType SourceType { get; set; }
 }
 
 public abstract class AudioProjectManager<T> where T : AudioProjectManager<T>, IAudioProjectManager
@@ -56,6 +57,11 @@ public abstract class AudioProjectManager<T> where T : AudioProjectManager<T>, I
     {
     }
 
+    public virtual void HallGoBattle()
+    {
+        
+    }
+
     public virtual void HallBack()
     {
     }
@@ -67,8 +73,6 @@ public abstract class AudioProjectManager<T> where T : AudioProjectManager<T>, I
     private HashSet<GameObject> ambWaitQueue = new HashSet<GameObject>();
     public AudioBattleListener battleListener { get; protected set; }
     public bool                prepareReady   { get; protected set; }
-
-    public AudioSourceType SourceType { get;}
 
     private HashSet<GameObject> ambToPlayList = new HashSet<GameObject>();
     public HashSet<GameObject> AmbToPlayList
@@ -115,4 +119,5 @@ public abstract class AudioProjectManager<T> where T : AudioProjectManager<T>, I
         spatialListener = listenerGo.AddComponent<AkSpatialAudioListener>();
         listener.SetIsDefaultListener(true);
     }
+
 }

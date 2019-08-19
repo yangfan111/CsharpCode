@@ -174,7 +174,7 @@ namespace Core.Attack
                 _bulletHitHandler.OnHit(cmdSeq, segment.BulletEntityAgent, camDirHit, world);
             }
         }
-
+        //profiler:热点 world.Raycast -- hitboxHandler.EnableHitBox --HitBoxTransformProvider.SetActive()
         private void InspectNewBulletHit(int cmdSeq, DefaultBulletSegment segment, CompensationWorld world)
         {
             RaycastHit camDirHit;
@@ -188,7 +188,7 @@ namespace Core.Attack
                 if (!checkGunDirObstacle)
                 {
                     checkGunDirObstacle = true;
-                    //如果击中物体，从枪口向击中位置做检测，如果有物体，则使用枪口方向的结果 
+                    //如果击中物体，从枪口向击中位置做射线检测，如果有物体，则使用枪口方向的结果 
                     Vector3 startPosition = segment.BulletEntityAgent.GunEmitPosition;
                     var     target        = camDirHit.point;
                     var     dir           = target - startPosition;

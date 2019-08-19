@@ -6,6 +6,9 @@ using System.Text;
 using com.wd.free.@event;
 using com.wd.free.trigger;
 using Core.Free;
+using App.Server.GameModules.GamePlay.free.player;
+using Core.EntityComponent;
+using com.wd.free.para;
 
 namespace App.Shared.FreeFramework.UnitTest
 {
@@ -20,6 +23,21 @@ namespace App.Shared.FreeFramework.UnitTest
         {
             if (values != null)
             {
+                SimpleParaList testParaList = new SimpleParaList();
+
+                FreeData fd = GetPlayer(args);
+                if (null != fd)
+                {
+                    PlayerEntity player = fd.Player;
+                    var entity = args.GameContext.mapObject.GetEntityWithEntityKey(new EntityKey(player.gamePlay.UseEntityId, (int)EEntityType.MapObject));
+                    if (null != entity && entity.hasDoorData) {
+                        testParaList.AddFields(new ObjectFields(entity.doorData));
+                    }
+                }
+
+                SimpleParable sp = new SimpleParable(testParaList);
+                args.TempUse("testPara", sp);
+
                 args.TempUse(UnitTestConstant.Tester, GetPlayer(args));
 
                 GameTrigger trigger = FreeLog.GetTrigger();
@@ -43,6 +61,7 @@ namespace App.Shared.FreeFramework.UnitTest
                     }
                 }
 
+                args.Resume("testPara");
                 args.Resume(UnitTestConstant.Tester);
             }
         }

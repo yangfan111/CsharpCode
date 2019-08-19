@@ -63,12 +63,12 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                         if (!infoMap.ContainsKey(playerEntity.playerInfo.PlayerId))
                         {
                             MiniMapTeamPlayInfo info = new MiniMapTeamPlayInfo(playerEntity.playerInfo.PlayerId, playerEntity.playerInfo.EntityId, true, 1,
-                                MapUtils.TeamColor(playerEntity.playerInfo.Num), MiniMapPlayStatue.NORMAL, new Vector2(500, 300), 45f,
+                                MapUtils.TeamColor(playerEntity.playerInfo.Num), MiniMapPlayStatue.NORMAL, new Vector3(500, 0, 300), 45f,
                                 new List<MiniMapPlayMarkInfo>()
                                 {
                                     new MiniMapPlayMarkInfo(new Vector3(500, 250), 1, Color.black),
                                 }, false, 0,
-                                playerEntity.playerInfo.PlayerName, (int)playerEntity.gamePlay.CurHp, playerEntity.gamePlay.MaxHp, (int)playerEntity.gamePlay.InHurtedHp, false, playerEntity.position.Value);
+                                playerEntity.playerInfo.PlayerName, (int)playerEntity.gamePlay.CurHp, playerEntity.gamePlay.MaxHp, (int)playerEntity.gamePlay.InHurtedHp, false, playerEntity.position.Value, playerEntity.gamePlay.HudView);
                             
                             infoMap[playerEntity.playerInfo.PlayerId] = info;
                         }
@@ -107,13 +107,15 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                         {
                             //飞机上（位置已做过偏移，这里不再偏移）
                             AirPlaneData planeData = data.PlaneData;
-                            oneInfo.Pos = new MapFixedVector2(planeData.Pos.WorldVector2());
+                            oneInfo.Pos = new MapFixedVector2(planeData.Pos.WorldVector3().To2D());
+                            oneInfo.Pos3D = new MapFixedVector3(planeData.Pos.WorldVector3());
                             oneInfo.FaceDirection = planeData.Direction;
                         }
                         else
                         {
 //                            oneInfo.Pos = new Vector2(playerEntity.position.Value.x - leftMinPos.x, playerEntity.position.Value.z - leftMinPos.z);
                             oneInfo.Pos = new MapFixedVector2(playerEntity.position.FixedVector3.To2D());
+                            oneInfo.Pos3D = new MapFixedVector3(playerEntity.position.FixedVector3);
                             oneInfo.FaceDirection = playerEntity.orientation.Yaw;
                         }
                         
@@ -181,6 +183,7 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                         oneInfo.IsMark = data.MapMarks.ContainsKey(oneInfo.PlayerId) ? true : false;
                         oneInfo.TopPos = PlayerEntityUtility.GetPlayerTopPosition(playerEntity);
                         oneInfo.EntityId = playerEntity.entityKey.Value.EntityId;
+                        oneInfo.IsShow = playerEntity.gamePlay.HudView;
                         data.TeamInfos.Add(oneInfo);
 
                     }
@@ -200,7 +203,7 @@ namespace App.Client.GameModules.GamePlay.Free.UI
             AirPlaneData planeData = SingletonManager.Get<FreeUiManager>().Contexts1.ui.map.PlaneData;
             if (planeData == null)
             {
-                planeData = new AirPlaneData(1, new MapFixedVector2(0, 0), 0);
+                planeData = new AirPlaneData(1, new MapFixedVector3(0,0, 0), 0);
                 SingletonManager.Get<FreeUiManager>().Contexts1.ui.map.PlaneData = planeData;
             }
 
@@ -214,7 +217,7 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                     planeData.Type = 1;
 //                        planeData.Pos = new Vector2(plane.model3D.x - leftMinPos.x, plane.model3D.z - leftMinPos.z);
                     var worldPos = WorldOrigin.WorldPosition(new Vector3(plane.model3D.x, plane.model3D.y, plane.model3D.z));
-                    planeData.Pos = new MapFixedVector2(worldPos.To2D());
+                    planeData.Pos = new MapFixedVector3(worldPos);
                     planeData.Direction = -plane.GetEffect(0).EffectModel3D.model3D.rotationY;
                 }
             }
@@ -223,14 +226,14 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                 planeData.Type = 2;
 //                    planeData.Pos = new Vector2(plane.model3D.x - leftMinPos.x, plane.model3D.z - leftMinPos.z);
                 var worldPos = WorldOrigin.WorldPosition(new Vector3(plane.model3D.x, plane.model3D.y, plane.model3D.z));
-                planeData.Pos = new MapFixedVector2(worldPos.To2D());
+                planeData.Pos = new MapFixedVector3(worldPos);
                 planeData.Direction = -plane.GetEffect(0).EffectModel3D.model3D.rotationY;
             }
 
             if (plane == null)
             {
                 planeData.Type = 0;
-                planeData.Pos = new MapFixedVector2(0, 0);
+                planeData.Pos = new MapFixedVector3(0, 0, 0);
                 planeData.Direction = 0;
             }
         }

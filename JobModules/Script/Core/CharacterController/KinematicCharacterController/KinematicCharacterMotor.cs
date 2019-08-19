@@ -1,12 +1,11 @@
 ﻿#define USE_SPHERE_CAST
 #undef USE_SPHERE_CAST
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using Core.CameraControl;
 using Core.Utils;
 using ECM.Components;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Utils.Compare;
 using Debug = UnityEngine.Debug;
@@ -14,7 +13,7 @@ using Debug = UnityEngine.Debug;
 namespace KinematicCharacterController
 {
 
-    
+
     public enum RigidbodyInteractionType
     {
         None,

@@ -20,7 +20,6 @@ namespace App.Shared.GameModules.Player.ResourceLoad
         {
             protected static LoggerAdapter Logger = new LoggerAdapter(typeof(ModelLoadHandler));
             public static readonly string ModeloffsetName = "ModelOffset";
-            public static readonly string EffectsName = "Effects";
             private Contexts _contexts;
 
             protected ModelLoadHandler(Contexts contexts)
@@ -72,11 +71,13 @@ namespace App.Shared.GameModules.Player.ResourceLoad
 
                     var characterBone = new CharacterBoneManager();
                     characterBone.SetWardrobeController(appearanceManager.GetWardrobeController());
-                    characterBone.SetWeaponController(appearanceManager.GetController<WeaponController>());
-                    var weaponController = (WeaponController)appearanceManager.GetController<WeaponController>();
+                    characterBone.SetWeaponController(appearanceManager.GetController<NewWeaponController>());
+                    var weaponController = (NewWeaponController)appearanceManager.GetController<NewWeaponController>();
                     if (null != weaponController)
                     {
-                        weaponController.SetWeaponChangedCallBack(characterBone.CurrentWeaponChanged);
+                        weaponController.SetWeaponChangedCallBack(characterBone.CurrentP1WeaponChanged, characterBone.CurrentP3WeaponChanged);
+                        weaponController.SetWeaponOrAttachmentDeleteCallBack(characterBone.WeaponOrAttachmentDel);
+                        weaponController.SetWeaponOrAttachementAddCallBack(characterBone.WeaponOrAttachmentAdd);
                         weaponController.SetCacheChangeAction(characterBone.CacheChangeCacheAction);
                     }
 

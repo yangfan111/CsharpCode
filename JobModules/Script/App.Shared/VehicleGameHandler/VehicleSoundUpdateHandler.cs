@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Vehicle;
+using Common;
 using Core.Configuration;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ namespace App.Shared.VehicleGameHandler
                 {
                     if (gameData.CurrentSoundId != (int) EVehicleSoundId.Invalid)
                     {
-                        gameData.SetMusicSyncTime(Time.time);
+                        gameData.SetMusicSyncTime(MyGameTime.time);
                     }
                 }
             }

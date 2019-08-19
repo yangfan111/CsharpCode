@@ -19,9 +19,13 @@ namespace App.Shared.GameModules.Attack
 {
     public class HitEnvironmentHandler:AbstractHitHandler
     {
+        private CustomProfileInfo subProfilerInfo; 
+
         public HitEnvironmentHandler(Contexts contexts) : base(contexts)
         {
             profilerInfo  = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("BulletHitHandler_OnHitEnvironment");
+            subProfilerInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("BulletSub1");
+
         }
         protected override bool Filter(HitBoxOwnerComponent boxOwnerComponent, int cmdSeq)
         {
@@ -43,17 +47,22 @@ namespace App.Shared.GameModules.Attack
                 BulletHitHandler._logger.InfoFormat("hit environment dead");
                 return;
             }
-
-            BulletHitHandler._logger.InfoFormat("[Hit{0}] OwnerEntityKey {1}, point {2},collider:{3}", cmdSeq,
-                bulletEntityAgent.OwnerEntityKey, hit.point, hit.collider.name);
+            subProfilerInfo.BeginProfileOnlyEnableProfile();
+            // BulletHitHandler._logger.InfoFormat("[Hit{0}] OwnerEntityKey {1}, point {2},collider:{3}", cmdSeq,
+            //     bulletEntityAgent.OwnerEntityKey, hit.point, hit.collider.name);
             ThicknessInfo thicknessInfo;
+            /*profiler：热点项 考虑材质检测方式调整
+              --GetColliderThickness
+              -- GetMaterialByHit
+              --GetEnvironmentTypeByMatName
+             */
             EnvironmentInfo info =
                             BulletEnvironmentUtil.GetEnvironmentInfoByHitBoxName(hit, bulletEntityAgent.Velocity,
                             out thicknessInfo);
             float damageDecayFactor = SingletonManager.Get<EnvironmentTypeConfigManager>().GetDamageDecayFactorByEnvironmentType(info.Type);
             float energyDecayFactor = SingletonManager.Get<EnvironmentTypeConfigManager>().GetEnergyDecayFactorByEnvironmentType(info.Type);
-            float oldThickNess      = bulletEntityAgent.PenetrableThickness;
-            float oldDamage         = bulletEntityAgent.BaseDamage;
+            // float oldThickNess      = bulletEntityAgent.PenetrableThickness;
+            // float oldDamage         = bulletEntityAgent.BaseDamage;
             bulletEntityAgent.BaseDamage *= damageDecayFactor;
             bulletEntityAgent.PenetrableThickness =
                             bulletEntityAgent.PenetrableThickness * energyDecayFactor - info.Thickness;
@@ -61,13 +70,14 @@ namespace App.Shared.GameModules.Attack
 
             if (bulletEntityAgent.PenetrableLayerCount <= 0 || bulletEntityAgent.PenetrableThickness <= 0)
             {
+                //profiler：editor下热点项 -- Entity.AddComponent
                 bulletEntityAgent.IsValid = false;
             }
-            else
+            else 
             {
                 bulletEntityAgent.AddPenetrateInfo(info.Type);
             }
-
+            subProfilerInfo.EndProfileOnlyEnableProfile();
             var collider          = hit.collider;
             var fracturedHittable = collider.GetComponent<FracturedHittable>();
             if (fracturedHittable != null)
@@ -104,6 +114,7 @@ namespace App.Shared.GameModules.Attack
             }
             else
             {
+                //profiler:热点项   -- EventInfos.Instance.Allocate(EEventType.HitEnvironment, false);
                 ClientEffectFactory.AdHitEnvironmentEffectEvent(srcPlayer, hit.point, hit.normal, info.Type,
                 (int) EAudioUniqueId.BulletHit);
 
@@ -114,10 +125,10 @@ namespace App.Shared.GameModules.Attack
                 }
             }
 
-            BulletHitHandler._logger.InfoFormat(
-            "bullet from {0} hit environment {1}, collier {2}, base damage {3}->{4}, penetrable thick {5}->{6}, env ({7}), remain layer {8}",
-            bulletEntityAgent.OwnerEntityKey, hit.point, hit.collider.name, oldDamage, bulletEntityAgent.BaseDamage,
-            oldThickNess, bulletEntityAgent.PenetrableThickness, info, bulletEntityAgent.PenetrableLayerCount);
+            // BulletHitHandler._logger.InfoFormat(
+            // "bullet from {0} hit environment {1}, collier {2}, base damage {3}->{4}, penetrable thick {5}->{6}, env ({7}), remain layer {8}",
+            // bulletEntityAgent.OwnerEntityKey, hit.point, hit.collider.name, oldDamage, bulletEntityAgent.BaseDamage,
+            // oldThickNess, bulletEntityAgent.PenetrableThickness, info, bulletEntityAgent.PenetrableLayerCount);
         }
       
     }

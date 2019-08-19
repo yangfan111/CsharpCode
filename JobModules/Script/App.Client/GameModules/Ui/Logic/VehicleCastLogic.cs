@@ -1,31 +1,28 @@
-﻿using App.Shared;
-using UserInputManager.Lib;
-using UnityEngine;
-using App.Client.CastObjectUtil;
-using Core.Prediction.UserPrediction.Cmd;
+﻿using App.Client.CastObjectUtil;
+using App.Shared;
+using App.Shared.GameModules.Player;
 using App.Shared.GameModules.Vehicle;
+using Core.EntityComponent;
+using Core.Enums;
+using Core.Prediction.UserPrediction.Cmd;
 using Core.Prediction.VehiclePrediction.Cmd;
 using Core.Utils;
-using Core.Enums;
-using App.Shared.GameModules.Player;
 using I2.Loc;
+using UnityEngine;
+using UserInputManager.Lib;
 
 namespace App.Client.GameModules.Ui.Logic
 {
     public class VehicleCastLogic : AbstractCastLogic
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(VehicleCastLogic));
+
         private VehicleContext _vehicleContext;
-        private PlayerContext _playerContext;
         private IUserCmdGenerator _userCmdGenerator;
         private int _seatId;
         private int _vehicleId;
 
-        public VehicleCastLogic(
-            VehicleContext vehicleContext,
-            PlayerContext playerContext,
-            IUserCmdGenerator cmdGenerator,
-            float maxDistance) : base(playerContext, maxDistance)
+        public VehicleCastLogic(VehicleContext vehicleContext, PlayerContext playerContext, IUserCmdGenerator cmdGenerator, float maxDistance) : base(playerContext, maxDistance)
         {
             _vehicleContext = vehicleContext;
             _playerContext = playerContext;
@@ -45,7 +42,7 @@ namespace App.Client.GameModules.Ui.Logic
         {
             _seatId = 0;
             _vehicleId = VehicleCastData.EntityId(data.IdList);
-            var vehicleEntity = _vehicleContext.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(_vehicleId, (short)EEntityType.Vehicle));
+            var vehicleEntity = _vehicleContext.GetEntityWithEntityKey(new EntityKey(_vehicleId, (short)EEntityType.Vehicle));
             if(null != vehicleEntity)
             {
                 if(vehicleEntity.hasPosition)
@@ -60,9 +57,9 @@ namespace App.Client.GameModules.Ui.Logic
                         }
                        if(!player.IsOnVehicle())
                         {
-                            if(!player.IsVehicleEnterable(vehicleEntity) || 
-                                !vehicleEntity.IsFocusable())
+                            if(!player.IsVehicleEnterable(vehicleEntity) || !vehicleEntity.IsFocusable())
                             {
+                                Logger.DebugFormat("Player is unable to enter the vehicle, or the vehicle is unfocusable.");
                                 return;
                             }
 
@@ -71,12 +68,12 @@ namespace App.Client.GameModules.Ui.Logic
                                 Tip = string.Format(ScriptLocalization.client_actiontip.pullupvehicle, vehicleEntity.vehicleAssetInfo.TipName);
                                 return;
                             }
-         
 
                             var hitPos = data.Position;
                             _seatId = vehicleEntity.FindPreferedSeat(hitPos);
                             if(_seatId == (int)VehicleSeatIndex.None)
                             {
+                                Logger.DebugFormat("No seats available.");
                                 return;
                             }
                             if (_seatId == (int)VehicleSeatIndex.Driver)

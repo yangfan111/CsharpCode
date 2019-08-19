@@ -141,9 +141,9 @@ namespace App.Client.GameModules.Ui.Models.Common
             return _viewModel.rootActive;
         }
 
-        public override void Destory()
+        public override void OnDestory()
         {
-            base.Destory();
+            base.OnDestory();
             if (_backwardAnime != null) _backwardAnime.Kill();
         }
     }

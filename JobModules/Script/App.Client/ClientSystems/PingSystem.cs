@@ -6,6 +6,7 @@ using App.Protobuf;
 using App.Shared;
 using App.Shared.Util;
 using Assets.App.Client.GameModules.Ui;
+using Common;
 using Core.GameModule.Interface;
 using Core.Network;
 using Core.Utils;
@@ -49,7 +50,7 @@ namespace App.Client.ClientSystems
 
         public void OnRender()
         {
-            var time = Time.time;
+            var time = MyGameTime.time;
             var delta = time - _last;
             _contexts.session.clientSessionObjects.FpsSatatus.Tick(time, delta);
             _last = time;
@@ -140,9 +141,9 @@ namespace App.Client.ClientSystems
 
         private void ReconnectCheck()
         {
-            float time = Time.time;
+            float time = MyGameTime.time;
 
-            if (ReconnectShow)
+            if (ReconnectShow && !SharedConfig.IsOffline)
             {
                 LastReconnectCheckTime = time;
                 var channel = _contexts.session.clientSessionObjects.NetworkChannel;
@@ -167,7 +168,8 @@ namespace App.Client.ClientSystems
 
                 if ((utTcp > NetWorkStatusCheckInterval ||
                     utUdp > NetWorkStatusCheckInterval ) &&
-                    !ReconnectShow) {
+                    !ReconnectShow &&
+                    !SharedConfig.IsOffline) {
                     UiCommon.AlertManager.AddDataToQueueAndShow(AlertWindowStyle.YES, "网络连接中断", /*Application.Quit*/YesCB, null, "确定", null,
                         0, null);
                     ReconnectShow = true;

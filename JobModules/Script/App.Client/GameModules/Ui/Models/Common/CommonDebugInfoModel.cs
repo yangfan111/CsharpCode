@@ -40,8 +40,8 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void InitKey()
         {
-            KeyReceiver = new KeyReceiver(Layer.System, BlockType.None);
-            KeyReceiver.AddAction(UserInputKey.ShowDebug, (data) => { _adapter.Enable = !_adapter.Enable; });
+            KeyReceiver = new KeyReceiver(EInputLayer.System, BlockType.None,"hdebug");
+            KeyReceiver.BindKeyAction(UserInputKey.ShowDebug, (data) => { _adapter.Enable = !_adapter.Enable; });
             _adapter.RegisterKeyReceive(KeyReceiver);
         }
 

@@ -29,6 +29,6 @@ namespace App.Shared.Components.Ui
 
         [DontInitilize] public Dictionary<UiGroup, List<IUiGroupController>> UiGroup;
         [DontInitilize] public List<UiGroup> HideGroup;
-        [DontInitilize] public List<IKeyReceiver> OpenUiKeyReceiverList;
+        [DontInitilize] public List<KeyHandler> OpenUKeyhandlerList;
     }
 }

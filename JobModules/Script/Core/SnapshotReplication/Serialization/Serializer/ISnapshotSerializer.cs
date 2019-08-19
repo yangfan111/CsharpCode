@@ -14,7 +14,7 @@ namespace Core.SnapshotReplication.Serialization.Serializer
         /// <param name="snap">要发送的Snapshot</param>
         /// <param name="stream"></param>
         /// <returns></returns>
-        void Serialize(ISnapshot baseSnap, ISnapshot snap, Stream stream);
+        int Serialize(ISnapshot baseSnap, ISnapshot snap, Stream stream);
 
         SnapshotPatch DeSerialize(BinaryReader readert, out SnapshotHeader header);
 

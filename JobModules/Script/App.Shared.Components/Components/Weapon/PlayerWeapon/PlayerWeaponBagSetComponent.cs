@@ -1,14 +1,12 @@
-using System.Collections.Generic;
 using Core;
 using Core.Components;
 using Core.Prediction.UserPrediction;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
 using Core.SyncLatest;
-using Core.Utils;
-using Entitas.CodeGeneration.Attributes;
 
 namespace App.Shared.Components.Weapon
 {
+
      /// <summary>
     /// 武器背包集合
     /// </summary>
@@ -16,7 +14,6 @@ namespace App.Shared.Components.Weapon
     public class PlayerWeaponBagSetComponent : ISelfLatestComponent
     {
         [NetworkProperty] public WeaponBagContainer WeaponBag;
-        [NetworkProperty, DontInitilize] public byte HeldBagPointer;
 
 
 
@@ -88,27 +85,7 @@ namespace App.Shared.Components.Weapon
             CopyFrom(rightComponent as PlayerWeaponBagSetComponent);
         }
 
-        public void ClearPointer()
-        {
-            HeldBagPointer = 0;
-            WeaponBag.ClearPointer();
-        }
-
-
-        #region//shotcut
-
-        public int HeldSlotIndex
-        {
-            get { return WeaponBag.HeldSlotPointer; }
-        }
-
-        public int LastSlotIndex
-        {
-            get { return WeaponBag.LastSlotPointer; }
-        }
-
-
-        #endregion
+     
     }
 
 }

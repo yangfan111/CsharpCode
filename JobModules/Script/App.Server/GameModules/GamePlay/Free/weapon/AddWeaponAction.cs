@@ -10,6 +10,8 @@ using com.wd.free.util;
 using Core;
 using Core.Utils;
 using System;
+using Assets.App.Server.GameModules.GamePlay.Free;
+using Free.framework;
 using Utils.Singleton;
 
 namespace App.Server.GameModules.GamePlay.Free.weapon
@@ -67,22 +69,12 @@ namespace App.Server.GameModules.GamePlay.Free.weapon
                         p.WeaponController().TryArmWeaponImmediately(st);
                     }
                 }
-
-                /*SimpleProto message = new SimpleProto();
-                message.Ins.Add(itemId);
-                if (index > 0)
-                {
-                    message.Ins.Add((int)st);
-                }
-                else
-                {
-                    message.Ins.Add(-1);
-                }
-
+                SimpleProto message = new SimpleProto();
+                message.Key = FreeMessageConstant.PlaySound;
                 message.Ks.Add(2);
-                message.Key = FreeMessageConstant.ChangeAvatar;
-                FreeMessageSender.SendMessage(p, message);*/
-                //p.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.FreeData, message);
+                message.Ins.Add((int)EAudioUniqueId.PickupWeapon);
+                message.Bs.Add(true);
+                FreeMessageSender.SendMessage(p, message);
             }
         }
 

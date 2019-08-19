@@ -14,6 +14,7 @@ namespace Core.UpdateLatest
         List<UpdateLatestPacakge> GetPackagesLargeThan(int seq);
         int LatestMessageSeq { get; }
         bool ContainsKey(int baseUserCmdSeq);
+        void ClearOldMessage(int headBaseUserCmdSeq);
     }
 
     public class UpdateMessagePool : IUpdateMessagePool
@@ -57,6 +58,7 @@ namespace Core.UpdateLatest
             return ret;
         }
         private List<UpdateLatestPacakge> _tempList = new List<UpdateLatestPacakge>();
+     
         public List<UpdateLatestPacakge>  GetPackagesLargeThan(int seq)
         {
             _tempList.Clear();
@@ -85,6 +87,25 @@ namespace Core.UpdateLatest
         public bool ContainsKey(int baseUserCmdSeq)
         {
             return dict.ContainsKey(baseUserCmdSeq);
+        }
+
+        public void ClearOldMessage(int headBaseUserCmdSeq)
+        {
+            int count = 0;
+            foreach (var updateLatestPacakge in _list)
+            {
+                if (updateLatestPacakge.Head.UserCmdSeq < headBaseUserCmdSeq)
+                {
+                    updateLatestPacakge.ReleaseReference();
+                    count++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            _list.RemoveRange(0, count);
+            
         }
 
         public void Dispose()

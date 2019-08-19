@@ -14,13 +14,15 @@ namespace App.Shared.Network
             _serialize = new ProtoBufSerializeInfo<TriggerObjectEventMessage>(TriggerObjectEventMessage.Parser);
         }
 
-        public void Serialize(Stream outStream, object message)
+        public int Serialize(Stream outStream, object message)
         {
+         
             var syncEvent = (TriggerObjectSyncEvent)message;
             var msg = TriggerObjectEventMessage.Allocate();
             TriggerObjectEventMessageConverter.ToProtoBuf(msg, syncEvent);
-            _serialize.Serialize(outStream, msg);
+            var ret =_serialize.Serialize(outStream, msg);
             msg.ReleaseReference();
+            return ret;
         }
 
         public object Deserialize(Stream inStream)

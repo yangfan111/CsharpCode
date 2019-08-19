@@ -73,6 +73,7 @@ namespace Core.Utils
         {
             var writer = ObjectAllocatorHolder<MyBinaryWriter>.Allocate();
             writer.OutStream = stream;
+            writer.WriterLenght = 0;
             return writer;
         }
 
@@ -176,11 +177,14 @@ namespace Core.Utils
             get { return OutStream.Position; }
         }
 
+        public int WriterLenght { get;private set; }
+
         // Writes a boolean to this stream. A single byte is written to the stream
         // with the value 0 representing false or the value 1 representing true.
         // 
         public virtual void Write(bool value)
         {
+            WriterLenght += 1;
             _buffer[0] = (byte)(value ? 1 : 0);
             OutStream.Write(_buffer, 0, 1);
         }
@@ -190,6 +194,7 @@ namespace Core.Utils
         // 
         public virtual void Write(byte value)
         {
+            WriterLenght += 1;
             OutStream.WriteByte(value);
         }
 
@@ -199,6 +204,7 @@ namespace Core.Utils
         
         public virtual void Write(sbyte value)
         {
+            WriterLenght += 1;
             OutStream.WriteByte((byte)value);
         }
 
@@ -212,6 +218,7 @@ namespace Core.Utils
             if (buffer == null)
                 throw new ArgumentNullException("buffer");
             OutStream.Write(buffer, 0, buffer.Length);
+            WriterLenght += buffer.Length;
         }
 
         // Writes a section of a byte array to this stream.
@@ -222,6 +229,7 @@ namespace Core.Utils
         public virtual void Write(byte[] buffer, int index, int count)
         {
             OutStream.Write(buffer, index, count);
+            WriterLenght += count;
         }
 
 
@@ -241,6 +249,7 @@ namespace Core.Utils
                 numBytes = _encoder.GetBytes(&ch, 1, pBytes, _buffer.Length, true);
             }
             OutStream.Write(_buffer, 0, numBytes);
+            WriterLenght += numBytes;
         }
 
         // Writes a character array to this stream.
@@ -255,6 +264,7 @@ namespace Core.Utils
 
             byte[] bytes = _encoding.GetBytes(chars, 0, chars.Length);
             OutStream.Write(bytes, 0, bytes.Length);
+            WriterLenght += bytes.Length;
         }
 
         // Writes a section of a character array to this stream.
@@ -266,6 +276,7 @@ namespace Core.Utils
         {
             byte[] bytes = _encoding.GetBytes(chars, index, count);
             OutStream.Write(bytes, 0, bytes.Length);
+            WriterLenght += count;
         }
 
 
@@ -289,6 +300,7 @@ namespace Core.Utils
             _buffer[7] = (byte)(TmpValue >> 56);
             OutStream.Write(_buffer, 0, 8);
 #endif
+            WriterLenght += 8;
         }
 
         public virtual void Write(decimal value)
@@ -304,6 +316,7 @@ namespace Core.Utils
             _buffer[0] = (byte)value;
             _buffer[1] = (byte)(value >> 8);
             OutStream.Write(_buffer, 0, 2);
+            WriterLenght += 2;
         }
 
         // Writes a two-byte unsigned integer to this stream. The current position
@@ -314,6 +327,7 @@ namespace Core.Utils
             _buffer[0] = (byte)value;
             _buffer[1] = (byte)(value >> 8);
             OutStream.Write(_buffer, 0, 2);
+            WriterLenght += 2;
         }
 
         // Writes a four-byte signed integer to this stream. The current position
@@ -326,6 +340,7 @@ namespace Core.Utils
             _buffer[2] = (byte)(value >> 16);
             _buffer[3] = (byte)(value >> 24);
             OutStream.Write(_buffer, 0, 4);
+            WriterLenght += 4;
         }
 
         // Writes a four-byte unsigned integer to this stream. The current position
@@ -338,6 +353,7 @@ namespace Core.Utils
             _buffer[2] = (byte)(value >> 16);
             _buffer[3] = (byte)(value >> 24);
             OutStream.Write(_buffer, 0, 4);
+            WriterLenght += 4;
         }
 
         // Writes an eight-byte signed integer to this stream. The current position
@@ -354,6 +370,7 @@ namespace Core.Utils
             _buffer[6] = (byte)(value >> 48);
             _buffer[7] = (byte)(value >> 56);
             OutStream.Write(_buffer, 0, 8);
+            WriterLenght += 8;
         }
 
         // Writes an eight-byte unsigned integer to this stream. The current 
@@ -370,6 +387,7 @@ namespace Core.Utils
             _buffer[6] = (byte)(value >> 48);
             _buffer[7] = (byte)(value >> 56);
             OutStream.Write(_buffer, 0, 8);
+            WriterLenght += 8;
         }
 
         // Writes a float to this stream. The current position of the stream is
@@ -388,6 +406,7 @@ namespace Core.Utils
             _buffer[3] = (byte)(TmpValue >> 24);
             OutStream.Write(_buffer, 0, 4);
 #endif
+            WriterLenght += 4;
         }
 
 
@@ -416,6 +435,7 @@ namespace Core.Utils
                 //Contract.Assert(len == _encoding.GetBytes(chars, 0, chars.Length, _largeByteBuffer, 0), "encoding's GetByteCount & GetBytes gave different answers!  encoding type: "+_encoding.GetType().Name);
                 _encoding.GetBytes(value, 0, value.Length, _largeByteBuffer, 0);
                 OutStream.Write(_largeByteBuffer, 0, len);
+                WriterLenght += len;
             }
             else
             {
@@ -454,6 +474,7 @@ namespace Core.Utils
                     Contract.Assert (totalBytes <= len && byteLen <= _largeByteBuffer.Length, "Core.Utils.MyBinaryWriter::Write(String) - More bytes encoded than expected!");
 #endif
                     OutStream.Write(_largeByteBuffer, 0, byteLen);
+                    WriterLenght += byteLen;
                     charStart += charCount;
                     numLeft -= charCount;
                 }
@@ -488,7 +509,7 @@ namespace Core.Utils
             int bytes = (bitArray.Length - 1) / 8 + 1;
             bitArray.CopyTo(_buffer,0);
             OutStream.Write(_buffer, 0, bytes);
-            
+            WriterLenght += bytes;
         }
     }
 }

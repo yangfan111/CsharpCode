@@ -2,7 +2,6 @@
 using App.Shared;
 using App.Shared.GameMode;
 using Core;
-using Core.Configuration;
 using Core.EntityComponent;
 using Core.Prediction.UserPrediction.Cmd;
 
@@ -39,19 +38,13 @@ namespace App.Client.GameMode
             });
         }
 
-        /*protected override void DoDropGrenade(PlayerEntity playerEntity,EWeaponSlotType slot, IUserCmd cmd)
+        protected override void DoDropGrenade(PlayerEntity playerEntity, EWeaponSlotType slot, IUserCmd cmd)
         {
-            if (null != _userCmdGenerator)
-            {
-                _userCmdGenerator.SetUserCmd((userCmd) =>
-                {
-                    userCmd.IsLeftAttack = true;
-                });
-                playerEntity.WeaponController().AutoThrowing = true;
-            }
-        }*/
+            _userCmdGenerator.SetUserCmd((userCmd) => userCmd.IsLeftAttack = true);
+            playerEntity.WeaponController().AutoThrowing = true;
+        }
 
-        public override void SendAutoPickupWeapon(int entityId)
+        /*public override void SendAutoPickupWeapon(int entityId)
         {
             var target = _contexts.sceneObject.GetEntityWithEntityKey(new EntityKey(entityId, (short)EEntityType.SceneObject));
             var model = target.hasUnityObject ? target.unityObject.UnityObject : target.multiUnityObject.FirstAsset;
@@ -63,6 +56,6 @@ namespace App.Client.GameMode
                         cmd.AutoPickUpEquip.Add(entityId);
                 });
             }
-        }
+        }*/
     }
 }

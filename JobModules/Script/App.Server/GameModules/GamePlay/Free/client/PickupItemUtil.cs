@@ -1,9 +1,12 @@
 ﻿using App.Server.GameModules.GamePlay.free.player;
+using App.Server.GameModules.GamePlay.Free.chicken;
+using App.Server.GameModules.GamePlay.Free.entity;
 using App.Server.GameModules.GamePlay.Free.item;
 using App.Server.GameModules.GamePlay.Free.item.config;
 using App.Server.GameModules.GamePlay.Free.player;
 using App.Server.GameModules.GamePlay.Free.weapon;
 using App.Shared;
+using App.Shared.GameModules.GamePlay.Free;
 using App.Shared.GameModules.GamePlay.Free.Map;
 using App.Shared.GameModules.Player;
 using Assets.App.Server.GameModules.GamePlay.Free;
@@ -13,6 +16,7 @@ using com.cpkf.yyjd.tools.util;
 using com.cpkf.yyjd.tools.util.math;
 using com.wd.free.item;
 using com.wd.free.para;
+using Core.EntityComponent;
 using Core.EntityComponent;
 using Core.Free;
 using Free.framework;
@@ -31,20 +35,6 @@ namespace App.Server.GameModules.GamePlay.Free.client
     /// </summary>
     public class PickupItemUtil
     {
-        private const string BagWeapon1 = "w1";
-
-        private const string BagWeapon2 = "w2";
-
-        private const string BagWeapon3 = "w3";
-
-        private const string BagWeapon4 = "w4";
-
-        private const string BagWeapon5 = "w5";
-
-        private const string BagDefault = "default";
-
-        private const string BagGround = "ground";
-
         private static MyDictionary<string, string> typeInvDic;
 
         static PickupItemUtil()
@@ -52,19 +42,19 @@ namespace App.Server.GameModules.GamePlay.Free.client
             typeInvDic = new MyDictionary<string, string>();
             for (int i = 1; i <= 5; i++)
             {
-                typeInvDic["p" + i] = "w1" + i;
+                typeInvDic["p" + i] = ChickenConstant.BagPrimeWeapon + i;
             }
-            typeInvDic["w2"] = "w3";
+            typeInvDic[ChickenConstant.ItemCatPistolWeapon] = ChickenConstant.BagPistolWeapon;
         }
 
         public static bool IsDefault(string key)
         {
-            return !string.IsNullOrEmpty(key) && key.StartsWith(BagDefault);
+            return !string.IsNullOrEmpty(key) && key.StartsWith(ChickenConstant.BagDefault);
         }
 
         public static bool IsGround(string key)
         {
-            return !string.IsNullOrEmpty(key) && key.StartsWith(BagGround);
+            return !string.IsNullOrEmpty(key) && key.StartsWith(ChickenConstant.BagGround);
         }
 
         public static bool isWeapon(string key)
@@ -127,7 +117,7 @@ namespace App.Server.GameModules.GamePlay.Free.client
         public static void ShowSplitUI(ServerRoom room, FreeData fd, string key)
         {
             // 分拆道具
-            if (key.StartsWith("default"))
+            if (key.StartsWith(ChickenConstant.BagDefault))
             {
                 ItemPosition ip = FreeItemManager.GetItemPosition(room.FreeArgs, key, fd.GetFreeInventory().GetInventoryManager());
                 FreeItemInfo info = FreeItemConfig.GetItemInfo(ip.key.GetKey());
@@ -166,7 +156,7 @@ namespace App.Server.GameModules.GamePlay.Free.client
             }
         }
 
-        public static void AddItemToPlayer(ServerRoom room, PlayerEntity player, int entityId, int cat, int id, int count, string toInv = "")
+        public static bool AddItemToPlayer(ServerRoom room, PlayerEntity player, int entityId, int cat, int id, int count, string toInv = "")
         {
             SceneObjectEntity entity = room.RoomContexts.sceneObject.GetEntityWithEntityKey(new EntityKey(entityId, (short)EEntityType.SceneObject));
             FreeMoveEntity freeMoveEntity = null;
@@ -175,40 +165,40 @@ namespace App.Server.GameModules.GamePlay.Free.client
                 freeMoveEntity = room.RoomContexts.freeMove.GetEntityWithEntityKey(new EntityKey(entityId, (short)EEntityType.FreeMove));
                 if (freeMoveEntity == null)
                 {
-                    return;
+                    return false;
                 }
             }
 
             FreeData fd = (FreeData) player.freeData.FreeData;
             room.FreeArgs.TempUse("current", fd);
 
-            if (!FreeItemConfig.Contains(cat, id)) return;
+            if (!FreeItemConfig.Contains(cat, id)) return false;
 
             FreeItemInfo item = FreeItemConfig.GetItemInfo(cat, id);
             CreateItemToPlayerAction action = new CreateItemToPlayerAction();
 
-            action.name = "default";
+            action.name = ChickenConstant.BagDefault;
             switch (item.cat)
             {
                 case (int)ECategory.Weapon:
-                    if (item.subType == "w1")
+                    if (item.subType == ChickenConstant.ItemCatPrimeWeapon)
                     {
-                        action.name = "w1";
+                        action.name = ChickenConstant.BagPrimeWeapon;
 
-                        int c1 = fd.freeInventory.GetInventoryManager().GetInventory("w1").posList.Count;
-                        int c2 = fd.freeInventory.GetInventoryManager().GetInventory("w2").posList.Count;
+                        int c1 = fd.freeInventory.GetInventoryManager().GetInventory(ChickenConstant.BagPrimeWeapon).posList.Count;
+                        int c2 = fd.freeInventory.GetInventoryManager().GetInventory(ChickenConstant.BagSecondaryWeapon).posList.Count;
 
-                        if (toInv.StartsWith("w1"))
+                        if (toInv.StartsWith(ChickenConstant.BagPrimeWeapon))
                         {
-                            action.name = "w1";
+                            action.name = ChickenConstant.BagPrimeWeapon;
                             if (c1 > 0)
                             {
                                 DropItem(action.name, fd, room);
                             }
                         }
-                        else if (toInv.StartsWith("w2"))
+                        else if (toInv.StartsWith(ChickenConstant.BagSecondaryWeapon))
                         {
-                            action.name = "w2";
+                            action.name = ChickenConstant.BagSecondaryWeapon;
                             if (c2 > 0)
                             {
                                 DropItem(action.name, fd, room);
@@ -218,7 +208,7 @@ namespace App.Server.GameModules.GamePlay.Free.client
                         {
                             if (c1 > 0 && c2 == 0)
                             {
-                                action.name = "w2";
+                                action.name = ChickenConstant.BagSecondaryWeapon;
                             }
 
                             if (c1 > 0 && c2 > 0)
@@ -234,36 +224,36 @@ namespace App.Server.GameModules.GamePlay.Free.client
                                 }
                                 else
                                 {
-                                    action.name = "w1";
+                                    action.name = ChickenConstant.BagPrimeWeapon;
                                 }
 
                                 DropItem(action.name, fd, room);
                             }
                         }
                     }
-                    else if (item.subType == "w2")
+                    else if (item.subType == ChickenConstant.ItemCatPistolWeapon)
                     {
-                        action.name = "w3";
+                        action.name = ChickenConstant.BagPistolWeapon;
                         DropItem(action.name, fd, room);
                     }
-                    else if (item.subType == "w3")
+                    else if (item.subType == ChickenConstant.ItemCatMeleeWeapon)
                     {
-                        action.name = "w4";
+                        action.name = ChickenConstant.BagMeleeWeapon;
                         DropItem(action.name, fd, room);
                     }
-                    else if (item.subType == "w4")
+                    else if (item.subType == ChickenConstant.ItemCatGrenadeWeapon)
                     {
-                        action.name = "default";
+                        action.name = ChickenConstant.BagDefault;
                     }
-                    else if(item.subType == "w6")
+                    else if(item.subType == ChickenConstant.ItemCatArmor)
                     {
-                        action.name = "armor";
+                        action.name = ChickenConstant.BagArmor;
                         if (entity != null) count = entity.armorDurability.CurDurability;
                         DropItem(action.name, fd, room);
                     }
-                    else if(item.subType == "w7")
+                    else if(item.subType == ChickenConstant.ItemCatHelmet)
                     {
-                        action.name = "hel";
+                        action.name = ChickenConstant.BagHelmet;
                         if (entity != null) count = entity.armorDurability.CurDurability;
                         DropItem(action.name, fd, room);
                     }
@@ -281,11 +271,11 @@ namespace App.Server.GameModules.GamePlay.Free.client
             action.key = FreeItemConfig.GetItemKey(item.cat, item.id);
 
             int canCount = 0;
-            if (action.name == "default")
+            if (action.name == ChickenConstant.BagDefault)
             {
                 canCount = BagCapacityUtil.CanAddToBagCount(room.FreeArgs, fd, item.cat, item.id, count);
             }
-            else if (item.type == "avatar" || action.name == "hel" || action.name == "armor")
+            else if (item.type == ChickenConstant.ItemCatAvatar || action.name == ChickenConstant.BagHelmet || action.name == ChickenConstant.BagArmor)
             {
                 canCount = count;
             }
@@ -294,10 +284,11 @@ namespace App.Server.GameModules.GamePlay.Free.client
                 canCount = 1;
             }
 
+            bool pickupSuccess = false;
             if (canCount > 0 && !string.IsNullOrEmpty(action.name))
             {
                 PlayerAnimationAction.DoAnimation(room.RoomContexts, PlayerAnimationAction.Interrupt, fd.Player, true);
-                PlayerAnimationAction.DoAnimation(room.RoomContexts, 101, fd.Player, true);
+                PlayerAnimationAction.DoAnimation(room.RoomContexts, PlayerAnimationAction.PickUp, fd.Player, true);
                 PlayerStateUtil.AddPlayerState(EPlayerGameState.InterruptItem, fd.Player.gamePlay);
 
                 if (!string.IsNullOrEmpty(action.key))
@@ -317,6 +308,7 @@ namespace App.Server.GameModules.GamePlay.Free.client
                         room.FreeArgs.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleObjectEntity((ECategory)item.cat,
                             item.id, count - canCount, entity == null ? freeMoveEntity.position.Value : entity.position.Value);
                     }
+                    pickupSuccess = true;
                 }
                 else
                 {
@@ -324,23 +316,37 @@ namespace App.Server.GameModules.GamePlay.Free.client
                 }
 
                 if (entity != null) entity.isFlagDestroy = true;
-                if (freeMoveEntity != null) freeMoveEntity.isFlagDestroy = true;
+                if (freeMoveEntity != null)
+                {
+                    freeMoveEntity.isFlagDestroy = true;
+                    if (freeMoveEntity.freeData.Cat == FreeEntityConstant.DeadBox)
+                    {
+                        var deadBox = room.FreeArgs.GameContext.freeMove.GetEntityWithEntityKey(new EntityKey(freeMoveEntity.freeData.IntValue, (short) EEntityType.FreeMove));
+                        if (deadBox != null && deadBox.freeData.EmptyDelete)
+                        {
+                            if (deadBox.freeData.IntValue > 1) deadBox.freeData.IntValue--;
+                            else deadBox.isFlagDestroy = true;
+                        }
+                    }
+                }
             }
             room.FreeArgs.Resume("current");
+
+            return pickupSuccess;
         }
 
         public static string AutoPutPart(FreeData fd, FreeItemInfo partInfo, string toInv = "", ServerRoom room = null)
         {
             string inv = null;
-            if (toInv.StartsWith("w1"))
+            if (toInv.StartsWith(ChickenConstant.BagPrimeWeapon))
             {
                 inv = putOnPart(fd, 1, partInfo, toInv, room);
             }
-            else if (toInv.StartsWith("w2"))
+            else if (toInv.StartsWith(ChickenConstant.BagSecondaryWeapon))
             {
                 inv = putOnPart(fd, 2, partInfo, toInv, room);
             }
-            else if (toInv.StartsWith("w3"))
+            else if (toInv.StartsWith(ChickenConstant.BagPistolWeapon))
             {
                 inv = putOnPart(fd, 3, partInfo, toInv, room);
             }
@@ -356,7 +362,7 @@ namespace App.Server.GameModules.GamePlay.Free.client
                     }
                 }
             }
-            return inv == null ? "default" : inv;
+            return inv == null ? ChickenConstant.BagDefault : inv;
         }
 
         private static string putOnPart(FreeData fd, int weaponType, FreeItemInfo info, string toInv = "", ServerRoom room = null)
@@ -440,7 +446,7 @@ namespace App.Server.GameModules.GamePlay.Free.client
             {
                 if (item.subType == type)
                 {
-                    action.name = "default";
+                    action.name = ChickenConstant.BagDefault;
                 }
             }
         }
@@ -471,8 +477,9 @@ namespace App.Server.GameModules.GamePlay.Free.client
 
                 if (info.cat > 0)
                 {
-                    room.RoomContexts.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleObjectEntity((ECategory)info.cat, 
-                        info.id, ip.GetCount(), fd.Player.position.Value, ip.GetCount());
+                    /*room.RoomContexts.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleObjectEntity((ECategory)info.cat, 
+                        info.id, ip.GetCount(), fd.Player.position.Value, ip.GetCount());*/
+                    CreateSceneObjectAction.CreateDropItem(fd.Player, info.cat, info.id, ip.GetCount(), room.RoomContexts.session.entityFactoryObject.SceneObjectEntityFactory);
                 }
             }
         }

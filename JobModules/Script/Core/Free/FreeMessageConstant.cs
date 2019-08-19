@@ -84,13 +84,17 @@ namespace Core.Free
         public const int PlayerMiniMapSupplyMark = 124;
         public const int CommonPlayerInfoUI = 125;
         public const int PlayerRageStart = 126;
-
+        public const int PlayerObserveTrigger = 127;
+        public const int DeadUiSwitch = 128;
         public const int CommonTipUI = 130;
         public const int ClearCommonTipUI = 131;
         public const int ChickenTip = 132;
 
         public const int ThirdPerson = 133;
         public const int CommonPickUpModel = 134;
+        public const int TestPosition = 135;
+        public const int Witness = 136;
+        public const int OpenSpecifyUI = 137;
 
         private static Dictionary<int, string> MessageDesc = new Dictionary<int, string>();
 

@@ -11,7 +11,6 @@ namespace Core.Animation
     {
         public const float NotInTransition = -1;
 
-        private BitArrayWrapper _bitArray;
         public const int LadderLayer = 1;
         public const int PlayerSyncLayer = 2;
         public const int PlayerUpperBodyOverlayLayer = 5;
@@ -21,11 +20,14 @@ namespace Core.Animation
 
         public int LayerIndex;
         public float Weight;
-        public int CurrentStateHash;
-        public float NormalizedTime;
-        public float StateDuration;
+        public int CurrentStateFullPathHash;
+        public float CurrentStateNormalizedTime;
+        public int TransitionFullPathHash;
+        public byte TransitionIndex;
+        public float TransitionStartTime;
+        public float NextStateNormalizedTime;
         public float TransitionNormalizedTime;
-        public float TransitionDuration;
+        public float StateDuration;
 
         public NetworkAnimatorLayer()
         {
@@ -47,11 +49,14 @@ namespace Core.Animation
         {
             SetCurrentStateInfo(right.LayerIndex,
                 right.Weight,
-                right.CurrentStateHash,
-                right.NormalizedTime,
-                right.StateDuration,
+                right.CurrentStateFullPathHash,
+                right.CurrentStateNormalizedTime,
+                right.TransitionFullPathHash,
+                right.TransitionIndex,
+                right.TransitionStartTime,
+                right.NextStateNormalizedTime,
                 right.TransitionNormalizedTime,
-                right.TransitionDuration);
+                right.StateDuration);
         }
 
         public void CopyFrom(NetworkAnimatorLayer right)
@@ -69,11 +74,14 @@ namespace Core.Animation
             if (right == null) return false;
             return CompareUtility.IsApproximatelyEqual(LayerIndex, right.LayerIndex)
                    && CompareUtility.IsApproximatelyEqual(Weight, right.Weight)
-                   && CompareUtility.IsApproximatelyEqual(CurrentStateHash, right.CurrentStateHash)
-                   && CompareUtility.IsApproximatelyEqual(NormalizedTime, right.NormalizedTime)
-                   && CompareUtility.IsApproximatelyEqual(StateDuration, right.StateDuration)
+                   && CompareUtility.IsApproximatelyEqual(CurrentStateFullPathHash, right.CurrentStateFullPathHash)
+                   && CompareUtility.IsApproximatelyEqual(CurrentStateNormalizedTime, right.CurrentStateNormalizedTime)
+                   && CompareUtility.IsApproximatelyEqual(TransitionFullPathHash, right.TransitionFullPathHash)
+                   && CompareUtility.IsApproximatelyEqual(TransitionIndex, right.TransitionIndex)
+                   && CompareUtility.IsApproximatelyEqual(TransitionStartTime, right.TransitionStartTime)
+                   && CompareUtility.IsApproximatelyEqual(NextStateNormalizedTime, right.NextStateNormalizedTime)
                    && CompareUtility.IsApproximatelyEqual(TransitionNormalizedTime, right.TransitionNormalizedTime)
-                   && CompareUtility.IsApproximatelyEqual(TransitionDuration, right.TransitionDuration);
+                   && CompareUtility.IsApproximatelyEqual(StateDuration, right.StateDuration);
         }
 
         #region Serialization
@@ -85,108 +93,60 @@ namespace Core.Animation
             return rc;
         }
 
-
-        public void Read(BinaryReader reader)
-        {
-            if (_bitArray != null) _bitArray.ReleaseReference();
-            _bitArray = reader.ReadBitArray();
-            LayerIndex = _bitArray[0] ? reader.ReadInt32() : LayerIndex;
-            Weight = _bitArray[1] ? reader.ReadSingle() : Weight;
-            CurrentStateHash = _bitArray[2] ? reader.ReadInt32() : CurrentStateHash;
-            NormalizedTime = _bitArray[3] ? reader.ReadSingle() : NormalizedTime;
-            StateDuration = _bitArray[4] ? reader.ReadSingle() : StateDuration;
-            TransitionNormalizedTime = _bitArray[5] ? reader.ReadSingle() : TransitionNormalizedTime;
-            TransitionDuration = _bitArray[6] ? reader.ReadSingle() : TransitionDuration;
-        }
-
-        public void Write(NetworkAnimatorLayer right, MyBinaryWriter writer)
-        {
-            BitArrayWrapper bitArray = BitArrayWrapper.Allocate(7, false);
-
-            if (right == null)
-            {
-                bitArray.SetAll(true);
-            }
-            else
-            {
-                bitArray[0] = !CompareUtility.IsApproximatelyEqual(LayerIndex, right.LayerIndex);
-                bitArray[1] = Weight != right.Weight;
-                bitArray[2] = !CompareUtility.IsApproximatelyEqual(CurrentStateHash, right.CurrentStateHash);
-                bitArray[3] = NormalizedTime != right.NormalizedTime;
-                bitArray[4] = StateDuration != right.StateDuration;
-                bitArray[5] = TransitionNormalizedTime != right.TransitionNormalizedTime;
-                bitArray[6] = TransitionDuration != right.TransitionDuration;
-            }
-
-            writer.Write(bitArray);
-            if (bitArray[0]) writer.Write(LayerIndex);
-            if (bitArray[1]) writer.Write(Weight);
-            if (bitArray[2]) writer.Write(CurrentStateHash);
-            if (bitArray[3]) writer.Write(NormalizedTime);
-            if (bitArray[4]) writer.Write(StateDuration);
-            if (bitArray[5]) writer.Write(TransitionNormalizedTime);
-            if (bitArray[6]) writer.Write(TransitionDuration);
-
-
-            bitArray.ReleaseReference();
-        }
-
-        public void MergeFromPatch(NetworkAnimatorLayer from)
-        {
-            LayerIndex = from._bitArray[0] ? from.LayerIndex : LayerIndex;
-            Weight = from._bitArray[1] ? from.Weight : Weight;
-            CurrentStateHash = from._bitArray[2] ? from.CurrentStateHash : CurrentStateHash;
-            NormalizedTime = from._bitArray[3] ? from.NormalizedTime : NormalizedTime;
-            StateDuration = from._bitArray[4] ? from.StateDuration : StateDuration;
-            TransitionNormalizedTime = from._bitArray[5] ? from.TransitionNormalizedTime : TransitionNormalizedTime;
-            TransitionDuration = from._bitArray[6] ? from.TransitionDuration : TransitionDuration;
-           
-            from._bitArray.ReleaseReference();
-            from._bitArray = null;
-            
-        }
-
         public bool HasValue { get; set; }
         public NetworkAnimatorLayer CreateInstance()
         {
             return new NetworkAnimatorLayer();
         }
-        
+
+        public string GetName()
+        {
+            return "NetworkAnimatorLayer";
+        }
+
+        public BitArrayWrapper BitArray { get; set; }
 
         #endregion
 
-        public NetworkAnimatorLayer(int layerIndex, float weight, int currentStateHash, float normalizedTime,
-            float stateDuration, float transitionNormalizedTime, float transitionDuration)
+        public NetworkAnimatorLayer(int layerIndex, float weight, int currentStateFullPathHash, float currentStateNormalizedTime,
+            int transitionFullPathHash, byte transitionIndex, float transitionStartTime, float nextStateNormalizedTime,
+            float transitionNormalizedTime, float stateDuration)
         {
-            SetCurrentStateInfo(layerIndex, weight, currentStateHash, normalizedTime, stateDuration,
-                transitionNormalizedTime, transitionDuration);
+            SetCurrentStateInfo(layerIndex, weight, currentStateFullPathHash, currentStateNormalizedTime, transitionFullPathHash,
+                transitionIndex, transitionStartTime, nextStateNormalizedTime, transitionNormalizedTime, stateDuration);
         }
 
-        public void SetCurrentStateInfo(int layerIndex, float weight, int currentStateHash, float normalizedTime,
-            float stateDuration, float transitionNormalizedTime, float transitionDuration)
+        public void SetCurrentStateInfo(int layerIndex, float weight, int currentStateFullPathHash, float currentStateNormalizedTime,
+            int transitionFullPathHash, byte transitionIndex, float transitionStartTime, float nextStateNormalizedTime,
+            float transitionNormalizedTime, float stateDuration)
         {
             LayerIndex = layerIndex;
             Weight = weight;
-            CurrentStateHash = currentStateHash;
-            NormalizedTime = normalizedTime;
-            StateDuration = stateDuration;
+            CurrentStateFullPathHash = currentStateFullPathHash;
+            CurrentStateNormalizedTime = currentStateNormalizedTime;
+            TransitionFullPathHash = transitionFullPathHash;
+            TransitionIndex = transitionIndex;
+            TransitionStartTime = transitionStartTime;
+            NextStateNormalizedTime = nextStateNormalizedTime;
             TransitionNormalizedTime = transitionNormalizedTime;
-            TransitionDuration = transitionDuration;
+            StateDuration = stateDuration;
         }
 
         public override string ToString()
         {
             return string.Format(
-                "NetworkAnimatorLayer LayerIndex: {0}, Weight: {1}, CurrentStateHash: {2}, NormalizedTime: {3}, StateDuration: {4}, TransitionNormalizedTIme: {5}, TransitionDuration: {6}",
-                LayerIndex, Weight, CurrentStateHash, NormalizedTime, StateDuration, TransitionNormalizedTime,
-                TransitionDuration);
+                "NetworkAnimatorLayer LayerIndex: {0}, Weight: {1}, CurrentStateFullPathHash: {2}, CurrentStateNormalizedTime: {3}, " +
+                "TransitionFullPathHash: {4}, NextStateNormalizedTime: {5}, TransitionNormalizedTime: {6}, TransitionStartTime: {7}, " +
+                "TransitionIndex: {8}",
+                LayerIndex, Weight, CurrentStateFullPathHash, CurrentStateNormalizedTime, TransitionFullPathHash,
+                NextStateNormalizedTime, TransitionNormalizedTime, TransitionStartTime, TransitionIndex);
         }
 
         public void Dispose()
         {
-            if (_bitArray != null)
+            if (BitArray != null)
             {
-                _bitArray.ReleaseReference();
+                BitArray.ReleaseReference();
             }
         }
     }

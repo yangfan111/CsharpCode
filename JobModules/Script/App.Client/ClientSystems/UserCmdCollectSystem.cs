@@ -45,7 +45,7 @@ namespace App.Client.ClientSystems
             
             _timeManager = _sessionObjects.TimeManager;
             _generator = _sessionObjects.UserCmdGenerator;
-            _vehicleCmdGenerator = new UnityVehicleCmdGenerator(contexts.userInput.userInputManager.Instance);
+            _vehicleCmdGenerator = new UnityVehicleCmdGenerator(contexts.userInput.userInputManager.Mgr);
             _playerContext = contexts.player;
 
             _simulationTimer = _sessionObjects.SimulationTimer;
@@ -70,7 +70,7 @@ namespace App.Client.ClientSystems
             {
                 CreateUserCmd(player);
 
-              //  CreateVehicleCmd(player, channel);
+                CreateVehicleCmd(player);
             }
             
 
@@ -86,7 +86,7 @@ namespace App.Client.ClientSystems
 
                 if (vehicleCmd != null)
                 {
-                    controlledVehicle.vehicleCmd.AddStepTemp(vehicleCmd);
+                    controlledVehicle.vehicleCmd.AddLatest(vehicleCmd);
 
                     
                 }
@@ -124,9 +124,9 @@ namespace App.Client.ClientSystems
             UserCmd cmd = _generator.GenerateUserCmd(new DummyPlayerEntityUserCmdOwnApapter(player), _timeManager.FrameInterval);
             cmd.RenderTime = _timeManager.RenderTime;
             cmd.ClientTime = _timeManager.ClientTime;
-            if (_sessionObjects.SnapshotPool.LatestSnapshot != null)
+            if (_sessionObjects.SnapshotSelctor.LatestSnapshot != null)
             {
-                cmd.SnapshotId = _sessionObjects.SnapshotPool.LatestSnapshot.SnapshotSeq;
+                cmd.SnapshotId = _sessionObjects.SnapshotSelctor.LatestSnapshot.SnapshotSeq;
             }
             else
             {
@@ -134,7 +134,7 @@ namespace App.Client.ClientSystems
             }
 
             _generator.SetLastUserCmd(cmd);
-            player.userCmd.AddStepTemp(cmd);
+            player.userCmd.AddLatest(cmd);
 
             
         }

@@ -14,6 +14,8 @@ using Core.Components;
 using Core.SpatialPartition;
 using Core.Ui.Map;
 using Utils.Singleton;
+using App.Shared.Components;
+using Core.Enums;
 
 namespace App.Client.GameModules.Ui.UiAdapter
 {
@@ -138,6 +140,15 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 return CurPlayer.Pos.ShiftedUIVector2();
             }
         }
+        public MapFixedVector3 CurPlayerPos3D
+        {
+            get
+            {
+                if (null == CurPlayer)
+                    return new MapFixedVector3(Vector3.zero);
+                return CurPlayer.Pos3D;
+            }
+        }
         #endregion
 
         #region 毒圈数据
@@ -215,8 +226,9 @@ namespace App.Client.GameModules.Ui.UiAdapter
                                 if (realId == planeId)
                                 {
                                     kongTouList.Add(new MapFixedVector2(WorldOrigin.WorldPosition(new Vector3(drop.model3D.x, drop.model3D.y, drop.model3D.z)).To2D()));
+//                                    Debug.LogFormat("AirDrop :  planeId:{0} dropId:{1}, pos: {2}", planeId, realId, WorldOrigin.WorldPosition(new Vector3(drop.model3D.x, drop.model3D.y, drop.model3D.z)));
                                 }
-                                //                        Debug.LogFormat("********************************** planeId:{0} dropId:{1}", planeId, realId);
+                               
                             }
                         }
                     }
@@ -301,6 +313,51 @@ namespace App.Client.GameModules.Ui.UiAdapter
             }
         }
 
+        public Vector3 APosition
+        {
+            get
+            {
+                return _contexts.ui.blast.BlastAPosition.ShiftedUIVector3();
+            }
+        }
+
+        public Vector3 BPosition
+        {
+            get
+            {
+                return _contexts.ui.blast.BlastBPosition.ShiftedUIVector3();
+            }
+        }
+
+        public bool isBombMode
+        {
+            get
+            {
+                return GameRules.IsBomb(GetGameRule());
+            }
+        }
+
+        private int GetGameRule()
+        {
+            return _contexts.session.commonSession.RoomInfo.ModeId;
+        }
+
+        public bool IsCampPass()
+        {
+            var player = Player;
+            var camp = player.playerInfo.Camp;
+            return camp == (int)EUICampType.T;
+        }
+
+        public int C4SetStatus
+        {
+            get
+            {
+                return _contexts.ui.blast.C4SetStatus;
+            }
+        }
+
+
         public GamePlayComponent gamePlay
         {
             get { return _contexts.player.flagSelfEntity.gamePlay; }
@@ -309,35 +366,27 @@ namespace App.Client.GameModules.Ui.UiAdapter
         #region Bio
 
         private List<Vector3> _motherPosList = new List<Vector3>();
-        private HashSet<long> _lastMotherIdlIst = new HashSet<long>();
         public List<Vector3> MotherPos
         {
             get
             {
-                UpdatePlayerPos(_contexts.ui.uI.MotherIdList, ref _lastMotherIdlIst, ref _motherPosList);
+                UpdatePlayerPos(_contexts.ui.uI.MotherIdList, ref _motherPosList);
 
                 return _motherPosList;
             }
         }
         private List<Vector3> _heroPosList = new List<Vector3>();
-        private HashSet<long> _lastHeroIdlIst = new HashSet<long>();
 
-        private void UpdatePlayerPos(List<long> idList, ref HashSet<long> lastIdList, ref List<Vector3> posList)
+        private void UpdatePlayerPos(List<long> idList, ref List<Vector3> posList)
         {
-            if (!lastIdList.SetEquals(idList))
-            {
-                lastIdList = new HashSet<long>(idList);
-            }
-
             posList.Clear();
-
-            if (lastIdList.Count == 0)
+            if (idList.Count == 0)
             {
                 return;
             }
             foreach (PlayerEntity pe in _contexts.player.GetEntities())
             {
-                if (lastIdList.Contains(pe.playerInfo.PlayerId))
+                if (idList.Contains(pe.playerInfo.PlayerId))
                 {
                     posList.Add(new MapFixedVector3(pe.position.FixedVector3).ShiftedUIVector3());
                 }
@@ -349,20 +398,19 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                UpdatePlayerPos(_contexts.ui.uI.HeroIdList, ref _lastHeroIdlIst, ref _heroPosList);
+                UpdatePlayerPos(_contexts.ui.uI.HeroIdList, ref _heroPosList);
 
                 return _heroPosList;
             }
         }
 
         private List<Vector3> _humanPosList = new List<Vector3>();
-        private HashSet<long> _lastHumanIdlIst = new HashSet<long>();
 
         public List<Vector3> HumanPos
         {
             get
             {
-                UpdatePlayerPos(_contexts.ui.uI.HumanIdList, ref _lastHumanIdlIst, ref _humanPosList);
+                UpdatePlayerPos(_contexts.ui.uI.HumanIdList, ref _humanPosList);
 
                 return _humanPosList;
             }

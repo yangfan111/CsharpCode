@@ -1,5 +1,6 @@
 using App.Server.GameModules.GamePlay;
 using App.Server.GameModules.GamePlay.free.player;
+using App.Server.GameModules.GamePlay.Free.chicken;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.action;
 using com.wd.free.@event;
@@ -51,7 +52,7 @@ namespace gameplay.gamerule.free.item
                 args.TempUse(ParaConstant.PARA_PLAYER_CURRENT, fd);
                 args.TempUse(ParaConstant.PARA_ITEM, fi);
 
-                args.TempUsePara(new StringPara("from", "ground"));
+                args.TempUsePara(new StringPara("from", ChickenConstant.BagGround));
 
                 if (action != null)
                 {

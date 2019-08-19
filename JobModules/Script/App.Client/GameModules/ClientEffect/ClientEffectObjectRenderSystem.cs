@@ -62,7 +62,7 @@ namespace App.Client.GameModules.ClientEffect
                         break;
                     case EEffectStageType.AsynLoading:
 
-                        if (Time.time > effect.loadAsyncTimestamp + GlobalConst.MaxLoadAsyncWaitTime)
+                        if (Time.time > effect.LoadAsyncTimestamp + GlobalConst.MaxLoadAsyncWaitTime)
                         {
                             effect.StageType = EEffectStageType.WaitFinish;
                         }

@@ -34,13 +34,13 @@ namespace App.Client.GameModules.Ui.Models.Common
             base.OnGameobjectInitialized();
             InitVariable();
             InitGui();
-            InitReceiver();
+            IniTKeyHandler();
         }
 
-        private void InitReceiver()
+        private void IniTKeyHandler()
         {
-            pointerReceiver = new PointerReceiver(UiConstant.specicalCmdKeyLayer - 1, BlockType.All);
-            keyReceiver = new KeyReceiver(UiConstant.specicalCmdKeyLayer - 1, BlockType.All);
+            _pointerKeyHandler = new PointerKeyHandler(UiConstant.specicalCmdKeyLayer - 1, BlockType.All);
+            _keyHandler = new KeyHandler(UiConstant.specicalCmdKeyLayer - 1, BlockType.All);
         }
 
         Transform winAnime, loseAnime,tieAnime;
@@ -94,22 +94,22 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
 
         }
-        private PointerReceiver pointerReceiver;
-        private KeyReceiver keyReceiver;
+        private PointerKeyHandler _pointerKeyHandler;
+        private KeyHandler _keyHandler;
 
         private void ShowContinueBtn()
         {
             _adapter.SetCrossVisible(false);
             _viewModel.ContinueBtnShow = true;
-            RegisterReceiver();
+            Registerhandler();
         }
 
         private bool haveRegister = false;
-        private void RegisterReceiver()
+        private void Registerhandler()
         {
             if (haveRegister) return;
-            _adapter.RegisterPointerReceive(pointerReceiver);
-            _adapter.RegisterKeyReceive(keyReceiver);
+            _adapter.RegisterPointerReceive(_pointerKeyHandler);
+            _adapter.RegisterKeyReceive(_keyHandler);
             haveRegister = true;
         }
 
@@ -119,8 +119,8 @@ namespace App.Client.GameModules.Ui.Models.Common
             if (!enable)
             {
                 haveRegister = false;
-                _adapter.UnRegisterPointerReceive(pointerReceiver);
-                _adapter.UnRegisterKeyReceive(keyReceiver);
+                _adapter.UnRegisterPointerReceive(_pointerKeyHandler);
+                _adapter.UnRegisterKeyReceive(_keyHandler);
                 _adapter.CanOpenUiByKey = true;
             }
             if (enable)

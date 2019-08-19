@@ -81,7 +81,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                 {
                     if (adapter.CurUIModel == 1) //默认模式      左下角
                     {
-                        _viewModel.rootLocation = new UnityEngine.Vector2(9F, 10f);
+                        _viewModel.rootRectTransform.anchoredPosition = new UnityEngine.Vector2(9F, 10f);
                     }
                     else                                //可选模式         居中
                     {
@@ -96,7 +96,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                             }
                         }
                         float halfScreenWidth = Screen.width / 2;
-                        _viewModel.rootLocation = new UnityEngine.Vector2(halfScreenWidth - halfGoWidth, 50f);
+                        _viewModel.rootRectTransform.sizeDelta = new UnityEngine.Vector2(halfScreenWidth - halfGoWidth, 50f);
                     }
                     lastUIMode = adapter.CurUIModel;
                 }
@@ -105,8 +105,8 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void InitHpGroup()
         {
-            _viewModel.currentHpValue = 0;
-            _viewModel.specialHpBgValue = 0.75f;
+            _viewModel.CurrentHpSliderValue = 0;
+            _viewModel.PowerBarImageImage.fillAmount = 0;
 
             addImgCom = FindChildGo("addImg").GetComponent<RectTransform>();
             reduceImgCom = FindChildGo("reduceImg").GetComponent<RectTransform>();
@@ -114,6 +114,8 @@ namespace App.Client.GameModules.Ui.Models.Common
             addImgCom.offsetMax = new Vector2(0, -2);
             reduceImgCom.offsetMin = new Vector2(0, 2);
             reduceImgCom.offsetMax = new Vector2(0, -2);
+
+            _viewModel.curO2Image.fillAmount = 0;
         }
         private void RefresHpGroup(float interval)
         {
@@ -126,12 +128,12 @@ namespace App.Client.GameModules.Ui.Models.Common
               
                 if (!adapter.IsInHurtedState)      //非受伤状态
                 {
-                    _viewModel.HpGroupGameObjectActiveSelf = true;
-                    _viewModel.HpGroupInHurtGameObjectActiveSelf = false;                       
+                    _viewModel.HpGroup.SetActive(true);
+                    _viewModel.HpGroupInHurt.SetActive(false);
                         
                     if(mayRecoverHp == 0)    //此时只显示当前血量 
                     {
-                        float number = _viewModel.currentHpValue;
+                        float number = _viewModel.CurrentHpSliderValue;
                      
 
                         float endNumber = (float)curHp / (float)maxHp;
@@ -152,7 +154,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                             reduceImgCom.gameObject.SetActive(false);
                         }
 
-
+                        _viewModel.PercentTextUIText.text = Mathf.RoundToInt(endNumber * 100) + "%";
                         hpTemperTime += interval;
                         if (hpTemperTime >= hpTimeInterval)
                         {
@@ -168,7 +170,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                                 addDecreaseTween.SetEase(Ease.Linear);
                                 addDecreaseTween.OnUpdate(() =>
                                 {
-                                    _viewModel.currentHpValue = startNum;
+                                    _viewModel.CurrentHpSliderValue = startNum;
                                     if(add)
                                     {
                                         addImgCom.anchorMin = new Vector2(startNum, 0f);
@@ -180,13 +182,17 @@ namespace App.Client.GameModules.Ui.Models.Common
                                         reduceImgCom.anchorMax = new Vector2(startNum, 1f);
                                     }
                                     
-                                    if (_viewModel.currentHpValue < 0.3f)
+                                    if (_viewModel.CurrentHpSliderValue < 0.3f)
                                     {
-                                        _viewModel.currentHpFillColor = new UnityEngine.Color(237f / 255f, 129f / 255f, 129f / 255f, 1.0f);
+                                        Color c;
+                                        ColorUtility.TryParseHtmlString("#f83e1fe6", out c);
+                                        _viewModel.currentHpFillImage.color = c;
                                     }
                                     else
                                     {
-                                        _viewModel.currentHpFillColor = new UnityEngine.Color(247f / 255f, 238f / 255f, 201f / 255f, 1.0f);
+                                        Color c;
+                                        ColorUtility.TryParseHtmlString("#ffffffe6", out c);
+                                        _viewModel.currentHpFillImage.color = c;
                                     }
                                 });
                                 addDecreaseTween.OnComplete(() =>
@@ -205,46 +211,50 @@ namespace App.Client.GameModules.Ui.Models.Common
                 {
                     if (curHpInHurted == 0) //受伤-死亡状态
                     {
-                        _viewModel.HpGroupGameObjectActiveSelf = false;
-                        _viewModel.HpGroupInHurtGameObjectActiveSelf = false;
+                        _viewModel.HpGroup.SetActive(false);
+                        _viewModel.HpGroupInHurt.SetActive(false);
 
-                        _viewModel.currentHpValue = 0;
-                        _viewModel.HpGroupHurtValue = 0;
+                        _viewModel.CurrentHpSliderValue = 0;
+                        _viewModel.HpGroupInHurtFillImage.fillAmount = 0;
+                        _viewModel.PercentTextUIText.text = "";
                     }
                     else                  //受伤-非死亡状态
                     {
-                        _viewModel.HpGroupGameObjectActiveSelf = false;
-                        _viewModel.HpGroupInHurtGameObjectActiveSelf = true;
+                        _viewModel.HpGroup.SetActive(false);
+                        _viewModel.HpGroupInHurt.SetActive(true);
 
                         //受伤- 当前血量
-                        double startNum = _viewModel.HpGroupHurtValue;
-                        double endNumber = (float)curHpInHurted / (float)maxHp;
+                        float startNum = _viewModel.HpGroupInHurtFillImage.fillAmount;
+                        float endNumber = (float)curHpInHurted / (float)maxHp;
+                        _viewModel.PercentTextUIText.text = Mathf.RoundToInt(endNumber * 100) + "%";
+                        _viewModel.CurrentHpSliderValue = 0;
                         Tween t = DOTween.To(() => startNum, x => startNum = x, endNumber, 0.3f);
                         t.OnUpdate(() =>
                         {
-                            _viewModel.HpGroupHurtValue = (float)startNum;
+                            _viewModel.HpGroupInHurtFillImage.fillAmount = (float)startNum;
                         });                                                                           
                     }
                 }
             }
         }
-        
+
         private void RefreshPoseGroup()
         {
             if (adapter != null)
             {
                 var curPos = adapter.CurPose;
                 var firstOrThird = adapter.FirstOrThirdView;
-                if(firstOrThird == 1)
+                if (firstOrThird == 1)
                 {
-                    _viewModel.ShowPoseGroupGameObjectActiveSelf = true;
+                    _viewModel.ShowPoseGroup.SetActive(true);
 
                     switch (curPos)
                     {
                         case 1: //站
                             {
-                                Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_UiIcons, "pose_stand", (sprite)=> {
-                                    _viewModel.currentPoseImg = sprite;
+                                Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_UiIcons, "pose_stand", (sprite) =>
+                                {
+                                    _viewModel.currentPoseImage.sprite = sprite;
                                 });
                             }
                             break;
@@ -252,7 +262,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                             {
                                 Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_UiIcons, "pose_squat", (sprite) =>
                                 {
-                                    _viewModel.currentPoseImg = sprite;
+                                    _viewModel.currentPoseImage.sprite = sprite;
                                 });
                             }
                             break;
@@ -260,7 +270,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                             {
                                 Loader.RetriveSpriteAsync(AssetBundleConstant.Icon_UiIcons, "pose_fall", (sprite) =>
                                 {
-                                    _viewModel.currentPoseImg = sprite;
+                                    _viewModel.currentPoseImage.sprite = sprite;
                                 });
                             }
                             break;
@@ -299,7 +309,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                     }
                 }
                 else
-                    _viewModel.ShowPoseGroupGameObjectActiveSelf = false;
+                    _viewModel.ShowPoseGroup.SetActive(false);
             }
         }
 
@@ -309,147 +319,60 @@ namespace App.Client.GameModules.Ui.Models.Common
             {
                 if (adapter.RecureBufActive == true)
                 {
-                    _viewModel.retreatBufActive = true;
+                    Color c;
+                    ColorUtility.TryParseHtmlString("#8fc1d8", out c);
+                    _viewModel.retreatBuffImage.color = c;
                 }
                 else
                 {
-                    _viewModel.retreatBufActive = false;
+                    Color c;
+                    ColorUtility.TryParseHtmlString("#888888", out c);
+                    _viewModel.retreatBuffImage.color = c;
                 }
 
                 if (adapter.SpeedBufActive == true)
                 {
-                    _viewModel.speedBufActive = true;
+                    Color c;
+                    ColorUtility.TryParseHtmlString("#f3b153", out c);
+                    _viewModel.speedBuffImage.color = c;
                 }
                 else
                 {
-                    _viewModel.speedBufActive = false;
+                    Color c;
+                    ColorUtility.TryParseHtmlString("#888888", out c);
+                    _viewModel.speedBuffImage.color = c;
                 }
-
-                if (adapter.CurO2 == adapter.MaxCurO2)
-                {
-                    _viewModel.o2BufActive = false;
-                }
-                else
-                {
-                    _viewModel.o2BufActive = true;
-                    _viewModel.curO2FillAmount = 1 - (adapter.CurO2 / adapter.MaxCurO2);
-                }
+                 _viewModel.curO2Image.fillAmount = 1 - (adapter.CurO2 / adapter.MaxCurO2);
             }
         }
 
         private void PreparedPowerGroup()
         {
-            //读表
-            powerConfigList.Add(0f);
-            powerConfigList.Add(20f);
-            powerConfigList.Add(60f);
-            powerConfigList.Add(90f);
-            powerConfigList.Add(100f);
             
-            Transform duan1 = FindChildGo("duan1");
-            Transform duan2 = FindChildGo("duan2");
-            Transform duan3 = FindChildGo("duan3");
-            Transform duan4 = FindChildGo("duan4");
-
-            if (duan1!= null)
-            {
-                var slider = duan1.GetComponent<Slider>();
-                if (slider)
-                {
-                    slider.maxValue = powerConfigList[1] / powerConfigList[4];
-                    slider.minValue = powerConfigList[0] / powerConfigList[4]; 
-                }
-            }
-
-            if (duan2 != null)
-            {
-                var slider = duan2.GetComponent<Slider>();
-                if (slider)
-                {
-                    slider.maxValue = powerConfigList[2] / powerConfigList[4];
-                    slider.minValue = powerConfigList[1] / powerConfigList[4]; 
-                }
-            }
-
-            if (duan3 != null)
-            {
-                var slider = duan3.GetComponent<Slider>();
-                if (slider)
-                {
-                    slider.maxValue = powerConfigList[3] / powerConfigList[4];
-                    slider.minValue = powerConfigList[2] / powerConfigList[4];
-                }
-            }
-
-            if (duan4 != null)
-            {
-                var slider = duan4.GetComponent<Slider>();
-                if (slider)
-                {
-                    slider.maxValue = powerConfigList[4] / powerConfigList[4];
-                    slider.minValue = powerConfigList[3] / powerConfigList[4];
-                }
-            }
         }
 
         private void RefreshPowerGroup()
         {
             if (adapter != null)
             {
-                if (powerConfigList.Count < 5)
-                    return;
-                float curPower = adapter.CurPower;                   
-                if (curPower <= 0)   //能量值小于0时候 隐藏能量条
+                float curPower = adapter.CurPower;
+                if (curPower != lastPower)
                 {
-                    _viewModel.PowerGroupActive = false;
-                }
-                else
-                {
-                    _viewModel.PowerGroupActive = true;
-                    if(curPower != lastPower)
+                    if (powerTween != null)
                     {
-                        if (powerTween != null)
-                        {
-                            powerTween.Kill();
-                            powerTween = null;
-                        }
-                        powerTween = UIUtils.CallTween(curtTweenPower, curPower, (value) => { UpdateFunc(value); }, (value) => { CompleteFunc(value); }, 1f);
-                        lastPower = curPower;
+                        powerTween.Kill();
+                        powerTween = null;
                     }
+                    powerTween = UIUtils.CallTween(curtTweenPower, curPower, (value) => { UpdateFunc(value); }, (value) => { CompleteFunc(value); }, 1f);
+                    lastPower = curPower;
                 }
+
             }
         }
 
         private void UpdateFunc(float curPower)
         {
-            if (curPower >= powerConfigList[3])
-            {
-                _viewModel.duan1 = powerConfigList[1] / powerConfigList[4];
-                _viewModel.duan2 = powerConfigList[2] / powerConfigList[4];
-                _viewModel.duan3 = powerConfigList[3] / powerConfigList[4];
-                _viewModel.duan4 = curPower / powerConfigList[4];
-            }
-            else if (curPower >= powerConfigList[2] && curPower < powerConfigList[3])
-            {
-                _viewModel.duan1 = powerConfigList[1] / powerConfigList[4];
-                _viewModel.duan2 = powerConfigList[2] / powerConfigList[4];
-                _viewModel.duan3 = curPower / powerConfigList[4];
-                _viewModel.duan4 = powerConfigList[3] / powerConfigList[4];
-            }
-            else if (curPower >= powerConfigList[1] && curPower < powerConfigList[2])
-            {
-                _viewModel.duan1 = powerConfigList[1] / powerConfigList[4];
-                _viewModel.duan2 = curPower / powerConfigList[4];
-                _viewModel.duan3 = powerConfigList[2] / powerConfigList[4];
-                _viewModel.duan4 = powerConfigList[3] / powerConfigList[4]; ;
-            }
-            else if (curPower < powerConfigList[1])
-            {
-                _viewModel.duan1 = curPower / powerConfigList[4];
-                _viewModel.duan2 = powerConfigList[1] / powerConfigList[4];
-                _viewModel.duan3 = powerConfigList[2] / powerConfigList[4];
-                _viewModel.duan4 = powerConfigList[3] / powerConfigList[4]; ;
-            }
+            _viewModel.PowerBarImageImage.fillAmount = curPower / 100f;
 
             curtTweenPower = curPower;
         }
@@ -469,10 +392,11 @@ namespace App.Client.GameModules.Ui.Models.Common
                 var maxHValue = adapter.maxHelmet;
                 if (adapter.maxHelmet > 0 && adapter.curHelmet > 0 && !isDead)
                 {
-                    _viewModel.HelmetActive = true;
+                    _viewModel.HeadIconImage.color = Color.white;
+                    ShowEquipLevel(_viewModel.HeadIconImage.transform.parent, adapter.HelmetLevel);
                     if (adapter.maxHelmet == adapter.curHelmet)
                     {
-                        _viewModel.HelmetFillAmount = 0;
+                        _viewModel.HelmetImage.fillAmount = 0;
                     }
                     if (lastHelmet != curHValue)
                     {
@@ -483,7 +407,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                         }
                         helmetTween = UIUtils.CallTween(lastHelmet, curHValue, (value) => 
                         {
-                            _viewModel.HelmetFillAmount =  1 - (value / maxHValue);
+                            _viewModel.HelmetImage.fillAmount =   (value / maxHValue);
                         }, 
                         (value) => 
                         {
@@ -495,17 +419,22 @@ namespace App.Client.GameModules.Ui.Models.Common
                 }
                 else
                 {
-                    _viewModel.HelmetActive = false;
+                    _viewModel.HelmetImage.fillAmount = 0;
+                    Color c;
+                    ColorUtility.TryParseHtmlString("#888888",out c);
+                    _viewModel.HeadIconImage.color = c;
+                    ShowEquipLevel(_viewModel.HeadIconImage.transform.parent, 0);
                 }
 
                 var curBValue = adapter.maxArmor - adapter.curArmor;
                 var maxBValue = adapter.maxArmor;
                 if (adapter.maxArmor > 0 && adapter.curArmor > 0 && !isDead)
                 {
-                    _viewModel.BulletproofActive = true;
+                    _viewModel.ClothIconImage.color = Color.white;
+                    ShowEquipLevel(_viewModel.ClothIconImage.transform.parent, adapter.ArmorLevel);
                     if (adapter.maxArmor == adapter.curArmor)
                     {
-                        _viewModel.BulletproofFillAmount = 0;
+                        _viewModel.BulletproofImage.fillAmount = 0;
                     }
                     if (lastBulletproof != curBValue)
                     {
@@ -516,7 +445,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                         }
                         bulletproofTween = UIUtils.CallTween(lastBulletproof, curBValue, (value) =>
                         {
-                            _viewModel.BulletproofFillAmount = 1 - (value / maxBValue);
+                            _viewModel.BulletproofImage.fillAmount =  (value / maxBValue);
                         },
                         (value) =>
                         {
@@ -528,7 +457,11 @@ namespace App.Client.GameModules.Ui.Models.Common
                 }
                 else
                 {
-                    _viewModel.BulletproofActive = false;
+                    _viewModel.BulletproofImage.fillAmount = 0;
+                    Color c;
+                    ColorUtility.TryParseHtmlString("#888888", out c);
+                    _viewModel.ClothIconImage.color = c;
+                    ShowEquipLevel(_viewModel.ClothIconImage.transform.parent, 0);
                 }
             }
         }
@@ -581,5 +514,23 @@ namespace App.Client.GameModules.Ui.Models.Common
                 }
             }
         }
+
+        private void ShowEquipLevel(Transform trans,int level)
+        {
+            int childCount = trans.childCount;
+            for (int i =0;i<3;i++ )
+            {
+                var child = trans.GetChild(childCount - (3 - i));
+                if (level == i+1)
+                {
+                    child.gameObject.SetActive(true);
+                }
+                else
+                {
+                    child.gameObject.SetActive(false);
+                }
+            }
+        }
+
     }
 }

@@ -7,6 +7,7 @@ using Entitas;
 using Entitas.CodeGeneration.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Core;
 using UnityEngine;
 using WeaponConfigNs;
@@ -58,14 +59,19 @@ namespace App.Shared.Components.Bullet
             return string.Format("Velocity:{0},Distance:{1},Gravity:{2},RemainFrameTime:{3},ServerTime:{4},MaxDistance:{5},PenetrableLayerCount:{6},BaseDamage:{7},PenetrableThickness:{8},VelocityDecay:{9},Caliber:{10},WeaponId:{11},DistanceDecay:{12},StartPoint:{13},Ignore:{14},StartDir:{15},HitPoint:{16}",Velocity.ToString(), Distance.ToString("f2"),Gravity, RemainFrameTime, ServerTime, MaxDistance.ToString("f2"), PenetrableLayerCount, BaseDamage, PenetrableThickness, VelocityDecay.ToString("f2"),Caliber, WeaponId, DistanceDecay.ToString("f2"), StartPoint, 0, StartDir,HitPoint);
        
         }*/
-        public string ToBaseString()
+        public string ToBaseString(StringBuilder sb)
         {
-            return string.Format("Gravity:{0},RemainFrameTime:{1},MaxDistance:{2},PenetrableLayerCount:{3},BaseDamage:{4},PenetrableThickness:{5},VelocityDecay:{6}\nCaliber:{7},WeaponId:{8},DistanceDecay:{9},StartPoint:{10},Ignore:{11},StartDir:{12}",Gravity, RemainFrameTime,  MaxDistance.ToString("f2"), PenetrableLayerCount, BaseDamage, PenetrableThickness, VelocityDecay.ToString("f2"),Caliber, WeaponId, DistanceDecay.ToString("f2"), StartPoint, 0, StartDir);        
+            sb.Length = 0;
+            sb.AppendFormat("MaxDistance:{0},VelocityDecay:{1}\nWeaponId:{2},DistanceDecay:{3},StartPoint:{4},StartDir:{5}", MaxDistance.ToString("f2"), VelocityDecay.ToString("f2"), WeaponId, DistanceDecay.ToString("f2"), StartPoint,StartDir);
+            return sb.ToString();
         }
 
-        public string ToDynamicString()
+        public string ToDynamicString(StringBuilder sb)
         {
-            return string.Format("Position:{0},Velocity:{1},Distance:{2},NextFrameTime:{3}", StartPoint, Velocity, Distance, RemainFrameTime);
+            sb.Length = 0;
+            sb.AppendFormat("Position:{0},Velocity:{1},Distance:{2},NextFrameTime:{3}", StartPoint, Velocity, Distance,
+                RemainFrameTime);
+            return sb.ToString();
         }
       
         public void CopyFrom(object rightComponent)

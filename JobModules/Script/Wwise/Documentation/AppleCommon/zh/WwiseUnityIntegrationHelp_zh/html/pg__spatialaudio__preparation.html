@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>Preparation for the Spatial Audio Tutorials</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>&nbsp;&raquo;&nbsp;<a class="el" href="pg__spatialaudio.html">Using Wwise Spatial Audio in Unity</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="pg_spatialaudio_preparation">Preparation for the Spatial Audio Tutorials </a></h1><p>The following steps must be followed beforehand to successfully complete the <a class="el" href="pg__surface__reflector__tut.html">Surface Reflectors Tutorial</a> and the <a class="el" href="pg__rooms__portals__tut.html">Rooms and Portals Tutorial</a> :</p>
+<ul>
+<li><a class="el" href="pg__spatialaudio__preparation.html#sect_create_unity">1. Create a Unity Project</a></li>
+<li><a class="el" href="pg__spatialaudio__preparation.html#sect_Wwise_prep">2. Wwise Project Preparation</a></li>
+<li><a class="el" href="pg__spatialaudio__preparation.html#sect_unity_prep">3. Unity Project Preparation</a><ul>
+<li><a class="el" href="pg__spatialaudio__preparation.html#sub_unity_env">3.A. 环境</a></li>
+<li><a class="el" href="pg__spatialaudio__preparation.html#sub_unity_listener">3.B. Character Listener</a></li>
+<li><a class="el" href="pg__spatialaudio__preparation.html#sub_unity_emitters">3.C. Third-Person Emitters</a></li>
+<li><a class="el" href="pg__spatialaudio__preparation.html#sub_scene">3.D. Scene</a></li>
+</ul>
+</li>
+</ul>
+<h2><a class="anchor" id="sect_create_unity">
+1. Create a Unity Project</a></h2>
+<p>Using the latest version of Wwise and Unity, follow the steps below in order to build your working environment.</p>
+<ol type="1">
+<li>Launch Unity and create a new project.</li>
+<li>Close Unity.</li>
+<li>Start the Wwise Launcher and <a href="https://www.audiokinetic.com/library/edge/?source=InstallGuide&amp;id=integrating_wwise_into_an_unreal_or_unity_project" target="_blank">integrate Wwise into your Unity project</a>.</li>
+</ol>
+<h2><a class="anchor" id="sect_Wwise_prep">
+2. Wwise Project Preparation</a></h2>
+<p>For the tutorials, you will need a Sound SFX, an Event to play it, and a SoundBank.</p>
+<ol type="1">
+<li>From the Launcher, open your project in Wwise.</li>
+<li>Add a Sound SFX under the Actor Mixer Hierarchy's <b>Default Work Unit</b>. In the integration Wwise Project, we added a dialogue.<ol type="a">
+<li>Import a sound into it.</li>
+<li>In the Sound Property Editor's<ol type="i">
+<li>General Settings tab, enable <b>Use game-defined auxiliary sends</b>. <br/>
+<br/>
+ <div align="center">
+<img src="SoundPropertyEditorGeneralSettings.png" alt="SoundPropertyEditorGeneralSettings.png"/>
+<p><strong>Sound Property Editor General Settings tab</strong></p></div>
+</li>
+<li>Positioning tab, enable <b>Listener Relative Routing</b> and select <b>Position + Orientation</b> for the 3D Spatialization. Optionally, add an Attenuation. <br/>
+<br/>
+ <div align="center">
+<img src="SoundPropertyEditorPositioning.png" alt="SoundPropertyEditorPositioning.png"/>
+<p><strong>Sound Property Editor Positioning tab</strong></p></div>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>Right-click on the Sound SFX within the Actor-Mixer Hierarchy, then select <b>New Event</b> &gt; <b>Play</b>. <br/>
+<br/>
+ <div align="center">
+<img src="EventEditor.png" alt="EventEditor.png"/>
+<p><strong>Event Editor</strong></p></div>
+</li>
+<li>Go to the SoundBank layout (shortcut F7) and add a new SoundBank. Drag the Event into the new SoundBank. Here's how the SoundBank Manager should look in the integration Wwise Project: <br/>
+<br/>
+ <div align="center">
+<img src="SoundBank.png" alt="SoundBank.png"/>
+<p><strong>SoundBank Manager and Editor</strong></p></div>
+</li>
+<li>Save your project.</li>
+</ol>
+<h2><a class="anchor" id="sect_unity_prep">
+3. Unity Project Preparation</a></h2>
+<p>In this section we will create our game area and the objects in it. We will need a listener, emitters, and two rooms. From the Launcher, open your project in Unity. Open the Wwise Picker (Windows &gt; Wwise Picker), Refresh Project, and Generate SoundBanks. <br/>
+<br/>
+ </p>
+<div align="center">
+<img src="WwisePicker.png" alt="WwisePicker.png"/>
+<p><strong>Wwise Picker</strong></p></div>
+ <h3><a class="anchor" id="sub_unity_env">
+3.A. 环境</a></h3>
+<ol type="1">
+<li>Create a floor, walls, and ceilings using cubes: <b>GameObject</b> &gt; <b>3D Object</b> &gt; <b>Cube</b>. <table class="doxtable">
+<tr>
+<th>Object Name </th><th>Position </th><th>Rotation </th><th>Scale </th></tr>
+<tr>
+<td>Floor </td><td>(0, 0, 0) </td><td>(0, 0, 0) </td><td>(50, 0.5, 50) </td></tr>
+<tr>
+<td>Wall Front Left </td><td>(-4.5, 3, -10) </td><td>(0, 0, 0) </td><td>(7, 6, 0.5) </td></tr>
+<tr>
+<td>Wall Front Middle </td><td>(0, 5, -10) </td><td>(0, 0, 0) </td><td>(2, 2, 0.5) </td></tr>
+<tr>
+<td>Wall Front Right </td><td>(2.5, 3, -10) </td><td>(0, 0, 0) </td><td>(3, 6, 0.5) </td></tr>
+<tr>
+<td>Wall Left Small </td><td>(-7.75, 3, -6) </td><td>(0, 0, 0) </td><td>(0.5, 6, 8) </td></tr>
+<tr>
+<td>Wall Back Small </td><td>(-2, 3, -2) </td><td>(0, 0, 0) </td><td>(12, 6, 0.5) </td></tr>
+<tr>
+<td>Ceiling Small </td><td>(-2, 5.75, -6) </td><td>(0, 0, 0) </td><td>(12, 0.5, 8) </td></tr>
+<tr>
+<td>Wall Right Small </td><td>(3.75, 3, -8) </td><td>(0, 0, 0) </td><td>(0.5, 6, 3.5) </td></tr>
+<tr>
+<td>Wall Front Large </td><td>(11.5, 3, -7.5) </td><td>(0, 0, 0) </td><td>(16, 6, 0.5) </td></tr>
+<tr>
+<td>Wall Right Large </td><td>(19.25, 3, 3.25) </td><td>(0, 0, 0) </td><td>(0.5, 6, 21.5) </td></tr>
+<tr>
+<td>Wall Middle </td><td>(3.75, 5, -4.5) </td><td>(0, 0, 0) </td><td>(0.5, 2, 3.5) </td></tr>
+<tr>
+<td>Wall Left Large </td><td>(3.75, 3, 5.625) </td><td>(0, 0, 0) </td><td>(0.5, 6, 16.75) </td></tr>
+<tr>
+<td>Wall Back Large </td><td>(11.5, 3, 14) </td><td>(0, 0, 0) </td><td>(16, 6, 0.5) </td></tr>
+<tr>
+<td>Ceiling Large </td><td>(11.5, 5.75, 3.25) </td><td>(0, 0, 0) </td><td>(16, 0.5, 22) </td></tr>
+<tr>
+<td>Barrier </td><td>(-4.5, 3, -17) </td><td>(0, 0, 0) </td><td>(7, 6, 0.5) </td></tr>
+</table>
+</li>
+<li>Add spotlights inside rooms ( <b>GameObject</b> &gt; <b>Light</b> &gt; <b>Spotlight</b> ). <table class="doxtable">
+<tr>
+<th>Object Name </th><th>Position </th><th>Rotation </th><th>Scale </th></tr>
+<tr>
+<td>Spotlight Small Room </td><td>(-3, 5.75, -6) </td><td>(0, 0, 0) </td><td>(1, 1, 1) </td></tr>
+<tr>
+<td>Spotlight Large Room </td><td>(11.5, 5.75, 5) </td><td>(0, 0, 0) </td><td>(1, 1, 1) </td></tr>
+</table>
+<ol type="a">
+<li>In the <b>Light</b> component, change:<ol type="i">
+<li><b>Range</b> to 30.</li>
+<li><b>Spot Angle</b> to 179.</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h3><a class="anchor" id="sub_unity_listener">
+3.B. Character Listener</a></h3>
+<ol type="1">
+<li>Create a character with the method of your choice. <table class="doxtable">
+<tr>
+<th>Object Name </th><th>Position </th><th>Rotation </th><th>Scale </th></tr>
+<tr>
+<td>MainCharacter </td><td>(0, 1.3, -20) </td><td>(0, 0, 0) </td><td>(1, 1, 1) </td></tr>
+</table>
+<ol type="a">
+<li>Remove any Unity Audio Source.</li>
+<li>Add an <b>Ak Audio Listener</b> component to the camera. <br/>
+<br/>
+ <div align="center">
+<img src="AkAudioListener.png" alt="AkAudioListener.png"/>
+<p><strong>Ak Audio Listener component</strong></p></div>
+</li>
+<li>Add an <b>Ak Spatial Audio Listener</b> component to the camera. <br/>
+<br/>
+ <div align="center">
+<img src="AkSpatialAudioListener.png" alt="AkSpatialAudioListener.png"/>
+<p><strong>Ak Spatial Audio Listener component</strong></p></div>
+ </li>
+</ol>
+</li>
+</ol>
+<h3><a class="anchor" id="sub_unity_emitters">
+3.C. Third-Person Emitters</a></h3>
+<ol type="1">
+<li>Create buttons using cylinders ( <b>GameObject</b> &gt; <b>3D Object</b> &gt; <b>Cylinder</b> ). <table class="doxtable">
+<tr>
+<th>Object Name </th><th>Position </th><th>Rotation </th><th>Scale </th></tr>
+<tr>
+<td>Button Outside </td><td>(-3, 0.75, -15) </td><td>(0, 0, 0) </td><td>(0.15, 0.5, 0.15) </td></tr>
+<tr>
+<td>Button Small Room </td><td>(-3, 0.75, -5) </td><td>(0, 0, 0) </td><td>(0.15, 0.5, 0.15) </td></tr>
+<tr>
+<td>Button Large Room </td><td>(7.5, 0.75, 5) </td><td>(0, 0, 0) </td><td>(0.15, 0.5, 0.15) </td></tr>
+</table>
+</li>
+<li>Add an <b>Ak Spatial Audio Emitter</b> component. <div align="center">
+<img src="AkSpatialAudioEmitterDefault.png" alt="AkSpatialAudioEmitterDefault.png"/>
+<p><strong>Ak Spatial Audio Emitter component</strong></p></div>
+</li>
+<li>In the Ak Game Obj component:<ol type="a">
+<li>Enable the Environment Aware option.</li>
+<li>Enable the Use Default Listener option. <div align="center">
+<img src="AkGameObj.png" alt="AkGameObj.png"/>
+<p><strong>Ak Game Obj component</strong></p></div>
+</li>
+</ol>
+</li>
+<li>Add an <b>Ak Ambient</b> component:<ol type="a">
+<li>Choose your preferred way to start the sound in <b>Trigger On</b>.</li>
+<li>Choose the Play_sound Event in <b>Event Name</b>. <div align="center">
+<img src="AkAmbient.png" alt="AkAmbient.png"/>
+<p><strong>Ak Ambient component</strong></p></div>
+</li>
+</ol>
+</li>
+<li>Add an Ak Bank component:<ol type="a">
+<li>Add the SoundBank created in <a class="el" href="pg__spatialaudio__preparation.html#sect_Wwise_prep">2. Wwise Project Preparation</a> to <b>Bank Name</b>. <div align="center">
+<img src="AkBank.png" alt="AkBank.png"/>
+<p><strong>Ak Bank component</strong></p></div>
+</li>
+</ol>
+</li>
+<li>Start the game, connect it to Wwise, and open the Profiler layout (shortcut F6).</li>
+<li>Play the sound from a button. You should hear the sound you imported in the Wwise project.</li>
+<li>In the Voices Graph tab, you should see the following graph. <div align="center">
+<img src="VoiceGraph.png" alt="VoiceGraph.png"/>
+<p><strong>Button Outside Voice Graph with no Effect</strong></p></div>
+ </li>
+</ol>
+<h3><a class="anchor" id="sub_scene">
+3.D. Scene</a></h3>
+<ol type="1">
+<li>Save your Scene to a convenient place.</li>
+<li>The final look of the scene is shown in the following image. This scene is available with the Unity integration package. Colors were added to elements of the scene for convenience. A mobile first-person controller was also added. <div align="center">
+<img src="SceneComplete.png" alt="SceneComplete.png"/>
+<p><strong>Tutorial Unity Scene</strong></p></div>
+</li>
+</ol>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

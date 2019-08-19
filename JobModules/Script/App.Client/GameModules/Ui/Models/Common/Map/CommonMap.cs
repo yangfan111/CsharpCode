@@ -6,6 +6,7 @@ using App.Shared.Components.Ui;
 using App.Shared.GameModules.Player;
 using Assets.App.Client.GameModules.Ui;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using UserInputManager.Lib;
 
 namespace App.Client.GameModules.Ui.Models.Common.Map
@@ -26,7 +27,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
         public CommonMap(IMiniMapUiAdapter adapter) : base(adapter)
         {
-            adapter.Enable = false;
+//            adapter.Enable = false;
             if (UiCommon.UIManager.GetRootRenderMode().Equals(RenderMode.ScreenSpaceCamera))
             {
                 uiCamera = UiCommon.UIManager.UICamera;
@@ -41,12 +42,17 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             CalculateRate();
             BindUIEventTrigger();
 
-            _mapGird1.InitGird();
+//            _mapGird1.InitGird();
             _safeMiniDis.Hide();
 
-            var rect = _viewModel.BgRectTransform;
-            rect.anchoredPosition = Vector2.zero;
-            rect.sizeDelta = rootRectTf.sizeDelta;
+            
+            //临时处理  多层canvas嵌套  会导致显示错误
+            var graphicRaycaster = _viewModel.CommonMiniMap.GetComponent<GraphicRaycaster>();
+            if (graphicRaycaster != null) GameObject.Destroy(graphicRaycaster);
+            var canvas = _viewModel.CommonMiniMap.GetComponent<Canvas>();
+            if (canvas != null) GameObject.Destroy(canvas);
+            mapNameRoot.gameObject.SetActive(false);
+            bgRect.gameObject.SetActive(false);
         }
 
         protected override void CalculateRate()
@@ -56,7 +62,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             rate = miniMapWByPixel / MiniMapRepresentWHByRice;
         }
 
-        private void SetMapRoot()
+        public void SetMapRoot()
         {
             float canavsW = root.parent.GetComponent<RectTransform>().rect.width;
             float canvasH = root.parent.GetComponent<RectTransform>().rect.height;
@@ -68,7 +74,12 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             rootRectTf.pivot = new Vector2(0.5f, 0.5f);
             rootRectTf.sizeDelta = new Vector2(maskWh, maskWh);
             rootRectTf.anchoredPosition = Vector2.zero;
+
+            var rect = _viewModel.BgRectTransform;
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = rootRectTf.sizeDelta;
         }
+
 
         private void BindUIEventTrigger()
         {
@@ -104,22 +115,22 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
         public void InitKeyBinding()
         {
-            var receiver = new KeyReceiver(UiConstant.maxMapWindowLayer, BlockType.None);
-            receiver.AddAction(UserInputKey.ShowMaxMap, (data) =>
-            {
-                if (root != null)
-                {
-                    ShowMap(!adapter.Enable);
-                }
-            });
-            //adapter.RegisterKeyReceive(receiver);
-            adapter.RegisterOpenKey(receiver);
+//            var receiver = new KeyReceiver(UiConstant.maxMapWindowLayer, BlockType.None);
+//            receiver.BindKeyAction(UserInputKey.ShowMaxMap, (data) =>
+//            {
+//                if (root != null)
+//                {
+//                    ShowMap(!adapter.Enable);
+//                }
+//            });
+//            //adapter.RegisterKeyReceive(receiver);
+//            adapter.RegisterOpenKey(receiver);
 
             //            DynamicKeyReceive();
             pointerReceiver = new PointerReceiver(UiConstant.maxMapWindowPointBlockLayer, BlockType.All);
             keyReceive = new KeyReceiver(UiConstant.maxMapWindowKeyBlockLayer, BlockType.All);
-            keyReceive.AddAction(UserInputKey.ChangeMapRate, OnChangeMapRate);
-            keyReceive.AddAction(UserInputKey.AddMark, (data) =>
+            keyReceive.BindKeyAction(UserInputKey.ChangeMapRate, OnChangeMapRate);
+            keyReceive.BindKeyAction(UserInputKey.AddMark, (data) =>
             {
                 if (MapLevel.Min.Equals(adapter.MapLevel) == false)
                 {
@@ -127,7 +138,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                     adapter.SendMarkMessage(markPos);
                 }
             });
-            keyReceive.AddAction(UserInputKey.MouseAddMark, (data) =>
+            keyReceive.BindKeyAction(UserInputKey.MouseAddMark, (data) =>
             {
                 Vector2 hitPoint = Vector2.zero;
                 Vector2 hitPoint1 = Vector2.zero;
@@ -143,15 +154,15 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                     }
                 }
             });
-            keyReceive.AddAction(UserInputKey.LocationCurPlay, OnLocationCurPlay);
+            keyReceive.BindKeyAction(UserInputKey.LocationCurPlay, OnLocationCurPlay);
 
-            keyReceive.AddAction(UserInputKey.HideWindow, (data) =>
-            {
-                if (adapter.Enable)
-                {
-                    ShowMap(!adapter.Enable);
-                }
-            });
+//            keyReceive.BindKeyAction(UserInputKey.HideWindow, (data) =>
+//            {
+//                if (adapter.Enable)
+//                {
+//                    ShowMap(!adapter.Enable);
+//                }
+//            });
         }
 
         private void OnLocationCurPlay(KeyData data)
@@ -208,22 +219,22 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                 }
             }
         }
-        public void ShowMap(bool visible)
-        {
-            if (root != null)
-            {
-                if (visible && !adapter.Enable)
-                {
-                    adapter.Enable = true;
-                    PlayerStateUtil.AddUIState(EPlayerUIState.MapOpen, adapter.gamePlay);
-                }
-                else if (!visible && adapter.Enable)
-                {
-                    adapter.Enable = false;
-                    PlayerStateUtil.RemoveUIState(EPlayerUIState.MapOpen, adapter.gamePlay);
-                }
-            }
-        }
+//        public void ShowMap(bool visible)
+//        {
+//            if (root != null)
+//            {
+//                if (visible && !adapter.Enable)
+//                {
+//                    adapter.Enable = true;
+//                    PlayerStateUtil.AddUIState(EPlayerUIState.MapOpen, adapter.gamePlay);
+//                }
+//                else if (!visible && adapter.Enable)
+//                {
+//                    adapter.Enable = false;
+//                    PlayerStateUtil.RemoveUIState(EPlayerUIState.MapOpen, adapter.gamePlay);
+//                }
+//            }
+//        }
         protected override void OnCanvasEnabledUpdate(bool visible)
         {
             if (root != null)
@@ -231,16 +242,17 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                 if (visible)
                 {
                     SetMapRoot();
-                    adapter.SetCrossActive(false);
-                    adapter.HideUiGroup(Core.Ui.UiGroup.MapHide);
+                    CalculateRate();
+                    //                    adapter.SetCrossActive(false);
+                    //                    adapter.HideUiGroup(Core.Ui.UiGroup.MapHide);
 
                     adapter.RegisterKeyReceive(keyReceive);
                     adapter.RegisterPointerReceive(pointerReceiver);
                 }
                 else
                 {
-                    adapter.SetCrossActive(true);
-                    adapter.ShowUiGroup(Core.Ui.UiGroup.MapHide);
+//                    adapter.SetCrossActive(true);
+//                    adapter.ShowUiGroup(Core.Ui.UiGroup.MapHide);
                     adapter.UnRegisterKeyReceive(keyReceive);
                     adapter.UnRegisterPointerReceive(pointerReceiver);
                 }
@@ -261,17 +273,17 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             GetCenterPosition();
             UpdateMapBg(_centerPos);
 
-            _mapPlayer.Update(adapter.TeamInfos, _centerPos, rate, MiniMapRepresentWHByRice, adapter.MapLevel);
+            _mapPlayer.Update(adapter.TeamInfos, _centerPos, rate, MiniMapRepresentWHByRice, adapter.MapLevel, selfPlayPos3D);
             _mapMark.Update(adapter.MapMarks, rate);
             _safeCircle.Update(adapter.NextDuquan, _centerPos, rate, MiniMapRepresentWHByRice);
             _duquanCircle.Update(adapter.CurDuquan, _centerPos, rate, MiniMapRepresentWHByRice);
             _bombArea.Update(adapter.BombArea, _centerPos, rate, MiniMapRepresentWHByRice);
 //            _safeMiniDis.Update(adapter.NextDuquan, selfPlayPos, playItemModelWidth, rate, MiniMapRepresentWHByRice);
-            if (_mapGird1 != null) _mapGird1.Update(rate, MapRealWHByRice, _centerPos, MiniMapRepresentWHByRice, OriginalMiniMapRepresentWHByRice);
+//            if (_mapGird1 != null) _mapGird1.Update(rate, MapRealWHByRice, _centerPos, MiniMapRepresentWHByRice, OriginalMiniMapRepresentWHByRice);
 
             _airPlane.Update(interval, rate, adapter.KongTouList(), adapter.PlaneData);
             _routeLine.Updata(adapter.IsShowRouteLine, adapter.RouteLineStartPoint, adapter.RouteLineEndPoint, rate);
-            _mapLabel.UpdateC4(adapter.IsC4Drop, adapter.C4DropPosition, rate);
+            _mapLabel.UpdateC4(adapter, rate);
         }
 
 

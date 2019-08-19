@@ -10,31 +10,27 @@ namespace App.Shared.GameModules.Weapon.Behavior
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CommonFireAppearanceUpdater));
 
 
-        public virtual void OnAfterFire(WeaponBaseAgent agent, WeaponSideCmd cmd)
+        public virtual void OnAfterFire(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
-            var weaponController = agent.Owner.WeaponController();
-            var relatedCharState = weaponController.RelatedCharState;
-            if (relatedCharState != null)
+            if (attackProxy.CharacterState != null)
             {
-                if (weaponController.RelatedCameraSNew.IsAiming())
-                    relatedCharState.SightsFire();
+                if (attackProxy.IsAiming)
+                    attackProxy.CharacterState.SightsFire();
                 else
-                    relatedCharState.Fire();
+                    attackProxy.CharacterState.Fire();
             }
         }
 
-        public void OnIdle(WeaponBaseAgent agent, WeaponSideCmd cmd)
+        public void OnIdle(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
             if (!cmd.IsFire)
             {
-                var audioController = agent.Owner.AudioController();
-
-                audioController.StopFireTrigger();
-                DoIdle(agent.Owner.WeaponController(), cmd);
+                attackProxy.AudioController.StopFireTrigger();
+                DoIdle(attackProxy, cmd);
             }
         }
 
-        protected virtual void DoIdle(PlayerWeaponController controller, WeaponSideCmd cmd)
+        protected virtual void DoIdle(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
         }
     }

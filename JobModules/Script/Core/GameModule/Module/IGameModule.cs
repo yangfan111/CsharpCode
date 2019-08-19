@@ -54,6 +54,6 @@ namespace Core.GameModule.Module
         List<IUiSystem> UiSystems { get; }
         List<IUiHfrSystem> UiHfrSystems { get; }
         List<IGamePlaySystem> GamePlaySystems { get; }
-        List<IBeforeUserCmdExecuteSystem> BeforeUserCmdExecuteSystems { get;  }
+       
     }
 }

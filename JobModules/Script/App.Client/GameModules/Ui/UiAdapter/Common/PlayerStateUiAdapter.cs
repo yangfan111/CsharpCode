@@ -195,7 +195,22 @@ namespace App.Client.GameModules.Ui.UiAdapter
             }
         }
 
-       
+        public int ArmorLevel
+        {
+            get
+            {
+                return PlayerEntity.gamePlay.ArmorLv - 99;
+            }
+        }
+
+        public int HelmetLevel {
+            get
+            {
+               return PlayerEntity.gamePlay.HelmetLv - 199;
+            }
+        }
+
+
         public override bool IsReady()
         {
             return PlayerEntity != null;

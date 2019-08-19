@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core.EntityComponent;
 using Core.Utils;
 

@@ -22,7 +22,7 @@ namespace App.Server.GameModules.SceneObject
             _contexts = contexts;
             _group = contexts.sceneObject.GetGroup(SceneObjectMatcher.AllOf(SceneObjectMatcher.WeaponObject, SceneObjectMatcher.LifeTime)
                 .NoneOf(SceneObjectMatcher.FlagDestroy));
-            _list = new List<SceneObjectEntity>(128);
+            _list = new List<SceneObjectEntity>(64);
         }
 
         public void OnGamePlay()

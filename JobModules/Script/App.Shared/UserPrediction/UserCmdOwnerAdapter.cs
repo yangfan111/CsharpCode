@@ -73,15 +73,7 @@ namespace App.Shared.GameModules.Player
             get { return _playerEntity.entityKey.Value; }
         }
 
-        public IUserCmd LastTempCmd
-        {
-            get
-            {
-                if (!_playerEntity.hasUserCmd)
-                    _playerEntity.AddUserCmd();
-                return _playerEntity.userCmd.LastTemp;
-            }
-        }
+     
 
         /// <summary>
         /// 获得过滤后的input命令

@@ -1,5 +1,4 @@
-﻿using App.Server.GameModules.GamePlay.free.player;
-using App.Shared.FreeFramework.Free.player;
+﻿using App.Shared.FreeFramework.Free.player;
 using Core.Free;
 using Free.framework;
 
@@ -17,7 +16,7 @@ namespace App.Server.GameModules.GamePlay.free.client
 
         public void Handle(ServerRoom room, PlayerEntity player, SimpleProto message)
         {
-            PlayerObserveAction.ObservePlayer(room.FreeArgs, (FreeData)player.freeData.FreeData, true, true);
+            PlayerObserveAction.ObservePlayer(room.FreeArgs, player, true, true);
         }
     }
 }

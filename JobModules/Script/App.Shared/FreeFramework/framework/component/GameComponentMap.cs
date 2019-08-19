@@ -109,7 +109,7 @@ namespace gameplay.gamerule.free.component
 					{
 						if (!this.actionMap.ContainsKey(ca.GetName()))
 						{
-							this.AddAction(ca.GetName(), ca.GetDefaultAction());
+							this.BindKeyAction(ca.GetName(), ca.GetDefaultAction());
 						}
 					}
 				}
@@ -217,7 +217,7 @@ namespace gameplay.gamerule.free.component
 
 		public virtual void TempUseAction(string name, IGameAction action)
 		{
-			AddAction(name, action);
+			BindKeyAction(name, action);
 		}
 
 		public virtual void ResumeAction(string name)
@@ -303,7 +303,7 @@ namespace gameplay.gamerule.free.component
 			this.triggerMap[name].Push(trigger);
 		}
 
-		public virtual void AddAction(string name, IGameAction action)
+		public virtual void BindKeyAction(string name, IGameAction action)
 		{
 			if (!actionMap.ContainsKey(name))
 			{

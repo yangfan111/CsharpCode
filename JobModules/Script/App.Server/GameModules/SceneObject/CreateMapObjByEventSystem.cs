@@ -4,6 +4,7 @@ using App.Shared.Player.Events;
 using App.Shared.SceneTriggerObject;
 using App.Shared.Util;
 using Core.EntityComponent;
+using Core.EntityComponent;
 using Core.Event;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
@@ -39,6 +40,12 @@ namespace App.Shared.GameModules.SceneObject
             {
                 HandleEvt(evt);
             }
+
+            foreach (var evt in MapObjectUtility.StoredCreateMapObjMsg)
+            {
+                HandleEvt(evt);
+            }
+            MapObjectUtility.StoredCreateMapObjMsg.Clear();
         }
 
         private void HandleEvt(IEvent evt)

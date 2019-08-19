@@ -7,7 +7,7 @@ namespace Core.Network.ENet
     {
         public int MessageType;
         public object MessageBody;
-        public MemoryStream MemoryStream;
-       
+        public abstract MemoryStream MemoryStream { get; }
+
     }
 }

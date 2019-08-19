@@ -11,7 +11,7 @@ using XmlConfig;
 
 namespace Assets.App.Shared.GameModules.Camera
 {
-    class CameraPreUpdateSystem: AbstractCameraUpdateSystem,IUserCmdExecuteSystem,IBeforeUserCmdExecuteSystem,ISimpleParallelUserCmdExecuteSystem
+    class CameraPreUpdateSystem: AbstractCameraUpdateSystem,IUserCmdExecuteSystem,ISimpleParallelUserCmdExecuteSystem
     {
         private Motors _motors = new Motors();
        
@@ -27,9 +27,7 @@ namespace Assets.App.Shared.GameModules.Camera
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
-            //Logger.InfoFormat("seq:{0}, delata yaw:{2},  client return judge:{1}", cmd.Seq, (!cmd.NeedStepPredication && !SharedConfig.IsServer), cmd.DeltaYaw);
-            if (!cmd.NeedStepPredication && !SharedConfig.IsServer) 
-                return;
+           
             var player = owner.OwnerEntity as PlayerEntity;
             if (player == null) return;
             
@@ -41,12 +39,7 @@ namespace Assets.App.Shared.GameModules.Camera
             return new CameraPreUpdateSystem(_contexts, _motors);
         }
 
-        public void BeforeExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
-        {
-            var player = owner.OwnerEntity as PlayerEntity;
-            if (player == null) return;
-            CommonUpdate(player,cmd);
-        }
+     
         
         protected override void ExecWhenObserving(PlayerEntity player, IUserCmd cmd)
         {
@@ -75,7 +68,7 @@ namespace Assets.App.Shared.GameModules.Camera
 
             DummyCameraMotorState.Convert(player.cameraStateNew, _state);
             DummyCameraMotorInput _input = (DummyCameraMotorInput) player.cameraStateNew.CameraMotorInput;
-            _input.Generate(player, cmd, _state);
+            _input.Generate(player, cmd, _state, LockView);
 
             for (int i=0;i<(int)SubCameraMotorType.End;i++)
             {

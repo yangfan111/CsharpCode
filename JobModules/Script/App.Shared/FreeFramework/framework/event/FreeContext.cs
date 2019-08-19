@@ -9,6 +9,7 @@ namespace App.Shared.FreeFramework.framework.@event
     public class FreeContext
     {
         public bool AiSuccess;
+        public bool OrderComplete;
         public bool DebugMode = false;
 
         public Contexts EntitasContexts;

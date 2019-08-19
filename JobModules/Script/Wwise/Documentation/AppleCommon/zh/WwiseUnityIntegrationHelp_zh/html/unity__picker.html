@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>Wwise Picker</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>&nbsp;&raquo;&nbsp;<a class="el" href="pg__appscripts.html">使用 Wwise Unity 集成</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="unity_picker">Wwise Picker </a></h1><p>Wwise Picker 窗口将用同样的结构来显示您的 Wwise 工程中可用的对象（如 Events 和 Switches）。在 Wwise Picker 视图中显示的工程是在 Wwise Settings 窗口中输入的项目（菜单 <b>Edit &gt; Wwise Settings...</b>），通常在 Unity 中安装 Wwise 插件时指定该项目。</p>
+<p>当保存 Wwise 工程时，Wwise Picker 视图会更新可用的对象。因此，如果没有看到您创建的对象，则可能是因为工程还没有被保存。通过单击 <code>Refresh Project</code>，您可以强制刷新 <code>Wwise</code> Picker 视图。注意，这也刷新了所有与 Wwise 相关的数据，包括在生成 SoundBank 时创建的 XML 元数据文件中的数据。</p>
+<table  border="0" cellspacing="0" cellpadding="2">
+<tr>
+<td valign="top"><div align="center">
+<img src="Note.gif" alt="Note.gif"/>
+</div>
+</td><td><b>备注：</b><b>Do not keep AkWwiseProjectData.asset under version control!</b> This is a temporary cache file for the Wwise project data, so as to avoid having the Wwise Picker continuously parse the Work Unit files. Adding it to version control could <a class="el" href="unity__troubleshooting.html#unity_components_losing_references">cause problems</a>. </td></tr>
+</table>
+<p>使用 Wwise Picker 顶部附近的筛选器框来搜索特定的项。只要写下您要找的东西的名字，然后 Picker 会自动过滤掉那些与您的搜索不匹配的条目。如果您要寻找的对象有一个关闭了的父级，那么可能需要展开一些项。</p>
+<p>您可以通过单击 + 和 - 按钮或双击项目名称来展开和关闭项目。</p>
+<h2><a class="anchor" id="generating_soundbanks">
+生成 SoundBank</a></h2>
+<p>单击 <code>Generate SoundBanks</code>，为所有平台和语言生成全部的 SoundBank。生成的 SoundBank 将出现在 Wwise Picker 的 SoundBanks 文件夹下，如同是从 Wwise 中生成的一样。此外，Unity 状态栏将显示下面可能的几条消息中的一条：如果没有错误或警告，<code>WwiseUnity: SoundBanks generation successful</code>；如果有警告，<code>WwiseUnity: SoundBanks generation has warning(s) </code>；如果有错误，<code>WwiseUnity: SoundBanks generation error</code>。点击消息，将焦点移动到 <code>Console</code> 选项卡，该选项卡显示来自 SoundBank 生成过程的信息。</p>
+<table  border="0" cellspacing="0" cellpadding="2">
+<tr>
+<td valign="top"><div align="center">
+<img src="Note.gif" alt="Note.gif"/>
+</div>
+</td><td><b>备注：</b> 在 Wwise Settings 对话框中，必须指定 <b>Wwise Windows Installation Path</b>（或者 Mac 上的 <b>Wwise Application</b> ）。当在 Unity 中点击 <code>Generate SoundBanks</code> 时，Unity 需要用到 Wwise 的路径。 </td></tr>
+</table>
+<h2><a class="anchor" id="picker_create">
+使用 Picker 在您的场景中添加音频</a></h2>
+<p>若要将 Wwise Picker 中的任何对象添加到您的场景中，要将对象拖拽到现有的 Game Object 上 或 Inspector 窗口中。有关各个组件的详细信息，请分别参阅组件的文档：</p>
+<ul>
+<li>拖放一个 Event 将创建一个 <a class="el" href="class_ak_ambient.html">AkAmbient</a>。</li>
+<li>拖放一个 SoundBank 将创建一个 <a class="el" href="class_ak_bank.html">AkBank</a>。</li>
+<li>拖放一个 Switch Value 将创建一个 <a class="el" href="class_ak_switch.html">AkSwitch</a>。</li>
+<li>拖放一个 State Value 将创建一个 <a class="el" href="class_ak_state.html">AkState</a>。</li>
+<li>拖放一条 Aux Bus 将创建一个 <a class="el" href="class_ak_environment.html">AkEnvironment</a>。 </li>
+</ul>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

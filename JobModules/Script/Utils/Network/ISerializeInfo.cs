@@ -36,7 +36,7 @@ namespace Core.Network
     }
     public interface ISerializeInfo: IDisposable
     {
-        void Serialize(Stream outStream, object message);
+        int Serialize(Stream outStream, object message);
         object Deserialize(Stream inStream);
         SerializationStatistics Statistics { get; }
 

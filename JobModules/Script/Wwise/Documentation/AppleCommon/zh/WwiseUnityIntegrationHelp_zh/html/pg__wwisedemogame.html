@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>Wwise Demo Game</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="pg_wwisedemogame">Wwise Demo Game </a></h1><p>包含 Wwise Unity 集成的一个演示场景，可以从 Wwise Launcher 的 UNITY 页面下载，具体是在 "Recent Unity Projects" 标题下的上下文菜单下面。这个简单的场景是全部使用 Unity 的标准素材创建的，它演示了如何使用集成的一些基本功能。</p>
+<h2><a class="anchor" id="unity_demogame_installation">
+安装</a></h2>
+<p>The Wwise Demo Game is a standalone project. 它可以在 Wwise Launcher 中下载。<b>您的游戏不能用它作为基础。</b>为此，使用 Wwise Launcher 将 Wwise 集成到一个新的 Unity 工程中。</p>
+<table  border="0" cellspacing="0" cellpadding="2">
+<tr>
+<td valign="top"><div align="center">
+<img src="Note.gif" alt="Note.gif"/>
+</div>
+</td><td><b>备注：</b><ul>
+<li>The generated SoundBanks are included in the package.</li>
+<li>You can find the Wwise Project associated with the scenes under <code>&lt;DEMO_SCENE_ROOT&gt;/WwiseProject</code>. 不建议将这个 Wwise 工程放在游戏的 Assets 文件夹中，但在这个演示中，为了打包目的，这样做是必要的。 </li>
+</ul>
+</td></tr>
+</table>
+<h2><a class="anchor" id="unity_demogame_deployment">
+部署</a></h2>
+<p>The Wwise Demo Game is intended as a way to preview and show how the Wwise Unity Integration can be used in the Unity Editor.</p>
+<p>To deploy one of the Wwise Demo Game scenes to a game console or mobile device, follow these steps:</p>
+<ol type="1">
+<li>Within the Launcher's Unity tab, select the <b>Modify Wwise in Project...</b> option from your Wwise Demo Game Unity Project.<ol type="a">
+<li>Launcher 的 Unity 集成页面打开了。</li>
+</ol>
+</li>
+<li>添加所需的 Deployment Platforms 并单击 <b>Modify</b>。</li>
+<li>在 Unity 中打开工程的最新版本。</li>
+<li>为平台生成 SoundBank。</li>
+<li>将 Generated SoundBanks 文件夹复制到 <code>StreamingAssets/Audio</code> 文件夹。</li>
+<li>在 Unity 中，为您想要的平台构建场景然后部署到设备上。</li>
+</ol>
+<h2><a class="anchor" id="unity_demoscene">
+演示场景</a></h2>
+<p>这个 First-Person 3D 地图包含一些沿着一条道路的"站点"。For each station, there is a small description on a sign next to the station. 为了便于引用，各个站点的素材都嵌套在场景层级结构中。</p>
+<h3><a class="anchor" id="unity_demoscene_footstepsdemo">
+脚步演示</a></h3>
+<p>步道和第一站演示了如何使用脚本和触发器来创建脚步系统。</p>
+<p>在 Wwise 工程中，已经按照推荐的方式实现了脚步：每个表面类型的 Random container，嵌套在一个 Switch Container 下。可以使用 <code>Footstep</code> 事件来发送一个脚步，而表面材料则是用 <code>Footstep_material</code> 切换开关组来控制的。</p>
+<p>场景的地形被描绘成四种不同的材质：草、砂石、木头和泥土。在不同的表面上行走会相应地改变脚步的声音。</p>
+<p>为了实现这一目标，各个区域都放置了 Box Collider。然后，只需简单地将一个 Switch Value 从 Wwise Picker Window 拖动到一个 Box Collider 上，就设置好了 <code>Footstep_Material</code> 切换开关。为了在 First Person Controller 进入碰撞体时在其上设置切换开关，我们需要在 "AkTriggerEnter" 触发器上触发 Ak Switch 脚本，并确保启用了 "Use Other Object" 复选框（如 Inspector Window 中所示）。</p>
+<p>一个非常基本的脚步脚本就实现好了，当玩家走动时，它会每隔 0.3 秒发布一个<code>Footstep</code> 事件。这个脚本已经附加到 First Person Controller 了。以上过程展示了一种通过脚本将事件发布到 Wwise SoundEngine 的方法。</p>
+<h3><a class="anchor" id="unity_demoscene_subtitledemo">
+字幕演示</a></h3>
+<p>接下来将用这个站点演示如何在 Unity 中创建自定义事件触发器，以及使用事件回调。</p>
+<p>一个简单的按钮脚本包含一个指令，当玩家离按钮足够近的时候按下键盘或控制器上的键，该指令就会运行。另一个脚本，<code>AkTriggerButtonPress，会在该指令上注册，然后从它的父类</code> <code><a class="el" href="class_ak_trigger_base.html">AkTriggerBase</a></code> 调用 <code>triggerDelegate。从</code> <code><a class="el" href="class_ak_trigger_base.html">AkTriggerBase</a></code> 继承，可以使自定义触发器在 Wwise Component Inspector 窗口中显示在 "触发器” 列表上（例如，附加在按钮上的 Ak Ambient）。有关自定义触发器的更多信息，请参见 <a class="el" href="unity__add__triggers.html">为 Wwise Events 添加新的 Trigger</a>。</p>
+<p>事件开始播放一个包含 WAV marker 的声音文件。注册与事件关联的 marker 回调，可以使得字幕在面板上更新显示。为了实现这一点，在 Ak Ambient 的 inspector 中，勾选了 "Use Callback" 选项。然后，该 GameObject （<code>SubtitleSign）包含一个脚本（<code>SubtitleDemo.cs），整个被拖放到了</code> "Game Object"</code> 框中。当回调被触发时会执行 Callback Function（<code>MarkerCallback），它的名称是手动输入的，且</code> Callback Flag 选为 "Marker"。查看 <code>SubtitleDemo</code> 的代码，可以看到 Callback 函数的实现很简单，就是使用 <code>MarkerCallback</code> 的 <code>uIdentifier</code> 字段作为索引，从预定义的字符串数组中读取字幕。参见 <a class="el" href="pg__appscripts.html#unity_use_AkEvent_AkAmbient">如何与 inspector 一起使用 AkAmbient</a> 以获取更多关于回调的信息。</p>
+<h3><a class="anchor" id="unity_demoscene_environmentdemo">
+环境演示</a></h3>
+<p>该站点演示了如何对场景的一个区域内所有声音施加效果器。两个洞穴包含一个 EnvironmentZone（同样是用 Box Collider 作为触发器），在这个环境上添加了一条 AuxBus（从 Wwise Picker 窗口中拖放）。</p>
+<p>在 Wwise 中，已经创建了两条 Auxiliary Bus，分别包含不同的效果。此外，脚步和 Little Sequence 都选中了 "Use game-defined Auxiliary sends"。</p>
+<p>当一个 Wwise 事件从 EnvironmentZone 中发出时，它的声音会连通到该区域关联的 AuxBus。</p>
+<p>本站点还演示了 Environment Portal 组件。它可以实现在两个环境之间进行空间过渡。本演示中的三个按钮用于说明 Environment Portal 如何影响 Auxiliary Bus 的混合。</p>
+<p>要创建一个环境门户，首先创建一个 Box Collider，它在它的一个轴上连接两个 Ak Environment（在这个演示中，门户会接触到 "z" 轴上的红色区域和蓝色区域）。然后添加 Ak Environment Portal 组件，并选择正确的轴。这两个环境将被混合，并被自动填充。</p>
+<p>想了解有关 Environments 和 Environment Portal 的更多信息，请参阅 <a class="el" href="pg__appscripts.html#unity_use_AkEvironment_AkEvironmentPortal">如何通过 inspector来使用 AkEvironment 和 AkEvironmentPortal（混响区域）</a>。</p>
+<h3><a class="anchor" id="unity_demoscene_timelinedemo">
+Timeline Demo</a></h3>
+<p>This station demonstrates the use of an AkEventTrack and an AkRTPCTrack within a Timeline in Unity. There are two cubes, which, when the button is pressed, are animated towards each other and stopped when they reach impact.</p>
+<p>In order to inspect the Timeline, select Window-&gt;Timeline. Then in the Hierarchy, expand the TimelineDemo object, and then expand the Timeline Demo Button object. Then select the Button object. The Timeline editor will now show the Timeline that controls the animation and Wwise Events for the cubes. The Timeline is controlled by the Playable Director component of the Button object.</p>
+<p>The Timeline contains two animation tracks, one for each cube. These tracks are used to animate the z position of each cube over time. The Timeline also contains an AkEventTrack and an AkRTPCTrack, marked by a white and red tab, respectively. The AkEventTrack contains two AkEventPlayable clips: the first triggers the PlayCubeMovement Wwise Event, and the next triggers the PlayImpact Wwise Event. The names of these Wwise Events are displayed in the clips. You may need to increase the size of the Timeline editor view and zoom in in order for the name to be displayed correctly. The PlayCubeMovement Wwise Event plays a sine wave source, which has an RTPC affecting its pitch. The name of this RTPC is CubeAcceleration. The AkRTPCTrack increases this RTPC over time as the cubes move towards each other. This causes the pitch of the sine wave to increase, producing a simple sound effect to indicate the acceleration of each cube towards the other.</p>
+<p>This station also demonstrates the Motion feature. Note that there is a game object called "Motion listener" in the player hierarchy. This game object set up the output for the Motion device on supported platforms. Any output needs a set of listeners to receive data. That is why the Motion listener also have a Ak Game Object and a Ak Audio Listener. To enable the Motion effect on the cube impact, two important things needs to be done. First, the impact sound needs to be routed to an output bus using the Wwise Motion ShareSet in the Wwise project. Second, the listener used for the Motion output needs to be added to the listeners of the emitter posting the impact event. Inspect the AkMotionListener script for an example on how to add an output.</p>
+<table  border="0" cellspacing="0" cellpadding="2">
+<tr>
+<td valign="top"><div align="center">
+<img src="Note.gif" alt="Note.gif"/>
+</div>
+</td><td><b>备注：</b> To support the Motion feature on android, the manifest of the application must include the vibration permission. Unity generates automatically the manifest based on the content of the application. Adding a call to <code>Handheld.Vibrate()</code> will add the desired permission in the manifest. </td></tr>
+</table>
+<p>For more information on the Timeline integration, see <a class="el" href="unity__timeline.html">Wwise Timeline Integration</a>.</p>
+<h2><a class="anchor" id="unity_spatialaudioscene">
+Spatial Audio Scene</a></h2>
+<p>This scene is the final product of the <a class="el" href="pg__spatialaudio.html">Spatial Audio Tutorial</a>. </p>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

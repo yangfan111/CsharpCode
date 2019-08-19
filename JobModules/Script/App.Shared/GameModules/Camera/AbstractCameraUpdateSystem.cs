@@ -13,10 +13,12 @@ namespace App.Shared.GameModules.Camera
         protected virtual void BeforeExec(PlayerEntity player, IUserCmd cmd) {}
 
         protected Contexts _contexts;
+        protected bool LockView;
         
         public AbstractCameraUpdateSystem(Contexts contexts)
         {
             _contexts = contexts;
+            LockView = !contexts.session.commonSession.RoomInfo.MultiAngleStatus;
         }
         
         public void CommonUpdate(PlayerEntity player, IUserCmd cmd)

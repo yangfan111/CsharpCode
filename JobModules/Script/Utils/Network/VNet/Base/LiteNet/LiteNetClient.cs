@@ -45,7 +45,7 @@ namespace VNet.Base.LiteNet
             _netClient = new NetManager(_listener);
             //取消超时机制，使用TCP的生命周期
             _netClient.DisconnectTimeout = int.MaxValue;
-        
+            
             _netClient.Start();
             var peer = _netClient.Connect(ip, port, "",connId);
             if (null == peer)
@@ -79,10 +79,26 @@ namespace VNet.Base.LiteNet
             {
                 if (null != OnReceiveListener)
                 {
-                    _receiveStream.Write(reader.Data, reader.Position, reader.AvailableBytes);
-                    OnReceiveListener(_peer, _receiveStream);
-                    _receiveStream.Position = 0;
-                    _receiveStream.SetLength(0);
+                    var stream = _receiveStream;
+                    stream.Position = 0;
+                    var crc32 = Utils.Utils.Crc32.Compute(reader.Data, reader.Position, reader.AvailableBytes-4);
+                    UInt32 crc32Message = (UInt32)(  reader.Data[reader.Position+reader.AvailableBytes - 1] << 24)
+                                          | (UInt32)(reader.Data[reader.Position+reader.AvailableBytes - 2] << 16)
+                                          | (UInt32)(reader.Data[reader.Position+reader.AvailableBytes - 3] << 8)
+                                          | (UInt32)(reader.Data[reader.Position+reader.AvailableBytes - 4] << 0);
+                    if ( crc32 == crc32Message)
+                    {
+                        stream.Write(reader.Data, reader.Position, reader.AvailableBytes-4);
+
+                        OnReceiveListener(_peer, stream);
+                        stream.Position = 0;
+                        stream.SetLength(0);
+                    }
+                    else
+                    {
+                       Logger.ErrorFormat("udp message crc error:{0} |= {1}", crc32,crc32Message);
+                    }
+                   
                 }
                 if (reader is NetPacketReader)
                 {

@@ -16,15 +16,18 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
     {
         private class GroupScoreView : UIView
         {
-            public GameObject Show;
+            public GameObject TimeShow;
             [HideInInspector]
-            public bool oriShow;
-            public Text WinContionText;
+            public bool oriTimeShow;
+            public Text TimeText;
             [HideInInspector]
-            public string oriWinContionText;
-            public Text WinContionColor;
+            public string oriTimeText;
+            public Text TimeColor;
             [HideInInspector]
-            public Color oriWinContionColor;
+            public Color oriTimeColor;
+            public Text ScoreText;
+            [HideInInspector]
+            public string oriScoreText;
             public Text CampKillCountText1;
             [HideInInspector]
             public string oriCampKillCountText1;
@@ -40,8 +43,8 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
                     var realName = v.gameObject.name.Replace("(Clone)","");
                     switch (realName)
                     {
-                        case "Show":
-                            Show = v.gameObject;
+                        case "Time":
+                            TimeShow = v.gameObject;
                             break;
                     }
                 }
@@ -52,9 +55,12 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
                     var realName = v.gameObject.name.Replace("(Clone)","");
                     switch (realName)
                     {
-                        case "WinContion":
-                            WinContionText = v;
-                            WinContionColor = v;
+                        case "Time":
+                            TimeText = v;
+                            TimeColor = v;
+                            break;
+                        case "ScoreText":
+                            ScoreText = v;
                             break;
                         case "CampKillCount1":
                             CampKillCountText1 = v;
@@ -69,14 +75,16 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
         }
 
 
-        private bool _show;
-        private string _winContionText;
-        private Color _winContionColor;
+        private bool _timeShow;
+        private string _timeText;
+        private Color _timeColor;
+        private string _scoreText;
         private string _campKillCountText1;
         private string _campKillCountText2;
-        public bool Show { get { return _show; } set {if(_show != value) Set(ref _show, value, "Show"); } }
-        public string WinContionText { get { return _winContionText; } set {if(_winContionText != value) Set(ref _winContionText, value, "WinContionText"); } }
-        public Color WinContionColor { get { return _winContionColor; } set {if(_winContionColor != value) Set(ref _winContionColor, value, "WinContionColor"); } }
+        public bool TimeShow { get { return _timeShow; } set {if(_timeShow != value) Set(ref _timeShow, value, "TimeShow"); } }
+        public string TimeText { get { return _timeText; } set {if(_timeText != value) Set(ref _timeText, value, "TimeText"); } }
+        public Color TimeColor { get { return _timeColor; } set {if(_timeColor != value) Set(ref _timeColor, value, "TimeColor"); } }
+        public string ScoreText { get { return _scoreText; } set {if(_scoreText != value) Set(ref _scoreText, value, "ScoreText"); } }
         public string CampKillCountText1 { get { return _campKillCountText1; } set {if(_campKillCountText1 != value) Set(ref _campKillCountText1, value, "CampKillCountText1"); } }
         public string CampKillCountText2 { get { return _campKillCountText2; } set {if(_campKillCountText2 != value) Set(ref _campKillCountText2, value, "CampKillCountText2"); } }
 
@@ -160,9 +168,10 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
 		{
 		     BindingSet<GroupScoreView, GroupScoreViewModel> bindingSet =
                 view.CreateBindingSet<GroupScoreView, GroupScoreViewModel>();
-            bindingSet.Bind(view.Show).For(v => v.activeSelf).To(vm => vm.Show).OneWay();
-            bindingSet.Bind(view.WinContionText).For(v => v.text).To(vm => vm.WinContionText).OneWay();
-            bindingSet.Bind(view.WinContionColor).For(v => v.color).To(vm => vm.WinContionColor).OneWay();
+            bindingSet.Bind(view.TimeShow).For(v => v.activeSelf).To(vm => vm.TimeShow).OneWay();
+            bindingSet.Bind(view.TimeText).For(v => v.text).To(vm => vm.TimeText).OneWay();
+            bindingSet.Bind(view.TimeColor).For(v => v.color).To(vm => vm.TimeColor).OneWay();
+            bindingSet.Bind(view.ScoreText).For(v => v.text).To(vm => vm.ScoreText).OneWay();
             bindingSet.Bind(view.CampKillCountText1).For(v => v.text).To(vm => vm.CampKillCountText1).OneWay();
             bindingSet.Bind(view.CampKillCountText2).For(v => v.text).To(vm => vm.CampKillCountText2).OneWay();
 		
@@ -171,9 +180,10 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
 
 		void DataInit(GroupScoreView view)
 		{
-            _show = view.Show.activeSelf;
-            _winContionText = view.WinContionText.text;
-            _winContionColor = view.WinContionColor.color;
+            _timeShow = view.TimeShow.activeSelf;
+            _timeText = view.TimeText.text;
+            _timeColor = view.TimeColor.color;
+            _scoreText = view.ScoreText.text;
             _campKillCountText1 = view.CampKillCountText1.text;
             _campKillCountText2 = view.CampKillCountText2.text;
 		}
@@ -181,9 +191,10 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
 
 		void SaveOriData(GroupScoreView view)
 		{
-            view.oriShow = _show;
-            view.oriWinContionText = _winContionText;
-            view.oriWinContionColor = _winContionColor;
+            view.oriTimeShow = _timeShow;
+            view.oriTimeText = _timeText;
+            view.oriTimeColor = _timeColor;
+            view.oriScoreText = _scoreText;
             view.oriCampKillCountText1 = _campKillCountText1;
             view.oriCampKillCountText2 = _campKillCountText2;
 		}
@@ -201,9 +212,10 @@ namespace App.Client.GameModules.Ui.ViewModels.Group
 			{
 				return;
 			}
-			Show = _view.oriShow;
-			WinContionText = _view.oriWinContionText;
-			WinContionColor = _view.oriWinContionColor;
+			TimeShow = _view.oriTimeShow;
+			TimeText = _view.oriTimeText;
+			TimeColor = _view.oriTimeColor;
+			ScoreText = _view.oriScoreText;
 			CampKillCountText1 = _view.oriCampKillCountText1;
 			CampKillCountText2 = _view.oriCampKillCountText2;
 			SpriteReset();

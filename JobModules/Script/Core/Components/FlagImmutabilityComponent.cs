@@ -11,10 +11,14 @@ namespace Core.Components
         [NetworkProperty] public int LastModifyServerTime;
         public bool NeedSkipPlayBack { get; private set; }
         public bool NeedSkipSyncLatest { get; private set; }
+
+        private bool HasBeenRendered;
+        
         public bool NeedSkipUpdate
         {
-            get { return NeedSkipPlayBack && NeedSkipSyncLatest; }
+            get { return NeedSkipPlayBack && NeedSkipSyncLatest && HasBeenRendered; }
         }
+        
         public int InitTime { get; private set; }
         public const int MinLastModifyOffset = 100;
         public const int ChangeInitTime = 1000;
@@ -32,26 +36,32 @@ namespace Core.Components
             return (int) ECoreComponentIds.FlagImmutability;
         }
 
+        public void HasUsed()
+        {
+            HasBeenRendered = true;
+        }
+        
         public bool JudgeNeedSkipPlayback(int leftServerTime, bool isPlayback = false)
         {
             //开关&&保证1秒内不会进入状态，判断差值左值在范围内，判断改次修改有没有生效过
-            if (!DisableImmutability && InitTime <= 0 &&  LastModifyServerTime + MinLastModifyOffset< leftServerTime && _lastSkipPlaybackTime ==LastModifyServerTime)
+            if (!DisableImmutability && InitTime <= 0 && LastModifyServerTime + MinLastModifyOffset < leftServerTime &&
+                _lastSkipPlaybackTime == LastModifyServerTime)
             {
                 NeedSkipPlayBack = true;
             }
             else
             {
-                if(isPlayback)
+                if (isPlayback)
                     _lastSkipPlaybackTime = LastModifyServerTime;
                 NeedSkipPlayBack = false;
             }
-
             return NeedSkipPlayBack;
         }
 
         public bool JudgeNeedSkipSyncLatest(int rightServerTime)
         {
-            if (!DisableImmutability && InitTime <= 0 && LastModifyServerTime + MinLastModifyOffset < rightServerTime && _lastSkipSyncLatestTime == LastModifyServerTime)
+            if (!DisableImmutability && InitTime <= 0 && LastModifyServerTime + MinLastModifyOffset < rightServerTime &&
+                _lastSkipSyncLatestTime == LastModifyServerTime)
             {
                 NeedSkipSyncLatest = true;
             }
@@ -69,7 +79,6 @@ namespace Core.Components
             InitTime = ChangeInitTime;
             _lastSkipSyncLatestTime = -1;
             _lastSkipPlaybackTime = -1;
-
         }
 
         public void Tick(int interval)

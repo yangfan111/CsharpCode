@@ -1,113 +1,138 @@
 using System;
-using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
-using Loxodon.Framework.Binding;
-using Loxodon.Framework.Binding.Builder;
-using Loxodon.Framework.ViewModels;
-using Loxodon.Framework.Views;
 using Assets.UiFramework.Libs;
 using UnityEngine.UI;
 using UIComponent.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
 namespace App.Client.GameModules.Ui.ViewModels.Common
 {
-    public class CommonMaxMapViewModel : ViewModelBase, IUiViewModel
+    public class CommonMaxMapViewModel : UIViewModelBase
     {
-        private class CommonMaxMapView : UIView
+        private class CommonMaxMapView : UIViewBase
         {
-            public Action<BaseEventData> OnmaskBgETHover;
-            public Action<BaseEventData> OnmaskBgETClick;
-            public Action<BaseEventData> OnmaskBgETMouseDown;
-            public Action<BaseEventData> OnmaskBgETMouseUp;
-            public Action<BaseEventData> OnmaskBgETHoverExit;
-            public RectTransform rootLocation;
-            [HideInInspector]
-            public Vector2 orirootLocation;
-            public EventTrigger maskBgET;
-            public void GenerateTrigger()
-            {
-            	maskBgET.triggers.Clear();
-            	var maskBgETEntry = new EventTrigger.Entry() { callback = new EventTrigger.TriggerEvent(), eventID = EventTriggerType.PointerEnter};
-            	maskBgETEntry.callback.AddListener((data) => { if (null != OnmaskBgETHover) OnmaskBgETHover(data); });
-            	maskBgET.triggers.Add(maskBgETEntry);
-            	maskBgETEntry = new EventTrigger.Entry() { callback = new EventTrigger.TriggerEvent(), eventID = EventTriggerType.PointerClick};
-            	maskBgETEntry.callback.AddListener((data) => { if (null != OnmaskBgETClick) OnmaskBgETClick(data); });
-            	maskBgET.triggers.Add(maskBgETEntry);
-            	maskBgETEntry = new EventTrigger.Entry() { callback = new EventTrigger.TriggerEvent(), eventID = EventTriggerType.PointerDown};
-            	maskBgETEntry.callback.AddListener((data) => { if (null != OnmaskBgETMouseDown) OnmaskBgETMouseDown(data); });
-            	maskBgET.triggers.Add(maskBgETEntry);
-            	maskBgETEntry = new EventTrigger.Entry() { callback = new EventTrigger.TriggerEvent(), eventID = EventTriggerType.PointerUp};
-            	maskBgETEntry.callback.AddListener((data) => { if (null != OnmaskBgETMouseUp) OnmaskBgETMouseUp(data); });
-            	maskBgET.triggers.Add(maskBgETEntry);
-            	maskBgETEntry = new EventTrigger.Entry() { callback = new EventTrigger.TriggerEvent(), eventID = EventTriggerType.PointerExit};
-            	maskBgETEntry.callback.AddListener((data) => { if (null != OnmaskBgETHoverExit) OnmaskBgETHoverExit(data); });
-            	maskBgET.triggers.Add(maskBgETEntry);
-            }
-            
-            public void FillField()
-            {
-                RectTransform[] recttransforms = gameObject.GetComponentsInChildren<RectTransform>(true);
-                foreach (var v in recttransforms)
-                {
-                    var realName = v.gameObject.name.Replace("(Clone)","");
-                    switch (realName)
-                    {
-                        case "root":
-                            rootLocation = v;
-                            break;
-                    }
-                }
+			public UIText MapNameUIText;
+			public UIText RoomInfoUIText;
+			public UIText NumberUIText;
+			public UIText WinConditionUIText;
+			public UIText TeamUIText;
+			public UIText TipUIText;
+			public GameObject MapRoot;
+			public GameObject RoomInfoGroup;
+			public GameObject NumberGroup;
+			public GameObject WinConditionGroup;
+			public GameObject TeamGroup;
+			public GameObject TipGroup;
+			public VerticalLayoutGroup GroupVerticalLayoutGroup;
+			public VerticalLayoutGroup RoomInfoGroupVerticalLayoutGroup;
+			public VerticalLayoutGroup WinConditionGroupVerticalLayoutGroup;
 
-                EventTrigger[] eventtriggers = gameObject.GetComponentsInChildren<EventTrigger>(true);
-                foreach (var v in eventtriggers)
-                {
-                    var realName = v.gameObject.name.Replace("(Clone)","");
-                    switch (realName)
-                    {
-                        case "Bg":
-                            maskBgET = v;
-                            break;
-                    }
-                }
 
+
+			public override void FillField()
+			{
+				base.FillField();
+				UIBind uibind = GetComponent<UIBind>();
+				MapNameUIText =  uibind.AllObjs[0] as UIText;
+				RoomInfoUIText =  uibind.AllObjs[1] as UIText;
+				NumberUIText =  uibind.AllObjs[2] as UIText;
+				WinConditionUIText =  uibind.AllObjs[3] as UIText;
+				TeamUIText =  uibind.AllObjs[4] as UIText;
+				TipUIText =  uibind.AllObjs[5] as UIText;
+				MapRoot =  uibind.AllObjs[6] as GameObject;
+				RoomInfoGroup =  uibind.AllObjs[7] as GameObject;
+				NumberGroup =  uibind.AllObjs[8] as GameObject;
+				WinConditionGroup =  uibind.AllObjs[9] as GameObject;
+				TeamGroup =  uibind.AllObjs[10] as GameObject;
+				TipGroup =  uibind.AllObjs[11] as GameObject;
+				GroupVerticalLayoutGroup =  uibind.AllObjs[12] as VerticalLayoutGroup;
+				RoomInfoGroupVerticalLayoutGroup =  uibind.AllObjs[13] as VerticalLayoutGroup;
+				WinConditionGroupVerticalLayoutGroup =  uibind.AllObjs[14] as VerticalLayoutGroup;
             }
+
         }
 
 
-        private Vector2 _rootLocation;
-        private List<EventTrigger.Entry> _maskBgET;
-        public Vector2 rootLocation { get { return _rootLocation; } set {if(_rootLocation != value) Set(ref _rootLocation, value, "rootLocation"); } }
-        public List<EventTrigger.Entry> maskBgET{	get { return _maskBgET; }	set	{if (_maskBgET != null){foreach (var eventEntry in _maskBgET){_view.maskBgET.triggers.Remove(eventEntry);}}if (value != null){foreach (var eventEntry in value){_view.maskBgET.triggers.Add(eventEntry);}}Set(ref _maskBgET, value, "maskBgET");}}
 
-		private Action<Action<BaseEventData>> _onOnmaskBgETHoverChanged;
-		private Action<BaseEventData> _onmaskBgETHoverListener;
-		public Action<BaseEventData> OnmaskBgETHoverListener { get { return _onmaskBgETHoverListener ;} set { if (null != _onOnmaskBgETHoverChanged) _onOnmaskBgETHoverChanged(value); _onmaskBgETHoverListener = value; } }
-		private Action<Action<BaseEventData>> _onOnmaskBgETClickChanged;
-		private Action<BaseEventData> _onmaskBgETClickListener;
-		public Action<BaseEventData> OnmaskBgETClickListener { get { return _onmaskBgETClickListener ;} set { if (null != _onOnmaskBgETClickChanged) _onOnmaskBgETClickChanged(value); _onmaskBgETClickListener = value; } }
-		private Action<Action<BaseEventData>> _onOnmaskBgETMouseDownChanged;
-		private Action<BaseEventData> _onmaskBgETMouseDownListener;
-		public Action<BaseEventData> OnmaskBgETMouseDownListener { get { return _onmaskBgETMouseDownListener ;} set { if (null != _onOnmaskBgETMouseDownChanged) _onOnmaskBgETMouseDownChanged(value); _onmaskBgETMouseDownListener = value; } }
-		private Action<Action<BaseEventData>> _onOnmaskBgETMouseUpChanged;
-		private Action<BaseEventData> _onmaskBgETMouseUpListener;
-		public Action<BaseEventData> OnmaskBgETMouseUpListener { get { return _onmaskBgETMouseUpListener ;} set { if (null != _onOnmaskBgETMouseUpChanged) _onOnmaskBgETMouseUpChanged(value); _onmaskBgETMouseUpListener = value; } }
-		private Action<Action<BaseEventData>> _onOnmaskBgETHoverExitChanged;
-		private Action<BaseEventData> _onmaskBgETHoverExitListener;
-		public Action<BaseEventData> OnmaskBgETHoverExitListener { get { return _onmaskBgETHoverExitListener ;} set { if (null != _onOnmaskBgETHoverExitChanged) _onOnmaskBgETHoverExitChanged(value); _onmaskBgETHoverExitListener = value; } }
+			public UIText MapNameUIText { 
+			get { return _view.MapNameUIText;} 
+			}
+
+			public UIText RoomInfoUIText { 
+			get { return _view.RoomInfoUIText;} 
+			}
+
+			public UIText NumberUIText { 
+			get { return _view.NumberUIText;} 
+			}
+
+			public UIText WinConditionUIText { 
+			get { return _view.WinConditionUIText;} 
+			}
+
+			public UIText TeamUIText { 
+			get { return _view.TeamUIText;} 
+			}
+
+			public UIText TipUIText { 
+			get { return _view.TipUIText;} 
+			}
+
+			public GameObject MapRoot { 
+			get { return _view.MapRoot;} 
+			}
+
+			public GameObject RoomInfoGroup { 
+			get { return _view.RoomInfoGroup;} 
+			}
+
+			public GameObject NumberGroup { 
+			get { return _view.NumberGroup;} 
+			}
+
+			public GameObject WinConditionGroup { 
+			get { return _view.WinConditionGroup;} 
+			}
+
+			public GameObject TeamGroup { 
+			get { return _view.TeamGroup;} 
+			}
+
+			public GameObject TipGroup { 
+			get { return _view.TipGroup;} 
+			}
+
+			public VerticalLayoutGroup GroupVerticalLayoutGroup { 
+			get { return _view.GroupVerticalLayoutGroup;} 
+			}
+
+			public VerticalLayoutGroup RoomInfoGroupVerticalLayoutGroup { 
+			get { return _view.RoomInfoGroupVerticalLayoutGroup;} 
+			}
+
+			public VerticalLayoutGroup WinConditionGroupVerticalLayoutGroup { 
+			get { return _view.WinConditionGroupVerticalLayoutGroup;} 
+			}
+
+
+
+
+
+		
 		private GameObject _viewGameObject;
 		private Canvas _viewCanvas;
 		private CommonMaxMapView _view;
 		
-		public void Destory()
+		public override void Destory()
         {
             if (_viewGameObject != null)
             {
 				UnityEngine.Object.Destroy(_viewGameObject);
             }
         }
-		public void Visible(bool isViaible)
+		public override void Visible(bool isViaible)
 		{
 		    if (_viewGameObject != null)
             {
@@ -115,14 +140,14 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
             }
 		
 		}
-		public void SetCanvasEnabled(bool value)
+		public override void SetCanvasEnabled(bool value)
         {
             if (_viewCanvas != null)
             {
                 _viewCanvas.enabled = value;
             }
         }
-        public void CreateBinding(GameObject obj)
+        public override void CreateBinding(GameObject obj)
         {
 			_viewGameObject = obj;
 			_viewCanvas = _viewGameObject.GetComponent<Canvas>();
@@ -137,66 +162,36 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 			}
 			DataInit(view);
 			SpriteReset();
-			view.BindingContext().DataContext = this;
+
 			if(bFirst)
 			{
 				SaveOriData(view);
-				ViewBind(view);
 			}
 			_view = view;
+			viewBase = view;
 
-			view.GenerateTrigger();
-			EventTriggerBind(view);
+			
         }
+		
 		private void EventTriggerBind(CommonMaxMapView view)
 		{
-			_onOnmaskBgETHoverChanged = (val) => view.OnmaskBgETHover = val;
-			_onOnmaskBgETClickChanged = (val) => view.OnmaskBgETClick = val;
-			_onOnmaskBgETMouseDownChanged = (val) => view.OnmaskBgETMouseDown = val;
-			_onOnmaskBgETMouseUpChanged = (val) => view.OnmaskBgETMouseUp = val;
-			_onOnmaskBgETHoverExitChanged = (val) => view.OnmaskBgETHoverExit = val;
-		}
 
-        private static readonly Dictionary<string, PropertyInfo> PropertySetter = new Dictionary<string, PropertyInfo>();
-        private static readonly Dictionary<string, MethodInfo> MethodSetter = new Dictionary<string, MethodInfo>();
-
-        static CommonMaxMapViewModel()
-        {
-            Type type = typeof(CommonMaxMapViewModel);
-            foreach (var property in type.GetProperties())
-            {
-                if (property.CanWrite)
-                {
-                    PropertySetter.Add(property.Name, property);
-                }
-            }
-			foreach (var methodInfo in type.GetMethods())
-            {
-                if (methodInfo.IsPublic)
-                {
-                    MethodSetter.Add(methodInfo.Name, methodInfo);
-                }
-            }
-        }
-
-		void ViewBind(CommonMaxMapView view)
-		{
-		     BindingSet<CommonMaxMapView, CommonMaxMapViewModel> bindingSet =
-                view.CreateBindingSet<CommonMaxMapView, CommonMaxMapViewModel>();
-            bindingSet.Bind(view.rootLocation).For(v => v.anchoredPosition).To(vm => vm.rootLocation).OneWay();
 		
-			bindingSet.Build();
+
 		}
+		
+
+		
+		
 
 		void DataInit(CommonMaxMapView view)
 		{
-            _rootLocation = view.rootLocation.anchoredPosition;
 		}
 
 
 		void SaveOriData(CommonMaxMapView view)
 		{
-            view.orirootLocation = _rootLocation;
+        
 		}
 
 
@@ -204,44 +199,41 @@ namespace App.Client.GameModules.Ui.ViewModels.Common
 
 		private void SpriteReset()
 		{
+			
 		}
 
-		public void Reset()
+		public override void Reset()
 		{
 			if(_viewGameObject == null)
 			{
 				return;
 			}
-			rootLocation = _view.orirootLocation;
+			
 			SpriteReset();
 		}
 
-		public void CallFunction(string functionName)
+		public override bool IsPropertyExist(string name)
         {
-            if (MethodSetter.ContainsKey(functionName))
-            {
-                MethodSetter[functionName].Invoke(this, null);
-            }
+            return false;
         }
 
-		public bool IsPropertyExist(string propertyId)
+        public override Transform GetParentLinkNode()
         {
-            return PropertySetter.ContainsKey(propertyId);
+            return null;
         }
 
-		public Transform GetParentLinkNode()
-		{
-			return null;
-		}
+        public override Transform GetChildLinkNode()
+        {
+            return null;
+        }
 
-		public Transform GetChildLinkNode()
-		{
-			return null;
-		}
 
-        public string ResourceBundleName { get { return "ui/client/prefab/common"; } }
-        public string ResourceAssetName { get { return "CommonMaxMap"; } }
-        public string ConfigBundleName { get { return ""; } }
-        public string ConfigAssetName { get { return ""; } }
+
+       
+
+        public override string ResourceBundleName { get { return "ui/client/prefab/common"; } }
+        public override string ResourceAssetName { get { return "CommonMaxMap"; } }
+        public override string ConfigBundleName { get { return ""; } }
+        public override string ConfigAssetName { get { return ""; } }
     }
 }

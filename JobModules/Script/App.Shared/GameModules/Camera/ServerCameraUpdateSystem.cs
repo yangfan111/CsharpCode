@@ -53,9 +53,9 @@ namespace App.Shared.GameModules.Camera
 
         private void HandleAction(PlayerEntity player)
         {
-            CameraActionManager.CopyActionCode(CameraActionType.Enter, player.cameraStateUpload.EnterActionCode);
-            CameraActionManager.CopyActionCode(CameraActionType.Leave, player.cameraStateUpload.LeaveActionCode);
-            CameraActionManager.OnAction(player, _state);
+            _motors.ActionManager.CopyActionCode(CameraActionType.Enter, player.cameraStateUpload.EnterActionCode);
+            _motors.ActionManager.CopyActionCode(CameraActionType.Leave, player.cameraStateUpload.LeaveActionCode);
+            _motors.ActionManager.OnAction(player, _state);
         }
 
         private void CopyClientStateToComponent(CameraStateUploadComponent input, CameraStateNewComponent output)
@@ -66,9 +66,6 @@ namespace App.Shared.GameModules.Camera
             output.FreeNowMode = input.FreeNowMode;
             output.FreeYaw = input.FreeYaw;
             output.FreePitch = input.FreePitch;
-//            output.LastFreeYaw = input.LastFreeYaw;
-//            output.LastFreePitch = input.LastFreePitch;
-//            output.LastPeekPercent = input.LastPeekPercent;
             output.CanFire = input.CanFire;
         }
 

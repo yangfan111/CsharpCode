@@ -1,10 +1,13 @@
-﻿using Core.Network.ENet;
+﻿using System.IO;
+using Core.Network.ENet;
 using Core.ObjectPool;
 
 namespace VNet
 {
     internal class VNetworkMessageItem: NetworkMessageItem
     {
+        private MemoryStream _stream;
+
         public class ObjcetFactory :CustomAbstractObjectFactory
         {
             public ObjcetFactory() : base(typeof(VNetworkMessageItem)){}
@@ -25,7 +28,7 @@ namespace VNet
         }
         private VNetworkMessageItem() 
         {
-           
+           _stream = new MemoryStream(1024*10);
         }
         public static VNetworkMessageItem Allocate(int messageType, object messageBody, int channel)
         {
@@ -35,6 +38,8 @@ namespace VNet
         }
         public void Init(int messageType, object messageBody, int channel)
         {
+            _stream.Seek(0, SeekOrigin.Begin);
+            _stream.SetLength(0);
             Channel = channel;
             MessageType = messageType;
             MessageBody = messageBody;
@@ -71,6 +76,14 @@ namespace VNet
             base.ReleaseReference();
            
             
+        }
+
+        public override MemoryStream MemoryStream
+        {
+            get
+            {
+                return _stream;
+            }
         }
     }
 }

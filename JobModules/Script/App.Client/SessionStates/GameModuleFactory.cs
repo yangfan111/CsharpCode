@@ -2,12 +2,12 @@ using App.Client.GameModules.Attack;
 using App.Client.GameModules.ClientEffect;
 using App.Client.GameModules.GamePlay;
 using App.Client.GameModules.GamePlay.Free.Entitas;
-using App.Client.GameModules.GamePlay.Free.Scene;
 using App.Client.GameModules.OC;
 using App.Client.GameModules.Player;
 using App.Client.GameModules.Player.Robot;
 using App.Client.GameModules.SceneManagement;
 using App.Client.GameModules.SceneObject;
+using App.Client.GameModules.Sound;
 using App.Client.GameModules.Terrain;
 using App.Client.GameModules.Throwing;
 using App.Client.GameModules.Ui;
@@ -26,7 +26,6 @@ using Core.Configuration;
 using Core.Free;
 using Core.GameModule.Module;
 using Free.framework;
-using Utils.Configuration;
 using Utils.Singleton;
 using XmlConfig;
 
@@ -55,7 +54,7 @@ namespace App.Client.SessionStates
             GameModule cmdModule = new UserCmdGameModule(contexts, factory,
                 new BulletHitHandler(contexts, sessionObjects.EntityIdGenerator, null), new MeleeHitHandler(null),
                 new ThrowingHitHandler(null), contexts.session.commonSession, motors);
-            cmdModule.AddSystem(new PlayerAddMarkSystem(contexts));
+//            cmdModule.AddSystem(new PlayerAddMarkSystem(contexts));
             cmdModule.AddSystem(new PlayerSprayPaintSystem(contexts));
 
             gameModule.AddModule(cmdModule);
@@ -65,6 +64,7 @@ namespace App.Client.SessionStates
             gameModule.AddModule(new ClientEffectModule(contexts));
             gameModule.AddModule(new ClientVehicleModule(contexts));
             gameModule.AddModule(new ClientPlayerModule(contexts));
+            gameModule.AddModule(new ClientSoundModule(contexts));
 
 
             if (SharedConfig.IsRobot)
@@ -74,12 +74,13 @@ namespace App.Client.SessionStates
 
             gameModule.AddSystem(new VisionCenterUpdateSystem(contexts));
             gameModule.AddSystem(new TerrainDataLoadSystem(contexts));
-            if (SingletonManager.Get<MapConfigManager>().SceneParameters is SceneConfig)
+            if (SingletonManager.Get<MapConfigManager>().SceneParameters is SceneConfig
+                || SingletonManager.Get<MapConfigManager>().SceneParameters.Id == 0)
             {
                 gameModule.AddSystem(new ClientAutoWorldShiftRenderSystem(contexts));
             }
 
-            gameModule.AddSystem(new OcclusionCullingSystem(contexts));
+            //gameModule.AddSystem(new OcclusionCullingSystem(contexts));
 
             gameModule.AddModule(new ClientSceneObjectModule(contexts, sessionObjects));
             //  gameModule.AddModule(new ClientSoundModule(contexts));

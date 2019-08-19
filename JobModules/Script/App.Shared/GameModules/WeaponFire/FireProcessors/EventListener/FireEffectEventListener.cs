@@ -1,7 +1,7 @@
 ﻿using App.Shared.Components;
 using App.Shared.EntityFactory;
-using App.Shared.GameModules.Player;
 using App.Shared.GameModules.Weapon.Behavior;
+using Core.CharacterBone;
 using Core.Configuration;
 using Core.Event;
 using Core.Utils;
@@ -39,36 +39,35 @@ namespace App.Shared.GameModules.Weapon
             get { return _config as DefaultWeaponEffectConfig; }
         }
 
-        public void OnAfterFire(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
+        public void OnAfterFire(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
             if (DefaultCfg == null)
                 return;
-            var weaponController = weaponBaseAgent.Owner.WeaponController();
-            CreateFireRelatedEffect(weaponController);
-            CreateBulletEffect(weaponController);
+            var bones = attackProxy.Owner.RelatedBones;
+            CreateFireRelatedEffect(attackProxy,bones);
+            CreateBulletEffect(attackProxy,bones);
         }
 
-        private void CreateBulletEffect(PlayerWeaponController controller)
+
+        private void CreateBulletEffect(WeaponAttackProxy attackProxy, ICharacterBone bones)
         {
-            if (DefaultCfg.BulletFly < 1)
+            if (DefaultCfg.BulletFly < 1 || attackProxy.IsAiming)
                 return;
-            if (controller.RelatedCameraSNew.IsAiming())
-                return;
-            var muzzleTrans = controller.RelatedBones.GetLocation(SpecialLocation.MuzzleEffectPosition,
-                controller.RelatedAppearence.IsFirstPerson ? CharacterView.FirstPerson : CharacterView.ThirdPerson);
+            var muzzleTrans = bones.GetLocation(SpecialLocation.MuzzleEffectPosition,
+                attackProxy.Appearence.IsFirstPerson ? CharacterView.FirstPerson : CharacterView.ThirdPerson);
             if (!muzzleTrans)
                 return;
             var efcCommonCfg = SingletonManager.Get<ClientEffectCommonConfigManager>()
                             .GetConfigByType(EEffectObjectClassify.BulletFly);
-            foreach (var bulletData in controller.BulletList)
+            foreach (var bulletData in attackProxy.Owner.BulletList)
             {
-                var origin = bulletData.ViewPosition;
+                var origin   = bulletData.ViewPosition;
                 var velocity = efcCommonCfg.Velocity * bulletData.Dir;
 
                 Vector3 target               = origin + velocity * 1.0f;
                 Vector3 bulletEffectVelocity = (target - bulletData.EmitPosition) / 1.0f;
-                ClientEffectFactory.CreateBulletFlyEffect(controller.Owner, muzzleTrans.position, muzzleTrans.rotation,
-                    bulletEffectVelocity, DefaultCfg.BulletFly,efcCommonCfg.Delay);
+                ClientEffectFactory.CreateBulletFlyEffect(attackProxy.Owner.Owner, muzzleTrans.position,
+                    muzzleTrans.rotation, bulletEffectVelocity, DefaultCfg.BulletFly, efcCommonCfg.Delay);
             }
         }
 
@@ -77,31 +76,31 @@ namespace App.Shared.GameModules.Weapon
         {
         }
 
-        private void AddPullBoltEvent(PlayerWeaponController controller)
+        private void AddPullBoltEvent(WeaponAttackProxy attackProxy)
         {
-            if (controller.RelatedLocalEvents != null)
-            {
-                var e = EventInfos.Instance.Allocate(EEventType.PullBolt, false);
-                controller.RelatedLocalEvents.AddEvent(e);
-            }
+            var e = EventInfos.Instance.Allocate(EEventType.PullBolt, false);
+            attackProxy.Owner.RelatedLocalEvents.AddEvent(e);
         }
 
-        protected virtual void CreateFireRelatedEffect(PlayerWeaponController controller)
+        protected virtual void CreateFireRelatedEffect(WeaponAttackProxy attackProxy, ICharacterBone bones)
+
         {
-            if (null == controller || DefaultCfg.Spark < 1)
+            if (DefaultCfg.Spark < 1)
                 return;
-            var muzzleTrans = controller.RelatedBones.GetLocation(SpecialLocation.MuzzleEffectPosition,
-                controller.RelatedAppearence.IsFirstPerson ? CharacterView.FirstPerson : CharacterView.ThirdPerson);
-            var ejectTrans = controller.RelatedBones.GetLocation(SpecialLocation.EjectionLocation,
-                controller.RelatedAppearence.IsFirstPerson ? CharacterView.FirstPerson : CharacterView.ThirdPerson);
-            bool hasMuzzleEfc  = null != muzzleTrans && DefaultCfg.Spark > 0;
-            bool hasBulletDrop = null != ejectTrans && DefaultCfg.BulletDrop > 0;
+            var muzzleTrans = bones.GetLocation(SpecialLocation.MuzzleEffectPosition,
+                attackProxy.Appearence.IsFirstPerson ? CharacterView.FirstPerson : CharacterView.ThirdPerson);
+            var ejectTrans = bones.GetLocation(SpecialLocation.EjectionLocation,
+                attackProxy.Appearence.IsFirstPerson ? CharacterView.FirstPerson : CharacterView.ThirdPerson);
+
+            bool hasMuzzleEfc  = muzzleTrans && DefaultCfg.Spark > 0 && attackProxy.Owner.HeldWeaponAgent.HasSpark;
+            bool hasBulletDrop = ejectTrans && DefaultCfg.BulletDrop > 0;
             if (hasMuzzleEfc)
-                ClientEffectFactory.CreateMuzzleSparkEffct(muzzleTrans.position, controller.RelatedOrientation.Yaw,controller.RelatedOrientation.Pitch,DefaultCfg.Spark,muzzleTrans);
+                ClientEffectFactory.CreateMuzzleSparkEffct(muzzleTrans.position, attackProxy.Orientation.Yaw,
+                    attackProxy.Orientation.Pitch, DefaultCfg.Spark, muzzleTrans);
             if (hasBulletDrop)
-                ClientEffectFactory.CreateBulletDrop(ejectTrans.position,
-                    controller.RelatedOrientation.Yaw, controller.RelatedOrientation.Pitch, DefaultCfg.BulletDrop,
-                    controller.HeldConfigId, AudioGrp_FootMatType.Concrete);
+                ClientEffectFactory.CreateBulletDrop(ejectTrans.position, attackProxy.Orientation.Yaw,
+                    attackProxy.Orientation.Pitch, DefaultCfg.BulletDrop, attackProxy.WeaponConfigAssy.S_Id,
+                    attackProxy.AudioController.GetFootMatType());
         }
 
         private void CreatePullBoltEffect(PlayerWeaponController controller)
@@ -112,7 +111,7 @@ namespace App.Shared.GameModules.Weapon
                 return;
             }
 
-            var   effectPos   = PlayerEntityUtility.GetThrowingEmitPosition(controller);
+            var   effectPos   = SingletonManager.Get<ThrowAmmunitionCalculator>().GetFireViewPosition(controller);
             float effectYaw   = (controller.RelatedOrientation.Yaw + 90) % 360;
             float effectPitch = controller.RelatedOrientation.Pitch;
             int   effectId    = 32;

@@ -7,6 +7,7 @@ using Core.Utils;
 using Entitas.CodeGeneration.Attributes;
 using System;
 using Core.Free;
+using Entitas;
 
 namespace App.Shared.Components.Player
 {
@@ -33,7 +34,7 @@ namespace App.Shared.Components.Player
 
 
     [Player]
-    public class GamePlayComponent : ISelfLatestComponent, IPlaybackComponent, IRule
+    public class GamePlayComponent : ISelfLatestComponent, IPlaybackComponent, IRule, IResetableComponent
     {
         public static string[] LifeStateString = new[]
         {
@@ -99,6 +100,14 @@ namespace App.Shared.Components.Player
         public bool ClientVisibility;
         [NetworkProperty] public int JobAttribute { get; set; }
         [DontInitilize] [NetworkProperty] public bool ChickenHxWin;
+
+        [DontInitilize] public int UseEntityId;
+
+        [NetworkProperty] public bool Witness = false; // 观战
+
+        [DontInitilize] public int ActiveMask;
+
+        [NetworkProperty] public bool HudView = false; // Hud可见
 
         public void ChangeLifeState(EPlayerLifeState state, int time)
         {
@@ -236,6 +245,7 @@ namespace App.Shared.Components.Player
             Visibility = hp.Visibility;
             TipHideStatus = hp.TipHideStatus;
             JobAttribute = hp.JobAttribute;
+            Witness = hp.Witness;
             ChickenHxWin = hp.ChickenHxWin;
         }
 
@@ -265,7 +275,7 @@ namespace App.Shared.Components.Player
             return (JobAttribute == (int)EJobAttribute.EJob_EveryMan);
         }
 
-        public float DecreaseHp(float damage, int time = 0)
+        public float DecreaseHp(float damage)
         {
             float ret = 0;
             float oldHp = 0;
@@ -302,6 +312,12 @@ namespace App.Shared.Components.Player
         public int GetRuleID()
         {
             return (int)ERuleIds.GamePlayComponent;
+        }
+
+        public void Reset()
+        {
+            LastNewRoleId = -1;
+            NewRoleId = -1;
         }
     }
 }

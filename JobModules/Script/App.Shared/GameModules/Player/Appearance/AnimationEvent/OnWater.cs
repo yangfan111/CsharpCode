@@ -14,7 +14,7 @@ namespace App.Shared.GameModules.Player.Appearance.AnimationEvent
     /// </summary>
     public class OnSwimIdle : AbstractAninamtionEvent,IAnimationEventCallback
     {
-        protected override void DoAnimationEvent(PlayerEntity player)
+        protected override void DoAnimationEvent(PlayerEntity player, UnityEngine.AnimationEvent eventParam)
         {
             player.playerAudio.InWaterState = true;
             player.AudioController().PlaySimpleAudio(EAudioUniqueId.SwimIdle);
@@ -22,28 +22,28 @@ namespace App.Shared.GameModules.Player.Appearance.AnimationEvent
     }
     public class OnSwimStraight : AbstractAninamtionEvent,IAnimationEventCallback
     {
-        protected override void DoAnimationEvent(PlayerEntity player)
+        protected override void DoAnimationEvent(PlayerEntity player, UnityEngine.AnimationEvent eventParam)
         {
             player.AudioController().PlaySimpleAudio(EAudioUniqueId.SwimStraight);
         }
     }
     public class OnSwimSide : AbstractAninamtionEvent,IAnimationEventCallback
     {
-        protected override void DoAnimationEvent(PlayerEntity player)
+        protected override void DoAnimationEvent(PlayerEntity player, UnityEngine.AnimationEvent eventParam)
         {
             player.AudioController().PlaySimpleAudio(EAudioUniqueId.SwimSide);
         }
     }
     public class OnDive : AbstractAninamtionEvent,IAnimationEventCallback
     {
-        protected override void DoAnimationEvent(PlayerEntity player)
+        protected override void DoAnimationEvent(PlayerEntity player, UnityEngine.AnimationEvent eventParam)
         {
             player.AudioController().PlaySimpleAudio(EAudioUniqueId.SwimSide);
         }
     }
     public class OnDiveIdle : AbstractAninamtionEvent,IAnimationEventCallback
     {
-        protected override void DoAnimationEvent(PlayerEntity player)
+        protected override void DoAnimationEvent(PlayerEntity player, UnityEngine.AnimationEvent eventParam)
         {
             player.playerAudio.InWaterState = true;
             player.AudioController().PlaySimpleAudio(EAudioUniqueId.Dive);

@@ -1,10 +1,6 @@
-﻿using System;
-using App.Shared.EntityFactory;
-using App.Shared.GameModules.Attack;
+﻿using App.Shared.EntityFactory;
 using App.Shared.GameModules.Vehicle;
 using App.Shared.GameModules.Weapon;
-using App.Shared.SceneTriggerObject;
-using App.Shared.Util;
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using Core;
@@ -51,7 +47,7 @@ namespace App.Shared.GameModules.Attack
 
         public MeleeHitHandler(IPlayerDamager damager)
         {
-            _damager             = damager;
+            _damager = damager;
         }
 
 
@@ -60,10 +56,12 @@ namespace App.Shared.GameModules.Attack
         {
             EBodyPart part = BulletPlayerUtil.GetBodyPartByHitBoxName(hit.collider);
             var baseDamage = MeleeHitUtil.GetPlayerFactor(hit, config, part) *
-                             MeleeHitUtil.GetBaseDamage(attackInfo, config);
-            if (src.hasStatisticsData) {
-                src.statisticsData.Statistics.AttackType = (int)attackInfo.AttackType;
+                            MeleeHitUtil.GetBaseDamage(attackInfo, config);
+            if (src.hasStatisticsData)
+            {
+                src.statisticsData.Statistics.AttackType = (int) attackInfo.AttackType;
             }
+
             //有效命中
             /*if (target.gamePlay.IsLastLifeState(EPlayerLifeState.Alive))
             {
@@ -73,13 +71,15 @@ namespace App.Shared.GameModules.Attack
             WeaponResConfigItem newConfig =
                             SingletonManager.Get<WeaponResourceConfigManager>().GetConfigById(playerWeaponId);
             EUIDeadType euiDeadType = (null != newConfig && newConfig.SubType == (int) EWeaponSubType.Hand)
-                            ? EUIDeadType.Unarmed 
+                            ? EUIDeadType.Unarmed
                             : EUIDeadType.Weapon;
 
-            BulletPlayerUtil.ProcessPlayerHealthDamage(contexts, _damager, src, target, new PlayerDamageInfo(Mathf.CeilToInt(baseDamage), (int) euiDeadType,
-                (int) part, src.WeaponController().HeldWeaponAgent.ConfigId, false, false, false, hit.point, target.position.Value - src.position.Value));
+            BulletPlayerUtil.ProcessPlayerHealthDamage(contexts, _damager, src, target,
+                new PlayerDamageInfo(Mathf.CeilToInt(baseDamage), (int) euiDeadType, (int) part,
+                    src.WeaponController().HeldWeaponAgent.ConfigId, false, false, false, hit.point,
+                    target.position.Value - src.position.Value));
 
-        //   Logger.InfoFormat("[Hit] process damage sucess,dvalue:{0}", baseDamage);
+            //   Logger.InfoFormat("[Hit] process damage sucess,dvalue:{0}", baseDamage);
             //由于动画放在客户端做了,服务器调用的命令会被忽视,需要发送事件到客户端
             //            if (target.hasStateInterface && target.stateInterface.State.CanBeenHit())
             //            {
@@ -87,9 +87,9 @@ namespace App.Shared.GameModules.Attack
             //            }
 
             ClientEffectFactory.AddBeenHitEvent(src, target, AttackUtil.GeneraterUniqueHitId(src, seq),
-                                                contexts.session.currentTimeObject.CurrentTime);
+                contexts.session.currentTimeObject.CurrentTime);
             int audioId = SingletonManager.Get<AudioWeaponManager>().FindById(playerWeaponId).HitList.Body;
-            ClientEffectFactory.AddHitPlayerEffectEvent(src, target.entityKey.Value, hit.point,audioId, part);
+            ClientEffectFactory.AddHitPlayerEffectEvent(src, target.entityKey.Value, hit.point, audioId, part);
         }
 
         public void OnHitVehicle(Contexts contexts, PlayerEntity src, VehicleEntity target, RaycastHit hit,
@@ -97,7 +97,7 @@ namespace App.Shared.GameModules.Attack
         {
             VehiclePartIndex partIndex;
             var baseDamage = MeleeHitUtil.GetVehicleFactor(hit, target, out partIndex) *
-                             MeleeHitUtil.GetBaseDamage(attackInfo, config);
+                            MeleeHitUtil.GetBaseDamage(attackInfo, config);
             var gameData = target.GetGameData();
             gameData.DecreaseHp(partIndex, baseDamage);
             if (!src.WeaponController().IsHeldSlotEmpty)
@@ -106,8 +106,7 @@ namespace App.Shared.GameModules.Attack
                 if (MeleeHitUtil.CanMeleeAttackShowHit(src, out effectHit, config.Range))
                 {
                     ClientEffectFactory.AddHitVehicleEffectEvent(src, target.entityKey.Value, effectHit.point,
-                                                                 effectHit.point - target.position.Value,
-                                                                 effectHit.normal);
+                        effectHit.point - target.position.Value, effectHit.normal);
                 }
             }
         }
@@ -115,18 +114,20 @@ namespace App.Shared.GameModules.Attack
         public void OnHitEnvrionment(Contexts contexts, PlayerEntity src, RaycastHit hit, MeleeAttackInfo attackInfo,
                                      MeleeFireLogicConfig config)
         {
-            var heldConfigId = src.WeaponController().HeldConfigId;
+            var        heldConfigId = src.WeaponController().HeldConfigId;
             RaycastHit effectHit;
-            if (MeleeHitUtil.CanMeleeAttackShowHit(src, out effectHit, config.Range))
+            bool showAttackEffect = (MeleeHitUtil.CanMeleeAttackShowHit(src, out effectHit, config.Range));
+            var collider          = effectHit.collider != null ? effectHit.collider : hit.collider;
+            FracturedHittable fracturedHittable = collider.GetComponent<FracturedHittable>();
+            FracturedAbstractChunk fracturedChunk = HitFracturedHandler.HitFracturedObj(src, effectHit, fracturedHittable);
+            var hasHole = fracturedChunk == null || (fracturedChunk.HasBulletHole && !fracturedChunk.IsBroken());
+            if (showAttackEffect && hasHole)
             {
-                int audioId      = SingletonManager.Get<AudioWeaponManager>().FindById(heldConfigId).HitList.Body;
+                int audioId = SingletonManager.Get<AudioWeaponManager>().FindById(heldConfigId).HitList.Body;
                 ClientEffectFactory.AdHitEnvironmentEffectEvent(src, effectHit.point, effectHit.normal,
-                                                                EEnvironmentType.Wood, audioId,0,heldConfigId != WeaponUtil.EmptyHandId);
+                    EEnvironmentType.Wood, audioId, 0, heldConfigId != WeaponUtil.EmptyHandId);
             }
             
-            var collider          = hit.collider;
-            var fracturedHittable = collider.GetComponent<FracturedHittable>();
-            HitFracturedHandler.HitFracturedObj(src, hit, fracturedHittable);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
         public static PlayerEntity Player { set; private get; }
         public const float Spine1RotateMax = 15.0f;
         public const float SpineRotateMax = 5.0f;
+        private const int DriveSeatIndex = 2;
         
         private static readonly float HandRotMax = SingletonManager.Get<CharacterStateConfigManager>().HandRotMax;
         private static readonly float HandRotMin = SingletonManager.Get<CharacterStateConfigManager>().HandRotMin;
@@ -49,6 +50,8 @@ namespace App.Shared.GameModules.Player.CharacterBone
             {
                 case ActionKeepInConfig.Sight:
                     return false;
+                case ActionKeepInConfig.Drive:
+                    return Player.controlledVehicle.Role <= DriveSeatIndex;
             }
 
             switch (leanState)
@@ -59,11 +62,6 @@ namespace App.Shared.GameModules.Player.CharacterBone
             }
 
             return true;
-        }
-
-        public static bool IsHeadRotCw()
-        {
-            return Player.characterBoneInterface.CharacterBone.IsHeadRotCW;
         }
 
         private static bool CanPitchHead()
@@ -154,7 +152,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
         {
             return Player.stateInterface.State.GetActionState() == ActionInConfig.Reload ||
                    Player.stateInterface.State.GetActionState() == ActionInConfig.SpecialReload ||
-                   Player.stateInterface.State.GetActionState() == ActionInConfig.Props;
+                   Player.stateInterface.State.GetActionState() == ActionInConfig.Props ;
         }
 
         public static float PitchHeadAngle()
@@ -199,12 +197,6 @@ namespace App.Shared.GameModules.Player.CharacterBone
             if (handPitch >= 0)
                 return SpineRotateMax + Spine1RotateMax;
             return -(SpineRotateMax + Spine1RotateMax);
-        }
-
-        public static float HeadRotProcess()
-        {
-            return (Player.time.ClientTime - Player.characterBoneInterface.CharacterBone.LastHeadRotSlerpTime) /
-                   1000.0f;
         }
     }
 }

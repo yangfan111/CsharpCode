@@ -29,21 +29,6 @@ namespace App.Shared.GameModules.Weapon
             _entityIdGenerator = entityIdGenerator;
         }
 
-//        public IWeaponFireUpdate CreateFireUpdater(WeaponResConfigItem newCfg,
-//        WeaponConfig config)
-//        {
-//            IWeaponFireUpdate rc = null;
-//            var weaponLogicConfig = config.WeaponLogic;
-//            if (weaponLogicConfig is WeaponConfigNs.DefaultWeaponBehaviorConfig)
-//            {
-//                rc = new CommonWeaponFireUpdate();
-//            }
-//            else if (weaponLogicConfig is DoubleWeaponBehaviorConfig)
-//            {
-//                rc = new DoubleWeaponFireUpdate(null, null);
-//            }
-//            return rc;
-//        }
 
         public IAccuracyCalculator CreateAccuracyCalculator(AccuracyLogicConfig config)
         {
@@ -169,40 +154,6 @@ namespace App.Shared.GameModules.Weapon
                 return new ServerFireEffectEventListener(_contexts.clientEffect, _entityIdGenerator, config);
             else 
                 return new AfterFireEffectEventListener(_contexts.clientEffect, _entityIdGenerator, config);            
-        }
-
-        public IFireEffectFactory CreateFireEffectFactory(BulletConfig config)
-        {
-            return new FireEffectFactory(_contexts.clientEffect, _entityIdGenerator, config);
-        }
-
-        /// <summary>
-        /// Defines the <see cref="FireEffectFactory" />
-        /// </summary>
-        public class FireEffectFactory : IFireEffectFactory
-        {
-            private ClientEffectContext _clientEffectContext;
-
-            private IEntityIdGenerator _idGenerator;
-
-            private BulletConfig _bulletConfig;
-
-            public FireEffectFactory(ClientEffectContext context, IEntityIdGenerator idGenerator, BulletConfig config)
-            {
-                _clientEffectContext = context;
-                _idGenerator = idGenerator;
-                _bulletConfig = config;
-            }
-
-            public void CreateBulletDropEffect(PlayerWeaponController controller)
-            {
-                controller.AddAuxEffect(XmlConfig.EClientEffectType.BulletDrop);
-            }
-
-            public void CreateSparkEffect(PlayerWeaponController controller)
-            {
-                controller.AddAuxEffect(XmlConfig.EClientEffectType.MuzzleSpark);
-            }
         }
 
 

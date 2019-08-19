@@ -70,7 +70,7 @@ namespace StatsMonitor.View
         }
 
         Vector3[] posCache;
-
+        Vector3[] valueToPosCache;
 
         public override void Update()
         {
@@ -81,6 +81,8 @@ namespace StatsMonitor.View
             {
                 posCache = new Vector3[lineLength];
                 fpsLine = CreateLineRenders();
+
+                valueToPosCache = new Vector3[(int)((1.2)*lineLength)];
             }
 
             UpdateLineRender();
@@ -91,14 +93,15 @@ namespace StatsMonitor.View
             foreach (var item in _statsMonitor.profilerList)
             {
                 var lineRender = profileLinerDic[item];
-                DrawLine(lineRender, 200, item.SampleValue(),200, vector3Cache[lineRender], color);
+                float max = CalMaxValue(vector3Cache[lineRender],line);
+                DrawLine(lineRender, 0, item.SampleValue(), max, vector3Cache[lineRender], color);
                 color++;
             }
         }
 
         private void DrawLine(LineRenderer line,float baseValue,float value,float maxValue,Vector3[] pos,int color)
         {
-            var count = line.GetPositions(pos);
+            var count = line.GetPositions(valueToPosCache);
             var xOffset = _statsMonitor.space;
             for (int i = 0; i < count; i++)
             {
@@ -118,9 +121,11 @@ namespace StatsMonitor.View
             }
 
             var x = Width-1;
-            var y = Mathf.Min(_graphMaxY, ((value * 1.0f / (maxValue > baseValue ? maxValue : baseValue)) * _graphMaxY));
-            pos[count] = new Vector3(x, y, 0);
-            line.SetPositions(pos);
+
+            
+            pos[count] = new Vector3(x, value, 0);
+            CalYPos(maxValue,baseValue,pos,valueToPosCache);
+            line.SetPositions(valueToPosCache);
 
             Color c = Color.white;
             if (color < customColor.Length)
@@ -129,6 +134,30 @@ namespace StatsMonitor.View
             }
             line.startColor = c;
             line.endColor = c;
+        }
+
+        void CalYPos(float maxValue,float baseValue,Vector3[] pos,Vector3[] cache)
+        {
+            for (int i = 0; i < pos.Length; i++)
+            {
+                var y = Mathf.Min(_graphMaxY, ((pos[i].y * 1.0f / (maxValue > baseValue ? maxValue : baseValue)) * _graphMaxY));
+                cache[i] = new Vector3(pos[i].x,y, 0);
+            }
+        }
+
+        float CalMaxValue(Vector3[] pos, LineRenderer line)
+        {
+            var count = line.positionCount;
+            float max = 0;
+            for (int i = 0; i < count; i++)
+            {
+                float value = pos[i].y;
+                if (value>max)
+                {
+                    max = value;
+                }
+            }
+            return max;
         }
 
         public override void Dispose()
@@ -278,7 +307,6 @@ namespace StatsMonitor.View
                 
             }
             
-
         }
 
       

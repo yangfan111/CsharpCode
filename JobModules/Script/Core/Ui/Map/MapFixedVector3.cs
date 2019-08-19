@@ -45,7 +45,11 @@ namespace Core.Ui.Map
         {
             return Vector.Equals(other);
         }
-        
+        public bool Equals(MapFixedVector3 other)
+        {
+            return other.Vector.x.Equals(Vector.x) && other.Vector.y.Equals(Vector.y) && other.Vector.z.Equals(Vector.z);
+        }
+
         public Vector3 WorldVector3()
         {
             return Vector.WorldVector3();
@@ -61,7 +65,7 @@ namespace Core.Ui.Map
         public Vector3 ShiftedUIVector3()
         {
             var origin = MapOrigin.Origin;
-            var v = Vector.ShiftedVector3();
+            var v = Vector.WorldVector3();
             return v - origin;
         }
         
@@ -93,10 +97,10 @@ namespace Core.Ui.Map
             Vector.x = x;
             Vector.y = y;
         }
-        public void Set(Vector2 vector2)
+        public void Set(Vector2 worldPos)
         {
-            Vector.x = vector2.x;
-            Vector.y = vector2.y;
+            Vector.x = worldPos.x;
+            Vector.y = worldPos.y;
         }
         public MapFixedVector2(FixedVector2 fixedVector2)
         {

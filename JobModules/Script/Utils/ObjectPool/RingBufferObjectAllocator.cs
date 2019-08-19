@@ -123,36 +123,39 @@ namespace Core.ObjectPool
 
             _factory.DestroyObject(t);
             Interlocked.Increment(ref FreeCount);
-            if (_pool.Count > _pool.Capacity - 5)
-            {
-              _old = _pool;
-                _pool = new RingBuffer<object>(_old.Capacity * 2);
-                _logger.InfoFormat("ring buffer not big enough for object pool of type {0}",
-                    _factory.MakeObject().GetType());
-            }
-
-//            if (_old.Count > 0)
-//            {
-//                object obj;
-//                var succ = _old.TryDequeue(out obj);
-//                while (succ && obj != null)
-//                {
-//                    succ = _old.TryDequeue(out obj);
-//                    _pool.Enqueue(obj);
-//                }
-//            }
-
-            {
 #if (NET_4_6 && UNITY_2017)
             System.Threading.SpinWait spin = new System.Threading.SpinWait();
 #else
-                Core.Utils.SpinWait spin = new Core.Utils.SpinWait();
+            Core.Utils.SpinWait spin = new Core.Utils.SpinWait();
 #endif
-                while (Interlocked.Increment(ref _freeNumber) != 1)
+            while (Interlocked.Increment(ref _freeNumber) != 1)
+            {
+                Interlocked.Decrement(ref _freeNumber);
+                spin.SpinOnce();
+            }
+            if (_pool.Count > _pool.Capacity - 5)
+            {
+              _old = _pool;
+              _pool = new RingBuffer<object>(_old.Capacity * 2);
+              _logger.InfoFormat("ring buffer not big enough for object pool of type {0}",
+                  _factory.MakeObject().GetType());
+              if (_old.Count > 0)
+            {
+                object obj;
+                var succ = _old.TryDequeue(out obj);
+                while (succ && obj != null)
                 {
-                    Interlocked.Decrement(ref _freeNumber);
-                    spin.SpinOnce();
+                    _pool.Enqueue(obj);
+                    succ = _old.TryDequeue(out obj);
                 }
+            }
+              _old = null;
+            }
+
+
+
+            {
+
 
                 _pool.Enqueue(t);
                 Interlocked.Decrement(ref _freeNumber);

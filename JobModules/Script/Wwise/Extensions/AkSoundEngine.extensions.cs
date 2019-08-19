@@ -32,7 +32,13 @@ public partial class AkSoundEngine
 		else if (gameObject.GetComponent<AkGameObj>() == null)
 			gameObject.AddComponent<AkGameObj>();
 	}
-
+	private static void AutoRegister(AkGameObj akGameObj, ulong id)
+	{
+		if (akGameObj == null)
+			new AutoObject(null);
+		else if(!akGameObj.gameObject.activeInHierarchy)
+			new AutoObject(akGameObj.gameObject);
+	}
 	static partial void PreGameObjectAPICallUserHook(UnityEngine.GameObject gameObject, ulong id)
 	{
 #if UNITY_EDITOR
@@ -46,7 +52,18 @@ public partial class AkSoundEngine
 		if (!IsInRegisteredList(id) && IsInitialized())
 			AutoRegister(gameObject, id);
 	}
-
+	static partial void PreGameObjectAPICallUserHook(AkGameObj akGameObj, ulong id)
+	{
+#if UNITY_EDITOR
+		if (!UnityEngine.Application.isPlaying)
+		{
+			AutoRegister(akGameObj, id);
+			return;
+		}
+#endif
+		if (!IsInRegisteredList(id) && IsInitialized())
+			AutoRegister(akGameObj, id);
+	}
 	private static readonly System.Collections.Generic.HashSet<ulong> RegisteredGameObjects =
 		new System.Collections.Generic.HashSet<ulong>();
 

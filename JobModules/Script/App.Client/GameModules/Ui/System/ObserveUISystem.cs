@@ -1,6 +1,7 @@
 ﻿using App.Client.GameModules.Player;
 using App.Shared;
 using Core.EntityComponent;
+using Core.EntityComponent;
 using Entitas;
 
 namespace App.Client.GameModules.Ui.System

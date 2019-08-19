@@ -35,10 +35,8 @@ namespace App.Client.GameModules.Ui.Models.Common
         private Transform infoItemModel = null;
         private Transform infoItemRoot = null;
 
-		private Color _normalColor = Color.white;
-	    private Color _killerPlayerColor = UiCommonColor.KillerPlayerColor;
-		private Color _deadPlayerColor = UiCommonColor.DeadPlayerColor;
-
+        private Color _teamMateColor = new Color32(0x93, 0xec, 0x82, 0xff);
+        private Color _nonTeamMateColor = new Color32(0xff, 0x5e, 0x5e, 0xff);
 	    private Dictionary<AssetInfo, Sprite> _assetPool = new Dictionary<AssetInfo, Sprite>(AssetInfo.AssetInfoComparer.Instance);
 
 
@@ -86,7 +84,6 @@ namespace App.Client.GameModules.Ui.Models.Common
                 (transform as RectTransform).anchoredPosition -= new Vector2(0, (5 + _cellViewHeight) * index);
             }
 
-            //settings = infoItemModel.Find("DeadName").GetComponent<Text>().GetGenerationSettings(Vector2.zero);
         }
 
         private void InitCellInfoRef(Transform transform)
@@ -320,22 +317,12 @@ namespace App.Client.GameModules.Ui.Models.Common
             cellInfo.KillerName.text = item.killerName;
             float tempWidth2 = cellInfo.KillerName.preferredWidth;
             cellInfo.KillerName.rectTransform.sizeDelta = new Vector2(tempWidth2, _cellViewHeight);
-	        Color color = _normalColor;
 	        bool isKillerInTeam = item.killerTeamId == _adapter.SelfTeamId;
 	        bool isDeadInTeam = item.deadTeamId == _adapter.SelfTeamId;
 
+            cellInfo.KillerName.color = isKillerInTeam ? _teamMateColor : _nonTeamMateColor;
+            cellInfo.DeadName.color = isDeadInTeam ? _teamMateColor : _nonTeamMateColor;
 
-			if (isKillerInTeam && !isDeadInTeam)
-			{
-				color = _killerPlayerColor;
-			}
-			else if (isDeadInTeam)
-			{
-				color = _deadPlayerColor;
-			}
-
-	        cellInfo.DeadName.color = color;
-	        cellInfo.KillerName.color = color;
 
         }
 

@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>Wwise Timeline Integration</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>&nbsp;&raquo;&nbsp;<a class="el" href="pg__appscripts.html">使用 Wwise Unity 集成</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="unity_timeline">Wwise Timeline Integration </a></h1><p>Timeline is Unity's cinematic editing tool. It can be used to create game-play sequences, audio sequences, and other cinematic content.</p>
+<p>For more information on Timeline refer to <a href="https://docs.unity3d.com/Manual/TimelineOverview.html" target="_blank">Timeline Docs</a>.</p>
+<p>For instructions on how to create a Timeline Asset and Timeline instance, refer to <a href="https://docs.unity3d.com/Manual/TimelineWorkflowCreatingAssetInstance.html" target="_blank">Timeline Usage</a>.</p>
+<h2><a class="anchor" id="timeline_tracks">
+Wwise Timeline Tracks</a></h2>
+<p>The Wwise Unity Integration adds two tracks: the <b>AkRTPC</b> track and the <b><a class="el" href="class_ak_event.html" title="Helper class that knows a Wwise Event and when to trigger it in Unity. As of 2017...">AkEvent</a></b> track. The <b>AkRTPC</b> track is used to set Game Parameter values, and the <b><a class="el" href="class_ak_event.html" title="Helper class that knows a Wwise Event and when to trigger it in Unity. As of 2017...">AkEvent</a></b> track is used to post Wwise Events. <b>AkRTPC</b> tracks and <b><a class="el" href="class_ak_event.html" title="Helper class that knows a Wwise Event and when to trigger it in Unity. As of 2017...">AkEvent</a></b> tracks can be added to a Timeline in Unity using the "Add" dropdown button.</p>
+<div align="center">
+<img src="Timeline_Tracks.png" alt="Timeline_Tracks.png"/>
+<p><strong>Adding AK tracks to Timeline</strong></p></div>
+ <h3><a class="anchor" id="timeline_event_track_properties">
+Ak Track Object Bindings</a></h3>
+<p><b><a class="el" href="class_ak_event.html" title="Helper class that knows a Wwise Event and when to trigger it in Unity. As of 2017...">AkEvent</a></b> tracks and <b>AkRTPC</b> tracks have object bindings which can be set to any Game Object. If this is left as None, the Event messages or RTPC messages in the track will be triggered on the Game Object that owns the Timeline (this is the Game Object that has a PlayableDirector component, which is used to trigger the Timeline). If the track binding is set to a different Game Object, the messages will be triggered on that Game Object.</p>
+<h3><a class="anchor" id="timeline_rtpc_track_parameter">
+The AkRTPC Parameter Property</a></h3>
+<p><b>AkRTPC</b> tracks have one property in their property inspector: <b>Parameter</b>. This is the Wwise RTPC parameter that will be set from the various clips in the track.</p>
+<div align="center">
+<img src="Timeline_RTPCTrackProperties.png" alt="Timeline_RTPCTrackProperties.png"/>
+<p><strong>RTPC Track Parameter Property</strong></p></div>
+ <h3><a class="anchor" id="timeline_clips">
+Wwise Timeline Playable Clips</a></h3>
+<p>The <b><a class="el" href="class_ak_event.html" title="Helper class that knows a Wwise Event and when to trigger it in Unity. As of 2017...">AkEvent</a></b> track and the <b>AkRTPC</b> tracks each hold corresponding clips: the <b>AkEventPlayable</b> clip and the <b>AkRTPCPlayable</b> clip. These can be added to a track using the track's menu.</p>
+<div align="center">
+<img src="Timeline_AddingAClip.png" alt="Timeline_AddingAClip.png"/>
+<p><strong>Adding AK clips to AK tracks</strong></p></div>
+ <h4><a class="anchor" id="timeline_clip_properties">
+Timeline Clip Properties</a></h4>
+<p>All clips in Timeline have timing properties that are displayed in the top portion of the inspector. For more information on these properties, refer to <a href="https://docs.unity3d.com/Manual/script-EditorClip.html" target="_blank">Clip Properties</a>.</p>
+<h4><a class="anchor" id="timeline_rtpc_clip_properties">
+AkRTPCPlayable Clip Properties</a></h4>
+<p>The following properties are accessible from the inspector of an <b>AkRTPCPlayable</b> clip:</p>
+<div align="center">
+<img src="Timeline_RTPCProperties.png" alt="Timeline_RTPCProperties.png"/>
+<p><strong>AkRTPCPlayable Clip Properties</strong></p></div>
+<ul>
+<li><b>Set RTPC Globally</b>: If this is checked, the RTPC will be set globally for all objects.</li>
+<li><b>Override Track Object</b>: If this is checked, the RTPC will be set for the selected Game Object in the RTPC Object property (only available when <b>Set RTPC Globally</b> is unchecked).</li>
+<li><b>RTPC Object</b>: The Game Object for which the RTPC will be updated. If this is set to <b>None</b>, the RTPC will be set on the track object (or the Timeline's owner object if the track object is set to <b>None</b>). This is only available when <b>Override Track Object</b> is checked.</li>
+<li><b>Animated Value: RTPC Value:</b> This is the value that will be animated by the RTPC track. In order to begin animating this value you need to arm the track for recording, set the playhead to somewhere within the RTPCPlayable clip, and then edit the value from the property inspector.</li>
+</ul>
+<div align="center">
+<img src="Timeline_AnimatingRTPCValues.png" alt="Timeline_AnimatingRTPCValues.png"/>
+<p><strong>Animating RTPC Values from Timeline</strong></p></div>
+<p> Following these steps will insert a keyframe into the RTPC track, below the RTPC clip. You can then use this Unity curve editor to add more keyframes. The keyframes have a context menu that can be used for more precise values.</p>
+<div align="center">
+<img src="Timeline_RTPCKeyframeContextMenu.png" alt="Timeline_RTPCKeyframeContextMenu.png"/>
+<p><strong>RTPC Keyframe Context Menu</strong></p></div>
+ <div align="center">
+<img src="Timeline_RTPCKeyframeEdit.png" alt="Timeline_RTPCKeyframeEdit.png"/>
+<p><strong>Editting RTPC Keyframe Values</strong></p></div>
+ <h4><a class="anchor" id="timeline_event_clip_properties">
+AkEventPlayable Clip Properties</a></h4>
+<p>The following properties are accessible from the inspector of an <b>AkEventPlayable</b> clip:</p>
+<div align="center">
+<img src="Timeline_EventProperties.png" alt="Timeline_EventProperties.png"/>
+<p><strong>AkEventPlayable Clip Properties</strong></p></div>
+<ul>
+<li><b>Override Track Object</b>: This can be checked in order to have the Event emitted from a specific Game Object, different to the track binding object. This will also override the Timeline owner object if the track binding is set to None (see <a class="el" href="unity__timeline.html#timeline_event_track_properties">Ak Track Object Bindings</a>).</li>
+<li><b>Emitter Object Ref</b>: The Game Object from which the Event should be emitted (only available when <b>Override Track Object</b> is checked).</li>
+<li><b>Event</b>: The Wwise Event that will be triggered from this clip.</li>
+</ul>
+<h2><a class="anchor" id="timeline_limitations">
+Known Issues &amp; Limitations</a></h2>
+<p>Currently scrubbing is only supported in Play mode in the Unity editor. This is due to an issue with Unity Playable callbacks in edit mode. Unity are aware of the issue: <a href="https://fogbugz.unity3d.com/default.asp?953109_kitf7pso0vmjm0m0" target="_blank">953109</a>. This means that "Play from anywhere" behavior is not supported in edit mode either. If you place the playhead somewhere between the beginning and end of a clip and play the timeline, while in edit mode, the event will not be triggered.</p>
+<h2><a class="anchor" id="wwise_project_setup">
+Wwise Project Setup</a></h2>
+<p>To ensure that Event lengths are properly represented in the <b><a class="el" href="class_ak_event.html" title="Helper class that knows a Wwise Event and when to trigger it in Unity. As of 2017...">AkEvent</a></b> Tracks, the Wwise project needs to be set up to estimate the duration of its audio Events and JSON metadata must be generated. To enable these project-wide settings, go to the Project Settings' SoundBanks tab. Enable the <b>Estimated duration</b> check box within the <b>Metadata Options</b> group box and enable the <b>Generate JSON Metadata</b> check box within the <b>SoundBank Settings</b> group box, as seen below.</p>
+<div align="center">
+<img src="project_settings.png" alt="project_settings.png"/>
+<p><strong>Required Project Settings for AkEvent Tracks</strong></p></div>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

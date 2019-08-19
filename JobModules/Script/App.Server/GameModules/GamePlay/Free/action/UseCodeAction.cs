@@ -1,8 +1,10 @@
 ﻿using App.Server.GameModules.GamePlay.free.player;
+using App.Server.GameModules.GamePlay.Free.chicken;
 using App.Server.GameModules.GamePlay.Free.client;
 using App.Server.GameModules.GamePlay.Free.item;
 using App.Server.GameModules.GamePlay.Free.item.config;
 using App.Shared;
+using App.Shared.Components.Player;
 using App.Shared.GameModules.Attack;
 using App.Shared.GameModules.Player;
 using App.Shared.GameModules.Vehicle;
@@ -37,7 +39,9 @@ namespace App.Server.GameModules.GamePlay.Free.action
         public override void DoAction(IEventArgs args)
         {
             HandleScore(args);
+            
             HandleKill(args);
+            HandleBioDamage(args);
             HandleFrame(args);
             HandleAddFuel(args);
             HandleBullet(args);
@@ -197,7 +201,7 @@ namespace App.Server.GameModules.GamePlay.Free.action
                         }
                         else
                         {
-                            ItemInventory ground = fd.freeInventory.GetInventoryManager().GetInventory("ground");
+                            ItemInventory ground = fd.freeInventory.GetInventoryManager().GetInventory(ChickenConstant.BagGround);
                             int[] next = ground.GetNextEmptyPosition(ip.key);
                             ItemInventoryUtil.MovePosition(ip, ground, next[0], next[1], (ISkillArgs)args);
                         }
@@ -299,6 +303,42 @@ namespace App.Server.GameModules.GamePlay.Free.action
 
                 SendMessageAction.sender.SendMessage(args, message, 1, "current");
 
+            }
+        }
+
+        private void HandleBioDamage(IEventArgs args)
+        {
+            if (code == "BioDamage")
+            {
+                SimpleProto message = FreePool.Allocate();
+                message.Key = FreeMessageConstant.ScoreInfo;
+                message.Ks.Add(3);
+                message.Bs.Add(true);
+
+                PlayerDamageInfo damageInfo = GetDamageInfo(args);
+                IParable source = args.GetUnit("source");
+                if (null == source) return;
+                FreeData freeData = (FreeData)args.GetUnit("source");
+                if (null == freeData) return;
+                int jobAttribute = 0;
+                if (freeData.Player.hasGamePlay) {
+                    jobAttribute = freeData.Player.gamePlay.JobAttribute;
+                }
+                if (jobAttribute == (int)EJobAttribute.EJob_EveryMan ||
+                    jobAttribute == (int)EJobAttribute.EJob_Hero)
+                    return;
+
+                message.Ss.Add(FreeUtil.ReplaceVar("{source.PlayerName}", args));
+                message.Ds.Add(FreeUtil.ReplaceDouble("{source.TeamId}", args));
+                message.Ins.Add(damageInfo.weaponId);
+                message.Ins.Add(damageInfo.KillType);
+                message.Ins.Add(damageInfo.KillFeedbackType);
+
+                message.Ss.Add(FreeUtil.ReplaceVar("{target.PlayerName}", args));
+                message.Ds.Add(FreeUtil.ReplaceDouble("{target.TeamId}", args));
+                message.Ins.Add(damageInfo.type);
+
+                SendMessageAction.sender.SendMessage(args, message, 4, string.Empty);
             }
         }
 

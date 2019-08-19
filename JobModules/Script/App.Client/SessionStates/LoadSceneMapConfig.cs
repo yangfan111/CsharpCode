@@ -15,7 +15,7 @@ using App.Shared.GameModules.Configuration;
 using App.Shared.GameModules.Preparation;
 using App.Shared.SceneManagement.Streaming;
 using Core;
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core.GameModule.Module;
 using Entitas;
 using Core.Prediction.VehiclePrediction.TimeSync;

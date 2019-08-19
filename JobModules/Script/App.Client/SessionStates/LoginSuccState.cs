@@ -1,58 +1,53 @@
-using System;
 using App.Client.ClientSystems;
-using App.Client.GameModules.GamePlay;
 using App.Client.GameModules.GamePlay.Free.Entitas;
-using App.Client.GameModules.UserInput;
 using App.Client.GameModules.Player;
-using App.Client.GameModules.SceneObject;
-using App.Client.GameModules.Sound;
 using App.Client.GameModules.Terrain;
-using App.Client.GameModules.Ui;
-using App.Client.GameModules.Vehicle;
-using App.Server;
+using App.Client.GameModules.UserInput;
+using App.Client.SessionStates;
+using App.Client.Tools;
 using App.Shared;
-using App.Shared.Components.ClientSession;
+using App.Shared.Components;
 using App.Shared.GameModules;
-using App.Shared.GameModules.Attack;
 using App.Shared.VechilePrediction;
-using Assets.Sources.Free.UI;
-using Core.Compensation;
-using Core.Free;
 using Core.GameModule.Module;
+using Core.GameModule.Step;
 using Core.GameModule.System;
 using Core.Playback;
 using Core.Prediction;
 using Core.Prediction.VehiclePrediction.TimeSync;
 using Core.SessionState;
 using Core.SyncLatest;
-using Entitas;
-using Free.framework;
-using App.Client.GameModules.Attack;
-using App.Client.GameModules.Player.Robot;
-using App.Shared.Configuration;
-using XmlConfig;
-using App.Shared.GameModules.Attack;
 using Core.Utils;
+using Entitas;
+using System;
 using UnityEngine;
-using App.Client.GameModules.Throwing;
-using App.Shared.GameModules.Configuration;
-using App.Shared.GameModules.Throwing;
-using App.Client.GameModules.ClientEffect;
-using Assets.App.Shared.GameModules.Camera;
-using Assets.App.Shared.GameModules.Camera.Utils;
-using Assets.Sources.Free;
-using Core.Configuration;
-using Core.GameModule.Step;
-
-using App.Client.GameModules.GamePlay.Free.Scene;
-using App.Client.GameModules.Ui.System;
-using App.Client.SessionStates;
-using App.Client.Tools;
-using App.Shared.Components;
-using Utils.Configuration;
 
 namespace App.Client.ClientGameModules
 {
+
+    public sealed class ClientUserCmdFeature : Feature
+    {
+        public ClientUserCmdFeature(string name, Contexts contexts) : base(name)
+        {
+            Add(new InputCollectSystem(contexts));
+            Add(new MouseLockSystem(contexts));
+            Add(new ClientFreeCmdGenerateSystem(contexts));
+            Add(new UserCmdCollectSystem(contexts));
+            Add(new PlayerInterceptCmdSystem(contexts));
+            Add(new ClientPlayerPickAndDropSystem(contexts));
+        }
+    }
+
+    public sealed class ClientProfileFeature : Feature
+    {
+        public ClientProfileFeature(string name, Contexts contexts) : base(name)
+        {
+            Add(new TerrainTestSystem(contexts));
+            Add(new AutoTerrainNavigatorSystem(contexts));
+            Add(new MinRendererSetSystem(contexts));
+            Add(new WoodConflictSystem(contexts));
+        }
+    }
     /// <summary>
     ///
     /// 
@@ -76,37 +71,30 @@ namespace App.Client.ClientGameModules
             _gameModule = GameModuleFactory.CreateCompositeGameModule(_contexts);
             var sessionObjects = _contexts.session.clientSessionObjects;
 
-            ISyncLatestManager syncLatestManager = sessionObjects.SyncLatestManager;
+            SyncLastestManager netSyncManager = sessionObjects.netSyncManager;
             IPlaybackManager playbackManager = sessionObjects.PlaybackManager;
-            IPredictionInitManager predictionInitManager = sessionObjects.UserPredictionInitManager;
-            
-            IUserPredictionInfoProvider predicatoinInfoProvider = sessionObjects.UserPredictionInfoProvider;
+            var predictionManager = sessionObjects.UserPredictionManager;
+            var predicatoinProvider = sessionObjects.UserPredictionProvider;
             ISimulationTimer simulationTimer = sessionObjects.SimulationTimer;
 
             var systems = new Feature("LoginSuccState");
-           
-            systems.Add(new InputCollectSystem(_contexts).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
-            systems.Add(new MouseLockSystem(_contexts));
-            systems.Add(new DriveTimeSystem(_contexts).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
-            systems.Add(new ClientFreeCmdGenerateSystem(_contexts).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
-            systems.Add(new UserCmdCollectSystem(_contexts).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
-            //  systems.Add(new ClientCameraPreUpdateSystem(_contexts.vehicle, _contexts.freeMove,_contexts.player, motors).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
-            systems.Add(new PlayerInterceptCmdSystem(_contexts).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
-            systems.Add(new UserCmdMergeSystem(_contexts).WithExecFrameStep(EEcecuteStep.CmdFrameStep));
-
-            //Test
-            systems.Add(new TerrainTestSystem(_contexts));
-            //////
-            systems.Add(new AutoTerrainNavigatorSystem(_contexts));
-            systems.Add(new MinRendererSetSystem(_contexts));
-            systems.Add(new WoodConflictSystem(_contexts));
+            systems.Add(new DriveTimeSystem(_contexts));
+            systems.Add(new PrepareSnapshotPairSystem(_contexts));
+            systems.Add(new ClientUserCmdFeature("UserCmd", _contexts));
+            systems.Add(new ClientProfileFeature("Profile", _contexts));
+            if (SharedConfig.IsReplay)
+            {
+                systems.Add(new UserCmdReplaySystem(_contexts));
+                systems.Add(new PrepareSnapshotPairSystem(_contexts));
+                
+            }
             systems.Add(new ClientMainFeature(
                 "LoginSuccSystems",
                 _gameModule,
-                syncLatestManager,
+                netSyncManager,
                 playbackManager,
-                predictionInitManager,
-                predicatoinInfoProvider,
+                predictionManager,
+                predicatoinProvider,
                 simulationTimer,
                 sessionObjects.VehicleCmdExecuteSystemHandler,
                 new ClientVehicleExecutionSelector(_contexts), 

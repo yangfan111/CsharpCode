@@ -80,9 +80,10 @@ namespace Assets.Sources.Free.Effect
             var s = GetAuto("scale");
             if (s != null)
             {
-                var v = (Vector3)s.Frame(frameTime);
-                if(v != null)
+                object obj = s.Frame(frameTime);
+                if(obj != null)
                 {
+                    Vector3 v = (Vector3)obj;
                     obj3D.scaleX = (float)v.x;
                     obj3D.scaleY = (float)v.y;
                     obj3D.scaleZ = (float)v.z;

@@ -1,14 +1,10 @@
-﻿using com.wd.free.para.exp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using App.Shared.FreeFramework.framework.ai.move;
 using com.wd.free.@event;
 using com.wd.free.map.position;
-using UnityEngine;
+using com.wd.free.para.exp;
 using com.wd.free.unit;
-using App.Shared.FreeFramework.framework.ai.move;
 using Core.Free;
+using System;
 
 namespace App.Shared.FreeFramework.Free.condition
 {
@@ -28,7 +24,7 @@ namespace App.Shared.FreeFramework.Free.condition
             UnitPosition upf = from.Select(args);
             UnitPosition upt = to.Select(args);
 
-            long s = DateTime.Now.Ticks;
+            //long s = DateTime.Now.Ticks;
 
             bool can = false;
 

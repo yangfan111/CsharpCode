@@ -37,12 +37,19 @@ namespace Core.CharacterState.Action.States
                         return FsmStateResponseType.Reenter;
                     }
                     
-                    if (command.IsMatch(FsmInput.Fire))
+                    if (command.IsMatch(FsmInput.Fire) ||
+                        command.IsMatch(FsmInput.SightsFire))
                     {
-                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireEndHash,
-                                                 AnimatorParametersHash.Instance.FireEndName,
-                                                 AnimatorParametersHash.Instance.FireEndEnableValue,
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireHash,
+                                                 AnimatorParametersHash.Instance.FireName,
+                                                 AnimatorParametersHash.Instance.FireDisableValue,
                                                  CharacterView.FirstPerson | CharacterView.ThirdPerson, true);
+                        addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.SightsFireHash,
+                            AnimatorParametersHash.Instance.SightsFireName,
+                            AnimatorParametersHash.Instance.SightsFireDisableValue,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, true);
                         addOutput(FsmOutput.Cache);
 
                         return FsmStateResponseType.Reenter;
@@ -50,25 +57,7 @@ namespace Core.CharacterState.Action.States
 
                     return FsmStateResponseType.Pass;
                 },
-                null, (int) ActionStateId.CommonNull, null, 0, new[] { FsmInput.Fire, FsmInput.InterruptAction });
-
-            AddTransition(
-                (command, addOutput) =>
-                {
-                    if (command.IsMatch(FsmInput.SightsFire))
-                    {
-                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireEndHash,
-                                                 AnimatorParametersHash.Instance.FireEndName,
-                                                 AnimatorParametersHash.Instance.FireEndEnableValue,
-                                                 CharacterView.FirstPerson | CharacterView.ThirdPerson, true);
-                        addOutput(FsmOutput.Cache);
-
-                        return FsmStateResponseType.Reenter;
-                    }
-
-                    return FsmStateResponseType.Pass;
-                },
-                null, (int)ActionStateId.CommonNull, null, 0, new[] { FsmInput.SightsFire });
+                null, (int) ActionStateId.CommonNull, null, 0, new[] { FsmInput.Fire, FsmInput.SightsFire, FsmInput.InterruptAction });
 
             #endregion
 
@@ -77,11 +66,18 @@ namespace Core.CharacterState.Action.States
             AddTransition(
                 (command, addOutput) =>
                 {
-                    if (command.IsMatch(FsmInput.ReloadEmpty))
+                    if (command.IsMatch(FsmInput.ReloadEmpty) ||
+                        command.IsMatch(FsmInput.Reload))
                     {
-                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireEndHash,
-                            AnimatorParametersHash.Instance.FireEndName,
-                            AnimatorParametersHash.Instance.FireEndEnableValue,
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireHash,
+                            AnimatorParametersHash.Instance.FireName,
+                            AnimatorParametersHash.Instance.FireDisableValue,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, true);
+                        addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.SightsFireHash,
+                            AnimatorParametersHash.Instance.SightsFireName,
+                            AnimatorParametersHash.Instance.SightsFireDisableValue,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson, true);
                         addOutput(FsmOutput.Cache);
                         
@@ -98,7 +94,7 @@ namespace Core.CharacterState.Action.States
                     
                     return false;
                 },
-                null, (int) ActionStateId.Reload, null, 0, new[] { FsmInput.ReloadEmpty });
+                null, (int) ActionStateId.Reload, null, 0, new[] { FsmInput.ReloadEmpty, FsmInput.Reload });
 
             #endregion
 
@@ -109,9 +105,15 @@ namespace Core.CharacterState.Action.States
                 {
                     if (command.IsMatch(FsmInput.SpecialReload))
                     {
-                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireEndHash,
-                            AnimatorParametersHash.Instance.FireEndName,
-                            AnimatorParametersHash.Instance.FireEndEnableValue,
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireHash,
+                            AnimatorParametersHash.Instance.FireName,
+                            AnimatorParametersHash.Instance.FireDisableValue,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, true);
+                        addOutput(FsmOutput.Cache);
+                        
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.SightsFireHash,
+                            AnimatorParametersHash.Instance.SightsFireName,
+                            AnimatorParametersHash.Instance.SightsFireDisableValue,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson, true);
                         addOutput(FsmOutput.Cache);
                         
@@ -135,31 +137,37 @@ namespace Core.CharacterState.Action.States
             #endregion
         }
 
-        public override void DoBeforeEntering(IFsmInputCommand command, Action<FsmOutput> addOutput)
-        {
-            base.DoBeforeEntering(command, addOutput);
-
-            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireHash,
-                                     AnimatorParametersHash.Instance.FireName,
-                                     AnimatorParametersHash.Instance.FireDisableValue,
-                                     CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
-            addOutput(FsmOutput.Cache);
-
-            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.SightsFireHash,
-                                     AnimatorParametersHash.Instance.SightsFireName,
-                                     AnimatorParametersHash.Instance.SightsFireDisableValue,
-                                     CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
-            addOutput(FsmOutput.Cache);
-        }
+//        public override void DoBeforeEntering(IFsmInputCommand command, Action<FsmOutput> addOutput)
+//        {
+//            base.DoBeforeEntering(command, addOutput);
+//
+//            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireHash,
+//                                     AnimatorParametersHash.Instance.FireName,
+//                                     AnimatorParametersHash.Instance.FireDisableValue,
+//                                     CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+//            addOutput(FsmOutput.Cache);
+//
+//            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.SightsFireHash,
+//                                     AnimatorParametersHash.Instance.SightsFireName,
+//                                     AnimatorParametersHash.Instance.SightsFireDisableValue,
+//                                     CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+//            addOutput(FsmOutput.Cache);
+//        }
 
         public override void DoBeforeLeaving(Action<FsmOutput> addOutput)
         {
             base.DoBeforeLeaving(addOutput);
-
-            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireEndHash,
-                                     AnimatorParametersHash.Instance.FireEndName,
-                                     AnimatorParametersHash.Instance.FireEndDisableValue,
-                                     CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+            
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireHash,
+                AnimatorParametersHash.Instance.FireName,
+                AnimatorParametersHash.Instance.FireDisableValue,
+                CharacterView.FirstPerson | CharacterView.ThirdPerson, true);
+            addOutput(FsmOutput.Cache);
+                        
+            FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.SightsFireHash,
+                AnimatorParametersHash.Instance.SightsFireName,
+                AnimatorParametersHash.Instance.SightsFireDisableValue,
+                CharacterView.FirstPerson | CharacterView.ThirdPerson, true);
             addOutput(FsmOutput.Cache);
             
             FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.InterruptHash,

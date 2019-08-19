@@ -77,6 +77,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
         int HoldWeaponSlotIndex { get; }
 
         void SetCrossVisible(bool isVisible);
-
+        List<int> GetWeaponPartIdsBySlotIndex(int index);
     }
 }

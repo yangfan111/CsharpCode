@@ -1,9 +1,11 @@
 ﻿using App.Client.GameModules.Ui.UiAdapter;
+using App.Shared;
 using Assets.App.Client.GameModules.Ui;
 using Assets.Sources.Free;
 using Assets.Sources.Free.UI;
 using Assets.Sources.Free.Utility;
 using Assets.Utils.Configuration;
+using Core;
 using Core.Free;
 using Free.framework;
 using I2.Loc;
@@ -179,6 +181,12 @@ namespace App.Client.GameModules.GamePlay.Free.App
                         break;
                 }
 
+                int[] notError = new int[]{4, 5, 6, 72, 75, 80};
+                if (!notError.ToList().Contains(int.Parse(tips[0].Substring(4))))
+                {
+                    contexts.player.flagSelfEntity.AudioController().PlaySimpleAudio((EAudioUniqueId) 5024, false);
+                }
+
                 if (tips.Length > 1)
                 {
                     tips = tips.SubList(1, tips.Length - 1).ToArray();
@@ -200,6 +208,7 @@ namespace App.Client.GameModules.GamePlay.Free.App
                     contexts.ui.uISession.UiState[UiNameConstant.CommonOperationTipModel] = true;
                     ui.OperationTipData = tip;
                 }
+
             }
         }
 

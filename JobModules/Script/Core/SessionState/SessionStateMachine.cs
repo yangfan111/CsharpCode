@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using System.Text;
 using App.Shared.Components;
+using Common;
 using Core.Utils;
 using Entitas;
 using Entitas.VisualDebugging.Unity;
@@ -23,7 +24,6 @@ namespace Core.SessionState
         {
             _monitor = monitor;
         }
-        
         public int CurrentState
         {
             get { return _currentState; }
@@ -38,6 +38,7 @@ namespace Core.SessionState
 
         public void Initialize(int initState)
         {
+            MyGameTime.stage = initState;
             _currentState = initState;
             if (_monitor != null)
                 _monitor.ChangeState(_states[_currentState]);
@@ -89,7 +90,7 @@ namespace Core.SessionState
                 if (nextState >= 0 && nextState != _currentState)
                 {
                     _logger.InfoFormat("change state {0}:=> {1}", _currentState, nextState);
-                    _logger.InfoFormat("change state {0}:{1} => {2}:{3}",
+                    _logger.InfoFormat("----  change state {0}:{1} => {2}:{3}",
                         _currentState, _states[_currentState].GetType(),
                         nextState, _states[nextState].GetType());
                     string condition = string.Format("change state {0}:{1} => {2}:{3}",
@@ -101,6 +102,8 @@ namespace Core.SessionState
                     _states[_currentState].Leave();
                     _states[nextState].Initialize();
                     _currentState = nextState;
+                    MyGameTime.stage = _currentState;
+                    MyGameTime.seq = 0;
                     _states[_currentState].FullfillExitCondition(condition);
                     
                 }

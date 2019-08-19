@@ -15,8 +15,6 @@ namespace Utils.Utils
         private Func<Job, Result> _action;
         private CustomProfileInfo _profile;
         private CustomProfileInfo _profile2;
-        private volatile int _count = 0;
-
         public ConsumerThread(string name, Func<Job, Result> action, BlockingQueue<Job> queue=null) :base(name)
         {
             _action = action;
@@ -36,13 +34,14 @@ namespace Utils.Utils
 
         public void Offer(Job job)
         {
+            _queue.AddRef();
             _queue.Enqueue(job);
-            Interlocked.Increment(ref _count);
+            
         }
 
         public bool IsDone()
         {
-            return _queue.Count == 0;
+            return _queue.Count == 0 && _queue.Ref == 0;
         }
 
       
@@ -57,16 +56,15 @@ namespace Utils.Utils
                 {
                     Job task = _queue.Dequeue(1);
                     if (task == null) continue;
-                    _logger.Debug("start");
                     try
                     {
                         _profile.BeginProfileOnlyEnableProfile();
                         _action(task);
                        // _profile2.BeginProfileOnlyEnableProfile();
-                        Interlocked.Decrement(ref _count);
                     }
                     finally
                     {
+                        _queue.DelRef();
                         _profile.EndProfileOnlyEnableProfile();
                        // _profile2.EndProfileOnlyEnableProfile();
                     }

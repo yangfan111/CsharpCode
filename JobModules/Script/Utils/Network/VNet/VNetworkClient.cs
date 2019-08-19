@@ -31,18 +31,21 @@ namespace VNet
         public bool IsMultiThread { get; private set; }
 
         private string _ip;
-        private int _udpPort;
+      
 
-        public int UdpPort
-        {
-            get { return _udpPort; }
-            set { _udpPort = value; }
-        }
+
+        public int UdpPort { get; private set; }
+           
+        
+        
+        public int RemoteConnId { get; private set; }
 
         public bool isRealTimeConnected
         {
             get { return _realTimeClient.IsConnected; }
         }
+
+       
 
         protected override void Poll()
         {
@@ -72,13 +75,14 @@ namespace VNet
             Start(1, !IsMultiThread, IsMultiThread);
         }
 
-        public void Connect(string ip, NetworkPortInfo port)
+        public void Connect(string ip,NetworkPortInfo portInfo)
         {
-            Logger.InfoFormat("Service {2} Connect to {0}:{1}", ip, port, ServiceName);
+            var tcpPort = portInfo.TcpPort;
+            Logger.InfoFormat("Service {2} Connect to {0}:{1}", ip, tcpPort, ServiceName);
             if (_reliableClient != null)
             {
                 _reliableClient.Init();
-                _reliableClient.Connect(ip, port.TcpPort, 0);
+                _reliableClient.Connect(ip, tcpPort, 0);
                 _reliableClient.OnConnectListener += OnReliableConnected;
                 _reliableClient.OnReceiveListener += OnReliableReceive;
 
@@ -89,15 +93,17 @@ namespace VNet
             }
 
             _ip = ip;
-            _udpPort = port.UdpPort;
+           
         }
 
-        public void RealTimeConnect(int connId)
+        public void RealTimeConnect(int udpPort, int connId)
         {
-            RealTimeConnect(_ip, _udpPort, connId);
+            UdpPort = udpPort;
+            RemoteConnId = connId;
+            RealTimeConnect(_ip, UdpPort, connId);
         }
 
-        public void RealTimeConnect(string ip, int port, int connId)
+        private void RealTimeConnect(string ip, int port, int connId)
         {
             if (null == _realTimeClient)
             {

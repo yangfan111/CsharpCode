@@ -3,6 +3,7 @@ using App.Client.GameModules.Ui.Utils;
 using App.Shared.Components.Ui;
 using Assets.App.Client.GameModules.Ui;
 using Assets.UiFramework.Libs;
+using Core.SpatialPartition;
 using Core.Ui.Map;
 using Core.Utils;
 using UnityEngine;
@@ -22,6 +23,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private Transform tran;
         private Transform airPlane;
         private Transform airDrop;
+        private ActiveSetter airPlaneActiveSetter;
 
         private int lastPlaneType = -1;
         private bool isNeedChangeSprite;
@@ -40,7 +42,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             airPlane = tran.Find("airPlane");
             airDrop = tran.Find("kongtouModel");
             UIUtils.SetActive(airDrop, false);
-
+            airPlaneActiveSetter = new ActiveSetter(airPlane.gameObject);
             PreParedKTouSprite();
         }
 
@@ -69,19 +71,19 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         }
 
         private List<MapFixedVector2> _dropList;
-        private void UpdateAirDrop(float rate, bool forceUpdate = false)
+        private void UpdateAirDrop(float rate)
         {
             if (_dropList == null) return;
-            if (lastRate.Equals(rate) && !forceUpdate) return;
             for (int i = 0; i < _dropList.Count; i++)
             {
+                if (i >= airDropList.Count) return;
                 Transform dropTf = airDropList[i];
                 if (dropTf != null)
                 {
                     // 设置空投点的位置
                     Vector2 kTouPosByPixel = (_dropList[i].ShiftedUIVector2()) * rate;
                     dropTf.GetComponent<RectTransform>().anchoredPosition = kTouPosByPixel;
-                    Logger.InfoFormat("Update Drop Pos {0}", kTouPosByPixel);
+//                    Logger.InfoFormat("AirDrop : Update Drop Pos {0}", _dropList[i].WorldVector2());
                 }
             }
         }
@@ -109,7 +111,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                 UIUtils.SetActive(dropTf, true);
                 Vector2 kTouPosByPixel = (dropList[i].ShiftedUIVector2()) * rate;
                 dropTf.GetComponent<RectTransform>().anchoredPosition = kTouPosByPixel;
-                Logger.InfoFormat("Drop Pos {0}", kTouPosByPixel);
+//                Logger.InfoFormat("AirDrop : Drop Pos {0}", dropList[i].WorldVector2());
             }
             for (; i < airDropList.Count; i++)
             {
@@ -124,7 +126,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             {
                 if (planeData.Type != lastPlaneType)
                 {
-                    UIUtils.SetActive(airPlane, false);
+                    airPlaneActiveSetter.Active = false;
                     HideAirDrop();
                     lastPlaneType = planeData.Type;
                 }
@@ -133,12 +135,12 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             {
                 if (planeData.Type != lastPlaneType)
                 {
-                    UIUtils.SetActive(airPlane, true);
+                    airPlaneActiveSetter.Active = true;
                     lastPlaneType = planeData.Type;
                 }
 
                 //更新飞机位置
-                Vector2 planePosByPixel = (planeData.Pos.ShiftedUIVector2()) * rate;
+                Vector2 planePosByPixel = (planeData.Pos.ShiftedUIVector3().To2D()) * rate;
                 airPlane.GetComponent<RectTransform>().anchoredPosition = planePosByPixel;
 
                 //更新飞机方向
@@ -154,13 +156,13 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             {
                 if (planeData.Type != lastPlaneType)
                 {
-                    UIUtils.SetActive(airPlane, true);
+                    airPlaneActiveSetter.Active = true;
                     HideAirDrop();
                     lastPlaneType = planeData.Type;
                 }
 
                 //更新飞机位置
-                Vector2 planePosByPixel = (planeData.Pos.ShiftedUIVector2()) * rate;
+                Vector2 planePosByPixel = (planeData.Pos.ShiftedUIVector3().To2D()) * rate;
                 airPlane.GetComponent<RectTransform>().anchoredPosition = planePosByPixel;
 
                 //更新飞机方向

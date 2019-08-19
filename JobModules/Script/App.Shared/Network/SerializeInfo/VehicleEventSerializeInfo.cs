@@ -15,13 +15,14 @@ namespace App.Shared.Network
             _serialize = new ProtoBufSerializeInfo<VehicleEventMessage>(VehicleEventMessage.Parser);
         }
 
-        public void Serialize(Stream outStream, object message)
+        public int Serialize(Stream outStream, object message)
         {
             var syncEvent = (IVehicleSyncEvent) message;
             VehicleEventMessage msg = VehicleEventMessage.Allocate();
             VehicleEventMessageConverter.ToProtoBuf(msg, syncEvent);
-            _serialize.Serialize(outStream, msg);
+            var ret = _serialize.Serialize(outStream, msg);
             msg.ReleaseReference();
+            return ret;
         }
 
         public object Deserialize(Stream inStream)

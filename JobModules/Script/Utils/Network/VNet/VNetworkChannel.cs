@@ -21,15 +21,12 @@ namespace VNet
 
         private new static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(VNetworkChannel));
         private MemoryStream _sendStream = new MemoryStream();
+        Stopwatch _stopwatch = new Stopwatch();
         private int _remoteConnId;
         public override int RemoteConnId
         {
             get { return _remoteConnId; }
-            set
-            {
-                _remoteConnId = value;
-                RealTimeConnect();
-            }
+           
         }
 
         public override int UdpPort
@@ -40,11 +37,7 @@ namespace VNet
                     return _connecter.UdpPort;
                 return 0;
             }
-            set
-            {
-                if (null != _connecter)
-                    _connecter.UdpPort = value;
-            }
+            
         }
 
         public VNetworkChannel(IVNetPeer connection, bool littleEndian)
@@ -86,11 +79,12 @@ namespace VNet
             _connecter = connecter;
         }
 
-        public void RealTimeConnect()
+        public override void RealTimeConnect(int udpPort, int remoteUdpId)
         {
             if (null != _connecter)
             {
-                _connecter.RealTimeConnect(RemoteConnId);
+                _remoteConnId = remoteUdpId;
+                _connecter.RealTimeConnect( udpPort,remoteUdpId);
             }
         }
 
@@ -99,23 +93,25 @@ namespace VNet
             _isConnected = true;
             LocalConnId = RealiableConn.ConnectId;
         }
-        Stopwatch _stopwatch = new Stopwatch();
-        protected override void DoSend(NetworkMessageItem item)
+        
+        protected override int DoSend(NetworkMessageItem item)
         {
+            var send = 0;
             var msgItem = item as VNetworkMessageItem;
             if (null == msgItem)
             {
                 Logger.ErrorFormat("message item is null or not VNetworkMessageItem {0}",IdInfo());
-                return;
+                return send;
             }
-            
+
+          
             switch (msgItem.Channel)
             {
                 case RealTimeChannel:
                     if (null == RealTimePeer)
                     {
                         Logger.ErrorFormat("{0} send failed : peer is null", IdInfo());
-                        return;
+                        return send;
                     }
                     _stopwatch.Reset();
                     long l = item.MemoryStream.Length;
@@ -124,8 +120,12 @@ namespace VNet
                     item.MemoryStream.WriteByte((byte)(RemoteConnId>>8));
                     item.MemoryStream.WriteByte((byte)(RemoteConnId>>16));
                     item.MemoryStream.WriteByte((byte)(RemoteConnId>>24));
-                    
-                    
+
+                    if (item.MemoryStream.Capacity < item.MemoryStream.Length + 4)
+                    {
+                        item.MemoryStream.Capacity = item.MemoryStream.Capacity + 4;
+                    }
+                    send = (int) item.MemoryStream.Length;
                     RealTimePeer.Send(item.MemoryStream.GetBuffer(), (int)item.MemoryStream.Length, 0);
 
                     _stopwatch.Stop();
@@ -133,11 +133,14 @@ namespace VNet
                     break;
                 case ReliableChannel:
                     _stopwatch.Reset();
+                    send = (int) item.MemoryStream.Length;
                     RealiableConn.Send(item.MemoryStream.GetBuffer(), (int)item.MemoryStream.Length-4, 4);
                     _stopwatch.Stop();
                     FlowSend(true,item.MemoryStream.Length,_stopwatch.ElapsedMilliseconds);
                     break;
             }
+
+            return send;
         }
 
         public void SendRawDataRealTime(byte[] bytes, int length, int offset)

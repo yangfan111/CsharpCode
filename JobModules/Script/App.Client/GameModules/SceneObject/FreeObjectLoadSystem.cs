@@ -1,11 +1,10 @@
 ﻿using App.Client.CastObjectUtil;
 using App.Shared.GameModules.GamePlay.Free;
-using Utils.AssetManager;
 using Core.GameModule.System;
 using Core.Utils;
 using Entitas;
-using System.Collections.Generic;
 using UnityEngine;
+using Utils.AssetManager;
 
 namespace App.Client.GameModules.SceneObject
 {

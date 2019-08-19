@@ -46,6 +46,7 @@ namespace App.Client.GameModules.ClientInit
         private bool _loginSuccReceived;
         public void Handle(INetworkChannel networkChannel, int messageType, object messageBody)
         {
+            _logger.InfoFormat("Handle:{0}", messageBody);
             switch (messageType)
             {
                 case (int)EServer2ClientMessage.SceneInfo:

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Core.Fsm;
+﻿using Core.Fsm;
 using Utils.CharacterState;
 
 namespace Core.CharacterState.Posture.States
@@ -16,8 +12,9 @@ namespace Core.CharacterState.Posture.States
             AddTransition(
                 (command, addOutput) =>
                 {
-                    var ret = command.IsMatch(FsmInput.OutProneTransitFinish);
-                    if (ret)
+                    var ret = command.IsMatch(FsmInput.OutProneTransitFinish) ||
+                              command.IsMatch(FsmInput.Dying);
+                    if (command.IsMatch(FsmInput.OutProneTransitFinish))
                     {
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.PostureHash,
                                                  AnimatorParametersHash.Instance.PostureName,
@@ -28,8 +25,7 @@ namespace Core.CharacterState.Posture.States
                     }
 
                     return ret;
-                },
-                null, (int)PostureStateId.Crouch, null, 0, new[] { FsmInput.OutProneTransitFinish });
+                }, null, (int)PostureStateId.Crouch, null, 0, new[] { FsmInput.OutProneTransitFinish, FsmInput.Dying });
 
             #endregion
         }

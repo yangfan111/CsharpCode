@@ -1,14 +1,12 @@
 ﻿using Core.Components;
+using Core.Free;
 using Core.Playback;
 using Core.Room;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
-using Core.SyncLatest;
+using Entitas;
 using Entitas.CodeGeneration.Attributes;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
-using Entitas;
-using Core.Free;
 
 namespace App.Shared.Components.Player
 {
@@ -56,6 +54,8 @@ namespace App.Shared.Components.Player
         [DontInitilize] public Transform ThirdPersonRightHand;
         [DontInitilize] public Transform FirstPersonHead;
         [DontInitilize] public Transform ThirdPersonHead;
+
+        [DontInitilize] public CampInfo CampInfo { get; set; }
 
         public int GetComponentId()
         {
@@ -125,6 +125,9 @@ namespace App.Shared.Components.Player
                 SprayLacquers = new List<int>();
             }
             SprayLacquers.Clear();
+            if(null != CampInfo)
+                CampInfo.Reset();
+            Camp = 0;
         }
 
         public void ChangeNewRole(int roleId)

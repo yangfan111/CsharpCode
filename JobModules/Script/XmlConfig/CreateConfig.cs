@@ -20,5 +20,10 @@ namespace XmlConfig
         public List<int> ChooseInnerList;
         public List<int> ChooseTrouserList;
         public List<int> ChooseFootList;
+        public List<int> ChooseCapList;
+        public List<int> ChooseGloveList;
+        public List<int> ChoosePendantfaceList;
+        public List<int> ChooseEntiretyList;
+        public List<int> ChooseWaistList;
     }
 }

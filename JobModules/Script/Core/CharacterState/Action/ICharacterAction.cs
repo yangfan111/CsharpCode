@@ -1,9 +1,4 @@
-﻿﻿using Core;
-using Core.Fsm;
-using System;
-using XmlConfig;
-
-namespace Core.CharacterState.Action
+﻿namespace Core.CharacterState.Action
 {
     public interface ICharacterAction
     {

@@ -9,6 +9,7 @@ using Core.Utils;
 using VNet;
 using App.Server.Scripts.Config;
 using App.Shared.Components.Serializer;
+using Common;
 using UnityEngine;
 using Version = Core.Utils.Version;
 using Utils.Singleton;
@@ -150,7 +151,7 @@ namespace App.Server
         {
             _networkMonitor.Update();
             _server.Update();
-            _server.FlowTick(Time.time);
+            _server.FlowTick(MyGameTime.time);
         }
     }
 }

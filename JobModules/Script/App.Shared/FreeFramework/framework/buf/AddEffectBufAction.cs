@@ -1,11 +1,8 @@
-﻿using com.wd.free.action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using App.Server.GameModules.GamePlay.free.player;
+using com.wd.free.action;
 using com.wd.free.@event;
-using App.Server.GameModules.GamePlay.free.player;
 using Core.Free;
+using System;
 
 namespace App.Shared.FreeFramework.framework.buf
 {
@@ -26,7 +23,7 @@ namespace App.Shared.FreeFramework.framework.buf
             }
             else
             {
-                fd.EffectBufs.AddEffect(args.GetString(effect), args.GetFloat(level), realTime);
+                fd.EffectBufs.AddEffect(args.GetString(effect), args.GetFloat(level), realTime, args);
             }
         }
 

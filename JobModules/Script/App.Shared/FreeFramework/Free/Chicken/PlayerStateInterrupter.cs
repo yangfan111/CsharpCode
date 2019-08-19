@@ -21,14 +21,11 @@ namespace App.Shared.FreeFramework.Free.Chicken
 
                 var manager = SingletonManager.Get<StateTransitionConfigManager>();
 
-                if (fd.Player.stateInterface.State.GetCurrentPostureState() != fd.Player.stateInterface.State.GetNextPostureState())
-                    return true;
-
                 foreach (EPlayerState state in fd.Player.StateInteractController().GetCurrStates())
                 {
                     StateTransitionConfigItem condition = manager.GetConditionByState(state);
                     if (condition == null) continue;
-                    if (!condition.IsUseItem)
+                    if (!condition.GetTransition(Transition.IsUseItem) /*IsUseItem*/)
                     {
                         return true;
                     }

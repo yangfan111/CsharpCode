@@ -8,5 +8,6 @@
         bool GameExit { get; set; }
         long GameStartTime { get; set; }
         long GameEndTime { get; set; }
+        long StartTime { get; }
     }
 }

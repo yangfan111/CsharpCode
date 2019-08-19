@@ -44,7 +44,7 @@ namespace App.Client.GameModules.GamePlay
                         break;
                 }
                 cmdGenerator.RegisterGlobalKeyReceiver(inputMapper);
-                cmdGenerator.BeginReceiveUserInput(_contexts.userInput.userInputManager.Instance);
+                cmdGenerator.BeginReceiveUserInput(_contexts.userInput.userInputManager.Mgr);
             }
         }
     }

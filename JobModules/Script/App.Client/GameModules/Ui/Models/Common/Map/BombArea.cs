@@ -12,11 +12,13 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private Transform tran;
         private RectTransform rectTransform;
         private Image img;
+        private ActiveSetter tranActiveSetter;
 
         public BombArea(Transform tran)
         {
-            UIUtils.SetActive(tran, true);
             this.tran = tran;
+            tranActiveSetter = new ActiveSetter(tran.gameObject);
+            tranActiveSetter.Active = true;
             rectTransform = tran.GetComponent<RectTransform>();
             img = tran.GetComponent<Image>();
         }
@@ -26,13 +28,13 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             Vector2 referPosByPixel = Vector2.zero;
 
             var temperVec = curBombAreaInfo.Center.ShiftedUIVector2();
-            if (curBombAreaInfo.Radius.Equals(0) && curBombAreaInfo.Num.Equals(-1) && Vector2.Distance(selfPlayPos, temperVec) > 1.414f * windowWidthByRice / 2 + curBombAreaInfo.Radius) //不在地图视野内
+            if (curBombAreaInfo.Radius == 0 || curBombAreaInfo.Num == 0 || Vector2.Distance(selfPlayPos, temperVec) > 1.414f * windowWidthByRice / 2 + curBombAreaInfo.Radius) //不在地图视野内
             {
-                UIUtils.SetActive(tran, false);
+                tranActiveSetter.Active = false;
             }
             else
             {
-                UIUtils.SetActive(tran, true);
+                tranActiveSetter.Active = true;
                 var material = img.material;
                 //设置大小
                 float beishu = (curBombAreaInfo.Radius * rate) / (rectTransform.rect.width / 2);

@@ -1,8 +1,6 @@
-﻿using App.Client.CastObjectUtil;
-using App.Shared;
+﻿using App.Shared;
 using App.Shared.GameMode;
 using Core;
-using Core.EntityComponent;
 using Core.Free;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
@@ -55,7 +53,7 @@ namespace App.Client.GameMode
             }
         }
 
-        public override void SendAutoPickupWeapon(int entityId)
+        /*public override void SendAutoPickupWeapon(int entityId)
         {
             var target = _contexts.sceneObject.GetEntityWithEntityKey(new EntityKey(entityId, (short)EEntityType.SceneObject));
             if (target != null && Player.WeaponController().FilterAutoPickup(target.simpleItem.Id))
@@ -74,7 +72,7 @@ namespace App.Client.GameMode
                 pickUp.Ins.Add(1);
                 Player.network.NetworkChannel.SendReliable((int)EClient2ServerMessage.FreeEvent, pickUp);
             }
-        }
+        }*/
 
         protected override void DoDropGrenade(PlayerEntity playerEntity, EWeaponSlotType slot, IUserCmd cmd)
         {

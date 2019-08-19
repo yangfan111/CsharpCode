@@ -5,11 +5,23 @@ using System.Xml.Serialization;
 
 namespace XmlConfig.BootConfig
 {
+    public class SmallMap
+    {
+        public int MapId;
+        public List<Vector2> Points;
+    }
+
+    public class BigMap
+    {
+        public int MapId;
+        public List<Vector2> ExcludedScenes;
+    }
+
     [XmlType("config")]
     public class TerrainSampleConfig
     {
         public string Url;
-        public string Key;
+
         public string Quality;
 
         /// <summary>
@@ -48,18 +60,28 @@ namespace XmlConfig.BootConfig
         public bool EnablePosLimit;
 
         /// <summary>
-        /// 采样限制位置的X坐标
+        /// 采样位置限制的X坐标
         /// </summary>
         public int PosLimitX;
 
         /// <summary>
-        /// 采样限制位置的Z坐标
+        /// 采样位置限制的Z坐标
         /// </summary>
         public int PosLimitZ;
 
         /// <summary>
-        /// 采样限制位置的方向，-1表示取最坏，0~3对应四个方向
+        /// 采样位置限制的方向，-1表示取最坏，0~3对应四个方向
         /// </summary>
         public int PosLimitDir;
+
+        /// <summary>
+        /// 需要指定采样点的小地图
+        /// </summary>
+        public List<SmallMap> SmallMaps;
+
+        /// <summary>
+        /// 存在不需要采样场景的大地图
+        /// </summary>
+        public List<BigMap> BigMaps;
     }
 }

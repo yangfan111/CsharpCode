@@ -42,6 +42,7 @@ namespace com.wd.free.@event
 
         private MyDictionary<string, Stack<IParable>> temp;
 
+        private TempUseArgs useArgs;
         public BaseEventArgs()
         {
             this.map = new MyDictionary<string, IParable>();
@@ -55,6 +56,7 @@ namespace com.wd.free.@event
             this._bufs = new FreeBufManager();
             this._poss = new PosManager(this);
             this._freeContext = new FreeContext(_gameContext, this);
+            this.useArgs = new TempUseArgs(this);
         }
 
         public virtual GameTriggers Triggers
@@ -95,7 +97,11 @@ namespace com.wd.free.@event
 
         public virtual IParable RemovePara(string key)
         {
-            IParable para = this.map[key];
+            IParable para = null;
+            if (useArgs.RemovePara(key, out para))
+                return para;
+
+            para = this.map[key];
             this.map.Remove(key);
 
             this.directMap.Remove(key);
@@ -109,7 +115,8 @@ namespace com.wd.free.@event
 
         public virtual void AddDefault(IParable paras)
         {
-            this.map[DEFAULT] = paras;
+            /*this.map[DEFAULT] = paras;*/
+            useArgs.AddDefault(paras);
         }
 
         public virtual void ClearDefault()
@@ -125,6 +132,10 @@ namespace com.wd.free.@event
         public virtual IParable GetUnit(string key)
         {
             IParable v = null;
+
+            if (useArgs.GetUnit(key, out v))
+                return v;
+
             if (/*directMap.Count > 0 && */directMap.TryGetValue(key, out v))
             {
                 return v;
@@ -137,7 +148,12 @@ namespace com.wd.free.@event
 
         public virtual string[] GetUnitKeys()
         {
-            return Sharpen.Collections.ToArray(map.Keys, new string[0]);
+            int count = map.Keys.Count;
+            string[] keys =  Sharpen.Collections.ToArray(map.Keys, new string[0], TempUseArgs.UseCount);
+            keys[count++] = TempUseArgs.DEFAULT;
+            keys[count++] = TempUseArgs.buf;
+            keys[count++] = TempUseArgs.creator;
+            return keys;
         }
 
         public virtual GameUnitSet GetGameUnits()
@@ -152,6 +168,8 @@ namespace com.wd.free.@event
 
         public virtual void TempUse(string key, IParable paras)
         {
+            if (useArgs.TempUse(key, paras)) return;
+
             Stack<IParable> v = null;
             if (!temp.TryGetValue(key, out v))
             {
@@ -164,6 +182,8 @@ namespace com.wd.free.@event
 
         public virtual void Resume(string key)
         {
+            if (useArgs.Resume(key)) return;
+
             IParable old = temp[key].Pop();
 
             this.map[key] = old;
@@ -171,18 +191,20 @@ namespace com.wd.free.@event
 
         public void TempUsePara(IPara para)
         {
-            if (map.ContainsKey(DEFAULT))
-            {
-                map[DEFAULT].GetParameters().TempUse(para);
-            }
+            //if (map.ContainsKey(DEFAULT))
+            //{
+            //    map[DEFAULT].GetParameters().TempUse(para);
+            //}
+            useArgs.TempUsePara(para);
         }
 
         public void ResumePara(string paraName)
         {
-            if (map.ContainsKey(DEFAULT))
-            {
-                map[DEFAULT].GetParameters().Resume(paraName);
-            }
+            //if (map.ContainsKey(DEFAULT))
+            //{
+            //    map[DEFAULT].GetParameters().Resume(paraName);
+            //}
+            useArgs.ResumePara(paraName);
         }
 
         private TriggerArgs triggerArgs = new TriggerArgs();

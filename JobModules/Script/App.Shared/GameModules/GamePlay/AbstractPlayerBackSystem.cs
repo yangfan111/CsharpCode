@@ -13,7 +13,10 @@ namespace App.Client.GameModules.Player
         /*
          * 如果为true就不进行下一步
          */
-        protected abstract bool Filter(TEntity entity);
+        protected virtual bool Filter(TEntity entity)
+        {
+            return true;
+        }
         protected abstract void OnGamePlay(TEntity entity);
         protected IGroup<TEntity> _group;
 

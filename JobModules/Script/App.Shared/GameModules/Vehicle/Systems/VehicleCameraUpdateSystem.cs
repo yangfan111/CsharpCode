@@ -5,6 +5,7 @@ using System.Text;
 using App.Shared.GameModules.Player;
 using BehaviorDesigner.Runtime.Tasks.Basic.UnityTransform;
 using Core.EntityComponent;
+using Common;
 using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
@@ -40,12 +41,12 @@ namespace App.Shared.GameModules.Vehicle
 
             if (_newVehicle)
             {
-                _lastTime = Time.time;
+                _lastTime = MyGameTime.time;
                 _newVehicle = false;
                 return;
             }
 
-            var currentTime = Time.time;
+            var currentTime = MyGameTime.time;
 
             var controlledVehicle = player.controlledVehicle;
             var vehicleEntity = _vehicleContext.GetEntityWithEntityKey(controlledVehicle.EntityKey);

@@ -11,13 +11,16 @@ using App.Shared.Components.Player;
 using App.Shared.GameModules.Player.Appearance.WardrobeControllerPackage;
 using App.Shared.GameModules.Player.Appearance.WeaponControllerPackage;
 using App.Shared.GameModules.Player.CharacterBone.IkControllerPackage;
+using App.Shared.GameModules.Player.Robot.Conditions;
 using Core.EntityComponent;
 using Shared.Scripts;
 using UnityEngine;
 using Utils.Appearance;
 using Utils.Appearance.Bone;
+using Utils.Appearance.Effects;
 using Utils.Appearance.Script;
 using Utils.Appearance.WardrobePackage;
+using Utils.Appearance.Weapon.WeaponShowPackage;
 using Utils.AssetManager;
 using Utils.CharacterState;
 using Utils.Configuration;
@@ -35,7 +38,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
         private GameObject _characterP3;
         private GameObject _characterP1;
-        private WeaponController _weaponController;
+        private NewWeaponController _weaponController;
         private WardrobeController _wardrobeController;
         private PlayerIkController _playerIkController;
 
@@ -69,6 +72,16 @@ namespace App.Shared.GameModules.Player.CharacterBone
             get { return _view == CharacterView.FirstPerson; }
         }
 
+        public Vector3 BaseLocatorDelta
+        {
+            get
+            {
+                if (_boneRigging.BaseLocatorP1)
+                    return _boneRigging.BaseLocatorP1.localPosition;
+                return Vector3.zero;
+            }
+        }
+
         public bool IsIKActive
         {
             set
@@ -79,9 +92,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
             get { return _playerIkController.EnableIK; }
         }
 
-        public int LastHeadRotSlerpTime { get; set; }
         public float LastHeadRotAngle { get; set; }
-        public bool IsHeadRotCW { get; set; }
         public bool ForbidRot { get; set; }
 
         public CharacterBoneManager()
@@ -102,9 +113,9 @@ namespace App.Shared.GameModules.Player.CharacterBone
             _wardrobeController = value as WardrobeController;
         }
 
-        public void SetWeaponController(WeaponControllerBase value)
+        public void SetWeaponController(NewWeaponControllerBase value)
         {
-            _weaponController = value as WeaponController;
+            _weaponController = value as NewWeaponController;
         }
 
         public Transform FastGetBoneTransform(string boneName, CharacterView view)
@@ -260,11 +271,6 @@ namespace App.Shared.GameModules.Player.CharacterBone
             _weaponRot.WeaponRotPlayback(param);
         }
 
-        public void GetWeaponObj()
-        {
-            _weaponController.RemountWeaponInPackage();
-        }
-
         public void Update(CodeRigBoneParam param)
         {
             try
@@ -351,10 +357,26 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 _wardrobeController.HandleSignleWardrobe(type, act);
         }
 
-        // 包括枪配件的改变
-        public void CurrentWeaponChanged(GameObject objP1, GameObject objP3)
+        public void WeaponOrAttachmentDel(GameObject obj)
         {
-            if (null == objP1 && null == objP3)
+            EffectUtility.DeleteGodModeEffect(_characterRoot, obj);
+        }
+
+        public void WeaponOrAttachmentAdd(GameObject obj)
+        {
+            EffectUtility.ReflushGodModeEffect(_characterRoot, obj);
+        }
+        
+        // 包括枪配件的改变
+        public void CurrentP1WeaponChanged(GameObject obj)
+        {
+            if(null == obj) return;
+            _boneRigging.SetP1IkTarget(obj);
+        }
+        
+        public void CurrentP3WeaponChanged(GameObject obj)
+        {
+            if (null == obj)
             {
                 _directOutputs.CacheFsmOutput(AnimatorParametersHash.Instance.HandPoseHash,
                     AnimatorParametersHash.Instance.HandPoseName,
@@ -368,7 +390,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 AnimatorParametersHash.Instance.HandPoseEnableValue,
                 CharacterView.FirstPerson | CharacterView.ThirdPerson);
                 
-            if (_boneRigging.SetIKTarget(objP1, objP3, ref _weaponHasIK))
+            if (_boneRigging.SetP3IkTarget(obj, ref _weaponHasIK))
             {
                 var lowRailInCurrentWeapon = _weaponController.GetCurrentLowRailId();
                 var gripHandPoseState =
@@ -393,8 +415,6 @@ namespace App.Shared.GameModules.Player.CharacterBone
                     CharacterView.FirstPerson | CharacterView.ThirdPerson);
                 _attachmentNeedIK = false;
             }
-            
-            
         }
 
         private bool UpdateSightData(ref CodeRigBoneParam param)

@@ -51,6 +51,7 @@ namespace App.Client.GameModules.GamePlay
             set { }
         }
 
+        public long StartTime { get{return 0;}}
         public long GameStartTime { get{return 0;} set { } }
         public long GameEndTime { get{return 0;} set { } }
 

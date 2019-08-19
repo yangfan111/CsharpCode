@@ -35,6 +35,7 @@ public class AkEvent : AkUnityEventHandler, UnityEngine.ISerializationCallbackRe
 	//- audio event 通用s模板
 	public AkActionOnEventType actionOnEventType = AkActionOnEventType.AkActionOnEventType_Stop;
 	public AkCurveInterpolation curveInterpolation = AkCurveInterpolation.AkCurveInterpolation_Linear;
+	//-执行AkSoundEngine.ExecuteActionOnEvent
 	public bool enableActionOnEvent = false;
 	public float transitionDuration = 0.0f;
 
@@ -45,7 +46,7 @@ public class AkEvent : AkUnityEventHandler, UnityEngine.ISerializationCallbackRe
 	public int eventID { get { return (int)(data == null ? AkSoundEngine.AK_INVALID_UNIQUE_ID : data.Id); } }
 
 	public AK.Wwise.Event data = new AK.Wwise.Event();
-
+	//仅当enableActionOnEvent = false时生效
 	public AkEventCallbackData m_callbackData = null;
 	public uint playingId = AkSoundEngine.AK_INVALID_PLAYING_ID;
 

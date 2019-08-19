@@ -29,6 +29,10 @@ namespace App.Client.GameModules.GamePlay.Free.Player
             return (entity.hasGamePlay && entity.gamePlay.IsMatrix());
         }
 
+        private bool IsVariant(PlayerEntity entity) {
+            return (entity.hasGamePlay && entity.gamePlay.IsVariant());
+        }
+
         private AbstractEffectMonoBehaviour _glowOutlineComponent = null;
 
         private AbstractEffectMonoBehaviour GlowOutlineComponent
@@ -90,8 +94,8 @@ namespace App.Client.GameModules.GamePlay.Free.Player
                 case 2:
                     PlayerEntity pe = GetEntityById(contexts, playerId);
                     if (add) {
-                        heroIdList.Add(playerId);
-                        if (IsMatrix(selfEntity)) {
+                        /*heroIdList.Add(playerId);*/
+                        if (IsVariant(selfEntity)) {
                             if (!GlowOutlineComponent.enabled)
                             {
                                 GlowOutlineComponent.SetParam(ClearCharacters, (object)null);
@@ -100,8 +104,8 @@ namespace App.Client.GameModules.GamePlay.Free.Player
                             GlowOutlineComponent.SetParam(AddCharacter, (object)pe.RootGo());
                         }
                     } else {
-                        heroIdList.Remove(playerId);
-                        if (IsMatrix(selfEntity)) {
+                        /*heroIdList.Remove(playerId);*/
+                        if (IsVariant(selfEntity)) {
                             GlowOutlineComponent.SetParam(RemoveCharacter, (object)pe.RootGo());
                         }
                     }
@@ -109,8 +113,8 @@ namespace App.Client.GameModules.GamePlay.Free.Player
                 case 3:
                     pe = GetEntityById(contexts, playerId);
                     if (add) {
-                        humanIdList.Add(playerId);
-                        if (IsMatrix(selfEntity)) {
+                        /*humanIdList.Add(playerId);*/
+                        if (IsVariant(selfEntity)) {
                             if (!GlowOutlineComponent.enabled)
                             {
                                 GlowOutlineComponent.SetParam(ClearCharacters, (object)null);
@@ -119,8 +123,8 @@ namespace App.Client.GameModules.GamePlay.Free.Player
                             GlowOutlineComponent.SetParam(AddCharacter, (object)pe.RootGo());
                         }
                     } else {
-                        humanIdList.Remove(playerId);
-                        if (IsMatrix(selfEntity)) {
+                        /*humanIdList.Remove(playerId);*/
+                        if (IsVariant(selfEntity)) {
                             GlowOutlineComponent.SetParam(RemoveCharacter, (object)pe.RootGo());
                         }
                     }

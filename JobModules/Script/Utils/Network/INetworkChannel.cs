@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Sockets;
+using Utils.Replay;
 
 namespace Core.Network
 {
@@ -17,15 +18,18 @@ namespace Core.Network
     
      
         void Disconnect();
-        int LocalConnId { get; set; }
-        int RemoteConnId { get; set; }
-        int UdpPort { get; set; }
+        int LocalConnId { get; }
+        int RemoteConnId { get;  }
+        
         INetworkMessageSerializer Serializer { get; set; }
+        IRecordManager Recoder { get; set; }
         int Id { get; }
         SocketError ErrorCode { get; }
         void FlowSend(bool Type, long bytes, long ms=0);
         void FlowRecv(bool Type, long bytes, long ms=0);
      
         string IdInfo();
+       
+        void RealTimeConnect(int udpPort, int remoteUdpId);
     }
 }

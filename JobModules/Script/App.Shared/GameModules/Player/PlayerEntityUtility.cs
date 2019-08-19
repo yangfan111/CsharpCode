@@ -1,26 +1,18 @@
-using App.Shared.GameModules.Common;
-using Core.Animation;
-using Core.Utils;
-using UnityEngine;
 using App.Shared.Components.Player;
-using Utils.Appearance;
-using Utils.Configuration;
-using XmlConfig;
-using Object = UnityEngine.Object;
-using App.Shared.GameModules.Player.Appearance;
-using App.Shared.Player;
-using App.Shared.GameModules.Player.ConcreteCharacterController;
-using Core.CharacterController;
-using KinematicCharacterController;
-using Utils.CharacterState;
-using Core.CameraControl.NewMotor;
+using App.Shared.GameModules.Common;
 using App.Shared.GameModules.Player.CharacterBone;
-using System.Collections.Generic;
-using Utils.Compare;
-using Utils.Singleton;
-using App.Shared.GameModules.Weapon;
-using Poly2Tri;
+using App.Shared.Player;
+using Core.Animation;
+using Core.CharacterController;
+using Core.Enums;
+using Core.Utils;
+using KinematicCharacterController;
+using UnityEngine;
+using Utils.Appearance;
 using Utils.Appearance.Bone;
+using Utils.Configuration;
+using Utils.Singleton;
+using Object = UnityEngine.Object;
 
 namespace App.Shared.GameModules.Player
 {
@@ -28,26 +20,12 @@ namespace App.Shared.GameModules.Player
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerEntityUtility));
 
-        public static Vector3 BulletEmittorOffset = new Vector3(0, 0, 0.1f);
-        public static Vector3 BulletDirection = Vector3.forward;
-        public static Vector3 CameraOffset = new Vector3(0.3f, 1.8f, -0.6f);
-        public static Vector3 ThrowingEmittorFirstOffset = new Vector3(0.3f, -0.4f, 1.2f);
-        public static Vector3 ThrowingEmittorThirdOffset = new Vector3(0, -0.2f, 3.0f);
-        private static GameObject _go;
-
-        private static GameObject go
-        {
-            get
-            {
-                if (_go == null)
-                {
-                    _go = new GameObject();
-                    _go.name = "PlayerEntityUtil";
-                }
-
-                return _go;
-            }
-        }
+        // public static Vector3 BulletEmittorOffset = new Vector3(0, 0, 0.1f);
+        // public static Vector3 BulletDirection = Vector3.forward;
+        // public static Vector3 CameraOffset = new Vector3(0.3f, 1.8f, -0.6f);
+        // public static Vector3 ThrowingEmittorFirstOffset = new Vector3(0.3f, -0.4f, 1.2f);
+        // public static Vector3 ThrowingEmittorThirdOffset = new Vector3(0, -0.2f, 3.0f);
+   
 
         public static CharacterController InitCharacterController(GameObject go)
         {
@@ -132,69 +110,68 @@ namespace App.Shared.GameModules.Player
             return true;
         }
 
-        public static Vector3 GetCameraBulletEmitPosition(PlayerEntity playerEntity)
-        {
-            go.transform.rotation = Quaternion.Euler(playerEntity.cameraFinalOutputNew.EulerAngle);
-            go.transform.position = playerEntity.cameraFinalOutputNew.Position;
-            if (Logger.IsDebugEnabled)
-            {
-                Logger.DebugFormat("camera pos is {0}", playerEntity.cameraFinalOutputNew.Position.ToStringExt());
-            }
+        // public static Vector3 GetCameraBulletEmitPosition(PlayerEntity playerEntity)
+        // {
+        //     go.transform.rotation = Quaternion.Euler(playerEntity.cameraFinalOutputNew.EulerAngle);
+        //     go.transform.position = playerEntity.cameraFinalOutputNew.Position;
+        //     if (Logger.IsDebugEnabled)
+        //     {
+        //         Logger.DebugFormat("camera pos is {0}", playerEntity.cameraFinalOutputNew.Position.ToStringExt());
+        //     }
+        //
+        //     var rc = go.transform.TransformPoint(BulletEmittorOffset);
+        //     if (playerEntity.cameraStateNew.ViewNowMode == (int) ECameraViewMode.GunSight)
+        //     {
+        //         var _sightLocationP1 = playerEntity.characterBoneInterface.CharacterBone.GetLocation(
+        //             Utils.CharacterState.SpecialLocation.SightsLocatorPosition,
+        //             Utils.CharacterState.CharacterView.FirstPerson);
+        //         if (_sightLocationP1 != null)
+        //         {
+        //             rc = _sightLocationP1.transform.position;
+        //         }
+        //         else
+        //         {
+        //             Logger.ErrorFormat("no sight locator in weapon");
+        //         }
+        //     }
+        //
+        //     return rc;
+        // }
 
-            var rc = go.transform.TransformPoint(BulletEmittorOffset);
-            if (playerEntity.cameraStateNew.ViewNowMode == (int) ECameraViewMode.GunSight)
-            {
-                var _sightLocationP1 = playerEntity.characterBoneInterface.CharacterBone.GetLocation(
-                    Utils.CharacterState.SpecialLocation.SightsLocatorPosition,
-                    Utils.CharacterState.CharacterView.FirstPerson);
-                if (_sightLocationP1 != null)
-                {
-                    rc = _sightLocationP1.transform.position;
-                }
-                else
-                {
-                    Logger.ErrorFormat("no sight locator in weapon");
-                }
-            }
-
-            return rc;
-        }
-
-        public static bool GetGunBulletEmitPosition(PlayerEntity playerEntity, out Vector3 pos)
-        {
-            var appearance = playerEntity.appearanceInterface.Appearance;
-            var characterBone = playerEntity.characterBoneInterface.CharacterBone;
-            var muzzleTrans = characterBone.GetLocation(SpecialLocation.MuzzleEffectPosition,
-                appearance.IsFirstPerson ? CharacterView.FirstPerson : CharacterView.ThirdPerson);
-            if (null != muzzleTrans)
-            {
-                pos = muzzleTrans.position;
-                return true;
-            }
-            else
-            {
-                pos = Vector3.zero;
-                Logger.ErrorFormat("no muzzle effect anchor found");
-                return false;
-            }
-        }
-        //TODO:controller util
-        public static Vector3 GetThrowingEmitPosition(PlayerWeaponController controller)
-        {
-            go.transform.rotation = Quaternion.Euler(controller.RelatedCameraFinal.EulerAngle);
-            go.transform.position = controller.RelatedCameraFinal.Position;
-            Vector3 rc;
-            if (controller.RelatedAppearence.IsFirstPerson)
-            {
-                rc = go.transform.TransformPoint(ThrowingEmittorFirstOffset);
-            }
-            else
-            {
-                rc = go.transform.TransformPoint(ThrowingEmittorThirdOffset);
-            }
-
-            return rc;
-        }
+        // public static bool GetGunBulletEmitPosition(PlayerEntity playerEntity, out Vector3 pos)
+        // {
+        //     var appearance = playerEntity.appearanceInterface.Appearance;
+        //     var characterBone = playerEntity.characterBoneInterface.CharacterBone;
+        //     var muzzleTrans = characterBone.GetLocation(SpecialLocation.MuzzleEffectPosition,
+        //         appearance.IsFirstPerson ? CharacterView.FirstPerson : CharacterView.ThirdPerson);
+        //     if (null != muzzleTrans)
+        //     {
+        //         pos = muzzleTrans.position;
+        //         return true;
+        //     }
+        //     else
+        //     {
+        //         pos = Vector3.zero;
+        //         Logger.ErrorFormat("no muzzle effect anchor found");
+        //         return false;
+        //     }
+        // }
+        // public static Vector3 GetThrowingEmitPosition(PlayerWeaponController controller)
+        // {
+        //     go.transform.rotation = Quaternion.Euler(controller.RelatedCameraFinal.EulerAngle);
+        //     go.transform.position = controller.RelatedCameraFinal.Position;
+        //     Vector3 rc;
+        //     if (controller.RelatedAppearence.IsFirstPerson)
+        //     {
+        //         rc = go.transform.TransformPoint(ThrowingEmittorFirstOffset);
+        //     }
+        //     else
+        //     {
+        //         rc = go.transform.TransformPoint(ThrowingEmittorThirdOffset);
+        //     }
+        //
+        //     return rc;
+        // }
 
         public static Vector3 GetHandWeaponPosition(this PlayerEntity playerEntity)
         {
@@ -234,10 +211,12 @@ namespace App.Shared.GameModules.Player
         public static Vector3 GetPlayerTopPosition(PlayerEntity playerEntity)
         {
             Vector3 ret = playerEntity.position.Value;
+            if (ret == Vector3.zero)
+                return Vector3.zero;
             Transform tran;
             if (!playerEntity.hasAppearanceInterface)
             {
-                return Vector3.zero;
+                return ret + new Vector3(0, 2, 0);
             }
 
             if (playerEntity.appearanceInterface.Appearance.IsFirstPerson)
@@ -300,14 +279,26 @@ namespace App.Shared.GameModules.Player
             var networkAnimator = player.networkAnimator;
             var animatorP3 = player.thirdPersonAnimator.UnityAnimator;
             var previousMode = animatorP3.cullingMode;
+
             animatorP3.cullingMode = AnimatorCullingMode.AlwaysAnimate;
             // Animation
-            PoseReplayer.ReplayPose(networkAnimator.AnimatorLayers, networkAnimator.AnimatorParameters,
+            Animator.ClearAnimatorJobContainer();
+            
+//            流量优化用
+//            if (networkAnimator.AnimatorParameters == null)
+//            {
+//                networkAnimator.SetAnimatorParamsWithoutChangeData(
+//                    NetworkAnimatorUtil.GetAnimatorParams(player.thirdPersonAnimator.UnityAnimator));
+//                networkAnimator.ConvertCompressDataToStructureData();
+//            }
+            AnimatorPoseReplayer.ReplayPose(networkAnimator.AnimatorLayers, networkAnimator.AnimatorParameters,
                 animatorP3);
+
+            Animator.BatchUpdate();
+            
             animatorP3.cullingMode = previousMode;
         }
 
-        private static readonly AnimatorPoseReplayer PoseReplayer = new AnimatorPoseReplayer();
         public static readonly float CcSkinWidth= 0.03f;
 
         public static void UpdateTransform(PlayerEntity player, NetworkAnimatorComponent networkAnimator,
@@ -317,18 +308,21 @@ namespace App.Shared.GameModules.Player
             {
                 return;
             }
-
             
-            //Logger.InfoFormat("replay pose, networkAnimatior:BaseClientTime{0}, server Time:{1}", networkAnimator.BaseClientTime, networkAnimator.BaseServerTime);
-
             // Animation
             Animator.ClearAnimatorJobContainer();
 
-            PoseReplayer.ReplayPose(networkAnimator.AnimatorLayers, networkAnimator.AnimatorParameters,
+//            流量优化用
+//            if (networkAnimator.AnimatorParameters == null)
+//            {
+//                networkAnimator.SetAnimatorParamsWithoutChangeData(
+//                    NetworkAnimatorUtil.GetAnimatorParams(player.thirdPersonAnimator.UnityAnimator));
+//                networkAnimator.ConvertCompressDataToStructureData();
+//            }
+            AnimatorPoseReplayer.ReplayPose(networkAnimator.AnimatorLayers, networkAnimator.AnimatorParameters,
                 player.thirdPersonAnimator.UnityAnimator);
 
             Animator.BatchUpdate();
-            Animator.ClearAnimatorJobContainer();
 
             // equipment(pan)
             var appearanceInterface = player.appearanceInterface;
@@ -354,10 +348,7 @@ namespace App.Shared.GameModules.Player
                 HeadPitch = characterBone.PitchHeadAngle,
                 HeadYaw = characterBone.RotHeadAngle,
                 CurrentHandPitch = characterBone.CurrentPitchHandAngle,
-                HeadRotProcess = characterBone.HeadRotProcess,
                 WeaponRot = characterBone.WeaponRot,
-                IsProne = thirdPersonAppearance.Posture == ThirdPersonPosture.Prone,
-                IsHeadRotCW = characterBone.IsHeadRotCW,
 
                 FirstPersonPositionOffset = characterBone.FirstPersonPositionOffset,
                 FirstPersonRotationOffset = characterBone.FirstPersonRotationOffset,
@@ -417,9 +408,36 @@ namespace App.Shared.GameModules.Player
             return controller.transform.position - midPoint * Vector3.up;
         }
 
-        public static void SetActive(PlayerEntity player, bool active)
+        public static void SetActive(PlayerEntity player, bool active, EActiveMask mask)
         {
-            player.RootGo().SetActive(active);
+            if (active)
+            {
+                player.gamePlay.ActiveMask &= ~(int)mask;
+                if (0 == player.gamePlay.ActiveMask)
+                    player.RootGo().SetActive(true);
+                return;
+            }
+            else
+                player.gamePlay.ActiveMask |= (int)mask;
+            player.RootGo().SetActive(false);
+        }
+
+        public static void SetVisibility(GameObject gameObject, bool visibility)
+        {
+            if (null == gameObject)
+                return;
+            gameObject.transform.localScale = visibility ? Vector3.one : 0.01f * Vector3.one;
+        }
+
+        private static void SetActive(GameObject @object, bool active)
+        {
+            if (null == @object) return;
+            Renderer[] renderers = @object.GetComponentsInChildren<Renderer>();
+            for (int i = 0, maxi = (renderers == null ? 0 : renderers.Length); i < maxi; i++) {
+                Renderer renderer = renderers[i];
+                if (null == renderer) continue;
+                renderer.enabled = active;
+            }
         }
     }
 }

@@ -46,7 +46,7 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
     {
         public bool IsActive(ICameraMotorInput input, ICameraMotorState state)
         {
-            return input.NextPostureState == PostureInConfig.Swim;
+            return input.NextPostureState == PostureInConfig.Swim || input.NextPostureState == PostureInConfig.Dive;
         }
     }
 
@@ -115,11 +115,10 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
         private int _order;
         private readonly float Epsilon = 0.01f;
         protected float _transitionTime ;
-        
 
         public NormalPoseMotor(ECameraPoseMode modeId,
             HashSet<ECameraPoseMode> excludes,
-            IMotorActive active)
+            IMotorActive active, Motors m):base(m)
         {
             _modeId = (short)modeId;
             _motorType = SubCameraMotorType.Pose;

@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>AkSurfaceReflector类参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li class="current"><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="tabs">
+    <ul>
+      <li><a href="annotated.html"><span>组合类型列表</span></a></li>
+      <li><a href="classes.html"><span>组合类型索引</span></a></li>
+      <li><a href="hierarchy.html"><span>类继承关系</span></a></li>
+      <li><a href="functions.html"><span>组合类型成员</span></a></li>
+    </ul>
+  </div>
+</div>
+<div class="contents">
+<h1>AkSurfaceReflector类参考</h1><!-- doxytag: class="AkSurfaceReflector" -->
+<p>This component will convert the triangles of the GameObject's geometry into sound reflective surfaces.  
+<a href="#_details">更多...</a></p>
+
+<p><a href="class_ak_surface_reflector-members.html">所有成员的列表。</a></p>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2"><h2>静态公有成员</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_surface_reflector_a0faa6e6eb8800c544fcb341c0ce4c87c.html#a0faa6e6eb8800c544fcb341c0ce4c87c">AddGeometrySet</a> (AK.Wwise.AcousticTexture acousticTexture, UnityEngine.MeshFilter meshFilter, bool enableDiffraction, bool enableDiffractionOnBoundaryEdges)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sends the mesh filter's triangles and their acoustic texture to Spatial Audio.  <a href="#a0faa6e6eb8800c544fcb341c0ce4c87c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_surface_reflector_aa7f4f3a3e13db50eb51b96c0f5ef833e.html#aa7f4f3a3e13db50eb51b96c0f5ef833e">RemoveGeometrySet</a> (UnityEngine.MeshFilter meshFilter)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Remove the corresponding mesh filter's geometry from Spatial Audio.  <a href="#aa7f4f3a3e13db50eb51b96c0f5ef833e"></a><br/></td></tr>
+<tr><td colspan="2"><h2>公有属性</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">AK.Wwise.AcousticTexture&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_surface_reflector_a3f780a056ad53534aa3fd5ee4a8afa52.html#a3f780a056ad53534aa3fd5ee4a8afa52">AcousticTexture</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">All triangles of the component's mesh will be applied with this texture. The texture will change the filter parameters of the sound reflected from this component.  <a href="#a3f780a056ad53534aa3fd5ee4a8afa52"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_surface_reflector_a5a979f445b0115e4379a2e4f805e406b.html#a5a979f445b0115e4379a2e4f805e406b">EnableDiffraction</a> = false</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Switch to enable or disable geometric diffraction for this mesh.  <a href="#a5a979f445b0115e4379a2e4f805e406b"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_surface_reflector_adf972958e3e4bf36a274a3514dd8a700.html#adf972958e3e4bf36a274a3514dd8a700">EnableDiffractionOnBoundaryEdges</a> = false</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Switch to enable or disable geometric diffraction on boundary edges for this mesh. Boundary edges are edges that are connected to only one triangle.  <a href="#adf972958e3e4bf36a274a3514dd8a700"></a><br/></td></tr>
+</table>
+<hr/><a name="_details"></a><h2>详细描述</h2>
+<p>This component will convert the triangles of the GameObject's geometry into sound reflective surfaces. </p>
+<p>This component requires a Mesh Filter component. The triangles of the mesh will be sent to the Spatial Audio wrapper by calling SpatialAudio::AddGeometrySet(). The triangles will reflect the sound emitted from <a class="el" href="class_ak_spatial_audio_emitter.html" title="Add this script on the GameObject which represents an emitter that uses the Spatial...">AkSpatialAudioEmitter</a> components. </p>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

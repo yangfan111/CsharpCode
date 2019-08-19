@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>将声音实现到您的游戏中</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>&nbsp;&raquo;&nbsp;<a class="el" href="pg__installation.html">在 Unity 工程中安装或升级集成</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="pg_installvalidation">将声音实现到您的游戏中 </a></h1><p>现阶段，您应该能够通过 Wwise 在您的游戏中播放声音了。If you haven't already set up your Wwise project with a few sounds, Events, and SoundBanks, you will need to start Wwise and do the following:</p>
+<ol type="1">
+<li>导入一个 WAV 文件。Drag and drop one from a File Explorer window to the Project Explorer's Audio tab. 这将创建一个声音。</li>
+<li>创建一个事件。在 Sound 上右击，并选择 <b>New Event</b>。给它起一个合适的名字。</li>
+<li>创建一个 SoundBank。进入 SoundBanks 布局（F7）Click <b>New…</b> in the SoundBank Manager.</li>
+<li>把您的事件放到 SoundBank 中。为此，将 Event 从 Project Explorer 中拖放到 SoundBank 中。</li>
+<li>单击 <b>Generate Selected</b>。现在您就有声音可以播放了。</li>
+</ol>
+<p>现在，为了将一个声音集成到您的 Unity 工程中：</p>
+<ol type="1">
+<li>打开 <a class="el" href="unity__picker.html">Wwise Picker</a> 窗口（<b>Window &gt; Wwise Picker</b>），它应该显示出您的 Events 和 SoundBanks。</li>
+<li>将您的 SoundBank 拖放到场景中的对象上。</li>
+<li>将您的 Event 拖放到场景中的一个对象上。</li>
+<li>玩一下您的游戏吧！您应该能在启动时听到声音。</li>
+</ol>
+<p>什么也听不到吗？想了解更多，参见 <a class="el" href="unity__troubleshooting.html">故障排除</a> 页面。</p>
+<h2><a class="anchor" id="install_components">
+集成更多的声音</a></h2>
+<p>当前 Unity 中 Wwise 的集成提供了一些 Unity 组件，这些组件足以应对一些常规的使用情况。</p>
+<ul>
+<li>使用 <code><a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a></code> 来放置场景中的发声体。</li>
+<li>使用 <code><a class="el" href="class_ak_bank.html" title="Loads and unloads a SoundBank at a specified moment. Vorbis sounds can be decompressed...">AkBank</a></code> 来加载 SoundBank。</li>
+<li>将 <code><a class="el" href="class_ak_environment.html" title="Use this component to define a reverb zone. This needs to be added to a collider...">AkEnvironment</a></code> 附加到碰撞体上，用来在指定区域内设置混响。</li>
+<li><a class="el" href="pg__appscripts.html">了解其它组件</a>。</li>
+</ul>
+<p>然而，重要的是，如果想在游戏中实现更复杂的行为，需要程序员编写脚本来支持。您可以在这两节中找到更多关于 Wwise API 的信息：</p>
+<ul>
+<li><a href="https://www.audiokinetic.com/library/?source=SDK&amp;id=workingwithsdks__integratingelements.html" target="_blank">Integrate Wwise Elements into Your Game</a></li>
+<li><a href="https://www.audiokinetic.com/library/?source=SDK&amp;id=namespace_a_k_1_1_sound_engine.html" target="_blank">AK::SoundEngine Namespace Reference</a> </li>
+</ul>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

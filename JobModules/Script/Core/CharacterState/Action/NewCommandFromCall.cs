@@ -244,14 +244,12 @@ namespace Core.CharacterState.Action
             Logger.InfoFormat("BuriedBomb--------------");
             SetNewCommandFromFunctionCall(FsmInput.BuriedBomb);
             SetNewCallbackFromFunctionCall(FsmInput.BuriedBombFinished, FsmInput.BuriedBombFinished, callBack);
-            SetPostureStand();
         }
 
         public void DismantleBomb(System.Action callBack)
         {
             SetNewCommandFromFunctionCall(FsmInput.DismantleBomb);
             SetNewCallbackFromFunctionCall(FsmInput.DismantleBombFinished, FsmInput.DismantleBombFinished, callBack);
-            SetPostureCrouch();
         }
 
         //投掷动作

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using App.Client.GameModules.Ui.Models.Common;
+using App.Client.GameModules.Ui.Models.Common.Tip;
 using App.Client.GameModules.Ui.UiAdapter;
 using App.Client.GameModules.Ui.ViewModels.Chicken;
 using App.Shared.Components.Ui;
@@ -48,11 +49,11 @@ namespace App.Client.GameModules.Ui.Models.Chicken
         private void InitKey()
         {
             openKeyReceiver = new KeyReceiver(UiConstant.userCmdKeyLayer, BlockType.None);
-            openKeyReceiver.AddAction(UserInputKey.OpenBag, (data) => { _adapter.Enable = true; });
+            openKeyReceiver.BindKeyAction(UserInputKey.OpenBag, (data) => { _adapter.Enable = true; });
             _adapter.RegisterOpenKey(openKeyReceiver);
             keyReveiver = new KeyReceiver(UiConstant.userCmdUIKeyLayer, BlockType.All);
-            keyReveiver.AddAction(UserInputKey.OpenBag, (data) => { _adapter.Enable = false; });
-            keyReveiver.AddAction(UserInputKey.HideWindow, (data) => { _adapter.Enable = false; });
+            keyReveiver.BindKeyAction(UserInputKey.OpenBag, (data) => { _adapter.Enable = false; });
+            keyReveiver.BindKeyAction(UserInputKey.HideWindow, (data) => { _adapter.Enable = false; });
             pointerReceiver = new PointerReceiver(UiConstant.userCmdUIKeyLayer, BlockType.All);
         }
 
@@ -134,8 +135,28 @@ namespace App.Client.GameModules.Ui.Models.Chicken
                 var data = new TipShowData();
                 data.CategoryId = (int)ECategory.Weapon;
                 data.TemID = id;
+                HandleWeaponPartDataInWeaponSlot(weaponSlot,data);
+                data.IsMyWeapon = true;
                 return data;
             }, root);
+        }
+
+        private void HandleWeaponPartDataInWeaponSlot(int index,TipShowData data)
+        {
+            var list = _adapter.GetWeaponPartIdsBySlotIndex(index);
+            var partsDataList = data.WeaponPartsList;
+            partsDataList.Clear();
+            foreach(var it in list)
+            {
+                var partData = new TipPartUiData();
+                var config = GetConfig((int) ECategory.WeaponPart, it);
+                if (config == null) continue;
+                partData.Id = it;
+                partData.Name = config.Name;
+                partData.Quality = config.Xlv;
+                partData.Type = config.Type;
+                partsDataList.Add(partData);
+            }
         }
 
         int TypeToSlot(EWeaponType_Config type)
@@ -157,6 +178,7 @@ namespace App.Client.GameModules.Ui.Models.Chicken
             if (config == null)
             {
                 Logger.Error("error weapon config id:" + data.TemID);
+                return;
             }
             data.ContrastTemId = 0;
             var type = config.Type;
@@ -225,7 +247,7 @@ namespace App.Client.GameModules.Ui.Models.Chicken
 
             listener.onEnter = (arg1, arg2) =>
             {
-                tipManager.RegisterTip<CommonTipModel>(root, data.Invoke());
+                tipManager.RegisterTip<CommonItemTipModel>(root, data.Invoke());
             };
             if(needPassEvent)
             listener.onDrop = (arg1,arg2)=>

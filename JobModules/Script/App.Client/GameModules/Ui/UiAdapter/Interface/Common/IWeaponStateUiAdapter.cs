@@ -67,7 +67,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         /// </summary>
         bool IsSwitchWeapon { get; }
 	    /// <summary>
-	    /// 返回当前装备的手雷索引，从1到4
+	    /// 返回当前装备的手雷索引，从1到4,0表示不持手雷
 	    /// </summary>
 	    /// <returns></returns>
 	    int CurrentGrenadeIndex { get; }

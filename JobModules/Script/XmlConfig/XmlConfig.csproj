@@ -83,6 +83,7 @@
     <Compile Include="GlobalDataConfig.cs" />
     <Compile Include="GloryItemConfig.cs" />
     <Compile Include="HallSystemEnableConfig.cs" />
+    <Compile Include="HintWindowConfig.cs" />
     <Compile Include="HitBox\HitBox.cs" />
     <Compile Include="HitBox\HitBoxConfigParser.cs" />
     <Compile Include="HitBox\HitBoxConstants.cs" />
@@ -114,14 +115,12 @@
     <Compile Include="RankConfig.cs" />
     <Compile Include="RayCastActionConfig.cs" />
     <Compile Include="RoleAvatarConfig.cs" />
-    <Compile Include="RoleAvatarResConfig.cs" />
     <Compile Include="RoleConfig.cs" />
     <Compile Include="RoleExpConfig.cs" />
     <Compile Include="ServerTipCodeConfig.cs" />
     <Compile Include="SettingConfig.cs" />
     <Compile Include="ShopConfig.cs" />
     <Compile Include="SoundConfig.cs" />
-    <Compile Include="SoundHallConfig.cs" />
     <Compile Include="SpeedCurveConfig.cs" />
     <Compile Include="StateTransitionConfig.cs" />
     <Compile Include="TableLanguageConfig.cs" />

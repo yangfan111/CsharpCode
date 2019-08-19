@@ -1,64 +1,54 @@
-﻿using Core;
-using Core.Utils;
-using XmlConfig;
+﻿using XmlConfig;
 
 namespace App.Shared.GameModules.Weapon.Behavior
 {
     /// <summary>
-    /// Defines the <see cref="SpecialReloadChecker" />
+    ///     Defines the <see cref="SpecialReloadChecker" />
     /// </summary>
     public class SpecialReloadChecker : IFireChecker
     {
-
-        public bool IsCanFire(PlayerWeaponController controller, WeaponSideCmd cmd)
+        public bool IsCanFire(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
-            return CheckSpecialReload(controller);
+            return CheckSpecialReload(attackProxy);
         }
 
         /// <summary>
-        /// 判断特殊换弹逻辑 
+        ///     判断特殊换弹逻辑
         /// </summary>
         /// <param name="playerWeapon"></param>
         /// <param name="cmd"></param>
         /// <returns>是否可以射击</returns>
-        private bool CheckSpecialReload(PlayerWeaponController controller)
+        private bool CheckSpecialReload(WeaponAttackProxy attackProxy)
         {
-
-            var specialReload = controller.RelatedCharState.GetActionState();
-           // DebugUtil.MyLog("GetActionState:"+controller.RelatedCharState.GetActionState());
-            if (specialReload!= ActionInConfig.Reload &&
-                specialReload!= ActionInConfig.SpecialReload)
+            var specialReload = attackProxy.CharacterState.GetActionState();
+            // DebugUtil.MyLog("GetActionState:"+controller.RelatedCharState.GetActionState());
+            if (specialReload != ActionInConfig.Reload && specialReload != ActionInConfig.SpecialReload)
             {
                 return true;
             }
-            var config = controller.HeldWeaponAgent.CommonFireCfg;
+
+            var config = attackProxy.WeaponConfigAssy.S_CommonFireCfg;
             if (config == null)
                 return false;
-            var weaponRunTIme = controller.HeldWeaponAgent.RunTimeComponent;
-            var weaponBase = controller.HeldWeaponAgent.BaseComponent;
-
-
-            if (config.SpecialReloadCount > 0 && weaponBase.Bullet > 0)
+            if (config.SpecialReloadCount > 0 && attackProxy.BasicComponent.Bullet > 0)
             {
-                if (weaponBase.PullBolt)
+                if (attackProxy.BasicComponent.PullBolt)
                 {
                     //如果已经上膛，直接打断并开枪
-                    controller.RelatedCharState.ForceBreakSpecialReload(null);
+                    attackProxy.CharacterState.ForceBreakSpecialReload(null);
                     return true;
                 }
-                else
-                {
-                    //如果没有上膛，执行上膛，结束后开枪
-                    controller.RelatedCharState.BreakSpecialReload();
-                    weaponBase.PullBolt = true;
-                    weaponRunTIme.NeedAutoBurstShoot = false;
-                }
+
+                //如果没有上膛，执行上膛，结束后开枪
+                attackProxy.CharacterState.BreakSpecialReload();
+                attackProxy.BasicComponent.PullBolt             = true;
+                attackProxy.RuntimeComponent.NeedAutoBurstShoot = false;
             }
             else
             {
-          
-                    controller.AudioController.PlayEmptyFireAudio();
+                attackProxy.AudioController.PlayEmptyFireAudio();
             }
+
             return false;
         }
     }

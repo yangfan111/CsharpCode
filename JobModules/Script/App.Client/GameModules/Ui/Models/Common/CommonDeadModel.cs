@@ -69,27 +69,31 @@ namespace App.Client.GameModules.Ui.Models.Common
             else
             {
                 _viewModel.ButtonGroupShow = true;
+                _adapter.SetCrossVisible(false);
                 _viewModel.ContinueBtnText = _adapter.HaveAliveTeammate ? BackToHallText : ContinueText;
             }
         }
 
-        private void RegisterReceiver()
+        private void Registerhandler()
         {
             if (!haveRegister)
             {
                 haveRegister = true;
-                _adapter.SetCrossVisible(false);
+                //_adapter.SetCrossVisible(false);
                 _viewModel.MaskGroupShow = true;
             }
             
         }
 
-        private void UnRegisterReceiver()
+        private void UnRegisterhandler()
         {
             if (haveRegister)
             {
                 haveRegister = false;
-                _adapter.SetCrossVisible(true);
+                if (_adapter.DeadButtonShow)
+                {
+                    _adapter.SetCrossVisible(true);
+                }
                 _viewModel.MaskGroupShow = false;
             }
         }
@@ -109,11 +113,11 @@ namespace App.Client.GameModules.Ui.Models.Common
             base.SetCanvasEnabled(enable);
             if (!enable)
             {
-                UnRegisterReceiver();
+                UnRegisterhandler();
             }
             else
             {
-                RegisterReceiver();
+                Registerhandler();
             }
            
         }

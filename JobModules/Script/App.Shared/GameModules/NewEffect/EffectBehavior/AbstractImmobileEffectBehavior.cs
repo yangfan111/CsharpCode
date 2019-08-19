@@ -86,7 +86,6 @@ namespace App.Shared
         {
             if (Parent)
                 emitter.nodeObject.transform.SetParent(emitter.PoolFolder);
-            ObjectAllocatorHolder<AbstractImmobileEffectBehavior>.Free(this);
         }
     }
 }

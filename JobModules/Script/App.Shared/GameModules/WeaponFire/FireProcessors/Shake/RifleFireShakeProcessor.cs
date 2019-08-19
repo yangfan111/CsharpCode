@@ -17,19 +17,19 @@ namespace App.Shared.GameModules.Weapon.Behavior
         /// <param name="agent"></param>
         /// <param name="cmd"></param>
                         
-        public override void OnFrame(WeaponBaseAgent agent, WeaponSideCmd cmd)
+        public override void OnFrame(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
-            var weaponController = agent.Owner.WeaponController();
-            ShakeGroup shakeGroup = FireShakeProvider.GetShakeGroup(agent.RifleShakeCfg, weaponController);
-            var runTimeComponent = agent.RunTimeComponent;
-            int frameInterval = cmd.UserCmd.FrameInterval;
-            var orient = weaponController.RelatedOrientation;
+            ShakeGroup shakeGroup = FireShakeProvider.GetShakeGroup(attackProxy.WeaponConfigAssy.SRifleShakeCfg, attackProxy.Owner);
+            var runTimeComponent = attackProxy.RuntimeComponent;
+            //int frameInterval = cmd.UserCmd.FrameInterval;
+            var orient = attackProxy.Orientation;
             //后坐力生效时间
+            var deltaTime = Mathf.Min(cmd.UserCmd.FrameInterval, cmd.UserCmd.RenderTime - runTimeComponent.LastRenderTimestamp);
             if (runTimeComponent.PunchDecayLeftInterval > 0)
             {
-                float totalInterval = FireShakeProvider.GetDecayInterval(agent);
+                float totalInterval = FireShakeProvider.GetDecayInterval(attackProxy.WeaponConfigAssy);
                 float lastInterval = runTimeComponent.PunchDecayLeftInterval;
-                runTimeComponent.PunchDecayLeftInterval -= frameInterval;
+                runTimeComponent.PunchDecayLeftInterval -= deltaTime;
                 float newInterval = runTimeComponent.PunchDecayLeftInterval;
 
                 var lastPunchPitch = FireShakeFormula.EaseOutCubic(0, runTimeComponent.TargetPunchPitchDelta,
@@ -40,9 +40,6 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 orient.AccPunchPitch += newPunchPitch - lastPunchPitch;
                 orient.AccPunchPitchValue = orient.AccPunchPitch * shakeGroup.VPunchOffsetFactor;
 
-
-                var deltaTime = cmd.UserCmd.RenderTime - runTimeComponent.LastRenderTimestamp;
-
                 orient.AccPunchYaw += runTimeComponent.PunchYawSpeed * deltaTime;
                 orient.AccPunchYawValue = orient.AccPunchYaw * shakeGroup.HPunchOffsetFactor;
 
@@ -51,31 +48,29 @@ namespace App.Shared.GameModules.Weapon.Behavior
             }
             else
             {
-                UpdateOrientationAttenuation(agent, cmd);
+                UpdateOrientationAttenuation(attackProxy, cmd);
             }
 
-            if (agent.FireRollCfg != null && runTimeComponent.CameraRotationInterval > 0)
+            if (attackProxy.WeaponConfigAssy.S_FireRollCfg!= null && runTimeComponent.CameraRotationInterval > 0)
             {
-                runTimeComponent.CameraRotationInterval -= frameInterval;
-                orient.FireRoll += runTimeComponent.CameraRotationSpeed * frameInterval;
+                runTimeComponent.CameraRotationInterval -= deltaTime;
+                orient.FireRoll += runTimeComponent.CameraRotationSpeed * deltaTime;
             }
             else
             {
-                RecoverFireRoll(agent, cmd);
+                RecoverFireRoll(attackProxy, cmd);
             }
-
-            base.OnFrame(agent, cmd);
+            base.OnFrame(attackProxy, cmd);
         }
 
 
-        public override void OnAfterFire(WeaponBaseAgent agent, WeaponSideCmd cmd)
+        public override void OnAfterFire(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
-            var weaponController = agent.Owner.WeaponController();
-            var config = agent.RifleShakeCfg;
-            var shakeGroup = FireShakeProvider.GetShakeGroup(config, weaponController);
-            var shakeInfo = FireShakeProvider.GetShakeInfo(config, weaponController, shakeGroup);
+            var config = attackProxy.WeaponConfigAssy.SRifleShakeCfg;
+            var shakeGroup = FireShakeProvider.GetShakeGroup(config, attackProxy.Owner);
+            var shakeInfo = FireShakeProvider.GetShakeInfo(config, attackProxy.Owner, shakeGroup);
 
-            CalcBaseShake(agent, cmd.UserCmd.Seq, shakeInfo);
+            CalcBaseShake(attackProxy, cmd.UserCmd.Seq, shakeInfo);
         }
         /// <summary>
         /// last/NewAccPunchPitch->TargetPunchPitchDelta 
@@ -83,14 +78,12 @@ namespace App.Shared.GameModules.Weapon.Behavior
         /// <param name="heldAgent"></param>
         /// <param name="seed"></param>
         /// <param name="shakeInfo"></param>
-        private void CalcBaseShake(WeaponBaseAgent heldAgent, int seed, ShakeInfo shakeInfo)
+        private void CalcBaseShake(WeaponAttackProxy attackProxy, int seed, ShakeInfo shakeInfo)
         {
-            var weaponController = heldAgent.Owner.WeaponController();
-            var runTimeComponent = heldAgent.RunTimeComponent;
-            var orient = weaponController.RelatedOrientation;
-            heldAgent.SyncParts();
-            var commonFireConfig = heldAgent.CommonFireCfg;
-            ShakeInfoStruct dirShakeArgs = FireShakeProvider.GetFireUpDirShakeArgs(heldAgent, shakeInfo);
+            var runTimeComponent = attackProxy.RuntimeComponent;
+            var orient = attackProxy.Orientation;
+            var commonFireConfig = attackProxy.WeaponConfigAssy.S_CommonFireCfg;
+            ShakeInfoStruct dirShakeArgs = FireShakeProvider.GetFireUpDirShakeArgs(attackProxy, shakeInfo);
             /*计算水平，垂直震动增量*/
             float upDirShakeDelta, lateralDirShakeDelta;
             upDirShakeDelta = FireShakeFormula.CalcFireDirShakeDelta(dirShakeArgs.UpBase, dirShakeArgs.UpModifier,
@@ -114,17 +107,17 @@ namespace App.Shared.GameModules.Weapon.Behavior
             if (UniformRandom.RandomInt(seed, 0, (int) dirShakeArgs.LateralTurnback) == 0)
                 runTimeComponent.PunchYawLeftSide = !runTimeComponent.PunchYawLeftSide;
             //apply PunchDecayCdTime
-            runTimeComponent.PunchDecayLeftInterval = (int) FireShakeProvider.GetDecayInterval(heldAgent);
+            runTimeComponent.PunchDecayLeftInterval = (int) FireShakeProvider.GetDecayInterval(attackProxy.WeaponConfigAssy);
             //PunchYawSpeed 
             runTimeComponent.PunchYawSpeed = FireShakeFormula.CalcPitchSpeed(punchYaw,
                 orient.AccPunchYaw, runTimeComponent.PunchDecayLeftInterval);
             //PunchPitchSpeed(Not Speed) 
-            if (heldAgent.FireRollCfg != null)
+            var fireRollCfg = attackProxy.WeaponConfigAssy.S_FireRollCfg;
+            if (fireRollCfg != null)
             {
                 var rotation = orient.FireRoll;
-                var fireRollCfg = heldAgent.WeaponConfigAssy.S_FireRollCfg;
                 var rotateYaw = dirShakeArgs.UpBase * fireRollCfg.FireRollFactor;
-                runTimeComponent.CameraRotationInterval = heldAgent.FireRollCfg.FireRollTime;
+                runTimeComponent.CameraRotationInterval = fireRollCfg.FireRollTime;
                 if (Random.Range(0, 2) == 0) rotateYaw = -rotateYaw;
                 var maxFireRollAngle = fireRollCfg.MaxFireRollAngle;
                 if (rotation + rotateYaw >= maxFireRollAngle)
@@ -142,11 +135,11 @@ namespace App.Shared.GameModules.Weapon.Behavior
             }
         }
 
-        public override float UpdateLen(WeaponBaseAgent agent, float len, float frameTime)
+        public override float UpdateLen(WeaponAttackProxy attackProxy, float len, float frameTime)
         {
             var r = len;
-            r -= (agent.RifleShakeCfg.FixedDecayFactor +
-                  r * agent.RifleShakeCfg.LenDecayFactor) * frameTime;
+            r -= (attackProxy.WeaponConfigAssy.SRifleShakeCfg.FixedDecayFactor +
+                  r * attackProxy.WeaponConfigAssy.SRifleShakeCfg.LenDecayFactor) * frameTime;
             r = Mathf.Max(r, 0f);
             return r;
         }

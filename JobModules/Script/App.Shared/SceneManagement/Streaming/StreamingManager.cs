@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using App.Shared.Configuration;
 using App.Shared.DebugHandle;
 using App.Shared.SceneTriggerObject;
@@ -8,6 +9,7 @@ using Core.Utils;
 using Shared.Scripts.SceneManagement;
 using Shared.Scripts.ScenesIndoorCull;
 using UnityEngine;
+using UnityEngine.Profiling;
 using UnityEngine.SceneManagement;
 using Utils.AssetManager;
 using Utils.Singleton;
@@ -29,6 +31,9 @@ namespace App.Shared.SceneManagement.Streaming
         private readonly Dictionary<int, GameObject> loadedGoes = new Dictionary<int, GameObject>();
 
         private readonly ISceneResourceRequestHandler _requestHandler;
+        /// <summary>
+        /// 流数据，包含 List<StreamingScene> Scenes
+        /// </summary>
         private readonly StreamingData _sceneDescription;
         private readonly MeshRecords _scenesLightmapRecords;
         private readonly IndoorCullRecords _scenesIndoorCullRecords;
@@ -40,6 +45,8 @@ namespace App.Shared.SceneManagement.Streaming
 
         private int _concurrentLimit = ConcurrentLimit;
         private const int AsapLimit = 500;
+        //TESTCODE
+        //private const int ConcurrentLimit = int.MaxValue;
         private const int ConcurrentLimit = 5;
         private int _concurrentCount;
 
@@ -80,13 +87,17 @@ namespace App.Shared.SceneManagement.Streaming
                 for (int i = 0; i < count; i++)
                     _sceneIndex.Add(_sceneDescription.Scenes[i].SceneName, i);
             }
+            
+            //TESTCODE
 
+            
             _requestHandler.SceneLoaded += SceneLoaded;
             _requestHandler.SceneUnloaded += SceneUnloaded;
             _requestHandler.GoLoaded += GoLoaded;
             _requestHandler.GoUnloaded += GoUnloaded;
             _requestHandler.LightmapLoaded += LightmapsLoaded;
             _requestHandler.LightmapUnloaded += LightmapsUnloaded;
+            
         }
 
         #region ISceneResourceManager
@@ -107,6 +118,10 @@ namespace App.Shared.SceneManagement.Streaming
 
         #region IStreamingResourceHandler
 
+        /// <summary>
+        /// 将 AssetInfo 加入到 _sceneRequestQueue 加载场景请求队列中
+        /// </summary>
+        /// <param name="addr"></param>
         public void LoadScene(AssetInfo addr)
         {
             _sceneRequestQueue.Enqueue(addr);
@@ -180,6 +195,7 @@ namespace App.Shared.SceneManagement.Streaming
         {
             while (EnoughRoom() && _sceneRequestQueue.Count > 0)
             {
+                // 即 LevelManager.AddLoadSceneRequest
                 _requestHandler.AddLoadSceneRequest(_sceneRequestQueue.Dequeue());
                 ++_concurrentCount;
             }
@@ -275,7 +291,6 @@ namespace App.Shared.SceneManagement.Streaming
                 if (_unloadingScene.ContainsKey(sceneName))
                 {
                     _unloadingScene[sceneName].Enqueue(unityObj);
-
                     RequestForUnload();
                 }
                 else
@@ -288,17 +303,16 @@ namespace App.Shared.SceneManagement.Streaming
                     go.transform.localScale = data.Scale;
                     unityObj.SceneObjAttr.Id = data.Id;
 
-                    var multiTag = go.GetComponent<MultiTagBase>();
-                    if (multiTag != null)
+                    Transform prefabTf = null;
+                    if (go.transform.childCount > 0)
                     {
-                        multiTag.renderId = data.RenderId;                      
-                        multiTag.sceneName = data.SceneName;
-                        if (SharedConfig.RestoreMultiTag)
+                        prefabTf = go.transform.GetChild(0);
+
+                        // 还原各个 AbstractSaveMono
+                        string errorStr = data.LoadCompDatas(prefabTf);
+                        if (!string.IsNullOrEmpty(errorStr))
                         {
-                            for (int i = 0; i < (int)MultiTagBase.TagEnum.Max; ++i)
-                            {
-                                multiTag.btags[i] = ((data.SceneTag) & (1 << i)) != 0;
-                            }
+                            _logger.Error(errorStr);
                         }
                     }
 
@@ -322,16 +336,14 @@ namespace App.Shared.SceneManagement.Streaming
                             cull.bound = indoorCullRecord.bounds;
                             cull.lightIndexes = indoorCullRecord.lights;
                             cull.refProbeIndexes = indoorCullRecord.refProbes;
-                            cull.SetGetLightsFunc(GetLights);
-                            cull.SetGetRefProbesFunc(GetReflectionProbes);
+                            cull.SetGetLightsFunc(GetLightsFun);
+                            cull.SetGetRefProbesFunc(GetReflectionProbesFun);
                         }
 
-                        if(hideImportObject)
-                        {
-                            checkObjectVisible(go, data);
-                        }
-                       
-                        
+                    }
+                    if (hideImportObject)
+                    {
+                        checkObjectVisible(go, data);
                     }
                     RequestForLoad();
                 }
@@ -349,7 +361,7 @@ namespace App.Shared.SceneManagement.Streaming
             {
                 return;
             }
-            MultiTagBase mul = obj.GetComponent<MultiTagBase>();
+            MultiTagBase mul = obj.GetComponentInChildren<MultiTagBase>();
             if (mul == null)
             {
                 return;
@@ -366,9 +378,8 @@ namespace App.Shared.SceneManagement.Streaming
             {
                 return;
             }
-            
 
-           
+
             int level = 0;
             //TEST Code
             /*
@@ -420,15 +431,20 @@ namespace App.Shared.SceneManagement.Streaming
 
             int count = 0;
             var iterator = uObjs.GetEnumerator();
-            Texture2D colorMap = null, dirMap = null;
+            Texture2D colorMap = null, shadowMap = null, dirMap = null;
             while (iterator.MoveNext())
             {
                 Texture2D tex = iterator.Current.As<Texture2D>();
-                if (count == 0) colorMap = tex;
-                else if (count == 1) dirMap = tex;
+                if (count == 0)
+                    colorMap = tex;
+                else if (count == 1)
+                    shadowMap = tex;
+                else if (count == 2)
+                    dirMap = tex;
+                
                 ++count;
             }
-            int index = GetLightmapIndex(colorMap, dirMap);
+            int index = GetLightmapIndex(colorMap, shadowMap, dirMap);
             if (index == -1) return;
 
             mr.lightmapIndex = index;
@@ -459,36 +475,55 @@ namespace App.Shared.SceneManagement.Streaming
             for (int i = 0; i < num; i++)
             {
                 var record = meshRecords[i];
-                if (record != null && record.siblingIndex < go.transform.childCount)
+
+                if (go.transform.childCount > 0)
                 {
-                    Transform child = go.transform.GetChild(record.siblingIndex);
-                    MeshRenderer mr = child.GetComponent<MeshRenderer>();
-                    if (mr == null) continue;
-
-                    mr.lightmapScaleOffset = record.lightMapScaleOffset;
-
-                    // request load lightmaps to apply 
-                    List<AssetInfoEx<MeshRenderer>> infos = new List<AssetInfoEx<MeshRenderer>>();
-                    if (!string.IsNullOrEmpty(record.colorMapAssetName))
+                    Transform prefabTF = go.transform.GetChild(0);
+                    if (record != null && record.siblingIndex < prefabTF.childCount)
                     {
-                        AssetInfoEx<MeshRenderer> info = new AssetInfoEx<MeshRenderer>();
-                        info.asset = new AssetInfo(record.bundleName, record.colorMapAssetName);
-                        info.data = mr;
-                        infos.Add(info);
+                        Transform child = prefabTF.GetChild(record.siblingIndex);
+
+                        MeshRenderer mr = child.GetComponent<MeshRenderer>();
+                        //_logger.ErrorFormat(child.name + "#####"+(mr!=null? "有MeshRenderer": "没有MeshRenderer"));
+                        if (mr == null) continue;
+
+                        mr.lightmapScaleOffset = record.lightMapScaleOffset;
+
+                        // request load lightmaps to apply 
+                        List<AssetInfoEx<MeshRenderer>> infos = new List<AssetInfoEx<MeshRenderer>>();
+                        if (!string.IsNullOrEmpty(record.colorMapAssetName))
+                        {
+                            AssetInfoEx<MeshRenderer> info = new AssetInfoEx<MeshRenderer>();
+                            info.asset = new AssetInfo(record.bundleName, record.colorMapAssetName);
+                            info.data = mr;
+                            infos.Add(info);
+                        }
+
+                        if (!string.IsNullOrEmpty(record.shadowMapAssetName))
+                        {
+                            AssetInfoEx<MeshRenderer> info = new AssetInfoEx<MeshRenderer>();
+                            info.asset = new AssetInfo(record.bundleName, record.shadowMapAssetName);
+                            info.data = mr;
+                            infos.Add(info);
+                        }
+
+                        if (!string.IsNullOrEmpty(record.dirMapAssetName))
+                        {
+                            AssetInfoEx<MeshRenderer> info = new AssetInfoEx<MeshRenderer>();
+                            info.asset = new AssetInfo(record.bundleName, record.dirMapAssetName);
+                            info.data = mr;
+                            infos.Add(info);
+                        }
+                       
+
+                        LoadLightmaps(infos);
                     }
-                    if (!string.IsNullOrEmpty(record.dirMapAssetName))
-                    {
-                        AssetInfoEx<MeshRenderer> info = new AssetInfoEx<MeshRenderer>();
-                        info.asset = new AssetInfo(record.bundleName, record.dirMapAssetName);
-                        info.data = mr;
-                        infos.Add(info);
-                    }
-                    LoadLightmaps(infos);
                 }
+
             }
         }
 
-        private int GetLightmapIndex(Texture2D texColor, Texture2D texDir)
+        private int GetLightmapIndex(Texture2D texColor, Texture2D shadowMap, Texture2D texDir)
         {
             if (texColor == null)
             {
@@ -513,6 +548,7 @@ namespace App.Shared.SceneManagement.Streaming
                 lightmaps.AddRange(LightmapSettings.lightmaps);
                 LightmapData data = new LightmapData();
                 data.lightmapColor = texColor;
+                data.shadowMask = shadowMap;
                 data.lightmapDir = texDir;
                 lightmaps.Add(data);
                 LightmapSettings.lightmaps = lightmaps.ToArray();
@@ -522,6 +558,35 @@ namespace App.Shared.SceneManagement.Streaming
             return index;
         }
 
+        #region 防止 delegate 产生GC
+   
+        private System.Func<int, List<int>, List<Light>> GetLightsFun
+        {
+            get {
+                if (m_GetLightsFun == null)
+                {
+                    m_GetLightsFun = new System.Func<int, List<int>, List<Light>>(GetLights);
+                }
+                return m_GetLightsFun;
+            }
+        }
+        private System.Func<int, List<int>, List<Light>> m_GetLightsFun;
+
+        private System.Func<int, List<int>, List<ReflectionProbe>> GetReflectionProbesFun
+        {
+            get
+            {
+                if (m_GetReflectionProbesFun == null)
+                {
+                    m_GetReflectionProbesFun = new System.Func<int, List<int>, List<ReflectionProbe>>(GetReflectionProbes);
+                }
+                return m_GetReflectionProbesFun;
+            }
+        }
+        private System.Func<int, List<int>, List<ReflectionProbe>> m_GetReflectionProbesFun;
+
+        #endregion
+
         private List<Light> GetLights(int bakeId, List<int> indexes)
         {
             if (indexes == null || indexes.Count <= 0) return null;
@@ -529,12 +594,19 @@ namespace App.Shared.SceneManagement.Streaming
             GameObject go = null;
             if (!loadedGoes.TryGetValue(bakeId, out go) || go == null) return null;
 
+            if (go.transform.childCount < 1)
+            {
+                return null;
+            }
+
+            Transform prefabTF = go.transform.GetChild(0);
+
             List<Light> lights = new List<Light>();
             for (int i = 0; i < indexes.Count; i++)
             {
-                if (indexes[i] < go.transform.childCount)
+                if (indexes[i] < prefabTF.childCount)
                 {
-                    Light light = go.transform.GetChild(indexes[i]).GetComponent<Light>();
+                    Light light = prefabTF.GetChild(indexes[i]).GetComponent<Light>();
                     if (light != null) lights.Add(light);
                 }
             }

@@ -13,6 +13,7 @@ namespace App.Client.GameModules.Ui.Logic
     public abstract class AbstractCastLogic : ICastLogic
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(AbstractCastLogic)); 
+
         public virtual string Tip { get; protected set; }
         private float _maxDistance;
         private const float _groundOffset = 0.5f;
@@ -42,7 +43,7 @@ namespace App.Client.GameModules.Ui.Logic
             {
                 StateTransitionConfigItem condition = manager.GetConditionByState(state);
                 if (condition == null) continue;
-                if(!condition.IsUseAction)
+                if(!condition.GetTransition(Transition.IsUseAction)/*IsUseAction*/)
                 {
                     if(Logger.IsDebugEnabled)
                     {
@@ -83,29 +84,28 @@ namespace App.Client.GameModules.Ui.Logic
 
         protected bool IsUntouchableOffGround(PlayerEntity player, Vector3 hitPoint, GameObject item)
         {
-            return IsUntouchable(player, hitPoint, item);
-        }
-
-        protected bool IsUntouchable(PlayerEntity player, Vector3 hitPoint, GameObject item)
-        {
-            bool untouchable = HasObstacle(player, hitPoint, item) || OutOfRange(player, hitPoint);
+            bool untouchable = HasObstacle(player, hitPoint, item) || OutOfRange(player, hitPoint, item);
             return untouchable; 
         }
 
         private bool HasObstacle(PlayerEntity player, Vector3 targetCenter, GameObject item)
         {
             var hasObstacle = CommonObjectCastUtil.HasObstacleBetweenPlayerAndItem(player, targetCenter, item);
+            if (hasObstacle)
+            {
+                Logger.DebugFormat("There must be obstacle(s) between player and {0}", item.name);
+            }
             return hasObstacle; 
         }
 
-        private bool OutOfRange(PlayerEntity player, Vector3 hitPoint)
+        private bool OutOfRange(PlayerEntity player, Vector3 hitPoint, GameObject item)
         {
             var xzHitPoint = new Vector3(hitPoint.x, player.position.Value.y, hitPoint.z);
             var dis = Vector3.Distance(xzHitPoint, player.position.Value);
             var outOfrange = dis > _maxDistance;
             if (outOfrange)
             {
-                Logger.Debug("OutOfRange");
+                Logger.DebugFormat("{0} is out of range", item.name);
             }
             return outOfrange;
         }

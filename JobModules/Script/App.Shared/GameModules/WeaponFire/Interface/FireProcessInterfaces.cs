@@ -21,7 +21,7 @@ namespace  App.Shared.GameModules.Weapon.Behavior
         /// </summary>
         /// <param name="playerWeapon"></param>
         /// <param name="cmd"></param>
-        void OnBeforeFire(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd);
+        void OnBeforeFire(WeaponAttackProxy attackProxy, WeaponSideCmd cmd);
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ namespace  App.Shared.GameModules.Weapon.Behavior
         /// </summary>
         /// <param name="playerWeapon"></param>
         /// <param name="cmd"></param>
-        void OnAfterFire(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd);
+        void OnAfterFire(WeaponAttackProxy attackProxy, WeaponSideCmd cmd);
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ namespace  App.Shared.GameModules.Weapon.Behavior
         /// </summary>
         /// <param name="playerWeapon"></param>
         /// <param name="cmd"></param>
-        void OnIdle(WeaponBaseAgent agent, WeaponSideCmd cmd);
+        void OnIdle(WeaponAttackProxy attackProxy, WeaponSideCmd cmd);
     }
 
     /// <summary>
@@ -60,7 +60,7 @@ namespace  App.Shared.GameModules.Weapon.Behavior
         /// </summary>
         /// <param name="playerWeapon"></param>
         /// <param name="cmd"></param>
-        void OnFrame(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd);
+        void OnFrame(WeaponAttackProxy attackProxy, WeaponSideCmd cmd);
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ namespace  App.Shared.GameModules.Weapon.Behavior
     /// </summary>
     public interface IBulletFire : IFireProcess
     {
-        void OnBulletFire(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd);
+        void OnBulletFire(WeaponAttackProxy attackProxy, WeaponSideCmd cmd);
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ namespace  App.Shared.GameModules.Weapon.Behavior
     /// </summary>
     public interface IFireTriggger : IFireProcess
     {
-        bool IsTrigger(PlayerWeaponController controller, WeaponSideCmd cmd);
+        bool IsTrigger(WeaponSideCmd cmd);
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ namespace  App.Shared.GameModules.Weapon.Behavior
     /// </summary>
     public interface IFireChecker : IFireProcess
     {
-        bool IsCanFire(PlayerWeaponController controller, WeaponSideCmd cmd);
+        bool IsCanFire(WeaponAttackProxy attackProxy, WeaponSideCmd cmd);
     }
 
 

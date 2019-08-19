@@ -154,7 +154,7 @@ namespace App.Shared.GameModules.Player
             var radius = controller.radius;
             var gameObject = playerEntity.RootGo();
             var prevLayer = gameObject.layer;
-            var prev = IntersectionDetectTool.SetColliderDisable(gameObject);
+            IntersectionDetectTool.SetColliderDisable(gameObject, IntersectionDetectTool.ColliderEnableState);
             var playerPos = playerEntity.position.Value;
             var startPoint = new Vector3(playerPos.x,SingletonManager.Get<MapConfigManager>().WaterSurfaceHeight(playerPos),playerPos.z );
             // a shift lift up
@@ -165,7 +165,7 @@ namespace App.Shared.GameModules.Player
                 ret = true;
                 dist = outHit.distance + radius;
             }
-            IntersectionDetectTool.RestoreCollider(gameObject, prev);
+            IntersectionDetectTool.RestoreCollider(gameObject, IntersectionDetectTool.ColliderEnableState);
             //_logger.InfoFormat("GroundTest : {0}", ret);
             return ret;
         }

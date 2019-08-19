@@ -161,12 +161,18 @@ namespace App.Client.GPUInstancing.Core
 
             if (detailCount == 0)
             {
-                _logger.Warn("no grass prototypes exists");
+                _logger.Error("no grass prototypes exists");
                 return false;
             }
-
+            
             if (_instancingDraw == null)
                 _instancingDraw = new DetailInstancingDraw[detailCount];
+
+            if (detailCount != _instancingDraw.Length)
+            {
+                _logger.ErrorFormat("unmatch grass count: unique->{0} other->{1}", detailCount, _instancingDraw);
+                return false;
+            }
 
             List<DividedDetailProperty> detailProps = new List<DividedDetailProperty>();
             float nodeMargin = float.MinValue;

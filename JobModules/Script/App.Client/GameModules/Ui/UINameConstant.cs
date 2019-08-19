@@ -14,7 +14,6 @@ namespace Assets.App.Client.GameModules.Ui
         public const string CommonPickUpModel = "CommonPickUpModel";
         public const string CommonMiniMap = "CommonMiniMap";
         public const string CommonMaxMap = "CommonMaxMap";
-        public const string CommonMap = "CommonMap";
         public const string CommonPlayerInfo = "CommonPlayerInfo";
         public const string CommonCrossHairModel = "CommonCrossHairModel";
         public const string CommonHurtedModel = "CommonHurtedModel";
@@ -28,6 +27,7 @@ namespace Assets.App.Client.GameModules.Ui
         public const string CommonRangingModel = "CommonRangingModel";
         public const string CommonTechStatModel = "CommonTechStatModel";
         public const string CommonWeaponHudModel = "CommonWeaponHudModel";
+        public const string BaseWeaponHudModel = "BaseWeaponHudModel";
         public const string CommonVehicleTipModel = "CommonVehicleTipModel";
         public const string CommonChatModel = "CommonChatModel";
         public const string CommonLoadingModel = "CommonLoadingModel";
@@ -63,6 +63,7 @@ namespace Assets.App.Client.GameModules.Ui
         public const string BlastWeaponHudModel = "BlastWeaponHudModl";
         public const string CommonBlastTipsModel = "CommonBlastTipsViewModel";
         public const string BlastRecordModel = "BlastRecordModel";
+        public const string BlastC4TipModel = "BlastC4TipModel";
 
         #endregion
         #region Biochemical

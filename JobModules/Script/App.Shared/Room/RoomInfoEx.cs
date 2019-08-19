@@ -1,4 +1,4 @@
-﻿using App.Protobuf;
+using App.Protobuf;
 using Core.Room;
 using System.Linq;
 
@@ -18,6 +18,8 @@ namespace App.Client.GameModules.Room
             roomInfo.HasFriendHarm = message.HasFriendHarm;
             roomInfo.WaitTimeNum = message.WaitTimeNum;
             roomInfo.OverTime = message.OverTime;
+            roomInfo.ConditionValue = message.ConditionValue;
+            roomInfo.ConditionType = message.ConditionType;
             roomInfo.ChannelName = message.ChannelName;
             roomInfo.RoomName = message.RoomName;
             roomInfo.RoomDisplayId = message.RoomDisplayId;
@@ -38,8 +40,10 @@ namespace App.Client.GameModules.Room
             message.HasFriendHarm = roomInfo.HasFriendHarm;
             message.WaitTimeNum = roomInfo.WaitTimeNum;
             message.OverTime = roomInfo.OverTime;
-            message.ChannelName = roomInfo.ChannelName == null ? "": roomInfo.ChannelName;
-            message.RoomName = roomInfo.RoomName == null ? "" : roomInfo.RoomName;
+            message.ConditionValue = roomInfo.ConditionValue;
+            message.ConditionType = roomInfo.ConditionType;
+            message.ChannelName = roomInfo.ChannelName == null ? "null": roomInfo.ChannelName;
+            message.RoomName = roomInfo.RoomName == null ? "null" : roomInfo.RoomName;
             message.RoomDisplayId = roomInfo.RoomDisplayId;
             message.RoomCapacity = roomInfo.RoomCapacity;
             message.PreLoadAssetInfo.Clear();
@@ -50,7 +54,7 @@ namespace App.Client.GameModules.Room
                     message.PreLoadAssetInfo.Add(asset);
                 }
             }
-            message.PreLoadUI = roomInfo.PreLoadUI;
+            message.PreLoadUI = roomInfo.PreLoadUI ==  null?"null" :roomInfo.PreLoadUI;
         }
     }
 }

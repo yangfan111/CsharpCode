@@ -54,7 +54,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                 adapter.KillerChanged = false;
             }
             
-            if (Time.time - _beginTime > 8f || adapter.IsKillerDead)
+            if (Time.time - _beginTime > 8f || adapter.IsKillerDead || adapter.TagHideStatus)
             {
                 needShow = false;
             }

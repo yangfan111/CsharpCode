@@ -3,7 +3,7 @@ using App.Client.GameModules.Ui.UiAdapter;
 
 namespace App.Client.GameModules.Ui.Models.Blast
 {
-    public class BlastWeaponHudModel : CommonWeaponHudModel
+    public class BlastWeaponHudModel : BaseWeaponHudModel
     {
         public BlastWeaponHudModel(IWeaponStateUiAdapter adapter) : base(adapter)
         {

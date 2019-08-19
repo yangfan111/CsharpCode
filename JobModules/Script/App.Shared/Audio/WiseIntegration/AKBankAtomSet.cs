@@ -1,35 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 namespace App.Shared.Audio
 {
+    public delegate void WiseReusltHandler(AKRESULT akresult);
+
     public class AKBankAtomSet
     {
         private readonly Dictionary<string, AKBankAtom> bankAtomContenter = new Dictionary<string, AKBankAtom>();
 
-        //完整加载的bank列表
-        private readonly HashSet<AKBankAtom> loadedBanks = new HashSet<AKBankAtom>();
-
-        //加载中的bank列表
-        private readonly HashSet<AKBankAtom> loadingBanks = new HashSet<AKBankAtom>();
-        //  private readonly HashSet<string> bankOnLoadIdList = new HashSet<string>();
-
-
-        public AKBankAtom Register(string               bnkName,
-                                   AudioBank_LoadAction actionType,
-                                   AudioBank_LoadMode   modeType)
+        
+        public AKBankAtom Register(string bnkName, AudioBank_LoadMode modeType)
         {
             AKBankAtom atom;
             if (!bankAtomContenter.TryGetValue(bnkName, out atom))
             {
-                atom = new AKBankAtom(bnkName, actionType, modeType);
+                atom = new AKBankAtom(bnkName, modeType);
                 bankAtomContenter.Add(bnkName, atom);
             }
 
             return atom;
         }
 
+        public void UnloadAll()
+        {
+            /*foreach (var bankAtom in bankAtomContenter)
+            {
+                bankAtom.
+            }*/
+            
+        }
         public AKBankAtom Get(string bnk)
         {
             AKBankAtom atom;
@@ -37,37 +36,20 @@ namespace App.Shared.Audio
             return atom;
         }
 
-        public AKRESULT Vertify(AKBankAtom atom)
+        public void DoLoadBank(AKBankAtom atom, WiseReusltHandler handler = null)
         {
-            if (loadedBanks.Contains(atom))
-                return AKRESULT.AK_BankAlreadyLoaded;
-            if (loadingBanks.Contains(atom))
-                return AKRESULT.AK_BankInLoadingQueue;
-            return AKRESULT.AK_Success;
-        }
-        //TODO:支持多种加载方式
-        public void DoLoadBank(AKBankAtom atom,System.Action<AKRESULT> handler)
-        {
-            LoadPrepare(atom);
-            AKRESULT akresult = AkBankManager.LoadBankRes(atom.BankName, false, false);
-            LoadFinish(atom, akresult);
-            if (handler != null)
-                handler(akresult);
-            else
-                AudioUtil.VerifyAKResult(akresult,"Audio load atom:"+atom.BankName);
-        }
-         void LoadPrepare(AKBankAtom atom)
-        {
-            loadingBanks.Add(atom);
+            AKRESULT akresult;
+            if (atom.Execute(handler, out akresult))
+            {
+                if (handler != null)
+                    handler(akresult);
+                else
+                    AudioUtil.VerifyAKResult(akresult, "load atom:{0}", atom.BankName);
+            }
         }
 
-        void LoadFinish(AKBankAtom atom,AKRESULT akresult)
+        private void DefaultLoadAyncHandler()
         {
-            loadingBanks.Remove(atom);
-            if (akresult.Sucess())
-            {
-                loadedBanks.Add(atom);
-            }
         }
     }
 }

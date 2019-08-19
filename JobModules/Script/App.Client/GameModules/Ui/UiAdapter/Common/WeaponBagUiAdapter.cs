@@ -27,6 +27,13 @@ namespace App.Client.GameModules.Ui.UiAdapter
         private readonly AssetInfo _upperAsset; 
         private readonly AssetInfo _lowerAsset;
 
+        private AssetInfo GetWeaponPartIcon(int id)
+        {
+            var config = SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(id);
+            if (config == null) return AssetInfo.EmptyInstance;
+            return new AssetInfo(config.IconBundle, config.Icon);
+        }
+
         public WeaponBagItemInfo(PlayerWeaponData playerWeaponData, WeaponResConfigItem newWeaponConfig, WeaponAvatarConfigItem weaponAvatarConfigItem)
         {
             _playerWeaponData = playerWeaponData;
@@ -34,23 +41,23 @@ namespace App.Client.GameModules.Ui.UiAdapter
             _weaponAvatarConfig = weaponAvatarConfigItem;
             if (_playerWeaponData.Muzzle > 0)
             {
-                _muzzleAsset = SingletonManager.Get<WeaponPartsConfigManager>().GetAsset(_playerWeaponData.Muzzle);
+                _muzzleAsset = GetWeaponPartIcon(_playerWeaponData.Muzzle);
             }
             if (_playerWeaponData.Magazine > 0)
             {
-                _magazineAsset = SingletonManager.Get<WeaponPartsConfigManager>().GetAsset(_playerWeaponData.Magazine);
+                _magazineAsset = GetWeaponPartIcon(_playerWeaponData.Magazine);
             }
             if (_playerWeaponData.Stock > 0)
             {
-                _magazineAsset = SingletonManager.Get<WeaponPartsConfigManager>().GetAsset(_playerWeaponData.Stock);
+                _stockAsset = GetWeaponPartIcon(_playerWeaponData.Stock);
             }
             if (_playerWeaponData.UpperRail > 0)
             {
-                _magazineAsset = SingletonManager.Get<WeaponPartsConfigManager>().GetAsset(_playerWeaponData.UpperRail);
+                _upperAsset = GetWeaponPartIcon(_playerWeaponData.UpperRail);
             }
             if (_playerWeaponData.LowerRail > 0)
             {
-                _magazineAsset = SingletonManager.Get<WeaponPartsConfigManager>().GetAsset(_playerWeaponData.LowerRail);
+                _lowerAsset = GetWeaponPartIcon(_playerWeaponData.LowerRail);
             }
         }
 
@@ -321,12 +328,13 @@ namespace App.Client.GameModules.Ui.UiAdapter
                     }
                     return _overrideWeaponItemInfoMap[tacticAmount];
                 }
-                return _weaponBagInfos[StartIndex + 6];
+                return _weaponBagInfos[StartIndex + 4];
             }
         }
 
         public IWeaponBagItemInfo GetGrenadeInfoByIndex(int index)
         {
+            if (index != 1) return null;
             return _weaponBagInfos[index + StartIndex + 2];
         }
     }

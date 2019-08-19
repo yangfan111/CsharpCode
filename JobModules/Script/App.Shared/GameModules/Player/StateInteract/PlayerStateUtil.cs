@@ -1,8 +1,5 @@
 ﻿using App.Shared.Components.Player;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using XmlConfig;
 
 namespace App.Shared.GameModules.Player
 {
@@ -27,9 +24,8 @@ namespace App.Shared.GameModules.Player
 
         public static bool HasUIState(GamePlayComponent player)
         {
-            return HasUIState(EPlayerUIState.BagOpen,player) ||
-                HasUIState(EPlayerUIState.ExitOpen,player)||
-                HasUIState(EPlayerUIState.MapOpen,player);
+            return HasUIState(EPlayerUIState.BagOpen, player) || HasUIState(EPlayerUIState.ExitOpen, player) ||
+                   HasUIState(EPlayerUIState.MapOpen, player) || HasUIState(EPlayerUIState.ChatOpen, player);
         }
         
         public static void RemoveUIState(EPlayerUIState state, GamePlayComponent player)
@@ -67,6 +63,17 @@ namespace App.Shared.GameModules.Player
         {
             player.CastState &= ~(1 << (int)state);
         }
+        public static EPlayerInput ToEPlayerInput(this InterruptConfigType interrupt)
+        {
+            switch (interrupt)
+            {
+                case InterruptConfigType.PullboltInterrupt:
+                    return EPlayerInput.IsPullboltInterrupt;
+                case InterruptConfigType.ThrowInterrupt:
+                    return EPlayerInput.IsThrowingInterrupt;
+                default: return EPlayerInput.None;
+            }
+        }
     }
 
     public enum EPlayerUIState
@@ -74,7 +81,8 @@ namespace App.Shared.GameModules.Player
         BagOpen = 1,
         MapOpen = 2,
         ExitOpen = 3,
-        PaintOpen = 4
+        PaintOpen = 4,
+        ChatOpen = 5
     }
 
     public enum EPlayerGameState
@@ -95,7 +103,8 @@ namespace App.Shared.GameModules.Player
         TurnOver,
         TurnStart,
         OnPlane,
-        CanDefuse
+        CanDefuse,
+        UseItem
     }
 
     public enum EPlayerCastState

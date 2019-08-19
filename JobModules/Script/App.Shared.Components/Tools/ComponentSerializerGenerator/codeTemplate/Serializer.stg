@@ -9,6 +9,7 @@ private BitArray32 DiffNetworkObject(<Comp.Name> baseComponent, <Comp.Name> newC
 {
     BitArray32 mask = new BitArray32(ComponentNetworkPropertyNum);
     <ComponentInfo.SortedPropertyNameList:DiffFieldCall()>
+    <ComponentInfo.IPatchPropertyTypeDict:DiffFieldCall()>
     return mask;
 }
 
@@ -27,7 +28,7 @@ private int <FieldName>Index=<ComponentInfo.PropertyIndexDict.(FieldName)>;
 
 >>
 
-SerializeNotBoolFieldCall(FieldName) ::= <<
+SerializeFieldCall(FieldName) ::= <<
 if (writeAll || Has<FieldName>(fieldsMask))
 {
     FieldSerializeUtil.Serialize(gameComponent.<FieldName>,<ComponentInfo.ParamsDict.(FieldName)>  writer, lastGameComponent.<FieldName>,  writeAll);		
@@ -43,7 +44,7 @@ if(writeAll || Has<FieldName>(fieldsMask))
 
 >>
 
-SerializeFieldCallNull(FieldName) ::= <<
+FullSerializeFieldCall(FieldName) ::= <<
 if (writeAll || Has<FieldName>(fieldsMask))
 {
     FieldSerializeUtil.Serialize(gameComponent.<FieldName>, <ComponentInfo.ParamsDict.(FieldName)>  writer );	
@@ -56,10 +57,12 @@ SerializeMethod(Comp) ::= <<
 private void Serialize(<Comp.Name> lastGameComponent, <Comp.Name> gameComponent, BitArray32 fieldsMask, bool DoCompress, Core.Utils.MyBinaryWriter writer,bool writeAll)
 {	
     if(lastGameComponent==null){
-        <ComponentInfo.NotBoolPropertyNameList:SerializeFieldCallNull()>	
+        <ComponentInfo.NotBoolPropertyNameList:FullSerializeFieldCall()>	
+        <ComponentInfo.IPatchPropertyTypeDict: FullSerializeFieldCall()>
     }
     else{
-        <ComponentInfo.NotBoolPropertyNameList:SerializeNotBoolFieldCall()>		
+        <ComponentInfo.NotBoolPropertyNameList:SerializeFieldCall()>		
+        <ComponentInfo.IPatchPropertyTypeDict:SerializeFieldCall()>		
     }
     
     //collect changed bool value 
@@ -108,6 +111,7 @@ DeserializeMethod(Comp) ::= <<
 private void Deserialize(<Comp.Name> gameComponent, BitArray32 fieldsMask, bool DoCompress, BinaryReader reader,bool readAll)
 {
     <ComponentInfo.NotBoolPropertyNameList:DeserializeFieldCall()>
+    <ComponentInfo.IPatchPropertyTypeDict:DeserializeFieldCall()>
     
     //calculate num of bool value to depress	
     int sentBoolNum =  GetSentBoolNum(gameComponent,fieldsMask,readAll);
@@ -145,14 +149,16 @@ if (Has<FieldName>(fieldsMask))
 >>
 
 MergeBoolFieldCall(FieldName) ::=<<
-    to.<FieldName> = FieldMergeUtil.Merge(to.<FieldName>,from.<FieldName>);
+to.<FieldName> = FieldMergeUtil.Merge(to.<FieldName>,from.<FieldName>);
 
 >>
+
 
 MergeMethod(Comp) ::= <<
 private void Merge(<Comp.Name> from, <Comp.Name> to, BitArray32 fieldsMask)
 {
     <ComponentInfo.SortedPropertyNameList:MergeNotBoolFieldCall()>	
+    <ComponentInfo.IPatchPropertyTypeDict:MergeNotBoolFieldCall()>	
 }
 
 >>
@@ -175,6 +181,7 @@ private bool Has<FieldName>(BitArray32 mask)
 
 HasMethod(Comp) ::=<<
 <Comp.SortedPropertyNameList:HasMethodForSingleField()>
+<Comp.IPatchPropertyTypeDict:HasMethodForSingleField()>
 
 >>
 
@@ -190,6 +197,7 @@ private void Compare<FieldName>AndSetMask(<ComponentInfo.Name> baseComponent, <C
 
 CompareAndSetMethod(Comp) ::=<<
 <Comp.SortedPropertyNameList:CompareAndSetMethodForSingleField()>
+<Comp.IPatchPropertyTypeDict:CompareAndSetMethodForSingleField()>
 
 >>
 
@@ -240,6 +248,8 @@ using System.Collections;
 using System.IO;
 using Core.SnapshotReplication.Serialization.NetworkObject;
 using Core.SnapshotReplication.Serialization.Serializer;
+using Utils.Compare;
+using Utils.Utils.Buildin;
 using <ComponentInfo.Name> = <ComponentInfo.FullName>;
 namespace <NameSpace>
 {
@@ -250,6 +260,7 @@ namespace <NameSpace>
        private BitArray32 emptyFieldMask = new BitArray32(ComponentNetworkPropertyNum);
        private BitArray32 boolMask = new BitArray32(<ComponentInfo.BoolPropertyNum>);
        <ComponentInfo.SortedPropertyNameList:PropertyIndex()>
+       <ComponentInfo.IPatchPropertyTypeDict:PropertyIndex()>
        
        //DiffMethod
        <DiffMethod(ComponentInfo)>
@@ -419,3 +430,115 @@ namespace <NameSpace>
     }
 }
 >>
+
+
+
+
+SetNameSpaces(FieldName) ::=<<
+using <FieldName>;
+
+>>
+
+DiffIPatchField(FieldName) ::=<<
+bitArray[<IPatchMetaInfo.IndexDict.(FieldName)>] = !CompareUtility.IsApproximatelyEqual(curValue.<FieldName>, lastValue.<FieldName>);
+
+>>
+
+WriteIPatchField(FieldName)::=<<
+if(bitArray[<IPatchMetaInfo.IndexDict.(FieldName)>]) 
+    FieldSerializeUtil.Serialize(<IPatchMetaInfo.WriteParamDict.(FieldName)> curValue.<FieldName>, <IPatchMetaInfo.SerializeParamDict.(FieldName)> writer);
+
+>>
+
+ReadIPatchField(FieldName)::=<<
+if(curValue.BitArray[<IPatchMetaInfo.IndexDict.(FieldName)>])
+    curValue.<FieldName> = <IPatchMetaInfo.ReadTransferDict.(FieldName)> FieldSerializeUtil.Deserialize( <IPatchMetaInfo.WriteParamDict.(FieldName)>curValue.<FieldName>, <IPatchMetaInfo.SerializeParamDict.(FieldName)> reader);
+
+>>
+
+MergeIPatchField(FieldName)::=<<
+if(lastValue.BitArray[<IPatchMetaInfo.IndexDict.(FieldName)>])
+    curValue.<FieldName> = lastValue.<FieldName>;
+
+>>
+
+
+RegistPatchSerializer(PatchMetaInfo) ::=<<
+PatchPropertySerializer.RegistSerialzier(new <PatchMetaInfo>Serializer());
+
+>>
+
+IPatchSerializerRegister(NameSpace, IPatchName) ::=<<
+
+namespace <NameSpace>
+{
+    public static partial class PatchPropertySerializer
+    {
+        static PatchPropertySerializer()
+        {
+            <IPatchName:RegistPatchSerializer()>
+        }
+    }
+}
+
+>>
+
+
+SerializerIPatch(NameSpace, IPatchMetaInfo) ::=<<
+
+using Utils.Compare;
+using System.IO;
+using Core.SnapshotReplication.Serialization.Serializer;
+using Utils.Utils.Buildin;
+using Core.Animation;
+using Core.Utils;
+<IPatchMetaInfo.NameSpaces:SetNameSpaces()>
+namespace <NameSpace>
+{
+    public class <IPatchMetaInfo.Name>Serializer : AbstractPatchSerializer,IPatchSerializer\<<IPatchMetaInfo.Name>\>
+    {
+        public void Write(<IPatchMetaInfo.Name> curValue, <IPatchMetaInfo.Name> lastValue, MyBinaryWriter writer)
+        {
+              BitArrayWrapper bitArray = BitArrayWrapper.Allocate(<IPatchMetaInfo.Fields.Count>, false);
+              if(lastValue==null)
+                bitArray.SetAll(true);
+              else{
+                <IPatchMetaInfo.Fields:DiffIPatchField()>
+              } 
+              
+              writer.Write(bitArray);
+              <IPatchMetaInfo.Fields:WriteIPatchField()>
+              bitArray.ReleaseReference();
+        }
+
+        public void Read(<IPatchMetaInfo.Name> curValue, BinaryReader reader)
+        {   
+            if(curValue.BitArray != null)
+                curValue.BitArray.ReleaseReference();
+            curValue.BitArray = reader.ReadBitArray();
+            <IPatchMetaInfo.Fields:ReadIPatchField()>
+        }
+       
+        public void Merge(<IPatchMetaInfo.Name> curValue, <IPatchMetaInfo.Name> lastValue)
+        {
+            <IPatchMetaInfo.Fields:MergeIPatchField()>
+            lastValue.BitArray.ReleaseReference();
+            lastValue.BitArray = null;
+        }
+        
+        public override bool CheckType(object t)
+        {
+            return t is <IPatchMetaInfo.Name>;
+        }
+        
+        public override string GetType()
+        {
+            return Activator.CreateInstance\<<IPatchMetaInfo.Name>\>().GetName();
+            
+        }
+        
+    }
+}
+
+>>
+

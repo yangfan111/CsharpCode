@@ -1,5 +1,6 @@
 ﻿using Core.Utils;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Utils.Configuration;
 using Utils.Utils;
 using XmlConfig;
@@ -23,14 +24,15 @@ namespace Core.Configuration
                 _configs[item.Id] = item;
             }
         }
-
+    private static LoggerAdapter _loggerAdapter = new LoggerAdapter("ClientEffectConfigManager");
         public ClientEffectConfigItem GetConfigItemById(int id)
         {
             if (id == 0)
                 return null;
             ClientEffectConfigItem efcItem;
             _configs.TryGetValue(id, out efcItem);
-            AssertUtility.Assert(efcItem != null,string.Format("config with id {0} doesn't exist ! ",id));
+            if(efcItem == null)
+                _loggerAdapter.ErrorFormat("Client effect item failed ,id {0}",id);
             return efcItem;
         }
 

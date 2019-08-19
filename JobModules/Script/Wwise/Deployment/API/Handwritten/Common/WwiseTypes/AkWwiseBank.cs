@@ -19,19 +19,19 @@ namespace AK.Wwise
 		public void Load(bool decodeBank = false, bool saveDecodedBank = false)
 		{
 			if (IsValid())
-				AkBankManager.LoadBank(Name, decodeBank, saveDecodedBank);
+				AkBankManager.LoadBankEditor(Name, decodeBank, saveDecodedBank);
 		}
 
 		public void LoadAsync(AkCallbackManager.BankCallback callback = null)
 		{
 			if (IsValid())
-				AkBankManager.LoadBankAsync(Name, callback);
+				AkBankManager.LoadBank(Name, callback);
 		}
 
 		public void Unload()
 		{
 			if (IsValid())
-				AkBankManager.UnloadBank(Name);
+				AkBankManager.UnloadBankEditor(Name);
 		}
 	}
 }

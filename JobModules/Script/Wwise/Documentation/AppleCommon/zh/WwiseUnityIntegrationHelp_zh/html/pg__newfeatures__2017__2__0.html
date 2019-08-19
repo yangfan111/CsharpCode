@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>新功能 2017.2</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>&nbsp;&raquo;&nbsp;<a class="el" href="pg__previousreleases.html">Previous Release Notes</a>&nbsp;&raquo;&nbsp;<a class="el" href="pg__releasenotes__2017__2__0__947.html">版本说明 - Wwise Unity Integration 2017.2.0.6500.947</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="pg_newfeatures_2017_2_0">新功能 2017.2 </a></h1><p>在 Wwise 2017.1 和它的 Unity 集成中有许多重要的新功能。新功能包含以下几点：</p>
+<ul>
+<li><a class="el" href="pg__newfeatures__2017__2__0.html#sect_edit_mode">Edit 模式支持</a><ul>
+<li><a class="el" href="pg__newfeatures__2017__2__0.html#subsect_edit_mode_banks">在 Edit 模式下加载和卸载音频包</a></li>
+</ul>
+</li>
+<li><a class="el" href="pg__newfeatures__2017__2__0.html#sect_wwiseglobal_additions">增添 WwiseGlobal 游戏对象组件</a></li>
+<li><a class="el" href="pg__newfeatures__2017__2__0.html#sect_audio_input_scripts">Wwise Audio Input 插件</a></li>
+<li><a class="el" href="pg__newfeatures__2017__2__0.html#sect_midi_events">MIDI 事件</a></li>
+<li><a class="el" href="pg__newfeatures__2017__2__0.html#sect_auto_soundbank_mgmt">SoundBank 自动管理</a></li>
+</ul>
+<h2><a class="anchor" id="sect_edit_mode">
+Edit 模式支持</a></h2>
+<p>现在支持在 Unity 处于 Edit 模式时初始化 Wwise 声音引擎。如此一来，无需进入 Play 模式便可从编辑器触发 Wwise 事件。为了展示这一改进，相应地更新了 <code><a class="el" href="class_ak_event.html" title="Helper class that knows a Wwise Event and when to trigger it in Unity. As of 2017...">AkEvent</a></code> 和 <code><a class="el" href="class_ak_ambient.html" title="Use this component to attach a Wwise Event to any object in a scene. The sound can...">AkAmbient</a></code> 检视器 （Inspector）。检视器中现在设有相应按钮，方便直接从编辑器播放和停止 Event。您可以使用 Play/Stop 按钮来单独播放和停止各个 Event。在针对多个对象选中 <a class="el" href="class_ak_event.html" title="Helper class that knows a Wwise Event and when to trigger it in Unity. As of 2017...">AkEvent</a> 时，则可使用 Play Multiple 和 Stop Multiple 按钮来播放或停止当前选中的所有 Event。此外，还可使用 Stop All 按钮来停止当前正在播放的所有 Event。</p>
+<div align="center">
+<img src="EditMode_AkEventPlayButton.PNG" alt="EditMode_AkEventPlayButton.PNG"/>
+</div>
+<h3><a class="anchor" id="subsect_edit_mode_banks">
+在 Edit 模式下加载和卸载音频包</a></h3>
+<p>注意，为了确保可正常使用 Edit 模式，必须将对应 <a class="el" href="class_ak_bank.html" title="Loads and unloads a SoundBank at a specified moment. Vorbis sounds can be decompressed...">AkBank</a> 组件的 Load On: 属性设为 Awake，同时将 Unload On: 属性设为 Never。</p>
+<h2><a class="anchor" id="sect_wwiseglobal_additions">
+增添 WwiseGlobal 游戏对象组件</a></h2>
+<p>WwiseGlobal 游戏对象包含了 AkEditorEventPlayer 组件。此组件仅适用于编辑器，方便在 Edit 模式下播放与 <a class="el" href="class_ak_event.html" title="Helper class that knows a Wwise Event and when to trigger it in Unity. As of 2017...">AkEvent</a> 关联的 WwiseEvent。此外，WwiseGlobal 对象还包含了 <code>Rigidbody、<code><a class="el" href="class_ak_game_obj.html" title="This component represents a sound object in your scene tracking its position and...">AkGameObj</a></code> 和</code> <code><a class="el" href="class_ak_audio_listener.html" title="Add this script on the game object that represent a listener. This is normally added...">AkAudioListener</a></code> 组件。这些组件用于在 Edit 模式下实现 <code>AkEnvironment、<code><a class="el" href="class_ak_game_obj.html" title="This component represents a sound object in your scene tracking its position and...">AkGameObj</a></code> 和</code> <code><a class="el" href="class_ak_room.html" title="An AkRoom is an enclosed environment that can only communicate to the outside/other...">AkRoom</a></code> 组件之间的交互。请参阅 <a class="el" href="pg__installprojectchange.html">对您 Unity 工程作出的变更</a> 。</p>
+<h2><a class="anchor" id="sect_audio_input_scripts">
+Wwise Audio Input 插件</a></h2>
+<p>现在可以通过 C# 脚本来访问 Wwise Audio Input 源插件了。详情参见 <a class="el" href="pg__appscripts.html#subsect_unity_audio_input">Using the Audio Input Source Plug-in in Unity.</a> 。</p>
+<h2><a class="anchor" id="sect_midi_events">
+MIDI 事件</a></h2>
+<p>现在可以通过 C# 脚本将 MIDI 事件发布至 Wwise 了。详情参见 <a class="el" href="pg__appscripts.html#subsect_unity_code_midi">Sending MIDI to Wwise.</a> 。</p>
+<h2><a class="anchor" id="sect_auto_soundbank_mgmt">
+SoundBank 自动管理</a></h2>
+<p>现在增加了 SoundBank 自动管理功能。详情参见 <a class="el" href="pg__deploy.html#sect_genbankstounityproj">在单平台工程中部署 SoundBanks</a> 和 <a class="el" href="pg__deploy.html#sect_excludeplatformbanks">在多平台工程中部署 SoundBank</a> 。</p>
+<h2><a class="anchor" id="sect_spatial_audio">
+空间音频集成</a></h2>
+<p>为 Unity 集成添加了空间音频 API。如需查看教程，请参阅 <a class="el" href="pg__spatialaudio.html">Using Wwise Spatial Audio in Unity</a> 。 </p>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

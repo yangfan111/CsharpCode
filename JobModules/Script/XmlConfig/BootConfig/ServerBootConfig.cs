@@ -49,6 +49,8 @@ namespace XmlConfig.BootConfig
 
         public string Ip;
 
+        public string InnerIp;
+
         public ServerInfo BattleServer;
 
         public RoomServerInfo HallRoomServer;

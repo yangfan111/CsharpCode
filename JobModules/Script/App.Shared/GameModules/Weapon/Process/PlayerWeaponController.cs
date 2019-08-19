@@ -34,7 +34,8 @@ namespace App.Shared.GameModules.Weapon
             if (!processHelper.FilterSameSpecies(slot) || !processHelper.FilterSlotValied(slot))
                 return;
             //把当前的一些枪械状态重置掉
-            HeldWeaponAgent.SaveDynamic();
+            HeldWeaponAgent.InterruptPullBolt();
+        
             var lastWeapon       = HeldConfigId;
             var destWeapon       = GetWeaponAgent(slot).ComponentScan;
             var appearanceStruct = processHelper.GetDrawAppearanceStruct(slot);
@@ -64,9 +65,9 @@ namespace App.Shared.GameModules.Weapon
         {
             if (IsHeldSlotEmpty)
                 return EWeaponSlotType.None;
+            AudioController.StopPullBoltAudio();
             RelatedThrowAction.CleanThrowingState();
-            HeldWeaponAgent.SaveDynamic();
-            RelatedThrowAction.CleanThrowingState();
+            HeldWeaponAgent.InterruptPullBolt();
             var holdSlot = HeldSlotType;
             if(needInterrupt)
                 DoAppearanceInterrupt();
@@ -78,7 +79,7 @@ namespace App.Shared.GameModules.Weapon
             {
                 DoDrawUnarmWeaponWithoutAction(HeldConfigId);
             }
-
+        
             return holdSlot;
         }
 
@@ -110,6 +111,7 @@ namespace App.Shared.GameModules.Weapon
             if (IsHeldBagSlotType(slotType))
             {
                 SetHeldSlotType(EWeaponSlotType.None);
+                logger.InfoFormat("Do DestroyWeapon {0}",HeldSlotType);
             }
 
             DoDrawEmptyWeaponInPackage(slotType, interrupt);
@@ -230,6 +232,7 @@ namespace App.Shared.GameModules.Weapon
         {
             ClearBagPointer();
             HeldBagPointer = (byte) pointer;
+            DebugUtil.MyLog("HeldBagPointer:"+HeldBagPointer);
         }
 
         public bool ReplaceWeaponToSlot(EWeaponSlotType slotType, WeaponScanStruct orient)
@@ -333,6 +336,7 @@ namespace App.Shared.GameModules.Weapon
         {
             RelatedAppearence.JustClearOverrideController();
             SetHeldSlotType(EWeaponSlotType.None);
+            logger.InfoFormat("Do Weaopon HolsterEnd callback {0}",HeldSlotType);
             ThrowActionExecute();
         }
         
@@ -340,6 +344,7 @@ namespace App.Shared.GameModules.Weapon
         {
             RelatedAppearence.JustClearOverrideController();
             SetHeldSlotType(EWeaponSlotType.None);
+            logger.InfoFormat("Do Weaopon UnArmFinished callback {0}",HeldSlotType);
             if (weaponId.HasValue && WeaponUtil.IsC4p(weaponId.Value))
             {
                 UnArmC4();
@@ -456,6 +461,7 @@ namespace App.Shared.GameModules.Weapon
         {
             RelatedAppearence.UnmountWeaponFromHand();
             SetHeldSlotType(EWeaponSlotType.None);
+            logger.InfoFormat("Do Weaopon HolsterEnd OnUnArmWeaponCallback {0}",HeldSlotType);
             if (WeaponUtil.IsC4p(weaponId))
             {
                 UnArmC4();
@@ -541,7 +547,11 @@ namespace App.Shared.GameModules.Weapon
         private void DoArmFinished(WeaponScanStruct weapon, EWeaponSlotType slot)
         {
             //TODO:
+            logger.InfoFormat("DoArmFinished {0}",HeldSlotType);
             SetHeldSlotType(slot);
+      
+        
+
             if (weapon.Bullet <= 0)
             {
                 if (SharedConfig.CurrentGameMode == EGameMode.Normal)
@@ -555,15 +565,20 @@ namespace App.Shared.GameModules.Weapon
 
         #region Update
 
-        public void InternalUpdate(PlayerEntity player)
+        public void InternalUpdate()
         {
+            GrenadeHandler.Rewind();
             if (!HeldWeaponAgent.IsValid())
             {
                 if (HeldSlotType != EWeaponSlotType.None)
+                {
                     SetHeldSlotType(EWeaponSlotType.None);
+                    logger.InfoFormat("Do internal {0}",HeldSlotType);
+                }
+                    
             }
 
-            switch (RelatedServerUpdate.EUpdateCmdType)
+            switch ((EWeaponUpdateCmdType) RelatedServerUpdate.UpdateCmdType)
             {
                 case EWeaponUpdateCmdType.UpdateHoldAppearance:
                     logger.Info("WeaponUpdate.UpdateHeldAppearance Come in ");
@@ -575,7 +590,7 @@ namespace App.Shared.GameModules.Weapon
                         RefreshWeaponAppearance();
                     else
                     {
-                        if (player.gamePlay.JobAttribute == (int) EJobAttribute.EJob_EveryMan)
+                        if (RelatedGamePlay.JobAttribute == (int) EJobAttribute.EJob_EveryMan)
                         {
                             TryArmWeaponImmediately(newSlot);
                         }
@@ -684,10 +699,27 @@ namespace App.Shared.GameModules.Weapon
             DestroyWeapon(EWeaponSlotType.ThrowingWeapon, 0);
             RefreshWeaponAppearance(EWeaponSlotType.ThrowingWeapon);
             GrenadeHandler.ClearCache();
+            RelatedGamePlay.ArmorLv = RelatedGamePlay.CurArmor = RelatedGamePlay.MaxArmor = 0;
+            RelatedGamePlay.HelmetLv = RelatedGamePlay.CurHelmet = RelatedGamePlay.MaxHelmet = 0;
             foreach (var weapon in tarBag.weaponList)
             {
                 var slot            = PlayerWeaponBagData.Index2Slot(weapon.Index);
                 var weaponAllConfig = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(weapon.WeaponTplId);
+
+                if (weaponAllConfig.NewWeaponCfg.Type == (int) EWeaponType_Config.Armor)
+                {
+                    RelatedGamePlay.ArmorLv = weaponAllConfig.NewWeaponCfg.Id;
+                    RelatedGamePlay.MaxArmor = RelatedGamePlay.CurArmor = weaponAllConfig.NewWeaponCfg.Durable;
+                    continue;
+                }
+
+                if (weaponAllConfig.NewWeaponCfg.Type == (int) EWeaponType_Config.Helmet)
+                {
+                    RelatedGamePlay.HelmetLv = weaponAllConfig.NewWeaponCfg.Id;
+                    RelatedGamePlay.MaxHelmet = RelatedGamePlay.CurHelmet = weaponAllConfig.NewWeaponCfg.Durable;
+                    continue;
+                }
+
                 if (slot != EWeaponSlotType.ThrowingWeapon && slot != EWeaponSlotType.TacticWeapon)
                 {
                     var orient = WeaponUtil.CreateScan(weapon);
@@ -724,30 +756,45 @@ namespace App.Shared.GameModules.Weapon
 
         public bool SwitchBagByReservedType(int index)
         {
-            if (null == RelatedServerUpdate.ReservedWeaponSubType ||
-            RelatedServerUpdate.ReservedWeaponSubType.Count == 0)
+            if (null == RelatedServerUpdate.ReservedWeaponSubType || RelatedServerUpdate.ReservedWeaponSubType.Count == 0)
                 return false;
 
             var tarBag = FindWeaponBagDataBySlot(index);
             if (tarBag == null) return true;
+
             DestroyWeapon(EWeaponSlotType.ThrowingWeapon, 0);
             RefreshWeaponAppearance(EWeaponSlotType.ThrowingWeapon);
             GrenadeHandler.ClearCache();
+            RelatedGamePlay.ArmorLv = RelatedGamePlay.CurArmor = RelatedGamePlay.MaxArmor = 0;
+            RelatedGamePlay.HelmetLv = RelatedGamePlay.CurHelmet = RelatedGamePlay.MaxHelmet = 0;
+
             var removedSlotList = new Byte[(int) EWeaponSlotType.Length];
             foreach (var weapon in tarBag.weaponList)
             {
                 bool needReserved = false;
-                var weaponAllConfig =
-                                SingletonManager.Get<WeaponConfigManagement>().FindConfigById(weapon.WeaponTplId);
+                var weaponAllConfig = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(weapon.WeaponTplId);
+
                 if (weaponAllConfig.NewWeaponCfg.Type == (int) EWeaponType_Config.ThrowWeapon)
                     needReserved = RelatedServerUpdate.ReservedWeaponSubType.Contains((int) EWeaponSubType.Throw);
                 else
-                    needReserved =
-                                    RelatedServerUpdate.ReservedWeaponSubType.Contains(weaponAllConfig.NewWeaponCfg
-                                                    .SubType);
+                    needReserved = RelatedServerUpdate.ReservedWeaponSubType.Contains(weaponAllConfig.NewWeaponCfg.SubType);
 
                 if (!needReserved)
                     continue;
+
+                if (weaponAllConfig.NewWeaponCfg.Type == (int) EWeaponType_Config.Armor)
+                {
+                    RelatedGamePlay.ArmorLv = weaponAllConfig.NewWeaponCfg.Id;
+                    RelatedGamePlay.MaxArmor = RelatedGamePlay.CurArmor = weaponAllConfig.NewWeaponCfg.Durable;
+                    continue;
+                }
+
+                if (weaponAllConfig.NewWeaponCfg.Type == (int) EWeaponType_Config.Helmet)
+                {
+                    RelatedGamePlay.HelmetLv = weaponAllConfig.NewWeaponCfg.Id;
+                    RelatedGamePlay.MaxHelmet = RelatedGamePlay.CurHelmet = weaponAllConfig.NewWeaponCfg.Durable;
+                    continue;
+                }
 
                 var slot = PlayerWeaponBagData.Index2Slot(weapon.Index);
                 if (slot != EWeaponSlotType.ThrowingWeapon && slot != EWeaponSlotType.TacticWeapon)

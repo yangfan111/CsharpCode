@@ -44,7 +44,6 @@ namespace Core.SnapshotReplication.Serialization.Patch
         {
             foreach (var patch in _entityPatchList)
             {
-               
                 patch.ApplyPatchTo(baseSnap, serializerManager);
             }
         }

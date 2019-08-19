@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.Compare;
+﻿using Core.Compare;
 using Core.Compensation;
 using Core.EntityComponent;
 using Core.Interpolate;
 using Core.Playback;
-using Core.Prediction;
-using Core.Prediction.UserPrediction;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
 using Core.Utils;
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 // ReSharper disable PossibleNullReferenceException
@@ -65,6 +63,8 @@ namespace Core.Components
             }
         }
 
+        [DontInitilize] public Bounds Bounds { get; set; }
+        [DontInitilize] public bool ModelRotate { get; set; }
 
         private List<PositionChangedDelgate> _positionListener = new List<PositionChangedDelgate>();
 

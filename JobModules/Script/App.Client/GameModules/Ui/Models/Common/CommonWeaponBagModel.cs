@@ -1,14 +1,13 @@
-using System;
-using System.Collections.Generic;
 using App.Client.GameModules.Ui.Utils;
 using App.Client.GameModules.Ui.ViewModels.Common;
-using App.Client.Utility;
 using App.Shared.Components.Ui.UiAdapter;
 using Assets.App.Client.GameModules.Ui;
 using Assets.UiFramework.Libs;
 using Assets.XmlConfig;
 using Core.GameModule.Interface;
 using Core.Utils;
+using System;
+using System.Collections.Generic;
 using UIComponent.UI;
 using UIComponent.UI.Manager;
 using UnityEngine;
@@ -63,9 +62,9 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void InitOpenKeyReveiver()
         {
             openKeyReceiver = new KeyReceiver(UiConstant.weaponBagWindowLayer, BlockType.None);
-            openKeyReceiver.AddAction(UserInputKey.OpenWeaponBag, (data) =>
+            openKeyReceiver.BindKeyAction(UserInputKey.OpenWeaponBag, (data) =>
             {
-                SwitchWeaponBagViewShow();
+                if(_adapter.CanOpenBag) SwitchWeaponBagViewShow();
             });
             _adapter.RegisterOpenKey(openKeyReceiver);
             //_adapter.RegisterKeyReceive(openKeyReceiver);
@@ -79,12 +78,12 @@ namespace App.Client.GameModules.Ui.Models.Common
                 if (_haveBagForIndexList[i])
                 {
                     var index = i - 1;
-                    keyReveiver.AddAction(UserInputKey.Switch1 + index,
+                    keyReveiver.BindKeyAction(UserInputKey.Switch1 + index,
                         (data) => {
                             btnGroupTab.SetSelect(index);
                             CloseView();
                         });
-                    keyReveiver.AddAction(UserInputKey.HideWindow,
+                    keyReveiver.BindKeyAction(UserInputKey.HideWindow,
                         (data) => {
                             CloseView();
                         });
@@ -380,7 +379,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             var data = new TipShowData();
             data.CategoryId = (int)ECategory.Weapon;
             data.TemID = id;
-            tipManager.RegisterTip<CommonTipModel>(transform, data);
+            tipManager.RegisterTip<CommonItemTipModel>(transform, data);
         }
 
         private Dictionary<EWeaponPartType, int> WeaponPartTypeToIndexDict = new Dictionary<EWeaponPartType, int>
@@ -442,7 +441,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             var data = new TipShowData();
             data.CategoryId = (int)ECategory.WeaponPart;
             data.TemID = id;
-            tipManager.RegisterTip<CommonTipModel>(transform, data);
+            tipManager.RegisterTip<CommonItemTipModel>(transform, data);
         }
 
         Transform GetNewWeaponItem(Transform root,bool haveWeaponPart,string type = "")

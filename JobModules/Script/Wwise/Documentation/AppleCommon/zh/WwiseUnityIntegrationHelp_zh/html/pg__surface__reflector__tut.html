@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>Surface Reflectors Tutorial</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>&nbsp;&raquo;&nbsp;<a class="el" href="pg__spatialaudio.html">Using Wwise Spatial Audio in Unity</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="pg_surface_reflector_tut">Surface Reflectors Tutorial </a></h1><p>In the following steps, this tutorial will show you how to use the new Reflect plug-in with Spatial Audio. You will need a Reflect plug-in license to make the project work.</p>
+<ul>
+<li><a class="el" href="pg__surface__reflector__tut.html#sect_surface_reflector_wwise">A. Wwise Project（工程）</a></li>
+<li><a class="el" href="pg__surface__reflector__tut.html#sect_surface_reflector_emitter">B. Spatial Audio Emitter</a></li>
+<li><a class="el" href="pg__surface__reflector__tut.html#sect_surface_reflector">C. Surface Reflector Component</a><ul>
+<li><a class="el" href="pg__surface__reflector__tut.html#sub_existing_mesh">C.1. Use Existing Meshes</a></li>
+<li><a class="el" href="pg__surface__reflector__tut.html#sub_new_volume">C.2. Alternative: Create a New Volume</a></li>
+</ul>
+</li>
+</ul>
+<p><b>Note</b>: This tutorial presumes that you have completed the <a class="el" href="pg__spatialaudio__preparation.html">Preparation for the Spatial Audio Tutorials</a>. However, it does not consider if the <a class="el" href="pg__rooms__portals__tut.html">Rooms and Portals Tutorial</a> was done; both tutorials are independent.</p>
+<h2><a class="anchor" id="sect_surface_reflector_wwise">
+A. Wwise Project（工程）</a></h2>
+<p>We need to update our Wwise project with an Auxiliary Bus with the Reflect plug-in and Acoustic Textures.</p>
+<ol type="1">
+<li>Add an Auxiliary Bus under the <b>Master Audio Bus</b>.<ol type="a">
+<li>In the <b>Auxiliary Bus Property Editor</b>,<ol type="i">
+<li>Under the <b>Effects</b> tab, add the Wwise Reflect Effect. <div align="center">
+<img src="AuxBusPropertyEditorEffectsThirdPerson.png" alt="AuxBusPropertyEditorEffectsThirdPerson.png"/>
+<p><strong>Auxiliary Bus Property Editor Effects tab for Reflect</strong></p></div>
+</li>
+<li>Under the Positioning tab, enable <b>Listener Relative Routing</b> and select <b>None</b> for the 3D Spatialization. <div align="center">
+<img src="AuxBusPropertyEditorPositioningThirdPerson.png" alt="AuxBusPropertyEditorPositioningThirdPerson.png"/>
+<p><strong>Auxiliary Bus Property Editor Positioning tab for Reflect</strong></p></div>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>Import Reflect Acoustic Textures from: Project &gt; Import Factory Assets...<ol type="a">
+<li>They will be added to the <b>Virtual Acoustics</b> folder in the <b>ShareSets</b> tab of the <b>Project Explorer</b> view. <div align="center">
+<img src="ProjectExplorerShareSets.png" alt="ProjectExplorerShareSets.png"/>
+<p><strong>Factory Reflect Acoustic Textures in the Project Explorer ShareSets tab</strong></p></div>
+</li>
+<li>(optional) You can add custom Acoustic Textures in the <b>Virtual Acoustics</b> folder under <b>Default Work Unit</b>.</li>
+</ol>
+</li>
+<li>Save your project.</li>
+</ol>
+<h2><a class="anchor" id="sect_surface_reflector_emitter">
+B. Spatial Audio Emitter</a></h2>
+<p>We need to modify the spatial audio emitter to use our newly created reflect aux bus.</p>
+<ol type="1">
+<li>Refresh your Wwise project in the Wwise Picker: Windows &gt; Wwise Picker<ol type="a">
+<li>Generate SoundBanks <div align="center">
+<img src="WwisePicker.png" alt="WwisePicker.png"/>
+<p><strong>Wwise Picker</strong></p></div>
+</li>
+</ol>
+</li>
+<li>Modify the <b>Ak Spatial Audio Emitter</b> component of each button.<ol type="a">
+<li>Pick the Reflect Auxiliary Bus for <b>Reflect Aux Bus</b>.</li>
+<li>Choose 2 for the <b>Reflections Order</b>.</li>
+<li>Choose 1 for the <b>Reflections Aux Bus Gain</b>.</li>
+<li>Choose 100000 for the <b>Reflection Max Path Length</b>.</li>
+<li>Check the <b>Draw First Order Reflections</b> and <b>Draw Second Order Reflections</b> under <b>Debug Draw</b>. <div align="center">
+<img src="AkSpatialAudioEmitterReflect.png" alt="AkSpatialAudioEmitterReflect.png"/>
+<p><strong>Ak Spatial Audio Emitter for Surface Reflector</strong></p></div>
+ </li>
+</ol>
+</li>
+</ol>
+<h2><a class="anchor" id="sect_surface_reflector">
+C. Surface Reflector Component</a></h2>
+<p>You can simulate early reflections with the <b>Ak Surface Reflector</b> component. One way to have surface reflectors is to use existing meshes of the game. If the shape is too complex, you may want to add a new object as a surface reflector.</p>
+<h3><a class="anchor" id="sub_existing_mesh">
+C.1. Use Existing Meshes</a></h3>
+<p>The advantages of using the existing meshes are that you don't need to create new objects and each mesh can have a different acoustic texture. The disadvantages are that if you have a complex figure, you may send too much triangles to the Spatial Audio API and this could slow down your game. Also, another disadvantage is that each mesh only gets assigned one texture. In the case of the this tutorial, this means that it is not possible to have a different acoustic texture on the outside than on the inside of the rooms. In the scene provided by the unity integration, this is the method used for surface reflectors.</p>
+<ol type="1">
+<li>Select all the walls, ceiling and floor from section <a class="el" href="pg__spatialaudio__preparation.html#sub_unity_env">3.A. 环境</a> and add an <b>Ak Surface Reflector</b> component.<ol type="a">
+<li>In the <b>Acoustic Texture</b> parameter, choose an acoustic texture or leave it at <b>None</b> to have an unfiltered reflection. <div align="center">
+<img src="AkSurfaceReflector.png" alt="AkSurfaceReflector.png"/>
+<p><strong>Ak Surface Reflector component</strong></p></div>
+</li>
+</ol>
+</li>
+<li>Start the game.<ol type="a">
+<li>Since we have enabled the drawing of reflections under <b>Debug Draw</b> in section , you should see rays going from the emitter to the listener in the <b>Scene</b> window. (The ceiling was removed in the following image to see the rays clearly) The blue rays are first order reflections, i.e. they reflect from one surface before reaching the listener, and the yellow rays are second order reflections. The name of the triangles are displayed at the reflection point. A name is made up of the game object's name and the triangle's number. A cube has 12 triangles, two per face. <div align="center">
+<img src="DebugDraw2ndOrderTop.png" alt="DebugDraw2ndOrderTop.png"/>
+<p><strong>Top view of early reflection drawings for existing mesh surface reflectors</strong></p></div>
+</li>
+<li>You can see the rays in the <b>Game</b> window by enabling <b>Gizmos</b>; as we can see in the next image. From this point of view, we can also see that the <b>Debug Draw</b> option draws the triangles of the surfaces that are being reflected on. Leaving the ceiling in this view, we can see that the sound will also reflect from the ceiling on triangles 7 and 6. <div align="center">
+<img src="DebugDraw2ndOrderGame.png" alt="DebugDraw2ndOrderGame.png"/>
+<p><strong>First person view of early reflection drawings for existing mesh surface reflectors</strong></p></div>
+</li>
+<li>Connect the game in Wwise and go to the Profiler Layout. You should see a similar graph when Button Small Room is emitting. <div align="center">
+<img src="VoiceGraphReflect.png" alt="VoiceGraphReflect.png"/>
+<p><strong>Button Small Room Voice Graph with Reflect Effect</strong></p></div>
+</li>
+<li>Double click on the Auxiliary Bus with the Reflect Effect in the graph. Navigate to the Effects tab and double click on the Reflect Effect. When playing the sound, you should see the current reflections in the graph and the list of the Reflect Effect Editor. In thw following image, there is a Drywall acoustic texture for all the walls and the ceiling and a Tile acoustic texture for the floor. When there are two textures in the list, it means that the reflection is a second order one. <div align="center">
+<img src="ReflectEffectEditor.png" alt="ReflectEffectEditor.png"/>
+<p><strong>Reflect Effect Editor View</strong></p></div>
+ </li>
+</ol>
+</li>
+</ol>
+<h3><a class="anchor" id="sub_new_volume">
+C.2. Alternative: Create a New Volume</a></h3>
+<p>Creating a new game object with no mesh renderer can simplify a complex shape. In this optional section, we will show you how to have a surface reflector volume for the interior of the small room. You can also mix solutions by having some meshes be Surface Reflectors and having an object with no mesh renderer as well. 示例Having each mesh be a surface reflector to have different texture per wall inside of the house and adding and exterior volume to have a completly different texture on the outside of the house. It is also possible to use <b>Quads</b> instead of cubes to have a different texture wherever desired. But be careful with intersections when using quads; you don't want your sound to get out of your shape.</p>
+<ol type="1">
+<li>Create a simpler unrendered mesh using a cube: GameObject &gt; 3D Object &gt; Cube <table class="doxtable">
+<tr>
+<th>Object Name </th><th>Position </th><th>Rotation </th><th>Scale </th></tr>
+<tr>
+<td>Small Room Interior </td><td>(-2, 2.875, -6) </td><td>(0, 0, 0) </td><td>(11, 5.25, 7.5) </td></tr>
+</table>
+</li>
+</ol>
+<ol type="1">
+<li>Remove the <b>Mesh Renderer</b> component</li>
+<li>Check the <b>Is Trigger</b> in the <b>Box Collider</b> component</li>
+<li>add an Ak <b>Surface Reflector</b>.</li>
+</ol>
+<p>Start the game.</p>
+<ol type="1">
+<li>Since we simplified the shape of our room, the door is now part of the reflective surface. We don't have any reflections from Button Small Room if we are standing outside. We even get a reflection from Button Outside on the door opening. You may have noticed the name of the reflection point is now referencing to Small Room Interior. <div align="center">
+<img src="DebugDraw2ndOrderTopOutsideInterior.png" alt="DebugDraw2ndOrderTopOutsideInterior.png"/>
+<p><strong>Top view of early reflection drawings for a new surface reflector volume when the emitter is outside</strong></p></div>
+</li>
+<li>Entering the small room, Button Small Room's debug drawings appear and the ones for Button Outside disappear. <div align="center">
+<img src="DebugDraw2ndOrderTopInsideInterior.png" alt="DebugDraw2ndOrderTopInsideInterior.png"/>
+<p><strong>Top view of early reflection drawings for a new surface reflector volume when the emitter is inside</strong></p></div>
+</li>
+</ol>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

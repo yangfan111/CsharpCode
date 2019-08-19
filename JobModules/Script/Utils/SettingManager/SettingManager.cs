@@ -24,6 +24,8 @@ namespace Utils.SettingManager
     public enum VideoSettingId
     {
         Begin = 96,
+        Screen = 97,
+        Resolution = 98,
         Quality = 100,
         End = 109,
     }
@@ -80,6 +82,14 @@ namespace Utils.SettingManager
         }
         #region manager init
 
+        /// <summary>
+        /// Use boot param to control resolution and isAllScreen
+        /// </summary>
+        public bool UseBootParam { get; set; }
+        public int WidthParam { get; set; }
+        public int HeightParam { get; set; }
+        public bool IsFullScreen { get; set; }
+
 
         public void InitConfig(List<SettingConfigItem> list, List<SettingConfigVideoItem> videolist, Dictionary<int, VideoSetting> videoConfigs )
         {
@@ -97,12 +107,39 @@ namespace Utils.SettingManager
                 var config = AddItemToManager(item);
                 _configDic[config.item.Id] = config;
             }
-            
 
             GameQualitySettingManager.VideoSettingDic = videoConfigs;
         }
 
+        private void ReplaceConfigOfResolutionAndScreenMode(Dictionary<int, string> configDict,Dictionary<int, PlayerSettingItem> origConfigDic)
+        {
+            if (configDict == null || origConfigDic == null)
+            {
+                return;
+            }
+            var resolutionFormat = "{0}x{1}";
+            var resolution = string.Format(resolutionFormat, WidthParam, HeightParam);
+            PlayerSettingItem origResolutionConfig = null;
+            if (origConfigDic.TryGetValue((int) VideoSettingId.Resolution, out origResolutionConfig))
+            {
+                var index = origResolutionConfig.item.ComboxItemNames.FindIndex(s => s.Equals(resolution));
+                if (index == -1)
+                {
+                    _logger.Error("Boot Param For Resolution is Invalid");
+                    return;
+                }
 
+                configDict[(int) VideoSettingId.Resolution] = index.ToString();
+            }
+            else
+            {
+                _logger.Error("Orig Resolution Config Not Found");
+
+            }
+
+            var isFullScreen = IsFullScreen ? 0 : 1;
+            configDict[(int) VideoSettingId.Screen] = isFullScreen.ToString();
+        }
 
         public bool IsInitialized()
         {
@@ -377,10 +414,6 @@ namespace Utils.SettingManager
             var configDic = new Dictionary<int, string>();
             if(_configDic!=null)
             {
-                if (!configDic.ContainsKey((int) VideoSettingId.Quality))
-                {
-                    haveQualityLevelCache = false;
-                }
                 foreach (var item in _configDic)
                 {
                     configDic[item.Key] = item.Value.value;
@@ -392,7 +425,19 @@ namespace Utils.SettingManager
                 foreach (var item in sourceDic)
                 {
                     configDic[item.Key] = item.Value;
-                }
+                }   
+            }
+
+            if (sourceDic == null || !sourceDic.ContainsKey((int)VideoSettingId.Quality))
+            {
+                haveQualityLevelCache = false;
+            }
+
+            ResolutionParamHelper.SetParamToSettingManager();
+
+            if (UseBootParam)
+            {
+                ReplaceConfigOfResolutionAndScreenMode(configDic,_configDic);
             }
 
             if (isSet)
@@ -405,6 +450,7 @@ namespace Utils.SettingManager
                 _localCache[pair.Key] = pair.Value;
             }
         }
+
 
         public void SaveSettingToLocal()
         {
@@ -422,10 +468,59 @@ namespace Utils.SettingManager
         #endregion
 
         #region Quality
+
+        private int bootQualityParm = 0;
+        private bool haveSetQualityParm;
+
+        public void SetBootQualityParm(int quality)
+        {
+            if (haveSetQualityParm) return;
+            bootQualityParm = quality;
+            haveSetQualityParm = true;
+        }
+
+        public void SetBootQualityParm(string val)
+        {
+            try
+            {
+                var intVal = Int32.Parse(val);
+                SetBootQualityParm(intVal);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+            }
+        }
+
+        private int QualityLevelToConfigValue(QualityLevel level)
+        {
+            var res = (5 - (int) level);
+            return res;
+        }
+
+        public void SetQualityWithRecommandLevel(QualityLevel val,bool needUpdate = false)
+        {
+            if (needUpdate)
+            {
+                SetQuality(val);
+            }
+            var defaultVal = QualityLevelToConfigValue(val);
+            SetDefaultConfigValue((int) VideoSettingId.Quality, defaultVal.ToString());//replace default value by recommand level
+        }
+
+        private void SetDefaultConfigValue(int id, string defaultVal)
+        {
+            PlayerSettingItem playerItem;
+            if (_configDic.TryGetValue(id, out playerItem))
+            {
+                playerItem.item.DefaultValue = defaultVal;
+            }
+        }
+
         public void SetQuality(QualityLevel level)
         {
             if (level == QualityLevel.Undefined) return;
-            SetSetting((int)VideoSettingId.Quality, (5-(int)level));
+            SetSetting((int)VideoSettingId.Quality, QualityLevelToConfigValue(level));
 
             FlushData();
         }
@@ -473,12 +568,12 @@ namespace Utils.SettingManager
 
         private QualityLevel GetQualityCustomLevel()
         {
-            var name = QualitySettings.names[QualitySettings.GetQualityLevel()];
-            if (!name.StartsWith("QL_"))
-                return QualityLevel.Undefined;
-            var res = QualityLevel.Undefined;
-            _qualityDict.TryGetValue(name, out res);
-            return res;
+            if(Enum.IsDefined(typeof(QualityLevel), bootQualityParm))
+            {
+                return (QualityLevel) bootQualityParm;
+            }
+
+            return QualityLevel.Undefined;
         }
 
         public bool UseQualityCustomLevel()

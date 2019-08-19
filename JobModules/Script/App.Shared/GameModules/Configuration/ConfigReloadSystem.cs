@@ -65,6 +65,12 @@ namespace App.Shared.GameModules.Configuration
                 OnReload = StateTransitionReload,
             };
             _configs.Add(stateTrans);
+            // var stateInterrupt = new ConfigReloadItem
+            // {
+            //                 Asset    = "StateInterrupt",
+            //                 OnReload = StateInterruptReload,
+            // };
+            // _configs.Add(stateInterrupt);
             _playerContext = contexts.player;
             _contexts = contexts;
         }
@@ -117,11 +123,15 @@ namespace App.Shared.GameModules.Configuration
             }
         }
 
-        public void StateTransitionReload(TextAsset textAsset)
+         void StateTransitionReload(TextAsset textAsset)
         {
             SingletonManager.Get<StateTransitionConfigManager>().ParseConfig(textAsset.text);
             PlayerStateInputsDataMap.Instance.Reload(
                 SingletonManager.Get<StateTransitionConfigManager>().GetTransitons());
+        }
+         void StateInterruptReload(TextAsset textAsset)
+        {
+            SingletonManager.Get<StateInteruptConfigManager>().ParseConfig(textAsset.text);
         }
     }
 }

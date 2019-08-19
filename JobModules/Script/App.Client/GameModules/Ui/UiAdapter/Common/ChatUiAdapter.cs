@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using App.Shared.Components.Player;
 using Sharpen;
 using UnityEngine;
 using Utils.Configuration;
@@ -145,6 +146,14 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get { return _contexts.ui.chat.GetPersonalOnlineStatusCallback; }
             set { _contexts.ui.chat.GetPersonalOnlineStatusCallback = value; }
-}
+        }
+
+        public GamePlayComponent gamePlay
+        {
+            get
+            {
+                return _contexts.player.flagSelfEntity.gamePlay;
+            }
+        }
     }
 }

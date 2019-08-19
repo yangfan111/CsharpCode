@@ -23,6 +23,7 @@ namespace App.Server.GameModules.GamePlay.free.client
             handlers.Add(new FreeLoginSucessHandler());
             handlers.Add(new FreeClickImageHandler());
             handlers.Add(new FreeMoveImageHandler());
+            handlers.Add(new FreeOpenSpecifyUIHandler());
             handlers.Add(new FreePickupHandler());
             handlers.Add(new FreeDragImageHandler());
             handlers.Add(new FreeAddMarkHandler());
@@ -30,6 +31,7 @@ namespace App.Server.GameModules.GamePlay.free.client
             handlers.Add(new SplitItemHandler());
             handlers.Add(new FreeObservePlayerHandler());
             handlers.Add(new FreeSprayPaintHandle());
+            handlers.Add(new FreeWitnessHandler());
         }
 
         public static void Handle(ServerRoom room, PlayerEntity player, SimpleProto message)

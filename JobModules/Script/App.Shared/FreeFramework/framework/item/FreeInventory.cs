@@ -39,7 +39,7 @@ namespace com.wd.free.item
         public void StopUseItem(IEventArgs args, FreeData fd, bool inter)
         {
             startUse = false;
-
+            PlayerStateUtil.RemoveGameState(EPlayerGameState.UseItem, fd.Player.gamePlay);
             if (inter)
             {
                 StartCounter(args, 0, fd, false);
@@ -123,6 +123,7 @@ namespace com.wd.free.item
             data.Ks.Add(0);
             data.Ins.Add(FreeUtil.ReplaceInt("{item.itemId}", args));
             fd.Player.network.NetworkChannel.SendReliable((int)EServer2ClientMessage.FreeData, data);
+            PlayerStateUtil.AddPlayerState(EPlayerGameState.UseItem, fd.Player.gamePlay);
         }
 
         private void StartCounter(IEventArgs args, int time, FreeData fd, bool start)
@@ -254,6 +255,7 @@ namespace com.wd.free.item
                     PlayerAnimationAction.DoAnimation(args.GameContext, PlayerAnimationAction.Stop, fd.Player);
                     //FreeSoundUtil.Stop("use", args, fd);
                     PlayerStateUtil.RemoveGameState(EPlayerGameState.InterruptItem, fd.Player.gamePlay);
+                    PlayerStateUtil.RemoveGameState(EPlayerGameState.UseItem, fd.Player.gamePlay);
                 }
             }
             else
@@ -263,6 +265,7 @@ namespace com.wd.free.item
                     UseItem(ip, fd, (ISkillArgs)args);
                     fd.freeInventory.StopUseItem(args, fd, inter);
                     PlayerAnimationAction.DoAnimation(args.GameContext, PlayerAnimationAction.Interrupt, fd.Player);
+                    PlayerStateUtil.RemoveGameState(EPlayerGameState.UseItem, fd.Player.gamePlay);
                 }
             }
         }

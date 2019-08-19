@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Core.EntityComponent;
 
-namespace Core.EntitasAdpater
+namespace Core.EntityComponent
 {
     public interface IGameGroup
     {

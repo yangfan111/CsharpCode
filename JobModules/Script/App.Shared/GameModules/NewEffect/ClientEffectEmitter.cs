@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using App.Shared.Audio;
 using App.Shared.Util;
+using Common;
 using Core;
 using Core.Configuration;
 using Core.ObjectPool;
@@ -60,6 +61,7 @@ namespace App.Shared
                     _nodeObject                     = go.AddComponent<EffectObject>();
                     _nodeObject.AudioMono           = go.AddComponent<AkGameObj>();
                     _nodeObject.clientEffectEmitter = this;
+                    Enable = false;
                     go.transform.SetParent(PoolFolder);
                 }
 
@@ -72,7 +74,7 @@ namespace App.Shared
 
         public float Duration { get; set; }
 
-        public float loadAsyncTimestamp { get; private set; }
+        public float LoadAsyncTimestamp { get; private set; }
 
         public EEffectStageType StageType
         {
@@ -83,7 +85,7 @@ namespace App.Shared
                 stageType = value;
                 if (stageType == EEffectStageType.AsynLoading)
                 {
-                    loadAsyncTimestamp = Time.time;
+                    LoadAsyncTimestamp = MyGameTime.time;
                 }
             }
         }
@@ -240,7 +242,7 @@ namespace App.Shared
             Enable = true;
             if (effectBehavior != null)
                 effectBehavior.PlayEffect(this, unityObject.AsGameObject);
-            timeFinishStamp = Time.time + Duration;
+            timeFinishStamp = MyGameTime.time + Duration;
             StageType = EEffectStageType.Playing;
         }
 
@@ -249,7 +251,7 @@ namespace App.Shared
         {
             if (effectBehavior != null)
                 effectBehavior.FrameUpdate(this);
-            if ((!IsStatic  && timeFinishStamp < Time.time) || effectBehavior.NeedRecycle)
+            if ((!IsStatic  && timeFinishStamp < MyGameTime.time) || effectBehavior.NeedRecycle)
             {
                 StageType = EEffectStageType.WaitFinish;
             }

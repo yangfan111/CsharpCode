@@ -46,12 +46,12 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void InitKey()
         {
             openKeyReceiver = new KeyReceiver(UiConstant.paintWindowLayer, BlockType.None);
-            openKeyReceiver.AddAction(UserInputKey.F1, (data) => { _adapter.Enable = true;});
+            openKeyReceiver.BindKeyAction(UserInputKey.F1, (data) => { _adapter.Enable = true;});
             _adapter.RegisterOpenKey(openKeyReceiver);
 
             keyReveiver = new KeyReceiver(UiConstant.paintWindowKeyBlockLayer, BlockType.All);
-            keyReveiver.AddAction(UserInputKey.F1, (data) => { _adapter.Enable = false; });
-            keyReveiver.AddAction(UserInputKey.HideWindow, (data) => { _adapter.Enable = false; });
+            keyReveiver.BindKeyAction(UserInputKey.F1, (data) => { _adapter.Enable = false; });
+            keyReveiver.BindKeyAction(UserInputKey.HideWindow, (data) => { _adapter.Enable = false; });
             pointerReceiver = new PointerReceiver(UiConstant.paintWindowKeyBlockLayer, BlockType.All);
         }
 

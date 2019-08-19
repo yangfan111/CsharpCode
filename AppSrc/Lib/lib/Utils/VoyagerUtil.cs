@@ -29,7 +29,7 @@ namespace YF.Utils
         }
 
 
-        public static void ProcessEnumElements<T>(Action<string> process)
+        public static void ProcessEnumNames<T>(Action<string> process)
         {
             var typeT = typeof(T);
             var names = Enum.GetNames(typeT);

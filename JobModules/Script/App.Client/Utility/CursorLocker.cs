@@ -17,16 +17,7 @@ namespace App.Client.Utility
         public static void UnLockCursor()
         {
             Cursor.visible = true;
-            if (Screen.fullScreen)
-            {
-                Cursor.lockState = CursorLockMode.Confined;
-            }
-            else
-            {
-                Cursor.lockState = CursorLockMode.None;
-            }
-            
-            
+            Cursor.lockState = CursorLockMode.Confined;
         }
     }
 }

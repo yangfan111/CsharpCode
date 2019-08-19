@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using Core.Network;
+using Utils.Replay;
 
 namespace App.Server.Robot
 {
@@ -57,6 +58,7 @@ namespace App.Server.Robot
         public int RemoteConnId { get; set; }
         public int UdpPort { get; set; }
         public INetworkMessageSerializer Serializer { get; set; }
+        public IRecordManager Recoder { get; set; }
         public int Id { get; private set; }
         public SocketError ErrorCode { get; set; }
         public void FlowSend(bool Type, long bytes, long ms =0)
@@ -84,5 +86,12 @@ namespace App.Server.Robot
         {
             throw new NotImplementedException();
         }
+
+        public void RealTimeConnect(int messagePort, int messageId)
+        {
+            throw new NotImplementedException();
+        }
+
+      
     }
 }

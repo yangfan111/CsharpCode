@@ -24,6 +24,7 @@ using UIComponent.UI.Manager;
 using App.Client.GameModules.GamePlay.Free.App;
 using Utils.Singleton;
 using Assets.Utils.Configuration;
+using Core.EntityComponent;
 
 namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
 {
@@ -95,8 +96,8 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
                 else
                 {
                     SingletonManager.Get<FreeUiManager>().Contexts1.ui.uI.IsShowCrossHair = false;
-                    bagBlockKeyId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockKey(UserInputManager.Lib.Layer.Ui);
-                    bagBlockPointerId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockPointer(UserInputManager.Lib.Layer.Ui);
+                    bagBlockKeyId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockKey(UserInputManager.Lib.EInputLayer.Ui);
+                    bagBlockPointerId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockPointer(UserInputManager.Lib.EInputLayer.Ui);
                 }
                 isOpen = bag.Visible;
 
@@ -104,8 +105,8 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
                 {
                     //Unlock
                     SingletonManager.Get<FreeUiManager>().Contexts1.ui.uI.IsShowCrossHair = false;
-                    CursorLocker.SystemBlockKeyId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockKey(UserInputManager.Lib.Layer.System);
-                    CursorLocker.SystemBlockPointerId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockPointer(UserInputManager.Lib.Layer.System);
+                    CursorLocker.SystemBlockKeyId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockKey(UserInputManager.Lib.EInputLayer.System);
+                    CursorLocker.SystemBlockPointerId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockPointer(UserInputManager.Lib.EInputLayer.System);
                 }
             }
 
@@ -346,13 +347,13 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
 
                 foreach (var id in current)
                 {
-                    var sceneEntity = context.sceneObject.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(id, (short)EEntityType.SceneObject));
+                    var sceneEntity = context.sceneObject.GetEntityWithEntityKey(new EntityKey(id, (short)EEntityType.SceneObject));
                     if (null != sceneEntity)
                     {
                         list.Add(sceneEntity);
                         continue;
                     }
-                    var freeMoveEntity = context.freeMove.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(id, (short)EEntityType.FreeMove));
+                    var freeMoveEntity = context.freeMove.GetEntityWithEntityKey(new EntityKey(id, (short)EEntityType.FreeMove));
                     {
                         if (freeMoveEntity.freeData.Cat == FreeEntityConstant.DeadBox)
                         {

@@ -1,6 +1,6 @@
 ﻿using App.Shared.Components;
 using Utils.AssetManager;
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core;
 using Core.IFactory;
 
@@ -31,7 +31,6 @@ namespace Core.GameModule.System
        // IWeaponMode WeaponModeLogic { get; set; }
     //    PlayerStateCollectorPool PlayerStateCollectorPool { get; set; }
         RoomInfo RoomInfo { get; set; }
-        RuntimeGameConfig RuntimeGameConfig { get; set; }
         IEntityIdGenerator EntityIdGenerator{ get; set; }
         IEntityIdGenerator EquipmentEntityIdGenerator { get; set; }
         IFreeArgs FreeArgs{ get; set; }

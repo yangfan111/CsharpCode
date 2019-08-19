@@ -10,16 +10,16 @@ namespace App.Shared.GameModules.Weapon.Behavior
     public class BurstFireModeUpdater : IAfterFireProcess
     {
 
-        public void OnAfterFire(WeaponBaseAgent heldBaseAgent, WeaponSideCmd cmd)
+        public void OnAfterFire(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
-            if(heldBaseAgent.BaseComponent.RealFireModel != (int)EFireMode.Burst)
+            if(attackProxy.BasicComponent.RealFireModel != (int)EFireMode.Burst)
                 return;
 
-            var runTimeComponent = heldBaseAgent.RunTimeComponent;
+            var runTimeComponent = attackProxy.RuntimeComponent;
             runTimeComponent.NeedAutoBurstShoot = false;
-            var config = heldBaseAgent.DefaultFireModeLogicCfg;
+            var config = attackProxy.WeaponConfigAssy.S_DefaultFireModeLogicCfg;
             runTimeComponent.BurstShootCount += 1;
-            float intervalFactor = 1 - heldBaseAgent.GetAttachedAttributeByType(WeaponAttributeType.AttackInterval) / 100;
+            float intervalFactor = 1 - attackProxy.GetAttachedAttributeByType(WeaponAttributeType.AttackInterval) / 100;
             if (runTimeComponent.BurstShootCount < config.BurstCount)
             {
                 runTimeComponent.NextAttackTimestamp = cmd.UserCmd.RenderTime + Mathf.CeilToInt(config.BurstAttackInnerInterval * intervalFactor);
@@ -32,7 +32,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 runTimeComponent.BurstShootCount = 0;
             }
 
-            if (heldBaseAgent.BaseComponent.Bullet == 0)
+            if (attackProxy.BasicComponent.Bullet == 0)
             {
                 runTimeComponent.BurstShootCount = 0;
                 runTimeComponent.NeedAutoBurstShoot = false;

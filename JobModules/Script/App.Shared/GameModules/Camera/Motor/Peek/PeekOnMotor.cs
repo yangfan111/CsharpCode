@@ -15,7 +15,7 @@ namespace App.Shared.GameModules.Camera.Motor.Peek
 
         private readonly bool _isRight;
 
-        public PeekOnMotor(bool isright, PeekCameraConfig config)
+        public PeekOnMotor(bool isright, PeekCameraConfig config, Motors m) : base(m)
         {
             _isRight = isright;
             _modeId = (short) (_isRight ? ECameraPeekMode.Right : ECameraPeekMode.Left);

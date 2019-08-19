@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Core.CharacterState.Action.States;
+using Core.CharacterState.Action.States.Melee;
 using Core.CharacterState.Action.States.Rage;
 using Core.Fsm;
 using Core.Utils;
@@ -136,6 +137,28 @@ namespace Core.CharacterState.Action
                     return false;
                 },
                 null, (int)ActionStateId.SpecialFire, null, 0, new[] { FsmInput.SpecialSightsFire });
+
+            #endregion
+            
+            #region CommonNull To SpecialFireEnd
+
+            state.AddTransition(
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.SpecialFireEnd))
+                    {
+                        FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.FireEndHash,
+                            AnimatorParametersHash.Instance.FireEndName,
+                            AnimatorParametersHash.Instance.FireEndEnableValue,
+                            CharacterView.FirstPerson | CharacterView.ThirdPerson, false);
+                        addOutput(FsmOutput.Cache);
+
+                        return true;
+                    }
+
+                    return false;
+                },
+                null, (int)ActionStateId.SpecialFireEnd, null, 0, new[] { FsmInput.SpecialFireEnd });
 
             #endregion
 
@@ -405,15 +428,43 @@ namespace Core.CharacterState.Action
                             CharacterView.FirstPerson | CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
                     }
-                    else if (command.IsMatch(FsmInput.LightMeleeAttackTwo))
+                    else
+                        return false;
+
+                    command.Handled = true;
+
+                    return true;
+                },
+                null, (int) ActionStateId.MeleeAttackOne,
+                (normalizedTime, addOutput) => { LerpOpenUpperBodyLayer(addOutput, normalizedTime); },
+                (int) SingletonManager.Get<CharacterStateConfigManager>().AttackTransitionTime,
+                new[] {FsmInput.LightMeleeAttackOne});
+            
+            state.AddTransition(
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.LightMeleeAttackTwo))
                     {
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MeleeStateHash,
                             AnimatorParametersHash.Instance.MeleeStateName,
                             AnimatorParametersHash.Instance.LightMeleeTwo,
                             CharacterView.FirstPerson | CharacterView.ThirdPerson);
                         addOutput(FsmOutput.Cache);
-                    }
-                    else if (command.IsMatch(FsmInput.MeleeSpecialAttack))
+                    }  else return false;
+
+                    command.Handled = true;
+
+                    return true;
+                },
+                null, (int) ActionStateId.MeleeAttackTwo,
+                (normalizedTime, addOutput) => { LerpOpenUpperBodyLayer(addOutput, normalizedTime); },
+                (int) SingletonManager.Get<CharacterStateConfigManager>().AttackTransitionTime,
+                new[] {FsmInput.LightMeleeAttackTwo});
+            
+            state.AddTransition(
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.MeleeSpecialAttack))
                     {
                         FsmOutput.Cache.SetValue(AnimatorParametersHash.Instance.MeleeStateHash,
                             AnimatorParametersHash.Instance.MeleeStateName,
@@ -423,14 +474,15 @@ namespace Core.CharacterState.Action
                     }
                     else
                         return false;
-                    
+
                     command.Handled = true;
-                    
-                    //TurnOnUpperBodyOverlay(addOutput);
-                    
+
                     return true;
                 },
-                null, (int) ActionStateId.MeleeAttack, (normalizedTime, addOutput) => { LerpOpenUpperBodyLayer(addOutput, normalizedTime); }, (int)SingletonManager.Get<CharacterStateConfigManager>().AttackTransitionTime, new[] { FsmInput.LightMeleeAttackOne, FsmInput.MeleeSpecialAttack, FsmInput.LightMeleeAttackTwo });
+                null, (int) ActionStateId.MeleeAttackSpecial,
+                (normalizedTime, addOutput) => { LerpOpenUpperBodyLayer(addOutput, normalizedTime); },
+                (int) SingletonManager.Get<CharacterStateConfigManager>().AttackTransitionTime,
+                new[] {FsmInput.MeleeSpecialAttack});
             
             #endregion
             
@@ -943,9 +995,19 @@ namespace Core.CharacterState.Action
             return new PropsState(ActionStateId.Props);
         }
         
-        public static ActionState CreateMeleeAttackState()
+        public static ActionState CreateMeleeAttackOneState()
         {
-            return new MeleeAttackState(ActionStateId.MeleeAttack);
+            return new MeleeAttackOneState(ActionStateId.MeleeAttackOne);
+        }
+        
+        public static ActionState CreateMeleeAttackTwoState()
+        {
+            return new MeleeAttackTwoState(ActionStateId.MeleeAttackTwo);
+        }
+        
+        public static ActionState CreateMeleeAttackSpecialState()
+        {
+            return new MeleeAttackSpecialState(ActionStateId.MeleeAttackSpecial);
         }
         
         public static ActionState CreateGrenadeState()

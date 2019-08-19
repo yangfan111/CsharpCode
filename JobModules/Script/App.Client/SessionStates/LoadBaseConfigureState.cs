@@ -8,7 +8,7 @@ using App.Shared.EntityFactory;
 using App.Shared.GameModules;
 using App.Shared.GameModules.Configuration;
 using Core;
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core.GameModule.Module;
 using Entitas;
 using Core.Prediction.VehiclePrediction.TimeSync;
@@ -40,6 +40,7 @@ namespace App.Client.SessionStates
                 _gameModule,
                 _contexts.session.commonSession
                 ));
+            systems.Add(new SettingInitSystem(this));
             return systems;
         }
 

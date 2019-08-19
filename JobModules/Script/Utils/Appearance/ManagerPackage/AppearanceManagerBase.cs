@@ -2,8 +2,10 @@ using System.Collections.Generic;
 using Core.Utils;
 using Shared.Scripts;
 using UnityEngine;
+using Utils.Appearance.Effects;
 using Utils.Appearance.PropItem;
 using Utils.Appearance.WardrobePackage;
+using Utils.Appearance.Weapon.WeaponShowPackage;
 using Utils.AssetManager;
 using Utils.CharacterState;
 using Utils.Configuration;
@@ -16,7 +18,8 @@ namespace Utils.Appearance.ManagerPackage
     {
         protected readonly LoggerAdapter Logger = new LoggerAdapter(typeof(AppearanceManagerBase));
 
-        protected WeaponControllerBase WeaponControllerBaseImpl;
+        protected NewWeaponControllerBase WeaponControllerBaseImpl;
+        protected WeaponDataAdapter WeaponDataBaseImpl;
         protected WardrobeControllerBase WardrobeControllerBaseImpl;
         protected PropControllerBase PropControllerBaseImpl;
         protected ReplaceMaterialShaderBase ReplaceMaterialShaderBaseImpl;
@@ -26,7 +29,6 @@ namespace Utils.Appearance.ManagerPackage
         private GameObject _rootGo;
 
         private CharacterView _view = CharacterView.ThirdPerson;
-        private static readonly string EffectsName = "Effects";
 
         private readonly List<UnityObject> _recycleRequestBatch = new List<UnityObject>();
         private readonly List<AbstractLoadRequest> _loadRequestBatch = new List<AbstractLoadRequest>();
@@ -78,20 +80,7 @@ namespace Utils.Appearance.ManagerPackage
         public void SetRootGo(GameObject obj)
         {
             _rootGo = obj;
-            AddEffectsObject(obj);
             Logger.InfoFormat("CharacterLog-- SetRootGo : {0}", obj.name);
-        }
-        
-        private void AddEffectsObject(GameObject root)
-        {
-            if (root.transform.Find(EffectsName) == null)
-            {
-                var thirdModelOffset = new GameObject(EffectsName);
-                thirdModelOffset.transform.SetParent(root.transform);
-                thirdModelOffset.transform.localPosition = new Vector3(0, 0, 0);
-                thirdModelOffset.transform.localRotation = Quaternion.identity;
-                thirdModelOffset.transform.localScale = Vector3.one;
-            }
         }
         
         public void SetAnimatorP1(Animator animator)
@@ -180,7 +169,6 @@ namespace Utils.Appearance.ManagerPackage
         public virtual void PlayerDead()
         {
             UnmountWeaponFromHand();
-            SetThridPerson();
             Logger.InfoFormat("CharacterLog-- Player Dead");
         }
 
@@ -197,13 +185,35 @@ namespace Utils.Appearance.ManagerPackage
                 _characterP1.SetActive(value);
         }
 
+        public void SetVisibility(bool value)
+        {
+            if (null != _characterP3)
+            {
+                _characterP3.transform.localScale = value ? Vector3.one : 0.01f * Vector3.one;
+            }
+            if (null != _characterP1)
+            {
+                _characterP1.transform.localScale = value ? Vector3.one : 0.01f * Vector3.one;
+            }
+        }
+
         public virtual void Execute()
         {
-            WeaponControllerBaseImpl.Execute();
             WardrobeControllerBaseImpl.Execute();
             WardrobeControllerBaseImpl.TryRewind();
             PropControllerBaseImpl.Execute();
             PropControllerBaseImpl.TryRewind();
+        }
+
+        public virtual void Update()
+        {
+            WeaponControllerBaseImpl.Update();
+        }
+
+        public void Init()
+        {
+            WeaponDataBaseImpl.Init();
+            WeaponControllerBaseImpl.Init();
         }
 
         #region changeAvatar
@@ -215,7 +225,7 @@ namespace Utils.Appearance.ManagerPackage
 
         private void SetInitWeapon()
         {
-            WeaponControllerBaseImpl.ClearInitWeaponData();
+            //WeaponControllerBaseImpl.ClearInitWeaponData();
         }
 
         public virtual void UpdateAvatar()
@@ -231,6 +241,11 @@ namespace Utils.Appearance.ManagerPackage
         public void ClearAvatar(Wardrobe pos)
         {
             WardrobeControllerBaseImpl.Undress(pos);
+        }
+
+        public void SetForceLodLevel(int level)
+        {
+            WardrobeControllerBaseImpl.SetForceLodLevel(level);
         }
         #endregion
 
@@ -271,12 +286,14 @@ namespace Utils.Appearance.ManagerPackage
 
         public GameObject GetP3CurrentAttachmentByType(int type)
         {
-            return WeaponControllerBaseImpl.GetP3CurrentAttachmentByType(type);
+            return null;
+            //return WeaponControllerBaseImpl.GetP3CurrentAttachmentByType(type);
         }
 
         public int GetScopeIdInCurrentWeapon()
         {
-            return WeaponControllerBaseImpl.GetCurrentScopeId();
+            return -1;
+            //return WeaponControllerBaseImpl.GetCurrentScopeId();
         }
 
         public int GetWeaponIdInHand()
@@ -294,11 +311,11 @@ namespace Utils.Appearance.ManagerPackage
             return WeaponControllerBaseImpl.IsEmptyHand();
         }
 
-        public void MountWeaponInPackage(WeaponInPackage pos, int id)
+        public virtual void MountWeaponInPackage(WeaponInPackage pos, int id)
         {
             if ((int) pos < (int) WeaponInPackage.EndOfTheWorld)
             {
-                WeaponControllerBaseImpl.MountWeaponToPackage(pos, id);
+                WeaponDataBaseImpl.MountWeaponToPackage(pos, id);
             }
             else
             {
@@ -306,11 +323,11 @@ namespace Utils.Appearance.ManagerPackage
             }
         }
 
-        public void UnmountWeaponInPackage(WeaponInPackage pos)
+        public virtual void UnmountWeaponInPackage(WeaponInPackage pos)
         {
             if ((int) pos < (int) WeaponInPackage.EndOfTheWorld)
             {
-                WeaponControllerBaseImpl.UnmountWeaponInPackage(pos);
+                WeaponDataBaseImpl.UnmountWeaponInPackage(pos);
             }
             else
             {
@@ -318,11 +335,11 @@ namespace Utils.Appearance.ManagerPackage
             }
         }
 
-        public void MountWeaponToHand(WeaponInPackage pos)
+        public virtual void MountWeaponToHand(WeaponInPackage pos)
         {
             if ((int) pos < (int) WeaponInPackage.EndOfTheWorld)
             {
-                WeaponControllerBaseImpl.MountWeaponToHand(pos);
+                WeaponDataBaseImpl.MountWeaponToHand(pos);
             }
             else
             {
@@ -330,82 +347,82 @@ namespace Utils.Appearance.ManagerPackage
             }
         }
 
-        public void UnmountWeaponFromHand()
+        public virtual void UnmountWeaponFromHand()
         {
-            WeaponControllerBaseImpl.UnmountWeaponFromHand();
+            WeaponDataBaseImpl.UnmountWeaponFromHand();
         }
         
         public void JustUnMountWeaponFromHand()
         {
-            WeaponControllerBaseImpl.JustUnMountWeaponFromHand();
+            WeaponDataBaseImpl.JustUnMountWeaponFromHand();
         }
 
         public void JustClearOverrideController()
         {
-            WeaponControllerBaseImpl.JustClearOverrideController();
+            WeaponDataBaseImpl.JustClearOverrideController();
         }
 
         public void UnmountWeaponFromHandAtOnce()        //仅人物死亡时使用
         {
-            WeaponControllerBaseImpl.UnmountWeaponFromHandAtOnce();
+            WeaponDataBaseImpl.UnmountWeaponFromHandAtOnce();
         }
 
-        public void MountAttachment(WeaponInPackage pos, WeaponPartLocation location, int id)
+        public virtual void MountAttachment(WeaponInPackage pos, WeaponPartLocation location, int id)
         {
             if ((int) pos <= (int) WeaponInPackage.EndOfTheWorld &&
                 (int) location <= (int) WeaponPartLocation.EndOfTheWorld)
             {
-                WeaponControllerBaseImpl.MountAttachment(pos, location, id);
+                WeaponDataBaseImpl.MountAttachment(pos, location, id);
             }
         }
 
-        public void UnmountAttachment(WeaponInPackage pos, WeaponPartLocation location)
+        public virtual void UnmountAttachment(WeaponInPackage pos, WeaponPartLocation location)
         {
             if ((int) pos <= (int) WeaponInPackage.EndOfTheWorld &&
                 (int) location <= (int) WeaponPartLocation.EndOfTheWorld)
             {
-                WeaponControllerBaseImpl.UnmountAttachment(pos, location);
+                WeaponDataBaseImpl.UnmountAttachment(pos, location);
             }
         }
 
         public void MountWeaponOnAlternativeLocator()
         {
-            WeaponControllerBaseImpl.MountWeaponOnAlternativeLocator();
+            //WeaponControllerBaseImpl.MountWeaponOnAlternativeLocator();
         }
 
         public void RemountWeaponOnRightHand()
         {
-            WeaponControllerBaseImpl.RemountWeaponOnRightHand();
+            //WeaponControllerBaseImpl.RemountWeaponOnRightHand();
         }
 
         public void MountP3WeaponOnAlternativeLocator()
         {
-            WeaponControllerBaseImpl.MountP3WeaponOnAlternativeLocator();
+            //WeaponControllerBaseImpl.MountP3WeaponOnAlternativeLocator();
         }
 
         public void RemountP3WeaponOnRightHand()
         {
-            WeaponControllerBaseImpl.RemountP3WeaponOnRightHand();
+            //WeaponControllerBaseImpl.RemountP3WeaponOnRightHand();
         }
 
         public void StartReload()
         {
-            WeaponControllerBaseImpl.StartReload();
+            //WeaponControllerBaseImpl.StartReload();
         }
 
         public void DropMagazine()
         {
-            WeaponControllerBaseImpl.DropMagazine();
+            //WeaponControllerBaseImpl.DropMagazine();
         }
 
         public void AddMagazine()
         {
-            WeaponControllerBaseImpl.AddMagazine();
+            //WeaponControllerBaseImpl.AddMagazine();
         }
 
         public void EndReload()
         {
-            WeaponControllerBaseImpl.EndReload();
+            //WeaponControllerBaseImpl.EndReload();
         }
 
         #endregion

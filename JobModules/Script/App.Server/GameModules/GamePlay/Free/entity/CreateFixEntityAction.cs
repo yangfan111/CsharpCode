@@ -11,6 +11,7 @@ using gameplay.gamerule.free.ui;
 using UnityEngine;
 using com.wd.free.map.position;
 using com.wd.free.unit;
+using Core.EntityComponent;
 using Core.Free;
 
 namespace App.Server.GameModules.GamePlay.Free.entity

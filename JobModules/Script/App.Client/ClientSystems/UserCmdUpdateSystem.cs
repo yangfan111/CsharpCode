@@ -1,6 +1,7 @@
 using App.Shared;
 using App.Shared.Components;
 using App.Shared.Components.Player;
+using Common;
 using Core.Network;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Prediction.VehiclePrediction.Cmd;
@@ -14,7 +15,7 @@ namespace App.Client.ClientSystems
 
     public class UserCmdUpdateSystem : AbstractStepExecuteSystem
     {
-        private static LoggerAdapter _logger = new LoggerAdapter(typeof(UserCmdSendSystem));
+        private static LoggerAdapter _logger = new LoggerAdapter(typeof(UserCmdUpdateSystem));
         private IUserCmdGenerator _generator;
         private IVehicleCmdGenerator _vehicleCmdGenerator;
 
@@ -70,7 +71,7 @@ namespace App.Client.ClientSystems
             {
                 channel.SendRealTime((int) EClient2ServerMessage.UpdateMsg, pacakge);
             }
-
+            _logger.DebugFormat("SendUserCmd:seq:{0} msg:{1} last;{2}", MyGameTime.seq, pacakge.Head.UserCmdSeq,  player.userCmd.Latest.Seq);
             pacakge.ReleaseReference();
         }
     }

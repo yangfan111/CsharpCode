@@ -18,7 +18,7 @@ namespace App.Shared.GameModules.Weapon
     {
         private GrenadeCacheHandler _bagCacheHandler;
 
-        public GrenadeWeaponAgent(Func<EntityKey> in_holdExtractor, Func<EntityKey>    in_emptyExtractor,
+        public GrenadeWeaponAgent(Func<EWeaponSlotType, EntityKey> in_holdExtractor, Func<EntityKey>    in_emptyExtractor,
                                   EWeaponSlotType slot,             GrenadeCacheHandler grenadeHandler) :
             base(in_holdExtractor, in_emptyExtractor, slot, grenadeHandler)
         {

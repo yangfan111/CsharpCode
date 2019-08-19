@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using App.Shared;
+using App.Shared.Audio;
 using App.Shared.Configuration;
 using Assets.App.Client.GameModules.Ui;
 using Core.SessionState;
@@ -44,11 +45,13 @@ namespace App.Client.SessionStates
         {
             _contexts = contexts as Contexts;
 
-            UiCommon.InitUI(UiRootName);
+            UiCommon.InitUI(UiRootName, _contexts.session.commonSession.CoRoutineManager as MonoBehaviour);
 
             _assetManager = _contexts.session.commonSession.AssetManager;
 
             _assetManager.LoadAssetAsync(GetType().ToString(), new AssetInfo(LoadingUiBundleName, LoadingUiAssetName), OnLoadSucc);
+
+           
         }
 
         protected override void OnProgressUpdated(float progressRate, string tip)
@@ -57,6 +60,12 @@ namespace App.Client.SessionStates
             if (progressRate > 1 &&  _loadingUi != null)
             {
                 _loadingUi.SetActive(false);
+                var audioMgr = AkSoundEngineController.AudioMgrGetter;
+                if (audioMgr != null)
+                {
+                    audioMgr.HallGoBattle();
+                    //GameAudioMedia.Prepare();
+                }
             }
             else
             {
@@ -73,10 +82,37 @@ namespace App.Client.SessionStates
             }
             else
             {
+               
                 ShowTips();
+                ExtentFontTextureSize();
             }
         }
 
+        void ExtentFontTextureSize()
+        {
+            if (flag == false)
+            {
+                //TESTCODE
+                
+                GameObject obj = GameObject.Find("ClientUIRoot");
+                if (obj != null)
+                {
+                    Transform tr = obj.transform.Find("CommonLoading/root/text");
+                    if (tr != null)
+                    {
+                        Text text = tr.GetComponent<Text>();
+                        if (text != null && _loadingTipTxt.text != null)
+                        {
+                            text.font.RequestCharactersInTexture(_loadingTipTxt.text, 300);
+                            flag = true;
+                        }
+                    }
+                }
+            }
+
+        }
+
+        bool flag = false;
         private void ShowTips()
         {
             if (_tips.Count == 0) return;

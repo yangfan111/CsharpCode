@@ -29,5 +29,8 @@ namespace App.Client.GameModules.Ui.UiAdapter
         bool IsInHurtedState { get; } //是否在受伤状态
         int CurrentHpInHurtedState { get; }
         ParticleSystem MyParticle { get; }  //掉血特效
+
+        int ArmorLevel { get; }
+        int HelmetLevel { get; }
     }
 }

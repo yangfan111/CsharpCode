@@ -18,7 +18,7 @@ namespace App.Client.GameModules.GamePlay.Free.App
         {
             return key == FreeMessageConstant.GroupScoreUI || key == FreeMessageConstant.GroupTechStatUI
                 || key == FreeMessageConstant.GroupGameOverUI || key == FreeMessageConstant.PlayerTipHide ||
-                key == FreeMessageConstant.CommonPlayerInfoUI;
+                key == FreeMessageConstant.CommonPlayerInfoUI || key == FreeMessageConstant.DeadUiSwitch;
         }
 
         public void Handle(SimpleProto data)
@@ -107,6 +107,11 @@ namespace App.Client.GameModules.GamePlay.Free.App
                     contexts.player.flagSelfEntity.gamePlay.TipHideStatus = data.Bs[0];
                 }
             }
+
+            if (data.Key == FreeMessageConstant.DeadUiSwitch)
+            {
+                contexts.ui.uISession.UiState[UiNameConstant.CommonDeadModel] = data.Bs[0];
+            }
         }
 
         private IGroupBattleData ToBattleData(long selfId, SimpleProto msg)
@@ -125,6 +130,10 @@ namespace App.Client.GameModules.GamePlay.Free.App
             data.C4PlantCount = msg.Ins[8];
             data.C4DefuseCount = msg.Ins[9];
             data.HaveC4 = msg.Bs[1];
+            data.BadgeId = msg.Ins[10];
+            data.IsHurt = msg.Bs[2];
+            data.HitDownCount = msg.Ins[11];
+            data.ResqueCount = msg.Ins[12];
 
             return data;
         }

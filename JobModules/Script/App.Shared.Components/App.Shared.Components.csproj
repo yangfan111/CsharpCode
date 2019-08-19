@@ -66,8 +66,8 @@
     <Compile Include="Components\EComponentIds.cs" />
     <Compile Include="Components\Effect\EffectsComponent.cs" />
     <Compile Include="Components\FreeMove\AirPlaneComponent.cs" />
+    <Compile Include="Components\FreeMove\BombSoundComponent.cs" />
     <Compile Include="Components\FreeMove\FreeDataComponent.cs" />
-    <Compile Include="Components\FreeMove\FreeMoveCatComponent.cs" />
     <Compile Include="Components\FreeMove\FreeMoveController.cs" />
     <Compile Include="Components\FreeMove\FreeMoveKeyComponent.cs" />
     <Compile Include="Components\FreeMove\UnityGameObjectComponent.cs" />
@@ -155,6 +155,7 @@
     <Compile Include="Components\Serializer\FieldSerializer\Vector2Serializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\Vector3Serializer.cs" />
     <Compile Include="Components\Serializer\FieldSerializer\WeaponBagSerializer.cs" />
+    <Compile Include="Components\Serializer\PatchPropertySerializer.cs" />
     <Compile Include="Components\Session\FpsSatatus.cs" />
     <Compile Include="Components\Session\ServerStatus.cs" />
     <Compile Include="Components\Session\SessionComponents.cs" />
@@ -266,6 +267,7 @@
     <Compile Include="Generated\Entitas\Generated\ClientEffect\Components\ClientEffectPositionComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\ClientEffect\Components\ClientEffectPositionFilterComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\ClientEffect\Components\ClientEffectSprayPaintComponent.cs" />
+    <Compile Include="Generated\Entitas\Generated\Components\Interfaces\IBombSound.cs" />
     <Compile Include="Generated\Entitas\Generated\Components\Interfaces\IEffects.cs" />
     <Compile Include="Generated\Entitas\Generated\Components\Interfaces\IEntityAdapter.cs" />
     <Compile Include="Generated\Entitas\Generated\Components\Interfaces\IEntityKey.cs" />
@@ -292,6 +294,7 @@
     <Compile Include="Generated\Entitas\Generated\Dummy\DummyMatcher.cs" />
     <Compile Include="Generated\Entitas\Generated\Feature.cs" />
     <Compile Include="Generated\Entitas\Generated\FreeMove\Components\FreeMoveAirPlaneComponent.cs" />
+    <Compile Include="Generated\Entitas\Generated\FreeMove\Components\FreeMoveBombSoundComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\FreeMove\Components\FreeMoveEntityAdapterComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\FreeMove\Components\FreeMoveEntityKeyComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\FreeMove\Components\FreeMoveFlagDestroyComponent.cs" />
@@ -476,6 +479,7 @@
     <Compile Include="Generated\Entitas\Generated\SceneObject\Components\SceneObjectArmorDurabilityComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\SceneObject\Components\SceneObjectAudioComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\SceneObject\Components\SceneObjectAudioTestEmitterComponent.cs" />
+    <Compile Include="Generated\Entitas\Generated\SceneObject\Components\SceneObjectBombSoundComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\SceneObject\Components\SceneObjectCastFlagComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\SceneObject\Components\SceneObjectEffectsComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\SceneObject\Components\SceneObjectEntityAdapterComponent.cs" />
@@ -630,7 +634,6 @@
     <Compile Include="Generated\Entitas\Generated\Weapon\Components\WeaponFlagSyncSelfComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Weapon\Components\WeaponOwnerIdComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Weapon\Components\WeaponWeaponBasicDataComponent.cs" />
-    <Compile Include="Generated\Entitas\Generated\Weapon\Components\WeaponWeaponClientUpdateComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Weapon\Components\WeaponWeaponRuntimeDataComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Weapon\Components\WeaponWeaponScanComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Weapon\WeaponAttribute.cs" />
@@ -733,6 +736,7 @@
     <Compile Include="Generated\Serializer\GlobalFlagComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\GrenadeCacheDataComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\GrenadeCacheDataComponentSerializer.cs" />
+    <Compile Include="Generated\Serializer\GrenadeCacheDataSerializer.cs" />
     <Compile Include="Generated\Serializer\HitBoxComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\LatestAdjustCmdComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\LatestAdjustCmdComponentSerializer.cs" />
@@ -747,6 +751,8 @@
     <Compile Include="Generated\Serializer\NetworkAnimatiorServerTimeObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\NetworkAnimatorComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\NetworkAnimatorComponentSerializer.cs" />
+    <Compile Include="Generated\Serializer\NetworkAnimatorLayerSerializer.cs" />
+    <Compile Include="Generated\Serializer\NetworkAnimatorParameterSerializer.cs" />
     <Compile Include="Generated\Serializer\NetworkWeaponAnimationComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\NetworkWeaponAnimationComponentSerializer.cs" />
     <Compile Include="Generated\Serializer\NormalComponentObjcetFactory.cs" />
@@ -759,6 +765,7 @@
     <Compile Include="Generated\Serializer\OwnerIdComponentSerializer.cs" />
     <Compile Include="Generated\Serializer\OxygenEnergyComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\OxygenEnergyComponentSerializer.cs" />
+    <Compile Include="Generated\Serializer\PatchSerializerRegister.cs" />
     <Compile Include="Generated\Serializer\PingStatisticsComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\PingStatisticsComponentSerializer.cs" />
     <Compile Include="Generated\Serializer\PlayerAudioComponentObjcetFactory.cs" />
@@ -867,8 +874,6 @@
     <Compile Include="Generated\Serializer\VehicleSeatComponentSerializer.cs" />
     <Compile Include="Generated\Serializer\WeaponBasicDataComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\WeaponBasicDataComponentSerializer.cs" />
-    <Compile Include="Generated\Serializer\WeaponClientUpdateComponentObjcetFactory.cs" />
-    <Compile Include="Generated\Serializer\WeaponClientUpdateComponentSerializer.cs" />
     <Compile Include="Generated\Serializer\WeaponObjectComponentObjcetFactory.cs" />
     <Compile Include="Generated\Serializer\WeaponObjectComponentSerializer.cs" />
     <Compile Include="Generated\Serializer\WeaponRuntimeDataComponentObjcetFactory.cs" />

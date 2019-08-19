@@ -7,8 +7,8 @@ using UnityEngine.EventSystems;
 using App.Shared.Components.Player;
 using App.Client.Utility;
 using App.Client.GameModules.Ui.UiAdapter;
-using App.Shared;
 using App.Shared.GameModules.Player;
+using Assets.App.Client.GameModules.Ui;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {
@@ -47,7 +47,10 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void RefreshGui()
         {
-           
+            if (_viewModel.rootActiveSelf)
+            {
+                menuUiAdapter.SetCrossVisible(false);
+            }
         }
 
         private void BindEventTrigger()
@@ -60,11 +63,10 @@ namespace App.Client.GameModules.Ui.Models.Common
         public void InitKeyBinding()
         {
             var receiver = new KeyReceiver(UiConstant.menuWindowLayer, BlockType.None);
-            receiver.AddAction(UserInputKey.OpenMenu, (data) =>
+            receiver.BindKeyAction(UserInputKey.OpenMenu, (data) =>
             {
                 ShowMenu(true);
             });
-            //menuUiAdapter.RegisterKeyReceive(receiver);
             menuUiAdapter.RegisterOpenKey(receiver);
             DynamicKeyBinding();
         }
@@ -74,10 +76,22 @@ namespace App.Client.GameModules.Ui.Models.Common
             //保证 菜单界面打开的时候 打不开大地图界面
             pointerReceiver = new PointerReceiver(UiConstant.menuWindowPointBlockLayer, BlockType.All);
             keyReceive = new KeyReceiver(UiConstant.menuWindowKeyBlockLayer, BlockType.All);
-            keyReceive.AddAction(UserInputKey.OpenMenu, (data) =>
+            keyReceive.BindKeyAction(UserInputKey.OpenMenu, (data) =>
             {
                 ShowMenu(false);
             });
+        }
+
+        void RegisterReceive()
+        {
+            menuUiAdapter.RegisterKeyReceive(keyReceive);
+            menuUiAdapter.RegisterPointerReceive(pointerReceiver);
+        }
+
+        void UnRegisterReceive()
+        {
+            menuUiAdapter.UnRegisterKeyReceive(keyReceive);
+            menuUiAdapter.UnRegisterPointerReceive(pointerReceiver);
         }
 
         public void ShowMenu(bool visible)
@@ -87,16 +101,19 @@ namespace App.Client.GameModules.Ui.Models.Common
                 PlayerStateUtil.AddUIState(EPlayerUIState.ExitOpen, menuUiAdapter.gamePlay);
                 menuUiAdapter.SetCrossVisible(false);
                 _viewModel.rootActiveSelf = true;
-                menuUiAdapter.RegisterKeyReceive(keyReceive);
-                menuUiAdapter.RegisterPointerReceive(pointerReceiver);
+                RegisterReceive();
             }
             else
             {
+                if (showNotice)
+                {
+                    UiCommon.AlertManager.ClearQueueAndClose();
+                    showNotice = false;
+                }
                 PlayerStateUtil.RemoveUIState(EPlayerUIState.ExitOpen, menuUiAdapter.gamePlay);
                 menuUiAdapter.SetCrossVisible(true);
                 _viewModel.rootActiveSelf = false;
-                menuUiAdapter.UnRegisterKeyReceive(keyReceive);
-                menuUiAdapter.UnRegisterPointerReceive(pointerReceiver);
+                UnRegisterReceive();
             }
             if(menuUiAdapter.Enable != visible)
             menuUiAdapter.Enable = visible;
@@ -110,8 +127,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         void OnSettingETClick(BaseEventData data)
         {
             _viewModel.rootActiveSelf = false;
-            menuUiAdapter.UnRegisterKeyReceive(keyReceive);
-            menuUiAdapter.UnRegisterPointerReceive(pointerReceiver);
+            UnRegisterReceive();
 
             Action<bool> hideCallback = (active) =>
             {
@@ -132,11 +148,8 @@ namespace App.Client.GameModules.Ui.Models.Common
         {    
             if (menuUiAdapter != null)
             {
-
                 _viewModel.rootActiveSelf = false;
-                menuUiAdapter.UnRegisterKeyReceive(keyReceive);
-                menuUiAdapter.UnRegisterPointerReceive(pointerReceiver);
-
+                //UnRegisterReceive();
 
                 string title = "";
                 bool isOverGame = menuUiAdapter.PlayStaue == (int)EPlayerLifeState.Dead || menuUiAdapter.WarVictory;
@@ -147,23 +160,21 @@ namespace App.Client.GameModules.Ui.Models.Common
                         I2.Loc.ScriptLocalization.client_common.word14;
 
                 string yesText = I2.Loc.ScriptLocalization.client_common.word15;
-                Action yesCB = ()=>
-                {
-                    HallUtility.GameOver();
-                };
+                Action yesCB = HallUtility.GameOver;
                 Action noCB = () =>
                 {
-                    _viewModel.rootActiveSelf = true;
-                    menuUiAdapter.RegisterKeyReceive(keyReceive);
-                    menuUiAdapter.RegisterPointerReceive(pointerReceiver);
-                    menuUiAdapter.SetCrossVisible(false);
+                    showNotice = false;
+                    ShowMenu(false);
                 };
 
                 string noText = I2.Loc.ScriptLocalization.client_common.word16;
                 
                 menuUiAdapter.ShowNoticeWindow(title, yesCB, noCB, yesText, noText);
+                showNotice = true;
             }
         }
+
+        private bool showNotice = false;
 
         protected override void OnCanvasEnabledUpdate(bool enable)
         {

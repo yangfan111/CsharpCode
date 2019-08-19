@@ -60,24 +60,18 @@ namespace App.Client.GameModules.Ui
                 return;
             }
 
+            if (parent == null) parent = _uiLoaderRoot;
             _assetManager.LoadAssetAsync("UiResourceLoader", assetInfo, (source, unityObj)=>
             {
-                try
+                if (callback != null)
                 {
-                    if (callback != null)
-                    {
-                        callback(unityObj);
-                    }
-                    else
-                    {
-                        AddToGameObjectPool(unityObj);
-                    }
+                    callback(unityObj);
                 }
-                catch (Exception e)
+                else
                 {
-                    Logger.ErrorFormat("ui resource loaded failed: {0} {1}", e, assetInfo);
+                    AddToGameObjectPool(unityObj);
                 }
-            }, new AssetLoadOption(parent:_uiLoaderRoot,  recyclable:true , objectType: objectType));
+            }, new AssetLoadOption(parent: parent,  recyclable:true , objectType: objectType));
         }
 
         public void AddToGameObjectPool(Object obj)
@@ -146,7 +140,27 @@ namespace App.Client.GameModules.Ui
 
         public void Load(GameObject prefab, string bundle, string name, Action<UnityEngine.Object> callback, GameObject parent = null)
         {
-            throw new NotImplementedException();
+            AssetInfo assetInfo = new AssetInfo(bundle, name);
+            if (parent == null) parent = _uiLoaderRoot;
+            
+            UnityObject unityObj;
+            unityObj = (_assetManager as UnityAssetManager).ObjectPool.GetOrNull(assetInfo);
+            if (unityObj == null)
+            {
+                GameObject go = GameObject.Instantiate(prefab, parent.transform, false);
+                unityObj = new UnityObject(go, assetInfo);
+                unityObj.AddUnityObjectReference();
+            }
+
+                if (callback != null)
+                {
+                    callback(unityObj);
+                }
+                else
+                {
+                    AddToGameObjectPool(unityObj);
+                }
+         
         }
     }
 }

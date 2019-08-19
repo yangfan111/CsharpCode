@@ -1,5 +1,6 @@
 ﻿using Core.GameModule.Module;
 using App.Client.ClientGameModules.Throwing;
+using App.Shared.GameModules.Weapon;
 
 namespace App.Client.GameModules.Throwing
 {

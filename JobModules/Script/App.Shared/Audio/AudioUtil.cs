@@ -27,7 +27,7 @@ namespace App.Shared
                 if (result != AKRESULT.AK_Success && result != AKRESULT.AK_BankAlreadyLoaded)
                 {
                     //   DebugUtil.MyLog(s + string.Format(" {0} ", result), DebugUtil.DebugColor.Grey);
-                    Logger.Info(string.Format("[Audio Result Exception]{0}  {1}", s, result));
+                    Logger.Info(string.Format("[Wise]  Result Exception {0}  {1}", s, result));
                 }
                 else
                 {
@@ -120,8 +120,8 @@ namespace App.Shared
 
         public static EAudioUniqueId ToUseItemAudioUniqueId(int itemId)
         {
-            var gameItemConfig = SingletonManager.Get<GameItemConfigManager>().GetConfigById(itemId);
-            EAudioUniqueId audioUniqueId =EAudioUniqueId.None ;
+            var            gameItemConfig = SingletonManager.Get<GameItemConfigManager>().GetConfigById(itemId);
+            EAudioUniqueId audioUniqueId  = EAudioUniqueId.None;
             switch ((EItemAudioType) gameItemConfig.Type)
             {
                 case EItemAudioType.Bandage:
@@ -150,6 +150,7 @@ namespace App.Shared
 
             return audioUniqueId;
         }
+
         public static EAudioUniqueId ToAudioUniqueId(ECategory itemCategory, int itemId)
         {
             EAudioUniqueId audioUniqueId = EAudioUniqueId.None;
@@ -264,33 +265,67 @@ namespace App.Shared
         {
             if (playingId == AkSoundEngine.AK_INVALID_PLAYING_ID && AkSoundEngine.IsInitialized())
             {
-                if (GlobalConst.EnableAudioLog)
-                    DebugUtil.MyLog("Audio Post event failed:{0}", atomEvtName);
-                Logger.ErrorFormat("Audio Post event failed:{0}", atomEvtName);
+                DebugUtil.MyLog("[Wise]  Post event failed:{0}", atomEvtName);
+                Logger.ErrorFormat("[Wise] io Post event failed:{0}", atomEvtName);
             }
-            else if (GlobalConst.EnableAudioLog)
+            else if (GMVariable.AudioPostEventLog)
             {
-                DebugUtil.MyLog("Audio Post event {0} sucess", atomEvtName);
+
+                Logger.InfoFormat("[Wise]  Post event {0} sucess", atomEvtName);
+                DebugUtil.MyLog("[Wise]  Post event {0} sucess", atomEvtName);
             }
         }
 
-        public static bool VerifyAKResult(AKRESULT akresult, object contexts)
+        public static bool VerifyAKResult(AKRESULT akresult, string logText, params object[] args)
         {
             var result = akresult.Sucess();
             if (!result)
             {
-                Logger.ErrorFormat("Audio process {1} failed:{0}", akresult, contexts);
-                if (GlobalConst.EnableAudioLog)
-                {
-                    DebugUtil.MyLog("Audio process {1} failed:{0}", akresult, contexts);
-                }
+                string s1 = string.Format(logText, args);
+                Logger.ErrorFormat("[Wise] process {1} failed:{0}", akresult, s1);
+                DebugUtil.MyLog("[Wise] process {1} failed:{0}", akresult, s1);
             }
-            else if (GlobalConst.EnableAudioLog)
+            else if (GMVariable.AudioPostEventLog)
             {
-                DebugUtil.MyLog("Audio process {0} sucess", contexts);
+                string s2 = string.Format(logText, args);
+                Logger.InfoFormat("[Wise] process {0} sucess", s2);
+                DebugUtil.MyLog("[Wise] process {0} sucess", s2);
             }
 
             return result;
         }
-    }
+
+        public static uint GetConvertedId(this AudioEventItem audioEventItem)
+        {
+            
+            if (audioEventItem.ConvertedId == AkSoundEngine.AK_INVALID_UNIQUE_ID)
+            {
+                audioEventItem.ConvertedId = AkSoundEngine.GetIDFromString(audioEventItem.Event);
+            }
+
+            return audioEventItem.ConvertedId;
+        }
+        public static uint GetConvertedGroupId(this AudioGroupItem audioGroup)
+        {
+            
+            if (audioGroup.ConvertedGroupId== AkSoundEngine.AK_INVALID_UNIQUE_ID)
+            {
+                audioGroup.ConvertedGroupId = AkSoundEngine.GetIDFromString(audioGroup.Group);
+            }
+
+            return audioGroup.ConvertedGroupId;
+        }
+        public static uint GetConvertedGroupStateId(this AudioGroupItem audioGroup,int index)
+        {
+            
+            if(audioGroup.ConvertedStateIds == null)
+                audioGroup.ConvertedStateIds = new uint[audioGroup.StateArr.Length];
+            if (audioGroup.ConvertedStateIds [index]== AkSoundEngine.AK_INVALID_UNIQUE_ID)
+            {
+                audioGroup.ConvertedStateIds [index]= AkSoundEngine.GetIDFromString(audioGroup.StateArr[index]);
+            }
+
+            return audioGroup.ConvertedStateIds [index];
+        } 
+}
 }

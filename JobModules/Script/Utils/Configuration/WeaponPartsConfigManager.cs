@@ -186,7 +186,7 @@ namespace Utils.Configuration
             GetPartAchiveAttachedAttributeByType(achive.Brake, attributeType, ref attachedVal);
             return attachedVal;
         }
-
+       
         public const float AttributeInvalidConst = -999f;
 
         private void GetPartAchiveAttachedAttributeByType(int partId, WeaponAttributeType attributeType,

@@ -1,42 +1,37 @@
-﻿using Core.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace App.Shared.GameModules.Weapon.Behavior
 {
     /// <summary>
-    /// Defines the <see cref="ContinueFireCounter" />
+    ///     Defines the <see cref="ContinueFireCounter" />
     /// </summary>
     public class ContinueFireCounter : IFireProcessCounter
     {
-       
-        public void OnIdle(WeaponBaseAgent heldAgent, WeaponSideCmd cmd)
+        public void OnBeforeFire(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
-            if (heldAgent.RifleFireCounterCfg == null) return;
-            if (heldAgent.RunTimeComponent.ContinuesShootCount < 1)
+            if (attackProxy.WeaponConfigAssy.S_RifleFireCounterCfg == null)
                 return;
-            if (heldAgent.RunTimeComponent.ContinuesShootReduceTimestamp < cmd.UserCmd.RenderTime )
-            {
-                
-      //          DebugUtil.MyLog("Count -- ||DecreaseStepInterval:"+heldAgent.RifleFireCounterCfg.DecreaseStepInterval+"||"+heldAgent.RifleFireCounterCfg.DecreaseStepInterval);
-                heldAgent.RunTimeComponent.ContinuesShootReduceTimestamp = cmd.UserCmd.RenderTime + 
-                                                                           heldAgent.RifleFireCounterCfg.DecreaseStepInterval;
-                --heldAgent.RunTimeComponent.ContinuesShootCount;
-            }
-
-        }
-
-        public void OnBeforeFire(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
-        {
-            if (weaponBaseAgent.RifleFireCounterCfg == null)
-                return;
-            
-            var runTimeComponent = weaponBaseAgent.RunTimeComponent;
-         // runTimeComponent.NeedReduceContinuesShootCD = true;
+            var runTimeComponent = attackProxy.RuntimeComponent;
+            // runTimeComponent.NeedReduceContinuesShootCD = true;
             runTimeComponent.ContinuesShootCount = Mathf.Min(++runTimeComponent.ContinuesShootCount,
-                weaponBaseAgent.RifleFireCounterCfg.MaxCount);
-            runTimeComponent.ContinuesShootReduceTimestamp = cmd.UserCmd.RenderTime + weaponBaseAgent.RifleFireCounterCfg.DecreaseInitInterval;
+                attackProxy.WeaponConfigAssy.S_RifleFireCounterCfg.MaxCount);
+            runTimeComponent.ContinuesShootReduceTimestamp =
+                            cmd.UserCmd.RenderTime + attackProxy.WeaponConfigAssy.S_RifleFireCounterCfg.DecreaseInitInterval;
         }
 
-    
+        public void OnIdle(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
+        {
+            if (attackProxy.WeaponConfigAssy.S_RifleFireCounterCfg == null) return;
+
+            if (attackProxy.RuntimeComponent.ContinuesShootCount < 1)
+                return;
+            if (attackProxy.RuntimeComponent.ContinuesShootReduceTimestamp < cmd.UserCmd.RenderTime)
+            {
+                //          DebugUtil.MyLog("Count -- ||DecreaseStepInterval:"+heldAgent.RifleFireCounterCfg.DecreaseStepInterval+"||"+heldAgent.RifleFireCounterCfg.DecreaseStepInterval);
+                attackProxy.RuntimeComponent.ContinuesShootReduceTimestamp = cmd.UserCmd.RenderTime +
+                                attackProxy.WeaponConfigAssy.S_RifleFireCounterCfg.DecreaseStepInterval;
+                --attackProxy.RuntimeComponent.ContinuesShootCount;
+            }
+        }
     }
 }

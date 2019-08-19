@@ -22,23 +22,12 @@ namespace App.Client.GameModules.Ui.Models.Common
         private static int pixelPreGirl = ruleWidth / 360 * angelPreGirl;
         private static float rulerImageOffSet = 0.166f;
 
-        private RawImage rulerRawImage;
-        private RawImage scaleRulerRawImage;
-        private RawImage rulerMaskRawIamge;
         private Rect rulerRawImageRect;
-        private Rect scaleRulerRawImageRect;
-        private Rect rulerMaskRawIamgeRect;
-        private Text angelText;
 
         private Dictionary<float, MarkItem> markList;
 
-        private Transform root;
-        private Transform markRoot;
-        private RectTransform markRootRect;
       
         private Dictionary<float, string> locationConfig = new Dictionary<float, string>();
-        //标记 相关变量
-        Transform markModel = null;
 
         private float lastAngel = -190;
 
@@ -58,7 +47,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             base.OnGameobjectInitialized();
             isGameObjectCreated = true;
             PreparedLocationConfig();
-            DynamicCreateGameObject();
+            InitView();
         }
 
        public override void Update(float interval)
@@ -81,16 +70,10 @@ namespace App.Client.GameModules.Ui.Models.Common
             locationConfig.Add(315, I2.Loc.ScriptLocalization.client_common.word12);
             locationConfig.Add(360, I2.Loc.ScriptLocalization.client_common.word5);
         }
-        private void DynamicCreateGameObject()
+        private void InitView()
         {
-            rulerRawImage = FindChildGo("RulerRawImage").GetComponent<RawImage>();
-            rulerRawImageRect = rulerRawImage.uvRect;
-            root = FindChildGo("Show");
-            markModel = FindChildGo("mark");
-            markRoot = FindChildGo("markRoot");
-            angelText = FindChildGo("AngelText").GetComponent<Text>();
-            markRootRect = markRoot.GetComponent<RectTransform>();
-            markModel.gameObject.SetActive(false);
+            rulerRawImageRect = _viewModel.RulerRawImage.uvRect;
+            _viewModel.Mark.SetActive(false);
         }
        
         private void UpdateLocationGroup()
@@ -108,7 +91,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             lastAngel = curPlayerFaceDirection;
 
             rulerRawImageRect.x = 1 - (curPlayerFaceDirection + 180) / 360 + rulerImageOffSet;
-            rulerRawImage.uvRect = rulerRawImageRect;
+            _viewModel.RulerRawImage.uvRect = rulerRawImageRect;
 
             var angel = curPlayerFaceDirection < 0 ? -curPlayerFaceDirection : 360 - curPlayerFaceDirection;
             UpdateAngelText(angel);
@@ -128,7 +111,8 @@ namespace App.Client.GameModules.Ui.Models.Common
             {
                 showText = showTextAngel.ToString();
             }
-            if (showText.Equals(angelText.text) == false) angelText.text = showText;
+
+            _viewModel.AngelTextUITextText = showText;
         }
 
         private void UpdateMarkList(float angel)
@@ -189,7 +173,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
             if (item == null)
             {
-                var itemObj = GameObject.Instantiate(markModel, markRoot);
+                var itemObj = GameObject.Instantiate(_viewModel.Mark.transform, _viewModel.markRoot.transform);
                 var img = itemObj.GetComponent<Image>();
                 var rtf = itemObj.GetComponent<RectTransform>();
                 item =  new MarkItem() { MarkTf = itemObj, MarkRtf = rtf, Img = img };

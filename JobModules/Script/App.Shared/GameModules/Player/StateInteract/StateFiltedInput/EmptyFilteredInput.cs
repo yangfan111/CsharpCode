@@ -1,16 +1,15 @@
 ﻿using Core;
-using System;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Player
 {
     public class EmptyFilteredInput : IFilteredInput
     {
-        public  void BlockInput(EPlayerInput input)
+        public void BlockInput(EPlayerInput input)
         {
         }
 
-        public  bool IsInput(EPlayerInput input)
+        public bool IsInput(EPlayerInput input)
         {
             return false;
         }
@@ -24,8 +23,9 @@ namespace App.Shared.GameModules.Player
         {
         }
 
-        public  void SetInput(EPlayerInput input, bool val)
+        public void SetInput(EPlayerInput input, bool val)
         {
+            
         }
     }
 }

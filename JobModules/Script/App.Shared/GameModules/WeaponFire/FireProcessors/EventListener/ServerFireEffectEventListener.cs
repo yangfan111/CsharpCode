@@ -1,6 +1,7 @@
 ﻿using App.Shared.Components;
 using App.Shared.Player.Events;
 using Core;
+using Core.CharacterBone;
 using Core.EntityComponent;
 using Core.Event;
 using Utils.CharacterState;
@@ -18,15 +19,15 @@ namespace App.Shared.GameModules.Weapon
         {
         }
 
-        protected override void CreateFireRelatedEffect(PlayerWeaponController controller)
+        protected override void CreateFireRelatedEffect(WeaponAttackProxy attackProxy, ICharacterBone bones)
         {
-            if (null == controller || DefaultCfg.Spark < 1)
+            if (DefaultCfg.Spark < 1)
                 return;
-            var muzzleTrans = controller.RelatedBones.GetLocation(SpecialLocation.MuzzleEffectPosition,
-            controller.RelatedAppearence.IsFirstPerson ? CharacterView.FirstPerson : CharacterView.ThirdPerson);
-            var ejectTrans = controller.RelatedBones.GetLocation(SpecialLocation.EjectionLocation,
-            controller.RelatedAppearence.IsFirstPerson ? CharacterView.FirstPerson : CharacterView.ThirdPerson);
-            bool hasMuzzleEfc  = null != muzzleTrans && DefaultCfg.Spark > 0;
+            var muzzleTrans = bones.GetLocation(SpecialLocation.MuzzleEffectPosition,
+            attackProxy.Appearence.IsFirstPerson ? CharacterView.FirstPerson : CharacterView.ThirdPerson);
+            var ejectTrans = bones.GetLocation(SpecialLocation.EjectionLocation, 
+                attackProxy.Appearence.IsFirstPerson ? CharacterView.FirstPerson : CharacterView.ThirdPerson);
+            bool hasMuzzleEfc  = null != muzzleTrans && DefaultCfg.Spark > 0 && attackProxy.Owner.HeldWeaponAgent.HasSpark;
             bool hasBulletDrop = null != ejectTrans && DefaultCfg.BulletDrop > 0;
             if (!hasMuzzleEfc && !hasBulletDrop)
                 return;
@@ -37,12 +38,12 @@ namespace App.Shared.GameModules.Weapon
                 fireEffectType = FireEvent.FireEffectType.MuzzleOnly;
 
             FireEvent e = (FireEvent) EventInfos.Instance.Allocate(EEventType.Fire, false);
-            e.owner = controller.Owner ;
+            e.owner = attackProxy.Owner.Owner;
             e.fireEffectType = fireEffectType;
-            e.pitch          = controller.RelatedOrientation.Pitch;
-            e.yaw            = controller.RelatedOrientation.Yaw;
-            e.weaponId       = controller.HeldConfigId;
-            controller.RelatedLocalEvents.AddEvent(e);
+            e.pitch          = attackProxy.Orientation.Pitch;
+            e.yaw            = attackProxy.Orientation.Yaw;
+            e.weaponId       = attackProxy.WeaponConfigAssy.S_Id;
+            attackProxy.Owner.RelatedLocalEvents.AddEvent(e);
         }
     }
 }

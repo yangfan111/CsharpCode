@@ -2,8 +2,9 @@
 {
     public interface IRealTimeConnector
     {
-        void RealTimeConnect(int connId);
-        int UdpPort { get; set; }
+        void RealTimeConnect(int udpPort, int connId);
+        int UdpPort { get;}
         bool isRealTimeConnected { get; }
+        int RemoteConnId { get; }
     }
 }

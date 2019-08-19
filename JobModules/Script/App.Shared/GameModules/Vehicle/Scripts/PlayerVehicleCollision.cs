@@ -1,6 +1,7 @@
 ﻿using System;
 using App.Shared.Components.Player;
 using App.Shared.GameModules.Common;
+using Common;
 using Core.Utils;
 using UnityEngine;
 
@@ -34,7 +35,7 @@ namespace App.Shared.GameModules.Vehicle
                 {
                     SetCollisionState(vehicle, EVehicleCollisionState.Enter);
 
-                    var collisionTime = Time.time;
+                    var collisionTime = MyGameTime.time;
                     if (collisionTime - _lastCollisionTime > 0.34f)
                     {
                         var damage = CalcPlayerCollisionDamage(vehicle);

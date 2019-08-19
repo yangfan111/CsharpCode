@@ -12,6 +12,7 @@ namespace App.Shared.Player
         private static LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerEntityAnimationEx));
         public static void StopAnimation(this PlayerEntity playerEntity)
         {
+            Logger.Info("[Tmp]Interrupt");
             playerEntity.stateInterface.State.InterruptAction();
             if(playerEntity.hasAnimationExData)
             {

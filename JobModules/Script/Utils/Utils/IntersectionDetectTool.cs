@@ -9,6 +9,8 @@ namespace Utils.Utils
         public static Collider[] _internalColliders = new Collider[16];
         public static RaycastHit[] _internalCharacterHits = new RaycastHit[16];
         public static List<Collider> _colliderList = new List<Collider>(128);
+        
+        public static List<bool> ColliderEnableState = new List<bool>(128);
         /// <summary>
         /// Raycasts to detect collision hits
         /// </summary>
@@ -67,9 +69,8 @@ namespace Utils.Utils
             _colliderList.Clear();
         }
         
-        public static List<bool> SetColliderDisable(GameObject gameObject)
+        public static void SetColliderDisable(GameObject gameObject, List<bool> ret)
         {
-            List<bool> ret = new List<bool>();
             _colliderList.Clear();
             gameObject.GetComponentsInChildren<Collider>(_colliderList);
             foreach (var v in _colliderList)
@@ -78,7 +79,6 @@ namespace Utils.Utils
                 v.enabled = false;
             }
             _colliderList.Clear();
-            return ret;
         }
         
         public static void RestoreCollider(GameObject gameObject, List<bool> restoreValue)
@@ -91,6 +91,7 @@ namespace Utils.Utils
                 _colliderList[i].enabled = restoreValue[i];
             }
             _colliderList.Clear();
+            restoreValue.Clear();
         }
     }
 }

@@ -5,7 +5,7 @@ using Object = UnityEngine.Object;
 
 namespace AssetBundleManager.Operation
 {
-    class SceneLoading : AssetLoading
+   public class SceneLoading : AssetLoading
     {
         private bool _isAdditive;
         private SynchronizationMode _mode;
@@ -24,6 +24,19 @@ namespace AssetBundleManager.Operation
         public override bool IsLoadFailed
         {
             get { return _asyncLoadRequest == null; }
+        }
+
+        public AsyncOperation AsyncLoadRequest
+        {
+            get
+            {
+                return _asyncLoadRequest;
+            }
+
+            set
+            {
+                _asyncLoadRequest = value;
+            }
         }
 
         public override void SetAssetBundle(LoadedAssetBundle assetBundle)

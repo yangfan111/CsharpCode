@@ -1,4 +1,6 @@
-﻿using Assets.App.Client.GameModules.Ui.UiAdapter.Interface;
+﻿using System.Collections.Generic;
+using App.Shared.Components.Ui;
+using Assets.App.Client.GameModules.Ui.UiAdapter.Interface;
 using Core.Enums;
 
 namespace App.Client.GameModules.Ui.UiAdapter
@@ -6,19 +8,27 @@ namespace App.Client.GameModules.Ui.UiAdapter
     public interface IGroupScoreUiAdapter : IAbstractUiAdapter
     {
         /// <summary>
-        /// 完成每局游戏所需要的时间(毫秒)
+        /// 完成每回合游戏所需要的时间(毫秒)
         /// </summary>
         int GameTime { get; set; }
         /// <summary>
-        /// 胜利所需的击杀数(限时模式则返回0）
-        /// </summary>
-        int KillCountForWin { get; }
-        /// <summary>
-        /// 阵营对应的击杀数
+        /// 阵营对应的玩家总人数，死亡人数
         /// </summary>
         /// <param name="campType"></param>
         /// <returns></returns>
-        int GetKillCountByCampType(EUICampType campType);
+        IPlayerCountData GetDataByCampType(EUICampType campType);
+        List<IGroupBattleData> GetBattleDataListByCampType(EUICampType type);
+
+        /// <summary>
+        /// 获胜所需的分数
+        /// </summary>
+        int ScoreForWin { get; }
+        /// <summary>
+        /// 每个阵营的分数
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        int GetScoreByCamp(EUICampType type);
         bool NeedPause { get; }
 
     }

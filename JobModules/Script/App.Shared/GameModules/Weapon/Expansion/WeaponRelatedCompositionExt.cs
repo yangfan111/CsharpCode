@@ -9,6 +9,7 @@ using Core;
 using Core.Appearance;
 using Core.CharacterState;
 using Core.EntityComponent;
+using Core.Utils;
 using Shared.Scripts;
 using UnityEngine;
 using Utils.Appearance;
@@ -52,11 +53,12 @@ namespace App.Shared
             return throwingActionData.IsReady && !throwingActionData.IsThrow;
         }
 
-        public static void SetThrow(this ThrowingActionData throwingActionData)
+        public static void SetThrow(this ThrowingActionData throwingActionData, Vector3 handPos)
         {
             throwingActionData.IsThrow         = true;
             throwingActionData.IsThrowing      = true;
             throwingActionData.ShowCountdownUI = false;
+            throwingActionData.throwBackupPos = handPos;
         }
         public static bool CanReady(this ThrowingActionData throwingActionData)
         {
@@ -149,11 +151,12 @@ namespace App.Shared
         public static void CharacterUnmount(this ICharacterState State, Action holsterStart, Action holsterEnd,
                                             float unarmParam)
         {
+            _loggerAdapter .Info("[Tmp]Interrupt");
             State.InterruptAction();
             State.ForceFinishGrenadeThrow();
             State.Holster(holsterStart, holsterEnd, unarmParam);
         }
-
+        private static LoggerAdapter _loggerAdapter = new LoggerAdapter("controller");
         public static GameObject WeaponHandObject(this ICharacterAppearance Appearance)
         {
             return Appearance.GetWeaponP1InHand();

@@ -1,16 +1,12 @@
-﻿using com.wd.free.action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Assets.App.Server.GameModules.GamePlay.Free;
+using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.map.position;
 using com.wd.free.unit;
-using UnityEngine;
-using Free.framework;
 using Core.Free;
-using Assets.App.Server.GameModules.GamePlay.Free;
-using com.wd.free.para;
+using Free.framework;
+using System;
+using UnityEngine;
 
 namespace App.Shared.FreeFramework.framework.ai.move
 {
@@ -28,11 +24,11 @@ namespace App.Shared.FreeFramework.framework.ai.move
                 player = "current";
             }
 
-            if (DateTime.Now.Ticks - startTime < 10000 * 200)
+            if (args.Rule.ServerTime - startTime <200)
             {
                 return;
             }
-            startTime = DateTime.Now.Ticks;
+            startTime = args.Rule.ServerTime;
 
             PlayerEntity entity = GetPlayerEntity(args);
             if (entity != null)

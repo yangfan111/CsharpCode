@@ -81,7 +81,7 @@ namespace App.Client.GameModules.SceneObject
             if (mapObject == null)
             {
                 var rawObj = chunk.FracturedObjectSource.gameObject;
-                MapObjectUtility.StoreCreateMapObjMsg(MapObjectUtility.GetGameObjType(rawObj),
+                MapObjectUtility.SendCreateMapObjMsg(MapObjectUtility.GetGameObjType(rawObj),
                     MapObjectUtility.GetGameObjId(rawObj));
                 var evt = ChunkSyncEvent.Allocate();
                 evt.EType = TriggerObjectSyncEventType.BreakChunk;

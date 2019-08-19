@@ -38,12 +38,23 @@ namespace VNet.Base.LiteNet
 
         public void Send(byte[] bytes, int length, int offset)
         {
-            if (!_connected)
+            if (!_connected )
             {
                 Logger.ErrorFormat("LietNet is not connected ! {0}",ConnectId);
                 return;
             }
-            _peer.Send(bytes, offset, length, DeliveryMethod.Unreliable); 
+
+            if (bytes.Length < length + 4)
+            {
+                Logger.ErrorFormat("LietNet is bytes Length not enough! {0}",bytes.Length);
+                return;
+            }
+            var crc32 = Utils.Utils.Crc32.Compute(bytes, offset, length);
+            bytes[length+0]=((byte)(crc32>>0));
+            bytes[length+1]=((byte)(crc32>>8));
+            bytes[length+2]=((byte)(crc32>>16));
+            bytes[length+3]=((byte)(crc32>>24));
+            _peer.Send(bytes, offset, length+4, DeliveryMethod.Unreliable); 
         }
 
         public void OnDisconnect()

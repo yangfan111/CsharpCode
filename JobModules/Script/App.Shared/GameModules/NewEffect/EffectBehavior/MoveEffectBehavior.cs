@@ -1,8 +1,10 @@
 using System;
+using Common;
 using Core;
 using Core.ObjectPool;
 using Core.Utils;
 using UnityEngine;
+using XmlConfig;
 using Random = System.Random;
 
 namespace App.Shared
@@ -26,7 +28,7 @@ namespace App.Shared
             InitRocatioin  = initRocatioin;
             Velocity       = velocity;
             DelayDuration = delayDuration;
-            lastUpdateTime = Time.time;
+            lastUpdateTime = MyGameTime.time;
             NeedRecycle = false;
         }
 
@@ -35,11 +37,11 @@ namespace App.Shared
             this.effectGo = effectGo;
             emitter.nodeObject.transform.SetPositionAndRotation(CurrPosition,InitRocatioin);
             effectGo.SetActive(false);
-            ShowEffectTime = Time.time + DelayDuration;
+            ShowEffectTime = MyGameTime.time + DelayDuration;
         }
         public override void FrameUpdate(ClientEffectEmitter emitter)
         {
-            var nowTime = Time.time;;
+            var nowTime = MyGameTime.time;;
             var interval = nowTime - lastUpdateTime;
             if (effectGo && ShowEffectTime <= nowTime)
             {
@@ -52,9 +54,10 @@ namespace App.Shared
             CurrPosition.z = CurrPosition.z + Velocity.z * interval;
 
             emitter.nodeObject.transform.position = CurrPosition;
+            emitter.nodeObject.transform.rotation = Quaternion.LookRotation(Velocity);
         //   DebugUtil.MyLog("UpdatePos:{0},{1}",CurrPosition,interval.ToString("f3"));
             lastUpdateTime = nowTime;
-           
+         
         }
 
         protected override void Free(ClientEffectEmitter emitter)

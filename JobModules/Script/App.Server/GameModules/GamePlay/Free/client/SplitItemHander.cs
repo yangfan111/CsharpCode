@@ -3,6 +3,7 @@ using App.Server.GameModules.GamePlay.Free.chicken;
 using App.Server.GameModules.GamePlay.Free.item;
 using App.Server.GameModules.GamePlay.Free.item.config;
 using App.Shared;
+using Assets.App.Server.GameModules.GamePlay.Free;
 using Assets.Utils.Configuration;
 using Assets.XmlConfig;
 using com.wd.free.item;
@@ -67,6 +68,13 @@ namespace App.Server.GameModules.GamePlay.free.client
                 {
                     player.WeaponController().SetReservedBullet((EBulletCaliber) info.id, CarryClipUtil.GetClipCount(info.id, fd, room.FreeArgs));
                 }
+
+                SimpleProto sp = FreePool.Allocate();
+                sp.Key = FreeMessageConstant.PlaySound;
+                sp.Ks.Add(2);
+                sp.Ins.Add(5017);
+                sp.Bs.Add(false);
+                FreeMessageSender.SendMessage(fd.Player, sp);
             }
 
             room.FreeArgs.Resume(PARA_PLAYER_CURRENT);

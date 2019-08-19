@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using App.Protobuf;
 using App.Shared;
+using Common;
 using Core.Network;
 using Core.Room;
 using Core.Utils;
@@ -20,7 +21,7 @@ namespace App.Server
 
             public NetworkState(long playerId)
             {
-                _initTime = Time.time;
+                _initTime = MyGameTime.time;
                 PlayerId = playerId;
             }
 
@@ -164,7 +165,7 @@ namespace App.Server
         private List<INetworkChannel> _disconnectedChannel = new List<INetworkChannel>();
         private void SendHeartBeat()
         {
-            var time = Time.time;
+            var time = MyGameTime.time;
 
             if (time - _lastHeartBeatTime > MAX_HEARTBEAT_INTERVAL)
             {

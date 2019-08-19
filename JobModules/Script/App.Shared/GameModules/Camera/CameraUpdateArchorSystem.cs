@@ -21,6 +21,11 @@ namespace App.Shared.GameModules.Camera
         
         private float _transitionTime = 300;
 
+        private CursorLockMode _wantedMode;
+        private float _movementSpeed = 10f;
+        private Vector3 _freePosition;
+        private ECameraArchorType eCameraPositionArchorType;
+
         public CameraUpdateArchorSystem(Contexts _contexts):base(_contexts)
         {
             _playerContext = _contexts.player;
@@ -62,7 +67,58 @@ namespace App.Shared.GameModules.Camera
                 GetAnchorEulerAngle(player, player.cameraArchor.ArchorType);
             UpdareArchTransition(player);
         }
+        private void SetCursorState()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                Cursor.lockState = _wantedMode = CursorLockMode.None;
+            }
 
+            if (Input.GetMouseButtonDown(0))
+            {
+                _wantedMode = CursorLockMode.Locked;
+            }
+
+            // Apply cursor state
+            Cursor.lockState = _wantedMode;
+            // Hide cursor when locking
+            Cursor.visible = (CursorLockMode.Locked != _wantedMode);
+        }
+
+        protected Vector3 UpdateFreeTransition()
+        {
+            /*SetCursorState();*/
+
+            Vector3 deltaPosition = Vector3.zero;
+
+            Transform transform = UnityEngine.Camera.main.transform;
+
+            if (Input.GetKey(KeyCode.W))
+                deltaPosition += transform.forward;
+
+            if (Input.GetKey(KeyCode.S))
+                deltaPosition -= transform.forward;
+
+            if (Input.GetKey(KeyCode.A))
+                deltaPosition -= transform.right;
+
+            if (Input.GetKey(KeyCode.D))
+                deltaPosition += transform.right;
+
+            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            if (Mathf.Abs(scroll) > 0)
+            {
+                _movementSpeed += scroll * 7.5f;
+            }
+
+            if (_movementSpeed < 0)
+            {
+                _movementSpeed = 0;
+            }
+
+            _freePosition += deltaPosition * _movementSpeed * Time.deltaTime;
+            return _freePosition;
+        }
         private void UpdareArchTransition(PlayerEntity player)
         {
             if (player.cameraArchor.ArchorType != player.cameraArchor.LastArchorType && (
@@ -105,12 +161,16 @@ namespace App.Shared.GameModules.Camera
             {
                 return ECameraArchorType.AirPlane;
             }
-            else if(player.gamePlay.IsObserving())
+            else if (player.gamePlay.IsObserving())
             {
                 var follow = _playerContext.GetEntityWithEntityKey(
-                    new Core.EntityComponent.EntityKey(player.gamePlay.CameraEntityId, (short) EEntityType.Player));
+                    new Core.EntityComponent.EntityKey(player.gamePlay.CameraEntityId, (short)EEntityType.Player));
                 if (follow != null && follow.hasPosition)
                     return ECameraArchorType.FollowEntity;
+            }
+            else if (player.gamePlay.Witness)
+            {
+                return ECameraArchorType.Witness;
             }
             return ECameraArchorType.Third;
         }
@@ -151,13 +211,16 @@ namespace App.Shared.GameModules.Camera
             switch (type)
             {
                 case ECameraArchorType.Car:
+                    eCameraPositionArchorType = ECameraArchorType.Car;
                     var t = player.controlledVehicle.CameraCurrentPosition;
                     return new Vector3(t.x, t.y, t.z);
 
                 case ECameraArchorType.AirPlane:
+                    eCameraPositionArchorType = ECameraArchorType.AirPlane;
                     return player.GetAirPlane(_freeMoveContext).position.Value;
 
                 case ECameraArchorType.FollowEntity:
+                    eCameraPositionArchorType = ECameraArchorType.FollowEntity;
                     PlayerEntity follow = _playerContext.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(player.gamePlay.CameraEntityId, (short)EEntityType.Player));
                     if (follow != null)
                     {
@@ -169,9 +232,27 @@ namespace App.Shared.GameModules.Camera
                     }
 
                 case ECameraArchorType.Parachuting:
+                    eCameraPositionArchorType = ECameraArchorType.Parachuting;
                     return player.playerSkyMove.Position.ShiftedVector3();
+
+                case ECameraArchorType.Witness:
+                    if (ECameraArchorType.Witness != eCameraPositionArchorType)
+                    {
+                        PlayerEntity cameraEntity = _playerContext.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(player.gamePlay.CameraEntityId, (short)EEntityType.Player));
+                        if (cameraEntity != null)
+                        {
+                            _freePosition = cameraEntity.position.Value;
+                        }
+                        else
+                        {
+                            _freePosition = player.position.Value;
+                        }
+                    }
+                    eCameraPositionArchorType = ECameraArchorType.Witness;
+                    return /*Vector3.zero*/UpdateFreeTransition();
                 
                 default:
+                    eCameraPositionArchorType = ECameraArchorType.Default;
                     if (player.hasAppearanceInterface && player.appearanceInterface.Appearance.IsFirstPerson)
                     {
                         var camRoot = player.characterBoneInterface.CharacterBone.GetLocation(SpecialLocation

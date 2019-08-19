@@ -52,7 +52,7 @@ namespace App.Client.GameModules.GamePlay.Offline
 //            CreateVehicles(EVehicleType.Ship, idGenerator);
 
            
-            ((OfflineSnapshotSelector)_contexts.session.clientSessionObjects.SnapshotSelectorContainer.SnapshotSelector).Init();
+            ((OfflineSnapshotSelector)_contexts.session.clientSessionObjects.SnapshotSelctor).Init();
             PhysicsUtility.SetAutoSimulation(false);
             CreateSceneObject();
             

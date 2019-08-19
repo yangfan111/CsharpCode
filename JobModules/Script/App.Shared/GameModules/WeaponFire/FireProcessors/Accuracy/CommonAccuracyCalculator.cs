@@ -8,35 +8,35 @@ namespace App.Shared.GameModules.Weapon.Behavior
     public class CommonAccuracyCalculator : IAccuracyCalculator
     {
 
-        public void OnBeforeFire(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
+        public void OnBeforeFire(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
-            UpdateAccurcy(weaponBaseAgent);
+            UpdateAccurcy(attackProxy);
         }
-
  
-        public void OnIdle(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
+        public void OnIdle(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
             //静止状态accurcy会影响到准星扩散
-            UpdateAccurcy(weaponBaseAgent);
+            UpdateAccurcy(attackProxy);
 
         }
-        private void UpdateAccurcy(WeaponBaseAgent weaponBaseAgent)
+        private void UpdateAccurcy(WeaponAttackProxy attackProxy)
         {
-            var config = weaponBaseAgent.BaseAccuracyLogicCfg;
+            var config = attackProxy.WeaponConfigAssy.S_BaseAccuracyLogicCfg;
             if (config == null)
                 return;
-            var runTimeComponent = weaponBaseAgent.RunTimeComponent;
                 
             int accuracyDivisor = config.AccuracyDivisor; //除数因子
             if (accuracyDivisor != -1)
             {
-                runTimeComponent.Accuracy = AccuracyFormula.GetCommonAccuracy(config.MaxInaccuracy, runTimeComponent.ContinuesShootCount,
+                attackProxy.RuntimeComponent.Accuracy = AccuracyFormula.GetCommonAccuracy(config.MaxInaccuracy, attackProxy.RuntimeComponent.ContinuesShootCount,
                     config.AccuracyDivisor, config.AccuracyOffset);
             }
             else
             {
-                runTimeComponent.Accuracy = 0;
+                attackProxy.RuntimeComponent.Accuracy = 0;
             }
         }
+
+     
     }
 }

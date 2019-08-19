@@ -5,7 +5,9 @@ using App.Shared;
 using App.Shared.GameModules;
 using App.Shared.GameModules.Camera.Utils;
 using App.Shared.GameModules.Weapon;
+using App.Shared.Player;
 using Assets.App.Shared.GameModules.Camera;
+using com.wd.free.skill;
 using Core.Utils;
 using Shared.Scripts.Effect;
 using UnityEngine;
@@ -19,37 +21,79 @@ namespace Core.CameraControl.NewMotor.View
 {
     public class GunSightMotor:AbstractCameraMotor
     {
-        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(GunSightMotor));
-        
-        public GunSightMotor()
+        public GunSightMotor(Motors m):base(m)
         {
-            CameraActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.View, (int)ModeId, (player, state) =>
-            {
-                if (player.hasAppearanceInterface)
+            _motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.View, (int) ModeId,
+                (player, state) =>
                 {
+                    if (!player.hasAppearanceInterface) return;
                     if (!player.appearanceInterface.Appearance.IsFirstPerson)
                     {
                         player.appearanceInterface.Appearance.SetFirstPerson();
                         player.characterBoneInterface.CharacterBone.SetFirstPerson();
                         player.UpdateCameraArchorPostion();
                     }
+
+                });
+            
+            _motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.View, (int) ModeId,
+                (player, state) =>
+                {
+                    if (!player.hasAppearanceInterface) return;
+                    var playerUtils = EffectUtility.GetEffect(player.RootGo(), "PlayerUtils");
+                    if (playerUtils != null)
+                        playerUtils.SetParam("GunViewBegin", (object)player.RootGo().gameObject);
+                });
+
+            _motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.View, (int) ModeId,
+                (player, state) =>
+                {
+                    if (!player.hasAppearanceInterface) return;
                     var speed = player.WeaponController().HeldWeaponAgent.CmrFocusSpeed;
                     player.stateInterface.State.SetSight(speed);
-                    player.AudioController().PlaySimpleAudio(EAudioUniqueId.SightOpen, true);
                     Logger.InfoFormat("Enter sight!");
-                }
+                });
+            
+            _motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.View, (int) ModeId,
+                (player, state) =>
+                {
+                    if (!player.hasAppearanceInterface) return;
+                    player.AudioController().PlaySimpleAudio(EAudioUniqueId.SightOpen, true);
+                });
+            
+            _motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.View, (int) ModeId,
+                (player, state) =>
+                {
+                    if (!player.hasAppearanceInterface) return;
+                    OpenDepthOfField(player);
+                });
 
-                OpenDepthOfField(player);
-            });
-
-            CameraActionManager.AddAction(CameraActionType.Leave, SubCameraMotorType.View, (int)ModeId,
+            _motors.ActionManager.BindKeyAction(CameraActionType.Leave, SubCameraMotorType.View, (int)ModeId,
                 (player, state) =>
                 {
                     var speed = player.WeaponController().HeldWeaponAgent.CmrFocusSpeed;
                     player.stateInterface.State.CancelSight(speed);
-                    player.AudioController().PlaySimpleAudio(EAudioUniqueId.SightClose, true);
-                    CloseDepthOfField(player);
                     Logger.InfoFormat("Leave sight!");
+                });
+            
+            _motors.ActionManager.BindKeyAction(CameraActionType.Leave, SubCameraMotorType.View, (int) ModeId,
+                (player, state) =>
+                {
+                    var playerUtils = EffectUtility.GetEffect(player.RootGo(), "PlayerUtils");
+                    if (playerUtils != null)
+                        playerUtils.SetParam("GunViewEnd", (object)player.RootGo().gameObject);
+                });
+
+            _motors.ActionManager.BindKeyAction(CameraActionType.Leave, SubCameraMotorType.View, (int) ModeId,
+                (player, state) =>
+                {
+                    player.AudioController().PlaySimpleAudio(EAudioUniqueId.SightClose, true);
+                });
+
+            _motors.ActionManager.BindKeyAction(CameraActionType.Leave, SubCameraMotorType.View, (int) ModeId,
+                (player, state) =>
+                {
+                    CloseDepthOfField(player);
                 });
         }
 
@@ -76,7 +120,7 @@ namespace Core.CameraControl.NewMotor.View
                 {
                     needDefaultSet = true;
                 }
-            }
+            } 
             else needDefaultSet = true;
             
             if(needDefaultSet)
@@ -151,11 +195,10 @@ namespace Core.CameraControl.NewMotor.View
             if (state.IsFree()) return false;
             var config = input.GetPoseConfig(state.GetMainMotor().NowMode);
             if (!config.CanSwitchView) return false;
-
+            
             if (state.ViewMode == ECameraViewMode.GunSight &&
                 (input.FilteredCameraFocus || input.InterruptCameraFocus))
             {
-             //   DebugUtil.MyLog(input.FilteredCameraFocus +"_"+ input.InterruptCameraFocus);
                 if(input.InterruptCameraFocus)
                 {
                     if(Logger.IsDebugEnabled)

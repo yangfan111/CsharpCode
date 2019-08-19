@@ -29,14 +29,6 @@ namespace App.Shared.GameModules.Player.Animation
                 animator.GetBool(AnimatorParametersHash.Instance.FreeFallHash)
             );
         }
-        
-        public static string ToStringExt(this NetworkAnimatorLayer layer)
-        {
-            return string.Format(
-                "NetworkAnimatorLayer LayerIndex: {0}, Weight: {1}, CurrentStateHash: {2}, NormalizedTime: {3}, StateDuration: {4}, TransitionNormalizedTIme: {5}, TransitionDuration: {6}",
-                layer.LayerIndex, layer.Weight, AnimatorParametersHash.Instance.GetHashString(layer.CurrentStateHash), layer.NormalizedTime, layer.StateDuration, layer.TransitionNormalizedTime,
-                layer.TransitionDuration);
-        }
 
         public static string PrintAnimator(Animator animator, int layerIndex, int seq)
         {

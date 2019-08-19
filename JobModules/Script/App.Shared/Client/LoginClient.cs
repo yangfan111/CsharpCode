@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using Core.Network;
 using Core.Network.ENet;
 using Core.Utils;
@@ -9,17 +8,17 @@ using VNet;
 
 namespace App.Shared.Client
 {
-    public class LoginClient : IDisposable
+    public class LoginClient : ILoginClient
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(LoginClient));
         private INetworkChannel _networkChannel;
-        private IClientRoom _clientRoom;
+        private IClientNetwork _clientRoom;
         private INetworkClient _networkClient;
 
         public LoginClient(
             string serverIp,
             NetworkPortInfo networkPortInfo,
-            IClientRoom clientRoom)
+            IClientNetwork clientRoom)
         {
             this._clientRoom = clientRoom;
 

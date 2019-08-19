@@ -39,7 +39,7 @@ namespace App.Client.GameModules.Player
             AddSystem(new CameraFxInitSystem(contexts.player));
             AddSystem(new ClientCameraEffectSystem(contexts));
             AddSystem(new PlayerDebugDrawSystem(contexts));
-            AddSystem(new PlayerEquipPickAndDropSystem(contexts.session.clientSessionObjects.UserCmdGenerator));
+            AddSystem(new PlayerEquipPickAndDropSystem());
             AddSystem(new ClientCameraFinalRenderSystem(contexts));
             if (SingletonManager.Get<MapConfigManager>().SceneParameters is SceneConfig)
                 AddSystem(new PositionRelatedEffectUpdateSystem(contexts, SingletonManager.Get<DynamicScenesController>().GetPositionRelatedEffectUpdater()));
@@ -58,7 +58,6 @@ namespace App.Client.GameModules.Player
             #if UNITY_EDITOR
             AddSystem(new ClientPlayerDebugWeaponSystem(contexts));
             #endif
-            AddSystem(new ClientPlayerUpdateWeaponSystem(contexts));
             AddSystem(new PlayerEffectsSystem(contexts));
         }
     }

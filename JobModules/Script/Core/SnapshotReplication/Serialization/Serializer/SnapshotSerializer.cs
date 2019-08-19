@@ -25,7 +25,7 @@ namespace Core.SnapshotReplication.Serialization.Serializer
         {
             return _serializerManager;
         }
-        public void Serialize(ISnapshot baseSnap, ISnapshot snap, Stream stream)
+        public int Serialize(ISnapshot baseSnap, ISnapshot snap, Stream stream)
         {
 //            _binaryWriter = new MyBinaryWriter(stream);
             _binaryWriter = MyBinaryWriter.Allocate(stream);
@@ -34,13 +34,14 @@ namespace Core.SnapshotReplication.Serialization.Serializer
             var baseMap = baseSnap.EntityMap;
             var currentMap = snap.EntityMap;
             SnapshotPatchGenerator handler = new SnapshotPatchGenerator(_serializerManager);
-            EntityMapComparator.Diff(baseMap, currentMap, handler, "serialize");
+            EntityMapCompareExecutor.Diff(baseMap, currentMap, handler, "serialize",null);
             SnapshotPatch patch = handler.Detach();
             
             patch.BaseSnapshotSeq = baseSnap.SnapshotSeq;
             patch.Serialize(_binaryWriter, _serializerManager);
             _binaryWriter.ReleaseReference();
             patch.ReleaseReference();
+            return _binaryWriter.WriterLenght;
         }
 
         public SnapshotPatch DeSerialize(BinaryReader reader, out SnapshotHeader header)

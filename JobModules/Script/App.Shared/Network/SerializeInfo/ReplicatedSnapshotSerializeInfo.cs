@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core.Replicaton;
 using Core.SnapshotReplication;
 
@@ -15,10 +15,10 @@ namespace App.Shared.Network.SerializeInfo
 
         }
 
-        public override void DoSerialize(Stream outStream, Snapshot message)
+        public override int DoSerialize(Stream outStream, Snapshot message)
         {
 
-            _snapshotReplicator.Serialize(outStream, message);
+            return _snapshotReplicator.Serialize(outStream, message);
         }
 
         public override void Dispose()
@@ -48,7 +48,7 @@ namespace App.Shared.Network.SerializeInfo
                 {
                     var e = entity.SortedComponentList;
                     var h= entity.PlayBackComponentDictionary;
-                    var j= entity.SyncLatestComponentDictionary;
+                    var j= entity.SyncLatestComponentDict;
                 }
             }
             return copy;

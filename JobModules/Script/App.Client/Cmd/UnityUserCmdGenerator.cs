@@ -8,6 +8,7 @@ using App.Client.GameModules.Ui;
 using App.Shared.DebugHandle;
 using App.Shared.GameMode;
 using App.Client.GameMode;
+using Common;
 
 namespace Assets.Sources
 {
@@ -15,7 +16,7 @@ namespace Assets.Sources
     public class UnityUserCmdGenerator : IUserCmdGenerator
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(UnityUserCmdGenerator));
-        private int _seq;
+       
         private UserCmd _userCmd = UserCmd.Allocate();
         KeyReceiver _keyReceiver;
         KeyReceiver _specialKeyReceiver;
@@ -23,7 +24,7 @@ namespace Assets.Sources
         KeyReceiver _bioKeyReceiver;
         KeyReceiver _bioSpecialKeyReceiver;
         PointerReceiver _pointerReceiver;
-        IUserInputManager _userInputManager;
+        GameInputManager _userInputManager;
         List<IGlobalKeyInputMapper> _inputMapperList = new List<IGlobalKeyInputMapper>();
 
         private float[] yaws;
@@ -35,7 +36,6 @@ namespace Assets.Sources
         public UnityUserCmdGenerator()
         {
             Type = CmdGeneratorType.Hunam;
-            _seq = 0;
 
             this.yaws = new float[4];
             this.pitchs = new float[4];
@@ -47,80 +47,80 @@ namespace Assets.Sources
         }
 
         //这里所有的操作层级都设置为Env，如果有特殊遮挡需求请修改层级并修改这段注释
-        public void BeginReceiveUserInput(IUserInputManager manager)
+        public void BeginReceiveUserInput(GameInputManager manager)
         {
             _userInputManager = manager;
             #region Env keyreceiver
 
             // 有UI打开的情况下，不能开枪, 不能瞄准
-            _specialKeyReceiver = new KeyReceiver(UiConstant.specicalCmdKeyLayer, BlockType.None);
+            _specialKeyReceiver = new KeyReceiver(UiConstant.specicalCmdKeyLayer, BlockType.None,"specicalCmd");
             for(int i = 0; i < _inputMapperList.Count; i++)
             {
                 _inputMapperList[i].RegisterSpecialCmdKeyInput(_specialKeyReceiver, _userCmd);
             }
-            _specialKeyReceiver.AddAction(UserInputKey.Fire, (data) => _userCmd.IsLeftAttack = true);
-            _specialKeyReceiver.AddAction(UserInputKey.RightAttack, (data) => _userCmd.IsRightAttack = true);
-            _specialKeyReceiver.AddAction(UserInputKey.CameraFocus, (data) => _userCmd.IsCameraFocus = true);
+            _specialKeyReceiver.BindKeyAction(UserInputKey.Fire, (data) => _userCmd.IsLeftAttack = true);
+            _specialKeyReceiver.BindKeyAction(UserInputKey.RightAttack, (data) => _userCmd.IsRightAttack = true);
+            _specialKeyReceiver.BindKeyAction(UserInputKey.CameraFocus, (data) => _userCmd.IsCameraFocus = true);
             _userInputManager.RegisterKeyReceiver(_specialKeyReceiver);
 
-            _keyReceiver = new KeyReceiver(UiConstant.userCmdKeyLayer, BlockType.None);
+            _keyReceiver = new KeyReceiver(UiConstant.userCmdKeyLayer, BlockType.None,"userCmdLower");
             for(int i = 0; i < _inputMapperList.Count; i++)
             {
                 _inputMapperList[i].RegisterEnvKeyInput(_keyReceiver, _userCmd);
             }
-            _keyReceiver.AddAction(UserInputKey.SwitchFireMode, (data) => _userCmd.IsSwitchFireMode = true);
-            _keyReceiver.AddAction(UserInputKey.DrawWeapon, (data) => _userCmd.IsDrawWeapon = true);
-            _keyReceiver.AddAction(UserInputKey.Throwing, (data) => _userCmd.IsThrowing = true);
-            _keyReceiver.AddAction(UserInputKey.FirstPerson, (data) => _userCmd.ChangeCamera = true);
-            _keyReceiver.AddAction(UserInputKey.FreeCamera, (data) => _userCmd.IsCameraFree = true);
-            _keyReceiver.AddAction(UserInputKey.Jump, (data) => _userCmd.IsJump = true);
-            _keyReceiver.AddAction(UserInputKey.Crouch, (data) => _userCmd.IsCrouch = true);
-            _keyReceiver.AddAction(UserInputKey.Prone, (data) => _userCmd.IsProne = true);
-            //_keyReceiver.AddAction(UserInputKey.Injured, (data) => _userCmd.BeState = 2);
-            //_keyReceiver.AddAction(UserInputKey.Swim, (data) => _userCmd.BeState = 1);
-            _keyReceiver.AddAction(UserInputKey.Reload, (data) => _userCmd.IsReload = true);
-            _keyReceiver.AddAction(UserInputKey.PeekLeft, (data) => _userCmd.IsPeekLeft = true);
-            _keyReceiver.AddAction(UserInputKey.PeekRight, (data) => _userCmd.IsPeekRight = true);
-            _keyReceiver.AddAction(UserInputKey.SwitchWeapon, (data) => _userCmd.IsSwitchWeapon = true);
-            _keyReceiver.AddAction(UserInputKey.DropWeapon, (data) => _userCmd.IsDropWeapon = true);
-            _keyReceiver.AddAction(UserInputKey.Switch1, data => _userCmd.SwitchNumber = 1);
-            _keyReceiver.AddAction(UserInputKey.Switch7, data => _userCmd.SwitchNumber = 7);
-            _keyReceiver.AddAction(UserInputKey.IsPDown, data => _userCmd.IsPDown = true);
-            _keyReceiver.AddAction(UserInputKey.IsYDown, data => _userCmd.IsYDown = true);
-            _keyReceiver.AddAction(UserInputKey.AddMark, data => _userCmd.IsAddMark = true);
-            _keyReceiver.AddAction(UserInputKey.BreathHold, data => _userCmd.IsHoldBreath = true);
-            _keyReceiver.AddAction(UserInputKey.SwitchAutoRun, data => _userCmd.IsSwitchAutoRun = true);
-            _keyReceiver.AddAction(UserInputKey.IsCDown, data => _userCmd.IsCDown = true);
-            _keyReceiver.AddAction(UserInputKey.IsSpaceDown, data => _userCmd.IsSpaceDown = true);
-            _keyReceiver.AddAction(UserInputKey.HoldF, data => _userCmd.IsF = true);
-            _keyReceiver.AddAction(UserInputKey.SprayPaint, data => _userCmd.IsSprayPaint = true);
-            _keyReceiver.AddAction(UserInputKey.ScopeIn, data => _userCmd.IsScopeIn = true);
-            _keyReceiver.AddAction(UserInputKey.ScopeOut, data => _userCmd.IsScopeOut = true);
+            _keyReceiver.BindKeyAction(UserInputKey.SwitchFireMode, (data) => _userCmd.IsSwitchFireMode = true);
+            _keyReceiver.BindKeyAction(UserInputKey.DrawWeapon, (data) => _userCmd.IsDrawWeapon = true);
+            _keyReceiver.BindKeyAction(UserInputKey.Throwing, (data) => _userCmd.IsThrowing = true);
+            _keyReceiver.BindKeyAction(UserInputKey.FirstPerson, (data) => _userCmd.ChangeCamera = true);
+            _keyReceiver.BindKeyAction(UserInputKey.FreeCamera, (data) => _userCmd.IsCameraFree = true);
+            _keyReceiver.BindKeyAction(UserInputKey.Jump, (data) => _userCmd.IsJump = true);
+            _keyReceiver.BindKeyAction(UserInputKey.Crouch, (data) => _userCmd.IsCrouch = true);
+            _keyReceiver.BindKeyAction(UserInputKey.Prone, (data) => _userCmd.IsProne = true);
+            //_keyReceiver.BindKeyAction(UserInputKey.Injured, (data) => _userCmd.BeState = 2);
+            //_keyReceiver.BindKeyAction(UserInputKey.Swim, (data) => _userCmd.BeState = 1);
+            _keyReceiver.BindKeyAction(UserInputKey.Reload, (data) => _userCmd.IsReload = true);
+            _keyReceiver.BindKeyAction(UserInputKey.PeekLeft, (data) => _userCmd.IsPeekLeft = true);
+            _keyReceiver.BindKeyAction(UserInputKey.PeekRight, (data) => _userCmd.IsPeekRight = true);
+            _keyReceiver.BindKeyAction(UserInputKey.SwitchWeapon, (data) => _userCmd.IsSwitchWeapon = true);
+            _keyReceiver.BindKeyAction(UserInputKey.DropWeapon, (data) => _userCmd.IsDropWeapon = true);
+            _keyReceiver.BindKeyAction(UserInputKey.Switch1, data => _userCmd.SwitchNumber = 1);
+            _keyReceiver.BindKeyAction(UserInputKey.Switch7, data => _userCmd.SwitchNumber = 7);
+            _keyReceiver.BindKeyAction(UserInputKey.IsPDown, data => _userCmd.IsPDown = true);
+            _keyReceiver.BindKeyAction(UserInputKey.IsYDown, data => _userCmd.IsYDown = true);
+            _keyReceiver.BindKeyAction(UserInputKey.AddMark, data => _userCmd.IsAddMark = true);
+            _keyReceiver.BindKeyAction(UserInputKey.BreathHold, data => _userCmd.IsHoldBreath = true);
+            _keyReceiver.BindKeyAction(UserInputKey.SwitchAutoRun, data => _userCmd.IsSwitchAutoRun = true);
+            _keyReceiver.BindKeyAction(UserInputKey.IsCDown, data => _userCmd.IsCDown = true);
+            _keyReceiver.BindKeyAction(UserInputKey.IsSpaceDown, data => _userCmd.IsSpaceDown = true);
+            _keyReceiver.BindKeyAction(UserInputKey.HoldF, data => _userCmd.IsF = true);
+            _keyReceiver.BindKeyAction(UserInputKey.SprayPaint, data => _userCmd.IsSprayPaint = true);
+            _keyReceiver.BindKeyAction(UserInputKey.ScopeIn, data => _userCmd.IsScopeIn = true);
+            _keyReceiver.BindKeyAction(UserInputKey.ScopeOut, data => _userCmd.IsScopeOut = true);
             _userInputManager.RegisterKeyReceiver(_keyReceiver);
 
             #endregion
             _bioSpecialKeyReceiver = new KeyReceiver(UiConstant.specicalCmdKeyLayer, BlockType.None);
-            _bioSpecialKeyReceiver.AddAction(UserInputKey.Fire, (data) => _userCmd.IsLeftAttack = true);
-            _bioSpecialKeyReceiver.AddAction(UserInputKey.RightAttack, (data) => _userCmd.IsRightAttack = true);
-            _bioSpecialKeyReceiver.AddAction(UserInputKey.CameraFocus, (data) => _userCmd.IsCameraFocus = true);
+            _bioSpecialKeyReceiver.BindKeyAction(UserInputKey.Fire, (data) => _userCmd.IsLeftAttack = true);
+            _bioSpecialKeyReceiver.BindKeyAction(UserInputKey.RightAttack, (data) => _userCmd.IsRightAttack = true);
+            _bioSpecialKeyReceiver.BindKeyAction(UserInputKey.CameraFocus, (data) => _userCmd.IsCameraFocus = true);
 
             _bioKeyReceiver = new KeyReceiver(UiConstant.userCmdKeyLayer, BlockType.None);
-            _bioKeyReceiver.AddAction(UserInputKey.Throwing, (data) => _userCmd.IsThrowing = true);
-            _bioKeyReceiver.AddAction(UserInputKey.FreeCamera, (data) => _userCmd.IsCameraFree = true);
-            _bioKeyReceiver.AddAction(UserInputKey.Jump, (data) => _userCmd.IsJump = true);
-            _bioKeyReceiver.AddAction(UserInputKey.Crouch, (data) => _userCmd.IsCrouch = true);
-            _bioKeyReceiver.AddAction(UserInputKey.Prone, (data) => _userCmd.IsProne = true);
-            _bioKeyReceiver.AddAction(UserInputKey.IsPDown, data => _userCmd.IsPDown = true);
-            _bioKeyReceiver.AddAction(UserInputKey.IsYDown, data => _userCmd.IsYDown = true);
-            _bioKeyReceiver.AddAction(UserInputKey.AddMark, data => _userCmd.IsAddMark = true);
-            _bioKeyReceiver.AddAction(UserInputKey.BreathHold, data => _userCmd.IsHoldBreath = true);
-            _bioKeyReceiver.AddAction(UserInputKey.SwitchAutoRun, data => _userCmd.IsSwitchAutoRun = true);
-            _bioKeyReceiver.AddAction(UserInputKey.IsCDown, data => _userCmd.IsCDown = true);
-            _bioKeyReceiver.AddAction(UserInputKey.IsSpaceDown, data => _userCmd.IsSpaceDown = true);
-            _bioKeyReceiver.AddAction(UserInputKey.HoldF, data => _userCmd.IsF = true);
-            _bioKeyReceiver.AddAction(UserInputKey.SprayPaint, data => _userCmd.IsSprayPaint = true);
-            _bioKeyReceiver.AddAction(UserInputKey.ScopeIn, data => _userCmd.IsScopeIn = true);
-            _bioKeyReceiver.AddAction(UserInputKey.ScopeOut, data => _userCmd.IsScopeOut = true);
+            _bioKeyReceiver.BindKeyAction(UserInputKey.Throwing, (data) => _userCmd.IsThrowing = true);
+            _bioKeyReceiver.BindKeyAction(UserInputKey.FreeCamera, (data) => _userCmd.IsCameraFree = true);
+            _bioKeyReceiver.BindKeyAction(UserInputKey.Jump, (data) => _userCmd.IsJump = true);
+            _bioKeyReceiver.BindKeyAction(UserInputKey.Crouch, (data) => _userCmd.IsCrouch = true);
+            _bioKeyReceiver.BindKeyAction(UserInputKey.Prone, (data) => _userCmd.IsProne = true);
+            _bioKeyReceiver.BindKeyAction(UserInputKey.IsPDown, data => _userCmd.IsPDown = true);
+            _bioKeyReceiver.BindKeyAction(UserInputKey.IsYDown, data => _userCmd.IsYDown = true);
+            _bioKeyReceiver.BindKeyAction(UserInputKey.AddMark, data => _userCmd.IsAddMark = true);
+            _bioKeyReceiver.BindKeyAction(UserInputKey.BreathHold, data => _userCmd.IsHoldBreath = true);
+            _bioKeyReceiver.BindKeyAction(UserInputKey.SwitchAutoRun, data => _userCmd.IsSwitchAutoRun = true);
+            _bioKeyReceiver.BindKeyAction(UserInputKey.IsCDown, data => _userCmd.IsCDown = true);
+            _bioKeyReceiver.BindKeyAction(UserInputKey.IsSpaceDown, data => _userCmd.IsSpaceDown = true);
+            _bioKeyReceiver.BindKeyAction(UserInputKey.HoldF, data => _userCmd.IsF = true);
+            _bioKeyReceiver.BindKeyAction(UserInputKey.SprayPaint, data => _userCmd.IsSprayPaint = true);
+            _bioKeyReceiver.BindKeyAction(UserInputKey.ScopeIn, data => _userCmd.IsScopeIn = true);
+            _bioKeyReceiver.BindKeyAction(UserInputKey.ScopeOut, data => _userCmd.IsScopeOut = true);
             #region bioMain
 
 
@@ -128,13 +128,13 @@ namespace Assets.Sources
 
             #region Ui Keyreciever
 
-            _uiKeyReceiver = new KeyReceiver(UiConstant.userCmdUIKeyLayer, BlockType.None);
-            _uiKeyReceiver.AddAction(UserInputKey.MoveHorizontal, (data) => _userCmd.MoveHorizontal = data.Axis);
-            _uiKeyReceiver.AddAction(UserInputKey.MoveVertical, (data) => _userCmd.MoveVertical = data.Axis);
-            _uiKeyReceiver.AddAction(UserInputKey.MoveUpDown, (data) => _userCmd.MoveUpDown = data.Axis);
-            _uiKeyReceiver.AddAction(UserInputKey.Run, (data) => _userCmd.IsRun = true);
-            _uiKeyReceiver.AddAction(UserInputKey.IsTabDown, data => _userCmd.IsTabDown = true);
-            _uiKeyReceiver.AddAction(UserInputKey.SlightWalk, data => _userCmd.IsSlightWalk = true);
+            _uiKeyReceiver = new KeyReceiver(UiConstant.userCmdUIKeyLayer, BlockType.None,"UserCmdAUpper");
+            _uiKeyReceiver.BindKeyAction(UserInputKey.MoveHorizontal, (data) => _userCmd.MoveHorizontal = data.Axis);
+            _uiKeyReceiver.BindKeyAction(UserInputKey.MoveVertical, (data) => _userCmd.MoveVertical = data.Axis);
+            _uiKeyReceiver.BindKeyAction(UserInputKey.MoveUpDown, (data) => _userCmd.MoveUpDown = data.Axis);
+            _uiKeyReceiver.BindKeyAction(UserInputKey.Run, (data) => _userCmd.IsRun = true);
+            _uiKeyReceiver.BindKeyAction(UserInputKey.IsTabDown, data => _userCmd.IsTabDown = true);
+            _uiKeyReceiver.BindKeyAction(UserInputKey.SlightWalk, data => _userCmd.IsSlightWalk = true);
             _userInputManager.RegisterKeyReceiver(_uiKeyReceiver);
 
             #endregion
@@ -147,8 +147,9 @@ namespace Assets.Sources
 #endif
 
             var pointerReceiver = new PointerReceiver(UiConstant.userCmdPointLayer, BlockType.None);
-            pointerReceiver.AddAction(UserInputKey.Yaw, (pointerData) =>
+            pointerReceiver.BindPointAction(UserInputKey.Yaw, (data) =>
             {
+                var pointerData = data as PointerData;
                 for (int i = 0; i < yaws.Length - 1; i++)
                 {
                     yaws[i] = yaws[i + 1];
@@ -170,8 +171,9 @@ namespace Assets.Sources
                 _userCmd.DeltaYaw = total;
 #endif
             });
-            pointerReceiver.AddAction(UserInputKey.Pitch, (pointerData) =>
+            pointerReceiver.BindPointAction(UserInputKey.Pitch, (data) =>
             {
+                var pointerData = data as PointerData;
                 for (int i = 0; i < pitchs.Length - 1; i++)
                 {
                     pitchs[i] = pitchs[i + 1];
@@ -205,6 +207,15 @@ namespace Assets.Sources
             _userInputManager.UnregisterKeyReceiver(_bioKeyReceiver);
         }
 
+        public void StartReceiveUserInput()
+        {
+            _userInputManager.RegisterKeyReceiver(_specialKeyReceiver);
+            _userInputManager.RegisterKeyReceiver(_uiKeyReceiver);
+            _userInputManager.RegisterKeyReceiver(_keyReceiver);
+            _userInputManager.RegisterPointerReceiver(_pointerReceiver);
+            _userInputManager.RegisterKeyReceiver(_bioKeyReceiver);
+        }
+
         public void SwitchMode(EModeSwitch mode)
         {
             switch (mode) {
@@ -227,7 +238,8 @@ namespace Assets.Sources
 
         public UserCmd GenerateUserCmd(IUserCmdOwnAdapter player, int intverval)
         {
-            _userCmd.Seq = _seq++;
+            _logger.DebugFormat("GenerateUserCmd:{0}", MyGameTime.seq);
+            _userCmd.Seq = MyGameTime.seq;
             _userCmd.FrameInterval = intverval;
             _userCmd.ChangedSeat = ChangeSeat();
             _userCmd.ChangeChannel = ChangeChannel();

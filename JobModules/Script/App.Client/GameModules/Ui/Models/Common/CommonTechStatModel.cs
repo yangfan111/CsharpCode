@@ -111,7 +111,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         {
             if (null != _infoItemRoot)
             {
-                UITool.HideChilds(_infoItemRoot);
+                UITool.SetChildsActive(_infoItemRoot,false);
             }
         }
 

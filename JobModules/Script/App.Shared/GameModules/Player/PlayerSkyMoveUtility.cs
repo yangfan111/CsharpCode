@@ -2,11 +2,14 @@
 using App.Server.GameModules.GamePlay.free.player;
 using App.Shared.GameModules.Player.ResourceLoad;
 using App.Shared.Player;
+using Assets.App.Server.GameModules.GamePlay.Free;
 using com.wd.free.item;
 using com.wd.free.skill;
 using Core.Components;
+using Core.Free;
 using Core.HitBox;
 using Core.Utils;
+using Free.framework;
 using Utils.Appearance.Bone;
 
 namespace App.Shared.GameModules.Player
@@ -55,6 +58,13 @@ namespace App.Shared.GameModules.Player
             }
 
             player.playerSkyMove.IsParachuteAttached = false;
+
+            SimpleProto sp = FreePool.Allocate();
+            sp.Key = FreeMessageConstant.PlaySound;
+            sp.Ks.Add(2);
+            sp.Ins.Add(5030);
+            sp.Bs.Add(true);
+            FreeMessageSender.SendMessage(player, sp);
         }
 
         public static void AttachParachute(Contexts contexts, PlayerEntity player, bool isSyncRemote)

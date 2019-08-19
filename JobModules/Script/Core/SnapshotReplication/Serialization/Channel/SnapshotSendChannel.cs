@@ -51,7 +51,7 @@ namespace Core.SnapshotReplication.Serialization.Channel
         private int _lastAllSnapShotTime;
         private bool _isSendAll;
 
-        public void SerializeSnapshot(ISnapshot snap, Stream stream)
+        public int SerializeSnapshot(ISnapshot snap, Stream stream)
         {
             snap.AcquireReference();
             try
@@ -65,25 +65,27 @@ namespace Core.SnapshotReplication.Serialization.Channel
             }
             _snapshotQueue.Enqueue(snap.SnapshotSeq);
             ISnapshot baseSnap = GetBaseSnapshot(AckedSnapshotId);
+            int ret = 0;
             if (baseSnap == null)
             {
                 _emptySnapshot.SnapshotSeq = -1;
-                _snapSerializer.Serialize(_emptySnapshot, snap, stream);
+                ret = _snapSerializer.Serialize(_emptySnapshot, snap, stream);
                 _lastAllSnapShotId = snap.SnapshotSeq;
                 _lastAllSnapShotTime = snap.ServerTime;
                 _isSendAll = true;
-                _logger.Warn("send full snapshot!");
+                _logger.Debug("send full snapshot!");
                 FullCount++;
             }
             else
             {
-                _snapSerializer.Serialize(baseSnap, snap, stream);
+               ret= _snapSerializer.Serialize(baseSnap, snap, stream);
                 _isSendAll = false;
                 DiffCount++;
             }
 
             ClearOldSnapshot(AckedSnapshotId);
 			ClearSnapshotWhenLimitExceeded();
+            return ret;
         }
 
 

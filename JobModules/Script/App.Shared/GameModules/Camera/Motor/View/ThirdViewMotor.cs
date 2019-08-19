@@ -1,17 +1,19 @@
 ﻿using System.Collections.Generic;
 using App.Shared.GameModules.Camera.Utils;
+using App.Shared.Player;
 using Assets.App.Shared.GameModules.Camera;
 using UnityEngine;
+using Utils.Appearance.Effects;
 using XmlConfig;
 
 namespace Core.CameraControl.NewMotor.View
 {
     public class ThirdViewMotor:AbstractCameraMotor
     {
-        public ThirdViewMotor()
+        public ThirdViewMotor(Motors m):base(m)
         {
 
-            CameraActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.View, (int)ModeId, 
+            _motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.View, (int)ModeId, 
                 (player, state) =>
             {
                 if (player.hasAppearanceInterface && player.appearanceInterface.Appearance.IsFirstPerson)
@@ -19,6 +21,9 @@ namespace Core.CameraControl.NewMotor.View
                     player.appearanceInterface.Appearance.SetThridPerson();
                     player.characterBoneInterface.CharacterBone.SetThridPerson();
                     player.UpdateCameraArchorPostion();
+                    var playerUtils = EffectUtility.GetEffect(player.RootGo(), "PlayerUtils");
+                    if (playerUtils != null)
+                        playerUtils.SetParam("ThirdSightBegin", (object)player.RootGo().gameObject);
                 }
             });
         }

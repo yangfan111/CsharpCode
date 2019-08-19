@@ -1,4 +1,4 @@
-﻿using App.Client.Console.MessageHandler;
+using App.Client.Console.MessageHandler;
 using App.Client.GameModules.GamePlay.Free.App;
 using App.Client.GameModules.GamePlay.Free.Entity;
 using App.Client.GameModules.GamePlay.Free.Game;
@@ -96,6 +96,7 @@ namespace Assets.Sources.Free
             _handlers.Add(new PlayerAnimationHandler());
 			_handlers.Add(new GroupClassicUIHandler());
             _handlers.Add(new BlastUIHandler());
+            _handlers.Add(new OpenSpecifyUIHandler());
             SingletonManager.Get<SimpleUIUpdater>().Add(new MinMapUpdater());
             SingletonManager.Get<SimpleUIUpdater>().Add(new DebugDataUpdater());
             _handlers.Add(new PlayerMoveSpeedHandler());
@@ -104,16 +105,13 @@ namespace Assets.Sources.Free
             _handlers.Add(new PlayerMiniMapSupplyMarkHandler());
             _handlers.Add(new PlaneUIHandler());
             _handlers.Add(new CommonTipHandler());
+            _handlers.Add(new TestPositionHandler());
+            _handlers.Add(new PlayerObserveHandler());
         }
 
         public override void DoHandle(int message, SimpleProto data)
         {
             _logger.DebugFormat("Recieve SimpleProto Key {0} \n{1}", data.Key, data);
-
-            if(RenderSettings.ambientMode != UnityEngine.Rendering.AmbientMode.Flat)
-            {
-                RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-            }
             
             for (var index = 0; index < _handlers.Count; index++)
             {

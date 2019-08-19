@@ -103,17 +103,27 @@ namespace App.Shared.FreeFramework.Free.player
                 {
                     foreach (RoomPlayer player in roomPlayers)
                     {
-                        var gender = roleConfigManager.GetRoleItemById(player.RoleModelId).Sex;
-                        foreach (int avatarId in player.AvatarIds)
+                        var model = roleConfigManager.GetRoleItemById(player.RoleModelId);
+                        if (model != null && !StringUtil.IsNullOrEmpty(model.ThirdModelAssetBundle) && !StringUtil.IsNullOrEmpty(model.FirstModelAssetBundle))
                         {
-                            var resId = roleAvatarConfigManager.GetResId(avatarId, (Sex) gender);
-                            var avatar = avatarAssetConfigManager.GetAvatarAssetItemById(resId);
-                            if (avatar != null && !StringUtil.IsNullOrEmpty(avatar.BundleName))
+                            string modelP3 = model.ThirdModelAssetBundle + "/" + model.ThirdModelAssetName;
+                            string modelP1 = model.FirstModelAssetBundle + "/" + model.FirstModelAssetName;
+                            if (dict.ContainsKey(modelP3))
+                                dict[modelP3] = dict[modelP3] + 1;
+                            else dict.Add(modelP3, 1);
+                            if (!dict.ContainsKey(modelP1)) dict.Add(modelP1, 1);
+
+                            foreach (int avatarId in player.AvatarIds)
                             {
-                                string asset = avatar.BundleName + "/" + avatar.AssetName;
-                                if (dict.ContainsKey(asset))
-                                    dict[asset] = dict[asset] + 1;
-                                else dict.Add(asset, 1);
+                                var resId = roleAvatarConfigManager.GetResId(avatarId, (Sex) model.Sex);
+                                var avatar = avatarAssetConfigManager.GetAvatarAssetItemById(resId);
+                                if (avatar != null && !StringUtil.IsNullOrEmpty(avatar.BundleName))
+                                {
+                                    string asset = avatar.BundleName + "/" + avatar.AssetName;
+                                    if (dict.ContainsKey(asset))
+                                        dict[asset] = dict[asset] + 1;
+                                    else dict.Add(asset, 1);
+                                }
                             }
                         }
                     }
@@ -129,22 +139,66 @@ namespace App.Shared.FreeFramework.Free.player
                     var avatarAssetConfigManager = SingletonManager.Get<AvatarAssetConfigManager>();
                     var weaponResourceConfigManager = SingletonManager.Get<WeaponResourceConfigManager>();
                     var weaponAvatarConfigManager = SingletonManager.Get<WeaponAvatarConfigManager>();
+                    var weaponPartsConfigManager = SingletonManager.Get<WeaponPartsConfigManager>();
 
                     foreach (RoomPlayer player in roomPlayers)
                     {
-                        var gender = roleConfigManager.GetRoleItemById(player.RoleModelId).Sex;
-                        foreach (int avatarId in player.AvatarIds)
+                        if (GameRules.ClothesType(args.GameContext.session.commonSession.RoomInfo.ModeId) != (int) EGameModeClothes.Default && player.CampInfo != null && player.CampInfo.Preset.Count > 0)
                         {
-                            var resId = roleAvatarConfigManager.GetResId(avatarId, (Sex) gender);
-                            var avatar = avatarAssetConfigManager.GetAvatarAssetItemById(resId);
-                            if (avatar != null && !StringUtil.IsNullOrEmpty(avatar.BundleName))
+                            foreach (PresetInfo p in player.CampInfo.Preset)
                             {
-                                string asset = avatar.BundleName + "/" + avatar.AssetName;
-                                if (dict.ContainsKey(asset))
-                                    dict[asset] = dict[asset] + 1;
-                                else dict.Add(asset, 1);
+                                var model = roleConfigManager.GetRoleItemById(p.RoleModelId);
+                                if (model != null && !StringUtil.IsNullOrEmpty(model.ThirdModelAssetBundle) && !StringUtil.IsNullOrEmpty(model.FirstModelAssetBundle))
+                                {
+                                    string modelP3 = model.ThirdModelAssetBundle + "/" + model.ThirdModelAssetName;
+                                    string modelP1 = model.FirstModelAssetBundle + "/" + model.FirstModelAssetName;
+                                    if (dict.ContainsKey(modelP3))
+                                        dict[modelP3] = dict[modelP3] + 1;
+                                    else dict.Add(modelP3, 1);
+                                    if (!dict.ContainsKey(modelP1)) dict.Add(modelP1, 1);
+
+                                    foreach (int avatarId in p.AvatarIds)
+                                    {
+                                        var resId = roleAvatarConfigManager.GetResId(avatarId, (Sex) model.Sex);
+                                        var avatar = avatarAssetConfigManager.GetAvatarAssetItemById(resId);
+                                        if (avatar != null && !StringUtil.IsNullOrEmpty(avatar.BundleName))
+                                        {
+                                            string asset = avatar.BundleName + "/" + avatar.AssetName;
+                                            if (dict.ContainsKey(asset))
+                                                dict[asset] = dict[asset] + 1;
+                                            else dict.Add(asset, 1);
+                                        }
+                                    }
+                                }
                             }
                         }
+                        else
+                        {
+                            var model = roleConfigManager.GetRoleItemById(player.RoleModelId);
+                            if (model != null && !StringUtil.IsNullOrEmpty(model.ThirdModelAssetBundle) && !StringUtil.IsNullOrEmpty(model.FirstModelAssetBundle))
+                            {
+                                string modelP3 = model.ThirdModelAssetBundle + "/" + model.ThirdModelAssetName;
+                                string modelP1 = model.FirstModelAssetBundle + "/" + model.FirstModelAssetName;
+                                if (dict.ContainsKey(modelP3))
+                                    dict[modelP3] = dict[modelP3] + 1;
+                                else dict.Add(modelP3, 1);
+                                if (!dict.ContainsKey(modelP1)) dict.Add(modelP1, 1);
+
+                                foreach (int avatarId in player.AvatarIds)
+                                {
+                                    var resId = roleAvatarConfigManager.GetResId(avatarId, (Sex) model.Sex);
+                                    var avatar = avatarAssetConfigManager.GetAvatarAssetItemById(resId);
+                                    if (avatar != null && !StringUtil.IsNullOrEmpty(avatar.BundleName))
+                                    {
+                                        string asset = avatar.BundleName + "/" + avatar.AssetName;
+                                        if (dict.ContainsKey(asset))
+                                            dict[asset] = dict[asset] + 1;
+                                        else dict.Add(asset, 1);
+                                    }
+                                }
+                            }
+                        }
+
 
                         foreach (PlayerWeaponBagData weaponBag in player.WeaponBags)
                         {
@@ -162,9 +216,23 @@ namespace App.Shared.FreeFramework.Free.player
                                     else dict.Add(assetP3, 1);
                                     if (!dict.ContainsKey(assetP1))
                                         dict.Add(assetP1, 1);
+
+                                    foreach (int partId in weaponData.WeaponPartTplId)
+                                    {
+                                        var part = weaponPartsConfigManager.GetConfigById(partId);
+                                        if (part != null && !StringUtil.IsNullOrEmpty(part.Bundle))
+                                        {
+                                            string asset = part.Bundle + "/" + part.Res;
+                                            if (dict.ContainsKey(asset))
+                                                dict[asset] = dict[asset] + 1;
+                                            else dict.Add(asset, 1);
+                                        }
+                                    }
                                 }
                             }
                         }
+
+                        
                     }
                 }
             }
@@ -179,60 +247,6 @@ namespace App.Shared.FreeFramework.Free.player
                 count += dict[assetInfo];
             }
             _logger.InfoFormat("preloading --- asset count: {0}", count);
-
-            /*IPlayerInfo player = (IPlayerInfo)((ObjectUnit)args.GetUnit("playerInfo")).GetObject;
-            LoginSuccMessage room = (LoginSuccMessage)((ObjectUnit)args.GetUnit("roomInfo")).GetObject;
-
-            HashSet<string> set = new HashSet<string>();
-
-            RoleItem item = SingletonManager.Get<RoleConfigManager>().GetRoleItemById(player.RoleModelId);
-
-            foreach (int id in player.AvatarIds)
-            {
-                set.UnionWith(GetAvatarAsset(id, (Sex)item.Sex));
-            }
-
-            set.UnionWith(GetRoleAsset(item));
-
-            room.PreLoadAssetInfo = Merge(room.PreLoadAssetInfo, set);*/
         }
-
-        /*private string Merge(string old, HashSet<string> set)
-        {
-            if (!string.IsNullOrEmpty(old))
-            {
-                string[] uis = old.Split(',');
-                foreach (string u in uis)
-                {
-                    if (!string.IsNullOrEmpty(u))
-                    {
-                        set.Add(u.Trim());
-                    }
-                }
-            }
-
-            return string.Join(",", set.ToArray());
-        }
-
-        private string[] GetRoleAsset(RoleItem role)
-        {
-            HashSet<string> set = new HashSet<string>();
-            foreach (int id in role.Res)
-            {
-                AvatarAssetItem item = SingletonManager.Get<AvatarAssetConfigManager>().GetAvatarAssetItemById(id);
-
-                set.UnionWith(new string[] { item.BundleName + "/" + item.AssetName, item.BundleName + "/" + item.SecondRes });
-            }
-
-            return set.ToArray();
-        }
-
-        private string[] GetAvatarAsset(int id, Sex sex)
-        {
-            int resId = SingletonManager.Get<RoleAvatarConfigManager>().GetResId(id, Sex.Female);
-            AvatarAssetItem item = SingletonManager.Get<AvatarAssetConfigManager>().GetAvatarAssetItemById(resId);
-
-            return new string[] { item.BundleName + "/" + item.AssetName, item.BundleName + "/" + item.SecondRes };
-        }*/
     }
 }

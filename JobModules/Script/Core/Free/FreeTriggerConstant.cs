@@ -38,5 +38,6 @@
         public const int TEST_CASE_END = 46;
         public const int PLAYER_SWITCH_BAG = 47;
         public const int PLAYER_EAT_BUF = 48;
+        public const int PLAYER_RESCUE_SUCCESS = 49;
     }
 }

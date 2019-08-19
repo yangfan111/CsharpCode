@@ -11,9 +11,9 @@ namespace App.Shared.GameModules.Weapon.Behavior
     {
 
 
-        public abstract void OnAfterFire(WeaponBaseAgent agent, WeaponSideCmd cmd);
+        public abstract void OnAfterFire(WeaponAttackProxy attackProxy, WeaponSideCmd cmd);
         //以当前0.5X+10速度衰减
-        public virtual float UpdateLen(WeaponBaseAgent agent, float len, float frameSec)
+        public virtual float UpdateLen(WeaponAttackProxy attackProxy, float len, float frameSec)
         {
             var r = len;
             r -= (10f + r * 0.5f) * frameSec;
@@ -23,14 +23,14 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
         protected abstract float GePuntchFallbackFactor(PlayerWeaponController weaponController);
 
-        public virtual void OnFrame(WeaponBaseAgent agent, WeaponSideCmd cmd)
+        public virtual void OnFrame(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
-            agent.RunTimeComponent.LastRenderTimestamp = cmd.UserCmd.RenderTime;
+            attackProxy.RuntimeComponent.LastRenderTimestamp = cmd.UserCmd.RenderTime;
         }
 
-        protected void UpdateOrientationAttenuation(WeaponBaseAgent agent, WeaponSideCmd cmd)
+        protected void UpdateOrientationAttenuation(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
-            var orientation     = agent.Owner.WeaponController().RelatedOrientation;
+            var orientation     = attackProxy.Orientation;
             var punchYaw   = orientation.AccPunchYaw;
             var punchPitch = orientation.AccPunchPitch;
 
@@ -42,35 +42,34 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 punchYaw   = punchYaw / puntchLength;
                 punchPitch = punchPitch / puntchLength;
                    
-                puntchLength        = UpdateLen(agent, puntchLength, frameSec);
+                puntchLength        = UpdateLen(attackProxy, puntchLength, frameSec);
                 //UpdateLen: AccPunchYaw  =>AccPunchYaw   
                 orientation.AccPunchYaw   = punchYaw * puntchLength;
                 orientation.AccPunchPitch = punchPitch * puntchLength;
          
-                var factor = GePuntchFallbackFactor(agent.Owner.WeaponController());
+                var factor = GePuntchFallbackFactor(attackProxy.Owner);
                 //GePuntchFallbackFactor : AccPunchYaw => AccPunchPitch     
                 orientation.AccPunchYawValue   = orientation.AccPunchYaw * factor;
                 orientation.AccPunchPitchValue = orientation.AccPunchPitch * factor;
             }
         }
 
-        protected void RecoverFireRoll(WeaponBaseAgent agent, WeaponSideCmd cmd)
+        protected void RecoverFireRoll(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
-            var orientation = agent.Owner.WeaponController().RelatedOrientation;
-            var rotateYaw = orientation.FireRoll;
+            var rotateYaw =  attackProxy.Orientation.FireRoll;
             if (rotateYaw != 0)
             {
-                if (agent.FireRollCfg == null)
+                if (attackProxy.WeaponConfigAssy.S_FireRollCfg== null)
                 {
                     rotateYaw = 0;
                 }
                 else
                 {
                     var rotatePos = rotateYaw >= 0;
-                    rotateYaw -= rotateYaw * cmd.UserCmd.FrameInterval  / agent.FireRollCfg.FireRollBackTime;
+                    rotateYaw -= rotateYaw * cmd.UserCmd.FrameInterval  / attackProxy.WeaponConfigAssy.S_FireRollCfg.FireRollBackTime;
                     if ((rotatePos && rotateYaw < 0) || (!rotatePos && rotateYaw > 0)) rotateYaw = 0;
                 }
-                orientation.FireRoll = rotateYaw;
+                attackProxy.Orientation.FireRoll = rotateYaw;
             }
         }
 
@@ -79,5 +78,6 @@ namespace App.Shared.GameModules.Weapon.Behavior
 //            //t当前时间|b起始位置|c最大距离|d总时间
 //            return (t == d) ? b + c : c * (-(float) Mathf.Pow(2, -10 * t / d) + 1) + b;
 //        }
+
     }
 }

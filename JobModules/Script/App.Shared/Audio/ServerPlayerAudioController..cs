@@ -25,7 +25,7 @@ namespace App.Shared.Audio
         {
             AudioJumpstepEvent audioEvent =
                 (AudioJumpstepEvent) EventInfos.Instance.Allocate(EEventType.AJumpstep, false);
-            audioEvent.Initialize(FootMatType, new Vector3(PlayerObject.transform.position.x,
+            audioEvent.Initialize(GetFootMatType(), new Vector3(PlayerObject.transform.position.x,
                 0, PlayerObject.transform.position.z), PlayerObject.transform.eulerAngles);
             entity.localEvents.Events.AddEvent(audioEvent);
         }
@@ -34,7 +34,7 @@ namespace App.Shared.Audio
         {
             AudioFootstepEvent audioEvent =
                 (AudioFootstepEvent) EventInfos.Instance.Allocate(EEventType.AFootstep, false);
-            audioEvent.Initialize(stepState, FootMatType,
+            audioEvent.Initialize(stepState, GetFootMatType(),
                 new Vector3(PlayerObject.transform.position.x, 0, PlayerObject.transform.position.z),
                 PlayerObject.transform.eulerAngles);
             entity.localEvents.Events.AddEvent(audioEvent);

@@ -1,4 +1,5 @@
-﻿using App.Shared.GameModules.Player;
+﻿using App.Shared.Components.Player;
+using App.Shared.GameModules.Player;
 using Assets.App.Server.GameModules.GamePlay.Free;
 using com.wd.free.action;
 using com.wd.free.@event;
@@ -14,22 +15,22 @@ namespace App.Server.GameModules.GamePlay.Free.app
     public class GroupTechStatUiAction : AbstractGameAction, IRule
     {
         private static IComparer<TechStat> KdComparater = new KdStatComparator();
+        private static IComparer<TechStat> HdComparater = new HdStatComparator();
         private static IComparer<TechStat> KillComparater = new KillStatComparator();
+        private static IComparer<TechStat> HitDownComparater = new HitDownComparator();
 
         public override void DoAction(IEventArgs args)
         {
             SimpleProto builder = FreePool.Allocate();
-
             builder.Key = FreeMessageConstant.GroupTechStatUI;
 
-
-            List<TechStat> list = new List<TechStat>();
-
-            int index = 0;
             bool needSort = true;
+            bool rescueEnabled = args.GameContext.session.commonSession.RoomInfo.TeamCapacity > 1;
+            List<TechStat> list = new List<TechStat>();
+            int index = 0;
             foreach (PlayerEntity p in args.GameContext.player.GetInitializedPlayerEntities())
             {
-                TechStat ts = new TechStat(p, index++, args.GameContext.session.commonSession.RoomInfo.TeamCapacity);
+                TechStat ts = new TechStat(p, index++, rescueEnabled);
                 builder.Ps.Add(ts.ToMessage());
                 list.Add(ts);
                 if (!p.statisticsData.Statistics.DataCollectSwitch)
@@ -41,28 +42,28 @@ namespace App.Server.GameModules.GamePlay.Free.app
 
             if (needSort)
             {
-                list.Sort(KillComparater);
-                if (list.Count > 0 && list[0].kill > 0)
-                {
-                    TechStat ts = list[0];
-                    builder.Ps[ts.index].Ins[2] |= (1 << (int)EUIGameTitleType.Ace);
-                }
-                if (list.Count > 1 && list[1].kill > 0)
-                {
-                    TechStat ts = list[1];
-                    builder.Ps[ts.index].Ins[2] |= (1 << (int)EUIGameTitleType.Second);
-                }
-                if (list.Count > 2 && list[2].kill > 0)
-                {
-                    TechStat ts = list[2];
-                    builder.Ps[ts.index].Ins[2] |= (1 << (int)EUIGameTitleType.Third);
-                }
+                if (rescueEnabled) list.Sort(HitDownComparater);
+                else list.Sort(KillComparater);
 
-                list.Sort(KdComparater);
+                if (list.Count > 0 && ((list[0].kill > 0 && !rescueEnabled) || (list[0].hitDownCount > 0 && rescueEnabled)))
+                {
+                    builder.Ps[list[0].index].Ins[2] |= 1 << (int) EUIGameTitleType.Ace;
+                }
+                if (list.Count > 1 && ((list[1].kill > 0 && !rescueEnabled) || (list[1].hitDownCount > 0 && rescueEnabled)))
+                {
+                    builder.Ps[list[1].index].Ins[2] |= 1 << (int) EUIGameTitleType.Second;
+                }
+                if (list.Count > 2 && ((list[2].kill > 0 && !rescueEnabled) || (list[2].hitDownCount > 0 && rescueEnabled)))
+                {
+                    builder.Ps[list[2].index].Ins[2] |= 1 << (int) EUIGameTitleType.Third;
+                }
+                
+                if (rescueEnabled) list.Sort(HdComparater);
+                else list.Sort(KdComparater);
+
                 if (list.Count > 0 && list[0].kd > 0)
                 {
-                    TechStat ts = list[0];
-                    builder.Ps[ts.index].Ins[2] |= (1 << (int)EUIGameTitleType.KdKing);
+                    builder.Ps[list[0].index].Ins[2] |= 1 << (int) EUIGameTitleType.KdKing;
                 }
             }
 
@@ -82,42 +83,31 @@ namespace App.Server.GameModules.GamePlay.Free.app
     {
         public int Compare(TechStat x, TechStat y)
         {
-            if (x.kd < y.kd)
-            {
-                return 1;
-            }
-            if (x.kd == y.kd)
-            {
-                if (x.kill < y.kill)
-                {
-                    return 1;
-                }
-                if (x.kill == y.kill)
-                {
-                    //最后击杀更晚的玩家排名更低
-                    if (x.lastKillTime < y.lastKillTime)
-                    {
-                        return -1;
-                    }
-                    if (x.lastKillTime > y.lastKillTime)
-                    {
-                        return 1;
-                    }
-                    //未死亡的玩家排名更高&最后死亡时间更晚的玩家排名更高
-                    if ((x.lastDeadTime == 0 && y.lastDeadTime != 0)
-                        || (x.lastDeadTime > y.lastDeadTime && y.lastDeadTime != 0))
-                    {
-                        return -1;
-                    }
-                    if ((x.lastDeadTime != 0 && y.lastDeadTime == 0)
-                        || (x.lastDeadTime < y.lastDeadTime && x.lastDeadTime != 0))
-                    {
-                        return 1;
-                    }
-                    return 0;
-                }
-            }
-            return -1;
+            if (x.kd < y.kd) return 1;
+            if (x.kd > y.kd) return -1;
+            if (x.kill < y.kill) return 1;
+            if (x.kill > y.kill) return -1;
+            if (x.lastKillTime < y.lastKillTime) return -1;
+            if (x.lastKillTime > y.lastKillTime) return 1;
+            if ((x.lastDeadTime == 0 && y.lastDeadTime != 0) || (x.lastDeadTime > y.lastDeadTime && y.lastDeadTime != 0)) return -1;
+            if ((x.lastDeadTime != 0 && y.lastDeadTime == 0) || (x.lastDeadTime < y.lastDeadTime && x.lastDeadTime != 0)) return 1;
+            return 0;
+        }
+    }
+
+    class HdStatComparator : IComparer<TechStat>
+    {
+        public int Compare(TechStat x, TechStat y)
+        {
+            if (x.kd < y.kd) return 1;
+            if (x.kd > y.kd) return -1;
+            if (x.hitDownCount < y.hitDownCount) return 1;
+            if (x.hitDownCount > y.hitDownCount) return -1;
+            if (x.lastKillTime < y.lastKillTime) return -1;
+            if (x.lastKillTime > y.lastKillTime) return 1;
+            if ((x.lastDeadTime == 0 && y.lastDeadTime != 0) || (x.lastDeadTime > y.lastDeadTime && y.lastDeadTime != 0)) return -1;
+            if ((x.lastDeadTime != 0 && y.lastDeadTime == 0) || (x.lastDeadTime < y.lastDeadTime && x.lastDeadTime != 0)) return 1;
+            return 0;
         }
     }
 
@@ -125,40 +115,39 @@ namespace App.Server.GameModules.GamePlay.Free.app
     {
         public int Compare(TechStat x, TechStat y)
         {
-            if (x.kill < y.kill)
-            {
-                return 1;
-            }
-            if (x.kill == y.kill)
-            {
-                if (x.dead > y.dead)
-                {
-                    return 1;
-                }
-                if (x.dead == y.dead)
-                {
-                    //最后击杀更晚的玩家排名更低
-                    if (x.lastKillTime < y.lastKillTime)
-                    {
-                        return -1;
-                    }
-                    if (x.lastKillTime > y.lastKillTime)
-                    {
-                        return 1;
-                    }
-                    //最后死亡时间更晚的玩家排名更高
-                    if (x.lastDeadTime > y.lastDeadTime && y.lastDeadTime != 0)
-                    {
-                        return -1;
-                    }
-                    if (x.lastDeadTime < y.lastDeadTime && x.lastDeadTime != 0)
-                    {
-                        return 1;
-                    }
-                    return 0;
-                }
-            }
-            return -1;
+            if (x.kill < y.kill) return 1;
+            if (x.kill > y.kill) return -1;
+            if (x.dead > y.dead) return 1;
+            if (x.dead < y.dead) return -1;
+            if (x.assist > y.assist) return -1;
+            if (x.assist < y.assist) return 1;
+            if (x.damage > y.damage) return -1;
+            if (x.damage < y.damage) return 1;
+            if (x.lastKillTime < y.lastKillTime) return -1;
+            if (x.lastKillTime > y.lastKillTime) return 1;
+            if ((x.lastDeadTime == 0 && y.lastDeadTime != 0) || (x.lastDeadTime > y.lastDeadTime && y.lastDeadTime != 0)) return -1;
+            if ((x.lastDeadTime != 0 && y.lastDeadTime == 0) || (x.lastDeadTime < y.lastDeadTime && x.lastDeadTime != 0)) return 1;
+            return 0;
+        }
+    }
+
+    class HitDownComparator : IComparer<TechStat>
+    {
+        public int Compare(TechStat x, TechStat y)
+        {
+            if (x.hitDownCount < y.hitDownCount) return 1;
+            if (x.hitDownCount > y.hitDownCount) return -1;
+            if (x.dead > y.dead) return 1;
+            if (x.dead < y.dead) return -1;
+            if (x.resqueCount > y.resqueCount) return -1;
+            if (x.resqueCount < y.resqueCount) return 1;
+            if (x.damage > y.damage) return -1;
+            if (x.damage < y.damage) return 1;
+            if (x.lastKillTime < y.lastKillTime) return -1;
+            if (x.lastKillTime > y.lastKillTime) return 1;
+            if ((x.lastDeadTime == 0 && y.lastDeadTime != 0) || (x.lastDeadTime > y.lastDeadTime && y.lastDeadTime != 0)) return -1;
+            if ((x.lastDeadTime != 0 && y.lastDeadTime == 0) || (x.lastDeadTime < y.lastDeadTime && x.lastDeadTime != 0)) return 1;
+            return 0;
         }
     }
 
@@ -182,11 +171,15 @@ namespace App.Server.GameModules.GamePlay.Free.app
         public int c4PlantCount;
         public int c4DefuseCount;
         public bool hasC4;
+        public int badgeId;
+        public bool isHurt;
+        public int hitDownCount;
+        public int resqueCount;
 
-        public TechStat(PlayerEntity player, int index, int teamCap)
+        public TechStat(PlayerEntity player, int index, bool rescueEnabled)
         {
             this.id = (int) player.playerInfo.PlayerId;
-            this.kill = teamCap > 1 ? player.statisticsData.Statistics.HitDownCount : player.statisticsData.Statistics.KillCount;
+            this.kill = player.statisticsData.Statistics.KillCount;
             this.dead = player.statisticsData.Statistics.DeadCount;
             this.assist = player.statisticsData.Statistics.AssistCount;
             this.damage = Convert.ToInt32(player.statisticsData.Statistics.TotalDamage);
@@ -202,18 +195,32 @@ namespace App.Server.GameModules.GamePlay.Free.app
             this.c4PlantCount = player.statisticsData.Statistics.C4PlantCount;
             this.c4DefuseCount = player.statisticsData.Statistics.C4DefuseCount;
             this.hasC4 = player.statisticsData.Statistics.HasC4;
+            this.badgeId = player.playerInfo.BadgeId;
+            this.isHurt = player.gamePlay.IsLifeState(EPlayerLifeState.Dying);
+            this.hitDownCount = player.statisticsData.Statistics.HitDownCount;
+            this.resqueCount = player.statisticsData.Statistics.SaveCount;
 
-            if (dead > 0)
+            if (rescueEnabled)
             {
-                this.kd = (float)kill / (float)dead;
+                if (hitDownCount < 5)
+                {
+                    kd = 0;
+                }
+                else
+                {
+                    kd = dead > 0 ? hitDownCount / dead : hitDownCount;
+                }
             }
             else
             {
-                this.kd = kill;
-            }
-            if (kill < 5)
-            {
-                kd = 0;
+                if (kill < 5)
+                {
+                    kd = 0;
+                }
+                else
+                {
+                    kd = dead > 0 ? kill / dead : kill;
+                }
             }
         }
 
@@ -230,9 +237,13 @@ namespace App.Server.GameModules.GamePlay.Free.app
             msg.Ins.Add(ping);
             msg.Ins.Add(c4PlantCount);
             msg.Ins.Add(c4DefuseCount);
+            msg.Ins.Add(badgeId);
+            msg.Ins.Add(hitDownCount);
+            msg.Ins.Add(resqueCount);
 
             msg.Bs.Add(isDead);
             msg.Bs.Add(hasC4);
+            msg.Bs.Add(isHurt);
 
             msg.Ss.Add(name);
             msg.Ss.Add(teamName);

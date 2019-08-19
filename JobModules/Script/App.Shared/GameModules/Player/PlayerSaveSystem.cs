@@ -1,7 +1,10 @@
-﻿using App.Server.GameModules.GamePlay.Free.player;
+﻿using App.Server.GameModules.GamePlay.free.player;
+using App.Server.GameModules.GamePlay.Free.player;
 using App.Shared.Components;
 using App.Shared.Components.Player;
+using App.Shared.FreeFramework.framework.trigger;
 using Assets.App.Server.GameModules.GamePlay.Free;
+using com.wd.free.@event;
 using Core;
 using Core.EntityComponent;
 using Core.Enums;
@@ -10,6 +13,7 @@ using Core.GameModule.Interface;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using Free.framework;
+using System;
 using UnityEngine;
 using Utils.Utils;
 using XmlConfig;
@@ -63,6 +67,23 @@ namespace App.Shared.GameModules.Player
                         if(SharedConfig.IsServer)
                             myEntity.gamePlay.ChangeLifeState(EPlayerLifeState.Alive, myEntity.time.ClientTime);
                     }
+
+                    try
+                    {
+                        var args = _contexts.session.commonSession.FreeArgs as IEventArgs;
+                        if (args != null && SharedConfig.IsServer)
+                        {
+                            TriggerArgs ta = new TriggerArgs();
+                            ta.AddUnit("savor", (FreeData) (myEntity.gamePlay.IsSave ? myEntity.freeData.FreeData : teamEntity.freeData.FreeData));
+                            ta.AddUnit("saved", (FreeData) (myEntity.gamePlay.IsSave ? teamEntity.freeData.FreeData : myEntity.freeData.FreeData));
+                            args.Trigger(FreeTriggerConstant.PLAYER_RESCUE_SUCCESS, ta);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.ErrorFormat("player rescue success trigger failed", e);
+                    }
+
                     StopSave(myEntity, false);
                     return;
                 }

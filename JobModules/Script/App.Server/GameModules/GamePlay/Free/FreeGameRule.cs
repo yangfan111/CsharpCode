@@ -10,7 +10,6 @@ using App.Shared.GameModules.Attack;
 using App.Shared.GameModules.Player;
 using App.Shared.Util;
 using Assets.App.Server.GameModules.GamePlay.Free;
-using com.cpkf.yyjd.tools.util.math;
 using com.wd.free.action;
 using com.wd.free.para;
 using Core.Free;
@@ -64,7 +63,7 @@ namespace App.Server.GameModules.GamePlay
 
             this.Room = room;
 
-            RandomUtil.SetSeed(RandomUtil.Random(1, 10000000));
+            //RandomUtil.SetSeed(0);
 
             SendMessageAction.sender = new FreeMessageSender();
 
@@ -174,6 +173,10 @@ namespace App.Server.GameModules.GamePlay
 
         }
 
+        public long StartTime{
+            get { return startTime; }
+        }
+
         public long GameStartTime{
             get { return gameStartTime; }
             set { gameStartTime = value; }
@@ -273,6 +276,8 @@ namespace App.Server.GameModules.GamePlay
             //}
 
             serverTime = Runtime.CurrentTimeMillis() - startTime;
+
+            //RandomUtil.SetSeed((int) serverTime);
 
             args.FreeContext.TimerTask.TimeElapse(args, (int)(serverTime - lastServerTime));
             UpdateFreeMoveEntity(room, interval);

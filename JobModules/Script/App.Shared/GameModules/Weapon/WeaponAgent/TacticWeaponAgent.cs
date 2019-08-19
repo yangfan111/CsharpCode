@@ -10,7 +10,7 @@ namespace App.Shared.GameModules.Weapon
     [WeaponSpecies(EWeaponSlotType.TacticWeapon)]
     public class TacticWeaponAgent : CommonWeaponAgent
     {
-        public TacticWeaponAgent(Func<EntityKey> in_holdExtractor, Func<EntityKey> in_emptyExtractor, EWeaponSlotType slot, GrenadeCacheHandler grenadeHandler) : base(in_holdExtractor, in_emptyExtractor, slot, grenadeHandler)
+        public TacticWeaponAgent(Func<EWeaponSlotType, EntityKey> in_holdExtractor, Func<EntityKey> in_emptyExtractor, EWeaponSlotType slot, GrenadeCacheHandler grenadeHandler) : base(in_holdExtractor, in_emptyExtractor, slot, grenadeHandler)
         {
         }
         internal override bool CanApplyPart

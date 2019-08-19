@@ -8,8 +8,12 @@ using com.wd.free.util;
 using Core;
 using Core.EntityComponent;
 using Core.Free;
+using Core.Room;
+using Core.Utils;
 using Free.framework;
 using System;
+using Utils.Configuration;
+using Utils.Singleton;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
@@ -36,6 +40,8 @@ namespace App.Server.GameModules.GamePlay.Free.player
         public const int InterPlantBomb = 118;
         public const int RescueEnd = 119;
         public const int Interrupt = 120;
+        public const int SuccessPose = 121;
+        public const int InterruptSwitchWeapon = 122;
 
         private string state;
 
@@ -50,11 +56,12 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 DoAnimation(args.GameContext, realState, fd.Player);
             }
         }
-
+private  static LoggerAdapter _loggerAdapter = new LoggerAdapter("PlayerAnimationAction");
         public static void DoAnimation(Contexts contexts, int ani, PlayerEntity player, bool server = true)
         {
             if (player != null)
             {
+                var pose = 0;
                 if (ani > 100)
                 {
                     switch (ani)
@@ -69,6 +76,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
                             player.stateInterface.State.PickUp();
                             break;
                         case Interrupt:
+                            _loggerAdapter.Info("[Tmp]Interrupt");
                             player.stateInterface.State.InterruptAction();
                             break;
                         case Rescue:
@@ -100,6 +108,8 @@ namespace App.Server.GameModules.GamePlay.Free.player
                             player.stateInterface.State.Gliding();
                             break;
                         case OpenDoor:
+                            player.StateInteractController().InterruptCharactor();
+
                             player.stateInterface.State.OpenDoor();
                             player.AudioController().PlaySimpleAudio(EAudioUniqueId.OpenDoor);
                             break;
@@ -132,11 +142,38 @@ namespace App.Server.GameModules.GamePlay.Free.player
                             }
                             break;
                         case InterPlantBomb:
+                            _loggerAdapter.Info("[Tmp]InterPlantBomb Interrupt");
                             player.stateInterface.State.InterruptAction();
                             player.appearanceInterface.Appearance.RemountWeaponOnRightHand();
                             break;
                         case RescueEnd:
                             player.stateInterface.State.RescueEnd();
+                            break;
+                        case SuccessPose:
+                            if (player.playerInfo.CampInfo != null && player.playerInfo.CampInfo.Preset.Count > 0)
+                            {
+                                foreach (Preset p in player.playerInfo.CampInfo.Preset)
+                                {
+                                    if (p.camp == player.playerInfo.Camp)
+                                    {
+                                        var config = SingletonManager.Get<IndividuationConfigManager>().GetConfigById(p.pose);
+                                        if (config != null)
+                                        {
+                                            pose = config.PoseId;
+                                        }
+                                        else
+                                        {
+                                            config = SingletonManager.Get<IndividuationConfigManager>().GetConfigById(3);
+                                            if (null != config) pose = config.PoseId;
+                                        }
+
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        case InterruptSwitchWeapon:
+                            player.stateInterface.State.InterruptSwitchWeapon();
                             break;
                         default:
                             break;
@@ -154,6 +191,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
                     SimpleProto message = FreePool.Allocate();
                     message.Key = FreeMessageConstant.PlayerAnimation;
                     message.Ins.Add(ani);
+                    message.Ins.Add(pose);
                     FreeMessageSender.SendMessage(player, message);
                 }
             }

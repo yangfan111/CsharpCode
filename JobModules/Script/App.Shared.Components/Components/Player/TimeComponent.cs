@@ -34,7 +34,7 @@ namespace App.Shared.Components.Player
 
 	    public override string ToString()
 	    {
-		    return string.Format("NextAttckCmdTime: {0}", ClientTime);
+		    return string.Format("ClientTime: {0}", ClientTime);
 	    }
 
         public void RewindTo(object rightComponent)

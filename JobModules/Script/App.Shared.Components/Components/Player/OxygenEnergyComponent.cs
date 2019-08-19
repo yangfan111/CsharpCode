@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Core.CharacterState;
+﻿using App.Shared.Components.Oxygen;
 using Core.Compare;
 using Core.Components;
+using Core.Free;
 using Core.Prediction.UserPrediction;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
 using Entitas;
-using App.Shared.Components.Oxygen;
 
 namespace App.Shared.Components.Player
 {
     [Player]
-    
-    public class OxygenEnergyComponent : IUserPredictionComponent, IPredictedOxygenState
+    public class OxygenEnergyComponent : IUserPredictionComponent, IPredictedOxygenState, IRule
     {
         [NetworkProperty(1000,-1000,0.01f)] public float CurrentOxygen { get; set; }
 
@@ -50,6 +45,11 @@ namespace App.Shared.Components.Player
         public void RewindTo(object rightComponent)
         {
             CopyFrom(rightComponent);
+        }
+
+        public int GetRuleID()
+        {
+            return (int) ERuleIds.OxygenEnergyComponent;
         }
     }
 

@@ -20,7 +20,8 @@ namespace App.Client.GameModules.Ui.Models.Chicken
         protected override void SetView()
         {
             base.SetView();
-            SetVisible(true);
+            ClearTip();
+            InitEvent();
             if (Data is IChickenBagItemUiData)
             {
                 SetView(Data as IChickenBagItemUiData);
@@ -29,14 +30,8 @@ namespace App.Client.GameModules.Ui.Models.Chicken
             {
                 SetView(Data as IBaseChickenBagItemData);
             }
-
         }
 
-        public override void Init()
-        {
-            base.Init();
-            InitEvent();
-        }
 
 
         private UIEventTriggerListener eventTrigger;
@@ -61,6 +56,11 @@ namespace App.Client.GameModules.Ui.Models.Chicken
             if (eventTrigger != null)
             {
                 eventTrigger.onClick = RightClickAction;
+            }
+
+            if (eventTrigger.isEnter && eventTrigger.onEnter != null)
+            {
+                eventTrigger.onEnter.Invoke(null, null);
             }
             uiDrog = FindComponent<UIDrag>(_viewModel.ResourceAssetName);
             if (uiDrog != null)
@@ -100,7 +100,6 @@ namespace App.Client.GameModules.Ui.Models.Chicken
         public Transform GetRoot()
         {
             return ViewInstance.transform;
-            //return _viewModel.ChickenBagItemTransform;
         }
 
         private void RightClickAction(UIEventTriggerListener arg1, PointerEventData eventData)
@@ -126,6 +125,7 @@ namespace App.Client.GameModules.Ui.Models.Chicken
                 _viewModel.TitleGroupShow = true;
                 _viewModel.TitleText = realData.title;
                 _viewModel.ItemGroupShow = false;
+                ShowView(true);
             }
             else
             {
@@ -133,23 +133,30 @@ namespace App.Client.GameModules.Ui.Models.Chicken
             }
         }
 
+        private void ShowView(bool show)
+        {
+            ViewInstance.GetComponent<CanvasGroup>().alpha = show ? 1 : 0;
+        }
+
+
         private void SetView(IBaseChickenBagItemData realData)
         {
             _viewModel.ItemGroupShow = true;
             _viewModel.TitleGroupShow = false;
             _viewModel.CountText = realData.count.ToString();
             _viewModel.CountShow = realData.count > 1;
+           
             var config = SingletonManager.Get<ItemBaseConfigManager>().GetConfigById(realData.cat, realData.id,true);
             if (config == null)
             {
                 Logger.ErrorFormat("error config cat:{0} id:{1}", realData.cat, realData.id);
-                SetVisible(false);
-                //Destory();
+                ShowView(false);
                 return;
             }
             _viewModel.ItemIconBundle = config.IconBundle;
             _viewModel.ItemIconAsset = config.Icon;
             _viewModel.ItemNameText = config.Name;
+            ShowView(true);
         }
 
         protected override IUiViewModel ViewModel
@@ -171,6 +178,12 @@ namespace App.Client.GameModules.Ui.Models.Chicken
                 eventTrigger.onExit = null;
             }
 
+            ClearTip();
+            
+        }
+
+        private void ClearTip()
+        {
             var root = GetRoot();
             if (root != null)
                 UiCommon.TipManager.UnRegisterTip(root);

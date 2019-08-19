@@ -26,25 +26,24 @@ namespace App.Shared.Audio
             string[] assetNames = AudioUtil.GetBankAssetNamesByFolder(null);
             foreach (string bankName in assetNames)
             {
-                if(bankName.Contains("hall_"))
+                if(bankName.StartsWith("Hall_")|| bankName.StartsWith("Map_"))
                     continue;
-                AKBankAtom atom = bankAtomSet.Register(bankName, AudioBank_LoadAction.Normal, AudioBank_LoadMode.Sync);
-                bankAtomSet.DoLoadBank(atom, null);
+                AKBankAtom atom = bankAtomSet.Register(bankName, AudioBank_LoadMode.Aync);
+                bankAtomSet.DoLoadBank(atom);
             }
 
             IsInitialized = true;
             return AKRESULT.AK_Success;
         }
-
-        public void LoadAtom(string bankName, bool ignoreIfAssetNotExist, Action<AKRESULT> handler)
+        
+        public void LoadAtom(string bankName, bool ignoreIfAssetNotExist, WiseReusltHandler handler)
         {
-            LoadAtom(bankName, ignoreIfAssetNotExist, AudioBank_LoadAction.Normal, AudioBank_LoadMode.Sync, handler);
+            LoadAtom(bankName, ignoreIfAssetNotExist, AudioBank_LoadMode.Normal, handler);
         }
 
         public void LoadAtom(string               bankName,   bool               ignoreIfAssetNotExist,
-                             AudioBank_LoadAction loadAction, AudioBank_LoadMode loadMode, Action<AKRESULT> handler)
+                             AudioBank_LoadMode loadMode,  WiseReusltHandler handler)
         {
-            AKRESULT   result;
             AKBankAtom atom = bankAtomSet.Get(bankName);
             if (atom == null)
             {
@@ -55,19 +54,8 @@ namespace App.Shared.Audio
                     return;
                 }
 
-                atom = bankAtomSet.Register(bankName, loadAction, loadMode);
+                atom = bankAtomSet.Register(bankName, loadMode);
             }
-            else
-            {
-                result = bankAtomSet.Vertify(atom);
-                if (result != AKRESULT.AK_Success)
-                {
-                    if (handler != null)
-                        handler(result);
-                    return;
-                }
-            }
-
             bankAtomSet.DoLoadBank(atom, handler);
         }
     }

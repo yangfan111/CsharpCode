@@ -17,6 +17,8 @@ namespace Core.SnapshotReplication.Serialization.Channel
         private Dictionary<int, ISnapshot> _receivedSnapMap;
         private ISnapshotSerializer _snapSerializer;
         private ISnapshot _emptySnapshot = Snapshot.Allocate();
+        private const int MaxReceivedSnapMapCount = 100;
+        List<int> _removeList = new List<int>(100);
         public SnapshotRecvChannel(SnapshotSerializer serializer)
         {
             _receivedSnapMap = new Dictionary<int, ISnapshot>();
@@ -38,14 +40,13 @@ namespace Core.SnapshotReplication.Serialization.Channel
         {
             SnapshotHeader header;
             SnapshotPatch patch = _snapSerializer.DeSerialize(reader, out header);
-            ClearOldSnapshot(patch.BaseSnapshotSeq);
+            ClearOldSnapshot(patch.BaseSnapshotSeq, header.SnapshotSeq);
             var baseSnap = SnapshotCloner.Clone(GetBaseSnapshot(patch.BaseSnapshotSeq));
             baseSnap.Header = header;
             patch.ApplyPatchTo(baseSnap, _snapSerializer.GetSerializerManager());
             patch.ReleaseReference();
             if (_receivedSnapMap.ContainsKey(baseSnap.SnapshotSeq))
             {
-                Debug.LogErrorFormat("SnapSHotSeq {0} exist", baseSnap.SnapshotSeq);
                 Logger.ErrorFormat("SnapSHotSeq {0} exist", baseSnap.SnapshotSeq);
             }
             else
@@ -55,17 +56,23 @@ namespace Core.SnapshotReplication.Serialization.Channel
             baseSnap.AcquireReference();
             return baseSnap;
         }
-
-        private void ClearOldSnapshot(int baseId)
+        private void ClearOldSnapshot(int baseId, int currentId)
         {
-            foreach(var id in _receivedSnapMap.Keys.ToArray())
+            _removeList.Clear();
+            foreach(var id in _receivedSnapMap.Keys)
             {
-                if (id < baseId)
+                if (id < baseId || id < currentId - MaxReceivedSnapMapCount)
                 {
-                    _receivedSnapMap[id].ReleaseReference();
-                    _receivedSnapMap.Remove(id);
+                    _removeList.Add(id);
+                   
                 }
             }
+            foreach (var id in _removeList)
+            {
+                _receivedSnapMap[id].ReleaseReference();
+                _receivedSnapMap.Remove(id);
+            }
+           
         }
         private ISnapshot GetBaseSnapshot(int id)
         {

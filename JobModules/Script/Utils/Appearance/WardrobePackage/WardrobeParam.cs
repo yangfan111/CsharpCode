@@ -47,7 +47,7 @@ namespace Utils.Appearance.WardrobePackage
         public bool NeedMappingBones { get; private set; }
 
         // 通过mask确保不穿帮的其他部位
-        public Core.Utils.Tuple<Wardrobe, Texture>[] Masks { get; private set; }
+        public Tuple<Wardrobe, Texture>[] Masks { get; private set; }
 
         private static readonly int DefaultMaterialId = 0;
 
@@ -88,7 +88,7 @@ namespace Utils.Appearance.WardrobePackage
             }
             var comp = DefaultGameObject.AsGameObject.GetComponent<CharacterMaskParams>();
             Masks = comp != null
-                ? comp.AvatarItems.Select(x => Core.Utils.Tuple.Create((Wardrobe)x.Type, x.Tex)).ToArray()
+                ? comp.AvatarItems.Select(x => Tuple.Create(x.Type, x.Tex)).ToArray()
                 : null;
         }
 

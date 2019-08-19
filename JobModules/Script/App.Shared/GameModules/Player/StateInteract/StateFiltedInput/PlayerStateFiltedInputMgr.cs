@@ -1,9 +1,10 @@
-﻿using Core.Prediction.UserPrediction.Cmd;
+﻿using Core;
+using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
+using System;
 using System.Collections.Generic;
-using Core;
-using Core.EntityComponent;
-using Entitas;
+using System.Linq;
+using Core.Free;
 using XmlConfig;
 
 namespace App.Shared.GameModules.Player
@@ -17,7 +18,6 @@ namespace App.Shared.GameModules.Player
             new LoggerAdapter(typeof(PlayerStateFiltedInputMgr));
 
         private List<PlayerStateInputData> currStateInputItems = new List<PlayerStateInputData>();
-
         public IFilteredInput UserInput { get; private set; }
 
         private IPlayerStateColltector playerStateCollector;
@@ -30,54 +30,98 @@ namespace App.Shared.GameModules.Player
         }
 
         public PlayerStateFiltedInputMgr(IPlayerStateColltector playerStateCollector,
-                                         ValuableFilteredInput  valuableFilteredInput)
+            ValuableFilteredInput valuableFilteredInput)
         {
             this.playerStateCollector = playerStateCollector;
-            UserInput                 = valuableFilteredInput;
-            EmptyInput                = new EmptyFilteredInput();
+            UserInput = valuableFilteredInput;
+            EmptyInput = new EmptyFilteredInput();
         }
 
 
         private void UpdateStateInputItems(IUserCmd cmd)
         {
             currStateInputItems.Clear();
-            
+
             //获取实时玩家状态,每帧只更新一次
-            HashSet<EPlayerState> currStates = playerStateCollector.GetCurrStates(EPlayerStateCollectType.CurrentMoment);
+            HashSet<EPlayerState> currStates =
+                playerStateCollector.GetCurrStates(EPlayerStateCollectType.CurrentMoment);
             //匍匐捡枪不允许移动
             if (currStates.Contains(EPlayerState.Pickup) && currStates.Contains(EPlayerState.Prone))
             {
                 cmd.MoveHorizontal = 0f;
                 cmd.MoveVertical = 0f;
-                UserInput.SetInput(EPlayerInput.IsRun,false) ;
-                UserInput.SetInput(EPlayerInput.IsSprint,false) ;
-                UserInput.SetInput(EPlayerInput.IsSlightWalk,false) ;
-                
+                UserInput.SetInput(EPlayerInput.IsRun, false);
+                UserInput.SetInput(EPlayerInput.IsSprint, false);
+                UserInput.SetInput(EPlayerInput.IsSlightWalk, false);
+
             }
+
             foreach (var state in currStates)
                 currStateInputItems.Add(PlayerStateInputsDataMap.Instance.GetState(state));
         }
 
+        // private struct InputInfo
+        // {
+        //     public EPlayerInput input;
+        //     public bool isInput;
+        //     public Action execAction;
+        //
+        //     public InputInfo(EPlayerInput input, bool isInput, Action execAction)
+        //     {
+        //         this.isInput = isInput;
+        //         this.input = input;
+        //         this.execAction = execAction;
+        //     }
+        // }
+        //
+        // private List<InputInfo> tempOriginInputs = new List<InputInfo>();
+
+        // private void CacheBeingBlockCmd(EPlayerInput playerInput, System.Action execAction)
+        // {
+        //     tempOriginInputs.Add(new InputInfo(playerInput, UserInput.IsInput(playerInput), execAction));
+        //     UserInput.SetInput(playerInput, true);
+        // }
+        //
+        // private void ExecWhenBlockCmd()
+        // {
+        //     foreach (var oinput in tempOriginInputs)
+        //     {
+        //         if (!UserInput.IsInput(oinput.input))
+        //         {
+        //             oinput.execAction();
+        //         }
+        //         else
+        //         {
+        //             UserInput.SetInput(oinput.input, oinput.isInput);
+        //         }
+        //     }
+        // }
+        private void DoReloadInterrupt()
+        {
+            //    UserInput.SetInput(EPlayerInput.IsReloadInterrupt, true);
+
+        }
+
+        private HashSet<InterruptConfigType> interruptMergeBuffer = new HashSet<InterruptConfigType>();
         private void BlockUserInput()
         {
-            var IsUserThrowing = UserInput.IsInput(EPlayerInput.IsThrowing);
-            UserInput.SetInput(EPlayerInput.IsThrowing, true);
-         
-            
-            //与逻辑标志位
-            var pullInterrupt = false;
+            interruptMergeBuffer.Clear();
+            PlayerStateInputData state;
             for (int i = 0, maxi = currStateInputItems.Count; i < maxi; i++)
             {
-                PlayerStateInputData state = currStateInputItems[i];
+                state = currStateInputItems[i];
                 if (state == null) continue;
                 state.BlockUnavaliableInputs(UserInput);
-                pullInterrupt = pullInterrupt || state.IsInputEnabled(EPlayerInput.IsPullboltInterrupt);
+                state.MergeInterrupts(interruptMergeBuffer);
             }
-            if (!UserInput.IsInput(EPlayerInput.IsThrowing))
-                UserInput.SetInput(EPlayerInput.IsThrowingInterrupt, true);
-            else
-                UserInput.SetInput(EPlayerInput.IsThrowing, IsUserThrowing);
-            UserInput.SetInput(EPlayerInput.IsPullboltInterrupt, pullInterrupt);
+            EPlayerInput input;
+            foreach (var interrupt in interruptMergeBuffer)
+            {
+                input = interrupt.ToEPlayerInput();
+                if(input != EPlayerInput.None)
+                    UserInput.SetInput(input, true);
+            //    DebugUtil.MyLog("Set {0}",interrupt.ToEPlayerInput());
+            }
         }
 
         public bool IsInputEnalbed(EPlayerInput input)
@@ -100,9 +144,14 @@ namespace App.Shared.GameModules.Player
                 cmd.MoveHorizontal = debugMoveSignal;
             }
 #endif
+            if (playerStateCollector.GetCurrStates(EPlayerStateCollectType.CurrentMoment)
+                .Contains(EPlayerState.FinalPosing))
+                return EmptyInput;
+
             UserCmdInputConverter.ApplyCmdToInput(cmd, UserInput);
-           
+            UserCmdInputConverter.ApplyInputStaticBlock(UserInput);
             BlockStateInput(cmd);
+            UserCmdInputConverter.ApplyInputInterrupt(UserInput);
             return UserInput;
         }
     }

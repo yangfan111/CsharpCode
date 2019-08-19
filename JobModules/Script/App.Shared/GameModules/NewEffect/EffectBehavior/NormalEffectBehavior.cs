@@ -1,4 +1,6 @@
 using Core;
+using Core.ObjectPool;
+using Core.Utils;
 using UnityEngine;
 
 namespace App.Shared
@@ -26,6 +28,11 @@ namespace App.Shared
         {
             emitter.nodeObject.transform.SetPositionAndRotation(Position + GlobalConst.offset * Normal,
                 Quaternion.FromToRotation(Vector3.forward, Normal));
+        }
+        protected override void Free(ClientEffectEmitter emitter)
+        {
+            base.Free(emitter);
+            ObjectAllocatorHolder<NormalEffectBehavior>.Free(this);
         }
     }
 }

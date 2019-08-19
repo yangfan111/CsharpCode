@@ -12,6 +12,7 @@ using UnityEngine;
 using Assets.App.Client.GameModules.Ui;
 using Core.GameModule.Interface;
 using UIComponent.UI;
+using UIComponent.UI.Manager.Alert;
 
 namespace App.Client.GameModules.Ui
 {
@@ -48,11 +49,35 @@ namespace App.Client.GameModules.Ui
                 UIImageLoader.LoadTextureAsync = loader.RetriveTextureAsync;
             }
 
-            AddModelSystems();
+            InitBlurManager(loader);            InitUiSubManager(loader);            AddModelSystems();
             AddSystem(new UiSessionSystem(contexts));
             //AddSystem(new UiPlayerDataInitSystem(contexts));
             AddSystem(new ObserveUISystem(contexts));
             AddSystem(this);
+        }
+
+        private void InitBlurManager(UiResourceLoader loader)
+        {
+            var root = UiCommon.UIManager.UIRoot;
+            loader.LoadAsync("ui/hall/prefabs/common", "SceneBlurImage", (obj)
+                =>
+            {
+                var blur = root.AddComponent<BlurManager>();
+                blur.SetBlurImage(obj as GameObject);
+            });
+        }
+
+        private void InitUiSubManager(IUiResourcesLoader loader)
+        {
+            var alertManager = UiCommon.AlertManager;
+            if (loader == null)
+            {
+                return;
+            }
+
+            var bundle = AssetBundleConstant.Prefab_Common;
+            var asset = "BattleAlert";
+            loader.LoadAsync(bundle, asset, (obj) => { alertManager.SetStyle<AlertUIModel>(obj as GameObject); });
         }
 
         private void AddModelSystems()

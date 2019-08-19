@@ -45,10 +45,10 @@ namespace Sharpen
 			return array;
 		}
 
-		public static U[] ToArray<T,U> (ICollection<T> list, U[] res) where T:U
+		public static U[] ToArray<T,U> (ICollection<T> list, U[] res, int expand = 0) where T:U
 		{
-			if (res.Length < list.Count)
-				res = new U [list.Count];
+			if (res.Length < list.Count + expand)
+				res = new U [list.Count + expand];
 			
 			int n = 0;
 			foreach (T t in list)

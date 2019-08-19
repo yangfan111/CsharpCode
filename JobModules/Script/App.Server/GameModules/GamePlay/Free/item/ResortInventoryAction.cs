@@ -1,6 +1,6 @@
 using App.Server.GameModules.GamePlay;
 using App.Server.GameModules.GamePlay.free.player;
-using Sharpen;
+using App.Server.GameModules.GamePlay.Free.chicken;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.action;
 using com.wd.free.@event;
@@ -11,7 +11,7 @@ using Core.Free;
 
 namespace gameplay.gamerule.free.item
 {
-	[System.Serializable]
+    [System.Serializable]
 	public class ResortInventoryAction : AbstractPlayerAction, IRule
     {
 		private const long serialVersionUID = -1253447267320235916L;
@@ -28,7 +28,7 @@ namespace gameplay.gamerule.free.item
 			{
 				if (StringUtil.IsNullOrEmpty(inventory))
 				{
-					inventory = "default";
+					inventory = ChickenConstant.BagDefault;
 				}
 				string inKey = FreeUtil.ReplaceVar(inventory, args);
 				FreeData fd = (FreeData)player;

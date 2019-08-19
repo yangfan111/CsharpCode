@@ -110,7 +110,9 @@ namespace Core.CharacterState.Posture
             { ActionStateId.Draw,                   ActionInConfig.SwitchWeapon },
             { ActionStateId.SwitchWeapon,           ActionInConfig.SwitchWeapon },
             { ActionStateId.PickUp,                 ActionInConfig.PickUp },
-            { ActionStateId.MeleeAttack,            ActionInConfig.MeleeAttack },
+            { ActionStateId.MeleeAttackOne,         ActionInConfig.MeleeAttack },
+            { ActionStateId.MeleeAttackTwo,         ActionInConfig.MeleeAttack },
+            { ActionStateId.MeleeAttackSpecial,     ActionInConfig.MeleeAttack },
             { ActionStateId.Grenade,                ActionInConfig.Grenade },
             
             { ActionStateId.Gliding,                ActionInConfig.Gliding },

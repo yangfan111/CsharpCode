@@ -23,6 +23,11 @@ namespace App.Shared
             return new AssetInfo(item.ThirdModelAssetBundle, item.ThirdModelAssetName);
         }
 
+        public static bool RoleIdExit(int roleId)
+        {
+            return null != SingletonManager.Get<RoleConfigManager>().GetRoleItemById(roleId);
+        }
+
         public static AssetInfo GetCharacterHandAssetInfo(int roleId)
         {
             var item = SingletonManager.Get<RoleConfigManager>().GetRoleItemById(roleId);
@@ -36,9 +41,9 @@ namespace App.Shared
 
         public static AssetInfo GetBulletAssetInfo(bool isAim)
         {
-            //if(isAim)
+            if(isAim)
                 return  new AssetInfo("common/bullet", "dandao03");
-            return new AssetInfo("common/bullet", "bolt");
+            return new AssetInfo("common/bullet", "dandao04");
             //if (isAim)
             //        return new AssetInfo("common/bullet", "dandao03");
             //    return new AssetInfo("common/bullet", "bolt");

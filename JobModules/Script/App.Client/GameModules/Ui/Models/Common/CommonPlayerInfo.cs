@@ -47,18 +47,18 @@ namespace App.Client.GameModules.Ui.Models.Common
             {
                 if (info.IsPlayer) continue;
 
-                
-                if (_playerInfoDic.ContainsKey(info.PlayerId))
+                PlayerInfo playerInfo;
+                if (_playerInfoDic.TryGetValue(info.PlayerId, out playerInfo))
                 {
                     if (info.Statue == MiniMapPlayStatue.DEAD)
                     {
-                        _playerInfoDic[info.PlayerId].MarkTime = markTime;
-                        _playerInfoDic[info.PlayerId].SetActive(false);
+                        playerInfo.MarkTime = markTime;
+                        playerInfo.SetActive(false);
                         continue;
                     }
-                    _playerInfoDic[info.PlayerId].UpdateLocation(info.TopPos);
-                    _playerInfoDic[info.PlayerId].UpdateInfo(info.Num, info.Color, info.PlayerName,info.EntityId, selectedPlayerId, info.CurHp*1.0f/info.MaxHp);
-                    
+
+                    playerInfo.UpdateInfo(info.IsShow, info.Num, info.Color, info.PlayerName, info.EntityId, selectedPlayerId, info.CurHp * 1.0f / info.MaxHp);
+                    playerInfo.UpdateLocation(info.TopPos);
                 }
                 else
                 {
@@ -93,16 +93,16 @@ namespace App.Client.GameModules.Ui.Models.Common
        public void InitKeyBinding()
        {
            var receiver = new PointerReceiver(UiConstant.maxMapWindowLayer, BlockType.None);
-           receiver.AddAction(UserInputKey.PickUpTip, (data) =>
+           receiver.BindPointAction(UserInputKey.PickUpTip, (data) =>
            {
-               var pointerData = data;
+               var pointerData = data as PointerData;
               
                var type = pointerData.IdList[0];
                switch ((ECastDataType)type)
                {
 
                    case ECastDataType.Player:
-                       selectedPlayerId = PlayerCastData.EntityId(data.IdList);
+                       selectedPlayerId = PlayerCastData.EntityId(pointerData.IdList);
                        //Debug.Log(selectedPlayerId);
                        break;
                     default: selectedPlayerId = 0;
@@ -117,15 +117,15 @@ namespace App.Client.GameModules.Ui.Models.Common
         {
             var info = new PlayerInfo();
             info.Init(GameObject.Instantiate(FindChildGo("playerInfo").gameObject, FindChildGo("Show")));
-            info.UpdateInfo(PlayInfo.Num, PlayInfo.Color, PlayInfo.PlayerName, PlayInfo.EntityId, 0,1);
+            info.UpdateInfo(PlayInfo.IsShow, PlayInfo.Num, PlayInfo.Color, PlayInfo.PlayerName, PlayInfo.EntityId, 0,1);
             info.UpdateLocation(PlayInfo.TopPos);
             return info;
         }
 
 
-        public override void Destory()
+        public override void OnDestory()
         {
-            base.Destory();
+            base.OnDestory();
             foreach (var paire in _playerInfoDic)
             {
                 paire.Value.Destroy();
@@ -154,6 +154,8 @@ namespace App.Client.GameModules.Ui.Models.Common
         private bool isStartUp = true;
 
         private bool hasWait;
+        public bool isActive = true;
+        private ActiveSetter goActiveSetter;
         //private Vector2 canvasSize;
         public void Init(GameObject gameObject)
         {
@@ -164,9 +166,10 @@ namespace App.Client.GameModules.Ui.Models.Common
             //                camera = UiCommon.UIManager.UICamera;
             //            }
             go = gameObject;
+            goActiveSetter = new ActiveSetter(go);
             rect = gameObject.GetComponent<RectTransform>();
             parentRect = rect.GetComponentInParent<RectTransform>();
-            gameObject.SetActive(true);
+            goActiveSetter.Active = true;
             _indexImage = gameObject.transform.Find("IndexImage").GetComponent<Image>();
             var tests = gameObject.GetComponentsInChildren<Text>(true);
             foreach (var v in tests)
@@ -187,9 +190,10 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
         }
 
-        public void UpdateInfo(int index, Color color, string name,int playerID,int selectId,float percent)
+        public void UpdateInfo(bool isShow, int index, Color color, string name,int playerID,int selectId,float percent)
         {
-
+            SetActive(isShow);
+            if (!isActive) return;
             _playerId = playerID;
           
             _indexImage.color = color;
@@ -226,13 +230,14 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         public void UpdateLocation(Vector3 pos)
         {
+            if (!isActive) return;
             var viewPortPos = camera.WorldToViewportPoint(pos);
             if (!InView(pos, viewPortPos))
             {
-                go.SetActive(false);
+                goActiveSetter.Active = false;
                 return;
             }
-            if(!go.activeSelf) go.SetActive(true);
+            goActiveSetter.Active = true;
             _position = pos;
 
             Vector2 result = UIUtils.WorldPosToRect(pos, camera, parentRect);
@@ -258,7 +263,8 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         public void SetActive(bool flag)
         {
-            go.SetActive(false);
+            go.SetActive(flag);
+            isActive = flag;
         }
     }
 }

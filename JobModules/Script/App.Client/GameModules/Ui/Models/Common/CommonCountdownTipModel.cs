@@ -6,6 +6,7 @@ using App.Shared.Components.Ui;
 using Assets.UiFramework.Libs;
 using Core.GameModule.Interface;
 using Core.Utils;
+using UIComponent.UI;
 
 namespace App.Client.GameModules.Ui.Models.Common
 {
@@ -25,6 +26,8 @@ namespace App.Client.GameModules.Ui.Models.Common
             _adapter = adapter;
         }
 
+        private UISelectable uISelectable;
+
         protected override void OnGameobjectInitialized()
         {
             base.OnGameobjectInitialized();
@@ -40,7 +43,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void InitVariable()
         {
-
+            uISelectable = ViewInstance.GetComponentInChildren<UISelectable>();
         }
 
 
@@ -60,18 +63,24 @@ namespace App.Client.GameModules.Ui.Models.Common
                 _adapter.Enable = false;
                 return;
             }
-            var curTime = DateTime.Now.Ticks / 10000;
+            var curTime = _adapter.CurTime;
             var item = tipList[0];
             _viewModel.TitleText = item.Title;
             var remainTime = _createTimeDict[item] - curTime + item.DurationTime;
             remainTime = remainTime < 0 ? 0 : (remainTime + 1000) / 1000;
             _viewModel.TimeText = remainTime.ToString();
+            if (uISelectable != null)
+            {
+                uISelectable.Selected = remainTime < timeNeedSwitchColor;//to make all text color to red;
+            }
         }
+
+        private const float timeNeedSwitchColor = 10f;
 
         private void UpdateRemainTime()
         {
             var tipList = _adapter.CountdownTipDataList;
-            var curTime = DateTime.Now.Ticks / 10000;
+            var curTime = _adapter.CurTime;
             for (int i = tipList.Count - 1; i >= 0; i--)
             {
                 var item = tipList[i];
@@ -90,12 +99,13 @@ namespace App.Client.GameModules.Ui.Models.Common
             {
                 return;
             }
-            var curTime = DateTime.Now.Ticks / 10000;
+            var curTime = _adapter.CurTime;
             foreach (var it in dataList)
             {
                 if (!_createTimeDict.ContainsKey(it))
                 {
                     _createTimeDict.Add(it, curTime);
+                    Logger.Info("Add CountDown:" + it);
                 }
             }
         }

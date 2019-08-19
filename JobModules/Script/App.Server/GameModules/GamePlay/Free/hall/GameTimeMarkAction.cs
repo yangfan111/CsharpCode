@@ -1,5 +1,4 @@
-﻿using App.Shared.GameModules.Player;
-using Assets.App.Server.GameModules.GamePlay.Free;
+﻿using Assets.App.Server.GameModules.GamePlay.Free;
 using com.wd.free.action;
 using com.wd.free.@event;
 using Core.Free;
@@ -19,9 +18,9 @@ namespace App.Server.GameModules.GamePlay.Free.hall
             if (type == 0)
             {
                 rule.GameStartTime = rule.ServerTime;
-                foreach (PlayerEntity player in args.GameContext.player.GetInitializedPlayerEntities())
+                foreach (PlayerEntity player in args.GameContext.player.GetEntities())
                 {
-                    player.statisticsData.Statistics.GameJoinTime = rule.ServerTime;
+                    if(player.hasStatisticsData) player.statisticsData.Statistics.GameJoinTime = rule.ServerTime;
                     SimpleProto sp = FreePool.Allocate();
                     sp.Key = FreeMessageConstant.PlaySound;
                     sp.Ks.Add(1);
@@ -33,12 +32,15 @@ namespace App.Server.GameModules.GamePlay.Free.hall
             if (type == 1)
             {
                 rule.GameEndTime = rule.ServerTime;
-                foreach (PlayerEntity player in args.GameContext.player.GetInitializedPlayerEntities())
+                foreach (PlayerEntity player in args.GameContext.player.GetEntities())
                 {
-                    player.statisticsData.Statistics.GameTime = (int) (rule.ServerTime - player.statisticsData.Statistics.GameJoinTime);
+                    if (player.hasStatisticsData && player.statisticsData.Statistics.GameJoinTime > 0)
+                    {
+                        player.statisticsData.Statistics.GameTime = (int) (rule.ServerTime - player.statisticsData.Statistics.GameJoinTime);
+                    }
                     if (player.gamePlay.IsDead())
                     {
-                        player.statisticsData.Statistics.DeadTime += (int) (DateTime.Now.Ticks / 10000L - player.statisticsData.Statistics.LastDeadTime);
+                        player.statisticsData.Statistics.DeadTime += (int) (rule.ServerTime - player.statisticsData.Statistics.LastDeadTime);
                     }
                 }
             }

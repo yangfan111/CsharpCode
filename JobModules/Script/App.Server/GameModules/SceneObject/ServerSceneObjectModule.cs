@@ -17,8 +17,7 @@ namespace App.Server.GameModules.SceneObject
             AddSystem(new ServerDestructibleObjectUpdateSystem(contexts));
             AddSystem(new ServerFreeCastSceneEntityDestroySystem(contexts));
             AddSystem(new ServerSceneObjectThrowingSystem(contexts.sceneObject, 
-                contexts.session.currentTimeObject,
-                contexts.session.commonSession.RuntimeGameConfig));
+                contexts.session.currentTimeObject));
             AddSystem(new SceneObjectLimitSystem(contexts));
 #if UNITY_EDITOR
         AddSystem(new ServerDebugSystem(contexts));

@@ -24,16 +24,23 @@ namespace App.Shared.GameModules.Player
             var controller = owner.OwnerEntityKey.WeaponController();
             var weaponId = controller.HeldWeaponAgent.ConfigId;
             var jobAttribute = controller.JobAttribute;
-            if (weaponId < 1) return;
+            if (weaponId < 1 || Filter(owner, cmd)) return;
             if (jobAttribute == (int)EJobAttribute.EJob_Variant ||
                 jobAttribute == (int)EJobAttribute.EJob_Matrix) {
                 weaponId = WeaponUtil.MeleeVariant;
             }
+
             var fireUpdater = _weaponFireUpdateManagaer.GetFireUpdater(weaponId);
             if(null != fireUpdater)
             {
                 fireUpdater.Update(owner.OwnerEntityKey, cmd, _contexts);
             }
+        }
+
+        protected bool Filter(IUserCmdOwner owner, IUserCmd cmd)
+        {
+            var controller = owner.OwnerEntityKey.WeaponController();
+            return (cmd.IsLeftAttack && controller.NotMove);
         }
     }
 }

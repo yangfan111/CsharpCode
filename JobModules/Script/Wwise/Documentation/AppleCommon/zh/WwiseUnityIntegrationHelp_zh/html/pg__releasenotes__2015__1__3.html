@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>版本说明 - Wwise Unity Integration 2015.1.3</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>&nbsp;&raquo;&nbsp;<a class="el" href="pg__previousreleases.html">Previous Release Notes</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="pg_releasenotes_2015_1_3">版本说明 - Wwise Unity Integration 2015.1.3 </a></h1><p>本次发布为 Wwise 2015.1.3 和 Universal Windows Platform 提供了 Wwise SDK 更新。</p>
+<p><b>兼容性：</b></p>
+<ul>
+<li>Wwise SDK: 2015.1.3</li>
+<li>Unity：Unity 4.6 Pro 或 Unity 5.2 (Personal 或 Pro) <table  border="1" cellspacing="0">
+<tr>
+<td><b>平台：</b> </td><td><b>Wwise Unity Integration 在以下平台测试过：</b>  </td></tr>
+<tr>
+<td>Android<br/>
+iOS<br/>
+Linux<br/>
+Mac<br/>
+PS3<br/>
+PS4<br/>
+PS Vita<br/>
+Windows<br/>
+Windows Store Apps<br/>
+Xbox One </td><td>Unity 5.2.2p1  </td></tr>
+<tr>
+<td>Wii U </td><td>Unity 4.3.7f1 和 Wii U add-on 2.2.5  </td></tr>
+<tr>
+<td>Xbox 360 </td><td>Unity 5.0.1f1  </td></tr>
+</table>
+</li>
+</ul>
+<p><b>新功能：</b></p>
+<ul>
+<li>在 Windows Store Apps 包下添加了对 Universal Windows Platform 的支持。</li>
+<li>添加了对 Windows Store Apps SDK 8.1 的支持。</li>
+<li>取消了对 Windows Phone 8.0 的支持。</li>
+<li>取消了对 Windows Store Apps SDK 8.0 的支持。</li>
+</ul>
+<p><b>已解决的问题：</b></p>
+<ul>
+<li>WG-25945 修复了：Wwise 错误总是被重定向到 Unity 控制台。在 WwiseGlobal 设置中添加一个菜单项，以便在 Unity 控制台中启用/禁用 Wwise 引擎输出。</li>
+<li>WG-26011 修复了：在创建一个新场景后，启用回 Ak Audio Listener 不能正确地破坏 Default Unity Audio Listener。</li>
+<li>WG-28108 修复了：当暂停编辑器时，声音仍然一直在播放。现在在编辑器中暂停后，声音会停止；取消暂停后，声音会重新播放。声音在切换窗口时（和以前一样）一直在播放。</li>
+<li>WG-28175 修复了：在创建新场景时，WwiseGlobal 并不是每次都自动创建。</li>
+<li>WG-28479 修复了：安装时尝试添加未勾选的选项。 现在在没有 Main Camera 的工程中安装集成时，安装会成功。</li>
+<li>WG-28526 修复了：潜在的 Unity Editor 崩溃。确保了在注册和取消注册 GameObjects 之前，先对 SoundEngine 进行了初始化。 </li>
+</ul>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

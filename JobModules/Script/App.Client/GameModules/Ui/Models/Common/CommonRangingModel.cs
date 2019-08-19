@@ -130,7 +130,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void InitKeyBinding()
         {
             var receiver = new KeyReceiver(UiConstant.rangingWindowLayer, BlockType.None);
-            receiver.AddAction(UserInputKey.CheckRanging, (data) =>
+            receiver.BindKeyAction(UserInputKey.CheckRanging, (data) =>
             {
                
                 Debug.Log("CheckRanging..........................");

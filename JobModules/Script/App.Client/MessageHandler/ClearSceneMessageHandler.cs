@@ -1,5 +1,6 @@
 ﻿using App.Client.Console.MessageHandler;
 using App.Protobuf;
+using App.Shared.Util;
 
 namespace App.Client.MessageHandler
 {
@@ -23,6 +24,7 @@ namespace App.Client.MessageHandler
             {
                 entity.isFlagDestroy = true;
             }
+            LocalObjectGenerator.Dispose(true);
         }
     }
 }

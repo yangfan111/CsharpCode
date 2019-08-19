@@ -1,20 +1,15 @@
-﻿using Core.Compare;
+﻿using App.Shared.Components.Player;
+using App.Shared.GameModules.Camera.Utils;
+using Core.Compare;
 using Core.Fsm;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Core.CharacterState;
-using UnityEngine;
 using Utils.Appearance;
 using Utils.Utils;
 using XmlConfig;
-using App.Shared.Player;
-using Core.CharacterState.Posture;
-using App.Shared.GameModules.Weapon;
-using App.Shared.Components.Player;
 
 namespace App.Shared.GameModules.Player.CharacterState
 {
@@ -101,57 +96,64 @@ namespace App.Shared.GameModules.Player.CharacterState
                 {
                     SetCommand(cmd.MoveVertical > 0 ? FsmInput.Forth : FsmInput.Back, cmd.MoveVertical);
                 }
-                if(player.playerMove.IsAutoRun)
+                if (PlayerStateUtil.HasPlayerState(EPlayerGameState.UseItem, player.gamePlay) || player.IsAiming()
+                    || player.StateInteractController().GetCurrStates().Contains(EPlayerState.RunDebuff))
                 {
-                    if (IsVariant &&
-                        player.hasStateInterface &&
-                        player.stateInterface.State.GetCurrentPostureState() == PostureInConfig.Crouch)
-                    {
-                        SetCommand(FsmInput.Forth, InputValueLimit.MaxAxisValue);
-                        SetCommand(FsmInput.Run);
-                    }
-                    else
-                    {
-                        SetCommand(FsmInput.Forth, InputValueLimit.MaxAxisValue);
-                        SetCommand(FsmInput.Sprint);
-                    }
+                    SetCommand(FsmInput.Walk);
                 }
-                // 冲刺
-                IsSprint = (cmd.MoveVertical > 0 && cmd.MoveVertical >= Math.Abs(cmd.MoveHorizontal));
-                if (cmd.IsRun && IsCanSprint(cmd, player))
+                else
                 {
-                    // 冲刺只有前向90度
-                    if (IsSprint)
+                    if(player.playerMove.IsAutoRun)
                     {
-                        if (!(player.hasStateInterface && player.stateInterface.State.GetCurrentPostureState() == PostureInConfig.Crouch && IsVariantFilter(player))) {
+                        if (IsVariant && player.hasStateInterface &&
+                            player.stateInterface.State.GetCurrentPostureState() == PostureInConfig.Crouch)
+                        {
+                            SetCommand(FsmInput.Forth, InputValueLimit.MaxAxisValue);
+                            SetCommand(FsmInput.Run);
+                        }
+                        else
+                        {
+                            SetCommand(FsmInput.Forth, InputValueLimit.MaxAxisValue);
                             SetCommand(FsmInput.Sprint);
                         }
                     }
-                    else
+                    // 冲刺
+                    IsSprint = (cmd.MoveVertical > 0 && cmd.MoveVertical >= Math.Abs(cmd.MoveHorizontal));
+                    if (cmd.IsRun && IsCanSprint(cmd, player))
+                    {
+                        // 冲刺只有前向90度
+                        if (IsSprint)
+                        {
+                            if (!(player.hasStateInterface && player.stateInterface.State.GetCurrentPostureState() == PostureInConfig.Crouch && IsVariantFilter(player))) {
+                                SetCommand(FsmInput.Sprint);
+                            }
+                        }
+                        else
+                        {
+                            SetCommand(FsmInput.Run);
+                        }
+                    }
+                    // 静走 静走不被限制
+                    else if (cmd.FilteredInput.IsInput(EPlayerInput.IsSlightWalk))
+                    {
+                        if (IsVariant)
+                        {
+                            SetCommand(FsmInput.Run);
+                        }
+                        else
+                        {
+                            SetCommand(FsmInput.Walk);
+                        }
+                    }
+                    else if (IsCanRun(cmd))
                     {
                         SetCommand(FsmInput.Run);
                     }
-                }
-                // 静走 静走不被限制
-                else if (cmd.FilteredInput.IsInput(EPlayerInput.IsSlightWalk))
-                {
-                    if (IsVariant)
-                    {
-                        SetCommand(FsmInput.Run);
-                    }
-                    else
+                    //不能冲刺跑步，就切换为静走
+                    else if(cmd.FilteredInput.IsInput(EPlayerInput.IsSlightWalk))
                     {
                         SetCommand(FsmInput.Walk);
                     }
-                }
-                else if (IsCanRun(cmd))
-                {
-                    SetCommand(FsmInput.Run);
-                }
-                //不能冲刺跑步，就切换为静走
-                else if(cmd.FilteredInput.IsInput(EPlayerInput.IsSlightWalk))
-                {
-                    SetCommand(FsmInput.Walk);
                 }
             }
 

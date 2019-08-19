@@ -100,5 +100,6 @@ namespace App.Shared.Components.Ui
         [DontInitilize] public bool ShowBuffTip;
         [DontInitilize] public string BuffTip;
         [DontInitilize] public PlayerEntity Player;
+        [DontInitilize] public float C4InitialProgress;
     }
 }

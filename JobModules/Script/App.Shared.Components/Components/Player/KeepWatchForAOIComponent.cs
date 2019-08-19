@@ -1,7 +1,7 @@
 using Entitas;
 using System;
 using System.Collections.Generic;
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core.EntityComponent;
 
 namespace App.Shared.Components.Player
@@ -10,7 +10,7 @@ namespace App.Shared.Components.Player
     public class KeepWatchForAOIComponent: IComponent
     {
         /// <summary>
-        ///  йсоъдз╡паТ╤тоС╣дkey рт╪╟ фД╪схКвж╣Д╣дпео╒ё╗д©г╟пео╒йгй╠╪Д(╣╔н╩ms)ё╛рт╨Ср╡©идэйг╠П╣дпео╒ё╘
+        ///  О©╫О©╫О©╫О©╫О©╫з╡О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫key О©╫т╪О©╫ О©╫О©╫О©╫О©╫О©╫О©╫ж╣О©╫О©╫О©╫О©╫о╒О©╫О©╫д©г╟О©╫О©╫о╒О©╫О©╫й╠О©╫О©╫(О©╫О©╫н╩ms)О©╫О©╫О©╫т╨О©╫р╡О©╫О©╫О©╫О©╫О©╫г╠О©╫О©╫О©╫О©╫о╒О©╫О©╫
         /// </summary>
         public IWatchDict watchMap;
     }

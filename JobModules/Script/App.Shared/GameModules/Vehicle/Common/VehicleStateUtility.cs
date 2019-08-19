@@ -53,6 +53,9 @@ namespace App.Shared.GameModules.Vehicle
             }
 
             var controller = vehicle.GetController<VehicleCommonController>();
+            if (controller == null)
+                return true;
+
             if (controller.IsKinematic)
             {
                 if (!IsTransformSameWithComponent(controller, data))
@@ -143,6 +146,9 @@ namespace App.Shared.GameModules.Vehicle
         private static bool CheckAndResetStateChanged( VehicleEntity vehicle)
         {
             var controller = vehicle.GetController<VehicleCommonController>();
+            if (controller == null)
+                return false;
+
             var isStateChanged = controller.isStateChanged;
             controller.isStateChanged = false;
             return isStateChanged;

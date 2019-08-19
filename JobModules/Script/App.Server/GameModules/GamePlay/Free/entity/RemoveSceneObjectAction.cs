@@ -10,6 +10,7 @@ using com.wd.free.para.exp;
 using com.wd.free.skill;
 using com.wd.free.util;
 using Core.EntityComponent;
+using Core.EntityComponent;
 using gameplay.gamerule.free.ui;
 using UnityEngine;
 using Core.Free;
@@ -24,7 +25,7 @@ namespace App.Server.GameModules.GamePlay.Free.entity
         public override void DoAction(IEventArgs args)
         {
             Debug.LogFormat("remove scene object {0}", id);
-            SceneObjectEntity entity = args.GameContext.sceneObject.GetEntityWithEntityKey(new Core.EntityComponent.EntityKey(FreeUtil.ReplaceInt(id, args), (short)EEntityType.SceneObject));
+            SceneObjectEntity entity = args.GameContext.sceneObject.GetEntityWithEntityKey(new EntityKey(FreeUtil.ReplaceInt(id, args), (short)EEntityType.SceneObject));
 
             if (entity != null)
             {

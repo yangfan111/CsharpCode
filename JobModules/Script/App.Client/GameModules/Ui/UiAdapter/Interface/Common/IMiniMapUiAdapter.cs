@@ -233,6 +233,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
         MiniMapTeamPlayInfo GetPlayerById(long playerId);   //取玩家
         MiniMapTeamPlayInfo CurPlayer { get; }    //当前玩家
         Vector2 CurPlayerPos { get; }   //当前玩家位置
+        MapFixedVector3 CurPlayerPos3D { get; }   //当前玩家位置
 
         AirPlaneData PlaneData { get; } //当前飞机 
         List<MapFixedVector2> KongTouList(); //空投点
@@ -259,6 +260,11 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         bool IsC4Drop { get; }
         Vector3 C4DropPosition { get; }
+        Vector3 APosition { get; }
+        Vector3 BPosition { get; }
+        bool isBombMode { get; }
+        bool IsCampPass();
+        int C4SetStatus { get; }
 
         GamePlayComponent gamePlay { get; }
 

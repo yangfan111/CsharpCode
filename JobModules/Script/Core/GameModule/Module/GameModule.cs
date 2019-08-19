@@ -28,7 +28,7 @@ namespace Core.GameModule.Module
         private List<IGamePlaySystem> _gamePlaySystems = new List<IGamePlaySystem>();
         private List<IUiSystem> _uiSystems = new List<IUiSystem>();
         private List<IUiHfrSystem> _hfrUiSystems = new List<IUiHfrSystem>();
-        private List<IBeforeUserCmdExecuteSystem> _beforeUserCmdExecuteSystem = new List<IBeforeUserCmdExecuteSystem>();
+       
 
         public virtual void Init()
         {
@@ -55,7 +55,7 @@ namespace Core.GameModule.Module
             if (system is IGamePlaySystem) _gamePlaySystems.Add(system as IGamePlaySystem);
             if (system is IUiSystem) _uiSystems.Add(system as IUiSystem);
             if (system is IUiHfrSystem) _hfrUiSystems.Add(system as IUiHfrSystem);
-            if(system is IBeforeUserCmdExecuteSystem) _beforeUserCmdExecuteSystem.Add(system as IBeforeUserCmdExecuteSystem);
+           
         }
 
         public List<IEntityInitSystem> EntityInitSystems
@@ -143,10 +143,7 @@ namespace Core.GameModule.Module
             get { return _gamePlaySystems; }
         }
 
-        public List<IBeforeUserCmdExecuteSystem> BeforeUserCmdExecuteSystems
-        {
-            get { return _beforeUserCmdExecuteSystem; }
-         }
+       
 
 
         public List<IResourceLoadSystem> ResourceLoadSystems { get { return _resourceLoadSystems; } }

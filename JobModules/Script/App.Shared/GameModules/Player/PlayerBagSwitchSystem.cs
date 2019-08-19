@@ -5,6 +5,7 @@ using Core.Free;
 using Core.GameModule.Interface;
 using Core.GameModule.System;
 using Core.Prediction.UserPrediction.Cmd;
+using XmlConfig;
 
 namespace App.Shared.GameModules.Player
 {
@@ -21,9 +22,13 @@ namespace App.Shared.GameModules.Player
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
+
             if (cmd.BagIndex > 0)
             {
                 var player = owner.OwnerEntity as PlayerEntity;
+                if (player.StateInteractController().GetCurrStates().Contains(EPlayerState.SwitchWeapon))
+                    return;
+
                 player.WeaponController().SwitchBag(cmd.BagIndex-1);
 
                 var args = _contexts.session.commonSession.FreeArgs as IEventArgs;

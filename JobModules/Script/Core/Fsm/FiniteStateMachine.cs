@@ -38,13 +38,14 @@ namespace Core.Fsm
 
         public void SetFsmSnapshot(FsmSnapshot snapshot)
         {
-            if (_states.ContainsKey(snapshot.StateId))
+            FsmState fsmState = null;
+            if (_states.TryGetValue(snapshot.StateId, out fsmState))
             {
                 if (snapshot.StateId != _currentState.StateId)
                 {
-                    if (_states.ContainsKey(snapshot.StateId))
+                    if (_states.TryGetValue(snapshot.StateId, out fsmState))
                     {
-                        _currentState = _states[snapshot.StateId];
+                        _currentState = /*_states[snapshot.StateId]*/fsmState;
                         Logger.DebugFormat("rewind to {0} in {1}", snapshot.StateId, _name);
                     }
                     else

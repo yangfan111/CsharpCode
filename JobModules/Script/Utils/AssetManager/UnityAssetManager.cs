@@ -14,6 +14,7 @@ using UnityEngine;
 using Utils.Singleton;
 using XmlConfig.BootConfig;
 using Object = UnityEngine.Object;
+using AssetBundleManager.Operation;
 
 namespace Utils.AssetManager
 {
@@ -32,15 +33,20 @@ namespace Utils.AssetManager
         public bool Recyclable;
         public Func<UnityObject, IAssetPostProcessor> PostProcessorFactory;
         public Type ObjectType;
+        public Vector3? Position;
+        public Quaternion? Rotation;
 
         public AssetLoadOption(bool dontAutoActive = false, GameObject parent = null, bool recyclable = false,
-            Func<UnityObject, IAssetPostProcessor> postProcessorFactory = null, Type objectType = null)
+            Func<UnityObject, IAssetPostProcessor> postProcessorFactory = null, Type objectType = null, 
+            Vector3? position = null, Quaternion? rotation = null)
         {
             DontAutoActive = dontAutoActive;
             Parent = parent;
             Recyclable = recyclable;
             PostProcessorFactory = postProcessorFactory;
             ObjectType = objectType;
+            Position = position;
+            Rotation = rotation;
         }
 
         public static AssetLoadOption Default = new AssetLoadOption();
@@ -48,7 +54,7 @@ namespace Utils.AssetManager
 
     public interface IUnityAssetManager
     {
-        IEnumerator Init(ResourceConfig config, ICoRoutineManager coRoutineManager, bool isLow = false);
+        IEnumerator Init(ResourceConfig config, ICoRoutineManager coRoutineManager, bool isLow = false, string useMD5 = null);
 
         HashSet<string> AllAssetBundleNames { get; }
 
@@ -376,6 +382,19 @@ namespace Utils.AssetManager
             }
         }
 
+        public static string GetRemainsAndFailed()
+        {
+            string str = _bundlePool != null ? _bundlePool.Status_RemainsAndFailed() : string.Empty;
+            str+="\n回调失败的Asset:\n"+ string.Join("\n\n", failed_CallBack_Asset_List.ToArray());
+            str += "\n============----------------==================---------------------===============\n";
+            return str;
+        }
+
+        /// <summary>
+        /// 记录回调出错的asset
+        /// </summary>
+        private static List<string> failed_CallBack_Asset_List = new List<string>();
+
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(UnityAssetManager));
         private static AssetBundleStat _bundleStat = new AssetBundleStat();
         private static AssetBundlePool _bundlePool = new AssetBundlePool(_bundleStat);
@@ -409,7 +428,6 @@ namespace Utils.AssetManager
         public UnityAssetManager(IUnityObjectPool objectPool, int maxLoadingAssetNum = Int32.MaxValue,
             bool useAssetPool = true)
         {
-            
             _objectPool = objectPool;
             _maxLoadingAssetNum = Math.Max(1, maxLoadingAssetNum);
             _useAssetPool = useAssetPool;
@@ -442,7 +460,7 @@ namespace Utils.AssetManager
             public string[] Bundles;
         }
 
-        public IEnumerator Init(ResourceConfig config, ICoRoutineManager coRoutineManager, bool isServer = false)
+        public IEnumerator Init(ResourceConfig config, ICoRoutineManager coRoutineManager, bool isServer = false, string useMD5 = null)
         {
 #if !UNITY_EDITOR
             var isLQ =
@@ -454,7 +472,7 @@ namespace Utils.AssetManager
                 SettingManager.SettingManager.GetInstance().GetQualityBeforeInit());
             coRoutineManager.StartCoRoutine(InitUpdate());
             coRoutineManager.StartCoRoutine(Init(config,
-                !isServer && isLQ));
+                !isServer && isLQ, useMD5));
 
             yield return new WaitUntil(() => _isInitialized);
         }
@@ -469,7 +487,7 @@ namespace Utils.AssetManager
             }
         }
 
-        private IEnumerator Init(ResourceConfig config, bool isLow)
+        private IEnumerator Init(ResourceConfig config, bool isLow, string useMD5 = null)
         {
             var defaultWarehouseAddr = new AssetBundleWarehouseAddr()
             {
@@ -504,12 +522,12 @@ namespace Utils.AssetManager
             }
 
            
-            yield return InitWarehouse(defaultWarehouseAddr, supplementaryWarehouses, isLow);
+            yield return InitWarehouse(defaultWarehouseAddr, supplementaryWarehouses, isLow, useMD5);
         }
 
         //For Test Purpose.
         public IEnumerator InitWarehouse(AssetBundleWarehouseAddr defaultWarehouseAddr,
-            List<SupplementaryWarehouse> supplementaryWarehouses = null, bool isLow = false)
+            List<SupplementaryWarehouse> supplementaryWarehouses = null, bool isLow = false, string useMD5 = null)
         {
             if (!_isWareHouseConfig)
             {
@@ -523,7 +541,7 @@ namespace Utils.AssetManager
                     }
                 }
 
-                yield return _bundlePool.Init(isLow);
+                yield return _bundlePool.Init(isLow, useMD5);
                 _isWareHouseConfig = true;
                 //yield return _bundlePool.Init(/*"Low"*/SettingManager.SettingManager.GetInstance().GetQualityBeforeInit().ToString());
 
@@ -623,7 +641,7 @@ namespace Utils.AssetManager
             Action<T, UnityObject> handlerAction,
             AssetLoadOption option)
         {
-            _logger.DebugFormat("Loading Asset {0}", assetInfo);
+            _logger.DebugFormat("*****  *****  ***** Loading Asset {0}", assetInfo);
 
             var req = AssetLoadRequest<T>.Alloc();
             req.Source = source;
@@ -668,14 +686,14 @@ namespace Utils.AssetManager
                 unityObj.OnLoadFromPool();
                 req.LoadedObject = unityObj;
                 _loadedRequests.Enqueue(req);
-                _logger.DebugFormat("Load resource for object pool {0}", assetInfo);
+                _logger.InfoFormat("Load resource for object pool {0}", assetInfo);
             }
             else
             {
                 _pendingRequests.AddLast(req);
             }
 
-            return req;
+            return req; 
         }
 
         public void LoadSceneAsync(AssetInfo assetInfo, bool isAdditive)
@@ -833,6 +851,7 @@ namespace Utils.AssetManager
                                 try
                                 {
                                     _assetLoadProfile.BeginProfileOnlyEnableProfile();
+
                                     if (TryLoadFromAssetPool(req))
                                     {
                                         _loadedRequests.Enqueue(req);
@@ -895,7 +914,9 @@ namespace Utils.AssetManager
                 }
                 catch (Exception e)
                 {
-                    _logger.Error("OnLoaded Callback Error", e);
+                    string content = req.AssetInfo.ToString();
+                    failed_CallBack_Asset_List.Add(content+"\n"+e.ToString());
+                    _logger.ErrorFormat("OnLoaded Callback Error: {0},\n{1}", content, e);
                 }
                 finally
                 {
@@ -1016,7 +1037,20 @@ namespace Utils.AssetManager
                 var profiler = SingletonManager.Get<LoadRequestProfileHelp>().GetProfile(assetInfo);
                 profiler.InstantiateTimes++;
 
-                obj = Object.Instantiate(go, GetGameObjectParent(req), false);
+                var hasPosition = req.Option.Position.HasValue;
+                var hasRotation = req.Option.Rotation.HasValue;
+                if (hasPosition || hasRotation)
+                {
+                    var position = hasPosition ? req.Option.Position.Value : Vector3.zero;
+                    var rotation = hasRotation ? req.Option.Rotation.Value : Quaternion.identity;
+                    obj = Object.Instantiate(go, position, rotation, GetGameObjectParent(req));
+                }
+                else
+                {
+                    obj = Object.Instantiate(go, GetGameObjectParent(req), false);
+                }
+
+               
                 go = obj as GameObject;
             }
 
@@ -1092,6 +1126,7 @@ namespace Utils.AssetManager
             _loadingScenes.Clear();
             _objectPool.Clear();
             _bundlePool.Reset();
+            failed_CallBack_Asset_List.Clear();
             _logger.InfoFormat("Clear UnityAssetManager End");
         }
 
@@ -1108,6 +1143,26 @@ namespace Utils.AssetManager
         private static AssetInfo GetAssetInfo(string bundleName, string assetName)
         {
             return new AssetInfo(bundleName, assetName);
+        }
+
+        public AsyncOperation GetSceneLoadAsyncOperation(string sceneName)
+        {
+            foreach (var item in _bundlePool.AssetsWaitForBundle)
+            {
+                if(item.IsSceneLoading&&item.Name == sceneName)
+                {
+                    return (item as SceneLoading).AsyncLoadRequest; 
+                }
+            }
+
+            foreach (var item in _bundlePool.LoadingAssets)
+            {
+                if (item.IsSceneLoading && item.Name == sceneName)
+                {
+                    return (item as SceneLoading).AsyncLoadRequest;
+                }
+            }
+            return null;
         }
     }
 }

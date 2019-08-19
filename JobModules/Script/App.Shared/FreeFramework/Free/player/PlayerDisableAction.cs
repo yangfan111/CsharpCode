@@ -6,6 +6,7 @@ using System.Text;
 using com.wd.free.@event;
 using App.Shared.GameModules.Player;
 using Core.Free;
+using Core.Enums;
 
 namespace App.Shared.FreeFramework.Free.player
 {
@@ -19,7 +20,7 @@ namespace App.Shared.FreeFramework.Free.player
             PlayerEntity p = GetPlayerEntity(args);
             if (p != null)
             {
-                PlayerEntityUtility.SetActive(p, args.GetBool(enable));
+                PlayerEntityUtility.SetActive(p, args.GetBool(enable), EActiveMask.DisableAction);
             }
         }
 

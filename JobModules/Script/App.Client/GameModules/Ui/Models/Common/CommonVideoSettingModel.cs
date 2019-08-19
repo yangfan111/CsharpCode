@@ -35,6 +35,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         }
         IVideoSettingUiAdapter _adapter;
         private PointerReceiver pointerReceiver;
+        private KeyReceiver keyReceiver;
         private bool _haveRegister;
 
         public CommonVideoSettingModel(IVideoSettingUiAdapter adapter) : base(adapter)
@@ -55,7 +56,8 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void InitReceiver()
         {
-            pointerReceiver = new PointerReceiver(Layer.Env, BlockType.All);
+            pointerReceiver = new PointerReceiver(EInputLayer.Env, BlockType.All);
+            keyReceiver = new KeyReceiver(EInputLayer.Env, BlockType.All);
         }
 
         private void InitGui()
@@ -349,6 +351,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         {
             _adapter.SetCrossVisible(true);
             _adapter.UnRegisterPointerReceive(pointerReceiver);
+            _adapter.UnRegisterKeyReceive(keyReceiver);
             _haveRegister = false;
         }
 
@@ -356,6 +359,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         {
             _adapter.SetCrossVisible(false);
             _adapter.RegisterPointerReceive(pointerReceiver);
+            _adapter.RegisterKeyReceive(keyReceiver);
             _haveRegister = true;
         }
     }

@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>Rooms and Portals Tutorial</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>&nbsp;&raquo;&nbsp;<a class="el" href="pg__spatialaudio.html">Using Wwise Spatial Audio in Unity</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="pg_rooms_portals_tut">Rooms and Portals Tutorial </a></h1><p>This tutorial will show you how to use Rooms and Portals with Spatial Audio. The following sections detail each step in the tutorial:</p>
+<ul>
+<li><a class="el" href="pg__rooms__portals__tut.html#sect_rooms_portals_wwise">A. Wwise Project（工程）</a></li>
+<li><a class="el" href="pg__rooms__portals__tut.html#sect_romms_portals_emitter">B. Spatial Audio Emitter</a></li>
+<li><a class="el" href="pg__rooms__portals__tut.html#sect_rooms">C. Rooms</a></li>
+<li><a class="el" href="pg__rooms__portals__tut.html#sect_portals">D. Portals（门户）</a></li>
+<li><a class="el" href="pg__rooms__portals__tut.html#sect_portals_reverb">E. Portals（门户）和 Reverb（混响）</a></li>
+<li><a class="el" href="pg__rooms__portals__tut.html#sect_reflect_reverb">F. Surface Reflectors and Reverb</a></li>
+</ul>
+<p><b>Note</b>: This tutorial presumes that you have completed the <a class="el" href="pg__spatialaudio__preparation.html">Preparation for the Spatial Audio Tutorials</a>. However, it does not consider if the <a class="el" href="pg__surface__reflector__tut.html">Surface Reflectors Tutorial</a> was done; both tutorials are independent. If you did the <a class="el" href="pg__surface__reflector__tut.html">Surface Reflectors Tutorial</a> and wish to continue with this tutorial, you can do so without changing anything to your scene except for the optional step of <a class="el" href="pg__surface__reflector__tut.html#sub_new_volume">C.2. Alternative: Create a New Volume</a>, which should be reverted. If you wish to start anew, and you've done the <a class="el" href="pg__surface__reflector__tut.html">Surface Reflectors Tutorial</a>, you can still keep the same scene and just remove any <b>Ak Surface Reflector</b> components.</p>
+<h2><a class="anchor" id="sect_rooms_portals_wwise">
+A. Wwise Project（工程）</a></h2>
+<p>For the rooms and portals tutorial, we will need to add Reverb Effects and modify Obstruction curves to hear diffraction through a portal when loosing sight of an emitter.</p>
+<ol type="1">
+<li>Add two Auxiliary Busses under the <b>Master Audio Bus</b> called SmallRoom and LargeRoom. In the <b>Auxiliary Bus Property Editor</b>,<ol type="a">
+<li>Under the <b>Effects</b> tab, add the Wwise RoomVerb effect. I chose two different factory presets: Rooms/Room_Medium for SmallRoom and Cathedrals/Medium for LargeRoom. <div align="center">
+<img src="AuxBusPropertyEditorEffectsLargeRoom.png" alt="AuxBusPropertyEditorEffectsLargeRoom.png"/>
+<p><strong>Auxiliary Bus Property Editor Effects tab for rooms</strong></p></div>
+</li>
+<li>Under the Positioning tab, enable <b>Listener Relative Routing</b> and select <b>Position + Orientation</b> for the 3D Spatialization. <div align="center">
+<img src="AuxBusPropertyEditorPositioningLargeRoom.png" alt="AuxBusPropertyEditorPositioningLargeRoom.png"/>
+<p><strong>Auxiliary Bus Property Editor Positioning tab for Rooms</strong></p></div>
+</li>
+</ol>
+</li>
+<li>Project &gt; Project Settings &gt; Obstruction/Occlusion<ol type="a">
+<li>Change the curves: <table  border="1" cellspacing="0" width="800px">
+<tr>
+<th>Curve </th><th colspan="2">Point 1 </th><th colspan="2">Point 2 </th></tr>
+<tr>
+<td></td><td>X </td><td>Y </td><td>X </td><td>Y </td></tr>
+<tr>
+<td>Obstruction Volume </td><td>0 </td><td>0 </td><td>100 </td><td>-3 </td></tr>
+<tr>
+<td>Obstruction LPF </td><td>0 </td><td>0 </td><td>100 </td><td>60 </td></tr>
+</table>
+</li>
+<li>Here's how the Obstruction Volume curve looks like: <div align="center">
+<img src="ProjectSettingsObsOccCurves.png" alt="ProjectSettingsObsOccCurves.png"/>
+<p><strong>Obstruction/Occlusion curves in the Wwise Project Settings</strong></p></div>
+</li>
+</ol>
+</li>
+<li>Save your project.</li>
+</ol>
+<h2><a class="anchor" id="sect_romms_portals_emitter">
+B. Spatial Audio Emitter</a></h2>
+<p>We need to modify the spatial audio emitter to use our newly created reflect aux bus.</p>
+<ol type="1">
+<li>Refresh your Wwise project in the Wwise Picker: Windows &gt; Wwise Picker<ol type="a">
+<li>Generate SoundBanks <div align="center">
+<img src="WwisePicker.png" alt="WwisePicker.png"/>
+<p><strong>Wwise Picker</strong></p></div>
+</li>
+</ol>
+</li>
+<li>Modify the <b>Ak Spatial Audio Emitter</b> component of each button.<ol type="a">
+<li>Apply a gain of 1 for the <b>Room Reverb Aux Bus Gain</b> parameter.</li>
+<li>Check <b>Draw Sound Propagation</b> under <b>Debug Draw</b> and uncheck all the others. <div align="center">
+<img src="AkSpatialAudioEmitterRoomsAndPortals.png" alt="AkSpatialAudioEmitterRoomsAndPortals.png"/>
+<p><strong>Ak Spatial Audio Emitter for Rooms and Portals</strong></p></div>
+</li>
+</ol>
+</li>
+<li>We will use rooms in the next section, so we need to add a Rigidbody component to our emitter; as explained in the warning message on the Ak Game Obj component.<ol type="a">
+<li>Click on Add Rigidbody <div align="center">
+<img src="AkGameObj.png" alt="AkGameObj.png"/>
+<p><strong>Ak Game Obj component</strong></p></div>
+ </li>
+</ol>
+</li>
+</ol>
+<h2><a class="anchor" id="sect_rooms">
+C. Rooms</a></h2>
+<p>Each of the rooms will have their own room reverb. To do so, we will use the Ak Room component.</p>
+<ol type="1">
+<li>Create unrendered meshes using cubes: GameObject &gt; 3D Object &gt; Cube <table  border="1" cellspacing="0" width="800px">
+<tr>
+<th>Object Name </th><th>Position </th><th>Rotation </th><th>Scale </th></tr>
+<tr>
+<td>Small Room Interior </td><td>(-2, 2.875, -6) </td><td>(0, 0, 0) </td><td>(11, 5.25, 7.5) </td></tr>
+<tr>
+<td>Large Room Interior </td><td>(11.5, 2.875, 3.25) </td><td>(0, 0, 0) </td><td>(15, 5.25, 21) </td></tr>
+</table>
+<ol type="a">
+<li>Remove the <b>Mesh Renderer</b> component.</li>
+<li>Check the <b>Is Trigger</b> in the <b>Box Collider</b> component.</li>
+<li>Add an <b>Ak Room</b> component to the Small and Large Room Interior Volumes.<ol type="i">
+<li>Pick the corresponding SmallRoom or LargeRoom Auxiliary Busses for <b>Reverb Aux Bus</b>.</li>
+<li>If you added a <b>Rigidbody</b> to your emitters, you don't need one here. If not, click on Add Rigidbody. <div align="center">
+<img src="AkRoom.png" alt="AkRoom.png"/>
+<p><strong>Ak Room component</strong></p></div>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>Start the game, connect to Wwise and go to the Game Object Profiler layout<ol type="a">
+<li>Watch all the emitters and the listener.</li>
+<li>Open a Game Object 3D Viewer view. You should see each emitter in their respective rooms. The next image is a top view of the scene. The listener and Button Outside are not in a room, so they are put by default in the "Outdoors" room. If everything is in the Outdoors room instead of their respective rooms, it means spatial audio is disabled. You must have forgotten to add an Ak Spatial Audio Listener component to the listener. Follow step 3.B. <div align="center">
+<img src="GameObject3DViewerRooms.png" alt="GameObject3DViewerRooms.png"/>
+<p><strong>Emitters in their respective rooms and the Listener Outdoors</strong></p></div>
+</li>
+<li>Move the listener to a room and see the room name change under your listener game object in the Game Object 3d Viewer. In the following image, the listener is in the large room. <div align="center">
+<img src="GameObject3DViewerListenerRoom.png" alt="GameObject3DViewerListenerRoom.png"/>
+<p><strong>Emitters in their respective rooms and the Listener in the Large Room Interior</strong></p></div>
+</li>
+</ol>
+</li>
+<li>Press the button in one of the rooms to hear the reverb.<ol type="a">
+<li>In the small room, the voice graph should look like this: <div align="center">
+<img src="VoiceGraphSmallRoom.png" alt="VoiceGraphSmallRoom.png"/>
+<p><strong>Button Small Room Voice Graph with Reverb</strong></p></div>
+</li>
+<li>When a listener is in a different room than the emitter, the sound is completely occluded. You will need to add portals to hear the sound coming from rooms through desired openings.</li>
+</ol>
+</li>
+</ol>
+<p>add a reverb outside, add a Room around the entire area. Make sure that the Room has a lower priority than the Small Room Interior and Large Room Interior. </p>
+<h2><a class="anchor" id="sect_portals">
+D. Portals（门户）</a></h2>
+<p>Each Room needs a Portal to be connected to another area. We need two Portals: one on the door between the outside area and the small Room and one between both Rooms.</p>
+<ol type="1">
+<li>Create two Ak Room Portal components: GameObject &gt; Wwise &gt; Room Portal <table  border="1" cellspacing="0" width="800px">
+<tr>
+<th>Object Name </th><th>Position </th><th>Rotation </th><th>Scale </th></tr>
+<tr>
+<td>Outside Portal </td><td>(0, 2, -10) </td><td>(0, 0, 0) </td><td>(2, 4, 2) </td></tr>
+<tr>
+<td>Inside Portal </td><td>(3.75, 2, -4.5) </td><td>(0, 90, 0) </td><td>(3.5, 4, 2) </td></tr>
+</table>
+</li>
+<li>In the Ak Room Portal component:<ol type="a">
+<li><b>Open On</b> Start.</li>
+<li><b>Close On</b> Nothing.</li>
+<li>Make sure that the Back Room and Front Room display the right <b>Ak Room</b> components.</li>
+</ol>
+</li>
+<li>This is how the Inside Portal Ak Room Portal component will look like: <div align="center">
+<img src="AkRoomPortal.png" alt="AkRoomPortal.png"/>
+<p><strong>Ak Room Portal component</strong></p></div>
+</li>
+<li>In the <b>Scene</b> window, a Portal is represented with a yellow ribbon around it indicating its size and the orientation in which it should be placed. The red line shows the separation between front and back areas of the Portal. The front is in the same direction as the local z axis. <div align="center">
+<img src="AkRoomPortalScene.png" alt="AkRoomPortalScene.png"/>
+<p><strong>Ak Room Portal in the Scene window</strong></p></div>
+</li>
+<li>Start the game. You should already see the Draw Sound Propagation drawings indicating where the sound will be coming from through the portal. The sphere on the left comes from the small room emitter and the one on the right from the large room emitter. You can see the latter is actually coming from the Portal connecting the small and large Rooms. The sound propagation is represented by red and blue spheres that change in size depending on the wet and dry diffraction angles respectively. <div align="center">
+<img src="StartRoomsAndPortals.png" alt="StartRoomsAndPortals.png"/>
+<p><strong>Game window at Start</strong></p></div>
+<ol type="a">
+<li>Connect to Wwise.</li>
+<li>Play the button outside and go inside the small room.<ol type="i">
+<li>You should see the same sound propagation drawings coming from the outside emitter through the portal connecting with the outside. <div align="center">
+<img src="RoomsAndPortalsInSmallRoom.png" alt="RoomsAndPortalsInSmallRoom.png"/>
+<p><strong>Sound Propagation drawings from Button Outside when the listener is inside Small Room Interior</strong></p></div>
+</li>
+<li>Move in and out of sight to hear the diffraction applied on the sound. You will hear more or less diffraction depending on the angle of the listener vs. the portal. In the next image, we are watching the listener and Button Outside. You can see a top view of the scene in the Game Object 3D Viewer. In dark red, we can see the portals. The one in the middle is the Outside Portal, the area on top of the Portal is the Small Room Interior and the area on the bottom is the outside. The Listener is in the Small Room Interior and the playing emitter is Button Outside. On the image, you can see the sound propagation in green between the listener and the emitter. The Diffraction angle is 103.3. Also, you can see the virtual position of the Button Outside emitter on the right. That's where the sound you hear will go through the portal. <div align="center">
+<img src="GameObject3DViewerOutsideDiffractionInSmallRoom.png" alt="GameObject3DViewerOutsideDiffractionInSmallRoom.png"/>
+<p><strong>Portal diffraction angle on Game Object 3D Viewer</strong></p></div>
+ <b>Note:</b> At this point, if you change the position of the rooms or multi-edit portals, the front and back rooms will not update, unless you open each individual <a class="el" href="class_ak_room_portal.html" title="An AkRoomPortal can connect two AkRoom components together.">AkRoomPortal</a> inspector. In a scene with a lot of portals, this is not convenient, so you can use the <a class="el" href="class_ak_room_portal.html" title="An AkRoomPortal can connect two AkRoom components together.">AkRoomPortal</a> Baker window we added as an example in this tutorial. Open the window from the menu: Wwise &gt; <a class="el" href="class_ak_room_portal.html" title="An AkRoomPortal can connect two AkRoom components together.">AkRoomPortal</a> Baker... Click the bake button to update the front and back rooms of all the portals in the scene.</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h2><a class="anchor" id="sect_portals_reverb">
+E. Portals（门户）和 Reverb（混响）</a></h2>
+<p>Sound emitted through Portals can also use the reverb from the current Room the listener is in.</p>
+<ol type="1">
+<li>Open the SmallRoom Auxiliary Bus Property Editor and check <b>Use game-defined auxiliary sends</b> in the General Settings tab. This will send the small Room reverb to other reverbs in the scene. <div align="center">
+<img src="AuxBusPropertyGeneralSmallRoom.png" alt="AuxBusPropertyGeneralSmallRoom.png"/>
+<p><strong>Auxiliary Bus Property Editor General Settings tab to send room reverb to other reverbs</strong></p></div>
+</li>
+<li>When playing the small room emitter, and going into the large room, you will see the small room's reverb feeding into the large room's reverb. <div align="center">
+<img src="VoiceGraphSmallRoomButtonSend.png" alt="VoiceGraphSmallRoomButtonSend.png"/>
+<p><strong>Button Small Room reverb sending to Large Room Interior room's reverb on the Voices Graph</strong></p></div>
+ </li>
+</ol>
+<h2><a class="anchor" id="sect_reflect_reverb">
+F. Surface Reflectors and Reverb</a></h2>
+<p>It is also possible to feed early reflections into the reverb of a Room. Let's add surface reflectors in our scene.</p>
+<ol type="1">
+<li>Following section <a class="el" href="pg__surface__reflector__tut.html">Surface Reflectors Tutorial</a>,<ol type="a">
+<li>Add an Auxiliary Bus with the Reflect Effect.</li>
+<li>Link each <b>Ak Spatial Audio Emitter</b> to the new Reflect Auxiliary Bus.</li>
+<li>Add <b>Ak Surface Reflector</b> components on all the walls and the floor.</li>
+</ol>
+</li>
+<li>In the Wwise project, open the Auxiliary Bus with the Reflect Effect applied to it.<ol type="a">
+<li>In the General Settings tab, check <b>Use game-defined auxiliary sends</b>. <div align="center">
+<img src="AuxBusPropertyGeneralThirdPerson.png" alt="AuxBusPropertyGeneralThirdPerson.png"/>
+<p><strong>Auxiliary Bus Property Editor General Settings tab to send early reflection to the room reverb</strong></p></div>
+</li>
+</ol>
+</li>
+<li>Play the scene and press the button in the small Room. With the player in the small Room, here is the Voices Graph we see: <div align="center">
+<img src="VoiceGraphReflectSend.png" alt="VoiceGraphReflectSend.png"/>
+<p><strong>Early reflections in the small room are sent to the small room's reverb in the Voices Graph</strong></p></div>
+</li>
+</ol>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

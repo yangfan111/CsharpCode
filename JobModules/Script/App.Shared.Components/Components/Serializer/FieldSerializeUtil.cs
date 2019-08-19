@@ -255,7 +255,7 @@ namespace App.Shared.Components.Serializer
             uint toSend = (uint)((data - min) * ratio);
             SendCompressedData(sendTimes, toSend, writer);
         }
-
+        
         public static void Serialize(bool data, Core.Utils.MyBinaryWriter writer, bool last = default(bool),
             bool weiteAll = false)
         {
@@ -390,7 +390,7 @@ namespace App.Shared.Components.Serializer
             _weaponBagSerializer.Write(data, writer);
         }
         //_weaponBagSerializer
-        private static BitArrayWrapper GetDiffBitArray<T>(List<T> last, List<T> data, bool writeAll)
+        public static BitArrayWrapper GetDiffBitArray<T>(List<T> last, List<T> data, bool writeAll)
             where T : IPatchClass<T>, new()
         {
             var count = data == null ? 0 : data.Count;
@@ -438,7 +438,7 @@ namespace App.Shared.Components.Serializer
             {
                 if (bitArray[i] == false) continue;
                 var last = i >= lastCount || writeAll ? default(T) : lastList[i];
-                list[i].Write(last, writer);
+                PatchPropertySerializer.Write(list[i], last, writer);
             }
 
             bitArray.ReleaseReference();
@@ -586,15 +586,14 @@ namespace App.Shared.Components.Serializer
             bitArray.ReleaseReference();
             return list;
         }
-
    
         private static void Serialize<T>(T curr, T last, MyBinaryWriter writer) where T : class, IPatchClass<T>, new()
         {
-            curr.Write(last, writer);
+            PatchPropertySerializer.Write(curr, last, writer);
         }
         private static T Deserialize<T>(T last, BinaryReader reader) where T : class, IPatchClass<T>, new()
         {
-            last.Read(reader);
+            PatchPropertySerializer.Read(last, reader);
             return last;
         }
 
@@ -632,6 +631,11 @@ namespace App.Shared.Components.Serializer
         public static short Deserialize(short typeTag, BinaryReader reader)
         {
             return _shortSerializer.Read(reader);
+        }
+
+        public static ushort Deserialize(ushort typeTag, BinaryReader reader)
+        {
+            return _uint16Serializer.Read(reader);
         }
 
         public static short Deserialize(short typeTag, float max, float min, float ratio, int receiveTimes,

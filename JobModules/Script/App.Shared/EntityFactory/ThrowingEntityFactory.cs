@@ -14,25 +14,32 @@ namespace App.Shared.EntityFactory
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(ThrowingEntityFactory));
 
         public static ThrowingContext    ThrowingContext   { set; private get; }
+
+        public static ThrowingEntity GetEntityWithEntityKey(EntityKey entityKey)
+        {
+            return ThrowingContext.GetEntityWithEntityKey(entityKey);
+        }
+
         public static IEntityIdGenerator EntityIdGenerator { set; private get; }
 
         public static ThrowingEntity CreateThrowingEntity(PlayerWeaponController controller, int serverTime,
-                                                          Vector3 dir, float initVel,
+                                                          Vector3 dir,Vector3 viePos, float initVel,
                                                           WeaponResConfigItem newWeaponConfig,
                                                           ThrowingConfig throwingConfig)
         {
             int throwingEntityId = EntityIdGenerator.GetNextEntityId();
 
-            var     emitPost       = PlayerEntityUtility.GetThrowingEmitPosition(controller);
+         
             Vector3 velocity       = dir * initVel;
-            var     throwingEntity = ThrowingContext.CreateEntity();
+            ThrowingEntity     throwingEntity = ThrowingContext.CreateEntity();
 
             throwingEntity.AddEntityKey(new EntityKey(throwingEntityId, (int) EEntityType.Throwing));
             // throwingEntity.AddThrowingData(velocity, false, false, 0, serverTime, false, initVel, throwingConfig,
             //     newWeaponConfig.SubType);
             throwingEntity.AddThrowingData(throwingConfig,newWeaponConfig,initVel,0,serverTime,velocity,newWeaponConfig.SubType);
             throwingEntity.AddPosition();
-            throwingEntity.position.Value = emitPost;
+            //TODO:EmitPos,ViewPos做射线检测取合适的点
+            throwingEntity.position.Value = viePos;
             throwingEntity.AddOwnerId(controller.Owner);
             throwingEntity.isFlagSyncNonSelf = true;
             throwingEntity.AddLifeTime(DateTime.Now, throwingConfig.CountdownTime + 2000);

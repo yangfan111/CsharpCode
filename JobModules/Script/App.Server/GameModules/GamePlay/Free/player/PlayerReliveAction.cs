@@ -1,7 +1,5 @@
-﻿using App.Server.GameModules.GamePlay.free.player;
-using App.Shared;
+﻿using App.Shared;
 using App.Shared.Components.Player;
-using App.Shared.FreeFramework.framework.ai;
 using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.util;
@@ -9,6 +7,7 @@ using Core.Components;
 using Core.EntityComponent;
 using Core.Free;
 using System;
+using Core.EntityComponent;
 
 namespace App.Server.GameModules.GamePlay.Free.player
 {
@@ -32,8 +31,6 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 player.gamePlay.IsStandPosture = true;
                 player.gamePlay.CurHp = player.gamePlay.MaxHp;
                 player.isFlagCompensation = true;
-                //player.gamePlay.CurArmor = player.gamePlay.MaxArmor;
-                //player.gamePlay.CurHelmet = player.gamePlay.MaxHelmet;
                 player.oxygenEnergyInterface.Oxygen.ResetOxygen(true);
                 player.position.InterpolateType = (int) PositionInterpolateMode.Discrete;
                 player.position.ServerTime = args.GameContext.session.currentTimeObject.CurrentTime;
@@ -46,8 +43,6 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 {
                     player.ModeController().RecoverPlayerWeapon(player, player.WeaponController().HeldBagPointer);
                 }
-                PlayerInterceptCommands.InterceptKeys(player, SimplePlayerInput.ATTACK, 200);
-                PlayerInterceptCommands.InterceptKeys(player, SimplePlayerInput.ATTACK2, 200);
             }
         }
 
@@ -63,7 +58,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
             }
             else if (playerEntity.gamePlay.IsDead())
             {
-                playerEntity.statisticsData.Statistics.DeadTime += (int) (DateTime.Now.Ticks / 10000L - playerEntity.statisticsData.Statistics.LastDeadTime);
+                playerEntity.statisticsData.Statistics.DeadTime += (int) (args.Rule.ServerTime - playerEntity.statisticsData.Statistics.LastDeadTime);
             }
         }
 

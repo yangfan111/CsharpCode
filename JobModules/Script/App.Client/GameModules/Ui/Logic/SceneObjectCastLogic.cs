@@ -46,6 +46,7 @@ namespace App.Client.GameModules.Ui.Logic
             {
                 return;
             }
+            Logger.Info("[Tmp]Interrupt");
             player.stateInterface.State.InterruptAction();
             player.stateInterface.State.PickUp();
             player.ModeController().SendPickup(player.WeaponController(),entityId, itemId, category, count);

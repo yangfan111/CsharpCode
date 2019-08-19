@@ -2,6 +2,7 @@
 using Core.Utils;
 using System.IO;
 using System.Runtime.CompilerServices;
+using Core.SnapshotReplication.Serialization.Serializer;
 
 namespace Core
 {
@@ -15,6 +16,13 @@ namespace Core
         {
             return new GrenadeCacheData();
         }
+
+        public string GetName()
+        {
+            return "GrenadeCacheData";
+        }
+
+        public BitArrayWrapper BitArray { get; set; }
 
         public GrenadeCacheData Clone()
         {
@@ -32,28 +40,10 @@ namespace Core
           
         }
 
-        public void MergeFromPatch(GrenadeCacheData from)
-        {
-            grenadeId = from.grenadeId;
-            grenadeCount = from.grenadeCount;
-          
-        }
-
-        public void Read(BinaryReader reader)
-        {
-            grenadeId = reader.ReadInt32();
-            grenadeCount = reader.ReadInt32();
-        }
-
         public void RewindTo(GrenadeCacheData right)
         {
-            MergeFromPatch(right);
-        }
-
-        public void Write(GrenadeCacheData last, MyBinaryWriter writer)
-        {
-            writer.Write(grenadeId);
-            writer.Write(grenadeCount);
+            grenadeId = right.grenadeId;
+            grenadeCount = right.grenadeCount;
         }
       
     }

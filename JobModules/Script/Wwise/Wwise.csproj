@@ -51,7 +51,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AKShared.cs" />
-    <Compile Include="AkBankManagerExt.cs" />
+    <Compile Include="AkBankManager.cs" />
+    <Compile Include="AkMemBankLoader.cs" />
     <Compile Include="AkUtilitiesExt.cs" />
     <Compile Include="AudioBattleListener.cs" />
     <Compile Include="AudioProjectManager.cs" />
@@ -159,7 +160,6 @@
     <Compile Include="Deployment\API\Handwritten\Common\AkAcousticSurfaceArray.cs" />
     <Compile Include="Deployment\API\Handwritten\Common\AkAudioInputManager.cs" />
     <Compile Include="Deployment\API\Handwritten\Common\AkAuxSendArray.cs" />
-    <Compile Include="Deployment\API\Handwritten\Common\AkBankManager.cs" />
     <Compile Include="Deployment\API\Handwritten\Common\AkBaseArray.cs" />
     <Compile Include="Deployment\API\Handwritten\Common\AkBasePathGetter.cs" />
     <Compile Include="Deployment\API\Handwritten\Common\AkCallbackManager.cs" />
@@ -222,7 +222,6 @@
     <Compile Include="Deployment\Components\AkGameObjPosOffsetData.cs" />
     <Compile Include="Deployment\Components\AkGameObjPositionData.cs" />
     <Compile Include="Deployment\Components\AkGameObjPositionOffsetData.cs" />
-    <Compile Include="Deployment\Components\AkMemBankLoader.cs" />
     <Compile Include="Deployment\Components\AkObstructionOcclusion.cs" />
     <Compile Include="Deployment\Components\AkRTPCPlayable.cs" />
     <Compile Include="Deployment\Components\AkRTPCTrack.cs" />

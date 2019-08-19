@@ -4,6 +4,7 @@ using Core.GameTime;
 using Core.Utils;
 using Entitas;
 using System.Collections.Generic;
+using Core;
 using UnityEngine;
 
 namespace App.Server.GameModules.SceneObject
@@ -13,13 +14,11 @@ namespace App.Server.GameModules.SceneObject
         IGroup<SceneObjectEntity> _throwingSceneObjectGroup;
         private ICurrentTime _currentTime;
         private List<SceneObjectEntity> _removeEntityList = new List<SceneObjectEntity>();
-        private RuntimeGameConfig _gameConfig;
 
-        public ServerSceneObjectThrowingSystem(SceneObjectContext sceneObjectContext, ICurrentTime currentTime, RuntimeGameConfig config)
+        public ServerSceneObjectThrowingSystem(SceneObjectContext sceneObjectContext, ICurrentTime currentTime)
         {
             _throwingSceneObjectGroup = sceneObjectContext.GetGroup(SceneObjectMatcher.Throwing);
             _currentTime = currentTime;
-            _gameConfig = config; 
         }
 
         public void OnGamePlay()
@@ -37,7 +36,7 @@ namespace App.Server.GameModules.SceneObject
                 sceneObjectEntiy.throwing.Time = _currentTime.CurrentTime;
                 sceneObjectEntiy.ReplaceFlagImmutability(_currentTime.CurrentTime);
                 var velocity = sceneObjectEntiy.throwing.Velocity * secondInterval;
-                velocity.y += _gameConfig.WeaponDropVSpeed * secondInterval;
+                velocity.y += GlobalConst.WeaponDropVSpeed * secondInterval;
                 var lastPos = sceneObjectEntiy.position.Value;
                 var newPos = lastPos + velocity;
                 sceneObjectEntiy.throwing.Velocity = velocity;

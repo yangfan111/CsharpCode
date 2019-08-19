@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using App.Shared.Components.Player;
 using Core.CameraControl;
 using Core.CameraControl.NewMotor;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Free
         private float _transitionTime ;
         private SubCameraMotorType _motorType;
         
-        public FreeOnMotor()
+        public FreeOnMotor(Motors m): base(m)
         {
             _motorType = SubCameraMotorType.View;
         }
@@ -26,9 +27,10 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Free
             if (state.IsFristPersion()) return false;
             if (state.GetMainMotor().NowMode == (short)ECameraPoseMode.Dead) return false;
             if (state.PeekMode != ECameraPeekMode.Off) return false;
-            return input.IsCameraFree || state.GetMainMotor().NowMode == (short)ECameraPoseMode.AirPlane ||
-                   state.GetMainMotor().NowMode == (short)ECameraPoseMode.Parachuting || input.IsDriveCar || 
-                   state.GetMainMotor().NowMode == (short)ECameraPoseMode.ParachutingOpen ;
+            return state.GetMainMotor().NowMode == (short)ECameraPoseMode.AirPlane ||
+                   state.GetMainMotor().NowMode == (short)ECameraPoseMode.Parachuting ||
+                   state.GetMainMotor().NowMode == (short)ECameraPoseMode.ParachutingOpen ||
+                   input.IsCameraFree || input.IsDriveCar ;
         }
 
         public override int Order

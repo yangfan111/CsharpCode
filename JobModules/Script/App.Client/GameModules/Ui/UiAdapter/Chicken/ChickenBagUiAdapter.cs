@@ -70,6 +70,21 @@ namespace App.Client.GameModules.Ui.UiAdapter
             return list[index];
         }
 
+        private List<int> weaponPartsIdList = new List<int>();
+        public List<int> GetWeaponPartIdsBySlotIndex(int index)
+        {
+            var list = _contexts.ui.uI.WeaponPartList;
+            int len = list.GetLength(1);
+            weaponPartsIdList.Clear();
+            for (int i = 0; i < len; i++)
+            {
+                weaponPartsIdList.Add(list[index, i]);
+            }
+
+            return weaponPartsIdList;
+
+        }
+
         public int GetWeaponPartIdBySlotIndexAndWeaponPartType(int index, EWeaponPartType type)
         {
             var list = _contexts.ui.uI.WeaponPartList;
@@ -336,8 +351,13 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 else
                     PlayerStateUtil.RemoveUIState(EPlayerUIState.BagOpen, Player.gamePlay);
             }
+            get { return base.Enable && !IsDead(); }
         }
 
+        private bool IsDead()
+        {
+            return Player.gamePlay.IsDead();
+        }
     }
 
 }

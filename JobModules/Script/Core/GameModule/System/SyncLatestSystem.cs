@@ -11,12 +11,12 @@ namespace Core.GameModule.System
     {
         private LoggerAdapter _logger = new LoggerAdapter(typeof(SyncLatestSystem));
 
-        private ISyncLatestManager _syncLatestManager;
+        private SyncLastestManager _netSyncManager;
 
-        public SyncLatestSystem(ISyncLatestManager syncLatestManager)
+        public SyncLatestSystem(SyncLastestManager netSyncManager)
         {
             _logger.Info("start");
-            _syncLatestManager = syncLatestManager;
+            _netSyncManager = netSyncManager;
         }
 
 
@@ -25,7 +25,7 @@ namespace Core.GameModule.System
             try
             {
                 SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.SyncLatest);
-                _syncLatestManager.SyncLatest();
+                _netSyncManager.SyncLatest();
             }
             catch (Exception e)
             {

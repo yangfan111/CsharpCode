@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>AkRoom类参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li class="current"><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="tabs">
+    <ul>
+      <li><a href="annotated.html"><span>组合类型列表</span></a></li>
+      <li><a href="classes.html"><span>组合类型索引</span></a></li>
+      <li><a href="hierarchy.html"><span>类继承关系</span></a></li>
+      <li><a href="functions.html"><span>组合类型成员</span></a></li>
+    </ul>
+  </div>
+</div>
+<div class="contents">
+<h1>AkRoom类参考</h1><!-- doxytag: class="AkRoom" --><!-- doxytag: inherits="AkUnityEventHandler" -->
+<p>An <a class="el" href="class_ak_room.html" title="An AkRoom is an enclosed environment that can only communicate to the outside/other...">AkRoom</a> is an enclosed environment that can only communicate to the outside/other rooms with AkRoomPortals.  
+<a href="#_details">更多...</a></p>
+
+<p>继承自AkUnityEventHandler。</p>
+
+<p><a href="class_ak_room-members.html">所有成员的列表。</a></p>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2"><h2>公有成员</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">ulong&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_room_a9f34f32008b1557ca6643e8f53091070.html#a9f34f32008b1557ca6643e8f53091070">GetID</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Access the room's ID.  <a href="#a9f34f32008b1557ca6643e8f53091070"></a><br/></td></tr>
+<tr><td colspan="2"><h2>公有属性</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_room_a1637d0e27f1fd0c0bee4ff23badbf171.html#a1637d0e27f1fd0c0bee4ff23badbf171">priority</a> = 0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">AK.Wwise.AuxBus&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_room_aef30f6ba95e6427df3b4f41d48fd7f7c.html#aef30f6ba95e6427df3b4f41d48fd7f7c">reverbAuxBus</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The reverb auxiliary bus.  <a href="#aef30f6ba95e6427df3b4f41d48fd7f7c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_room_aadd32d9ed8045d5a5949a5a9ef75d900.html#aadd32d9ed8045d5a5949a5a9ef75d900">reverbLevel</a> = 1</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The reverb control value for the send to the reverb aux bus.  <a href="#aadd32d9ed8045d5a5949a5a9ef75d900"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_room_a072a168fe1a45d8b21c8ba4bb52c00e5.html#a072a168fe1a45d8b21c8ba4bb52c00e5">wallOcclusion</a> = 1</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Occlusion level modeling transmission through walls.  <a href="#a072a168fe1a45d8b21c8ba4bb52c00e5"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">AK.Wwise.Event&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_room_afe7b27e49e03835b1de1f6555827f8bb.html#afe7b27e49e03835b1de1f6555827f8bb">roomToneEvent</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Wwise Event to be posted on the room game object.  <a href="#afe7b27e49e03835b1de1f6555827f8bb"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_room_a78682aea250e586032d6c2d680227599.html#a78682aea250e586032d6c2d680227599">roomToneAuxSend</a> = 0</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Send level for sounds that are posted on the room game object; adds reverb to ambience and room tones. Valid range: (0.f-1.f). A value of 0 disables the aux send.  <a href="#a78682aea250e586032d6c2d680227599"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html#a66a8b7926fdb83ea328b32f58027e319">MAX_NB_TRIGGERS</a> = 32</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Since our mask is a 32 bits integer, we can't have more than 32 triggers.  <a href="#a66a8b7926fdb83ea328b32f58027e319"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">System.Collections.Generic.List<br class="typebreak"/>
+&lt; int &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html#ae4fb12ca0dcd883567cdae2aa6667f99">triggerList</a> = new System.Collections.Generic.List&lt;int&gt; { START_TRIGGER_ID }</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">List containing the enabled triggers.  <a href="#ae4fb12ca0dcd883567cdae2aa6667f99"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html#a7356afac1aa764845f51a4f403eb277a">useOtherObject</a> = false</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">This property is usefull only when used with colliders. When enabled, the target of the action will be the other colliding object. When disabled, it will be the current object.  <a href="#a7356afac1aa764845f51a4f403eb277a"></a><br/></td></tr>
+<tr><td colspan="2"><h2>静态公有属性</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static <br class="typebreak"/>
+System.Collections.Generic.Dictionary<br class="typebreak"/>
+&lt; uint, string &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html#ae7a9a7b78c99c34282de009bf24d981a">triggerTypes</a> = AkTriggerBase.GetAllDerivedTypes()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Will contain the types of all the triggers derived from <a class="el" href="class_ak_trigger_base.html">AkTriggerBase</a> at runtime.  <a href="#ae7a9a7b78c99c34282de009bf24d981a"></a><br/></td></tr>
+</table>
+<hr/><a name="_details"></a><h2>详细描述</h2>
+<p>An <a class="el" href="class_ak_room.html" title="An AkRoom is an enclosed environment that can only communicate to the outside/other...">AkRoom</a> is an enclosed environment that can only communicate to the outside/other rooms with AkRoomPortals. </p>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

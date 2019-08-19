@@ -1,4 +1,4 @@
-﻿using Core.EntitasAdpater;
+﻿using Core.EntityComponent;
 using Core.EntityComponent;
 using Core.Playback;
 using Core.Replicaton;
@@ -66,11 +66,11 @@ namespace Core.Compensation
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(ServerCompensationWorldFactory));
       
-        private ISnapshotSelectorContainer _snapshotSelector;
+        private ISnapshotSelector _snapshotSelector;
         
 
         public ServerCompensationWorldFactory(
-            ISnapshotSelectorContainer snapshotSelectorContainer,
+            ISnapshotSelector snapshotSelectorContainer,
             IHitBoxEntityManager hitboxHandler) : base(hitboxHandler)
         {
             _snapshotSelector = snapshotSelectorContainer;
@@ -78,20 +78,20 @@ namespace Core.Compensation
 
         protected override EntityMap CreateEntityMap(int serverTime)
         {
-            SnapshotPair pair = _snapshotSelector.SnapshotSelector.SelectSnapshot(serverTime);
+            SnapshotPair pair = _snapshotSelector.SelectSnapshot(serverTime);
             if (pair != null)
             {
-                CompensationSnapshotHandler handler = new CompensationSnapshotHandler(new InterpolationInfo(pair));
+                CompensationMapDiffHandler diffHandler = new CompensationMapDiffHandler(new InterpolationInfo(pair));
                 EntityMap left = pair.LeftSnapshot.CompensationEntityMap;
                 EntityMap right = pair.RightSnapshot.CompensationEntityMap;
-                EntityMapComparator.Diff(left, right, handler, "compensation");
-                return handler.TheSnapshot.EntityMap;
+                EntityMapCompareExecutor.Diff(left, right, diffHandler, "compensation",null);
+                return diffHandler.TheSnapshot.EntityMap;
                
             }
             _logger.ErrorFormat("can't get snapshot at {0}, current range: {1}-{2}", 
                 serverTime,
-                _snapshotSelector.SnapshotSelector.OldestSnapshot.ServerTime, 
-                _snapshotSelector.SnapshotSelector.LatestSnapshot.ServerTime);
+                _snapshotSelector.OldestSnapshot.ServerTime, 
+                _snapshotSelector.LatestSnapshot.ServerTime);
             return null;
         }
 

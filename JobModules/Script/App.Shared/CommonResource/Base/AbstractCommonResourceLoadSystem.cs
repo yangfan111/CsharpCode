@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using App.Shared.CommonResource.Base;
+using Common;
 using Core.CommonResource;
 using Core.EntityComponent;
 using Core.ObjectPool;
@@ -38,7 +39,7 @@ namespace App.Shared.CommonResource
 
         public void LoadResource(TEntity entity, int index, AssetInfo assetInfo, bool forceReload)
         {
-            var time = (int) (Time.time * 1000);
+            var time = (int) (MyGameTime.time * 1000);
             AssertUtility.Assert(index < GetActionsLength());
             var comp = GetCommonResource(entity);
             var old = LoadResource(comp, index, assetInfo, time, forceReload);
@@ -149,7 +150,7 @@ namespace App.Shared.CommonResource
 
         private void ProcessCommonResources(TEntity entity, ICommonResourceComponent res, IUnityAssetManager loadRequestManager)
         {
-            var time = (int) (Time.time * 1000);
+            var time = (int) (MyGameTime.time * 1000);
             var resourceLength = res.Resources.Length;
             for (var i = 0; i < resourceLength; i++)
             {

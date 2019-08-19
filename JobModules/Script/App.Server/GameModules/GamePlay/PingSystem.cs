@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using Common;
 using Entitas;
 using UnityEngine;
 
@@ -19,7 +20,7 @@ namespace App.Server.GameModules.GamePlay
         public void Execute()
         {
             var serverStatus = _contexts.session.serverSessionObjects.FpsSatatus;
-            var time = Time.time;
+            var time = MyGameTime.time;
             var delta = time - _lastime;
             _lastime = time;
             serverStatus.Tick(time, delta);

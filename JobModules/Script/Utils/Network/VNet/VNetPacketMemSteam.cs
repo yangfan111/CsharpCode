@@ -7,9 +7,9 @@ using UnityEngine;
 
 namespace VNet
 {
-    internal class VNetPacketMemSteam : BaseRefCounter, IPacket
+    public class VNetPacketMemSteam : BaseRefCounter, IPacket
     {
-        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(VNetPacket));
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(VNetPacketMemSteam));
         private MemoryStream _stream = new MemoryStream(1024*100);
         public MemoryStream Stream
         {
@@ -72,10 +72,7 @@ namespace VNet
             _stream.Write(array,arrayIndex,count);
         }
 
-        public void Dispose()
-        {
-            ReleaseReference();
-        }
+       
 
         protected override void OnCleanUp()
         {

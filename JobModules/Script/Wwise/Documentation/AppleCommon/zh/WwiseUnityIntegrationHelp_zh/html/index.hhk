@@ -1,0 +1,481 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML><HEAD></HEAD><BODY>
+<OBJECT type="text/site properties">
+<param name="FrameName" value="right">
+</OBJECT>
+<UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_surface_reflector_a3f780a056ad53534aa3fd5ee4a8afa52.html"><param name="Name" value="AcousticTexture"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a9ebd4b3857bd5aa4e48ad140f7418a75.html"><param name="Name" value="actionOnEventType"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a9ebd4b3857bd5aa4e48ad140f7418a75.html"><param name="Name" value="AkAmbient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a9ebd4b3857bd5aa4e48ad140f7418a75.html"><param name="Name" value="AkEvent"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_listener_1_1_spatial_audio_listener_list_a1006bbe8c86c7a32bff09d2ac209b3bd.html"><param name="Name" value="Add"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_surface_reflector_a0faa6e6eb8800c544fcb341c0ce4c87c.html"><param name="Name" value="AddGeometrySet"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__initialization__settings.html"><param name="Name" value="Adjusting Wwise Initialization Settings"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_ambient.html"><param name="Name" value="AkAmbient"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a9ebd4b3857bd5aa4e48ad140f7418a75.html"><param name="Name" value="actionOnEventType"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_ac9a601f2ea52e2ec4f7da6f6d1f47417.html"><param name="Name" value="curveInterpolation"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a55c358f4863c8f85aa5dd72dcf5b8fcb.html"><param name="Name" value="enableActionOnEvent"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html"><param name="Name" value="MAX_NB_TRIGGERS"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a6299fe43fd983eef04a9b0aebc8fd4cf.html"><param name="Name" value="soundEmitterObject"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a856277457c22871638f774f7b99069d8.html"><param name="Name" value="transitionDuration"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html"><param name="Name" value="triggerList"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html"><param name="Name" value="triggerTypes"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html"><param name="Name" value="useOtherObject"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_audio_listener.html"><param name="Name" value="AkAudioListener"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_bank.html"><param name="Name" value="AkBank"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_bank_a3f58529f1a33b70d89941ec3c9e1e7f7.html"><param name="Name" value="decodeBank"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_bank_a08cc9eeda081d81c8c2183de837a4b37.html"><param name="Name" value="HandleEvent"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_bank_ad4479c06c1ebb566ae0026ac55a33466.html"><param name="Name" value="loadAsynchronous"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html"><param name="Name" value="MAX_NB_TRIGGERS"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_bank_a94de1015c0721b0bd1372827c86821bb.html"><param name="Name" value="saveDecodedBank"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html"><param name="Name" value="triggerList"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html"><param name="Name" value="triggerTypes"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_bank_a76dab3660ea72e5e842aff7c5b3a0506.html"><param name="Name" value="UnloadBank"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_bank_a7d5d68d607a2c55e3370aed5ed0e5824.html"><param name="Name" value="unloadTriggerList"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html"><param name="Name" value="useOtherObject"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_drag_drop_helper.html"><param name="Name" value="AkDragDropHelper"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_emitter_obstruction_occlusion.html"><param name="Name" value="AkEmitterObstructionOcclusion"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_ad31314853113a2fad62f06cacc6ce7da.html"><param name="Name" value="fadeTime"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_a4f13c1683b7ef2eddbdeb8cb79d3bc0a.html"><param name="Name" value="LayerMask"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_a4cf6740e886ee0116a5ce5b8006e5845.html"><param name="Name" value="maxDistance"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_ad801c47cf862aa6230642a0f16b73f48.html"><param name="Name" value="refreshInterval"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_environment.html"><param name="Name" value="AkEnvironment"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_environment_1_1_ak_environment___compare_by_priority.html"><param name="Name" value="AkEnvironment::AkEnvironment_CompareByPriority"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_environment_1_1_ak_environment___compare_by_selection_algorithm.html"><param name="Name" value="AkEnvironment::AkEnvironment_CompareBySelectionAlgorithm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_environment_portal.html"><param name="Name" value="AkEnvironmentPortal"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_environment_portal_1_1_env_list_wrapper.html"><param name="Name" value="AkEnvironmentPortal::EnvListWrapper"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_environment_portal_a504d789ba5d9381faea26c7b70482fc8.html"><param name="Name" value="AkEnvironmentPortal"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_environment_portal_a504d789ba5d9381faea26c7b70482fc8.html"><param name="Name" value="axis"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_environment_portal_a8cbc19a19d2e53560a310160c23be2b3.html"><param name="Name" value="environments"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_environment_portal_a1dee19a10f7a385e408dfeb92e6e0584.html"><param name="Name" value="envList"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event.html"><param name="Name" value="AkEvent"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a9ebd4b3857bd5aa4e48ad140f7418a75.html"><param name="Name" value="actionOnEventType"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_ac9a601f2ea52e2ec4f7da6f6d1f47417.html"><param name="Name" value="curveInterpolation"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a55c358f4863c8f85aa5dd72dcf5b8fcb.html"><param name="Name" value="enableActionOnEvent"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html"><param name="Name" value="MAX_NB_TRIGGERS"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a6299fe43fd983eef04a9b0aebc8fd4cf.html"><param name="Name" value="soundEmitterObject"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a856277457c22871638f774f7b99069d8.html"><param name="Name" value="transitionDuration"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html"><param name="Name" value="triggerList"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html"><param name="Name" value="triggerTypes"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html"><param name="Name" value="useOtherObject"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_callback_msg.html"><param name="Name" value="AkEventCallbackMsg"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_callback_msg_ae7a3476be29a602f067ebed7a3e1427e.html"><param name="Name" value="info"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_callback_msg_ae6f04b166afcefef734cb746cad20ad6.html"><param name="Name" value="sender"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_callback_msg_aa474d9a67d007d46e006a49c46c8ccfc.html"><param name="Name" value="type"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_game_obj.html"><param name="Name" value="AkGameObj"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_game_obj_aea8a036e1256803caef03267145d088b.html"><param name="Name" value="GetForward"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_game_obj_a3c97c5520bb2ddb83096ee9f7a7452a9.html"><param name="Name" value="GetPosition"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_game_obj_ac2c4df4653f96860c16a5433413d9b8a.html"><param name="Name" value="GetUpward"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_game_obj_a92b827623ddc330289d2e1f228841399.html"><param name="Name" value="isEnvironmentAware"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_game_obj_af04d8aad357e219372c374457245cd2b.html"><param name="Name" value="m_positionOffsetData"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_initializer.html"><param name="Name" value="AkInitializer"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_mem_bank_loader.html"><param name="Name" value="AkMemBankLoader"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_mem_bank_loader_a2a14604a902af51dc8589b273c7be184.html"><param name="Name" value="bankName"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_mem_bank_loader_a2eb6294ffc60c639f86e13869fc99826.html"><param name="Name" value="isLocalizedBank"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_mem_bank_loader_a97d7dae0ed7e6718759403417274af54.html"><param name="Name" value="LoadLocalizedBank"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_mem_bank_loader_ac730fdbbc50db52628fab61369cfff3a.html"><param name="Name" value="LoadNonLocalizedBank"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room.html"><param name="Name" value="AkRoom"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_a9f34f32008b1557ca6643e8f53091070.html"><param name="Name" value="GetID"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html"><param name="Name" value="MAX_NB_TRIGGERS"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_a1637d0e27f1fd0c0bee4ff23badbf171.html"><param name="Name" value="priority"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_aef30f6ba95e6427df3b4f41d48fd7f7c.html"><param name="Name" value="reverbAuxBus"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_aadd32d9ed8045d5a5949a5a9ef75d900.html"><param name="Name" value="reverbLevel"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_a78682aea250e586032d6c2d680227599.html"><param name="Name" value="roomToneAuxSend"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_afe7b27e49e03835b1de1f6555827f8bb.html"><param name="Name" value="roomToneEvent"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html"><param name="Name" value="triggerList"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html"><param name="Name" value="triggerTypes"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html"><param name="Name" value="useOtherObject"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_a072a168fe1a45d8b21c8ba4bb52c00e5.html"><param name="Name" value="wallOcclusion"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_portal.html"><param name="Name" value="AkRoomPortal"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_portal_aee3606929fc86b44dcd3fbcd1aa77d7c.html"><param name="Name" value="ClosePortal"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_portal_a7b51b55bbe6693241fc49fd5fe7db7b3.html"><param name="Name" value="GetID"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_portal_ae545ae47cd83f1a84afa4d2b42fa70ca.html"><param name="Name" value="HandleEvent"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html"><param name="Name" value="MAX_NB_TRIGGERS"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_portal_a39c53f00442550cb42948aac0ba9eb11.html"><param name="Name" value="MAX_ROOMS_PER_PORTAL"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_portal_a3880e462962b933cde8dafc5a294242b.html"><param name="Name" value="rooms"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html"><param name="Name" value="triggerList"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html"><param name="Name" value="triggerTypes"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html"><param name="Name" value="useOtherObject"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_portal_obstruction.html"><param name="Name" value="AkRoomPortalObstruction"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_ad31314853113a2fad62f06cacc6ce7da.html"><param name="Name" value="fadeTime"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_a4f13c1683b7ef2eddbdeb8cb79d3bc0a.html"><param name="Name" value="LayerMask"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_a4cf6740e886ee0116a5ce5b8006e5845.html"><param name="Name" value="maxDistance"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_ad801c47cf862aa6230642a0f16b73f48.html"><param name="Name" value="refreshInterval"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base.html"><param name="Name" value="AkSpatialAudioBase"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_a2ea2753e75d2f917801b8664bfad1976.html"><param name="Name" value="EnteredRoom"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_ae417d5e9af28063cc1876c5c1d9d3d1e.html"><param name="Name" value="ExitedRoom"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_a50c345c8830fe5fb90f4cbeab5f16f7d.html"><param name="Name" value="SetGameObjectInRoom"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter.html"><param name="Name" value="AkSpatialAudioEmitter"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_a09e1f65a706838f24dd731e1412b0bd4.html"><param name="Name" value="diffractionMaxEdges"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_a6b15756221fab541837d9c785893e885.html"><param name="Name" value="diffractionMaxPathLength"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_a6ad3216ad3b7457a8625c3d2ef040df5.html"><param name="Name" value="diffractionMaxPaths"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_ab9882c472ab02fa32c61f5ac38620a81.html"><param name="Name" value="drawFirstOrderReflections"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_a2fc57046f744a8b83c3eaad60f60b48b.html"><param name="Name" value="drawGeometricDiffraction"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_a1fa48cd0d83e549eadcb837a18c206b8.html"><param name="Name" value="drawHigherOrderReflections"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_ac01b6c7b2f5c2cb06eb04d07cc819162.html"><param name="Name" value="drawSecondOrderReflections"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_aa077fda651f45a3df57fa44ef1861389.html"><param name="Name" value="drawSoundPropagation"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_a2ea2753e75d2f917801b8664bfad1976.html"><param name="Name" value="EnteredRoom"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_ae417d5e9af28063cc1876c5c1d9d3d1e.html"><param name="Name" value="ExitedRoom"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_a6e426e74c3d2865e9cd8374f77c2920b.html"><param name="Name" value="reflectAuxBus"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_ac56f96705df59e097f589fcb58687846.html"><param name="Name" value="reflectionMaxPathLength"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_a58fc1cc9bbc20c935c1735fe3de05328.html"><param name="Name" value="reflectionsAuxBusGain"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_aead7eca8d8bb7670abb7d5baec4f8274.html"><param name="Name" value="reflectionsOrder"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_ae2ba5199b536118c0edb72d1904be75e.html"><param name="Name" value="roomReverbAuxBusGain"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_a50c345c8830fe5fb90f4cbeab5f16f7d.html"><param name="Name" value="SetGameObjectInRoom"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_listener.html"><param name="Name" value="AkSpatialAudioListener"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_listener_1_1_spatial_audio_listener_list.html"><param name="Name" value="AkSpatialAudioListener::SpatialAudioListenerList"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_listener_1_1_spatial_audio_listener_list_a1006bbe8c86c7a32bff09d2ac209b3bd.html"><param name="Name" value="Add"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_listener_1_1_spatial_audio_listener_list_a04b9673e6c62e51036a6174b5152f1fb.html"><param name="Name" value="Remove"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_a2ea2753e75d2f917801b8664bfad1976.html"><param name="Name" value="AkSpatialAudioListener"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_a2ea2753e75d2f917801b8664bfad1976.html"><param name="Name" value="EnteredRoom"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_ae417d5e9af28063cc1876c5c1d9d3d1e.html"><param name="Name" value="ExitedRoom"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_a50c345c8830fe5fb90f4cbeab5f16f7d.html"><param name="Name" value="SetGameObjectInRoom"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_listener_a052e2b33ae03a89acc55191e0a040292.html"><param name="Name" value="SpatialAudioListeners"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_listener_a75ad9f266d3fe002b258a02400e42c4b.html"><param name="Name" value="TheSpatialAudioListener"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_state.html"><param name="Name" value="AkState"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html"><param name="Name" value="MAX_NB_TRIGGERS"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html"><param name="Name" value="triggerList"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html"><param name="Name" value="triggerTypes"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html"><param name="Name" value="useOtherObject"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_surface_reflector.html"><param name="Name" value="AkSurfaceReflector"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_surface_reflector_a3f780a056ad53534aa3fd5ee4a8afa52.html"><param name="Name" value="AcousticTexture"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_surface_reflector_a0faa6e6eb8800c544fcb341c0ce4c87c.html"><param name="Name" value="AddGeometrySet"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_surface_reflector_a5a979f445b0115e4379a2e4f805e406b.html"><param name="Name" value="EnableDiffraction"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_surface_reflector_adf972958e3e4bf36a274a3514dd8a700.html"><param name="Name" value="EnableDiffractionOnBoundaryEdges"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_surface_reflector_aa7f4f3a3e13db50eb51b96c0f5ef833e.html"><param name="Name" value="RemoveGeometrySet"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_switch.html"><param name="Name" value="AkSwitch"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html"><param name="Name" value="MAX_NB_TRIGGERS"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html"><param name="Name" value="triggerList"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html"><param name="Name" value="triggerTypes"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html"><param name="Name" value="useOtherObject"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_terminator.html"><param name="Name" value="AkTerminator"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_trigger_base.html"><param name="Name" value="AkTriggerBase"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_trigger_base_ae9841d50f232dfb082f4727412419224.html"><param name="Name" value="Trigger"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_trigger_base_ab98c3e4da938eedb78dc5506f61ab6e4.html"><param name="Name" value="triggerDelegate"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_waapi_client.html"><param name="Name" value="AkWaapiClient"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_waapi_client_a10d4e4d8b9c1116f521e06a505505a5c.html"><param name="Name" value="Call"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_waapi_client_a61a977e6edac658cbc077c4e596e2de2.html"><param name="Name" value="Connect"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_waapi_client_a2e5e50d8c82b4cdda94d9782d704ce0a.html"><param name="Name" value="Disconnect"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_waapi_client_ad37cd98c27eba16bed8faace836b5a57.html"><param name="Name" value="IsConnected"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_waapi_client_a5c7499da530b06bc37a5c4ee3a407081.html"><param name="Name" value="Subscribe"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_waapi_client_ac2d9cb03d11a820ae589c9217cfc881a.html"><param name="Name" value="Unsubscribe"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_waapi_client_a1adad3d0690a5abc19f6628a11523c9c.html"><param name="Name" value="WaapiEventCallback"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__limitations.html"><param name="Name" value="API 变化和限制"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_environment_portal_a504d789ba5d9381faea26c7b70482fc8.html"><param name="Name" value="axis"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_mem_bank_loader_a2a14604a902af51dc8589b273c7be184.html"><param name="Name" value="bankName"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_waapi_client_a10d4e4d8b9c1116f521e06a505505a5c.html"><param name="Name" value="Call"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_portal_aee3606929fc86b44dcd3fbcd1aa77d7c.html"><param name="Name" value="ClosePortal"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_waapi_client_a61a977e6edac658cbc077c4e596e2de2.html"><param name="Name" value="Connect"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_ac9a601f2ea52e2ec4f7da6f6d1f47417.html"><param name="Name" value="curveInterpolation"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_ac9a601f2ea52e2ec4f7da6f6d1f47417.html"><param name="Name" value="AkAmbient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_ac9a601f2ea52e2ec4f7da6f6d1f47417.html"><param name="Name" value="AkEvent"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_bank_a3f58529f1a33b70d89941ec3c9e1e7f7.html"><param name="Name" value="decodeBank"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_a09e1f65a706838f24dd731e1412b0bd4.html"><param name="Name" value="diffractionMaxEdges"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_a6b15756221fab541837d9c785893e885.html"><param name="Name" value="diffractionMaxPathLength"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_a6ad3216ad3b7457a8625c3d2ef040df5.html"><param name="Name" value="diffractionMaxPaths"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_waapi_client_a2e5e50d8c82b4cdda94d9782d704ce0a.html"><param name="Name" value="Disconnect"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_ab9882c472ab02fa32c61f5ac38620a81.html"><param name="Name" value="drawFirstOrderReflections"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_a2fc57046f744a8b83c3eaad60f60b48b.html"><param name="Name" value="drawGeometricDiffraction"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_a1fa48cd0d83e549eadcb837a18c206b8.html"><param name="Name" value="drawHigherOrderReflections"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_ac01b6c7b2f5c2cb06eb04d07cc819162.html"><param name="Name" value="drawSecondOrderReflections"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_aa077fda651f45a3df57fa44ef1861389.html"><param name="Name" value="drawSoundPropagation"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a55c358f4863c8f85aa5dd72dcf5b8fcb.html"><param name="Name" value="enableActionOnEvent"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a55c358f4863c8f85aa5dd72dcf5b8fcb.html"><param name="Name" value="AkAmbient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a55c358f4863c8f85aa5dd72dcf5b8fcb.html"><param name="Name" value="AkEvent"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_surface_reflector_a5a979f445b0115e4379a2e4f805e406b.html"><param name="Name" value="EnableDiffraction"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_surface_reflector_adf972958e3e4bf36a274a3514dd8a700.html"><param name="Name" value="EnableDiffractionOnBoundaryEdges"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_a2ea2753e75d2f917801b8664bfad1976.html"><param name="Name" value="EnteredRoom"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_a2ea2753e75d2f917801b8664bfad1976.html"><param name="Name" value="AkSpatialAudioBase"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_a2ea2753e75d2f917801b8664bfad1976.html"><param name="Name" value="AkSpatialAudioEmitter"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_a2ea2753e75d2f917801b8664bfad1976.html"><param name="Name" value="AkSpatialAudioListener"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_environment_portal_a8cbc19a19d2e53560a310160c23be2b3.html"><param name="Name" value="environments"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_environment_portal_a1dee19a10f7a385e408dfeb92e6e0584.html"><param name="Name" value="envList"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_ae417d5e9af28063cc1876c5c1d9d3d1e.html"><param name="Name" value="ExitedRoom"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_ae417d5e9af28063cc1876c5c1d9d3d1e.html"><param name="Name" value="AkSpatialAudioBase"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_ae417d5e9af28063cc1876c5c1d9d3d1e.html"><param name="Name" value="AkSpatialAudioEmitter"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_ae417d5e9af28063cc1876c5c1d9d3d1e.html"><param name="Name" value="AkSpatialAudioListener"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_ad31314853113a2fad62f06cacc6ce7da.html"><param name="Name" value="fadeTime"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_ad31314853113a2fad62f06cacc6ce7da.html"><param name="Name" value="AkEmitterObstructionOcclusion"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_ad31314853113a2fad62f06cacc6ce7da.html"><param name="Name" value="AkRoomPortalObstruction"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_game_obj_aea8a036e1256803caef03267145d088b.html"><param name="Name" value="GetForward"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_a9f34f32008b1557ca6643e8f53091070.html"><param name="Name" value="GetID"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_a9f34f32008b1557ca6643e8f53091070.html"><param name="Name" value="AkRoom"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_portal_a7b51b55bbe6693241fc49fd5fe7db7b3.html"><param name="Name" value="AkRoomPortal"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_game_obj_a3c97c5520bb2ddb83096ee9f7a7452a9.html"><param name="Name" value="GetPosition"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_game_obj_ac2c4df4653f96860c16a5433413d9b8a.html"><param name="Name" value="GetUpward"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_bank_a08cc9eeda081d81c8c2183de837a4b37.html"><param name="Name" value="HandleEvent"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_bank_a08cc9eeda081d81c8c2183de837a4b37.html"><param name="Name" value="AkBank"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_portal_ae545ae47cd83f1a84afa4d2b42fa70ca.html"><param name="Name" value="AkRoomPortal"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_callback_msg_ae7a3476be29a602f067ebed7a3e1427e.html"><param name="Name" value="info"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_waapi_client_ad37cd98c27eba16bed8faace836b5a57.html"><param name="Name" value="IsConnected"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_game_obj_a92b827623ddc330289d2e1f228841399.html"><param name="Name" value="isEnvironmentAware"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_mem_bank_loader_a2eb6294ffc60c639f86e13869fc99826.html"><param name="Name" value="isLocalizedBank"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_a4f13c1683b7ef2eddbdeb8cb79d3bc0a.html"><param name="Name" value="LayerMask"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_a4f13c1683b7ef2eddbdeb8cb79d3bc0a.html"><param name="Name" value="AkEmitterObstructionOcclusion"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_a4f13c1683b7ef2eddbdeb8cb79d3bc0a.html"><param name="Name" value="AkRoomPortalObstruction"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_bank_ad4479c06c1ebb566ae0026ac55a33466.html"><param name="Name" value="loadAsynchronous"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_mem_bank_loader_a97d7dae0ed7e6718759403417274af54.html"><param name="Name" value="LoadLocalizedBank"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_mem_bank_loader_ac730fdbbc50db52628fab61369cfff3a.html"><param name="Name" value="LoadNonLocalizedBank"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_game_obj_af04d8aad357e219372c374457245cd2b.html"><param name="Name" value="m_positionOffsetData"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html"><param name="Name" value="MAX_NB_TRIGGERS"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html"><param name="Name" value="AkAmbient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html"><param name="Name" value="AkBank"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html"><param name="Name" value="AkEvent"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html"><param name="Name" value="AkRoom"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html"><param name="Name" value="AkRoomPortal"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html"><param name="Name" value="AkState"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a66a8b7926fdb83ea328b32f58027e319.html"><param name="Name" value="AkSwitch"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_portal_a39c53f00442550cb42948aac0ba9eb11.html"><param name="Name" value="MAX_ROOMS_PER_PORTAL"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_a4cf6740e886ee0116a5ce5b8006e5845.html"><param name="Name" value="maxDistance"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_a4cf6740e886ee0116a5ce5b8006e5845.html"><param name="Name" value="AkEmitterObstructionOcclusion"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_a4cf6740e886ee0116a5ce5b8006e5845.html"><param name="Name" value="AkRoomPortalObstruction"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__obs__occ.html"><param name="Name" value="Obstruction and Occlusion"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__spatialaudio__preparation.html"><param name="Name" value="Preparation for the Spatial Audio Tutorials"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__previousreleases.html"><param name="Name" value="Previous Release Notes"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_a1637d0e27f1fd0c0bee4ff23badbf171.html"><param name="Name" value="priority"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_a6e426e74c3d2865e9cd8374f77c2920b.html"><param name="Name" value="reflectAuxBus"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_ac56f96705df59e097f589fcb58687846.html"><param name="Name" value="reflectionMaxPathLength"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_a58fc1cc9bbc20c935c1735fe3de05328.html"><param name="Name" value="reflectionsAuxBusGain"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_aead7eca8d8bb7670abb7d5baec4f8274.html"><param name="Name" value="reflectionsOrder"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_ad801c47cf862aa6230642a0f16b73f48.html"><param name="Name" value="refreshInterval"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_ad801c47cf862aa6230642a0f16b73f48.html"><param name="Name" value="AkEmitterObstructionOcclusion"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_obstruction_occlusion_ad801c47cf862aa6230642a0f16b73f48.html"><param name="Name" value="AkRoomPortalObstruction"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_listener_1_1_spatial_audio_listener_list_a04b9673e6c62e51036a6174b5152f1fb.html"><param name="Name" value="Remove"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_surface_reflector_aa7f4f3a3e13db50eb51b96c0f5ef833e.html"><param name="Name" value="RemoveGeometrySet"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_aef30f6ba95e6427df3b4f41d48fd7f7c.html"><param name="Name" value="reverbAuxBus"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_aadd32d9ed8045d5a5949a5a9ef75d900.html"><param name="Name" value="reverbLevel"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_emitter_ae2ba5199b536118c0edb72d1904be75e.html"><param name="Name" value="roomReverbAuxBusGain"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__rooms__portals__tut.html"><param name="Name" value="Rooms and Portals Tutorial"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_portal_a3880e462962b933cde8dafc5a294242b.html"><param name="Name" value="rooms"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_a78682aea250e586032d6c2d680227599.html"><param name="Name" value="roomToneAuxSend"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_afe7b27e49e03835b1de1f6555827f8bb.html"><param name="Name" value="roomToneEvent"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_bank_a94de1015c0721b0bd1372827c86821bb.html"><param name="Name" value="saveDecodedBank"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_callback_msg_ae6f04b166afcefef734cb746cad20ad6.html"><param name="Name" value="sender"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_a50c345c8830fe5fb90f4cbeab5f16f7d.html"><param name="Name" value="SetGameObjectInRoom"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_a50c345c8830fe5fb90f4cbeab5f16f7d.html"><param name="Name" value="AkSpatialAudioBase"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_a50c345c8830fe5fb90f4cbeab5f16f7d.html"><param name="Name" value="AkSpatialAudioEmitter"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_base_a50c345c8830fe5fb90f4cbeab5f16f7d.html"><param name="Name" value="AkSpatialAudioListener"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a6299fe43fd983eef04a9b0aebc8fd4cf.html"><param name="Name" value="soundEmitterObject"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a6299fe43fd983eef04a9b0aebc8fd4cf.html"><param name="Name" value="AkAmbient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a6299fe43fd983eef04a9b0aebc8fd4cf.html"><param name="Name" value="AkEvent"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_listener_a052e2b33ae03a89acc55191e0a040292.html"><param name="Name" value="SpatialAudioListeners"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_waapi_client_a5c7499da530b06bc37a5c4ee3a407081.html"><param name="Name" value="Subscribe"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__surface__reflector__tut.html"><param name="Name" value="Surface Reflectors Tutorial"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="unity__waapi.html"><param name="Name" value="The Unity WAAPI Client"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_spatial_audio_listener_a75ad9f266d3fe002b258a02400e42c4b.html"><param name="Name" value="TheSpatialAudioListener"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a856277457c22871638f774f7b99069d8.html"><param name="Name" value="transitionDuration"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a856277457c22871638f774f7b99069d8.html"><param name="Name" value="AkAmbient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_a856277457c22871638f774f7b99069d8.html"><param name="Name" value="AkEvent"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_trigger_base_ae9841d50f232dfb082f4727412419224.html"><param name="Name" value="Trigger"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_trigger_base_ab98c3e4da938eedb78dc5506f61ab6e4.html"><param name="Name" value="triggerDelegate"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html"><param name="Name" value="triggerList"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html"><param name="Name" value="AkAmbient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html"><param name="Name" value="AkBank"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html"><param name="Name" value="AkEvent"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html"><param name="Name" value="AkRoom"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html"><param name="Name" value="AkRoomPortal"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html"><param name="Name" value="AkState"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae4fb12ca0dcd883567cdae2aa6667f99.html"><param name="Name" value="AkSwitch"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html"><param name="Name" value="triggerTypes"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html"><param name="Name" value="AkAmbient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html"><param name="Name" value="AkBank"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html"><param name="Name" value="AkEvent"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html"><param name="Name" value="AkRoom"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html"><param name="Name" value="AkRoomPortal"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html"><param name="Name" value="AkState"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_ae7a9a7b78c99c34282de009bf24d981a.html"><param name="Name" value="AkSwitch"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_event_callback_msg_aa474d9a67d007d46e006a49c46c8ccfc.html"><param name="Name" value="type"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_bank_a76dab3660ea72e5e842aff7c5b3a0506.html"><param name="Name" value="UnloadBank"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_bank_a7d5d68d607a2c55e3370aed5ed0e5824.html"><param name="Name" value="unloadTriggerList"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_waapi_client_ac2d9cb03d11a820ae589c9217cfc881a.html"><param name="Name" value="Unsubscribe"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html"><param name="Name" value="useOtherObject"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html"><param name="Name" value="AkAmbient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html"><param name="Name" value="AkBank"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html"><param name="Name" value="AkEvent"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html"><param name="Name" value="AkRoom"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html"><param name="Name" value="AkRoomPortal"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html"><param name="Name" value="AkState"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_unity_event_handler_a7356afac1aa764845f51a4f403eb277a.html"><param name="Name" value="AkSwitch"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__spatialaudio.html"><param name="Name" value="Using Wwise Spatial Audio in Unity"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_waapi_client_a1adad3d0690a5abc19f6628a11523c9c.html"><param name="Name" value="WaapiEventCallback"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="class_ak_room_a072a168fe1a45d8b21c8ba4bb52c00e5.html"><param name="Name" value="wallOcclusion"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__wwisedemogame.html"><param name="Name" value="Wwise Demo Game"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="unity__picker.html"><param name="Name" value="Wwise Picker"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="unity__timeline.html"><param name="Name" value="Wwise Timeline Integration"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="unity__wwise__types.html"><param name="Name" value="Wwise Types"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__builddeployandroid.html"><param name="Name" value="为 Android 平台构建应用程序"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__howtobuilddeployios.html"><param name="Name" value="为 iOS 构建应用程序"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__howtobuilddeploylinux.html"><param name="Name" value="为 Linux 构建"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="unity__add__triggers.html"><param name="Name" value="为 Wwise Events 添加新的 Trigger"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__deploy.html"><param name="Name" value="为目标平台构建您的 Unity 游戏"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__building.html"><param name="Name" value="从源代码构建原生集成插件"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__loadbankobb.html"><param name="Name" value="使用 OBB 文件（Android）"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__appscripts.html"><param name="Name" value="使用 Wwise Unity 集成"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg___w_s_a_info.html"><param name="Name" value="关于 Windows Store Apps 的特殊信息"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__platforms.html"><param name="Name" value="关于各个平台特定的信息"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__requsinginte.html"><param name="Name" value="前提条件"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__uninstalling.html"><param name="Name" value="卸载 Wwise 集成包"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__customplatforms.html"><param name="Name" value="在 Unity 中使用 Wwise 自定义平台"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__installation.html"><param name="Name" value="在 Unity 工程中安装或升级集成"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__installprojectchange.html"><param name="Name" value="对您 Unity 工程作出的变更"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__installvalidation.html"><param name="Name" value="将声音实现到您的游戏中"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__updating__modified__code.html"><param name="Name" value="当您修改了插件的 C++ 代码时，将 Wwise 集成包 更新/升级到一个较新的版本"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__soundbank__location.html"><param name="Name" value="我的 SoundBank 应该放在哪里？"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="unity__troubleshooting.html"><param name="Name" value="故障排除"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__newfeatures__2017__1__0.html"><param name="Name" value="新功能 2017.1"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__newfeatures__2017__2__0.html"><param name="Name" value="新功能 2017.2"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__newfeatures__2018__1__0.html"><param name="Name" value="新功能 2018.1"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__updating.html"><param name="Name" value="更新/升级 Wwise 集成包版本"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__buildlog.html"><param name="Name" value="构建日志"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__install__addlicensedplugins.html"><param name="Name" value="添加插件"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2013__1.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2013.1"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2013__1__1.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2013.1.1"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2013__2__1.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2013.2.1"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2013__2__10.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2013.2.10"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2013__2__4.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2013.2.4"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2013__2__5.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2013.2.5"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2013__2__8.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2013.2.8"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2013__2__9.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2013.2.9"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2014__1.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2014.1"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2014__1__1.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2014.1.1"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2014__1__2.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2014.1.2"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2014__1__3.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2014.1.3"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2014__1__4.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2014.1.4"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2014__1__5.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2014.1.5"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2014__1__6.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2014.1.6"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2015__1.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2015.1"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2015__1__1.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2015.1.1"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2015__1__2.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2015.1.2"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2015__1__3.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2015.1.3"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2015__1__4.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2015.1.4"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2015__1__5.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2015.1.5"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2015__1__6.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2015.1.6"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2015__1__7.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2015.1.7"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2015__1__8.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2015.1.8"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2015__1__9.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2015.1.9"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2016__1.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2016.1"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2016__1__1.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2016.1.1"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2016__1__2.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2016.1.2"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2016__1__3.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2016.1.3"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2016__1__4.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2016.1.4"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2016__1__5.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2016.1.5"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2016__1__6.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2016.1.6"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2016__2__0.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2016.2.0"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2016__2__1.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2016.2.1"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2016__2__1__409.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2016.2.1.5995.409"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2016__2__2__430.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2016.2.2.6022.430"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2016__2__3__504.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2016.2.3.6077.504"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2016__2__4__531.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2016.2.4.6098.531"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2016__2__5__560.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2016.2.5.6121.560"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2016__2__6__595.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2016.2.6.6153.595"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__1__0__726.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.1.0.6302.726"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__1__1__770.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.1.1.6340.770"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__1__2__791.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.1.2.6361.791"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__1__3__812.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.1.3.6377.812"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__1__4__845.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.1.4.6407.845"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__1__5__870.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.1.5.6429.870"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__1__6__890.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.1.6.6446.890"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__1__7__910.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.1.7.6467.910"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__1__8__933.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.1.8.6488.933"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__1__9__947.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.1.9.6501.947"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__2__0__947.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.2.0.6500.947"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__2__1__980.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.2.1.6524.980"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__2__2__1015.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.2.2.6553.1015"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__2__3__1037.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.2.3.6575.1037"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__2__4__1054.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.2.4.6590.1054"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__2__4__1064.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.2.4.6590.1064"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__2__5__1090.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.2.5.6619.1090"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__2__6__1107.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.2.6.6636.1107"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__2__7__1133.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.2.7.6661.1133"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2017__2__8__1171.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2017.2.8.6698.1171"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2018__1__0__1154.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2018.1.0.6714.1154"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2018__1__1__1172.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2018.1.1.6727.1172"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2018__1__2__1211.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2018.1.2.6762.1211"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2018__1__3__1233.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2018.1.3.6784.1233"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes__2018__1__4__1258.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2018.1.4.6807.1258"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__releasenotes.html"><param name="Name" value="版本说明 - Wwise Unity Integration 2018.1.5.6835.1288"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__unity__dlc.html"><param name="Name" value="用 Wwise 和 Unity 制作 DLC"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__installunitypackage.html"><param name="Name" value="第一次安装 Wwise 集成包"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__pauseresumeandroid.html"><param name="Name" value="背景模式（Android）"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__important__migration__notes__2017__1__0.html"><param name="Name" value="重要迁移说明 2017.1"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__important__migration__notes__2017__2__0.html"><param name="Name" value="重要迁移说明 2017.2"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="pg__audiosessionios.html"><param name="Name" value="音频会话中断（iOS）"></OBJECT>
+</UL>
+</BODY>
+</HTML>

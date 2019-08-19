@@ -4,10 +4,7 @@ using Object = UnityEngine.Object;
 
 namespace AssetBundleManager.Operation
 {
-    /// <summary>
-    /// SetAssetBundle(LoadedAssetBundle assetBundle) => process { LoadedAsset赋值}
-    /// </summary>
-    abstract class AssetLoading : PollingOperation
+    public abstract class AssetLoading : PollingOperation
     {
         public string BundleName { get; private set; }
         public string Name { get; private set; }
@@ -38,6 +35,11 @@ namespace AssetBundleManager.Operation
         }
 
         public abstract void SetAssetBundle(LoadedAssetBundle assetBundle);
-       
+
+
+        public override string ToString()
+        {
+            return "[" + BundleName + ":" + Name + "]";
+        }
     }
 }

@@ -24,9 +24,10 @@ namespace App.Shared.GameModules.Weapon.Behavior
             UpdateFire(weaponController, cmd,contexts);
             if (CleanFireInspector(cmd))
             {
-                weaponController.RelatedThrowAction.InternalCleanUp();
-                weaponController.RelatedThrowAction.ThrowingEntityKey = EntityKey.Default;
-                weaponController.RelatedThrowAction.LastFireWeaponKey = 0;
+                
+                throwingActionData.InternalCleanUp();
+                throwingActionData.ThrowingEntityKey = EntityKey.Default;
+                throwingActionData.LastFireWeaponKey = 0;
             }
         }
 

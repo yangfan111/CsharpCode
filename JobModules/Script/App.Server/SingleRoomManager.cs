@@ -11,6 +11,7 @@ using Core.Room;
 using Core.Utils;
 using System;
 using System.Collections.Generic;
+using Common;
 using UnityEngine;
 using Utils.Singleton;
 
@@ -289,7 +290,8 @@ namespace App.Server
                 }
                 else
                 {
-                    float now = Time.time * 1000;
+                   
+                    float now = MyGameTime.time * 1000;
                     int interval = _calcFixTimeInterval.Update(now);
                     _room.Update(interval);
                 }

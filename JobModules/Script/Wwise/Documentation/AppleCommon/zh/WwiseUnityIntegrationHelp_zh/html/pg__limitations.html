@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>API 变化和限制</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="pg_limitations">API 变化和限制 </a></h1><p>以下原生 Wwise SDK 的一些特性和函数在 Unity 集成中是不支持的，或者它们的行为在集成中已经修改过了（先列出的为最近的变化）：</p>
+<ul>
+<li><code>UnloadBank()</code> 不再使用单一参数重载版本。必须用第二个参数提供一个内存位置的指针。</li>
+<li>Windows 版本的 <code>GetGameObjectFromPlayingID()</code> 对 Windows 32 位和 64 位（截尾）返回 32 位的 GameObject ID。</li>
+<li><code>PostEvent()</code> 和 GameObject 相关的 API 现在接受 <code>null</code> 作为 GameObject 这个输入变量来影响全局范围。</li>
+<li><code>PostEvent()</code> 的所有回调是序列化的，并出现在下一个游戏帧的开始，而不是从音频线程中调用。因此并不需要同步机制。</li>
+<li><code>AK::Monitoring::SetLocalOutput()</code> 被 <code>AkCallbackManager.SetMonitoringCallback()</code> 所取代。</li>
+<li><code>AK::SoundEngine::SetPosition()</code> 被 <code>AkSoundEngine.SetObjectPosition()</code> 所取代。</li>
+<li><code>PostEvent()</code> 中的外部源数组只局限于一个源。</li>
+<li>在从磁盘加载关卡数据时，不能同时处理声音的流播放。</li>
+<li>一些 <code>AK::SoundEngine::DynamicSequence</code> API 函数在它们的 Unity API 绑定中重命名了，以保持清晰明确。这是一种补救措施，补偿由 SWIG 引起的名字空间扁平化这个副作用。比如，在生成的 API 中，<code>AK::SoundEngine::DynamicSequence::Open()</code> 会变为 <code>AkSoundEngine.Open()。因此，我们将它在</code> API 绑定中重命名为 <code>AkSoundEngine.DynamicSequenceOpen()。</code> </li>
+<li>C++ 重载的操作符被重命名为 Unity 脚本语言中的函数；比如，<code>AkArray::operator[]</code> 变为 <code>AkPlaylistArray.ItemAtIndex(uint uiIndex)</code> 。这是根据 SWIG 处理 C++ 重载操作符方面的设计来实现的。</li>
+<li>不支持的 API 和组件：<ul>
+<li>iOS 音频输入回调 API</li>
+<li><code>AkSpeakerVolumeMatrixCallbackInfo</code> </li>
+<li><code>AkSpeakerVolumeMatrixBusCallbackInfo</code> </li>
+<li><code>AkBusCallbackFunc</code> </li>
+<li><code>AK::SoundEngine::RegisterBusVolumeCallback</code> </li>
+<li><code>AK::SoundEngine::RegisterCodec</code> </li>
+<li><code>AK::SoundEngine::RegisterGlobalCallback</code> </li>
+<li><code>AK::SoundEngine::RegisterPlugin</code> </li>
+<li><code>AK::SoundEngine::Query::AkGameObjectsList</code> </li>
+<li><code>AK::SoundEngine::Query::GetActiveGameObjects()</code> </li>
+<li><code>AK::SoundEngine::Query::GameObjDst</code> </li>
+<li><code>AK::SoundEngine::Query::AkRadiusList</code> </li>
+<li><code>AK::SoundEngine::Query::GetMaxRadius(AkRadiusList&amp; io_RadiusList)</code> </li>
+<li>所有接受回调或 Event 名称的 <code>AK::SoundEngine::DynamicDialogue::ResolveDialogueEvent</code> 的变体。</li>
+</ul>
+</li>
+</ul>
+<dl class="see"><dt><b>参见:</b></dt><dd><ul>
+<li><a class="el" href="pg__platforms.html">关于各个平台特定的信息</a>. </li>
+</ul>
+</dd></dl>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

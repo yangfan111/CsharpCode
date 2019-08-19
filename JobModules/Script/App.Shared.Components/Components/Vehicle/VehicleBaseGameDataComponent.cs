@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using App.Shared.Components.Player;
+using Common;
 using Core.Configuration;
 using Core.EntityComponent;
 using Core.Enums;
@@ -100,7 +101,7 @@ namespace App.Shared.Components.Vehicle
 
         public void SetSoundChannel(EVehicleChannel channel)
         {
-            MusicStartTime = Time.time;
+            MusicStartTime = MyGameTime.time;
             SoundSyncTime = 0.0f;
 
             SoundChannel = (int) channel;

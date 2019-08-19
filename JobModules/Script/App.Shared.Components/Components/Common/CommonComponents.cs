@@ -112,7 +112,7 @@ namespace App.Shared.Components.Common
     [Weapon]
     public class FakeFlagDestroyComponent : FlagDestroyComponent,FakeComponent
     {
-
+        
     }
 
     [Player]

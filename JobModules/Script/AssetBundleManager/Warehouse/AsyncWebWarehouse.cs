@@ -12,7 +12,7 @@ namespace AssetBundleManager.Warehouse
         private readonly Dictionary<string, Hash128> _allHashes = new Dictionary<string, Hash128>();
         //private readonly string _sceneQuantityLevel;
 
-        public AsyncWebWarehouse(AssetBundleWarehouseAddr addr, bool isLow)
+        public AsyncWebWarehouse(AssetBundleWarehouseAddr addr, bool isLow, string useMD5 = null)
             : base(addr.Manifest, isLow)
         {
             _assetBundlePathPrefix = addr.Path;

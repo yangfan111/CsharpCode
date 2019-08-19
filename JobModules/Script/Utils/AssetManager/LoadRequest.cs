@@ -6,7 +6,7 @@ namespace Utils.AssetManager
 {
     public interface ILoadedHandler
     {
-        void OnLoadSucc<T>(T source, UnityObject unityObj);
+        void OnLoadSuccess<T>(T source, UnityObject unityObj);
     }
 
     public class LoadRequestFactory

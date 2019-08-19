@@ -7,10 +7,12 @@ using XmlConfig;
 
 namespace App.Shared
 {
-    public enum AudioBank_LoadAction
+    public enum AudioBank_LoadMode
     {
         DecodeOnLoad,
         DecodeOnLoadAndSave,
+        Aync,
+        Prepare,
         Normal,
     }
 
@@ -19,12 +21,12 @@ namespace App.Shared
         LoadEntirely,
     }
 
-    public enum AudioBank_LoadMode
-    {
-        Sync,
-        Async,
-        Prepare,
-    }
+    // public enum AudioBank_LoadMode
+    // {
+    //     Sync,
+    //     Async,
+    //     Prepare,
+    // }
 
     public enum AudioBank_LoadStage
     {

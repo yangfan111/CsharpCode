@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using App.Server.GameModules.GamePlay.free.player;
 using App.Shared;
 using com.cpkf.yyjd.tools.util;
 using com.wd.free.action;
@@ -10,12 +7,14 @@ using com.wd.free.para.exp;
 using com.wd.free.skill;
 using com.wd.free.util;
 using Core.EntityComponent;
-using gameplay.gamerule.free.ui;
-using UnityEngine;
-using App.Server.GameModules.GamePlay.free.player;
-using Utils.AssetManager;
-using gameplay.gamerule.free.ui.component;
 using Core.Free;
+using gameplay.gamerule.free.ui;
+using gameplay.gamerule.free.ui.component;
+using System;
+using System.Collections.Generic;
+using Core.EntityComponent;
+using UnityEngine;
+using Utils.AssetManager;
 
 namespace App.Server.GameModules.GamePlay.Free.entity
 {

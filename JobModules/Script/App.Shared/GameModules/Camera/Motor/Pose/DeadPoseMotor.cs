@@ -11,12 +11,15 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
 {
     class DeadPoseMotor:NormalPoseMotor
     {
-        public DeadPoseMotor(ECameraPoseMode modeId, HashSet<ECameraPoseMode> excludes, IMotorActive active,DeadCameraConfig deadConfig) : base(modeId, excludes, active)
+        public DeadPoseMotor(ECameraPoseMode modeId, HashSet<ECameraPoseMode> excludes, IMotorActive active,DeadCameraConfig deadConfig, Motors m) : base(modeId, excludes, active,m)
         {
-            CameraActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.Pose, (int)modeId,
+            _motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.Pose, (int)modeId,
                 (player, state) =>
                 {
                     player.cameraStateOutputNew.LastPitchWhenAlive = player.cameraFinalOutputNew.EulerAngle.x;
+                    //中途加入时不切三人称
+                    if(player.gamePlay.IsObserving())
+                        player.characterBoneInterface.CharacterBone.SetThridPerson();
                 });
         }
 

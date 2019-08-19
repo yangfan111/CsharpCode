@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
+﻿using App.Client.GameModules.Ui.UiAdapter;
 using App.Client.GameModules.Ui.Utils;
 using App.Client.GameModules.Ui.ViewModels.Common;
 using App.Client.Utility;
-using App.Client.GameModules.Ui.UiAdapter;
+using App.Shared.GameModules.Player;
 using Assets.UiFramework.Libs;
 using Com.Wooduan.Ssjj2.Common.Net.Proto;
 using Core.GameModule.Interface;
@@ -11,11 +10,14 @@ using Core.Utils;
 using DG.Tweening;
 using Google.Protobuf;
 using I2.Loc;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using UIComponent.UI;
 using UnityEngine;
 using UnityEngine.UI;
 using UserInputManager.Lib;
 using Utils.Configuration;
-using System.Collections;
 using Utils.Singleton;
 
 namespace App.Client.GameModules.Ui.Models.Common
@@ -41,7 +43,7 @@ namespace App.Client.GameModules.Ui.Models.Common
     {
         private int MaxMessageCount
         {
-            get { return 50; }
+            get { return 15; }
         }
 
         private EUIChatListState ChatListState
@@ -60,11 +62,8 @@ namespace App.Client.GameModules.Ui.Models.Common
         private Transform parent;
         private Transform item;
         private KeyReceiver switchKeyReceiver;
-
-        private Dictionary<Transform, BroadcastMessageData> messageDict = new Dictionary<Transform, BroadcastMessageData>();
-
+        private Vector2 origInputFieldSize;
         private List<int> channelList = new List<int>();
-      
         protected override IUiViewModel ViewModel
         {
             get { return _viewModel; }
@@ -94,7 +93,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             base.OnGameobjectInitialized();
             InitKeyReveiver();
             InitVariable();
-            InitAnim();
+            //InitAnim();
             InitChannel();
         }
 
@@ -119,14 +118,16 @@ namespace App.Client.GameModules.Ui.Models.Common
             UpdateChannel();
         }
 
+        private UIText privateNameRtf;
         private void InitVariable()
         {
             parent = FindChildGo("Content");
             item = FindChildGo("ChatMessage");
             item.gameObject.SetActive(false);
             inputField = FindChildGo("InputField").GetComponent<InputField>();
+            privateNameRtf = FindComponent<UIText>("PrivateName");
             _viewModel.InputValueChanged = InputValueOnChanged;
-            //new UIInputValid(inputField, new SenesitiveWord(), replaceStr: "*");
+            origInputFieldSize = _viewModel.InputSize;
         }
 
         private void InitAnim()
@@ -134,16 +135,13 @@ namespace App.Client.GameModules.Ui.Models.Common
             _closeViewAnim = DOTween.To(() => _viewModel.Alpha, (x) => _viewModel.Alpha = x, 0, 1f);
             _closeViewAnim.SetAutoKill(false);
             _closeViewAnim.Pause();
-            _closeViewAnim.OnComplete(() =>
-            {
-                ChatListState = EUIChatListState.None;
-                ResetTime();
-            });
+            _closeViewAnim.OnComplete(CloseSendView);
         }
 
-        public void CloseSendView()
+        private void CloseSendView()
         {
             ChatListState = EUIChatListState.None;
+            ResetTime();
         }
 
         private void InputValueOnChanged(string str)
@@ -162,8 +160,6 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         public override void Update(float interval)
         {
-            if (!isVisible || !_viewInitialized) return;
-
             UpdateChatListState();
             UpdateInputKey();
             UpdateView();
@@ -197,7 +193,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void InitKeyReveiver()
         {
             var keyReceiver = new KeyReceiver(UiConstant.chatWindowLayer, BlockType.None);
-            keyReceiver.AddAction(UserInputKey.SendChatMessage, (data) =>
+            keyReceiver.BindKeyAction(UserInputKey.SendChatMessage, (data) =>
             {
                 if (ChatListState != EUIChatListState.Send)
                 {
@@ -205,14 +201,13 @@ namespace App.Client.GameModules.Ui.Models.Common
                 }
             });
             switchKeyReceiver = new KeyReceiver(UiConstant.chatWindowKeyBlockLayer, BlockType.All);
-            switchKeyReceiver.AddAction(UserInputKey.SendChatMessage, (data) => { SendMessage();});
-            switchKeyReceiver.AddAction(UserInputKey.SwitchChatChannel, (data) =>
+            switchKeyReceiver.BindKeyAction(UserInputKey.SendChatMessage, (data) => { SendMessage();});
+            switchKeyReceiver.BindKeyAction(UserInputKey.SwitchChatChannel, (data) =>
             {
                 SwitchChannel();
                 UpdateChannel();
             });
 
-            //_chatState.RegisterKeyReceive(keyReveiver);
             _chatState.RegisterOpenKey(keyReceiver);
         }
 
@@ -235,17 +230,29 @@ namespace App.Client.GameModules.Ui.Models.Common
             {
                 ClearPrivateTarget();
             }
+
             _curChannel = (ChatChannel)channelList[index];
 
-            //if (_curChannel == ChatChannel.PrivateChat && _recentUsePrivateChatPlayerList.Count == 0)
             if (_curChannel == ChatChannel.PrivateChat)
             {
                 SwitchChannel();
             }
         }
 
+        private void ShowPrivateTarget()
+        {
+            var name = "/" + _curTargetPlayerName + ":";
+            _viewModel.PrivateNameShow = true;
+            _viewModel.PrivateNameText = name;
+            _viewModel.InputSize =
+                new Vector2(origInputFieldSize.x - privateNameRtf.preferredWidth, origInputFieldSize.y);
+        }
+
         private void ClearPrivateTarget()
         {
+            _viewModel.PrivateNameShow = false;
+            _viewModel.PrivateNameText = string.Empty;
+            _viewModel.InputSize = origInputFieldSize;
             string name = string.Empty;
             string text = string.Empty;
             ParseInputForPrivateChat(out name, out text);
@@ -272,6 +279,9 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void SwitchToSendState()
         {
             ChatListState = EUIChatListState.Send;
+            if(PlayerStateUtil.HasUIState(EPlayerUIState.ChatOpen, _chatState.gamePlay))
+                PlayerStateUtil.RemoveUIState(EPlayerUIState.ChatOpen, _chatState.gamePlay);
+            else PlayerStateUtil.AddUIState(EPlayerUIState.ChatOpen, _chatState.gamePlay);
             _chatState.SetCrossVisible(true);
             ResetCloseViewAnim();
         }
@@ -279,7 +289,15 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void UpdateChannel()
         {
             _viewModel.ChannelTipText = GetChannelChannelTip(_curChannel);
-            _viewModel.ChannelTipColor = UiCommonColor.GetChatChannelColor(_curChannel);
+            _viewModel.ChannelTipColor = UiCommonColor.GetChatColorByChatChannel(_curChannel);
+            if (inputField == null || inputField.textComponent == null)
+            {
+                Logger.Error("can't found text in inputfield");
+                return;
+            }
+            inputField.textComponent.color = _curChannel == ChatChannel.PrivateChat
+                ? UiCommonColor.GetChatColorByChatChannel(ChatChannel.PrivateChat)
+                : Color.white;
         }
 
         private string GetChannelChannelTip(ChatChannel channel)
@@ -294,25 +312,28 @@ namespace App.Client.GameModules.Ui.Models.Common
                 inputField.ActivateInputField();
             }
             _viewModel.Show = ChatListState != EUIChatListState.None;
-            _viewModel.ChatListBgShow = ChatListState == EUIChatListState.Send;
+            //_viewModel.ChatListBgShow = ChatListState == EUIChatListState.Send;
             _viewModel.SendMessageGroupShow = ChatListState == EUIChatListState.Send;
+            _viewModel.Alpha = ChatListState == EUIChatListState.Receive ? 0.7f : 1f;
+
         }
 
         private void UpdateChatListState()
         {
-            if (_closeViewAnim.IsPlaying())
-            {
-                return;
-            }
+            //if (_closeViewAnim.IsPlaying())
+            //{
+            //    return;
+            //}
             if ((Time.time - _lastMessageTime) > RemainTime && ChatListState != EUIChatListState.Send)
             {
-                PlayCloseViewAnim();
+                CloseSendView();
+                //PlayCloseViewAnim();
             }
-            else
-            {
-                ResetCloseViewAnim();
+            //else
+            //{
+            //    ResetCloseViewAnim();
+            //}
             }
-        }
 
         private void ResetCloseViewAnim()
         {
@@ -334,9 +355,17 @@ namespace App.Client.GameModules.Ui.Models.Common
             _closeViewAnim.Restart();
         }
 
+        private const string commonMessageWithColorFormat = "<color=#{0}>{1}</color>";
+
         public void AddMessage(BroadcastMessageData data)
         {
             var tf = GetNewMessageItem();
+            var channelColor = GetChannelColor(data);
+            var channelName = GetChannelNamePrefix(data, channelColor);
+            var messageText = string.Empty;
+            var textComponent = tf.GetComponent<Text>();
+            var channelRoot = textComponent.transform.GetChild(0);
+            var channelTextComponent = channelRoot != null ? channelRoot.GetComponent<Text>() : null;
             if (tf != null && data != null && data.ChatMessage != null)
             {
                 if (TargetIdDict != null)
@@ -345,32 +374,37 @@ namespace App.Client.GameModules.Ui.Models.Common
                     {
                         TargetIdDict[data.SendRoleId] = string.Empty;
                     }
+
                     TargetIdDict[data.SendRoleId] = data.SendRoleName;
                 }
 
-                if (data.SendRoleId == 0)
+                if (IsFromSystem(data))
                 {
-                    tf.GetComponent<Text>().text = data.ChatMessage.Message;
+                    var color = ColorUtility.ToHtmlStringRGB(UiCommonColor.SystemMessageColor);
+                    messageText = string.Format(commonMessageWithColorFormat, color, data.ChatMessage.Message);
                 }
-                else
+                else if (data.ChatType == (int) ChatType.PrivateChat)
                 {
-                    tf.GetComponent<Text>().text = data.SendRoleName + ":" + data.ChatMessage.Message;
-                }
-                if (data.ChatType == (int)ChatType.PrivateChat)
-                {
+                    var color = ColorUtility.ToHtmlStringRGB(
+                        UiCommonColor.GetChatColorByChatChannel(ChatChannel.PrivateChat));
+                    messageText = string.Format(commonMessageWithColorFormat, color, messageText);
                     long privateChatId = 0;
                     if (data.SendRoleId == _chatState.MyselfId)
                     {
                         privateChatId = data.TargetId;
-                        tf.GetComponent<Text>().text = string.Format(ScriptLocalization.hall_chat.word231,
+                        messageText = string.Format(ScriptLocalization.hall_chat.word231,
                                                            TargetIdDict[privateChatId]) + data.ChatMessage.Message;
-                        PrivateChatRecentUseQueueUpdate(privateChatId);
                     }
                     else
                     {
                         privateChatId = data.SendRoleId;
-                        PrivateChatRecentUseQueueUpdate(privateChatId);
+                        var name = string.Format(ScriptLocalization.hall_chat.PlayerNameFormat, data.SendRoleName);
+                        messageText = name + data.ChatMessage.Message;
                     }
+
+                        PrivateChatRecentUseQueueUpdate(privateChatId);
+                    messageText = string.Format(commonMessageWithColorFormat, color, messageText);
+
                     if (ChatListState != EUIChatListState.Send)
                     {
                         _curChannel = ChatChannel.PrivateChat;
@@ -378,32 +412,58 @@ namespace App.Client.GameModules.Ui.Models.Common
                         UpdateChannel();
                     }
                 }
-
-                if (data.SendRoleId > 0)
-                {
-                    tf.GetComponent<Text>().color = UiCommonColor.GetChatChannelColor(ChatTypeToChannel((ChatType)data.ChatType));
-                }
                 else
                 {
-                    tf.GetComponent<Text>().color = Color.red;
+                    var color = ColorUtility.ToHtmlStringRGB(UiCommonColor.ChatSenderColor);
+                    var name = string.Format(ScriptLocalization.hall_chat.PlayerNameFormat, data.SendRoleName);
+                    messageText = string.Format(commonMessageWithColorFormat, color, name) +
+                                  data.ChatMessage.Message;
                 }
+
+                if (channelTextComponent != null)
+                {
+                    channelTextComponent.text = channelName;
+                }
+                textComponent.text = messageText;
             }
             else
             {
                 Logger.Error("Null object,can't addMessage");
             }
-            ResetTime();
-            _closeViewAnim.Rewind();
-            if (messageDict != null)
+
+            if (ChatListState == EUIChatListState.None)
             {
-                if (ChatListState == EUIChatListState.None)
-                {
-                    ChatListState = EUIChatListState.Receive;
-                }
-                messageDict.Add(tf, data);
+                ChatListState = EUIChatListState.Receive;
+            }
+            ResetTime();
+            //_closeViewAnim.Rewind();           
+        
+        }
+
+        private string GetChannelNamePrefix(BroadcastMessageData data,Color color)
+        {
+            string channelName;
+            var channel = ChatTypeToChannel((ChatType)data.ChatType);
+            channelName = IsFromSystem(data) ? ScriptLocalization.hall_chat.word228 : GetChannelChannelTip(channel);
+            var colorText = ColorUtility.ToHtmlStringRGB(color);
+            if (!string.IsNullOrEmpty(channelName))
+            {
+                channelName = string.Format("<color=#{0}>[{1}]</color>  ", colorText, channelName);
             }
 
-            
+            return channelName;
+        }
+
+        private bool IsFromSystem(BroadcastMessageData data)
+        {
+            return data.SendRoleId == 0;
+        }
+
+        private Color GetChannelColor(BroadcastMessageData data)
+        {
+            if (IsFromSystem(data)) return UiCommonColor.SystemMessageColor;
+            var channel = ChatTypeToChannel((ChatType) data.ChatType);
+            return UiCommonColor.GetChatColorByChatChannel(channel);
         }
 
         private Transform GetNewMessageItem()
@@ -437,14 +497,6 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void SendMessage()
         {
-            //Debug.Log("SendMessage" + inputField.text);
-            //if (string.IsNullOrEmpty(inputField.text)) return;
-            //UiModule.contexts.ui.uI.OperationTipData = new BaseTipData { Title = inputField.text, DurationTime = 10 * 1000 };
-            //UiModule.contexts.ui.uISession.UiState["CommonOperationTipModel"] = true;
-            //UiModule.contexts.ui.uI.SystemTipDataQueue.Enqueue(new BaseTipData { Title = inputField.text, DurationTime = 10 * 1000 });
-            //UiModule.contexts.ui.uISession.UiState["CommonSystemTipModel"] = true;
-            //UiModule.contexts.ui.uI.GameResult = Core.Enums.EUIGameResultType.Tie;
-            //UiModule.contexts.ui.uISession.UiState["CommonGameOverModel"] = true;
             SendMessageData();
             ResetInputMessage();
         }
@@ -585,11 +637,12 @@ namespace App.Client.GameModules.Ui.Models.Common
                 inputField.text = string.Empty;
             }
             ChatListState = EUIChatListState.Receive;
+            ResetTime();
         }
 
-        public override void Destory()
+        public override void OnDestory()
         {
-            base.Destory();
+            base.OnDestory();
             if (_closeViewAnim != null)
             {
                 _closeViewAnim.Kill();

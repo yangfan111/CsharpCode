@@ -3,6 +3,9 @@
 
 namespace StatsMonitor
 {
+    
+    //StatsMonitor.Instance.RegistProfiler(IProfiler);
+    //StatsMonitor.Instance.UnRegistProfiler(IProfiler);
     public interface IProfiler
     {
         string Name
@@ -12,10 +15,7 @@ namespace StatsMonitor
 
         float SampleValue();
 
-        float MaxValue
-        {
-            get;
-        }
+
 
     }
 
@@ -25,19 +25,36 @@ namespace StatsMonitor
         {
             get
             {
+                
                 return "Test";
             }
         }
 
-        public float MaxValue
-        {
-            get { return 200f; }
-        }
+       
 
-
+        int timesToChange = 20;
+        int count;
+        int maxValue = 500;
+        int minValue = 100;
         public float SampleValue()
         {
-            return UnityEngine.Random.Range(0, 500);
+            count++;
+            if(count>timesToChange)
+            {
+                if(UnityEngine.Random.Range(0, 10)%2==0)
+                {
+                    maxValue = 1000;
+                    minValue = 300;
+                }
+                else
+                {
+                    maxValue = 350;
+                    minValue = 0;
+                }
+
+                count = 0;
+            }
+            return UnityEngine.Random.Range(minValue, maxValue);
         }
     }
 }

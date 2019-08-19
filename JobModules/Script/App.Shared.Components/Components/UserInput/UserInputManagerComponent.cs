@@ -8,7 +8,7 @@ namespace App.Shared.Components.UserInput
     [UserInput, Unique]
     public class UserInputManagerComponent : IComponent
     {
-        public IUserInputManager Instance;
-        public IUserInputHelper Helper;
+        public GameInputManager Mgr;
+        public GameInputHelper Helper;
     }
 }

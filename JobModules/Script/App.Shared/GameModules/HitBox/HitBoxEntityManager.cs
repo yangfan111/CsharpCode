@@ -4,7 +4,7 @@ using App.Shared.Components.Player;
 using BehaviorDesigner.Runtime.Tasks.Basic.UnityTime;
 using Core.Compensation;
 using Core.Components;
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core.EntityComponent;
 using Core.HitBox;
 using Core.Utils;

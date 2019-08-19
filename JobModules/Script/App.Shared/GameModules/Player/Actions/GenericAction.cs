@@ -65,6 +65,7 @@ namespace App.Shared.GameModules.Player.Actions
                 ResetConcretenessAction();
                 return;
             }
+            Logger.Info("[Tmp]Interrupt");
 
             player.stateInterface.State.InterruptAction();
             

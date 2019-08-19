@@ -35,7 +35,7 @@ namespace App.Shared.FreeFramework.Free.condition
                 {
                     StateTransitionConfigItem condition = manager.GetConditionByState(state);
                     if (condition == null) continue;
-                    if (!condition.IsUseAction)
+                    if (!condition.GetTransition(Transition.IsUseAction)/*IsUseAction*/)
                     {
                         return false;
                     }

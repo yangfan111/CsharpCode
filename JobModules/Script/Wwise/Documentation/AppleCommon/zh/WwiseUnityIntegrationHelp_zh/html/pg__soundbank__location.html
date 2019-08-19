@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>我的 SoundBank 应该放在哪里？</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>&nbsp;&raquo;&nbsp;<a class="el" href="pg__installation.html">在 Unity 工程中安装或升级集成</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="pg_soundbank_location">我的 SoundBank 应该放在哪里？ </a></h1><p>当在 Unity Editor 中运行时，直接从 Wwise 工程的 <em>GeneratedSoundBanks</em> 文件夹中取用 SoundBank。这有助于更快速的原型设计。</p>
+<p>当封装您的游戏时，Unity 没有办法区分那些专为一个平台或另一个平台而构建的素材。它将封装 <em>…</em> 下所有的 SoundBank。另一方面，Wwise 为每个平台在子文件夹中生成不同的 SoundBank。To avoid packaging the SoundBanks for all platforms with your game, you should enable the automatic generation of SoundBanks or use a <a href="http://docs.unity3d.com/Manual/BuildPlayerPipeline.html" target="_blank">BuildPlayerPipeline</a> script. 想了解更多内容，请参见此节：<a class="el" href="pg__deploy.html">为目标平台构建您的 Unity 游戏</a>。 </p>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

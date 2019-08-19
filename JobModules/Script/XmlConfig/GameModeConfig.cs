@@ -43,6 +43,8 @@ namespace XmlConfig
         public int Clothes;
         public float ExpCoefficient;
         public int ExpMode;
+        public string TeamADescription;
+        public string TeamBDescription;
     }
 
     public enum EBagType

@@ -21,7 +21,7 @@ namespace App.Shared.Components.Player
     public class PlayerAudioComponent : IGameComponent
     {
         [DontInitilize] public bool InWaterState;
-
+        [DontInitilize] public float C4UnityStamp;
         public int GetComponentId()
         {
             return (int)EComponentIds.PlayerAudio;
@@ -106,9 +106,11 @@ namespace App.Shared.Components.Player
             {
                 return string.Format("{0},{1},{2}", Dir, ViewPosition, EmitPosition);
             }
-            public  string ToStringExt()
+            public  string ToStringExt(StringBuilder stringBuilder)
             {
-                return string.Format("Dir:{0},ViewPosition:{1}", Dir, ViewPosition);
+                stringBuilder.Length = 0;
+                stringBuilder.AppendFormat("Dir:{0},ViewPosition:{1}", Dir, ViewPosition);
+                return stringBuilder.ToString();
             }
             public static PlayerBulletData Allocate()
             {

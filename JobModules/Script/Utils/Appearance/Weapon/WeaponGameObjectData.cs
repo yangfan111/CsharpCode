@@ -11,16 +11,14 @@ namespace Utils.Appearance.Weapon
         public bool Valid;
         
         private UnityObject _obj;
-        private GameObject _primaryGameObject;
-        private GameObject _deputyGameObject;
         private bool _needAssemble;
         
         public WeaponGameObjectData()
         {
             Valid = false;
             _obj = null;
-            _primaryGameObject = null;
-            _deputyGameObject = null;
+            PrimaryAsGameObject = null;
+            DeputyAsGameObject = null;
             _needAssemble = false;
         }
 
@@ -41,35 +39,22 @@ namespace Utils.Appearance.Weapon
             return _obj;
         }
 
-        public GameObject PrimaryAsGameObject
-        {
-            get
-            {
-                return _primaryGameObject;
-            }
-        }
-
-        public GameObject DeputyAsGameObject
-        {
-            get
-            {
-                return _deputyGameObject;
-            }
-        }
+        public GameObject PrimaryAsGameObject { get; private set; }
+        public GameObject DeputyAsGameObject { get; private set; }
 
         private void SetPrimaryAndDeputyGameObject(UnityObject obj)
         {
             if (null == obj || null == obj.AsGameObject ||
                 !SingletonManager.Get<WeaponAvatarConfigManager>().HaveLeftWeapon(obj.AsGameObject.name))
             {
-                _deputyGameObject = null;
-                _primaryGameObject = null != obj ? obj.AsGameObject : null;
+                DeputyAsGameObject = null;
+                PrimaryAsGameObject = null != obj ? obj.AsGameObject : null;
                 _needAssemble = false;
                 return;
             }
 
-            _primaryGameObject = SingletonManager.Get<WeaponAvatarConfigManager>().GetRightWeaponGameObject(obj);
-            _deputyGameObject = SingletonManager.Get<WeaponAvatarConfigManager>().GetLeftWeaponGameObject(obj);
+            PrimaryAsGameObject = SingletonManager.Get<WeaponAvatarConfigManager>().GetRightWeaponGameObject(obj);
+            DeputyAsGameObject = SingletonManager.Get<WeaponAvatarConfigManager>().GetLeftWeaponGameObject(obj);
 
             SplitPrimaryAndDeputyGameObject();
         }
@@ -78,16 +63,16 @@ namespace Utils.Appearance.Weapon
         {
             _needAssemble = true;
 
-            if (null != _primaryGameObject)
+            if (null != PrimaryAsGameObject)
             {
-                _primaryGameObject.transform.SetParent(null, false);
-                BoneTool.CacheTransform(_primaryGameObject);
+                PrimaryAsGameObject.transform.SetParent(null, false);
+                BoneTool.CacheTransform(PrimaryAsGameObject);
             }
 
-            if (null != _deputyGameObject)
+            if (null != DeputyAsGameObject)
             {
-                _deputyGameObject.transform.SetParent(null, false);
-                BoneTool.CacheTransform(_deputyGameObject);
+                DeputyAsGameObject.transform.SetParent(null, false);
+                BoneTool.CacheTransform(DeputyAsGameObject);
             }
         }
 
@@ -95,14 +80,14 @@ namespace Utils.Appearance.Weapon
         {
             if(!_needAssemble || null == _obj || null == _obj.AsGameObject) return;
             
-            if(null != _primaryGameObject)
-                _primaryGameObject.transform.SetParent(_obj.AsGameObject.transform, false);
+            if(null != PrimaryAsGameObject)
+                PrimaryAsGameObject.transform.SetParent(_obj.AsGameObject.transform, false);
             
-            if(null != _deputyGameObject)
-                _deputyGameObject.transform.SetParent(_obj.AsGameObject.transform, false);
+            if(null != DeputyAsGameObject)
+                DeputyAsGameObject.transform.SetParent(_obj.AsGameObject.transform, false);
 
-            _primaryGameObject = null;
-            _deputyGameObject = null;
+            PrimaryAsGameObject = null;
+            DeputyAsGameObject = null;
             _needAssemble = false;
         }
     }

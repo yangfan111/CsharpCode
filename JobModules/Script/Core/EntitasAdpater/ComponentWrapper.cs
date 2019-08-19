@@ -3,7 +3,7 @@ using Core.Components;
 using Core.EntityComponent;
 using Core.ObjectPool;
 
-namespace Core.EntitasAdpater
+namespace Core.EntityComponent
 {
     public class ComponentWrapperComparer : IComparer<ComponentWrapper>
     {

@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using App.Shared.FreeFramework.Free.player;
 using App.Shared.Player;
 using Core.GameModule.System;
 using Core.Utils;
 using Entitas;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Utils.AssetManager;
 using Utils.Configuration;
@@ -15,6 +16,7 @@ namespace App.Shared.GameModules.Player.ResourceLoad
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerChangeRoleSystem));
         private readonly PlayerContext _player;
+        private readonly Contexts _contexts;
         private readonly FirstPersonModelLoadHandler _p1Handler;
         private readonly ThirdPersonModelLoadHandler _p3Handler;
 
@@ -24,6 +26,7 @@ namespace App.Shared.GameModules.Player.ResourceLoad
 
         public PlayerChangeRoleSystem(Contexts contexts) : base(contexts.player)
         {
+            _contexts = contexts;
             _player = contexts.player;
             _p1Handler = new FirstPersonModelLoadHandler(contexts);
             _p3Handler = new ThirdPersonModelLoadHandler(contexts);
@@ -75,7 +78,11 @@ namespace App.Shared.GameModules.Player.ResourceLoad
 
         private void ChangeRole(PlayerEntity player, int roleId)
         {
-            if (!player.hasPlayerInfo) return;
+            if(player.hasGamePlay)
+            Logger.InfoFormat("NewRoleId: {0}, LastRoleId: {1}", roleId, player.gamePlay.LastNewRoleId);
+            
+            if (!player.hasPlayerInfo ||
+                !AssetConfig.RoleIdExit(roleId)) return;
 
             player.playerInfo.ChangeNewRole(roleId);
             ChangeRoleInfo(player, roleId);
@@ -155,8 +162,9 @@ namespace App.Shared.GameModules.Player.ResourceLoad
         private static void ClearComponentData(PlayerEntity player)
         {
             if (!player.hasAppearanceInterface) return;
-
+            
             var appearance = player.appearanceInterface.Appearance;
+            appearance.Init();
             appearance.SyncPredictedTo(player.predictedAppearance);
             appearance.SyncClientTo(player.clientAppearance);
 
@@ -189,6 +197,8 @@ namespace App.Shared.GameModules.Player.ResourceLoad
 
                     _p3Objs.Remove(entityId);
                     _animationFinished.Remove(entityId);
+
+                    IniAvatarAction.InitAvatar(_contexts, player);
                 }
             }
             else
@@ -228,12 +238,17 @@ namespace App.Shared.GameModules.Player.ResourceLoad
         {
             if (!player.hasEntityKey) return;
             _p3Objs[player.entityKey.Value.EntityId] = unityObj;
+            // 移除视野
+            PlayerEntityUtility.SetVisibility(unityObj.AsGameObject, false);
         }
+
 
         private void P1ModelLoadSuccess(PlayerEntity player, UnityObject unityObj)
         {
             if (!player.hasEntityKey) return;
             _p1Objs[player.entityKey.Value.EntityId] = unityObj;
+            // 移除视野
+            PlayerEntityUtility.SetVisibility(unityObj.AsGameObject, false);
         }
 
         private static bool HasFirstPerson(int roleId)

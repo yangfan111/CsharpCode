@@ -20,9 +20,9 @@ namespace App.Shared.FreeFramework.framework.ai.player
            /// DebugUtil.LogInUnity("target.WeaponController():" + target.WeaponController().ToString());
             if (target != null)
             {
-                if (PlayerInterceptUtil.IsFaceTo(player, target.position.Value, player.userCmd.LastTemp))
+                if (PlayerInterceptUtil.IsFaceTo(player, target.position.Value, player.userCmd.Latest))
                 {
-                    player.userCmd.LastTemp.IsLeftAttack = true;
+                    player.userCmd.Latest.IsLeftAttack = true;
                 }
             }
         }

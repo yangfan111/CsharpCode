@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>在 Unity 中使用 Wwise 自定义平台</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>&nbsp;&raquo;&nbsp;<a class="el" href="pg__deploy.html">为目标平台构建您的 Unity 游戏</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="pg_customplatforms">在 Unity 中使用 Wwise 自定义平台 </a></h1><p>默认情况下，Wwise Unity 集成假设关联的 Wwise 工程中的定义的平台用的都是默认名称。如果您希望给平台自定义的名称或为一个基本平台定义多个自定义平台，则将需要创建一个 C# 脚本来实现此目标。</p>
+<table  border="0" cellspacing="0" cellpadding="2">
+<tr>
+<td valign="top"><div align="center">
+<img src="Note.gif" alt="Note.gif"/>
+</div>
+</td><td><b>备注：</b>在此页面中，假设生成 SoundBank 的子文件夹与您的平台名称相同。如果名称不同，那么请注意，<code>GetPlatformName</code> 方法返回的字符串实际上被用作游戏中的 SoundBank 子文件夹名。 </td></tr>
+</table>
+<h2><a class="anchor" id="定义自定义平台">
+定义自定义平台</a></h2>
+<p>默认的平台解析脚本可以在文件 <code>UNITY_PROJECT_ROOT/Assets/Wwise/Deployment/Components/AkBasePathGetter.cs</code> 中找到。在 <code>GetPlatformName()</code> 方法中可以看到，所有平台的默认名称都由这个函数返回。如果您希望采用自己命名的平台名称，则必须扩展这个不完全（partial）类。</p>
+<h2><a class="anchor" id="示例">
+示例</a></h2>
+<p>这个示例只涵盖了 iOS 平台的一个用例。在这个例子中，您希望有三个不同的自定义平台：一个是 ipod，一个是 iphone，一个是 ipad。</p>
+<ol type="1">
+<li>首先，在 Wwise 工程中，您将在 Platform Manager（平台管理器）中添加三个不同的平台："iPod"、"iPhone" 和 "iPad"。（关于 Wwise 的 Platform Manager 的更多信息，请参见 <a href="https://www.audiokinetic.com/library/?source=Help&amp;id=managing_platforms" target="_blank">Wwise Help &gt; 设置工程 &gt; 管理多平台</a> 一节）。</li>
+<li>然后在 Unity 中，创建一个 C# 脚本，它会扩展 <code>AkBasePathGetter</code>。该文件的内容类似于： <div class="fragment"><pre class="fragment"><span class="keyword">public</span> <span class="keyword">partial class </span>AkBasePathGetter
+{
+<span class="preprocessor">#if UNTIY_IOS</span>
+<span class="preprocessor"></span>    <span class="keyword">static</span> partial <span class="keywordtype">void</span> GetCustomPlatformName(ref <span class="keywordtype">string</span> platformName)
+    {
+        <span class="keywordflow">switch</span>(UnityEngine.iOS.Device.generation)
+        {
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPodTouch1Gen:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPodTouch2Gen:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPodTouch3Gen:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPodTouch4Gen:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPodTouch5Gen:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPodTouchUnknown:
+                platformName = <span class="stringliteral">&quot;iPod&quot;</span>;
+                <span class="keywordflow">break</span>;
+
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPad1Gen:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPad2Gen:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPad3Gen:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPadMini1Gen:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPad4Gen:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPadAir1:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPadMini2Gen:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPadMini3Gen:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPadAir2:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPadUnknown:
+                platformName = <span class="stringliteral">&quot;iPad&quot;</span>;
+                <span class="keywordflow">break</span>;
+
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPhone:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPhone3G:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPhone3GS:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPhone4:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPhone4S:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPhone5:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPhone5C:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPhone5S:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPhone6:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPhone6Plus:
+            <span class="keywordflow">case</span> UnityEngine.iOS.DeviceGeneration.iPhoneUnknown:
+            <span class="keywordflow">default</span>:
+                platformName = <span class="stringliteral">&quot;iPhone&quot;</span>;
+                <span class="keywordflow">break</span>;
+        }
+    }
+<span class="preprocessor">#endif</span>
+<span class="preprocessor">}</span>
+</pre></div> <table  border="0" cellspacing="0" cellpadding="2">
+<tr>
+<td valign="top"><div align="center">
+<img src="Note.gif" alt="Note.gif"/>
+</div>
+</td><td><b>备注：</b>如果 <code>platformName</code> 未修改，则当前激活状态的 Unity 平台将使用默认平台名称。 </td></tr>
+</table>
+</li>
+<li>或者，（a）创建一个 C#，它将扩展 <code>AkBuildPreprocessor</code>，或（b）创建一个 C#，它将使用 <code>AkBuildPreprocessor</code> 内的功能。该文件的内容可以类似于： <div class="fragment"><pre class="fragment"><span class="keyword">public</span> <span class="keyword">class </span>WwiseIOSBuildPreprocessor : IPreprocessBuild, IPostprocessBuild
+{
+    <span class="keyword">public</span> <span class="keywordtype">int</span> callbackOrder { <span class="keyword">get</span> { <span class="keywordflow">return</span> 0; } }
+    <span class="keywordtype">string</span> iPodDestinationSoundBankFolder = <span class="keywordtype">string</span>.Empty;
+    <span class="keywordtype">string</span> iPadDestinationSoundBankFolder = <span class="keywordtype">string</span>.Empty;
+    <span class="keywordtype">string</span> iPhoneDestinationSoundBankFolder = <span class="keywordtype">string</span>.Empty;
+    
+    <span class="keyword">public</span> <span class="keywordtype">void</span> OnPreprocessBuild(BuildTarget target, <span class="keywordtype">string</span> path)
+    {
+        <span class="keywordflow">if</span> (target == BuildTarget.iOS)
+        {
+            AkBuildPreprocessor.CopySoundbanks(<span class="keyword">true</span>, <span class="stringliteral">&quot;iPod&quot;</span>,   iPodDestinationSoundBankFolder);
+            AkBuildPreprocessor.CopySoundbanks(<span class="keyword">true</span>, <span class="stringliteral">&quot;iPad&quot;</span>,   iPadDestinationSoundBankFolder);
+            AkBuildPreprocessor.CopySoundbanks(<span class="keyword">true</span>, <span class="stringliteral">&quot;iPhone&quot;</span>, iPhoneDestinationSoundBankFolder);
+        }
+    }
+
+    <span class="keyword">public</span> <span class="keywordtype">void</span> OnPostprocessBuild(BuildTarget target, <span class="keywordtype">string</span> path)
+    {
+        DeleteSoundbanks(iPodDestinationSoundBankFolder);
+        DeleteSoundbanks(iPadDestinationSoundBankFolder);
+        DeleteSoundbanks(iPhoneDestinationSoundBankFolder);
+    }
+}
+</pre></div></li>
+<li>或者在 Wwise 中，为全部三个平台 "iPhone"、"iPod" 和 "iPad" 生成 SoundBank，将生成的三个文件夹复制到 <code>UNITY_PROJECT_ROOT/Assets/StreamingAssets/Audio/GeneratedSoundBanks</code> 中。</li>
+<li>在 Unity 中，为 iOS 平台构建您的游戏。</li>
+<li>从现在开始，根据使用的设备类型，将使用不同的 SoundBank 集合。 </li>
+</ol>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

@@ -4,6 +4,7 @@ using Core;
 using Core.CharacterState;
 using Core.Utils;
 using Utils.Appearance;
+using Utils.Singleton;
 using WeaponConfigNs;
 using XmlConfig;
 
@@ -23,17 +24,18 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
         public ThrowingWeaponFireController(ThrowingFireLogicConfig throwCfg, WeaponResConfigItem resCfg)
         {
-            CleanFireInspector = cmd => cmd.UserCmd.IsThrowing;
-            this.throwCfg      = throwCfg;
-            this.resCfg        = resCfg;
+            CleanFireInspector        = cmd => cmd.UserCmd.IsThrowing;
+            this.throwCfg             = throwCfg;
+            this.resCfg               = resCfg;
         }
 
         protected override void SyncData(PlayerWeaponController weaponController)
         {
             base.SyncData(weaponController);
-            characterState     = weaponController.RelatedCharState;
-            currentTime        = weaponController.RelatedTime;
+            characterState = weaponController.RelatedCharState;
+            currentTime    = weaponController.RelatedTime;
         }
+
         protected override void UpdateFire(PlayerWeaponController controller, WeaponSideCmd cmd, Contexts contexts)
         {
             if (cmd.FiltedInput(EPlayerInput.IsLeftAttack))
@@ -64,6 +66,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
                 return;
             throwingActionData.SetReady(holdAgent.WeaponKey.EntityId, throwCfg.Throwing);
             //准备动作
+            Logger.Info("[Tmp]Throw Interrupt");
             characterState.InterruptAction();
             characterState.StartFarGrenadeThrow(() =>
             {
@@ -90,16 +93,18 @@ namespace App.Shared.GameModules.Weapon.Behavior
             }
         }
 
-        //拉栓
-        private void DoPull(PlayerWeaponController controller, WeaponSideCmd cmd,bool playPullAudio = true)
+        //拉栓/不按R进行一次自动拉栓
+        private void DoPull(PlayerWeaponController controller, WeaponSideCmd cmd, bool playPullAudio = true)
         {
             if (!throwingActionData.CanPull())
                 return;
 
             //生成Entity
             int renderTime = cmd.UserCmd.RenderTime;
-            var dir        = BulletDirUtility.GetThrowingDir(controller);
-            var throwingEntity = ThrowingEntityFactory.CreateThrowingEntity(controller, renderTime, dir,
+            var throwAmmunitionCalculator = SingletonManager.Get<ThrowAmmunitionCalculator>();
+            var dir        = throwAmmunitionCalculator.GetFireDir(0, controller, 0);
+            var viewPosition    = throwAmmunitionCalculator.GetFireViewPosition(controller);
+            var throwingEntity = ThrowingEntityFactory.CreateThrowingEntity(controller, renderTime, dir, viewPosition,
                 throwCfg.Throwing.GetThrowingInitSpeed(throwingActionData.IsNearThrow), resCfg, throwCfg.Throwing);
             throwingActionData.SetPull(throwingEntity.entityKey.Value);
             //弹片特效
@@ -107,7 +112,8 @@ namespace App.Shared.GameModules.Weapon.Behavior
             {
                 controller.AddAuxEffect(EClientEffectType.PullBolt);
             }
-            if(playPullAudio)
+
+            if (playPullAudio)
                 controller.AudioController.PlaySimpleAudio(EAudioUniqueId.GrenadeTrigger, true);
         }
 
@@ -119,10 +125,12 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
             if (!throwingActionData.IsPull)
             {
-                DoPull(controller, cmd,false);
+                DoPull(controller, cmd, false);
             }
 
-            throwingActionData.SetThrow();
+            var handPos = controller.HandPos;
+            DebugUtil.MyLog("Throw");
+            throwingActionData.SetThrow(handPos);
             ThrowingEntityFactory.StartThrowingEntityFly(throwingActionData.ThrowingEntityKey, true,
                 throwCfg.Throwing.GetThrowingInitSpeed(throwingActionData.IsNearThrow));
             //投掷动作

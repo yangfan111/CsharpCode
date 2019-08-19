@@ -1,23 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using App.Shared.Components;
-using App.Shared.Components.Player;
+﻿using App.Shared.Components;
 using App.Shared.Configuration;
 using App.Shared.Player;
+using Core;
 using Core.CameraControl;
 using Core.Components;
-using Core.Configuration;
-using Core.HitBox;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
-using log4net.Repository.Hierarchy;
 using UnityEngine;
-using Utils.Appearance;
 using Utils.Configuration;
 using Utils.Singleton;
-using XmlConfig;
-using Object = System.Object;
 
 namespace App.Shared.GameModules.Player
 {
@@ -80,7 +71,7 @@ namespace App.Shared.GameModules.Player
                                         "back-----------------------------------------------------------------");
                     PlayerSkyMoveUtility.AttachParachute(contexts, player, false);
                 });
-               // player.soundManager.Value.PlayOnce(EPlayerSoundType.OpenParachute);
+                player.AudioController().PlaySimpleAudio((EAudioUniqueId) 5029, true);
                 playerSkyMove.IsWaitForAttach = true;
             }
             else if (!playerSkyMove.IsParachuteLoading && playerSkyMove.Parachute == null)

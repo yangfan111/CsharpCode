@@ -15,10 +15,11 @@ using RpcNetwork.RpcNetwork;
 
 namespace App.Shared.Network
 {
-    public class AppMessageTypeInfo: IMessageTypeInfo
+    public class AppMessageTypeInfo : IMessageTypeInfo
     {
         private readonly string _name;
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(AppMessageTypeInfo));
+
         public void PrintDebugInfo(StringBuilder sb)
         {
             sb.Append("full:").Append(_replicatedSnapshotSerializeInfo.SnapshotReplicator.SendChannel.FullCount)
@@ -54,7 +55,7 @@ namespace App.Shared.Network
                     sb.Append(st.TotalSerializeSize);
                     sb.Append("</td>");
                     sb.Append("<td>");
-                    sb.Append(st.TotalSerializeSize/(st.TotalSerializeCount+1));
+                    sb.Append(st.TotalSerializeSize / (st.TotalSerializeCount + 1));
                     sb.Append("</td>");
 
                     sb.Append("<td>");
@@ -76,58 +77,83 @@ namespace App.Shared.Network
                     sb.Append("</tr>");
                 }
             }
+
             sb.Append("</table>");
         }
 
-       
 
         private ISerializeInfo[] _serializeInfo;
 
         private ReplicatedSnapshotSerializeInfo _replicatedSnapshotSerializeInfo;
         private ReplicatedUpdateEntitySerializeInfo _replicatedUpdateEntitySerializeInfo;
-        public AppMessageTypeInfo(string name="default")
+
+        public AppMessageTypeInfo(string name = "default", int updateMsgSendCount = 3)
         {
             _name = name;
             _serializeInfo = new ISerializeInfo[(int) EServer2ClientMessage.Max];
-            _serializeInfo[(int) EClient2ServerMessage.Login] = new ProtoBufSerializeInfo<LoginMessage>(Protobuf.LoginMessage.Parser);
-            _serializeInfo[(int)EServer2ClientMessage.LoginSucc] = new ProtoBufSerializeInfo<LoginSuccMessage>(Protobuf.LoginSuccMessage.Parser);
+            _serializeInfo[(int) EClient2ServerMessage.Login] =
+                new ProtoBufSerializeInfo<LoginMessage>(Protobuf.LoginMessage.Parser);
+            _serializeInfo[(int) EServer2ClientMessage.LoginSucc] =
+                new ProtoBufSerializeInfo<LoginSuccMessage>(Protobuf.LoginSuccMessage.Parser);
             _serializeInfo[(int) EClient2ServerMessage.UserCmd] = new UserCmdSerializeInfo();
             _serializeInfo[(int) EClient2ServerMessage.SimulationTimeSync] = new SimulationTimeMessageSerializeInfo();
             _serializeInfo[(int) EClient2ServerMessage.VehicleCmd] = new VehicleCmdSerializeInfo();
-            _serializeInfo[(int)EClient2ServerMessage.VehicleEvent] = new VehicleEventSerializeInfo();
-            _serializeInfo[(int)EClient2ServerMessage.TriggerObjectEvent] = new TriggerObjectEventSerializeInfo();
+            _serializeInfo[(int) EClient2ServerMessage.VehicleEvent] = new VehicleEventSerializeInfo();
+            _serializeInfo[(int) EClient2ServerMessage.TriggerObjectEvent] = new TriggerObjectEventSerializeInfo();
             _serializeInfo[(int) EClient2ServerMessage.LocalDisconnect] = null;
             _serializeInfo[(int) EClient2ServerMessage.LocalLogin] = null;
-            _serializeInfo[(int)EClient2ServerMessage.ClothChange] = new ProtoBufSerializeInfo<ClothChangeMessage>(Protobuf.ClothChangeMessage.Parser);
-            _serializeInfo[(int)EClient2ServerMessage.DebugCommand] = new ProtoBufSerializeInfo<DebugCommandMessage>(Protobuf.DebugCommandMessage.Parser);
-            _serializeInfo[(int) EClient2ServerMessage.UpdateMsg] = _replicatedUpdateEntitySerializeInfo=new ReplicatedUpdateEntitySerializeInfo(ComponentSerializerManager.Instance, new UpdateMessagePool(), ComponentSerializerManager.HashMd5);
-            _serializeInfo[(int) EClient2ServerMessage.FireInfo] = new ProtoBufSerializeInfo<FireInfoMessage>(Protobuf.DebugCommandMessage.Parser);
-            _serializeInfo[(int) EClient2ServerMessage.DebugScriptInfo] =  new  ProtoBufSerializeInfo<DebugScriptInfo>(Protobuf.DebugScriptInfo.Parser);
-            _serializeInfo[(int) EClient2ServerMessage.GameOver ] = new ProtoBufSerializeInfo<GameOverMesssage>(Protobuf.GameOverMesssage.Parser);
-            _replicatedSnapshotSerializeInfo = new ReplicatedSnapshotSerializeInfo(new SnapshotReplicator(ComponentSerializerManager.Instance, ComponentSerializerManager.HashMd5));
+            _serializeInfo[(int) EClient2ServerMessage.ClothChange] =
+                new ProtoBufSerializeInfo<ClothChangeMessage>(Protobuf.ClothChangeMessage.Parser);
+            _serializeInfo[(int) EClient2ServerMessage.DebugCommand] =
+                new ProtoBufSerializeInfo<DebugCommandMessage>(Protobuf.DebugCommandMessage.Parser);
+            _serializeInfo[(int) EClient2ServerMessage.UpdateMsg] = _replicatedUpdateEntitySerializeInfo =
+                new ReplicatedUpdateEntitySerializeInfo(ComponentSerializerManager.Instance, new UpdateMessagePool(),
+                    ComponentSerializerManager.HashMd5, updateMsgSendCount);
+            _serializeInfo[(int) EClient2ServerMessage.FireInfo] =
+                new ProtoBufSerializeInfo<FireInfoMessage>(Protobuf.DebugCommandMessage.Parser);
+            _serializeInfo[(int) EClient2ServerMessage.DebugScriptInfo] =
+                new ProtoBufSerializeInfo<DebugScriptInfo>(Protobuf.DebugScriptInfo.Parser);
+            _serializeInfo[(int) EClient2ServerMessage.GameOver] =
+                new ProtoBufSerializeInfo<GameOverMesssage>(Protobuf.GameOverMesssage.Parser);
+            _replicatedSnapshotSerializeInfo = new ReplicatedSnapshotSerializeInfo(
+                new SnapshotReplicator(ComponentSerializerManager.Instance, ComponentSerializerManager.HashMd5));
             _serializeInfo[(int) EServer2ClientMessage.Snapshot] = _replicatedSnapshotSerializeInfo;
 
             //            _replicatedUserCmdSerializeInfo = new ReplicatedCmddSerializeInfo(new SnapshotReplicator(ComponentSerializerManager.Instance));
 
 
             _serializeInfo[(int) EServer2ClientMessage.SimulationTimeSync] = new SimulationTimeMessageSerializeInfo();
-            _serializeInfo[(int)EServer2ClientMessage.UdpId] = new ProtoBufSerializeInfo<UdpIdMessage>(Protobuf.UdpIdMessage.Parser);
-            _serializeInfo[(int)EServer2ClientMessage.FreeData] = new ProtoBufSerializeInfo<SimpleProto>(SimpleProto.Parser);
-            _serializeInfo[(int)EClient2ServerMessage.FreeEvent] = new ProtoBufSerializeInfo<SimpleProto>(SimpleProto.Parser);
-            _serializeInfo[(int)EServer2ClientMessage.Statistics] = new ProtoBufSerializeInfo<BattleStatisticsMessage>(Protobuf.BattleStatisticsMessage.Parser);
-            _serializeInfo[(int)EServer2ClientMessage.Ping] = new ProtoBufSerializeInfo<PingMessage>(Protobuf.PingMessage.Parser);
-            _serializeInfo[(int)EClient2ServerMessage.Ping] = new ProtoBufSerializeInfo<PingRequestMessage>(Protobuf.PingRequestMessage.Parser);
-            _serializeInfo[(int)EServer2ClientMessage.DamageInfo] = new ProtoBufSerializeInfo<PlayerDamageInfoMessage>(Protobuf.PlayerDamageInfoMessage.Parser);
-            _serializeInfo[(int)EServer2ClientMessage.UpdateAck] = new ProtoBufSerializeInfo<UpdateMessageAck>(Protobuf.UpdateMessageAck.Parser);
-            _serializeInfo[(int)EServer2ClientMessage.PlayerInfo] = new ProtoBufSerializeInfo<PlayerInfoMessage>(Protobuf.PlayerInfoMessage.Parser);
-            _serializeInfo[(int)EServer2ClientMessage.FireInfoAck] = new ProtoBufSerializeInfo<FireInfoAckMessage>(Protobuf.UpdateMessageAck.Parser);
-            _serializeInfo[(int)EServer2ClientMessage.DebugMessage] = new ProtoBufSerializeInfo<ServerDebugMessage>(Protobuf.ServerDebugMessage.Parser);
-            _serializeInfo[(int)EServer2ClientMessage.ClearScene] = new ProtoBufSerializeInfo<ClearSceneMessage>(Protobuf.ClearSceneMessage.Parser);
-            _serializeInfo[(int)EServer2ClientMessage.GameOver] = new ProtoBufSerializeInfo<GameOverMesssage>(Protobuf.GameOverMesssage.Parser);
-            _serializeInfo[(int)EServer2ClientMessage.HeartBeat] = new ProtoBufSerializeInfo<HeartBeatMessage>(Protobuf.HeartBeatMessage.Parser);
-            _serializeInfo[(int)EServer2ClientMessage.SceneInfo] = new ProtoBufSerializeInfo<LoginSuccMessage>(Protobuf.LoginSuccMessage.Parser);
+            _serializeInfo[(int) EServer2ClientMessage.UdpId] =
+                new ProtoBufSerializeInfo<UdpIdMessage>(Protobuf.UdpIdMessage.Parser);
+            _serializeInfo[(int) EServer2ClientMessage.FreeData] =
+                new ProtoBufSerializeInfo<SimpleProto>(SimpleProto.Parser);
+            _serializeInfo[(int) EClient2ServerMessage.FreeEvent] =
+                new ProtoBufSerializeInfo<SimpleProto>(SimpleProto.Parser);
+            _serializeInfo[(int) EServer2ClientMessage.Statistics] =
+                new ProtoBufSerializeInfo<BattleStatisticsMessage>(Protobuf.BattleStatisticsMessage.Parser);
+            _serializeInfo[(int) EServer2ClientMessage.Ping] =
+                new ProtoBufSerializeInfo<PingMessage>(Protobuf.PingMessage.Parser);
+            _serializeInfo[(int) EClient2ServerMessage.Ping] =
+                new ProtoBufSerializeInfo<PingRequestMessage>(Protobuf.PingRequestMessage.Parser);
+            _serializeInfo[(int) EServer2ClientMessage.DamageInfo] =
+                new ProtoBufSerializeInfo<PlayerDamageInfoMessage>(Protobuf.PlayerDamageInfoMessage.Parser);
+            _serializeInfo[(int) EServer2ClientMessage.UpdateAck] =
+                new ProtoBufSerializeInfo<UpdateMessageAck>(Protobuf.UpdateMessageAck.Parser);
+            _serializeInfo[(int) EServer2ClientMessage.PlayerInfo] =
+                new ProtoBufSerializeInfo<PlayerInfoMessage>(Protobuf.PlayerInfoMessage.Parser);
+            _serializeInfo[(int) EServer2ClientMessage.FireInfoAck] =
+                new ProtoBufSerializeInfo<FireInfoAckMessage>(Protobuf.UpdateMessageAck.Parser);
+            _serializeInfo[(int) EServer2ClientMessage.DebugMessage] =
+                new ProtoBufSerializeInfo<ServerDebugMessage>(Protobuf.ServerDebugMessage.Parser);
+            _serializeInfo[(int) EServer2ClientMessage.ClearScene] =
+                new ProtoBufSerializeInfo<ClearSceneMessage>(Protobuf.ClearSceneMessage.Parser);
+            _serializeInfo[(int) EServer2ClientMessage.GameOver] =
+                new ProtoBufSerializeInfo<GameOverMesssage>(Protobuf.GameOverMesssage.Parser);
+            _serializeInfo[(int) EServer2ClientMessage.HeartBeat] =
+                new ProtoBufSerializeInfo<HeartBeatMessage>(Protobuf.HeartBeatMessage.Parser);
+            _serializeInfo[(int) EServer2ClientMessage.SceneInfo] =
+                new ProtoBufSerializeInfo<LoginSuccMessage>(Protobuf.LoginSuccMessage.Parser);
         }
-
 
 
         public ISerializeInfo this[int messageType]
@@ -135,8 +161,6 @@ namespace App.Shared.Network
             get { return _serializeInfo[messageType]; }
             set { _serializeInfo[messageType] = value; }
         }
-
-
 
 
         public ISerializeInfo GetSerializeInfo(int messageType)
@@ -166,19 +190,18 @@ namespace App.Shared.Network
 
 
         public void Dispose()
-	    {
+        {
             _logger.InfoFormat("name{0} Dispose {1}", _name, _serializeInfo.Length);
-		    for (int i = 0; i < _serializeInfo.Length; i++)
-		    {
-               
-			    if (_serializeInfo[i] != null)
-			    {
+            for (int i = 0; i < _serializeInfo.Length; i++)
+            {
+                if (_serializeInfo[i] != null)
+                {
                     _logger.InfoFormat("idx:{0} type:{1} dispose", i, _serializeInfo[i].GetType());
-				    _serializeInfo[i].Dispose();
-				    _serializeInfo[i] = null;
-			    }
-		    }
-	    }
+                    _serializeInfo[i].Dispose();
+                    _serializeInfo[i] = null;
+                }
+            }
+        }
 
         public IUpdateMessagePool GetUpdateMessagePool()
         {

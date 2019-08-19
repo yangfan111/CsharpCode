@@ -75,7 +75,7 @@ namespace Core.Room
         private float _compensationInterval = 0;
         public void Update()
         {
-            float now = Time.time*1000;
+            float now = Common.MyGameTime.time*1000;
             int interval = _calcFixTimeInterval.Update(now);
             
             foreach (var room in _roomId2Room.Values)
@@ -164,7 +164,7 @@ namespace Core.Room
             if (RandomToken.Equals(token))
             {
                 System.Random rand = new System.Random();
-                return new PlayerInfo(token, GetNewRoom().RoomId,rand.Next(0, 1000) , "", 2, rand.Next(0, 1000),0,0,0,0,0,null,null,null,false, 0);
+                return new PlayerInfo(token, GetNewRoom().RoomId,rand.Next(0, 1000) , "", 2, rand.Next(0, 1000),0,0,0,0,0,null,null,null,false, 0, null);
             }
             IPlayerInfo rc;
             

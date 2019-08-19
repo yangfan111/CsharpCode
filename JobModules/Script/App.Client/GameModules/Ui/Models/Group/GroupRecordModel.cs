@@ -1,4 +1,3 @@
-using System;
 using App.Client.GameModules.Ui.ViewModels.Group;
 using App.Client.GameModules.Ui.UiAdapter;
 using App.Shared.Components.Ui;
@@ -41,12 +40,12 @@ namespace App.Client.GameModules.Ui.Models.Group
 
         private void InitKey()
         {
-            OpenKeyReceiver = new KeyReceiver(Layer.Env, BlockType.None);
-            OpenKeyReceiver.AddAction(UserInputKey.ShowRecord, (data) => { _adapter.Enable = true; });
+            OpenKeyReceiver = new KeyReceiver(EInputLayer.Env, BlockType.None);
+            OpenKeyReceiver.BindKeyAction(UserInputKey.ShowRecord, (data) => { _adapter.Enable = true; });
             _adapter.RegisterOpenKey(OpenKeyReceiver);
             KeyReceiver = new KeyReceiver(UiConstant.recordWindowKeyBlockLayer, BlockType.All);
-            KeyReceiver.AddAction(UserInputKey.HideRecord, (data) => { _adapter.Enable = false; });
-            KeyReceiver.AddAction(UserInputKey.HideWindow, (data) => { _adapter.Enable = false; });
+            KeyReceiver.BindKeyAction(UserInputKey.HideRecord, (data) => { _adapter.Enable = false; });
+            KeyReceiver.BindKeyAction(UserInputKey.HideWindow, (data) => { _adapter.Enable = false; });
         }
 
         private void InitInfoTitle()
@@ -110,6 +109,13 @@ namespace App.Client.GameModules.Ui.Models.Group
         public override void Update(float interval)
         {
             UpdateInfo();
+            UpdateScore();
+        }
+
+        private void UpdateScore()
+        {
+            _viewModel.CampScore1 = _adapter.GetScoreByCampType(EUICampType.T).ToString();
+            _viewModel.CampScore2 = _adapter.GetScoreByCampType(EUICampType.CT).ToString();
         }
 
         private void UpdateInfo()
@@ -121,26 +127,10 @@ namespace App.Client.GameModules.Ui.Models.Group
 
         private void UpdateInfoView()
         {
-            UpdateRoomInfo();
-            UpdatePlayerCount();
             UpdateInfoView(EUICampType.T);
             UpdateInfoView(EUICampType.CT);
         }
 
-        private void UpdatePlayerCount()
-        {
-            var curPlayer = _adapter.PlayerCount;
-            var maxPlayer = _adapter.PlayerCapacity;
-            _viewModel.PlayerCountText = string.Format(I2.Loc.ScriptLocalization.client_common.word43, curPlayer, maxPlayer);
-        }
-
-        private void UpdateRoomInfo()
-        {
-            var channel = _adapter.ChannelName;
-            var roomName = _adapter.RoomName;
-            var roomId = _adapter.RoomId;
-            _viewModel.RoomInfoText = string.Format("{0}/{1}/{2}", channel, roomName, roomId);
-        }
 
         private void UpdateInfoView(EUICampType campType)
         {

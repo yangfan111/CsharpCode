@@ -104,6 +104,12 @@ namespace Utils.Appearance.Weapon
             {
                 _waitPartGoDic[partType] = go;
             }
+
+            if (partType.Equals(WeaponPartLocation.Scope)) 
+            {
+                _weaponModelAssemblyController.RefreshRemovableAttachment(_weaponGo as GameObject,true);
+            }
+           
         }
 
         public void Attach(WeaponPartLocation partLocation, T partGo, T weaponGo)
@@ -189,6 +195,10 @@ namespace Utils.Appearance.Weapon
 #if !UnitTest
                         Logger.ErrorFormat("asset with location {0} doesn't exist in part asset dic ", location);
 #endif
+                    }
+                    if (location.Equals(WeaponPartLocation.Scope))
+                    {
+                        _weaponModelAssemblyController.RefreshRemovableAttachment(_weaponGo as GameObject, false);
                     }
                 }
             }

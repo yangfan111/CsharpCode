@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using Core.Utils;
-using UnityEngine;
 
 namespace App.Shared.Audio
 {
@@ -11,12 +9,16 @@ namespace App.Shared.Audio
         {
             InitBattleListner();
             GameAudioMedia.Prepare();
+            Logger.Info("[Wwise] BattleAudioManager media prepare sucess");
+            
         }
 
+        AudioSourceType sourceType = AudioSourceType.Battle;
         public AudioSourceType SourceType
         {
-            get { return AudioSourceType.Battle; }
+            get { return sourceType; }
+            set { sourceType = value; }
         }
-        
+
     }
 }

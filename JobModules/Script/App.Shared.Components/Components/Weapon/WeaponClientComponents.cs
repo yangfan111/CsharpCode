@@ -1,6 +1,7 @@
 ﻿using Core;
 using Core.Components;
 using Core.Prediction.UserPrediction;
+using Core.SnapshotReplication.Serialization.NetworkProperty;
 using Core.UpdateLatest;
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
@@ -60,28 +61,4 @@ namespace App.Shared.Components.Weapon
     }
 
  
-    [Weapon]
-    public class WeaponClientUpdateComponent : IUpdateComponent
-    {
-        //[DontInitilize, NetworkProperty] public bool PullBoltEnd;   //是否拉过栓了
-        //[DontInitilize, NetworkProperty] public bool IsPullingBolt; //是否在拉栓中
-        //[DontInitilize, NetworkProperty] public bool PullBoltInterrupt; 
-        //[DontInitilize, NetworkProperty] public bool IsInterruptSightView;
-        //[DontInitilize, NetworkProperty] public bool IsRecoverSightView;
-        public static readonly                  WeaponClientUpdateComponent Empty = new WeaponClientUpdateComponent();
-
-        public void CopyFrom(object rightComponent)
-        {
-            var remote = rightComponent as WeaponClientUpdateComponent;
-            //PullBoltEnd = remote.PullBoltEnd;
-            //IsPullingBolt = remote.IsPullingBolt;
-            //IsRecoverSightView = remote.IsRecoverSightView;
-            //IsInterruptSightView = remote.IsInterruptSightView;
-        }
-
-        public int GetComponentId()
-        {
-            return (int) EComponentIds.WeaponClientData;
-        }
-    }
 }

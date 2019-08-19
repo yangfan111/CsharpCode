@@ -9,6 +9,14 @@ using Core.Utils;
 using Entitas;
 using System;
 using System.Collections.Generic;
+using App.Server.GameModules.GamePlay.free.player;
+using App.Shared.FreeFramework.framework.trigger;
+using App.Shared.GameModules.SceneObject;
+using App.Shared.GameModules.Weapon;
+using com.wd.free.@event;
+using com.wd.free.para;
+using Core.Event;
+using Core.Free;
 using UnityEngine;
 using Utils.Singleton;
 using Object = UnityEngine.Object;
@@ -127,7 +135,27 @@ namespace App.Shared.EntityFactory
             return entity;
         }
 
+        public virtual IEntity CreateDropSceneWeaponObjectEntity(WeaponScanStruct weaponScan, IEntity entity,
+                                                                 int lifeTime,IFreeArgs freeArgs = null)
+        {
+            PlayerEntity playerEntity = entity as PlayerEntity;
+            var dropPos = SceneObjectDropUtil.GetDropObjectPos(playerEntity);
+            var sceneObjectEntity = CreateDropSceneWeaponObjectEntity(weaponScan, dropPos,
+                lifeTime) as SceneObjectEntity;
+            if (sceneObjectEntity != null && freeArgs is IEventArgs)
+            {
+                TriggerArgs ta = new TriggerArgs();
+                var posVal = sceneObjectEntity.position.Value;
+                ta.AddPara(new IntPara("weaponId", weaponScan.ConfigId));
+                ta.AddPara(new FloatPara("weaponx", posVal.x));
+                ta.AddPara(new FloatPara("weapony", posVal.y));
+                ta.AddPara(new FloatPara("weaponz", posVal.z));
+                ta.AddUnit("current", (FreeData) playerEntity.freeData.FreeData);
+                (freeArgs as IEventArgs).Trigger(FreeTriggerConstant.WEAPON_DROP, ta);
+            }
 
+            return sceneObjectEntity;
+        }
         public virtual IEntity CreateDropSceneWeaponObjectEntity(WeaponScanStruct weaponScan, Vector3 position, int lifeTime)
         {
             var entity = CreateSceneWeaponObjectEntity(weaponScan, position);
@@ -139,8 +167,11 @@ namespace App.Shared.EntityFactory
                     sceneObjectEntity.AddLifeTime(DateTime.Now, lifeTime);
                 }
             }
+
             if (WeaponUtil.IsC4p(weaponScan.ConfigId))
+            {
                 (entity as SceneObjectEntity).AddCastFlag((int)EPlayerCastState.C4Pickable);
+            }
             return entity;
         }
 

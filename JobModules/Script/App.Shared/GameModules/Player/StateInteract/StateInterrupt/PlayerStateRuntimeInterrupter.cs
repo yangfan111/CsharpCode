@@ -21,6 +21,7 @@ namespace App.Shared.GameModules.Player
             ResisterGunSight();
            // ResisterPullBolt();
             ResisterHoldWeapon();
+            RegisterCharactorAction();
         }
         private void ResisterHoldWeapon()
         {
@@ -30,10 +31,18 @@ namespace App.Shared.GameModules.Player
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.Swim, EInterruptCmdType.InterruptAndRollback));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.Climb, EInterruptCmdType.InterruptAndRollback));
             handler.ResisterEmitter(new InterruptEmitter(EPlayerState.Rescue, EInterruptCmdType.InterruptAndRollback));
-
+            handler.ResisterEmitter(new InterruptEmitter(EPlayerState.Ladder, EInterruptCmdType.InterruptAndRollback));
             interruptHandlers[(int)EInterruptType.HoldWeapon] = handler;
         }
 
+        private void RegisterCharactorAction()
+        {
+            var handler = new CharactorActionHandler(playerEntity);    
+            handler.ResisterEmitter(new InterruptEmitter(EPlayerState.ProneMove, EInterruptCmdType.InterruptSimple));
+            interruptHandlers[(int)EInterruptType.CharactorAction] = handler;
+
+
+        }
         private void ResisterPullBolt()
         {
 //            var handler = new PullboltHandler(playerEntity);
@@ -67,8 +76,9 @@ namespace App.Shared.GameModules.Player
                     handler.Update(states);
             }
 
-            if (cmd.IsInterrupt)
+            if (cmd.IsInterrupt || cmd.FilteredInput.IsInput(EPlayerInput.IsActionInterrupt))
             {
+                logger.InfoFormat("[Tmp]Interrupt  cmd.isInterrupt {0} EPlayerInput.IsActionInterrupt {1}",cmd.IsInterrupt,cmd.FilteredInput.IsInput(EPlayerInput.IsActionInterrupt));
                 InterruptCharactor();
             }
         }
@@ -85,6 +95,7 @@ namespace App.Shared.GameModules.Player
             RelatedCharState.InterruptSwitchWeapon();
             RelatedCharState.ForceBreakSpecialReload(null);
             RelatedCharState.ForceFinishGrenadeThrow();
+            playerEntity.AudioController().StopPullBoltAudio();
             PlayerStateUtil.AddPlayerState(EPlayerGameState.InterruptItem, playerEntity.gamePlay);
             if (playerEntity.hasThrowingAction)
                 playerEntity.throwingAction.ActionData.InternalCleanUp();

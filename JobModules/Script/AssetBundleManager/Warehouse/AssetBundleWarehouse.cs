@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Xml;
 using AssetBundleManagement;
 using AssetBundleManager.Operation;
 using AssetBundles;
@@ -13,9 +15,6 @@ namespace AssetBundleManager.Warehouse
     abstract class AssetBundleWarehouse
     {
         private readonly string _manifestBundleName;
-        /// <summary>
-        /// assetName -> Variants
-        /// </summary>
         private Dictionary<string, HashSet<string>> _bundlesWithVariant = new Dictionary<string, HashSet<string>>();
         private string[] _activeVariants = { };
         private readonly bool _isSceneQuantityLevel;
@@ -37,7 +36,7 @@ namespace AssetBundleManager.Warehouse
                     OperationFactory.CreateManifestLoading(_manifestBundleName, "AssetBundleManifest")
             };
         }
-        //GetAllAssetBundlesWithVariant
+
         public virtual void SetManifest(AssetBundleManifest obj)
         {
             foreach (var v in obj.GetAllAssetBundlesWithVariant())
@@ -49,7 +48,7 @@ namespace AssetBundleManager.Warehouse
                 _bundlesWithVariant[splits[0]].Add(splits[1]);
             }
 
-            string[] _allAssetBundle = obj.GetAllAssetBundles();
+            var _allAssetBundle = obj.GetAllAssetBundles();
             if (_allAssetBundle.Length == 0)
             {
                 _logger.InfoFormat("!!!!!!!!!!!! the _allAssetBundle is null !!!!!!!!!!!!!");
@@ -126,6 +125,37 @@ namespace AssetBundleManager.Warehouse
         public void SetActiveVariants(string[] activeVariants)
         {
             _activeVariants = activeVariants;
+        }
+
+
+        // [PPAN] Ω‚ŒˆMD5 AssetBundlesœ‡πÿ¬ﬂº≠
+        private Dictionary<string, string> dictAssetBundlesMD5 = new Dictionary<string, string>();
+        protected void LoadAssetBundlesXML(string strOriMD5Path, string strAssetBundleXML)
+        {
+            string strAssetBundlePath = strOriMD5Path + strAssetBundleXML;
+
+            using (StreamReader reader = File.OpenText(strAssetBundlePath))
+            {
+                XmlDocument xmlAssetBundles = new XmlDocument();
+                xmlAssetBundles.Load(reader);
+
+                XmlElement rootElem = xmlAssetBundles.DocumentElement;
+                for (int i = 0; i < rootElem.ChildNodes.Count; i++)
+                {
+                    XmlElement buildElem = (XmlElement)rootElem.ChildNodes[i];
+                    string abName = buildElem.GetAttribute("name");
+                    string md5Num = buildElem.GetAttribute("md5");
+                    dictAssetBundlesMD5.Add(abName, md5Num);
+                }
+            }
+        }
+
+        protected string ReadMD5FromXL(string strOriABName)
+        {
+            if (dictAssetBundlesMD5.ContainsKey(strOriABName))
+                return dictAssetBundlesMD5[strOriABName];
+            else
+                return string.Empty;
         }
     }
 }

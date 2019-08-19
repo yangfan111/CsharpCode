@@ -1,7 +1,6 @@
 ﻿using App.Server.GameModules.GamePlay.free.player;
 using App.Shared;
 using App.Shared.FreeFramework.framework.trigger;
-using App.Shared.Player;
 using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.map.position;
@@ -18,14 +17,10 @@ namespace App.Server.GameModules.GamePlay.Free.player
     [Serializable]
     public class PlayerWeaponDropAction : AbstractPlayerAction, IRule
     {
-        /// <summary>
-        /// 0 是当前武器
-        /// </summary>
         public int slotIndex;
-
         public IPosSelector pos;
-
         public string lifeTime;
+        public bool fixDrop;
 
         public override void DoAction(IEventArgs args)
         {
@@ -37,11 +32,11 @@ namespace App.Server.GameModules.GamePlay.Free.player
             var slot = (EWeaponSlotType)slotIndex;
             var lastWeaponScan = player.WeaponController().GetWeaponAgent(slot).ComponentScan;
             bool generateSceneObj = player.WeaponController().DropWeapon(slot);
-            //     var lastWeaponScan = player.WeaponController().HeldWeaponAgent.ComponentScan;
             if (!generateSceneObj || lastWeaponScan.IsUnSafeOrEmpty()) return;
             var unitPos = pos.Select(args);
-            var weapon = factory.CreateDropSceneWeaponObjectEntity(lastWeaponScan, 
-                new UnityEngine.Vector3(unitPos.GetX(), unitPos.GetY(), unitPos.GetZ()), args.GetInt(lifeTime)) as SceneObjectEntity;
+            SceneObjectEntity weapon;
+            if (fixDrop) weapon = factory.CreateDropSceneWeaponObjectEntity(lastWeaponScan, unitPos.Vector3, args.GetInt(lifeTime)) as SceneObjectEntity;
+            else weapon = factory.CreateDropSceneWeaponObjectEntity(lastWeaponScan, player, args.GetInt(lifeTime), null) as SceneObjectEntity;
             if (null != weapon)
             {
                 TriggerArgs ta = new TriggerArgs();

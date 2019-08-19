@@ -42,7 +42,7 @@ namespace Utils.Appearance
             if (null == obj || null == _topLayerShader) return;
             foreach (var value in obj.GetComponentsInChildren<Renderer>())
             {
-                var shader = value.material.shader;
+                var shader = value.sharedMaterial.shader;
                 if (null != shader && shader.name.Contains("MSAO"))
                 {
                     var q = RenderQueues[value.material.GetInstanceID()] = value.material.renderQueue;
@@ -57,7 +57,7 @@ namespace Utils.Appearance
             if (null == obj || null == _defaultShader || null == _topLayerShader) return;
             foreach (var value in obj.GetComponentsInChildren<Renderer>())
             {
-                if (value.material.shader.name.Equals(_topLayerShader.name))
+                if (value.sharedMaterial.shader.name.Equals(_topLayerShader.name))
                 {
                     value.material.shader = _defaultShader;
                     if (RenderQueues.ContainsKey(value.material.GetInstanceID()))
@@ -77,7 +77,7 @@ namespace Utils.Appearance
                 _shaderType = shaderType;
             }
 
-            public void OnLoadSucc<T>(T source, UnityObject obj)
+            public void OnLoadSuccess<T>(T source, UnityObject obj)
             {
                 if (null == obj) return;
                 var m = obj.AsObject as Material;

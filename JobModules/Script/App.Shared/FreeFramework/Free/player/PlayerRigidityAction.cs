@@ -1,14 +1,9 @@
-﻿using com.wd.free.action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using com.wd.free.@event;
-using App.Server.GameModules.GamePlay.free.player;
-using App.Shared.FreeFramework.framework.unit;
+﻿using App.Server.GameModules.GamePlay.free.player;
 using App.Shared.GameModules.Attack;
-using com.wd.free.para;
 using Assets.Utils.Configuration;
+using com.wd.free.action;
+using com.wd.free.@event;
+using com.wd.free.para;
 using Utils.Singleton;
 
 namespace App.Shared.FreeFramework.Free.player
@@ -35,7 +30,7 @@ namespace App.Shared.FreeFramework.Free.player
                         int time = configs.InitWeaponAllConfig.RigidityDuration;
                         int per = configs.InitWeaponAllConfig.RigidityEffect;
 
-                        fd.EffectBufs.AddEffect(RigidityEffect, (float)per / 100, time);
+                        fd.EffectBufs.AddEffect(RigidityEffect, (float)per / 100, time, args);
                     }
                 }
             }

@@ -27,9 +27,9 @@ namespace App.Client.GameModules.GamePlay.Free.Entitas
             {
                 for (int i = 0; i < generators.Count; i++)
                 {
-                    if (generators[i].CanHandle(_contexts, player, player.userCmd.LastTemp))
+                    if (generators[i].CanHandle(_contexts, player, player.userCmd.Latest))
                     {
-                        generators[i].Handle(_contexts, player, player.userCmd.LastTemp);
+                        generators[i].Handle(_contexts, player, player.userCmd.Latest);
                     }
                 }
             }

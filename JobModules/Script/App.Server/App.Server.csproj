@@ -88,7 +88,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AllocationClient.cs" />
     <Compile Include="Common\ServerRuntimeGameConfig.cs" />
     <Compile Include="FileSystemConfig\ServerFileSystemConfigManager.cs" />
     <Compile Include="GameModules\Attack\ServerBulletInfoCollectSystem.cs" />
@@ -141,7 +140,9 @@
     <Compile Include="GameModules\GamePlay\Free\client\FreeObservePlayerHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\client\FreePickupHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\client\FreeSprayPaintHandle.cs" />
+    <Compile Include="GameModules\GamePlay\Free\client\FreeWitnessHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\client\IFreeMessageHandler.cs" />
+    <Compile Include="GameModules\GamePlay\Free\client\OpenSpecifyUIHandler.cs" />
     <Compile Include="GameModules\GamePlay\Free\client\PickupItemUtil.cs" />
     <Compile Include="GameModules\GamePlay\Free\client\SplitItemHander.cs" />
     <Compile Include="GameModules\GamePlay\Free\condition\DistanceCondition.cs" />
@@ -164,7 +165,9 @@
     <Compile Include="GameModules\GamePlay\Free\entity\RemoveEntityAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\entity\RemoveSceneObjectAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\entity\SelectFreeMoveAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\entity\VehicleUnrideAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\hall\BattleReportAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\hall\CampChangeAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\hall\GameTimeMarkAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\hall\PlayerReportAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\item\BagCapacityUtil.cs" />
@@ -211,6 +214,7 @@
     <Compile Include="GameModules\GamePlay\Free\map\PlaySoundAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\map\SelectNearPointAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\map\SelectPointAction.cs" />
+    <Compile Include="GameModules\GamePlay\Free\map\SqlPointAction.cs" />
     <Compile Include="GameModules\GamePlay\Free\map\position\NotSamePosSelector.cs" />
     <Compile Include="GameModules\GamePlay\Free\map\position\PosAngleSelector.cs" />
     <Compile Include="GameModules\GamePlay\Free\map\position\PosEntitySelector.cs" />

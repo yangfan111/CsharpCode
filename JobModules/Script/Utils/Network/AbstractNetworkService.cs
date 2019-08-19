@@ -75,7 +75,7 @@ namespace Core.Network
 
 
                     sb.Append("<td>");
-                    sb.Append(channel.SendQueueCount);
+                    sb.Append(0);
                     sb.Append("</td>");
 
                     sb.Append("<td>");
@@ -168,10 +168,6 @@ namespace Core.Network
             {
                 ProcessSendReceive(false);
             }
-
-            
-
-            ProcessRecv();
         }
 
         public void FlowTick(float time)
@@ -182,13 +178,7 @@ namespace Core.Network
             }
         }
 
-        private void ProcessRecv()
-        {
-            foreach (var channel in _channels.ForRead())
-            {
-                channel.ProcessRecvQueue();
-            }
-        }
+       
 
         public ICollection<AbstractNetowrkChannel> Channels
         {
@@ -240,11 +230,7 @@ namespace Core.Network
 
         private void ProcessSendReceive(bool isMultiThread)
         {
-            foreach (var channel in _channels.ForRead())
-            {
-                channel.ProcessSendQueue(isMultiThread);
-            }
-
+           
             Poll();
         }
 

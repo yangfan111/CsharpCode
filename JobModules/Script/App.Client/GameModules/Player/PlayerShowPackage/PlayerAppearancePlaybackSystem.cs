@@ -1,4 +1,5 @@
 ﻿using App.Shared.Components.Player;
+using Core.EntityComponent;
 using Core.Utils;
 using Entitas;
 using Utils.Singleton;
@@ -53,9 +54,11 @@ namespace App.Client.GameModules.Player.PlayerShowPackage
                 try
                 {
                     _subSyncInfo.BeginProfileOnlyEnableProfile();
+                    
                     appearanceInterface.Appearance.SyncLatestFrom(player.latestAppearance);
                     appearanceInterface.Appearance.SyncPredictedFrom(player.predictedAppearance);
                     appearanceInterface.Appearance.SyncClientFrom(player.clientAppearance);
+                    appearanceInterface.Appearance.Update();
                 }
                 finally
                 {
@@ -83,7 +86,7 @@ namespace App.Client.GameModules.Player.PlayerShowPackage
             var appearanceInterface = player.appearanceInterface;
             if (player.gamePlay.ClientVisibility != player.gamePlay.Visibility)
             {
-                appearanceInterface.Appearance.PlayerVisibility(player.gamePlay.Visibility);
+                appearanceInterface.Appearance.SetVisibility(player.gamePlay.Visibility);
                 player.gamePlay.ClientVisibility = player.gamePlay.Visibility;
             }
         }

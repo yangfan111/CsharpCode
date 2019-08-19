@@ -3,6 +3,7 @@ using Assets.App.Client.GameModules.Ui;
 using Assets.Sources.Free;
 using Assets.Sources.Free.UI;
 using Core.Free;
+using Core.Utils;
 using Free.framework;
 using Utils.Singleton;
 
@@ -10,6 +11,8 @@ namespace App.Client.GameModules.GamePlay.Free.App
 {
     class GroupClassicUIHandler : ISimpleMesssageHandler
     {
+        private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(GroupClassicUIHandler));
+
         public bool CanHandle(int key)
         {
             return key == FreeMessageConstant.CommonRoundOverUI || key == FreeMessageConstant.CountDownTipUI || key == FreeMessageConstant.ResetBattleData
@@ -38,7 +41,9 @@ namespace App.Client.GameModules.GamePlay.Free.App
                     Title = data.Ss[0],
                     DurationTime = data.Ins[0]
                 };
+                
                 ui.CountdownTipDataList.Add(cdTipData);
+                Logger.Info("Add CountDown: " + cdTipData);
                 contexts.ui.uISession.UiState[UiNameConstant.CommonCountdownTipModel] = true;
             }
 

@@ -7,7 +7,6 @@ namespace App.Client.GameModules.Ui.Models.Common
 {
     public partial class CommonChatModel
     {
-        //private List<long> _recentUsePrivateChatPlayerList = new List<long>{11};
         private List<long> _recentUsePrivateChatPlayerList = new List<long>();
 
         private int MaxRecentUsePrivateChatCount
@@ -15,13 +14,6 @@ namespace App.Client.GameModules.Ui.Models.Common
             get { return 5; }
         }
 
-        public string PrivateChatNameText
-        {
-            get { return string.Empty; }
-
-        }
-
-        //private Dictionary<long, string> TargetIdDict = new Dictionary<long, string>{{11,"ddfd"}};
         private Dictionary<long, string> TargetIdDict = new Dictionary<long, string>();
         private long _curTargetPlayerId;
         private string _curTargetPlayerName;
@@ -43,6 +35,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
           
             _curTargetPlayerId = 0;
+            _curTargetPlayerName = string.Empty;
             return false;
 
         }
@@ -54,12 +47,8 @@ namespace App.Client.GameModules.Ui.Models.Common
             string name = string.Empty;
             string text = string.Empty;
             ParseInputForPrivateChat(out name, out text);
-            if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(text))
-            {
-                text = inputField.text;
-            }
-            inputField.text = string.Format("/{0} {1}", _curTargetPlayerName, text);
-            inputField.MoveTextEnd(false);
+            ShowPrivateTarget();
+
         }
 
         private void PrivateChatRecentUseQueueUpdate(long id)
@@ -93,6 +82,12 @@ namespace App.Client.GameModules.Ui.Models.Common
             if (!string.IsNullOrEmpty(name))
             {
                 res = true;
+            }
+            else if(_curChannel == ChatChannel.PrivateChat && !string.IsNullOrEmpty(_curTargetPlayerName))
+            {
+                res = true;
+                name = _curTargetPlayerName;
+                message = inputField.text;
             }
             else
             {
@@ -157,5 +152,6 @@ namespace App.Client.GameModules.Ui.Models.Common
             data.TargetId = id;
             HallUtility.SendChatMessage(data);
         }
+
     }
 }

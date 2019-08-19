@@ -20,7 +20,8 @@ namespace App.Client.GameModules.Ui.Models
         protected override void OnGameobjectInitialized()
         {
             base.OnGameobjectInitialized();
-            ViewModel.Visible(false);
+            SetVisible(false);
+//            SetCanvasEnabled(GetCanvasEnabled());
         }
 
         public void OnUiRender(float interval)
@@ -56,15 +57,15 @@ namespace App.Client.GameModules.Ui.Models
         {
 
         }
-        public new void SetVisible(bool b)
-        {
-            base.SetVisible(b);
-            SetViewModelVisible(); 
-        }
+//        public new void SetVisible(bool b)
+//        {
+//            base.SetVisible(b);
+//            SetViewModelVisible(); 
+//        }
 
         private void SetViewModelVisible()
         {
-            ViewModel.Visible(!(!isVisible || !_canvasEnabled));
+            SetVisible(_canvasEnabled);
         }
         protected bool GetCanvasEnabled()
         {

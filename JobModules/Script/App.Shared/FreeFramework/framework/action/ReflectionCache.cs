@@ -232,7 +232,7 @@ namespace com.wd.free.action
             }
             else
             {
-                throw new GameConfigExpception(field + " is not a valid field at " + id);
+                throw new GameConfigExpception(field + " is not a valid field at " + id + " and type is " + ruleObj.GetType());
             }
         }
     }

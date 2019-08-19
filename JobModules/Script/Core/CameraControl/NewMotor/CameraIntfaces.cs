@@ -20,6 +20,8 @@ namespace Core.CameraControl.NewMotor
         bool IsDead { get; set; }
         bool CanWeaponGunSight { get; set; }
         bool IsCmdRun { get; set; }
+        bool LockViewByRoom { get; set; }
+        bool ModelLoaded { get; set; }
         bool IsCmdMoveVertical { get; set; }
         float ArchorYaw { get; set; }
         float ArchorPitch { get; set; }
@@ -27,6 +29,7 @@ namespace Core.CameraControl.NewMotor
         bool InterruptCameraFocus { get; set; }
         bool IsChange(ICameraMotorInput r);
         short LastViewByOrder { get; set; }
+        bool IsVariant { get; set; }
         CameraConfigItem Config { get; }
 
         PoseCameraConfig GetPoseConfig(int modeId);

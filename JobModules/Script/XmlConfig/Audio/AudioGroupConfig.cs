@@ -18,8 +18,11 @@ namespace XmlConfig
     {
         public int Id;
         public string Group;
+        public uint ConvertedGroupId;
         public int GroupType;
         public List<string> States;
+        public uint [] ConvertedStateIds;
+
         public string DefaultState;
         public List<int> TriggerType;
         public int selectedIndex = 0;

@@ -17,15 +17,15 @@ using App.Shared.FreeFramework.Free.Weapon;
 using App.Shared.GameMode;
 using App.Shared.GameModules.Attack;
 using App.Shared.GameModules.Vehicle;
+using App.Shared.GameModules.Weapon;
 using App.Shared.GameModules.Weapon.Behavior;
 using App.Shared.Player;
 using com.wd.free.para;
 using com.wd.free.trigger;
 using Core;
 using Core.Components;
-using Core.Configuration;
 using Core.Configuration.Sound;
-using Core.EntitasAdpater;
+using Core.Enums;
 using Core.GameModule.System;
 using Core.MyProfiler;
 using Core.Network;
@@ -39,6 +39,7 @@ using Entitas;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Core.EntityComponent;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Utils.AssetManager;
@@ -63,7 +64,7 @@ namespace App.Server
 
         public NetworkMessageDispatcher MessageDispatcher { get; private set; }
 
-        private ISnapshotPool _compensationSnapshotPool = new SnapshotPool();
+        private SnapshotPool _compensationSnapshotPool = new SnapshotPool();
 
         private SnapshotFactory _snapshotFactory;
 
@@ -116,6 +117,8 @@ namespace App.Server
             get { return _state == RoomState.Disposed; }
         }
 
+        private bool _isDisposed = false;
+
         private int _testPlayerNum = 0;
 
         private SendSnapshotManager _sendSnapshotManager;
@@ -125,6 +128,7 @@ namespace App.Server
         {
             //SingletonManager.Get<ServerFileSystemConfigManager>().Reload();
             _state = RoomState.Initialized;
+            _isDisposed = false;
 
             _tokenGenerator = tokenGenerator;
             _coRoutineManager = coRoutineManager;
@@ -255,9 +259,7 @@ namespace App.Server
             _contexts.session.SetServerSessionObjects();
             var sessionObjects = _contexts.session.serverSessionObjects;
             var gameContexts = _contexts.session.commonSession.GameContexts;
-            sessionObjects.CompensationSnapshotPool = _compensationSnapshotPool;
-            sessionObjects.CompensationSnapshotSelector =
-                new SnapshotSelectorContainer(new SnapshotSelector(_compensationSnapshotPool));
+            sessionObjects.SnapshotSelector = _compensationSnapshotPool;
             sessionObjects.Bin2DConfig = new Bin2DConfig(-9000, -9000, 9000, 9000, 100, 16000);
 
             sessionObjects.Bin2dManager = bin2DManager;
@@ -309,7 +311,6 @@ namespace App.Server
                 MapId = SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.MapId,
                 ModeId = ruleId
             };
-            commonSession.RuntimeGameConfig = new RuntimeGameConfig();
 
             MakeWeaponLogicManager();
         }
@@ -385,7 +386,7 @@ namespace App.Server
                 new PingReqMessageHandler(_contexts, this));
             messageDispatcher.RegisterLater((int) EClient2ServerMessage.UpdateMsg,
                 new UserUpdateMsgHandler(this, _contexts));
-            messageDispatcher.RegisterImmediate((int) EClient2ServerMessage.UpdateMsg,
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.UpdateMsg,
                 new UserUpdateAckMsgHandler(this));
             messageDispatcher.RegisterLater((int) EClient2ServerMessage.FireInfo,
                 new FireInfoMessageHandler(_contexts, this));
@@ -519,9 +520,12 @@ namespace App.Server
                 playerInfo.PlayerName = "Test_" + playerInfo.PlayerId;
                 playerInfo.Num = ++_testPlayerNum;
                 playerInfo.Camp = _testPlayerNum % 2 == 0 ? 2 : 1;
+                playerInfo.RoleModelId = 1;
                 playerInfo.TeamId = playerInfo.Camp;
-                playerInfo.AvatarIds = new List<int> {354};
+                playerInfo.BadgeId = 15;
+                playerInfo.AvatarIds = new List<int>(){77, 319, 320, 321};
                 playerInfo.WeaponBags = PlayerEntityFactory.MakeFakeWeaponBag();
+                playerInfo.CampInfo = new CampInfo(1, new List<Preset>(){new Preset(2, 12, new List<int>(){325, 326, 327}, 1005), new Preset(1, 1, new List<int>(){77, 319, 320, 321}, 1003)});
             }
             else if (playerInfo.Token == TestUtility.RobotToken)
             {
@@ -580,6 +584,9 @@ namespace App.Server
                     }
                     else
                     {
+                        BulletPlayerUtil.DoProcessPlayerHealthDamage(_contexts, _contexts.session.commonSession.FreeArgs.Rule as IGameRule, null ,player,
+                            new PlayerDamageInfo(0, (int) EUIDeadType.NoHelp, 0, 0, false, false, true));
+
                         player.isFlagDestroy = true;
 
                         if (player.hasFreeData)
@@ -729,7 +736,8 @@ namespace App.Server
 
             _interval = interval;
             _contexts.session.currentTimeObject.CurrentTime += _interval;
-            MessageDispatcher.DriveDispatch();
+            if(!_isDisposed)
+                MessageDispatcher.DriveDispatch();
 
             _sessionStateMachine.Update();
 
@@ -753,6 +761,7 @@ namespace App.Server
             {
                 _logger.InfoFormat("Rule Game Over!");
                 GameOver(false, RoomState.RRuleOver);
+                _rule.GameEnd(_contexts);
                 _rule.GameOver = false;
             }
 
@@ -862,6 +871,7 @@ namespace App.Server
         
 #endif
             _state = RoomState.Disposing;
+            _isDisposed = true;
             DisposePlayerConnections();
             if (_bin2DManager != null)
             {
@@ -1027,6 +1037,7 @@ namespace App.Server
             SimpleParaList spl = (SimpleParaList) args.GetDefault().GetParameters();
             spl.AddFields(new ObjectFields(info));
             spl.AddPara(new BoolPara("hxMode", SharedConfig.IsHXMod));
+            spl.AddPara(new StringPara("version", FreeRuleConfig.GetVersion()));
         }
 
         public void SetRoomInfo(IHallRoom room)

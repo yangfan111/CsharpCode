@@ -11,6 +11,7 @@ namespace com.wd.free.action
     {
         private List<TimerGameAction> map;
         private int last;
+        private bool isCleared;
 
         private List<TimerGameAction> removes;
         private List<TimerGameAction> adds;
@@ -20,6 +21,7 @@ namespace com.wd.free.action
             this.map = new List<TimerGameAction>();
             this.removes = new List<TimerGameAction>();
             this.adds = new List<TimerGameAction>();
+            isCleared = false;
         }
 
         public virtual void Register(int key, TimerGameAction action)
@@ -43,8 +45,22 @@ namespace com.wd.free.action
             }
         }
 
+        private void Clear()
+        {
+            this.map.Clear();
+            this.removes.Clear();
+            this.adds.Clear();
+            isCleared = true;
+        }
+
         public virtual void TimeElapse(IEventArgs args, int time)
         {
+            if (args.Rule.GameExit)
+            {
+                if (!isCleared)
+                    Clear();
+                return;
+            }
             if (map.Count != last)
             {
                 last = map.Count;

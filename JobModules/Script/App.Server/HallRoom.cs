@@ -1,13 +1,13 @@
 ﻿using App.Server.StatisticData;
 using App.Shared;
+using App.Shared.Components;
 using Com.Wooduan.Ssjj2.Common.Net.Proto;
+using Core.Free;
 using Core.Room;
 using Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Utils.Configuration;
-using Utils.Singleton;
 
 namespace App.Server
 {
@@ -104,7 +104,15 @@ namespace App.Server
         {
             TotalPlayerCount = 0;
             if (ModeId == 0) ModeId = _contexts.session.commonSession.RoomInfo.ModeId;
-            var type = SingletonManager.Get<GameModeConfigManager>().GetBagTypeById(ModeId);
+            if (GameRules.IsChicken(ModeId))
+            {
+                _gameStatisticData = new SurvivalGameStatisticData(_dictTeams, _dictPlayers, _dictLeavedPlayers, _dictGoPlayers, TeamCapacity);
+            }
+            else
+            {
+                _gameStatisticData = new GroupGameStatisticData(_dictTeams, _dictPlayers, _dictLeavedPlayers, _dictGoPlayers, TeamCapacity);
+            }
+            /*var type = SingletonManager.Get<GameModeConfigManager>().GetBagTypeById(ModeId);
             switch (type)
             {
                 case XmlConfig.EBagType.Chicken:
@@ -113,11 +121,12 @@ namespace App.Server
                 case XmlConfig.EBagType.Group:
                     _gameStatisticData = new GroupGameStatisticData(_dictTeams, _dictPlayers, _dictLeavedPlayers, _dictGoPlayers, TeamCapacity);
                     break;
-            }
+            }*/
         }
 
         public void AddPlayer(IPlayerInfo player)
         {
+            _logger.InfoFormat("player {0} {1} is trying to join hall room", player.PlayerId, player.PlayerName);
             if (_dictLeavedPlayers.ContainsKey(player.PlayerId))
                 _dictLeavedPlayers.Remove(player.PlayerId);
             if (_dictGoPlayers.ContainsKey(player.PlayerId))
@@ -140,6 +149,7 @@ namespace App.Server
                 team.PlayerCount++;
                 team.TotalRankScore += player.RankScore;
                 team.AvgRankScore = team.PlayerCount > 0 ? (float)team.TotalRankScore / team.PlayerCount : 0;
+                _logger.InfoFormat("player {0} {1} joined hall room", player.PlayerId, player.PlayerName);
             }
             TotalPlayerCount = _dictPlayers.Count;
         }
@@ -175,6 +185,8 @@ namespace App.Server
                     team.TotalRankScore -= player.RankScore;
                     team.AvgRankScore = team.PlayerCount > 0 ? (float)team.TotalRankScore / team.PlayerCount : 0;
                 }
+
+                _logger.InfoFormat("player {0} {1} left hall room", player.PlayerId, player.PlayerName);
             }
         }
 
@@ -271,8 +283,8 @@ namespace App.Server
                 IPlayerInfo player = _dictPlayers[playerId];
                 if (player.StatisticsData != null && player.StatisticsData.GameTime <= 0)
                 {
-                    player.StatisticsData.DeadTime += (int) (DateTime.Now.Ticks / 10000L - player.StatisticsData.LastDeadTime);
-                    player.StatisticsData.GameTime = (int)(_contexts.session.commonSession.FreeArgs.Rule.ServerTime - player.StatisticsData.GameJoinTime);
+                    player.StatisticsData.DeadTime += (int) (_contexts.session.commonSession.FreeArgs.Rule.ServerTime - player.StatisticsData.LastDeadTime);
+                    player.StatisticsData.GameTime = (int) (_contexts.session.commonSession.FreeArgs.Rule.ServerTime - player.StatisticsData.GameJoinTime);
                 }
                 gameOverPlayer = GameOverPlayer.Allocate();
                 SetGameOverPlayerValue(gameOverPlayer, player);
@@ -328,6 +340,9 @@ namespace App.Server
                 Dispose();
             }
 
+            IFreeRule rule = _contexts.session.commonSession.FreeArgs.Rule;
+            msg.BattleStartTime = rule.StartTime + rule.GameStartTime;
+            msg.BattleEndTime = rule.StartTime + rule.GameEndTime;
          
 
             var evt = RoomEvent.AllocEvent<GameOverEvent>();

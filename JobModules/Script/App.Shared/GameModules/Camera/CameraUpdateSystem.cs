@@ -72,6 +72,25 @@ namespace App.Shared.GameModules.Camera
                 DummyCameraMotorState.Convert(_state, observedPlayer.cameraStateNew);
                 
             }
+
+            RestoreSelfPlayer(player);
+        }
+
+        private void RestoreSelfPlayer(PlayerEntity player)
+        {
+            var dict = _motors.GetDict(SubCameraMotorType.View);
+            var subState = _state.Get(SubCameraMotorType.View);
+            var oldMotor = dict[subState.NowMode];
+            if (oldMotor.ModeId != (short) ECameraViewMode.ThirdPerson)
+            {
+                subState.NowMode = (byte) ECameraViewMode.ThirdPerson;
+                subState.LastMode = (byte) ECameraViewMode.FirstPerson;
+
+                _motors.ActionManager.SetActionCode(CameraActionType.Leave, SubCameraMotorType.View, oldMotor.ModeId);
+                _motors.ActionManager.SetActionCode(CameraActionType.Enter, SubCameraMotorType.View,
+                    (int) ECameraViewMode.ThirdPerson);
+                _motors.ActionManager.OnAction(player, _state);
+            }
         }
 
         protected override void ExecWhenNormal(PlayerEntity player, IUserCmd cmd)
@@ -94,7 +113,7 @@ namespace App.Shared.GameModules.Camera
 
             DummyCameraMotorInput _input = (DummyCameraMotorInput) player.cameraStateNew.CameraMotorInput;
 
-            _input.Generate(player, cmd, _state);
+            _input.Generate(player, cmd, _state, LockView);
 
             if (!HasConfigInitialed(_input))
                 return;
@@ -107,7 +126,7 @@ namespace App.Shared.GameModules.Camera
 
             HandleAction(player);
 
-            CameraActionManager.ClearActionCode();
+            _motors.ActionManager.ClearActionCode();
 
             player.cameraStateNew.CameraMotorInput = player.cameraStateNew.LastCameraMotorInput;
             player.cameraStateNew.LastCameraMotorInput = _input;
@@ -126,9 +145,9 @@ namespace App.Shared.GameModules.Camera
 
         private void HandleAction(PlayerEntity player)
         {
-            player.cameraStateUpload.EnterActionCode = CameraActionManager.GetActionCode(CameraActionType.Enter);
-            player.cameraStateUpload.LeaveActionCode = CameraActionManager.GetActionCode(CameraActionType.Leave);
-            CameraActionManager.OnAction(player, _state);
+            player.cameraStateUpload.EnterActionCode = _motors.ActionManager.GetActionCode(CameraActionType.Enter);
+            player.cameraStateUpload.LeaveActionCode = _motors.ActionManager.GetActionCode(CameraActionType.Leave);
+            _motors.ActionManager.OnAction(player, _state);
         }
         
         private void CopyStateToUploadComponent(CameraStateNewComponent input, CameraStateUploadComponent output)
@@ -152,17 +171,17 @@ namespace App.Shared.GameModules.Camera
         {
             _output.Init();
             _output.ArchorPosition =
-                player.cameraArchor.ArchorPosition+
+                player.cameraArchor.ArchorPosition +
                 player.cameraArchor.ArchorTransitionOffsetPosition;
             _output.ArchorEulerAngle = player.cameraArchor.ArchorEulerAngle;
 
-            for(int i=0;i<(int)SubCameraMotorType.End;i++)
+            for (int i = 0; i < (int) SubCameraMotorType.End; i++)
             {
-                var type = (SubCameraMotorType)i;
+                var type = (SubCameraMotorType) i;
                 _output.Append(CalcSubFinalCamera(player, input, state, _motors.GetDict(type), state.Get(type),
                     player.time.ClientTime));
             }
-            
+
             finalOutput.ArchorPosition = _output.ArchorPosition;
             finalOutput.ArchorEulerAngle = _output.ArchorEulerAngle;
             finalOutput.ArchorOffset = _output.ArchorOffset;
@@ -222,8 +241,8 @@ namespace App.Shared.GameModules.Camera
                 subState.ModeTime = player.time.ClientTime;
                 subState.NowMode = (byte) nextMotor.ModeId;
                 subState.LastMode = (byte) oldMotor.ModeId;
-                CameraActionManager.SetActionCode(CameraActionType.Leave, type, oldMotor.ModeId);
-                CameraActionManager.SetActionCode(CameraActionType.Enter, type, nextMotor.ModeId);
+                _motors.ActionManager.SetActionCode(CameraActionType.Leave, type, oldMotor.ModeId);
+                _motors.ActionManager.SetActionCode(CameraActionType.Enter, type, nextMotor.ModeId);
             }
 
             if (type == SubCameraMotorType.View)

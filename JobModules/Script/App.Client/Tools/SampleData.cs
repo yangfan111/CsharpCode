@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Assets.App.Client.Tools;
 using UnityEngine;
 
 namespace App.Client.Tools
@@ -9,7 +10,7 @@ namespace App.Client.Tools
     /// <summary>
     /// 记录采样数据
     /// </summary>
-    public class SampleData
+    public class SampleData: IResetable
     {
         private int _x;
         private int _y;
@@ -43,7 +44,11 @@ namespace App.Client.Tools
         private int _camHDR;
         private int _camMSAA;
 
-        public SampleData(int posX, int posZ, float frameRate, int batches, int setPassCalls, int triangles, int vertices,
+        private SampleDataSubset _subSet;
+
+        private static SampleDataPool<SampleDataSubset> _subSetPool = new SampleDataPool<SampleDataSubset>();
+
+        public void SetData(int posX, int posZ, float frameRate, int batches, int setPassCalls, int triangles, int vertices,
             Vector3 camDir, Vector3 camUp, Vector3 camPos, float camFOV, float camNear, float camFar, int camOC, int camHDR,
             int camMSAA, int shadowCaster, float frameTime, float renderTime)
         {
@@ -72,6 +77,14 @@ namespace App.Client.Tools
             _shadowCaster = shadowCaster;
             _frameTime = frameTime;
             _renderTime = renderTime;
+        }
+
+
+
+        public void Reset()
+        {
+            _subSetPool.Return(_subSet);
+            _subSet = null;
         }
 
         public int X
@@ -197,6 +210,17 @@ namespace App.Client.Tools
         public float renderTime
         {
             get { return _renderTime; }
+        }
+
+        public SampleDataSubset SubSet
+        {
+            get
+            {
+                if (_subSet == null)
+                    _subSet = _subSetPool.Get();
+
+                return _subSet;
+            }
         }
     }
 }

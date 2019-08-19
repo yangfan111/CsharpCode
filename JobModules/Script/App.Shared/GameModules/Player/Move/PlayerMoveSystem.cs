@@ -30,6 +30,8 @@ namespace App.Shared.GameModules.Player
 
         public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
         {
+            if (cmd.PredicatedOnce)
+                return;
             
             PlayerEntity player = (PlayerEntity)owner.OwnerEntity;
 

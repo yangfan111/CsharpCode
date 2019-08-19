@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using App.Shared.Components.Ui;
-using App.Client.GameModules.Ui.UiAdapter;
+﻿using App.Shared.Components.Ui;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace App.Client.GameModules.Ui.UiAdapter
@@ -10,9 +9,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
         private Contexts _contexts;
         private PlayerEntity _playerEntity;
         private Shared.Components.Ui.UIComponent _ui;
-
-       
-
 
         public PlayerInfoUIAdapter(Contexts contexts)
         {
@@ -28,8 +24,6 @@ namespace App.Client.GameModules.Ui.UiAdapter
             }
         }
 
-
-
         public int CurrentHp          //非受伤状态的当前血量
         {
             get
@@ -44,6 +38,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 }
             }
         }
+
         public int MaxHp
         {
             get
@@ -66,6 +61,12 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 return Mathf.CeilToInt((CurrentHp * 1f / MaxHp)*100);
             }
         }
-        
+
+        public override bool IsReady()
+        {
+            if(_playerEntity != null)
+                return _playerEntity.gamePlay.CoverInit && _playerEntity.hasAppearanceInterface;
+            return false;
+        }
     }
 }

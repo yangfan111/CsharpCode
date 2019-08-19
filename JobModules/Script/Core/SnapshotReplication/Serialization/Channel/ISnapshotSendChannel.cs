@@ -8,6 +8,6 @@ namespace Core.SnapshotReplication.Serialization.Channel
     {
         int AckedSnapshotId { get; }
         void SnapshotReceived(int id);
-        void SerializeSnapshot(ISnapshot snap, Stream stream);   
+        int SerializeSnapshot(ISnapshot snap, Stream stream);   
     }
 }

@@ -9,7 +9,7 @@ namespace App.Shared.GameModules.Weapon.Behavior
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(DefaultFireCmdTrigger));
 
-        public bool IsTrigger(PlayerWeaponController controller, WeaponSideCmd cmd)
+        public bool IsTrigger(WeaponSideCmd cmd)
         {
             return cmd.FiltedInput(XmlConfig.EPlayerInput.IsLeftAttack)||
                    cmd.UserCmd.IsAutoFire;

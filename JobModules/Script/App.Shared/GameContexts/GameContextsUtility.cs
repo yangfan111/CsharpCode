@@ -3,7 +3,7 @@ using App.Shared.GameContexts;
 using Assets.App.Shared.GameContexts;
 using BehaviorDesigner.Runtime.Tasks;
 using Core.Components;
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core.EntityComponent;
 using Core.SpatialPartition;
 using Core.Utils;
@@ -26,41 +26,41 @@ namespace App.Shared.ContextInfos
 
         public static IGameContexts GetReplicationGameContexts(Contexts contexts, IBin2DManager bin = null)
         {
-            var entitasContextInfos = new Core.EntityComponent.GameContexts();
-            entitasContextInfos.AddContextInfo(new PlayerGameContext(contexts.player,
+            var gameContexts = new Core.EntityComponent.GameContexts();
+            gameContexts.AddContextEle(new PlayerGameContext(contexts.player,
                 GetBin2D(bin, (int) EEntityType.Player)));
-            entitasContextInfos.AddContextInfo(new BulletGameContext(contexts.bullet,
+            gameContexts.AddContextEle(new BulletGameContext(contexts.bullet,
                 GetBin2D(bin, (int) EEntityType.Bullet)));
-            entitasContextInfos.AddContextInfo(new ThrowingGameContext(contexts.throwing,
+            gameContexts.AddContextEle(new ThrowingGameContext(contexts.throwing,
                 GetBin2D(bin, (int) EEntityType.Throwing)));
-            entitasContextInfos.AddContextInfo(new ClientEffectGameContext(contexts.clientEffect,
+            gameContexts.AddContextEle(new ClientEffectGameContext(contexts.clientEffect,
                 GetBin2D(bin, (int) EEntityType.ClientEffect)));
-            entitasContextInfos.AddContextInfo(new VehicleGameContext(contexts.vehicle,
+            gameContexts.AddContextEle(new VehicleGameContext(contexts.vehicle,
                 GetBin2D(bin, (int) EEntityType.Vehicle)));
-            entitasContextInfos.AddContextInfo(new FreeMoveGameContext(contexts.freeMove,
+            gameContexts.AddContextEle(new FreeMoveGameContext(contexts.freeMove,
                 GetBin2D(bin, (int) EEntityType.FreeMove)));
-            entitasContextInfos.AddContextInfo(new SoundGameContext(contexts.sound,
-                GetBin2D(bin, (int) EEntityType.Sound)));
-            entitasContextInfos.AddContextInfo(new WeaponGameContext(contexts.weapon,
+            gameContexts.AddContextEle(new SoundGameContext(contexts.sound,
+                                                                         GetBin2D(bin, (int) EEntityType.Sound)));
+            gameContexts.AddContextEle(new WeaponGameContext(contexts.weapon,
                 GetBin2D(bin, (int)EEntityType.Weapon)));
             if (IsIncludeSceneObject)
             {
-                entitasContextInfos.AddContextInfo(new SceneObjectGameContext(contexts.sceneObject,
+                gameContexts.AddContextEle(new SceneObjectGameContext(contexts.sceneObject,
                     GetBin2D(bin, (int) EEntityType.SceneObject)));
-                entitasContextInfos.AddContextInfo(new MapObjectGameContext(contexts.mapObject,
+                gameContexts.AddContextEle(new MapObjectGameContext(contexts.mapObject,
                     GetBin2D(bin, (int) EEntityType.MapObject)));
             }
 #if UNITY_EDITOR
 
 
-            foreach (var context in entitasContextInfos.AllContexts)
+            foreach (var context in gameContexts.AllContexts)
             {
                 AssertUtility.Assert(context.CanContainComponent<EntityKeyComponent>());
                 AssertUtility.Assert(context.CanContainComponent<FlagDestroyComponent>());
                 AssertUtility.Assert(context.CanContainComponent<EntityAdapterComponent>());
             }
 #endif
-            return entitasContextInfos;
+            return gameContexts;
         }
 
         public static bool SceneObjectFilter(Vector3 position)

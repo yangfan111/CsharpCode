@@ -2,6 +2,8 @@
 using Core.EntityComponent;
 using Core.Utils;
 using System.Collections.Generic;
+using UnityEngine;
+using Utils.Singleton;
 
 namespace App.Shared.GameModules.Weapon.Behavior
 {
@@ -27,9 +29,10 @@ namespace App.Shared.GameModules.Weapon.Behavior
 
         private List<IBulletFireListener> _bulletFires = new List<IBulletFireListener>();
 
-        public CommonWeaponFireController()
-        {
-        }
+        private CustomProfileInfo pbefore = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("CallbeforeFire");
+        private CustomProfileInfo pafter = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("CallAfterFire");
+        private CustomProfileInfo pon = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("CallOnFire");
+
 
         public void RegisterProcessor<T>(T logic) where T : IFireProcess
         {
@@ -86,39 +89,50 @@ namespace App.Shared.GameModules.Weapon.Behavior
         protected override void UpdateFire(PlayerWeaponController controller, WeaponSideCmd cmd,Contexts contexts)
         {
             bool isFire = false;
-            
+            var attackProxy = controller.AttackProxy;
+
             foreach (var fireTrigger in _fireTrigggers)
             {
-                isFire |= fireTrigger.IsTrigger(controller, cmd);
+                isFire |= fireTrigger.IsTrigger(cmd);
             }
+
+            isFire = isFire && attackProxy.CanFire;
             if (isFire)
             {
                 foreach (var fireCheck in _fireCheckers)
                 {
-                    isFire &= fireCheck.IsCanFire(controller, cmd);
+                    isFire &= fireCheck.IsCanFire(attackProxy, cmd);
                 }
 
             }
-            if (isFire && controller.RelatedThrowAction.ThrowingEntityKey == EntityKey.Default
-                && (controller.RelatedThrowAction.LastFireWeaponKey == controller.HeldWeaponAgent.WeaponKey.EntityId || controller.RelatedThrowAction.LastFireWeaponKey == 0))
+         
+            if (isFire && throwingActionData.ThrowingEntityKey == EntityKey.Default
+                && (throwingActionData.LastFireWeaponKey == controller.HeldWeaponAgent.WeaponKey.EntityId || throwingActionData.LastFireWeaponKey == 0))
             {
                 Fire(controller, cmd,contexts);
-                controller.RelatedThrowAction.LastFireWeaponKey = controller.HeldWeaponAgent.WeaponKey.EntityId;
+                throwingActionData.LastFireWeaponKey = controller.HeldWeaponAgent.WeaponKey.EntityId;
             }
             else
             {
-                CallOnIdle(controller.HeldWeaponAgent, cmd);
-            }
+                CallOnIdle(attackProxy, cmd);
 
-            CallOnFrame(controller.HeldWeaponAgent, cmd);
+            }
+            CallOnFrame(attackProxy, cmd);
         }
 
 
         private void Fire(PlayerWeaponController controller, WeaponSideCmd cmd, Contexts contexts)
         {
-            CallBeforeFires(controller.HeldWeaponAgent, cmd);
+            pbefore.BeginProfileOnlyEnableProfile();
+            CallBeforeFires(controller.AttackProxy, cmd);
+            pbefore.EndProfileOnlyEnableProfile();
+            pon.BeginProfileOnlyEnableProfile();
             CallBulletFires(controller, cmd,contexts);
-            CallAfterFires(controller.HeldWeaponAgent, cmd);
+            pon.EndProfileOnlyEnableProfile();
+            pafter.BeginProfileOnlyEnableProfile();
+            CallAfterFires(controller.AttackProxy, cmd);
+            pafter.EndProfileOnlyEnableProfile();
+            
         }
 
         private void CallBulletFires(PlayerWeaponController controller, WeaponSideCmd cmd, Contexts contexts)
@@ -135,35 +149,35 @@ namespace App.Shared.GameModules.Weapon.Behavior
             }
         }
 
-        private void CallAfterFires(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
+        private void CallAfterFires(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
             foreach (var afterfire in _afterFireProcessors)
             {
-                afterfire.OnAfterFire(weaponBaseAgent, cmd);
+                afterfire.OnAfterFire(attackProxy, cmd);
             }
         }
 
-        private void CallBeforeFires(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
+        private void CallBeforeFires(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
             foreach (var beforeFire in _beforeFireProcessors)
             {
-                beforeFire.OnBeforeFire(weaponBaseAgent, cmd);
+                beforeFire.OnBeforeFire(attackProxy, cmd);
             }
         }
 
-        private void CallOnIdle(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
+        private void CallOnIdle(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
             foreach (var fireIdle in _idles)
             {
-                fireIdle.OnIdle(weaponBaseAgent, cmd);
+                fireIdle.OnIdle(attackProxy, cmd);
             }
         }
 
-        private void CallOnFrame(WeaponBaseAgent weaponBaseAgent, WeaponSideCmd cmd)
+        private void CallOnFrame(WeaponAttackProxy attackProxy, WeaponSideCmd cmd)
         {
             foreach (var frame in _frames)
             {
-                frame.OnFrame(weaponBaseAgent, cmd);
+                frame.OnFrame(attackProxy, cmd);
             }
         }
     }

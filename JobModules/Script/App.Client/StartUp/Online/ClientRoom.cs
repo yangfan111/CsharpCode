@@ -1,33 +1,22 @@
-﻿using System;
-using App.Client.GameModules.GamePlay.Free;
-using App.Client.GameModules.GamePlay.Free.Scene;
+﻿using App.Client.GameModules.GamePlay.Free;
 using App.Client.GameModules.Ui;
-using App.Client.MessageHandler;
+using App.Client.Scripts;
 using App.Client.SessionStates;
 using App.Protobuf;
 using App.Shared;
 using App.Shared.Client;
-using App.Shared.Components.Player;
 using App.Shared.DebugHandle;
-using App.Shared.GameModules.Vehicle;
-using App.Shared.Network;
 using Assets.App.Client.GameModules.GamePlay.Free;
-using Assets.Sources.Free;
 using Core.Components;
-using Core.EntitasAdpater;
 using Core.EntityComponent;
-using Core.GameModule.System;
-using Core.Network;
-using Core.Utils;
-using Entitas;
-using UnityEngine;
-using Core.Free;
-using Assets.Sources.Free.UI;
 using Core.GameModule.Step;
+using Core.GameModule.System;
 using Core.MyProfiler;
 using Core.SessionState;
-using App.Client.Utility;
-using App.Shared.Components;
+using Core.Utils;
+using Entitas;
+using System;
+using UnityEngine;
 using Utils.Singleton;
 
 namespace App.Client.Console
@@ -39,58 +28,38 @@ namespace App.Client.Console
 
         private Contexts _contexts;
         private SessionStateMachine _clientSessionStateMachine;
-        private ClientDebugCommandHandler _clientDebugCommandHandler;
 
-        public delegate void AddFreeCommand(string command, string desc, string useage);
 
-        public event AddFreeCommand AddCommand;
+       
+        private readonly IDebugCommandHandler _commandHandler;
+
+     
+
+       
 
         public Contexts Contexts
         {
             get { return _contexts; }
         }
 
-        private bool _isDisconnected = false;
+
         private bool _isDisposed = false;
 
-        public ClientRoom(IClientContextInitilizer clientContextInitializer)
+        public ClientRoom(Contexts contexts)
         {
             _logger.InfoFormat("Platform Endianness is little = {0}", BitConverter.IsLittleEndian);
 
-            _contexts = clientContextInitializer.CreateContexts();
-            _clientDebugCommandHandler = new ClientDebugCommandHandler(_contexts);
+            _contexts = contexts;
+
             if (SharedConfig.InSamplingMode || SharedConfig.InLegacySampleingMode)
                 _clientSessionStateMachine = new ClientProfileSessionStateMachine(_contexts);
             else
                 _clientSessionStateMachine = new ClientSessionStateMachine(_contexts);
             SingletonManager.Get<MyProfilerManager>().Contexts = _contexts;
-
-            InitNetworMessageHandlers();
+            
+            _commandHandler = new DebugCommandHandler(_clientSessionStateMachine, _contexts);
         }
 
-        public void OnNetworkConnected(INetworkChannel networkChannel)
-        {
-            networkChannel.Serializer = new NetworkMessageSerializer(new AppMessageTypeInfo());
-            ;
-            networkChannel.MessageReceived += NetworkChannelOnMessageReceived;
-            _contexts.session.clientSessionObjects.NetworkChannel = networkChannel;
-
-            InitBuleltInfoCollector(networkChannel);
-        }
-
-        private void InitBuleltInfoCollector(INetworkChannel networkChannel)
-        {
-            var sessionObjects = _contexts.session.commonSession;
-            _contexts.session.clientSessionObjects.MessageDispatcher.RegisterLater(
-                (int) EServer2ClientMessage.FireInfoAck,
-                new FireInfoAckMessageHandler());
-        }
-
-        public void OnNetworkDisconnected()
-        {
-            _logger.ErrorFormat("Client Disconnected ");
-            _isDisconnected = true;
-        }
 
         public string LoginToken
         {
@@ -98,33 +67,35 @@ namespace App.Client.Console
         }
 
 
+      
+
         public void Update()
         {
             try
             {
                 if (_isDisposed)
                     return;
+                SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.Room);
+                var sessionObjects = _contexts.session.clientSessionObjects;
 
-                //if (_isDisconnected)
-                //{
-                //    HallUtility.GameOver();
-                //}
-                //else
-                {
-                    SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.Room);
-                    var sessionObjects = _contexts.session.clientSessionObjects;
+                sessionObjects.MessageDispatcher.DriveDispatch();
 
-                    sessionObjects.MessageDispatcher.DriveDispatch();
-                    StepExecuteManager.Instance.Update();
-                    _clientSessionStateMachine.Update();
-                }
+                if (_isDisposed)
+                    return;
+
+                StepExecuteManager.Instance.Update();
+                _clientSessionStateMachine.Update();
             }
-#if UNITY_EDITOR
+
             catch (Exception e)
             {
-                Debug.LogError("unknown error : " + e.StackTrace);
-            }
+                _logger.ErrorFormat("{0}",e);
+#if UNITY_EDITOR
+              
+                Debug.LogError("e.Message : " + e.Message + " unknown error : " + e.StackTrace);
 #endif
+            }
+
             finally
             {
                 SingletonManager.Get<DurationHelp>().ProfileEnd(CustomProfilerStep.Room);
@@ -276,55 +247,7 @@ namespace App.Client.Console
         }
 
 
-        private void InitNetworMessageHandlers()
-        {
-            var sessionObjects = _contexts.session.clientSessionObjects;
-
-            var messageDispatcher = sessionObjects.MessageDispatcher;
-            messageDispatcher.RegisterLater((int) EServer2ClientMessage.Snapshot,
-                new SnapshotMessageHandler(sessionObjects.SnapshotPool, sessionObjects.UpdateLatestHandler,
-                    sessionObjects.TimeManager));
-            messageDispatcher.RegisterLater((int) EServer2ClientMessage.UdpId, new UdpIdMessageHandler());
-            messageDispatcher.RegisterImmediate((int) EServer2ClientMessage.Snapshot,
-                new SnapshotSyncTimeHandler(sessionObjects.TimeManager));
-            messageDispatcher.RegisterLater((int) EServer2ClientMessage.FreeData, SimpleMessageManager.Instance);
-            messageDispatcher.RegisterLater((int) EServer2ClientMessage.Statistics,
-                new StatisticsMessageHandler(_contexts));
-            //messageDispatcher.RegisterLater((int)EServer2ClientMessage.Ping, new PingRespMessageHandler(_contexts));
-            messageDispatcher.RegisterLater((int) EServer2ClientMessage.DamageInfo,
-                new DamageInfoMessageHandler(_contexts.player, _contexts.ui));
-            messageDispatcher.RegisterImmediate((int) EServer2ClientMessage.Ping,
-                new PingRespMessageHandler(_contexts));
-            messageDispatcher.RegisterImmediate((int) EServer2ClientMessage.UpdateAck,
-                new UpdateMessageAckMessageHandler(sessionObjects.UpdateLatestHandler));
-            messageDispatcher.RegisterLater((int) EServer2ClientMessage.DebugMessage,
-                new ServerDebugMessageHandler(_contexts));
-            messageDispatcher.RegisterLater((int) EServer2ClientMessage.ClearScene,
-                new ClearSceneMessageHandler(_contexts));
-            messageDispatcher.RegisterLater((int) EServer2ClientMessage.GameOver, new ClientGameOverMessageHandler());
-            messageDispatcher.RegisterLater((int) EServer2ClientMessage.HeartBeat, new ClientHeartBeatMessageHandler());
-        }
-
-        public void NetworkChannelOnMessageReceived(INetworkChannel networkChannel, int messageType, object messageBody)
-        {
-            if (RegisterCommandHandler.canHandle(messageBody))
-            {
-                RegisterCommandHandler.Handle(this, messageBody);
-            }
-            else
-            {
-                var messageDispatcher = _contexts.session.clientSessionObjects.MessageDispatcher;
-                messageDispatcher.SaveDispatch(networkChannel, messageType, messageBody);
-            }
-        }
-
-        public void RegisterCommand(string command, string desc, string usage)
-        {
-            if (AddCommand != null)
-            {
-                AddCommand(command, desc, usage);
-            }
-        }
+      
 
         public void SendGameOverMessage()
         {
@@ -385,29 +308,17 @@ namespace App.Client.Console
             _clientSessionStateMachine.OnGUI();
         }
 
-        public string OnDebugMessage(DebugCommand message)
-        {
-            var channel = _contexts.session.clientSessionObjects.NetworkChannel;
-            if (channel != null)
-            {
-                var msg = DebugCommandMessage.Allocate();
-                msg.Command = message.Command;
-                if (message.Args != null && message.Command != DebugCommands.TestMap &&
-                    message.Command != DebugCommands.ClientMove)
-                {
-                    msg.Args.AddRange(message.Args);
-                }
-
-                channel.SendReliable((int) EClient2ServerMessage.DebugCommand, msg);
-                msg.ReleaseReference();
-            }
-
-            return _clientDebugCommandHandler.OnDebugMessage(message, _clientSessionStateMachine);
-        }
 
         public SessionStateMachine GetSessionStateMachine()
         {
             return _clientSessionStateMachine;
+        }
+
+        public string OnDebugMessage(DebugCommand message)
+        {
+            if (SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.DisableDebug)
+                return "";
+            return _commandHandler.OnDebugMessage(message);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Free
         private float _transitionTime ;
         private SubCameraMotorType _motorType;
 
-        public FreeOffMotor(float transitionTime)
+        public FreeOffMotor(float transitionTime,Motors m) : base(m)
         {
             _transitionTime = transitionTime;
             _motorType = SubCameraMotorType.View;

@@ -11,6 +11,7 @@ using Core.Enums;
 using Core.Free;
 using Core.Utils;
 using System;
+using App.Shared.Util;
 using UltimateFracturing;
 using UnityEngine;
 
@@ -167,17 +168,21 @@ namespace App.Server.GameModules.GamePlay.Free.player
                             {
                                 return true;
                             }
+
                             obstacleParent = obstacleParent.parent;
                         }
+
                         return false;
                     }))
+
+                    if (Logger.IsDebugEnabled)
                     {
-                        if (Logger.IsDebugEnabled)
-                        {
-                            Logger.DebugFormat("do fractured explode ");
-                        }
-                        fractured.Explode(Vector3.zero, damage);
+                        Logger.DebugFormat("do fractured explode ");
                     }
+
+                    fractured.Explode(Vector3.zero, damage);
+                    MapObjectUtility.StoreCreateMapObjMsg(MapObjectUtility.GetGameObjType(trans.parent.gameObject),
+                        MapObjectUtility.GetGameObjId(trans.parent.gameObject));
                     break;
                 }
                 parent = parent.parent;
@@ -193,6 +198,8 @@ namespace App.Server.GameModules.GamePlay.Free.player
                 if (null != fractured)
                 {
                     fractured.MakeBroken();
+                    MapObjectUtility.StoreCreateMapObjMsg(MapObjectUtility.GetGameObjType(fractured.Owner),
+                        MapObjectUtility.GetGameObjId(fractured.Owner));
                 }
                 parent = parent.parent;
             }

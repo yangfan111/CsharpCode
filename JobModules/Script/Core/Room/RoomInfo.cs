@@ -1,4 +1,4 @@
-﻿using Core.Free;
+using Core.Free;
 using System.Collections.Generic;
 
 namespace Core.Room
@@ -10,7 +10,7 @@ namespace Core.Room
         public int TeamCapacity;
         public int MapId;
         public int RevivalTime;
-        public bool MultiAngleStatus;
+        public bool MultiAngleStatus = true;
         public bool WatchStatus;
         public bool HelpStatus;
         public bool HasFriendHarm;
@@ -18,16 +18,16 @@ namespace Core.Room
         public int OverTime;
         public int ConditionValue;
         public int ConditionType;
-        public string ChannelName;
-        public string RoomName;
+        public string ChannelName = "null";
+        public string RoomName = "null";
         public int RoomDisplayId;
         public int RoomCapacity;
-        public string PreLoadUI = "";
+        public string PreLoadUI = "null";
         public List<string> PreLoadAssetInfo = new List<string>(); //AssetInfo Format: "AssetBundName0/AssetName0,AssetBundName1/AssetName1,..."
 
         public RoomInfo()
         {
-
+            MultiAngleStatus = true;
         }
 
         public RoomInfo(IHallRoom room)

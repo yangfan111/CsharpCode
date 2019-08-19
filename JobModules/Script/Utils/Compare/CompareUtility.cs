@@ -10,6 +10,12 @@ namespace Utils.Compare
         {
             return left == right;
         }
+        
+        public static bool IsApproximatelyEqual(Enum left, Enum right)
+        {
+            return left == right;
+        }
+        
         public static bool IsBetween<T>( T value, T min, T max) where T : IComparable<T>
         {
             return (min.CompareTo(value) < 0) && (value.CompareTo(max) <= 0);

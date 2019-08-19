@@ -65,12 +65,14 @@ public class AudioBattleListener
 	{
 		DefaultListenerObj.transform.transform.SetParent(parentTrans);
 		DefaultListenerObj.transform.localPosition =Vector3.zero;
-		var go = new GameObject("thdViewEmitter");
+        DefaultListenerObj.transform.localEulerAngles = Vector3.zero;
+        var go = new GameObject("thdViewEmitter");
 		ThdViewEmitter = go.AddComponent<AkGameObj>();
 		ThdViewEmitter.IsMainObject = true;
 		ThdViewEmitter.transform.SetParent(parentTrans);
 		ThdViewEmitter.transform.localPosition = ThrdEmitterDistanceDelta;
-		ThdViewEmitter.transform.LookAt(DefaultListenerObj.transform);
+		ThdViewEmitter.transform.localEulerAngles = Vector3.zero;
+		//ThdViewEmitter.transform.LookAt(DefaultListenerObj.transform);
 		AkSoundEngine.SetRTPCValue(Different_player_effect, 0f,ThdViewEmitter.gameObject);
 		//ThdViewEmitter.localRotation = Quaternion.LookRotation(DefaultListenerTrans.transform.position - ThdViewEmitter.transform.position);
 	
@@ -79,7 +81,8 @@ public class AudioBattleListener
 		FstViewEmitter.IsMainObject = true;
 		FstViewEmitter.transform.SetParent(parentTrans);
 		FstViewEmitter.transform.localPosition = FstEmitterDistanceDelta;
-		FstViewEmitter.transform.LookAt(DefaultListenerObj.transform);
+		FstViewEmitter.transform.localEulerAngles = Vector3.zero;
+		//FstViewEmitter.transform.LookAt(DefaultListenerObj.transform);
       
         AkSoundEngine.SetRTPCValue(Different_player_effect, 0f,FstViewEmitter.gameObject);
         IsInitialized = true;

@@ -1,15 +1,12 @@
-﻿using com.wd.free.map.position;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using App.Shared.Configuration;
 using com.wd.free.@event;
+using com.wd.free.map.position;
 using com.wd.free.unit;
-using UnityEngine;
-using App.Shared.Configuration;
-using Utils.Singleton;
-using Core.Utils;
 using Core.Free;
+using Core.Utils;
+using System;
+using UnityEngine;
+using Utils.Singleton;
 
 namespace App.Server.GameModules.GamePlay.Free.map.position
 {
@@ -19,38 +16,43 @@ namespace App.Server.GameModules.GamePlay.Free.map.position
         private IPosSelector pos;
         private float waterDelta;
 
-        public int GetRuleID()
-        {
-            return (int)ERuleIds.PosGroundSelector;
-        }
-
         public override UnitPosition Select(IEventArgs args)
         {
             UnitPosition up = pos.Select(args);
-
-            Vector3 fromV = UnityPositionUtil.ToVector3(up);
-
-            Vector3 toV = new Vector3(up.GetX(), -10000, up.GetZ());
-
-            Ray r = new Ray(fromV, new Vector3(toV.x - fromV.x, toV.y - fromV.y, toV.z - fromV.z));
+            Vector3 position = UnityPositionUtil.ToVector3(up);
 
             RaycastHit hitInfo;
-            bool hited = Physics.Raycast(r, out hitInfo, 100000, UnityLayers.SceneCollidableLayerMask);
-
-            if (hited)
+            if (SingletonManager.Get<MapConfigManager>().InWater(position))
             {
-                if (SingletonManager.Get<MapConfigManager>().InWater(new Vector3(hitInfo.point.x,
-                            hitInfo.point.y - 0.1f, hitInfo.point.z)))
+                Ray ray = new Ray(position, Vector3.up);
+                bool hit = Physics.Raycast(ray, out hitInfo, 10000, UnityLayerManager.GetLayerMask(EUnityLayerName.WaterTrigger));
+                if (hit)
                 {
-                    hitInfo.point = new Vector3(fromV.x, hitInfo.point.y - waterDelta, fromV.z);
+                    return UnityPositionUtil.FromVector(hitInfo.point - new Vector3(0, waterDelta, 0));
                 }
-
-                //Debug.LogFormat("hit {0},{1},{2}", hitInfo.point.x, hitInfo.point.y, hitInfo.point.z);
-
-                return UnityPositionUtil.FromVector(hitInfo.point);
             }
-
+            else
+            {
+                Ray ray = new Ray(position, Vector3.down);
+                bool hit = Physics.Raycast(ray, out hitInfo, 10000, UnityLayers.SceneCollidableLayerMask | UnityLayerManager.GetLayerMask(EUnityLayerName.WaterTrigger));
+                if (hit)
+                {
+                    if (hitInfo.collider.transform.gameObject.layer == UnityLayerManager.GetLayerIndex(EUnityLayerName.WaterTrigger))
+                    {
+                        return UnityPositionUtil.FromVector(hitInfo.point - new Vector3(0, waterDelta, 0));
+                    }
+                    else
+                    {
+                        return UnityPositionUtil.FromVector(hitInfo.point);
+                    }
+                }
+            }
             return up;
+        }
+
+        public int GetRuleID()
+        {
+            return (int)ERuleIds.PosGroundSelector;
         }
     }
 }

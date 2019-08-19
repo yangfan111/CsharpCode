@@ -14,10 +14,10 @@ namespace App.Client.GameModules.Ui.Logic
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(FreeObjectCastLogic));
         private FreeMoveContext _freeMoveContext;
         private PlayerContext _playerContext;
-        private IUserInputManager _userInputManager;
+        private GameInputManager _userInputManager;
         private UnityEngine.Vector3 _centeroffset; 
 
-        public FreeObjectCastLogic(FreeMoveContext freeMoveContext, PlayerContext playerContext, IUserInputManager userInputManager, float distance) : base(playerContext, distance)
+        public FreeObjectCastLogic(FreeMoveContext freeMoveContext, PlayerContext playerContext, GameInputManager userInputManager, float distance) : base(playerContext, distance)
         {
             _freeMoveContext = freeMoveContext;
             _playerContext = playerContext;

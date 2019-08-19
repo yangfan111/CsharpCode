@@ -1,6 +1,6 @@
 namespace AssetBundleManager.Operation
 {
-    enum SynchronizationMode
+    public enum SynchronizationMode
     {
         Sync,
         Async,

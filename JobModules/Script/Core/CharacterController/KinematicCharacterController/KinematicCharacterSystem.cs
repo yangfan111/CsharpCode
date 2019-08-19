@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.CameraControl;
+﻿using Common;
 using Core.Utils;
+using System.Collections.Generic;
 using UnityEngine;
-using Utils.Compare;
 
 namespace KinematicCharacterController
 {
@@ -133,11 +131,18 @@ namespace KinematicCharacterController
         {
             CharacterMotors.Add(motor);
 
-            RigidbodyInterpolation interpMethod =
+            /*RigidbodyInterpolation interpMethod =
                 (_internalInterpolationMethod == CharacterSystemInterpolationMethod.Unity)
                     ? RigidbodyInterpolation.Interpolate
                     : RigidbodyInterpolation.None;
             //motor.Rigidbody.interpolation = interpMethod;
+            var rigidbody = motor.GetComponent<Rigidbody>();
+            if (rigidbody != null)
+            {
+                rigidbody.interpolation = interpMethod;
+                rigidbody.useGravity = false;
+                rigidbody.isKinematic = true;
+            }*/
         }
 
         /// <summary>
@@ -199,7 +204,7 @@ namespace KinematicCharacterController
         {
             if (AutoSimulation)
             {
-                float deltaTime = Time.deltaTime;
+                float deltaTime = MyGameTime.deltaTime;
 
                 PreSimulationUpdate(deltaTime);
                 Simulate(deltaTime);
@@ -478,7 +483,7 @@ namespace KinematicCharacterController
 
             if (InterpolationMethod == CharacterSystemInterpolationMethod.Custom)
             {
-                _lastCustomInterpolationStartTime = Time.time;
+                _lastCustomInterpolationStartTime = MyGameTime.time;
                 _lastCustomInterpolationDeltaTime = deltaTime;
             }
 
@@ -529,7 +534,7 @@ namespace KinematicCharacterController
         private static void CustomInterpolationUpdate()
         {
             float interpolationFactor =
-                Mathf.Clamp01((Time.time - _lastCustomInterpolationStartTime) / _lastCustomInterpolationDeltaTime);
+                Mathf.Clamp01((MyGameTime.time - _lastCustomInterpolationStartTime) / _lastCustomInterpolationDeltaTime);
 
             // Handle characters interpolation
             for (int i = 0; i < CharacterMotors.Count; i++)

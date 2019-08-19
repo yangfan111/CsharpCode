@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using Utils.Configuration;
 using Core.Compare;
 using Core.CharacterBone;
@@ -35,9 +36,12 @@ namespace App.Shared.GameModules.Player.CharacterBone
         private readonly float _neckRotVerticalIndex =
             SingletonManager.Get<CharacterStateConfigManager>().NeckRotVerticalIndex;
 
-        private readonly float _headRotReversalTime =
-            SingletonManager.Get<CharacterStateConfigManager>().HeadRotReversalTime;
-
+        private readonly float NoHeadRotStart = 
+            SingletonManager.Get<CharacterStateConfigManager>().NoHeadRotStart;
+        
+        private readonly float FixedRotSpeed = 
+            SingletonManager.Get<CharacterStateConfigManager>().HeadRotSpeed;
+        
         private const float HandPitchChangeSpeed = 200.0f;
         private Transform _neckP3;
         private Transform _headP3;
@@ -59,7 +63,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
             _characterP3 = obj;
             GetP3Bones(obj);
         }
-
+        
         public void PreUpdate(FollowRotParam param, ICharacterBone characterBone, float deltaTime)
         {
             //人物正向和载具正向相差180度
@@ -71,35 +75,39 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 curAngle = curAngle + (curAngle > 0 ? -180 : 180);
             }
 
-            if (curAngle * characterBone.LastHeadRotAngle < _horizontalHeadRotMax * _horizontalHeadRotMin
-            ) //头部水平旋转角穿过+-180度（暂定最大旋转角度为+-60）
-            {
-                characterBone.LastHeadRotSlerpTime = param.ClientTime;
-                characterBone.IsHeadRotCW = curAngle > 0;
-            }
+            if (curAngle > NoHeadRotStart) curAngle = 0;
+            if (curAngle < -NoHeadRotStart) curAngle = 0;
 
             if (FollowRotHelper.ForbidRot())
             {
                 characterBone.ForbidRot = true;
             }
-            else if (param.CameraFreeNowMode != (byte) ECameraFreeMode.On
-                     && param.CameraEulerAngle == Vector3.zero)
+            else
             {
                 characterBone.ForbidRot = false;
             }
 
-            if (characterBone.ForbidRot)
-            {
-                characterBone.LastHeadRotAngle = 0;
-            }
-            else
-            {
-                characterBone.LastHeadRotAngle = curAngle;
-            }
+            var aimAngle = characterBone.ForbidRot ? 0 : curAngle;
+            characterBone.LastHeadRotAngle =
+                CalcuStepRotAngle(aimAngle,
+                    characterBone.LastHeadRotAngle, deltaTime);
 
             CalcCurrentHandPitch(FollowRotHelper.PitchHandAngle(), deltaTime);
         }
 
+        private float CalcuStepRotAngle(float curAngle, float lastAngle,float deltaTime)
+        {
+            if (CompareUtility.IsApproximatelyEqual(lastAngle, curAngle))
+                return curAngle;
+            var speed = curAngle > lastAngle ? FixedRotSpeed : -FixedRotSpeed;
+            var step = speed * (deltaTime * 1000);
+            var result = lastAngle + step;
+            if ((step + lastAngle) > curAngle && curAngle > lastAngle ||
+                (step + lastAngle) < curAngle && curAngle < lastAngle)
+                result = curAngle;
+            return result;
+        }
+        
         public void Update(CodeRigBoneParam param)
         {
             try
@@ -108,8 +116,6 @@ namespace App.Shared.GameModules.Player.CharacterBone
                 FollowRotFunc(param.HeadPitch,
                     param.HeadYaw,
                     param.CurrentHandPitch,
-                    param.HeadRotProcess,
-                    param.IsHeadRotCW,
                     param.IsServer);
             }
             finally
@@ -137,33 +143,12 @@ namespace App.Shared.GameModules.Player.CharacterBone
         private void FollowRotFunc(float headPitch,
             float headYaw,
             float handPitch,
-            float headRotProcess,
-            bool isHeadRotCw,
             bool isServer)
         {
             if (!ThirdPersonIncluded || isServer) return;
             HandFollow(handPitch);
             HeadFollowPitch(headPitch);
-            headYaw = SlerpHeadRot(headRotProcess, headYaw, isHeadRotCw);
             HeadFollowYaw(headYaw);
-        }
-
-        //处理头部随动时，角度在+-180度切换
-        private float SlerpHeadRot(float headRotProcess, float curAngleValue, bool isHeadRotCw)
-        {
-            if (headRotProcess > _headRotReversalTime)
-            {
-                return curAngleValue;
-            }
-
-            if (curAngleValue <= _horizontalHeadRotMax && curAngleValue >= _horizontalHeadRotMin)
-            {
-                return curAngleValue;
-            }
-
-            var result = _horizontalHeadRotMin +
-                         (_horizontalHeadRotMax - _horizontalHeadRotMin) * headRotProcess / _headRotReversalTime;
-            return isHeadRotCw ? result : -result;
         }
 
         private void HeadFollowPitch(float headPitch)
@@ -255,9 +240,7 @@ namespace App.Shared.GameModules.Player.CharacterBone
             if (null == value) return;
             value.PitchHeadAngle = FollowRotHelper.PitchHeadAngle();
             value.RotHeadAngle = FollowRotHelper.YawHeadAngle();
-            value.HeadRotProcess = FollowRotHelper.HeadRotProcess();
             value.CurrentPitchHandAngle = _currentHandPitch;
-            value.IsHeadRotCW = FollowRotHelper.IsHeadRotCw();
         }
     }
 }

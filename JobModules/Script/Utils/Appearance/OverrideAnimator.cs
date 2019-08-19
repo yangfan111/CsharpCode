@@ -1,46 +1,67 @@
 ﻿using Core.Utils;
 using UnityEngine;
+using Utils.Appearance.Weapon.WeaponShowPackage;
 using Utils.AssetManager;
 using Object = UnityEngine.Object;
 using Utils.CharacterState;
 using Utils.Configuration;
 using Utils.Singleton;
+using Utils.Utils;
 
 namespace Utils.Appearance
 {
-    class OverrideAnimator
+    public class OverrideAnimator : ParamBase
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(OverrideAnimator));
 
-        private readonly Animator _animator;
         private readonly bool _firstPerson;
         
         private readonly CustomProfileInfo _changeOverrideControllerInfo;
         private readonly CustomProfileInfo _changeOverrideControllerUpdateAnimationInfo;
 
-        public OverrideAnimator(Animator animator, bool firstPerson)
+        private Animator _animator;
+        private Sex _sex;
+        private bool _unique;
+
+        protected OverrideAnimator(bool firstPerson)
         {
             _changeOverrideControllerInfo = SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("ChangeOverrideController");
             _changeOverrideControllerUpdateAnimationInfo = 
                 SingletonManager.Get<DurationHelp>().GetCustomProfileInfo("ChangeOverrideControllerUpdateAnimation");
-            _animator = animator;
+            
             _firstPerson = firstPerson;
         }
-
-        public void Change(Sex sex, bool unique, int weaponId)
+        
+        public void SetSex(Sex sex)
         {
-            if(unique) return;
+            _sex = sex;
+        }
+
+        public void SetUnique(bool unique)
+        {
+            _unique = unique;
+        }
+        
+        public void SetAnimator(Animator animator)
+        {
+            _animator = animator;
+            Change(UniversalConsts.InvalidIntId);
+        }
+
+        protected void Change(int weaponId)
+        {
+            if(_unique) return;
 
             try
             {
                 _changeOverrideControllerInfo.BeginProfileOnlyEnableProfile();
                 if (_firstPerson)
                 {
-                    ChangeFirstPersonAnimation(sex, weaponId);
+                    ChangeFirstPersonAnimation(_sex, weaponId);
                 }
                 else
                 {
-                    ChangeThirdPersonAnimation(sex, weaponId);
+                    ChangeThirdPersonAnimation(_sex, weaponId);
                 }
             }
             finally
@@ -49,10 +70,10 @@ namespace Utils.Appearance
             }
         }
         
-        public void ChangeTransition(Sex sex, int weaponId)
+        public void ChangeTransition(int weaponId)
         {
             if (_firstPerson) return;
-            ChangeThirdPersonTransitionAnimation(sex, weaponId);
+            ChangeThirdPersonTransitionAnimation(_sex, weaponId);
         }
 
         private void ChangeFirstPersonAnimation(Sex sex, int weaponId)

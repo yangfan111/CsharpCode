@@ -41,7 +41,14 @@ namespace Core.CharacterState.Posture
             state.AddTransition(new PostureTransition(
                     state.AvailableTransitionId(),
                     (command, addOutput) => FsmTransition.SimpleCommandHandler(command, FsmInput.Crouch),
-                    (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                    (command, addOutput) =>
+                    {
+                        if (command.IsMatch(FsmInput.Dying))
+                        {
+                            return FsmTransitionResponseType.ChangeRoad;
+                        }
+                        return FsmTransitionResponseType.NoResponse;
+                    },
                     PostureStateId.Crouch,
                     SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Stand,
                         PostureInConfig.Crouch),
@@ -137,7 +144,14 @@ namespace Core.CharacterState.Posture
 
                         return ret;
                     },
-                    (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                    (command, addOutput) =>
+                    {
+                        if (command.IsMatch(FsmInput.Dying))
+                        {
+                            return FsmTransitionResponseType.ChangeRoad;
+                        }
+                        return FsmTransitionResponseType.NoResponse;
+                    },
                     PostureStateId.ProneTransit,
                     SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Stand,
                         PostureInConfig.Prone) /*0*/,
@@ -271,7 +285,14 @@ namespace Core.CharacterState.Posture
 
                     return ret;
                 },
-                (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                (command, addOutput) =>
+                {
+                    if (command.IsMatch(FsmInput.Dying))
+                    {
+                        return FsmTransitionResponseType.ChangeRoad;
+                    }
+                    return FsmTransitionResponseType.NoResponse;
+                },
                 (int) PostureStateId.Swim,
                 (normalizedTime, addOutput) =>
                 {
@@ -357,7 +378,14 @@ namespace Core.CharacterState.Posture
                     (command, addOutput) => FsmTransition.SimpleCommandHandler(command, FsmInput.Crouch) ||
                                             FsmTransition.SimpleCommandHandler(command, FsmInput.Jump) ||
                                             FsmTransition.SimpleCommandHandler(command, FsmInput.PostureStand),
-                    (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                    (command, addOutput) =>
+                    {
+                        if (command.IsMatch(FsmInput.Dying))
+                        {
+                            return FsmTransitionResponseType.ChangeRoad;
+                        }
+                        return FsmTransitionResponseType.NoResponse;
+                    },
                     PostureStateId.Stand,
                     SingletonManager.Get<CharacterStateConfigManager>()
                         .GetPostureTransitionTime(PostureInConfig.Crouch, PostureInConfig.Stand),
@@ -438,7 +466,14 @@ namespace Core.CharacterState.Posture
 
                         return ret;
                     },
-                    (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                    (command, addOutput) =>
+                    {
+                        if (command.IsMatch(FsmInput.Dying))
+                        {
+                            return FsmTransitionResponseType.ChangeRoad;
+                        }
+                        return FsmTransitionResponseType.NoResponse;
+                    },
                     PostureStateId.ProneTransit,
                     SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Crouch,
                         PostureInConfig.Prone) /*0*/,
@@ -582,7 +617,14 @@ namespace Core.CharacterState.Posture
 
                         return ret;
                     },
-                    (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                    (command, addOutput) =>
+                    {
+                        if (command.IsMatch(FsmInput.Dying))
+                        {
+                            return FsmTransitionResponseType.ChangeRoad;
+                        }
+                        return FsmTransitionResponseType.NoResponse;
+                    },
                     PostureStateId.ProneToCrouch,
                     SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Prone,
                         PostureInConfig.Crouch) /*0*/,
@@ -665,7 +707,14 @@ namespace Core.CharacterState.Posture
 
                         return ret;
                     },
-                    (command, addOutput) => FsmTransitionResponseType.NoResponse,
+                    (command, addOutput) =>
+                    {
+                        if (command.IsMatch(FsmInput.Dying))
+                        {
+                            return FsmTransitionResponseType.ChangeRoad;
+                        }
+                        return FsmTransitionResponseType.NoResponse;
+                    },
                     PostureStateId.ProneToStand,
                     SingletonManager.Get<CharacterStateConfigManager>().GetPostureTransitionTime(PostureInConfig.Prone,
                         PostureInConfig.Stand) /*0*/,

@@ -24,7 +24,7 @@ namespace App.Shared.GameModules.Player.Appearance.WardrobeControllerPackage
 
         protected override AbstractLoadRequest CreateLoadRequest(AssetInfo assetInfo, ILoadedHandler mountHandler)
         {
-            return LoadRequestFactory.Create<PlayerEntity>(assetInfo, mountHandler.OnLoadSucc);
+            return LoadRequestFactory.Create<PlayerEntity>(assetInfo, mountHandler.OnLoadSuccess);
         }
 
         #region Helper

@@ -68,16 +68,18 @@ namespace App.Shared.EntityFactory
 
             var entityId = entityIdGenerator.GetNextEntityId();
             playerInfo.EntityId = entityId;
-            return CreateNewPlayerEntity(playerContext,
+
+            var playerEntity = CreateNewPlayerEntity(playerContext,
                 position, playerInfo, true, false);
+
+            // 在角色Entity上追加 KeepWatchForAOIComponent，以记录 视线内残留对象 以及 其加入字典的时间
+            // 只应用于Server
+            playerEntity.AddKeepWatchForAOI(new Util.WatchDict(playerEntity.entityKey.Value));
+            return playerEntity;
         }
 
-        public static PlayerEntity CreateNewPlayerEntity(
-            PlayerContext playerContext,
-            Vector3 position,
-            ICreatePlayerInfo playerInfo,
-            bool prediction,
-            bool autoMove)
+        public static PlayerEntity CreateNewPlayerEntity(PlayerContext playerContext,
+            Vector3 position, ICreatePlayerInfo playerInfo, bool prediction, bool autoMove)
         {
             var playerEntity = playerContext.CreateEntity();
 
@@ -88,6 +90,7 @@ namespace App.Shared.EntityFactory
                 playerInfo.SprayLacquers, position);
             playerEntity.AddPlayerToken(playerInfo.Token);
             playerEntity.playerInfo.WeaponBags = playerInfo.WeaponBags;
+            playerEntity.playerInfo.CampInfo = playerInfo.CampInfo;
             playerEntity.AddUserCmd();
             playerEntity.AddUserCmdSeq(0);
             playerEntity.AddLatestAdjustCmd(-1, -1);
@@ -114,7 +117,7 @@ namespace App.Shared.EntityFactory
             playerEntity.AddPlayerSkyMove(false, -1);
             playerEntity.AddPlayerSkyMoveInterVar();
             playerEntity.AddTime(0);
-            playerEntity.AddGamePlay(100, 100, -1, -1, true, true, 0);
+            playerEntity.AddGamePlay(100, 100, -1, -1, true, true, false, true, 0);
             playerEntity.AddChangeRole(false);
             playerEntity.AddRagDoll("Bip01 Pelvis", Vector3.zero, Vector3.zero);
 
@@ -169,8 +172,6 @@ namespace App.Shared.EntityFactory
 
             playerEntity.AddPlayerSpray(0);
 
-            // 在角色Entity上追加 KeepWatchForAOIComponent，以记录 视线内残留对象 以及 其加入字典的时间
-            playerEntity.AddKeepWatchForAOI(new Util.WatchDict());
             //Logger.Info(playerEntity.Dump());
             return playerEntity;
         }
@@ -316,6 +317,11 @@ namespace App.Shared.EntityFactory
                 if (player.hasStatisticsServerData)
                 {
                     fd.AddFields(new ObjectFields(player.statisticsServerData));
+                }
+
+                if (player.hasOxygenEnergy)
+                {
+                    fd.AddFields(new ObjectFields(player.oxygenEnergy));
                 }
                 player.AddFreeData(fd);
             }

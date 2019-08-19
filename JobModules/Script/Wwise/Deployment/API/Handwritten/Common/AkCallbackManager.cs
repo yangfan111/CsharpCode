@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 #if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.
@@ -65,9 +66,10 @@ public static class AkCallbackManager
 		new AkMonitoringCallbackInfo(System.IntPtr.Zero, false);
 
 	private static readonly AkBankCallbackInfo AkBankCallbackInfo = new AkBankCallbackInfo(System.IntPtr.Zero, false);
-
+	private static readonly Stack<EventCallbackPackage> resumeEventCallbackPackages = new Stack<EventCallbackPackage>();
 	/// <summary>
 	/// This class holds the data associated with an event callback.
+	///TODO:profiler ,创建产生40B gc
 	/// </summary>
 	public class EventCallbackPackage
 	{
@@ -77,6 +79,19 @@ public static class AkCallbackManager
 		public object m_Cookie;
 		public uint m_playingID;
 
+		public void Reset()
+		{
+			m_playingID = 0;
+			
+		}
+	
+		private static EventCallbackPackage Allocate()
+		{
+			if(resumeEventCallbackPackages.Count==0)
+				return  new EventCallbackPackage();
+			return resumeEventCallbackPackages.Pop();
+
+		}
 		public static EventCallbackPackage Create(EventCallback in_cb, object in_cookie, ref uint io_Flags)
 		{
 			if (io_Flags == 0 || in_cb == null)
@@ -85,7 +100,7 @@ public static class AkCallbackManager
 				return null;
 			}
 
-			var evt = new EventCallbackPackage();
+			var evt = Allocate();
 
 			evt.m_Callback = in_cb;
 			evt.m_Cookie = in_cookie;
@@ -101,7 +116,7 @@ public static class AkCallbackManager
 		~EventCallbackPackage()
 		{
 			if (m_Cookie != null)
-				RemoveEventCallbackCookie(m_Cookie);
+				RemoveEventCallbackByCookie(m_Cookie);
 		}
 	}
 
@@ -130,7 +145,7 @@ public static class AkCallbackManager
 
 	private static EventCallbackPackage m_LastAddedEventPackage;
 
-	public static void RemoveEventCallback(uint in_playingID)
+	public static void RemoveEventCallbackByPlayer(uint in_playingID)
 	{
 		var cookiesToRemove = new System.Collections.Generic.List<int>();
 		foreach (var pair in m_mapEventCallbacks)
@@ -142,14 +157,18 @@ public static class AkCallbackManager
 			}
 		}
 
-		var Count = cookiesToRemove.Count;
-		for (var ii = 0; ii < Count; ++ii)
-			m_mapEventCallbacks.Remove(cookiesToRemove[ii]);
+		foreach (var key in cookiesToRemove)
+		{
+			var package = m_mapEventCallbacks[key];
+			m_mapEventCallbacks.Remove(key);
+			package.Reset();
+			resumeEventCallbackPackages.Push(package);
+		}
 
 		AkSoundEnginePINVOKE.CSharp_CancelEventCallback(in_playingID);
 	}
 
-	public static void RemoveEventCallbackCookie(object in_cookie)
+	public static void RemoveEventCallbackByCookie(object in_cookie)
 	{
 		var cookiesToRemove = new System.Collections.Generic.List<int>();
 		foreach (var pair in m_mapEventCallbacks)
@@ -157,13 +176,13 @@ public static class AkCallbackManager
 			if (pair.Value.m_Cookie == in_cookie)
 				cookiesToRemove.Add(pair.Key);
 		}
-
-		var Count = cookiesToRemove.Count;
-		for (var ii = 0; ii < Count; ++ii)
+		foreach (var key in cookiesToRemove)
 		{
-			var toRemove = cookiesToRemove[ii];
-			m_mapEventCallbacks.Remove(toRemove);
-			AkSoundEnginePINVOKE.CSharp_CancelEventCallbackCookie((System.IntPtr) toRemove);
+			var package = m_mapEventCallbacks[key];
+			m_mapEventCallbacks.Remove(key);
+			package.Reset();
+			resumeEventCallbackPackages.Push(package);
+			AkSoundEnginePINVOKE.CSharp_CancelEventCallbackCookie((System.IntPtr) key);
 		}
 	}
 
@@ -375,11 +394,14 @@ public static class AkCallbackManager
 							{
 								case AkCallbackType.AK_EndOfEvent:
 									m_mapEventCallbacks.Remove(eventPkg.GetHashCode());
+									
 									if (eventPkg.m_bNotifyEndOfEvent)
 									{
 										AkEventCallbackInfo.setCPtr(pData);
 										info = AkEventCallbackInfo;
 									}
+									eventPkg.Reset();
+									resumeEventCallbackPackages.Push(eventPkg);
 									break;
 
 								case AkCallbackType.AK_MusicPlayStarted:

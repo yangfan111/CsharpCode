@@ -154,7 +154,8 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
 			}
 			DataInit(view);
 			SpriteReset();
-			view.BindingContext().DataContext = this;
+
+            view.BindingContext().DataContext = this;
 			if(bFirst)
 			{
 				SaveOriData(view);
@@ -163,7 +164,18 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
 			_view = view;
 
         }
-		private void EventTriggerBind(ChickenBagItemView view)
+
+        public void OnAddToPool()
+        {
+            if(_view!=null)
+            {
+                UnityEngine.Object.Destroy(_view);
+            }
+            _viewGameObject = null;
+            _viewCanvas = null;
+        }
+
+        private void EventTriggerBind(ChickenBagItemView view)
 		{
 		}
 
@@ -192,7 +204,7 @@ namespace App.Client.GameModules.Ui.ViewModels.Chicken
 		void ViewBind(ChickenBagItemView view)
 		{
 		     BindingSet<ChickenBagItemView, ChickenBagItemViewModel> bindingSet =
-                view.CreateBindingSet<ChickenBagItemView, ChickenBagItemViewModel>();
+                 view.CreateBindingSet<ChickenBagItemView, ChickenBagItemViewModel>();
             bindingSet.Bind(view.TitleGroupShow).For(v => v.activeSelf).To(vm => vm.TitleGroupShow).OneWay();
             bindingSet.Bind(view.ItemGroupShow).For(v => v.activeSelf).To(vm => vm.ItemGroupShow).OneWay();
             bindingSet.Bind(view.TitleText).For(v => v.text).To(vm => vm.TitleText).OneWay();

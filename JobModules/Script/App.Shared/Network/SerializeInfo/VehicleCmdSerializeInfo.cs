@@ -14,13 +14,15 @@ namespace App.Shared.Network
         {
             _serialize = new ProtoBufSerializeInfo<VehicleCmdMessage>(VehicleCmdMessage.Parser);
         }
-        public void Serialize(Stream outStream, object message)
+        public int Serialize(Stream outStream, object message)
         {
+            
             ReusableList<IVehicleCmd> list = (ReusableList<IVehicleCmd>) message;
             VehicleCmdMessage msg = VehicleCmdMessage.Allocate();
             VehicleCmdMessageConverter.ToProtoBuf(msg, list);
-            _serialize.Serialize(outStream, msg);
+            var ret =_serialize.Serialize(outStream, msg);
             msg.ReleaseReference();
+            return ret;
         }
 
         public object Deserialize(Stream inStream)

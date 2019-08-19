@@ -10,15 +10,6 @@ namespace Core.Animation
     public class NetworkAnimatorUtil
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(NetworkAnimatorUtil));
-        private static List<NetworkAnimatorLayer> Cache = new List<NetworkAnimatorLayer>();
-
-        static NetworkAnimatorUtil()
-        {
-            for (int i = 0; i < 10; i++)
-            {
-                Cache.Add(new NetworkAnimatorLayer());
-            }
-        }
 
         public static List<NetworkAnimatorLayer> CreateAnimatorLayers(Animator animator)
         {
@@ -33,78 +24,52 @@ namespace Core.Animation
                     layerList.Add(new NetworkAnimatorLayer());
             }
 
-            GetAnimatorLayers(animator, layerList, true);
+            GetAnimatorLayers(animator, layerList);
             return layerList;
         }
 
-        public static bool GetAnimatorLayers(Animator animator, List<NetworkAnimatorLayer> layers, bool force)
+        public static void GetAnimatorLayers(Animator animator, List<NetworkAnimatorLayer> layers)
         {
             int layerCount = animator.layerCount;
-
-            List<NetworkAnimatorLayer> tmpTarget = layers;
-            if (!force)
-            {
-                ExpandCache(layerCount);
-                tmpTarget = Cache;
-            }
             
-            bool currentAnimationChanged = force;
-
             for (int i = 0; i < layerCount; i++)
             {
                 if (layers[i].LayerIndex < 0)
                     continue;
                 
-                var layer = tmpTarget[i];
+                var layer = layers[i];
                 var layerWeight = animator.GetLayerWeight(i);
-                var layerIndex = i;
-                AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(layerIndex);
 
-                int currentStateHash = currentAnimatorStateInfo.fullPathHash;
-                float normalizedTime = currentAnimatorStateInfo.normalizedTime;
-
-                currentAnimationChanged = currentAnimationChanged || currentStateHash != layers[i].CurrentStateHash;
-
-                //if (currentStateHash != layers[i].CurrentStateHash)
-                //{
-                //    Logger.InfoFormat("cur:{0}, prev:{1} is not same",currentStateHash , layers[i].CurrentStateHash);
-                //}
-                
+                var currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(i);
+                float currentStateNormalizedTime = currentAnimatorStateInfo.normalizedTime;
+                int transitionFullPathHash = -1;
+                byte transitionIndex = 0;
                 float transitionNormalizedTime = NetworkAnimatorLayer.NotInTransition;
-                float transitionDuration = 0;
-                if (animator.IsInTransition(layerIndex))
+                float nextStateNormalizedTime = -1;
+                float transitionStartTime = -1;
+
+                if (animator.IsInTransition(i))
                 {
-                    transitionNormalizedTime = animator.GetAnimatorTransitionInfo(layerIndex).normalizedTime;
-                    var nextState = animator.GetNextAnimatorStateInfo(i);
-                    transitionDuration = transitionNormalizedTime != 0
-                        ? (nextState.length * (float.IsNaN(nextState.speedMultiplier) ? 1.0f:nextState.speedMultiplier) * nextState.normalizedTime) / transitionNormalizedTime
-                        : 0;
+                    var transitionInfo = animator.GetAnimatorTransitionInfo(i);
+                    currentStateNormalizedTime = transitionInfo.currentStateTime;
+                    transitionFullPathHash = transitionInfo.fullPathHash;
+                    transitionIndex = (byte)transitionInfo.index;
+                    transitionStartTime = transitionInfo.startTime;
+                    nextStateNormalizedTime = transitionInfo.nextStateTime;
+                    transitionNormalizedTime = transitionInfo.normalizedTime;
                 }
 
-                layer.SetCurrentStateInfo(layerIndex,
-                                          layerWeight,
-                                          currentStateHash,
-                                          normalizedTime,
-                                          currentAnimatorStateInfo.length * (float.IsNaN(currentAnimatorStateInfo.speedMultiplier) ? 1.0f:currentAnimatorStateInfo.speedMultiplier),
-                                          transitionNormalizedTime,
-                                          transitionDuration);
+                layer.SetCurrentStateInfo(i,
+                    layerWeight,
+                    currentAnimatorStateInfo.fullPathHash,
+                    currentStateNormalizedTime,
+                    transitionFullPathHash,
+                    transitionIndex,
+                    transitionStartTime,
+                    nextStateNormalizedTime,
+                    transitionNormalizedTime,
+                    currentAnimatorStateInfo.length);
             }
-
-            if (!force && currentAnimationChanged)
-            {
-                for (int i = 0; i < layerCount; i++)
-                {
-                    var layer = layers[i];
-                    
-                    if (layer.LayerIndex < 0)
-                        continue;
-
-                    var cache = Cache[i];
-                    layer.CopyFrom(cache);
-                }
-            }
-
-            return currentAnimationChanged;
         }
 
         public static List<NetworkAnimatorParameter> GetAnimatorParams(Animator animator)
@@ -141,20 +106,8 @@ namespace Core.Animation
             return dumppedparamList;
         }
 
-        private static void ExpandCache(int newSize)
-        {
-            if (newSize > Cache.Count)
-            {
-                for (int i = Cache.Count; i < newSize; i++)
-                {
-                    Cache.Add(new NetworkAnimatorLayer());
-                }
-            }
-        }
-
         public static void ForceChangeNetworkAnimator(List<NetworkAnimatorLayer> layers, int layer, float layerWeight,
-            int stateHash, float normalizeTime, float stateDuration, float transitionNormalizedTime = NetworkAnimatorLayer.NotInTransition,
-            float transitionDuration = 0)
+            int stateHash, float normalizeTime)
         {
             try
             {
@@ -162,11 +115,9 @@ namespace Core.Animation
                 {
                     var animation = layers[layer];
                     animation.Weight = layerWeight;
-                    animation.CurrentStateHash = stateHash;
-                    animation.NormalizedTime = normalizeTime;
-                    animation.StateDuration = stateDuration;
-                    animation.TransitionNormalizedTime = transitionNormalizedTime;
-                    animation.TransitionDuration = transitionDuration;
+                    animation.CurrentStateFullPathHash = stateHash;
+                    animation.CurrentStateNormalizedTime = normalizeTime;
+                    animation.TransitionNormalizedTime = NetworkAnimatorLayer.NotInTransition;
                 }
             }
             catch (Exception e)
@@ -178,7 +129,7 @@ namespace Core.Animation
 
         public static void ForceToInjureState(List<NetworkAnimatorLayer> layers, float normalizeTime)
         {
-            ForceChangeNetworkAnimator(layers, NetworkAnimatorLayer.PlayerUpperBodyAddLayer, 1.0f, AnimatorParametersHash.InjureyStateHash, normalizeTime, AnimatorParametersHash.InjureyStateDuration);
+            ForceChangeNetworkAnimator(layers, NetworkAnimatorLayer.PlayerUpperBodyAddLayer, 1.0f, AnimatorParametersHash.InjureyStateHash, normalizeTime);
         }
     }
 }

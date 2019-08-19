@@ -24,7 +24,16 @@ namespace App.Server.GameModules.GamePlay.free.client
             else {
                 intervalCD = config.IntervalCD;
             }
-            return player.playerSpray.mLastCreateTime + intervalCD < serverTime;
+
+            if (player.playerSpray.mLastCreateTime + intervalCD < serverTime)
+            {
+                return true;
+            }
+            else
+            {
+                //TODO 喷漆CD提示
+                return false;
+            }
         }
 
         public void Handle(ServerRoom room, PlayerEntity player, SimpleProto message)

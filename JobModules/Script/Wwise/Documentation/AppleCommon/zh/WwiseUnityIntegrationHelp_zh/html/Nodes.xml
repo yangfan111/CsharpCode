@@ -1,0 +1,923 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DocSetNodes version="1.0">
+  <TOC>
+    <Node>
+      <Name>Root</Name>
+      <Path>main.html</Path>
+      <Subnodes>
+       <Node>
+        <Name>Wwise Unity 集成</Name>
+        <Path>main.html</Path>
+        <Subnodes>
+         <Node>
+          <Name>版本说明 - Wwise Unity Integration 2018.1.5.6835.1288</Name>
+          <Path>pg__releasenotes.html</Path>
+          <Subnodes>
+          </Subnodes>
+         </Node>
+         <Node>
+          <Name>Previous Release Notes</Name>
+          <Path>pg__previousreleases.html</Path>
+          <Subnodes>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2018.1.4.6807.1258</Name>
+            <Path>pg__releasenotes__2018__1__4__1258.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2018.1.3.6784.1233</Name>
+            <Path>pg__releasenotes__2018__1__3__1233.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2018.1.2.6762.1211</Name>
+            <Path>pg__releasenotes__2018__1__2__1211.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2018.1.1.6727.1172</Name>
+            <Path>pg__releasenotes__2018__1__1__1172.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2018.1.0.6714.1154</Name>
+            <Path>pg__releasenotes__2018__1__0__1154.html</Path>
+            <Subnodes>
+             <Node>
+              <Name>新功能 2018.1</Name>
+              <Path>pg__newfeatures__2018__1__0.html</Path>
+              <Subnodes>
+              </Subnodes>
+             </Node>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.2.8.6698.1171</Name>
+            <Path>pg__releasenotes__2017__2__8__1171.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.2.7.6661.1133</Name>
+            <Path>pg__releasenotes__2017__2__7__1133.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.2.6.6636.1107</Name>
+            <Path>pg__releasenotes__2017__2__6__1107.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.2.5.6619.1090</Name>
+            <Path>pg__releasenotes__2017__2__5__1090.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.2.4.6590.1064</Name>
+            <Path>pg__releasenotes__2017__2__4__1064.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.2.4.6590.1054</Name>
+            <Path>pg__releasenotes__2017__2__4__1054.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.2.3.6575.1037</Name>
+            <Path>pg__releasenotes__2017__2__3__1037.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.2.2.6553.1015</Name>
+            <Path>pg__releasenotes__2017__2__2__1015.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.2.1.6524.980</Name>
+            <Path>pg__releasenotes__2017__2__1__980.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.2.0.6500.947</Name>
+            <Path>pg__releasenotes__2017__2__0__947.html</Path>
+            <Subnodes>
+             <Node>
+              <Name>新功能 2017.2</Name>
+              <Path>pg__newfeatures__2017__2__0.html</Path>
+              <Subnodes>
+              </Subnodes>
+             </Node>
+             <Node>
+              <Name>重要迁移说明 2017.2</Name>
+              <Path>pg__important__migration__notes__2017__2__0.html</Path>
+              <Subnodes>
+              </Subnodes>
+             </Node>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.1.9.6501.947</Name>
+            <Path>pg__releasenotes__2017__1__9__947.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.1.8.6488.933</Name>
+            <Path>pg__releasenotes__2017__1__8__933.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.1.7.6467.910</Name>
+            <Path>pg__releasenotes__2017__1__7__910.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.1.6.6446.890</Name>
+            <Path>pg__releasenotes__2017__1__6__890.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.1.5.6429.870</Name>
+            <Path>pg__releasenotes__2017__1__5__870.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.1.4.6407.845</Name>
+            <Path>pg__releasenotes__2017__1__4__845.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.1.3.6377.812</Name>
+            <Path>pg__releasenotes__2017__1__3__812.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.1.2.6361.791</Name>
+            <Path>pg__releasenotes__2017__1__2__791.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.1.1.6340.770</Name>
+            <Path>pg__releasenotes__2017__1__1__770.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2017.1.0.6302.726</Name>
+            <Path>pg__releasenotes__2017__1__0__726.html</Path>
+            <Subnodes>
+             <Node>
+              <Name>新功能 2017.1</Name>
+              <Path>pg__newfeatures__2017__1__0.html</Path>
+              <Subnodes>
+              </Subnodes>
+             </Node>
+             <Node>
+              <Name>重要迁移说明 2017.1</Name>
+              <Path>pg__important__migration__notes__2017__1__0.html</Path>
+              <Subnodes>
+              </Subnodes>
+             </Node>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2016.2.6.6153.595</Name>
+            <Path>pg__releasenotes__2016__2__6__595.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2016.2.5.6121.560</Name>
+            <Path>pg__releasenotes__2016__2__5__560.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2016.2.4.6098.531</Name>
+            <Path>pg__releasenotes__2016__2__4__531.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2016.2.3.6077.504</Name>
+            <Path>pg__releasenotes__2016__2__3__504.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2016.2.2.6022.430</Name>
+            <Path>pg__releasenotes__2016__2__2__430.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2016.2.1.5995.409</Name>
+            <Path>pg__releasenotes__2016__2__1__409.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2016.2.1</Name>
+            <Path>pg__releasenotes__2016__2__1.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2016.2.0</Name>
+            <Path>pg__releasenotes__2016__2__0.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2016.1.6</Name>
+            <Path>pg__releasenotes__2016__1__6.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2016.1.5</Name>
+            <Path>pg__releasenotes__2016__1__5.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2016.1.4</Name>
+            <Path>pg__releasenotes__2016__1__4.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2016.1.3</Name>
+            <Path>pg__releasenotes__2016__1__3.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2016.1.2</Name>
+            <Path>pg__releasenotes__2016__1__2.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2016.1.1</Name>
+            <Path>pg__releasenotes__2016__1__1.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2016.1</Name>
+            <Path>pg__releasenotes__2016__1.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2015.1.9</Name>
+            <Path>pg__releasenotes__2015__1__9.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2015.1.8</Name>
+            <Path>pg__releasenotes__2015__1__8.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2015.1.7</Name>
+            <Path>pg__releasenotes__2015__1__7.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2015.1.6</Name>
+            <Path>pg__releasenotes__2015__1__6.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2015.1.5</Name>
+            <Path>pg__releasenotes__2015__1__5.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2015.1.4</Name>
+            <Path>pg__releasenotes__2015__1__4.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2015.1.3</Name>
+            <Path>pg__releasenotes__2015__1__3.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2015.1.2</Name>
+            <Path>pg__releasenotes__2015__1__2.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2015.1.1</Name>
+            <Path>pg__releasenotes__2015__1__1.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2015.1</Name>
+            <Path>pg__releasenotes__2015__1.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2014.1.6</Name>
+            <Path>pg__releasenotes__2014__1__6.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2014.1.5</Name>
+            <Path>pg__releasenotes__2014__1__5.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2014.1.4</Name>
+            <Path>pg__releasenotes__2014__1__4.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2014.1.3</Name>
+            <Path>pg__releasenotes__2014__1__3.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2014.1.2</Name>
+            <Path>pg__releasenotes__2014__1__2.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2014.1.1</Name>
+            <Path>pg__releasenotes__2014__1__1.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2014.1</Name>
+            <Path>pg__releasenotes__2014__1.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2013.2.10</Name>
+            <Path>pg__releasenotes__2013__2__10.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2013.2.9</Name>
+            <Path>pg__releasenotes__2013__2__9.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2013.2.8</Name>
+            <Path>pg__releasenotes__2013__2__8.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2013.2.5</Name>
+            <Path>pg__releasenotes__2013__2__5.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2013.2.4</Name>
+            <Path>pg__releasenotes__2013__2__4.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2013.2.1</Name>
+            <Path>pg__releasenotes__2013__2__1.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2013.1.1</Name>
+            <Path>pg__releasenotes__2013__1__1.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>版本说明 - Wwise Unity Integration 2013.1</Name>
+            <Path>pg__releasenotes__2013__1.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+          </Subnodes>
+         </Node>
+         <Node>
+          <Name>在 Unity 工程中安装或升级集成</Name>
+          <Path>pg__installation.html</Path>
+          <Subnodes>
+           <Node>
+            <Name>前提条件</Name>
+            <Path>pg__requsinginte.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>第一次安装 Wwise 集成包</Name>
+            <Path>pg__installunitypackage.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>对您 Unity 工程作出的变更</Name>
+            <Path>pg__installprojectchange.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>将声音实现到您的游戏中</Name>
+            <Path>pg__installvalidation.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>我的 SoundBank 应该放在哪里？</Name>
+            <Path>pg__soundbank__location.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>添加插件</Name>
+            <Path>pg__install__addlicensedplugins.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>更新/升级 Wwise 集成包版本</Name>
+            <Path>pg__updating.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+          </Subnodes>
+         </Node>
+         <Node>
+          <Name>卸载 Wwise 集成包</Name>
+          <Path>pg__uninstalling.html</Path>
+          <Subnodes>
+          </Subnodes>
+         </Node>
+         <Node>
+          <Name>Adjusting Wwise Initialization Settings</Name>
+          <Path>pg__initialization__settings.html</Path>
+          <Subnodes>
+          </Subnodes>
+         </Node>
+         <Node>
+          <Name>使用 Wwise Unity 集成</Name>
+          <Path>pg__appscripts.html</Path>
+          <Subnodes>
+           <Node>
+            <Name>Wwise Picker</Name>
+            <Path>unity__picker.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>Wwise Types</Name>
+            <Path>unity__wwise__types.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>为 Wwise Events 添加新的 Trigger</Name>
+            <Path>unity__add__triggers.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>Wwise Timeline Integration</Name>
+            <Path>unity__timeline.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>The Unity WAAPI Client</Name>
+            <Path>unity__waapi.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+          </Subnodes>
+         </Node>
+         <Node>
+          <Name>为目标平台构建您的 Unity 游戏</Name>
+          <Path>pg__deploy.html</Path>
+          <Subnodes>
+           <Node>
+            <Name>为 Android 平台构建应用程序</Name>
+            <Path>pg__builddeployandroid.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>为 iOS 构建应用程序</Name>
+            <Path>pg__howtobuilddeployios.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>为 Linux 构建</Name>
+            <Path>pg__howtobuilddeploylinux.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>在 Unity 中使用 Wwise 自定义平台</Name>
+            <Path>pg__customplatforms.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+          </Subnodes>
+         </Node>
+         <Node>
+          <Name>用 Wwise 和 Unity 制作 DLC</Name>
+          <Path>pg__unity__dlc.html</Path>
+          <Subnodes>
+          </Subnodes>
+         </Node>
+         <Node>
+          <Name>从源代码构建原生集成插件</Name>
+          <Path>pg__building.html</Path>
+          <Subnodes>
+           <Node>
+            <Name>构建日志</Name>
+            <Path>pg__buildlog.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>当您修改了插件的 C++ 代码时，将 Wwise 集成包 更新/升级到一个较新的版本</Name>
+            <Path>pg__updating__modified__code.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+          </Subnodes>
+         </Node>
+         <Node>
+          <Name>API 变化和限制</Name>
+          <Path>pg__limitations.html</Path>
+          <Subnodes>
+          </Subnodes>
+         </Node>
+         <Node>
+          <Name>关于各个平台特定的信息</Name>
+          <Path>pg__platforms.html</Path>
+          <Subnodes>
+           <Node>
+            <Name>背景模式（Android）</Name>
+            <Path>pg__pauseresumeandroid.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>使用 OBB 文件（Android）</Name>
+            <Path>pg__loadbankobb.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>音频会话中断（iOS）</Name>
+            <Path>pg__audiosessionios.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>关于 Windows Store Apps 的特殊信息</Name>
+            <Path>pg___w_s_a_info.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+          </Subnodes>
+         </Node>
+         <Node>
+          <Name>Wwise Demo Game</Name>
+          <Path>pg__wwisedemogame.html</Path>
+          <Subnodes>
+          </Subnodes>
+         </Node>
+         <Node>
+          <Name>Using Wwise Spatial Audio in Unity</Name>
+          <Path>pg__spatialaudio.html</Path>
+          <Subnodes>
+           <Node>
+            <Name>Preparation for the Spatial Audio Tutorials</Name>
+            <Path>pg__spatialaudio__preparation.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>Surface Reflectors Tutorial</Name>
+            <Path>pg__surface__reflector__tut.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>Rooms and Portals Tutorial</Name>
+            <Path>pg__rooms__portals__tut.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>Obstruction and Occlusion</Name>
+            <Path>pg__obs__occ.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+          </Subnodes>
+         </Node>
+         <Node>
+          <Name>故障排除</Name>
+          <Path>unity__troubleshooting.html</Path>
+          <Subnodes>
+          </Subnodes>
+         </Node>
+        </Subnodes>
+       </Node>
+       <Node>
+        <Name>组合类型列表</Name>
+        <Path>annotated.html</Path>
+        <Subnodes>
+         <Node>
+          <Name>AkAmbient</Name>
+          <Path>class_ak_ambient.html</Path>
+         </Node>
+         <Node>
+          <Name>AkAudioListener</Name>
+          <Path>class_ak_audio_listener.html</Path>
+         </Node>
+         <Node>
+          <Name>AkBank</Name>
+          <Path>class_ak_bank.html</Path>
+         </Node>
+         <Node>
+          <Name>AkDragDropHelper</Name>
+          <Path>class_ak_drag_drop_helper.html</Path>
+         </Node>
+         <Node>
+          <Name>AkEmitterObstructionOcclusion</Name>
+          <Path>class_ak_emitter_obstruction_occlusion.html</Path>
+         </Node>
+         <Node>
+          <Name>AkEnvironment</Name>
+          <Path>class_ak_environment.html</Path>
+         </Node>
+         <Node>
+          <Name>AkEnvironment::AkEnvironment_CompareByPriority</Name>
+          <Path>class_ak_environment_1_1_ak_environment___compare_by_priority.html</Path>
+         </Node>
+         <Node>
+          <Name>AkEnvironment::AkEnvironment_CompareBySelectionAlgorithm</Name>
+          <Path>class_ak_environment_1_1_ak_environment___compare_by_selection_algorithm.html</Path>
+         </Node>
+         <Node>
+          <Name>AkEnvironmentPortal</Name>
+          <Path>class_ak_environment_portal.html</Path>
+         </Node>
+         <Node>
+          <Name>AkEnvironmentPortal::EnvListWrapper</Name>
+          <Path>class_ak_environment_portal_1_1_env_list_wrapper.html</Path>
+         </Node>
+         <Node>
+          <Name>AkEvent</Name>
+          <Path>class_ak_event.html</Path>
+         </Node>
+         <Node>
+          <Name>AkEventCallbackMsg</Name>
+          <Path>class_ak_event_callback_msg.html</Path>
+         </Node>
+         <Node>
+          <Name>AkGameObj</Name>
+          <Path>class_ak_game_obj.html</Path>
+         </Node>
+         <Node>
+          <Name>AkInitializer</Name>
+          <Path>class_ak_initializer.html</Path>
+         </Node>
+         <Node>
+          <Name>AkMemBankLoader</Name>
+          <Path>class_ak_mem_bank_loader.html</Path>
+         </Node>
+         <Node>
+          <Name>AkRoom</Name>
+          <Path>class_ak_room.html</Path>
+         </Node>
+         <Node>
+          <Name>AkRoomPortal</Name>
+          <Path>class_ak_room_portal.html</Path>
+         </Node>
+         <Node>
+          <Name>AkRoomPortalObstruction</Name>
+          <Path>class_ak_room_portal_obstruction.html</Path>
+         </Node>
+         <Node>
+          <Name>AkSpatialAudioBase</Name>
+          <Path>class_ak_spatial_audio_base.html</Path>
+         </Node>
+         <Node>
+          <Name>AkSpatialAudioEmitter</Name>
+          <Path>class_ak_spatial_audio_emitter.html</Path>
+         </Node>
+         <Node>
+          <Name>AkSpatialAudioListener</Name>
+          <Path>class_ak_spatial_audio_listener.html</Path>
+         </Node>
+         <Node>
+          <Name>AkSpatialAudioListener::SpatialAudioListenerList</Name>
+          <Path>class_ak_spatial_audio_listener_1_1_spatial_audio_listener_list.html</Path>
+         </Node>
+         <Node>
+          <Name>AkState</Name>
+          <Path>class_ak_state.html</Path>
+         </Node>
+         <Node>
+          <Name>AkSurfaceReflector</Name>
+          <Path>class_ak_surface_reflector.html</Path>
+         </Node>
+         <Node>
+          <Name>AkSwitch</Name>
+          <Path>class_ak_switch.html</Path>
+         </Node>
+         <Node>
+          <Name>AkTerminator</Name>
+          <Path>class_ak_terminator.html</Path>
+         </Node>
+         <Node>
+          <Name>AkTriggerBase</Name>
+          <Path>class_ak_trigger_base.html</Path>
+         </Node>
+         <Node>
+          <Name>AkWaapiClient</Name>
+          <Path>class_ak_waapi_client.html</Path>
+         </Node>
+        </Subnodes>
+       </Node>
+       <Node>
+        <Name>类继承关系</Name>
+        <Path>hierarchy.html</Path>
+        <Subnodes>
+         <Node>
+          <Name>AkAudioListener</Name>
+          <Path>class_ak_audio_listener.html</Path>
+         </Node>
+         <Node>
+          <Name>AkBank</Name>
+          <Path>class_ak_bank.html</Path>
+         </Node>
+         <Node>
+          <Name>AkDragDropHelper</Name>
+          <Path>class_ak_drag_drop_helper.html</Path>
+         </Node>
+         <Node>
+          <Name>AkEmitterObstructionOcclusion</Name>
+          <Path>class_ak_emitter_obstruction_occlusion.html</Path>
+         </Node>
+         <Node>
+          <Name>AkEnvironment</Name>
+          <Path>class_ak_environment.html</Path>
+         </Node>
+         <Node>
+          <Name>AkEnvironment::AkEnvironment_CompareByPriority</Name>
+          <Path>class_ak_environment_1_1_ak_environment___compare_by_priority.html</Path>
+          <Subnodes>
+           <Node>
+            <Name>AkEnvironment::AkEnvironment_CompareBySelectionAlgorithm</Name>
+            <Path>class_ak_environment_1_1_ak_environment___compare_by_selection_algorithm.html</Path>
+           </Node>
+          </Subnodes>
+         </Node>
+         <Node>
+          <Name>AkEnvironmentPortal</Name>
+          <Path>class_ak_environment_portal.html</Path>
+         </Node>
+         <Node>
+          <Name>AkEnvironmentPortal::EnvListWrapper</Name>
+          <Path>class_ak_environment_portal_1_1_env_list_wrapper.html</Path>
+         </Node>
+         <Node>
+          <Name>AkEvent</Name>
+          <Path>class_ak_event.html</Path>
+          <Subnodes>
+           <Node>
+            <Name>AkAmbient</Name>
+            <Path>class_ak_ambient.html</Path>
+           </Node>
+          </Subnodes>
+         </Node>
+         <Node>
+          <Name>AkEventCallbackMsg</Name>
+          <Path>class_ak_event_callback_msg.html</Path>
+         </Node>
+         <Node>
+          <Name>AkGameObj</Name>
+          <Path>class_ak_game_obj.html</Path>
+         </Node>
+         <Node>
+          <Name>AkInitializer</Name>
+          <Path>class_ak_initializer.html</Path>
+         </Node>
+         <Node>
+          <Name>AkMemBankLoader</Name>
+          <Path>class_ak_mem_bank_loader.html</Path>
+         </Node>
+         <Node>
+          <Name>AkRoom</Name>
+          <Path>class_ak_room.html</Path>
+         </Node>
+         <Node>
+          <Name>AkRoomPortal</Name>
+          <Path>class_ak_room_portal.html</Path>
+         </Node>
+         <Node>
+          <Name>AkRoomPortalObstruction</Name>
+          <Path>class_ak_room_portal_obstruction.html</Path>
+         </Node>
+         <Node>
+          <Name>AkSpatialAudioBase</Name>
+          <Path>class_ak_spatial_audio_base.html</Path>
+          <Subnodes>
+           <Node>
+            <Name>AkSpatialAudioEmitter</Name>
+            <Path>class_ak_spatial_audio_emitter.html</Path>
+           </Node>
+           <Node>
+            <Name>AkSpatialAudioListener</Name>
+            <Path>class_ak_spatial_audio_listener.html</Path>
+           </Node>
+          </Subnodes>
+         </Node>
+         <Node>
+          <Name>AkSpatialAudioListener::SpatialAudioListenerList</Name>
+          <Path>class_ak_spatial_audio_listener_1_1_spatial_audio_listener_list.html</Path>
+         </Node>
+         <Node>
+          <Name>AkState</Name>
+          <Path>class_ak_state.html</Path>
+         </Node>
+         <Node>
+          <Name>AkSurfaceReflector</Name>
+          <Path>class_ak_surface_reflector.html</Path>
+         </Node>
+         <Node>
+          <Name>AkSwitch</Name>
+          <Path>class_ak_switch.html</Path>
+         </Node>
+         <Node>
+          <Name>AkTerminator</Name>
+          <Path>class_ak_terminator.html</Path>
+         </Node>
+         <Node>
+          <Name>AkTriggerBase</Name>
+          <Path>class_ak_trigger_base.html</Path>
+         </Node>
+         <Node>
+          <Name>AkWaapiClient</Name>
+          <Path>class_ak_waapi_client.html</Path>
+         </Node>
+        </Subnodes>
+       </Node>
+       <Node>
+        <Name>组合类型成员</Name>
+        <Path>functions.html</Path>
+       </Node>
+      </Subnodes>
+    </Node>
+  </TOC>
+</DocSetNodes>

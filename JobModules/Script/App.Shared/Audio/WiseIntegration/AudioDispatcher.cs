@@ -23,12 +23,11 @@ namespace App.Shared.Audio
         internal void PrepareEvent(int eventId, AkGameObj target)
         {
         }
-
         internal void PostEvent(AudioEventItem econfig, AkGameObj target, bool skipSwitchSetting = false)
         {
             bankLoader.LoadAtom(econfig.BankRef, false, (result) =>
             {
-                if (AudioUtil.VerifyAKResult(result, "Audio load atom:" + econfig.BankRef))
+                if (AudioUtil.VerifyAKResult(result, "load atom:{0}" , econfig.BankRef))
                 {
                     LoadBankResultHandler(econfig, target, skipSwitchSetting);
                 }
@@ -45,7 +44,7 @@ namespace App.Shared.Audio
         {
             var result = AkSoundEngine.ExecuteActionOnEvent(econfig.Event, AkActionOnEventType.AkActionOnEventType_Stop,
                 target.gameObject, 0, AkCurveInterpolation.AkCurveInterpolation_Linear);
-            AudioUtil.VerifyAKResult(result, "StopEvent:" + econfig.Event);
+            AudioUtil.VerifyAKResult(result, "StopEvent:{0}", econfig.Event);
         }
 
         #region overrride method for switchgroup

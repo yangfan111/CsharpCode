@@ -24,7 +24,7 @@ namespace App.Shared.Components.Serializer
             {
                 if (patch[i].HasValue)
                 {
-                    to[i].MergeFromPatch(patch[i]);
+                    PatchPropertySerializer.MergeFromPatch(to[i],patch[i]);
                 }
             }
 
@@ -55,7 +55,8 @@ namespace App.Shared.Components.Serializer
             {
                 if (origin[i].HasValue)
                 {
-                    dest[i].MergeFromPatch(origin[i]);
+//                    dest[i].MergeFromPatch(origin[i]);
+                    PatchPropertySerializer.MergeFromPatch(dest[i],origin[i]);
                 }
             }
 

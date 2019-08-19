@@ -2,7 +2,7 @@
 using App.Shared.GameModules.Common;
 using App.Shared.UpdateLatest;
 using Core;
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core.GameModule.Common;
 using Core.GameModule.Module;
 using Core.GameModule.System;

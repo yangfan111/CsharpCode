@@ -1,4 +1,4 @@
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core.EntityComponent;
 using Core.Replicaton;
 using UnityEngine;
@@ -47,5 +47,13 @@ namespace App.Client
 
         public ISnapshot LatestSnapshot { get { return right; } }
         public ISnapshot OldestSnapshot { get { return left; } }
+        public void AddSnapshot(ISnapshot messageBody)
+        {
+        }
+
+    
+        public void Dispose()
+        {
+        }
     }
 }

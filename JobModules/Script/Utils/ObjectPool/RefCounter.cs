@@ -62,7 +62,7 @@ namespace Core.ObjectPool
 #if UNITY_EDITOR
             _msg = string.Format("concurrent usage of type {0}" , GetType());
 #endif
-            AcquireReference();
+            AcquireReference_Internal(false);
         }
 
         public void ReInit()
@@ -80,13 +80,23 @@ namespace Core.ObjectPool
             
         }
 
-      
-        public virtual void AcquireReference()
+        private void AcquireReference_Internal(bool isCheck)
         {
             SetCurrentThread();
-            Interlocked.Increment(ref _refCount);
+            if(isCheck)
+            {
+                AssertUtility.Assert(Interlocked.Increment(ref _refCount) != 1);
+            }
+            else
+            {
+                Interlocked.Increment(ref _refCount);
+            }
             AssertUtility.Assert(_refCount < MaxRef);
             ClearCurrentThread();
+        }
+        public virtual void AcquireReference()
+        {
+            AcquireReference_Internal(true);
         }
 
         public virtual void ReleaseReference()

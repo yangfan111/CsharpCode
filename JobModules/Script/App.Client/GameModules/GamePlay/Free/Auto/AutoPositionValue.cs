@@ -5,6 +5,7 @@ using Assets.Sources.Free.Data;
 using Assets.Sources.Free.UI;
 using Core.Components;
 using Core.EntityComponent;
+using Core.EntityComponent;
 using UnityEngine;
 using Utils.Singleton;
 using Object = System.Object;

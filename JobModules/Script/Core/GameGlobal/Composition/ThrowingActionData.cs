@@ -12,6 +12,7 @@ namespace Core
         public bool IsThrow;
         public bool IsThrowing;
         public bool IsNearThrow;
+        public Vector3 throwBackupPos;
         public int LastSwitchTime;
 
         public Vector3 Pos;
@@ -28,6 +29,10 @@ namespace Core
         //Draw throwing line
         public ThrowingConfig Config;
 
+        public bool ThrowingPrepare
+        {
+            get { return IsReady && !IsThrow; }
+        }
         public void InternalCleanUp(bool interrupt = false)
         {
             if (!interrupt || IsReady || ShowCountdownUI)

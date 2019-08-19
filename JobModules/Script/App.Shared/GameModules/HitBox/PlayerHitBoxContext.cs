@@ -18,12 +18,10 @@ namespace App.Shared.GameModules.Attack
     {
         protected static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerHitBoxContext));
         private PlayerContext _playerContext;
-        private AnimatorPoseReplayer _poseReplayer;
       
         public PlayerHitBoxContext(PlayerContext playerContext)
         {
             _playerContext = playerContext;
-            _poseReplayer = new AnimatorPoseReplayer();
         }
 
 
@@ -44,7 +42,7 @@ namespace App.Shared.GameModules.Attack
         public void EnableHitBox(EntityKey entityKey, bool enable)
         {
             var entity = _playerContext.GetEntityWithEntityKey(entityKey);
-            if (entity != null && entity.hasPosition && entity.hasHitBox && entity.gamePlay.IsAlive())
+            if (entity != null && entity.hasPosition && entity.hasHitBox) 
             { 
                 var provider = SingletonManager.Get<HitBoxTransformProviderCache>().GetProvider(entity.thirdPersonModel.Value);
                 if (provider != null)

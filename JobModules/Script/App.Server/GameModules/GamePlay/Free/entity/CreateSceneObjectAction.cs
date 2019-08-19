@@ -1,9 +1,11 @@
 ﻿using App.Server.GameModules.GamePlay.Free.map.position;
 using App.Shared.GameModules.Player;
+using Assets.XmlConfig;
 using com.wd.free.action;
 using com.wd.free.@event;
 using com.wd.free.map.position;
 using com.wd.free.util;
+using Core;
 using Core.Free;
 using Core.Utils;
 using System;
@@ -62,6 +64,38 @@ namespace App.Server.GameModules.GamePlay.Free.entity
         public int GetRuleID()
         {
             return (int)ERuleIds.CreateSceneObjectAction;
+        }
+
+        public static void CreateDropItem(PlayerEntity player, int cat, int id, int count, ISceneObjectEntityFactory factory)
+        {
+            var dropPos = player.position.Value + player.characterContoller.Value.transform.forward * 2;
+            if (player != null)
+            {
+                RaycastHit hit;
+                Vector3 throwPos = player.GetHandWeaponPosition();
+                Ray ray = new Ray(throwPos, dropPos - throwPos);
+                if(Physics.Raycast(ray, out hit, Vector3.Distance(throwPos, dropPos) - 0.01f, UnityLayers.PickupObstacleLayerMask))
+                {
+                    RaycastHit vhit;
+                    if (Physics.Raycast(hit.point + new Vector3(0, 0.1f, 0), Vector3.down, out vhit, 100, UnityLayers.PickupObstacleLayerMask))
+                    {
+                        dropPos = vhit.point;
+                    }
+                    else
+                    {
+                        dropPos = hit.point;
+                    }
+                }
+                else
+                {
+                    RaycastHit vhit;
+                    if (Physics.Raycast(dropPos + new Vector3(0, 0.1f, 0), Vector3.down, out vhit, 100, UnityLayers.PickupObstacleLayerMask))
+                    {
+                        dropPos = vhit.point;
+                    }
+                }
+            }
+            factory.CreateSimpleObjectEntity((ECategory) cat, id, count, dropPos, count);
         }
     }
 }

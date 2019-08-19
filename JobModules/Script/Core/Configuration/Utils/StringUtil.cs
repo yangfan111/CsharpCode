@@ -31,7 +31,7 @@ namespace Core.Configuration.Utils
             }
             catch (Exception e)
             {
-                _logger.DebugFormat("String To Int32 with exception: {0}, source: {1}", e.Message, value);
+                _logger.ErrorFormat("String To Int32 with exception: {0}, source: {1}", e.Message, value);
             }
 
             return ret;
@@ -47,7 +47,7 @@ namespace Core.Configuration.Utils
             }
             catch (Exception e)
             {
-                _logger.DebugFormat("String To Vector3 with exception: {0}, source: {1}", e.Message, value);
+                _logger.ErrorFormat("String To Vector3 with exception: {0}, source: {1}", e.Message, value);
             }
 
             return ret;

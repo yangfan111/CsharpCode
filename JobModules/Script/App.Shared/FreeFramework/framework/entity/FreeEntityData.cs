@@ -138,7 +138,7 @@ namespace App.Server.GameModules.GamePlay.Free.entity
 
                 effect.Act(args);
 
-                lastEffectTime = DateTime.Now.Ticks / 10000L;
+                lastEffectTime = args.Rule.ServerTime;
             }
 
             args.Resume(name);
@@ -195,7 +195,7 @@ namespace App.Server.GameModules.GamePlay.Free.entity
                 frameAction.Act(args);
             }
 
-            if (effect != null && DateTime.Now.Ticks / 10000L - lastEffectTime > 1000L)
+            if (effect != null && args.Rule.ServerTime - lastEffectTime > 1000L)
             {
                 foreach (PlayerEntity player in args.GameContext.player.GetInitializedPlayerEntities())
                 {
@@ -203,7 +203,7 @@ namespace App.Server.GameModules.GamePlay.Free.entity
                     {
                         effect.Act(args);
                         effect.AddPlayerId(player.entityKey.Value.EntityId);
-                        lastEffectTime = DateTime.Now.Ticks / 10000L;
+                        lastEffectTime = args.Rule.ServerTime;
                         break;
                     }
                 }

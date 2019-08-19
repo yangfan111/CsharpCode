@@ -21,49 +21,10 @@ namespace App.Shared.Components.Player
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(NetworkAnimatorComponent));
         
         public int GetComponentId() { return (int) EComponentIds.FpAnimData; }
-
-
        
         public override void RewindTo(object rightComponent)
         {
             CopyFrom(rightComponent);
-        }
-        
-
-        public bool IsApproximatelyEqual(object right)
-        {
-            bool ret = true;
-            var rightComp = right as FpAnimStatusComponent;
-            if (rightComp != null)
-            {
-//                for (int i = 0; i < AnimatorLayers.Count; i++)
-//                {
-//                    var equal = AnimatorLayers[i].IsSimilar(rightComp.AnimatorLayers[i]);
-//                    if (!equal)
-//                    {
-//                        _logger.Debug(AnimatorLayers[i].ToString());
-//                        _logger.Debug(rightComp.AnimatorLayers[i].ToString());
-//                    }
-//
-//                    ret = ret && equal;
-//                }
-
-                for (int i = 0; i < AnimatorParameters.Count; i++)
-                {
-                    var equal = AnimatorParameters[i].IsSimilar(rightComp.AnimatorParameters[i]);
-                    if (!equal)
-                    {
-                        _logger.Debug(AnimatorParameters[i].ToString());
-                        _logger.Debug(rightComp.AnimatorParameters[i].ToString());
-                    }
-
-                    ret = ret && equal;
-                }
-                
-                ret = ret && CompareUtility.IsApproximatelyEqual(BaseClientTime, rightComp.BaseClientTime);
-            }
-
-            return ret;
         }
 
         public override string ToString()

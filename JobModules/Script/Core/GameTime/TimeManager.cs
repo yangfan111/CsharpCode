@@ -25,7 +25,7 @@ namespace Core.GameTime
 
         public int FrameInterval { get; private set; }
 
-        public int RenderTime { get; private set; }
+        public int RenderTime { get; set; }
 
         public float FrameInterpolation { get; private set; }
         public int LastAvgInterpolateInterval = TimeConstant.InterpolateInterval;

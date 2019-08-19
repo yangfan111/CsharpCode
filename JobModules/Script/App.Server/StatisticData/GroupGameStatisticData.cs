@@ -12,9 +12,6 @@ namespace App.Server.StatisticData
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(GroupGameStatisticData));
 
-        /*private List<IPlayerInfo> _teammates = new List<IPlayerInfo>();
-        private IRankData rankData = new GroupRank();*/
-
         public GroupGameStatisticData(Dictionary<long, ITeamInfo> dictTeam, Dictionary<long, IPlayerInfo> dictPlayers, Dictionary<long, IPlayerInfo> leavedPlayers, Dictionary<long, GameOverPlayer> goPlayers, int teamCapacity)
             : base(dictTeam, dictPlayers, leavedPlayers, goPlayers, teamCapacity)
         {
@@ -34,6 +31,7 @@ namespace App.Server.StatisticData
             {
                 gameOverPlayer.Statistics.Add((int) eId, 0);
             }
+            int normalKills = playerInfo.StatisticsData.KillCount - playerInfo.StatisticsData.CritKillCount;
             gameOverPlayer.Statistics[(int) EStatisticsID.KillCount] = playerInfo.StatisticsData.KillCount;
             gameOverPlayer.Statistics[(int) EStatisticsID.HitDownCount] = playerInfo.StatisticsData.HitDownCount;
             gameOverPlayer.Statistics[(int) EStatisticsID.PlayerDamage] = Convert.ToInt32(playerInfo.StatisticsData.PlayerDamage);
@@ -66,6 +64,7 @@ namespace App.Server.StatisticData
             gameOverPlayer.Statistics[(int) EStatisticsID.C4DefuseCount] = playerInfo.StatisticsData.C4DefuseCount;
             gameOverPlayer.Statistics[(int) EStatisticsID.GetFirstBlood] = playerInfo.StatisticsData.GetFirstBlood ? 1 : 0;
             gameOverPlayer.Statistics[(int) EStatisticsID.DeadTime] = playerInfo.StatisticsData.DeadTime;
+            gameOverPlayer.Statistics[(int)EStatisticsID.NormalKills] = Math.Max(0, normalKills);
             AddHonorData(gameOverPlayer, playerInfo);
             PlayerReportTrigger(gameOverPlayer, playerInfo, freeArgs);
         }

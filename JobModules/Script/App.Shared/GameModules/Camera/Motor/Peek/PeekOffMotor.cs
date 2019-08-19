@@ -21,9 +21,7 @@ namespace App.Shared.GameModules.Camera.Motor.Peek
             get { return 0; }
         }
 
-        public PeekOffMotor(
-            float transitionTime
-        )
+        public PeekOffMotor(float transitionTime, Motors m) : base(m)
         {
             this.transitionTime = transitionTime;
         }

@@ -312,7 +312,7 @@ namespace Utils.Appearance.PropItem
                 _index = index;
             }
 
-            public void OnLoadSucc<T>(T source, UnityObject unityObj)
+            public void OnLoadSuccess<T>(T source, UnityObject unityObj)
             {
                 var go = unityObj.AsGameObject;
                 if (null == go) return;

@@ -8,12 +8,14 @@ using gameplay.gamerule.free.ui;
 using Core.Free;
 using App.Server.GameModules.GamePlay.Free.client;
 using com.wd.free.para;
+using Core.Utils;
 
 namespace App.Server.GameModules.GamePlay.Free.action
 {
     [Serializable]
     public class RegisterCommandAction : SendMessageAction, IRule
     {
+        static LoggerAdapter _logger = new LoggerAdapter(typeof(RegisterCommandAction));
         private string command;
         private string usage;
 
@@ -21,6 +23,7 @@ namespace App.Server.GameModules.GamePlay.Free.action
 
         protected override void BuildMessage(IEventArgs args)
         {
+            _logger.InfoFormat("RegisterCommandAction :{0} {1} {2} ", command,desc, usage );
             builder.Key = FreeMessageConstant.RegisterCommand;
 
             builder.Ss.Add(command);

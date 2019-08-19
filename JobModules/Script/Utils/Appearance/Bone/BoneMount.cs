@@ -360,7 +360,7 @@ namespace Utils.Appearance.Bone
                     }
                 }
                 if (!ignoreMissing)
-                    _logger.DebugFormat("missing {0} in {1}", target, obj.name);
+                    _logger.ErrorFormat("missing {0} in {1}", target, obj.name);
             }
             else
             {

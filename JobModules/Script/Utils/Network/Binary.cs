@@ -44,10 +44,12 @@ namespace Core.Network
     {
         private SerializationStatistics _statistics = new SerializationStatistics("binary");
         public SerializationStatistics Statistics { get { return _statistics; } }
-        public void Serialize(Stream outStream, object message)
+        public int Serialize(Stream outStream, object message)
         {
+            var start = outStream.Position;
             BinaryFormatter serializer = new BinaryFormatter();
             serializer.Serialize(outStream, message);
+            return  (int) (outStream.Position - start);
         }
 
         public object Deserialize(Stream inStream)

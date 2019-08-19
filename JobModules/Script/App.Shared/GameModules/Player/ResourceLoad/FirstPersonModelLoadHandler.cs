@@ -2,8 +2,10 @@ using App.Shared.GameModules.Player.Appearance;
 using App.Shared.GameModules.Player.Appearance.AnimationEvent;
 using App.Shared.Player;
 using Core.Animation;
+using Shared.Scripts.Effect;
 using UnityEngine;
 using Utils.Appearance.Bone;
+using Utils.Appearance.Effects;
 using Utils.Appearance.Script;
 using Utils.AssetManager;
 
@@ -88,6 +90,16 @@ namespace App.Shared.GameModules.Player.ResourceLoad
                 player.firstPersonAnimator.UnityAnimator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
             else
                 player.firstPersonAnimator.UnityAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+
+            var playerUtils = GameObject.Instantiate(Resources.Load<GameObject>("PlayerUtils"));
+            EffectUtility.RegistEffect(player.RootGo().gameObject, playerUtils);
+            playerUtils.transform.parent = EffectUtility.GetEffectNode(player.RootGo());
+
+            // 处理显隐
+            if (player.hasGamePlay)
+            {
+                PlayerEntityUtility.SetVisibility(go, player.gamePlay.Visibility);
+            }
         }
     }
 }

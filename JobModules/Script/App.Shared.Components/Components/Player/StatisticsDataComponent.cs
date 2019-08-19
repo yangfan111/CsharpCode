@@ -2,22 +2,19 @@
 using Core.EntityComponent;
 using Core.Enums;
 using Core.Free;
-using Core.Prediction.UserPrediction;
 using Core.SnapshotReplication.Serialization.NetworkProperty;
 using Core.Statistics;
 using Core.SyncLatest;
-using Core.UpdateLatest;
-using Core.Utils;
 using Entitas;
 using Entitas.CodeGeneration.Attributes;
+using System;
 
 namespace App.Shared.Components.Player
 {
- 
+
     [Player]
     public class StatisticsServerDataComponent : ISelfLatestComponent,IRule
     {
-
         public int RecordedShootTotalCount
         {
             get { return ShootPlayerMatchCount + ServerShootPlayerExtraCount + ClientShootPlayerMissCount; }
@@ -51,7 +48,6 @@ namespace App.Shared.Components.Player
             CachedClientShootPlayerMissCount = ClientShootPlayerMissCount;
             CachedServerShootPlayerExtraCount = ServerShootPlayerExtraCount;
             CachedShootPlayerMatchCount = ShootPlayerMatchCount;
-
         }
         
         [System.Obsolete]
@@ -71,8 +67,6 @@ namespace App.Shared.Components.Player
         /// </summary>
         [DontInitilize, NetworkProperty] public int ServerShootPlayerExtraCount;
         
-        
-
         public void CopyFrom(object rightComponent)
         {
             var right = (rightComponent as StatisticsServerDataComponent);
@@ -94,7 +88,7 @@ namespace App.Shared.Components.Player
         public bool IsApproximatelyEqual(object right)
         {
             var rightComponent = (right as StatisticsServerDataComponent);
-             return   ServerShootPlayerExtraCount == rightComponent.ServerShootPlayerExtraCount &&
+            return ServerShootPlayerExtraCount == rightComponent.ServerShootPlayerExtraCount &&
                    ClientShootPlayerMissCount == rightComponent.ClientShootPlayerMissCount &&
                    ShootPlayerMatchCount == rightComponent.ShootPlayerMatchCount;
         }
@@ -136,15 +130,10 @@ namespace App.Shared.Components.Player
 
         public int GetComponentId()
         {
-            {
-                {
-                    return (int) EComponentIds.PlayerStatisticsData;
-                }
-            }
+            return (int) EComponentIds.PlayerStatisticsData;
         }
 
-        private void SetBattleInfo(EntityKey key, int weaponId, PlayerInfoComponent playerInfo,
-                                   PlayerBattleInfo battleInfo, long timestamp)
+        private void SetBattleInfo(EntityKey key, int weaponId, PlayerInfoComponent playerInfo, PlayerBattleInfo battleInfo, long timestamp)
         {
             battleInfo.PlayerKey  = key;
             battleInfo.PlayerLv   = playerInfo.Level;
@@ -156,8 +145,7 @@ namespace App.Shared.Components.Player
             battleInfo.timestamp  = timestamp;
         }
 
-        public void AddOpponentInfo(EntityKey key, int weaponId, bool isKill, bool isHitDown, float damage,
-                                    PlayerInfoComponent playerInfo, int deathCount)
+        public void AddOpponentInfo(EntityKey key, int weaponId, bool isKill, bool isHitDown, float damage, PlayerInfoComponent playerInfo, int deathCount)
         {
             OpponentBattleInfo opponent = new OpponentBattleInfo();
             ;
@@ -183,7 +171,7 @@ namespace App.Shared.Components.Player
             if (!opponent.IsKill) opponent.IsKill       = isKill;
             if (!opponent.IsHitDown) opponent.IsHitDown = isHitDown;
             opponent.TrueDamage += damage;
-            opponent.Damage     =  (int) opponent.TrueDamage;
+            opponent.Damage = Convert.ToInt32(opponent.TrueDamage);
             opponent.DeathCount =  deathCount;
             SetBattleInfo(key, weaponId, playerInfo, opponent, 0L);
         }
@@ -194,8 +182,7 @@ namespace App.Shared.Components.Player
             SetDeadType(deadType);
         }
 
-        public void AddOtherInfo(EntityKey key, int weaponId, bool isKill, bool isHitDown, float damage,
-                                 PlayerInfoComponent playerInfo, long timestamp)
+        public void AddOtherInfo(EntityKey key, int weaponId, bool isKill, bool isHitDown, float damage, PlayerInfoComponent playerInfo, long timestamp)
         {
             OpponentBattleInfo other;
             Battle.OtherDict.TryGetValue(key, out other);
@@ -210,7 +197,7 @@ namespace App.Shared.Components.Player
             if (!other.IsHitDown)
                 other.IsHitDown = isHitDown;
             other.TrueDamage += damage;
-            other.Damage     =  (int) other.TrueDamage;
+            other.Damage = Convert.ToInt32(other.TrueDamage);
             SetBattleInfo(key, weaponId, playerInfo, other, timestamp);
         }
 

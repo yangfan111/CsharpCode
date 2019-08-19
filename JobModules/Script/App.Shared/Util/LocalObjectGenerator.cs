@@ -29,11 +29,21 @@ namespace App.Shared.Util
             }
         }
 
-        public static void Dispose()
+        public static void Dispose(bool soft = false)
         {
-            if (generatorGo)
-                Destroy(generatorGo);
+            if (soft)
+            {
+                EffectLocal.Clear();
+                AudioLocal.Clear();
+            }
+            else
+            {
+                if (generatorGo)
+                    Destroy(generatorGo);
+            }
+           
         }
+        
 
         private static void Initialize()
         {

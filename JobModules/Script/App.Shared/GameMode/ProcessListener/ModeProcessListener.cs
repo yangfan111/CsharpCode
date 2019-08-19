@@ -31,7 +31,7 @@ namespace App.Shared.GameMode
 
         public virtual void OnWeaponPickup(IPlayerWeaponProcessor controller, EWeaponSlotType slot)
         {
-            controller.AudioController.PlaySimpleAudio(EAudioUniqueId.PikcupWeapon);
+            controller.AudioController.PlaySimpleAudio(EAudioUniqueId.PickupWeapon);
         }
 
         public virtual void OnDrop(IPlayerWeaponProcessor controller, EWeaponSlotType slot)
@@ -41,10 +41,9 @@ namespace App.Shared.GameMode
 
         public void OnSwitch(IPlayerWeaponProcessor controller, int weaponId, EInOrOff op)
         {
-            {
                 var uniqueId = op == EInOrOff.In ? EAudioUniqueId.WeaponIn : EAudioUniqueId.WeaponOff;
+                controller.AudioController.StopPullBoltAudio();
                 controller.AudioController.PlaySimpleAudio(uniqueId, true);
-            }
         }
 
         public void OnItemPickup(IPlayerWeaponProcessor controller, int itemId, int category, int count)

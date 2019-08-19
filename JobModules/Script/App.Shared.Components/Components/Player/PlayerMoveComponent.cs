@@ -94,7 +94,7 @@ namespace App.Shared.Components.Player
     public class MoveUpdateComponent : IUpdateComponent
     {
         [NetworkProperty(100,-100,0.01f)] [DontInitilize] public Vector3 Velocity;
-        [NetworkProperty(SyncFieldScale.Position)] [DontInitilize] public FixedVector3 LastPosition;
+        [NetworkProperty] [DontInitilize] public FixedVector3 LastPosition;
         [NetworkProperty(SyncFieldScale.EularAngle)] [DontInitilize] public Vector3 Rotation;
         [NetworkProperty] [DontInitilize] public Vector3 Dist;
         [NetworkProperty] [DontInitilize] public Vector3 VehicleRideOffOffset;

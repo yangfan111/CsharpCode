@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>更新/升级 Wwise 集成包版本</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="akdoxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- 制作者 Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="main.html"><span>首页</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+    </ul>
+  </div>
+  <div class="navpath"><a class="el" href="main.html">Wwise Unity 集成</a>&nbsp;&raquo;&nbsp;<a class="el" href="pg__installation.html">在 Unity 工程中安装或升级集成</a>
+  </div>
+</div>
+<div class="contents">
+
+
+<h1><a class="anchor" id="pg_updating">更新/升级 Wwise 集成包版本 </a></h1><table  border="0" cellspacing="0" cellpadding="2">
+<tr>
+<td valign="top" width="45px"><div align="center">
+<img src="Warning.gif" alt="Warning.gif"/>
+</div>
+</td><td><b style="color:red">警告：</b><b>建议</b> <ul>
+<li>Unity 迁移操作是不可逆的。在您继续之前，请确保已经备份了 Unity 工程。</li>
+<li>如果 Unity 工程有版本控制，请确保在开始迁移之前 check-out 整个 Unity 工程文件夹。否则，迁移会失败，因为它无法成功地修改文件。</li>
+<li>在安装 Wwise 集成之前，需要确保您的 Unity 工程可以成功编译。（出现警告是正常的。）</li>
+<li>如果您已经修改了 C++ <code>AkSoundEngine</code> 插件源代码中的 C++ Wwise SDK，请遵循 <a class="el" href="pg__updating__modified__code.html">当您修改了插件的 C++ 代码时，将 Wwise 集成包 更新/升级到一个较新的版本</a> 中列出的指南 </li>
+</ul>
+</td></tr>
+</table>
+<p>这个安装过程假定您已有了一个包含以前的 Wwise 集成包的 Unity 工程。如果想了解新安装，请参阅 <a class="el" href="pg__installunitypackage.html">第一次安装 Wwise 集成包</a> 页面。与其它的 Unity 插件不同，您需要留下之前安装的 Wwise 集成包，以便升级到新版本。Wwise Launcher 将安装新功能和漏洞修复，然后将先前的 Wwise 集成迁移到新版本。 </p>
+<table  border="0" cellspacing="0" cellpadding="2">
+<tr>
+<td valign="top" width="45px"><div align="center">
+<img src="Warning.gif" alt="Warning.gif"/>
+</div>
+</td><td><b style="color:red">警告：</b> 在安装新版本之前，不要删除之前的 Wwise 集成，因为那样的话，您将 Wwise 音频集成到游戏中的所有努力就白费了。 </td></tr>
+</table>
+<p>升级过程分 2 步。首先，您需要将 Wwise 工程更新到您希望使用的新版本，然后也要对 Unity 工程升级。</p>
+<h2><a class="anchor" id="sect_updating_wwise">
+将您的 Wwise 工程更新到新版本</a></h2>
+<ol type="1">
+<li>启动 Wwise，该 Wwise 的版本要匹配您打算在 Unity 中使用的新 Wwise 集成包。</li>
+</ol>
+<ul>
+<li>打开 Wwise 工程。</li>
+</ul>
+<ol type="1">
+<li>当提示将您的 Wwise 工程更新到当前版本时，请回答 “Yes” 。</li>
+<li>完成后，确保在更新 Unity 工程之后，重新生成 Wwise SoundBank，以便能继续您的工作。</li>
+</ol>
+<h2><a class="anchor" id="sect_updating_unity">
+将您的 Unity 工程更新到新的 Wwise 版本</a></h2>
+<p>将 Unity 工程更新到新的 Wwise 版本是由 Wwise Launcher 负责的。 </p>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated at Tue Jan 29 11:48:54 2019 for Wwise Unity Integration by&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

@@ -39,7 +39,7 @@ namespace App.Shared.GameModules.Player
             RotateCharacter(player, deltaTime);
             
             var finalVec = SpeedCalculator.CalcSpeed(player, deltaTime);
-
+            
             var dist = finalVec * deltaTime;
             
             SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.ClientMove);
@@ -127,24 +127,10 @@ namespace App.Shared.GameModules.Player
                         out resolutionDistance
                     ))
                     {
-                        //characterController.Move(resolutionDirection.normalized * (resolutionDirection.magnitude + CollisionOffset));
-//                        PhysicsCastHelper.DrawCollider(characterController, Color.green, 60f, true);
-//
-//                        DebugDraw.DebugArrow(controller.transform.position, resolutionDirection, Color.magenta, 60f,
-//                            true);
-//                        DebugDraw.DebugArrow(controller.transform.position, resolutionDirection*resolutionDistance, Color.green, 60f,
-//                            true);
                         characterController.Move(new Vector3(0,-0.01f,0));                        
                         _logger.DebugFormat(
                             "ResolveOverlapWithPlayer ResolveOverlapWithPlayer resolutionDirection:{0}, resolutionDistance:{1}, hitCollider:{2}",
                             resolutionDirection.ToStringExt(), resolutionDistance, overlappedTransform.name);
-                        
-//                        var collider = colliders[i] as CapsuleCollider;
-//                        if (collider != null)
-//                        {
-//                            PhysicsCastHelper.DrawCollider(collider, Color.blue, 60f, true);
-//                            PhysicsCastHelper.DrawCollider(characterController, Color.red, 60f, true);
-//                        }
                     }
                     else
                     {
@@ -350,12 +336,12 @@ namespace App.Shared.GameModules.Player
             CalcSlideSlopeDirection(player);
             SetIsExceedSlopeLimit(player);
             CalcCurrentSpeed(player);
-            return CalcFinalSpeed(player);
+            return CalcFinalSpeed(player, deltaTime);
         }
 
         private RaycastHit hitInfo;
 
-        private Vector3 CalcFinalSpeed(PlayerEntity player)
+        private Vector3 CalcFinalSpeed(PlayerEntity player, float deltaTime)
         {
             var scaledVel = CurrentVelocity;
             scaledVel.Scale(new Vector4(player.playerMove.MoveSpeedRatio, 1, player.playerMove.MoveSpeedRatio, 1));
@@ -363,7 +349,7 @@ namespace App.Shared.GameModules.Player
 
             if (finalSpeed.magnitude > 0 && player.stateInterface.State.GetNextPostureState() != PostureInConfig.Jump && GroundInfo.isValidGround)
             {
-                finalSpeed.y = -1000;
+                finalSpeed.y = -0.3f / deltaTime;
             }
 
             return finalSpeed;

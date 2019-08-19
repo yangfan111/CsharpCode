@@ -36,12 +36,15 @@ namespace App.Shared.GameModules.Player.Appearance
             if(player.hasGamePlay)
                 appearance.CheckP3HaveInit(!player.gamePlay.HasNewRoleIdChangedFlag());
             
+            appearance.CreateComponentData(player.latestAppearance, player.predictedAppearance);
+            
             appearance.SyncLatestFrom(player.latestAppearance);
             appearance.SyncPredictedFrom(player.predictedAppearance);
             appearance.SyncClientFrom(player.clientAppearance);
             
             appearance.TryRewind();
             appearance.Execute();
+            appearance.Update();
             
             appearance.SyncLatestTo(player.latestAppearance);
             appearance.SyncPredictedTo(player.predictedAppearance);
@@ -53,7 +56,7 @@ namespace App.Shared.GameModules.Player.Appearance
             var appearanceInterface = player.appearanceInterface;
             if (player.gamePlay.ClientVisibility != player.gamePlay.Visibility)
             {
-                appearanceInterface.Appearance.PlayerVisibility(player.gamePlay.Visibility);
+                appearanceInterface.Appearance.SetVisibility(player.gamePlay.Visibility);
                 player.gamePlay.ClientVisibility = player.gamePlay.Visibility;
             }
         }

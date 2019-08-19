@@ -1,8 +1,9 @@
-﻿using App.Shared.GameModules.Common;
+﻿using App.Client.StartUp;
+using App.Shared.GameModules.Common;
 using Assets.App.Shared.GameModules.Camera;
 using Core;
 
-using Core.EntitasAdpater;
+using Core.EntityComponent;
 using Core.GameModule.Common;
 using Core.GameModule.Module;
 using Core.GameModule.Step;
@@ -24,10 +25,10 @@ namespace App.Shared.GameModules
         
         public ClientMainFeature(string name,
             IGameModule topLevelGameModule,
-            ISyncLatestManager syncLatestManager,
+            SyncLastestManager netSyncManager,
             IPlaybackManager playbackManager,
-            IPredictionInitManager userPredictionInitManager,
-            IUserPredictionInfoProvider predicatoinInfoProvider,
+            PredictionManager userPredictionManager,
+            AbstractPredictionProvider predicatoinProvider,
             ISimulationTimer simulationTimer,
             IVehicleCmdExecuteSystemHandler vehicleCmdExecuteSystemHandler,
             IVehicleExecutionSelector vehicleExecutionSelector,
@@ -37,48 +38,47 @@ namespace App.Shared.GameModules
             topLevelGameModule.Init();
             
             Add(new ModuleInitSystem(topLevelGameModule, commonSessionObjects.AssetManager));
-            Add(new EntityCreateSystem(topLevelGameModule).WithExecFrameStep(EEcecuteStep.NormalFrameStep)); 
+            Add(new EntityCreateSystem(topLevelGameModule)); 
 
 
 
-            Add(new SyncLatestSystem(syncLatestManager).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
+            Add(new SyncLatestSystem(netSyncManager));
             if(!SharedConfig.IsOffline)
-                Add(new PlaybackInitSystem(playbackManager).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
-            Add(new PlaybackSystem(topLevelGameModule).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
+                Add(new PlaybackInitSystem(playbackManager));
+            Add(new PlaybackSystem(topLevelGameModule));
 
             //添加游戏状态更新处理
-            Add(new GameStateUpdateSystem(topLevelGameModule).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
+            Add(new GameStateUpdateSystem(topLevelGameModule));
 
             // 需要在playback之后，因为要根据车的位置更新人的位置
             // 要在predicte之前，因为要根据车的位置，更像摄像机位置
-            Add(new PhysicsInitSystem(topLevelGameModule).WithExecFrameStep(EEcecuteStep.CmdFrameStep));
-            Add(new PhysicsUpdateSystem(topLevelGameModule).WithExecFrameStep(EEcecuteStep.CmdFrameStep));
+            Add(new PhysicsInitSystem(topLevelGameModule));
+            Add(new PhysicsUpdateSystem(topLevelGameModule));
 
             
-            Add(new VehicleCmdExecuteManagerSystem(vehicleExecutionSelector, topLevelGameModule, vehicleCmdExecuteSystemHandler, simulationTimer,false, SharedConfig.ServerAuthorative).WithExecFrameStep(EEcecuteStep.CmdFrameStep));
-            Add(new UserPrePredictionSystem(topLevelGameModule, 
-                predicatoinInfoProvider, 
-                userPredictionInitManager).WithExecFrameStep(EEcecuteStep.NormalFrameStep)); //每帧执行的cmd要放在回滚之前，不然会导致多执行帧
-            Add(new PhysicsPostUpdateSystem(topLevelGameModule).WithExecFrameStep(EEcecuteStep.CmdFrameStep));
-            Add(new PredictionInitSystem(userPredictionInitManager).WithExecFrameStep(EEcecuteStep.CmdFrameStep));           
+            Add(new VehicleCmdExecuteManagerSystem(vehicleExecutionSelector, topLevelGameModule, vehicleCmdExecuteSystemHandler, simulationTimer,false, SharedConfig.ServerAuthorative));
+          
+            
+            Add(new PhysicsPostUpdateSystem(topLevelGameModule));
+            Add(new PredictionInitSystem(userPredictionManager));           
             Add(new UserPredictionSystem(topLevelGameModule, 
-                predicatoinInfoProvider, 
-                userPredictionInitManager).WithExecFrameStep(EEcecuteStep.CmdFrameStep));
+                predicatoinProvider, 
+                userPredictionManager));
             
           
-            Add(new ResourceLoadSystem(topLevelGameModule, commonSessionObjects.AssetManager).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
+            Add(new ResourceLoadSystem(topLevelGameModule, commonSessionObjects.AssetManager));
 
-            Add(new GamePlaySystem(topLevelGameModule).WithExecFrameStep(EEcecuteStep.CmdFrameStep));
+            Add(new GamePlaySystem(topLevelGameModule));
 
-            Add(new RenderSystem(topLevelGameModule).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
+            Add(new RenderSystem(topLevelGameModule));
             Add(new UiSystem(topLevelGameModule).WithExecFrameStep(EEcecuteStep.UIFrameStep));
-            Add(new UiHfrSystem(topLevelGameModule).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
+            Add(new UiHfrSystem(topLevelGameModule));
 
-            Add(new CommonLifeTimeSystem(commonSessionObjects.GameContexts).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
-            Add(new CommoTickImmutabblitySystem(commonSessionObjects.GameContexts).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
-            Add(new EntityCleanUpSystem(topLevelGameModule).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
+            Add(new CommonLifeTimeSystem(commonSessionObjects.GameContexts));
+            Add(new CommoTickImmutabblitySystem(commonSessionObjects.GameContexts));
+            Add(new EntityCleanUpSystem(topLevelGameModule));
           
-            Add(new CommonDestroySystem(commonSessionObjects).WithExecFrameStep(EEcecuteStep.NormalFrameStep));
+            Add(new CommonDestroySystem(commonSessionObjects));
 
 
         }

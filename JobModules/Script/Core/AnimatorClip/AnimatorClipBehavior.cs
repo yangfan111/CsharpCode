@@ -1,10 +1,7 @@
-﻿using Core.Compare;
-using Core.Fsm;
+﻿using Core.Fsm;
 using Core.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using Utils.CharacterState;
 
@@ -14,10 +11,10 @@ namespace Core.Animation
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(AnimatorClipBehavior));
         private  StateBehaviorParam[] _currentStateInfos = new  StateBehaviorParam[16];
-        public readonly static AnimatorClipInfo NullClipInfo = new AnimatorClipInfo();
-        public readonly static AnimatorStateInfo NullStateInfo = new AnimatorStateInfo();
-        protected readonly AnimationClipNameMatcher _matcher = new AnimationClipNameMatcher();
-        protected Action<AnimationEvent> _animationCleanEventCallback;
+        public static AnimatorClipInfo NullClipInfo = new AnimatorClipInfo();
+        public static AnimatorStateInfo NullStateInfo = new AnimatorStateInfo();
+        protected readonly AnimationClipNameMatcher Matcher = new AnimationClipNameMatcher();
+        protected Action<AnimationEvent> AnimationCleanEventCallback;
         List<AnimatorClipInfo> _animatorClipInfos = new List<AnimatorClipInfo>();
         
         /// <summary>
@@ -102,32 +99,30 @@ namespace Core.Animation
                     for (var i = 0; i < aimEvents.Length; ++i)
                     {
                         var aimEvent = aimEvents[i];
-                        var isClean = _matcher.Match(aimEvent.stringParameter).Equals(_cleanStr, System.StringComparison.Ordinal);
+                        var isClean = Matcher.Match(aimEvent.stringParameter).Equals(_cleanStr, StringComparison.Ordinal);
                         if (isClean)
                         {
-                            if (null != _animationCleanEventCallback)
-                                _animationCleanEventCallback.Invoke(aimEvent);
-                            return;
+                            if (null != AnimationCleanEventCallback)
+                                AnimationCleanEventCallback.Invoke(aimEvent);
                         }
                     }
                 }
             }
         }
 
-        virtual public void ChangeSpeedMultiplier(float speed, bool reset = false)
-        {
-
-        }
-
-        virtual public void Update(Action<FsmOutput> addOutput, CharacterView view, float stateSpeedBuff)
+        public virtual void ChangeSpeedMultiplier(float speed, bool reset = false)
         {
         }
 
-        private bool IsEqual(string left, string right)
+        public virtual void Update(Action<FsmOutput> addOutput, CharacterView view, float stateSpeedBuff)
+        {
+        }
+
+        private static bool IsEqual(string left, string right)
         {
             if (null == left && null == right) return true;
             if (null == left || null == right) return false;
-            return left.Equals(right, System.StringComparison.Ordinal);
+            return left.Equals(right, StringComparison.Ordinal);
         }
     }
 
@@ -135,7 +130,7 @@ namespace Core.Animation
     {
         public AnimatorClipInfo CurrentClipInfo = AnimatorClipBehavior.NullClipInfo;
         public AnimatorStateInfo CurrentStateInfo = AnimatorClipBehavior.NullStateInfo;
-        public string CurrentClipInfoName = null;
-        public bool IsEnter = false;
+        public string CurrentClipInfoName;
+        public bool IsEnter;
     }
 }

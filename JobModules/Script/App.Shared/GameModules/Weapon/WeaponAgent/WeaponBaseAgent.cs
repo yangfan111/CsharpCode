@@ -1,11 +1,9 @@
 ﻿using System;
-using App.Shared.Audio;
 using App.Shared.Components.Weapon;
 using Assets.App.Shared.EntityFactory;
 using Assets.Utils.Configuration;
 using Core;
 using Core.EntityComponent;
-using Core.Utils;
 using UnityEngine;
 using Utils.Configuration;
 using Utils.Singleton;
@@ -20,7 +18,6 @@ namespace App.Shared.GameModules.Weapon
     public abstract class WeaponBaseAgent
     {
         private readonly WeaponPartsAchive partsAchiveCache = new WeaponPartsAchive();
-
         private WeaponAllConfigs configCache;
 
         protected Func<EntityKey> emptyKeyExtractor;
@@ -31,15 +28,16 @@ namespace App.Shared.GameModules.Weapon
 
         protected EWeaponSlotType handledSlot;
 
-        protected Func<EntityKey> weaponKeyExtractor;
+        protected Func<EWeaponSlotType, EntityKey> weaponKeyExtractor;
 
-        public WeaponBaseAgent(Func<EntityKey> in_holdExtractor, Func<EntityKey> in_emptyExtractor,
+        public WeaponBaseAgent(Func<EWeaponSlotType, EntityKey> in_holdExtractor, Func<EntityKey> in_emptyExtractor,
                                EWeaponSlotType slot, GrenadeCacheHandler grenadeHandler)
         {
             weaponKeyExtractor = in_holdExtractor;
             emptyKeyExtractor  = in_emptyExtractor;
             handledSlot        = slot;
         }
+
 
         protected virtual WeaponEntity Entity
         {
@@ -53,7 +51,7 @@ namespace App.Shared.GameModules.Weapon
 
         public virtual EntityKey WeaponKey
         {
-            get { return weaponKeyExtractor(); }
+            get { return weaponKeyExtractor(handledSlot); }
         }
 
         internal EntityKey EmptyWeaponKey
@@ -61,12 +59,22 @@ namespace App.Shared.GameModules.Weapon
             get { return emptyKeyExtractor(); }
         }
 
-        internal WeaponPartsStruct PartsScan
+        public WeaponPartsStruct PartsScan
         {
             get
             {
                 SyncParts();
                 return WeaponPartUtil.CreateParts(partsAchiveCache);
+            }
+        }
+
+        public bool HasSpark
+        {
+            get
+            {
+                var Muzzle = PartsScan.Muzzle;
+                return (Muzzle <= 0) ||
+                                SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(Muzzle).Spark > -1;
             }
         }
 
@@ -79,12 +87,22 @@ namespace App.Shared.GameModules.Weapon
 
         public WeaponBasicDataComponent BaseComponent
         {
-            get { return Entity != null ? entityCache.weaponBasicData : WeaponBasicDataComponent.Empty; }
+            get
+            {
+                return Entity != null && entityCache.hasWeaponBasicData
+                                ? entityCache.weaponBasicData
+                                : WeaponBasicDataComponent.Empty;
+            }
         }
 
         public WeaponRuntimeDataComponent RunTimeComponent
         {
-            get { return Entity != null ? entityCache.weaponRuntimeData : WeaponRuntimeDataComponent.Empty; }
+            get
+            {
+                return Entity != null && entityCache.hasWeaponRuntimeData
+                                ? entityCache.weaponRuntimeData
+                                : WeaponRuntimeDataComponent.Empty;
+            }
         }
 
 
@@ -116,7 +134,7 @@ namespace App.Shared.GameModules.Weapon
         {
             get
             {
-                if (IsValid())
+                if (IsValid() && entityCache.hasWeaponBasicData)
                     return entityCache.weaponBasicData.ConfigId;
                 return WeaponUtil.EmptyHandId;
             }
@@ -137,8 +155,9 @@ namespace App.Shared.GameModules.Weapon
         {
             get
             {
-                if (configCache == null || configCache.S_Id != ConfigId)
-                    configCache = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(ConfigId);
+                var cfgId = ConfigId;
+                if (configCache == null || configCache.S_Id != cfgId)
+                    configCache = SingletonManager.Get<WeaponConfigManagement>().FindConfigById(cfgId);
 
                 return configCache;
             }
@@ -370,47 +389,33 @@ namespace App.Shared.GameModules.Weapon
         //                return entityCache.weaponClientUpdate;
         //            }
         //        }
+
+
         public void InterruptPullBolt()
         {
             if (RunTimeComponent.PullBoltFinish)
             {
                 RunTimeComponent.PullBoltInterrupt = false;
                 return;
-
             }
-            if (GlobalConst.EnableWeaponLog)
-                DebugUtil.MyLog("Do Interrupt :" + ConfigId);
+
             RunTimeComponent.PullBoltInterrupt = true;
-            var audioController = GameModuleManagement.Get<PlayerAudioControllerBase>(Owner.EntityId);
-            audioController.StopPullBoltAudio(ConfigId);
-        }
-
-        public void SaveDynamic()
-        {
-            InterruptPullBolt();
         }
 
 
-        public void SyncParts()
+        public WeaponPartsAchive SyncParts()
         {
             if (IsValid())
             {
                 partsAchiveCache.CloneFrom(WeaponConfigAssy.DefaultParts);
                 partsAchiveCache.ApplyParts(BaseComponent);
             }
+
+            return partsAchiveCache;
         }
 
-        /// <summary>
-        ///     call syncParts before usage
-        /// </summary>
-        /// <param name="attributeType"></param>
-        /// <returns></returns>
-        public float GetAttachedAttributeByType(WeaponAttributeType attributeType)
-        {
-            return SingletonManager.Get<WeaponPartsConfigManager>()
-                            .GetPartAchiveAttachedAttributeByType(partsAchiveCache, attributeType);
-        }
 
+        [Obsolete]
         public bool IsWeaponConfigStuffed(int weaponId)
         {
             if (!IsValid()) return false;
@@ -419,7 +424,7 @@ namespace App.Shared.GameModules.Weapon
 
         public void ResetRuntimeData()
         {
-            if (!IsValid())
+            if (!IsValid() || !entityCache.hasWeaponRuntimeData)
                 return;
             entityCache.weaponRuntimeData.Accuracy                      = 0;
             entityCache.weaponRuntimeData.BurstShootCount               = 0;
@@ -434,12 +439,12 @@ namespace App.Shared.GameModules.Weapon
             entityCache.weaponRuntimeData.LastSpreadY                   = 0;
             entityCache.weaponRuntimeData.PullBoltInterrupt             = false;
             entityCache.weaponRuntimeData.NeedAutoReload                = false;
-            entityCache.weaponRuntimeData.PullBoltFinish                = true;
+            entityCache.weaponRuntimeData.FinishPullBolt();
         }
 
         public void ResetParts()
         {
-            if (!IsValid())
+            if (!IsValid() || !entityCache.hasWeaponBasicData)
                 return;
             entityCache.weaponBasicData.LowerRail = 0;
             entityCache.weaponBasicData.UpperRail = 0;

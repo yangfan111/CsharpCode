@@ -94,6 +94,10 @@ public partial class AkSoundEngine
 	{
 		return gameObjectHash(gameObject);
 	}
+	public static ulong GetAkGameObjectID(AkGameObj akGameObj)
+	{
+		return akGameObj == null ? AK_INVALID_GAME_OBJECT : (ulong) akGameObj.InstanceId;
+	}
 
 	#endregion
 
@@ -167,7 +171,10 @@ public partial class AkSoundEngine
 	{
 		PreGameObjectAPICallUserHook(gameObject, id);
 	}
-
+	public static void PreGameObjectAPICall(AkGameObj akGameObj, ulong id)
+	{
+		PreGameObjectAPICallUserHook(akGameObj, id);
+	}
 	/// <summary>
 	///     User hook called within all Wwise integration functions that receive GameObjects and do not perform
 	///     (un)registration. This is called
@@ -177,7 +184,7 @@ public partial class AkSoundEngine
 	/// <param name="gameObject">The GameObject being processed.</param>
 	/// <param name="id">The ulong returned from GameObjectHash that represents this GameObject in Wwise.</param>
 	static partial void PreGameObjectAPICallUserHook(UnityEngine.GameObject gameObject, ulong id);
-
+	static partial void PreGameObjectAPICallUserHook(AkGameObj akGameObj, ulong id);
 	/// <summary>
 	///     User hook called after RegisterGameObj(). An example use could be to add the id and gameObject to a dictionary upon
 	///     AK_Success.

@@ -90,8 +90,7 @@ namespace com.wd.free.map
 		public virtual bool OnCreate(IEventArgs skill)
 		{
 		    startTime = skill.Rule.ServerTime;
-            IPosSelector pos = GetPos(region.GetCenter(skill));
-            if(pos.Select(skill).GetInvalid()) return false;
+
             this.ins = new HashSet<long>();
 			this.showedIds = new HashSet<long>();
 			this.realKey = FreeUtil.ReplaceVar(key, skill);
@@ -105,6 +104,10 @@ namespace com.wd.free.map
                 posindex = (int)list.Get("posindex").GetValue();
             }
             skill.TempUse("buf", this);
+
+            IPosSelector pos = GetPos(region.GetCenter(skill));
+            if (pos.Select(skill).GetInvalid()) return false;
+
             bool hasCreator = false;
 			if (creator != null && creator.hasFreeData)
 			{

@@ -105,7 +105,6 @@ public class AkSoundEngineController
 
         //Execute callbacks that occurred in last frame (not the current update)
         AkCallbackManager.PostCallbacks();
-        AkBankManager.DoUnloadBanks();
         AkSoundEngine.RenderAudio();
     }
 
@@ -166,7 +165,10 @@ public class AkSoundEngineController
 #endif
 
         if (!AkWwiseInitializationSettings.InitializeSoundEngine())
+        {
+            Debug.LogError("WwiseUnity: Initialize Failed.");
             return;
+        }
         DoInitializedEvent();
     }
 
@@ -243,16 +245,16 @@ public class AkSoundEngineController
 #endif
 
 #if UNITY_EDITOR || !UNITY_IOS
-    private void ActivateAudio(bool activate)
+    public void ActivateAudio(bool activate)
     {
         if (AkSoundEngine.IsInitialized())
         {
             if (activate)
                 AkSoundEngine.WakeupFromSuspend();
             else
-                AkSoundEngine.Suspend();
+                AkSoundEngine.Suspend(true);
 
-            AkSoundEngine.RenderAudio();
+           // AkSoundEngine.RenderAudio();
         }
     }
 #endif
