@@ -25,10 +25,10 @@ namespace App.Shared.GameModules.Vehicle
             _playerContext = contexts.player;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
             var playerEntities = _playerContext.GetEntities();
-            var ownerEntity = owner.OwnerEntity as PlayerEntity;
+            var ownerEntity = getter.OwnerEntity as PlayerEntity;
             for(var i = 0; i < playerEntities.Length; ++i)
             {
                 var playerEntity = playerEntities[i];

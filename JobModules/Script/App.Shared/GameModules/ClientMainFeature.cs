@@ -26,7 +26,7 @@ namespace App.Shared.GameModules
         public ClientMainFeature(string name,
             IGameModule topLevelGameModule,
             SyncLastestManager netSyncManager,
-            IPlaybackManager playbackManager,
+            PlaybackManager playbackManager,
             PredictionManager userPredictionManager,
             AbstractPredictionProvider predicatoinProvider,
             ISimulationTimer simulationTimer,
@@ -45,7 +45,7 @@ namespace App.Shared.GameModules
             Add(new SyncLatestSystem(netSyncManager));
             if(!SharedConfig.IsOffline)
                 Add(new PlaybackInitSystem(playbackManager));
-            Add(new PlaybackSystem(topLevelGameModule));
+            Add(new PlaybackExcuteSystem(topLevelGameModule));
 
             //添加游戏状态更新处理
             Add(new GameStateUpdateSystem(topLevelGameModule));
@@ -60,7 +60,7 @@ namespace App.Shared.GameModules
           
             
             Add(new PhysicsPostUpdateSystem(topLevelGameModule));
-            Add(new PredictionInitSystem(userPredictionManager));           
+            Add(new PredictionCompareSystem(userPredictionManager));           
             Add(new UserPredictionSystem(topLevelGameModule, 
                 predicatoinProvider, 
                 userPredictionManager));

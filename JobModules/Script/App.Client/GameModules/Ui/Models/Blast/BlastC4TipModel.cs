@@ -14,7 +14,8 @@ namespace App.Client.GameModules.Ui.Models.Blast
 
         private IBlastC4TipUiAdapter _adapter;
 
-        private bool _needResetBombProgress = true;
+        private bool _needResetBombProgress = false;
+        private bool _haveResetBombProgress = false;
 
         protected override IUiViewModel ViewModel
         {
@@ -63,7 +64,7 @@ namespace App.Client.GameModules.Ui.Models.Blast
 
         private void UpdateResetState()
         {
-            if (_adapter.C4InstallState != Core.Enums.EUIBombInstallState.Installed)
+            if (_adapter.C4InstallState == Core.Enums.EUIBombInstallState.None)
             {
                 _needResetBombProgress = true;
             }
@@ -74,7 +75,6 @@ namespace App.Client.GameModules.Ui.Models.Blast
             if (!_needResetBombProgress) return;
             UpdateCurTime();
             _c4BeginTime = _curTime;
-            _needResetBombProgress = false;
         }
     }
 }

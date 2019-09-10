@@ -19,12 +19,12 @@ namespace App.Shared.GameModules.Player
             _weaponFireUpdateManagaer = contexts.session.commonSession.WeaponFireUpdateManager as WeaponFireUpdateManagaer;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var controller = owner.OwnerEntityKey.WeaponController();
+            var controller = getter.OwnerEntityKey.WeaponController();
             var weaponId = controller.HeldWeaponAgent.ConfigId;
             var jobAttribute = controller.JobAttribute;
-            if (weaponId < 1 || Filter(owner, cmd)) return;
+            if (weaponId < 1 || Filter(getter, cmd)) return;
             if (jobAttribute == (int)EJobAttribute.EJob_Variant ||
                 jobAttribute == (int)EJobAttribute.EJob_Matrix) {
                 weaponId = WeaponUtil.MeleeVariant;
@@ -33,13 +33,13 @@ namespace App.Shared.GameModules.Player
             var fireUpdater = _weaponFireUpdateManagaer.GetFireUpdater(weaponId);
             if(null != fireUpdater)
             {
-                fireUpdater.Update(owner.OwnerEntityKey, cmd, _contexts);
+                fireUpdater.Update(getter.OwnerEntityKey, cmd, _contexts);
             }
         }
 
-        protected bool Filter(IUserCmdOwner owner, IUserCmd cmd)
+        protected bool Filter(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var controller = owner.OwnerEntityKey.WeaponController();
+            var controller = getter.OwnerEntityKey.WeaponController();
             return (cmd.IsLeftAttack && controller.NotMove);
         }
     }

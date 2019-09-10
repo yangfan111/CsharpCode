@@ -32,9 +32,9 @@ namespace App.Shared.GameModules.Camera
             _state = new DummyCameraMotorState();
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity playerEntity = owner.OwnerEntity as PlayerEntity;
+            PlayerEntity playerEntity = getter.OwnerEntity as PlayerEntity;
 
             if (!playerEntity.hasCameraStateNew) return;
             if (!playerEntity.hasCameraStateOutputNew) return;

@@ -16,14 +16,6 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private GameObject Bnormal;
         private GameObject Bred;
 
-        private ActiveSetter ALocateRtfActiveSetter;
-        private ActiveSetter BLocateRtfActiveSetter;
-        private ActiveSetter c4LocateActiveSetter;
-        private ActiveSetter anormalActiveSetter;
-        private ActiveSetter bnormalActiveSetter;
-        private ActiveSetter aRedActiveSetter;
-        private ActiveSetter bRedActiveSetter;
-
         public MapLabel(Transform tran)
         {
             UIUtils.SetActive(tran, true);
@@ -38,17 +30,9 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             Bnormal = tran.Find("BLocate").Find("Normal").gameObject;
             Bred = tran.Find("BLocate").Find("Red").gameObject;
 
-            ALocateRtfActiveSetter = new ActiveSetter(ALocateRtf.gameObject);
-            BLocateRtfActiveSetter = new ActiveSetter(BLocateRtf.gameObject);
-            c4LocateActiveSetter = new ActiveSetter(c4Locate.gameObject);
-            anormalActiveSetter = new ActiveSetter(Anormal.gameObject);
-            bnormalActiveSetter = new ActiveSetter(Bnormal.gameObject);
-            aRedActiveSetter = new ActiveSetter(Ared.gameObject);
-            bRedActiveSetter = new ActiveSetter(Bred.gameObject);
-
-            c4LocateActiveSetter.Active = false;
-            ALocateRtfActiveSetter.Active = false;
-            BLocateRtfActiveSetter.Active = false;
+            UIUtils.SetActive(c4Locate, false);
+            UIUtils.SetActive(ALocateRtf, false);
+            UIUtils.SetActive(BLocateRtf, false);
         }
 
         private bool _isC4Drop = false;
@@ -59,23 +43,23 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                 return;
             _rate = rate;
             _isC4Drop = adapter.IsC4Drop;
-            c4LocateActiveSetter.Active = adapter.IsC4Drop;
+            UIUtils.SetActive(c4Locate, adapter.IsC4Drop);
             if (adapter.IsC4Drop)
             {
                 c4LocateRtf.anchoredPosition = new Vector2(adapter.C4DropPosition.x, adapter.C4DropPosition.z)  * rate;                  //更新标记位置
             }
-            ALocateRtfActiveSetter.Active = true;
-            BLocateRtfActiveSetter.Active = true;
+            UIUtils.SetActive(ALocateRtf, true);
+            UIUtils.SetActive(BLocateRtf, true);
             ALocateRtf.anchoredPosition = new Vector2(adapter.APosition.x, adapter.APosition.z) * rate;
             BLocateRtf.anchoredPosition = new Vector2(adapter.BPosition.x, adapter.BPosition.z) * rate;
 
             int C4SetStatus = adapter.C4SetStatus;
             if (C4SetStatus == 0)
             {
-                anormalActiveSetter.Active = true;
-                bnormalActiveSetter.Active = true;
-                aRedActiveSetter.Active = false;
-                bRedActiveSetter.Active = false;
+                UIUtils.SetActive(Anormal, true);
+                UIUtils.SetActive(Bnormal, true);
+                UIUtils.SetActive(Ared, false);
+                UIUtils.SetActive(Bred, false);
 
             }
             else if (C4SetStatus == 1)
@@ -83,17 +67,17 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
                 if (adapter.IsCampPass())
                 {
-                    anormalActiveSetter.Active = false;
-                    bnormalActiveSetter.Active = true;
-                    aRedActiveSetter.Active = true;
-                    bRedActiveSetter.Active = false;
+                    UIUtils.SetActive(Anormal, false);
+                    UIUtils.SetActive(Bnormal, true);
+                    UIUtils.SetActive(Ared, true);
+                    UIUtils.SetActive(Bred, false);
                 }
                 else
                 {
-                    anormalActiveSetter.Active = false;
-                    bnormalActiveSetter.Active = false;
-                    aRedActiveSetter.Active = true;
-                    bRedActiveSetter.Active = true;
+                    UIUtils.SetActive(Anormal, false);
+                    UIUtils.SetActive(Bnormal, false);
+                    UIUtils.SetActive(Ared, true);
+                    UIUtils.SetActive(Bred, true);
                 }
             }
             else if (C4SetStatus == 2)
@@ -101,17 +85,17 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
                 if (adapter.IsCampPass())
                 {
-                    anormalActiveSetter.Active = true;
-                    bnormalActiveSetter.Active = false;
-                    aRedActiveSetter.Active = false;
-                    bRedActiveSetter.Active = true;
+                    UIUtils.SetActive(Anormal, true);
+                    UIUtils.SetActive(Bnormal, false);
+                    UIUtils.SetActive(Ared, false);
+                    UIUtils.SetActive(Bred, true);
                 }
                 else
                 {
-                    anormalActiveSetter.Active = false;
-                    bnormalActiveSetter.Active = false;
-                    aRedActiveSetter.Active = true;
-                    bRedActiveSetter.Active = true;
+                    UIUtils.SetActive(Anormal, false);
+                    UIUtils.SetActive(Bnormal, false);
+                    UIUtils.SetActive(Ared, true);
+                    UIUtils.SetActive(Bred, true);
                 }
             }
 

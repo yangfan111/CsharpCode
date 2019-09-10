@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace UserInputManager.Lib
 {
-    public abstract class AbstractProvider<TKeyReceiver,TData> where TKeyReceiver : IKeyReceiver<TData> where TData : KeyData,new()
+    public abstract class AbstractProvider<TKeyHandler,TData> where TKeyHandler : IKeyHandler<TData> where TData : KeyData,new()
     {
-        protected AbsKeyDataCollection<TKeyReceiver,TData> collection;
+        protected KeyHandlerDataCollection<TKeyHandler,TData> collection;
         protected  KeyConverter keyConverter;
         protected Queue<KeyData> KeyDatas = new Queue<KeyData>();
         private Queue<KeyData> insertQueue = new Queue<KeyData>();
@@ -22,7 +22,7 @@ namespace UserInputManager.Lib
            
         }
 
-        public void SetCollection(AbsKeyDataCollection<TKeyReceiver,TData> collection)
+        public void SetCollection(KeyHandlerDataCollection<TKeyHandler,TData> collection)
         {
             this.collection = collection;
         }
@@ -46,11 +46,11 @@ namespace UserInputManager.Lib
             insertQueue.Enqueue(key);
         }
         private List<UserInputKey> resultList = new List<UserInputKey>();
-        protected List<UserInputKey> GetKeyList(TKeyReceiver data)
+        protected List<UserInputKey> GetKeyList(TKeyHandler data)
         {
          
             resultList.Clear();
-            Dictionary<TData, KeyPointAction> binding = data.GetBindingActions();
+            Dictionary<TData, KeyPointAction> binding = data.GetBindingDict();
             foreach (var pair in binding)
             {
                 resultList.Add(pair.Key.Key);     

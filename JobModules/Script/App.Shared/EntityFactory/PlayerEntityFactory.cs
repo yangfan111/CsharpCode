@@ -30,6 +30,8 @@ using Core.Room;
 using Core.Statistics;
 using Core.Utils;
 using System.Collections.Generic;
+using App.Shared.GameModules;
+using App.Shared.GameModules.Weapon;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -91,11 +93,13 @@ namespace App.Shared.EntityFactory
             playerEntity.AddPlayerToken(playerInfo.Token);
             playerEntity.playerInfo.WeaponBags = playerInfo.WeaponBags;
             playerEntity.playerInfo.CampInfo = playerInfo.CampInfo;
-            playerEntity.AddUserCmd();
-            playerEntity.AddUserCmdSeq(0);
-            playerEntity.AddLatestAdjustCmd(-1, -1);
-            playerEntity.AddUserCmdOwner(new UserCmdOwnerAdapter(playerEntity));
             playerEntity.AddEntityKey(new EntityKey(playerInfo.EntityId, (int) EEntityType.Player));
+            AttachUserCmd(playerEntity);
+            // playerEntity.AddUserCmd();
+            // playerEntity.AddUserCmdSeq(0);
+            // playerEntity.AddLatestAdjustCmd(-1, -1);
+            // playerEntity.AddUserCmdOwner(new UserCmdOwnerAdapter(playerEntity));
+           
             playerEntity.AddPosition();
             playerEntity.position.Value = position;
 
@@ -176,6 +180,20 @@ namespace App.Shared.EntityFactory
             return playerEntity;
         }
 
+        private static void AttachUserCmd(PlayerEntity playerEntity)
+        {
+                PlayerUserCmdController controller;
+                if (SharedConfig.IsServer)
+                    controller = new ServerPlayerUserCmdController();
+                else
+                    controller = new PlayerUserCmdController();
+                controller.Initialize(playerEntity);
+                GameModuleManagement.ForceCache(playerEntity.entityKey.Value.EntityId,controller);
+            
+      
+            
+            
+        }
         public static void CreateRobotPlayerEntity(Contexts contexts, PlayerEntity player, IRobotConfig robotConfig,
             IRobotUserCmdProvider robotUserCmdProvider, IUserCmdGenerator userCmdGenerator)
         {
@@ -268,9 +286,6 @@ namespace App.Shared.EntityFactory
 
             if (!player.hasVehicleCmdSeq)
                 player.AddVehicleCmdSeq(0);
-            if (!player.hasUserCmd)
-                player.AddUserCmd();
-
             if (!player.hasControlledVehicle)
                 player.AddControlledVehicle();
 

@@ -96,8 +96,8 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
                 else
                 {
                     SingletonManager.Get<FreeUiManager>().Contexts1.ui.uI.IsShowCrossHair = false;
-                    bagBlockKeyId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockKey(UserInputManager.Lib.EInputLayer.Ui);
-                    bagBlockPointerId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockPointer(UserInputManager.Lib.EInputLayer.Ui);
+                    bagBlockKeyId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockKey(UserInputManager.Lib.Layer.Ui);
+                    bagBlockPointerId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockPointer(UserInputManager.Lib.Layer.Ui);
                 }
                 isOpen = bag.Visible;
 
@@ -105,8 +105,8 @@ namespace App.Client.GameModules.GamePlay.Free.Auto.Prefab
                 {
                     //Unlock
                     SingletonManager.Get<FreeUiManager>().Contexts1.ui.uI.IsShowCrossHair = false;
-                    CursorLocker.SystemBlockKeyId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockKey(UserInputManager.Lib.EInputLayer.System);
-                    CursorLocker.SystemBlockPointerId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockPointer(UserInputManager.Lib.EInputLayer.System);
+                    CursorLocker.SystemBlockKeyId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockKey(UserInputManager.Lib.Layer.System);
+                    CursorLocker.SystemBlockPointerId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockPointer(UserInputManager.Lib.Layer.System);
                 }
             }
 

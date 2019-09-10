@@ -12,7 +12,7 @@ namespace App.Server.GameModules.GamePlay.Free.player
             _room = room;
         }
 
-        public IEventArgs FreeArgs { get { return _room.FreeArgs; } }
+        public IEventArgs FreeArgs { get { return _room.ContextsWrapper.FreeArgs; } }
 
         public IGameRule GameRule
         {

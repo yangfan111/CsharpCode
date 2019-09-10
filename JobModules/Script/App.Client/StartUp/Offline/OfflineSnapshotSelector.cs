@@ -10,7 +10,7 @@ namespace App.Client
         public OfflineSnapshotSelector(EntityKey self, IGameContexts gameContexts)
         {
             _self = self;
-            _snapshotFactory = new SnapshotFactory(gameContexts);
+            _snapshotFac = new SnapshotFactory(gameContexts);
             
         }
 
@@ -18,7 +18,7 @@ namespace App.Client
         {
             if (left != null)
                 left.ReleaseReference();
-            left = _snapshotFactory.GenerateSnapshot(_self,_position);
+            left = _snapshotFac.GenerateOfflineSnapshot(_self,_position);
             left.AcquireReference();
             left.Self = _self;
             left.ServerTime = 1;
@@ -27,7 +27,7 @@ namespace App.Client
 
             if (right != null)
                 right.ReleaseReference();
-            right = _snapshotFactory.GenerateSnapshot(_self,_position);;
+            right = _snapshotFac.GenerateOfflineSnapshot(_self,_position);;
             right.AcquireReference();
             right.Self = _self;
             right.ServerTime = 2;
@@ -35,7 +35,7 @@ namespace App.Client
             right.VehicleSimulationTime = 0;
         }
         private EntityKey _self;
-        private SnapshotFactory _snapshotFactory;
+        private SnapshotFactory _snapshotFac;
         private ISnapshot left;
         private ISnapshot right;
         private Vector3 _position = Vector3.zero;

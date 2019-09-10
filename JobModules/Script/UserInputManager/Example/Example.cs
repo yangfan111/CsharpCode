@@ -24,12 +24,12 @@ namespace UserInputManager.Example
             public UserInputKey Key { get; set; }
         }
 
-        private List<KeyReceiver>_handlerList = new List<KeyReceiver>();
+        private List<KeyHandler>_handlerList = new List<KeyHandler>();
         private List<ReceiveItem> _receiveItemList = new List<ReceiveItem>();
-        private Lib.GameInputManager _manager;
+        private Lib.UserInputManager _manager;
         private void Run()
         {
-            _manager = new Lib.GameInputManager();
+            _manager = new Lib.UserInputManager();
             InitReceiveItems();
             Registerhandler();
         }
@@ -48,7 +48,7 @@ namespace UserInputManager.Example
             foreach (var item in _receiveItemList)
             {
                 var log = item.Log;
-                _manager.RegisterKeyReceiver(new KeyReceiver(item.Layer, item.Block).BindKeyAction(item.Key, (data) =>
+                _manager.RegisterKeyhandler(new KeyHandler(item.Layer, item.Block).BindKeyAction(item.Key, (data) =>
                 {
                     Console.Write(log);
                 }));
@@ -57,10 +57,10 @@ namespace UserInputManager.Example
 
         private void InitReceiveItems()
         {
-            _receiveItemList.Add(new ReceiveItem((int)EInputLayer.Ui, BlockType.None, UserInputKey.Switch1, "Uihandler"));
-            _receiveItemList.Add(new ReceiveItem((int)EInputLayer.Env, BlockType.None, UserInputKey.Switch1, "Envhandler"));
-            _receiveItemList.Add(new ReceiveItem((int)EInputLayer.System, BlockType.None, UserInputKey.Switch1, "Systemhandler"));
-            _receiveItemList.Add(new ReceiveItem((int)EInputLayer.Top, BlockType.None, UserInputKey.Switch1, "Tophandler"));
+            _receiveItemList.Add(new ReceiveItem((int)Layer.Ui, BlockType.None, UserInputKey.Switch1, "Uihandler"));
+            _receiveItemList.Add(new ReceiveItem((int)Layer.Env, BlockType.None, UserInputKey.Switch1, "Envhandler"));
+            _receiveItemList.Add(new ReceiveItem((int)Layer.System, BlockType.None, UserInputKey.Switch1, "Systemhandler"));
+            _receiveItemList.Add(new ReceiveItem((int)Layer.Top, BlockType.None, UserInputKey.Switch1, "Tophandler"));
         }
     }
 }

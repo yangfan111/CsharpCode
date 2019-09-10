@@ -13,17 +13,17 @@ namespace App.Client.GameMode
             _contexts = contexts;
         }
 
-        public void RegisterEnvKeyInput(KeyReceiver keyReceiver, UserCmd userCmd)
+        public void RegisterEnvKeyInput(KeyHandler keyHandler, UserCmd userCmd)
         {
         }
 
-        public void RegisterSpecialCmdKeyInput(KeyReceiver keyReceiver, UserCmd userCmd)
+        public void RegisterSpecialCmdKeyInput(KeyHandler keyHandler, UserCmd userCmd)
         {
-            keyReceiver.BindKeyAction(UserInputKey.Switch1, (data) => userCmd.CurWeapon = (int)EWeaponSlotType.PrimeWeapon);
-            keyReceiver.BindKeyAction(UserInputKey.Switch3, (data) => userCmd.CurWeapon = (int)EWeaponSlotType.PistolWeapon);
-            keyReceiver.BindKeyAction(UserInputKey.Switch4, (data) => userCmd.CurWeapon = (int)EWeaponSlotType.MeleeWeapon);
-            keyReceiver.BindKeyAction(UserInputKey.Switch5, (data) => userCmd.CurWeapon = (int)EWeaponSlotType.ThrowingWeapon);
-            keyReceiver.BindKeyAction(UserInputKey.Switch6, (data) => userCmd.CurWeapon = (int)EWeaponSlotType.TacticWeapon);
+            keyHandler.BindKeyAction(UserInputKey.Switch1, (data) => userCmd.CurWeapon = (int)EWeaponSlotType.PrimeWeapon);
+            keyHandler.BindKeyAction(UserInputKey.Switch3, (data) => userCmd.CurWeapon = (int)EWeaponSlotType.PistolWeapon);
+            keyHandler.BindKeyAction(UserInputKey.Switch4, (data) => userCmd.CurWeapon = (int)EWeaponSlotType.MeleeWeapon);
+            keyHandler.BindKeyAction(UserInputKey.Switch5, (data) => userCmd.CurWeapon = (int)EWeaponSlotType.ThrowingWeapon);
+            keyHandler.BindKeyAction(UserInputKey.Switch6, (data) => userCmd.CurWeapon = (int)EWeaponSlotType.TacticWeapon);
         }
     }
 }

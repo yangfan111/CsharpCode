@@ -366,27 +366,35 @@ namespace App.Client.GameModules.Ui.UiAdapter
         #region Bio
 
         private List<Vector3> _motherPosList = new List<Vector3>();
+        private HashSet<long> _lastMotherIdlIst = new HashSet<long>();
         public List<Vector3> MotherPos
         {
             get
             {
-                UpdatePlayerPos(_contexts.ui.uI.MotherIdList, ref _motherPosList);
+                UpdatePlayerPos(_contexts.ui.uI.MotherIdList, ref _lastMotherIdlIst, ref _motherPosList);
 
                 return _motherPosList;
             }
         }
         private List<Vector3> _heroPosList = new List<Vector3>();
+        private HashSet<long> _lastHeroIdlIst = new HashSet<long>();
 
-        private void UpdatePlayerPos(List<long> idList, ref List<Vector3> posList)
+        private void UpdatePlayerPos(List<long> idList, ref HashSet<long> lastIdList, ref List<Vector3> posList)
         {
+            if (!lastIdList.SetEquals(idList))
+            {
+                lastIdList = new HashSet<long>(idList);
+            }
+
             posList.Clear();
-            if (idList.Count == 0)
+
+            if (lastIdList.Count == 0)
             {
                 return;
             }
             foreach (PlayerEntity pe in _contexts.player.GetEntities())
             {
-                if (idList.Contains(pe.playerInfo.PlayerId))
+                if (lastIdList.Contains(pe.playerInfo.PlayerId))
                 {
                     posList.Add(new MapFixedVector3(pe.position.FixedVector3).ShiftedUIVector3());
                 }
@@ -398,19 +406,20 @@ namespace App.Client.GameModules.Ui.UiAdapter
         {
             get
             {
-                UpdatePlayerPos(_contexts.ui.uI.HeroIdList, ref _heroPosList);
+                UpdatePlayerPos(_contexts.ui.uI.HeroIdList, ref _lastHeroIdlIst, ref _heroPosList);
 
                 return _heroPosList;
             }
         }
 
         private List<Vector3> _humanPosList = new List<Vector3>();
+        private HashSet<long> _lastHumanIdlIst = new HashSet<long>();
 
         public List<Vector3> HumanPos
         {
             get
             {
-                UpdatePlayerPos(_contexts.ui.uI.HumanIdList, ref _humanPosList);
+                UpdatePlayerPos(_contexts.ui.uI.HumanIdList, ref _lastHumanIdlIst, ref _humanPosList);
 
                 return _humanPosList;
             }

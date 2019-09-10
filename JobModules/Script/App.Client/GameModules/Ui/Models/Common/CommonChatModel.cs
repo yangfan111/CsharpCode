@@ -61,7 +61,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         private ChatChannel _curChannel = ChatChannel.None;
         private Transform parent;
         private Transform item;
-        private KeyReceiver switchKeyReceiver;
+        private KeyHandler _switchKeyHandler;
         private Vector2 origInputFieldSize;
         private List<int> channelList = new List<int>();
         protected override IUiViewModel ViewModel
@@ -168,7 +168,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         bool haveRegister = false;
         private void UpdateInputKey()
         {
-            if (switchKeyReceiver == null)
+            if (_switchKeyHandler == null)
             {
                 return;
             }
@@ -176,7 +176,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             {
                 if (!haveRegister)
                 {
-                    _chatState.RegisterKeyReceive(switchKeyReceiver);
+                    _chatState.RegisterKeyReceive(_switchKeyHandler);
                     haveRegister = true;
                 }
             }
@@ -184,7 +184,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             {
                 if (haveRegister)
                 {
-                    _chatState.UnRegisterKeyReceive(switchKeyReceiver);
+                    _chatState.UnRegisterKeyReceive(_switchKeyHandler);
                     haveRegister = false;
                 }
             }
@@ -192,23 +192,23 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void InitKeyReveiver()
         {
-            var keyReceiver = new KeyReceiver(UiConstant.chatWindowLayer, BlockType.None);
-            keyReceiver.BindKeyAction(UserInputKey.SendChatMessage, (data) =>
+            var keyhandler = new KeyHandler(UiConstant.chatWindowLayer, BlockType.None);
+            keyhandler.BindKeyAction(UserInputKey.SendChatMessage, (data) =>
             {
                 if (ChatListState != EUIChatListState.Send)
                 {
                     SwitchToSendState();
                 }
             });
-            switchKeyReceiver = new KeyReceiver(UiConstant.chatWindowKeyBlockLayer, BlockType.All);
-            switchKeyReceiver.BindKeyAction(UserInputKey.SendChatMessage, (data) => { SendMessage();});
-            switchKeyReceiver.BindKeyAction(UserInputKey.SwitchChatChannel, (data) =>
+            _switchKeyHandler = new KeyHandler(UiConstant.chatWindowKeyBlockLayer, BlockType.All);
+            _switchKeyHandler.BindKeyAction(UserInputKey.SendChatMessage, (data) => { SendMessage();});
+            _switchKeyHandler.BindKeyAction(UserInputKey.SwitchChatChannel, (data) =>
             {
                 SwitchChannel();
                 UpdateChannel();
             });
 
-            _chatState.RegisterOpenKey(keyReceiver);
+            _chatState.RegisterOpenKey(keyhandler);
         }
 
         private void SwitchChannel()

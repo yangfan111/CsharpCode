@@ -26,6 +26,10 @@ namespace App.Shared.Util
         private IContexts _contexts;
         private IGameContexts _gameContexts = null;
 
+        public SnapshotEntityInsert InsertFun
+        {
+            get { return OnInsert; }
+        }
         /// <summary>
         /// 用于在 Add 函数中判断 是否加入的entity是 上次残留的对象
         /// </summary>
@@ -90,6 +94,8 @@ namespace App.Shared.Util
                 _logger.ErrorFormat("当前线程为 {0},异常为：{1}", System.Threading.Thread.CurrentThread.Name, e.Message+"\n"+e.StackTrace);
             }
         }
+
+     
 
         public void Add(IGameEntity localEntity)
         {

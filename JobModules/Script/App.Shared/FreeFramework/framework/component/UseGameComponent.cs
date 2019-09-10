@@ -142,7 +142,7 @@ namespace gameplay.gamerule.free.component
 				iniTrigger = new GameTrigger(1);
                 triggers.AddTrigger(iniTrigger);
 			}
-			iniTrigger.BindKeyAction(new UseGameComponent.AddComponentParaAction(this, this.name, args));
+			iniTrigger.AddAction(new UseGameComponent.AddComponentParaAction(this, this.name, args));
 		}
 
         public int GetRuleID()

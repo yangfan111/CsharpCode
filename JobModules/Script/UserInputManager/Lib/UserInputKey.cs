@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace UserInputManager.Lib
 {
@@ -104,14 +103,6 @@ namespace UserInputManager.Lib
         Count,
     }
 
-    public enum InputInspectType
-    {
-        None,
-        Button,
-        Aixs,
-        Key,
-        
-    }
     /// <summary>
     /// 键盘的按键状态,button和key的区别在于，button是可指定的（在setting->input)，key是固定的
     /// 基本和Input类一一对应，具体请参照文档 https://docs.unity3d.com/ScriptReference/Input.html
@@ -120,16 +111,21 @@ namespace UserInputManager.Lib
     /// </summary>
     public enum  UserInputState
     {
-        
-        PointerMove,//鼠标直接移动
-        PointerRaycast,//鼠标指向
+        /// <summary>
+        /// 鼠标移动
+        /// </summary>
+        PointerMove,
+        /// <summary>
+        /// 鼠标指向，
+        /// </summary>
+        PointerRaycast,
         KeyDown,
-        KeyUp,//Mouse0,Mouse0,Tab
+        KeyUp,
         KeyHold,
-        [Obsolete]ButtonHold,
-        ButtonDown, //InputKey: Jump,CameraFocus
-        [Obsolete]ButtonUp,
-        Axis,//摇杆 InputKey : Horizontal,Vertical,UpDown,Mouse ScrollWheel
-        [Obsolete]AxisRow,
+        ButtonHold,
+        ButtonDown,
+        ButtonUp,
+        Axis,
+        AxisRow,
     }
 }

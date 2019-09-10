@@ -18,9 +18,9 @@ namespace App.Shared.GameModules.Player
             _contexts = contexts;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var player = (PlayerEntity) owner.OwnerEntity;
+            var player = (PlayerEntity) getter.OwnerEntity;
             var moveUpdateData = player.moveUpdate;
 
             if (!moveUpdateData.NeedUpdate) 

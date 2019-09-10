@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Compensation;
 using Core.Components;
 using Core.EntityComponent;
 using Core.EntityComponent;
@@ -10,11 +11,21 @@ using UnityEngine;
 
 namespace Core.Replicaton
 {
-    public class DummyEntityMapFilter : IEntityMapFilter
+    public class CompensationFilter : IEntityMapFilter
     {
-        public DummyEntityMapFilter()
+        public bool IsIncludeComponent(IGameEntity entity, IGameComponent componentType)
         {
+            return componentType is ICompensationComponent;
         }
+
+        public bool IsIncludeEntity(IGameEntity entity)
+        {
+            return (entity.IsCompensation && !entity.IsDestroy);
+        }
+    }
+    public struct DummyEntityMapFilter : IEntityMapFilter
+    {
+       
 
         public bool IsIncludeComponent(IGameEntity entity, IGameComponent componentType)
         {
@@ -27,24 +38,24 @@ namespace Core.Replicaton
         }
     }
 
-    public class PreSendSnapshotFilter : ISnapshotSerializeFilter
+    public struct SendSnapshotFilter : ISnapshotSerializeFilter
     {
-        private EntityKey _self;
-        private ReplicationFilter _filter;
-        private Vector3 _position;
+        private EntityKey self;
+        private ReplicationFilter filter;
+        private Vector3 position;
 
-        public PreSendSnapshotFilter(EntityKey self, Vector3 position)
+        public SendSnapshotFilter(EntityKey self, Vector3 position)
         {
-            _self = self;
-            _filter = new ReplicationFilter();
-            _position = position;
+            this.self = self;
+            filter = new ReplicationFilter();
+            this.position = position;
         }
 
         public void Init(EntityKey self, Vector3 position)
         {
-            _self = self;
+            this.self = self;
             
-            _position = position;
+            this.position = position;
         }
 
         public bool IsIncludeEntity(IGameEntity entity)
@@ -53,28 +64,28 @@ namespace Core.Replicaton
                            entity.IsSyncSelf) &&
                           !entity.IsDestroy;
 
-            return isSync && _filter.IsSyncSelfOrThird(entity, _self);
+            return isSync && filter.IsSyncSelfOrThird(entity, self);
         }
 
         public EntityKey Self
         {
-            get { return _self; }
+            get { return self; }
         }
 
         public Vector3 Position
         {
-            get { return _position; }
+            get { return position; }
         }
 
         public bool IsEntitySelf(IGameEntity entity)
         {
-            return _filter.IsSelf;
+            return filter.IsSelf;
         }
 
 
         public bool IsIncludeComponent(IGameEntity entity, IGameComponent component)
         {
-            if (_filter.IsSelf)
+            if (filter.IsSelf)
             {
                 return component is IPredictionComponent || component is ISelfLatestComponent;
             }

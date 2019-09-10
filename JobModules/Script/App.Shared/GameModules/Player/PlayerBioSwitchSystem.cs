@@ -39,9 +39,9 @@ namespace App.Shared.GameModules.Player
             }
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var player = owner.OwnerEntity as PlayerEntity;
+            var player = getter.OwnerEntity as PlayerEntity;
             if (player.hasGamePlay)
             {
                 var jobAttribute = player.gamePlay.JobAttribute;

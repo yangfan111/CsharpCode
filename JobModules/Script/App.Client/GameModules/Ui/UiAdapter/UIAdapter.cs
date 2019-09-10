@@ -3,7 +3,6 @@ using App.Shared.Components.UserInput;
 using Assets.App.Client.GameModules.Ui.UiAdapter.Interface;
 using Core.Ui;
 using UserInputManager.Lib;
-using NotImplementedException = System.NotImplementedException;
 
 namespace App.Client.GameModules.Ui.UiAdapter
 {
@@ -54,16 +53,16 @@ namespace App.Client.GameModules.Ui.UiAdapter
                 if (_canOpenUiByKey == value) return;
                 if (value)
                 {
-                    foreach (var it in UiSessionComponent.OpenUiKeyReceiverList)
+                    foreach (var it in UiSessionComponent.OpenUKeyhandlerList)
                     {
-                        RegisterKeyReceive(it as KeyReceiver);
+                        RegisterKeyReceive(it);
                     }
                 }
                 else
                 {
-                    foreach (var it in UiSessionComponent.OpenUiKeyReceiverList)
+                    foreach (var it in UiSessionComponent.OpenUKeyhandlerList)
                     {
-                        UnRegisterKeyReceive(it as KeyReceiver);
+                        UnRegisterKeyReceive(it);
                     }
                 }
 
@@ -72,34 +71,33 @@ namespace App.Client.GameModules.Ui.UiAdapter
         }
 
 
-        public void RegisterKeyReceive(KeyReceiver keyReceive)
+        public void RegisterKeyReceive(KeyHandler keyReceive)
         {
-            UserInputManager.Mgr.RegisterKeyReceiver(keyReceive);
+            UserInputManager.Instance.RegisterKeyhandler(keyReceive);
         }
 
-        public void UnRegisterKeyReceive(KeyReceiver keyReceive)
+        public void UnRegisterKeyReceive(KeyHandler keyReceive)
         {
-            UserInputManager.Mgr.UnregisterKeyReceiver(keyReceive);
+            UserInputManager.Instance.UnregisterKeyhandler(keyReceive);
         }
 
-        public void RegisterPointerReceive(PointerReceiver pointReceive)
+        public void RegisterPointerReceive(PointerKeyHandler pointReceive)
         {
-            UserInputManager.Mgr.RegisterPointerReceiver(pointReceive);
+            UserInputManager.Instance.RegisterPointerhandler(pointReceive);
         }
 
-        public void UnRegisterPointerReceive(PointerReceiver pointReceive)
+        public void UnRegisterPointerReceive(PointerKeyHandler pointReceive)
         {
-            UserInputManager.Mgr.UnregisterPointerReceiver(pointReceive);
+            UserInputManager.Instance.UnregisterPointerhandler(pointReceive);
         }
 
- 
-        public void RegisterOpenKey(KeyReceiver keyReceiver)
+        public void RegisterOpenKey(KeyHandler keyHandler)
         {
             if (CanOpenUiByKey)
             {
-                RegisterKeyReceive(keyReceiver );
+                RegisterKeyReceive(keyHandler);
             }
-            UiSessionComponent.OpenUiKeyReceiverList.Add(keyReceiver);
+            UiSessionComponent.OpenUKeyhandlerList.Add(keyHandler);
         }
 
         public UISessionComponent UiSessionComponent

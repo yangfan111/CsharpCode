@@ -12,15 +12,13 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private Transform line;
         private RectTransform lineRT;
         private RawImage lineImage;
-        private ActiveSetter tranActiveSetter;
 
         private float lastWidth;
 
         public SafeMiniDis(Transform tran)
         {
+            UIUtils.SetActive(tran, true);
             this.tran = tran;
-            tranActiveSetter = new ActiveSetter(tran.gameObject);
-            tranActiveSetter.Active = true;
             rectTransform = tran.GetComponent<RectTransform>();
             line = tran.Find("line");
             lineRT = line.GetComponent<RectTransform>();
@@ -29,7 +27,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
         public void Hide()
         {
-            tranActiveSetter.Active = false;
+            UIUtils.SetActive(tran, false);
         }
 
         public void Update(DuQuanInfo safeDuquan, Vector2 selfPlayPos, float playItemModelWidth, float rate, float miniMapRepresentWHByRice)
@@ -38,7 +36,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             // 安全区和当前玩家的连线的方向
             if (safeDuquan.Level != 0 && safeDuquan.Radius > 0 && Vector2.Distance(selfPlayPos, salfCenter) > safeDuquan.Radius)  //安全区外
             {
-                tranActiveSetter.Active = true;
+                UIUtils.SetActive(tran, true);
                 {
                     Vector2 fromVector = new Vector2(0, 1);
                     Vector3 temper = salfCenter - selfPlayPos;
@@ -86,7 +84,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             }
             else
             {
-                tranActiveSetter.Active = false;
+                UIUtils.SetActive(tran, false);
             }
         }
     }

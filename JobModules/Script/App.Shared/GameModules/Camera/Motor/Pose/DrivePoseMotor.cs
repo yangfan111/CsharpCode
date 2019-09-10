@@ -43,7 +43,7 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Pose
             _order = SingletonManager.Get<CameraConfigManager>().GetRoleConfig()
                 .GetCameraConfigItem((ECameraPoseMode) _modeId).Order;
             
-            _motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.Pose, (int)modeId, 
+            _motors.ActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.Pose, (int)modeId, 
                 (player, state) =>
                 {
                     if (player.IsOnVehicle())
@@ -62,7 +62,7 @@ namespace Assets.App.Shared.GameModules.Camera.Motor.Pose
                     state.FreeYaw = t.y;
                     state.FreePitch = t.x;
                 });
-            _motors.ActionManager.BindKeyAction(CameraActionType.Leave, SubCameraMotorType.Pose, (int) modeId,
+            _motors.ActionManager.AddAction(CameraActionType.Leave, SubCameraMotorType.Pose, (int) modeId,
                 (player, state) =>
                 {
                     var rotation = player.cameraFinalOutputNew.EulerAngle;

@@ -48,13 +48,13 @@ namespace App.Client.GameModules.Ui.Models.Chicken
 
         private void InitKey()
         {
-            openKeyReceiver = new KeyReceiver(UiConstant.userCmdKeyLayer, BlockType.None);
-            openKeyReceiver.BindKeyAction(UserInputKey.OpenBag, (data) => { _adapter.Enable = true; });
-            _adapter.RegisterOpenKey(openKeyReceiver);
-            keyReveiver = new KeyReceiver(UiConstant.userCmdUIKeyLayer, BlockType.All);
+            _openKeyHandler = new KeyHandler(UiConstant.userCmdKeyLayer, BlockType.None);
+            _openKeyHandler.BindKeyAction(UserInputKey.OpenBag, (data) => { _adapter.Enable = true; });
+            _adapter.RegisterOpenKey(_openKeyHandler);
+            keyReveiver = new KeyHandler(UiConstant.userCmdUIKeyLayer, BlockType.All);
             keyReveiver.BindKeyAction(UserInputKey.OpenBag, (data) => { _adapter.Enable = false; });
             keyReveiver.BindKeyAction(UserInputKey.HideWindow, (data) => { _adapter.Enable = false; });
-            pointerReceiver = new PointerReceiver(UiConstant.userCmdUIKeyLayer, BlockType.All);
+            _pointerKeyHandler = new PointerKeyHandler(UiConstant.userCmdUIKeyLayer, BlockType.All);
         }
 
 
@@ -63,8 +63,8 @@ namespace App.Client.GameModules.Ui.Models.Chicken
 
         ReactiveListData<IBaseChickenBagItemData> bagItemDataList;
 
-        private KeyReceiver keyReveiver, openKeyReceiver;
-        private PointerReceiver pointerReceiver;
+        private KeyHandler keyReveiver, _openKeyHandler;
+        private PointerKeyHandler _pointerKeyHandler;
 
         private void InitVariable()
         {
@@ -713,11 +713,11 @@ namespace App.Client.GameModules.Ui.Models.Chicken
 
             if (enable && !_haveRegister)
             {
-                RegisterKeyReceiver();
+                RegisterKeyhandler();
             }
             else if (!enable && _haveRegister)
             {
-                UnRegisterKeyReceiver();
+                UnRegisterKeyhandler();
                 tipManager.HideShowTip();
             }
 
@@ -740,32 +740,32 @@ namespace App.Client.GameModules.Ui.Models.Chicken
             }
         }
 
-        private void UnRegisterKeyReceiver()
+        private void UnRegisterKeyhandler()
         {
             _adapter.SetCrossVisible(true);
 
-            if (keyReveiver == null || pointerReceiver == null)
+            if (keyReveiver == null || _pointerKeyHandler == null)
             {
                 return;
             }
             _adapter.UnRegisterKeyReceive(keyReveiver);
-            _adapter.UnRegisterPointerReceive(pointerReceiver);
+            _adapter.UnRegisterPointerReceive(_pointerKeyHandler);
 
             _haveRegister = false;
             _adapter.ShowUiGroup(Core.Ui.UiGroup.SurvivalBagHide);
 
         }
 
-        private void RegisterKeyReceiver()
+        private void RegisterKeyhandler()
         {
             _adapter.SetCrossVisible(false);
 
-            if (keyReveiver == null || pointerReceiver == null)
+            if (keyReveiver == null || _pointerKeyHandler == null)
             {
                 return;
             }
             _adapter.RegisterKeyReceive(keyReveiver);
-            _adapter.RegisterPointerReceive(pointerReceiver);
+            _adapter.RegisterPointerReceive(_pointerKeyHandler);
             _haveRegister = true;
             _adapter.HideUiGroup(Core.Ui.UiGroup.SurvivalBagHide);
 

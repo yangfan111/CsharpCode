@@ -7,7 +7,7 @@ namespace Core
         public static int SpreadOffsetFactor=300;
 
         public static bool AudioFrameworkLog = true;
-
+        public static bool NeedBulletFlyLog = true;
 
         public static bool AudioPostEventLog ;
         public static bool AudioListenerLog;

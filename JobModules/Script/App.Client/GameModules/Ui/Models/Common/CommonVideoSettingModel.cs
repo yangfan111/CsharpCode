@@ -34,8 +34,8 @@ namespace App.Client.GameModules.Ui.Models.Common
             get { return _viewModel; }
         }
         IVideoSettingUiAdapter _adapter;
-        private PointerReceiver pointerReceiver;
-        private KeyReceiver keyReceiver;
+        private PointerKeyHandler _pointerKeyHandler;
+        private KeyHandler _keyHandler;
         private bool _haveRegister;
 
         public CommonVideoSettingModel(IVideoSettingUiAdapter adapter) : base(adapter)
@@ -50,14 +50,14 @@ namespace App.Client.GameModules.Ui.Models.Common
             InitVariable();
             InitEventTriggers();
             InitGui();
-            InitReceiver();
+            IniTKeyHandler();
 
         }
 
-        private void InitReceiver()
+        private void IniTKeyHandler()
         {
-            pointerReceiver = new PointerReceiver(EInputLayer.Env, BlockType.All);
-            keyReceiver = new KeyReceiver(EInputLayer.Env, BlockType.All);
+            _pointerKeyHandler = new PointerKeyHandler(Layer.Env, BlockType.All);
+            _keyHandler = new KeyHandler(Layer.Env, BlockType.All);
         }
 
         private void InitGui()
@@ -327,11 +327,11 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
             if (enable && !_haveRegister)
             {
-                RegisterKeyReceiver();
+                RegisterKeyhandler();
             }
             else if (!enable && _haveRegister)
             {
-                UnRegisterKeyReceiver();
+                UnRegisterKeyhandler();
             }
         }
 
@@ -347,19 +347,19 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
         }
 
-        private void UnRegisterKeyReceiver()
+        private void UnRegisterKeyhandler()
         {
             _adapter.SetCrossVisible(true);
-            _adapter.UnRegisterPointerReceive(pointerReceiver);
-            _adapter.UnRegisterKeyReceive(keyReceiver);
+            _adapter.UnRegisterPointerReceive(_pointerKeyHandler);
+            _adapter.UnRegisterKeyReceive(_keyHandler);
             _haveRegister = false;
         }
 
-        private void RegisterKeyReceiver()
+        private void RegisterKeyhandler()
         {
             _adapter.SetCrossVisible(false);
-            _adapter.RegisterPointerReceive(pointerReceiver);
-            _adapter.RegisterKeyReceive(keyReceiver);
+            _adapter.RegisterPointerReceive(_pointerKeyHandler);
+            _adapter.RegisterKeyReceive(_keyHandler);
             _haveRegister = true;
         }
     }

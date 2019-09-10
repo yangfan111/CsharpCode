@@ -5,10 +5,10 @@ namespace Assets.App.Client.GameModules.Ui.UiAdapter.Interface
 {
     public interface IAbstractUiAdapter : IUiAdapter
     {
-        void RegisterKeyReceive(KeyReceiver keyReceive);
-        void UnRegisterKeyReceive(KeyReceiver keyReceive);
-        void RegisterPointerReceive(PointerReceiver pointReceive);
-        void UnRegisterPointerReceive(PointerReceiver pointReceive);
-        void RegisterOpenKey(KeyReceiver keyReceiver);
+        void RegisterKeyReceive(KeyHandler keyReceive);
+        void UnRegisterKeyReceive(KeyHandler keyReceive);
+        void RegisterPointerReceive(PointerKeyHandler pointReceive);
+        void UnRegisterPointerReceive(PointerKeyHandler pointReceive);
+        void RegisterOpenKey(KeyHandler keyHandler);
     }
 }

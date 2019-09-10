@@ -12,19 +12,19 @@ namespace App.Shared.GameModules.Player
         /// <summary>
         /// 槽位切换&模式切换
         /// </summary>
-        /// <param name="owner"></param>
+        /// <param name="getter"></param>
         /// <param name="cmd"></param>
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {    
             if (cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsSwitchWeapon) && cmd.CurWeapon != (int) EWeaponSlotType.None)
             {
-                var newSlot = owner.OwnerEntityKey.ModeController().GetSlotByIndex(cmd.CurWeapon);
-                owner.OwnerEntityKey.WeaponController().SwitchIn(newSlot);
+                var newSlot = getter.OwnerEntityKey.ModeController().GetSlotByIndex(cmd.CurWeapon);
+                getter.OwnerEntityKey.WeaponController().SwitchIn(newSlot);
                 return;
             }
             if (cmd.FilteredInput.IsInput(XmlConfig.EPlayerInput.IsSwitchFireMode))
             {
-                owner.OwnerEntityKey.WeaponController().SwitchFireMode();
+                getter.OwnerEntityKey.WeaponController().SwitchFireMode();
                 return;
             }
         }

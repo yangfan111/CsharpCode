@@ -39,9 +39,9 @@ namespace App.Shared.GameModules.Camera
             }
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity player = owner.OwnerEntity as PlayerEntity;
+            PlayerEntity player = getter.OwnerEntity as PlayerEntity;
 
             if (!player.hasCameraStateNew) return;
             if (!player.hasCameraStateOutputNew) return;

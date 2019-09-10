@@ -34,6 +34,10 @@ namespace Utils.Appearance.Weapon
                     }
                 }
             }
+            else
+            {
+                Logger.WarnFormat("Animation component not exist in {0}", go.name);
+            }
 
             return false;
         }

@@ -1,91 +1,89 @@
-﻿using Core.Compensation;
-using Core.EntityComponent;
+﻿using System;
 using Core.EntityComponent;
 using Core.Replicaton;
+using Core.SyncLatest;
 using Core.Utils;
 
 namespace Core.Playback
 {
-    public class PlaybackInfoProvider : IPlaybackInfoProvider
+
+    public class PlaybackInfoProvider : INetSyncProvider
     {
-        private static LoggerAdapter _logger = new LoggerAdapter(LoggerNameHolder<PlaybackInfoProvider>.LoggerName);
-        private IGameContexts _gameContexts;
-        private SnapshotPair _snapshotPair;
-        public PlaybackInfoProvider(
-            IGameContexts gameContexts)
+        private static LoggerAdapter logger = new LoggerAdapter(LoggerNameHolder<PlaybackInfoProvider>.LoggerName);
+        private IGameContexts gameContexts;
+        private SnapshotPair snapshotPair;
+
+        public PlaybackInfoProvider(IGameContexts gameContexts)
         {
-            _gameContexts = gameContexts;            
+            this.gameContexts = gameContexts;
         }
-
-        public void Update(SnapshotPair snapshotPair, ISnapshot lastestSnapshot)
-        {
-            _snapshotPair = snapshotPair;
-        }
-
-        
-
-
 
         public IInterpolationInfo InterpolationInfo
         {
-            get { return new InterpolationInfo(_snapshotPair); }
+            get { return new InterpolationInfo(snapshotPair); }
         }
 
         public SnapshotPair SnapshotPair
         {
-            get { return _snapshotPair; }
-        }
-
-        public bool IsReady()
-        {
-            return _snapshotPair != null;
-        }
-
-        public void DestroyLocalEntity(IGameEntity entity)
-        {
-            
-            _logger.DebugFormat("destroy local entity {0}", entity.EntityKey);
-            entity.MarkDestroy();
-        }
-
-        public IGameEntity CreateLocalEntity(EntityKey entityKey)
-        {
-            _logger.DebugFormat("create local entity {0}", entityKey);
-            return _gameContexts.CreateAndGetGameEntity(entityKey);
+            get { return snapshotPair; }
         }
 
         public EntityMap LocalEntityMap
         {
-            get { return _gameContexts.NonSelfEntityMap; }
+            get { return gameContexts.NonSelfEntityMap; }
         }
 
         public EntityMap LocalAllEntityMap
         {
-            get { return _gameContexts.MyEntityMap; }
+            get { return gameContexts.MyEntityMap; }
         }
 
         public EntityMap RemoteLeftEntityMap
         {
-            get { return _snapshotPair.LeftSnapshot.NonSelfEntityMap; }
+            get { return snapshotPair.LeftSnapshot.NonSelfEntityMap; }
         }
 
         public EntityMap RemoteRightEntityMap
         {
-            get { return _snapshotPair.RightSnapshot.NonSelfEntityMap; }
+            get { return snapshotPair.RightSnapshot.NonSelfEntityMap; }
+        }
+
+
+        public void DestroyLocalEntity(IGameEntity entity)
+        {
+            logger.DebugFormat("destroy local entity {0}", entity.EntityKey);
+            entity.MarkDestroy();
+        }
+
+        public bool IsSelf(EntityKey key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IGameEntity CreateAndGetLocalEntity(EntityKey entityKey)
+        {
+            logger.DebugFormat("create local entity {0}", entityKey);
+            return gameContexts.CreateAndGetGameEntity(entityKey);
+        }
+
+        public void Update(SnapshotPair snapshotPair)
+        {
+            this.snapshotPair = snapshotPair;
+        }
+
+        public bool IsReady()
+        {
+            return snapshotPair != null;
         }
 
         public bool IsRemoteEntityExists(EntityKey entityKey)
         {
-            return _snapshotPair.RightSnapshot.EntityMap.ContainsKey(entityKey);
+            return snapshotPair.RightSnapshot.EntityMap.ContainsKey(entityKey);
         }
 
         public EntityMap GetRemoteAllEntityMap()
         {
-
-            return _snapshotPair.RightSnapshot.EntityMap;
-
+            return snapshotPair.RightSnapshot.EntityMap;
         }
-
-
     }
 }

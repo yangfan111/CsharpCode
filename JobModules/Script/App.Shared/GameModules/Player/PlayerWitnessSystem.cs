@@ -24,10 +24,10 @@ namespace App.Shared.GameModules.Player
             _contexts = contexts;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
             /*throw new System.NotImplementedException();*/
-            var player = owner.OwnerEntity as PlayerEntity;
+            var player = getter.OwnerEntity as PlayerEntity;
             if (player.hasGamePlay)
             {
                 if (_witness != player.gamePlay.Witness) {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Core.ObjectPool;
 using Core.Utils.System46;
+using Entitas.Utils;
 
 namespace Core.EntityComponent
 {
@@ -212,6 +213,7 @@ namespace Core.EntityComponent
         public override string ToString()
         {
             stringBuilder.Length = 0;
+            
             foreach (var value in entities.Keys)
             {
                 stringBuilder.Append("&");

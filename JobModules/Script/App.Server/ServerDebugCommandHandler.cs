@@ -17,7 +17,7 @@ namespace App.Server
 
         public void OnDebugMessage(ServerRoom room, DebugCommand message, PlayerEntity player,SessionStateMachine sessionStateMachine)
         {
-            FreeDebugCommandHandler.Handle(room.FreeArgs, message, player);
+            FreeDebugCommandHandler.Handle(room.ContextsWrapper.FreeArgs, message, player);
             SharedCommandHandler.ProcessGameSettingCommnands(message,sessionStateMachine);
             SharedCommandHandler.ProcessDebugCommand(message,_contexts);
             SharedCommandHandler.ProcessHitBoxCommands(message);

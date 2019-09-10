@@ -114,12 +114,12 @@ namespace App.Client
                
             }
 
-            sessionObjects.MessageDispatcher = new NetworkMessageDispatcher(sessionObjects.Record);
+            sessionObjects.MessageDispatcher = new NetworkMessageDispatcher((int)EClient2ServerMessage.Max,sessionObjects.Record);
           
             sessionObjects.TimeManager = new TimeManager(_contexts.session.currentTimeObject);
 
             sessionObjects.LoginToken = _loginToken;
-            sessionObjects.netSyncManager = new SyncLastestManager(gameContexts,sessionObjects.SnapshotSelctor);
+            sessionObjects.NetSyncManager = new SyncLastestManager(gameContexts,sessionObjects.SnapshotSelctor);
 
             sessionObjects.PlaybackInfoProvider = new PlaybackInfoProvider(gameContexts);
             sessionObjects.PlaybackManager = new PlaybackManager(sessionObjects.PlaybackInfoProvider);
@@ -136,7 +136,7 @@ namespace App.Client
             sessionObjects.SoundPlayer = new SoundPlayer();
             sessionObjects.FpsSatatus = new FpsSatatus();
             sessionObjects.ServerFpsSatatus = new ServerStatus();
-            sessionObjects.UpdateLatestHandler = new UpdateLatestHandler(gameContexts);
+            sessionObjects.ClientUpdateLatestMgr = new ClientUpdateLatestManager(gameContexts);
             sessionObjects.GlobalEffectManager = new GlobalEffectManager();
         }
 

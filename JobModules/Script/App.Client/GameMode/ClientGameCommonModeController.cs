@@ -12,7 +12,7 @@ namespace App.Client.GameMode
         {
             SetMode(modeId);
             serverInitHandler = new ServerWeaponInitHandler();
-        ProcessListener = new CommonModeProcessListener();
+            ProcessListener = new CommonModeProcessListener();
             PickupHandler = new ClientCommonPickupDropHandler(contexs, ModeId);
             ReservedBulletHandler = new LocalReservedBulletHandler();
             SlotLibary = WeaponSlotsLibrary.Allocate(EWeaponSlotsGroupType.Group);

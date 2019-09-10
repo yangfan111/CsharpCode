@@ -311,7 +311,7 @@ namespace Utils.Appearance.ManagerPackage
             return WeaponControllerBaseImpl.IsEmptyHand();
         }
 
-        public virtual void MountWeaponInPackage(WeaponInPackage pos, int id)
+        public void MountWeaponInPackage(WeaponInPackage pos, int id)
         {
             if ((int) pos < (int) WeaponInPackage.EndOfTheWorld)
             {
@@ -323,7 +323,7 @@ namespace Utils.Appearance.ManagerPackage
             }
         }
 
-        public virtual void UnmountWeaponInPackage(WeaponInPackage pos)
+        public void UnmountWeaponInPackage(WeaponInPackage pos)
         {
             if ((int) pos < (int) WeaponInPackage.EndOfTheWorld)
             {
@@ -335,7 +335,7 @@ namespace Utils.Appearance.ManagerPackage
             }
         }
 
-        public virtual void MountWeaponToHand(WeaponInPackage pos)
+        public void MountWeaponToHand(WeaponInPackage pos)
         {
             if ((int) pos < (int) WeaponInPackage.EndOfTheWorld)
             {
@@ -347,7 +347,7 @@ namespace Utils.Appearance.ManagerPackage
             }
         }
 
-        public virtual void UnmountWeaponFromHand()
+        public void UnmountWeaponFromHand()
         {
             WeaponDataBaseImpl.UnmountWeaponFromHand();
         }
@@ -367,7 +367,7 @@ namespace Utils.Appearance.ManagerPackage
             WeaponDataBaseImpl.UnmountWeaponFromHandAtOnce();
         }
 
-        public virtual void MountAttachment(WeaponInPackage pos, WeaponPartLocation location, int id)
+        public void MountAttachment(WeaponInPackage pos, WeaponPartLocation location, int id)
         {
             if ((int) pos <= (int) WeaponInPackage.EndOfTheWorld &&
                 (int) location <= (int) WeaponPartLocation.EndOfTheWorld)
@@ -376,7 +376,7 @@ namespace Utils.Appearance.ManagerPackage
             }
         }
 
-        public virtual void UnmountAttachment(WeaponInPackage pos, WeaponPartLocation location)
+        public void UnmountAttachment(WeaponInPackage pos, WeaponPartLocation location)
         {
             if ((int) pos <= (int) WeaponInPackage.EndOfTheWorld &&
                 (int) location <= (int) WeaponPartLocation.EndOfTheWorld)

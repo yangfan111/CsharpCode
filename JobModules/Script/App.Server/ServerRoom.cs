@@ -1,406 +1,139 @@
-﻿using App.Client.GameModules.GamePlay.Free;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using App.Client.GameModules.Room;
 using App.Protobuf;
 using App.Server.GameModules.GamePlay;
 using App.Server.GameModules.GamePlay.Free.map;
 using App.Server.GameModules.GamePlay.Free.player;
 using App.Server.MessageHandler;
-using App.Server.Scripts.Config;
 using App.Shared;
-using App.Shared.Components;
 using App.Shared.Components.Player;
-using App.Shared.Components.ServerSession;
-using App.Shared.ContextInfos;
 using App.Shared.DebugSystem;
 using App.Shared.EntityFactory;
-using App.Shared.FreeFramework.Free.Weapon;
 using App.Shared.GameMode;
 using App.Shared.GameModules.Attack;
 using App.Shared.GameModules.Vehicle;
 using App.Shared.GameModules.Weapon;
-using App.Shared.GameModules.Weapon.Behavior;
 using App.Shared.Player;
 using com.wd.free.para;
-using com.wd.free.trigger;
-using Core;
 using Core.Components;
-using Core.Configuration.Sound;
+using Core.EntityComponent;
 using Core.Enums;
 using Core.GameModule.System;
 using Core.MyProfiler;
 using Core.Network;
-using Core.Prediction.VehiclePrediction.TimeSync;
 using Core.Replicaton;
 using Core.Room;
 using Core.SessionState;
-using Core.SpatialPartition;
 using Core.Utils;
 using Entitas;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Core.EntityComponent;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Utils.AssetManager;
 using Utils.Configuration;
 using Utils.Singleton;
-using VehicleCommon;
-using Vector3 = UnityEngine.Vector3;
+using Object = UnityEngine.Object;
 
 namespace App.Server
 {
     /// <summary>
-    /// Defines the <see cref="ServerRoom" />
+    ///     Defines the <see cref="ServerRoom" />
     /// </summary>
     public partial class ServerRoom : IRoom, IPlayerEntityDic<PlayerEntity>, IEcsDebugHelper
     {
-        private static LoggerAdapter _logger = new LoggerAdapter(typeof(ServerRoom));
+        private static LoggerAdapter logger = new LoggerAdapter(typeof(ServerRoom));
 
-        private Contexts _contexts;
+        private Dictionary<INetworkChannel, PlayerEntity> channelToPlayer =
+                        new Dictionary<INetworkChannel, PlayerEntity>();
 
-        private Dictionary<INetworkChannel, PlayerEntity> _channelToPlayer =
-            new Dictionary<INetworkChannel, PlayerEntity>();
+        public ContextsServerWrapper ContextsWrapper { get; private set; }
+
+        private IPlayerDamager damager;
+
+        private IRoomEventDispatchter eventDispatcher;
+
+        private IHallRoom hallRoom;
+
+        private int interval;
+
+        private bool isDisposed;
+        private bool isGameExit;
+
+        private bool isGameOver;
+
+        private IGameRule rule;
+
+        private SendSnapshotManager sendSnapshotManager;
+
+        private CompensationManager compensationManager;
+
+        private ServerSessionStateMachine sessionStateMachine;
+
+        private SnapshotFactory snapshotFactory;
+
+
+        private RoomState state;
+
+
+        private int sumCheckTime;
+
+        private int testPlayerNum;
 
         public NetworkMessageDispatcher MessageDispatcher { get; private set; }
 
-        private SnapshotPool _compensationSnapshotPool = new SnapshotPool();
-
-        private SnapshotFactory _snapshotFactory;
-
-        private ServerSessionStateMachine _sessionStateMachine;
-
-        private IHallRoom _hallRoom;
-
-        private IGameRule _rule;
-
-        private IPlayerDamager _damager;
-
-        private ICoRoutineManager _coRoutineManager;
-
-        private int _sumCheckTime;
-
-        private IBin2DManager _bin2DManager;
-
-        private RoomState _state;
-
-        private IRoomEventDispatchter _eventDispatcher;
-       
-
-        public void OnInitializeCompleted()
+        public int UserCount
         {
-            _logger.Info("Server Room Initialize Completed");
-            _state = RoomState.Running;
-            _rule.GameStart(_contexts);
-            _contexts.session.commonSession.SessionMode =
-                ModeUtil.CreateSharedPlayerMode(_contexts, _contexts.session.commonSession.RoomInfo.ModeId);
-            DebugUtil.InitShootArchiveS(_contexts.session.commonSession.RoomInfo.RoomDisplayId);
-            FreeMapPosition.Init(_contexts);
-            DebugUtil.LogInUnity("Server Room Initialize Completed");
-
-            if (_channelToPlayer.Count == 0)
-            {
-                /*GameOver(true);*/
-            }
+            get { return channelToPlayer.Count; }
         }
 
-        private bool _isGameOver;
-        private bool _isGameExit;
+
+        public IGameRule GameRule
+        {
+            get { return rule; }
+            set { rule = value; }
+        }
+
+        public Contexts RoomContexts
+        {
+            get { return ContextsWrapper.contexts; }
+        }
+
+        public IPlayerDamager PlayerDamager
+        {
+            get { return damager; }
+        }
+
+        public SessionStateMachine GetSessionStateMachine()
+        {
+            return sessionStateMachine;
+        }
+
+        public PlayerEntity GetPlayer(INetworkChannel networkChannel)
+        {
+            PlayerEntity player = GetPlayerEntity(networkChannel);
+            if (player != null)
+            {
+            }
+            else
+            {
+                logger.ErrorFormat("illegal ChannelOnDisonnected event received {0}", networkChannel);
+            }
+
+            return player;
+        }
 
         public bool IsGameExit
         {
-            get { return _isGameExit; }
+            get { return isGameExit; }
         }
 
         public bool IsDiposed
         {
-            get { return _state == RoomState.Disposed; }
+            get { return state == RoomState.Disposed; }
         }
 
-        private bool _isDisposed = false;
-
-        private int _testPlayerNum = 0;
-
-        private SendSnapshotManager _sendSnapshotManager;
-
-        public ServerRoom(IRoomId roomId, Contexts contexts, IRoomEventDispatchter eventDispatcher,
-            ICoRoutineManager coRoutineManager, IUnityAssetManager assetManager, IPlayerTokenGenerator tokenGenerator)
-        {
-            //SingletonManager.Get<ServerFileSystemConfigManager>().Reload();
-            _state = RoomState.Initialized;
-            _isDisposed = false;
-
-            _tokenGenerator = tokenGenerator;
-            _coRoutineManager = coRoutineManager;
-
-            var entityIdGenerator = new EntityIdGenerator(EntityIdGenerator.GlobalBaseId);
-            var equipmentEntityIdGenerator = new EntityIdGenerator(EntityIdGenerator.EquipmentBaseId);
-            var ruleId = RuleMap.GetRuleId(SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.Rule);
-            RoomId = roomId;
-            _contexts = contexts;
-#if (!ENTITAS_DISABLE_VISUAL_DEBUGGING && UNITY_EDITOR)
-            _contexts.InitializeContexObservers();
-#endif
-            SingletonManager.Get<MyProfilerManager>().Contexts = _contexts;
-            _eventDispatcher = eventDispatcher;
-            _bin2DManager = CreateBin2DManager();
-            IniCurrentTimeSession();
-
-
-            InitEntityFactorySession(entityIdGenerator, equipmentEntityIdGenerator);
-            _assetManager = assetManager;
-          
-
-            InitCommonSession(entityIdGenerator,
-                equipmentEntityIdGenerator, ruleId);
-
-            InitServerSession(_bin2DManager, ruleId);
-
-
-            _contexts.vehicle.SetSimulationTime(0);
-            MessageDispatcher = CreateNetworMessageHandlers();
-            _snapshotFactory = new SnapshotFactory(_contexts.session.commonSession.GameContexts);
-            _sessionStateMachine = new ServerSessionStateMachine(_contexts, this);
-
-            _damager = new SimplePlayerDamager(this);
-            VehicleDamageUtility._damager = _damager;
-            _sendSnapshotManager = new SendSnapshotManager(_contexts);
-
-            InitialWeaponSkill();
-        }
-
-        public IPlayerInfo GetPlayerInfo(long playerId)
-        {
-            return _hallRoom == null ? null : _hallRoom.GetPlayer(playerId);
-        }
-
-        public RoomDebugInfo GetRoomDebugInfo()
-        {
-            var debugInfo = new RoomDebugInfo();
-            debugInfo.State = _state.ToString();
-            debugInfo.HallRoomId = _hallRoom == null ? 0 : _hallRoom.HallRoomId;
-            debugInfo.RoomId = RoomId.Id;
-            return debugInfo;
-        }
-
-        public IList<PlayerDebugInfo> GetPlayerDebugInfo()
-        {
-            var debugInfo = new List<PlayerDebugInfo>();
-            var playerInfoSet = new HashSet<IPlayerInfo>();
-            foreach (var player in _channelToPlayer.Values)
-            {
-                var pdinfo = new PlayerDebugInfo();
-                pdinfo.HasPlayerEntity = true;
-                pdinfo.EntityKey = player.entityKey.Value;
-                pdinfo.EntityId = player.playerInfo.EntityId;
-                pdinfo.PlayerId = player.playerInfo.PlayerId;
-                pdinfo.TeamId = player.playerInfo.TeamId;
-                pdinfo.Name = player.playerInfo.PlayerName;
-                pdinfo.HasPlayerInfo = false;
-                if (_hallRoom != null)
-                {
-                    var playerInfo = _hallRoom.GetPlayer(pdinfo.PlayerId);
-
-                    if (playerInfo != null)
-                    {
-                        pdinfo.HasPlayerInfo = true;
-                        pdinfo.IsRobot = playerInfo.IsRobot;
-                        pdinfo.IsLogin = playerInfo.IsLogin;
-                        pdinfo.Token = playerInfo.Token;
-                        pdinfo.CreateTime = playerInfo.CreateTime;
-                        pdinfo.GameStartTime = playerInfo.GameStartTime;
-                        playerInfoSet.Add(playerInfo);
-                    }
-                }
-
-                debugInfo.Add(pdinfo);
-            }
-
-            if (_hallRoom != null)
-            {
-                var allPlayerInfos = _hallRoom.GetAllPlayers();
-                foreach (var playerInfo in allPlayerInfos)
-                {
-                    if (!playerInfoSet.Contains(playerInfo))
-                    {
-                        var pdinfo = new PlayerDebugInfo();
-                        pdinfo.HasPlayerEntity = false;
-                        pdinfo.HasPlayerInfo = true;
-
-                        pdinfo.PlayerId = playerInfo.PlayerId;
-                        pdinfo.EntityId = playerInfo.EntityId;
-                        pdinfo.TeamId = playerInfo.TeamId;
-                        pdinfo.Name = playerInfo.PlayerName;
-
-                        pdinfo.IsRobot = playerInfo.IsRobot;
-                        pdinfo.Token = playerInfo.Token;
-                        pdinfo.CreateTime = playerInfo.CreateTime;
-                        pdinfo.GameStartTime = playerInfo.GameStartTime;
-                        debugInfo.Add(pdinfo);
-                    }
-                }
-            }
-
-            return debugInfo;
-        }
-
-        private void InitialWeaponSkill()
-        {
-            FreeRuleConfig config = FreeRuleConfig.GetRule("weaponSkill",
-                SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.Mysql);
-            foreach (GameTrigger trigger in config.Triggers.GetTriggers())
-            {
-                WeaponSkillFactory.RegisterSkill(FreeArgs, trigger);
-            }
-        }
-
-        private void InitServerSession(IBin2DManager bin2DManager, int ruleId)
-        {
-            _contexts.session.SetServerSessionObjects();
-            var sessionObjects = _contexts.session.serverSessionObjects;
-            var gameContexts = _contexts.session.commonSession.GameContexts;
-            sessionObjects.SnapshotSelector = _compensationSnapshotPool;
-            sessionObjects.Bin2DConfig = new Bin2DConfig(-9000, -9000, 9000, 9000, 100, 16000);
-
-            sessionObjects.Bin2dManager = bin2DManager;
-
-            sessionObjects.SimulationTimer = new ServerSimulationTimer();
-            sessionObjects.SimulationTimer.CurrentTime = 0;
-            sessionObjects.VehicleTimer = new VehicleTimer();
-
-            sessionObjects.GameRule = ruleId;
-            sessionObjects.FpsSatatus = new FpsSatatus();
-        }
-
-        private static IBin2DManager CreateBin2DManager()
-        {
-            return GameContextsUtility.GetReplicationBin2DManager(-9000, -9000, 9000, 9000,
-                16000,
-                new Dictionary<int, int>
-                {
-                    {(int) EEntityType.SceneObject, 32},
-                    {(int) EEntityType.MapObject, 256},
-                    {(int) EEntityType.Bullet, 1000},
-                    {(int) EEntityType.Sound, 32},
-                    {(int) EEntityType.Player, 1000},
-                    {(int) EEntityType.FreeMove, 10000},
-
-                    {(int) EEntityType.Throwing, 1000},
-                    {(int) EEntityType.Vehicle, 1000},
-                    {(int) EEntityType.ClientEffect, 1000}
-                });
-        }
-
-        private void InitCommonSession(
-            EntityIdGenerator entityIdGenerator,
-            EntityIdGenerator equipmentEntityIdGenerator, int ruleId)
-        {
-            _contexts.session.SetCommonSession();
-            var commonSession = _contexts.session.commonSession;
-            commonSession.InitPosition = Vector3.zero;
-
-            commonSession.AssetManager = _assetManager;
-
-            commonSession.CoRoutineManager = _coRoutineManager;
-            commonSession.GameContexts =
-                GameContextsUtility.GetReplicationGameContexts(_contexts, _bin2DManager);
-            commonSession.EntityIdGenerator = entityIdGenerator;
-            commonSession.EquipmentEntityIdGenerator = equipmentEntityIdGenerator;
-            commonSession.RoomInfo = new RoomInfo
-            {
-                MapId = SingletonManager.Get<ServerFileSystemConfigManager>().BootConfig.MapId,
-                ModeId = ruleId
-            };
-
-            MakeWeaponLogicManager();
-        }
-
-        private void MakeWeaponLogicManager()
-        {
-            var commonSession = _contexts.session.commonSession;
-            //commonSession.PlayerWeaponResourceConfigManager = new PlayerWeaponResourceConfigManager(SingletonManager.Get<WeaponPartsConfigManager>(),
-            //    SingletonManager.Get<WeaponDataConfigManager>());
-
-//            var weaponComponentsFacoty = new WeaponFireScriptsInitializer(_contexts,
-            //               _contexts.session.commonSession.EntityIdGenerator);
-            var fireScriptsProvider = new WeaponFireScriptsProvider(_contexts);
-            commonSession.WeaponFireUpdateManager =
-                new WeaponFireUpdateManagaer(fireScriptsProvider, _contexts.session.commonSession.FreeArgs);
-        }
-
-        private void InitEntityFactorySession(EntityIdGenerator entityIdGenerator,
-            EntityIdGenerator equipmentEntityIdGenerator)
-        {
-            _contexts.session.SetEntityFactoryObject();
-            var entityFactoryObject = _contexts.session.entityFactoryObject;
-            entityFactoryObject.SoundEntityFactory = new ServerSoundEntityFactory(_contexts.sound,
-                _contexts.player,
-                entityIdGenerator,
-                _contexts.session.currentTimeObject,
-                SingletonManager.Get<SoundConfigManager>());
-            entityFactoryObject.SceneObjectEntityFactory = new ServerSceneObjectEntityFactory(_contexts.sceneObject,
-                _contexts.player,
-                entityIdGenerator, equipmentEntityIdGenerator, _contexts.session.currentTimeObject);
-            entityFactoryObject.MapObjectEntityFactory =
-                new ServerMapObjectEntityFactory(_contexts.mapObject, entityIdGenerator);
-        }
-
-        private void IniCurrentTimeSession()
-        {
-            if (!_contexts.session.hasCurrentTimeObject)
-            {
-                _contexts.session.SetCurrentTimeObject();
-            }
-            else
-            {
-                Debug.LogError("CurrentTimeObject already exist");
-            }
-
-            var currentTimeObject = _contexts.session.currentTimeObject;
-            currentTimeObject.CurrentTime = 0;
-        }
 
         public IRoomId RoomId { get; private set; }
-
-        private NetworkMessageDispatcher CreateNetworMessageHandlers()
-        {
-            var messageDispatcher = new NetworkMessageDispatcher();
-            messageDispatcher.RegisterLater((int) EClient2ServerMessage.UserCmd, new UserCmdMessageHandler(this));
-            messageDispatcher.RegisterLater((int) EClient2ServerMessage.LocalDisconnect,
-                new DelegateNetworkMessageHandler(OnDisconnect));
-            messageDispatcher.RegisterLater((int) EClient2ServerMessage.LocalLogin,
-                new DelegateNetworkMessageHandler(AsyncLoginPlayer));
-            messageDispatcher.RegisterLater((int) EClient2ServerMessage.VehicleCmd,
-                new VehicleCmdMessageHandler(_contexts, this));
-            messageDispatcher.RegisterLater((int) EClient2ServerMessage.DebugCommand,
-                new DebugMessageHandler(_contexts, this));
-            messageDispatcher.RegisterLater((int) EClient2ServerMessage.SimulationTimeSync,
-                new SimulationTimeServerSyncHandler(_contexts, this));
-            messageDispatcher.RegisterLater((int) EClient2ServerMessage.FreeEvent,
-                new FreeEventMessageHandler(_contexts, this));
-            messageDispatcher.RegisterLater((int) EClient2ServerMessage.VehicleEvent,
-                new VehicleEventMessageHandler(_contexts, this));
-            messageDispatcher.RegisterLater((int) EClient2ServerMessage.TriggerObjectEvent,
-                new TriggerObejctEventMessageHandler(_contexts, this));
-            messageDispatcher.RegisterImmediate((int) EClient2ServerMessage.Ping,
-                new PingReqMessageHandler(_contexts, this));
-            messageDispatcher.RegisterLater((int) EClient2ServerMessage.UpdateMsg,
-                new UserUpdateMsgHandler(this, _contexts));
-            messageDispatcher.RegisterLater((int) EClient2ServerMessage.UpdateMsg,
-                new UserUpdateAckMsgHandler(this));
-            messageDispatcher.RegisterLater((int) EClient2ServerMessage.FireInfo,
-                new FireInfoMessageHandler(_contexts, this));
-            messageDispatcher.RegisterLater((int) EClient2ServerMessage.DebugScriptInfo,
-                new DebugScriptInfoMessageHandler(this));
-            messageDispatcher.RegisterLater((int) EClient2ServerMessage.GameOver,
-                new ServerGameOverMessageHandler(this));
-            return messageDispatcher;
-        }
-
-        public void RegisterDebugInfoHandler(Action<string> handler)
-        {
-            DebugScriptInfoMessageHandler.SetHandler(handler);
-        }
 
         public bool LoginPlayer(IPlayerInfo playerInfo, INetworkChannel channel)
         {
@@ -410,70 +143,335 @@ namespace App.Server
 
         public bool SendLoginSucc(IPlayerInfo playerInfo, INetworkChannel channel)
         {
-            switch (_state)
+            switch (state)
             {
                 case RoomState.Initialized:
                 case RoomState.Running:
-                    var sessionObjects = _contexts.session.serverSessionObjects;
-                    var msg = LoginSuccMessage.Allocate();
-                    msg.GameRule = (int)sessionObjects.GameRule;
-                    _contexts.session.commonSession.RoomInfo.ToLoginSuccMsg(msg);
+                    var sessionObjects = ContextsWrapper.contexts.session.serverSessionObjects;
+                    var msg            = LoginSuccMessage.Allocate();
+                    msg.GameRule = sessionObjects.GameRule;
+                    ContextsWrapper.RoomInfo.ToLoginSuccMsg(msg);
                     msg.Camp = playerInfo.Camp;
-                    //FreeArgs.Trigger(FreeTriggerConstant.PRELOAD_RESOURCE, new TempUnit("roomInfo", new ObjectUnit(msg)), new TempUnit("playerInfo", new ObjectUnit(playerInfo)));
-                    channel.SendReliable((int)EServer2ClientMessage.SceneInfo, msg);
-                    if (RoomState.Running == _state)
-                        channel.SendReliable((int)EServer2ClientMessage.LoginSucc, msg);
+                    //FreeArgs.Trigger(FreeTriggerConstant.PRELOADRESOURCE, new TempUnit("roomInfo", new ObjectUnit(msg)), new TempUnit("playerInfo", new ObjectUnit(playerInfo)));
+                    channel.SendReliable((int) EServer2ClientMessage.SceneInfo, msg);
+                    if (RoomState.Running == state)
+                        channel.SendReliable((int) EServer2ClientMessage.LoginSucc, msg);
                     msg.ReleaseReference();
-                    _logger.InfoFormat("player SendLoginSucc with name {0}",
-                        playerInfo.PlayerName);
+                    logger.InfoFormat("player SendLoginSucc with name {0}", playerInfo.PlayerName);
                     break;
             }
+
             return true;
         }
 
         public void SetPlayerStageRunning(IPlayerInfo playerInfo, INetworkChannel channel)
         {
-            if (_channelToPlayer.ContainsKey(channel))
+            if (channelToPlayer.ContainsKey(channel))
             {
-                var playerEntity = _channelToPlayer[channel];
+                var playerEntity = channelToPlayer[channel];
                 playerEntity.ReplaceStage(EPlayerLoginStage.EnterRunning);
                 playerEntity.isFlagCompensation = true;
-                playerEntity.isFlagSyncNonSelf = true;
+                playerEntity.isFlagSyncNonSelf  = true;
             }
+        }
+
+        public void GameOver(bool forceExit, RoomState state)
+        {
+            logger.InfoFormat("ServerRoom GameOver ... Player Count:{0} GameExit {1}",
+                ContextsWrapper.contexts.player.GetEntities().Length, forceExit);
+            SetGameOverStatus(false);
+
+            if (forceExit)
+            {
+                GameExit(state);
+            }
+        }
+
+        public void Start()
+        {
+            hallRoom.UpdateRoomGameStatus(ERoomGameStatus.BEGIN, ERoomEnterStatus.CanEnter);
+        }
+
+
+        public void Update(int interval)
+        {
+            if (state == RoomState.Disposing || state == RoomState.Disposed)
+            {
+                return;
+            }
+
+            this.interval                                                       =  interval;
+            ContextsWrapper.contexts.session.currentTimeObject.CurrentTime += interval;
+            if (!isDisposed)
+                MessageDispatcher.DriveDispatch();
+
+            sessionStateMachine.Update();
+
+            CheckRoomGameStatus(interval);
+            if (ContextsWrapper.contexts.player.GetEntities().Length == 0)
+            {
+                SingletonManager.Get<MyProfilerManager>().IsRecordOn = false;
+            }
+        }
+
+        public void LateUpdate()
+        {
+            if (state != RoomState.Disposing && state != RoomState.Disposed)
+                sessionStateMachine.LateUpdate();
+        }
+
+        public void RunFreeGameRule()
+        {
+            rule.Update(ContextsWrapper.contexts, interval);
+            if (rule.GameOver)
+            {
+                logger.InfoFormat("Rule Game Over!");
+                GameOver(false, RoomState.RRuleOver);
+                rule.GameEnd(ContextsWrapper.contexts);
+                rule.GameOver = false;
+            }
+
+            if (rule.GameExit)
+            {
+                logger.InfoFormat("Rule Game Exit!");
+                GameExit(RoomState.RRuleOver);
+            }
+        }
+
+        public void SendSnapshot()
+        {
+            sendSnapshotManager.SendSnapshot(interval, snapshotFactory);
+        }
+
+        public void CompensationSnapshot()
+        {
+            compensationManager.CompensationSnapshot(ContextsWrapper,snapshotFactory);
+        }
+
+        public void Dispose()
+        {
+#if UNITYSOURCEMODIFIED && !UNITYEDITOR
+            UnityProfiler.EnableProfiler(false);
+
+#endif
+            state      = RoomState.Disposing;
+            isDisposed = true;
+            DisposePlayerConnections();
+            if (sendSnapshotManager != null)
+            {
+                sendSnapshotManager.Dispose();
+            }
+
+            GameModuleManagement.Dispose();
+            try
+            {
+                ResetContexts(true);
+                sessionStateMachine.ShutDown();
+            }
+            catch (Exception e)
+            {
+                logger.ErrorFormat("Reset Contexts Error {0}", e);
+            }
+
+       
+
+            DestoryObjectUnderDefaultGoBattleServer();
+            ContextsWrapper.CoRoutineManager.StartCoRoutine(UnloadScene());
+            ContextsWrapper.Dispose();
+            logger.InfoFormat("Server Room is Disposing...");
+        }
+
+        public void SetHallRoom(IHallRoom hallRoom)
+        {
+            this.hallRoom = hallRoom;
+        }
+
+        public void SetGameMode(int mode, int mapId)
+        {
+            ContextsWrapper.contexts.session.serverSessionObjects.GameRule = mode;
+            ContextsWrapper.RoomInfo.ModeId = mode;
+            ContextsWrapper.RoomInfo.MapId  = mapId;
+            FreeRuleEventArgs args = new FreeRuleEventArgs(ContextsWrapper.contexts);
+            ContextsWrapper.FreeArgs = args;
+            rule                     = new FreeGameRule(this);
+
+
+            SimpleParaList spl = (SimpleParaList) args.GetDefault().GetParameters();
+            spl.AddFields(new ObjectFields(ContextsWrapper.RoomInfo));
+            spl.AddPara(new BoolPara("hxMode", SharedConfig.IsHXMod));
+            spl.AddPara(new StringPara("version", FreeRuleConfig.GetVersion()));
+        }
+
+        private NetworkMessageDispatcher CreateNetworMessageHandlers()
+        {
+            var messageDispatcher = new NetworkMessageDispatcher((int)EClient2ServerMessage.Max);
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.UserCmd, new UserCmdMessageHandler(this));
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.LocalDisconnect,
+                new DelegateNetworkMessageHandler(OnDisconnect));
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.LocalLogin,
+                new DelegateNetworkMessageHandler(AsyncLoginPlayer));
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.VehicleCmd,
+                new VehicleCmdMessageHandler(ContextsWrapper.contexts, this));
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.DebugCommand,
+                new DebugMessageHandler(ContextsWrapper.contexts, this));
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.SimulationTimeSync,
+                new SimulationTimeServerSyncHandler(ContextsWrapper.contexts, this));
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.FreeEvent,
+                new FreeEventMessageHandler(ContextsWrapper.contexts, this));
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.VehicleEvent,
+                new VehicleEventMessageHandler(ContextsWrapper.contexts, this));
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.TriggerObjectEvent,
+                new TriggerObejctEventMessageHandler(ContextsWrapper.contexts, this));
+            messageDispatcher.RegisterImmediate((int) EClient2ServerMessage.Ping,
+                new PingReqMessageHandler(ContextsWrapper.contexts, this));
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.UpdateMsg,
+                new UserUpdateMsgHandler(this, ContextsWrapper.contexts));
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.UpdateMsg, new UserUpdateAckMsgHandler(this));
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.FireInfo,
+                new FireInfoMessageHandler(ContextsWrapper.contexts, this));
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.DebugScriptInfo,
+                new DebugScriptInfoMessageHandler(this));
+            messageDispatcher.RegisterLater((int) EClient2ServerMessage.GameOver,
+                new ServerGameOverMessageHandler(this));
+            return messageDispatcher;
+        }
+
+
+        public void OnInitializeCompleted()
+        {
+            logger.Info("Server Room Initialize Completed");
+            state = RoomState.Running;
+            rule.GameStart(ContextsWrapper.contexts);
+            ContextsWrapper.SessionMode =
+                            ModeUtil.CreateSharedPlayerMode(ContextsWrapper.contexts,
+                                ContextsWrapper.RoomInfo.ModeId);
+            DebugUtil.InitShootArchiveS(ContextsWrapper.RoomInfo.RoomDisplayId);
+            FreeMapPosition.Init(ContextsWrapper.contexts);
+            DebugUtil.LogInUnity("Server Room Initialize Completed");
+
+            if (channelToPlayer.Count == 0)
+            {
+                /*GameOver(true);*/
+            }
+        }
+
+
+        public IPlayerInfo GetPlayerInfo(long playerId)
+        {
+            return hallRoom == null ? null : hallRoom.GetPlayer(playerId);
+        }
+
+        public RoomDebugInfo GetRoomDebugInfo()
+        {
+            var debugInfo = new RoomDebugInfo();
+            debugInfo.State      = state.ToString();
+            debugInfo.HallRoomId = hallRoom == null ? 0 : hallRoom.HallRoomId;
+            debugInfo.RoomId     = RoomId.Id;
+            return debugInfo;
+        }
+
+        public IList<PlayerDebugInfo> GetPlayerDebugInfo()
+        {
+            var debugInfo     = new List<PlayerDebugInfo>();
+            var playerInfoSet = new HashSet<IPlayerInfo>();
+            foreach (var player in channelToPlayer.Values)
+            {
+                var pdinfo = new PlayerDebugInfo();
+                pdinfo.HasPlayerEntity = true;
+                pdinfo.EntityKey       = player.entityKey.Value;
+                pdinfo.EntityId        = player.playerInfo.EntityId;
+                pdinfo.PlayerId        = player.playerInfo.PlayerId;
+                pdinfo.TeamId          = player.playerInfo.TeamId;
+                pdinfo.Name            = player.playerInfo.PlayerName;
+                pdinfo.HasPlayerInfo   = false;
+                if (hallRoom != null)
+                {
+                    var playerInfo = hallRoom.GetPlayer(pdinfo.PlayerId);
+
+                    if (playerInfo != null)
+                    {
+                        pdinfo.HasPlayerInfo = true;
+                        pdinfo.IsRobot       = playerInfo.IsRobot;
+                        pdinfo.IsLogin       = playerInfo.IsLogin;
+                        pdinfo.Token         = playerInfo.Token;
+                        pdinfo.CreateTime    = playerInfo.CreateTime;
+                        pdinfo.GameStartTime = playerInfo.GameStartTime;
+                        playerInfoSet.Add(playerInfo);
+                    }
+                }
+
+                debugInfo.Add(pdinfo);
+            }
+
+            if (hallRoom != null)
+            {
+                var allPlayerInfos = hallRoom.GetAllPlayers();
+                foreach (var playerInfo in allPlayerInfos)
+                {
+                    if (!playerInfoSet.Contains(playerInfo))
+                    {
+                        var pdinfo = new PlayerDebugInfo();
+                        pdinfo.HasPlayerEntity = false;
+                        pdinfo.HasPlayerInfo   = true;
+
+                        pdinfo.PlayerId = playerInfo.PlayerId;
+                        pdinfo.EntityId = playerInfo.EntityId;
+                        pdinfo.TeamId   = playerInfo.TeamId;
+                        pdinfo.Name     = playerInfo.PlayerName;
+
+                        pdinfo.IsRobot       = playerInfo.IsRobot;
+                        pdinfo.Token         = playerInfo.Token;
+                        pdinfo.CreateTime    = playerInfo.CreateTime;
+                        pdinfo.GameStartTime = playerInfo.GameStartTime;
+                        debugInfo.Add(pdinfo);
+                    }
+                }
+            }
+
+            return debugInfo;
+        }
+
+
+        public void RegisterDebugInfoHandler(Action<string> handler)
+        {
+            DebugScriptInfoMessageHandler.SetHandler(handler);
         }
 
         public void AsyncLoginPlayer(INetworkChannel channel, int messageType, object playerInfoObj)
         {
             IPlayerInfo playerInfo = (IPlayerInfo) playerInfoObj;
-            _logger.InfoFormat("Received LocalLogin Message ... playerName:{0}", playerInfo.PlayerName);
+            logger.InfoFormat("Received LocalLogin Message ... playerName:{0}", playerInfo.PlayerName);
 
-            if (_channelToPlayer.Count == 0 && _contexts.player.count == 0)
+            if (channelToPlayer.Count == 0 && ContextsWrapper.contexts.player.count == 0)
             {
                 ResetContexts(false);
-                _logger.InfoFormat("Reset All Entity Finish ...");
+                logger.InfoFormat("Reset All Entity Finish ...");
             }
 
-            if (!_channelToPlayer.ContainsKey(channel))
+            if (!channelToPlayer.ContainsKey(channel))
             {
                 UpdateTestPlayerInfo(playerInfo);
                 // 大厅传入错误RoleModelId
                 if (null == SingletonManager.Get<RoleConfigManager>().GetRoleItemById(playerInfo.RoleModelId))
                 {
-                    _logger.Error("RoleModelIdError:  " + playerInfo.RoleModelId);
+                    logger.Error("RoleModelIdError:  " + playerInfo.RoleModelId);
                     playerInfo.RoleModelId = 2;
                 }
+
                 var player = CreateNewPlayerEntity(playerInfo);
                 playerInfo.PlayerEntity = player;
                 player.ReplaceNetwork(channel);
 
                 playerInfo.StatisticsData = player.statisticsData.Statistics;
-                if (_contexts.session.commonSession.FreeArgs.Rule.GameStartTime > 0)
+                if (ContextsWrapper.FreeArgs.Rule.GameStartTime > 0)
                 {
-                    playerInfo.StatisticsData.GameJoinTime = _contexts.session.commonSession.FreeArgs.Rule.ServerTime;
+                    playerInfo.StatisticsData.GameJoinTime =
+                                    ContextsWrapper.FreeArgs.Rule.ServerTime;
                 }
-                _channelToPlayer[channel] = player;
-                channel.MessageReceived += ChannelOnMessageReceived;
-                channel.Disconnected += ChannelOnDisonnected;
+
+                channelToPlayer[channel] =  player;
+                channel.MessageReceived  += ChannelOnMessageReceived;
+                channel.Disconnected     += ChannelOnDisonnected;
 
 
                 if (!player.hasUpdateMessagePool)
@@ -484,27 +482,25 @@ namespace App.Server
 
                 NoticeHallPlayerLoginSucc(player);
                 player.ReplaceStage(EPlayerLoginStage.CreateEntity);
-                var msg = App.Protobuf.PlayerInfoMessage.Allocate();
+                var msg = PlayerInfoMessage.Allocate();
                 msg.ConvertFrom(playerInfo);
                 channel.SendReliable((int) EServer2ClientMessage.PlayerInfo, msg);
-                _logger.InfoFormat("player login with name {0}, key {1}, game rule {2}, msp id {3}",
-                    playerInfo.PlayerName,
-                    player.entityKey,
-                    0, 0);
+                logger.InfoFormat("player login with name {0}, key {1}, game rule {2}, msp id {3}",
+                    playerInfo.PlayerName, player.entityKey, 0, 0);
                 msg.ReleaseReference();
             }
             else
             {
-                _logger.ErrorFormat("player duplicate login from name:{0}, channe:{1}", playerInfo.PlayerName, channel);
+                logger.ErrorFormat("player duplicate login from name:{0}, channe:{1}", playerInfo.PlayerName, channel);
             }
         }
 
         private void NoticeHallPlayerLoginSucc(PlayerEntity player)
         {
-            if (_hallRoom != null)
+            if (hallRoom != null)
             {
-                _hallRoom.UpdatePlayerStatus(player.playerInfo.PlayerId, EPlayerGameStatus.MIDDLE);
-                _hallRoom.PlayerLoginSucc(player.playerInfo.PlayerId);
+                hallRoom.UpdatePlayerStatus(player.playerInfo.PlayerId, EPlayerGameStatus.MIDDLE);
+                hallRoom.PlayerLoginSucc(player.playerInfo.PlayerId);
             }
         }
 
@@ -516,43 +512,47 @@ namespace App.Server
         {
             if (playerInfo.Token == TestUtility.TestToken)
             {
-                playerInfo.PlayerId = TestUtility.NewPlayerId;
-                playerInfo.PlayerName = "Test_" + playerInfo.PlayerId;
-                playerInfo.Num = ++_testPlayerNum;
-                playerInfo.Camp = _testPlayerNum % 2 == 0 ? 2 : 1;
+                playerInfo.PlayerId    = TestUtility.NewPlayerId;
+                playerInfo.PlayerName  = "Test" + playerInfo.PlayerId;
+                playerInfo.Num         = ++testPlayerNum;
+                playerInfo.Camp        = testPlayerNum % 2 == 0 ? 2 : 1;
                 playerInfo.RoleModelId = 1;
-                playerInfo.TeamId = playerInfo.Camp;
-                playerInfo.BadgeId = 15;
-                playerInfo.AvatarIds = new List<int>(){77, 319, 320, 321};
-                playerInfo.WeaponBags = PlayerEntityFactory.MakeFakeWeaponBag();
-                playerInfo.CampInfo = new CampInfo(1, new List<Preset>(){new Preset(2, 12, new List<int>(){325, 326, 327}, 1005), new Preset(1, 1, new List<int>(){77, 319, 320, 321}, 1003)});
+                playerInfo.TeamId      = playerInfo.Camp;
+                playerInfo.BadgeId     = 15;
+                playerInfo.AvatarIds   = new List<int> {77, 319, 320, 321};
+                playerInfo.WeaponBags  = PlayerEntityFactory.MakeFakeWeaponBag();
+                playerInfo.CampInfo = new CampInfo(1, new List<Preset>
+                {
+                                new Preset(2, 12, new List<int> {325, 326, 327}, 1005),
+                                new Preset(1, 1, new List<int> {77, 319, 320, 321}, 1003)
+                });
             }
             else if (playerInfo.Token == TestUtility.RobotToken)
             {
-                playerInfo.PlayerId = TestUtility.NewPlayerId;
-                playerInfo.PlayerName = "Robot_" + playerInfo.PlayerId;
-                playerInfo.Num = ++_testPlayerNum;
-                playerInfo.Camp = _testPlayerNum % 2 == 0 ? 1 : 2;
-                playerInfo.TeamId = playerInfo.Camp;
-                playerInfo.AvatarIds = new List<int> {354};
+                playerInfo.PlayerId   = TestUtility.NewPlayerId;
+                playerInfo.PlayerName = "Robot" + playerInfo.PlayerId;
+                playerInfo.Num        = ++testPlayerNum;
+                playerInfo.Camp       = testPlayerNum % 2 == 0 ? 1 : 2;
+                playerInfo.TeamId     = playerInfo.Camp;
+                playerInfo.AvatarIds  = new List<int> {354};
                 playerInfo.WeaponBags = PlayerEntityFactory.MakeFakeWeaponBag();
             }
         }
 
         private PlayerEntity CreateNewPlayerEntity(IPlayerInfo playerInfo)
         {
-            return PlayerEntityFactory.CreateNewServerPlayerEntity(_contexts.player,
-                _contexts.session.commonSession,
-                _contexts.session.commonSession.EntityIdGenerator,
-                _contexts.session.commonSession.InitPosition,
+            return PlayerEntityFactory.CreateNewServerPlayerEntity(ContextsWrapper.contexts.player,
+                ContextsWrapper.contexts.session.commonSession,
+                ContextsWrapper.contexts.session.commonSession.EntityIdGenerator,
+                ContextsWrapper.contexts.session.commonSession.InitPosition,
                 //SingletonManager.Get<MapConfigManager>().SceneParameters.PlayerBirthPosition,
-                playerInfo, _hallRoom.AllowReConnect);
+                playerInfo, hallRoom.AllowReConnect);
         }
 
         public PlayerEntity GetPlayerEntity(INetworkChannel channel)
         {
             PlayerEntity player;
-            if (_channelToPlayer.TryGetValue(channel, out player))
+            if (channelToPlayer.TryGetValue(channel, out player))
             {
             }
 
@@ -574,17 +574,18 @@ namespace App.Server
             {
                 try
                 {
-                    _logger.InfoFormat("player disconnected id {0}", player.entityKey);
-                    if (_hallRoom != null && _hallRoom.AllowReConnect)
+                    logger.InfoFormat("player disconnected id {0}", player.entityKey);
+                    if (hallRoom != null && hallRoom.AllowReConnect)
                     {
-                        _logger.InfoFormat("player AllowReConnect id {0}", player.entityKey);
+                        logger.InfoFormat("player AllowReConnect id {0}", player.entityKey);
                         player.stage.Value = EPlayerLoginStage.Offline;
                         player.RemoveNetwork();
                         player.RemoveUpdateMessagePool();
                     }
                     else
                     {
-                        BulletPlayerUtil.DoProcessPlayerHealthDamage(_contexts, _contexts.session.commonSession.FreeArgs.Rule as IGameRule, null ,player,
+                        BulletPlayerUtil.DoProcessPlayerHealthDamage(ContextsWrapper.contexts,
+                            ContextsWrapper.FreeArgs.Rule as IGameRule, null, player,
                             new PlayerDamageInfo(0, (int) EUIDeadType.NoHelp, 0, 0, false, false, true));
 
                         player.isFlagDestroy = true;
@@ -593,42 +594,41 @@ namespace App.Server
                         {
                             if (player.isInitialized)
                             {
-                                _logger.InfoFormat("player PlayerLeave id {0}", player.entityKey);
-                                _rule.PlayerLeave(_contexts, player);
+                                logger.InfoFormat("player PlayerLeave id {0}", player.entityKey);
+                                rule.PlayerLeave(ContextsWrapper.contexts, player);
                                 player.isInitialized = false;
                             }
                         }
                         else
                         {
-                            _logger.ErrorFormat("Leave Player {0} Id {1} without Free Data ",
-                                player.playerInfo.PlayerName,
-                                player.playerInfo.PlayerId);
+                            logger.ErrorFormat("Leave Player {0} Id {1} without Free Data ",
+                                player.playerInfo.PlayerName, player.playerInfo.PlayerId);
                         }
 
-                        if (_hallRoom != null)
+                        if (hallRoom != null)
                         {
-                            _logger.InfoFormat("player PlayerLeaveRoom id {0}", player.entityKey);
-                            _hallRoom.PlayerLeaveRoom(player.playerInfo.PlayerId);
+                            logger.InfoFormat("player PlayerLeaveRoom id {0}", player.entityKey);
+                            hallRoom.PlayerLeaveRoom(player.playerInfo.PlayerId);
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    _logger.ErrorFormat("player disconnected error: {0} \n {1}", e.Message, e.StackTrace);
+                    logger.ErrorFormat("player disconnected error: {0} \n {1}", e.Message, e.StackTrace);
                 }
                 finally
                 {
-                    int channelToPlayerCount = _channelToPlayer.Count;
+                    int channelToPlayerCount = channelToPlayer.Count;
                     try
                     {
                         channel.MessageReceived -= ChannelOnMessageReceived;
-                        channel.Disconnected -= ChannelOnDisonnected;
-                        _channelToPlayer.Remove(channel);
+                        channel.Disconnected    -= ChannelOnDisonnected;
+                        channelToPlayer.Remove(channel);
                         channel.Dispose();
                     }
                     catch (Exception e)
                     {
-                        _logger.ErrorFormat("player Remove error: {0} \n {1}", e.Message, e.StackTrace);
+                        logger.ErrorFormat("player Remove error: {0} \n {1}", e.Message, e.StackTrace);
                     }
                     finally
                     {
@@ -637,9 +637,9 @@ namespace App.Server
 
                     if (channelToPlayerCount == 0)
                     {
-                        if (_hallRoom == null && _hallRoom.AllowReConnect)
+                        if (hallRoom == null && hallRoom.AllowReConnect)
                         {
-                            _logger.ErrorFormat("AllowReConnect");
+                            logger.ErrorFormat("AllowReConnect");
                         }
                         else
                         {
@@ -650,34 +650,22 @@ namespace App.Server
             }
             else
             {
-                _logger.ErrorFormat("illegal ChannelOnDisonnected event received {0}", channel);
-            }
-        }
-
-        public void GameOver(bool forceExit, RoomState state)
-        {
-            _logger.InfoFormat("ServerRoom GameOver ... Player Count:{0} GameExit {1}",
-                _contexts.player.GetEntities().Length, forceExit);
-            SetGameOverStatus(false);
-
-            if (forceExit)
-            {
-                GameExit(state);
+                logger.ErrorFormat("illegal ChannelOnDisonnected event received {0}", channel);
             }
         }
 
         private void SetGameOverStatus(bool forceOver)
         {
-            _logger.InfoFormat("Set ServerRoom GameOver Status, GameOver {0} ForceOver {1}", _isGameOver, forceOver);
-            if (!_isGameOver)
+            logger.InfoFormat("Set ServerRoom GameOver Status, GameOver {0} ForceOver {1}", isGameOver, forceOver);
+            if (!isGameOver)
             {
-                _isGameOver = true;
-                _testPlayerNum = 0;
-                if (null != _hallRoom)
+                isGameOver    = true;
+                testPlayerNum = 0;
+                if (null != hallRoom)
                 {
-                    _hallRoom.GameOver(forceOver);
-                    if(forceOver)
-                        _hallRoom = null;
+                    hallRoom.GameOver(forceOver);
+                    if (forceOver)
+                        hallRoom = null;
                 }
             }
         }
@@ -686,18 +674,18 @@ namespace App.Server
         {
             SetGameOverStatus(true);
 
-            if (!_isGameExit)
+            if (!isGameExit)
             {
                 SendGameOverMessageToAllPlayers();
                 var evt = RoomEvent.AllocEvent<GameExitEvent>();
-                _eventDispatcher.AddEvent(evt);
-                _isGameExit = true;
+                eventDispatcher.AddEvent(evt);
+                isGameExit = true;
             }
         }
 
         private void SendGameOverMessageToAllPlayers()
         {
-            foreach (var channel in _channelToPlayer.Keys)
+            foreach (var channel in channelToPlayer.Keys)
             {
                 if (channel.IsConnected)
                 {
@@ -708,104 +696,26 @@ namespace App.Server
             }
         }
 
-        public int UserCount
-        {
-            get { return _channelToPlayer.Count; }
-        }
-
         public void ChannelOnMessageReceived(INetworkChannel networkChannel, int messageType, object messageBody)
         {
             MessageDispatcher.SaveDispatch(networkChannel, messageType, messageBody);
         }
 
-        public void Start()
-        {
-            _hallRoom.UpdateRoomGameStatus(ERoomGameStatus.BEGIN, ERoomEnterStatus.CanEnter);
-        }
-
-        private int _interval;
-
-        private IUnityAssetManager _assetManager;
-
-        public void Update(int interval)
-        {
-            if (_state == RoomState.Disposing || _state == RoomState.Disposed)
-            {
-                return;
-            }
-
-            _interval = interval;
-            _contexts.session.currentTimeObject.CurrentTime += _interval;
-            if(!_isDisposed)
-                MessageDispatcher.DriveDispatch();
-
-            _sessionStateMachine.Update();
-
-            CheckRoomGameStatus(interval);
-            if (_contexts.player.GetEntities().Length == 0)
-            {
-                SingletonManager.Get<MyProfilerManager>().IsRecordOn = false;
-            }
-        }
-
-        public void LateUpdate()
-        {
-            if (_state != RoomState.Disposing && _state != RoomState.Disposed)
-                _sessionStateMachine.LateUpdate();
-        }
-
-        public void RunFreeGameRule()
-        {
-            _rule.Update(_contexts, _interval);
-            if (_rule.GameOver)
-            {
-                _logger.InfoFormat("Rule Game Over!");
-                GameOver(false, RoomState.RRuleOver);
-                _rule.GameEnd(_contexts);
-                _rule.GameOver = false;
-            }
-
-            if (_rule.GameExit)
-            {
-                _logger.InfoFormat("Rule Game Exit!");
-                GameExit(RoomState.RRuleOver);
-            }
-        }
-
-        public void SendSnapshot()
-        {
-            _sendSnapshotManager.SendSnapshot(_interval, _snapshotFactory);
-        }
-
-        public void CompensationSnapshot()
-        {
-            var sessionObjects = _contexts.session.serverSessionObjects;
-            int snapshotSeq = sessionObjects.GetNextSnapshotSeq();
-            int vehicleSimulationTime = sessionObjects.SimulationTimer.CurrentTime;
-            int serverTime = _contexts.session.currentTimeObject.CurrentTime;
-            ISnapshot compensationSnapshot = _snapshotFactory.GenerateCompensationSnapshot();
-            compensationSnapshot.ServerTime = serverTime;
-            compensationSnapshot.SnapshotSeq = snapshotSeq;
-            compensationSnapshot.VehicleSimulationTime = vehicleSimulationTime;
-            _compensationSnapshotPool.AddSnapshot(compensationSnapshot);
-            compensationSnapshot.ReleaseReference();
-        }
-
         private void ResetContexts(bool dispose)
         {
-            ICommonSessionObjects _sessionObjects = _contexts.session.commonSession;
+            ICommonSessionObjects sessionObjects = ContextsWrapper.contexts.session.commonSession;
 
-            foreach (var entity in _contexts.player.GetEntities())
+            foreach (var entity in ContextsWrapper.contexts.player.GetEntities())
             {
-                DestroyEntity(_sessionObjects, entity);
+                DestroyEntity(sessionObjects, entity);
                 entity.isFlagDestroy = true;
             }
 
-            foreach (var entity in _contexts.mapObject.GetEntities())
+            foreach (var entity in ContextsWrapper.contexts.mapObject.GetEntities())
             {
                 if (dispose || !entity.hasReset)
                 {
-                    DestroyEntity(_sessionObjects, entity);
+                    DestroyEntity(sessionObjects, entity);
                     entity.isFlagDestroy = true;
                 }
                 else
@@ -814,40 +724,40 @@ namespace App.Server
                 }
             }
 
-            foreach (var entity in _contexts.sceneObject.GetEntities())
+            foreach (var entity in ContextsWrapper.contexts.sceneObject.GetEntities())
             {
-                DestroyEntity(_sessionObjects, entity);
+                DestroyEntity(sessionObjects, entity);
                 entity.isFlagDestroy = true;
             }
 
-            foreach (var entity in _contexts.freeMove.GetEntities())
+            foreach (var entity in ContextsWrapper.contexts.freeMove.GetEntities())
             {
-                DestroyEntity(_sessionObjects, entity);
+                DestroyEntity(sessionObjects, entity);
                 entity.isFlagDestroy = true;
             }
 
-            foreach (var entity in _contexts.bullet.GetEntities())
+            foreach (var entity in ContextsWrapper.contexts.bullet.GetEntities())
             {
-                DestroyEntity(_sessionObjects, entity);
+                DestroyEntity(sessionObjects, entity);
                 entity.isFlagDestroy = true;
             }
 
-            foreach (var entity in _contexts.sound.GetEntities())
+            foreach (var entity in ContextsWrapper.contexts.sound.GetEntities())
             {
-                DestroyEntity(_sessionObjects, entity);
+                DestroyEntity(sessionObjects, entity);
                 entity.isFlagDestroy = true;
             }
 
-            foreach (var entity in _contexts.vehicle.GetEntities())
+            foreach (var entity in ContextsWrapper.contexts.vehicle.GetEntities())
             {
                 if (entity.hasEntityKey)
                 {
-                    DestroyEntity(_sessionObjects, entity);
+                    DestroyEntity(sessionObjects, entity);
                     entity.isFlagDestroy = true;
                 }
             }
 
-            _contexts.session.currentTimeObject.CurrentTime = 0;
+            ContextsWrapper.contexts.session.currentTimeObject.CurrentTime = 0;
         }
 
         private void DestroyEntity(ICommonSessionObjects sessionObjects, Entity entity)
@@ -864,53 +774,11 @@ namespace App.Server
                 sessionObjects.AssetManager.LoadCancel(entity);
         }
 
-        public void Dispose()
-        {
-#if UNITY_SOURCE_MODIFIED && !UNITY_EDITOR
-            UnityProfiler.EnableProfiler(false);
-        
-#endif
-            _state = RoomState.Disposing;
-            _isDisposed = true;
-            DisposePlayerConnections();
-            if (_bin2DManager != null)
-            {
-                _bin2DManager.Dispose();
-            }
-
-            if (_sendSnapshotManager != null)
-            {
-                _sendSnapshotManager.Dispose();
-            }
-
-            _contexts.session.commonSession.Dispose();
-            _contexts.session.serverSessionObjects.Dispose();
-
-            GameModuleManagement.Dispose();
-            try
-            {
-                ResetContexts(true);
-                _sessionStateMachine.ShutDown();
-                _contexts.Reset();
-            }
-            catch (Exception e)
-            {
-                _logger.ErrorFormat("Reset Contexts Error {0}", e);
-            }
-
-            _contexts = null;
-
-            DestoryObjectUnderDefaultGoBattleServer();
-            _coRoutineManager.StartCoRoutine(UnloadScene());
-
-            _logger.InfoFormat("Server Room is Disposing...");
-        }
-
         private void DisposePlayerConnections()
         {
-            foreach (var channelPair in _channelToPlayer)
+            foreach (var channelPair in channelToPlayer)
             {
-                _logger.InfoFormat("Disconnect player {0} on disposing...", channelPair.Value.entityKey);
+                logger.InfoFormat("Disconnect player {0} on disposing...", channelPair.Value.entityKey);
                 var channel = channelPair.Key;
                 if (channel.IsConnected)
                 {
@@ -932,9 +800,9 @@ namespace App.Server
 
         private IEnumerator UnloadScene()
         {
-            yield return _assetManager.Clear();
+            yield return ContextsWrapper.AssetManager.Clear();
 
-            var count = SceneManager.sceneCount;
+            var count     = SceneManager.sceneCount;
             var sceneList = new List<Scene>();
             for (int i = 0; i < count; ++i)
             {
@@ -952,8 +820,8 @@ namespace App.Server
 
             yield return Resources.UnloadUnusedAssets();
             GC.Collect();
-            _logger.InfoFormat("Server Room is Disposed!");
-            _state = RoomState.Disposed;
+            logger.InfoFormat("Server Room is Disposed!");
+            state = RoomState.Disposed;
         }
 
         private void DestoryObjectUnderDefaultGoBattleServer()
@@ -963,7 +831,7 @@ namespace App.Server
             if (serverScene.isLoaded)
             {
                 var rootObjects = serverScene.GetRootGameObjects();
-                var children = new List<GameObject>();
+                var children    = new List<GameObject>();
                 foreach (var go in rootObjects)
                 {
                     if (go.name.Equals("DefaultGoBattleServer"))
@@ -978,114 +846,78 @@ namespace App.Server
 
                 foreach (var child in children)
                 {
-                    GameObject.Destroy(child);
+                    Object.Destroy(child);
                 }
             }
         }
 
-        public FreeRuleEventArgs FreeArgs
-        {
-            get { return (FreeRuleEventArgs) _contexts.session.commonSession.FreeArgs; }
-        }
-
-        public IGameRule GameRule
-        {
-            get { return _rule; }
-            set { _rule = value; }
-        }
-
-        public Contexts RoomContexts
-        {
-            get { return _contexts; }
-        }
-
-        public IPlayerDamager PlayerDamager
-        {
-            get { return _damager; }
-        }
-
-        public PlayerEntity GetPlayer(INetworkChannel networkChannel)
-        {
-            PlayerEntity player = GetPlayerEntity(networkChannel);
-            if (player != null)
-            {
-            }
-            else
-            {
-                _logger.ErrorFormat("illegal ChannelOnDisonnected event received {0}", networkChannel);
-            }
-
-            return player;
-        }
-
-        public void SetHallRoom(IHallRoom hallRoom)
-        {
-            this._hallRoom = hallRoom;
-        }
-
-        public void SetGameMode(int mode, int mapId)
-        {
-            _contexts.session.serverSessionObjects.GameRule = mode;
-            _contexts.session.commonSession.RoomInfo.ModeId = mode;
-            _contexts.session.commonSession.RoomInfo.MapId = mapId;
-            FreeRuleEventArgs args = new FreeRuleEventArgs(_contexts);
-            _contexts.session.commonSession.FreeArgs = args;
-            _rule = new FreeGameRule(this);
-
-            RoomInfo info = _contexts.session.commonSession.RoomInfo;
-
-            SimpleParaList spl = (SimpleParaList) args.GetDefault().GetParameters();
-            spl.AddFields(new ObjectFields(info));
-            spl.AddPara(new BoolPara("hxMode", SharedConfig.IsHXMod));
-            spl.AddPara(new StringPara("version", FreeRuleConfig.GetVersion()));
-        }
-
         public void SetRoomInfo(IHallRoom room)
         {
-            _contexts.session.commonSession.RoomInfo.CopyFrom(room);
+            ContextsWrapper.RoomInfo.CopyFrom(room);
         }
 
         private void CheckRoomGameStatus(int interval)
         {
             //check hall room timeout
-            if (null != _hallRoom && !_hallRoom.IsValid)
+            if (null != hallRoom && !hallRoom.IsValid)
             {
                 GameOver(true, RoomState.RValid);
             }
 
             //check player
-            _sumCheckTime += interval;
-            if (_sumCheckTime > 20000)
+            sumCheckTime += interval;
+            if (sumCheckTime > 20000)
             {
-                _sumCheckTime = 0;
-                string playerName = "";
-                string playerIp = "";
-                bool hasHallRoom = _hallRoom != null;
-                if (_contexts.player.GetEntities().Length > 0)
+                sumCheckTime = 0;
+                string playerName  = "";
+                string playerIp    = "";
+                bool   hasHallRoom = hallRoom != null;
+                if (ContextsWrapper.contexts.player.GetEntities().Length > 0)
                 {
-                    PlayerEntity player = _contexts.player.GetEntities()[0];
+                    PlayerEntity player = ContextsWrapper.contexts.player.GetEntities()[0];
                     playerName = player.playerInfo.PlayerName;
-                    playerIp = player.hasNetwork ? player.network.NetworkChannel.IdInfo() : "offline";
+                    playerIp   = player.hasNetwork ? player.network.NetworkChannel.IdInfo() : "offline";
                 }
 
                 //update status
-                if (_hallRoom != null)
+                if (hallRoom != null)
                 {
-                    _hallRoom.UpdateRoomGameStatus((ERoomGameStatus) _rule.GameStage,
-                        (ERoomEnterStatus) _rule.EnterStatus);
+                    hallRoom.UpdateRoomGameStatus((ERoomGameStatus) rule.GameStage,
+                        (ERoomEnterStatus) rule.EnterStatus);
                 }
 
-                _logger.InfoFormat(
+                logger.InfoFormat(
                     "ServerStatus: PlayerCount:{0}, FirstPlayerName:{1}, PlayerIp:{2}, LoginServer:{3}, HallRoomServer:{4}, AllocationClient:{5}, HasHallRoom:{6}",
-                    _channelToPlayer.Count, playerName, playerIp,
-                    ServerStatusCollectUtil.LoginServerStatus, ServerStatusCollectUtil.HallRoomServerStatus,
-                    ServerStatusCollectUtil.AllocationClientStatus, hasHallRoom);
+                    channelToPlayer.Count, playerName, playerIp, ServerStatusCollectUtil.LoginServerStatus,
+                    ServerStatusCollectUtil.HallRoomServerStatus, ServerStatusCollectUtil.AllocationClientStatus,
+                    hasHallRoom);
             }
         }
 
-        public SessionStateMachine GetSessionStateMachine()
+
+        #region intialize
+
+        public ServerRoom(RoomId id, ContextsServerWrapper contextsServerWrapper, RoomEventDispatcher dispatcher,
+                          IPlayerTokenGenerator playerTokenGenerator)
         {
-            return _sessionStateMachine;
+            state               = RoomState.Initialized;
+            isDisposed          = false;
+            RoomId              = id;
+            ContextsWrapper     = contextsServerWrapper;
+            MessageDispatcher   = CreateNetworMessageHandlers();
+            tokenGenerator      = playerTokenGenerator;
+            eventDispatcher     = dispatcher;
+            snapshotFactory     = new SnapshotFactory(ContextsWrapper.GameContexts);
+            sessionStateMachine = new ServerSessionStateMachine(ContextsWrapper.contexts, this);
+            damager             = new SimplePlayerDamager(this);
+            compensationManager = new CompensationManager();
+
+            VehicleDamageUtility._damager = damager;
+            sendSnapshotManager           = new SendSnapshotManager(ContextsWrapper.contexts);
         }
+
+
+
+        #endregion
     }
 }

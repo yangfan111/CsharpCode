@@ -129,7 +129,6 @@
     <Compile Include="Components\Player\TriggerEventComponent.cs" />
     <Compile Include="Components\Player\UpdateMessagePoolComponent.cs" />
     <Compile Include="Components\Player\UserCmdComponent.cs" />
-    <Compile Include="Components\Player\UserCmdOwnerComponent.cs" />
     <Compile Include="Components\SceneObject\SceneObjectComponents.cs" />
     <Compile Include="Components\Serializer\CList.cs" />
     <Compile Include="Components\Serializer\DummyComponent.cs" />

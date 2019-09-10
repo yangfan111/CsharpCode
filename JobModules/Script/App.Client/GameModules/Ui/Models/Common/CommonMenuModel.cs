@@ -16,8 +16,8 @@ namespace App.Client.GameModules.Ui.Models.Common
     {
         private IMenuUiAdapter menuUiAdapter = null;
         private bool isGameObjectCreated = false;
-        private KeyReceiver keyReceive = null;
-        private PointerReceiver pointerReceiver = null;
+        private KeyHandler keyReceive = null;
+        private PointerKeyHandler _pointerKeyHandler = null;
 
         private CommonMenuViewModel _viewModel = new CommonMenuViewModel();
         protected override IUiViewModel ViewModel
@@ -62,20 +62,20 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         public void InitKeyBinding()
         {
-            var receiver = new KeyReceiver(UiConstant.menuWindowLayer, BlockType.None);
-            receiver.BindKeyAction(UserInputKey.OpenMenu, (data) =>
+            var handler = new KeyHandler(UiConstant.menuWindowLayer, BlockType.None);
+            handler.BindKeyAction(UserInputKey.OpenMenu, (data) =>
             {
                 ShowMenu(true);
             });
-            menuUiAdapter.RegisterOpenKey(receiver);
+            menuUiAdapter.RegisterOpenKey(handler);
             DynamicKeyBinding();
         }
 
         void DynamicKeyBinding()
         {
             //保证 菜单界面打开的时候 打不开大地图界面
-            pointerReceiver = new PointerReceiver(UiConstant.menuWindowPointBlockLayer, BlockType.All);
-            keyReceive = new KeyReceiver(UiConstant.menuWindowKeyBlockLayer, BlockType.All);
+            _pointerKeyHandler = new PointerKeyHandler(UiConstant.menuWindowPointBlockLayer, BlockType.All);
+            keyReceive = new KeyHandler(UiConstant.menuWindowKeyBlockLayer, BlockType.All);
             keyReceive.BindKeyAction(UserInputKey.OpenMenu, (data) =>
             {
                 ShowMenu(false);
@@ -85,13 +85,13 @@ namespace App.Client.GameModules.Ui.Models.Common
         void RegisterReceive()
         {
             menuUiAdapter.RegisterKeyReceive(keyReceive);
-            menuUiAdapter.RegisterPointerReceive(pointerReceiver);
+            menuUiAdapter.RegisterPointerReceive(_pointerKeyHandler);
         }
 
         void UnRegisterReceive()
         {
             menuUiAdapter.UnRegisterKeyReceive(keyReceive);
-            menuUiAdapter.UnRegisterPointerReceive(pointerReceiver);
+            menuUiAdapter.UnRegisterPointerReceive(_pointerKeyHandler);
         }
 
         public void ShowMenu(bool visible)

@@ -36,7 +36,7 @@ namespace App.Shared.FreeFramework.framework.ai.player
                 int[] keys = player.playerIntercept.RealPressKeys.Keys;
                 foreach (int key in keys)
                 {
-                    contexts.userInput.userInputManager.Mgr.InsertKey(new KeyData((UserInputKey) key, player.playerIntercept.RealPressKeys.Axis(key)));
+                    contexts.userInput.userInputManager.Instance.InsertKey(new KeyData((UserInputKey) key, player.playerIntercept.RealPressKeys.Axis(key)));
                 }
                 player.playerIntercept.RealPressKeys.Frame();
             }

@@ -6,8 +6,8 @@ namespace App.Client.GameModules.Ui.UiAdapter
 {
     public interface IPickUpUiAdapter : IAbstractUiAdapter
     {
-        void RegisterKeyReceiver(KeyReceiver receiver);
-        void RegisterPointerReceiver(PointerReceiver receiver);
+        void RegisterKeyhandler(KeyHandler handler);
+        void RegisterPointerhandler(PointerKeyHandler handler);
         SceneObjectCastLogic GetSceneObjectCastLogic();
         MapObjectCastLogic GetMapObjectCastLogic();
         VehicleCastLogic GetVehicleCastLogic();

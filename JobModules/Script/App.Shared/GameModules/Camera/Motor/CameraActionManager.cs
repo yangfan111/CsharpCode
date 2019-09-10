@@ -89,7 +89,7 @@ namespace Core.CameraControl.NewMotor
             LeaveAction = new BitVector32();
         }
 
-        public void BindKeyAction(CameraActionType actionType, SubCameraMotorType motorType, int motorId,
+        public void AddAction(CameraActionType actionType, SubCameraMotorType motorType, int motorId,
             Action<PlayerEntity, ICameraMotorState> act)
         {
             if (actionType == CameraActionType.Enter)

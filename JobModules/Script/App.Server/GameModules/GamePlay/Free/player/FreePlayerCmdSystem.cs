@@ -14,7 +14,7 @@ namespace App.Server.GameModules.GamePlay.free.player
             this._contexts = contexts;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter owner, IUserCmd cmd)
         {
             this._room.GameRule.PlayerPressCmd(_contexts, owner.OwnerEntity as PlayerEntity, cmd);
         }

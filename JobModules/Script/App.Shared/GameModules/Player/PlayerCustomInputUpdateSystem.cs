@@ -15,9 +15,9 @@ namespace App.Shared.GameModules.Player
         
         private static readonly LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerCustomInputUpdateSystem));
         
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity player = (PlayerEntity)owner.OwnerEntity;
+            PlayerEntity player = (PlayerEntity)getter.OwnerEntity;
             
             if (player.gamePlay.IsLifeState(EPlayerLifeState.Dead))
             {

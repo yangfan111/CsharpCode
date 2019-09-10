@@ -129,7 +129,6 @@
     <Compile Include="Components\Player\TriggerEventComponent.cs" />
     <Compile Include="Components\Player\UpdateMessagePoolComponent.cs" />
     <Compile Include="Components\Player\UserCmdComponent.cs" />
-    <Compile Include="Components\Player\UserCmdOwnerComponent.cs" />
     <Compile Include="Components\SceneObject\SceneObjectComponents.cs" />
     <Compile Include="Components\Serializer\CList.cs" />
     <Compile Include="Components\Serializer\DummyComponent.cs" />
@@ -467,7 +466,6 @@
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerUpdateMessagePoolComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerUploadEventsComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerUserCmdComponent.cs" />
-    <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerUserCmdOwnerComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerUserCmdSeqComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerVehicleCmdSeqComponent.cs" />
     <Compile Include="Generated\Entitas\Generated\Player\Components\PlayerWeaponSoundComponent.cs" />

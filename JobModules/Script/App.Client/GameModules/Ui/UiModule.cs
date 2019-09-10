@@ -63,6 +63,7 @@ namespace App.Client.GameModules.Ui
                 =>
             {
                 var blur = root.AddComponent<BlurManager>();
+                blur.rootName = root.name;
                 blur.SetBlurImage(obj as GameObject);
             });
         }
@@ -75,8 +76,8 @@ namespace App.Client.GameModules.Ui
                 return;
             }
 
-            var bundle = AssetBundleConstant.Prefab_Common;
-            var asset = "BattleAlert";
+            var bundle = AssetBundleConstant.Prefab_Hall_Common;
+            var asset = "UICommonAlert";
             loader.LoadAsync(bundle, asset, (obj) => { alertManager.SetStyle<AlertUIModel>(obj as GameObject); });
         }
 

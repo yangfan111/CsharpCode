@@ -14,7 +14,7 @@ namespace App.Shared
             scCounter = SingletonManager.Get<StaticColliderCounter>();
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter owner, IUserCmd cmd)
         {
             scCounter.CalcuColliderNum(cmd.Seq);
         }

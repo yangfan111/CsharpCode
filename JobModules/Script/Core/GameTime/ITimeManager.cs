@@ -6,16 +6,12 @@
 
         int FrameInterval { get; }
 
-        int ServerTime { get; set; }
-
         int RenderTime { get; set; }
 
         float FrameInterpolation { get; }
         
-        int Delta { get; }
-
         void Tick(float now);
-        void SyncWithServer(int latestServerTime);
+        void SyncWithServer(int serverTime);
         void UpdateFrameInterpolation(int leftServerTime, int rightServerTime);
        
     }

@@ -17,8 +17,8 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
         private Vector2 _centerPos = Vector2.zero;
 
-        private KeyReceiver keyReceive = null;
-        private PointerReceiver pointerReceiver = null;
+        private KeyHandler keyReceive = null;
+        private PointerKeyHandler _pointerKeyHandler = null;
         private Camera uiCamera = null;
 
         private bool _dragging;
@@ -115,20 +115,20 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
         public void InitKeyBinding()
         {
-//            var receiver = new KeyReceiver(UiConstant.maxMapWindowLayer, BlockType.None);
-//            receiver.BindKeyAction(UserInputKey.ShowMaxMap, (data) =>
+//            var handler = new Keyhandler(UiConstant.maxMapWindowLayer, BlockType.None);
+//            handler.AddAction(UserInputKey.ShowMaxMap, (data) =>
 //            {
 //                if (root != null)
 //                {
 //                    ShowMap(!adapter.Enable);
 //                }
 //            });
-//            //adapter.RegisterKeyReceive(receiver);
-//            adapter.RegisterOpenKey(receiver);
+//            //adapter.RegisterKeyReceive(handler);
+//            adapter.RegisterOpenKey(handler);
 
             //            DynamicKeyReceive();
-            pointerReceiver = new PointerReceiver(UiConstant.maxMapWindowPointBlockLayer, BlockType.All);
-            keyReceive = new KeyReceiver(UiConstant.maxMapWindowKeyBlockLayer, BlockType.All);
+            _pointerKeyHandler = new PointerKeyHandler(UiConstant.maxMapWindowPointBlockLayer, BlockType.All);
+            keyReceive = new KeyHandler(UiConstant.maxMapWindowKeyBlockLayer, BlockType.All);
             keyReceive.BindKeyAction(UserInputKey.ChangeMapRate, OnChangeMapRate);
             keyReceive.BindKeyAction(UserInputKey.AddMark, (data) =>
             {
@@ -156,7 +156,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             });
             keyReceive.BindKeyAction(UserInputKey.LocationCurPlay, OnLocationCurPlay);
 
-//            keyReceive.BindKeyAction(UserInputKey.HideWindow, (data) =>
+//            keyReceive.AddAction(UserInputKey.HideWindow, (data) =>
 //            {
 //                if (adapter.Enable)
 //                {
@@ -247,14 +247,14 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                     //                    adapter.HideUiGroup(Core.Ui.UiGroup.MapHide);
 
                     adapter.RegisterKeyReceive(keyReceive);
-                    adapter.RegisterPointerReceive(pointerReceiver);
+                    adapter.RegisterPointerReceive(_pointerKeyHandler);
                 }
                 else
                 {
 //                    adapter.SetCrossActive(true);
 //                    adapter.ShowUiGroup(Core.Ui.UiGroup.MapHide);
                     adapter.UnRegisterKeyReceive(keyReceive);
-                    adapter.UnRegisterPointerReceive(pointerReceiver);
+                    adapter.UnRegisterPointerReceive(_pointerKeyHandler);
                 }
             }
         }

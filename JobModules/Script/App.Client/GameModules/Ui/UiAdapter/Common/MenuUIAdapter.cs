@@ -52,7 +52,7 @@ namespace App.Client.GameModules.Ui.UiAdapter
 
         public void SetInputManagerEnable(bool isEnabled)
         {
-            _contexts.userInput.userInputManager.Mgr.SetEnable(isEnabled);
+            _contexts.userInput.userInputManager.Instance.SetEnable(isEnabled);
         }
 
         public void SetCrossVisible(bool isActive)

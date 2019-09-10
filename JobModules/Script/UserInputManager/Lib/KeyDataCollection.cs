@@ -5,28 +5,27 @@ using UnityEngine;
 
 namespace UserInputManager.Lib
 {
-    public class KeyDataCollection : AbsKeyDataCollection<KeyReceiver, KeyData>{}
+    public class KeyDataCollection : KeyHandlerDataCollection<KeyHandler, KeyData>{}
    
-    public class PointDataCollection:AbsKeyDataCollection<PointerReceiver,PointerData>{}
+    public class PointDataCollection:KeyHandlerDataCollection<PointerKeyHandler,PointerData>{}
   //  public delegate void KeyBindhandlerChanged(Ihandler t, bool isAdd);
-    public abstract class AbsKeyDataCollection<TKeyReceiver,TData> : IEnumerable<TKeyReceiver> where TKeyReceiver :IKeyReceiver<TData> where TData:KeyData
+    public abstract class KeyHandlerDataCollection<TKeyHandler,TData> : IEnumerable<TKeyHandler> where TKeyHandler :IKeyHandler<TData> where TData:KeyData
 
     {
-        private LinkedList<TKeyReceiver> keyGroups = new LinkedList<TKeyReceiver>();
+        private LinkedList<TKeyHandler> keyHandlers = new LinkedList<TKeyHandler>();
         private int blockLayer = -1;
-        private bool isDirty = true;
-        private Dictionary<KeyData,List<KeyPointAction>> dispatchDict = new Dictionary<KeyData, List<KeyPointAction>>(KeyDataComparer.Instance);
-        public  void Dispatch(KeyData keyData)
+        private bool isDirty;
+        private Dictionary<KeyData,List<KeyPointAction>> dispatchDict = new Dictionary<KeyData, List<KeyPointAction>>();
+        public virtual void Dispatch(KeyData keyData)
         {
             Rebuild();
             List<KeyPointAction> actions;
             if (dispatchDict.TryGetValue(keyData, out actions))
             {
-                for (int i = 0; i < actions.Count; i++)
+                foreach (var action in actions)
                 {
-                    DoDispatch(actions[i],keyData);
+                    DoDispatch(action, keyData);
                 }
-            
             }
         }
 
@@ -43,9 +42,9 @@ namespace UserInputManager.Lib
             {
                 keyValuePair.Value.Clear();
             }
-            foreach (TKeyReceiver keyData in this)
+            foreach (TKeyHandler keyData in this)
             {
-                var bindings = keyData.GetBindingActions();
+                var bindings = keyData.GetBindingDict();
                 foreach (KeyValuePair<TData, KeyPointAction> binding in bindings)
                 {
                     List<KeyPointAction> keyActions;
@@ -61,19 +60,19 @@ namespace UserInputManager.Lib
         }
         
 
-        public void AddOne(TKeyReceiver handler)
+        public void AddOne(TKeyHandler handler)
         {
             Console.WriteLine("add handler " + handler);
             if (null == handler)
             {
                 return;
             }
-            if (keyGroups.Contains(handler))
+            if (keyHandlers.Contains(handler))
             {
                 return;
             }
             var newLayer = handler.GetLayer();
-            var node = keyGroups.First;
+            var node = keyHandlers.First;
             var added = false;
             for (; null != node; node = node.Next)
             {
@@ -83,20 +82,20 @@ namespace UserInputManager.Lib
                     continue;
                 }
 
-                keyGroups.AddBefore(node, handler);
+                keyHandlers.AddBefore(node, handler);
                 added = true;
                 break;
             }
 
             if (!added)
             {
-                keyGroups.AddLast(handler);
+                keyHandlers.AddLast(handler);
             }
 
             isDirty = true;
         }
 
-        public void Remove(TKeyReceiver handler)
+        public void Remove(TKeyHandler handler)
         {
             Console.WriteLine("remove handler " + handler);
             if (null == handler)
@@ -104,21 +103,21 @@ namespace UserInputManager.Lib
                 return;
             }
 
-            if (keyGroups.Remove(handler))
+            if (keyHandlers.Remove(handler))
             {
-                isDirty = true;
+                isDirty = false;
             }
 
             
         }
 
-        public IEnumerator<TKeyReceiver> GetEnumerator()
+        public IEnumerator<TKeyHandler> GetEnumerator()
         {
             blockLayer = -1;
-            var node = keyGroups.First;
+            var node = keyHandlers.First;
             for (; null != node; node = node.Next)
             {
-                int layer = node.Value.GetLayer();
+                var layer = node.Value.GetLayer();
                 if (blockLayer > -1 && layer > blockLayer)
                 {
                     yield break;

@@ -43,7 +43,7 @@ namespace Core.Prediction
         /// <summary>
         /// remoteOwnerEntity.UserOwner 
         /// </summary>
-        public virtual IUserCmdOwner UserCmdOwner { get; }
+        public virtual IPlayerUserCmdGetter UserCmdOwner { get; }
 
         public void DestroyLocalEntity(IGameEntity entity)
         {

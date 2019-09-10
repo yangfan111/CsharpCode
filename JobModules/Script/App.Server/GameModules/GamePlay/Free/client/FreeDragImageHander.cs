@@ -10,6 +10,7 @@ using App.Shared.GameModules.Player;
 using App.Shared.GameModules.Weapon;
 using Assets.App.Server.GameModules.GamePlay.Free;
 using Assets.XmlConfig;
+using com.wd.free.@event;
 using com.wd.free.item;
 using com.wd.free.para;
 using com.wd.free.skill;
@@ -37,17 +38,17 @@ namespace App.Server.GameModules.GamePlay.free.client
         public void Handle(ServerRoom room, PlayerEntity player, SimpleProto message)
         {
             FreeData fd = (FreeData)player.freeData.FreeData;
-
-            room.FreeArgs.TempUse(PARA_PLAYER_CURRENT, fd);
+            var freeArgs = room.ContextsWrapper.FreeArgs as FreeRuleEventArgs;
+            freeArgs.TempUse(PARA_PLAYER_CURRENT, fd);
             eventKey.SetValue(message.Ss[0]);
-            room.FreeArgs.GetDefault().GetParameters().TempUse(eventKey);
+            freeArgs.GetDefault().GetParameters().TempUse(eventKey);
 
             Debug.Log("drag from:" + message.Ss[0] + " to:" + message.Ss[1]);
             string from = message.Ss[0];
             string to = message.Ss[1];
 
-            ItemPosition fromIp = FreeItemManager.GetItemPosition(room.FreeArgs, from, fd.freeInventory.GetInventoryManager());
-            ItemPosition toIp = FreeItemManager.GetItemPosition(room.FreeArgs, to, fd.freeInventory.GetInventoryManager());
+            ItemPosition fromIp = FreeItemManager.GetItemPosition(freeArgs, from, fd.freeInventory.GetInventoryManager());
+            ItemPosition toIp = FreeItemManager.GetItemPosition(freeArgs, to, fd.freeInventory.GetInventoryManager());
 
             // 显示拆分UI
             if (message.Bs[0] && from.StartsWith(ChickenConstant.BagDefault))
@@ -109,7 +110,7 @@ namespace App.Server.GameModules.GamePlay.free.client
                     }
                     else
                     {
-                        FreeItemManager.DragItem(from, fd, room.FreeArgs, to);
+                        FreeItemManager.DragItem(from, fd, room.ContextsWrapper.FreeArgs, to);
                     }
                 }
             }
@@ -125,13 +126,13 @@ namespace App.Server.GameModules.GamePlay.free.client
                     }
                     else
                     {
-                        FreeItemManager.UseItem(from, fd, room.FreeArgs);
+                        FreeItemManager.UseItem(from, fd, room.ContextsWrapper.FreeArgs);
                     }
                 }
             }
             else if ((from.StartsWith("w1,") && to.StartsWith("w2,")) || (from.StartsWith("w2,") && to.StartsWith("w1,")))
             {
-                ExchangeWeapon(room.FreeArgs, fd, from, to);
+                ExchangeWeapon(room.ContextsWrapper.FreeArgs, fd, from, to);
             }
             else if (from.StartsWith("w") && to.StartsWith("w") && from.IndexOf(",") == 3 && to.IndexOf(",") == 2)
             {
@@ -149,7 +150,7 @@ namespace App.Server.GameModules.GamePlay.free.client
                     else
                     {
                         string toPosition = to.Substring(0, 2) + from.Substring(2, 1) + ",0,0";
-                        ItemPosition toPart = FreeItemManager.GetItemPosition(room.FreeArgs, toPosition, fd.freeInventory.GetInventoryManager());
+                        ItemPosition toPart = FreeItemManager.GetItemPosition(room.ContextsWrapper.FreeArgs, toPosition, fd.freeInventory.GetInventoryManager());
                         WeaponBaseAgent fromAgent = fd.Player.WeaponController().GetWeaponAgent((EWeaponSlotType) short.Parse(from.Substring(1, 1)));
                         if (toPart != null)
                         {
@@ -165,7 +166,7 @@ namespace App.Server.GameModules.GamePlay.free.client
                             {
                                 if (BagCapacityUtil.CanExchangeAttachment(room, fd, fromInfo, toInfo, fromAgent, toAgent))
                                 {
-                                    FreeItemManager.DragItem(from, fd, room.FreeArgs, toPosition);
+                                    FreeItemManager.DragItem(from, fd, room.ContextsWrapper.FreeArgs, toPosition);
                                 }
                             }
                         }
@@ -173,7 +174,7 @@ namespace App.Server.GameModules.GamePlay.free.client
                         {
                             if (BagCapacityUtil.CanDemountAttachment(room, fd, fromInfo, from, false))
                             {
-                                FreeItemManager.DragItem(from, fd, room.FreeArgs, toPosition);
+                                FreeItemManager.DragItem(from, fd, room.ContextsWrapper.FreeArgs, toPosition);
                             }
                         }
                     }
@@ -187,16 +188,16 @@ namespace App.Server.GameModules.GamePlay.free.client
                     ItemInventory fromInv = fromIp.GetInventory();
                     ItemInventory toInv = toIp == null ? fd.freeInventory.GetInventoryManager().GetInventory(ChickenConstant.BagDefault) : toIp.GetInventory();
                     int[] pos = toIp == null ? new int[] {0, 0} : toInv.GetNextEmptyPosition(toIp.GetKey());
-                    ItemInventoryUtil.MoveItem(pos[0], pos[1], fromInv, toInv, fromInv.GetInventoryUI(), toInv.GetInventoryUI(), fromIp, null, room.FreeArgs);
+                    ItemInventoryUtil.MoveItem(pos[0], pos[1], fromInv, toInv, fromInv.GetInventoryUI(), toInv.GetInventoryUI(), fromIp, null, room.ContextsWrapper.FreeArgs);
                 }
             }
             else
             {
-                FreeItemManager.DragItem(from, fd, room.FreeArgs, to);
+                FreeItemManager.DragItem(from, fd, room.ContextsWrapper.FreeArgs, to);
             }
             
-            room.FreeArgs.Resume(PARA_PLAYER_CURRENT);
-            room.FreeArgs.GetDefault().GetParameters().Resume(PARA_EVENT_KEY);
+            room.ContextsWrapper.FreeArgs.Resume(PARA_PLAYER_CURRENT);
+            room.ContextsWrapper.FreeArgs.GetDefault().GetParameters().Resume(PARA_EVENT_KEY);
         }
 
         private void ExchangeWeapon(ISkillArgs args, FreeData fd, string from, string to)
@@ -263,7 +264,7 @@ namespace App.Server.GameModules.GamePlay.free.client
             {
                 ItemInventory toInv = fd.freeInventory.GetInventoryManager().GetInventory(inv);
                 int[] xy = toInv.GetNextEmptyPosition(ip.key);
-                ItemInventoryUtil.MovePosition(ip, toInv, xy[0], xy[1], room.FreeArgs);
+                ItemInventoryUtil.MovePosition(ip, toInv, xy[0], xy[1], room.ContextsWrapper.FreeArgs);
             }
             else
             {
@@ -284,7 +285,7 @@ namespace App.Server.GameModules.GamePlay.free.client
             }
             else
             {
-                ItemPosition ip = FreeItemManager.GetItemPosition(room.FreeArgs, from, fd.freeInventory.GetInventoryManager());
+                ItemPosition ip = FreeItemManager.GetItemPosition(room.ContextsWrapper.FreeArgs, from, fd.freeInventory.GetInventoryManager());
                 if (ip == null)
                 {
                     ItemInventory ii = fd.freeInventory.GetInventoryManager().GetInventory(from.Trim());
@@ -307,12 +308,12 @@ namespace App.Server.GameModules.GamePlay.free.client
                 {
                     if (from.StartsWith(ChickenConstant.BagGround) && !to.StartsWith(ChickenConstant.BagGround))
                     {
-                        return BagCapacityUtil.CanAddToBag(room.FreeArgs, fd, info.cat, info.id, 1);
+                        return BagCapacityUtil.CanAddToBag(room.ContextsWrapper.FreeArgs, fd, info.cat, info.id, 1);
                     }
 
                     if (to.StartsWith(ChickenConstant.BagGround) && !from.StartsWith(ChickenConstant.BagGround))
                     {
-                        return BagCapacityUtil.CanTakeOff(room.FreeArgs, fd, info.cat, info.id);
+                        return BagCapacityUtil.CanTakeOff(room.ContextsWrapper.FreeArgs, fd, info.cat, info.id);
                     }
                 }
             }
@@ -337,7 +338,7 @@ namespace App.Server.GameModules.GamePlay.free.client
         private void handleToGround(string from, string to, ServerRoom room, FreeData fd)
         {
             PlayerStateUtil.AddPlayerState(EPlayerGameState.InterruptItem, fd.Player.gamePlay);
-            FreeItemManager.DragItem(from, fd, room.FreeArgs, ChickenConstant.BagGround);
+            FreeItemManager.DragItem(from, fd, room.ContextsWrapper.FreeArgs, ChickenConstant.BagGround);
 
             SimpleProto sp = FreePool.Allocate();
             sp.Key = FreeMessageConstant.PlaySound;
@@ -357,9 +358,9 @@ namespace App.Server.GameModules.GamePlay.free.client
                 if (inv != null)
                 {
                     inv.Clear();
-                    FreeItem item = FreeItemManager.GetItem(room.FreeArgs, FreeItemConfig.GetItemKey(info.cat, info.id), info.count);
+                    FreeItem item = FreeItemManager.GetItem(room.ContextsWrapper.FreeArgs, FreeItemConfig.GetItemKey(info.cat, info.id), info.count);
                     item.GetParameters().AddPara(new IntPara("entityId", info.entityId));
-                    inv.AddItem(room.FreeArgs, item, false);
+                    inv.AddItem(room.ContextsWrapper.FreeArgs, item, false);
 
                     DragGroundOne(fd, room, to);
                 }
@@ -374,11 +375,11 @@ namespace App.Server.GameModules.GamePlay.free.client
         {
             if (to.StartsWith(ChickenConstant.BagDefault))
             {
-                FreeItemManager.DragItem("ground,0,0", fd, room.FreeArgs, ChickenConstant.BagDefault);
+                FreeItemManager.DragItem("ground,0,0", fd, room.ContextsWrapper.FreeArgs, ChickenConstant.BagDefault);
             }
             else
             {
-                FreeItemManager.DragItem("ground,0,0", fd, room.FreeArgs, to);
+                FreeItemManager.DragItem("ground,0,0", fd, room.ContextsWrapper.FreeArgs, to);
             }
         }
 

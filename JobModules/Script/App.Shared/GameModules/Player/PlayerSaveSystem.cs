@@ -39,9 +39,9 @@ namespace App.Shared.GameModules.Player
             }
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity myEntity = owner.OwnerEntity as PlayerEntity;
+            PlayerEntity myEntity = getter.OwnerEntity as PlayerEntity;
             if (null == myEntity) return;
 
             var myState = myEntity.stateInterface.State;

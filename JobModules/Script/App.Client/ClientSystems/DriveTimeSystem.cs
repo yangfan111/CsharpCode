@@ -39,14 +39,13 @@ namespace App.Client.ClientSystems
         {
             _sessionObjects = contexts.session.clientSessionObjects;
         }
-      
+      // _sessionObjects.TimeManager.RenderTime即为当前服务器时间rednerTime
+
         protected override void InternalExecute()
         {
-        
-          
             var snapshotPool = _sessionObjects.SnapshotSelctor;
             var snapshotPair = snapshotPool.SelectSnapshot(_sessionObjects.TimeManager.RenderTime);
-            _sessionObjects.PlaybackInfoProvider.Update(snapshotPair, snapshotPool.LatestSnapshot);
+            _sessionObjects.PlaybackInfoProvider.Update(snapshotPair);
 
 
             if (snapshotPair != null)

@@ -71,7 +71,7 @@ namespace Core.Room
             return _token2UserInfo.ContainsKey(token);
         }
 
-        private CalcFixTimeInterval _calcFixTimeInterval = new CalcFixTimeInterval();
+        private CompensationFixTimer _calcFixTimeInterval = new CompensationFixTimer();
         private float _compensationInterval = 0;
         public void Update()
         {

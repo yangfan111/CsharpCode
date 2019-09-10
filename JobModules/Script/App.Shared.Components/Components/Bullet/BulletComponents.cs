@@ -53,7 +53,7 @@ namespace App.Shared.Components.Bullet
         [DontInitilize] public EHitType HitType;
         [DontInitilize] public int CmdSeq;
         [DontInitilize] public BulletStatisticsInfo StatisticsInfo;
-       
+
         /*public override string ToString()
         {
             return string.Format("Velocity:{0},Distance:{1},Gravity:{2},RemainFrameTime:{3},ServerTime:{4},MaxDistance:{5},PenetrableLayerCount:{6},BaseDamage:{7},PenetrableThickness:{8},VelocityDecay:{9},Caliber:{10},WeaponId:{11},DistanceDecay:{12},StartPoint:{13},Ignore:{14},StartDir:{15},HitPoint:{16}",Velocity.ToString(), Distance.ToString("f2"),Gravity, RemainFrameTime, ServerTime, MaxDistance.ToString("f2"), PenetrableLayerCount, BaseDamage, PenetrableThickness, VelocityDecay.ToString("f2"),Caliber, WeaponId, DistanceDecay.ToString("f2"), StartPoint, 0, StartDir,HitPoint);

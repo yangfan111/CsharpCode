@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace UserInputManager.Lib
 {
-    public  class PointerProvider : AbstractProvider<PointerReceiver, PointerData>
+    public class PointerProvider : AbstractProvider<PointerKeyHandler, PointerData>
     {
         LoggerAdapter _logger = new LoggerAdapter(typeof(PointerProvider));
 
@@ -24,7 +24,7 @@ namespace UserInputManager.Lib
             pointerData.IdList = target.IdList;
         }
 
-        private KeyData MakeKeyData(UserInputKey key, Vector3 pos)
+        private KeyData MakeKeyData(UserInputKey key, float axis, Vector3 pos)
         {
             var data = dataPool.GetData();
             data.Key = key;
@@ -65,7 +65,7 @@ namespace UserInputManager.Lib
                         //移动消息直接响应
                         if (state == UserInputState.PointerMove)
                         {
-                            KeyDatas.Enqueue(MakeKeyData(inputKey, Input.mousePosition));
+                            KeyDatas.Enqueue(MakeKeyData(inputKey, 0, Input.mousePosition));
                             break;
                         }
 
@@ -77,7 +77,7 @@ namespace UserInputManager.Lib
                             var target = hitTarget.transform.GetComponent<RayCastTarget>();
                             if (null == target) continue;
                             //if (!target.KeyList.Contains(inputKey)) continue;
-                            var pointerData = MakeKeyData(inputKey, hitTarget.point);
+                            var pointerData = MakeKeyData(inputKey, 0, hitTarget.point);
                             SetRaycastTargetData(pointerData, target);
                             KeyDatas.Enqueue(pointerData);
                         }

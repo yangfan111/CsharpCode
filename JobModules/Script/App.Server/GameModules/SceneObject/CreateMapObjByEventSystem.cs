@@ -29,7 +29,7 @@ namespace App.Shared.GameModules.SceneObject
             _doorListener = new ServerDoorListener(contexts);
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter owner, IUserCmd cmd)
         {
             var player = owner.OwnerEntity as PlayerEntity;
             if (player == null) return;

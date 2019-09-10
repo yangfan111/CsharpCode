@@ -1,20 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-using Luminosity.IO;
 using UnityEngine;
 
 namespace UserInputManager.Lib
 {
-    public class KeyProvider : AbstractProvider<KeyReceiver, KeyData>
+    public class KeyProvider : AbstractProvider<KeyHandler, KeyData>
     {
-        StringBuilder stringBuilder = new StringBuilder();
 
         public KeyData MakeKeyData(UserInputKey key, float axis)
         {
             var data = dataPool.GetData();
-            data.Key  = key;
+            data.Key = key;
             data.Axis = axis;
             return data;
         }
@@ -22,22 +18,11 @@ namespace UserInputManager.Lib
         protected override void DoCollect()
         {
             //没有按键按下的时候不执行收集操作
-            // if(!Input.anyKey && !Input.anyKeyDown)
-            // {
-            //     //return;//没有anyKeyUp，会导致问题，暂时不优化，有性能问题再考虑分离keyup事件
-            // }
-
-       //     int count = Time.frameCount;
-            Func<KeyCode, bool>           keyAction    = null;
-            Func<string, bool>            buttonAction = null;
-            Func<string, PlayerID, float> axisAction   = null;
-            InputInspectType inspectType;
-            bool stepPass = false;
-            float axis = 0;
-            foreach (KeyReceiver data in collection)
-                            //{
-                            //    stringBuilder.Length = 0;
-                            //    stringBuilder.AppendFormat("[{0}][{1}] ", count,data);
+            if(!Input.anyKey && !Input.anyKeyDown)
+            {
+                //return;//没有anyKeyUp，会导致问题，暂时不优化，有性能问题再考虑分离keyup事件
+            }
+            foreach (var data in collection)
             {
                 List<UserInputKey> userInputKeys = GetKeyList(data);
                 foreach (UserInputKey inputKey in userInputKeys)
@@ -46,73 +31,65 @@ namespace UserInputManager.Lib
                     List<KeyConvertItem> keys = keyConverter.Convert(inputKey);
                     foreach (var keyConvertItem in keys)
                     {
-                        stepPass = false;
                         var state = keyConvertItem.State;
                         //按键消息需要检测是否响应
-                        keyAction    = null;
-                        buttonAction = null;
-                        axisAction   = null;
-                        inspectType = InputInspectType.None;
+                        Func<KeyCode, bool> keyAction = null;
+                        Func<string, bool> buttonAction = null;
+                        Func<string, Luminosity.IO.PlayerID, float> axisAction = null;
                         switch (state)
                         {
                             case UserInputState.KeyDown:
-                                keyAction = InputManager.GetKeyDown;
-                                inspectType = InputInspectType.Key;
+                                keyAction = Luminosity.IO.InputManager.GetKeyDown;
                                 break;
                             case UserInputState.KeyHold:
-                                keyAction = InputManager.GetKey;
-                                inspectType = InputInspectType.Key;
+                                keyAction = Luminosity.IO.InputManager.GetKey;
                                 break;
                             case UserInputState.KeyUp:
-                                keyAction = InputManager.GetKeyUp;
-                                inspectType = InputInspectType.Key;
+                                keyAction = Luminosity.IO.InputManager.GetKeyUp;
                                 break;
                             case UserInputState.ButtonDown:
-                                buttonAction = InputManager.GetButtonDown;
-                                inspectType = InputInspectType.Button;
+                                buttonAction = Luminosity.IO.InputManager.GetButtonDown;
                                 break;
                             case UserInputState.ButtonUp:
-                                buttonAction = InputManager.GetButtonUp;
-                                inspectType = InputInspectType.Button;
+                                buttonAction = Luminosity.IO.InputManager.GetButtonUp;
                                 break;
                             case UserInputState.ButtonHold:
-                                buttonAction = InputManager.GetButton;
-                                inspectType = InputInspectType.Button;
+                                buttonAction = Luminosity.IO.InputManager.GetButton;
                                 break;
                             case UserInputState.Axis:
-                                axisAction = InputManager.GetAxis;
-                                inspectType = InputInspectType.Aixs;
+                                axisAction = Luminosity.IO.InputManager.GetAxis;
                                 break;
                             case UserInputState.AxisRow:
-                                axisAction = InputManager.GetAxisRaw;
-                                inspectType = InputInspectType.Aixs;
-
+                                axisAction = Luminosity.IO.InputManager.GetAxisRaw;
                                 break;
                         }
-        
-                        switch (inspectType)
+
+                        if (null != keyAction)
                         {
-                            case InputInspectType.Aixs:
-                                axis = axisAction(keyConvertItem.InputKey, PlayerID.One);
-                                stepPass = true;
-                                break;
-                            case InputInspectType.Button:
-                                stepPass = buttonAction(keyConvertItem.InputKey);
-                                break;
-                            case InputInspectType.Key:
-                                stepPass = keyAction(keyConvertItem.Key);
-                                break;
+                            if (!keyAction(keyConvertItem.Key))
+                            {
+                                continue;
+                            }
                         }
 
-                        if (stepPass)
+                        if (null != buttonAction)
                         {
-                            var keydata = MakeKeyData(inputKey, axis);
-                            KeyDatas.Enqueue(keydata);
-                            // 只要有一个条件满足就如队列，后续条件就不判断了
-
-                            break;
+                            if (!buttonAction(keyConvertItem.InputKey))
+                            {
+                                continue;
+                            }
                         }
-                     
+
+                        float axis = 0;
+                        if (null != axisAction)
+                        {
+                            axis = axisAction(keyConvertItem.InputKey, Luminosity.IO.PlayerID.One);
+                        }
+
+                        var keydata = MakeKeyData(inputKey, axis);
+                        KeyDatas.Enqueue(keydata);
+                        // 只要有一个条件满足就如队列，后续条件就不判断了
+                        break;
                     }
                 }
             }

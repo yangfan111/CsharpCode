@@ -18,9 +18,9 @@ namespace App.Shared.GameModules.Player.Oxygen
             _vehicleContext = vehicleContex;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity player = owner.OwnerEntity as PlayerEntity;
+            PlayerEntity player = getter.OwnerEntity as PlayerEntity;
             if (player.gamePlay.IsLifeState(EPlayerLifeState.Dead))
             {
                 return;

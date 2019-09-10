@@ -13,13 +13,13 @@ namespace App.Client.Console
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(SnapshotMessageHandler));
         private bool _first = true;
         private ITimeManager _timeManager;
-        private IUpdateLatestHandler _updateLatestHandler;
-        public SnapshotMessageHandler(ISnapshotSelector pool, IUpdateLatestHandler updateLatestHandler,
+        private ClientUpdateLatestManager _clientUpdateMgr;
+        public SnapshotMessageHandler(ISnapshotSelector pool, ClientUpdateLatestManager clientUpdateMgr,
             ITimeManager timeManager)
         {
             _pool = pool;
             _timeManager = timeManager;
-            _updateLatestHandler = updateLatestHandler;
+            _clientUpdateMgr = clientUpdateMgr;
 
         }
 
@@ -47,8 +47,8 @@ namespace App.Client.Console
 
             _logger.DebugFormat("DoHandle :seq:{0} usercmd:{1} snapshotId:{2}", MyGameTime.seq, messageBody.LastUserCmdSeq, messageBody.SnapshotSeq);
               
-            _updateLatestHandler.BaseUserCmdSeq = messageBody.LastUserCmdSeq;
-            _updateLatestHandler.LastSnapshotId = messageBody.SnapshotSeq;
+            _clientUpdateMgr.LastAckUserCmdSeq = messageBody.LastUserCmdSeq;
+            _clientUpdateMgr.LastAckSnapshotId = messageBody.SnapshotSeq;
             _pool.AddSnapshot(messageBody);
         }
     }

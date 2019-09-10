@@ -43,8 +43,8 @@ namespace App.Client.GameModules.GamePlay
                         inputMapper = new DefaultModeInputMapper();
                         break;
                 }
-                cmdGenerator.RegisterGlobalKeyReceiver(inputMapper);
-                cmdGenerator.BeginReceiveUserInput(_contexts.userInput.userInputManager.Mgr);
+                cmdGenerator.RegisterGlobalKeyhandler(inputMapper);
+                cmdGenerator.BeginReceiveUserInput(_contexts.userInput.userInputManager.Instance);
             }
         }
     }

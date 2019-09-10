@@ -7,16 +7,19 @@ using App.Shared;
 using App.Shared.Client;
 using App.Shared.DebugHandle;
 using Assets.App.Client.GameModules.GamePlay.Free;
+using Assets.Sources.Free.UI;
 using Core.Components;
 using Core.EntityComponent;
 using Core.GameModule.Step;
 using Core.GameModule.System;
 using Core.MyProfiler;
+using Core.Network;
 using Core.SessionState;
 using Core.Utils;
 using Entitas;
 using System;
 using UnityEngine;
+using Core.UpdateLatest;
 using Utils.Singleton;
 
 namespace App.Client.Console
@@ -78,11 +81,7 @@ namespace App.Client.Console
                 SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.Room);
                 var sessionObjects = _contexts.session.clientSessionObjects;
 
-                sessionObjects.MessageDispatcher.DriveDispatch();
-
-                if (_isDisposed)
-                    return;
-
+                    sessionObjects.MessageDispatcher.DriveDispatch();
                 StepExecuteManager.Instance.Update();
                 _clientSessionStateMachine.Update();
             }
@@ -316,8 +315,6 @@ namespace App.Client.Console
 
         public string OnDebugMessage(DebugCommand message)
         {
-            if (SingletonManager.Get<ClientFileSystemConfigManager>().BootConfig.DisableDebug)
-                return "";
             return _commandHandler.OnDebugMessage(message);
         }
     }

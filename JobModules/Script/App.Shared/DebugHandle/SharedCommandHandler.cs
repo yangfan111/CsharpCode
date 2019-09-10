@@ -502,6 +502,7 @@ namespace App.Shared.DebugHandle
                             case 2:
                                 GMVariable.SpreadOffsetFactor = int.Parse(message.Args[1]) ;
                                 break;
+                            
                         }
                     break;
                 case DebugCommands.SetAttachment:

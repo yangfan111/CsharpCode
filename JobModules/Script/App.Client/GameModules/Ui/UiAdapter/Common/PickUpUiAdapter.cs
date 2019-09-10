@@ -2,7 +2,6 @@
 using UserInputManager.Lib;
 using Utils.Configuration;
 using Utils.Singleton;
-using NotImplementedException = System.NotImplementedException;
 
 namespace App.Client.GameModules.Ui.UiAdapter
 {
@@ -14,10 +13,10 @@ namespace App.Client.GameModules.Ui.UiAdapter
         private SessionContext session;
         private VehicleContext vehicle;
         private FreeMoveContext freeMove;
-        private GameInputManager userInputManager;
+        private UserInputManager.Lib.UserInputManager userInputManager;
         private UiContext uiContext;
 
-        public PickUpUiAdapter(PlayerContext player,  SceneObjectContext sceneObject, MapObjectContext mapObject, SessionContext session, VehicleContext vehicle, FreeMoveContext freeMove, GameInputManager userInputManager, UiContext uiContext)
+        public PickUpUiAdapter(PlayerContext player,  SceneObjectContext sceneObject, MapObjectContext mapObject, SessionContext session, VehicleContext vehicle, FreeMoveContext freeMove, UserInputManager.Lib.UserInputManager userInputManager, UiContext uiContext)
         {
             this.player = player;
             this.sceneObject = sceneObject;
@@ -29,17 +28,13 @@ namespace App.Client.GameModules.Ui.UiAdapter
             this.uiContext = uiContext;
         }
 
-        public void RegisterKeyReceiver(KeyReceiver receiver)
+        public void RegisterKeyhandler(KeyHandler handler)
         {
-            userInputManager.RegisterKeyReceiver(receiver);
+            userInputManager.RegisterKeyhandler(handler);
         }
-
-
-
-
-        public void RegisterPointerReceiver(PointerReceiver receiver)
+        public void RegisterPointerhandler(PointerKeyHandler handler)
         {
-            userInputManager.RegisterPointerReceiver(receiver);
+            userInputManager.RegisterPointerhandler(handler);
         }
 
         public SceneObjectCastLogic GetSceneObjectCastLogic()

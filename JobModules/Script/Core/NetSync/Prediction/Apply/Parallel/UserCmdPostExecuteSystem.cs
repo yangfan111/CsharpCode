@@ -5,10 +5,10 @@ namespace Core.Prediction.UserPrediction.Parallel
 {
     class UserCmdPostExecuteSystem : ISimpleParallelUserCmdExecuteSystem
     {
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd userCmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd userCmd)
         {
             userCmd.FilteredInput = null;
-            owner.LastCmdSeq = userCmd.Seq;
+            getter.LastCmdSeq = userCmd.Seq;
         }
 
         public ISimpleParallelUserCmdExecuteSystem CreateCopy()

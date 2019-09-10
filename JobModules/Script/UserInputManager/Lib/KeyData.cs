@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 namespace UserInputManager.Lib
 {
- 
     public class KeyDataComparer : IEqualityComparer<KeyData>
     {
-     
         public bool Equals(KeyData x, KeyData y)
         {
             if(null == x && null == y)
@@ -45,11 +41,6 @@ namespace UserInputManager.Lib
         {
             Key = UserInputKey.None;
             Axis = 0;
-        }
-
-        public override string ToString()
-        {
-            return string.Format("{0},{1}", Key, Axis);
         }
 
         public KeyData(UserInputKey key)

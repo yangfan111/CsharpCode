@@ -19,7 +19,7 @@ namespace App.Client.GameModules.Ui.Models.Common
         private CommonDebugInfoViewModel _viewModel = new CommonDebugInfoViewModel();
 
         private IDebugInfoUiAdapter _adapter;
-        private KeyReceiver KeyReceiver;
+        private KeyHandler _keyHandler;
 
         protected override IUiViewModel ViewModel
         {
@@ -40,9 +40,9 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void InitKey()
         {
-            KeyReceiver = new KeyReceiver(EInputLayer.System, BlockType.None,"hdebug");
-            KeyReceiver.BindKeyAction(UserInputKey.ShowDebug, (data) => { _adapter.Enable = !_adapter.Enable; });
-            _adapter.RegisterKeyReceive(KeyReceiver);
+            _keyHandler = new KeyHandler(Layer.System, BlockType.None);
+            _keyHandler.BindKeyAction(UserInputKey.ShowDebug, (data) => { _adapter.Enable = !_adapter.Enable; });
+            _adapter.RegisterKeyReceive(_keyHandler);
         }
 
         private void InitGui()

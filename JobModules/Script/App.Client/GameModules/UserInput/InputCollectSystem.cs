@@ -22,7 +22,7 @@ namespace App.Client.GameModules.UserInput
             if (Camera.main != null)
             {
                 var lastLayer = ProcessIgnoreLayers();
-                _userInputContext.userInputManager.Mgr.Dispatch();
+                _userInputContext.userInputManager.Instance.Dispatch();
                 ResumeIgnoreLayers(lastLayer);
             }
         }

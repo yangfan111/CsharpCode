@@ -13,17 +13,14 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private RectTransform rectTransform;
         private Image img;
         private Material material;
-        private ActiveSetter tranActiveSetter;
 
         public BaneCircle(Transform tran, bool isBane, bool isMiniMap = true)
         {
+            UIUtils.SetActive(tran, true);
             this.tran = tran;
-            tranActiveSetter = new ActiveSetter(tran.gameObject);
-            tranActiveSetter.Active = true;
             rectTransform = tran.GetComponent<RectTransform>();
             img = tran.GetComponent<Image>();
             material = img.material;
-            
 
             UnityEngine.Color boundColor = UnityEngine.Color.white;
             if (isBane)
@@ -48,12 +45,12 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             var duquanPos = duQuanInfo.Center.ShiftedUIVector2();
             if (duQuanInfo.Level == 0 || duQuanInfo.Radius == 0 || UnityEngine.Vector2.Distance(selfPlayPos, duquanPos) > 1.414f * windowWidthByRice / 2 + duQuanInfo.Radius) //不在地图视野内
             {
-                tranActiveSetter.Active = false;
+                UIUtils.SetActive(tran, false);
             }
             else
             {
-                tranActiveSetter.Active = true;
-
+                UIUtils.SetActive(tran, true);
+                
                 //设置大小
                 float beishu = (duQuanInfo.Radius * rate) / (rectTransform.rect.width / 2);
                 float beishuDaosu = (rectTransform.rect.width / 2) / (duQuanInfo.Radius * rate);

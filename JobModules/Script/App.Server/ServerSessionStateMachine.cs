@@ -153,13 +153,13 @@ namespace App.Server
             _gameModule.AddModule(
             new ServerSceneObjectModule(contexts, this, sessionObjects.EquipmentEntityIdGenerator));
 
-            IUserCmdExecuteSystemHandler userCmdExecuteSystemHandler = new UserCmdExecuteSystemHandler(contexts);
+            IServerUserCmdList serrverServerUserCmdList = new ServerServerUserCmdList(contexts);
             IVehicleCmdExecuteSystemHandler vehicleCmdExecuteSystemHandler =
                             new ServerVehicleCmdExecuteSystemHandler(contexts);
 
             var systems = new Feature("GameSessionState");
             systems.Add(new PingSystem(contexts));
-            systems.Add(new ServerMainFeature("ServerSystems", _gameModule, userCmdExecuteSystemHandler,
+            systems.Add(new ServerMainFeature("ServerSystems", _gameModule, serrverServerUserCmdList,
             vehicleCmdExecuteSystemHandler, contexts.session.serverSessionObjects.SimulationTimer,
             new VehicleExecutionSelector(contexts), sessionObjects, room));
 

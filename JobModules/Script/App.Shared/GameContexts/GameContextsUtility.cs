@@ -75,14 +75,20 @@ namespace App.Shared.ContextInfos
             while (rval < a) rval <<= 1;
             return rval;
         }
-
+        /// player -128
+        /// bullet -128
+        /// client -128
+        /// throw  -128
+        /// sceneObject -4
+        /// freeMove  -2048
+        /// MapObject -32
         public static IBin2DManager GetReplicationBin2DManager(float minX, float minY, float maxX, float maxY,
-            int visibleRadius, Dictionary<int, int> customVisibleRadiusDict)
+            int defaultVisibleRadius, Dictionary<int, int> customVisibleRadiusDict)
         {
             IBin2DManager bin2DManager = new Bin2DManager();
             for (int i = 0; i < (int) EEntityType.End; i++)
             {
-                var v = visibleRadius;
+                var v = defaultVisibleRadius;
                 if (customVisibleRadiusDict.ContainsKey(i))
                 {
                     v = customVisibleRadiusDict[i];

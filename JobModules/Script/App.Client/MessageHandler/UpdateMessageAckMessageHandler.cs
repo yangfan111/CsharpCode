@@ -6,16 +6,16 @@ namespace App.Client.MessageHandler
 {
     public class UpdateMessageAckMessageHandler:AbstractClientMessageHandler<Protobuf.UpdateMessageAck>
     {
-        private IUpdateLatestHandler _updateLatestHandler;
+        private ClientUpdateLatestManager _clientUpdateLatestHandler;
 
-        public UpdateMessageAckMessageHandler(IUpdateLatestHandler updateLatestHandler)
+        public UpdateMessageAckMessageHandler(ClientUpdateLatestManager clientUpdateLatestHandler)
         {
-            _updateLatestHandler = updateLatestHandler;
+            _clientUpdateLatestHandler = clientUpdateLatestHandler;
         }
 
         public override void DoHandle(int messageType, UpdateMessageAck messageBody)
         {
-            _updateLatestHandler.BaseUserCmdSeq = messageBody.AckSeq;
+            _clientUpdateLatestHandler.LastAckUserCmdSeq = messageBody.AckSeq;
            
         }
     }

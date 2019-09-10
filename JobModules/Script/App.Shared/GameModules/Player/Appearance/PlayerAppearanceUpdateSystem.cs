@@ -20,9 +20,9 @@ namespace App.Shared.GameModules.Player.Appearance
     {
         private static LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerAppearanceUpdateSystem));
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var player = owner.OwnerEntity as PlayerEntity;
+            var player = getter.OwnerEntity as PlayerEntity;
             CheckPlayerLifeState(player);
             AppearanceUpdate(player);
         }

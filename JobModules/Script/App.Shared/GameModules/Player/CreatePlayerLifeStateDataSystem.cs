@@ -13,9 +13,9 @@ namespace App.Shared.GameModules.Player
         {
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var playerEntity = (PlayerEntity) owner.OwnerEntity;
+            var playerEntity = (PlayerEntity) getter.OwnerEntity;
             CreateLifeStateData(playerEntity);
         }
         

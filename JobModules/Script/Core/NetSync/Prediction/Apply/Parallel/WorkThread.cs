@@ -81,9 +81,9 @@ namespace Core.Prediction.UserPrediction.Parallel
                 {
                     SingletonManager.Get<DurationHelp>().ProfileStart(_systemsProfiles[systemIdx]);
                     var sytstem = _systems[systemIdx];
-                    sytstem.ExecuteUserCmd(task.Owner, task.UserCmd);
+                    sytstem.ExecuteUserCmd(task.Getter, task.UserCmd);
                     _logger.DebugFormat("{0} Execute :{1} seq:{2} player:{3}", Name, systemIdx, task.UserCmd.Seq,
-                        task.Owner.OwnerEntityKey.EntityId);
+                        task.Getter.OwnerEntityKey.EntityId);
                 }
                 catch (Exception e)
                 {

@@ -27,6 +27,8 @@ namespace App.Server
             _contexts = new Contexts();
         }
 
+ 
+
         public IPlayerTokenGenerator TokenGenerator
         {
             set { _tokenGenerator = value; }
@@ -35,8 +37,8 @@ namespace App.Server
         public ServerRoom Create(RequestCreateRoomMessage message)
         {
             _logger.InfoFormat("Handle CreateRoom Message");
-           
-            var serverRoom = new ServerRoom(new RoomId(1), _contexts, _dispatcher, _coRouitneManager, _assetMananger, _tokenGenerator);
+           var contextsServerWrapper = new ContextsServerWrapper(_contexts,_assetMananger,_coRouitneManager);
+            var serverRoom = new ServerRoom(new RoomId(1), contextsServerWrapper, _dispatcher, _tokenGenerator);
             ResetEventDispacther();
 
             if (message != null)

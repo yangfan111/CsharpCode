@@ -15,7 +15,7 @@ namespace App.Shared.Audio
 {
     public class PlayerAudioCmdUpdateSystem : IUserCmdExecuteSystem
     {
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter owner, IUserCmd cmd)
         {
             var audioController = owner.OwnerEntityKey.AudioController();
             audioController.Update(cmd);

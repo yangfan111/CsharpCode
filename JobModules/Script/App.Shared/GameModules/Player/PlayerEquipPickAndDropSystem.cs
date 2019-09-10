@@ -11,9 +11,9 @@ namespace App.Shared.GameModules.Player
 
         public PlayerEquipPickAndDropSystem(){}
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var player = owner.OwnerEntity as PlayerEntity;
+            var player = getter.OwnerEntity as PlayerEntity;
             var controller = player.WeaponController();
             if (!player.gamePlay.IsLifeState(EPlayerLifeState.Alive) || !player.gamePlay.CanAutoPick())
                 return;

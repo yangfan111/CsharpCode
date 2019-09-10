@@ -6,10 +6,10 @@ using Utils.Singleton;
 
 namespace Core.GameModule.System
 {
-    public class PlaybackSystem : AbstractFrameworkSystem<IPlaybackSystem>
+    public class PlaybackExcuteSystem : AbstractFrameworkSystem<IPlaybackSystem>
     {
         private IList<IPlaybackSystem> _systems;
-        public PlaybackSystem(IGameModule module)
+        public PlaybackExcuteSystem(IGameModule module)
         {
             
             _systems = module.PlaybackSystems;

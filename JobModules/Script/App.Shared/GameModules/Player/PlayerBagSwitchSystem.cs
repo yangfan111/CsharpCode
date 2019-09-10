@@ -20,12 +20,12 @@ namespace App.Shared.GameModules.Player
             _contexts = contexts;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
 
             if (cmd.BagIndex > 0)
             {
-                var player = owner.OwnerEntity as PlayerEntity;
+                var player = getter.OwnerEntity as PlayerEntity;
                 if (player.StateInteractController().GetCurrStates().Contains(EPlayerState.SwitchWeapon))
                     return;
 

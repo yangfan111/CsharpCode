@@ -11,6 +11,7 @@ SET_TARGET_PROPERTIES(${Proj_Name} PROPERTIES
 
 target_link_libraries(${Proj_Name} LiteNetLib Common Shared.Scripts XmlConfig AssetBundleManager)
 
+
 set_property(TARGET ${Proj_Name} PROPERTY VS_DOTNET_REFERENCES
 	"System"
 	"System.Core"

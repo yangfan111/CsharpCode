@@ -15,9 +15,9 @@ namespace App.Shared.GameModules.Player.Actions
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerClimbActionSystem));
         private IGenericAction _genericAction;
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var player = (PlayerEntity)owner.OwnerEntity;
+            var player = (PlayerEntity)getter.OwnerEntity;
             
             CheckPlayerLifeState(player);
             

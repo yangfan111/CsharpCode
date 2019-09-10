@@ -71,8 +71,8 @@ namespace App.Client.ClientGameModules
             _gameModule = GameModuleFactory.CreateCompositeGameModule(_contexts);
             var sessionObjects = _contexts.session.clientSessionObjects;
 
-            SyncLastestManager netSyncManager = sessionObjects.netSyncManager;
-            IPlaybackManager playbackManager = sessionObjects.PlaybackManager;
+            SyncLastestManager netSyncManager = sessionObjects.NetSyncManager;
+            PlaybackManager playbackManager = sessionObjects.PlaybackManager;
             var predictionManager = sessionObjects.UserPredictionManager;
             var predicatoinProvider = sessionObjects.UserPredictionProvider;
             ISimulationTimer simulationTimer = sessionObjects.SimulationTimer;

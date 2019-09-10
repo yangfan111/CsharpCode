@@ -118,13 +118,13 @@ namespace App.Shared.Components
         [DontInitilize] public string LoginToken;
         
         
-        [DontInitilize] public IUpdateLatestHandler UpdateLatestHandler;
+        [DontInitilize] public ClientUpdateLatestManager ClientUpdateLatestMgr;
         [DontInitilize] public ISnapshotSelector SnapshotSelctor;
         [DontInitilize] public ITimeManager TimeManager;
         
         [DontInitilize] public IUserCmdGenerator UserCmdGenerator;
-        [DontInitilize] public IPlaybackInfoProvider PlaybackInfoProvider;
-        [DontInitilize] public IPlaybackManager PlaybackManager;
+        [DontInitilize] public PlaybackInfoProvider PlaybackInfoProvider;
+        [DontInitilize] public PlaybackManager PlaybackManager;
         
         [DontInitilize] public PredictionManager UserPredictionManager;
     //    [DontInitilize] public PredictionManager VehiclePredictionManager;
@@ -134,7 +134,7 @@ namespace App.Shared.Components
        
        
      //   [DontInitilize] public SyncLatestProvider SyncLatestProvider;
-        [DontInitilize] public SyncLastestManager netSyncManager;
+        [DontInitilize] public SyncLastestManager NetSyncManager;
         [DontInitilize] public IClientSimulationTimer SimulationTimer;
         [DontInitilize] public VehicleTimer VehicleTimer;
 
@@ -184,7 +184,6 @@ namespace App.Shared.Components
         [DontInitilize] public VehicleTimer VehicleTimer;
 
         [DontInitilize] public int GameRule;
-        [DontInitilize] public IUpdateMessagePool UpdateMessagePool { get; set; }
 
 
         //服务器状态
@@ -205,8 +204,6 @@ namespace App.Shared.Components
                 SnapshotSelector.Dispose();
             if(Bin2dManager!=null)
                 Bin2dManager.Dispose();
-            if(UpdateMessagePool!=null)
-                UpdateMessagePool.Dispose();
         }
     }
 }

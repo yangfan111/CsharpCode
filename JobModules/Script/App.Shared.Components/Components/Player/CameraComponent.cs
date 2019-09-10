@@ -76,7 +76,7 @@ namespace App.Shared.Components.Player
         Car,
         Parachuting,
         FollowEntity,
-        Witness, // втсийс╫г
+        Witness, // Х┤╙Г■╠Х╖├Х╖▓
         Default
     }
     

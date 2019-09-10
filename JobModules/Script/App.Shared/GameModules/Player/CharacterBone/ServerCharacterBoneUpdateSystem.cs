@@ -6,9 +6,9 @@ namespace App.Shared.GameModules.Player.CharacterBone
 {
     public class ServerCharacterBoneUpdateSystem: IUserCmdExecuteSystem
     {
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var player = owner.OwnerEntity as PlayerEntity;
+            var player = getter.OwnerEntity as PlayerEntity;
             if (null != player && (player.gamePlay.IsLifeState(EPlayerLifeState.Dead)   || player.gamePlay.IsLastLifeState(EPlayerLifeState.Dead)))
             {
                 return;

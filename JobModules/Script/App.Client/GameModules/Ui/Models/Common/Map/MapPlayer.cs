@@ -93,24 +93,16 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private Image stateIconImage;
         private Image loftIconImage;
 
-        public ActiveSetter tranActiveSetter;
-        public ActiveSetter numberActiveSetter;
-        public ActiveSetter loftIconActiveSetter;
-        public ActiveSetter stateIconActiveSetter;
-        public ActiveSetter faceDirActiveSetter;
-        public ActiveSetter directionActiveSetter;
-
         private Transform faceDirectionTf;
 
-        private Tween tranCTween; // Transform与之关联的Tween
+        private Dictionary<Transform, Tween> tranCTween = new Dictionary<Transform, Tween>(); // Transform与之关联的Tween
 
         public bool IsOutDate;
 
         public PlayerItem(Transform tran)
         {
+            UIUtils.SetActive(tran, true);
             this.tran = tran;
-            tranActiveSetter = new ActiveSetter(tran.gameObject);
-            tranActiveSetter.Active = true;
             rectTransform = tran.GetComponent<RectTransform>();
             direction = tran.Find("direction");
             directionRectTf = direction.GetComponent<RectTransform>();
@@ -124,33 +116,12 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             loftIcon = bgTf.Find("loftIcon");
             stateIconImage = stateIcon.GetComponent<Image>();
             loftIconImage = loftIcon.GetComponent<Image>();
+
             faceDirectionTf = tran.Find("faceDireciton");
-
-            numberActiveSetter = new ActiveSetter(number.gameObject);
-            loftIconActiveSetter = new ActiveSetter(loftIcon.gameObject);
-            stateIconActiveSetter = new ActiveSetter(stateIcon.gameObject);
-            faceDirActiveSetter = new ActiveSetter(faceDirectionTf.gameObject);
-            directionActiveSetter = new ActiveSetter(direction.gameObject);
-
-            tranCTween = UIUtils.CallTween(1, 1.2f, (value) =>
-            {
-                bgRectTf.localScale = new UnityEngine.Vector3((float)value, (float)value, 1.0f);
-            },
-            (value) =>
-            {
-                bgRectTf.localScale = Vector3.one;
-            },
-            0.1f);
-            tranCTween.SetAutoKill(false);
         }
 
         public void Update(MiniMapTeamPlayInfo data, float rate, Vector2 selfPlayPos, float miniMapRepresentWHByRice, MapLevel mapLevel, bool isNoTeamPlayer, MapFixedVector3 selfPlayPos3D)
         {
-            tranActiveSetter.Active = data.IsShow;
-            if (!data.IsShow)
-            {
-                return;
-            }
             UodateLocation(data, rate, ref selfPlayPos, miniMapRepresentWHByRice);
             UpdatePlayNum(data, mapLevel, isNoTeamPlayer);
             UpdatePlayStatue(ref selfPlayPos, data, mapLevel, selfPlayPos3D);
@@ -165,8 +136,8 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private void UodateLocation(MiniMapTeamPlayInfo data, float rate, ref Vector2 selfPlayPos, float miniMapRepresentWHByRice)
         {
             var shiftVec = data.Pos.ShiftedUIVector2();
-            if (_isPlayer == data.IsPlayer && _pos == shiftVec && _selfPlayPos == selfPlayPos &&
-                _rate == rate && _mapWidth == miniMapRepresentWHByRice) return;
+            if (_isPlayer.Equals(data.IsPlayer) && _pos.Equals(shiftVec) && _selfPlayPos.Equals(selfPlayPos) &&
+                _rate.Equals(rate) && _mapWidth.Equals(miniMapRepresentWHByRice)) return;
             //Logger.InfoFormat("--------------Player Pos: {0}", data.Pos.WorldVector2());
             _isPlayer = data.IsPlayer;
             _pos = shiftVec;
@@ -177,23 +148,23 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             if (data.IsPlayer == true)
             {
                 rectTransform.anchoredPosition = _pos * rate;
-                directionActiveSetter.Active = false;
+                UIUtils.SetActive(direction, false);
             }
             else
             {
                 var offset = new Vector2(rectTransform.sizeDelta.y + directionRectTf.sizeDelta.y, rectTransform.sizeDelta.y + directionRectTf.sizeDelta.y) / (2 * rate);
                 var result = UIUtils.MathUtil.IsInSquare(selfPlayPos, miniMapRepresentWHByRice, miniMapRepresentWHByRice, offset, true, _pos);
-                rectTransform.anchoredPosition = (selfPlayPos + result.ContactPoint) * rate;
+                tran.GetComponent<RectTransform>().anchoredPosition = (selfPlayPos + result.ContactPoint) * rate;
                 if (!result.IsContact)
                 {
-                    directionActiveSetter.Active = false;
+                    UIUtils.SetActive(direction, false);
                 }
                 else
                 {
-                    directionActiveSetter.Active = true;
+                    UIUtils.SetActive(direction, true);
                     {
                         Vector2 fromVector = new Vector2(0, 1);
-                        Vector2 toVector = rectTransform.anchoredPosition.normalized;
+                        Vector2 toVector = tran.GetComponent<RectTransform>().anchoredPosition.normalized;
 
                         float angle = UnityEngine.Vector2.Angle(fromVector, toVector); //求出两向量之间的夹角  
                         UnityEngine.Vector3 normal = UnityEngine.Vector3.Cross(fromVector, toVector);//叉乘求出法线向量  
@@ -212,13 +183,13 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private bool _isNoTeamPlayer;
         private void UpdatePlayNum(MiniMapTeamPlayInfo data, MapLevel mapLevel, bool isNoTeamPlayer)
         {
-            if (data.Num == _num && data.Color == _color && isNoTeamPlayer == _isNoTeamPlayer) return;
+            if (data.Num.Equals(_num) && data.Color.Equals(_color) && isNoTeamPlayer.Equals(_isNoTeamPlayer)) return;
             _isNoTeamPlayer = isNoTeamPlayer;
             _num = data.Num;
             _color = data.Color;
             //刷新编号
 
-            if(numberActiveSetter.Active)
+            if(number.gameObject.activeSelf)
             {
                 if (numberText)
                 {
@@ -255,8 +226,8 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private void UpdatePlayStatue(ref Vector2 referPos, MiniMapTeamPlayInfo data, MapLevel mapLevel, MapFixedVector3 selfPlayPos3D)
         {
             var shiftVec = data.Pos.ShiftedUIVector2();
-            if (referPos == _referPos && data.Statue == _miniMapPlayStatue &&
-                shiftVec == _infoPos && data.ShootingCount == _shootingCount && _selfPlayPos3D.Equals(selfPlayPos3D)) return;
+            if (referPos.Equals(_referPos) && data.Statue.Equals(_miniMapPlayStatue) &&
+                shiftVec.Equals(_infoPos) && data.ShootingCount.Equals(_shootingCount) && _selfPlayPos3D.Equals(selfPlayPos3D)) return;
             _referPos = referPos;
             _miniMapPlayStatue = data.Statue;
             _infoPos = shiftVec;
@@ -265,69 +236,88 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
            switch (data.Statue)
             {
                 case MiniMapPlayStatue.NORMAL:    //常态
-                {
-                        numberActiveSetter.Active = !(MapLevel.Min == mapLevel);
-                        stateIconActiveSetter.Active = false;
+                    {
+                        UIUtils.SetActive(number,!MapLevel.Min.Equals(mapLevel));
+                        UIUtils.SetActive(stateIcon, false);
                         if (data.IsPlayer)
                         {
-                            loftIconActiveSetter.Active = false;
+                            UIUtils.SetActive(loftIcon, false);
                         }
                         else
                         {
                             
-//                            var temperSprite = SpriteComon.GetInstance().GetSpriteByName("Loft_icon");
-//                            if (temperSprite != null && loftIconImage.sprite != temperSprite)
-//                            {
-//                                loftIconImage.sprite = temperSprite;
-//                            }
+                            var temperSprite = SpriteComon.GetInstance().GetSpriteByName("Loft_icon");
+                            if (temperSprite != null && loftIconImage.sprite != temperSprite)
+                            {
+                                loftIconImage.sprite = temperSprite;
+                            }
 
                             if (data.Pos3D.Vector.y > selfPlayPos3D.Vector.y + 2.5f)       //上方
                             {
-                                if (!(loftIcon.transform.localScale.y == 1))
+                                if (!loftIcon.transform.localScale.y.Equals(1))
                                 {
                                     loftIcon.transform.localScale = Vector3.one;
                                 }
-                                loftIconActiveSetter.Active = true;
+                                UIUtils.SetActive(loftIcon, true);
                             }
                             else if (data.Pos3D.Vector.y < selfPlayPos3D.Vector.y - 2.5f)   //下方
                             {
-                                if (!(loftIcon.transform.localScale.y == -1))
+                                if (!loftIcon.transform.localScale.y.Equals(-1))
                                 {
                                     loftIcon.transform.localScale = new UnityEngine.Vector3(1, -1, 1);
                                 }
-                                loftIconActiveSetter.Active = true;
+                                UIUtils.SetActive(loftIcon, true);
                             }
                             else
                             {
-                                loftIconActiveSetter.Active = false;
+                                UIUtils.SetActive(loftIcon, false);
                             }
                         }
 
                         if (data.ShootingCount > 0)   //在射击状态下
                         {
-                            if (!tranCTween.IsPlaying())
+
+                            if (!tranCTween.ContainsKey(tran) || tranCTween[tran] == null)
                             {
-                                tranCTween.Restart();
-                                data.ShootingCount = 0;
+                                var temperTween = UIUtils.CallTween(1, 1.5f, (value) =>
+                                {
+                                    bgRectTf.localScale = new UnityEngine.Vector3((float)value, (float)value, 1.0f);
+                                },
+                                (value) =>
+                                {
+                                    bgRectTf.localScale = Vector3.one;
+                                    data.ShootingCount--;
+                                    tranCTween[tran].Kill();
+                                    tranCTween[tran] = null;
+
+                                },
+                                0.1f);
+
+                                if (!tranCTween.ContainsKey(tran))
+                                {
+                                    tranCTween.Add(tran, temperTween);
+                                }
+                                else
+                                    tranCTween[tran] = temperTween;
                             }
                         }
-//                        else
-//                        {
-//                            if (tranCTween.ContainsKey(tran) && tranCTween[tran] != null)
-//                            {
-//                                tranCTween[tran].Kill();
-//                                tranCTween[tran] = null;
-//                            }
-//                            if (bgRectTf.localScale != Vector3.one)
-//                                bgRectTf.localScale = Vector3.one;
-//                        }
+                        else
+                        {
+                            if (tranCTween.ContainsKey(tran) && tranCTween[tran] != null)
+                            {
+                                tranCTween[tran].Kill();
+                                tranCTween[tran] = null;
+                            }
+                            if (bgRectTf.localScale != Vector3.one)
+                                bgRectTf.localScale = Vector3.one;
+                        }
                     }
                     break;
                 case MiniMapPlayStatue.TIAOSAN:    //跳伞
                     {
-                        numberActiveSetter.Active = false;
-                        loftIconActiveSetter.Active = false;
-                        stateIconActiveSetter.Active = true;
+                        UIUtils.SetActive(number, false);
+                        UIUtils.SetActive(loftIcon, false);
+                        UIUtils.SetActive(stateIcon, true);
 
                         var temperSprite = SpriteComon.GetInstance().GetSpriteByName("icon_parachute");
                         if (temperSprite != null && stateIconImage.sprite != temperSprite)
@@ -338,9 +328,9 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                     break;
                 case MiniMapPlayStatue.ZAIJU:    //载具
                     {
-                        numberActiveSetter.Active = false;
-                        loftIconActiveSetter.Active = false;
-                        stateIconActiveSetter.Active = true;
+                        UIUtils.SetActive(number, false);
+                        UIUtils.SetActive(loftIcon, false);
+                        UIUtils.SetActive(stateIcon, true);
 
                         var temperSprite = SpriteComon.GetInstance().GetSpriteByName("icon_drive");
                         if (temperSprite != null && stateIconImage.sprite != temperSprite)
@@ -351,9 +341,9 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                     break;
                 case MiniMapPlayStatue.HURTED:    //受伤
                     {
-                        numberActiveSetter.Active = false;
-                        loftIconActiveSetter.Active = false;
-                        stateIconActiveSetter.Active = true;
+                        UIUtils.SetActive(number, false);
+                        UIUtils.SetActive(loftIcon, false);
+                        UIUtils.SetActive(stateIcon, true);
 
                         var temperSprite = SpriteComon.GetInstance().GetSpriteByName("icon_hurt");
                         if (temperSprite != null && stateIconImage.sprite != temperSprite)
@@ -364,9 +354,9 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                     break;
                 case MiniMapPlayStatue.DEAD:    //死亡
                     {
-                        numberActiveSetter.Active = false;
-                        loftIconActiveSetter.Active = false;
-                        stateIconActiveSetter.Active = true;
+                        UIUtils.SetActive(number, false);
+                        UIUtils.SetActive(loftIcon, false);
+                        UIUtils.SetActive(stateIcon, true);
 
                         var temperSprite = SpriteComon.GetInstance().GetSpriteByName("icon_die");
                         if (temperSprite != null && stateIconImage.sprite != temperSprite)
@@ -377,9 +367,9 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
                     break;
                 default:
                     {
-                        numberActiveSetter.Active = false;
-                        loftIconActiveSetter.Active = false;
-                        stateIconActiveSetter.Active = false;
+                        UIUtils.SetActive(number, false);
+                        UIUtils.SetActive(loftIcon, false);
+                        UIUtils.SetActive(stateIcon, false);
                     }
                     break;
             }
@@ -389,13 +379,13 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private float _faceDirection;
         private void UpdatePlayFaceDirection(MiniMapTeamPlayInfo data)
         {
-            if (data.Statue == _playStatue && data.FaceDirection == _faceDirection) return;
+            if (data.Statue.Equals(_playStatue) && data.FaceDirection.Equals(_faceDirection)) return;
             _playStatue = data.Statue;
             _faceDirection = data.FaceDirection;
 
             if (data.Statue != MiniMapPlayStatue.DEAD && data.IsPlayer) //非死亡状态
             {
-                faceDirActiveSetter.Active = true;
+                UIUtils.SetActive(faceDirectionTf, true);
 
                 float angular = data.FaceDirection % 360;
                 angular = angular < 0 ? 360 + angular : angular;
@@ -404,7 +394,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             }
             else
             {
-                faceDirActiveSetter.Active = false;
+                UIUtils.SetActive(faceDirectionTf, false);
             }
         }
        

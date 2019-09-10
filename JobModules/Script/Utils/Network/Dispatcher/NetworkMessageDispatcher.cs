@@ -11,42 +11,44 @@ namespace Core.Network
     public partial class NetworkMessageDispatcher :INetworkMessageDispatcher
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(NetworkMessageDispatcher));
-        private Dictionary<int, CompositeNetworkMessageHandler> _laterMessageType2Handler = new Dictionary<int, CompositeNetworkMessageHandler>();
+        private CompositeNetworkMessageHandler[] laterMessageType2Handlers;
+        private CompositeNetworkMessageHandler[] immediateMessageType2Handler;
 
-        private Dictionary<int, CompositeNetworkMessageHandler> _immediateMessageType2Handler = new Dictionary<int, CompositeNetworkMessageHandler>();
         private Queue _queue = Queue.Synchronized(new Queue());
         private IRecordManager _record;
+        private int msgTypeLength;
 
 
         public void RegisterLater(int messageType, INetworkMessageHandler handler)
         {
-            
-            CompositeNetworkMessageHandler handlers;
-            _laterMessageType2Handler.TryGetValue(messageType, out handlers);
+            var handlers = laterMessageType2Handlers[messageType];
             if (handlers == null)
             {
                 handlers = new CompositeNetworkMessageHandler();
-                _laterMessageType2Handler[messageType] = handlers;
+                laterMessageType2Handlers[messageType] = handlers;
             }
             handlers.Register(handler);
         }
 
         public void RegisterImmediate(int messageType, INetworkMessageHandler handler)
         {
-            CompositeNetworkMessageHandler handlers;
-            _immediateMessageType2Handler.TryGetValue(messageType, out handlers);
+            var handlers = immediateMessageType2Handler[messageType];
             if (handlers == null)
             {
-                handlers = new CompositeNetworkMessageHandler();
-                _immediateMessageType2Handler[messageType] = handlers;
+                handlers                               = new CompositeNetworkMessageHandler();
+                laterMessageType2Handlers[messageType] = handlers;
             }
             handlers.Register(handler);
         }
 
        
 
-        public NetworkMessageDispatcher(IRecordManager record=null)
+        public NetworkMessageDispatcher(int msgTypeLength, IRecordManager record=null)
         {
+            this.msgTypeLength = msgTypeLength;
+            laterMessageType2Handlers = new CompositeNetworkMessageHandler[msgTypeLength];
+            immediateMessageType2Handler = new CompositeNetworkMessageHandler[msgTypeLength];
+
             _record = record;
         }
 
@@ -55,15 +57,18 @@ namespace Core.Network
             while (_queue.Count > 0)
             {
                 QueueItem item = (QueueItem)_queue.Dequeue();
+                
                 CompositeNetworkMessageHandler handler;
-                _laterMessageType2Handler.TryGetValue(item.MessageType, out handler);
+                handler = laterMessageType2Handlers[item.MessageType];
                 if (handler != null)
                 {
                     handler.Handle(item.Channel, item.MessageType, item.MessageBody);
                 }
-                else if(!_immediateMessageType2Handler.ContainsKey(item.MessageType))
+                else 
                 {
-                    _logger.WarnFormat("unknow MessageType;{0}",item.MessageType );
+                    handler = immediateMessageType2Handler[item.MessageType];
+                    if(handler == null)
+                        _logger.WarnFormat("unknow MessageType;{0}",item.MessageType );
                 }
 
                 if (_record != null)
@@ -78,14 +83,10 @@ namespace Core.Network
 
         public void SaveDispatch(INetworkChannel channel, int messageType, object messageBody)
         {
-           
-            CompositeNetworkMessageHandler handlers;
-            if (_immediateMessageType2Handler.TryGetValue(messageType, out handlers))
-            {
-                handlers.Handle(channel, messageType, messageBody);
-            }
+
+            var handlers = immediateMessageType2Handler[messageType];
+            handlers.Handle(channel, messageType, messageBody);
             var item = QueueItem.Allocate(channel, messageType, messageBody);
-           
             _queue.Enqueue(item);
            
         }

@@ -68,7 +68,7 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                                 {
                                     new MiniMapPlayMarkInfo(new Vector3(500, 250), 1, Color.black),
                                 }, false, 0,
-                                playerEntity.playerInfo.PlayerName, (int)playerEntity.gamePlay.CurHp, playerEntity.gamePlay.MaxHp, (int)playerEntity.gamePlay.InHurtedHp, false, playerEntity.position.Value, playerEntity.gamePlay.HudView);
+                                playerEntity.playerInfo.PlayerName, (int)playerEntity.gamePlay.CurHp, playerEntity.gamePlay.MaxHp, (int)playerEntity.gamePlay.InHurtedHp, false, playerEntity.position.Value);
                             
                             infoMap[playerEntity.playerInfo.PlayerId] = info;
                         }
@@ -183,7 +183,6 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                         oneInfo.IsMark = data.MapMarks.ContainsKey(oneInfo.PlayerId) ? true : false;
                         oneInfo.TopPos = PlayerEntityUtility.GetPlayerTopPosition(playerEntity);
                         oneInfo.EntityId = playerEntity.entityKey.Value.EntityId;
-                        oneInfo.IsShow = playerEntity.gamePlay.HudView;
                         data.TeamInfos.Add(oneInfo);
 
                     }

@@ -10,9 +10,9 @@ namespace App.Shared.GameModules.Camera
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerRotateLimitSystem));
         
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity playerEntity = owner.OwnerEntity as PlayerEntity;
+            PlayerEntity playerEntity = getter.OwnerEntity as PlayerEntity;
             if (!playerEntity.hasCharacterContoller || !playerEntity.hasPlayerRotateLimit || !playerEntity.hasPosition || !playerEntity.hasOrientation)
             {
                 return;

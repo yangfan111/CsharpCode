@@ -28,12 +28,12 @@ namespace App.Shared.GameModules.Player
             _contexts = contexts;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
             if (cmd.PredicatedOnce)
                 return;
             
-            PlayerEntity player = (PlayerEntity)owner.OwnerEntity;
+            PlayerEntity player = (PlayerEntity)getter.OwnerEntity;
 
             //服务器通过tcp指令修改客户端位置
             CorrectPositionByServer(cmd, player);

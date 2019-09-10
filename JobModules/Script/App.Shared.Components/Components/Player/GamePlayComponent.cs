@@ -296,11 +296,13 @@ namespace App.Shared.Components.Player
         public bool IsInterpolateEveryFrame(){ return true; }
         public void Interpolate(object left, object right, IInterpolationInfo interpolationInfo)
         {
+            Logger.InfoFormat("Interpolate");
             CopyFrom(left);
         }
 
         public void SyncLatestFrom(object rightComponent)
         {
+            Logger.InfoFormat("SyncLastest");
             CopyFrom(rightComponent);
         }
 

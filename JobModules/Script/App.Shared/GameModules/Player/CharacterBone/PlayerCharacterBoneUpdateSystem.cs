@@ -23,9 +23,9 @@ namespace App.Shared.GameModules.Player.CharacterBone
 
         private float _deltaTime;
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var player = owner.OwnerEntity as PlayerEntity;
+            var player = getter.OwnerEntity as PlayerEntity;
             CheckPlayerLifeState(player);
             
             if(null != player && player.gamePlay.IsLifeState(EPlayerLifeState.Dead)) return;

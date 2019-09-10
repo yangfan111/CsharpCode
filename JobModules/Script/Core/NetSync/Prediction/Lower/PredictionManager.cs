@@ -11,6 +11,7 @@ namespace Core.Prediction
 {
     /// <summary>
     /// 严格复制IUserPrediction所有组件
+    /// 有多帧同时进来的情况下只执行最后一帧的Prediction比对
     /// </summary>
     public class PredictionManager
                     //<TPredictionComponent> : PredictionManager where TPredictionComponent:IPredictionComponent

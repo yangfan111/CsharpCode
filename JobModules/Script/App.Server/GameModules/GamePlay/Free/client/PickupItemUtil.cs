@@ -119,7 +119,7 @@ namespace App.Server.GameModules.GamePlay.Free.client
             // 分拆道具
             if (key.StartsWith(ChickenConstant.BagDefault))
             {
-                ItemPosition ip = FreeItemManager.GetItemPosition(room.FreeArgs, key, fd.GetFreeInventory().GetInventoryManager());
+                ItemPosition ip = FreeItemManager.GetItemPosition(room.ContextsWrapper.FreeArgs, key, fd.GetFreeInventory().GetInventoryManager());
                 FreeItemInfo info = FreeItemConfig.GetItemInfo(ip.key.GetKey());
                 var stackable = true;
                 if (info.cat == (int)ECategory.Weapon)
@@ -170,7 +170,7 @@ namespace App.Server.GameModules.GamePlay.Free.client
             }
 
             FreeData fd = (FreeData) player.freeData.FreeData;
-            room.FreeArgs.TempUse("current", fd);
+            room.ContextsWrapper.FreeArgs.TempUse("current", fd);
 
             if (!FreeItemConfig.Contains(cat, id)) return false;
 
@@ -273,7 +273,7 @@ namespace App.Server.GameModules.GamePlay.Free.client
             int canCount = 0;
             if (action.name == ChickenConstant.BagDefault)
             {
-                canCount = BagCapacityUtil.CanAddToBagCount(room.FreeArgs, fd, item.cat, item.id, count);
+                canCount = BagCapacityUtil.CanAddToBagCount(room.ContextsWrapper.FreeArgs, fd, item.cat, item.id, count);
             }
             else if (item.type == ChickenConstant.ItemCatAvatar || action.name == ChickenConstant.BagHelmet || action.name == ChickenConstant.BagArmor)
             {
@@ -295,9 +295,9 @@ namespace App.Server.GameModules.GamePlay.Free.client
                 {
                     action.count = canCount.ToString();
                     action.SetPlayer("current");
-                    room.FreeArgs.TempUse("current", fd);
-                    action.Act(room.FreeArgs);
-                    room.FreeArgs.Resume("current");
+                    room.ContextsWrapper.FreeArgs.TempUse("current", fd);
+                    action.Act(room.ContextsWrapper.FreeArgs);
+                    room.ContextsWrapper.FreeArgs.Resume("current");
 
                     if (count > canCount)
                     {
@@ -305,7 +305,7 @@ namespace App.Server.GameModules.GamePlay.Free.client
                         msg.Key = FreeMessageConstant.ChickenTip;
                         msg.Ss.Add("word80," + count + "," + canCount);
                         FreeMessageSender.SendMessage(fd.Player, msg);
-                        room.FreeArgs.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleObjectEntity((ECategory)item.cat,
+                        room.ContextsWrapper.FreeArgs.GameContext.session.entityFactoryObject.SceneObjectEntityFactory.CreateSimpleObjectEntity((ECategory)item.cat,
                             item.id, count - canCount, entity == null ? freeMoveEntity.position.Value : entity.position.Value);
                     }
                     pickupSuccess = true;
@@ -321,7 +321,7 @@ namespace App.Server.GameModules.GamePlay.Free.client
                     freeMoveEntity.isFlagDestroy = true;
                     if (freeMoveEntity.freeData.Cat == FreeEntityConstant.DeadBox)
                     {
-                        var deadBox = room.FreeArgs.GameContext.freeMove.GetEntityWithEntityKey(new EntityKey(freeMoveEntity.freeData.IntValue, (short) EEntityType.FreeMove));
+                        var deadBox = room.ContextsWrapper.FreeArgs.GameContext.freeMove.GetEntityWithEntityKey(new EntityKey(freeMoveEntity.freeData.IntValue, (short) EEntityType.FreeMove));
                         if (deadBox != null && deadBox.freeData.EmptyDelete)
                         {
                             if (deadBox.freeData.IntValue > 1) deadBox.freeData.IntValue--;
@@ -330,7 +330,7 @@ namespace App.Server.GameModules.GamePlay.Free.client
                     }
                 }
             }
-            room.FreeArgs.Resume("current");
+            room.ContextsWrapper.FreeArgs.Resume("current");
 
             return pickupSuccess;
         }
@@ -406,13 +406,13 @@ namespace App.Server.GameModules.GamePlay.Free.client
             {
                 ItemPosition ip = w3.posList[0];
 
-                w3.RemoveItem(room.FreeArgs, ip);
+                w3.RemoveItem(room.ContextsWrapper.FreeArgs, ip);
 
                 FreeItemInfo info = FreeItemConfig.GetItemInfo(ip.GetKey().GetKey());
 
-                if (BagCapacityUtil.CanAddToBag(room.FreeArgs, fd, ip))
+                if (BagCapacityUtil.CanAddToBag(room.ContextsWrapper.FreeArgs, fd, ip))
                 {
-                    fd.freeInventory.GetInventoryManager().GetDefaultInventory().AddItem(room.FreeArgs, ip.key, true);
+                    fd.freeInventory.GetInventoryManager().GetDefaultInventory().AddItem(room.ContextsWrapper.FreeArgs, ip.key, true);
                 }
                 else
                 {
@@ -472,7 +472,7 @@ namespace App.Server.GameModules.GamePlay.Free.client
             if (c3 > 0)
             {
                 ItemPosition ip = w3.posList[0];
-                w3.RemoveItem(room.FreeArgs, ip);
+                w3.RemoveItem(room.ContextsWrapper.FreeArgs, ip);
                 FreeItemInfo info = FreeItemConfig.GetItemInfo(ip.GetKey().GetKey());
 
                 if (info.cat > 0)

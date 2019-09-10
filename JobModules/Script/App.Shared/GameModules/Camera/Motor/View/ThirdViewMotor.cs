@@ -13,7 +13,7 @@ namespace Core.CameraControl.NewMotor.View
         public ThirdViewMotor(Motors m):base(m)
         {
 
-            _motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.View, (int)ModeId, 
+            _motors.ActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.View, (int)ModeId, 
                 (player, state) =>
             {
                 if (player.hasAppearanceInterface && player.appearanceInterface.Appearance.IsFirstPerson)

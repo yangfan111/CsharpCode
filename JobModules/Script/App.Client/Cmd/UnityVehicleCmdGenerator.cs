@@ -13,29 +13,29 @@ namespace App.Client.Cmd
     {
         private int _seq;
         private int _lastCmdExecuteTime = 0;
-        private GameInputManager _inputManager;
+        private UserInputManager.Lib.UserInputManager _inputManager;
         private VehicleCmd _lastCmd;
 
         private GameObject autoGo;
         private bool firstSet = true;
 
-        public UnityVehicleCmdGenerator(GameInputManager manager)
+        public UnityVehicleCmdGenerator(UserInputManager.Lib.UserInputManager manager)
         {
             
             _lastCmd = new VehicleCmd();
             _inputManager = manager;
             // 界面不会影响车辆控制
-            var keyReceiver = new KeyReceiver(EInputLayer.Ui, BlockType.None,"VehicleCmd");
-            _inputManager.RegisterKeyReceiver(keyReceiver);
-            keyReceiver.BindKeyAction(UserInputKey.MoveVertical, data => _lastCmd.MoveVertical = data.Axis);
-            keyReceiver.BindKeyAction(UserInputKey.MoveHorizontal, data => _lastCmd.MoveHorizontal = data.Axis);
-            keyReceiver.BindKeyAction(UserInputKey.VehicleSpeedUp, data => _lastCmd.IsSpeedup = true);
-            keyReceiver.BindKeyAction(UserInputKey.VehicleBrake, data => _lastCmd.IsHandbrake = true);
-            keyReceiver.BindKeyAction(UserInputKey.VehicleHorn, data => _lastCmd.IsHornOn = true);
+            var keyhandler = new KeyHandler(Layer.Ui, BlockType.None);
+            _inputManager.RegisterKeyhandler(keyhandler);
+            keyhandler.BindKeyAction(UserInputKey.MoveVertical, data => _lastCmd.MoveVertical = data.Axis);
+            keyhandler.BindKeyAction(UserInputKey.MoveHorizontal, data => _lastCmd.MoveHorizontal = data.Axis);
+            keyhandler.BindKeyAction(UserInputKey.VehicleSpeedUp, data => _lastCmd.IsSpeedup = true);
+            keyhandler.BindKeyAction(UserInputKey.VehicleBrake, data => _lastCmd.IsHandbrake = true);
+            keyhandler.BindKeyAction(UserInputKey.VehicleHorn, data => _lastCmd.IsHornOn = true);
 
-            keyReceiver.BindKeyAction(UserInputKey.VehicleLeftShift, data => _lastCmd.IsLeftShift = true);
-            keyReceiver.BindKeyAction(UserInputKey.VehicleRightShift, data => _lastCmd.IsRightShift = true);
-            keyReceiver.BindKeyAction(UserInputKey.VehicleStunt, data => _lastCmd.IsStunt = true);
+            keyhandler.BindKeyAction(UserInputKey.VehicleLeftShift, data => _lastCmd.IsLeftShift = true);
+            keyhandler.BindKeyAction(UserInputKey.VehicleRightShift, data => _lastCmd.IsRightShift = true);
+            keyhandler.BindKeyAction(UserInputKey.VehicleStunt, data => _lastCmd.IsStunt = true);
         }
 
         public IVehicleCmd GeneratorVehicleCmd(int currentSimulationTime)

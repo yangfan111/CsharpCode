@@ -19,9 +19,9 @@ namespace App.Shared.GameModules.Player.Appearance
     {
         private static LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerFirstAppearanceUpdateSystem));
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity player = owner.OwnerEntity as PlayerEntity;
+            PlayerEntity player = getter.OwnerEntity as PlayerEntity;
             if (player.gamePlay.IsLifeState(EPlayerLifeState.Dead) || player.gamePlay.IsLastLifeState(EPlayerLifeState.Dead))
             {
                 return;

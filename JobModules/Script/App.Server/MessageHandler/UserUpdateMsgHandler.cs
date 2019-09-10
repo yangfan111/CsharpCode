@@ -23,12 +23,12 @@ namespace App.Server.MessageHandler
             EClient2ServerMessage eClient2ServerMessage, ReusableList<UpdateLatestPacakge> messageBody)
         {
             
-            var pool = entity.updateMessagePool.UpdateMessagePool;
-            foreach (var updateLatestPacakge in messageBody.Value)
+            var pool = entity.updateMessagePool.Value;
+            foreach (UpdateLatestPacakge updateLatestPacakge in messageBody.Value)
             {
                 pool.AddMessage(updateLatestPacakge);
                 updateLatestPacakge.ReleaseReference();
-                _logger.DebugFormat("DoHandle:{0}", updateLatestPacakge.Head.UserCmdSeq);
+                _logger.DebugFormat("DoHandle:{0}", updateLatestPacakge.Head.LastUserCmdSeq);
                 entity.network.NetworkChannel.Serializer.MessageTypeInfo.SetReplicationAckId(updateLatestPacakge.Head.LastSnapshotId);
             }
             

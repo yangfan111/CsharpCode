@@ -14,9 +14,9 @@ namespace App.Shared.GameModules.Player
             _contexts = contexts;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity player = owner.OwnerEntity as PlayerEntity;
+            PlayerEntity player = getter.OwnerEntity as PlayerEntity;
             if (!player.gamePlay.IsDead())
             {
                 if (player.hasOxygenEnergyInterface && player.oxygenEnergyInterface.Oxygen.InDivingDeffState)

@@ -26,7 +26,7 @@ namespace Assets.App.Client.GameModules.Ui
         public const string Effect_Common = "effect/common";
 
         public const string Prefab_Spray = "decalicious/decal";
-        public const string Prefab_Common = "ui/client/prefab/common";
+        public const string Prefab_Hall_Common = "ui/hall/prefabs/common";
 
         public static AssetInfo GetPartsQualityAssetInfo(int quality)
         {

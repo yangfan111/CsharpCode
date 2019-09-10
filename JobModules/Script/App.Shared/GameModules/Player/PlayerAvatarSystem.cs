@@ -13,9 +13,9 @@ namespace App.Shared.GameModules.Player
         {
         }
         
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var player = owner.OwnerEntity as PlayerEntity;
+            var player = getter.OwnerEntity as PlayerEntity;
             if (null == player)
             {
                 Logger.Error("owner entity is not player entity ");

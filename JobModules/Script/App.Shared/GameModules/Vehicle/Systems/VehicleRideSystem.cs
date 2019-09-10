@@ -27,14 +27,14 @@ namespace App.Shared.GameModules.Vehicle
             _currentTime = contexts.session.currentTimeObject;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
             if (cmd.PredicatedOnce)
             {
                 return;
             }
 
-            var playerEntity = (PlayerEntity)owner.OwnerEntity;
+            var playerEntity = (PlayerEntity)getter.OwnerEntity;
 
             if (CheckRideOffVehicle(playerEntity))
             {

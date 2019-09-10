@@ -8,9 +8,9 @@ namespace Assets.App.Shared.GameModules.Player
     public class PlayerHoldBreathSystem : IUserCmdExecuteSystem
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerHoldBreathSystem));
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var player = owner.OwnerEntity as PlayerEntity;
+            var player = getter.OwnerEntity as PlayerEntity;
             if(null == player)
             {
                 return;

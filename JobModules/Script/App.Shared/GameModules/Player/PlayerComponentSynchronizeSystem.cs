@@ -13,9 +13,9 @@ namespace App.Shared.GameModules.Player
 {
     class PlayerSynchronizeToComponentSystem : IUserCmdExecuteSystem
     {
-        void IUserCmdExecuteSystem.ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        void IUserCmdExecuteSystem.ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity playerEntity = (PlayerEntity)owner.OwnerEntity;
+            PlayerEntity playerEntity = (PlayerEntity)getter.OwnerEntity;
 
             var stateManager = playerEntity.stateInterface.State;
 
@@ -29,9 +29,9 @@ namespace App.Shared.GameModules.Player
     {
         private static LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerSynchronizeFromComponentSystem));
         
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity playerEntity = (PlayerEntity)owner.OwnerEntity;
+            PlayerEntity playerEntity = (PlayerEntity)getter.OwnerEntity;
 
             var stateManager = playerEntity.stateInterface.State;
 
@@ -57,9 +57,9 @@ namespace App.Shared.GameModules.Player
     
     class ServerSynchronizeFromComponentSystem : IUserCmdExecuteSystem
     {
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity playerEntity = (PlayerEntity)owner.OwnerEntity;
+            PlayerEntity playerEntity = (PlayerEntity)getter.OwnerEntity;
 
             var stateManager = playerEntity.stateInterface.State;
 

@@ -21,7 +21,7 @@ namespace App.Shared.GameModules.Attack
                                                 SharedConfig.BulletSimulationIntervalTime);
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter owner, IUserCmd cmd)
         {
             _bulletEntityCollector.BulletOwner = owner.OwnerEntityKey;
             _bulletSimulator.Update(cmd.RenderTime, cmd.Seq, _bulletEntityCollector.GetAllPlayerBulletAgents());

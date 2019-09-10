@@ -1059,6 +1059,7 @@
     <Compile Include="GameModules\Player\StateInteract\StateInterrupt\PlayerStateRuntimeInterrupter.cs" />
     <Compile Include="GameModules\Player\Statistics\PlayerStatisticsController.cs" />
     <Compile Include="GameModules\Player\Statistics\PlayerStatisticsUpdateSystem.cs" />
+    <Compile Include="GameModules\PlayerUserCmdController.cs" />
     <Compile Include="GameModules\Preparation\GameObjectRecordSystem.cs" />
     <Compile Include="GameModules\Preparation\InitMapIdSystem.cs" />
     <Compile Include="GameModules\Preparation\InitTriggerObjectManagerSystem.cs" />
@@ -1188,6 +1189,10 @@
     <Compile Include="GameModules\WeaponUtil\WeaponPartUtil.cs" />
     <Compile Include="GameModules\WeaponUtil\WeaponUtil.cs" />
     <Compile Include="MyHttpServer.cs" />
+    <Compile Include="NetSync\ServerSyncUpdateLatestMsg.cs" />
+    <Compile Include="NetSync\UserPrediction\ServerServerUserCmdList.cs" />
+    <Compile Include="NetSync\UserPrediction\UserPredictionProvider.cs" />
+    <Compile Include="NetSync\UserPrediction\VehiclePredictionInfoProvider.cs" />
     <Compile Include="Network\AppMessageTypeInfo.cs" />
     <Compile Include="Network\RpcNetworkMessage.cs" />
     <Compile Include="Network\SerializeInfo\AbstractSnapshotSerializeInfo.cs" />
@@ -1260,12 +1265,7 @@
     <Compile Include="Terrains\TerrainEffectPool.cs" />
     <Compile Include="Terrains\TerrainManager.cs" />
     <Compile Include="TestUtility.cs" />
-    <Compile Include="UpdateLatest\SyncUpdateLatestMsgHandler.cs" />
     <Compile Include="UserPhysics\PhysicsDebugUtility.cs" />
-    <Compile Include="UserPrediction\UserCmdExecuteSystemHandler.cs" />
-    <Compile Include="UserPrediction\UserCmdOwnerAdapter.cs" />
-    <Compile Include="UserPrediction\UserPredictionProvider.cs" />
-    <Compile Include="UserPrediction\VehiclePredictionInfoProvider.cs" />
     <Compile Include="Util\AbstractLocalObjectPool.cs" />
     <Compile Include="Util\AbstractUserCmdExecuteSystem.cs" />
     <Compile Include="Util\GameModuleManagement.cs" />

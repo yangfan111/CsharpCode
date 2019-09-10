@@ -50,7 +50,7 @@ namespace App.Server.GameModules.GamePlay.Free.hall
                 RankType rankType = (RankType) ranktype;
 
                 IPlayerInfo playerInfo;
-                infoList.TryGetValue(goPlayer.Id, out playerInfo);
+                playerInfoList.TryGetValue(goPlayer.Id, out playerInfo);
                 if (null == playerInfo)
                 {
                     Logger.InfoFormat("no IPlayerInfo of player {0}", goPlayer.Id);

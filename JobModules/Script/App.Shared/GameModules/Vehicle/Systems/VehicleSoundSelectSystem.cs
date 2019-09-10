@@ -22,9 +22,9 @@ namespace App.Shared.GameModules.Vehicle
             _context = context;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var playerEntity = (PlayerEntity) owner.OwnerEntity;
+            var playerEntity = (PlayerEntity) getter.OwnerEntity;
             if (playerEntity.IsOnVehicle())
             {
 

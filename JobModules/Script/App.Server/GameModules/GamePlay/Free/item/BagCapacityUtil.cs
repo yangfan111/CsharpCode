@@ -266,8 +266,8 @@ namespace App.Server.GameModules.GamePlay.Free.item
             if (overBullet > 0)
             {
                 agent.BaseComponent.Bullet = agent.WeaponConfigAssy.PropertyCfg.Bullet;
-                CarryClipUtil.AddClip(overBullet, (int) agent.Caliber, fd, room.FreeArgs);
-                fd.Player.WeaponController().SetReservedBullet(agent.Caliber, CarryClipUtil.GetClipCount((int) agent.Caliber, fd, room.FreeArgs));
+                CarryClipUtil.AddClip(overBullet, (int) agent.Caliber, fd, room.ContextsWrapper.FreeArgs);
+                fd.Player.WeaponController().SetReservedBullet(agent.Caliber, CarryClipUtil.GetClipCount((int) agent.Caliber, fd, room.ContextsWrapper.FreeArgs));
             }
 
             return true;
@@ -311,15 +311,15 @@ namespace App.Server.GameModules.GamePlay.Free.item
             if (overBulletFrom > 0)
             {
                 fromAgent.BaseComponent.Bullet = fromAgent.WeaponConfigAssy.PropertyCfg.Bullet + toBullet;
-                CarryClipUtil.AddClip(overBulletFrom, (int) fromAgent.Caliber, fd, room.FreeArgs);
-                fd.Player.WeaponController().SetReservedBullet(fromAgent.Caliber, CarryClipUtil.GetClipCount((int) fromAgent.Caliber, fd, room.FreeArgs));
+                CarryClipUtil.AddClip(overBulletFrom, (int) fromAgent.Caliber, fd, room.ContextsWrapper.FreeArgs);
+                fd.Player.WeaponController().SetReservedBullet(fromAgent.Caliber, CarryClipUtil.GetClipCount((int) fromAgent.Caliber, fd, room.ContextsWrapper.FreeArgs));
             }
 
             if (overBulletTo > 0)
             {
                 toAgent.BaseComponent.Bullet = toAgent.WeaponConfigAssy.PropertyCfg.Bullet + fromBullet;
-                CarryClipUtil.AddClip(overBulletTo, (int) toAgent.Caliber, fd, room.FreeArgs);
-                fd.Player.WeaponController().SetReservedBullet(toAgent.Caliber, CarryClipUtil.GetClipCount((int) toAgent.Caliber, fd, room.FreeArgs));
+                CarryClipUtil.AddClip(overBulletTo, (int) toAgent.Caliber, fd, room.ContextsWrapper.FreeArgs);
+                fd.Player.WeaponController().SetReservedBullet(toAgent.Caliber, CarryClipUtil.GetClipCount((int) toAgent.Caliber, fd, room.ContextsWrapper.FreeArgs));
             }
 
             return true;

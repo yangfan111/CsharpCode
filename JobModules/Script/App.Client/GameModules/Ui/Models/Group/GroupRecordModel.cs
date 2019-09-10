@@ -40,12 +40,12 @@ namespace App.Client.GameModules.Ui.Models.Group
 
         private void InitKey()
         {
-            OpenKeyReceiver = new KeyReceiver(EInputLayer.Env, BlockType.None);
-            OpenKeyReceiver.BindKeyAction(UserInputKey.ShowRecord, (data) => { _adapter.Enable = true; });
-            _adapter.RegisterOpenKey(OpenKeyReceiver);
-            KeyReceiver = new KeyReceiver(UiConstant.recordWindowKeyBlockLayer, BlockType.All);
-            KeyReceiver.BindKeyAction(UserInputKey.HideRecord, (data) => { _adapter.Enable = false; });
-            KeyReceiver.BindKeyAction(UserInputKey.HideWindow, (data) => { _adapter.Enable = false; });
+            _openKeyHandler = new KeyHandler(Layer.Env, BlockType.None);
+            _openKeyHandler.BindKeyAction(UserInputKey.ShowRecord, (data) => { _adapter.Enable = true; });
+            _adapter.RegisterOpenKey(_openKeyHandler);
+            _keyHandler = new KeyHandler(UiConstant.recordWindowKeyBlockLayer, BlockType.All);
+            _keyHandler.BindKeyAction(UserInputKey.HideRecord, (data) => { _adapter.Enable = false; });
+            _keyHandler.BindKeyAction(UserInputKey.HideWindow, (data) => { _adapter.Enable = false; });
         }
 
         private void InitInfoTitle()
@@ -76,7 +76,7 @@ namespace App.Client.GameModules.Ui.Models.Group
         }
 
         private UIList _campInfoList1, _campInfoList2;
-        private KeyReceiver KeyReceiver,OpenKeyReceiver;
+        private KeyHandler _keyHandler,_openKeyHandler;
 
         private void InitInfoGroup()
         {
@@ -164,14 +164,14 @@ namespace App.Client.GameModules.Ui.Models.Group
         protected override void OnCanvasEnabledUpdate(bool enable)
         {
             base.OnCanvasEnabledUpdate(enable);
-            if (KeyReceiver == null) return;
+            if (_keyHandler == null) return;
             if (enable)
             {
-                _adapter.RegisterKeyReceive(KeyReceiver);
+                _adapter.RegisterKeyReceive(_keyHandler);
             }
             else
             {
-                _adapter.UnRegisterKeyReceive(KeyReceiver);
+                _adapter.UnRegisterKeyReceive(_keyHandler);
             }
 
         }

@@ -23,7 +23,7 @@ namespace Core.CameraControl.NewMotor.View
     {
         public GunSightMotor(Motors m):base(m)
         {
-            _motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.View, (int) ModeId,
+            _motors.ActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.View, (int) ModeId,
                 (player, state) =>
                 {
                     if (!player.hasAppearanceInterface) return;
@@ -36,7 +36,7 @@ namespace Core.CameraControl.NewMotor.View
 
                 });
             
-            _motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.View, (int) ModeId,
+            _motors.ActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.View, (int) ModeId,
                 (player, state) =>
                 {
                     if (!player.hasAppearanceInterface) return;
@@ -45,7 +45,7 @@ namespace Core.CameraControl.NewMotor.View
                         playerUtils.SetParam("GunViewBegin", (object)player.RootGo().gameObject);
                 });
 
-            _motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.View, (int) ModeId,
+            _motors.ActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.View, (int) ModeId,
                 (player, state) =>
                 {
                     if (!player.hasAppearanceInterface) return;
@@ -54,21 +54,21 @@ namespace Core.CameraControl.NewMotor.View
                     Logger.InfoFormat("Enter sight!");
                 });
             
-            _motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.View, (int) ModeId,
+            _motors.ActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.View, (int) ModeId,
                 (player, state) =>
                 {
                     if (!player.hasAppearanceInterface) return;
                     player.AudioController().PlaySimpleAudio(EAudioUniqueId.SightOpen, true);
                 });
             
-            _motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.View, (int) ModeId,
+            _motors.ActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.View, (int) ModeId,
                 (player, state) =>
                 {
                     if (!player.hasAppearanceInterface) return;
                     OpenDepthOfField(player);
                 });
 
-            _motors.ActionManager.BindKeyAction(CameraActionType.Leave, SubCameraMotorType.View, (int)ModeId,
+            _motors.ActionManager.AddAction(CameraActionType.Leave, SubCameraMotorType.View, (int)ModeId,
                 (player, state) =>
                 {
                     var speed = player.WeaponController().HeldWeaponAgent.CmrFocusSpeed;
@@ -76,7 +76,7 @@ namespace Core.CameraControl.NewMotor.View
                     Logger.InfoFormat("Leave sight!");
                 });
             
-            _motors.ActionManager.BindKeyAction(CameraActionType.Leave, SubCameraMotorType.View, (int) ModeId,
+            _motors.ActionManager.AddAction(CameraActionType.Leave, SubCameraMotorType.View, (int) ModeId,
                 (player, state) =>
                 {
                     var playerUtils = EffectUtility.GetEffect(player.RootGo(), "PlayerUtils");
@@ -84,13 +84,13 @@ namespace Core.CameraControl.NewMotor.View
                         playerUtils.SetParam("GunViewEnd", (object)player.RootGo().gameObject);
                 });
 
-            _motors.ActionManager.BindKeyAction(CameraActionType.Leave, SubCameraMotorType.View, (int) ModeId,
+            _motors.ActionManager.AddAction(CameraActionType.Leave, SubCameraMotorType.View, (int) ModeId,
                 (player, state) =>
                 {
                     player.AudioController().PlaySimpleAudio(EAudioUniqueId.SightClose, true);
                 });
 
-            _motors.ActionManager.BindKeyAction(CameraActionType.Leave, SubCameraMotorType.View, (int) ModeId,
+            _motors.ActionManager.AddAction(CameraActionType.Leave, SubCameraMotorType.View, (int) ModeId,
                 (player, state) =>
                 {
                     CloseDepthOfField(player);

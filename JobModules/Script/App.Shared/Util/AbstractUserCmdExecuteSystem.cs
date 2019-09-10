@@ -19,9 +19,9 @@ namespace App.Shared.Util
 
         protected abstract void ExecuteUserCmd(PlayerEntity playerEntity, IUserCmd cmd);
         
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity player = owner.OwnerEntity as PlayerEntity;
+            PlayerEntity player = getter.OwnerEntity as PlayerEntity;
             if (player != null && Filter(player)&& FilterCmd(cmd))
             {
                 ExecuteUserCmd(player, cmd);

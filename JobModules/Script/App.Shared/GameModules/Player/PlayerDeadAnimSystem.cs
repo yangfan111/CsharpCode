@@ -9,9 +9,9 @@ namespace App.Shared.GameModules.Player
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(PlayerDeadAnimSystem));
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var playerEntity = (PlayerEntity)owner.OwnerEntity;
+            var playerEntity = (PlayerEntity)getter.OwnerEntity;
             
             if(null == playerEntity || null == playerEntity.playerGameState ||
                null == playerEntity.characterControllerInterface) 

@@ -78,7 +78,7 @@ namespace Assets.App.Shared.GameModules.Camera.Utils
             view[(int)ECameraViewMode.GunSight] = new GunSightMotor(motors);
             view[(int)ECameraViewMode.ThirdPerson] = new ThirdViewMotor(motors);
 
-            motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.Pose,
+            motors.ActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.Pose,
                 (int) ECameraPoseMode.Parachuting, (player, state) =>
                 {
                     var cameraEulerAngle = player.cameraFinalOutputNew.EulerAngle;

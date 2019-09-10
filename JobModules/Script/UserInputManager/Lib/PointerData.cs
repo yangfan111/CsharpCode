@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using UnityEngine;
 
 namespace UserInputManager.Lib
@@ -47,11 +46,6 @@ namespace UserInputManager.Lib
             MouseY = 0;
             Data = null;
             IdList = null;
-        }
-
-        public override string ToString()
-        {
-            return string.Format("Pos:{0} MouseX:{1} MouseY:{2} ",Position,MouseX,MouseY);
         }
 
         public PointerData(UserInputKey key):base(key)

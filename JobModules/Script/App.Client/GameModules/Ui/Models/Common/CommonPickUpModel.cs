@@ -66,13 +66,13 @@ namespace App.Client.GameModules.Ui.Models.Common
         private void RegisterKeyBinding()
         {
            // 虽然是Ui但是其实层级应该是Env
-            var keyreciever = new KeyReceiver(EInputLayer.Env, BlockType.None);
+            var keyreciever = new KeyHandler(Layer.Env, BlockType.None);
             keyreciever.BindKeyAction(UserInputKey.PickUp, OnAction);
-            _pickUpUiAdapter.RegisterKeyReceiver(keyreciever);
+            _pickUpUiAdapter.RegisterKeyhandler(keyreciever);
 
-            var pointerReceiver = new PointerReceiver(EInputLayer.Env, BlockType.None);
-            pointerReceiver.BindPointAction(UserInputKey.PickUpTip, SetCastData);
-            _pickUpUiAdapter.RegisterPointerReceiver(pointerReceiver);
+            var pointerhandler = new PointerKeyHandler(Layer.Env, BlockType.None);
+            pointerhandler.BindPointAction(UserInputKey.PickUpTip, SetCastData);
+            _pickUpUiAdapter.RegisterPointerhandler(pointerhandler);
         }
 
         protected override void OnGameobjectInitialized()

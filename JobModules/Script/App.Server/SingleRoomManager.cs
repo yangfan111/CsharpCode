@@ -276,7 +276,7 @@ namespace App.Server
             return null;
         }
 
-        private CalcFixTimeInterval _calcFixTimeInterval = new CalcFixTimeInterval();
+        private CompensationFixTimer _calcFixTimeInterval = new CompensationFixTimer();
         public void Update()
         {
             if (_room != null)

@@ -83,9 +83,9 @@ namespace App.Shared.GameModules.Camera
             }
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var player = owner.OwnerEntity as PlayerEntity;
+            var player = getter.OwnerEntity as PlayerEntity;
             if (player == null) return;
             CommonUpdate(player, cmd);
             LastTime = cmd.ClientTime;

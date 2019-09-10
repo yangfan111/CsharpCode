@@ -18,12 +18,12 @@ namespace Core.Prediction.UserPrediction.Parallel
 //            _stateCollectorPool = gameStateProcessorFactory;
 //        }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd userCmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd userCmd)
         {
-            if (userCmd.Seq != owner.LastCmdSeq + 1)
+            if (userCmd.Seq != getter.LastCmdSeq + 1)
             {
-                _logger.ErrorFormat("{2} lost user cmd last {0}, cur {1}", owner.LastCmdSeq,
-                    userCmd.Seq, owner.OwnerEntityKey);
+                _logger.ErrorFormat("{2} lost user cmd last {0}, cur {1}", getter.LastCmdSeq,
+                    userCmd.Seq, getter.OwnerEntityKey);
             }
 
             if (_logger.IsDebugEnabled)
@@ -31,7 +31,7 @@ namespace Core.Prediction.UserPrediction.Parallel
                 _logger.DebugFormat("processing user cmd {0}", userCmd);
             }
 
-            userCmd.FilteredInput = owner.GetFiltedInput(userCmd);
+            userCmd.FilteredInput = getter.GetFiltedInput(userCmd);
         }
 
         public ISimpleParallelUserCmdExecuteSystem CreateCopy()

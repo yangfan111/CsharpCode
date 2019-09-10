@@ -4,6 +4,7 @@ using Core.GameModule.Module;
 using Core.GameModule.System;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
+using UnityEngine;
 using Utils.Singleton;
 
 namespace Core.Prediction.UserPrediction
@@ -11,7 +12,7 @@ namespace Core.Prediction.UserPrediction
     public class UserPredictionSystem : AbstractFrameworkSystem<IUserCmdExecuteSystem>
     {
         private IUserCmd currentCmd;
-        private LoggerAdapter logger = new LoggerAdapter(LoggerNameHolder<UserPredictionSystem>.LoggerName);
+        private LoggerAdapter logger = new LoggerAdapter("UserPrediction");
         private PredictionManager predictionManager;
 
         private AbstractPredictionProvider provider;
@@ -57,16 +58,16 @@ namespace Core.Prediction.UserPrediction
                     logger.InfoFormat("predicatoinInfoProvider is not ready");
                     return;
                 }
-                /// remoteOwnerEntity.UserOwner 
-                var owner = provider.UserCmdOwner;
+                //当前playerContexts玩家的UserCmdPrediction，可能与ewindProvider.RemoteHistoryId不一致！！！！！
+                IPlayerUserCmdGetter playerUserCmdGetter = provider.UserCmdOwner;
                 // logger.InfoFormat("processing user cmd last:{0} {1} {2}", owner.LastCmdSeq, owner.UserCmdList.Count, owner.UserCmdList.Count>0?owner.UserCmdList.Last().Seq:-1);
-                foreach (var cmd in owner.UserCmdList)
+                foreach (var cmd in playerUserCmdGetter.UserCmdList)
                 {
                     currentCmd = cmd;
-                    if (currentCmd.Seq > owner.LastCmdSeq)
+                    if (currentCmd.Seq > playerUserCmdGetter.LastCmdSeq)
                     {
                         //过滤输入状态
-                        cmd.FilteredInput = owner.GetFiltedInput(cmd);
+                        cmd.FilteredInput = playerUserCmdGetter.GetFiltedInput(cmd);
 
                         //logger.InfoFormat("processing user cmd {0}", cmd);
 
@@ -75,8 +76,9 @@ namespace Core.Prediction.UserPrediction
                         ExecuteSystems();
                         cmd.FilteredInput  = null;
                         cmd.PredicatedOnce = true;
-                        owner.LastCmdSeq   = cmd.Seq;
+                        playerUserCmdGetter.LastCmdSeq   = cmd.Seq;
                         predictionManager.SavePredictionCompoments(cmd.Seq);
+                     
                     }
                 }
             }

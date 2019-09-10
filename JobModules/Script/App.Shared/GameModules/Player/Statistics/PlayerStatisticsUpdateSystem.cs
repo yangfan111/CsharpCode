@@ -11,9 +11,9 @@ namespace App.Shared.GameModules.Weapon
     {
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(PlayerWeaponGamePlayUpdateSystem));
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            owner.OwnerEntityKey.StatisticsController().Update(cmd);
+            getter.OwnerEntityKey.StatisticsController().Update(cmd);
         }
     }
 }

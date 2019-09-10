@@ -20,6 +20,7 @@ namespace Utils.AssetManager
         public Object AsObject
         {
             get { return Value; }
+            set {Value = value;} 
         }
 
         public MonoBehaviour AudioMono { get; set; }

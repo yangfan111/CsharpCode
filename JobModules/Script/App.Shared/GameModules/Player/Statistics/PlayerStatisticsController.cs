@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using App.Shared.Audio;
 using App.Shared.Player.Events;
 using Core;
 using Core.Attack;
@@ -9,6 +10,7 @@ using Core.Event;
 using Core.ObjectPool;
 using Core.Prediction.UserPrediction.Cmd;
 using Core.Utils;
+using Utils.Configuration;
 using WeaponConfigNs;
 
 namespace App.Shared.GameModules.Player

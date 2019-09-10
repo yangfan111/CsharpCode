@@ -45,7 +45,7 @@ namespace App.Client.ClientSystems
             
             _timeManager = _sessionObjects.TimeManager;
             _generator = _sessionObjects.UserCmdGenerator;
-            _vehicleCmdGenerator = new UnityVehicleCmdGenerator(contexts.userInput.userInputManager.Mgr);
+            _vehicleCmdGenerator = new UnityVehicleCmdGenerator(contexts.userInput.userInputManager.Instance);
             _playerContext = contexts.player;
 
             _simulationTimer = _sessionObjects.SimulationTimer;

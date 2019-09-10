@@ -5,20 +5,11 @@ using App.Shared.SceneManagement;
 using Core.SceneManagement;
 using Core.Utils;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using Utils.Singleton;
 
 namespace App.Client.SceneManagement
 {
-
-    enum OCType
-    {
-        None = 0,
-        Umbra = 1,
-        HZB = 2,
-    }
-
     public class ClientScenePostprocessor : Singleton<ClientScenePostprocessor>
     {
         private static LoggerAdapter _logger = new LoggerAdapter(typeof(ClientScenePostprocessor));
@@ -52,7 +43,6 @@ namespace App.Client.SceneManagement
 
                 var mapConfig = SingletonManager.Get<MapConfigManager>().SceneParameters;
 
-    
                 foreach (var v in go.GetComponentsInChildren<Camera>())
                 {
                     if (v != Camera.main) continue;//非主相机不需要GQS_Bind_Camera
@@ -66,39 +56,15 @@ namespace App.Client.SceneManagement
                         _logger.Error("ArtPlugins.GQS_Bind_Camera is null ??? !!!");
                     }
                             
-                    v.useOcclusionCulling = mapConfig.OcType == (int) OCType.Umbra;
+                    v.useOcclusionCulling = mapConfig.OcEnable;
 //                    if (v.GetComponent<AudioListener>() == null)
 //                    {
 //                        v.gameObject.AddComponent<AudioListener>();
 //                    }
                 }
 
-                SetDepthPrepass(mapConfig);
-                SetHZBCulling(mapConfig);
-
                 InitCameraPostProcessEffect();
             }
-        }
-
-        private void SetDepthPrepass(XmlConfig.AbstractMapConfig mapConfig)
-        {
-            GraphicsSettings.depthPrepassEnable = mapConfig.depthPrepassEnable;
-            GraphicsSettings.minRadiusRatioForDepthPrepass = mapConfig.minRadiusRatioForDepthPrepass;
-
-            if (mapConfig.depthPrepassEnable)
-                SharedConfig.GrassQueue = 1300;
-            else
-                SharedConfig.GrassQueue = -1;
-            
-        }
-
-       private void SetHZBCulling(XmlConfig.AbstractMapConfig mapConfig)
-        {
-            GraphicsSettings.hzbCullingEnable = mapConfig.OcType == (int)OCType.HZB;
-            GraphicsSettings.hzbMinCullingDistance = mapConfig.hzbMinCullingDistance;
-            GraphicsSettings.hzbCameraRejectEnable = mapConfig.hzbCameraRejectEnable;
-            GraphicsSettings.hzbCameraTranslationThreshold = mapConfig.hzbCameraTranslationThreshold;
-            GraphicsSettings.hzbCameraRotationThreshold = mapConfig.hzbCameraRotationThreshold;
         }
 
 

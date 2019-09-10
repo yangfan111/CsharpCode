@@ -129,7 +129,7 @@ namespace com.wd.free.trigger
             }
         }
 
-        public virtual void BindKeyAction(IGameAction t)
+        public virtual void AddAction(IGameAction t)
         {
             this.actions.Add(t);
         }

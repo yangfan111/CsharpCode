@@ -19,7 +19,7 @@ namespace App.Shared.GameModules
         public ServerMainFeature(
             string name,
             IGameModule topLevelGameModule,
-            IUserCmdExecuteSystemHandler userCmdExecuteSystemHandler,
+            IServerUserCmdList serrverServerUserCmdList,
             IVehicleCmdExecuteSystemHandler vehicleCmdExecuteSystemHandler,
             ISimulationTimer simluationTimer,
             IVehicleExecutionSelector vehicleExecutionSelector,
@@ -41,8 +41,8 @@ namespace App.Shared.GameModules
 //            Add(new UserCmdExecuteManagerSystem(topLevelGameModule, 
 //                userCmdExecuteSystemHandler,
 //                sessionObjects.GameStateProcessorFactory));
-            Add(new UserCmdUpdateMsgExecuteManagerSystem(topLevelGameModule, userCmdExecuteSystemHandler,
-                new SyncUpdateLatestMsgHandler()));
+            Add(new UserCmdUpdateMsgExecuteManagerSystem(topLevelGameModule, serrverServerUserCmdList,
+                new ServerSyncUpdateLatestMsg()));
 #else
             Add(new UserCmdParallelExecuteManagerSystem(topLevelGameModule,
                 userCmdExecuteSystemHandler,

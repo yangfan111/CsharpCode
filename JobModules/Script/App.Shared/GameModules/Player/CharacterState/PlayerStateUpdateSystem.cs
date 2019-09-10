@@ -46,9 +46,9 @@ namespace App.Shared.GameModules.Player.CharacterState
             _contexts = contexts;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity playerEntity = (PlayerEntity)owner.OwnerEntity;
+            PlayerEntity playerEntity = (PlayerEntity)getter.OwnerEntity;
 
             CheckPlayerLifeState(playerEntity);
 

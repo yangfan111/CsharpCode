@@ -44,7 +44,7 @@ namespace com.wd.free.trigger
                 triggers[trigger] = new List<GameTrigger>();
             }
             GameTrigger gt = new GameTrigger(trigger);
-            gt.BindKeyAction(action);
+            gt.AddAction(action);
             triggers[trigger].Add(gt);
         }
 

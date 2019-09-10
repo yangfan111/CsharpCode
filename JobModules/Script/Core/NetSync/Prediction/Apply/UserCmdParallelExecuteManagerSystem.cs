@@ -15,6 +15,10 @@ using Utils.Singleton;
 
 namespace Core.Prediction.UserPrediction
 {
+    public interface IServerUserCmdList
+        {
+            List<IPlayerUserCmdGetter> UserCmdOwnerList { get; }
+        }
     public class UserCmdParallelExecuteManagerSystem : IExecuteSystem
     {
         private List<IUserCmdExecuteSystem> _systems;
@@ -24,14 +28,14 @@ namespace Core.Prediction.UserPrediction
         private static LoggerAdapter _logger =
             new LoggerAdapter(LoggerNameHolder<UserCmdParallelExecuteManagerSystem>.LoggerName);
 
-        private IUserCmdExecuteSystemHandler _handler;
+        private IServerUserCmdList _handler;
 
         private WorkThread _mainThread;
         private TaskDispatcher _taskDisparcher;
 
 
         public UserCmdParallelExecuteManagerSystem(IGameModule gameModule,
-            IUserCmdExecuteSystemHandler handler,
+            IServerUserCmdList handler,
           //  PlayerStateCollectorPool gameStateProcessorFactory,
             int threadCount)
         {
@@ -133,7 +137,7 @@ namespace Core.Prediction.UserPrediction
 
     public class UserCmdEndExecuteSystem : IUserCmdExecuteSystem
     {
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
         }
     }

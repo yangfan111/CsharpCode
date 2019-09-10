@@ -189,7 +189,7 @@ namespace Utils.Appearance.Weapon.WeaponShowPackage
 
         #region sync
 
-        public void SetWeaponIdByType(WeaponInPackage type, int weaponId)
+        protected void SetWeaponIdByType(WeaponInPackage type, int weaponId)
         {
             _weaponDataController.SetWeaponIdByType(type, weaponId);
         }
@@ -199,12 +199,12 @@ namespace Utils.Appearance.Weapon.WeaponShowPackage
             return !ThirdPersonIncluded ? -1 : _characterWeaponP3.GetWeaponIdByType(type);
         }
         
-        public void SetAttachmentIdByType(WeaponInPackage weaponType, WeaponPartLocation attachmentType, int attachmentId)
+        protected void SetAttachmentIdByType(WeaponInPackage weaponType, WeaponPartLocation attachmentType, int attachmentId)
         {
             _weaponDataController.SetAttachmentIdByType(weaponType, attachmentType, attachmentId);
         }
 
-        public void SetHandWeaponType(WeaponInPackage type)
+        protected void SetHandWeaponType(WeaponInPackage type)
         {
             _weaponDataController.SetHandWeaponType(type);
         }

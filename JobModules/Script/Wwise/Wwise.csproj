@@ -271,7 +271,6 @@
     <Compile Include="Editor\WwiseMenu\Common\AkUnityPluginInstallerBase.cs" />
     <Compile Include="Editor\WwiseMenu\Common\AkWwiseIdConverter.cs" />
     <Compile Include="Editor\WwiseMenu\Mac\AkWwiseMenu_Mac.cs" />
-    <Compile Include="Editor\WwiseMenu\Windows\AkWwiseMenu_Windows.cs" />
     <Compile Include="Editor\WwiseSetupWizard\AkBuildPreprocessor.cs" />
     <Compile Include="Editor\WwiseSetupWizard\AkPluginActivator.cs" />
     <Compile Include="Editor\WwiseSetupWizard\AkSceneUtils.cs" />

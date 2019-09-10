@@ -13,6 +13,13 @@ namespace Core.Prediction
         public int HistoryId;
         public EntityMap EntityMap;
 
+            
     }
- 
+    public interface IPredictionManager
+    {
+        void RewindFirstSnapshot(EntityKey self);
+        void PredictionInit();
+        void SavePredictionCompoments(int historyId);
+        SavedHistory GetTargetHistory(int cmdSeq);
+    }
 }

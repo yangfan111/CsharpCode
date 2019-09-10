@@ -9,12 +9,18 @@ namespace App.Shared.GameModules.Weapon
     public class PlayerWeaponCmdUpdateSystem : IUserCmdExecuteSystem
     {
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var weaponController = GameModuleManagement.Get<PlayerWeaponController>(owner.OwnerEntityKey.EntityId);
+            var weaponController = GameModuleManagement.Get<PlayerWeaponController>(getter.OwnerEntityKey.EntityId);
             cmd.IsAutoFire = weaponController.HeldWeaponAgent.RunTimeComponent.NeedAutoBurstShoot;
             cmd.IsAutoReload = weaponController.HeldWeaponAgent.RunTimeComponent.NeedAutoReload;
             weaponController.InternalUpdate();
+            #if UNITY_EDITOR
+            if (cmd.IsYDown)
+            {
+                
+            }
+            #endif    
         }
     }
 }

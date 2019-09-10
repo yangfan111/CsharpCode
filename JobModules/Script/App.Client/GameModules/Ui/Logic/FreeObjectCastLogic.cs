@@ -3,6 +3,7 @@ using App.Shared;
 using App.Shared.GameModules.GamePlay.Free;
 using com.cpkf.yyjd.tools.util;
 using Core.EntityComponent;
+using Core.EntityComponent;
 using Core.Utils;
 using I2.Loc;
 using UserInputManager.Lib;
@@ -14,10 +15,10 @@ namespace App.Client.GameModules.Ui.Logic
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(FreeObjectCastLogic));
         private FreeMoveContext _freeMoveContext;
         private PlayerContext _playerContext;
-        private GameInputManager _userInputManager;
+        private UserInputManager.Lib.UserInputManager _userInputManager;
         private UnityEngine.Vector3 _centeroffset; 
 
-        public FreeObjectCastLogic(FreeMoveContext freeMoveContext, PlayerContext playerContext, GameInputManager userInputManager, float distance) : base(playerContext, distance)
+        public FreeObjectCastLogic(FreeMoveContext freeMoveContext, PlayerContext playerContext, UserInputManager.Lib.UserInputManager userInputManager, float distance) : base(playerContext, distance)
         {
             _freeMoveContext = freeMoveContext;
             _playerContext = playerContext;

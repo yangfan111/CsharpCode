@@ -11,9 +11,9 @@ namespace App.Shared.GameModules.Player.Actions.LadderPackage
     public class PlayerLadderActionSystem : IUserCmdExecuteSystem
     {
         private readonly FsmOutputBaseSystem _fsmOutputs = new FsmOutputBaseSystem();
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var player = (PlayerEntity)owner.OwnerEntity;
+            var player = (PlayerEntity)getter.OwnerEntity;
             if(null == player || null == player.RootGo() || 
                !player.hasLadderActionInterface ||
                IsUnique(player)) return;

@@ -14,9 +14,9 @@ namespace App.Shared.GameModules.Player
     public class PlayerControlledVehicleUserCmdExecuteSystem : IUserCmdExecuteSystem
     {
       
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var player = (PlayerEntity) owner.OwnerEntity;
+            var player = (PlayerEntity) getter.OwnerEntity;
             if (player.IsOnVehicle())
             {
                 player.position.AlwaysEqual = true;

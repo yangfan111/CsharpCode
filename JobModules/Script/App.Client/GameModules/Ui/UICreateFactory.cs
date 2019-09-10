@@ -157,7 +157,7 @@ namespace Assets.App.Client.GameModules.Ui
 
             RegisterUi(UiNameConstant.CommonHealthGroup, typeof(CommonHealthGroup), typeof(PlayerStateUiAdapter), UILayer.Base, new object[] { contexts }, 
                 new UiGroup[] { UiGroup.Base, UiGroup.MapHide});
-            RegisterUi(UiNameConstant.CommonPickUpModel, typeof(CommonPickUpModel), typeof(PickUpUiAdapter), UILayer.Base, new object[] { contexts.player, contexts.sceneObject, contexts.mapObject, contexts.session, contexts.vehicle, contexts.freeMove, contexts.userInput.userInputManager.Mgr, contexts.ui }, 
+            RegisterUi(UiNameConstant.CommonPickUpModel, typeof(CommonPickUpModel), typeof(PickUpUiAdapter), UILayer.Base, new object[] { contexts.player, contexts.sceneObject, contexts.mapObject, contexts.session, contexts.vehicle, contexts.freeMove, contexts.userInput.userInputManager.Instance, contexts.ui }, 
                 new UiGroup[] { UiGroup.Base});
             RegisterUi(UiNameConstant.CommonMiniMap, typeof(CommonMiniMap), typeof(MiniMapUiAdapter), UILayer.Base, new object[] { contexts }, 
                 new UiGroup[] { UiGroup.Base, UiGroup.MapHide, UiGroup.SurvivalBagHide });

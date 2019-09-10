@@ -5,11 +5,14 @@ using Core.UpdateLatest;
 
 namespace Core.Prediction.UserPrediction.Cmd
 {
-    public interface IUserCmdOwner
+    public interface IPlayerUserCmdGetter
     {
+        //GetLargerThan(lastSeq)
         List<IUserCmd> UserCmdList { get; }
-        List<UpdateLatestPacakge> UpdateList { get; }
         int LastCmdSeq { set; get; }
+        //只给服务器端使用
+        List<UpdateLatestPacakge> UpdateList { get; }
+        //只给服务器端使用
         int LastestExecuteUserCmdSeq { set; get; }
         object OwnerEntity { get; }
         EntityKey OwnerEntityKey { get; }

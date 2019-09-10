@@ -15,7 +15,7 @@ namespace App.Shared.GameModules.Player.Appearance.CharacterDebugPackage
             _playerContext = player;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
             var players = _playerContext.GetEntities();
             if (null == players) return;

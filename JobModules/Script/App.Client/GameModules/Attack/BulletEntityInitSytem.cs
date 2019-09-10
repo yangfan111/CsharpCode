@@ -39,6 +39,14 @@ namespace App.Client.ClientGameModules.Bullet
         {
             if(null != bullet && unityObj != null &&unityObj.AsGameObject)
             {
+
+                if (GMVariable.NeedBulletFlyLog)
+                {
+                    Object res   = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>("Assets/Assets/CoreRes/Sound/Model/Sphere.prefab");
+                    var    clone = GameObject.Instantiate(res) as GameObject;
+                    unityObj.AsObject = clone;
+                }
+              
                 bullet.AddBulletAsset(unityObj);
                 if (unityObj.AudioMono == null)
                 {

@@ -41,15 +41,15 @@ namespace App.Shared.GameModules.SceneObject
             _objectManager = triggerObjectManager.GetManager(ETriggerObjectType.Door);  
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
             if (cmd.IsUseAction && cmd.UseType == (int) EUseActionType.Door)
             {
                 var entity =
                     _mapContext.GetEntityWithEntityKey(new EntityKey(cmd.UseEntityId, (int) EEntityType.MapObject));
 
-                if (owner.OwnerEntity != null) {
-                    var player = (PlayerEntity)owner.OwnerEntity;
+                if (getter.OwnerEntity != null) {
+                    var player = (PlayerEntity)getter.OwnerEntity;
                     if (player != null && player.hasGamePlay) {
                         player.gamePlay.UseEntityId = cmd.UseEntityId;
                     }
@@ -68,7 +68,7 @@ namespace App.Shared.GameModules.SceneObject
 
                 if (!SharedConfig.IsServer && !SharedConfig.IsOffline)
                 {
-                    var player = (PlayerEntity)owner.OwnerEntity;
+                    var player = (PlayerEntity)getter.OwnerEntity;
                     player.autoMoveInterface.PlayerAutoMove.StopAutoMove();
                     player.StateInteractController().InterruptCharactor();
                     player.stateInterface.State.OpenDoor();
@@ -83,7 +83,7 @@ namespace App.Shared.GameModules.SceneObject
 
                 if (!door.hasDoorRotate && door.doorData.IsOpenable())
                 {
-                    var player = (PlayerEntity)owner.OwnerEntity;
+                    var player = (PlayerEntity)getter.OwnerEntity;
                     player.autoMoveInterface.PlayerAutoMove.StopAutoMove();
                     var go = door.rawGameObject.Value;
                     var playerPosition = player.RootGo().transform.position;

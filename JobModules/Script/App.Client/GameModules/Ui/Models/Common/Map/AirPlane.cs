@@ -23,7 +23,6 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private Transform tran;
         private Transform airPlane;
         private Transform airDrop;
-        private ActiveSetter airPlaneActiveSetter;
 
         private int lastPlaneType = -1;
         private bool isNeedChangeSprite;
@@ -42,7 +41,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             airPlane = tran.Find("airPlane");
             airDrop = tran.Find("kongtouModel");
             UIUtils.SetActive(airDrop, false);
-            airPlaneActiveSetter = new ActiveSetter(airPlane.gameObject);
+
             PreParedKTouSprite();
         }
 
@@ -126,7 +125,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             {
                 if (planeData.Type != lastPlaneType)
                 {
-                    airPlaneActiveSetter.Active = false;
+                    UIUtils.SetActive(airPlane, false);
                     HideAirDrop();
                     lastPlaneType = planeData.Type;
                 }
@@ -135,7 +134,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             {
                 if (planeData.Type != lastPlaneType)
                 {
-                    airPlaneActiveSetter.Active = true;
+                    UIUtils.SetActive(airPlane, true);
                     lastPlaneType = planeData.Type;
                 }
 
@@ -156,7 +155,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             {
                 if (planeData.Type != lastPlaneType)
                 {
-                    airPlaneActiveSetter.Active = true;
+                    UIUtils.SetActive(airPlane, true);
                     HideAirDrop();
                     lastPlaneType = planeData.Type;
                 }

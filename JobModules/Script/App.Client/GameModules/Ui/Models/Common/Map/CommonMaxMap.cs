@@ -17,7 +17,7 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private static readonly LoggerAdapter Logger = new LoggerAdapter(typeof(CommonMaxMap));
         private CommonMaxMapViewModel _viewModel = new CommonMaxMapViewModel();
         private IMapUiAdapter _adapter;
-        private KeyReceiver keyReceive = null;
+        private KeyHandler keyReceive = null;
 
         private CommonMap _map;
 
@@ -75,14 +75,14 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
 
         private void InitKeyBinding()
         {
-            var receiver = new KeyReceiver(UiConstant.maxMapWindowLayer, BlockType.None);
-            receiver.BindKeyAction(UserInputKey.ShowMaxMap, (data) =>
+            var handler = new KeyHandler(UiConstant.maxMapWindowLayer, BlockType.None);
+            handler.BindKeyAction(UserInputKey.ShowMaxMap, (data) =>
             {
                 ShowMap(!_adapter.Enable);
             });
-            _adapter.RegisterOpenKey(receiver);
+            _adapter.RegisterOpenKey(handler);
 
-            keyReceive = new KeyReceiver(UiConstant.maxMapWindowKeyBlockLayer, BlockType.All);
+            keyReceive = new KeyHandler(UiConstant.maxMapWindowKeyBlockLayer, BlockType.All);
             keyReceive.BindKeyAction(UserInputKey.HideWindow, (data) =>
             {
                 if (_adapter.Enable)

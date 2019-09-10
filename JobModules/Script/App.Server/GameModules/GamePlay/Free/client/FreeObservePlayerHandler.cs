@@ -16,7 +16,7 @@ namespace App.Server.GameModules.GamePlay.free.client
 
         public void Handle(ServerRoom room, PlayerEntity player, SimpleProto message)
         {
-            PlayerObserveAction.ObservePlayer(room.FreeArgs, player, true, true);
+            PlayerObserveAction.ObservePlayer(room.ContextsWrapper.FreeArgs, player, true, true);
         }
     }
 }

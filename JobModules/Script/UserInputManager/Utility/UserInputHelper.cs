@@ -4,23 +4,23 @@ using UserInputManager.Lib;
 namespace UserInputManager.Utility
 {
 
-    public class GameInputHelper 
+    public class UserInputHelper 
     {
-        public class KeyReceiverItem
+        public class KeyhandlerItem
         {
             public int Id;
-            public KeyReceiver Receiver;
+            public KeyHandler Handler;
         }
 
         public class PointerhandlerItem
         {
             public int Id;
-            public PointerReceiver Receiver;
+            public PointerKeyHandler KeyHandler;
         }
 
-        private Lib.GameInputManager _manager;
-        private Dictionary<int, KeyReceiverItem> _keyDic = new Dictionary<int, KeyReceiverItem>();
-        private Queue<KeyReceiverItem> _avaliableKeys = new Queue<KeyReceiverItem>(); 
+        private Lib.UserInputManager _manager;
+        private Dictionary<int, KeyhandlerItem> _keyDic = new Dictionary<int, KeyhandlerItem>();
+        private Queue<KeyhandlerItem> _avaliableKeys = new Queue<KeyhandlerItem>(); 
         private Dictionary<int, PointerhandlerItem> _pointerDic = new Dictionary<int, PointerhandlerItem>();
         private Queue<PointerhandlerItem> _avaliablePointers = new Queue<PointerhandlerItem>();
         private int _nextKeyId;
@@ -41,29 +41,29 @@ namespace UserInputManager.Utility
             }
         }
 
-        public GameInputHelper(Lib.GameInputManager manager)
+        public UserInputHelper(Lib.UserInputManager manager)
         {
             _manager = manager;
         }
 
-        public int BlockKey(EInputLayer eInputLayer)
+        public int BlockKey(Layer layer)
         {
             int id = 0;
             if(_avaliableKeys.Count > 0)
             {
                 var item = _avaliableKeys.Dequeue();
-                item.Receiver.handlerLayer = (int)eInputLayer;
-                _manager.RegisterKeyReceiver(item.Receiver);
+                item.Handler.handlerLayer = (int)layer;
+                _manager.RegisterKeyhandler(item.Handler);
                 id = item.Id;
             }
             else
             {
-                var item = new KeyReceiverItem
+                var item = new KeyhandlerItem
                 {
                     Id = NextKeyId,
-                    Receiver = new KeyReceiver(eInputLayer, BlockType.All),
+                    Handler = new KeyHandler(layer, BlockType.All),
                 };
-                _manager.RegisterKeyReceiver(item.Receiver);
+                _manager.RegisterKeyhandler(item.Handler);
                 _keyDic[item.Id] = item;
                 id = item.Id;
             }
@@ -75,17 +75,17 @@ namespace UserInputManager.Utility
             if(_keyDic.ContainsKey(key))
             {
                 _avaliableKeys.Enqueue(_keyDic[key]);
-                _manager.UnregisterKeyReceiver(_keyDic[key].Receiver);
+                _manager.UnregisterKeyhandler(_keyDic[key].Handler);
             }
         }
 
-        public int BlockPointer(EInputLayer eInputLayer)
+        public int BlockPointer(Layer layer)
         {
             int id = 0;
             if (_avaliablePointers.Count > 0)
             {
                 var item = _avaliablePointers.Dequeue();
-                _manager.RegisterPointerReceiver(item.Receiver);
+                _manager.RegisterPointerhandler(item.KeyHandler);
                 id = item.Id;
             }
             else
@@ -93,9 +93,9 @@ namespace UserInputManager.Utility
                 var item = new PointerhandlerItem 
                 {
                     Id = NextPointerId,
-                    Receiver = new PointerReceiver(eInputLayer, BlockType.All),
+                    KeyHandler = new PointerKeyHandler(layer, BlockType.All),
                 };
-                _manager.RegisterPointerReceiver(item.Receiver);
+                _manager.RegisterPointerhandler(item.KeyHandler);
                 _pointerDic[item.Id] = item;
                 id = item.Id;
             };
@@ -107,7 +107,7 @@ namespace UserInputManager.Utility
             if (_pointerDic.ContainsKey(key))
             {
                 _avaliablePointers.Enqueue(_pointerDic[key]);
-                _manager.UnregisterPointerReceiver(_pointerDic[key].Receiver);
+                _manager.UnregisterPointerhandler(_pointerDic[key].KeyHandler);
             }
         }
     }

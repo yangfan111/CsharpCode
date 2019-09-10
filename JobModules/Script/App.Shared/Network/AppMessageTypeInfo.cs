@@ -107,7 +107,7 @@ namespace App.Shared.Network
             _serializeInfo[(int) EClient2ServerMessage.DebugCommand] =
                 new ProtoBufSerializeInfo<DebugCommandMessage>(Protobuf.DebugCommandMessage.Parser);
             _serializeInfo[(int) EClient2ServerMessage.UpdateMsg] = _replicatedUpdateEntitySerializeInfo =
-                new ReplicatedUpdateEntitySerializeInfo(ComponentSerializerManager.Instance, new UpdateMessagePool(),
+                new ReplicatedUpdateEntitySerializeInfo(ComponentSerializerManager.Instance, new ServerUpdateMessagePool(),
                     ComponentSerializerManager.HashMd5, updateMsgSendCount);
             _serializeInfo[(int) EClient2ServerMessage.FireInfo] =
                 new ProtoBufSerializeInfo<FireInfoMessage>(Protobuf.DebugCommandMessage.Parser);
@@ -203,7 +203,7 @@ namespace App.Shared.Network
             }
         }
 
-        public IUpdateMessagePool GetUpdateMessagePool()
+        public ServerUpdateMessagePool GetUpdateMessagePool()
         {
             return _replicatedUpdateEntitySerializeInfo.MessagePool;
         }

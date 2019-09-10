@@ -57,7 +57,6 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private Transform tran;
         private RectTransform rectTransform;
         private Image img;
-        private ActiveSetter tranActiveSetter;
 
         public bool IsOutDate;
 
@@ -67,7 +66,6 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
             this.tran = tran;
             rectTransform = tran.GetComponent<RectTransform>();
             img = tran.GetComponent<Image>();
-            tranActiveSetter = new ActiveSetter(tran.gameObject);
         }
 
         public void SetActive(bool active)
@@ -81,19 +79,19 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private Vector2 _pos;
         public void Update(float rate, MiniMapPlayMarkInfo data)
         {
-            if (data.Color == _color && rate == _rate && data.Pos == _pos) return;
+            if (data.Color.Equals(_color) && rate.Equals(_rate) && data.Pos.Equals(_pos)) return;
 //            _statue = teamPlayInfo.Statue;
             _color = data.Color;
             _pos = data.Pos;
             _rate = rate;
 
-            //            if (_statue == MiniMapPlayStatue.DEAD) //死亡
-            //            {
-            //                UIUtils.SetActive(tran, false);
-            //            }
-            //            else
-            //            {
-            tranActiveSetter.Active = true;
+//            if (_statue == MiniMapPlayStatue.DEAD) //死亡
+//            {
+//                UIUtils.SetActive(tran, false);
+//            }
+//            else
+//            {
+                UIUtils.SetActive(tran, true);
 //                var temperSprite = SpriteComon.GetInstance().GetSpriteByName("fix_00");
 //                if (temperSprite != null && temperSprite != img.sprite)
 //                    img.sprite = temperSprite;

@@ -13,7 +13,7 @@ namespace Core.Prediction.UserPrediction
 {
     public interface ISyncUpdateLatestMsgHandler
     {
-        void SyncToEntity(IUserCmdOwner owner, UpdateLatestPacakge paackge);
+        void SyncToEntity(IPlayerUserCmdGetter getter, UpdateLatestPacakge paackge);
     }
 
     public class UserCmdUpdateMsgExecuteManagerSystem : AbstractFrameworkSystem<IUserCmdExecuteSystem>
@@ -21,16 +21,16 @@ namespace Core.Prediction.UserPrediction
         private static LoggerAdapter _logger =
             new LoggerAdapter(LoggerNameHolder<UserCmdUpdateMsgExecuteManagerSystem>.LoggerName);
 
-        private IUserCmdExecuteSystemHandler _handler;
+        private IServerUserCmdList _handler;
         private IList<IUserCmdExecuteSystem> _systems;
         private IUserCmd _currentCmd;
-        private IUserCmdOwner _currentUserCmdOwner;
+        private IPlayerUserCmdGetter _currentPlayerUserCmdGetter;
         private ISyncUpdateLatestMsgHandler _syncUpdateLatestMsgHandler;
         private CustomProfileInfo _syncToEntityProfile;
         private CustomProfileInfo _filtedInputProfile;
 
         public UserCmdUpdateMsgExecuteManagerSystem(IGameModule gameModule,
-            IUserCmdExecuteSystemHandler handler, ISyncUpdateLatestMsgHandler syncUpdateLatestMsgHandler)
+            IServerUserCmdList handler, ISyncUpdateLatestMsgHandler syncUpdateLatestMsgHandler)
         {
             _systems = gameModule.UserCmdExecuteSystems;
             _handler = handler;
@@ -49,7 +49,7 @@ namespace Core.Prediction.UserPrediction
 
         public override void SingleExecute(IUserCmdExecuteSystem system)
         {
-            system.ExecuteUserCmd(_currentUserCmdOwner, _currentCmd);
+            system.ExecuteUserCmd(_currentPlayerUserCmdGetter, _currentCmd);
         }
 
         public override void Execute()
@@ -57,9 +57,10 @@ namespace Core.Prediction.UserPrediction
             try
             {
                 SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.UserPrediction);
-                foreach (IUserCmdOwner owner in _handler.UserCmdOwnerList)
+                //UserCmd Seq是不通用的，以客户端生成为准，每个客户端不同
+                foreach (IPlayerUserCmdGetter owner in _handler.UserCmdOwnerList)
                 {
-                    _currentUserCmdOwner = owner;
+                    _currentPlayerUserCmdGetter = owner;
                     if (!owner.IsEnable())
                     {
                         _logger.ErrorFormat("player {0}is destroyed", owner.OwnerEntityKey);
@@ -73,19 +74,19 @@ namespace Core.Prediction.UserPrediction
                     }
 
                     int executeCount = 0;
-                    foreach (var update in owner.UpdateList)
+                    //一次updatePackage代表一次UserCmd
+                    foreach (UpdateLatestPacakge updatePackage in owner.UpdateList)
                     {
                         try
                         {
                             _syncToEntityProfile.BeginProfileOnlyEnableProfile();
-                            _syncUpdateLatestMsgHandler.SyncToEntity(_currentUserCmdOwner, update);
+                            _syncUpdateLatestMsgHandler.SyncToEntity(_currentPlayerUserCmdGetter, updatePackage);
                         }
                         finally
                         {
                             _syncToEntityProfile.EndProfileOnlyEnableProfile();
                         }
-                      
-
+                        //实际UserCmd只有一次而已
                         foreach (var userCmd in owner.UserCmdList)
                         {
                             _currentCmd = userCmd;
@@ -114,7 +115,7 @@ namespace Core.Prediction.UserPrediction
                             owner.LastCmdSeq = userCmd.Seq;
                         }
 
-                        owner.LastestExecuteUserCmdSeq = update.Head.UserCmdSeq;
+                        owner.LastestExecuteUserCmdSeq = updatePackage.Head.LastUserCmdSeq;
                         executeCount++;
                         if (executeCount > MaxEcecutePreFrame)
                         {

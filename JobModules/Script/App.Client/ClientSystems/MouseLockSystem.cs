@@ -15,23 +15,23 @@ namespace App.Client.ClientSystems
         public MouseLockSystem(Contexts contexts)
         {
             _contexts = contexts;
-            InitKeyReceiver(contexts.userInput);
+            InitKeyhandler(contexts.userInput);
         }
 
-        private void InitKeyReceiver(UserInputContext context)
+        private void InitKeyhandler(UserInputContext context)
         {
-            var recevier = new KeyReceiver(EInputLayer.Env + 2, BlockType.None,"MouseLock");
-            recevier.BindKeyAction(UserInputKey.LockCursor, (data) =>
+            var keyHandler = new KeyHandler(Layer.Env + 2, BlockType.None);
+            keyHandler.BindKeyAction(UserInputKey.LockCursor, (data) =>
             {
                 //暂时屏蔽               
                 _contexts.ui.uI.IsShowCrossHair = true;
             });
-            recevier.BindKeyAction(UserInputKey.UnlockCursor, (data) =>
+            keyHandler.BindKeyAction(UserInputKey.UnlockCursor, (data) =>
             {
                 //暂时屏蔽                
                 _contexts.ui.uI.IsShowCrossHair = false;
             });
-            context.userInputManager.Mgr.RegisterKeyReceiver(recevier);
+            context.userInputManager.Instance.RegisterKeyhandler(keyHandler);
         }
 
         public void Initialize()

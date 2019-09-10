@@ -19,9 +19,9 @@ namespace App.Shared.GameModules.GamePlay
             this.contexts = contexts;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity player = owner.OwnerEntity as PlayerEntity;
+            PlayerEntity player = getter.OwnerEntity as PlayerEntity;
             if (player.gamePlay.GameState == GameState.AirPlane)
             {
                 FreeMoveEntity[] entities = contexts.freeMove.GetEntities();

@@ -45,7 +45,7 @@ namespace App.Client.ClientGameModules
                             
                            
                             var right = updateComponent as SendUserCmdComponent;
-                            _logger.DebugFormat("replay usercmd: last:{0}, timeseq:{1}, msgSeq:{2} {3}", last.Seq, MyGameTime.seq, current.Head.UserCmdSeq, item);
+                            _logger.DebugFormat("replay usercmd: last:{0}, timeseq:{1}, msgSeq:{2} {3}", last.Seq, MyGameTime.seq, current.Head.LastUserCmdSeq, item);
                             //last.Seq = current.Head.UserCmdSeq;
                             //last.SnapshotId = current.Head.LastSnapshotId;
                             _contexts.session.clientSessionObjects.TimeManager.RenderTime = right.RenderTime;

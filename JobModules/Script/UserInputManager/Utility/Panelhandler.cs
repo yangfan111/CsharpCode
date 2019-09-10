@@ -8,18 +8,18 @@ namespace UserInputManager.Utility
 {
     public class Panelhandler
     {
-        public Panelhandler(Lib.GameInputManager manager, UserInputKey key, KeyPointAction onOpen, KeyPointAction onClose,
+        public Panelhandler(Lib.UserInputManager manager, UserInputKey key, KeyPointAction onOpen, KeyPointAction onClose,
             bool blockEnv = true)
         {
-            var openhandler = new KeyReceiver(EInputLayer.Ui, BlockType.None);
-            var closehandler = new KeyReceiver(EInputLayer.Ui, BlockType.All);
-            var openBlockhandler = blockEnv ? new PointerReceiver(EInputLayer.Ui, BlockType.All) : null;
+            var openhandler = new KeyHandler(Layer.Ui, BlockType.None);
+            var closehandler = new KeyHandler(Layer.Ui, BlockType.All);
+            var openBlockhandler = blockEnv ? new PointerKeyHandler(Layer.Ui, BlockType.All) : null;
 
             openhandler.BindKeyAction(key, (data) =>
             {
-                manager.RegisterKeyReceiver(closehandler);
-                manager.RegisterPointerReceiver(openBlockhandler);
-                manager.UnregisterKeyReceiver(openhandler);
+                manager.RegisterKeyhandler(closehandler);
+                manager.RegisterPointerhandler(openBlockhandler);
+                manager.UnregisterKeyhandler(openhandler);
             });
 
             if (null != onOpen)
@@ -29,16 +29,16 @@ namespace UserInputManager.Utility
 
             closehandler.BindKeyAction(key, (data) =>
             {
-                manager.RegisterKeyReceiver(openhandler);
-                manager.UnregisterKeyReceiver(closehandler);
-                manager.UnregisterPointerReceiver(openBlockhandler);
+                manager.RegisterKeyhandler(openhandler);
+                manager.UnregisterKeyhandler(closehandler);
+                manager.UnregisterPointerhandler(openBlockhandler);
             });
             if (null != onClose)
             {
                 closehandler.BindKeyAction(key, onClose);
             }
 
-            manager.RegisterKeyReceiver(openhandler);
+            manager.RegisterKeyhandler(openhandler);
         }
     }
 

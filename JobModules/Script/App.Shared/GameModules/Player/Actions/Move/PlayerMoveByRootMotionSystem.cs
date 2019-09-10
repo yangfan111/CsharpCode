@@ -8,9 +8,9 @@ namespace App.Shared.GameModules.Player.Actions.Move
 {
     public class PlayerMoveByRootMotionSystem : IUserCmdExecuteSystem
     {
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var player = (PlayerEntity)owner.OwnerEntity;
+            var player = (PlayerEntity)getter.OwnerEntity;
             if (player.gamePlay.IsLifeState(EPlayerLifeState.Dead))
             {
                 // gamePlay有对应的处理，这里不需要

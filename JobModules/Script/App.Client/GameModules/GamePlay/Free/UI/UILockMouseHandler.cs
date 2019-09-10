@@ -43,8 +43,8 @@ namespace App.Client.GameModules.GamePlay.Free.UI
                 {
                     //Unlock
                     SingletonManager.Get<FreeUiManager>().Contexts1.ui.uI.IsShowCrossHair = false;
-                    CursorLocker.SystemBlockKeyId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockKey(EInputLayer.System);
-                    CursorLocker.SystemBlockPointerId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockPointer(EInputLayer.System);
+                    CursorLocker.SystemBlockKeyId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockKey(Layer.System);
+                    CursorLocker.SystemBlockPointerId = SingletonManager.Get<FreeUiManager>().Contexts1.userInput.userInputManager.Helper.BlockPointer(Layer.System);
                 }
             }
         }

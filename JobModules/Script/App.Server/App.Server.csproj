@@ -89,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\ServerRuntimeGameConfig.cs" />
+    <Compile Include="ContextsServerWrapper.cs" />
     <Compile Include="FileSystemConfig\ServerFileSystemConfigManager.cs" />
     <Compile Include="GameModules\Attack\ServerBulletInfoCollectSystem.cs" />
     <Compile Include="GameModules\GamePlay\Free\FreeArgConstant.cs" />
@@ -306,12 +307,14 @@
     <Compile Include="MessageHandler\UserUpdateMsgHandler.cs" />
     <Compile Include="MessageHandler\VehicleCmdMessageHandler.cs" />
     <Compile Include="MessageHandler\VehicleEventMessageHandler.cs" />
+    <Compile Include="NetSync\CompensationManager.cs" />
+    <Compile Include="NetSync\CreateSnapshotTask.cs" />
+    <Compile Include="NetSync\SendSnapshotManager.cs" />
     <Compile Include="PlayerNetworkMonitor.cs" />
     <Compile Include="Robot\RobotFakeNetworkChannel.cs" />
     <Compile Include="Robot\RobotsManager.cs" />
     <Compile Include="RoomId.cs" />
     <Compile Include="SceneManagement\ServerScenePostprocessor.cs" />
-    <Compile Include="SendSnapshotManager.cs" />
     <Compile Include="ServerDebugCommandHandler.cs" />
     <Compile Include="ServerMain.cs" />
     <Compile Include="ServerRoom.cs" />

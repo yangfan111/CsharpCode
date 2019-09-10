@@ -23,13 +23,13 @@ namespace App.Shared.Network.SerializeInfo
         private ComponentSerializerManager _componentSerializerManager;
 
         //  private Dictionary<int, UpdateLatestPacakge> _updateLatestHistory = new Dictionary<int, UpdateLatestPacakge>();
-        public IUpdateMessagePool MessagePool { get; private set; }
+        public ServerUpdateMessagePool MessagePool { get; private set; }
 
         public ReplicatedUpdateEntitySerializeInfo(ComponentSerializerManager instance,
-            IUpdateMessagePool updateMessagePool, string version, int sendCount = 3)
+            ServerUpdateMessagePool serverUpdateMessagePool, string version, int sendCount = 3)
         {
             _componentSerializerManager = instance;
-            MessagePool = updateMessagePool;
+            MessagePool = serverUpdateMessagePool;
             Statistics = new SerializationStatistics("UpdateEntity");
            
             _version = version;
@@ -53,15 +53,15 @@ namespace App.Shared.Network.SerializeInfo
             var msg = message as UpdateLatestPacakge;
             var binaryWriter = MyBinaryWriter.Allocate(outStream);
             binaryWriter.Write(_version);
-            if (MessagePool.GetPackageBySeq(msg.Head.UserCmdSeq) != null)
+            if (MessagePool.GetPackageBySeq(msg.Head.LastUserCmdSeq) != null)
             {
-                _logger.ErrorFormat("repetition  msg.Head.UserCmdSeq{0}", msg.Head.UserCmdSeq);
+                _logger.ErrorFormat("repetition  msg.Head.UserCmdSeq{0}", msg.Head.LastUserCmdSeq);
                 binaryWriter.Write((byte) 0);
                 return binaryWriter.WriterLenght;
             }
 
             MessagePool.AddMessage(msg);
-            MessagePool.ClearOldMessage(msg.Head.BaseUserCmdSeq);
+            MessagePool.ClearOldMessage(msg.Head.LastAckUserCmdSeq);
             if (_sendHistoryStreams.Count > _sendCount)
             {
                 RemoveHistoryFirst();
@@ -69,8 +69,8 @@ namespace App.Shared.Network.SerializeInfo
 
             for (int i = 0; i < _sendCount; i++)
             {
-                if (_sendHistorySeqs.Count > 0 && msg.Head.BaseUserCmdSeq > 0 &&
-                    _sendHistorySeqs.First() <= msg.Head.BaseUserCmdSeq)
+                if (_sendHistorySeqs.Count > 0 && msg.Head.LastAckUserCmdSeq > 0 &&
+                    _sendHistorySeqs.First() <= msg.Head.LastAckUserCmdSeq)
                 {
                     RemoveHistoryFirst();
                 }
@@ -82,7 +82,7 @@ namespace App.Shared.Network.SerializeInfo
 
             var stream = SerializeSinaglePackage(msg);
             _sendHistoryStreams.AddLast(stream);
-            _sendHistorySeqs.AddLast(msg.Head.UserCmdSeq);
+            _sendHistorySeqs.AddLast(msg.Head.LastUserCmdSeq);
 
 
                 binaryWriter.Write((byte) _sendHistoryStreams.Count);
@@ -156,7 +156,7 @@ namespace App.Shared.Network.SerializeInfo
             stream.Stream.Seek(0, SeekOrigin.Begin);
             var binaryWriter = MyBinaryWriter.Allocate(stream.Stream);
             long bodyLength;
-            var old = MessagePool.GetPackageBySeq(msg.Head.BaseUserCmdSeq);
+            var old = MessagePool.GetPackageBySeq(msg.Head.LastAckUserCmdSeq);
             int count = 0;
             if (old != null)
             {
@@ -165,7 +165,7 @@ namespace App.Shared.Network.SerializeInfo
             }
             else
             {
-                msg.Head.BaseUserCmdSeq = -1;
+                msg.Head.LastAckUserCmdSeq = -1;
                 msg.Head.Serialize(binaryWriter);
                 bodyLength = SerializeComponents(binaryWriter, _emptyUpdateComponents, msg.UpdateComponents,out count);
             }
@@ -194,12 +194,12 @@ namespace App.Shared.Network.SerializeInfo
                 try
                 {
                     pacakge.Head.Deserialize(binaryReader);
-                    var seq = pacakge.Head.UserCmdSeq;
+                    var seq = pacakge.Head.LastUserCmdSeq;
                     var bodyLenght = pacakge.Head.BodyLength;
-                    MessagePool.ClearOldMessage(pacakge.Head.BaseUserCmdSeq);
+                    MessagePool.ClearOldMessage(pacakge.Head.LastAckUserCmdSeq);
                     if (MessagePool.GetPackageBySeq(seq) == null)
                     {
-                        var baseSeq = pacakge.Head.BaseUserCmdSeq;
+                        var baseSeq = pacakge.Head.LastAckUserCmdSeq;
                         var old = MessagePool.GetPackageBySeq(baseSeq);
                         if (old != null)
                         {
@@ -226,13 +226,13 @@ namespace App.Shared.Network.SerializeInfo
                         }
                         else
                         {
-                            _logger.WarnFormat("Skip package {0} with length {1} baseSeq;{2}", pacakge.Head.UserCmdSeq,
-                                pacakge.Head.BodyLength, pacakge.Head.BaseUserCmdSeq);
+                            _logger.WarnFormat("Skip package {0} with length {1} baseSeq;{2}", pacakge.Head.LastUserCmdSeq,
+                                pacakge.Head.BodyLength, pacakge.Head.LastAckUserCmdSeq);
                         }
                     }
                     else
                     {
-                        _logger.DebugFormat("Skip package {0} with length {1}", pacakge.Head.UserCmdSeq,
+                        _logger.DebugFormat("Skip package {0} with length {1}", pacakge.Head.LastUserCmdSeq,
                             pacakge.Head.BodyLength);
                         binaryReader.BaseStream.Seek(bodyLenght, SeekOrigin.Current);
                     }

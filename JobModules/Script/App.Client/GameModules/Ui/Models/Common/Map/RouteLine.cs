@@ -10,13 +10,11 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         private RectTransform rectTransform;
         private Transform line;
         private RectTransform lineRtf;
-        private ActiveSetter tranActiveSetter;
 
         public RouteLine(Transform tran)
         {
+            UIUtils.SetActive(tran, true);
             this.tran = tran;
-            tranActiveSetter = new ActiveSetter(tran.gameObject);
-            tranActiveSetter.Active = true;
             rectTransform = tran.GetComponent<RectTransform>();
             line = tran.Find("routeLine");
             lineRtf = line.GetComponent<RectTransform>();
@@ -26,11 +24,11 @@ namespace App.Client.GameModules.Ui.Models.Common.Map
         {
             if (!isShowRouteLine)
             {
-                tranActiveSetter.Active = false;
+                UIUtils.SetActive(tran, false);
             }
             else
             {
-                tranActiveSetter.Active = true;
+                UIUtils.SetActive(tran, true);
 
                 var startPosByPixel = (startPosByRice) * rate;
                 var endPosByPixel = (endPosByRice) * rate;

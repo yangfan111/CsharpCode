@@ -99,7 +99,7 @@ namespace App.Shared.Components.Ui
     public class MiniMapTeamPlayInfo
     {
         public MiniMapTeamPlayInfo(long playerId,int entityId, bool isPlayer, int num, Color color, MiniMapPlayStatue statue, Vector3 pos, float faceDirection, List<MiniMapPlayMarkInfo> markList, bool isShooting, int shootingCount,
-            string playerName, int curHp, int maxHp, int curHpInHurted, bool isMark, Vector3 topPos, bool IsShow)
+            string playerName, int curHp, int maxHp, int curHpInHurted, bool isMark, Vector3 topPos)
         {
             this.PlayerId = playerId;
             this.EntityId = entityId;
@@ -119,7 +119,6 @@ namespace App.Shared.Components.Ui
             this.CurHpInHurted = curHpInHurted;
             this.IsMark = isMark;
             this.TopPos = topPos;
-            this.IsShow = IsShow;
         }
 
         public MiniMapTeamPlayInfo()
@@ -145,7 +144,6 @@ namespace App.Shared.Components.Ui
         public int CurHpInHurted;                   //受伤血量
         public bool IsMark;                         //是否标记
         public Vector3 TopPos;                      //人物名字位置
-        public bool IsShow = true;                 //是否需要隐藏显示
 
         //是否受伤状态
         public bool IsInHurtedStatue

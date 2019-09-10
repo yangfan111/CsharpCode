@@ -11,9 +11,9 @@ namespace App.Shared.GameModules.Weapon
     public class ClientPlayerPreSyncDataSystem:IUserCmdExecuteSystem
     {
        
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var player = owner.OwnerEntity as PlayerEntity;
+            var player = getter.OwnerEntity as PlayerEntity;
             PrecisionsVector3 locatorDelta = new PrecisionsVector3(player.characterBoneInterface.CharacterBone.BaseLocatorDelta,4);
             var clientUpdateComp = player.playerClientUpdate;
             var gamePlay = player.gamePlay;

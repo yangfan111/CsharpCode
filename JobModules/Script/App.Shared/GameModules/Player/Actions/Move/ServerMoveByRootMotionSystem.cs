@@ -8,9 +8,9 @@ namespace App.Shared.GameModules.Player.Actions.Move
 {
     public class ServerMoveByRootMotionSystem: IUserCmdExecuteSystem
     {
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var player = (PlayerEntity)owner.OwnerEntity;
+            var player = (PlayerEntity)getter.OwnerEntity;
             var clientData = player.playerMoveByAnimUpdate;
             
             if (player.gamePlay.IsLifeState(EPlayerLifeState.Dead) || !clientData.NeedUpdate)

@@ -28,16 +28,16 @@ namespace Core.Prediction.UserPrediction.Parallel
     public class CmdTask
     {
         public int PayerIdx;
-        public IUserCmdOwner Owner;
+        public IPlayerUserCmdGetter Getter;
         public IUserCmd UserCmd;
         public int ThreadIdx;
         public TaskInfo TaskInfo;
 
 
-        public CmdTask(int payerIdx, IUserCmdOwner owner, IUserCmd userCmd, TaskInfo taskInfo, int threadIdx)
+        public CmdTask(int payerIdx, IPlayerUserCmdGetter getter, IUserCmd userCmd, TaskInfo taskInfo, int threadIdx)
         {
             PayerIdx = payerIdx;
-            Owner = owner;
+            Getter = getter;
             UserCmd = userCmd;
             TaskInfo = taskInfo;
             ThreadIdx = threadIdx;

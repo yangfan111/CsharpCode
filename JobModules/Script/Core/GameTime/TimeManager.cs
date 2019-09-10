@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Core.Utils;
-using Entitas.VisualDebugging.Unity;
 using UnityEngine;
 using Utils.Singleton;
 
@@ -10,136 +8,114 @@ namespace Core.GameTime
 {
     public class TimeManager : ITimeManager
     {
-        private static LoggerAdapter _logger = new LoggerAdapter(typeof(TimeManager));
+        private const int MaxHistory = 60;
+        private static LoggerAdapter logger = new LoggerAdapter(typeof(TimeManager));
+
+        private readonly CompensationFixTimer fixTimer = new CompensationFixTimer();
+        private readonly ICurrentTime sessionTimeComponent;
+
+
+        private float compensationDeltaInterval;
         private DateTime _lastFrameTime = DateTime.MinValue;
-        private volatile int _serverTimeDelta;
-        private volatile int _clientTime;
-        private bool _firstDelta = true;
-        private int _serverTime;
-        private readonly ICurrentTime _currentTime;
-        public int ClientTime
+        private volatile int lastScDelta;
+        private bool firstDelta = true;
+        List<int> interpolateIntervals = new List<int>(MaxHistory);
+        public int LastAvgInterpolateInterval = TimeConstant.InterpolateInterval;
+        private int latestServerTime;
+
+        private int sumIntverval;
+
+        public TimeManager(ICurrentTime sessionTimeComponent)
         {
-            get { return _clientTime; }
-            set { _clientTime = value; }
+            this.sessionTimeComponent = sessionTimeComponent;
         }
+
+        public int ClientTime { get; private set; }
+
 
         public int FrameInterval { get; private set; }
 
         public int RenderTime { get; set; }
 
         public float FrameInterpolation { get; private set; }
-        public int LastAvgInterpolateInterval = TimeConstant.InterpolateInterval;
-        /// <summary>
-        /// delta = server - client
-        /// </summary>
-        public int Delta
-        {
-            get { return _serverTimeDelta; }
-            set { _serverTimeDelta = value; }
-        }
 
-        CalcFixTimeInterval _calcFixTimeInterval = new CalcFixTimeInterval();
-
+   
         public void Tick(float now)
         {
-            FrameInterval = _calcFixTimeInterval.Update(now);
+            FrameInterval = fixTimer.Update(now);
             IncrClientTime(FrameInterval);
             UpdateRenderTime();
-            _currentTime.CurrentTime = RenderTime;
-        }
-
-        private void UpdateRenderTime()
-        {
-            //确定当前渲染时间
-            var newRenderTime = ClientTime + _serverTimeDelta -  LastAvgInterpolateInterval-
-                                TimeConstant.TimeNudge;
-            RenderTime = newRenderTime < RenderTime ? RenderTime : newRenderTime;
+            sessionTimeComponent.CurrentTime = RenderTime;
         }
 
 
-        public int ServerTime
+        public void SyncWithServer(int serverTime)
         {
-            get { return _serverTime; }
-            set { _serverTime = value; }
-        }
-
-        private void IncrClientTime(int frameInterval)
-        {
-            _clientTime += frameInterval;
-        }
-
-
-        private float _compensationDeltaDelta = 0;
-        private const int MaxHistory = 60;
-        List<int> interpolateIntervals = new List<int>(MaxHistory);
-        public void SyncWithServer(int latestServerTime)
-        {
-            if (_serverTime > latestServerTime)
+            if (latestServerTime > serverTime)
             {
-                _logger.InfoFormat("sync server time invalid now {0} recv:{1}", _serverTime, latestServerTime);
+                logger.InfoFormat("sync server time invalid now {0} recv:{1}", latestServerTime, serverTime);
                 return;
             }
 
 
-         
-            CheckInterpolation( latestServerTime - _serverTime);
-            this._serverTime = latestServerTime;
+            CheckInterpolation(serverTime - latestServerTime);
+            latestServerTime = serverTime;
 
-            var newDelta = latestServerTime - ClientTime;
-            var deltaDelta = System.Math.Abs(newDelta - _serverTimeDelta);
-             _logger.DebugFormat("sync server time invalid now {0} {1}", newDelta, _serverTimeDelta);
-            if (_firstDelta)
+            var newScDelta = serverTime - ClientTime;
+            var absDeltaInterval  = Math.Abs(newScDelta - lastScDelta);
+            var deltaInterval = newScDelta - lastScDelta;
+            var realDelta = 0;
+
+            logger.DebugFormat("sync server time invalid now {0} {1}", absDeltaInterval, lastScDelta);
+            if (firstDelta)
             {
-                _firstDelta = false;
-                _serverTimeDelta = newDelta;
-                _logger.InfoFormat("sync server time (first time) serverTime {0} delta {1} client {2}, deltaDelta {3}",
-                    latestServerTime, _serverTimeDelta, ClientTime, deltaDelta);
+                firstDelta       = false;
+                lastScDelta = absDeltaInterval;
+                logger.InfoFormat("sync server time (first time) serverTime {0} delta {1} client {2}, deltaDelta {3}",
+                    serverTime, lastScDelta, ClientTime, absDeltaInterval);
+                return;
             }
-            else
+            // 变化太大了 >500ms    realDelta =  deltaInterval / 4;
+            if (absDeltaInterval > TimeConstant.ResetTime) 
             {
-                if (deltaDelta > TimeConstant.ResetTime) // 变化太大了
-                {
-                    _logger.InfoFormat(
-                        "sync server time (delta invalid) serverTime {0} delta {1} client {2}, deltaDelta {3}",
-                        latestServerTime, _serverTimeDelta, ClientTime, deltaDelta);
-                    _serverTimeDelta += ((newDelta - _serverTimeDelta)/4);
-                }
-                else if (deltaDelta > 100 && newDelta < _serverTimeDelta) //超前时不马上设置到该值，而是通过下面的函数，递进的和增加
-                {
-                    var nextDelta =   _serverTimeDelta +( (newDelta - _serverTimeDelta)/8);
-                    _logger.InfoFormat(
-                        "sync server time (delta too large) serverTime {0} client {1} delta {2} newDelta{3}  deltaDelta {4} nextDelta{5}",
-                        latestServerTime, ClientTime, _serverTimeDelta,  newDelta, newDelta - _serverTimeDelta, nextDelta);
-                    _serverTimeDelta = nextDelta;
-                }
-                else if (deltaDelta > 40 && newDelta > _serverTimeDelta)
-                {
-                    if (newDelta > _serverTimeDelta)
-                    {
-                        _compensationDeltaDelta += TimeConstant.CompensationDeltaDelta * deltaDelta;
-                    }
-                    else
-                    {
-                        _compensationDeltaDelta -= TimeConstant.CompensationDeltaDelta * deltaDelta;
-                    }
-
-                    if (_compensationDeltaDelta > 1)
-                    {
-                        _serverTimeDelta += 1;
-                        _compensationDeltaDelta -= 1;
-                    }
-                    else if (_compensationDeltaDelta < -1)
-                    {
-                        _serverTimeDelta -= 1;
-                        _compensationDeltaDelta += 1;
-                    }
-                }
-
-                SingletonManager.Get<DurationHelp>().LastAvgInterpolateInterval = LastAvgInterpolateInterval;
-                SingletonManager.Get<DurationHelp>().ServerClientDelta = _serverTimeDelta;
-                SingletonManager.Get<DurationHelp>().LastServerTime = latestServerTime;
-                SingletonManager.Get<DurationHelp>().RenderTime = RenderTime;
+                logger.InfoFormat(
+                    "sync server time (delta invalid) serverTime {0} delta {1} client {2}, deltaDelta {3}",
+                    serverTime, lastScDelta, ClientTime, absDeltaInterval);
+                realDelta =  deltaInterval / 4;
             }
+            //时间超前: >100ms时处理   realDelta= deltaInterval/ 8;
+            else if (absDeltaInterval > 100 && newScDelta < lastScDelta) //超前时不马上设置到该值，而是通过下面的函数，递进的和增加
+            {
+                realDelta= deltaInterval/ 8;
+                logger.InfoFormat(
+                    "sync server time (delta too large) serverTime {0} client {1} delta {2} newDelta{3}  deltaDelta {4} ",
+                    serverTime, ClientTime, lastScDelta, absDeltaInterval, absDeltaInterval - lastScDelta);
+            }
+            //数据滞后:>40ms时处理 以absDeltaInterval/s缓慢增加
+            else if (absDeltaInterval > 40 && newScDelta > lastScDelta)
+            {
+                if (newScDelta > lastScDelta)
+                    compensationDeltaInterval += TimeConstant.CompensationDeltaDelta * absDeltaInterval;
+                else
+                    compensationDeltaInterval -= TimeConstant.CompensationDeltaDelta * absDeltaInterval;
+
+                if (compensationDeltaInterval > 1)
+                {
+                    lastScDelta        += 1;
+                    compensationDeltaInterval -= 1;
+                }
+                else if (compensationDeltaInterval < -1)
+                {
+                    lastScDelta        -= 1;
+                    compensationDeltaInterval += 1;
+                }
+            }
+
+            lastScDelta += realDelta;
+            SingletonManager.Get<DurationHelp>().LastAvgInterpolateInterval = LastAvgInterpolateInterval;
+            SingletonManager.Get<DurationHelp>().ServerClientDelta          = lastScDelta;
+            SingletonManager.Get<DurationHelp>().LastServerTime             = serverTime;
+            SingletonManager.Get<DurationHelp>().RenderTime                 = RenderTime;
         }
 
         public void UpdateFrameInterpolation(int leftServerTime, int rightServerTime)
@@ -156,20 +132,25 @@ namespace Core.GameTime
             }
         }
 
-        private int sumIntverval = 0;
-
-        public TimeManager(ICurrentTime currentTime)
+        private void UpdateRenderTime()
         {
-            _currentTime = currentTime;
+            //确定当前渲染时间
+            var newRenderTime = ClientTime + lastScDelta - LastAvgInterpolateInterval - TimeConstant.TimeNudge;
+            RenderTime = newRenderTime < RenderTime ? RenderTime : newRenderTime;
+        }
+
+        private void IncrClientTime(int frameInterval)
+        {
+            ClientTime += frameInterval;
         }
 
         private void CheckInterpolation(int intverval)
         {
-         
             if (interpolateIntervals.Count > MaxHistory)
             {
                 interpolateIntervals.RemoveAt(0);
             }
+
             interpolateIntervals.Add(intverval);
             sumIntverval += intverval;
             if (sumIntverval > 1000 * 10)
@@ -185,10 +166,8 @@ namespace Core.GameTime
                 var avg = sum / interpolateIntervals.Count;
                 if (Mathf.Abs(avg - LastAvgInterpolateInterval) > 10)
                 {
-                    _logger.InfoFormat("CheckInterpolation {0} to {1}", LastAvgInterpolateInterval, avg);
+                    logger.InfoFormat("CheckInterpolation {0} to {1}", LastAvgInterpolateInterval, avg);
                     LastAvgInterpolateInterval = avg;
-                    
-
                 }
             }
         }

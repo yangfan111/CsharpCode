@@ -19,9 +19,9 @@ namespace App.Shared.GameModules.Player
             _contexts = contexts;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity player = (PlayerEntity) owner.OwnerEntity;
+            PlayerEntity player = (PlayerEntity) getter.OwnerEntity;
             //受伤状态自动掉血（非被救援状态）
             if (player.gamePlay.IsLifeState(EPlayerLifeState.Dying) && player.gamePlay.InHurtedHp > 0
                 && !player.gamePlay.IsBeSave)

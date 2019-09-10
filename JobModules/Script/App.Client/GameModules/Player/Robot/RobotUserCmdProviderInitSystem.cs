@@ -19,7 +19,7 @@ namespace App.Client.GameModules.Player
             _contexts = contexts;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter owner, IUserCmd cmd)
         {
             if (!SharedConfig.IsRobot) return;
             var player = owner.OwnerEntity as PlayerEntity;

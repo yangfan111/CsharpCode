@@ -18,7 +18,7 @@ namespace com.wd.free.action.stage
             _actions = new MyDictionary<string, IGameAction>();
         }
 
-        public void BindKeyAction(string key, IGameAction action)
+        public void AddAction(string key, IGameAction action)
         {
             _actions[key] = action;
         }

@@ -18,7 +18,7 @@ namespace App.Client.GameModules.Ui.Models.Common
     {
         private CommonRoleDiskViewModel view = new CommonRoleDiskViewModel();
         IPaintUiAdapter _adapter;
-        private KeyReceiver openKeyReceiver;
+        private KeyHandler _openKeyHandler;
 
         public CommonPaintDiscModel(IPaintUiAdapter adapter) : base(adapter)
         {
@@ -45,22 +45,22 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void InitKey()
         {
-            openKeyReceiver = new KeyReceiver(UiConstant.paintWindowLayer, BlockType.None);
-            openKeyReceiver.BindKeyAction(UserInputKey.F1, (data) => { _adapter.Enable = true;});
-            _adapter.RegisterOpenKey(openKeyReceiver);
+            _openKeyHandler = new KeyHandler(UiConstant.paintWindowLayer, BlockType.None);
+            _openKeyHandler.BindKeyAction(UserInputKey.F1, (data) => { _adapter.Enable = true;});
+            _adapter.RegisterOpenKey(_openKeyHandler);
 
-            keyReveiver = new KeyReceiver(UiConstant.paintWindowKeyBlockLayer, BlockType.All);
+            keyReveiver = new KeyHandler(UiConstant.paintWindowKeyBlockLayer, BlockType.All);
             keyReveiver.BindKeyAction(UserInputKey.F1, (data) => { _adapter.Enable = false; });
             keyReveiver.BindKeyAction(UserInputKey.HideWindow, (data) => { _adapter.Enable = false; });
-            pointerReceiver = new PointerReceiver(UiConstant.paintWindowKeyBlockLayer, BlockType.All);
+            _pointerKeyHandler = new PointerKeyHandler(UiConstant.paintWindowKeyBlockLayer, BlockType.All);
         }
 
 
         Transform btnRoot;
         UITab tab;
         private bool _haveRegister;
-        private KeyReceiver keyReveiver;
-        private PointerReceiver pointerReceiver;
+        private KeyHandler keyReveiver;
+        private PointerKeyHandler _pointerKeyHandler;
 
         void Init()
         {
@@ -137,39 +137,39 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
             if (enable && !_haveRegister)
             {
-                RegisterKeyReceiver();
+                RegisterKeyhandler();
             }
             else if (!enable && _haveRegister)
             {
-                UnRegisterKeyReceiver();
+                UnRegisterKeyhandler();
             }
 
         }
 
-        private void UnRegisterKeyReceiver()
+        private void UnRegisterKeyhandler()
         {
             _adapter.SetCrossVisible(true);
             PlayerStateUtil.RemoveUIState(EPlayerUIState.PaintOpen, _adapter.gamePlay);
-            if (keyReveiver == null || pointerReceiver == null)
+            if (keyReveiver == null || _pointerKeyHandler == null)
             {
                 return;
             }
             _adapter.UnRegisterKeyReceive(keyReveiver);
-            _adapter.UnRegisterPointerReceive(pointerReceiver);
+            _adapter.UnRegisterPointerReceive(_pointerKeyHandler);
 
             _haveRegister = false;
         }
 
-        private void RegisterKeyReceiver()
+        private void RegisterKeyhandler()
         {
             _adapter.SetCrossVisible(false);
             PlayerStateUtil.AddUIState(EPlayerUIState.PaintOpen, _adapter.gamePlay);
-            if (keyReveiver == null || pointerReceiver == null)
+            if (keyReveiver == null || _pointerKeyHandler == null)
             {
                 return;
             }
             _adapter.RegisterKeyReceive(keyReveiver);
-            _adapter.RegisterPointerReceive(pointerReceiver);
+            _adapter.RegisterPointerReceive(_pointerKeyHandler);
             _haveRegister = true;
         }
 

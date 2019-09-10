@@ -76,7 +76,7 @@ namespace App.Client.StartUp.Online
 
             var messageDispatcher = sessionObjects.MessageDispatcher;
             messageDispatcher.RegisterLater((int) EServer2ClientMessage.Snapshot,
-                new SnapshotMessageHandler(sessionObjects.SnapshotSelctor, sessionObjects.UpdateLatestHandler,
+                new SnapshotMessageHandler(sessionObjects.SnapshotSelctor, sessionObjects.ClientUpdateLatestMgr,
                     sessionObjects.TimeManager));
             messageDispatcher.RegisterLater((int) EServer2ClientMessage.UdpId, new UdpIdMessageHandler());
             messageDispatcher.RegisterLater((int) EServer2ClientMessage.Snapshot,
@@ -90,7 +90,7 @@ namespace App.Client.StartUp.Online
             messageDispatcher.RegisterImmediate((int) EServer2ClientMessage.Ping,
                 new PingRespMessageHandler(_contexts));
             messageDispatcher.RegisterLater((int) EServer2ClientMessage.UpdateAck,
-                new UpdateMessageAckMessageHandler(sessionObjects.UpdateLatestHandler));
+                new UpdateMessageAckMessageHandler(sessionObjects.ClientUpdateLatestMgr));
             messageDispatcher.RegisterLater((int) EServer2ClientMessage.DebugMessage,
                 new ServerDebugMessageHandler(_contexts));
             messageDispatcher.RegisterLater((int) EServer2ClientMessage.ClearScene,

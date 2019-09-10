@@ -632,7 +632,6 @@
     <Compile Include="GameModules\Ui\UiLoadModule.cs" />
     <Compile Include="GameModules\Ui\UiModule.cs" />
     <Compile Include="GameModules\Ui\UiResourceLoader.cs" />
-    <Compile Include="GameModules\Ui\Utils\ActiveSetter.cs" />
     <Compile Include="GameModules\Ui\Utils\MiniMaxMapCommon.cs" />
     <Compile Include="GameModules\Ui\Utils\UICommonColor.cs" />
     <Compile Include="GameModules\Ui\Utils\UIUtils.cs" />

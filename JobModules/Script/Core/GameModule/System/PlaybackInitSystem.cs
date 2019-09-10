@@ -8,9 +8,9 @@ namespace Core.GameModule.System
 {
     public class PlaybackInitSystem : AbstractStepExecuteSystem
     {
-        private IPlaybackManager _playbackManager;
+        private PlaybackManager _playbackManager;
 
-        public PlaybackInitSystem(IPlaybackManager playbackManager)
+        public PlaybackInitSystem(PlaybackManager playbackManager)
         {
             _playbackManager = playbackManager;
             
@@ -22,7 +22,7 @@ namespace Core.GameModule.System
             try
             {
                 SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.PlaybackInit);
-                _playbackManager.Playback();
+                _playbackManager.DoPlaybackInit();
             }
             finally
             {

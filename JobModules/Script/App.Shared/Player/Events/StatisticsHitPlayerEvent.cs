@@ -18,9 +18,9 @@ namespace App.Shared.Player.Events
 
         // public string bulletBaseText;
         // public string bulletRuntimeText;
-        public int cmdSeq;
         public PrecisionsVector3 hitPoint;
         public PrecisionsVector3 posValue;
+        public int cmdSeq;
         public int serverTime;
         public string shootKey;
         public string statisticStr;

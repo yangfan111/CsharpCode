@@ -41,6 +41,9 @@ namespace Core.SpatialPartition
         Bin2dState GetBin2D(int type);
         ICollection<Bin2dState> GetBin2Ds();
     }
+    /// <summary>
+    /// 每个格子有一个Hashset<T>的列表
+    /// </summary>
     [Serializable]
     public class Bin2DManager : IBin2DManager
     {

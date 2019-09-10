@@ -12,23 +12,23 @@ namespace App.Server
 {
     public partial class ServerRoom
     {
-        private IPlayerTokenGenerator _tokenGenerator;
+        private IPlayerTokenGenerator tokenGenerator;
 
         public PlayerInfo PlayerJoin(long hallRoomId, object roomPlayerInfo, out int errorCode)
         {
-            _logger.InfoFormat("Player Join Game ...");
+            logger.InfoFormat("Player Join Game ...");
 
             var roomPlayer = roomPlayerInfo as RoomPlayer;
             PlayerInfo playerInfo = null;
 
             errorCode = 0;
-            if (_hallRoom == null || _hallRoom.HallRoomId != hallRoomId)
+            if (hallRoom == null || hallRoom.HallRoomId != hallRoomId)
             {
                 errorCode = (int) ErrorCode.JoinRoom_HallRoom_NotFound;
-            }else if (!_hallRoom.CanJoin())
+            }else if (!hallRoom.CanJoin())
             {
                 errorCode = (int) ErrorCode.JoinRoom_ServerRoom_Full;
-            }else if (_hallRoom.HasPlayer(roomPlayer.Id))
+            }else if (hallRoom.HasPlayer(roomPlayer.Id))
             {
                 errorCode = (int) ErrorCode.JoinRoom_RepeatJoin;
             }
@@ -38,7 +38,7 @@ namespace App.Server
             }
 
             bool success = playerInfo != null;
-            _logger.InfoFormat("Join  Success {6} Player({0}), Id:{1}, Name:{2}, ModelId:{3}, TeamId:{4}, Token:{5}", 0,
+            logger.InfoFormat("Join  Success {6} Player({0}), Id:{1}, Name:{2}, ModelId:{3}, TeamId:{4}, Token:{5}", 0,
                 roomPlayer.Id, roomPlayer.Name, roomPlayer.RoleModelId, roomPlayer.TeamId, success ?  playerInfo.Token : null, success);
 
             return playerInfo;
@@ -46,11 +46,11 @@ namespace App.Server
 
         private PlayerInfo AddPlayerToRoom(RoomPlayer roomPlayer)
         {
-            string token = _tokenGenerator.GenerateToken(roomPlayer.Id);
+            string token = tokenGenerator.GenerateToken(roomPlayer.Id);
             int[] avatarIds = RepeatedField2IntArray(roomPlayer.AvatarIds);
             int[] weaponAvatarIds = RepeatedField2IntArray(roomPlayer.WeaponAvatarIds);
             int[] sprayLacquers = RepeatedField2IntArray(roomPlayer.SprayLacquers);
-            int num = _hallRoom.MaxNum(roomPlayer.TeamId);
+            int num = hallRoom.MaxNum(roomPlayer.TeamId);
             /*JobAttrbute默认人类，其他职业根据模式，在房间里设置*/
             PlayerInfo playerInfo = new PlayerInfo(token, RoomId, roomPlayer.Id, roomPlayer.Name, roomPlayer.RoleModelId, roomPlayer.TeamId, num, roomPlayer.Level,
                 roomPlayer.BackId, roomPlayer.TitleId, roomPlayer.BadgeId, avatarIds, weaponAvatarIds, sprayLacquers, false, 0, CampInfoConvert(roomPlayer.CampInfo));
@@ -107,7 +107,7 @@ namespace App.Server
                 }
             }
 
-            _hallRoom.AddPlayer(playerInfo);
+            hallRoom.AddPlayer(playerInfo);
             return playerInfo;
         }
 

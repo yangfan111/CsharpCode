@@ -65,7 +65,7 @@ namespace App.Shared.GameModules.Throwing
             _players = _contexts.player.GetGroup(PlayerMatcher.AllOf(PlayerMatcher.FirstPersonModel, PlayerMatcher.ThirdPersonModel));
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter owner, IUserCmd cmd)
         {
             Update(owner.OwnerEntityKey, cmd.FrameInterval);
         }

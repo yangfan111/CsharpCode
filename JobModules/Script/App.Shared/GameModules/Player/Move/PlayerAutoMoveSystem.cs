@@ -8,9 +8,9 @@ namespace App.Shared.GameModules.Player.Move
 {
     public class PlayerAutoMoveSystem : IUserCmdExecuteSystem
     {
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var player = (PlayerEntity) owner.OwnerEntity;
+            var player = (PlayerEntity) getter.OwnerEntity;
 
             CheckPlayerLifeState(player);
             InterruptAutoRun(player, cmd);

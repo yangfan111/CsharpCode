@@ -27,15 +27,15 @@ namespace App.Server.GameModules.GamePlay.free.client
 
             FreeData fd = (FreeData)player.freeData.FreeData;
 
-            room.FreeArgs.TempUse(PARA_PLAYER_CURRENT, fd);
+            room.ContextsWrapper.FreeArgs.TempUse(PARA_PLAYER_CURRENT, fd);
             eventKey.SetValue(message.Ss[0]);
-            room.FreeArgs.GetDefault().GetParameters().TempUse(eventKey);
+            room.ContextsWrapper.FreeArgs.GetDefault().GetParameters().TempUse(eventKey);
 
-            FreeItemManager.MoveItem(message.Ss[0], fd, room.FreeArgs, message.Ins[0], message.Ins[1], message.Ins[2], message.Ins[3],
+            FreeItemManager.MoveItem(message.Ss[0], fd, room.ContextsWrapper.FreeArgs, message.Ins[0], message.Ins[1], message.Ins[2], message.Ins[3],
                 message.Ins[4], message.Ins[5], message.Ins[6], message.Ins[7]);
 
-            room.FreeArgs.Resume(PARA_PLAYER_CURRENT);
-            room.FreeArgs.GetDefault().GetParameters().Resume(PARA_EVENT_KEY);
+            room.ContextsWrapper.FreeArgs.Resume(PARA_PLAYER_CURRENT);
+            room.ContextsWrapper.FreeArgs.GetDefault().GetParameters().Resume(PARA_EVENT_KEY);
         }
     }
 }

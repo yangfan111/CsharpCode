@@ -129,8 +129,8 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void InitKeyBinding()
         {
-            var receiver = new KeyReceiver(UiConstant.rangingWindowLayer, BlockType.None);
-            receiver.BindKeyAction(UserInputKey.CheckRanging, (data) =>
+            var handler = new KeyHandler(UiConstant.rangingWindowLayer, BlockType.None);
+            handler.BindKeyAction(UserInputKey.CheckRanging, (data) =>
             {
                
                 Debug.Log("CheckRanging..........................");
@@ -165,7 +165,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                 }
                 RefreshGui();
             });
-            adapter.RegisterKeyReceive(receiver);
+            adapter.RegisterKeyReceive(handler);
         }
     }
 }    

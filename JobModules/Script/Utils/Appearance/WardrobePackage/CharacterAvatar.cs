@@ -865,7 +865,7 @@ namespace Utils.Appearance.WardrobePackage
         
         private void ReInterpretMaskAppearance(WardrobeParam param, bool show)
         {
-            if (null == param || param.Masks == null) return;
+            if (param.Masks == null) return;
             foreach (var mask in param.Masks)
             {
                 if(show)

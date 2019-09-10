@@ -12,7 +12,7 @@ namespace Core.Prediction.UserPrediction.Parallel
 {
     public interface ITaskDisparcher
     {
-        void CreateTasks(List<IUserCmdOwner> users);
+        void CreateTasks(List<IPlayerUserCmdGetter> users);
         void TaskEnd(CmdTask task);
     }
 
@@ -56,7 +56,7 @@ namespace Core.Prediction.UserPrediction.Parallel
             private set { _isStart = value; }
         }
 
-        public void CreateTasks(List<IUserCmdOwner> users)
+        public void CreateTasks(List<IPlayerUserCmdGetter> users)
         {
             int count = users.Count;
             int threadIdx = 0;
@@ -72,14 +72,14 @@ namespace Core.Prediction.UserPrediction.Parallel
             _userCount = count;
             for (var i = 0; i < count; i++)
             {
-                IUserCmdOwner owner = users[i];
+                IPlayerUserCmdGetter getter = users[i];
                 var queue = _taskDictionary[i];
-                foreach (var userCmd in owner.UserCmdList)
+                foreach (var userCmd in getter.UserCmdList)
                 {
                     foreach (var taskInfo in _taskInfos)
                     {
                         taskCount++;
-                        queue.Enqueue(new CmdTask(i, owner, userCmd, taskInfo, threadIdx));
+                        queue.Enqueue(new CmdTask(i, getter, userCmd, taskInfo, threadIdx));
                     }
                 }
 

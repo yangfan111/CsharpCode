@@ -17,9 +17,9 @@ namespace App.Shared.GameModules.Player
         {
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity player = (PlayerEntity)owner.OwnerEntity;
+            PlayerEntity player = (PlayerEntity)getter.OwnerEntity;
             if (!player.hasStatisticsData) return;
             StatisticsData statisticsData = player.statisticsData.Statistics;
 

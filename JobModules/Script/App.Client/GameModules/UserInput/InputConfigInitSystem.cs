@@ -1,39 +1,11 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Xml.Serialization;
-using App.Client.GameModules.UserInput;
-using Core.GameModule.Interface;
+﻿using Core.GameModule.Interface;
 using Core.SessionState;
 using Core.Utils;
 using UnityEngine;
 using UserInputManager.Lib;
 using UserInputManager.Utility;
 using Utils.AssetManager;
-using Utils.Configuration;
 using Utils.Singleton;
-using XmlConfig;
-
-public class InputConfigManager : AbstractConfigManager<InputConfigManager>
-{
-    public readonly Dictionary<UserInputKey, InputConvertItem> itemsMap = new Dictionary<UserInputKey, InputConvertItem>(40);
-
-    public InputConfig ConfigData { get; private set; }
-    public override void ParseConfig(string xml)
-    {
-        ConfigData = XmlConfigParser<InputConfig>.Load(xml);
-        foreach (var item in ConfigData.Items)
-        {
-            itemsMap[item.Key] = item;
-        }
-    }
-
-    public InputConvertItem FindById(UserInputKey key)
-    {
-        InputConvertItem item;
-        itemsMap.TryGetValue(key, out item);
-        return item;
-    }
-}
 
 namespace Assets.App.Client.GameModules.UserInput
 {
@@ -63,19 +35,19 @@ namespace Assets.App.Client.GameModules.UserInput
         public void OnLoadSucc(string source, UnityObject unityObj)
         {
             SingletonManager.Get<SubProgressBlackBoard>().Step();
-            var manager = new GameInputManager(new  UserPointerProvider(_contexts));
+            var manager = new UserInputManager.Lib.UserInputManager();
             if (!_inputContext.hasUserInputManager)
             {
-                var helper = new GameInputHelper(manager);
+                var helper = new UserInputHelper(manager);
                 _inputContext.SetUserInputManager(manager, helper);
             }
             {
                 var cfg = unityObj.As<TextAsset>();
                 if (null != cfg)
                 {
-                    string content = cfg.text;
-                    SingletonManager.Get<InputConfigManager>().ParseConfig(content);
-                    _inputContext.userInputManager.Mgr.Initialize(SingletonManager.Get<InputConfigManager>().ConfigData);
+                    var content = cfg.text;
+                    var inputCfg = InputConfigLoader<InputConfig>.Load(content);
+                    manager.Initialize(inputCfg);
                 }
                 else
                 {

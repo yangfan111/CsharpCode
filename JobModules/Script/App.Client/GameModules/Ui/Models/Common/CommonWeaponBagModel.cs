@@ -56,23 +56,23 @@ namespace App.Client.GameModules.Ui.Models.Common
             InitOpenKeyReveiver();
         }
 
-        private KeyReceiver keyReveiver,openKeyReceiver;
-        private PointerReceiver pointerReceiver;
+        private KeyHandler keyReveiver,_openKeyHandler;
+        private PointerKeyHandler _pointerKeyHandler;
 
         private void InitOpenKeyReveiver()
         {
-            openKeyReceiver = new KeyReceiver(UiConstant.weaponBagWindowLayer, BlockType.None);
-            openKeyReceiver.BindKeyAction(UserInputKey.OpenWeaponBag, (data) =>
+            _openKeyHandler = new KeyHandler(UiConstant.weaponBagWindowLayer, BlockType.None);
+            _openKeyHandler.BindKeyAction(UserInputKey.OpenWeaponBag, (data) =>
             {
                 if(_adapter.CanOpenBag) SwitchWeaponBagViewShow();
             });
-            _adapter.RegisterOpenKey(openKeyReceiver);
-            //_adapter.RegisterKeyReceive(openKeyReceiver);
+            _adapter.RegisterOpenKey(_openKeyHandler);
+            //_adapter.RegisterKeyReceive(openKeyhandler);
         }
 
         private void InitKeyReveiver()
         {
-            keyReveiver = new KeyReceiver(UiConstant.weaponBagWindowKeyBlockLayer, BlockType.All);
+            keyReveiver = new KeyHandler(UiConstant.weaponBagWindowKeyBlockLayer, BlockType.All);
             for (int i = 0; i < _haveBagForIndexList.Count; i++)
             {
                 if (_haveBagForIndexList[i])
@@ -89,7 +89,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                         });
                 }
             }
-            pointerReceiver = new PointerReceiver(UiConstant.weaponBagWindowKeyBlockLayer, BlockType.All);
+            _pointerKeyHandler = new PointerKeyHandler(UiConstant.weaponBagWindowKeyBlockLayer, BlockType.All);
         }
 
         private void SwitchWeaponBagViewShow()
@@ -246,7 +246,7 @@ namespace App.Client.GameModules.Ui.Models.Common
             _viewModel.CloseTipText = string.Format(I2.Loc.ScriptLocalization.client_common.word38, remainTime >= 0 ? remainTime : 0);
         }
 
-        private void RegisterKeyReceiver()
+        private void RegisterKeyhandler()
         {
             _adapter.SetCrossVisible(false);
 
@@ -255,12 +255,12 @@ namespace App.Client.GameModules.Ui.Models.Common
                 return;
             }
             _adapter.RegisterKeyReceive(keyReveiver);
-            _adapter.RegisterPointerReceive(pointerReceiver);
+            _adapter.RegisterPointerReceive(_pointerKeyHandler);
             //CursorLocker.SystemUnlock = true;
             _haveRegister = true;
         }
 
-        private void UnRegisterKeyReceiver()
+        private void UnRegisterKeyhandler()
         {
             _adapter.SetCrossVisible(true);
 
@@ -269,7 +269,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                 return;
             }
             _adapter.UnRegisterKeyReceive(keyReveiver);
-            _adapter.UnRegisterPointerReceive(pointerReceiver);
+            _adapter.UnRegisterPointerReceive(_pointerKeyHandler);
 
             //CursorLocker.SystemUnlock = false;
             _haveRegister = false;
@@ -288,11 +288,11 @@ namespace App.Client.GameModules.Ui.Models.Common
 
             if (enable && !_haveRegister)
             {
-                RegisterKeyReceiver();
+                RegisterKeyhandler();
             }
             else if (!enable && _haveRegister)
             {
-                UnRegisterKeyReceiver();
+                UnRegisterKeyhandler();
             }
         }
 

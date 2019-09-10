@@ -56,9 +56,14 @@ namespace App.Client.GameModules.Ui.Models.Common
                         playerInfo.SetActive(false);
                         continue;
                     }
-
-                    playerInfo.UpdateInfo(info.IsShow, info.Num, info.Color, info.PlayerName, info.EntityId, selectedPlayerId, info.CurHp * 1.0f / info.MaxHp);
-                    playerInfo.UpdateLocation(info.TopPos);
+                    if (info.TopPos != Vector3.zero)
+                    {
+                        if (!playerInfo.isActive)
+                            playerInfo.SetActive(true);
+                        playerInfo.UpdateLocation(info.TopPos);
+                    }
+                    playerInfo.UpdateInfo(info.Num, info.Color, info.PlayerName, info.EntityId, selectedPlayerId, info.CurHp * 1.0f / info.MaxHp);
+                    
                 }
                 else
                 {
@@ -92,10 +97,10 @@ namespace App.Client.GameModules.Ui.Models.Common
 
        public void InitKeyBinding()
        {
-           var receiver = new PointerReceiver(UiConstant.maxMapWindowLayer, BlockType.None);
-           receiver.BindPointAction(UserInputKey.PickUpTip, (data) =>
+           var handler = new PointerKeyHandler(UiConstant.maxMapWindowLayer, BlockType.None);
+           handler.BindPointAction(UserInputKey.PickUpTip, (data) =>
            {
-               var pointerData = data as PointerData;
+               var pointerData =  data as PointerData;
               
                var type = pointerData.IdList[0];
                switch ((ECastDataType)type)
@@ -109,7 +114,7 @@ namespace App.Client.GameModules.Ui.Models.Common
                         break;
                }
            });
-           playerInfoUIAdapter.RegisterPointerReceive(receiver);
+           playerInfoUIAdapter.RegisterPointerReceive(handler);
           
        }
 
@@ -117,8 +122,11 @@ namespace App.Client.GameModules.Ui.Models.Common
         {
             var info = new PlayerInfo();
             info.Init(GameObject.Instantiate(FindChildGo("playerInfo").gameObject, FindChildGo("Show")));
-            info.UpdateInfo(PlayInfo.IsShow, PlayInfo.Num, PlayInfo.Color, PlayInfo.PlayerName, PlayInfo.EntityId, 0,1);
-            info.UpdateLocation(PlayInfo.TopPos);
+            info.UpdateInfo(PlayInfo.Num, PlayInfo.Color, PlayInfo.PlayerName, PlayInfo.EntityId, 0,1);
+            if (PlayInfo.TopPos == Vector3.zero)
+                info.SetActive(false);
+            else
+                info.UpdateLocation(PlayInfo.TopPos);
             return info;
         }
 
@@ -155,7 +163,6 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private bool hasWait;
         public bool isActive = true;
-        private ActiveSetter goActiveSetter;
         //private Vector2 canvasSize;
         public void Init(GameObject gameObject)
         {
@@ -166,10 +173,9 @@ namespace App.Client.GameModules.Ui.Models.Common
             //                camera = UiCommon.UIManager.UICamera;
             //            }
             go = gameObject;
-            goActiveSetter = new ActiveSetter(go);
             rect = gameObject.GetComponent<RectTransform>();
             parentRect = rect.GetComponentInParent<RectTransform>();
-            goActiveSetter.Active = true;
+            gameObject.SetActive(true);
             _indexImage = gameObject.transform.Find("IndexImage").GetComponent<Image>();
             var tests = gameObject.GetComponentsInChildren<Text>(true);
             foreach (var v in tests)
@@ -190,10 +196,9 @@ namespace App.Client.GameModules.Ui.Models.Common
             }
         }
 
-        public void UpdateInfo(bool isShow, int index, Color color, string name,int playerID,int selectId,float percent)
+        public void UpdateInfo(int index, Color color, string name,int playerID,int selectId,float percent)
         {
-            SetActive(isShow);
-            if (!isActive) return;
+
             _playerId = playerID;
           
             _indexImage.color = color;
@@ -230,14 +235,13 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         public void UpdateLocation(Vector3 pos)
         {
-            if (!isActive) return;
             var viewPortPos = camera.WorldToViewportPoint(pos);
             if (!InView(pos, viewPortPos))
             {
-                goActiveSetter.Active = false;
+                go.SetActive(false);
                 return;
             }
-            goActiveSetter.Active = true;
+            if(!go.activeSelf) go.SetActive(true);
             _position = pos;
 
             Vector2 result = UIUtils.WorldPosToRect(pos, camera, parentRect);
@@ -263,7 +267,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         public void SetActive(bool flag)
         {
-            go.SetActive(flag);
+            go.SetActive(false);
             isActive = flag;
         }
     }

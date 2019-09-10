@@ -20,9 +20,9 @@ namespace App.Shared.GameModules.Player
             _contexts = contexts;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity player = (PlayerEntity) owner.OwnerEntity;
+            PlayerEntity player = (PlayerEntity) getter.OwnerEntity;
 
             if (player.playerMove.IsGround && !player.playerMove.FirstOnGround)
             {

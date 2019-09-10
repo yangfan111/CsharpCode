@@ -18,7 +18,7 @@ namespace App.Client.GameModules.Ui.Models.Common
     {
         private ISplitUiAdapter splitUIAdapter = null;
         private bool isGameObjectCreated = false;        
-        private KeyReceiver keyReveiver = null;
+        private KeyHandler keyReveiver = null;
 
         //记录正在拆分的道具 信息
         private int maxValue = 0;
@@ -143,7 +143,7 @@ namespace App.Client.GameModules.Ui.Models.Common
 
         private void InitKeyBinding()
         {
-            keyReveiver = new KeyReceiver(UiConstant.splitWindowKeyBlockLayer, BlockType.All);
+            keyReveiver = new KeyHandler(UiConstant.splitWindowKeyBlockLayer, BlockType.All);
             keyReveiver.BindKeyAction(UserInputKey.SplitProp, (data) =>
             {
                 if (!_viewModel.splitBtnInteractable)

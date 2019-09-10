@@ -27,9 +27,9 @@ namespace App.Shared.GameModules.Vehicle
             _vehicleContext = contexts.vehicle;
         }
 
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            var own = (PlayerEntity) owner.OwnerEntity;
+            var own = (PlayerEntity) getter.OwnerEntity;
 
             var player = HandleWhenObserve(own) ?? own;
             

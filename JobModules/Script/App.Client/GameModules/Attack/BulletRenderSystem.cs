@@ -28,12 +28,14 @@ namespace App.Client.GameModules.Attack
             return true;
         }
 
+        
         protected override void OnRender(BulletEntity bullet)
         {
             var bulletGo = bullet.bulletAsset.UnityObject.AsGameObject;
             if (!bulletGo)
                 return;
             bulletGo.SetActive( true/*bullet.bulletData.Distance > GlobalConst.InitDistanceForDisplay*/);
+            DebugUtil.MyLog(bulletGo.transform.position);
             if (bullet.bulletData.Distance < GlobalConst.MaxDistanceForCorrent)
             {
                 //float yDown = (GlobalConst.MaxDistanceForCorrent - bullet.bulletData.Distance) / GlobalConst.MaxDistanceForCorrent *

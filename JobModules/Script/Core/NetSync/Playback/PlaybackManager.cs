@@ -6,44 +6,50 @@ using Utils.Singleton;
 
 namespace Core.Playback
 {
-    public class PlaybackManager : IPlaybackManager
+    /// <summary>
+    /// 获取FlagNoneSelfComponent的Entity
+    /// 通过当前服务器时间获取时间节点两端的SnapShot，对当前Component进行Plackback操作
+    /// </summary>
+    public class PlaybackManager
     {
-        private IPlaybackInfoProvider _infoProvider;
-        private int _lastLeftPlayBackSnapshot = -1;
-        private GameEntityPlayBackCompareAgent _compareAgent = new GameEntityPlayBackCompareAgent();
+        //Compare
+        private GameEntityPlayBackCompareAgent compareAgent = new GameEntityPlayBackCompareAgent();
+        private PlaybackMapDiffHandler diffHandler = new PlaybackMapDiffHandler();
 
-        private GameEntityPlayBackInterpolateCompareAgent _interpolateCompareAgent =
-            new GameEntityPlayBackInterpolateCompareAgent();
+        private PlaybackInfoProvider infoProvider;
 
-        private List<PlayBackInfo> _playBackInfos = new List<PlayBackInfo>();
-        private PlaybackMapDiffHandler _diffHandler = new PlaybackMapDiffHandler();
-        private PlaybackLMapIntroplateDiffHandler _introplateDiffHandler = new PlaybackLMapIntroplateDiffHandler();
+        private GameEntityPlayBackInterpolateCompareAgent interpolateCompareAgent =
+                        new GameEntityPlayBackInterpolateCompareAgent();
 
-        public PlaybackManager(IPlaybackInfoProvider infoProvider)
+        private PlaybackLMapIntroplateDiffHandler introplateDiffHandler = new PlaybackLMapIntroplateDiffHandler();
+        private int lastLeftPlaybackSnapshotServerTime = -1;
+
+        private List<PlayBackInfo> playBackInfos = new List<PlayBackInfo>();
+
+        public PlaybackManager(PlaybackInfoProvider infoProvider)
         {
-            _infoProvider = infoProvider;
+            this.infoProvider = infoProvider;
         }
 
-        public void Playback()
+        public void DoPlaybackInit()
         {
-            if (_infoProvider.IsReady())
+            if (!infoProvider.IsReady())
+                return;
+            var remoteEntityMapLeft  = infoProvider.RemoteLeftEntityMap;
+            var remoteEntityMapRight = infoProvider.RemoteRightEntityMap;
+
+            var localEntityMap = infoProvider.LocalAllEntityMap;
+
+
+            if (lastLeftPlaybackSnapshotServerTime != infoProvider.InterpolationInfo.LeftServerTime)
             {
-                var remoteEntityMapLeft = _infoProvider.RemoteLeftEntityMap;
-                var remoteEntityMapRight = _infoProvider.RemoteRightEntityMap;
-
-                var localEntityMap = _infoProvider.LocalAllEntityMap;
-
-
-                if (_lastLeftPlayBackSnapshot != _infoProvider.InterpolationInfo.LeftServerTime)
-                {
-                    PlayBackInit(localEntityMap, remoteEntityMapLeft);
-
-                    PlayBackInterpolationAll(localEntityMap, remoteEntityMapLeft, remoteEntityMapRight);
-                }
-                else
-                {
-                    PlayBackInterpolationEvertFrame();
-                }
+                //正常状态下几乎每帧都在做
+                PlayBackInit(localEntityMap, remoteEntityMapLeft);
+                PlayBackInterpolationAll(localEntityMap, remoteEntityMapLeft, remoteEntityMapRight);
+            }
+            else
+            {
+                PlayBackInterpolationEvertFrame();
             }
         }
 
@@ -52,32 +58,31 @@ namespace Core.Playback
             try
             {
                 SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.PlaybackInit2);
-                var interpolationInfo = _infoProvider.InterpolationInfo;
-                foreach (var playBackInfo in _playBackInfos)
+                var interpolationInfo = infoProvider.InterpolationInfo;
+                foreach (var playBackInfo in playBackInfos)
                 {
-                    ((IInterpolatableComponent) playBackInfo.LocalComponent).Interpolate(
-                        playBackInfo.LeftComponent, playBackInfo.RightComponent, interpolationInfo);
+                    ((IInterpolatableComponent) playBackInfo.LocalComponent).Interpolate(playBackInfo.LeftComponent,
+                        playBackInfo.RightComponent, interpolationInfo);
                 }
             }
             finally
             {
                 SingletonManager.Get<DurationHelp>().ProfileEnd(CustomProfilerStep.PlaybackInit2);
             }
-           
         }
 
         private void PlayBackInterpolationAll(EntityMap localEntityMap, EntityMap remoteEntityMapLeft,
-            EntityMap remoteEntityMapRight)
+                                              EntityMap remoteEntityMapRight)
         {
             try
             {
                 SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.PlaybackInit2);
-                PlaybackLMapIntroplateDiffHandler interpolateDiffHandler = _introplateDiffHandler.init(localEntityMap,
-                    _infoProvider.InterpolationInfo, _playBackInfos);
+                PlaybackLMapIntroplateDiffHandler interpolateDiffHandler = introplateDiffHandler.init(localEntityMap,
+                    infoProvider.InterpolationInfo, playBackInfos);
 
                 EntityMapCompareExecutor.Diff(remoteEntityMapLeft, remoteEntityMapRight, interpolateDiffHandler,
                     "playbackInterpolate",
-                    _interpolateCompareAgent.Init(interpolateDiffHandler, _infoProvider.InterpolationInfo,
+                    interpolateCompareAgent.Init(interpolateDiffHandler, infoProvider.InterpolationInfo,
                         localEntityMap));
             }
             finally
@@ -88,18 +93,17 @@ namespace Core.Playback
 
         private void PlayBackInit(EntityMap localEntityMap, EntityMap remoteEntityMapLeft)
         {
-            PlaybackMapDiffHandler diffHandler = _diffHandler.init();
+            diffHandler.init();
 
             var localEntityMapClone = PlayBackEntityMap.Allocate(false);
-            localEntityMapClone.AddAll(_infoProvider.LocalEntityMap);
-            _lastLeftPlayBackSnapshot = _infoProvider.InterpolationInfo.LeftServerTime;
+            localEntityMapClone.AddAll(infoProvider.LocalEntityMap);
+            lastLeftPlaybackSnapshotServerTime = infoProvider.InterpolationInfo.LeftServerTime;
             try
             {
                 SingletonManager.Get<DurationHelp>().ProfileStart(CustomProfilerStep.PlaybackInit1);
-                EntityMapCompareExecutor.Diff(localEntityMapClone, remoteEntityMapLeft, diffHandler,
-                    "playbackInit",
-                    _compareAgent.Init(diffHandler, _infoProvider.InterpolationInfo, localEntityMap));
-                 RefCounterRecycler.Instance.ReleaseReference(localEntityMapClone);
+                EntityMapCompareExecutor.Diff(localEntityMapClone, remoteEntityMapLeft, diffHandler, "playbackInit",
+                    compareAgent.Init(diffHandler, infoProvider.InterpolationInfo, localEntityMap));
+                RefCounterRecycler.Instance.ReleaseReference(localEntityMapClone);
             }
             finally
             {

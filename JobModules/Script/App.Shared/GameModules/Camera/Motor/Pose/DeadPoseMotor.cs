@@ -13,7 +13,7 @@ namespace App.Shared.GameModules.Camera.Motor.Pose
     {
         public DeadPoseMotor(ECameraPoseMode modeId, HashSet<ECameraPoseMode> excludes, IMotorActive active,DeadCameraConfig deadConfig, Motors m) : base(modeId, excludes, active,m)
         {
-            _motors.ActionManager.BindKeyAction(CameraActionType.Enter, SubCameraMotorType.Pose, (int)modeId,
+            _motors.ActionManager.AddAction(CameraActionType.Enter, SubCameraMotorType.Pose, (int)modeId,
                 (player, state) =>
                 {
                     player.cameraStateOutputNew.LastPitchWhenAlive = player.cameraFinalOutputNew.EulerAngle.x;

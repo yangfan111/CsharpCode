@@ -15,23 +15,23 @@ namespace Assets.Sources
 
     public class UnityUserCmdGenerator : IUserCmdGenerator
     {
-        private static LoggerAdapter _logger = new LoggerAdapter(typeof(UnityUserCmdGenerator));
+        private static LoggerAdapter logger = new LoggerAdapter(typeof(UnityUserCmdGenerator));
        
-        private UserCmd _userCmd = UserCmd.Allocate();
-        KeyReceiver _keyReceiver;
-        KeyReceiver _specialKeyReceiver;
-        KeyReceiver _uiKeyReceiver;
-        KeyReceiver _bioKeyReceiver;
-        KeyReceiver _bioSpecialKeyReceiver;
-        PointerReceiver _pointerReceiver;
-        GameInputManager _userInputManager;
-        List<IGlobalKeyInputMapper> _inputMapperList = new List<IGlobalKeyInputMapper>();
+        private UserCmd userCmd = UserCmd.Allocate();
+        KeyHandler _keyHandler;
+        KeyHandler _specialKeyHandler;
+        KeyHandler _uKeyHandler;
+        KeyHandler _bioKeyHandler;
+        KeyHandler _bioSpecialKeyHandler;
+        PointerKeyHandler _pointerKeyHandler;
+        UserInputManager.Lib.UserInputManager userInputManager;
+        List<IGlobalKeyInputMapper> inputMapperList = new List<IGlobalKeyInputMapper>();
 
         private float[] yaws;
         private float[] pitchs;
 
-#if UNITY_EDITOR
-        private List<Action<UserCmd>> _mockCmdList = new List<Action<UserCmd>>();
+#if UNITYEDITOR
+        private List<Action<UserCmd>> mockCmdList = new List<Action<UserCmd>>();
 #endif
         public UnityUserCmdGenerator()
         {
@@ -41,86 +41,86 @@ namespace Assets.Sources
             this.pitchs = new float[4];
         }
 
-        public void RegisterGlobalKeyReceiver(IGlobalKeyInputMapper inputMapper)
+        public void RegisterGlobalKeyhandler(IGlobalKeyInputMapper inputMapper)
         {
-            _inputMapperList.Add(inputMapper);
+            inputMapperList.Add(inputMapper);
         }
 
         //这里所有的操作层级都设置为Env，如果有特殊遮挡需求请修改层级并修改这段注释
-        public void BeginReceiveUserInput(GameInputManager manager)
+        public void BeginReceiveUserInput(UserInputManager.Lib.UserInputManager manager)
         {
-            _userInputManager = manager;
-            #region Env keyreceiver
+            userInputManager = manager;
+            #region Env keyhandler
 
             // 有UI打开的情况下，不能开枪, 不能瞄准
-            _specialKeyReceiver = new KeyReceiver(UiConstant.specicalCmdKeyLayer, BlockType.None,"specicalCmd");
-            for(int i = 0; i < _inputMapperList.Count; i++)
+            _specialKeyHandler = new KeyHandler(UiConstant.specicalCmdKeyLayer, BlockType.None);
+            for(int i = 0; i < inputMapperList.Count; i++)
             {
-                _inputMapperList[i].RegisterSpecialCmdKeyInput(_specialKeyReceiver, _userCmd);
+                inputMapperList[i].RegisterSpecialCmdKeyInput(_specialKeyHandler, userCmd);
             }
-            _specialKeyReceiver.BindKeyAction(UserInputKey.Fire, (data) => _userCmd.IsLeftAttack = true);
-            _specialKeyReceiver.BindKeyAction(UserInputKey.RightAttack, (data) => _userCmd.IsRightAttack = true);
-            _specialKeyReceiver.BindKeyAction(UserInputKey.CameraFocus, (data) => _userCmd.IsCameraFocus = true);
-            _userInputManager.RegisterKeyReceiver(_specialKeyReceiver);
+            _specialKeyHandler.BindKeyAction(UserInputKey.Fire, (data) => userCmd.IsLeftAttack = true);
+            _specialKeyHandler.BindKeyAction(UserInputKey.RightAttack, (data) => userCmd.IsRightAttack = true);
+            _specialKeyHandler.BindKeyAction(UserInputKey.CameraFocus, (data) => userCmd.IsCameraFocus = true);
+            userInputManager.RegisterKeyhandler(_specialKeyHandler);
 
-            _keyReceiver = new KeyReceiver(UiConstant.userCmdKeyLayer, BlockType.None,"userCmdLower");
-            for(int i = 0; i < _inputMapperList.Count; i++)
+            _keyHandler = new KeyHandler(UiConstant.userCmdKeyLayer, BlockType.None);
+            for(int i = 0; i < inputMapperList.Count; i++)
             {
-                _inputMapperList[i].RegisterEnvKeyInput(_keyReceiver, _userCmd);
+                inputMapperList[i].RegisterEnvKeyInput(_keyHandler, userCmd);
             }
-            _keyReceiver.BindKeyAction(UserInputKey.SwitchFireMode, (data) => _userCmd.IsSwitchFireMode = true);
-            _keyReceiver.BindKeyAction(UserInputKey.DrawWeapon, (data) => _userCmd.IsDrawWeapon = true);
-            _keyReceiver.BindKeyAction(UserInputKey.Throwing, (data) => _userCmd.IsThrowing = true);
-            _keyReceiver.BindKeyAction(UserInputKey.FirstPerson, (data) => _userCmd.ChangeCamera = true);
-            _keyReceiver.BindKeyAction(UserInputKey.FreeCamera, (data) => _userCmd.IsCameraFree = true);
-            _keyReceiver.BindKeyAction(UserInputKey.Jump, (data) => _userCmd.IsJump = true);
-            _keyReceiver.BindKeyAction(UserInputKey.Crouch, (data) => _userCmd.IsCrouch = true);
-            _keyReceiver.BindKeyAction(UserInputKey.Prone, (data) => _userCmd.IsProne = true);
-            //_keyReceiver.BindKeyAction(UserInputKey.Injured, (data) => _userCmd.BeState = 2);
-            //_keyReceiver.BindKeyAction(UserInputKey.Swim, (data) => _userCmd.BeState = 1);
-            _keyReceiver.BindKeyAction(UserInputKey.Reload, (data) => _userCmd.IsReload = true);
-            _keyReceiver.BindKeyAction(UserInputKey.PeekLeft, (data) => _userCmd.IsPeekLeft = true);
-            _keyReceiver.BindKeyAction(UserInputKey.PeekRight, (data) => _userCmd.IsPeekRight = true);
-            _keyReceiver.BindKeyAction(UserInputKey.SwitchWeapon, (data) => _userCmd.IsSwitchWeapon = true);
-            _keyReceiver.BindKeyAction(UserInputKey.DropWeapon, (data) => _userCmd.IsDropWeapon = true);
-            _keyReceiver.BindKeyAction(UserInputKey.Switch1, data => _userCmd.SwitchNumber = 1);
-            _keyReceiver.BindKeyAction(UserInputKey.Switch7, data => _userCmd.SwitchNumber = 7);
-            _keyReceiver.BindKeyAction(UserInputKey.IsPDown, data => _userCmd.IsPDown = true);
-            _keyReceiver.BindKeyAction(UserInputKey.IsYDown, data => _userCmd.IsYDown = true);
-            _keyReceiver.BindKeyAction(UserInputKey.AddMark, data => _userCmd.IsAddMark = true);
-            _keyReceiver.BindKeyAction(UserInputKey.BreathHold, data => _userCmd.IsHoldBreath = true);
-            _keyReceiver.BindKeyAction(UserInputKey.SwitchAutoRun, data => _userCmd.IsSwitchAutoRun = true);
-            _keyReceiver.BindKeyAction(UserInputKey.IsCDown, data => _userCmd.IsCDown = true);
-            _keyReceiver.BindKeyAction(UserInputKey.IsSpaceDown, data => _userCmd.IsSpaceDown = true);
-            _keyReceiver.BindKeyAction(UserInputKey.HoldF, data => _userCmd.IsF = true);
-            _keyReceiver.BindKeyAction(UserInputKey.SprayPaint, data => _userCmd.IsSprayPaint = true);
-            _keyReceiver.BindKeyAction(UserInputKey.ScopeIn, data => _userCmd.IsScopeIn = true);
-            _keyReceiver.BindKeyAction(UserInputKey.ScopeOut, data => _userCmd.IsScopeOut = true);
-            _userInputManager.RegisterKeyReceiver(_keyReceiver);
+            _keyHandler.BindKeyAction(UserInputKey.SwitchFireMode, (data) => userCmd.IsSwitchFireMode = true);
+            _keyHandler.BindKeyAction(UserInputKey.DrawWeapon, (data) => userCmd.IsDrawWeapon = true);
+            _keyHandler.BindKeyAction(UserInputKey.Throwing, (data) => userCmd.IsThrowing = true);
+            _keyHandler.BindKeyAction(UserInputKey.FirstPerson, (data) => userCmd.ChangeCamera = true);
+            _keyHandler.BindKeyAction(UserInputKey.FreeCamera, (data) => userCmd.IsCameraFree = true);
+            _keyHandler.BindKeyAction(UserInputKey.Jump, (data) => userCmd.IsJump = true);
+            _keyHandler.BindKeyAction(UserInputKey.Crouch, (data) => userCmd.IsCrouch = true);
+            _keyHandler.BindKeyAction(UserInputKey.Prone, (data) => userCmd.IsProne = true);
+            //keyhandler.AddAction(UserInputKey.Injured, (data) => userCmd.BeState = 2);
+            //keyhandler.AddAction(UserInputKey.Swim, (data) => userCmd.BeState = 1);
+            _keyHandler.BindKeyAction(UserInputKey.Reload, (data) => userCmd.IsReload = true);
+            _keyHandler.BindKeyAction(UserInputKey.PeekLeft, (data) => userCmd.IsPeekLeft = true);
+            _keyHandler.BindKeyAction(UserInputKey.PeekRight, (data) => userCmd.IsPeekRight = true);
+            _keyHandler.BindKeyAction(UserInputKey.SwitchWeapon, (data) => userCmd.IsSwitchWeapon = true);
+            _keyHandler.BindKeyAction(UserInputKey.DropWeapon, (data) => userCmd.IsDropWeapon = true);
+            _keyHandler.BindKeyAction(UserInputKey.Switch1, data => userCmd.SwitchNumber = 1);
+            _keyHandler.BindKeyAction(UserInputKey.Switch7, data => userCmd.SwitchNumber = 7);
+            _keyHandler.BindKeyAction(UserInputKey.IsPDown, data => userCmd.IsPDown = true);
+            _keyHandler.BindKeyAction(UserInputKey.IsYDown, data => userCmd.IsYDown = true);
+            _keyHandler.BindKeyAction(UserInputKey.AddMark, data => userCmd.IsAddMark = true);
+            _keyHandler.BindKeyAction(UserInputKey.BreathHold, data => userCmd.IsHoldBreath = true);
+            _keyHandler.BindKeyAction(UserInputKey.SwitchAutoRun, data => userCmd.IsSwitchAutoRun = true);
+            _keyHandler.BindKeyAction(UserInputKey.IsCDown, data => userCmd.IsCDown = true);
+            _keyHandler.BindKeyAction(UserInputKey.IsSpaceDown, data => userCmd.IsSpaceDown = true);
+            _keyHandler.BindKeyAction(UserInputKey.HoldF, data => userCmd.IsF = true);
+            _keyHandler.BindKeyAction(UserInputKey.SprayPaint, data => userCmd.IsSprayPaint = true);
+            _keyHandler.BindKeyAction(UserInputKey.ScopeIn, data => userCmd.IsScopeIn = true);
+            _keyHandler.BindKeyAction(UserInputKey.ScopeOut, data => userCmd.IsScopeOut = true);
+            userInputManager.RegisterKeyhandler(_keyHandler);
 
             #endregion
-            _bioSpecialKeyReceiver = new KeyReceiver(UiConstant.specicalCmdKeyLayer, BlockType.None);
-            _bioSpecialKeyReceiver.BindKeyAction(UserInputKey.Fire, (data) => _userCmd.IsLeftAttack = true);
-            _bioSpecialKeyReceiver.BindKeyAction(UserInputKey.RightAttack, (data) => _userCmd.IsRightAttack = true);
-            _bioSpecialKeyReceiver.BindKeyAction(UserInputKey.CameraFocus, (data) => _userCmd.IsCameraFocus = true);
+            _bioSpecialKeyHandler = new KeyHandler(UiConstant.specicalCmdKeyLayer, BlockType.None);
+            _bioSpecialKeyHandler.BindKeyAction(UserInputKey.Fire, (data) => userCmd.IsLeftAttack = true);
+            _bioSpecialKeyHandler.BindKeyAction(UserInputKey.RightAttack, (data) => userCmd.IsRightAttack = true);
+            _bioSpecialKeyHandler.BindKeyAction(UserInputKey.CameraFocus, (data) => userCmd.IsCameraFocus = true);
 
-            _bioKeyReceiver = new KeyReceiver(UiConstant.userCmdKeyLayer, BlockType.None);
-            _bioKeyReceiver.BindKeyAction(UserInputKey.Throwing, (data) => _userCmd.IsThrowing = true);
-            _bioKeyReceiver.BindKeyAction(UserInputKey.FreeCamera, (data) => _userCmd.IsCameraFree = true);
-            _bioKeyReceiver.BindKeyAction(UserInputKey.Jump, (data) => _userCmd.IsJump = true);
-            _bioKeyReceiver.BindKeyAction(UserInputKey.Crouch, (data) => _userCmd.IsCrouch = true);
-            _bioKeyReceiver.BindKeyAction(UserInputKey.Prone, (data) => _userCmd.IsProne = true);
-            _bioKeyReceiver.BindKeyAction(UserInputKey.IsPDown, data => _userCmd.IsPDown = true);
-            _bioKeyReceiver.BindKeyAction(UserInputKey.IsYDown, data => _userCmd.IsYDown = true);
-            _bioKeyReceiver.BindKeyAction(UserInputKey.AddMark, data => _userCmd.IsAddMark = true);
-            _bioKeyReceiver.BindKeyAction(UserInputKey.BreathHold, data => _userCmd.IsHoldBreath = true);
-            _bioKeyReceiver.BindKeyAction(UserInputKey.SwitchAutoRun, data => _userCmd.IsSwitchAutoRun = true);
-            _bioKeyReceiver.BindKeyAction(UserInputKey.IsCDown, data => _userCmd.IsCDown = true);
-            _bioKeyReceiver.BindKeyAction(UserInputKey.IsSpaceDown, data => _userCmd.IsSpaceDown = true);
-            _bioKeyReceiver.BindKeyAction(UserInputKey.HoldF, data => _userCmd.IsF = true);
-            _bioKeyReceiver.BindKeyAction(UserInputKey.SprayPaint, data => _userCmd.IsSprayPaint = true);
-            _bioKeyReceiver.BindKeyAction(UserInputKey.ScopeIn, data => _userCmd.IsScopeIn = true);
-            _bioKeyReceiver.BindKeyAction(UserInputKey.ScopeOut, data => _userCmd.IsScopeOut = true);
+            _bioKeyHandler = new KeyHandler(UiConstant.userCmdKeyLayer, BlockType.None);
+            _bioKeyHandler.BindKeyAction(UserInputKey.Throwing, (data) => userCmd.IsThrowing = true);
+            _bioKeyHandler.BindKeyAction(UserInputKey.FreeCamera, (data) => userCmd.IsCameraFree = true);
+            _bioKeyHandler.BindKeyAction(UserInputKey.Jump, (data) => userCmd.IsJump = true);
+            _bioKeyHandler.BindKeyAction(UserInputKey.Crouch, (data) => userCmd.IsCrouch = true);
+            _bioKeyHandler.BindKeyAction(UserInputKey.Prone, (data) => userCmd.IsProne = true);
+            _bioKeyHandler.BindKeyAction(UserInputKey.IsPDown, data => userCmd.IsPDown = true);
+            _bioKeyHandler.BindKeyAction(UserInputKey.IsYDown, data => userCmd.IsYDown = true);
+            _bioKeyHandler.BindKeyAction(UserInputKey.AddMark, data => userCmd.IsAddMark = true);
+            _bioKeyHandler.BindKeyAction(UserInputKey.BreathHold, data => userCmd.IsHoldBreath = true);
+            _bioKeyHandler.BindKeyAction(UserInputKey.SwitchAutoRun, data => userCmd.IsSwitchAutoRun = true);
+            _bioKeyHandler.BindKeyAction(UserInputKey.IsCDown, data => userCmd.IsCDown = true);
+            _bioKeyHandler.BindKeyAction(UserInputKey.IsSpaceDown, data => userCmd.IsSpaceDown = true);
+            _bioKeyHandler.BindKeyAction(UserInputKey.HoldF, data => userCmd.IsF = true);
+            _bioKeyHandler.BindKeyAction(UserInputKey.SprayPaint, data => userCmd.IsSprayPaint = true);
+            _bioKeyHandler.BindKeyAction(UserInputKey.ScopeIn, data => userCmd.IsScopeIn = true);
+            _bioKeyHandler.BindKeyAction(UserInputKey.ScopeOut, data => userCmd.IsScopeOut = true);
             #region bioMain
 
 
@@ -128,28 +128,28 @@ namespace Assets.Sources
 
             #region Ui Keyreciever
 
-            _uiKeyReceiver = new KeyReceiver(UiConstant.userCmdUIKeyLayer, BlockType.None,"UserCmdAUpper");
-            _uiKeyReceiver.BindKeyAction(UserInputKey.MoveHorizontal, (data) => _userCmd.MoveHorizontal = data.Axis);
-            _uiKeyReceiver.BindKeyAction(UserInputKey.MoveVertical, (data) => _userCmd.MoveVertical = data.Axis);
-            _uiKeyReceiver.BindKeyAction(UserInputKey.MoveUpDown, (data) => _userCmd.MoveUpDown = data.Axis);
-            _uiKeyReceiver.BindKeyAction(UserInputKey.Run, (data) => _userCmd.IsRun = true);
-            _uiKeyReceiver.BindKeyAction(UserInputKey.IsTabDown, data => _userCmd.IsTabDown = true);
-            _uiKeyReceiver.BindKeyAction(UserInputKey.SlightWalk, data => _userCmd.IsSlightWalk = true);
-            _userInputManager.RegisterKeyReceiver(_uiKeyReceiver);
+            _uKeyHandler = new KeyHandler(UiConstant.userCmdUIKeyLayer, BlockType.None);
+            _uKeyHandler.BindKeyAction(UserInputKey.MoveHorizontal, (data) => userCmd.MoveHorizontal = data.Axis);
+            _uKeyHandler.BindKeyAction(UserInputKey.MoveVertical, (data) => userCmd.MoveVertical = data.Axis);
+            _uKeyHandler.BindKeyAction(UserInputKey.MoveUpDown, (data) => userCmd.MoveUpDown = data.Axis);
+            _uKeyHandler.BindKeyAction(UserInputKey.Run, (data) => userCmd.IsRun = true);
+            _uKeyHandler.BindKeyAction(UserInputKey.IsTabDown, data => userCmd.IsTabDown = true);
+            _uKeyHandler.BindKeyAction(UserInputKey.SlightWalk, data => userCmd.IsSlightWalk = true);
+            userInputManager.RegisterKeyhandler(_uKeyHandler);
 
             #endregion
 
-#if UNITY_EDITOR
-            foreach (var mockCmd in _mockCmdList)
+#if UNITYEDITOR
+            foreach (var mockCmd in mockCmdList)
             {
-                mockCmd(_userCmd);
+                mockCmd(userCmd);
             }
 #endif
 
-            var pointerReceiver = new PointerReceiver(UiConstant.userCmdPointLayer, BlockType.None);
-            pointerReceiver.BindPointAction(UserInputKey.Yaw, (data) =>
+            var pointerhandler = new PointerKeyHandler(UiConstant.userCmdPointLayer, BlockType.None);
+            pointerhandler.BindPointAction(UserInputKey.Yaw, (keyData) =>
             {
-                var pointerData = data as PointerData;
+                var pointerData = keyData as PointerData;
                 for (int i = 0; i < yaws.Length - 1; i++)
                 {
                     yaws[i] = yaws[i + 1];
@@ -162,18 +162,18 @@ namespace Assets.Sources
                 }
                 total = total / (float) BigMapDebug.SmoothFactor;
                 //Debug.LogFormat("deltaYaw is {0}, deltaTime {1}", total, Time.deltaTime);
-#if UNITY_EDITOR
+#if UNITYEDITOR
                 if (!Cursor.visible)
                 {
-                    _userCmd.DeltaYaw = total;
+                    userCmd.DeltaYaw = total;
                 }
 #else
-                _userCmd.DeltaYaw = total;
+                userCmd.DeltaYaw = total;
 #endif
             });
-            pointerReceiver.BindPointAction(UserInputKey.Pitch, (data) =>
+            pointerhandler.BindPointAction(UserInputKey.Pitch, (keyData) =>
             {
-                var pointerData = data as PointerData;
+                var pointerData = keyData as PointerData;
                 for (int i = 0; i < pitchs.Length - 1; i++)
                 {
                     pitchs[i] = pitchs[i + 1];
@@ -185,51 +185,51 @@ namespace Assets.Sources
                     total = total + pitchs[i];
                 }
                 total = total / (float) BigMapDebug.SmoothFactor;
-#if UNITY_EDITOR
+#if UNITYEDITOR
                 if (!Cursor.visible)
                 {
-                    _userCmd.DeltaPitch = -total;
+                    userCmd.DeltaPitch = -total;
                 }
 #else
-                _userCmd.DeltaPitch = -total;
+                userCmd.DeltaPitch = -total;
 #endif
             });
 
-            _userInputManager.RegisterPointerReceiver(pointerReceiver);
+            userInputManager.RegisterPointerhandler(pointerhandler);
         }
 
         public void StopReceiveUserInput()
         {
-            _userInputManager.UnregisterKeyReceiver(_specialKeyReceiver);
-            _userInputManager.UnregisterKeyReceiver(_uiKeyReceiver);
-            _userInputManager.UnregisterKeyReceiver(_keyReceiver);
-            _userInputManager.UnregisterPointerReceiver(_pointerReceiver);
-            _userInputManager.UnregisterKeyReceiver(_bioKeyReceiver);
+            userInputManager.UnregisterKeyhandler(_specialKeyHandler);
+            userInputManager.UnregisterKeyhandler(_uKeyHandler);
+            userInputManager.UnregisterKeyhandler(_keyHandler);
+            userInputManager.UnregisterPointerhandler(_pointerKeyHandler);
+            userInputManager.UnregisterKeyhandler(_bioKeyHandler);
         }
 
         public void StartReceiveUserInput()
         {
-            _userInputManager.RegisterKeyReceiver(_specialKeyReceiver);
-            _userInputManager.RegisterKeyReceiver(_uiKeyReceiver);
-            _userInputManager.RegisterKeyReceiver(_keyReceiver);
-            _userInputManager.RegisterPointerReceiver(_pointerReceiver);
-            _userInputManager.RegisterKeyReceiver(_bioKeyReceiver);
+            userInputManager.RegisterKeyhandler(_specialKeyHandler);
+            userInputManager.RegisterKeyhandler(_uKeyHandler);
+            userInputManager.RegisterKeyhandler(_keyHandler);
+            userInputManager.RegisterPointerhandler(_pointerKeyHandler);
+            userInputManager.RegisterKeyhandler(_bioKeyHandler);
         }
 
         public void SwitchMode(EModeSwitch mode)
         {
             switch (mode) {
                 case EModeSwitch.Normal:
-                    _userInputManager.RegisterKeyReceiver(_specialKeyReceiver);
-                    _userInputManager.RegisterKeyReceiver(_keyReceiver);
-                    _userInputManager.UnregisterKeyReceiver(_bioSpecialKeyReceiver);
-                    _userInputManager.UnregisterKeyReceiver(_bioKeyReceiver);
+                    userInputManager.RegisterKeyhandler(_specialKeyHandler);
+                    userInputManager.RegisterKeyhandler(_keyHandler);
+                    userInputManager.UnregisterKeyhandler(_bioSpecialKeyHandler);
+                    userInputManager.UnregisterKeyhandler(_bioKeyHandler);
                     break;
                 case EModeSwitch.Bio:
-                    _userInputManager.RegisterKeyReceiver(_bioSpecialKeyReceiver);
-                    _userInputManager.RegisterKeyReceiver(_bioKeyReceiver);
-                    _userInputManager.UnregisterKeyReceiver(_specialKeyReceiver);
-                    _userInputManager.UnregisterKeyReceiver(_keyReceiver);
+                    userInputManager.RegisterKeyhandler(_bioSpecialKeyHandler);
+                    userInputManager.RegisterKeyhandler(_bioKeyHandler);
+                    userInputManager.UnregisterKeyhandler(_specialKeyHandler);
+                    userInputManager.UnregisterKeyhandler(_keyHandler);
                     break;
             }
         }
@@ -238,18 +238,18 @@ namespace Assets.Sources
 
         public UserCmd GenerateUserCmd(IUserCmdOwnAdapter player, int intverval)
         {
-            _logger.DebugFormat("GenerateUserCmd:{0}", MyGameTime.seq);
-            _userCmd.Seq = MyGameTime.seq;
-            _userCmd.FrameInterval = intverval;
-            _userCmd.ChangedSeat = ChangeSeat();
-            _userCmd.ChangeChannel = ChangeChannel();
+            logger.DebugFormat("GenerateUserCmd:{0}", MyGameTime.seq);
+            userCmd.Seq = MyGameTime.seq;
+            userCmd.FrameInterval = intverval;
+            userCmd.ChangedSeat = ChangeSeat();
+            userCmd.ChangeChannel = ChangeChannel();
             var rc = UserCmd.Allocate();
-            _userCmd.CopyTo(rc);
-            _userCmd.Reset();
+            userCmd.CopyTo(rc);
+            userCmd.Reset();
             return rc;
         }
 
-        public void SetLastUserCmd(UserCmd missing_name)
+        public void SetLastUserCmd(UserCmd missingname)
         {
 
         }
@@ -262,14 +262,14 @@ namespace Assets.Sources
         {
             if (null != cb)
             {
-                cb(_userCmd);
+                cb(userCmd);
             }
         }
 
         public void MockUserCmd(Action<UserCmd> cb)
         {
-#if UNITY_EDITOR
-            _mockCmdList.Add(cb);
+#if UNITYEDITOR
+            mockCmdList.Add(cb);
 #endif
         }
 
@@ -332,7 +332,7 @@ namespace Assets.Sources
 
         public UserCmd GetUserCmd()
         {
-            return _userCmd;
+            return userCmd;
         }
     }
 }

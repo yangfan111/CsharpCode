@@ -29,9 +29,9 @@ namespace App.Server.GameModules.GamePlay.free.client
         {
             FreeData fd = (FreeData)player.freeData.FreeData;
 
-            room.FreeArgs.TempUse(PARA_PLAYER_CURRENT, fd);
+            room.ContextsWrapper.FreeArgs.TempUse(PARA_PLAYER_CURRENT, fd);
             eventKey.SetValue(message.Ss[0]);
-            room.FreeArgs.GetDefault().GetParameters().TempUse(eventKey);
+            room.ContextsWrapper.FreeArgs.GetDefault().GetParameters().TempUse(eventKey);
 
             room.GameRule.HandleFreeEvent(room.RoomContexts, player, message);
 
@@ -67,7 +67,7 @@ namespace App.Server.GameModules.GamePlay.free.client
                 }
                 else if (key.StartsWith(ChickenConstant.BagDefault))
                 {
-                    ItemPosition ip = FreeItemManager.GetItemPosition(room.FreeArgs, key, fd.GetFreeInventory().GetInventoryManager());
+                    ItemPosition ip = FreeItemManager.GetItemPosition(room.ContextsWrapper.FreeArgs, key, fd.GetFreeInventory().GetInventoryManager());
                     FreeItemInfo info = FreeItemConfig.GetItemInfo(ip.key.GetKey());
                     if (info.cat == (int)ECategory.WeaponPart)
                     {
@@ -75,12 +75,12 @@ namespace App.Server.GameModules.GamePlay.free.client
                         if (inv != null && inv != ChickenConstant.BagDefault)
                         {
                             ItemInventoryUtil.MovePosition(ip,
-                                fd.GetFreeInventory().GetInventoryManager().GetInventory(inv), 0, 0, room.FreeArgs);
+                                fd.GetFreeInventory().GetInventoryManager().GetInventory(inv), 0, 0, room.ContextsWrapper.FreeArgs);
                         }
                     }
                     else
                     {
-                        FreeItemManager.UseItem(key, fd, room.FreeArgs);
+                        FreeItemManager.UseItem(key, fd, room.ContextsWrapper.FreeArgs);
                     }
                 }
                 // 点击装配好的配件，自动进背包
@@ -96,18 +96,18 @@ namespace App.Server.GameModules.GamePlay.free.client
                         {
                             int[] xy = defaultInventory.GetNextEmptyPosition(ip.GetKey());
                             ItemInventoryUtil.MovePosition(ip,
-                                    defaultInventory, xy[0], xy[1], room.FreeArgs);
+                                    defaultInventory, xy[0], xy[1], room.ContextsWrapper.FreeArgs);
                         }
                     }
                 }
                 else
                 {
-                    FreeItemManager.UseItem(key, fd, room.FreeArgs);
+                    FreeItemManager.UseItem(key, fd, room.ContextsWrapper.FreeArgs);
                 }
             }
 
-            room.FreeArgs.Resume(PARA_PLAYER_CURRENT);
-            room.FreeArgs.GetDefault().GetParameters().Resume(PARA_EVENT_KEY);
+            room.ContextsWrapper.FreeArgs.Resume(PARA_PLAYER_CURRENT);
+            room.ContextsWrapper.FreeArgs.GetDefault().GetParameters().Resume(PARA_EVENT_KEY);
         }
 
         private bool CanChangeBag(ServerRoom room, FreeData fd, string key)
@@ -116,7 +116,7 @@ namespace App.Server.GameModules.GamePlay.free.client
             {
                 SimpleItemInfo info = PickupItemUtil.GetGroundItemInfo(room, fd, key);
 
-                return BagCapacityUtil.CanChangeBag(room.FreeArgs, fd, info.cat, info.id);
+                return BagCapacityUtil.CanChangeBag(room.ContextsWrapper.FreeArgs, fd, info.cat, info.id);
             }
             return true;
         }

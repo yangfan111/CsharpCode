@@ -14,9 +14,9 @@ namespace App.Shared.GameModules.Player
         }
 
       
-        public void ExecuteUserCmd(IUserCmdOwner owner, IUserCmd cmd)
+        public void ExecuteUserCmd(IPlayerUserCmdGetter getter, IUserCmd cmd)
         {
-            PlayerEntity playerEntity = (PlayerEntity)owner.OwnerEntity;
+            PlayerEntity playerEntity = (PlayerEntity)getter.OwnerEntity;
             playerEntity.time.ClientTime += cmd.FrameInterval;
           
         }

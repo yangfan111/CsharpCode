@@ -470,6 +470,7 @@ namespace App.Shared.GameModules.Weapon
         {
             if (IsValid() && ResConfig != null)
             {
+                // WeaponConfigAssy.DefaultParts
                 float upperFov = 0;
                 if (BaseComponent.UpperRail > 0)
                     upperFov = SingletonManager.Get<WeaponPartsConfigManager>().GetConfigById(BaseComponent.UpperRail)
