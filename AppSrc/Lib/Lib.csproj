@@ -8,6 +8,7 @@
     <AssemblyName>Lib</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,13 +55,15 @@
     <Compile Include="lib\Utils\EntityIdGenerator.cs" />
     <Compile Include="lib\Utils\EntityKey.cs" />
     <Compile Include="lib\Utils\ShortIDGenerator.cs" />
+    <Compile Include="lib\Utils\UnityUtil.cs" />
     <Compile Include="lib\Utils\VoyagerUtil.cs" />
     <Compile Include="lib\Utils\WiseUtil.cs" />
+    <Compile Include="lib\VoyagerLib.Basic.cs" />
     <Compile Include="lib\YF.EditorLib.cs" />
     <Compile Include="lib\YF.FileUtil.FS.cs" />
     <Compile Include="lib\YF.FileUtil.PS.cs" />
     <Compile Include="lib\YF.FileUtil.Seri.cs" />
-    <Compile Include="lib\YF.RunLib.cs" />
+    <Compile Include="lib\VoyagerLib.cs" />
     <Compile Include="lib\YF.UtilsSet.cs" />
     <Compile Include="practice\ABTest.cs" />
     <Compile Include="practice\_Serializable.cs" />
